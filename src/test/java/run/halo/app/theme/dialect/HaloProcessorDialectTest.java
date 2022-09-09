@@ -26,6 +26,8 @@ import org.thymeleaf.templateresolver.StringTemplateResolver;
 import org.thymeleaf.templateresource.ITemplateResource;
 import org.thymeleaf.templateresource.StringTemplateResource;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.Post;
+import run.halo.app.extension.Metadata;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.DefaultTemplateEnum;
@@ -113,9 +115,13 @@ class HaloProcessorDialectTest {
         List<Map<String, String>> htmlMetas = new ArrayList<>();
         htmlMetas.add(ImmutableSortedMap.of("name", "post-meta-V1", "content", "post-meta-V1"));
         htmlMetas.add(ImmutableSortedMap.of("name", "post-meta-V2", "content", "post-meta-V2"));
+        Post.PostSpec postSpec = new Post.PostSpec();
+        postSpec.setHtmlMetas(htmlMetas);
+        Metadata metadata = new Metadata();
+        metadata.setName("fake-post");
         PostVo postVo = PostVo.builder()
-            .htmlMetas(htmlMetas)
-            .name("fake-post").build();
+            .spec(postSpec)
+            .metadata(metadata).build();
         when(postFinder.getByName(eq("fake-post"))).thenReturn(postVo);
 
         String result = templateEngine.process("post", context);

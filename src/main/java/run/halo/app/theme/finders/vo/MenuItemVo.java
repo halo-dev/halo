@@ -1,10 +1,11 @@
 package run.halo.app.theme.finders.vo;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 import run.halo.app.core.extension.MenuItem;
+import run.halo.app.extension.MetadataOperator;
 
 /**
  * A value object for {@link MenuItem}.
@@ -13,22 +14,19 @@ import run.halo.app.core.extension.MenuItem;
  * @since 2.0.0
  */
 @Data
+@ToString
 @Builder
 public class MenuItemVo {
 
-    String name;
+    MetadataOperator metadata;
 
-    String parentName;
+    MenuItem.MenuItemSpec spec;
 
-    String displayName;
-
-    String href;
-
-    Integer priority;
-
-    LinkedHashSet<String> childrenNames;
+    MenuItem.MenuItemStatus status;
 
     List<MenuItemVo> children;
+
+    String parentName;
 
     /**
      * Convert {@link MenuItem} to {@link MenuItemVo}.
@@ -39,11 +37,10 @@ public class MenuItemVo {
     public static MenuItemVo from(MenuItem menuItem) {
         MenuItem.MenuItemStatus status = menuItem.getStatus();
         return MenuItemVo.builder()
-            .name(menuItem.getMetadata().getName())
-            .priority(menuItem.getSpec().getPriority())
-            .childrenNames(menuItem.getSpec().getChildren())
-            .displayName(status.getDisplayName())
-            .href(status.getHref())
+            .metadata(menuItem.getMetadata())
+            .spec(menuItem.getSpec())
+            .status(status)
+            .children(List.of())
             .build();
     }
 }

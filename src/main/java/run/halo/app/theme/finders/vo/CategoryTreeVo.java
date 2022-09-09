@@ -1,12 +1,13 @@
 package run.halo.app.theme.finders.vo;
 
 import java.util.List;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 import org.springframework.util.Assert;
 import run.halo.app.core.extension.Category;
+import run.halo.app.extension.MetadataOperator;
 
 /**
  * A tree vo for {@link Category}.
@@ -15,10 +16,16 @@ import run.halo.app.core.extension.Category;
  * @since 2.0.0
  */
 @Data
-@SuperBuilder
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class CategoryTreeVo extends BaseCategoryVo {
+@Builder
+@ToString
+@EqualsAndHashCode
+public class CategoryTreeVo {
+
+    private MetadataOperator metadata;
+
+    private Category.CategorySpec spec;
+
+    private Category.CategoryStatus status;
 
     private List<CategoryTreeVo> children;
 
@@ -33,14 +40,10 @@ public class CategoryTreeVo extends BaseCategoryVo {
     public static CategoryTreeVo from(CategoryVo category) {
         Assert.notNull(category, "The category must not be null");
         return CategoryTreeVo.builder()
-            .name(category.getName())
-            .displayName(category.getDisplayName())
-            .slug(category.getSlug())
-            .description(category.getDescription())
-            .cover(category.getCover())
-            .template(category.getTemplate())
-            .priority(category.getPriority())
-            .permalink(category.getPermalink())
+            .metadata(category.getMetadata())
+            .spec(category.getSpec())
+            .status(category.getStatus())
+            .children(List.of())
             .build();
     }
 }
