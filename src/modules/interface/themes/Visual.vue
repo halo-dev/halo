@@ -6,13 +6,12 @@ import {
   IconSettings,
   IconTablet,
   VButton,
-  VCard,
-  VModal,
   VSpace,
   VTabbar,
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
+import AttachmentSelectorModal from "@/modules/contents/attachments/components/AttachmentSelectorModal.vue";
 import { computed, onMounted, ref, shallowRef } from "vue";
 
 const activeId = ref("general");
@@ -46,19 +45,6 @@ const iframeClasses = computed(() => {
   return "w-96 h-[50rem]";
 });
 
-const attachments = Array.from(new Array(50), (_, index) => index).map(
-  (index) => {
-    return {
-      id: index,
-      name: `attachment-${index}`,
-      url: `https://picsum.photos/1000/700?random=${index}`,
-      size: "1.2MB",
-      type: "image/png",
-      strategy: "本地存储",
-    };
-  }
-);
-
 onMounted(() => {
   window.addEventListener(
     "message",
@@ -72,44 +58,9 @@ onMounted(() => {
 });
 </script>
 <template>
-  <VModal
+  <AttachmentSelectorModal
     v-model:visible="attachmentSelectVisible"
-    :width="1240"
-    title="选择附件"
-  >
-    <div class="w-full">
-      <ul
-        class="grid grid-cols-2 gap-x-2 gap-y-3 sm:grid-cols-3 md:grid-cols-2 xl:grid-cols-8 2xl:grid-cols-8"
-        role="list"
-      >
-        <li
-          v-for="(attachment, index) in attachments"
-          :key="index"
-          class="relative"
-        >
-          <VCard :body-class="['!p-0']">
-            <div
-              class="group aspect-w-10 aspect-h-7 block w-full cursor-pointer overflow-hidden bg-gray-100"
-            >
-              <img
-                :src="attachment.url"
-                alt=""
-                class="pointer-events-none object-cover group-hover:opacity-75"
-              />
-            </div>
-            <p
-              class="pointer-events-none block truncate px-2 py-1 text-sm font-medium text-gray-700"
-            >
-              {{ attachment.name }}
-            </p>
-          </VCard>
-        </li>
-      </ul>
-    </div>
-    <template #footer>
-      <VButton type="secondary">确定</VButton>
-    </template>
-  </VModal>
+  ></AttachmentSelectorModal>
   <div class="flex h-screen">
     <div class="flex-1">
       <div
@@ -151,7 +102,7 @@ onMounted(() => {
         <iframe
           :class="iframeClasses"
           class="border-none transition-all duration-300"
-          src="https://halo.run"
+          src="http://localhost:8090"
         ></iframe>
       </div>
     </div>
