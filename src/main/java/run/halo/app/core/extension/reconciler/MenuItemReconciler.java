@@ -8,6 +8,7 @@ import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.MenuItem.MenuItemSpec;
 import run.halo.app.core.extension.MenuItem.MenuItemStatus;
 import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.SinglePage;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Ref;
@@ -35,9 +36,8 @@ public class MenuItemReconciler implements Reconciler<Request> {
                 return handleCategoryRef(request.name(), status, spec.getCategoryRef());
             } else if (spec.getTagRef() != null) {
                 return handleTagRef(request.name(), status, spec.getTagRef());
-            } else if (spec.getPageRef() != null) {
-                // TODO resolve permalink from page. At present, we don't have Page extension.
-                return new Result(false, null);
+            } else if (spec.getSinglePageRef() != null) {
+                return handleSinglePageSpec(request.name(), status, spec.getSinglePageRef());
             } else if (spec.getPostRef() != null) {
                 return handlePostRef(request.name(), status, spec.getPostRef());
             } else {
@@ -74,6 +74,18 @@ public class MenuItemReconciler implements Reconciler<Request> {
             .ifPresent(post -> {
                 status.setHref(post.getStatus().getPermalink());
                 status.setDisplayName(post.getSpec().getTitle());
+                updateStatus(menuItemName, status);
+            });
+        return new Result(true, Duration.ofMinutes(1));
+    }
+
+    private Result handleSinglePageSpec(String menuItemName, MenuItemStatus status, Ref pageRef) {
+        client.fetch(SinglePage.class, pageRef.getName())
+            .filter(page -> page.getStatus() != null)
+            .filter(page -> StringUtils.hasText(page.getStatus().getPermalink()))
+            .ifPresent(page -> {
+                status.setHref(page.getStatus().getPermalink());
+                status.setDisplayName(page.getSpec().getTitle());
                 updateStatus(menuItemName, status);
             });
         return new Result(true, Duration.ofMinutes(1));

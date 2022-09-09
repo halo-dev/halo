@@ -18,6 +18,8 @@ import run.halo.app.core.extension.Post;
 @EqualsAndHashCode(callSuper = true)
 public class PostVo extends BasePostVo {
 
+    ContentVo content;
+
     List<CategoryVo> categories;
 
     List<TagVo> tags;
@@ -53,6 +55,7 @@ public class PostVo extends BasePostVo {
             .permalink(postStatus.getPermalink())
             .excerpt(postStatus.getExcerpt())
             .contributors(List.of())
+            .content(new ContentVo(null, null))
             .build();
     }
 }

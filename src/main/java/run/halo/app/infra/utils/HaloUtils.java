@@ -3,6 +3,7 @@ package run.halo.app.infra.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StreamUtils;
 
@@ -10,6 +11,7 @@ import org.springframework.util.StreamUtils;
  * @author guqing
  * @date 2022-04-12
  */
+@Slf4j
 public class HaloUtils {
 
     /**
@@ -28,4 +30,5 @@ public class HaloUtils {
                     location), e);
         }
     }
+
 }

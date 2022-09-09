@@ -49,8 +49,8 @@ public class MenuItem extends AbstractExtension {
         @Schema(description = "Post reference.")
         private Ref postRef;
 
-        @Schema(description = "Page reference.")
-        private Ref pageRef;
+        @Schema(description = "SinglePage reference.")
+        private Ref singlePageRef;
 
     }
 
