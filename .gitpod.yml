@@ -1,14 +1,15 @@
 ports:
-  - port: 8080
+  - port: 3000
     onOpen: open-browser
 
 tasks:
-  - init: npm install -g pnpm && pnpm install
-    command: pnpm serve
+  - init: npm install -g pnpm && pnpm install && pnpm build:packages
+    command: pnpm dev
 
 vscode:
   extensions:
     - dbaeumer.vscode-eslint
     - editorconfig.editorconfig
     - esbenp.prettier-vscode
-    - johnsoncodehk.volar
+    - vue.volar
+    - vue.vscode-typescript-vue-plugin
