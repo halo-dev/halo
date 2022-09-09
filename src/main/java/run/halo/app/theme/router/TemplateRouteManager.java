@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -35,13 +36,13 @@ public class TemplateRouteManager implements ApplicationListener<ApplicationRead
     private final ReentrantReadWriteLock.WriteLock writeLock =
         new ReentrantReadWriteLock().writeLock();
     private final Map<String, RouterFunction<ServerResponse>> routerFunctionMap = new HashMap<>();
-    private final PermalinkIndexer permalinkIndexer;
     private final PermalinkPatternProvider permalinkPatternProvider;
+    private final ApplicationContext applicationContext;
 
-    public TemplateRouteManager(PermalinkIndexer permalinkIndexer,
-        PermalinkPatternProvider permalinkPatternProvider) {
-        this.permalinkIndexer = permalinkIndexer;
+    public TemplateRouteManager(PermalinkPatternProvider permalinkPatternProvider,
+        ApplicationContext applicationContext) {
         this.permalinkPatternProvider = permalinkPatternProvider;
+        this.applicationContext = applicationContext;
     }
 
     public Map<String, RouterFunction<ServerResponse>> getRouterFunctionMap() {
@@ -85,6 +86,9 @@ public class TemplateRouteManager implements ApplicationListener<ApplicationRead
         String pattern = getPatternByTemplateName(templateName);
         RouterFunction<ServerResponse> routeFunction = templateRouterStrategy(templateName)
             .getRouteFunction(templateName, pattern);
+        if (routeFunction == null) {
+            throw new IllegalStateException("Router function must not be null");
+        }
         writeLock.lock();
         try {
             routerFunctionMap.put(templateName, routeFunction);
@@ -106,15 +110,16 @@ public class TemplateRouteManager implements ApplicationListener<ApplicationRead
         if (value == null) {
             throw new NotFoundException("Unknown template: " + template);
         }
+
         return switch (value) {
-            case INDEX -> new IndexRouteStrategy();
-            case POST -> new PostRouteStrategy(permalinkIndexer);
-            case ARCHIVES -> new ArchivesRouteStrategy();
-            case TAGS -> new TagsRouteStrategy();
-            case TAG -> new TagRouteStrategy(permalinkIndexer);
-            case CATEGORIES -> new CategoriesRouteStrategy();
-            case CATEGORY -> new CategoryRouteStrategy(permalinkIndexer);
-            case SINGLE_PAGE -> new SinglePageRouteStrategy(permalinkIndexer);
+            case INDEX -> applicationContext.getBean(IndexRouteStrategy.class);
+            case POST -> applicationContext.getBean(PostRouteStrategy.class);
+            case ARCHIVES -> applicationContext.getBean(ArchivesRouteStrategy.class);
+            case TAGS -> applicationContext.getBean(TagsRouteStrategy.class);
+            case TAG -> applicationContext.getBean(TagRouteStrategy.class);
+            case CATEGORIES -> applicationContext.getBean(CategoriesRouteStrategy.class);
+            case CATEGORY -> applicationContext.getBean(CategoryRouteStrategy.class);
+            case SINGLE_PAGE -> applicationContext.getBean(SinglePageRouteStrategy.class);
         };
     }
 

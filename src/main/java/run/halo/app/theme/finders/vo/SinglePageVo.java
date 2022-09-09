@@ -20,6 +20,8 @@ import run.halo.app.core.extension.SinglePage;
 @EqualsAndHashCode(callSuper = true)
 public class SinglePageVo extends BasePostVo {
 
+    ContentVo content;
+
     /**
      * Convert {@link SinglePage} to {@link SinglePageVo}.
      *
@@ -49,6 +51,7 @@ public class SinglePageVo extends BasePostVo {
             .permalink(pageStatus.getPermalink())
             .excerpt(pageStatus.getExcerpt())
             .contributors(List.of())
+            .content(new ContentVo(null, null))
             .build();
     }
 }

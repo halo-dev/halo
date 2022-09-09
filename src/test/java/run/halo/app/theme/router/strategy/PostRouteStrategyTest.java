@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -18,10 +19,13 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
+import run.halo.app.content.TestPost;
 import run.halo.app.content.permalinks.ExtensionLocator;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.finders.PostFinder;
+import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.router.PermalinkIndexer;
 
 /**
@@ -39,11 +43,15 @@ class PostRouteStrategyTest {
     @Mock
     private PermalinkIndexer permalinkIndexer;
 
+    @Mock
+    private PostFinder postFinder;
+
+    @InjectMocks
     private PostRouteStrategy postRouteStrategy;
 
     @BeforeEach
     void setUp() {
-        postRouteStrategy = new PostRouteStrategy(permalinkIndexer);
+        lenient().when(postFinder.getByName(any())).thenReturn(PostVo.from(TestPost.postV1()));
     }
 
     @Test

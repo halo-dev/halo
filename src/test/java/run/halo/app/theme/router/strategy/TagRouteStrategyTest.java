@@ -1,13 +1,16 @@
 package run.halo.app.theme.router.strategy;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -17,7 +20,9 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
+import run.halo.app.extension.ListResult;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.router.PermalinkIndexer;
 
 /**
@@ -31,15 +36,18 @@ class TagRouteStrategyTest {
 
     @Mock
     private PermalinkIndexer permalinkIndexer;
-
+    @Mock
+    private PostFinder postFinder;
     @Mock
     private ViewResolver viewResolver;
 
+    @InjectMocks
     private TagRouteStrategy tagRouteStrategy;
 
     @BeforeEach
     void setUp() {
-        tagRouteStrategy = new TagRouteStrategy(permalinkIndexer);
+        lenient().when(postFinder.listByTag(anyInt(), anyInt(), any()))
+            .thenReturn(new ListResult<>(1, 10, 0, List.of()));
         when(permalinkIndexer.getSlugs(any()))
             .thenReturn(List.of("fake-slug"));
         when(permalinkIndexer.getNameBySlug(any(), eq("fake-slug")))

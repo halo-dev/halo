@@ -2,19 +2,30 @@ package run.halo.app.theme.router.strategy;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
+import static run.halo.app.theme.router.TemplateRouterStrategy.PageUrlUtils.pageNum;
+import static run.halo.app.theme.router.TemplateRouterStrategy.PageUrlUtils.totalPage;
 
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.finders.PostFinder;
+import run.halo.app.theme.finders.TagFinder;
+import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.finders.vo.TagVo;
 import run.halo.app.theme.router.PermalinkIndexer;
 import run.halo.app.theme.router.TemplateRouterStrategy;
+import run.halo.app.theme.router.UrlContextListResult;
 
 /**
  * The {@link TagRouteStrategy} for generate {@link RouterFunction} specific to the template
@@ -23,12 +34,19 @@ import run.halo.app.theme.router.TemplateRouterStrategy;
  * @author guqing
  * @since 2.0.0
  */
+@Component
 public class TagRouteStrategy implements TemplateRouterStrategy {
 
     private final PermalinkIndexer permalinkIndexer;
+    private final PostFinder postFinder;
 
-    public TagRouteStrategy(PermalinkIndexer permalinkIndexer) {
+    private final TagFinder tagFinder;
+
+    public TagRouteStrategy(PermalinkIndexer permalinkIndexer, PostFinder postFinder,
+        TagFinder tagFinder) {
         this.permalinkIndexer = permalinkIndexer;
+        this.postFinder = postFinder;
+        this.tagFinder = tagFinder;
     }
 
     @Override
@@ -46,7 +64,27 @@ public class TagRouteStrategy implements TemplateRouterStrategy {
                     }
                     String name = permalinkIndexer.getNameBySlug(gvk, slug);
                     return ServerResponse.ok()
-                        .render(DefaultTemplateEnum.TAG.getValue(), Map.of("name", name));
+                        .render(DefaultTemplateEnum.TAG.getValue(),
+                            Map.of("name", name,
+                                "posts", postList(request, name),
+                                "tag", tagByName(name))
+                        );
                 });
+    }
+
+    private Mono<UrlContextListResult<PostVo>> postList(ServerRequest request, String name) {
+        String path = request.path();
+        return Mono.defer(() -> Mono.just(postFinder.listByTag(pageNum(request), 10, name)))
+            .publishOn(Schedulers.boundedElastic())
+            .map(list -> new UrlContextListResult.Builder<PostVo>()
+                .listResult(list)
+                .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
+                .prevUrl(PageUrlUtils.prevPageUrl(path))
+                .build());
+    }
+
+    private Mono<TagVo> tagByName(String name) {
+        return Mono.defer(() -> Mono.just(tagFinder.getByName(name)))
+            .publishOn(Schedulers.boundedElastic());
     }
 }

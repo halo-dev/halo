@@ -3,6 +3,7 @@ package run.halo.app.theme.finders.vo;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.util.Assert;
 import run.halo.app.core.extension.Category;
@@ -15,6 +16,7 @@ import run.halo.app.core.extension.Category;
  */
 @Data
 @SuperBuilder
+@ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class CategoryTreeVo extends BaseCategoryVo {
 

@@ -2,11 +2,14 @@ package run.halo.app.theme.router.strategy;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -17,6 +20,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.finders.CategoryFinder;
 
 /**
  * Tests for {@link CategoriesRouteStrategy}.
@@ -29,11 +33,16 @@ class CategoriesRouteStrategyTest {
     @Mock
     private ViewResolver viewResolver;
 
+    @Mock
+    private CategoryFinder categoryFinder;
+
+    @InjectMocks
     private CategoriesRouteStrategy categoriesRouteStrategy;
 
     @BeforeEach
     void setUp() {
-        categoriesRouteStrategy = new CategoriesRouteStrategy();
+        lenient().when(categoryFinder.listAsTree())
+            .thenReturn(List.of());
     }
 
     @Test

@@ -2,6 +2,7 @@ package run.halo.app.theme.finders.vo;
 
 import java.util.List;
 import lombok.Getter;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 /**
@@ -11,6 +12,7 @@ import lombok.experimental.SuperBuilder;
  * @since 2.0.0
  */
 @Getter
+@ToString
 @SuperBuilder
 public class BaseCategoryVo {
     String name;

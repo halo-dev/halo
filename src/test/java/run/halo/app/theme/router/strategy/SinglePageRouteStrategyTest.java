@@ -1,13 +1,16 @@
 package run.halo.app.theme.router.strategy;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -17,7 +20,9 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
+import run.halo.app.extension.ListResult;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.finders.SinglePageFinder;
 import run.halo.app.theme.router.PermalinkIndexer;
 
 /**
@@ -35,11 +40,16 @@ class SinglePageRouteStrategyTest {
     @Mock
     private ViewResolver viewResolver;
 
+    @Mock
+    private SinglePageFinder singlePageFinder;
+
+    @InjectMocks
     private SinglePageRouteStrategy strategy;
 
     @BeforeEach
     void setUp() {
-        strategy = new SinglePageRouteStrategy(permalinkIndexer);
+        lenient().when(singlePageFinder.list(anyInt(), anyInt()))
+            .thenReturn(new ListResult<>(1, 10, 0, List.of()));
         when(permalinkIndexer.getPermalinks(any()))
             .thenReturn(List.of("/fake-slug"));
         when(permalinkIndexer.getNameBySlug(any(), eq("fake-slug")))
