@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace, VTabItem, VTabs } from "@halo-dev/components";
-import { computed, ref, watchEffect } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 import type { PostRequest } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
@@ -67,7 +67,7 @@ const saving = ref(false);
 const publishing = ref(false);
 const publishCanceling = ref(false);
 
-const { categories } = usePostCategory({ fetchOnMounted: true });
+const { categories, handleFetchCategories } = usePostCategory();
 const categoriesMap = computed(() => {
   return categories.value.map((category) => {
     return {
@@ -77,7 +77,7 @@ const categoriesMap = computed(() => {
   });
 });
 
-const { tags } = usePostTag({ fetchOnMounted: true });
+const { tags, handleFetchTags } = usePostTag();
 const tagsMap = computed(() => {
   return tags.value.map((tag) => {
     return {
@@ -179,6 +179,16 @@ const handlePublishCanceling = async () => {
     publishCanceling.value = false;
   }
 };
+
+watch(
+  () => props.visible,
+  (visible) => {
+    if (visible) {
+      handleFetchCategories();
+      handleFetchTags();
+    }
+  }
+);
 
 watchEffect(() => {
   if (props.post) {

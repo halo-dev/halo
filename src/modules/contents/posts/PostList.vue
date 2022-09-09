@@ -9,6 +9,7 @@ import {
   IconEyeOff,
   IconSettings,
   IconTeam,
+  IconCloseCircle,
   useDialog,
   VButton,
   VCard,
@@ -21,7 +22,14 @@ import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSel
 import PostSettingModal from "./components/PostSettingModal.vue";
 import PostTag from "../posts/tags/components/PostTag.vue";
 import { onMounted, ref, watch, watchEffect } from "vue";
-import type { ListedPostList, Post, PostRequest } from "@halo-dev/api-client";
+import type {
+  User,
+  Category,
+  ListedPostList,
+  Post,
+  PostRequest,
+  Tag,
+} from "@halo-dev/api-client";
 import { apiClient } from "@halo-dev/admin-shared";
 import { formatDatetime } from "@/utils/date";
 import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
@@ -74,10 +82,29 @@ const handleFetchPosts = async () => {
       );
     }
 
+    let categories: string[] | undefined;
+    let tags: string[] | undefined;
+    let contributors: string[] | undefined;
+
+    if (selectedCategoryFilterItem.value) {
+      categories = [selectedCategoryFilterItem.value.metadata.name];
+    }
+
+    if (selectedTagFilterItem.value) {
+      tags = [selectedTagFilterItem.value.metadata.name];
+    }
+
+    if (selectedContributorItem.value) {
+      contributors = [selectedContributorItem.value.metadata.name];
+    }
+
     const { data } = await apiClient.post.listPosts({
       page: posts.value.page,
       size: posts.value.size,
       labelSelector,
+      categories,
+      tags,
+      contributors,
     });
     posts.value = data;
   } catch (e) {
@@ -266,6 +293,9 @@ const PhaseFilterItems: FilterItem[] = [
 
 const selectedVisibleFilterItem = ref<FilterItem>(VisibleFilterItems[0]);
 const selectedPhaseFilterItem = ref<FilterItem>(PhaseFilterItems[0]);
+const selectedCategoryFilterItem = ref<Category>();
+const selectedTagFilterItem = ref<Tag>();
+const selectedContributorItem = ref<User>();
 
 function handleVisibleFilterItemChange(filterItem: FilterItem) {
   selectedVisibleFilterItem.value = filterItem;
@@ -274,6 +304,21 @@ function handleVisibleFilterItemChange(filterItem: FilterItem) {
 
 function handlePhaseFilterItemChange(filterItem: FilterItem) {
   selectedPhaseFilterItem.value = filterItem;
+  handleFetchPosts();
+}
+
+function handleCategoryFilterItemChange(category?: Category) {
+  selectedCategoryFilterItem.value = category;
+  handleFetchPosts();
+}
+
+function handleTagFilterItemChange(tag?: Tag) {
+  selectedTagFilterItem.value = tag;
+  handleFetchPosts();
+}
+
+function handleContributorFilterItemChange(user?: User) {
+  selectedContributorItem.value = user;
   handleFetchPosts();
 }
 </script>
@@ -325,9 +370,76 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
                 @change="handleCheckAllChange"
               />
             </div>
-            <div class="flex w-full flex-1 sm:w-auto">
-              <div v-if="!selectedPostNames.length">
+            <div class="flex w-full flex-1 items-center sm:w-auto">
+              <div
+                v-if="!selectedPostNames.length"
+                class="flex items-center gap-2"
+              >
                 <FormKit placeholder="输入关键词搜索" type="text"></FormKit>
+
+                <div
+                  v-if="selectedPhaseFilterItem.value"
+                  class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                >
+                  <span class="text-xs text-gray-600 group-hover:text-gray-900">
+                    状态：{{ selectedPhaseFilterItem.label }}
+                  </span>
+                  <IconCloseCircle
+                    class="h-4 w-4 text-gray-600"
+                    @click="handlePhaseFilterItemChange(PhaseFilterItems[0])"
+                  />
+                </div>
+                <div
+                  v-if="selectedVisibleFilterItem.value"
+                  class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                >
+                  <span class="text-xs text-gray-600 group-hover:text-gray-900">
+                    可见性：{{ selectedVisibleFilterItem.label }}
+                  </span>
+                  <IconCloseCircle
+                    class="h-4 w-4 text-gray-600"
+                    @click="
+                      handleVisibleFilterItemChange(VisibleFilterItems[0])
+                    "
+                  />
+                </div>
+
+                <div
+                  v-if="selectedCategoryFilterItem"
+                  class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                >
+                  <span class="text-xs text-gray-600 group-hover:text-gray-900">
+                    分类：{{ selectedCategoryFilterItem.spec.displayName }}
+                  </span>
+                  <IconCloseCircle
+                    class="h-4 w-4 text-gray-600"
+                    @click="handleCategoryFilterItemChange()"
+                  />
+                </div>
+                <div
+                  v-if="selectedTagFilterItem"
+                  class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                >
+                  <span class="text-xs text-gray-600 group-hover:text-gray-900">
+                    标签：{{ selectedTagFilterItem.spec.displayName }}
+                  </span>
+                  <IconCloseCircle
+                    class="h-4 w-4 text-gray-600"
+                    @click="handleTagFilterItemChange()"
+                  />
+                </div>
+                <div
+                  v-if="selectedContributorItem"
+                  class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                >
+                  <span class="text-xs text-gray-600 group-hover:text-gray-900">
+                    标签：{{ selectedContributorItem.spec.displayName }}
+                  </span>
+                  <IconCloseCircle
+                    class="h-4 w-4 text-gray-600"
+                    @click="handleContributorFilterItemChange()"
+                  />
+                </div>
               </div>
               <VSpace v-else>
                 <VButton type="default">设置</VButton>
@@ -423,9 +535,15 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
                             v-for="(category, index) in categories"
                             :key="index"
                             v-close-popper
+                            @click="handleCategoryFilterItemChange(category)"
                           >
                             <div
                               class="group relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
+                              :class="{
+                                'bg-gray-100':
+                                  selectedCategoryFilterItem?.metadata.name ===
+                                  category.metadata.name,
+                              }"
                             >
                               <div class="relative flex flex-row items-center">
                                 <div class="flex-1">
@@ -439,7 +557,7 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
                                   </div>
                                   <div class="mt-1 flex">
                                     <span class="text-xs text-gray-500">
-                                      /categories/{{ category.spec.slug }}
+                                      {{ category.status?.permalink }}
                                     </span>
                                   </div>
                                 </div>
@@ -450,7 +568,8 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
                                     <div
                                       class="cursor-pointer text-sm text-gray-500 hover:text-gray-900"
                                     >
-                                      20 篇文章
+                                      {{ category.status?.posts?.length || 0 }}
+                                      篇文章
                                     </div>
                                   </div>
                                 </div>
@@ -489,9 +608,15 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
                             v-for="(tag, index) in tags"
                             :key="index"
                             v-close-popper
+                            @click="handleTagFilterItemChange(tag)"
                           >
                             <div
                               class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
+                              :class="{
+                                'bg-gray-100':
+                                  selectedTagFilterItem?.metadata.name ===
+                                  tag.metadata.name,
+                              }"
                             >
                               <div class="relative flex flex-row items-center">
                                 <div class="flex-1">
@@ -500,7 +625,7 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
                                   </div>
                                   <div class="mt-1 flex">
                                     <span class="text-xs text-gray-500">
-                                      /tags/{{ tag.spec.slug }}
+                                      {{ tag.status?.permalink }}
                                     </span>
                                   </div>
                                 </div>
@@ -511,7 +636,8 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
                                     <div
                                       class="cursor-pointer text-sm text-gray-500 hover:text-gray-900"
                                     >
-                                      20 篇文章
+                                      {{ tag.status?.posts?.length || 0 }}
+                                      篇文章
                                     </div>
                                   </div>
                                 </div>
@@ -523,7 +649,10 @@ function handlePhaseFilterItemChange(filterItem: FilterItem) {
                     </div>
                   </template>
                 </FloatingDropdown>
-                <UserDropdownSelector>
+                <UserDropdownSelector
+                  v-model:selected="selectedContributorItem"
+                  @select="handleContributorFilterItemChange"
+                >
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
