@@ -7,6 +7,7 @@ import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@halo-dev/admin-shared";
 import { reset, submitForm } from "@formkit/core";
 import { useMagicKeys } from "@vueuse/core";
+import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
   defineProps<{
@@ -95,7 +96,9 @@ watchEffect(() => {
 watch(
   () => props.visible,
   (visible) => {
-    if (!visible) {
+    if (visible) {
+      setFocus("displayNameInput");
+    } else {
       handleResetForm();
     }
   }
@@ -119,8 +122,14 @@ watch(
     :width="500"
     @update:visible="onVisibleChange"
   >
-    <FormKit id="attachment-group-form" type="form" @submit="handleSave">
+    <FormKit
+      id="attachment-group-form"
+      :config="{ validationVisibility: 'submit' }"
+      type="form"
+      @submit="handleSave"
+    >
       <FormKit
+        id="displayNameInput"
         v-model="formState.spec.displayName"
         label="名称"
         type="text"

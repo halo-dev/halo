@@ -15,7 +15,6 @@ import {
 } from "@halo-dev/components";
 
 // libs
-import { v4 as uuid } from "uuid";
 import YAML from "yaml";
 import cloneDeep from "lodash.clonedeep";
 import { useMagicKeys } from "@vueuse/core";
@@ -27,6 +26,7 @@ import { rbacAnnotations } from "@/constants/annotations";
 // hooks
 import { useFetchRole } from "@/modules/system/roles/composables/use-role";
 import type { FormKitOptionsList } from "@formkit/inputs";
+import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
   defineProps<{
@@ -44,41 +44,32 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-interface FormState {
-  user: User;
-  saving: boolean;
-  rawMode: boolean;
-  raw: string;
-}
-
-const initialFormState: FormState = {
-  user: {
-    spec: {
-      displayName: "",
-      avatar: "",
-      email: "",
-      phone: "",
-      password: "",
-      bio: "",
-      disabled: false,
-      loginHistoryLimit: 0,
-    },
-    apiVersion: "v1alpha1",
-    kind: "User",
-    metadata: {
-      name: uuid(),
-    },
+const initialFormState: User = {
+  spec: {
+    displayName: "",
+    avatar: "",
+    email: "",
+    phone: "",
+    password: "",
+    bio: "",
+    disabled: false,
+    loginHistoryLimit: 0,
   },
-  saving: false,
-  rawMode: false,
-  raw: "",
+  apiVersion: "v1alpha1",
+  kind: "User",
+  metadata: {
+    name: "",
+  },
 };
 
-const formState = ref<FormState>(cloneDeep(initialFormState));
+const formState = ref<User>(cloneDeep(initialFormState));
+const saving = ref(false);
+const rawMode = ref(false);
+const raw = ref("");
 const selectedRole = ref("");
 
 const isUpdateMode = computed(() => {
-  return !!formState.value.user.metadata.creationTimestamp;
+  return !!formState.value.metadata.creationTimestamp;
 });
 
 const creationModalTitle = computed(() => {
@@ -86,7 +77,7 @@ const creationModalTitle = computed(() => {
 });
 
 const modalWidth = computed(() => {
-  return formState.value.rawMode ? 800 : 700;
+  return rawMode.value ? 800 : 700;
 });
 
 const { roles } = useFetchRole();
@@ -112,7 +103,9 @@ watchEffect(() => {
 watch(
   () => props.visible,
   (visible) => {
-    if (!visible) {
+    if (visible) {
+      setFocus(isUpdateMode.value ? "displayNameInput" : "userNameInput");
+    } else {
       handleResetForm();
     }
   }
@@ -122,7 +115,7 @@ watch(
   () => props.user,
   (user) => {
     if (user) {
-      formState.value.user = cloneDeep(user);
+      formState.value = cloneDeep(user);
     } else {
       handleResetForm();
     }
@@ -138,24 +131,23 @@ const onVisibleChange = (visible: boolean) => {
 
 const handleResetForm = () => {
   formState.value = cloneDeep(initialFormState);
-  formState.value.user.metadata.name = uuid();
   reset("user-form");
 };
 
 const handleCreateUser = async () => {
   try {
-    formState.value.saving = true;
+    saving.value = true;
     let user: User;
 
     if (isUpdateMode.value) {
       const response = await apiClient.extension.user.updatev1alpha1User({
-        name: formState.value.user.metadata.name,
-        user: formState.value.user,
+        name: formState.value.metadata.name,
+        user: formState.value,
       });
       user = response.data;
     } else {
       const response = await apiClient.extension.user.createv1alpha1User({
-        user: formState.value.user,
+        user: formState.value,
       });
       user = response.data;
     }
@@ -173,17 +165,17 @@ const handleCreateUser = async () => {
   } catch (e) {
     console.error(e);
   } finally {
-    formState.value.saving = false;
+    saving.value = false;
   }
 };
 
 const handleRawModeChange = () => {
-  formState.value.rawMode = !formState.value.rawMode;
+  rawMode.value = !rawMode.value;
 
-  if (formState.value.rawMode) {
-    formState.value.raw = YAML.stringify(formState.value.user);
+  if (rawMode.value) {
+    raw.value = YAML.stringify(formState.value);
   } else {
-    formState.value.user = YAML.parse(formState.value.raw);
+    formState.value = YAML.parse(raw.value);
   }
 };
 </script>
@@ -196,35 +188,37 @@ const handleRawModeChange = () => {
   >
     <template #actions>
       <div class="modal-header-action" @click="handleRawModeChange">
-        <IconCodeBoxLine v-if="!formState.rawMode" />
+        <IconCodeBoxLine v-if="!rawMode" />
         <IconEye v-else />
       </div>
     </template>
 
-    <VCodemirror
-      v-show="formState.rawMode"
-      v-model="formState.raw"
-      height="50vh"
-      language="yaml"
-    />
+    <VCodemirror v-show="rawMode" v-model="raw" height="50vh" language="yaml" />
 
-    <div v-show="!formState.rawMode">
-      <FormKit id="user-form" type="form" @submit="handleCreateUser">
+    <div v-show="!rawMode">
+      <FormKit
+        id="user-form"
+        :config="{ validationVisibility: 'submit' }"
+        type="form"
+        @submit="handleCreateUser"
+      >
         <FormKit
-          v-model="formState.user.metadata.name"
+          id="userNameInput"
+          v-model="formState.metadata.name"
           :disabled="isUpdateMode"
           label="用户名"
           type="text"
           validation="required"
         ></FormKit>
         <FormKit
-          v-model="formState.user.spec.displayName"
+          id="displayNameInput"
+          v-model="formState.spec.displayName"
           label="显示名称"
           type="text"
           validation="required"
         ></FormKit>
         <FormKit
-          v-model="formState.user.spec.email"
+          v-model="formState.spec.email"
           label="电子邮箱"
           type="email"
           validation="required"
@@ -236,17 +230,17 @@ const handleRawModeChange = () => {
           type="select"
         ></FormKit>
         <FormKit
-          v-model="formState.user.spec.phone"
+          v-model="formState.spec.phone"
           label="手机号"
           type="text"
         ></FormKit>
         <FormKit
-          v-model="formState.user.spec.avatar"
+          v-model="formState.spec.avatar"
           label="头像"
           type="text"
         ></FormKit>
         <FormKit
-          v-model="formState.user.spec.bio"
+          v-model="formState.spec.bio"
           label="描述"
           type="textarea"
         ></FormKit>
@@ -255,7 +249,7 @@ const handleRawModeChange = () => {
     <template #footer>
       <VSpace>
         <VButton
-          :loading="formState.saving"
+          :loading="saving"
           type="secondary"
           @click="$formkit.submit('user-form')"
         >

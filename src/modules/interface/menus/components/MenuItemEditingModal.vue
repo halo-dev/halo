@@ -9,6 +9,7 @@ import cloneDeep from "lodash.clonedeep";
 import { useMagicKeys } from "@vueuse/core";
 import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
 import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
+import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
   defineProps<{
@@ -114,7 +115,9 @@ watchEffect(() => {
 watch(
   () => props.visible,
   (visible) => {
-    if (!visible) {
+    if (visible) {
+      setFocus("displayNameInput");
+    } else {
       handleResetForm();
     }
   }
@@ -301,7 +304,12 @@ watch(
     title="编辑菜单项"
     @update:visible="onVisibleChange"
   >
-    <FormKit id="menuitem-form" type="form" @submit="handleSaveMenuItem">
+    <FormKit
+      id="menuitem-form"
+      type="form"
+      :config="{ validationVisibility: 'submit' }"
+      @submit="handleSaveMenuItem"
+    >
       <FormKit
         v-model="selectedMenuItemSource"
         :options="menuItemSources"
@@ -314,6 +322,7 @@ watch(
 
       <FormKit
         v-if="selectedMenuItemSource === 'custom'"
+        id="displayNameInput"
         v-model="formState.spec.displayName"
         label="名称"
         type="text"

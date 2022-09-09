@@ -10,6 +10,7 @@ export default definePlugin({
     {
       path: "/settings",
       component: SystemSettingsLayout,
+      redirect: "/settings/basic",
       children: [
         {
           path: ":group",
@@ -25,7 +26,7 @@ export default definePlugin({
       items: [
         {
           name: "设置",
-          path: "/settings/basic",
+          path: "/settings",
           icon: IconSettings,
         },
       ],

@@ -9,7 +9,7 @@ import { useRouter } from "vue-router";
 const props = withDefaults(
   defineProps<{
     tag: Tag;
-    route: boolean;
+    route?: boolean;
   }>(),
   {
     route: false,

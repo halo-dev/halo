@@ -133,7 +133,7 @@ onMounted(async () => {
         </span>
       </div>
       <FloatingDropdown v-if="!readonly">
-        <IconMore />
+        <IconMore @click.stop />
         <template #popper>
           <div class="w-48 p-2">
             <VSpace class="w-full" direction="column">

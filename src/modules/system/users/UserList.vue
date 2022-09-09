@@ -102,14 +102,12 @@ onMounted(() => {
 <template>
   <UserEditingModal
     v-model:visible="editingModal"
-    v-permission="['system:users:manage']"
     :user="selectedUser"
     @close="onEditingModalClose"
   />
 
   <UserPasswordChangeModal
     v-model:visible="passwordChangeModal"
-    v-permission="['system:users:manage']"
     :user="selectedUser"
     @close="handleFetchUsers"
   />

@@ -12,6 +12,7 @@ import type { Category } from "@halo-dev/api-client";
 // libs
 import cloneDeep from "lodash.clonedeep";
 import { reset, submitForm } from "@formkit/core";
+import { setFocus } from "@/formkit/utils/focus";
 import { useMagicKeys } from "@vueuse/core";
 import { v4 as uuid } from "uuid";
 
@@ -105,7 +106,9 @@ watchEffect(() => {
 watch(
   () => props.visible,
   (visible) => {
-    if (!visible) {
+    if (visible) {
+      setFocus("displayNameInput");
+    } else {
       handleResetForm();
     }
   }
@@ -129,8 +132,14 @@ watch(
     :width="600"
     @update:visible="onVisibleChange"
   >
-    <FormKit id="category-form" type="form" @submit="handleSaveCategory">
+    <FormKit
+      id="category-form"
+      type="form"
+      :config="{ validationVisibility: 'submit' }"
+      @submit="handleSaveCategory"
+    >
       <FormKit
+        id="displayNameInput"
         v-model="formState.spec.displayName"
         label="名称"
         type="text"

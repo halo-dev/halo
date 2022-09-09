@@ -1,9 +1,12 @@
 <script lang="ts" setup>
-import { IconSave, VButton, VModal } from "@halo-dev/components";
-import { inject, ref } from "vue";
+import { VButton, VModal, VSpace } from "@halo-dev/components";
+import { inject, ref, watch, watchEffect } from "vue";
 import type { User } from "@halo-dev/api-client";
 import { apiClient } from "@halo-dev/admin-shared";
 import cloneDeep from "lodash.clonedeep";
+import { reset, submitForm } from "@formkit/core";
+import { useMagicKeys } from "@vueuse/core";
+import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
   defineProps<{
@@ -24,35 +27,54 @@ const emit = defineEmits<{
 const currentUser = inject<User>("currentUser");
 
 interface PasswordChangeFormState {
-  state: {
-    password: string;
-    password_confirm?: string;
-  };
-  submitting: boolean;
+  password: string;
+  password_confirm?: string;
 }
 
-const formState = ref<PasswordChangeFormState>({
-  state: {
-    password: "",
-    password_confirm: "",
-  },
-  submitting: false,
+const initialFormState: PasswordChangeFormState = {
+  password: "",
+  password_confirm: "",
+};
+
+const formState = ref<PasswordChangeFormState>(cloneDeep(initialFormState));
+const saving = ref(false);
+
+const { Command_Enter } = useMagicKeys();
+
+watchEffect(() => {
+  if (Command_Enter.value && props.visible) {
+    submitForm("password-form");
+  }
 });
 
-const handleVisibleChange = (visible: boolean) => {
+watch(
+  () => props.visible,
+  (visible) => {
+    if (visible) {
+      setFocus("passwordInput");
+    } else {
+      handleResetForm();
+    }
+  }
+);
+
+const onVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
-    formState.value.state.password = "";
-    formState.value.state.password_confirm = "";
     emit("close");
   }
 };
 
+const handleResetForm = () => {
+  formState.value = cloneDeep(initialFormState);
+  reset("password-form");
+};
+
 const handleChangePassword = async () => {
   try {
-    formState.value.submitting = true;
+    saving.value = true;
 
-    const changePasswordRequest = cloneDeep(formState.value.state);
+    const changePasswordRequest = cloneDeep(formState.value);
     delete changePasswordRequest.password_confirm;
 
     if (props.user?.metadata.name === currentUser?.metadata.name) {
@@ -67,11 +89,11 @@ const handleChangePassword = async () => {
       });
     }
 
-    handleVisibleChange(false);
+    onVisibleChange(false);
   } catch (e) {
     console.error(e);
   } finally {
-    formState.value.submitting = false;
+    saving.value = false;
   }
 };
 </script>
@@ -81,16 +103,18 @@ const handleChangePassword = async () => {
     :visible="visible"
     :width="500"
     title="密码修改"
-    @update:visible="handleVisibleChange"
+    @update:visible="onVisibleChange"
   >
     <FormKit
       id="password-form"
-      v-model="formState.state"
+      v-model="formState"
       :actions="false"
       type="form"
+      :config="{ validationVisibility: 'submit' }"
       @submit="handleChangePassword"
     >
       <FormKit
+        id="passwordInput"
         label="新密码"
         name="password"
         type="password"
@@ -104,16 +128,16 @@ const handleChangePassword = async () => {
       ></FormKit>
     </FormKit>
     <template #footer>
-      <VButton
-        :loading="formState.submitting"
-        type="secondary"
-        @click="$formkit.submit('password-form')"
-      >
-        <template #icon>
-          <IconSave class="h-full w-full" />
-        </template>
-        保存
-      </VButton>
+      <VSpace>
+        <VButton
+          :loading="saving"
+          type="secondary"
+          @click="$formkit.submit('password-form')"
+        >
+          提交 ⌘ + ↵
+        </VButton>
+        <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
+      </VSpace>
     </template>
   </VModal>
 </template>

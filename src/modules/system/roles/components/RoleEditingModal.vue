@@ -11,6 +11,7 @@ import cloneDeep from "lodash.clonedeep";
 import { reset, submitForm } from "@formkit/core";
 import { useMagicKeys } from "@vueuse/core";
 import { v4 as uuid } from "uuid";
+import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
   defineProps<{
@@ -60,7 +61,9 @@ watchEffect(() => {
 watch(
   () => props.visible,
   (visible) => {
-    if (!visible) {
+    if (visible) {
+      setFocus("displayNameInput");
+    } else {
       handleResetForm();
     }
   }
@@ -124,9 +127,11 @@ const handleResetForm = () => {
           id="role-form"
           :actions="false"
           type="form"
+          :config="{ validationVisibility: 'submit' }"
           @submit="handleCreateOrUpdateRole"
         >
           <FormKit
+            id="displayNameInput"
             v-model="
               formState.metadata.annotations[rbacAnnotations.DISPLAY_NAME]
             "
@@ -139,6 +144,7 @@ const handleResetForm = () => {
             help="角色别名，用于区分角色，不能重复，创建之后不能修改"
             label="别名"
             type="text"
+            :disabled="isUpdateMode"
             validation="required"
           ></FormKit>
         </FormKit>

@@ -7,6 +7,7 @@ import { apiClient, useSettingForm } from "@halo-dev/admin-shared";
 import { v4 as uuid } from "uuid";
 import { reset, submitForm } from "@formkit/core";
 import { useMagicKeys } from "@vueuse/core";
+import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
   defineProps<{
@@ -135,11 +136,14 @@ watchEffect(() => {
 watch(
   () => props.visible,
   (visible) => {
-    if (!visible) {
-      setTimeout(() => {
+    if (visible) {
+      setFocus("displayNameInput");
+    } else {
+      const timer = setTimeout(() => {
         policyTemplate.value = undefined;
         handleResetForm();
         handleResetSettingForm();
+        clearTimeout(timer);
       }, 100);
     }
   }
@@ -192,9 +196,11 @@ const onVisibleChange = (visible: boolean) => {
       :actions="false"
       :preserve="true"
       type="form"
+      :config="{ validationVisibility: 'submit' }"
       @submit="handleSave"
     >
       <FormKit
+        id="displayNameInput"
         v-model="formState.spec.displayName"
         label="名称"
         type="text"

@@ -2,11 +2,12 @@
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import type { Menu } from "@halo-dev/api-client";
 import { v4 as uuid } from "uuid";
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
 import { reset, submitForm } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
 import { useMagicKeys } from "@vueuse/core";
+import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
   defineProps<{
@@ -73,27 +74,41 @@ const onVisibleChange = (visible: boolean) => {
   }
 };
 
-watch(props, (newVal) => {
-  const { Command_Enter } = useMagicKeys();
-  let keyboardWatcher;
-  if (newVal.visible) {
-    keyboardWatcher = watch(Command_Enter, (v) => {
-      if (v) {
-        submitForm("menu-form");
-      }
-    });
-  } else {
-    keyboardWatcher?.unwatch();
-  }
-
-  if (newVal.visible && props.menu) {
-    formState.value = cloneDeep(props.menu);
-    return;
-  }
+const handleResetForm = () => {
   formState.value = cloneDeep(initialFormState);
   formState.value.metadata.name = uuid();
   reset("menu-form");
+};
+
+const { Command_Enter } = useMagicKeys();
+
+watchEffect(() => {
+  if (Command_Enter.value && props.visible) {
+    submitForm("menu-form");
+  }
 });
+
+watch(
+  () => props.visible,
+  (visible) => {
+    if (visible) {
+      setFocus("displayNameInput");
+    } else {
+      handleResetForm();
+    }
+  }
+);
+
+watch(
+  () => props.menu,
+  (menu) => {
+    if (menu) {
+      formState.value = cloneDeep(menu);
+    } else {
+      handleResetForm();
+    }
+  }
+);
 </script>
 <template>
   <VModal
@@ -106,9 +121,11 @@ watch(props, (newVal) => {
       id="menu-form"
       :classes="{ form: 'w-full' }"
       type="form"
+      :config="{ validationVisibility: 'submit' }"
       @submit="handleCreateMenu"
     >
       <FormKit
+        id="displayNameInput"
         v-model="formState.spec.displayName"
         help="可根据此名称查询菜单项"
         label="菜单名称"
