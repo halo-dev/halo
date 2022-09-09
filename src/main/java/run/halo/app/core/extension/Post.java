@@ -6,6 +6,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -46,6 +48,17 @@ public class Post extends AbstractExtension {
             this.status = new PostStatus();
         }
         return status;
+    }
+
+    @JsonIgnore
+    public boolean isDeleted() {
+        return Objects.equals(true, spec.getDeleted())
+            || getMetadata().getDeletionTimestamp() != null;
+    }
+
+    @JsonIgnore
+    public boolean isPublished() {
+        return Objects.equals(true, spec.getPublished());
     }
 
     @Data
@@ -148,5 +161,15 @@ public class Post extends AbstractExtension {
         PUBLIC,
         INTERNAL,
         PRIVATE
+    }
+
+    @Data
+    @Builder
+    public static class CompactPost {
+        private String name;
+
+        private VisibleEnum visible;
+
+        private Boolean published;
     }
 }

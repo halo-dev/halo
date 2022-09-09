@@ -8,17 +8,23 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
+import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.skyscreamer.jsonassert.JSONAssert;
+import run.halo.app.content.TestPost;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
+import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
+import run.halo.app.infra.utils.JsonUtils;
 
 /**
  * Tests for {@link TagReconciler}.
@@ -48,7 +54,7 @@ class TagReconcilerTest {
 
         tagReconciler.reconcile(new TagReconciler.Request("fake-tag"));
 
-        verify(client, times(2)).update(captor.capture());
+        verify(client, times(3)).update(captor.capture());
         verify(tagPermalinkPolicy, times(1)).onPermalinkAdd(any());
         verify(tagPermalinkPolicy, times(1)).onPermalinkDelete(any());
         Tag capture = captor.getValue();
@@ -57,7 +63,7 @@ class TagReconcilerTest {
         // change slug
         tag.getSpec().setSlug("new-slug");
         tagReconciler.reconcile(new TagReconciler.Request("fake-tag"));
-        verify(client, times(3)).update(captor.capture());
+        verify(client, times(4)).update(captor.capture());
         verify(tagPermalinkPolicy, times(2)).onPermalinkAdd(any());
         verify(tagPermalinkPolicy, times(2)).onPermalinkDelete(any());
         assertThat(capture.getStatus().getPermalink()).isEqualTo("/tags/new-slug");
@@ -78,6 +84,33 @@ class TagReconcilerTest {
         verify(tagPermalinkPolicy, times(0)).permalink(any());
     }
 
+    @Test
+    void reconcileStatusPosts() throws JSONException {
+        Tag tag = tag();
+        when(client.fetch(eq(Tag.class), eq("fake-tag")))
+            .thenReturn(Optional.of(tag));
+        when(client.list(eq(Post.class), any(), any())).thenReturn(posts());
+
+        ArgumentCaptor<Tag> captor = ArgumentCaptor.forClass(Tag.class);
+        tagReconciler.reconcile(new TagReconciler.Request("fake-tag"));
+        verify(client, times(2)).update(captor.capture());
+        List<Tag> allValues = captor.getAllValues();
+        List<Post.CompactPost> posts = allValues.get(1).getStatusOrDefault().getPosts();
+        JSONAssert.assertEquals("""
+                [{
+                    "name": "fake-post-1",
+                    "published": false,
+                    "visible": "PUBLIC"
+                },
+                {
+                    "name": "fake-post-3",
+                    "published": false,
+                    "visible": "PRIVATE"
+                }]
+                """,
+            JsonUtils.objectToJson(posts), true);
+    }
+
     Tag tag() {
         Tag tag = new Tag();
         tag.setMetadata(new Metadata());
@@ -89,4 +122,23 @@ class TagReconcilerTest {
         tag.setStatus(new Tag.TagStatus());
         return tag;
     }
+
+    private List<Post> posts() {
+        Post post1 = TestPost.postV1();
+        post1.getMetadata().setName("fake-post-1");
+        post1.getSpec().setVisible(Post.VisibleEnum.PUBLIC);
+        post1.getSpec().setTags(List.of("fake-tag", "tag-A", "tag-B"));
+
+        Post post2 = TestPost.postV1();
+        post2.getMetadata().setName("fake-post-2");
+        post2.getSpec().setVisible(Post.VisibleEnum.INTERNAL);
+        post2.getSpec().setTags(List.of("tag-A", "tag-C"));
+
+        Post post3 = TestPost.postV1();
+        post3.getMetadata().setName("fake-post-3");
+        post3.getSpec().setVisible(Post.VisibleEnum.PRIVATE);
+        post3.getSpec().setTags(List.of("tag-A", "fake-tag"));
+        return List.of(post1, post2, post3);
+    }
+
 }
