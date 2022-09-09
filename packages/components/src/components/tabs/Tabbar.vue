@@ -68,9 +68,10 @@ const handleChange = (id: number | string) => {
     cursor-pointer
     self-center
     transition-all
-    text-base
+    text-sm
     justify-center
-    gap-2;
+    gap-2
+    h-9;
 
     .tabbar-item-label,
     .tabbar-item-icon {
@@ -88,8 +89,7 @@ const handleChange = (id: number | string) => {
     }
 
     .tabbar-item {
-      @apply h-10
-      px-5
+      @apply px-5
       py-1
       border-b-gray-100;
 
@@ -109,8 +109,7 @@ const handleChange = (id: number | string) => {
     }
 
     .tabbar-item {
-      @apply h-10
-      px-9
+      @apply px-6
       py-1
       opacity-70
       rounded-base;
@@ -137,11 +136,10 @@ const handleChange = (id: number | string) => {
     }
 
     .tabbar-item {
-      @apply h-10
-      px-9
+      @apply px-6
       py-1
       opacity-70
-      rounded-base;
+      rounded-sm;
 
       &.tabbar-item-active {
         @apply bg-white
@@ -164,6 +162,10 @@ const handleChange = (id: number | string) => {
   &.tabbar-direction-column {
     .tabbar-items {
       @apply flex-col;
+    }
+
+    .tabbar-item {
+      width: 100%;
     }
 
     &.tabbar-default {
