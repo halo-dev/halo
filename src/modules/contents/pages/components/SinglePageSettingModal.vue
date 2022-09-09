@@ -82,14 +82,14 @@ const handleSave = async () => {
     formState.value.content.content = formState.value.content.raw;
 
     if (isUpdateMode.value) {
-      const { data } = await apiClient.post.updateDraftSinglePage({
+      const { data } = await apiClient.singlePage.updateDraftSinglePage({
         name: formState.value.page.metadata.name,
         singlePageRequest: formState.value,
       });
       formState.value.page = data;
       emit("saved", formState.value);
     } else {
-      const { data } = await apiClient.post.draftSinglePage({
+      const { data } = await apiClient.singlePage.draftSinglePage({
         singlePageRequest: formState.value,
       });
       formState.value.page = data;
@@ -117,7 +117,7 @@ const handlePublish = async () => {
     formState.value.page = latestData;
 
     // Publish single page
-    const { data } = await apiClient.post.publishSinglePage({
+    const { data } = await apiClient.singlePage.publishSinglePage({
       name: formState.value.page.metadata.name,
     });
     formState.value.page = data;
@@ -136,7 +136,7 @@ const handleCancelPublish = async () => {
     // Update published spec = false
     const singlePageToUpdate = cloneDeep(formState.value);
     singlePageToUpdate.page.spec.published = false;
-    await apiClient.post.updateDraftSinglePage({
+    await apiClient.singlePage.updateDraftSinglePage({
       name: singlePageToUpdate.page.metadata.name,
       singlePageRequest: singlePageToUpdate,
     });

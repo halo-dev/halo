@@ -57,7 +57,7 @@ const checkAll = ref(false);
 const handleFetchSinglePages = async () => {
   try {
     loading.value = true;
-    const { data } = await apiClient.post.listSinglePages({
+    const { data } = await apiClient.singlePage.listSinglePages({
       page: singlePages.value.page,
       size: singlePages.value.size,
     });

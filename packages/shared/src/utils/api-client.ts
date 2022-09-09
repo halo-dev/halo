@@ -2,6 +2,7 @@ import {
   ApiHaloRunV1alpha1ContentApi,
   ApiHaloRunV1alpha1PluginApi,
   ApiHaloRunV1alpha1PostApi,
+  ApiHaloRunV1alpha1SinglePageApi,
   ApiHaloRunV1alpha1ThemeApi,
   ApiHaloRunV1alpha1UserApi,
   ContentHaloRunV1alpha1CategoryApi,
@@ -109,6 +110,7 @@ function setupApiClient(axios: AxiosInstance) {
     plugin: new ApiHaloRunV1alpha1PluginApi(undefined, apiUrl, axios),
     theme: new ApiHaloRunV1alpha1ThemeApi(undefined, apiUrl, axios),
     post: new ApiHaloRunV1alpha1PostApi(undefined, apiUrl, axios),
+    singlePage: new ApiHaloRunV1alpha1SinglePageApi(undefined, apiUrl, axios),
     content: new ApiHaloRunV1alpha1ContentApi(undefined, apiUrl, axios),
   };
 }

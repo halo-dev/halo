@@ -109,13 +109,13 @@ const handleSave = async () => {
     }
 
     if (isUpdateMode.value) {
-      const { data } = await apiClient.post.updateDraftSinglePage({
+      const { data } = await apiClient.singlePage.updateDraftSinglePage({
         name: formState.value.page.metadata.name,
         singlePageRequest: formState.value,
       });
       formState.value.page = data;
     } else {
-      const { data } = await apiClient.post.draftSinglePage({
+      const { data } = await apiClient.singlePage.draftSinglePage({
         singlePageRequest: formState.value,
       });
       formState.value.page = data;
