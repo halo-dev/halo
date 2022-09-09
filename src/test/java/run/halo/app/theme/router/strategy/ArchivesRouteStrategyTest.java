@@ -21,7 +21,7 @@ import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
-import run.halo.app.theme.router.PageResult;
+import run.halo.app.theme.router.UrlContextListResult;
 
 /**
  * Tests for {@link ArchivesRouteStrategy}.
@@ -43,7 +43,7 @@ class ArchivesRouteStrategyTest {
     @BeforeEach
     void setUp() {
         lenient().when(postFinder.list(any(), any())).thenReturn(
-            new PageResult<>(1, 10, 1, List.of(), null, null));
+            new UrlContextListResult<>(1, 10, 1, List.of(), null, null));
     }
 
     @Test

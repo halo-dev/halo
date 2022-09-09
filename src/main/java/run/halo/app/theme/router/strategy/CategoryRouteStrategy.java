@@ -2,6 +2,8 @@ package run.halo.app.theme.router.strategy;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
+import static run.halo.app.theme.router.TemplateRouterStrategy.PageUrlUtils.pageNum;
+import static run.halo.app.theme.router.TemplateRouterStrategy.PageUrlUtils.totalPage;
 
 import java.util.List;
 import java.util.Map;
@@ -21,9 +23,9 @@ import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.CategoryVo;
 import run.halo.app.theme.finders.vo.PostVo;
-import run.halo.app.theme.router.PageResult;
 import run.halo.app.theme.router.PermalinkIndexer;
 import run.halo.app.theme.router.TemplateRouterStrategy;
+import run.halo.app.theme.router.UrlContextListResult;
 
 /**
  * The {@link CategoryRouteStrategy} for generate {@link RouterFunction} specific to the template
@@ -69,11 +71,12 @@ public class CategoryRouteStrategy implements TemplateRouterStrategy {
                 });
     }
 
-    private Mono<PageResult<PostVo>> postListByCategoryName(String name, ServerRequest request) {
+    private Mono<UrlContextListResult<PostVo>> postListByCategoryName(String name,
+        ServerRequest request) {
         String path = request.path();
         return Mono.defer(() -> Mono.just(postFinder.listByCategory(pageNum(request), 10, name)))
             .publishOn(Schedulers.boundedElastic())
-            .map(list -> new PageResult.Builder<PostVo>()
+            .map(list -> new UrlContextListResult.Builder<PostVo>()
                 .listResult(list)
                 .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
                 .prevUrl(PageUrlUtils.prevPageUrl(path))

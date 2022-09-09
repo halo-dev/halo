@@ -20,17 +20,17 @@ public interface TemplateRouterStrategy {
 
     RouterFunction<ServerResponse> getRouteFunction(String template, String pattern);
 
-    default int pageNum(ServerRequest request) {
-        String pageNum = request.pathVariables().get(PageUrlUtils.PAGE_PART);
-        return NumberUtils.toInt(pageNum, 1);
-    }
-
-    default long totalPage(ListResult<?> list) {
-        return (list.getTotal() - 1) / list.getSize() + 1;
-    }
-
     class PageUrlUtils {
         public static final String PAGE_PART = "page";
+
+        public static int pageNum(ServerRequest request) {
+            String pageNum = request.pathVariables().get(PageUrlUtils.PAGE_PART);
+            return NumberUtils.toInt(pageNum, 1);
+        }
+
+        public static long totalPage(ListResult<?> list) {
+            return (list.getTotal() - 1) / list.getSize() + 1;
+        }
 
         /**
          * Gets next page url with path.

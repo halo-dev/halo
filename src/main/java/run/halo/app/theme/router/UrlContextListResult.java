@@ -14,11 +14,11 @@ import run.halo.app.extension.ListResult;
  */
 @Getter
 @ToString(callSuper = true)
-public class PageResult<T> extends ListResult<T> {
+public class UrlContextListResult<T> extends ListResult<T> {
     private final String nextUrl;
     private final String prevUrl;
 
-    public PageResult(int page, int size, long total, List<T> items, String nextUrl,
+    public UrlContextListResult(int page, int size, long total, List<T> items, String nextUrl,
         String prevUrl) {
         super(page, size, total, items);
         this.nextUrl = nextUrl;
@@ -77,8 +77,8 @@ public class PageResult<T> extends ListResult<T> {
             return this;
         }
 
-        public PageResult<T> build() {
-            return new PageResult<>(page, size, total, items, nextUrl, prevUrl);
+        public UrlContextListResult<T> build() {
+            return new UrlContextListResult<>(page, size, total, items, nextUrl, prevUrl);
         }
     }
 }
