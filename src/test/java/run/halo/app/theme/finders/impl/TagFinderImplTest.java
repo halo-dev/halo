@@ -48,21 +48,28 @@ class TagFinderImplTest {
         when(client.fetch(eq(Tag.class), eq("t1")))
             .thenReturn(Mono.just(tag(1)));
         TagVo tagVo = tagFinder.getByName("t1");
+        tagVo.getMetadata().setCreationTimestamp(null);
         JSONAssert.assertEquals("""
                 {
-                    "name": "t1",
-                    "displayName": "displayName-1",
-                    "slug": "slug-1",
-                    "color": "color-1",
-                    "cover": "cover-1",
-                    "permalink": "permalink-1",
-                    "posts": [
-                        "p1",
-                        "p2"
-                    ],
-                    "annotations": {
-                        "K1": "V1"
-                    }
+                     "metadata": {
+                         "name": "t1",
+                         "annotations": {
+                             "K1": "V1"
+                         }
+                     },
+                     "spec": {
+                         "displayName": "displayName-1",
+                         "slug": "slug-1",
+                         "color": "color-1",
+                         "cover": "cover-1"
+                     },
+                     "status": {
+                         "permalink": "permalink-1",
+                         "posts": [
+                             "p1",
+                             "p2"
+                         ]
+                     }
                 }
                 """,
             JsonUtils.objectToJson(tagVo),
@@ -78,7 +85,9 @@ class TagFinderImplTest {
             );
         List<TagVo> tags = tagFinder.listAll();
         assertThat(tags).hasSize(3);
-        assertThat(tags.stream().map(TagVo::getName).collect(Collectors.toList()))
+        assertThat(tags.stream()
+            .map(tag -> tag.getMetadata().getName())
+            .collect(Collectors.toList()))
             .isEqualTo(List.of("t3", "t2", "t1"));
     }
 

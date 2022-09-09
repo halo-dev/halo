@@ -50,20 +50,27 @@ class CategoryFinderImplTest {
         when(client.fetch(eq(Category.class), eq("hello")))
             .thenReturn(Mono.just(category()));
         CategoryVo categoryVo = categoryFinder.getByName("hello");
+        categoryVo.getMetadata().setCreationTimestamp(null);
         JSONAssert.assertEquals("""
                 {
-                    "name": "hello",
-                    "displayName": "displayName-1",
-                    "slug": "slug-1",
-                    "description": "description-1",
-                    "cover": "cover-1",
-                    "template": "template-1",
-                    "priority": 0,
-                    "children": [
-                        "C1",
-                        "C2"
-                    ],
-                    "postCount": 0
+                     "metadata": {
+                         "name": "hello",
+                         "annotations": {
+                             "K1": "V1"
+                         }
+                     },
+                     "spec": {
+                         "displayName": "displayName-1",
+                         "slug": "slug-1",
+                         "description": "description-1",
+                         "cover": "cover-1",
+                         "template": "template-1",
+                         "priority": 0,
+                         "children": [
+                             "C1",
+                             "C2"
+                         ]
+                     }
                 }
                 """,
             JsonUtils.objectToJson(categoryVo),
@@ -80,7 +87,7 @@ class CategoryFinderImplTest {
             .thenReturn(Mono.just(categories));
         ListResult<CategoryVo> list = categoryFinder.list(1, 10);
         assertThat(list.getItems()).hasSize(3);
-        assertThat(list.get().map(CategoryVo::getName).toList())
+        assertThat(list.get().map(categoryVo -> categoryVo.getMetadata().getName()).toList())
             .isEqualTo(List.of("c3", "c2", "hello"));
     }
 

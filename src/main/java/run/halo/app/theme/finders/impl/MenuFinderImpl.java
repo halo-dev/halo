@@ -35,7 +35,7 @@ public class MenuFinderImpl implements MenuFinder {
     @Override
     public MenuVo getByName(String name) {
         return listAsTree().stream()
-            .filter(menu -> menu.getName().equals(name))
+            .filter(menu -> menu.getMetadata().getName().equals(name))
             .findAny()
             .orElse(null);
     }
@@ -63,10 +63,15 @@ public class MenuFinderImpl implements MenuFinder {
         List<MenuItemVo> menuItemVos = populateParentName(listAllMenuItem());
         List<MenuItemVo> treeList = listToTree(menuItemVos);
         Map<String, MenuItemVo> nameItemRootNodeMap = treeList.stream()
-            .collect(Collectors.toMap(MenuItemVo::getName, Function.identity()));
+            .collect(Collectors.toMap(item -> item.getMetadata().getName(), Function.identity()));
+
         return listAll().stream()
             .map(menuVo -> {
-                List<MenuItemVo> menuItems = menuVo.getMenuItemNames().stream()
+                LinkedHashSet<String> menuItemNames = menuVo.getSpec().getMenuItems();
+                if (menuItemNames == null) {
+                    return menuVo.withMenuItems(List.of());
+                }
+                List<MenuItemVo> menuItems = menuItemNames.stream()
                     .map(nameItemRootNodeMap::get)
                     .filter(Objects::nonNull)
                     .toList();
@@ -79,7 +84,7 @@ public class MenuFinderImpl implements MenuFinder {
         Map<String, List<MenuItemVo>> nameIdentityMap = list.stream()
             .filter(item -> item.getParentName() != null)
             .collect(Collectors.groupingBy(MenuItemVo::getParentName));
-        list.forEach(node -> node.setChildren(nameIdentityMap.get(node.getName())));
+        list.forEach(node -> node.setChildren(nameIdentityMap.get(node.getMetadata().getName())));
         // clear map to release memory
         nameIdentityMap.clear();
         return list.stream()
@@ -101,28 +106,30 @@ public class MenuFinderImpl implements MenuFinder {
 
     static List<MenuItemVo> populateParentName(List<MenuItemVo> menuItemVos) {
         Map<String, MenuItemVo> nameIdentityMap = menuItemVos.stream()
-            .collect(Collectors.toMap(MenuItemVo::getName, Function.identity()));
+            .collect(Collectors.toMap(menuItem -> menuItem.getMetadata().getName(),
+                Function.identity()));
 
         Map<String, MenuItemVo> treeVoMap = new HashMap<>();
         // populate parentName
         menuItemVos.forEach(menuItemVo -> {
-            final String parentName = menuItemVo.getName();
+            final String parentName = menuItemVo.getMetadata().getName();
             treeVoMap.putIfAbsent(parentName, menuItemVo);
-            LinkedHashSet<String> children = menuItemVo.getChildrenNames();
+            LinkedHashSet<String> children = menuItemVo.getSpec().getChildren();
             if (CollectionUtils.isEmpty(children)) {
                 return;
             }
             children.forEach(childrenName -> {
                 MenuItemVo childrenVo = nameIdentityMap.get(childrenName);
                 childrenVo.setParentName(parentName);
-                treeVoMap.putIfAbsent(childrenVo.getName(), childrenVo);
+                treeVoMap.putIfAbsent(childrenVo.getMetadata().getName(), childrenVo);
             });
         });
         // clear map to release memory
         nameIdentityMap.clear();
+        Function<MenuItemVo, Integer> priorityCmp = menuItem -> menuItem.getSpec().getPriority();
         return treeVoMap.values()
             .stream()
-            .sorted(Comparator.comparing(MenuItemVo::getPriority))
+            .sorted(Comparator.comparing(priorityCmp))
             .toList();
     }
 }

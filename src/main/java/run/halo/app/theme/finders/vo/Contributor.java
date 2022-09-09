@@ -1,6 +1,7 @@
 package run.halo.app.theme.finders.vo;
 
 import lombok.Builder;
+import lombok.ToString;
 import lombok.Value;
 import run.halo.app.core.extension.User;
 
@@ -11,6 +12,7 @@ import run.halo.app.core.extension.User;
  * @since 2.0.0
  */
 @Value
+@ToString
 @Builder
 public class Contributor {
     String name;
