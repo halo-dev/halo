@@ -211,12 +211,10 @@ onMounted(async () => {
                       </div>
                       <template #popper> 删除中</template>
                     </FloatingTooltip>
-                    <!--TODO: Get post count-->
                     <div
-                      v-if="false"
                       class="cursor-pointer text-sm text-gray-500 hover:text-gray-900"
                     >
-                      20 篇文章
+                      {{ tag.status?.posts?.length || 0 }} 篇文章
                     </div>
                     <time class="text-sm text-gray-500">
                       {{ formatDatetime(tag.metadata.creationTimestamp) }}
