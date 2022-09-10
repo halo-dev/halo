@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
-import { onMounted, type Ref } from "vue";
-import { provide, ref, watch } from "vue";
+import { nextTick, onMounted } from "vue";
+import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 // types
@@ -28,15 +28,10 @@ interface SettingTab {
 const tabs = ref<SettingTab[]>([] as SettingTab[]);
 const activeTab = ref("");
 
-const settingName = ref("system");
-const configMapName = ref("system");
-
 const { settings, handleFetchSettings } = useSettingForm(
-  settingName,
-  configMapName
+  ref("system"),
+  ref("system")
 );
-
-provide<Ref<string | undefined>>("activeTab", activeTab);
 
 const route = useRoute();
 const router = useRouter();
@@ -44,12 +39,14 @@ const router = useRouter();
 const handleTabChange = (id: string) => {
   const tab = tabs.value.find((item) => item.id === id);
   if (tab) {
+    activeTab.value = tab.id;
     router.push(tab.route);
   }
 };
 
 onMounted(async () => {
   await handleFetchSettings();
+
   if (settings.value && settings.value.spec) {
     tabs.value = settings.value.spec.map((item: FormKitSettingSpec) => {
       return {
@@ -63,14 +60,17 @@ onMounted(async () => {
         },
       };
     });
-    onTabChange(route.name as string);
   }
+
+  await nextTick();
+
+  handleTriggerTabChange();
 });
 
-const onTabChange = (routeName: string) => {
+const handleTriggerTabChange = () => {
   const tab = tabs.value.find((tab) => {
     return (
-      tab.route.name === routeName &&
+      tab.route.name === route.name &&
       tab.route.params?.group === route.params.group
     );
   });
@@ -83,12 +83,9 @@ const onTabChange = (routeName: string) => {
   activeTab.value = tabs.value[0].id;
 };
 
-watch(
-  () => route.name,
-  async (newRouteName) => {
-    onTabChange(newRouteName as string);
-  }
-);
+watch([() => route.name, () => route.params], async () => {
+  handleTriggerTabChange();
+});
 </script>
 <template>
   <BasicLayout>
@@ -111,7 +108,18 @@ watch(
         </template>
       </VCard>
       <div>
-        <RouterView :key="activeTab" />
+        <RouterView :key="activeTab" v-slot="{ Component }">
+          <template v-if="Component">
+            <Suspense>
+              <component :is="Component"></component>
+              <template #fallback>
+                <div class="flex h-32 w-full justify-center bg-white">
+                  <span class="text-sm text-gray-600">加载中...</span>
+                </div>
+              </template>
+            </Suspense>
+          </template>
+        </RouterView>
       </div>
     </div>
   </BasicLayout>

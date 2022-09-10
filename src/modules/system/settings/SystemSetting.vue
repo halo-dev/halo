@@ -1,20 +1,16 @@
 <script lang="ts" setup>
 // core libs
-import { computed, inject, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 
 // components
 import { VButton } from "@halo-dev/components";
 
-// types
-import type { Ref } from "vue";
-
 // hooks
 import { useSettingForm } from "@halo-dev/admin-shared";
+import { useRouteParams } from "@vueuse/router";
 
-const group = inject<Ref<string | undefined>>("activeTab");
+const group = useRouteParams<string>("group");
 
-const settingName = ref("system");
-const configMapName = ref("system");
 const {
   settings,
   configMapFormData,
@@ -22,7 +18,7 @@ const {
   handleFetchConfigMap,
   handleFetchSettings,
   handleSaveConfigMap,
-} = useSettingForm(settingName, configMapName);
+} = useSettingForm(ref("system"), ref("system"));
 
 const formSchema = computed(() => {
   if (!settings?.value?.spec) {
@@ -32,10 +28,8 @@ const formSchema = computed(() => {
     ?.formSchema;
 });
 
-onMounted(async () => {
-  await handleFetchSettings();
-  await handleFetchConfigMap();
-});
+await handleFetchSettings();
+await handleFetchConfigMap();
 </script>
 <template>
   <div class="bg-white p-4 sm:px-6">
