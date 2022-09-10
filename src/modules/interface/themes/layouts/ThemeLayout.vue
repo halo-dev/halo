@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
-import type { ComputedRef, Ref } from "vue";
-import { computed, provide, ref, watch, watchEffect } from "vue";
+import { nextTick, type ComputedRef, type Ref } from "vue";
+import { computed, provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 // libs
@@ -48,25 +48,23 @@ const initialTabs: ThemeTab[] = [
 ];
 
 const tabs = ref<ThemeTab[]>(cloneDeep(initialTabs));
-const selectedTheme = ref<Theme>({} as Theme);
+const selectedTheme = ref<Theme | undefined>();
 const themesModal = ref(false);
 const activeTab = ref("");
 
 const { loading, isActivated, activatedTheme, handleActiveTheme } =
   useThemeLifeCycle(selectedTheme);
 
-const settingName = computed(() => selectedTheme.value.spec?.settingName);
-const configMapName = computed(() => selectedTheme.value.spec?.configMapName);
+const settingName = computed(() => selectedTheme.value?.spec.settingName);
+const configMapName = computed(() => selectedTheme.value?.spec.configMapName);
 
 const { settings, handleFetchSettings } = useSettingForm(
   settingName,
   configMapName
 );
 
-provide<Ref<Theme>>("activatedTheme", activatedTheme);
-provide<Ref<Theme>>("selectedTheme", selectedTheme);
+provide<Ref<Theme | undefined>>("selectedTheme", selectedTheme);
 provide<ComputedRef<boolean>>("isActivated", isActivated);
-provide<Ref<string | undefined>>("activeTab", activeTab);
 
 const route = useRoute();
 const router = useRouter();
@@ -74,42 +72,49 @@ const router = useRouter();
 const handleTabChange = (id: string) => {
   const tab = tabs.value.find((item) => item.id === id);
   if (tab) {
+    activeTab.value = tab.id;
     router.push(tab.route);
   }
 };
 
-watchEffect(async () => {
-  if (selectedTheme.value) {
-    // reset tabs
-    tabs.value = cloneDeep(initialTabs);
-    await handleFetchSettings();
+watch(
+  () => selectedTheme.value,
+  async () => {
+    if (selectedTheme.value) {
+      // reset tabs
+      tabs.value = cloneDeep(initialTabs);
+      await handleFetchSettings();
 
-    if (settings.value && settings.value.spec) {
-      tabs.value = [
-        ...tabs.value,
-        ...settings.value.spec.map((item: FormKitSettingSpec) => {
-          return {
-            id: item.group,
-            label: item.label || "",
-            route: {
-              name: "ThemeSetting",
-              params: {
-                group: item.group,
+      if (settings.value && settings.value.spec) {
+        tabs.value = [
+          ...tabs.value,
+          ...settings.value.spec.map((item: FormKitSettingSpec) => {
+            return {
+              id: item.group,
+              label: item.label || "",
+              route: {
+                name: "ThemeSetting",
+                params: {
+                  group: item.group,
+                },
               },
-            },
-          };
-        }),
-      ] as ThemeTab[];
-      onTabChange(route.name as string);
+            };
+          }),
+        ] as ThemeTab[];
+      }
+
+      await nextTick();
+
+      handleTriggerTabChange();
     }
   }
-});
+);
 
-const onTabChange = (routeName: string) => {
-  if (routeName === "ThemeSetting") {
+const handleTriggerTabChange = () => {
+  if (route.name === "ThemeSetting") {
     const tab = tabs.value.find((tab) => {
       return (
-        tab.route.name === routeName &&
+        tab.route.name === route.name &&
         tab.route.params?.group === route.params.group
       );
     });
@@ -117,7 +122,7 @@ const onTabChange = (routeName: string) => {
       activeTab.value = tab.id;
       return;
     }
-    router.push({ name: "ThemeDetail" });
+    handleTabChange(tabs.value[0].id);
     return;
   }
 
@@ -125,12 +130,9 @@ const onTabChange = (routeName: string) => {
   activeTab.value = tab ? tab.id : tabs.value[0].id;
 };
 
-watch(
-  () => route.name,
-  async (newRouteName) => {
-    onTabChange(newRouteName as string);
-  }
-);
+watch([() => route.name, () => route.params], async () => {
+  handleTriggerTabChange();
+});
 </script>
 <template>
   <BasicLayout>
@@ -139,7 +141,7 @@ watch(
       v-model:selected-theme="selectedTheme"
       v-model:visible="themesModal"
     />
-    <VPageHeader :title="selectedTheme.spec?.displayName">
+    <VPageHeader :title="selectedTheme?.spec.displayName">
       <template #icon>
         <IconPalette class="mr-2 self-center" />
       </template>
@@ -171,11 +173,7 @@ watch(
 
     <div class="m-0 md:m-4">
       <VEmpty
-        v-if="
-          !selectedTheme.metadata?.name &&
-          !activatedTheme.metadata?.name &&
-          !loading
-        "
+        v-if="!selectedTheme && !loading"
         message="当前没有已激活或者选择的主题，你可以切换主题或者安装新主题"
         title="当前没有已激活或已选择的主题"
       >
@@ -205,7 +203,18 @@ watch(
           </template>
         </VCard>
         <div>
-          <RouterView :key="activeTab" />
+          <RouterView :key="activeTab" v-slot="{ Component }">
+            <template v-if="Component">
+              <Suspense>
+                <component :is="Component"></component>
+                <template #fallback>
+                  <div class="flex h-32 w-full justify-center bg-white">
+                    <span class="text-sm text-gray-600">加载中...</span>
+                  </div>
+                </template>
+              </Suspense>
+            </template>
+          </RouterView>
         </div>
       </div>
     </div>

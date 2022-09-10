@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { computed, inject, onMounted, ref } from "vue";
+import { computed, inject, watch } from "vue";
 
 // components
 import { VButton } from "@halo-dev/components";
@@ -11,12 +11,15 @@ import type { Theme } from "@halo-dev/api-client";
 
 // hooks
 import { useSettingForm } from "@halo-dev/admin-shared";
+import { useRouteParams } from "@vueuse/router";
 
-const selectedTheme = inject<Ref<Theme>>("selectedTheme", ref({} as Theme));
-const group = inject<Ref<string | undefined>>("activeTab");
+const group = useRouteParams<string>("group");
 
-const settingName = computed(() => selectedTheme.value.spec?.settingName);
-const configMapName = computed(() => selectedTheme.value.spec?.configMapName);
+const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme");
+
+const settingName = computed(() => selectedTheme?.value?.spec.settingName);
+const configMapName = computed(() => selectedTheme?.value?.spec.configMapName);
+
 const {
   settings,
   configMapFormData,
@@ -34,10 +37,16 @@ const formSchema = computed(() => {
     ?.formSchema;
 });
 
-onMounted(() => {
-  handleFetchSettings();
-  handleFetchConfigMap();
-});
+await handleFetchSettings();
+await handleFetchConfigMap();
+
+watch(
+  () => selectedTheme?.value,
+  () => {
+    handleFetchSettings();
+    handleFetchConfigMap();
+  }
+);
 </script>
 <template>
   <div class="bg-white p-4 sm:px-6">

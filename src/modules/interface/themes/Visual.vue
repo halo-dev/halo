@@ -64,7 +64,7 @@ onMounted(() => {
   <div class="flex h-screen">
     <div class="flex-1">
       <div
-        class="grid h-16 grid-cols-2 items-center bg-white py-2 px-4 drop-shadow-sm sm:grid-cols-3"
+        class="grid h-14 grid-cols-2 items-center bg-white px-4 drop-shadow-sm sm:grid-cols-3"
       >
         <div>
           <h2 class="truncate text-xl font-bold text-gray-800">
@@ -80,7 +80,7 @@ onMounted(() => {
         </div>
         <div class="flex justify-end">
           <VSpace>
-            <VButton type="default" @click="settingVisible = true">
+            <VButton size="sm" type="default" @click="settingVisible = true">
               <template #icon>
                 <IconSettings class="h-full w-full" />
               </template>

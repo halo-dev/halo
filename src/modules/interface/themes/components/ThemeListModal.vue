@@ -11,11 +11,11 @@ import {
   VTag,
 } from "@halo-dev/components";
 import ThemeInstallModal from "./ThemeInstallModal.vue";
-import { onMounted, ref } from "vue";
+import { ref, watch } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@halo-dev/admin-shared";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     visible: boolean;
     selectedTheme: Theme | null;
@@ -32,6 +32,7 @@ const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
   (event: "update:selectedTheme", theme: Theme | null): void;
+  (event: "select", theme: Theme | null): void;
 }>();
 
 const themes = ref<Theme[]>([]);
@@ -71,7 +72,7 @@ const handleUninstall = async (theme: Theme) => {
   });
 };
 
-const handleVisibleChange = (visible: boolean) => {
+const onVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
     emit("close");
@@ -80,10 +81,18 @@ const handleVisibleChange = (visible: boolean) => {
 
 const handleSelectTheme = (theme: Theme) => {
   emit("update:selectedTheme", theme);
-  handleVisibleChange(false);
+  emit("select", theme);
+  onVisibleChange(false);
 };
 
-onMounted(handleFetchThemes);
+watch(
+  () => props.visible,
+  (visible) => {
+    if (visible) {
+      handleFetchThemes();
+    }
+  }
+);
 
 defineExpose({
   handleFetchThemes,
@@ -95,7 +104,7 @@ defineExpose({
     :visible="visible"
     :width="888"
     title="已安装的主题"
-    @update:visible="handleVisibleChange"
+    @update:visible="onVisibleChange"
   >
     <VEmpty
       v-if="!themes.length && !loading"
@@ -212,7 +221,7 @@ defineExpose({
         <VButton type="secondary" @click="themeInstall = true">
           安装主题
         </VButton>
-        <VButton @click="handleVisibleChange(false)">关闭</VButton>
+        <VButton @click="onVisibleChange(false)">关闭</VButton>
       </VSpace>
     </template>
   </VModal>

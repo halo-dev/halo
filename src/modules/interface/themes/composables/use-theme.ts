@@ -6,17 +6,19 @@ import { useDialog } from "@halo-dev/components";
 
 interface useThemeLifeCycleReturn {
   loading: Ref<boolean>;
-  activatedTheme: Ref<Theme>;
+  activatedTheme: Ref<Theme | undefined>;
   isActivated: ComputedRef<boolean>;
   handleActiveTheme: () => void;
 }
 
-export function useThemeLifeCycle(theme: Ref<Theme>): useThemeLifeCycleReturn {
-  const activatedTheme = ref<Theme>({} as Theme);
+export function useThemeLifeCycle(
+  theme: Ref<Theme | undefined>
+): useThemeLifeCycleReturn {
+  const activatedTheme = ref<Theme | undefined>();
   const loading = ref(false);
 
   const isActivated = computed(() => {
-    return activatedTheme.value?.metadata?.name === theme.value?.metadata?.name;
+    return activatedTheme.value?.metadata.name === theme.value?.metadata.name;
   });
 
   const dialog = useDialog();
@@ -54,7 +56,7 @@ export function useThemeLifeCycle(theme: Ref<Theme>): useThemeLifeCycleReturn {
   const handleActiveTheme = async () => {
     dialog.info({
       title: "是否确认启用当前主题",
-      description: theme.value.spec.displayName,
+      description: theme.value?.spec.displayName,
       onConfirm: async () => {
         try {
           const { data: systemConfigMap } =
@@ -66,7 +68,7 @@ export function useThemeLifeCycle(theme: Ref<Theme>): useThemeLifeCycleReturn {
             const themeConfigToUpdate = JSON.parse(
               systemConfigMap.data?.theme || "{}"
             );
-            themeConfigToUpdate.active = theme.value?.metadata?.name;
+            themeConfigToUpdate.active = theme.value?.metadata.name;
             systemConfigMap.data["theme"] = JSON.stringify(themeConfigToUpdate);
 
             await apiClient.extension.configMap.updatev1alpha1ConfigMap({
