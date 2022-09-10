@@ -1,5 +1,5 @@
 <script lang="ts" name="RecentLoginWidget" setup>
-import { VCard } from "@halo-dev/components";
+import { VCard, VAvatar } from "@halo-dev/components";
 import { useUserFetch } from "@/modules/system/users/composables/use-user";
 
 const { users } = useUserFetch({ fetchOnMounted: true });
@@ -18,11 +18,11 @@ const { users } = useUserFetch({ fetchOnMounted: true });
           class="cursor-pointer py-4 hover:bg-gray-50"
         >
           <div class="flex items-center space-x-4">
-            <div class="flex-shrink-0">
-              <img
+            <div class="flex flex-shrink-0 items-center">
+              <VAvatar
                 :alt="user.spec.displayName"
                 :src="user.spec.avatar"
-                class="h-10 w-10 rounded"
+                size="md"
               />
             </div>
             <div class="min-w-0 flex-1">

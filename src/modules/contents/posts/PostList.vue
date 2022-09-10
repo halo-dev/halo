@@ -17,6 +17,7 @@ import {
   VPageHeader,
   VPagination,
   VSpace,
+  VAvatar,
 } from "@halo-dev/components";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";
@@ -833,14 +834,15 @@ function handleContributorFilterItemChange(user?: User) {
                       name: 'UserDetail',
                       params: { name: contributor.name },
                     }"
+                    class="flex items-center"
                   >
-                    <img
+                    <VAvatar
                       v-tooltip="contributor.displayName"
-                      :alt="contributor.name"
+                      size="xs"
                       :src="contributor.avatar"
-                      :title="contributor.displayName"
-                      class="hidden h-6 w-6 rounded-full ring-2 ring-white sm:inline-block"
-                    />
+                      :alt="contributor.displayName"
+                      circle
+                    ></VAvatar>
                   </RouterLink>
                   <span class="text-sm text-gray-500">
                     {{ finalStatus(post.post) }}

@@ -240,7 +240,7 @@ const handleDelete = async (role: Role) => {
               </div>
               <div class="flex">
                 <div
-                  class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
+                  class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
                 >
                   <FloatingTooltip
                     v-if="role.metadata.deletionTimestamp"

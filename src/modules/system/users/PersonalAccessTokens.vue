@@ -267,7 +267,7 @@ onMounted(() => {
           </div>
           <div class="flex">
             <div
-              class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
+              class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
             >
               <div class="flex flex-col gap-1">
                 <time class="text-xs text-gray-500" datetime="2020-01-07">

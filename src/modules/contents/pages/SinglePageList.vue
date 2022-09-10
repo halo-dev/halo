@@ -15,6 +15,7 @@ import {
   VSpace,
   useDialog,
   VEmpty,
+  VAvatar,
 } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
@@ -402,14 +403,15 @@ const handleSelectUser = (user?: User) => {
                     name: 'UserDetail',
                     params: { name: contributor.name },
                   }"
+                  class="flex items-center"
                 >
-                  <img
+                  <VAvatar
                     v-tooltip="contributor.displayName"
-                    :alt="contributor.name"
+                    size="xs"
                     :src="contributor.avatar"
-                    :title="contributor.displayName"
-                    class="hidden h-6 w-6 rounded-full ring-2 ring-white sm:inline-block"
-                  />
+                    :alt="contributor.displayName"
+                    circle
+                  ></VAvatar>
                 </RouterLink>
                 <span class="text-sm text-gray-500">
                   {{ finalStatus(singlePage.page) }}

@@ -7,6 +7,7 @@ import {
   VPageHeader,
   VTabbar,
   VTag,
+  VAvatar,
 } from "@halo-dev/components";
 import { useRoute } from "vue-router";
 import { onMounted, ref, watch } from "vue";
@@ -175,18 +176,12 @@ onMounted(() => {
                       <li class="block cursor-pointer hover:bg-gray-50">
                         <div class="flex items-center px-4 py-4">
                           <div class="flex min-w-0 flex-1 items-center">
-                            <div class="flex-shrink-0">
-                              <div class="h-12 w-12">
-                                <div
-                                  class="overflow-hidden rounded border bg-white hover:shadow-sm"
-                                >
-                                  <img
-                                    :alt="user.spec.displayName"
-                                    :src="user.spec.avatar"
-                                    class="h-full w-full"
-                                  />
-                                </div>
-                              </div>
+                            <div class="flex flex-shrink-0 items-center">
+                              <VAvatar
+                                :alt="user.spec.displayName"
+                                :src="user.spec.avatar"
+                                size="md"
+                              />
                             </div>
                             <div
                               class="min-w-0 flex-1 px-4 md:grid md:grid-cols-2 md:gap-4"

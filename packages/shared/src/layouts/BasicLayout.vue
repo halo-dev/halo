@@ -7,6 +7,7 @@ import {
   VModal,
   VRoutesMenu,
   VTag,
+  VAvatar,
 } from "@halo-dev/components";
 import type { MenuGroupType, MenuItemType } from "../types/menus";
 import type { User } from "@halo-dev/api-client";
@@ -59,7 +60,12 @@ const currentRole = computed(() => {
       <VRoutesMenu :menus="menus" />
       <div class="current-profile">
         <div v-if="currentUser?.spec.avatar" class="profile-avatar">
-          <img :src="currentUser?.spec.avatar" class="h-11 w-11 rounded-full" />
+          <VAvatar
+            :src="currentUser?.spec.avatar"
+            :alt="currentUser?.spec.displayName"
+            size="md"
+            circle
+          ></VAvatar>
         </div>
         <div class="profile-name">
           <div class="flex text-sm font-medium">
@@ -204,7 +210,8 @@ const currentRole = computed(() => {
 
     .profile-avatar {
       @apply self-center
-      flex;
+      flex 
+      items-center;
     }
 
     .profile-name {

@@ -11,6 +11,7 @@ import {
   VPagination,
   VSpace,
   VTag,
+  VAvatar,
 } from "@halo-dev/components";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
@@ -293,14 +294,12 @@ onMounted(() => {
                   type="checkbox"
                 />
               </div>
-              <div v-if="user.spec.avatar" class="mr-4">
-                <div class="h-12 w-12">
-                  <img
-                    :alt="user.spec.displayName"
-                    :src="user.spec.avatar"
-                    class="h-full w-full overflow-hidden rounded border bg-white hover:shadow-sm"
-                  />
-                </div>
+              <div v-if="user.spec.avatar" class="mr-4 flex items-center">
+                <VAvatar
+                  :alt="user.spec.displayName"
+                  :src="user.spec.avatar"
+                  size="md"
+                ></VAvatar>
               </div>
               <div class="flex-1">
                 <div class="flex flex-row items-center">

@@ -46,6 +46,7 @@ import IconTeam from "~icons/ri/team-fill";
 import IconCharacterRecognition from "~icons/ri/character-recognition-line";
 import IconCalendar from "~icons/ri/calendar-line";
 import IconLink from "~icons/ri/link";
+import IconUserLine from "~icons/ri/user-line";
 
 export {
   IconDashboard,
@@ -96,4 +97,5 @@ export {
   IconCharacterRecognition,
   IconCalendar,
   IconLink,
+  IconUserLine,
 };

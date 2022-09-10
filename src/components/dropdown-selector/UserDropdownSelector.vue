@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { User } from "@halo-dev/api-client";
 import { useUserFetch } from "@/modules/system/users/composables/use-user";
-import { IconCheckboxCircle } from "@halo-dev/components";
+import { IconCheckboxCircle, VAvatar } from "@halo-dev/components";
 
 const props = withDefaults(
   defineProps<{
@@ -57,12 +57,12 @@ function onDropdownShow() {
               @click="handleSelect(user)"
             >
               <div class="flex items-center space-x-4 px-4 py-3">
-                <div class="flex-shrink-0">
-                  <img
+                <div class="flex flex-shrink-0 items-center">
+                  <VAvatar
                     :alt="user.spec.displayName"
                     :src="user.spec.avatar"
-                    class="h-10 w-10 rounded"
-                  />
+                    size="md"
+                  ></VAvatar>
                 </div>
                 <div class="min-w-0 flex-1">
                   <p class="truncate text-sm font-medium text-gray-900">

@@ -8,6 +8,7 @@ import {
   VPageHeader,
   VPagination,
   VSpace,
+  VAvatar,
 } from "@halo-dev/components";
 import { ref } from "vue";
 
@@ -117,12 +118,13 @@ const checkAll = ref(false);
               </div>
               <div class="flex">
                 <div
-                  class="inline-flex flex-col flex-col-reverse items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
+                  class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
                 >
-                  <img
-                    class="hidden h-6 w-6 rounded-full ring-2 ring-white sm:inline-block"
+                  <VAvatar
+                    size="xs"
                     src="https://ryanc.cc/avatar"
-                  />
+                    circle
+                  ></VAvatar>
                   <time class="text-sm text-gray-500" datetime="2020-01-07">
                     2020-01-07
                   </time>
