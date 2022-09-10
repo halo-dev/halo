@@ -13,10 +13,10 @@ import { formatDatetime } from "@/utils/date";
 
 const props = withDefaults(
   defineProps<{
-    plugin: Plugin | null;
+    plugin?: Plugin;
   }>(),
   {
-    plugin: null,
+    plugin: undefined,
   }
 );
 

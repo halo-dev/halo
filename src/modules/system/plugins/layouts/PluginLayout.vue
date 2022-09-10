@@ -1,23 +1,23 @@
 <script lang="ts" setup>
 // core libs
-import { computed, onMounted, provide, ref, watch } from "vue";
+import { computed, nextTick, onMounted, provide, ref, watch } from "vue";
 import { RouterView, useRoute, useRouter } from "vue-router";
-import { apiClient } from "../utils/api-client";
+import { apiClient } from "@halo-dev/admin-shared";
 
 // libs
 import cloneDeep from "lodash.clonedeep";
 
 // hooks
-import { useSettingForm } from "../composables";
+import { useSettingForm } from "@halo-dev/admin-shared";
 
 // components
 import { VButton, VCard, VPageHeader, VTabbar } from "@halo-dev/components";
-import { BasicLayout } from "../layouts";
+import { BasicLayout } from "@halo-dev/admin-shared";
 
 // types
 import type { Ref } from "vue";
 import type { Plugin } from "@halo-dev/api-client";
-import type { FormKitSettingSpec } from "../types/formkit";
+import type { FormKitSettingSpec } from "@halo-dev/admin-shared";
 
 interface PluginTab {
   id: string;
@@ -41,15 +41,15 @@ const initialTabs: PluginTab[] = [
 const route = useRoute();
 const router = useRouter();
 
-const plugin = ref<Plugin>({} as Plugin);
+const plugin = ref<Plugin>();
 const tabs = ref<PluginTab[]>(cloneDeep(initialTabs));
 const activeTab = ref<string>();
 
-provide<Ref<Plugin>>("plugin", plugin);
+provide<Ref<Plugin | undefined>>("plugin", plugin);
 provide<Ref<string | undefined>>("activeTab", activeTab);
 
-const settingName = computed(() => plugin.value.spec?.settingName);
-const configMapName = computed(() => plugin.value.spec?.configMapName);
+const settingName = computed(() => plugin.value?.spec.settingName);
+const configMapName = computed(() => plugin.value?.spec.configMapName);
 
 const { settings, handleFetchSettings } = useSettingForm(
   settingName,
@@ -71,15 +71,16 @@ const handleFetchPlugin = async () => {
 const handleTabChange = (id: string) => {
   const tab = tabs.value.find((item) => item.id === id);
   if (tab) {
+    activeTab.value = tab.id;
     router.push(tab.route);
   }
 };
 
-const onTabChange = (routeName: string) => {
-  if (routeName === "PluginSetting") {
+const handleTriggerTabChange = () => {
+  if (route.name === "PluginSetting") {
     const tab = tabs.value.find((tab) => {
       return (
-        tab.route.name === routeName &&
+        tab.route.name === route.name &&
         tab.route.params?.group === route.params.group
       );
     });
@@ -87,7 +88,7 @@ const onTabChange = (routeName: string) => {
       activeTab.value = tab.id;
       return;
     }
-    router.push({ name: "PluginDetail" });
+    handleTabChange(tabs.value[0].id);
     return;
   }
   const tab = tabs.value.find((tab) => tab.route.name === route.name);
@@ -99,6 +100,7 @@ onMounted(async () => {
   await handleFetchSettings();
 
   tabs.value = cloneDeep(initialTabs);
+
   if (settings.value && settings.value.spec) {
     tabs.value = [
       ...tabs.value,
@@ -115,16 +117,16 @@ onMounted(async () => {
         };
       }),
     ] as PluginTab[];
-    onTabChange(route.name as string);
   }
+
+  await nextTick();
+
+  handleTriggerTabChange();
 });
 
-watch(
-  () => route.name,
-  async (newRouteName) => {
-    onTabChange(newRouteName as string);
-  }
-);
+watch([() => route.name, () => route.params], () => {
+  handleTriggerTabChange();
+});
 </script>
 <template>
   <BasicLayout>
@@ -150,7 +152,18 @@ watch(
         </template>
       </VCard>
       <div>
-        <RouterView :key="activeTab" />
+        <RouterView :key="activeTab" v-slot="{ Component }">
+          <template v-if="Component">
+            <Suspense>
+              <component :is="Component"></component>
+              <template #fallback>
+                <div class="flex h-32 w-full justify-center bg-white">
+                  <span class="text-sm text-gray-600">加载中...</span>
+                </div>
+              </template>
+            </Suspense>
+          </template>
+        </RouterView>
       </div>
     </div>
   </BasicLayout>

@@ -1,22 +1,24 @@
 <script lang="ts" setup>
 // core libs
-import { computed, inject, ref, watchEffect } from "vue";
+import { computed, ref } from "vue";
 
 // hooks
-import { useSettingForm } from "@halo-dev/admin-shared";
+import { apiClient, useSettingForm } from "@halo-dev/admin-shared";
 
 // components
 import { VButton } from "@halo-dev/components";
 
 // types
-import type { Ref } from "vue";
 import type { Plugin } from "@halo-dev/api-client";
+import { useRouteParams } from "@vueuse/router";
 
-const plugin = inject<Ref<Plugin>>("plugin", ref({} as Plugin));
-const group = inject<Ref<string | undefined>>("activeTab");
+const name = useRouteParams<string>("name");
+const group = useRouteParams<string>("group");
 
-const settingName = computed(() => plugin.value.spec?.settingName);
-const configMapName = computed(() => plugin.value.spec?.configMapName);
+const plugin = ref<Plugin | undefined>();
+
+const settingName = computed(() => plugin?.value?.spec.settingName);
+const configMapName = computed(() => plugin?.value?.spec.configMapName);
 
 const {
   settings,
@@ -31,16 +33,28 @@ const formSchema = computed(() => {
   if (!settings?.value?.spec) {
     return;
   }
-  return settings.value.spec.find((item) => item.group === group?.value)
+  return settings.value.spec.find((item) => item.group === group.value)
     ?.formSchema;
 });
 
-watchEffect(async () => {
-  if (settingName.value && configMapName.value) {
-    await handleFetchSettings();
-    await handleFetchConfigMap();
+const handleFetchPlugin = async () => {
+  try {
+    const { data } =
+      await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin({
+        name: name.value,
+      });
+    plugin.value = data;
+
+    if (settingName.value && configMapName.value) {
+      await handleFetchSettings();
+      await handleFetchConfigMap();
+    }
+  } catch (e) {
+    console.error("Failed to fetch plugin and settings", e);
   }
-});
+};
+
+await handleFetchPlugin();
 </script>
 <template>
   <div class="bg-white p-4 sm:px-6">

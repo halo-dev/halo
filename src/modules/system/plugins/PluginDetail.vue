@@ -8,7 +8,7 @@ import { pluginLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
 import { usePluginLifeCycle } from "./composables/use-plugin";
 
-const plugin = inject<Ref<Plugin>>("plugin", ref({} as Plugin));
+const plugin = inject<Ref<Plugin | undefined>>("plugin");
 const { changeStatus, isStarted } = usePluginLifeCycle(plugin);
 
 interface RoleTemplateGroup {
@@ -23,7 +23,7 @@ const handleFetchRoles = async () => {
     const { data } = await apiClient.extension.role.listv1alpha1Role({
       page: 0,
       size: 0,
-      labelSelector: [`${pluginLabels.NAME}=${plugin.value.metadata.name}`],
+      labelSelector: [`${pluginLabels.NAME}=${plugin?.value?.metadata.name}`],
     });
     pluginRoleTemplates.value = data.items;
   } catch (e) {
@@ -51,7 +51,7 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
 });
 
 watchEffect(() => {
-  if (plugin.value.metadata?.name) {
+  if (plugin?.value) {
     handleFetchRoles();
   }
 });
@@ -62,7 +62,7 @@ watchEffect(() => {
     <div>
       <h3 class="text-lg font-medium leading-6 text-gray-900">插件信息</h3>
       <p class="mt-1 flex max-w-2xl items-center gap-2 text-sm text-gray-500">
-        <span>{{ plugin?.spec?.version }}</span>
+        <span>{{ plugin?.spec.version }}</span>
         <VTag>
           {{ isStarted ? "已启用" : "未启用" }}
         </VTag>
@@ -79,7 +79,7 @@ watchEffect(() => {
       >
         <dt class="text-sm font-medium text-gray-900">名称</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-          {{ plugin?.spec?.displayName }}
+          {{ plugin?.spec.displayName }}
         </dd>
       </div>
       <div
@@ -87,7 +87,7 @@ watchEffect(() => {
       >
         <dt class="text-sm font-medium text-gray-900">版本</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-          {{ plugin?.spec?.version }}
+          {{ plugin?.spec.version }}
         </dd>
       </div>
       <div
@@ -95,7 +95,7 @@ watchEffect(() => {
       >
         <dt class="text-sm font-medium text-gray-900">Halo 版本要求</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-          {{ plugin?.spec?.requires }}
+          {{ plugin?.spec.requires }}
         </dd>
       </div>
       <div
@@ -103,8 +103,8 @@ watchEffect(() => {
       >
         <dt class="text-sm font-medium text-gray-900">提供方</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-          <a :href="plugin?.spec?.homepage" target="_blank">
-            {{ plugin?.spec?.author }}
+          <a :href="plugin?.spec.homepage" target="_blank">
+            {{ plugin?.spec.author }}
           </a>
         </dd>
       </div>
@@ -114,7 +114,7 @@ watchEffect(() => {
         <dt class="text-sm font-medium text-gray-900">协议</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
           <ul
-            v-if="plugin?.spec?.license && plugin?.spec?.license.length"
+            v-if="plugin?.spec.license && plugin?.spec.license.length"
             class="list-inside list-disc"
           >
             <li v-for="(license, index) in plugin.spec.license" :key="index">
@@ -132,7 +132,7 @@ watchEffect(() => {
         class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
       >
         <dt class="text-sm font-medium text-gray-900">模型定义</dt>
-        <dd class="mt-1 sm:col-span-2 sm:mt-0">
+        <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
           <span>无</span>
         </dd>
       </div>

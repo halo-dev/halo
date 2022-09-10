@@ -12,18 +12,18 @@ interface usePluginLifeCycleReturn {
 }
 
 export function usePluginLifeCycle(
-  plugin: Ref<Plugin | null>
+  plugin?: Ref<Plugin | undefined>
 ): usePluginLifeCycleReturn {
   const dialog = useDialog();
 
   const isStarted = computed(() => {
     return (
-      plugin.value?.status?.phase === "STARTED" && plugin.value?.spec.enabled
+      plugin?.value?.status?.phase === "STARTED" && plugin.value?.spec.enabled
     );
   });
 
   const changeStatus = () => {
-    if (!plugin.value) return;
+    if (!plugin?.value) return;
 
     const pluginToUpdate = cloneDeep(plugin.value);
 
@@ -46,7 +46,7 @@ export function usePluginLifeCycle(
   };
 
   const uninstall = () => {
-    if (!plugin.value) return;
+    if (!plugin?.value) return;
 
     const { enabled } = plugin.value.spec;
 
