@@ -1,13 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import {
-  VEmpty,
-  VSpace,
-  VButton,
-  IconAddCircle,
-  IconSettings,
-  VTag,
-} from "@halo-dev/components";
+import { VEmpty, VSpace, VButton, IconAddCircle } from "@halo-dev/components";
 import type { PagesPublicState } from "@halo-dev/admin-shared";
 import { useExtensionPointsState } from "@/composables/usePlugins";
 
@@ -44,28 +37,23 @@ useExtensionPointsState("PAGES", pagesPublicState);
       v-for="(page, index) in pagesPublicState.functionalPages"
       :key="index"
       v-permission="page.permissions"
-      @click="$router.push({ path: page.path })"
     >
       <div
         class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
       >
         <div class="relative flex flex-row items-center">
           <div class="flex-1">
-            <div class="flex flex-row">
-              <span
-                class="mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2"
+            <div class="flex">
+              <RouterLink
+                :to="page.path"
+                class="truncate text-sm font-medium text-gray-900"
               >
                 {{ page.name }}
-              </span>
-              <VTag>{{ page.url }}</VTag>
+              </RouterLink>
             </div>
-          </div>
-          <div class="flex">
-            <div
-              class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
-            >
-              <span class="cursor-pointer">
-                <IconSettings />
+            <div class="mt-1 flex">
+              <span class="text-xs text-gray-500">
+                {{ page.url }}
               </span>
             </div>
           </div>

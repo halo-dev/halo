@@ -357,9 +357,7 @@ const handleSelectUser = (user?: User) => {
                     query: { name: singlePage.page.metadata.name },
                   }"
                 >
-                  <span
-                    class="mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2"
-                  >
+                  <span class="truncate text-sm font-medium text-gray-900">
                     {{ singlePage.page.spec.title }}
                   </span>
                 </RouterLink>
