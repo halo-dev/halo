@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -123,7 +124,9 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Assert.notNull(categoryId, "Category id must not be null");
 
         // Find all post ids
-        Set<Integer> postIds = postCategoryRepository.findAllPostIdsByCategoryId(categoryId);
+        Set<Integer> postIds = new HashSet<>();
+        categoryService.listAllByParentId(categoryId).forEach(
+            x -> postIds.addAll(postCategoryRepository.findAllPostIdsByCategoryId(x.getId())));
 
         return postRepository.findAllById(postIds);
     }
@@ -134,8 +137,9 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Assert.notNull(status, "Post status must not be null");
 
         // Find all post ids
-        Set<Integer> postIds =
-            postCategoryRepository.findAllPostIdsByCategoryId(categoryId, status);
+        Set<Integer> postIds = new HashSet<>();
+        categoryService.listAllByParentId(categoryId).forEach(x -> postIds.addAll(
+            postCategoryRepository.findAllPostIdsByCategoryId(x.getId(), status)));
 
         return postRepository.findAllById(postIds);
     }
@@ -146,8 +150,9 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
         Assert.notNull(status, "Post status must not be null");
 
         // Find all post ids
-        Set<Integer> postIds = postCategoryRepository
-            .findAllPostIdsByCategoryId(categoryId, status);
+        Set<Integer> postIds = new HashSet<>();
+        categoryService.listAllByParentId(categoryId).forEach(x -> postIds.addAll(
+            postCategoryRepository.findAllPostIdsByCategoryId(x.getId(), status)));
 
         return postRepository.findAllById(postIds);
     }
@@ -163,10 +168,11 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
             throw new NotFoundException("查询不到该分类的信息").setErrorData(slug);
         }
 
-        Set<Integer> postsIds = postCategoryRepository
-            .findAllPostIdsByCategoryId(category.getId(), status);
+        Set<Integer> postIds = new HashSet<>();
+        categoryService.listAllByParentId(category.getId()).forEach(x -> postIds.addAll(
+            postCategoryRepository.findAllPostIdsByCategoryId(x.getId(), status)));
 
-        return postRepository.findAllById(postsIds);
+        return postRepository.findAllById(postIds);
     }
 
     @Override
@@ -180,10 +186,11 @@ public class PostCategoryServiceImpl extends AbstractCrudService<PostCategory, I
             throw new NotFoundException("查询不到该分类的信息").setErrorData(slug);
         }
 
-        Set<Integer> postsIds =
-            postCategoryRepository.findAllPostIdsByCategoryId(category.getId(), status);
+        Set<Integer> postIds = new HashSet<>();
+        categoryService.listAllByParentId(category.getId()).forEach(x -> postIds.addAll(
+            postCategoryRepository.findAllPostIdsByCategoryId(x.getId(), status)));
 
-        return postRepository.findAllById(postsIds);
+        return postRepository.findAllById(postIds);
     }
 
     @Override
