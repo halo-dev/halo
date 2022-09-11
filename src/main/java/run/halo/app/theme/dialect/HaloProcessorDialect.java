@@ -13,7 +13,7 @@ import org.thymeleaf.standard.StandardDialect;
  * @since 2.0.0
  */
 public class HaloProcessorDialect extends AbstractProcessorDialect {
-    private static final String DIALECT_NAME = "Halo Theme Dialect";
+    private static final String DIALECT_NAME = "haloThemeProcessorDialect";
 
     public HaloProcessorDialect() {
         // We will set this dialect the same "dialect processor" precedence as
