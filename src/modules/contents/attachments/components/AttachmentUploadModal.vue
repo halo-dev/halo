@@ -82,11 +82,11 @@ watch(
   >
     <template #actions>
       <FloatingDropdown>
-        <div v-tooltip="`选择存储策略`" class="modal-header-action">
+        <span v-tooltip="`选择存储策略`">
           <span class="text-sm">
             {{ selectedPolicy?.spec.displayName || "无存储策略" }}
           </span>
-        </div>
+        </span>
         <template #popper>
           <div class="w-72 p-4">
             <ul class="space-y-1">

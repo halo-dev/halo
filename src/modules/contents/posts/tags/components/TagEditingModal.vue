@@ -137,12 +137,12 @@ watch(
     @update:visible="onVisibleChange"
   >
     <template #actions>
-      <div class="modal-header-action" @click="emit('previous')">
+      <span @click="emit('previous')">
         <IconArrowLeft />
-      </div>
-      <div class="modal-header-action" @click="emit('next')">
+      </span>
+      <span @click="emit('next')">
         <IconArrowRight />
-      </div>
+      </span>
     </template>
     <FormKit
       id="tag-form"

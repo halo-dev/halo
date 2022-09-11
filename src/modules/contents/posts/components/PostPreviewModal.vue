@@ -34,13 +34,14 @@ const onVisibleChange = (visible: boolean) => {
     @update:visible="onVisibleChange"
   >
     <template #actions>
-      <a
-        class="modal-header-action"
-        href="https://halo.run/archives/halo-154-released.html"
-        target="_blank"
-      >
-        <IconLink />
-      </a>
+      <span>
+        <a
+          href="https://halo.run/archives/halo-154-released.html"
+          target="_blank"
+        >
+          <IconLink />
+        </a>
+      </span>
     </template>
     <div class="flex h-full items-center justify-center">
       <iframe

@@ -103,9 +103,9 @@ watch(
   >
     <template #actions>
       <FloatingDropdown>
-        <div v-tooltip="`添加存储策略`" class="modal-header-action">
+        <span v-tooltip="`添加存储策略`">
           <IconAddCircle />
-        </div>
+        </span>
         <template #popper>
           <div class="w-72 p-4">
             <ul class="space-y-1">

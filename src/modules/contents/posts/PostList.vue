@@ -330,12 +330,12 @@ function handleContributorFilterItemChange(user?: User) {
     @close="onSettingModalClose"
   >
     <template #actions>
-      <div class="modal-header-action" @click="handleSelectPrevious">
+      <span @click="handleSelectPrevious">
         <IconArrowLeft />
-      </div>
-      <div class="modal-header-action" @click="handleSelectNext">
+      </span>
+      <span @click="handleSelectNext">
         <IconArrowRight />
-      </div>
+      </span>
     </template>
   </PostSettingModal>
   <VPageHeader title="文章">

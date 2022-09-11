@@ -179,27 +179,22 @@ await handleFetchAttachments();
     @close="selectedAttachment = undefined"
   >
     <template #actions>
-      <div
+      <span
         v-if="selectedAttachment && selectedAttachments.has(selectedAttachment)"
-        class="modal-header-action"
         @click="handleSelect(selectedAttachment)"
       >
         <IconCheckboxFill />
-      </div>
-      <div
-        v-else
-        class="modal-header-action"
-        @click="handleSelect(selectedAttachment)"
-      >
+      </span>
+      <span v-else @click="handleSelect(selectedAttachment)">
         <IconCheckboxCircle />
-      </div>
+      </span>
 
-      <div class="modal-header-action" @click="handleSelectPrevious">
+      <span @click="handleSelectPrevious">
         <IconArrowLeft />
-      </div>
-      <div class="modal-header-action" @click="handleSelectNext">
+      </span>
+      <span @click="handleSelectNext">
         <IconArrowRight />
-      </div>
+      </span>
     </template>
   </AttachmentDetailModal>
 </template>

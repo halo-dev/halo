@@ -201,12 +201,12 @@ const handleSelectUser = (user?: User) => {
     @close="onSettingModalClose"
   >
     <template #actions>
-      <div class="modal-header-action" @click="handleSelectPrevious">
+      <span @click="handleSelectPrevious">
         <IconArrowLeft />
-      </div>
-      <div class="modal-header-action" @click="handleSelectNext">
+      </span>
+      <span @click="handleSelectNext">
         <IconArrowRight />
-      </div>
+      </span>
     </template>
   </SinglePageSettingModal>
   <VCard :body-class="['!p-0']" class="rounded-none border-none shadow-none">

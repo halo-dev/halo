@@ -187,10 +187,10 @@ const handleRawModeChange = () => {
     @update:visible="onVisibleChange"
   >
     <template #actions>
-      <div class="modal-header-action" @click="handleRawModeChange">
+      <span @click="handleRawModeChange">
         <IconCodeBoxLine v-if="!rawMode" />
         <IconEye v-else />
-      </div>
+      </span>
     </template>
 
     <VCodemirror v-show="rawMode" v-model="raw" height="50vh" language="yaml" />

@@ -97,14 +97,14 @@ watch(
           :style="contentStyles"
           class="modal-content transform transition-all"
         >
-          <div v-if="$slots.header || title" class="modal-header">
+          <div v-if="$slots.header || title" class="modal-header group">
             <slot name="header">
               <div class="modal-header-title">{{ title }}</div>
-              <div class="modal-header-actions flex flex-row">
+              <div class="modal-header-actions">
                 <slot name="actions"></slot>
-                <div class="modal-header-action" @click="handleClose()">
+                <span class="bg-gray-50" @click="handleClose()">
                   <IconClose />
-                </div>
+                </span>
               </div>
             </slot>
           </div>
@@ -159,25 +159,33 @@ watch(
     .modal-header {
       @apply flex
       justify-between
-      border-b;
+      border-b
+      items-center
+      select-none;
+      padding: 10px 16px;
 
       .modal-header-title {
-        @apply self-center
-        text-base
-        font-bold;
-        padding: 12px 16px;
+        @apply text-base
+        font-medium;
       }
 
       .modal-header-actions {
-        @apply self-center
-        h-full;
-        .modal-header-action {
-          @apply cursor-pointer;
-          padding: 12px 16px;
-
-          &:hover {
-            @apply bg-gray-100;
-          }
+        @apply flex
+        flex-row
+        gap-2;
+        span {
+          @apply cursor-pointer 
+          rounded-full 
+          w-7 
+          h-7 
+          inline-flex 
+          items-center 
+          justify-center 
+          hover:bg-gray-100
+          select-none
+          text-gray-600
+          hover:text-gray-900
+          group-hover:hidden;
         }
       }
     }
