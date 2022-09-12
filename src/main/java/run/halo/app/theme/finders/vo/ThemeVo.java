@@ -1,6 +1,6 @@
 package run.halo.app.theme.finders.vo;
 
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Builder;
 import lombok.ToString;
 import lombok.Value;
@@ -24,7 +24,7 @@ public class ThemeVo {
     Theme.ThemeSpec spec;
 
     @With
-    Map<String, Object> config;
+    JsonNode config;
 
     /**
      * Convert {@link Theme} to {@link ThemeVo}.
@@ -36,7 +36,7 @@ public class ThemeVo {
         return ThemeVo.builder()
             .metadata(theme.getMetadata())
             .spec(theme.getSpec())
-            .config(Map.of())
+            .config(null)
             .build();
     }
 }

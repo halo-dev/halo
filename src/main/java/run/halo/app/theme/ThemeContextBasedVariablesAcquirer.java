@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.finders.ThemeFinder;
 import run.halo.app.theme.finders.vo.ThemeVo;
 
@@ -34,7 +33,7 @@ public class ThemeContextBasedVariablesAcquirer implements ViewContextBasedVaria
                 String name = themeContext.getName();
                 ThemeVo themeVo = themeFinder.getByName(name);
                 if (themeVo == null) {
-                    throw new NotFoundException("Theme [" + name + "] not found");
+                    return Map.of();
                 }
                 return Map.of("theme", themeVo);
             });

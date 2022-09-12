@@ -172,7 +172,7 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
 
                 final String oldPostPattern = oldRules.getPost();
                 if (!StringUtils.equals(oldPostPattern, newRules.getPost())) {
-                    oldRules.setCategories(newRules.getCategories());
+                    oldRules.setPost(newRules.getPost());
                     updateNewRuleToConfigMap(configMap, oldRules, newRules);
 
                     log.debug("Categories prefix changed from [{}] to [{}].", oldPostPattern,

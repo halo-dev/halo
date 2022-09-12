@@ -2,7 +2,6 @@ package run.halo.app.theme.finders.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Mono;
@@ -56,23 +55,14 @@ public class ThemeFinderImpl implements ThemeFinder {
         }
         return client.fetch(ConfigMap.class, themeVo.getSpec().getConfigMapName())
             .map(configMap -> {
-                Map<String, Object> config = new HashMap<>();
+                Map<String, JsonNode> config = new HashMap<>();
                 configMap.getData().forEach((k, v) -> {
                     JsonNode jsonNode = JsonUtils.jsonToObject(v, JsonNode.class);
-                    config.put(k, convert(jsonNode));
+                    config.put(k, jsonNode);
                 });
-                return themeVo.withConfig(config);
+                JsonNode configJson = JsonUtils.mapToObject(config, JsonNode.class);
+                return themeVo.withConfig(configJson);
             })
             .switchIfEmpty(Mono.just(themeVo));
-    }
-
-    private Object convert(JsonNode jsonNode) {
-        if (jsonNode.isObject()) {
-            return JsonUtils.DEFAULT_JSON_MAPPER.convertValue(jsonNode, Map.class);
-        }
-        if (jsonNode.isArray()) {
-            return JsonUtils.DEFAULT_JSON_MAPPER.convertValue(jsonNode, List.class);
-        }
-        return jsonNode.asText();
     }
 }
