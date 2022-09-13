@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { IconList, VButton, VTag } from "@halo-dev/components";
+import { IconList, VButton, VTag, VStatusDot } from "@halo-dev/components";
 import Draggable from "vuedraggable";
 import { ref } from "vue";
 import type { MenuTreeItem } from "@/modules/interface/menus/utils";
@@ -89,14 +89,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
           <template #end>
             <EntityField v-if="menuItem.metadata.deletionTimestamp">
               <template #description>
-                <div
-                  v-tooltip="`删除中`"
-                  class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
-                >
-                  <span
-                    class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
-                  ></span>
-                </div>
+                <VStatusDot v-tooltip="`删除中`" state="warning" animate />
               </template>
             </EntityField>
           </template>

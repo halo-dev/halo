@@ -15,6 +15,7 @@ import {
   VPagination,
   VSpace,
   VTag,
+  VStatusDot,
 } from "@halo-dev/components";
 import RoleEditingModal from "./components/RoleEditingModal.vue";
 import Entity from "@/components/entity/Entity.vue";
@@ -227,14 +228,7 @@ const handleDelete = async (role: Role) => {
             <template #end>
               <EntityField v-if="role.metadata.deletionTimestamp">
                 <template #description>
-                  <div
-                    v-tooltip="`删除中`"
-                    class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
-                  >
-                    <span
-                      class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
-                    ></span>
-                  </div>
+                  <VStatusDot v-tooltip="`删除中`" state="warning" animate />
                 </template>
               </EntityField>
               <EntityField description="0 个用户" />

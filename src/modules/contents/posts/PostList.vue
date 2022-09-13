@@ -17,6 +17,7 @@ import {
   VPagination,
   VSpace,
   VAvatar,
+  VStatusDot,
 } from "@halo-dev/components";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";
@@ -768,13 +769,7 @@ function handleContributorFilterItemChange(user?: User) {
                       }"
                       class="flex items-center"
                     >
-                      <div
-                        class="inline-flex h-1.5 w-1.5 rounded-full bg-orange-600"
-                      >
-                        <span
-                          class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-orange-600"
-                        ></span>
-                      </div>
+                      <VStatusDot state="success" animate />
                     </RouterLink>
                     <PostTag
                       v-for="(tag, tagIndex) in post.tags"

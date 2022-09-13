@@ -1,5 +1,11 @@
 <script lang="ts" setup>
-import { VButton, VSpace, VSwitch, VTag } from "@halo-dev/components";
+import {
+  VButton,
+  VSpace,
+  VSwitch,
+  VTag,
+  VStatusDot,
+} from "@halo-dev/components";
 import Entity from "@/components/entity/Entity.vue";
 import EntityField from "@/components/entity/EntityField.vue";
 import { toRefs } from "vue";
@@ -54,14 +60,11 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
     <template #end>
       <EntityField v-if="plugin?.status?.phase === 'FAILED'">
         <template #description>
-          <div
+          <VStatusDot
             v-tooltip="`${plugin?.status?.reason}:${plugin?.status?.message}`"
-            class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
-          >
-            <span
-              class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
-            ></span>
-          </div>
+            state="error"
+            animate
+          />
         </template>
       </EntityField>
       <EntityField>

@@ -16,6 +16,7 @@ import {
   VEmpty,
   IconCloseCircle,
   IconFolder,
+  VStatusDot,
 } from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
@@ -617,14 +618,11 @@ onMounted(() => {
                     </EntityField>
                     <EntityField v-if="attachment.metadata.deletionTimestamp">
                       <template #description>
-                        <div
+                        <VStatusDot
                           v-tooltip="`删除中`"
-                          class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
-                        >
-                          <span
-                            class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
-                          ></span>
-                        </div>
+                          state="warning"
+                          animate
+                        />
                       </template>
                     </EntityField>
                     <EntityField

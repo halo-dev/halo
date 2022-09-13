@@ -5,6 +5,7 @@ import {
   VCard,
   VEmpty,
   VSpace,
+  VStatusDot,
 } from "@halo-dev/components";
 import MenuEditingModal from "./MenuEditingModal.vue";
 import { defineExpose, onMounted, ref } from "vue";
@@ -156,14 +157,7 @@ defineExpose({
           <template #end>
             <EntityField v-if="menu.metadata.deletionTimestamp">
               <template #description>
-                <div
-                  v-tooltip="`删除中`"
-                  class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
-                >
-                  <span
-                    class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
-                  ></span>
-                </div>
+                <VStatusDot v-tooltip="`删除中`" state="warning" animate />
               </template>
             </EntityField>
           </template>
