@@ -5,7 +5,6 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static run.halo.app.theme.router.TemplateRouterStrategy.PageUrlUtils.pageNum;
 import static run.halo.app.theme.router.TemplateRouterStrategy.PageUrlUtils.totalPage;
 
-import java.util.List;
 import java.util.Map;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -53,13 +52,12 @@ public class CategoryRouteStrategy implements TemplateRouterStrategy {
     public RouterFunction<ServerResponse> getRouteFunction(String template, String prefix) {
         return RouterFunctions
             .route(GET(PathUtils.combinePath(prefix, "/{slug}"))
-                    .or(GET(PathUtils.combinePath(prefix, "/{slug}/page/{page}")))
+                    .or(GET(PathUtils.combinePath(prefix, "/{slug}/page/{page:\\d+}")))
                     .and(accept(MediaType.TEXT_HTML)),
                 request -> {
                     String slug = request.pathVariable("slug");
                     GroupVersionKind gvk = GroupVersionKind.fromExtension(Category.class);
-                    List<String> slugs = permalinkIndexer.getSlugs(gvk);
-                    if (!slugs.contains(slug)) {
+                    if (!permalinkIndexer.containsSlug(gvk, slug)) {
                         return ServerResponse.notFound().build();
                     }
                     String categoryName = permalinkIndexer.getNameBySlug(gvk, slug);

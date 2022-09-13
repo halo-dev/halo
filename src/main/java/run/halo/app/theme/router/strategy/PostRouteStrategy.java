@@ -4,7 +4,6 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -75,32 +74,27 @@ public class PostRouteStrategy implements TemplateRouterStrategy {
                     }
                     return ServerResponse.ok()
                         .render(DefaultTemplateEnum.POST.getValue(),
-                            Map.of(PostRequestParamPredicate.NAME_PARAM, name)
+                            Map.of(PostRequestParamPredicate.NAME_PARAM, name,
+                                "post", postByName(name))
                         );
                 });
         }
         return RouterFunctions
             .route(GET(pattern).and(accept(MediaType.TEXT_HTML)),
                 request -> {
-                    List<String> permalinks =
-                        permalinkIndexer.getPermalinks(
-                            PostRequestParamPredicate.GVK);
-                    boolean contains = permalinks.contains(request.path());
-                    if (!contains) {
+                    ExtensionLocator locator = permalinkIndexer.lookup(request.path());
+                    if (locator == null) {
                         return ServerResponse.notFound().build();
                     }
-                    ExtensionLocator extensionLocator =
-                        permalinkIndexer.lookup(request.path());
                     PathPattern parse = PathPatternParser.defaultInstance.parse(pattern);
                     PathPattern.PathMatchInfo pathMatchInfo =
                         parse.matchAndExtract(PathContainer.parsePath(request.path()));
                     Map<String, Object> model = new HashMap<>();
-                    model.put(PostRequestParamPredicate.NAME_PARAM,
-                        extensionLocator.name());
+                    model.put(PostRequestParamPredicate.NAME_PARAM, locator.name());
                     if (pathMatchInfo != null) {
                         model.putAll(pathMatchInfo.getUriVariables());
                     }
-                    model.put("post", postByName(extensionLocator.name()));
+                    model.put("post", postByName(locator.name()));
                     return ServerResponse.ok()
                         .render(DefaultTemplateEnum.POST.getValue(), model);
                 });
@@ -139,17 +133,13 @@ public class PostRouteStrategy implements TemplateRouterStrategy {
             }
 
             if (NAME_PARAM.equals(placeholderName)) {
-                return RequestPredicates.queryParam(paramName, name -> {
-                    List<String> names = permalinkIndexer.getNames(GVK);
-                    return names.contains(name);
-                });
+                return RequestPredicates.queryParam(paramName,
+                    name -> permalinkIndexer.containsName(GVK, name));
             }
 
             if (SLUG_PARAM.equals(placeholderName)) {
-                return RequestPredicates.queryParam(paramName, slug -> {
-                    List<String> slugs = permalinkIndexer.getSlugs(GVK);
-                    return slugs.contains(slug);
-                });
+                return RequestPredicates.queryParam(paramName,
+                    slug -> permalinkIndexer.containsSlug(GVK, slug));
             }
             throw new IllegalArgumentException(
                 String.format("Unknown param value placeholder [%s] in pattern [%s]",

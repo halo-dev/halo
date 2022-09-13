@@ -133,8 +133,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
             .setPermalink(PathUtils.combinePath(singlePage.getSpec().getSlug()));
         ExtensionLocator locator = new ExtensionLocator(GVK, singlePage.getMetadata().getName(),
             singlePage.getSpec().getSlug());
-        applicationContext.publishEvent(new PermalinkIndexDeleteCommand(this, locator,
-            singlePage.getStatusOrDefault().getPermalink()));
+        applicationContext.publishEvent(new PermalinkIndexDeleteCommand(this, locator));
         templateRouteManager.changeTemplatePattern(DefaultTemplateEnum.SINGLE_PAGE.getValue());
     }
 

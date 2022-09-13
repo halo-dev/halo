@@ -47,4 +47,35 @@ public class PathUtils {
     public static String appendPathSeparatorIfMissing(String path) {
         return StringUtils.appendIfMissing(path, "/", "/");
     }
+
+    /**
+     * <p>Remove the regex in the path pattern placeholder.</p>
+     * <p>For example: </p>
+     * <ul>
+     * <li>'{@code /{year:\d{4}}/{month:\d{2}}}' &rarr; '{@code /{year}/{month}}'</li>
+     * <li>'{@code /archives/{year:\d{4}}/{month:\d{2}}}' &rarr; '{@code /archives/{year}/{month}
+     * }'</li>
+     * <li>'{@code /archives/{year:\d{4}}/{slug}}' &rarr; '{@code /archives/{year}/{slug}}'</li>
+     * </ul>
+     *
+     * @param pattern path pattern
+     * @return Simplified path pattern
+     */
+    public static String simplifyPathPattern(String pattern) {
+        if (StringUtils.isBlank(pattern)) {
+            return StringUtils.EMPTY;
+        }
+        String[] parts = StringUtils.split(pattern, '/');
+        for (int i = 0; i < parts.length; i++) {
+            String part = parts[i];
+            if (part.startsWith("{") && part.endsWith("}")) {
+                int colonIdx = part.indexOf(':');
+                if (colonIdx != -1) {
+                    parts[i] = part.substring(0, colonIdx) + part.charAt(part.length() - 1);
+                }
+
+            }
+        }
+        return combinePath(parts);
+    }
 }

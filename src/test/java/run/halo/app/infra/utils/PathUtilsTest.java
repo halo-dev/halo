@@ -43,4 +43,17 @@ class PathUtilsTest {
         s = PathUtils.appendPathSeparatorIfMissing(null);
         assertThat(s).isEqualTo(null);
     }
+
+    @Test
+    void simplifyPathPattern() {
+        assertThat(PathUtils.simplifyPathPattern("/a/b/c")).isEqualTo("/a/b/c");
+        assertThat(PathUtils.simplifyPathPattern("/a/{b}/c")).isEqualTo("/a/{b}/c");
+        assertThat(PathUtils.simplifyPathPattern("/a/{b}/*")).isEqualTo("/a/{b}/*");
+        assertThat(PathUtils.simplifyPathPattern("/archives/{year:\\d{4}}/{month:\\d{2}}"))
+            .isEqualTo("/archives/{year}/{month}");
+        assertThat(PathUtils.simplifyPathPattern("/archives/{year:\\d{4}}/{slug}"))
+            .isEqualTo("/archives/{year}/{slug}");
+        assertThat(PathUtils.simplifyPathPattern("/archives/{year:\\d{4}}/page/{page:\\d+}"))
+            .isEqualTo("/archives/{year}/page/{page}");
+    }
 }

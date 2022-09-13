@@ -49,7 +49,7 @@ class PermalinkIndexerTest {
         assertThat(permalinkIndexer.permalinkLocatorMapSize()).isEqualTo(1);
         assertThat(permalinkIndexer.permalinkLocatorMapSize()).isEqualTo(1);
 
-        permalinkIndexer.remove(locator, "/fake-permalink");
+        permalinkIndexer.remove(locator);
         assertThat(permalinkIndexer.permalinkLocatorMapSize()).isEqualTo(0);
         assertThat(permalinkIndexer.permalinkLocatorMapSize()).isEqualTo(0);
     }
@@ -77,8 +77,8 @@ class PermalinkIndexerTest {
         ExtensionLocator locator = new ExtensionLocator(gvk, "test-name", "test-slug");
         permalinkIndexer.register(locator, "/test-permalink");
 
-        List<String> names = permalinkIndexer.getNames(gvk);
-        assertThat(names).isEqualTo(List.of("fake-name", "test-name"));
+        assertThat(permalinkIndexer.containsName(gvk, "test-name")).isTrue();
+        assertThat(permalinkIndexer.containsName(gvk, "nothing")).isFalse();
     }
 
     @Test
@@ -86,24 +86,9 @@ class PermalinkIndexerTest {
         ExtensionLocator locator = new ExtensionLocator(gvk, "test-name", "test-slug");
         permalinkIndexer.register(locator, "/test-permalink");
 
-        List<String> slugs = permalinkIndexer.getSlugs(gvk);
-        assertThat(slugs).isEqualTo(List.of("fake-slug", "test-slug"));
-    }
-
-    @Test
-    void getSlugByName() {
-        ExtensionLocator locator = new ExtensionLocator(gvk, "test-name", "test-slug");
-        permalinkIndexer.register(locator, "/test-permalink");
-
-        String slugByName = permalinkIndexer.getSlugByName(gvk, "test-name");
-        assertThat(slugByName).isEqualTo("test-slug");
-
-        slugByName = permalinkIndexer.getSlugByName(gvk, "fake-name");
-        assertThat(slugByName).isEqualTo("fake-slug");
-
-        assertThatThrownBy(() -> {
-            permalinkIndexer.getSlugByName(gvk, "nothing");
-        }).isInstanceOf(NoSuchElementException.class);
+        assertThat(permalinkIndexer.containsSlug(gvk, "fake-slug")).isTrue();
+        assertThat(permalinkIndexer.containsSlug(gvk, "test-slug")).isTrue();
+        assertThat(permalinkIndexer.containsSlug(gvk, "nothing")).isFalse();
     }
 
     @Test

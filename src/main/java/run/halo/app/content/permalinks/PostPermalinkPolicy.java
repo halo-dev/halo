@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.PermalinkIndexAddCommand;
 import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
@@ -23,7 +24,6 @@ import run.halo.app.theme.router.PermalinkWatch;
  */
 @Component
 public class PostPermalinkPolicy implements PermalinkPolicy<Post>, PermalinkWatch<Post> {
-
     private final GroupVersionKind gvk = GroupVersionKind.fromExtension(Post.class);
     private static final NumberFormat NUMBER_FORMAT = new DecimalFormat("00");
 
@@ -65,8 +65,7 @@ public class PostPermalinkPolicy implements PermalinkPolicy<Post>, PermalinkWatc
 
     @Override
     public void onPermalinkDelete(Post post) {
-        applicationContext.publishEvent(new PermalinkIndexDeleteCommand(this, getLocator(post),
-            post.getStatusOrDefault().getPermalink()));
+        applicationContext.publishEvent(new PermalinkIndexDeleteCommand(this, getLocator(post)));
     }
 
     private ExtensionLocator getLocator(Post post) {
@@ -85,6 +84,8 @@ public class PostPermalinkPolicy implements PermalinkPolicy<Post>, PermalinkWatc
         properties.put("year", String.valueOf(zonedDateTime.getYear()));
         properties.put("month", NUMBER_FORMAT.format(zonedDateTime.getMonthValue()));
         properties.put("day", NUMBER_FORMAT.format(zonedDateTime.getDayOfMonth()));
-        return PROPERTY_PLACEHOLDER_HELPER.replacePlaceholders(pattern, properties);
+
+        String simplifiedPattern = PathUtils.simplifyPathPattern(pattern);
+        return PROPERTY_PLACEHOLDER_HELPER.replacePlaceholders(simplifiedPattern, properties);
     }
 }

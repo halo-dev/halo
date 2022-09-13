@@ -20,6 +20,8 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.Tag;
+import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListResult;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
@@ -48,8 +50,9 @@ class TagRouteStrategyTest {
     void setUp() {
         lenient().when(postFinder.listByTag(anyInt(), anyInt(), any()))
             .thenReturn(new ListResult<>(1, 10, 0, List.of()));
-        when(permalinkIndexer.getSlugs(any()))
-            .thenReturn(List.of("fake-slug"));
+        GroupVersionKind gvk = GroupVersionKind.fromExtension(Tag.class);
+        when(permalinkIndexer.containsSlug(eq(gvk), eq("fake-slug")))
+            .thenReturn(true);
         when(permalinkIndexer.getNameBySlug(any(), eq("fake-slug")))
             .thenReturn("fake-name");
     }

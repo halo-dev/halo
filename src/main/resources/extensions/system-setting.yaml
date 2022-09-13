@@ -32,7 +32,7 @@ spec:
         label: "默认角色"
         name: defaultRole
         validation: required
-  - group: themeRules
+  - group: routeRules
     label: 主题模板路由设置
     formSchema:
       - $formkit: text
@@ -58,9 +58,9 @@ spec:
           - /archives/{name}
           - /?p={name}
           - /?p={slug}
-          - /{year}/{slug}
-          - /{year}/{month}/{slug}
-          - /{year}/{month}/{day}/{slug}
+          - /{year:\d{4}}/{slug}
+          - /{year:\d{4}}/{month:\d{2}}/{slug}
+          - /{year:\d{4}}/{month:\d{2}}/{day:\d{2}}/{slug}
         name: post
         validation: required
   - group: post

@@ -57,8 +57,7 @@ public class TagPermalinkPolicy implements PermalinkPolicy<Tag>, PermalinkWatch<
 
     @Override
     public void onPermalinkDelete(Tag tag) {
-        applicationContext.publishEvent(new PermalinkIndexDeleteCommand(this, getLocator(tag),
-            tag.getStatusOrDefault().getPermalink()));
+        applicationContext.publishEvent(new PermalinkIndexDeleteCommand(this, getLocator(tag)));
     }
 
     private ExtensionLocator getLocator(Tag tag) {

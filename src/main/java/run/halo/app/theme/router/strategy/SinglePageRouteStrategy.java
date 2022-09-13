@@ -4,7 +4,6 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -48,8 +47,7 @@ public class SinglePageRouteStrategy implements TemplateRouterStrategy {
 
         RequestPredicate requestPredicate = request -> false;
 
-        List<String> permalinks =
-            Objects.requireNonNullElse(permalinkIndexer.getPermalinks(gvk), List.of());
+        List<String> permalinks = permalinkIndexer.getPermalinks(gvk);
         for (String permalink : permalinks) {
             requestPredicate = requestPredicate.or(RequestPredicates.GET(permalink));
         }
