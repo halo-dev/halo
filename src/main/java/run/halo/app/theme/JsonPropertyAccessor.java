@@ -18,8 +18,11 @@ import org.springframework.util.Assert;
 /**
  * A SpEL {@link PropertyAccessor} that knows how to read properties from JSON objects.
  * Uses Jackson {@link JsonNode} API for nested properties access.
+ * Reference from
+ * <a href="https://github.com/spring-projects/spring-integration">spring-integration</a>
  *
  * @author guqing
+ * @see <a href="https://github.com/spring-projects/spring-integration">spring-integration</a>
  * @since 2.0.0
  */
 public class JsonPropertyAccessor implements PropertyAccessor {

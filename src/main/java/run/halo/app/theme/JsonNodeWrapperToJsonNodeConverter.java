@@ -15,8 +15,11 @@ import org.springframework.lang.Nullable;
  * of {@link JsonPropertyAccessor.JsonNodeWrapper} to {@link JsonNode},
  * when the {@link JsonPropertyAccessor.JsonNodeWrapper} can be a result of the expression
  * for JSON in case of the {@link JsonPropertyAccessor} usage.
+  Reference from
+ * <a href="https://github.com/spring-projects/spring-integration">spring-integration</a>
  *
  * @author guqing
+ * @see <a href="https://github.com/spring-projects/spring-integration">spring-integration</a>
  * @since 2.0.0
  */
 public class JsonNodeWrapperToJsonNodeConverter implements GenericConverter {
