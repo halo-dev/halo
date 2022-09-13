@@ -1,5 +1,6 @@
 package run.halo.app.theme.dialect;
 
+import org.springframework.integration.json.JsonPropertyAccessor;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.ITemplateEnd;
 import org.thymeleaf.model.ITemplateStart;
@@ -8,7 +9,6 @@ import org.thymeleaf.processor.templateboundaries.ITemplateBoundariesStructureHa
 import org.thymeleaf.spring6.expression.ThymeleafEvaluationContext;
 import org.thymeleaf.standard.StandardDialect;
 import org.thymeleaf.templatemode.TemplateMode;
-import run.halo.app.theme.JsonPropertyAccessor;
 
 /**
  * A template boundaries processor for add {@link JsonPropertyAccessor} to
