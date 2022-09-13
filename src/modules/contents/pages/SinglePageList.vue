@@ -3,7 +3,6 @@ import {
   IconArrowDown,
   IconArrowLeft,
   IconArrowRight,
-  IconSettings,
   IconEye,
   IconEyeOff,
   IconTeam,
@@ -30,6 +29,8 @@ import { apiClient } from "@halo-dev/admin-shared";
 import { formatDatetime } from "@/utils/date";
 import { RouterLink } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
+import Entity from "../../../components/entity/Entity.vue";
+import EntityField from "../../../components/entity/EntityField.vue";
 
 enum SinglePagePhase {
   DRAFT = "未发布",
@@ -332,68 +333,47 @@ const handleSelectUser = (user?: User) => {
       role="list"
     >
       <li v-for="(singlePage, index) in singlePages.items" :key="index">
-        <div
-          :class="{
-            'bg-gray-100': checkAll,
-          }"
-          class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
-        >
-          <div
-            v-show="checkAll"
-            class="absolute inset-y-0 left-0 w-0.5 bg-primary"
-          ></div>
-          <div class="relative flex flex-row items-center">
-            <div class="mr-4 hidden items-center sm:flex">
-              <input
-                v-model="checkAll"
-                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                type="checkbox"
-              />
-            </div>
-            <div class="flex-1">
-              <div class="flex flex-row items-center">
+        <Entity :is-selected="checkAll">
+          <template #checkbox>
+            <input
+              v-model="checkAll"
+              class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+              type="checkbox"
+            />
+          </template>
+          <template #start>
+            <EntityField
+              :title="singlePage.page.spec.title"
+              :description="singlePage.page.status?.permalink"
+              :route="{
+                name: 'SinglePageEditor',
+                query: { name: singlePage.page.metadata.name },
+              }"
+            >
+              <template #extra>
                 <RouterLink
+                  v-if="singlePage.page.status?.inProgress"
+                  v-tooltip="`当前有内容已保存，但还未发布。`"
                   :to="{
                     name: 'SinglePageEditor',
                     query: { name: singlePage.page.metadata.name },
                   }"
+                  class="flex items-center"
                 >
-                  <span class="truncate text-sm font-medium text-gray-900">
-                    {{ singlePage.page.spec.title }}
-                  </span>
-                </RouterLink>
-                <FloatingTooltip
-                  v-if="singlePage.page.status?.inProgress"
-                  class="hidden items-center sm:flex"
-                >
-                  <RouterLink
-                    :to="{
-                      name: 'SinglePageEditor',
-                      query: { name: singlePage.page.metadata.name },
-                    }"
-                    class="flex items-center"
+                  <div
+                    class="inline-flex h-1.5 w-1.5 rounded-full bg-orange-600"
                   >
-                    <div
-                      class="inline-flex h-1.5 w-1.5 rounded-full bg-orange-600"
-                    >
-                      <span
-                        class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-orange-600"
-                      ></span>
-                    </div>
-                  </RouterLink>
-                  <template #popper> 当前有内容已保存，但还未发布。 </template>
-                </FloatingTooltip>
-              </div>
-              <div class="mt-1 flex">
-                <span class="text-xs text-gray-500">
-                  {{ singlePage.page.status?.permalink }}
-                </span>
-              </div>
-            </div>
-            <div class="flex">
-              <div
-                class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
-              >
+                    <span
+                      class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-orange-600"
+                    ></span>
+                  </div>
+                </RouterLink>
+              </template>
+            </EntityField>
+          </template>
+          <template #end>
+            <EntityField>
+              <template #description>
                 <RouterLink
                   v-for="(
                     contributor, contributorIndex
@@ -413,64 +393,53 @@ const handleSelectUser = (user?: User) => {
                     circle
                   ></VAvatar>
                 </RouterLink>
-                <span class="text-sm text-gray-500">
-                  {{ finalStatus(singlePage.page) }}
-                </span>
-                <span>
-                  <IconEye
-                    v-if="singlePage.page.spec.visible === 'PUBLIC'"
-                    v-tooltip="`公开访问`"
-                    class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                  />
-                  <IconEyeOff
-                    v-if="singlePage.page.spec.visible === 'PRIVATE'"
-                    v-tooltip="`私有访问`"
-                    class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                  />
-                  <IconTeam
-                    v-if="singlePage.page.spec.visible === 'INTERNAL'"
-                    v-tooltip="`内部成员可访问`"
-                    class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                  />
-                </span>
-                <time class="text-sm text-gray-500">
-                  {{
-                    formatDatetime(singlePage.page.metadata.creationTimestamp)
-                  }}
-                </time>
-                <span>
-                  <FloatingDropdown>
-                    <IconSettings
-                      class="cursor-pointer transition-all hover:text-blue-600"
-                    />
-                    <template #popper>
-                      <div class="w-48 p-2">
-                        <VSpace class="w-full" direction="column">
-                          <VButton
-                            v-close-popper
-                            block
-                            type="secondary"
-                            @click="handleOpenSettingModal(singlePage.page)"
-                          >
-                            设置
-                          </VButton>
-                          <VButton
-                            v-close-popper
-                            block
-                            type="danger"
-                            @click="handleDelete(singlePage.page)"
-                          >
-                            删除
-                          </VButton>
-                        </VSpace>
-                      </div>
-                    </template>
-                  </FloatingDropdown>
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+              </template>
+            </EntityField>
+            <EntityField :description="finalStatus(singlePage.page)" />
+            <EntityField>
+              <template #description>
+                <IconEye
+                  v-if="singlePage.page.spec.visible === 'PUBLIC'"
+                  v-tooltip="`公开访问`"
+                  class="cursor-pointer text-sm transition-all hover:text-blue-600"
+                />
+                <IconEyeOff
+                  v-if="singlePage.page.spec.visible === 'PRIVATE'"
+                  v-tooltip="`私有访问`"
+                  class="cursor-pointer text-sm transition-all hover:text-blue-600"
+                />
+                <IconTeam
+                  v-if="singlePage.page.spec.visible === 'INTERNAL'"
+                  v-tooltip="`内部成员可访问`"
+                  class="cursor-pointer text-sm transition-all hover:text-blue-600"
+                />
+              </template>
+            </EntityField>
+            <EntityField
+              :description="
+                formatDatetime(singlePage.page.metadata.creationTimestamp)
+              "
+            />
+          </template>
+          <template #menuItems>
+            <VButton
+              v-close-popper
+              block
+              type="secondary"
+              @click="handleOpenSettingModal(singlePage.page)"
+            >
+              设置
+            </VButton>
+            <VButton
+              v-close-popper
+              block
+              type="danger"
+              @click="handleDelete(singlePage.page)"
+            >
+              删除
+            </VButton>
+          </template>
+        </Entity>
       </li>
     </ul>
 

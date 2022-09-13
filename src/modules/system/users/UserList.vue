@@ -2,7 +2,6 @@
 import {
   IconAddCircle,
   IconArrowDown,
-  IconSettings,
   IconUserFollow,
   IconUserSettings,
   VButton,
@@ -21,6 +20,8 @@ import type { User, UserList } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 import { useRouteQuery } from "@vueuse/router";
+import Entity from "@/components/entity/Entity.vue";
+import EntityField from "@/components/entity/EntityField.vue";
 
 const checkAll = ref(false);
 const editingModal = ref<boolean>(false);
@@ -275,104 +276,70 @@ onMounted(() => {
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
         <li v-for="(user, index) in users.items" :key="index">
-          <div
-            :class="{
-              'bg-gray-100': checkAll,
-            }"
-            class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
-          >
-            <div
-              v-show="checkAll"
-              class="absolute inset-y-0 left-0 w-0.5 bg-primary"
-            ></div>
-            <div class="relative flex flex-row items-center">
-              <div class="mr-4 hidden items-center sm:flex">
-                <input
-                  v-model="checkAll"
-                  v-permission="['system:users:manage']"
-                  class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                  type="checkbox"
-                />
-              </div>
-              <div v-if="user.spec.avatar" class="mr-4 flex items-center">
-                <VAvatar
-                  :alt="user.spec.displayName"
-                  :src="user.spec.avatar"
-                  size="md"
-                ></VAvatar>
-              </div>
-              <div class="flex-1">
-                <div class="flex flex-row items-center">
-                  <span
-                    class="mr-2 truncate text-sm font-medium text-gray-900"
-                    @click="
-                      $router.push({
-                        name: 'UserDetail',
-                        params: { name: user.metadata.name },
-                      })
-                    "
-                  >
-                    {{ user.spec.displayName }}
-                  </span>
-                  <VTag class="sm:hidden">{{ user.metadata.name }}</VTag>
-                </div>
-                <div class="mt-1 flex">
-                  <VSpace align="start" direction="column" spacing="xs">
-                    <span class="text-xs text-gray-500">
-                      {{ user.metadata.name }}
-                    </span>
-                  </VSpace>
-                </div>
-              </div>
-              <div class="flex">
-                <div
-                  class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
-                >
+          <Entity :is-selected="checkAll">
+            <template #checkbox>
+              <input
+                v-model="checkAll"
+                v-permission="['system:users:manage']"
+                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                type="checkbox"
+              />
+            </template>
+            <template #start>
+              <EntityField>
+                <template #description>
+                  <VAvatar
+                    :alt="user.spec.displayName"
+                    :src="user.spec.avatar"
+                    size="md"
+                  ></VAvatar>
+                </template>
+              </EntityField>
+              <EntityField
+                :title="user.spec.displayName"
+                :description="user.metadata.name"
+                :route="{
+                  name: 'UserDetail',
+                  params: { name: user.metadata.name },
+                }"
+              />
+            </template>
+            <template #end>
+              <EntityField>
+                <template #description>
                   <div
                     v-for="(role, roleIndex) in getRoles(user)"
                     :key="roleIndex"
-                    class="hidden items-center sm:flex"
+                    class="flex items-center"
                   >
                     <VTag>
                       {{ role }}
                     </VTag>
                   </div>
-                  <time class="text-sm text-gray-500">
-                    {{ formatDatetime(user.metadata.creationTimestamp) }}
-                  </time>
-                  <span
-                    v-permission="['system:users:manage']"
-                    class="cursor-pointer"
-                  >
-                    <FloatingDropdown>
-                      <IconSettings />
-                      <template #popper>
-                        <div class="w-48 p-2">
-                          <VSpace class="w-full" direction="column">
-                            <VButton
-                              v-close-popper
-                              block
-                              type="secondary"
-                              @click="handleOpenCreateModal(user)"
-                            >
-                              修改资料
-                            </VButton>
-                            <VButton
-                              v-close-popper
-                              block
-                              @click="handleOpenPasswordChangeModal(user)"
-                            >
-                              修改密码
-                            </VButton>
-                          </VSpace>
-                        </div>
-                      </template>
-                    </FloatingDropdown>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+                </template>
+              </EntityField>
+              <EntityField
+                :description="formatDatetime(user.metadata.creationTimestamp)"
+              />
+            </template>
+            <template #menuItems>
+              <VButton
+                v-close-popper
+                block
+                type="secondary"
+                @click="handleOpenCreateModal(user)"
+              >
+                修改资料
+              </VButton>
+              <VButton
+                v-close-popper
+                block
+                @click="handleOpenPasswordChangeModal(user)"
+              >
+                修改密码
+              </VButton>
+            </template>
+          </Entity>
         </li>
       </ul>
 

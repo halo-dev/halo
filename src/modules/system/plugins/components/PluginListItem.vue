@@ -1,11 +1,7 @@
 <script lang="ts" setup>
-import {
-  IconSettings,
-  VButton,
-  VSpace,
-  VSwitch,
-  VTag,
-} from "@halo-dev/components";
+import { VButton, VSpace, VSwitch, VTag } from "@halo-dev/components";
+import Entity from "@/components/entity/Entity.vue";
+import EntityField from "@/components/entity/EntityField.vue";
 import { toRefs } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 import type { Plugin } from "@halo-dev/api-client";
@@ -25,17 +21,10 @@ const { plugin } = toRefs(props);
 const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
 </script>
 <template>
-  <div
-    class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
-  >
-    <div class="relative flex flex-row items-center">
-      <div v-if="plugin?.spec.logo" class="mr-4">
-        <RouterLink
-          :to="{
-            name: 'PluginDetail',
-            params: { name: plugin?.metadata.name },
-          }"
-        >
+  <Entity>
+    <template #start>
+      <EntityField>
+        <template #description>
           <div class="h-12 w-12 rounded border bg-white p-1 hover:shadow-sm">
             <img
               :alt="plugin?.metadata.name"
@@ -43,55 +32,40 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
               class="h-full w-full"
             />
           </div>
-        </RouterLink>
-      </div>
-      <div class="flex-1">
-        <div class="flex flex-row items-center">
-          <RouterLink
-            :to="{
-              name: 'PluginDetail',
-              params: { name: plugin?.metadata.name },
-            }"
-          >
-            <span class="mr-2 truncate text-sm font-medium text-gray-900">
-              {{ plugin?.spec.displayName }}
-            </span>
-          </RouterLink>
+        </template>
+      </EntityField>
+      <EntityField
+        :title="plugin?.spec.displayName"
+        :description="plugin?.spec.description"
+        :route="{
+          name: 'PluginDetail',
+          params: { name: plugin?.metadata.name },
+        }"
+      >
+        <template #extra>
           <VSpace>
             <VTag>
               {{ isStarted ? "已启用" : "未启用" }}
             </VTag>
           </VSpace>
-        </div>
-        <div class="mt-2 flex">
-          <VSpace align="start" direction="column" spacing="xs">
-            <span class="text-xs text-gray-500">
-              {{ plugin?.spec.description }}
-            </span>
-            <span class="text-xs text-gray-500 sm:hidden">
-              @{{ plugin?.spec.author }} {{ plugin?.spec.version }}
-            </span>
-          </VSpace>
-        </div>
-      </div>
-      <div class="flex">
-        <div
-          class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
-        >
-          <FloatingTooltip
-            v-if="plugin?.status?.phase === 'FAILED'"
-            class="hidden items-center sm:flex"
+        </template>
+      </EntityField>
+    </template>
+    <template #end>
+      <EntityField v-if="plugin?.status?.phase === 'FAILED'">
+        <template #description>
+          <div
+            v-tooltip="`${plugin?.status?.reason}:${plugin?.status?.message}`"
+            class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
           >
-            <div class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600">
-              <span
-                class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
-              ></span>
-            </div>
-            <template #popper>
-              {{ plugin?.status?.reason }}:
-              {{ plugin?.status?.message }}
-            </template>
-          </FloatingTooltip>
+            <span
+              class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
+            ></span>
+          </div>
+        </template>
+      </EntityField>
+      <EntityField>
+        <template #description>
           <a
             :href="plugin?.spec.homepage"
             class="hidden text-sm text-gray-500 hover:text-gray-900 sm:block"
@@ -99,12 +73,15 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
           >
             @{{ plugin?.spec.author }}
           </a>
-          <span class="hidden text-sm text-gray-500 sm:block">
-            {{ plugin?.spec.version }}
-          </span>
-          <time class="hidden text-sm text-gray-500 sm:block">
-            {{ formatDatetime(plugin?.metadata.creationTimestamp) }}
-          </time>
+        </template>
+      </EntityField>
+      <EntityField :description="plugin?.spec.version" />
+      <EntityField
+        v-if="plugin?.metadata.creationTimestamp"
+        :description="formatDatetime(plugin?.metadata.creationTimestamp)"
+      />
+      <EntityField>
+        <template #description>
           <div
             v-permission="['system:plugins:manage']"
             class="flex items-center"
@@ -114,27 +91,13 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
               @click="changeStatus"
             />
           </div>
-          <span v-permission="['system:plugins:manage']" class="cursor-pointer">
-            <FloatingDropdown>
-              <IconSettings />
-              <template #popper>
-                <div class="w-48 p-2">
-                  <VSpace class="w-full" direction="column">
-                    <VButton
-                      v-close-popper
-                      block
-                      type="danger"
-                      @click="uninstall"
-                    >
-                      卸载
-                    </VButton>
-                  </VSpace>
-                </div>
-              </template>
-            </FloatingDropdown>
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
+        </template>
+      </EntityField>
+    </template>
+    <template #menuItems>
+      <VButton v-close-popper block type="danger" @click="uninstall">
+        卸载
+      </VButton>
+    </template>
+  </Entity>
 </template>

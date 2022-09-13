@@ -7,7 +7,6 @@ import type { Role } from "@halo-dev/api-client";
 import {
   IconAddCircle,
   IconArrowDown,
-  IconSettings,
   IconShieldUser,
   useDialog,
   VButton,
@@ -18,6 +17,8 @@ import {
   VTag,
 } from "@halo-dev/components";
 import RoleEditingModal from "./components/RoleEditingModal.vue";
+import Entity from "@/components/entity/Entity.vue";
+import EntityField from "@/components/entity/EntityField.vue";
 
 // constants
 import { rbacAnnotations } from "@/constants/annotations";
@@ -199,114 +200,75 @@ const handleDelete = async (role: Role) => {
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
         <li v-for="(role, index) in roles" :key="index">
-          <div
-            class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
-          >
-            <div class="relative flex flex-row items-center">
-              <div class="flex-1">
-                <div class="flex flex-row items-center">
-                  <RouterLink
-                    :to="{
-                      name: 'RoleDetail',
-                      params: {
-                        name: role.metadata.name,
-                      },
-                    }"
-                  >
-                    <span
-                      class="mr-2 truncate text-sm font-medium text-gray-900"
-                    >
-                      {{
-                        role.metadata.annotations?.[
-                          rbacAnnotations.DISPLAY_NAME
-                        ] || role.metadata.name
-                      }}
-                    </span>
-                  </RouterLink>
-                </div>
-                <div class="mt-2 flex">
-                  <span class="text-xs text-gray-500">
-                    包含
-                    {{
+          <Entity>
+            <template #start>
+              <EntityField
+                :title="
+                  role.metadata.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
+                  role.metadata.name
+                "
+                :description="`包含
+                    ${
                       JSON.parse(
                         role.metadata.annotations?.[
                           rbacAnnotations.DEPENDENCIES
-                        ] || "[]"
+                        ] || '[]'
                       ).length
-                    }}
-                    个权限
-                  </span>
-                </div>
-              </div>
-              <div class="flex">
-                <div
-                  class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
-                >
-                  <FloatingTooltip
-                    v-if="role.metadata.deletionTimestamp"
-                    class="hidden items-center sm:flex"
+                    }
+                    个权限`"
+                :route="{
+                  name: 'RoleDetail',
+                  params: {
+                    name: role.metadata.name,
+                  },
+                }"
+              ></EntityField>
+            </template>
+            <template #end>
+              <EntityField v-if="role.metadata.deletionTimestamp">
+                <template #description>
+                  <div
+                    v-tooltip="`删除中`"
+                    class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
                   >
-                    <div
-                      class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
-                    >
-                      <span
-                        class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
-                      ></span>
-                    </div>
-                    <template #popper> 删除中</template>
-                  </FloatingTooltip>
-
-                  <a
-                    class="hidden text-sm text-gray-500 hover:text-gray-900 sm:block"
-                    target="_blank"
-                  >
-                    0 个用户
-                  </a>
+                    <span
+                      class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
+                    ></span>
+                  </div>
+                </template>
+              </EntityField>
+              <EntityField description="0 个用户" />
+              <EntityField>
+                <template #description>
                   <VTag> 系统保留</VTag>
-                  <time class="text-sm text-gray-500">
-                    {{ formatDatetime(role.metadata.creationTimestamp) }}
-                  </time>
-                  <span
-                    v-permission="['system:roles:manage']"
-                    class="cursor-pointer"
-                  >
-                    <FloatingDropdown>
-                      <IconSettings />
-                      <template #popper>
-                        <div class="w-48 p-2">
-                          <VSpace class="w-full" direction="column">
-                            <VButton
-                              v-close-popper
-                              block
-                              type="secondary"
-                              @click="handleOpenEditingModal(role)"
-                            >
-                              编辑
-                            </VButton>
-                            <VButton
-                              v-close-popper
-                              block
-                              type="danger"
-                              @click="handleDelete(role)"
-                            >
-                              删除
-                            </VButton>
-                            <VButton
-                              v-close-popper
-                              block
-                              @click="handleCloneRole(role)"
-                            >
-                              基于此角色创建
-                            </VButton>
-                          </VSpace>
-                        </div>
-                      </template>
-                    </FloatingDropdown>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+                </template>
+              </EntityField>
+              <EntityField
+                :description="formatDatetime(role.metadata.creationTimestamp)"
+              />
+            </template>
+            <template #menuItems>
+              <VButton
+                v-close-popper
+                block
+                type="secondary"
+                @click="handleOpenEditingModal(role)"
+              >
+                编辑
+              </VButton>
+              <VButton
+                v-close-popper
+                block
+                type="danger"
+                @click="handleDelete(role)"
+              >
+                删除
+              </VButton>
+              <VButton v-close-popper block @click="handleCloneRole(role)">
+                基于此角色创建
+              </VButton>
+            </template>
+          </Entity>
         </li>
       </ul>
 

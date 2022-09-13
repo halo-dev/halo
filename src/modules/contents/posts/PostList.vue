@@ -7,7 +7,6 @@ import {
   IconBookRead,
   IconEye,
   IconEyeOff,
-  IconSettings,
   IconTeam,
   IconCloseCircle,
   useDialog,
@@ -21,6 +20,8 @@ import {
 } from "@halo-dev/components";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";
+import Entity from "@/components/entity/Entity.vue";
+import EntityField from "@/components/entity/EntityField.vue";
 import PostTag from "../posts/tags/components/PostTag.vue";
 import { onMounted, ref, watch, watchEffect } from "vue";
 import type {
@@ -738,64 +739,43 @@ function handleContributorFilterItemChange(user?: User) {
         role="list"
       >
         <li v-for="(post, index) in posts.items" :key="index">
-          <div
-            :class="{
-              'bg-gray-100': checkSelection(post.post),
-            }"
-            class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
-          >
-            <div
-              v-show="checkSelection(post.post)"
-              class="absolute inset-y-0 left-0 w-0.5 bg-primary"
-            ></div>
-            <div class="relative flex flex-row items-center">
-              <div class="mr-4 hidden items-center sm:flex">
-                <input
-                  v-model="selectedPostNames"
-                  :value="post.post.metadata.name"
-                  class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                  name="post-checkbox"
-                  type="checkbox"
-                />
-              </div>
-              <div class="flex-1">
-                <div class="flex flex-col items-center sm:flex-row">
-                  <RouterLink
-                    :to="{
-                      name: 'PostEditor',
-                      query: { name: post.post.metadata.name },
-                    }"
-                  >
-                    <span
-                      class="mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2"
-                    >
-                      {{ post.post.spec.title }}
-                    </span>
-                  </RouterLink>
+          <Entity :is-selected="checkSelection(post.post)">
+            <template #checkbox>
+              <input
+                v-model="selectedPostNames"
+                :value="post.post.metadata.name"
+                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                name="post-checkbox"
+                type="checkbox"
+              />
+            </template>
+            <template #start>
+              <EntityField
+                :title="post.post.spec.title"
+                :route="{
+                  name: 'PostEditor',
+                  query: { name: post.post.metadata.name },
+                }"
+              >
+                <template #extra>
                   <VSpace class="mt-1 sm:mt-0">
-                    <FloatingTooltip
+                    <RouterLink
                       v-if="post.post.status?.inProgress"
-                      class="hidden items-center sm:flex"
+                      v-tooltip="`当前有内容已保存，但还未发布。`"
+                      :to="{
+                        name: 'PostEditor',
+                        query: { name: post.post.metadata.name },
+                      }"
+                      class="flex items-center"
                     >
-                      <RouterLink
-                        :to="{
-                          name: 'PostEditor',
-                          query: { name: post.post.metadata.name },
-                        }"
-                        class="flex items-center"
+                      <div
+                        class="inline-flex h-1.5 w-1.5 rounded-full bg-orange-600"
                       >
-                        <div
-                          class="inline-flex h-1.5 w-1.5 rounded-full bg-orange-600"
-                        >
-                          <span
-                            class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-orange-600"
-                          ></span>
-                        </div>
-                      </RouterLink>
-                      <template #popper>
-                        当前有内容已保存，但还未发布。
-                      </template>
-                    </FloatingTooltip>
+                        <span
+                          class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-orange-600"
+                        ></span>
+                      </div>
+                    </RouterLink>
                     <PostTag
                       v-for="(tag, tagIndex) in post.tags"
                       :key="tagIndex"
@@ -803,8 +783,8 @@ function handleContributorFilterItemChange(user?: User) {
                       route
                     ></PostTag>
                   </VSpace>
-                </div>
-                <div class="mt-1 flex">
+                </template>
+                <template #description>
                   <VSpace>
                     <p
                       v-if="post.categories.length"
@@ -821,12 +801,12 @@ function handleContributorFilterItemChange(user?: User) {
                     <span class="text-xs text-gray-500">访问量 0</span>
                     <span class="text-xs text-gray-500"> 评论 0 </span>
                   </VSpace>
-                </div>
-              </div>
-              <div class="flex">
-                <div
-                  class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
-                >
+                </template>
+              </EntityField>
+            </template>
+            <template #end>
+              <EntityField>
+                <template #description>
                   <RouterLink
                     v-for="(contributor, contributorIndex) in post.contributors"
                     :key="contributorIndex"
@@ -844,62 +824,53 @@ function handleContributorFilterItemChange(user?: User) {
                       circle
                     ></VAvatar>
                   </RouterLink>
-                  <span class="text-sm text-gray-500">
-                    {{ finalStatus(post.post) }}
-                  </span>
-                  <span>
-                    <IconEye
-                      v-if="post.post.spec.visible === 'PUBLIC'"
-                      v-tooltip="`公开访问`"
-                      class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                    />
-                    <IconEyeOff
-                      v-if="post.post.spec.visible === 'PRIVATE'"
-                      v-tooltip="`私有访问`"
-                      class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                    />
-                    <IconTeam
-                      v-if="post.post.spec.visible === 'INTERNAL'"
-                      v-tooltip="`内部成员可访问`"
-                      class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                    />
-                  </span>
-                  <time class="text-sm text-gray-500">
-                    {{ formatDatetime(post.post.metadata.creationTimestamp) }}
-                  </time>
-                  <span>
-                    <FloatingDropdown>
-                      <IconSettings
-                        class="cursor-pointer transition-all hover:text-blue-600"
-                      />
-                      <template #popper>
-                        <div class="w-48 p-2">
-                          <VSpace class="w-full" direction="column">
-                            <VButton
-                              v-close-popper
-                              block
-                              type="secondary"
-                              @click="handleOpenSettingModal(post.post)"
-                            >
-                              设置
-                            </VButton>
-                            <VButton
-                              v-close-popper
-                              block
-                              type="danger"
-                              @click="handleDelete(post.post)"
-                            >
-                              删除
-                            </VButton>
-                          </VSpace>
-                        </div>
-                      </template>
-                    </FloatingDropdown>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+                </template>
+              </EntityField>
+              <EntityField :description="finalStatus(post.post)"></EntityField>
+              <EntityField>
+                <template #description>
+                  <IconEye
+                    v-if="post.post.spec.visible === 'PUBLIC'"
+                    v-tooltip="`公开访问`"
+                    class="cursor-pointer text-sm transition-all hover:text-blue-600"
+                  />
+                  <IconEyeOff
+                    v-if="post.post.spec.visible === 'PRIVATE'"
+                    v-tooltip="`私有访问`"
+                    class="cursor-pointer text-sm transition-all hover:text-blue-600"
+                  />
+                  <IconTeam
+                    v-if="post.post.spec.visible === 'INTERNAL'"
+                    v-tooltip="`内部成员可访问`"
+                    class="cursor-pointer text-sm transition-all hover:text-blue-600"
+                  />
+                </template>
+              </EntityField>
+              <EntityField
+                :description="
+                  formatDatetime(post.post.metadata.creationTimestamp)
+                "
+              />
+            </template>
+            <template #menuItems>
+              <VButton
+                v-close-popper
+                block
+                type="secondary"
+                @click="handleOpenSettingModal(post.post)"
+              >
+                设置
+              </VButton>
+              <VButton
+                v-close-popper
+                block
+                type="danger"
+                @click="handleDelete(post.post)"
+              >
+                删除
+              </VButton>
+            </template>
+          </Entity>
         </li>
       </ul>
 

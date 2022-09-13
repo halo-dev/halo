@@ -3,6 +3,8 @@ import { ref } from "vue";
 import { VEmpty, VSpace, VButton, IconAddCircle } from "@halo-dev/components";
 import type { PagesPublicState } from "@halo-dev/admin-shared";
 import { useExtensionPointsState } from "@/composables/usePlugins";
+import Entity from "@/components/entity/Entity.vue";
+import EntityField from "@/components/entity/EntityField.vue";
 
 const pagesPublicState = ref<PagesPublicState>({
   functionalPages: [],
@@ -38,27 +40,15 @@ useExtensionPointsState("PAGES", pagesPublicState);
       :key="index"
       v-permission="page.permissions"
     >
-      <div
-        class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
-      >
-        <div class="relative flex flex-row items-center">
-          <div class="flex-1">
-            <div class="flex">
-              <RouterLink
-                :to="page.path"
-                class="truncate text-sm font-medium text-gray-900"
-              >
-                {{ page.name }}
-              </RouterLink>
-            </div>
-            <div class="mt-1 flex">
-              <span class="text-xs text-gray-500">
-                {{ page.url }}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Entity>
+        <template #start>
+          <EntityField
+            :title="page.name"
+            :route="page.path"
+            :description="page.url"
+          ></EntityField>
+        </template>
+      </Entity>
     </li>
   </ul>
 </template>

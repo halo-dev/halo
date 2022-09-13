@@ -7,7 +7,6 @@ import {
   IconDatabase2Line,
   IconGrid,
   IconList,
-  IconSettings,
   IconUpload,
   VButton,
   VCard,
@@ -36,6 +35,8 @@ import cloneDeep from "lodash.clonedeep";
 import { isImage } from "@/utils/image";
 import { useRouteQuery } from "@vueuse/router";
 import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
+import Entity from "@/components/entity/Entity.vue";
+import EntityField from "@/components/entity/EntityField.vue";
 
 const policyVisible = ref(false);
 const uploadVisible = ref(false);
@@ -555,47 +556,35 @@ onMounted(() => {
               role="list"
             >
               <li v-for="(attachment, index) in attachments.items" :key="index">
-                <div
-                  :class="{
-                    'bg-gray-100': isChecked(attachment),
-                  }"
-                  class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
-                >
-                  <div
-                    v-show="isChecked(attachment)"
-                    class="absolute inset-y-0 left-0 w-0.5 bg-primary"
-                  ></div>
-                  <div class="relative flex flex-row items-center">
-                    <div class="mr-4 hidden items-center sm:flex">
-                      <input
-                        :checked="selectedAttachments.has(attachment)"
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                        type="checkbox"
-                        @click="handleSelect(attachment)"
-                      />
-                    </div>
-                    <div class="mr-4">
-                      <div
-                        class="h-12 w-12 rounded border bg-white p-1 hover:shadow-sm"
-                      >
-                        <AttachmentFileTypeIcon
-                          :display-ext="false"
-                          :file-name="attachment.spec.displayName"
-                          :width="8"
-                          :height="8"
-                        />
-                      </div>
-                    </div>
-                    <div class="flex-1">
-                      <div class="flex flex-col sm:flex-row">
-                        <span
-                          class="mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2"
-                          @click="handleClickItem(attachment)"
+                <Entity :is-selected="isChecked(attachment)">
+                  <template #checkbox>
+                    <input
+                      :checked="selectedAttachments.has(attachment)"
+                      class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                      type="checkbox"
+                      @click="handleSelect(attachment)"
+                    />
+                  </template>
+                  <template #start>
+                    <EntityField>
+                      <template #description>
+                        <div
+                          class="h-10 w-10 rounded border bg-white p-1 hover:shadow-sm"
                         >
-                          {{ attachment.spec.displayName }}
-                        </span>
-                      </div>
-                      <div class="mt-1 flex">
+                          <AttachmentFileTypeIcon
+                            :display-ext="false"
+                            :file-name="attachment.spec.displayName"
+                            :width="8"
+                            :height="8"
+                          />
+                        </div>
+                      </template>
+                    </EntityField>
+                    <EntityField
+                      :title="attachment.spec.displayName"
+                      @click="handleClickItem(attachment)"
+                    >
+                      <template #description>
                         <VSpace>
                           <span class="text-xs text-gray-500">
                             {{ attachment.spec.mediaType }}
@@ -604,54 +593,50 @@ onMounted(() => {
                             {{ prettyBytes(attachment.spec.size || 0) }}
                           </span>
                         </VSpace>
-                      </div>
-                    </div>
-                    <div class="flex">
-                      <div
-                        class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
-                      >
-                        <span class="text-sm text-gray-500">
-                          {{ getPolicyName(attachment.spec.policyRef?.name) }}
-                        </span>
+                      </template>
+                    </EntityField>
+                  </template>
+                  <template #end>
+                    <EntityField
+                      :description="
+                        getPolicyName(attachment.spec.policyRef?.name)
+                      "
+                    />
+                    <EntityField>
+                      <template #description>
                         <RouterLink
                           :to="{
                             name: 'UserDetail',
                             params: { name: attachment.spec.uploadedBy?.name },
                           }"
+                          class="text-xs text-gray-500"
                         >
-                          <span class="text-sm text-gray-500">
-                            {{ attachment.spec.uploadedBy?.name }}
-                          </span>
+                          {{ attachment.spec.uploadedBy?.name }}
                         </RouterLink>
-                        <FloatingTooltip
-                          v-if="attachment.metadata.deletionTimestamp"
-                          class="hidden items-center sm:flex"
+                      </template>
+                    </EntityField>
+                    <EntityField v-if="attachment.metadata.deletionTimestamp">
+                      <template #description>
+                        <div
+                          v-tooltip="`删除中`"
+                          class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
                         >
-                          <div
-                            class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
-                          >
-                            <span
-                              class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
-                            ></span>
-                          </div>
-                          <template #popper> 删除中</template>
-                        </FloatingTooltip>
-                        <time class="text-sm text-gray-500">
-                          {{
-                            formatDatetime(
-                              attachment.metadata.creationTimestamp
-                            )
-                          }}
-                        </time>
-                        <span class="cursor-pointer">
-                          <IconSettings
-                            @click.stop="handleClickItem(attachment)"
-                          />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                          <span
+                            class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
+                          ></span>
+                        </div>
+                      </template>
+                    </EntityField>
+                    <EntityField
+                      :description="
+                        formatDatetime(attachment.metadata.creationTimestamp)
+                      "
+                    />
+                  </template>
+                  <template #menuItems>
+                    <VButton v-close-popper block type="danger"> 删除 </VButton>
+                  </template>
+                </Entity>
               </li>
             </ul>
           </div>

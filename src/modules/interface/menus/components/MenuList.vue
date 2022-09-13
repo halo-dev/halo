@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import {
-  IconSettings,
   useDialog,
   VButton,
   VCard,
@@ -12,6 +11,8 @@ import { defineExpose, onMounted, ref } from "vue";
 import type { Menu } from "@halo-dev/api-client";
 import { apiClient } from "@halo-dev/admin-shared";
 import { useRouteQuery } from "@vueuse/router";
+import Entity from "@/components/entity/Entity.vue";
+import EntityField from "@/components/entity/EntityField.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -137,71 +138,56 @@ defineExpose({
         </VSpace>
       </template>
     </VEmpty>
-    <div class="divide-y divide-gray-100 bg-white">
-      <div
+    <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
+      <li
         v-for="(menu, index) in menus"
         :key="index"
-        :class="{
-          'bg-gray-50': selectedMenu?.metadata.name === menu.metadata.name,
-        }"
-        class="relative flex items-center p-4"
         @click="handleSelect(menu)"
       >
-        <div
-          v-if="selectedMenu?.metadata.name === menu.metadata.name"
-          class="absolute inset-y-0 left-0 w-0.5 bg-primary"
-        ></div>
-        <span class="flex flex-1 cursor-pointer flex-col gap-y-1">
-          <span class="block text-sm font-medium">
-            {{ menu.spec?.displayName }}
-          </span>
-          <span class="block text-xs text-gray-400">
-            {{ menu.spec.menuItems?.length || 0 }}
-            个菜单项
-          </span>
-        </span>
-        <FloatingTooltip
-          v-if="menu.metadata.deletionTimestamp"
-          class="mr-4 hidden items-center sm:flex"
+        <Entity
+          :is-selected="selectedMenu?.metadata.name === menu.metadata.name"
         >
-          <div class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600">
-            <span
-              class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
-            ></span>
-          </div>
-          <template #popper> 删除中</template>
-        </FloatingTooltip>
-        <div class="self-center">
-          <FloatingDropdown>
-            <IconSettings
-              class="cursor-pointer transition-all hover:text-blue-600"
-            />
-            <template #popper>
-              <div class="w-48 p-2">
-                <VSpace class="w-full" direction="column">
-                  <VButton
-                    v-close-popper
-                    block
-                    type="secondary"
-                    @click="handleOpenEditingModal(menu)"
-                  >
-                    修改
-                  </VButton>
-                  <VButton
-                    v-close-popper
-                    block
-                    type="danger"
-                    @click="handleDeleteMenu(menu)"
-                  >
-                    删除
-                  </VButton>
-                </VSpace>
-              </div>
-            </template>
-          </FloatingDropdown>
-        </div>
-      </div>
-    </div>
+          <template #start>
+            <EntityField
+              :title="menu.spec?.displayName"
+              :description="`${menu.spec.menuItems?.length || 0} 个菜单项`"
+            ></EntityField>
+          </template>
+          <template #end>
+            <EntityField v-if="menu.metadata.deletionTimestamp">
+              <template #description>
+                <div
+                  v-tooltip="`删除中`"
+                  class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
+                >
+                  <span
+                    class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
+                  ></span>
+                </div>
+              </template>
+            </EntityField>
+          </template>
+          <template #menuItems>
+            <VButton
+              v-close-popper
+              block
+              type="secondary"
+              @click="handleOpenEditingModal(menu)"
+            >
+              修改
+            </VButton>
+            <VButton
+              v-close-popper
+              block
+              type="danger"
+              @click="handleDeleteMenu(menu)"
+            >
+              删除
+            </VButton>
+          </template>
+        </Entity>
+      </li>
+    </ul>
     <template #footer>
       <VButton block type="secondary" @click="handleOpenEditingModal(null)">
         新增

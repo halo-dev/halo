@@ -8,7 +8,6 @@ import {
   IconBookRead,
   IconGrid,
   IconList,
-  IconSettings,
   VButton,
   VCard,
   VEmpty,
@@ -17,6 +16,8 @@ import {
 } from "@halo-dev/components";
 import TagEditingModal from "./components/TagEditingModal.vue";
 import PostTag from "./components/PostTag.vue";
+import Entity from "@/components/entity/Entity.vue";
+import EntityField from "@/components/entity/EntityField.vue";
 
 // types
 import type { Tag } from "@halo-dev/api-client";
@@ -173,85 +174,55 @@ onMounted(async () => {
           role="list"
         >
           <li v-for="(tag, index) in tags" :key="index">
-            <div
-              :class="{
-                'bg-gray-100': selectedTag?.metadata.name === tag.metadata.name,
-              }"
-              class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
+            <Entity
+              :is-selected="selectedTag?.metadata.name === tag.metadata.name"
             >
-              <div
-                v-show="selectedTag?.metadata.name === tag.metadata.name"
-                class="absolute inset-y-0 left-0 w-0.5 bg-primary"
-              ></div>
-              <div class="relative flex flex-row items-center">
-                <div class="flex-1">
-                  <div class="flex flex-col sm:flex-row">
+              <template #start>
+                <EntityField :description="tag.status?.permalink">
+                  <template #title>
                     <PostTag :tag="tag" />
-                  </div>
-                  <div class="mt-1 flex">
-                    <span class="text-xs text-gray-500">
-                      {{ tag.status?.permalink }}
-                    </span>
-                  </div>
-                </div>
-                <div class="flex">
-                  <div
-                    class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
-                  >
-                    <FloatingTooltip
-                      v-if="tag.metadata.deletionTimestamp"
-                      class="mr-4 hidden items-center sm:flex"
-                    >
-                      <div
-                        class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
-                      >
-                        <span
-                          class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
-                        ></span>
-                      </div>
-                      <template #popper> 删除中</template>
-                    </FloatingTooltip>
+                  </template>
+                </EntityField>
+              </template>
+              <template #end>
+                <EntityField v-if="tag.metadata.deletionTimestamp">
+                  <template #description>
                     <div
-                      class="cursor-pointer text-sm text-gray-500 hover:text-gray-900"
+                      v-tooltip="`删除中`"
+                      class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
                     >
-                      {{ tag.status?.posts?.length || 0 }} 篇文章
+                      <span
+                        class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
+                      ></span>
                     </div>
-                    <time class="text-sm text-gray-500">
-                      {{ formatDatetime(tag.metadata.creationTimestamp) }}
-                    </time>
-                    <span class="self-center">
-                      <FloatingDropdown>
-                        <IconSettings
-                          class="cursor-pointer transition-all hover:text-blue-600"
-                        />
-                        <template #popper>
-                          <div class="w-48 p-2">
-                            <VSpace class="w-full" direction="column">
-                              <VButton
-                                v-close-popper
-                                block
-                                type="secondary"
-                                @click="handleOpenEditingModal(tag)"
-                              >
-                                修改
-                              </VButton>
-                              <VButton
-                                v-close-popper
-                                block
-                                type="danger"
-                                @click="handleDelete(tag)"
-                              >
-                                删除
-                              </VButton>
-                            </VSpace>
-                          </div>
-                        </template>
-                      </FloatingDropdown>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+                  </template>
+                </EntityField>
+                <EntityField
+                  :description="`${tag.status?.posts?.length || 0} 篇文章`"
+                />
+                <EntityField
+                  :description="formatDatetime(tag.metadata.creationTimestamp)"
+                />
+              </template>
+              <template #menuItems>
+                <VButton
+                  v-close-popper
+                  block
+                  type="secondary"
+                  @click="handleOpenEditingModal(tag)"
+                >
+                  修改
+                </VButton>
+                <VButton
+                  v-close-popper
+                  block
+                  type="danger"
+                  @click="handleDelete(tag)"
+                >
+                  删除
+                </VButton>
+              </template>
+            </Entity>
           </li>
         </ul>
 
