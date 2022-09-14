@@ -1,10 +1,15 @@
 <script lang="ts" setup>
-import { IconList, VButton, VTag, VStatusDot } from "@halo-dev/components";
+import {
+  IconList,
+  VButton,
+  VTag,
+  VStatusDot,
+  VEntity,
+  VEntityField,
+} from "@halo-dev/components";
 import Draggable from "vuedraggable";
 import { ref } from "vue";
 import type { MenuTreeItem } from "@/modules/interface/menus/utils";
-import Entity from "@/components/entity/Entity.vue";
-import EntityField from "@/components/entity/EntityField.vue";
 
 withDefaults(
   defineProps<{
@@ -66,7 +71,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
   >
     <template #item="{ element: menuItem }">
       <li>
-        <Entity>
+        <VEntity>
           <template #prepend>
             <div
               class="drag-element absolute inset-y-0 left-0 hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
@@ -75,7 +80,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
             </div>
           </template>
           <template #start>
-            <EntityField
+            <VEntityField
               :title="menuItem.status.displayName"
               :description="menuItem.status.href"
             >
@@ -84,16 +89,16 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
                   {{ getMenuItemRefDisplayName(menuItem) }}
                 </VTag>
               </template>
-            </EntityField>
+            </VEntityField>
           </template>
           <template #end>
-            <EntityField v-if="menuItem.metadata.deletionTimestamp">
+            <VEntityField v-if="menuItem.metadata.deletionTimestamp">
               <template #description>
                 <VStatusDot v-tooltip="`删除中`" state="warning" animate />
               </template>
-            </EntityField>
+            </VEntityField>
           </template>
-          <template #menuItems>
+          <template #dropdownItems>
             <VButton
               v-close-popper
               block
@@ -111,7 +116,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
               删除
             </VButton>
           </template>
-        </Entity>
+        </VEntity>
         <MenuItemListItem
           :menu-tree-items="menuItem.spec.children"
           class="pl-10 transition-all duration-300"

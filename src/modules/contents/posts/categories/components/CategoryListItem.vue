@@ -1,11 +1,15 @@
 <script lang="ts" setup>
-import { IconList, VButton, VStatusDot } from "@halo-dev/components";
+import {
+  IconList,
+  VButton,
+  VStatusDot,
+  VEntity,
+  VEntityField,
+} from "@halo-dev/components";
 import Draggable from "vuedraggable";
 import type { CategoryTree } from "../utils";
 import { ref } from "vue";
 import { formatDatetime } from "@/utils/date";
-import Entity from "@/components/entity/Entity.vue";
-import EntityField from "@/components/entity/EntityField.vue";
 
 withDefaults(
   defineProps<{
@@ -51,7 +55,7 @@ function onDelete(category: CategoryTree) {
   >
     <template #item="{ element: category }">
       <li>
-        <Entity>
+        <VEntity>
           <template #prepend>
             <div
               class="drag-element absolute inset-y-0 left-0 hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
@@ -60,25 +64,25 @@ function onDelete(category: CategoryTree) {
             </div>
           </template>
           <template #start>
-            <EntityField
+            <VEntityField
               :title="category.spec.displayName"
               :description="category.status.permalink"
             />
           </template>
           <template #end>
-            <EntityField v-if="category.metadata.deletionTimestamp">
+            <VEntityField v-if="category.metadata.deletionTimestamp">
               <template #description>
                 <VStatusDot v-tooltip="`删除中`" state="warning" animate />
               </template>
-            </EntityField>
-            <EntityField
+            </VEntityField>
+            <VEntityField
               :description="`${category.status?.posts?.length || 0} 篇文章`"
             />
-            <EntityField
+            <VEntityField
               :description="formatDatetime(category.metadata.creationTimestamp)"
             />
           </template>
-          <template #menuItems>
+          <template #dropdownItems>
             <VButton
               v-close-popper
               block
@@ -96,7 +100,7 @@ function onDelete(category: CategoryTree) {
               删除
             </VButton>
           </template>
-        </Entity>
+        </VEntity>
         <CategoryListItem
           :categories="category.spec.children"
           class="pl-10 transition-all duration-300"

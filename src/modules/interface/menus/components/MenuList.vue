@@ -6,14 +6,14 @@ import {
   VEmpty,
   VSpace,
   VStatusDot,
+  VEntity,
+  VEntityField,
 } from "@halo-dev/components";
 import MenuEditingModal from "./MenuEditingModal.vue";
 import { defineExpose, onMounted, ref } from "vue";
 import type { Menu } from "@halo-dev/api-client";
 import { apiClient } from "@halo-dev/admin-shared";
 import { useRouteQuery } from "@vueuse/router";
-import Entity from "@/components/entity/Entity.vue";
-import EntityField from "@/components/entity/EntityField.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -145,23 +145,23 @@ defineExpose({
         :key="index"
         @click="handleSelect(menu)"
       >
-        <Entity
+        <VEntity
           :is-selected="selectedMenu?.metadata.name === menu.metadata.name"
         >
           <template #start>
-            <EntityField
+            <VEntityField
               :title="menu.spec?.displayName"
               :description="`${menu.spec.menuItems?.length || 0} 个菜单项`"
-            ></EntityField>
+            ></VEntityField>
           </template>
           <template #end>
-            <EntityField v-if="menu.metadata.deletionTimestamp">
+            <VEntityField v-if="menu.metadata.deletionTimestamp">
               <template #description>
                 <VStatusDot v-tooltip="`删除中`" state="warning" animate />
               </template>
-            </EntityField>
+            </VEntityField>
           </template>
-          <template #menuItems>
+          <template #dropdownItems>
             <VButton
               v-close-popper
               block
@@ -179,7 +179,7 @@ defineExpose({
               删除
             </VButton>
           </template>
-        </Entity>
+        </VEntity>
       </li>
     </ul>
     <template #footer>

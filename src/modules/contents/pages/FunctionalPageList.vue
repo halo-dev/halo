@@ -1,10 +1,15 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import { VEmpty, VSpace, VButton, IconAddCircle } from "@halo-dev/components";
+import {
+  VEmpty,
+  VSpace,
+  VButton,
+  IconAddCircle,
+  VEntity,
+  VEntityField,
+} from "@halo-dev/components";
 import type { PagesPublicState } from "@halo-dev/admin-shared";
 import { useExtensionPointsState } from "@/composables/usePlugins";
-import Entity from "@/components/entity/Entity.vue";
-import EntityField from "@/components/entity/EntityField.vue";
 
 const pagesPublicState = ref<PagesPublicState>({
   functionalPages: [],
@@ -40,15 +45,15 @@ useExtensionPointsState("PAGES", pagesPublicState);
       :key="index"
       v-permission="page.permissions"
     >
-      <Entity>
+      <VEntity>
         <template #start>
-          <EntityField
+          <VEntityField
             :title="page.name"
             :route="page.path"
             :description="page.url"
-          ></EntityField>
+          ></VEntityField>
         </template>
-      </Entity>
+      </VEntity>
     </li>
   </ul>
 </template>

@@ -11,6 +11,8 @@ import {
   VSpace,
   VTag,
   VAvatar,
+  VEntity,
+  VEntityField,
 } from "@halo-dev/components";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
@@ -20,8 +22,6 @@ import type { User, UserList } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 import { useRouteQuery } from "@vueuse/router";
-import Entity from "@/components/entity/Entity.vue";
-import EntityField from "@/components/entity/EntityField.vue";
 
 const checkAll = ref(false);
 const editingModal = ref<boolean>(false);
@@ -276,7 +276,7 @@ onMounted(() => {
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
         <li v-for="(user, index) in users.items" :key="index">
-          <Entity :is-selected="checkAll">
+          <VEntity :is-selected="checkAll">
             <template #checkbox>
               <input
                 v-model="checkAll"
@@ -286,7 +286,7 @@ onMounted(() => {
               />
             </template>
             <template #start>
-              <EntityField>
+              <VEntityField>
                 <template #description>
                   <VAvatar
                     :alt="user.spec.displayName"
@@ -294,8 +294,8 @@ onMounted(() => {
                     size="md"
                   ></VAvatar>
                 </template>
-              </EntityField>
-              <EntityField
+              </VEntityField>
+              <VEntityField
                 :title="user.spec.displayName"
                 :description="user.metadata.name"
                 :route="{
@@ -305,7 +305,7 @@ onMounted(() => {
               />
             </template>
             <template #end>
-              <EntityField>
+              <VEntityField>
                 <template #description>
                   <div
                     v-for="(role, roleIndex) in getRoles(user)"
@@ -317,12 +317,12 @@ onMounted(() => {
                     </VTag>
                   </div>
                 </template>
-              </EntityField>
-              <EntityField
+              </VEntityField>
+              <VEntityField
                 :description="formatDatetime(user.metadata.creationTimestamp)"
               />
             </template>
-            <template #menuItems>
+            <template #dropdownItems>
               <VButton
                 v-close-popper
                 block
@@ -339,7 +339,7 @@ onMounted(() => {
                 修改密码
               </VButton>
             </template>
-          </Entity>
+          </VEntity>
         </li>
       </ul>
 

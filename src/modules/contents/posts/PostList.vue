@@ -18,11 +18,11 @@ import {
   VSpace,
   VAvatar,
   VStatusDot,
+  VEntity,
+  VEntityField,
 } from "@halo-dev/components";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";
-import Entity from "@/components/entity/Entity.vue";
-import EntityField from "@/components/entity/EntityField.vue";
 import PostTag from "../posts/tags/components/PostTag.vue";
 import { onMounted, ref, watch, watchEffect } from "vue";
 import type {
@@ -740,7 +740,7 @@ function handleContributorFilterItemChange(user?: User) {
         role="list"
       >
         <li v-for="(post, index) in posts.items" :key="index">
-          <Entity :is-selected="checkSelection(post.post)">
+          <VEntity :is-selected="checkSelection(post.post)">
             <template #checkbox>
               <input
                 v-model="selectedPostNames"
@@ -751,7 +751,7 @@ function handleContributorFilterItemChange(user?: User) {
               />
             </template>
             <template #start>
-              <EntityField
+              <VEntityField
                 :title="post.post.spec.title"
                 :route="{
                   name: 'PostEditor',
@@ -797,10 +797,10 @@ function handleContributorFilterItemChange(user?: User) {
                     <span class="text-xs text-gray-500"> 评论 0 </span>
                   </VSpace>
                 </template>
-              </EntityField>
+              </VEntityField>
             </template>
             <template #end>
-              <EntityField>
+              <VEntityField>
                 <template #description>
                   <RouterLink
                     v-for="(contributor, contributorIndex) in post.contributors"
@@ -820,9 +820,11 @@ function handleContributorFilterItemChange(user?: User) {
                     ></VAvatar>
                   </RouterLink>
                 </template>
-              </EntityField>
-              <EntityField :description="finalStatus(post.post)"></EntityField>
-              <EntityField>
+              </VEntityField>
+              <VEntityField
+                :description="finalStatus(post.post)"
+              ></VEntityField>
+              <VEntityField>
                 <template #description>
                   <IconEye
                     v-if="post.post.spec.visible === 'PUBLIC'"
@@ -840,14 +842,14 @@ function handleContributorFilterItemChange(user?: User) {
                     class="cursor-pointer text-sm transition-all hover:text-blue-600"
                   />
                 </template>
-              </EntityField>
-              <EntityField
+              </VEntityField>
+              <VEntityField
                 :description="
                   formatDatetime(post.post.metadata.creationTimestamp)
                 "
               />
             </template>
-            <template #menuItems>
+            <template #dropdownItems>
               <VButton
                 v-close-popper
                 block
@@ -865,7 +867,7 @@ function handleContributorFilterItemChange(user?: User) {
                 删除
               </VButton>
             </template>
-          </Entity>
+          </VEntity>
         </li>
       </ul>
 

@@ -5,9 +5,9 @@ import {
   VSwitch,
   VTag,
   VStatusDot,
+  VEntity,
+  VEntityField,
 } from "@halo-dev/components";
-import Entity from "@/components/entity/Entity.vue";
-import EntityField from "@/components/entity/EntityField.vue";
 import { toRefs } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 import type { Plugin } from "@halo-dev/api-client";
@@ -27,9 +27,9 @@ const { plugin } = toRefs(props);
 const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
 </script>
 <template>
-  <Entity>
+  <VEntity>
     <template #start>
-      <EntityField>
+      <VEntityField>
         <template #description>
           <div class="h-12 w-12 rounded border bg-white p-1 hover:shadow-sm">
             <img
@@ -39,8 +39,8 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
             />
           </div>
         </template>
-      </EntityField>
-      <EntityField
+      </VEntityField>
+      <VEntityField
         :title="plugin?.spec.displayName"
         :description="plugin?.spec.description"
         :route="{
@@ -55,10 +55,10 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
             </VTag>
           </VSpace>
         </template>
-      </EntityField>
+      </VEntityField>
     </template>
     <template #end>
-      <EntityField v-if="plugin?.status?.phase === 'FAILED'">
+      <VEntityField v-if="plugin?.status?.phase === 'FAILED'">
         <template #description>
           <VStatusDot
             v-tooltip="`${plugin?.status?.reason}:${plugin?.status?.message}`"
@@ -66,8 +66,8 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
             animate
           />
         </template>
-      </EntityField>
-      <EntityField>
+      </VEntityField>
+      <VEntityField>
         <template #description>
           <a
             :href="plugin?.spec.homepage"
@@ -77,13 +77,13 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
             @{{ plugin?.spec.author }}
           </a>
         </template>
-      </EntityField>
-      <EntityField :description="plugin?.spec.version" />
-      <EntityField
+      </VEntityField>
+      <VEntityField :description="plugin?.spec.version" />
+      <VEntityField
         v-if="plugin?.metadata.creationTimestamp"
         :description="formatDatetime(plugin?.metadata.creationTimestamp)"
       />
-      <EntityField>
+      <VEntityField>
         <template #description>
           <div
             v-permission="['system:plugins:manage']"
@@ -95,12 +95,12 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
             />
           </div>
         </template>
-      </EntityField>
+      </VEntityField>
     </template>
-    <template #menuItems>
+    <template #dropdownItems>
       <VButton v-close-popper block type="danger" @click="uninstall">
         卸载
       </VButton>
     </template>
-  </Entity>
+  </VEntity>
 </template>

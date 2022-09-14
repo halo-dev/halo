@@ -16,6 +16,8 @@ import {
   VEmpty,
   VAvatar,
   VStatusDot,
+  VEntity,
+  VEntityField,
 } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
@@ -30,8 +32,6 @@ import { apiClient } from "@halo-dev/admin-shared";
 import { formatDatetime } from "@/utils/date";
 import { RouterLink } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
-import Entity from "../../../components/entity/Entity.vue";
-import EntityField from "../../../components/entity/EntityField.vue";
 
 enum SinglePagePhase {
   DRAFT = "未发布",
@@ -334,7 +334,7 @@ const handleSelectUser = (user?: User) => {
       role="list"
     >
       <li v-for="(singlePage, index) in singlePages.items" :key="index">
-        <Entity :is-selected="checkAll">
+        <VEntity :is-selected="checkAll">
           <template #checkbox>
             <input
               v-model="checkAll"
@@ -343,7 +343,7 @@ const handleSelectUser = (user?: User) => {
             />
           </template>
           <template #start>
-            <EntityField
+            <VEntityField
               :title="singlePage.page.spec.title"
               :description="singlePage.page.status?.permalink"
               :route="{
@@ -364,10 +364,10 @@ const handleSelectUser = (user?: User) => {
                   <VStatusDot state="success" animate />
                 </RouterLink>
               </template>
-            </EntityField>
+            </VEntityField>
           </template>
           <template #end>
-            <EntityField>
+            <VEntityField>
               <template #description>
                 <RouterLink
                   v-for="(
@@ -389,9 +389,9 @@ const handleSelectUser = (user?: User) => {
                   ></VAvatar>
                 </RouterLink>
               </template>
-            </EntityField>
-            <EntityField :description="finalStatus(singlePage.page)" />
-            <EntityField>
+            </VEntityField>
+            <VEntityField :description="finalStatus(singlePage.page)" />
+            <VEntityField>
               <template #description>
                 <IconEye
                   v-if="singlePage.page.spec.visible === 'PUBLIC'"
@@ -409,14 +409,14 @@ const handleSelectUser = (user?: User) => {
                   class="cursor-pointer text-sm transition-all hover:text-blue-600"
                 />
               </template>
-            </EntityField>
-            <EntityField
+            </VEntityField>
+            <VEntityField
               :description="
                 formatDatetime(singlePage.page.metadata.creationTimestamp)
               "
             />
           </template>
-          <template #menuItems>
+          <template #dropdownItems>
             <VButton
               v-close-popper
               block
@@ -434,7 +434,7 @@ const handleSelectUser = (user?: User) => {
               删除
             </VButton>
           </template>
-        </Entity>
+        </VEntity>
       </li>
     </ul>
 
