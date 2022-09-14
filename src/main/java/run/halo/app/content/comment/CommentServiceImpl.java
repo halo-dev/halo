@@ -54,14 +54,22 @@ public class CommentServiceImpl implements CommentService {
     }
 
     private Mono<ListedComment> toListedComment(Comment comment) {
-        Comment.CommentOwner owner = comment.getSpec().getOwner();
-        // not empty
-        Mono<OwnerInfo> commentOwnerMono = getCommentOwnerInfo(owner);
-        // not empty
-        Mono<Extension> subjectMono =
-            getCommentSubject(comment.getSpec().getSubjectRef());
-        return Mono.zip(commentOwnerMono, subjectMono)
-            .map(tuple -> new ListedComment(comment, tuple.getT1(), tuple.getT2()));
+        ListedComment.ListedCommentBuilder commentBuilder = ListedComment.builder()
+            .comment(comment);
+        return Mono.just(commentBuilder)
+            .flatMap(builder -> {
+                Comment.CommentOwner owner = comment.getSpec().getOwner();
+                // not empty
+                return getCommentOwnerInfo(owner)
+                    .map(builder::owner);
+            })
+            .flatMap(builder -> getCommentSubject(comment.getSpec().getSubjectRef())
+                .map(subject -> {
+                    builder.subject(subject);
+                    return builder;
+                })
+            )
+            .map(ListedComment.ListedCommentBuilder::build);
     }
 
     private Mono<OwnerInfo> getCommentOwnerInfo(Comment.CommentOwner owner) {

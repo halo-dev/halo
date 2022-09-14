@@ -1,14 +1,25 @@
 package run.halo.app.content.comment;
 
-import org.springframework.util.Assert;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
+import lombok.Value;
 import run.halo.app.core.extension.Comment;
 import run.halo.app.extension.Extension;
 
-public record ListedComment(Comment comment, OwnerInfo owner, Extension subject) {
+/**
+ * Listed comment.
+ *
+ * @author guqing
+ * @since 2.0.0
+ */
+@Value
+@Builder
+public class ListedComment {
 
-    public ListedComment {
-        Assert.notNull(comment, "Comment must not be null.");
-        Assert.notNull(owner, "Owner must not be null.");
-        Assert.notNull(subject, "Subject must not be null.");
-    }
+    @Schema(required = true)
+    Comment comment;
+
+    OwnerInfo owner;
+
+    Extension subject;
 }
