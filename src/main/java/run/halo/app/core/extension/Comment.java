@@ -1,12 +1,16 @@
 package run.halo.app.core.extension;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
 import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.springframework.lang.Nullable;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
+import run.halo.app.extension.Ref;
 
 /**
  * @author guqing
@@ -24,12 +28,25 @@ public class Comment extends AbstractExtension {
     @Schema(required = true)
     private CommentSpec spec;
 
+    @Schema
+    private CommentStatus status;
+
+    @JsonIgnore
+    public CommentStatus getStatusOrDefault() {
+        if (this.status == null) {
+            this.status = new CommentStatus();
+        }
+        return this.status;
+    }
+
     @Data
     @EqualsAndHashCode(callSuper = true)
     public static class CommentSpec extends BaseCommentSpec {
 
         @Schema(required = true)
-        private CommentSubjectRef subjectRef;
+        private Ref subjectRef;
+
+        private Instant lastReadTime;
     }
 
     @Data
@@ -66,6 +83,10 @@ public class Comment extends AbstractExtension {
 
     @Data
     public static class CommentOwner {
+        public static final String KIND_EMAIL = "Email";
+        public static final String AVATAR_ANNO = "avatar";
+        public static final String DISPLAY_NAME_ANNO = "displayName";
+
         @Schema(required = true, minLength = 1)
         private String kind;
 
@@ -75,14 +96,25 @@ public class Comment extends AbstractExtension {
         private String displayName;
 
         private Map<String, String> annotations;
+
+        @Nullable
+        @JsonIgnore
+        public String getAnnotation(String key) {
+            return annotations == null ? null : annotations.get(key);
+        }
     }
 
     @Data
-    public static class CommentSubjectRef {
-        @Schema(required = true, minLength = 1)
-        private String kind;
+    public static class CommentStatus {
 
-        @Schema(required = true, minLength = 1, maxLength = 64)
-        private String name;
+        private Instant lastReplyTime;
+
+        private Integer replyCount;
+
+        private Integer unreadReplyCount;
+
+        public boolean getHasNewReply() {
+            return unreadReplyCount != null && unreadReplyCount > 0;
+        }
     }
 }
