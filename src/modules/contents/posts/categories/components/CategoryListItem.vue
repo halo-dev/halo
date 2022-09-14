@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { IconList, VButton } from "@halo-dev/components";
+import { IconList, VButton, VStatusDot } from "@halo-dev/components";
 import Draggable from "vuedraggable";
 import type { CategoryTree } from "../utils";
 import { ref } from "vue";
@@ -68,14 +68,7 @@ function onDelete(category: CategoryTree) {
           <template #end>
             <EntityField v-if="category.metadata.deletionTimestamp">
               <template #description>
-                <div
-                  v-tooltip="`删除中`"
-                  class="inline-flex h-1.5 w-1.5 rounded-full bg-red-600"
-                >
-                  <span
-                    class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-red-600"
-                  ></span>
-                </div>
+                <VStatusDot v-tooltip="`删除中`" state="warning" animate />
               </template>
             </EntityField>
             <EntityField

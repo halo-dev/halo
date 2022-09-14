@@ -15,6 +15,7 @@ import {
   useDialog,
   VEmpty,
   VAvatar,
+  VStatusDot,
 } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
@@ -360,13 +361,7 @@ const handleSelectUser = (user?: User) => {
                   }"
                   class="flex items-center"
                 >
-                  <div
-                    class="inline-flex h-1.5 w-1.5 rounded-full bg-orange-600"
-                  >
-                    <span
-                      class="inline-block h-1.5 w-1.5 animate-ping rounded-full bg-orange-600"
-                    ></span>
-                  </div>
+                  <VStatusDot state="success" animate />
                 </RouterLink>
               </template>
             </EntityField>

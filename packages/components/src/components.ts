@@ -18,3 +18,4 @@ export * from "./components/dialog";
 export * from "./components/pagination";
 export * from "./components/codemirror";
 export * from "./components/empty";
+export * from "./components/status";
