@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Function;
+import org.springframework.util.comparator.Comparators;
 import run.halo.app.core.extension.Comment;
 
 /**
@@ -40,14 +41,14 @@ public enum CommentSorter {
         if (REPLY_COUNT.equals(sorter)) {
             Function<Comment, Integer> comparatorFunc =
                 comment -> comment.getStatusOrDefault().getReplyCount();
-            return Comparator.comparing(comparatorFunc)
+            return Comparator.comparing(comparatorFunc, Comparators.nullsLow())
                 .thenComparing(name);
         }
 
         if (LAST_REPLY_TIME.equals(sorter)) {
             Function<Comment, Instant> comparatorFunc =
                 comment -> comment.getStatusOrDefault().getLastReplyTime();
-            return Comparator.comparing(comparatorFunc)
+            return Comparator.comparing(comparatorFunc, Comparators.nullsLow())
                 .thenComparing(name);
         }
 
@@ -66,7 +67,7 @@ public enum CommentSorter {
     static Comparator<Comment> defaultCommentComparator() {
         Function<Comment, Instant> lastReplyTime =
             comment -> comment.getStatusOrDefault().getLastReplyTime();
-        return Comparator.comparing(lastReplyTime)
+        return Comparator.comparing(lastReplyTime, Comparators.nullsLow())
             .thenComparing(name);
     }
 }
