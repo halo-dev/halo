@@ -103,7 +103,7 @@ public class CommentEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> createComment(ServerRequest request) {
         return request.bodyToMono(CommentRequest.class)
-            .map(commentRequest -> {
+            .flatMap(commentRequest -> {
                 Comment comment = commentRequest.toComment();
                 comment.getSpec().setIpAddress(IpAddressUtils.getIpAddress(request));
                 comment.getSpec().setUserAgent(userAgentFrom(request));
@@ -115,7 +115,7 @@ public class CommentEndpoint implements CustomEndpoint {
     Mono<ServerResponse> createReply(ServerRequest request) {
         String commentName = request.pathVariable("name");
         return request.bodyToMono(ReplyRequest.class)
-            .map(replyRequest -> {
+            .flatMap(replyRequest -> {
                 Reply reply = replyRequest.toReply();
                 reply.getSpec().setIpAddress(IpAddressUtils.getIpAddress(request));
                 reply.getSpec().setUserAgent(userAgentFrom(request));

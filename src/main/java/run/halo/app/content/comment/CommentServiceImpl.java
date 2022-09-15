@@ -68,6 +68,12 @@ public class CommentServiceImpl implements CommentService {
                     return Mono.error(
                         new AccessDeniedException("The comment function has been turned off."));
                 }
+                if (comment.getSpec().getTop() == null) {
+                    comment.getSpec().setTop(false);
+                }
+                if (comment.getSpec().getPriority() == null) {
+                    comment.getSpec().setPriority(0);
+                }
                 comment.getSpec()
                     .setApproved(Boolean.FALSE.equals(commentSetting.getRequireReviewForNew()));
                 comment.getSpec().setHidden(comment.getSpec().getApproved());

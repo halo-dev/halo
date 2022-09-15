@@ -35,6 +35,12 @@ public class ReplyServiceImpl implements ReplyService {
                 // Boolean allowNotification = reply.getSpec().getAllowNotification();
                 // TODO send notification if allowNotification is true
                 reply.getSpec().setCommentName(commentName);
+                if (reply.getSpec().getTop() == null) {
+                    reply.getSpec().setTop(false);
+                }
+                if (reply.getSpec().getPriority() == null) {
+                    reply.getSpec().setPriority(0);
+                }
                 return environmentFetcher.fetchComment()
                     .map(commentSetting -> {
                         if (Boolean.FALSE.equals(commentSetting.getEnable())) {
