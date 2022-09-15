@@ -8,4 +8,4 @@ metadata:
 rules:
   - apiGroups: [ "api.halo.run" ]
     resources: [ "comments", "comments/reply" ]
-    verbs: [ "list", "get" ]
+    verbs: [ "create" ]
