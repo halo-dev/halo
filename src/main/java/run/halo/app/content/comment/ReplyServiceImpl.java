@@ -8,6 +8,7 @@ import run.halo.app.core.extension.Reply;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.exception.AccessDeniedException;
 
 /**
  * A default implementation of {@link ReplyService}.
@@ -36,6 +37,10 @@ public class ReplyServiceImpl implements ReplyService {
                 reply.getSpec().setCommentName(commentName);
                 return environmentFetcher.fetchComment()
                     .map(commentSetting -> {
+                        if (Boolean.FALSE.equals(commentSetting.getEnable())) {
+                            throw new AccessDeniedException(
+                                "The comment function has been turned off.");
+                        }
                         reply.getSpec().setApproved(
                             Boolean.FALSE.equals(commentSetting.getRequireReviewForNew()));
                         reply.getSpec().setHidden(reply.getSpec().getApproved());
