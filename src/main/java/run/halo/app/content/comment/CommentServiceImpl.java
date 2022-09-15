@@ -130,9 +130,7 @@ public class CommentServiceImpl implements CommentService {
         if (User.KIND.equals(owner.getKind())) {
             return client.fetch(User.class, owner.getName())
                 .map(OwnerInfo::from)
-                .switchIfEmpty(Mono.error(
-                    new IllegalStateException(
-                        "Comment subject not found for: " + owner)));
+                .switchIfEmpty(Mono.just(OwnerInfo.ghostUser()));
         }
         if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
             return Mono.just(OwnerInfo.from(owner));
