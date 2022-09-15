@@ -38,4 +38,44 @@ public class SystemSetting {
 
         private String footer;
     }
+
+    @Data
+    public static class Basic {
+        public static final String GROUP = "basic";
+        String title;
+        String subtitle;
+        String logo;
+        String favicon;
+    }
+
+    @Data
+    public static class User {
+        public static final String GROUP = "user";
+        Boolean allowRegistration;
+        String defaultRole;
+    }
+
+    @Data
+    public static class Post {
+        public static final String GROUP = "post";
+        String sortOrder;
+        Integer pageSize;
+        Boolean review;
+    }
+
+    @Data
+    public static class Seo {
+        public static final String GROUP = "seo";
+        Boolean blockSpiders;
+        String keywords;
+        String description;
+    }
+
+    @Data
+    public static class Comment {
+        public static final String GROUP = "comment";
+        Boolean enable;
+        Boolean requireReviewForNew;
+        Boolean systemUserOnly;
+    }
 }
