@@ -99,6 +99,15 @@ public class CommentServiceImpl implements CommentService {
 
     Predicate<Comment> commentPredicate(CommentQuery query) {
         Predicate<Comment> predicate = comment -> true;
+
+        String keyword = query.getKeyword();
+        if (keyword != null) {
+            predicate = predicate.and(comment -> {
+                String raw = comment.getSpec().getRaw();
+                return StringUtils.containsIgnoreCase(raw, keyword);
+            });
+        }
+
         Boolean approved = query.getApproved();
         if (approved != null) {
             predicate =

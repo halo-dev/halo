@@ -17,6 +17,12 @@ public class CommentQuery extends IListRequest.QueryListRequest {
         super(queryParams);
     }
 
+    @Schema(description = "Comments filtered by keyword.")
+    public String getKeyword() {
+        String keyword = queryParams.getFirst("keyword");
+        return StringUtils.isBlank(keyword) ? null : keyword;
+    }
+
     @Schema(description = "Comments approved.")
     public Boolean getApproved() {
         return convertBooleanOrNull(queryParams.getFirst("approved"));
