@@ -20,6 +20,8 @@ import run.halo.app.extension.GVK;
 public class Reply extends AbstractExtension {
 
     public static final String KIND = "Reply";
+    public static final String COMMENT_NAME_LABEL = "content.halo.run/comment-name";
+    public static final String QUOTE_REPLY_LABEL = "content.halo.run/quote-reply";
 
     @Schema(required = true)
     private ReplySpec spec;

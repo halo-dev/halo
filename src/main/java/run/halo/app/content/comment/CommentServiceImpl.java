@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -16,6 +17,8 @@ import run.halo.app.extension.Extension;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.plugin.ExtensionComponentsFinder;
 
 /**
@@ -30,10 +33,14 @@ public class CommentServiceImpl implements CommentService {
     private final ReactiveExtensionClient client;
     private final ExtensionComponentsFinder extensionComponentsFinder;
 
+    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+
     public CommentServiceImpl(ReactiveExtensionClient client,
-        ExtensionComponentsFinder extensionComponentsFinder) {
+        ExtensionComponentsFinder extensionComponentsFinder,
+        SystemConfigurableEnvironmentFetcher environmentFetcher) {
         this.client = client;
         this.extensionComponentsFinder = extensionComponentsFinder;
+        this.environmentFetcher = environmentFetcher;
     }
 
     @Override
@@ -51,6 +58,47 @@ public class CommentServiceImpl implements CommentService {
                     comments.getTotal(), list)
                 )
             );
+    }
+
+    @Override
+    public Mono<Comment> create(Comment comment) {
+        return environmentFetcher.fetchComment()
+            .flatMap(commentSetting -> {
+                if (Boolean.FALSE.equals(commentSetting.getEnable())) {
+                    return Mono.error(
+                        new AccessDeniedException("The comment function has been turned off."));
+                }
+                comment.getSpec()
+                    .setApproved(Boolean.FALSE.equals(commentSetting.getRequireReviewForNew()));
+                comment.getSpec().setHidden(comment.getSpec().getApproved());
+                if (comment.getSpec().getOwner() != null) {
+                    return Mono.just(comment);
+                }
+                // populate owner from current user
+                return fetchCurrentUser()
+                    .map(this::toCommentOwner)
+                    .map(owner -> {
+                        comment.getSpec().setOwner(owner);
+                        return comment;
+                    })
+                    .switchIfEmpty(
+                        Mono.error(new IllegalStateException("The owner must not be null.")));
+            })
+            .flatMap(client::create);
+    }
+
+    private Comment.CommentOwner toCommentOwner(User user) {
+        Comment.CommentOwner owner = new Comment.CommentOwner();
+        owner.setKind(User.KIND);
+        owner.setName(user.getMetadata().getName());
+        owner.setDisplayName(user.getSpec().getDisplayName());
+        return owner;
+    }
+
+    private Mono<User> fetchCurrentUser() {
+        return ReactiveSecurityContextHolder.getContext()
+            .map(securityContext -> securityContext.getAuthentication().getName())
+            .flatMap(username -> client.fetch(User.class, username));
     }
 
     private Mono<ListedComment> toListedComment(Comment comment) {

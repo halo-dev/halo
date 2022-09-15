@@ -5,4 +5,7 @@ metadata:
   labels:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
-rules: [ ]
+rules:
+  - apiGroups: [ "api.halo.run" ]
+    resources: [ "comments", "comments/reply" ]
+    verbs: [ "list", "get" ]

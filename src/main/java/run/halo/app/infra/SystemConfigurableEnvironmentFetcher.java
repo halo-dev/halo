@@ -34,6 +34,11 @@ public class SystemConfigurableEnvironmentFetcher {
             });
     }
 
+    public Mono<SystemSetting.Comment> fetchComment() {
+        return fetch(SystemSetting.Comment.GROUP, SystemSetting.Comment.class)
+            .switchIfEmpty(Mono.just(new SystemSetting.Comment()));
+    }
+
     @NonNull
     private Mono<Map<String, String>> getValuesInternal() {
         return getConfigMap()

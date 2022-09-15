@@ -39,8 +39,8 @@ public class OwnerInfo {
             .kind(owner.getKind())
             .name(owner.getName())
             .email(owner.getName())
+            .displayName(owner.getDisplayName())
             .avatar(owner.getAnnotation(Comment.CommentOwner.AVATAR_ANNO))
-            .displayName(owner.getAnnotation(Comment.CommentOwner.DISPLAY_NAME_ANNO))
             .build();
     }
 

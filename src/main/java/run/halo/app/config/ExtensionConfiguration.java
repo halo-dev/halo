@@ -17,6 +17,7 @@ import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.Reply;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.SinglePage;
@@ -30,6 +31,7 @@ import run.halo.app.core.extension.reconciler.MenuItemReconciler;
 import run.halo.app.core.extension.reconciler.MenuReconciler;
 import run.halo.app.core.extension.reconciler.PluginReconciler;
 import run.halo.app.core.extension.reconciler.PostReconciler;
+import run.halo.app.core.extension.reconciler.ReplyReconciler;
 import run.halo.app.core.extension.reconciler.RoleBindingReconciler;
 import run.halo.app.core.extension.reconciler.RoleReconciler;
 import run.halo.app.core.extension.reconciler.SinglePageReconciler;
@@ -203,6 +205,14 @@ public class ExtensionConfiguration {
             return new ControllerBuilder("comment-controller", client)
                 .reconciler(new CommentReconciler(client))
                 .extension(new Comment())
+                .build();
+        }
+
+        @Bean
+        Controller replyController(ExtensionClient client) {
+            return new ControllerBuilder("reply-controller", client)
+                .reconciler(new ReplyReconciler(client))
+                .extension(new Reply())
                 .build();
         }
     }

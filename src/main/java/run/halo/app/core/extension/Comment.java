@@ -85,12 +85,12 @@ public class Comment extends AbstractExtension {
     public static class CommentOwner {
         public static final String KIND_EMAIL = "Email";
         public static final String AVATAR_ANNO = "avatar";
-        public static final String DISPLAY_NAME_ANNO = "displayName";
+        public static final String WEBSITE_ANNO = "website";
 
         @Schema(required = true, minLength = 1)
         private String kind;
 
-        @Schema(required = true, minLength = 1, maxLength = 64)
+        @Schema(required = true, maxLength = 64)
         private String name;
 
         private String displayName;

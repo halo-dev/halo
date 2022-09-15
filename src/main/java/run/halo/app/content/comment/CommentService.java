@@ -13,4 +13,6 @@ import run.halo.app.extension.ListResult;
 public interface CommentService {
 
     Mono<ListResult<ListedComment>> listComment(CommentQuery query);
+
+    Mono<Comment> create(Comment comment);
 }
