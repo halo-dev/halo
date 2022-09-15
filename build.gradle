@@ -74,6 +74,7 @@ dependencies {
     implementation "com.google.guava:guava:$guava"
     implementation "org.jsoup:jsoup:$jsoup"
     implementation "io.github.java-diff-utils:java-diff-utils:$javaDiffUtils"
+    implementation "org.springframework.integration:spring-integration-core"
 
     compileOnly 'org.projectlombok:lombok'
     testCompileOnly 'org.projectlombok:lombok'

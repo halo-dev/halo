@@ -91,7 +91,7 @@ spec:
     label: SEO 设置
     formSchema:
       - $formkit: checkbox
-        name: blockSpides
+        name: blockSpiders
         label: "屏蔽搜索引擎"
         value: false
       - $formkit: textarea
