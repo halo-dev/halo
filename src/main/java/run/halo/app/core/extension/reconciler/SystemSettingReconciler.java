@@ -70,7 +70,7 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
 
     class RouteRuleReconciler {
 
-        public  void reconcile(String name) {
+        public void reconcile(String name) {
             reconcileArchivesRule(name);
             reconcileTagsRule(name);
             reconcileCategoriesRule(name);
@@ -239,6 +239,7 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
     }
 
     public boolean isSystemSetting(String name) {
-        return SystemSetting.SYSTEM_CONFIG.equals(name);
+        return SystemSetting.SYSTEM_CONFIG.equals(name)
+            || SystemSetting.SYSTEM_CONFIG_DEFAULT.equals(name);
     }
 }
