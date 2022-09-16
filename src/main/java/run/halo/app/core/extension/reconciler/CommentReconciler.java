@@ -20,7 +20,7 @@ import run.halo.app.infra.utils.JsonUtils;
  * @since 2.0.0
  */
 public class CommentReconciler implements Reconciler<Reconciler.Request> {
-    private static final String FINALIZER_NAME = "comment-protection";
+    public static final String FINALIZER_NAME = "comment-protection";
     private final ExtensionClient client;
 
     public CommentReconciler(ExtensionClient client) {
@@ -32,8 +32,10 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
         return client.fetch(Comment.class, request.name())
             .map(comment -> {
                 if (isDeleted(comment)) {
-                    addFinalizerIfNecessary(comment);
+                    cleanUpResourcesAndRemoveFinalizer(request.name());
+                    return new Result(false, null);
                 }
+                addFinalizerIfNecessary(comment);
                 reconcileStatus(request.name());
                 return new Result(true, Duration.ofMinutes(1));
             })

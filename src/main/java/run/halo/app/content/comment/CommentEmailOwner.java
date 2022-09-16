@@ -1,6 +1,6 @@
 package run.halo.app.content.comment;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
@@ -34,7 +34,7 @@ public record CommentEmailOwner(String email, String avatar, String displayName,
         commentOwner.setName(StringUtils.defaultString(email, StringUtils.EMPTY));
 
         commentOwner.setDisplayName(displayName);
-        Map<String, String> annotations = new HashMap<>();
+        Map<String, String> annotations = new LinkedHashMap<>();
         commentOwner.setAnnotations(annotations);
         annotations.put(Comment.CommentOwner.AVATAR_ANNO, avatar);
         annotations.put(Comment.CommentOwner.WEBSITE_ANNO, website);

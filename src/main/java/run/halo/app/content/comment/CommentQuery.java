@@ -76,10 +76,10 @@ public class CommentQuery extends IListRequest.QueryListRequest {
     @Schema(description = "ascending order If it is true; otherwise, it is in descending order.")
     public Boolean getSortOrder() {
         String sortOrder = queryParams.getFirst("sortOrder");
-        return StringUtils.isNotBlank(sortOrder) && Boolean.parseBoolean(sortOrder);
+        return convertBooleanOrNull(sortOrder);
     }
 
     private Boolean convertBooleanOrNull(String value) {
-        return value == null ? null : Boolean.parseBoolean(value);
+        return StringUtils.isBlank(value) ? null : Boolean.parseBoolean(value);
     }
 }
