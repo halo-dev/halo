@@ -49,6 +49,7 @@ import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.ControllerManager;
 import run.halo.app.extension.router.ExtensionCompositeRouterFunction;
 import run.halo.app.infra.ExternalUrlSupplier;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.resources.JsBundleRuleProvider;
@@ -169,9 +170,11 @@ public class ExtensionConfiguration {
 
         @Bean
         Controller systemSettingController(ExtensionClient client,
+            SystemConfigurableEnvironmentFetcher environmentFetcher,
             ApplicationContext applicationContext) {
             return new ControllerBuilder("system-setting-controller", client)
-                .reconciler(new SystemSettingReconciler(client, applicationContext))
+                .reconciler(new SystemSettingReconciler(client, environmentFetcher,
+                    applicationContext))
                 .extension(new ConfigMap())
                 .build();
         }

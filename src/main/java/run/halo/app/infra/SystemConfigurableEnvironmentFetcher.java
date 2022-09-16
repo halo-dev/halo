@@ -71,12 +71,7 @@ public class SystemConfigurableEnvironmentFetcher {
                         system.setData(mergedData);
                         return system;
                     })
-                    .switchIfEmpty(
-                        Mono.defer(() -> {
-                            systemDefault.getMetadata().setName(SystemSetting.SYSTEM_CONFIG);
-                            return Mono.just(systemDefault);
-                        })
-                    ));
+                    .switchIfEmpty(Mono.just(systemDefault)));
     }
 
     public Optional<ConfigMap> getConfigMapBlocking() {

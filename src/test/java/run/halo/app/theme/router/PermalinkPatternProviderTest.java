@@ -1,19 +1,18 @@
 package run.halo.app.theme.router;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.util.Map;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.extension.ConfigMap;
-import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
@@ -28,18 +27,14 @@ import run.halo.app.theme.DefaultTemplateEnum;
 class PermalinkPatternProviderTest {
 
     @Mock
-    private ExtensionClient client;
+    private SystemConfigurableEnvironmentFetcher environmentFetcher;
 
+    @InjectMocks
     private PermalinkPatternProvider permalinkPatternProvider;
-
-    @BeforeEach
-    void setUp() {
-        permalinkPatternProvider = new PermalinkPatternProvider(client);
-    }
 
     @Test
     void getPatternThenDefault() {
-        when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
+        when(environmentFetcher.getConfigMapBlocking())
             .thenReturn(Optional.empty());
 
         String pattern = permalinkPatternProvider.getPattern(DefaultTemplateEnum.POST);
@@ -79,7 +74,7 @@ class PermalinkPatternProviderTest {
 
         configMap.setData(Map.of("routeRules", JsonUtils.objectToJson(themeRouteRules)));
 
-        when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
+        when(environmentFetcher.getConfigMapBlocking())
             .thenReturn(Optional.of(configMap));
 
         String pattern = permalinkPatternProvider.getPattern(DefaultTemplateEnum.POST);

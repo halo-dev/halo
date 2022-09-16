@@ -3,6 +3,7 @@ package run.halo.app.core.extension.reconciler;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -10,6 +11,7 @@ import org.springframework.context.ApplicationContext;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.PathUtils;
@@ -28,12 +30,15 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
     public static final String FINALIZER_NAME = "system-setting-protection";
 
     private final ExtensionClient client;
+    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
     private final ApplicationContext applicationContext;
 
     private final RouteRuleReconciler routeRuleReconciler = new RouteRuleReconciler();
 
-    public SystemSettingReconciler(ExtensionClient client, ApplicationContext applicationContext) {
+    public SystemSettingReconciler(ExtensionClient client,
+        SystemConfigurableEnvironmentFetcher environmentFetcher, ApplicationContext applicationContext) {
         this.client = client;
+        this.environmentFetcher = environmentFetcher;
         this.applicationContext = applicationContext;
     }
 
@@ -52,6 +57,9 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void addFinalizerIfNecessary(ConfigMap oldConfigMap) {
+        if (SystemSetting.SYSTEM_CONFIG.equals(oldConfigMap.getMetadata().getName())) {
+            return;
+        }
         Set<String> finalizers = oldConfigMap.getMetadata().getFinalizers();
         if (finalizers != null && finalizers.contains(FINALIZER_NAME)) {
             return;
@@ -78,7 +86,7 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
         }
 
         private void reconcileArchivesRule(String name) {
-            client.fetch(ConfigMap.class, name).ifPresent(configMap -> {
+            getConfigMap(name).ifPresent(configMap -> {
                 SystemSetting.ThemeRouteRules oldRules = getOldRouteRulesFromAnno(configMap);
                 SystemSetting.ThemeRouteRules newRules = getRouteRules(configMap);
 
@@ -128,7 +136,7 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
         }
 
         private void reconcileTagsRule(String name) {
-            client.fetch(ConfigMap.class, name).ifPresent(configMap -> {
+            getConfigMap(name).ifPresent(configMap -> {
                 SystemSetting.ThemeRouteRules oldRules = getOldRouteRulesFromAnno(configMap);
                 SystemSetting.ThemeRouteRules newRules = getRouteRules(configMap);
                 final String oldTagsPrefix = oldRules.getTags();
@@ -147,7 +155,7 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
         }
 
         private void reconcileCategoriesRule(String name) {
-            client.fetch(ConfigMap.class, name).ifPresent(configMap -> {
+            getConfigMap(name).ifPresent(configMap -> {
                 SystemSetting.ThemeRouteRules oldRules = getOldRouteRulesFromAnno(configMap);
                 SystemSetting.ThemeRouteRules newRules = getRouteRules(configMap);
                 final String oldCategoriesPrefix = oldRules.getCategories();
@@ -166,7 +174,7 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
         }
 
         private void reconcilePostRule(String name) {
-            client.fetch(ConfigMap.class, name).ifPresent(configMap -> {
+            getConfigMap(name).ifPresent(configMap -> {
                 SystemSetting.ThemeRouteRules oldRules = getOldRouteRulesFromAnno(configMap);
                 SystemSetting.ThemeRouteRules newRules = getRouteRules(configMap);
 
@@ -241,5 +249,9 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
     public boolean isSystemSetting(String name) {
         return SystemSetting.SYSTEM_CONFIG.equals(name)
             || SystemSetting.SYSTEM_CONFIG_DEFAULT.equals(name);
+    }
+
+    private Optional<ConfigMap> getConfigMap(String name) {
+        return environmentFetcher.getConfigMapBlocking();
     }
 }
