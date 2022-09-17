@@ -36,7 +36,8 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
     private final RouteRuleReconciler routeRuleReconciler = new RouteRuleReconciler();
 
     public SystemSettingReconciler(ExtensionClient client,
-        SystemConfigurableEnvironmentFetcher environmentFetcher, ApplicationContext applicationContext) {
+        SystemConfigurableEnvironmentFetcher environmentFetcher,
+        ApplicationContext applicationContext) {
         this.client = client;
         this.environmentFetcher = environmentFetcher;
         this.applicationContext = applicationContext;
