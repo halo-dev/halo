@@ -57,6 +57,7 @@ public class SinglePageFinderImpl implements SinglePageFinder {
             contributorFinder.getContributors(page.getStatus().getContributors());
         SinglePageVo pageVo = SinglePageVo.from(page);
         pageVo.setContributors(contributors);
+        pageVo.setContent(content(pageName));
         return pageVo;
     }
 

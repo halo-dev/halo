@@ -54,72 +54,135 @@ class MenuFinderImplTest {
         List<MenuVo> menuVos = menuFinder.listAsTree();
         JSONAssert.assertEquals("""
                 [
-                    {
-                        "name": "D",
-                        "displayName": "D",
-                        "menuItems": [
-                            {
-                                "name": "E",
-                                "priority": 0,
-                                "childrenNames": [
-                                    "A",
-                                    "C"
-                                ],
-                                "children": [
-                                    {
-                                        "name": "A",
-                                        "parentName": "E",
-                                        "priority": 0,
-                                        "childrenNames": [
-                                            "B"
-                                        ],
-                                        "children": [
-                                            {
-                                                "name": "B",
-                                                "parentName": "A",
-                                                "priority": 0
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "name": "C",
-                                        "parentName": "E",
-                                        "priority": 0
-                                    }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        "name": "X",
-                        "displayName": "X",
-                        "menuItems": [
-                            {
-                                "name": "G",
-                                "priority": 0
-                            }
-                        ]
-                    },
-                    {
-                        "name": "Y",
-                        "displayName": "Y",
-                        "menuItems": [
-                            {
-                                "name": "F",
-                                "priority": 0,
-                                "childrenNames": [
-                                    "H"
-                                ],
-                                "children": [
-                                    {
-                                        "name": "H",
-                                        "parentName": "F",
-                                        "priority": 0
-                                    }
-                                ]
-                            }
-                        ]
-                    }
+                     {
+                         "metadata": {
+                             "name": "D"
+                         },
+                         "spec": {
+                             "displayName": "D",
+                             "menuItems": [
+                                 "E"
+                             ]
+                         },
+                         "menuItems": [
+                             {
+                                 "metadata": {
+                                     "name": "E"
+                                 },
+                                 "spec": {
+                                     "displayName": "E",
+                                     "priority": 0,
+                                     "children": [
+                                         "A",
+                                         "C"
+                                     ]
+                                 },
+                                 "status": {},
+                                 "children": [
+                                     {
+                                         "metadata": {
+                                             "name": "A"
+                                         },
+                                         "spec": {
+                                             "displayName": "A",
+                                             "priority": 0,
+                                             "children": [
+                                                 "B"
+                                             ]
+                                         },
+                                         "status": {},
+                                         "children": [
+                                             {
+                                                 "metadata": {
+                                                     "name": "B"
+                                                 },
+                                                 "spec": {
+                                                     "displayName": "B",
+                                                     "priority": 0
+                                                 },
+                                                 "status": {},
+                                                 "parentName": "A"
+                                             }
+                                         ],
+                                         "parentName": "E"
+                                     },
+                                     {
+                                         "metadata": {
+                                             "name": "C"
+                                         },
+                                         "spec": {
+                                             "displayName": "C",
+                                             "priority": 0
+                                         },
+                                         "status": {},
+                                         "parentName": "E"
+                                     }
+                                 ]
+                             }
+                         ]
+                     },
+                     {
+                         "metadata": {
+                             "name": "X"
+                         },
+                         "spec": {
+                             "displayName": "X",
+                             "menuItems": [
+                                 "G"
+                             ]
+                         },
+                         "menuItems": [
+                             {
+                                 "metadata": {
+                                     "name": "G"
+                                 },
+                                 "spec": {
+                                     "displayName": "G",
+                                     "priority": 0
+                                 },
+                                 "status": {}
+                             }
+                         ]
+                     },
+                     {
+                         "metadata": {
+                             "name": "Y"
+                         },
+                         "spec": {
+                             "displayName": "Y",
+                             "menuItems": [
+                                 "F"
+                             ]
+                         },
+                         "menuItems": [
+                             {
+                                 "metadata": {
+                                     "name": "F"
+                                 },
+                                 "spec": {
+                                     "displayName": "F",
+                                     "priority": 0,
+                                     "children": [
+                                         "H"
+                                     ]
+                                 },
+                                 "status": {},
+                                 "children": [
+                                     {
+                                         "metadata": {
+                                             "name": "H"
+                                         },
+                                         "spec": {
+                                             "displayName": "H",
+                                             "priority": 0
+                                         },
+                                         "status": {},
+                                         "parentName": "F"
+                                     }
+                                 ]
+                             }
+                         ]
+                     }
                 ]
                 """,
             JsonUtils.objectToJson(menuVos),

@@ -1,9 +1,10 @@
 package run.halo.app.theme.finders.vo;
 
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
-import lombok.experimental.SuperBuilder;
 import run.halo.app.core.extension.Comment;
+import run.halo.app.extension.MetadataOperator;
 
 /**
  * A value object for {@link Comment}.
@@ -12,11 +13,13 @@ import run.halo.app.core.extension.Comment;
  * @since 2.0.0
  */
 @Value
-@SuperBuilder
-@EqualsAndHashCode(callSuper = true)
-public class CommentVo extends BaseCommentVo {
+@Builder
+@EqualsAndHashCode
+public class CommentVo {
 
-    Comment.CommentSubjectRef subjectRef;
+    MetadataOperator metadata;
+
+    Comment.CommentSpec spec;
 
     /**
      * Convert {@link Comment} to {@link CommentVo}.
@@ -25,18 +28,9 @@ public class CommentVo extends BaseCommentVo {
      * @return a value object for {@link Comment}
      */
     public static CommentVo from(Comment comment) {
-        Comment.CommentSpec spec = comment.getSpec();
         return CommentVo.builder()
-            .name(comment.getMetadata().getName())
-            .subjectRef(spec.getSubjectRef())
-            .raw(spec.getRaw())
-            .content(spec.getContent())
-            .owner(spec.getOwner())
-            .userAgent(spec.getUserAgent())
-            .priority(spec.getPriority())
-            .top(spec.getTop())
-            .allowNotification(spec.getAllowNotification())
-            .annotations(comment.getMetadata().getAnnotations())
+            .metadata(comment.getMetadata())
+            .spec(comment.getSpec())
             .build();
     }
 }

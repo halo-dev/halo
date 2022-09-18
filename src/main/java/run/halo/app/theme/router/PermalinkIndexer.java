@@ -3,12 +3,11 @@ package run.halo.app.theme.router;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.springframework.context.event.EventListener;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import run.halo.app.content.permalinks.ExtensionLocator;
 import run.halo.app.extension.GroupVersionKind;
 
@@ -21,9 +20,12 @@ import run.halo.app.extension.GroupVersionKind;
 @Component
 public class PermalinkIndexer {
     private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-    private final MultiValueMap<GroupVersionKind, String> permalinkLookup =
-        new LinkedMultiValueMap<>();
-    private final Map<String, ExtensionLocator> permalinkLocatorMap = new HashMap<>();
+
+    private final Map<GvkName, String> gvkNamePermalinkLookup = new HashMap<>();
+    private final Map<String, ExtensionLocator> permalinkLocatorLookup = new HashMap<>();
+
+    record GvkName(GroupVersionKind gvk, String name) {
+    }
 
     /**
      * Register extension and permalink mapping.
@@ -34,8 +36,9 @@ public class PermalinkIndexer {
     public void register(ExtensionLocator locator, String permalink) {
         readWriteLock.writeLock().lock();
         try {
-            permalinkLookup.add(locator.gvk(), permalink);
-            permalinkLocatorMap.put(permalink, locator);
+            GvkName gvkName = new GvkName(locator.gvk(), locator.name());
+            gvkNamePermalinkLookup.put(gvkName, permalink);
+            permalinkLocatorLookup.put(permalink, locator);
         } finally {
             readWriteLock.writeLock().unlock();
         }
@@ -44,110 +47,87 @@ public class PermalinkIndexer {
     /**
      * Remove extension and permalink mapping.
      *
-     * @param locator extension locator
-     * @param permalink extension permalink for theme template route
+     * @param locator extension info
      */
-    public void remove(ExtensionLocator locator, String permalink) {
+    public void remove(ExtensionLocator locator) {
         readWriteLock.writeLock().lock();
         try {
-            List<String> permalinks = permalinkLookup.get(locator.gvk());
-            if (permalinks != null) {
-                permalinks.remove(permalink);
-                if (permalinks.isEmpty()) {
-                    permalinkLookup.remove(locator.gvk());
-                }
+            String permalink =
+                gvkNamePermalinkLookup.remove(new GvkName(locator.gvk(), locator.name()));
+            if (permalink != null) {
+                permalinkLocatorLookup.remove(permalink);
             }
-            permalinkLocatorMap.remove(permalink);
         } finally {
             readWriteLock.writeLock().unlock();
         }
     }
 
     /**
-     * Lookup extension locator by permalink.
+     * Gets permalink by {@link GroupVersionKind}.
+     *
+     * @param gvk group version kind
+     * @return permalinks
+     */
+    @NonNull
+    public List<String> getPermalinks(GroupVersionKind gvk) {
+        readWriteLock.readLock().lock();
+        try {
+            return gvkNamePermalinkLookup.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().gvk.equals(gvk))
+                .map(Map.Entry::getValue)
+                .toList();
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+    }
+
+    /**
+     * Lookup extension info by permalink.
      *
      * @param permalink extension permalink for theme template route
      * @return extension locator
      */
+    @Nullable
     public ExtensionLocator lookup(String permalink) {
         readWriteLock.readLock().lock();
         try {
-            return permalinkLocatorMap.get(permalink);
+            return permalinkLocatorLookup.get(permalink);
         } finally {
             readWriteLock.readLock().unlock();
         }
     }
 
     /**
-     * Gets permalinks by extension's {@link GroupVersionKind}.
+     * Lookup extension permalink by {@link GroupVersionKind} and {@code name}.
      *
-     * @param gvk extension's {@link GroupVersionKind}
-     * @return permalinks for extension's {@link GroupVersionKind}
+     * @param gvk group version kind
+     * @param name extension name
+     * @return {@code true} if contains, otherwise {@code false}
      */
-    public List<String> getPermalinks(GroupVersionKind gvk) {
+    public boolean containsName(GroupVersionKind gvk, String name) {
         readWriteLock.readLock().lock();
         try {
-            return Objects.requireNonNullElse(permalinkLookup.get(gvk), List.of());
+            return gvkNamePermalinkLookup.containsKey(new GvkName(gvk, name));
         } finally {
             readWriteLock.readLock().unlock();
         }
     }
 
     /**
-     * Lookup extension resource names by {@link GroupVersionKind}.
+     * Lookup extension permalink by {@link GroupVersionKind} and {@code slug}.
      *
-     * @param gvk extension's {@link GroupVersionKind}
-     * @return extension resource names
+     * @param gvk group version kind
+     * @param slug extension slug
+     * @return {@code true} if contains, otherwise {@code false}
      */
-    public List<String> getNames(GroupVersionKind gvk) {
+    public boolean containsSlug(GroupVersionKind gvk, String slug) {
         readWriteLock.readLock().lock();
         try {
-            return permalinkLocatorMap.values()
+            return permalinkLocatorLookup.values()
                 .stream()
-                .filter(locator -> locator.gvk().equals(gvk))
-                .map(ExtensionLocator::name)
-                .toList();
-        } finally {
-            readWriteLock.readLock().unlock();
-        }
-    }
-
-    /**
-     * Lookup extension resource slugs by {@link GroupVersionKind}.
-     *
-     * @param gvk extension's {@link GroupVersionKind}
-     * @return extension resource slugs
-     */
-    public List<String> getSlugs(GroupVersionKind gvk) {
-        readWriteLock.readLock().lock();
-        try {
-            return permalinkLocatorMap.values()
-                .stream()
-                .filter(locator -> locator.gvk().equals(gvk))
-                .map(ExtensionLocator::slug)
-                .toList();
-        } finally {
-            readWriteLock.readLock().unlock();
-        }
-    }
-
-    /**
-     * Lookup extension slug by resource name.
-     *
-     * @param gvk extension's {@link GroupVersionKind}
-     * @param name extension resource name
-     * @return extension slug specified by resource name
-     */
-    public String getSlugByName(GroupVersionKind gvk, String name) {
-        readWriteLock.readLock().lock();
-        try {
-            return permalinkLocatorMap.values()
-                .stream()
-                .filter(locator -> locator.gvk().equals(gvk))
-                .filter(locator -> locator.name().equals(name))
-                .findFirst()
-                .map(ExtensionLocator::slug)
-                .orElseThrow();
+                .anyMatch(locator -> locator.gvk().equals(gvk)
+                    && locator.slug().equals(slug));
         } finally {
             readWriteLock.readLock().unlock();
         }
@@ -163,10 +143,10 @@ public class PermalinkIndexer {
     public String getNameBySlug(GroupVersionKind gvk, String slug) {
         readWriteLock.readLock().lock();
         try {
-            return permalinkLocatorMap.values()
+            return permalinkLocatorLookup.values()
                 .stream()
-                .filter(locator -> locator.gvk().equals(gvk))
-                .filter(locator -> locator.slug().equals(slug))
+                .filter(locator -> locator.gvk().equals(gvk)
+                    && locator.slug().equals(slug))
                 .findFirst()
                 .map(ExtensionLocator::name)
                 .orElseThrow();
@@ -180,8 +160,8 @@ public class PermalinkIndexer {
      *
      * @return permalinkLookup map size
      */
-    protected long permalinkLookupSize() {
-        return permalinkLookup.size();
+    protected long gvkNamePermalinkMapSize() {
+        return gvkNamePermalinkLookup.size();
     }
 
     /**
@@ -190,7 +170,7 @@ public class PermalinkIndexer {
      * @return permalinkLocatorMap map size
      */
     protected long permalinkLocatorMapSize() {
-        return permalinkLocatorMap.size();
+        return permalinkLocatorLookup.size();
     }
 
     @EventListener(PermalinkIndexAddCommand.class)
@@ -200,12 +180,12 @@ public class PermalinkIndexer {
 
     @EventListener(PermalinkIndexDeleteCommand.class)
     public void onPermalinkDelete(PermalinkIndexDeleteCommand deleteCommand) {
-        remove(deleteCommand.getLocator(), deleteCommand.getPermalink());
+        remove(deleteCommand.getLocator());
     }
 
     @EventListener(PermalinkIndexUpdateCommand.class)
     public void onPermalinkUpdate(PermalinkIndexUpdateCommand updateCommand) {
-        remove(updateCommand.getLocator(), updateCommand.getPermalink());
+        remove(updateCommand.getLocator());
         register(updateCommand.getLocator(), updateCommand.getPermalink());
     }
 }

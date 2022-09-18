@@ -66,7 +66,9 @@ public class PostFinderImpl implements PostFinder {
         if (post == null) {
             return null;
         }
-        return getPostVo(post);
+        PostVo postVo = getPostVo(post);
+        postVo.setContent(content(postName));
+        return postVo;
     }
 
     @Override

@@ -2,6 +2,7 @@ package run.halo.app.theme.dialect;
 
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
@@ -35,7 +36,7 @@ public class PostTemplateHeadProcessor implements TemplateHeadProcessor {
             .map(template -> (String) context.getVariable(POST_NAME_VARIABLE))
             .map(postFinder::getByName)
             .doOnNext(postVo -> {
-                List<Map<String, String>> htmlMetas = postVo.getHtmlMetas();
+                List<Map<String, String>> htmlMetas = postVo.getSpec().getHtmlMetas();
                 String metaHtml = headMetaBuilder(htmlMetas);
                 IModelFactory modelFactory = context.getModelFactory();
                 model.add(modelFactory.createText(metaHtml));
@@ -44,6 +45,9 @@ public class PostTemplateHeadProcessor implements TemplateHeadProcessor {
     }
 
     private String headMetaBuilder(List<Map<String, String>> htmlMetas) {
+        if (htmlMetas == null) {
+            return StringUtils.EMPTY;
+        }
         StringBuilder sb = new StringBuilder();
         for (Map<String, String> htmlMeta : htmlMetas) {
             sb.append("<meta");

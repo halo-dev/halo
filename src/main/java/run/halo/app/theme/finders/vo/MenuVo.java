@@ -1,12 +1,12 @@
 package run.halo.app.theme.finders.vo;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.util.LinkedHashSet;
 import java.util.List;
 import lombok.Builder;
+import lombok.ToString;
 import lombok.Value;
 import lombok.With;
 import run.halo.app.core.extension.Menu;
+import run.halo.app.extension.MetadataOperator;
 
 /**
  * A value object for {@link Menu}.
@@ -15,15 +15,13 @@ import run.halo.app.core.extension.Menu;
  * @since 2.0.0
  */
 @Value
+@ToString
 @Builder
 public class MenuVo {
 
-    String name;
+    MetadataOperator metadata;
 
-    String displayName;
-
-    @JsonIgnore
-    LinkedHashSet<String> menuItemNames;
+    Menu.Spec spec;
 
     @With
     List<MenuItemVo> menuItems;
@@ -36,9 +34,9 @@ public class MenuVo {
      */
     public static MenuVo from(Menu menu) {
         return builder()
-            .name(menu.getMetadata().getName())
-            .displayName(menu.getSpec().getDisplayName())
-            .menuItemNames(menu.getSpec().getMenuItems())
+            .metadata(menu.getMetadata())
+            .spec(menu.getSpec())
+            .menuItems(List.of())
             .build();
     }
 }

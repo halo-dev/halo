@@ -5,10 +5,10 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -18,10 +18,13 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
+import run.halo.app.content.TestPost;
 import run.halo.app.content.permalinks.ExtensionLocator;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.finders.PostFinder;
+import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.router.PermalinkIndexer;
 
 /**
@@ -39,11 +42,15 @@ class PostRouteStrategyTest {
     @Mock
     private PermalinkIndexer permalinkIndexer;
 
+    @Mock
+    private PostFinder postFinder;
+
+    @InjectMocks
     private PostRouteStrategy postRouteStrategy;
 
     @BeforeEach
     void setUp() {
-        postRouteStrategy = new PostRouteStrategy(permalinkIndexer);
+        lenient().when(postFinder.getByName(any())).thenReturn(PostVo.from(TestPost.postV1()));
     }
 
     @Test
@@ -55,9 +62,6 @@ class PostRouteStrategyTest {
         WebTestClient client = getWebTestClient(routeFunction);
 
         piling();
-
-        when(permalinkIndexer.getPermalinks(any()))
-            .thenReturn(List.of("/posts-test/fake-slug"));
 
         client.get()
             .uri("/posts-test/fake-slug")
@@ -76,9 +80,6 @@ class PostRouteStrategyTest {
 
         piling();
 
-        when(permalinkIndexer.getPermalinks(any()))
-            .thenReturn(List.of("/posts-test/fake-name"));
-
         client.get()
             .uri("/posts-test/fake-name")
             .exchange()
@@ -95,9 +96,6 @@ class PostRouteStrategyTest {
         WebTestClient client = getWebTestClient(routeFunction);
 
         piling();
-
-        when(permalinkIndexer.getPermalinks(any()))
-            .thenReturn(List.of("/2022/08/fake-slug"));
 
         client.get()
             .uri("/2022/08/fake-slug")
@@ -136,14 +134,11 @@ class PostRouteStrategyTest {
     }
 
     private void piling() {
-        lenient().when(permalinkIndexer.getNames(any()))
-            .thenReturn(List.of("fake-name"));
-
-        lenient().when(permalinkIndexer.getSlugs(any()))
-            .thenReturn(List.of("fake-slug"));
-
-        lenient().when(permalinkIndexer.getSlugs(any()))
-            .thenReturn(List.of("fake-slug"));
+        GroupVersionKind postGvk = GroupVersionKind.fromExtension(Post.class);
+        lenient().when(permalinkIndexer.containsName(eq(postGvk), eq("fake-name")))
+            .thenReturn(true);
+        lenient().when(permalinkIndexer.containsSlug(eq(postGvk), eq("fake-slug")))
+            .thenReturn(true);
 
         lenient().when(permalinkIndexer.getNameBySlug(any(), eq("fake-slug")))
             .thenReturn("fake-name");

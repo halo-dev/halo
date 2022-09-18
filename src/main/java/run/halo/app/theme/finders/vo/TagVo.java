@@ -1,10 +1,9 @@
 package run.halo.app.theme.finders.vo;
 
-import java.util.List;
-import java.util.Map;
 import lombok.Builder;
 import lombok.Value;
 import run.halo.app.core.extension.Tag;
+import run.halo.app.extension.MetadataOperator;
 
 /**
  * A value object for {@link Tag}.
@@ -13,21 +12,11 @@ import run.halo.app.core.extension.Tag;
 @Builder
 public class TagVo {
 
-    String name;
+    MetadataOperator metadata;
 
-    String displayName;
+    Tag.TagSpec spec;
 
-    String slug;
-
-    String color;
-
-    String cover;
-
-    String permalink;
-
-    List<String> posts;
-
-    Map<String, String> annotations;
+    Tag.TagStatus status;
 
     /**
      * Convert {@link Tag} to {@link TagVo}.
@@ -39,14 +28,9 @@ public class TagVo {
         Tag.TagSpec spec = tag.getSpec();
         Tag.TagStatus status = tag.getStatusOrDefault();
         return TagVo.builder()
-            .name(tag.getMetadata().getName())
-            .displayName(spec.getDisplayName())
-            .slug(spec.getSlug())
-            .color(spec.getColor())
-            .cover(spec.getCover())
-            .permalink(status.getPermalink())
-            .posts(status.getPosts())
-            .annotations(tag.getMetadata().getAnnotations())
+            .metadata(tag.getMetadata())
+            .spec(spec)
+            .status(status)
             .build();
     }
 }

@@ -1,12 +1,13 @@
 package run.halo.app.theme.finders.vo;
 
 import java.util.List;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 import org.springframework.util.Assert;
 import run.halo.app.core.extension.SinglePage;
+import run.halo.app.extension.MetadataOperator;
 
 /**
  * A value object for {@link SinglePage}.
@@ -15,10 +16,20 @@ import run.halo.app.core.extension.SinglePage;
  * @since 2.0.0
  */
 @Data
-@SuperBuilder
-@ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class SinglePageVo extends BasePostVo {
+@Builder
+@ToString
+@EqualsAndHashCode
+public class SinglePageVo {
+
+    private MetadataOperator metadata;
+
+    private SinglePage.SinglePageSpec spec;
+
+    private SinglePage.SinglePageStatus status;
+
+    private ContentVo content;
+
+    private List<Contributor> contributors;
 
     /**
      * Convert {@link SinglePage} to {@link SinglePageVo}.
@@ -31,24 +42,11 @@ public class SinglePageVo extends BasePostVo {
         SinglePage.SinglePageSpec spec = singlePage.getSpec();
         SinglePage.SinglePageStatus pageStatus = singlePage.getStatus();
         return SinglePageVo.builder()
-            .name(singlePage.getMetadata().getName())
-            .annotations(singlePage.getMetadata().getAnnotations())
-            .title(spec.getTitle())
-            .cover(spec.getCover())
-            .allowComment(spec.getAllowComment())
-            .owner(spec.getOwner())
-            .pinned(spec.getPinned())
-            .slug(spec.getSlug())
-            .htmlMetas(nullSafe(spec.getHtmlMetas()))
-            .published(spec.getPublished())
-            .publishTime(spec.getPublishTime())
-            .priority(spec.getPriority())
-            .version(spec.getVersion())
-            .visible(spec.getVisible())
-            .template(spec.getTemplate())
-            .permalink(pageStatus.getPermalink())
-            .excerpt(pageStatus.getExcerpt())
+            .metadata(singlePage.getMetadata())
+            .spec(spec)
+            .status(pageStatus)
             .contributors(List.of())
+            .content(new ContentVo(null, null))
             .build();
     }
 }

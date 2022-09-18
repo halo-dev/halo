@@ -13,7 +13,6 @@ import java.time.ZoneId;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.function.Function;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,8 +52,6 @@ class ThemeJava8TimeDialectIntegrationTest {
 
     private URL defaultThemeUrl;
 
-    Function<ServerHttpRequest, ThemeContext> themeContextFunction;
-
     @Autowired
     private WebTestClient webTestClient;
 
@@ -63,8 +60,8 @@ class ThemeJava8TimeDialectIntegrationTest {
     @BeforeEach
     void setUp() throws FileNotFoundException {
         defaultThemeUrl = ResourceUtils.getURL("classpath:themes/default");
-        when(themeResolver.getTheme(any(ServerHttpRequest.class))).thenReturn(
-            Mono.just(createDefaultContext()));
+        when(themeResolver.getTheme(any(ServerHttpRequest.class)))
+            .thenReturn(Mono.just(createDefaultContext()));
         defaultTimeZone = TimeZone.getDefault();
     }
 

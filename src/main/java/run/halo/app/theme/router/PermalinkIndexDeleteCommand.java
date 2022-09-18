@@ -12,19 +12,13 @@ import run.halo.app.content.permalinks.ExtensionLocator;
  */
 public class PermalinkIndexDeleteCommand extends ApplicationEvent {
     private final ExtensionLocator locator;
-    private final String permalink;
 
-    public PermalinkIndexDeleteCommand(Object source, ExtensionLocator locator, String permalink) {
+    public PermalinkIndexDeleteCommand(Object source, ExtensionLocator locator) {
         super(source);
         this.locator = locator;
-        this.permalink = permalink;
     }
 
     public ExtensionLocator getLocator() {
         return locator;
-    }
-
-    public String getPermalink() {
-        return permalink;
     }
 }

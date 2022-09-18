@@ -36,9 +36,13 @@ public class SystemConfigurableEnvironmentFetcher {
 
     @NonNull
     private Mono<Map<String, String>> getValuesInternal() {
-        return extensionClient.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG)
+        return getConfigMap()
             .filter(configMap -> configMap.getData() != null)
             .map(ConfigMap::getData)
             .defaultIfEmpty(Map.of());
+    }
+
+    public Mono<ConfigMap> getConfigMap() {
+        return extensionClient.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG);
     }
 }

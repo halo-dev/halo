@@ -58,8 +58,8 @@ public class CategoryPermalinkPolicy
 
     @Override
     public void onPermalinkDelete(Category category) {
-        applicationContext.publishEvent(new PermalinkIndexDeleteCommand(this, getLocator(category),
-            category.getStatusOrDefault().getPermalink()));
+        applicationContext.publishEvent(
+            new PermalinkIndexDeleteCommand(this, getLocator(category)));
     }
 
     private ExtensionLocator getLocator(Category category) {

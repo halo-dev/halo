@@ -76,14 +76,15 @@ public class CategoryFinderImpl implements CategoryFinder {
     public List<CategoryTreeVo> listAsTree() {
         List<CategoryVo> categoryVos = listAll();
         Map<String, CategoryVo> nameIdentityMap = categoryVos.stream()
-            .collect(Collectors.toMap(CategoryVo::getName, Function.identity()));
+            .collect(Collectors.toMap(categoryVo -> categoryVo.getMetadata().getName(),
+                Function.identity()));
 
         Map<String, CategoryTreeVo> treeVoMap = new HashMap<>();
         // populate parentName
         categoryVos.forEach(categoryVo -> {
-            final String parentName = categoryVo.getName();
+            final String parentName = categoryVo.getMetadata().getName();
             treeVoMap.putIfAbsent(parentName, CategoryTreeVo.from(categoryVo));
-            List<String> children = categoryVo.getChildren();
+            List<String> children = categoryVo.getSpec().getChildren();
             if (CollectionUtils.isEmpty(children)) {
                 return;
             }
@@ -91,7 +92,7 @@ public class CategoryFinderImpl implements CategoryFinder {
                 CategoryVo childrenVo = nameIdentityMap.get(childrenName);
                 CategoryTreeVo treeVo = CategoryTreeVo.from(childrenVo);
                 treeVo.setParentName(parentName);
-                treeVoMap.putIfAbsent(treeVo.getName(), treeVo);
+                treeVoMap.putIfAbsent(treeVo.getMetadata().getName(), treeVo);
             });
         });
         nameIdentityMap.clear();
@@ -102,7 +103,7 @@ public class CategoryFinderImpl implements CategoryFinder {
         Map<String, List<CategoryTreeVo>> nameIdentityMap = list.stream()
             .filter(item -> item.getParentName() != null)
             .collect(Collectors.groupingBy(CategoryTreeVo::getParentName));
-        list.forEach(node -> node.setChildren(nameIdentityMap.get(node.getName())));
+        list.forEach(node -> node.setChildren(nameIdentityMap.get(node.getMetadata().getName())));
         return list.stream()
             .filter(v -> v.getParentName() == null)
             .collect(Collectors.toList());
