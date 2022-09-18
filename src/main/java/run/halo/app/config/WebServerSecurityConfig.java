@@ -27,6 +27,7 @@ import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.SupplierReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
@@ -40,6 +41,10 @@ import run.halo.app.security.DefaultUserDetailService;
 import run.halo.app.security.SuperAdminInitializer;
 import run.halo.app.security.authentication.jwt.LoginAuthenticationFilter;
 import run.halo.app.security.authentication.jwt.LoginAuthenticationManager;
+import run.halo.app.security.authentication.pat.PatAuthenticationConverter;
+import run.halo.app.security.authentication.pat.PatAuthenticationManager;
+import run.halo.app.security.authentication.pat.PatDecoder;
+import run.halo.app.security.authentication.pat.PatEncoder;
 import run.halo.app.security.authorization.RequestInfoAuthorizationManager;
 
 /**
@@ -59,10 +64,13 @@ public class WebServerSecurityConfig {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     SecurityWebFilterChain apiFilterChain(ServerHttpSecurity http,
-        ServerCodecConfigurer codec,
-        ServerResponse.Context context,
-        UserService userService,
-        RoleService roleService) {
+                                          ServerCodecConfigurer codec,
+                                          ServerResponse.Context context,
+                                          ReactiveUserDetailsService userDetailsService,
+                                          RoleService roleService,
+                                          ReactiveExtensionClient client,
+                                          PatEncoder patEncoder,
+                                          PatDecoder patDecoder) {
         http.csrf().disable()
             .cors(corsSpec -> corsSpec.configurationSource(apiCorsConfigurationSource()))
             .securityMatcher(pathMatchers("/api/**", "/apis/**", "/login", "/logout"))
@@ -72,23 +80,29 @@ public class WebServerSecurityConfig {
             .formLogin(withDefaults())
             .logout(withDefaults())
             // for reuse the JWT authentication
-            .oauth2ResourceServer().jwt();
+            .oauth2ResourceServer().bearerTokenConverter(new PatFreeBearerTokenConverter()).jwt();
 
         var loginManager = new LoginAuthenticationManager(
-            userDetailsService(userService, roleService),
-            passwordEncoder());
+            userDetailsService, passwordEncoder());
         var loginFilter = new LoginAuthenticationFilter(loginManager,
             codec,
             jwtEncoder(),
             jwtProp,
             context);
 
+        var patAuthManager = new PatAuthenticationManager(patDecoder, patEncoder, client,
+            userDetailsService);
+        var patFilter = new AuthenticationWebFilter(patAuthManager);
+        patFilter.setServerAuthenticationConverter(new PatAuthenticationConverter());
+
         http.addFilterAt(loginFilter, SecurityWebFiltersOrder.FORM_LOGIN);
+        http.addFilterAt(patFilter, SecurityWebFiltersOrder.AUTHENTICATION);
+
         return http.build();
     }
 
     CorsConfigurationSource apiCorsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
+        var configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedHeaders(
             List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT,
@@ -104,7 +118,7 @@ public class WebServerSecurityConfig {
 
     @Bean
     ReactiveUserDetailsService userDetailsService(UserService userService,
-        RoleService roleService) {
+                                                  RoleService roleService) {
         return new DefaultUserDetailService(userService, roleService);
     }
 
@@ -136,7 +150,7 @@ public class WebServerSecurityConfig {
         havingValue = "false",
         matchIfMissing = true)
     SuperAdminInitializer superAdminInitializer(ReactiveExtensionClient client,
-        HaloProperties halo) {
+                                                HaloProperties halo) {
         return new SuperAdminInitializer(client, passwordEncoder(),
             halo.getSecurity().getInitializer());
     }

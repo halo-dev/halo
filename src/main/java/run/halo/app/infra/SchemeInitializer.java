@@ -26,7 +26,8 @@ import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.PolicyTemplate;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.SchemeManager;
-import run.halo.app.security.authentication.pat.PersonalAccessToken;
+import run.halo.app.core.extension.pat.PersonalAccessToken;
+import run.halo.app.core.extension.pat.Scope;
 
 @Component
 public class SchemeInitializer implements ApplicationListener<ApplicationStartedEvent> {
@@ -62,5 +63,8 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
         schemeManager.register(Policy.class);
         schemeManager.register(Attachment.class);
         schemeManager.register(PolicyTemplate.class);
+
+        schemeManager.register(PersonalAccessToken.class);
+        schemeManager.register(Scope.class);
     }
 }

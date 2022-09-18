@@ -1,5 +1,7 @@
 package run.halo.app.security;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -19,5 +21,10 @@ public final class LoginUtils {
             .getResponseBody()
             .single()
             .map(responseMap -> responseMap.get("token").toString());
+    }
+
+    public static String buildBasicAuthHeader(String username, String password) {
+        return "Basic " + Base64.getEncoder().encodeToString((username + ":" + password).getBytes(
+            StandardCharsets.UTF_8));
     }
 }

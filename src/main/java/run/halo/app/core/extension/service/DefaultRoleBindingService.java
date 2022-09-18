@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 
@@ -21,25 +22,14 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
  */
 @Slf4j
 public class DefaultRoleBindingService implements RoleBindingService {
-    private static final String SCOPE_AUTHORITY_PREFIX = "SCOPE_";
     private static final String ROLE_AUTHORITY_PREFIX = "ROLE_";
 
     @Override
     public Set<String> listBoundRoleNames(Collection<? extends GrantedAuthority> authorities) {
         return authorities.stream()
             .map(GrantedAuthority::getAuthority)
-            // Exclude anonymous user roles
-            .filter(authority -> !authority.equals("ROLE_ANONYMOUS"))
-            .map(scope -> {
-                if (scope.startsWith(SCOPE_AUTHORITY_PREFIX)) {
-                    scope = scope.replaceFirst(SCOPE_AUTHORITY_PREFIX, "");
-                    // keep checking the ROLE_ here
-                }
-                if (scope.startsWith(ROLE_AUTHORITY_PREFIX)) {
-                    return scope.replaceFirst(ROLE_AUTHORITY_PREFIX, "");
-                }
-                return scope;
-            })
+            .filter(authority -> StringUtils.startsWith(authority, ROLE_AUTHORITY_PREFIX))
+            .map(authority -> StringUtils.removeStart(authority, ROLE_AUTHORITY_PREFIX))
             .collect(Collectors.toSet());
     }
 }

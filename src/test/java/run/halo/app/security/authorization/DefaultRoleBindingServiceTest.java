@@ -38,17 +38,13 @@ public class DefaultRoleBindingServiceTest {
             new SimpleGrantedAuthority("readFake"),
             new SimpleGrantedAuthority("fake.read"),
             new SimpleGrantedAuthority("ROLE_role.fake.read"),
+            new SimpleGrantedAuthority("ROLE_ANONYMOUS"),
             new SimpleGrantedAuthority("SCOPE_scope.fake.read"),
             new SimpleGrantedAuthority("SCOPE_ROLE_scope.role.fake.read"));
 
         Set<String> roleBindings = roleBindingLister.listBoundRoleNames(authorities);
         assertThat(roleBindings).isNotNull();
-        assertThat(roleBindings).isEqualTo(Set.of(
-            "readFake",
-            "fake.read",
-            "role.fake.read",
-            "scope.fake.read",
-            "scope.role.fake.read"));
+        assertThat(roleBindings).isEqualTo(Set.of("role.fake.read", "ANONYMOUS"));
     }
 
     @Test

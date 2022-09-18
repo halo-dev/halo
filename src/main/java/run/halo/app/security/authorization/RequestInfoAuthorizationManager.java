@@ -30,12 +30,12 @@ public class RequestInfoAuthorizationManager
 
     @Override
     public Mono<AuthorizationDecision> check(Mono<Authentication> authentication,
-        AuthorizationContext context) {
+                                             AuthorizationContext context) {
         ServerHttpRequest request = context.getExchange().getRequest();
         RequestInfo requestInfo = RequestInfoFactory.INSTANCE.newRequestInfo(request);
 
         return authentication.flatMap(auth -> {
-            var userDetails = this.createUserDetails(auth);
+            var userDetails = this.getUserDetails(auth);
             return this.ruleResolver.visitRules(userDetails, requestInfo)
                 .map(visitor -> {
                     if (!visitor.isAllowed()) {
@@ -56,8 +56,13 @@ public class RequestInfoAuthorizationManager
         return !this.trustResolver.isAnonymous(authentication);
     }
 
-    private UserDetails createUserDetails(Authentication authentication) {
+    private UserDetails getUserDetails(Authentication authentication) {
         Assert.notNull(authentication, "The authentication must not be null.");
+
+        if (authentication.getPrincipal() instanceof UserDetails userDetails) {
+            return userDetails;
+        }
+
         return User.withUsername(authentication.getName())
             .authorities(authentication.getAuthorities())
             .password("")

@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.service;
 
+import java.util.Set;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
@@ -14,4 +15,7 @@ public interface UserService {
     Mono<User> updateWithRawPassword(String username, String rawPassword);
 
     Flux<Role> listRoles(String username);
+
+    Mono<User> grantRoles(String username, Set<String> roles);
+
 }

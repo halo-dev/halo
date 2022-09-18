@@ -55,10 +55,11 @@ class AuthorizationTest {
             Mono.just(User.withDefaultPasswordEncoder().username("user").password("password")
                 .roles("invalid-role").build()));
         when(roleService.getMonoRole(any())).thenReturn(Mono.empty());
-        var token = LoginUtils.login(webClient, "user", "password").block();
+        var basicAuth = LoginUtils.buildBasicAuthHeader("user", "password");
         webClient.get().uri("/apis/fake.halo.run/v1/posts")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).exchange().expectStatus()
-            .isForbidden();
+            .header(HttpHeaders.AUTHORIZATION, basicAuth)
+            .exchange()
+            .expectStatus().isForbidden();
 
         verify(roleService, times(1)).getMonoRole("authenticated");
         verify(roleService, times(1)).getMonoRole("invalid-role");
@@ -79,15 +80,16 @@ class AuthorizationTest {
         when(roleService.getMonoRole("authenticated")).thenReturn(
             Mono.error(ExtensionNotFoundException::new));
 
-        var token = LoginUtils.login(webClient, "user", "password").block();
+        String basicAuth = LoginUtils.buildBasicAuthHeader("user", "password");
         webClient.get().uri("/apis/fake.halo.run/v1/posts")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+            .header(HttpHeaders.AUTHORIZATION, basicAuth)
             .exchange()
             .expectStatus().isOk()
             .expectBody(String.class).isEqualTo("returned posts");
 
         webClient.put().uri("/apis/fake.halo.run/v1/posts/hello-halo")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer " + token).exchange()
+            .header(HttpHeaders.AUTHORIZATION, basicAuth)
+            .exchange()
             .expectStatus().isForbidden();
 
         verify(roleService, times(2)).getMonoRole("authenticated");
