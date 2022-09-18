@@ -21,6 +21,7 @@ import { apiClient } from "@halo-dev/admin-shared";
 import { useRouteQuery } from "@vueuse/router";
 import cloneDeep from "lodash.clonedeep";
 import { useAttachmentSelect } from "../attachments/composables/use-attachment";
+import MdiFileImageBox from "~icons/mdi/file-image-box";
 
 const initialFormState: SinglePageRequest = {
   page: {
@@ -181,13 +182,6 @@ onMounted(async () => {
     </template>
     <template #actions>
       <VSpace>
-        <VButton
-          size="sm"
-          type="default"
-          @click="attachemntSelectorModal = true"
-        >
-          附件库
-        </VButton>
         <VButton size="sm" type="default" @click="previewModal = true">
           预览
         </VButton>
@@ -204,6 +198,19 @@ onMounted(async () => {
     </template>
   </VPageHeader>
   <div class="editor border-t" style="height: calc(100vh - 3.5rem)">
-    <RichTextEditor v-if="editor" :editor="editor"> </RichTextEditor>
+    <RichTextEditor
+      v-if="editor"
+      :editor="editor"
+      :addtional-menu-items="[
+        {
+          type: 'button',
+          icon: MdiFileImageBox,
+          title: 'SuperScript',
+          action: () => (attachemntSelectorModal = true),
+          isActive: () => false,
+        },
+      ]"
+    >
+    </RichTextEditor>
   </div>
 </template>

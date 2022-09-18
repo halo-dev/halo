@@ -29,6 +29,7 @@ import {
 import ExtensionCharacterCount from "@tiptap/extension-character-count";
 import { formatDatetime } from "@/utils/date";
 import { useAttachmentSelect } from "../attachments/composables/use-attachment";
+import MdiFileImageBox from "~icons/mdi/file-image-box";
 
 const initialFormState: PostRequest = {
   post: {
@@ -237,13 +238,6 @@ onMounted(async () => {
     </template>
     <template #actions>
       <VSpace>
-        <VButton
-          size="sm"
-          type="default"
-          @click="attachemntSelectorModal = true"
-        >
-          附件库
-        </VButton>
         <VButton size="sm" type="default" @click="previewModal = true">
           预览
         </VButton>
@@ -260,7 +254,19 @@ onMounted(async () => {
     </template>
   </VPageHeader>
   <div class="editor border-t" style="height: calc(100vh - 3.5rem)">
-    <RichTextEditor v-if="editor" :editor="editor">
+    <RichTextEditor
+      v-if="editor"
+      :editor="editor"
+      :addtional-menu-items="[
+        {
+          type: 'button',
+          icon: MdiFileImageBox,
+          title: 'SuperScript',
+          action: () => (attachemntSelectorModal = true),
+          isActive: () => false,
+        },
+      ]"
+    >
       <template #extra>
         <div class="h-full w-72 overflow-y-auto border-l bg-white">
           <VTabs v-model:active-id="extraActiveId" type="outline">
