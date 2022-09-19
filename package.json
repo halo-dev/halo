@@ -25,6 +25,7 @@
     "packages/*"
   ],
   "dependencies": {
+    "@emoji-mart/data": "^1.0.6",
     "@formkit/addons": "1.0.0-beta.10",
     "@formkit/auto-animate": "1.0.0-beta.3",
     "@formkit/core": "1.0.0-beta.10",
@@ -33,7 +34,7 @@
     "@formkit/themes": "1.0.0-beta.10",
     "@formkit/vue": "1.0.0-beta.10",
     "@halo-dev/admin-shared": "workspace:*",
-    "@halo-dev/api-client": "^0.0.19",
+    "@halo-dev/api-client": "^0.0.22",
     "@halo-dev/components": "workspace:*",
     "@halo-dev/richtext-editor": "^0.0.0-alpha.7",
     "@tiptap/extension-character-count": "2.0.0-beta.31",
@@ -43,6 +44,7 @@
     "axios": "^0.27.2",
     "colorjs.io": "^0.4.0",
     "dayjs": "^1.11.5",
+    "emoji-mart": "^5.2.2",
     "filepond": "^4.30.4",
     "floating-vue": "2.0.0-beta.20",
     "lodash.clonedeep": "^4.5.0",

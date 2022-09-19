@@ -63,7 +63,7 @@ const emit = defineEmits<{
     @apply inline-flex items-center;
 
     .entity-field-description {
-      @apply text-xs text-gray-500;
+      @apply text-xs text-gray-500 truncate;
     }
   }
 }

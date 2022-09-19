@@ -5,6 +5,7 @@ importers:
   .:
     specifiers:
       '@changesets/cli': ^2.24.4
+      '@emoji-mart/data': ^1.0.6
       '@formkit/addons': 1.0.0-beta.10
       '@formkit/auto-animate': 1.0.0-beta.3
       '@formkit/core': 1.0.0-beta.10
@@ -13,7 +14,7 @@ importers:
       '@formkit/themes': 1.0.0-beta.10
       '@formkit/vue': 1.0.0-beta.10
       '@halo-dev/admin-shared': workspace:*
-      '@halo-dev/api-client': ^0.0.19
+      '@halo-dev/api-client': ^0.0.22
       '@halo-dev/components': workspace:*
       '@halo-dev/richtext-editor': ^0.0.0-alpha.7
       '@iconify-json/mdi': ^1.1.33
@@ -44,6 +45,7 @@ importers:
       colorjs.io: ^0.4.0
       cypress: ^9.7.0
       dayjs: ^1.11.5
+      emoji-mart: ^5.2.2
       eslint: ^8.23.0
       eslint-plugin-cypress: ^2.12.1
       eslint-plugin-vue: ^9.4.0
@@ -85,6 +87,7 @@ importers:
       vuedraggable: ^4.1.0
       yaml: ^2.1.1
     dependencies:
+      '@emoji-mart/data': 1.0.6
       '@formkit/addons': 1.0.0-beta.10
       '@formkit/auto-animate': 1.0.0-beta.3
       '@formkit/core': 1.0.0-beta.10
@@ -93,7 +96,7 @@ importers:
       '@formkit/themes': 1.0.0-beta.10_tailwindcss@3.1.8
       '@formkit/vue': 1.0.0-beta.10_jhzixbi2r7n2xnmwczrcaimaey
       '@halo-dev/admin-shared': link:packages/shared
-      '@halo-dev/api-client': 0.0.19
+      '@halo-dev/api-client': 0.0.22
       '@halo-dev/components': link:packages/components
       '@halo-dev/richtext-editor': 0.0.0-alpha.7_vue@3.2.39
       '@tiptap/extension-character-count': 2.0.0-beta.31
@@ -103,6 +106,7 @@ importers:
       axios: 0.27.2
       colorjs.io: 0.4.0
       dayjs: 1.11.5
+      emoji-mart: 5.2.2
       filepond: 4.30.4
       floating-vue: 2.0.0-beta.20_vue@3.2.39
       lodash.clonedeep: 4.5.0
@@ -196,14 +200,12 @@ importers:
 
   packages/shared:
     specifiers:
-      '@halo-dev/api-client': ^0.0.19
       '@halo-dev/components': workspace:*
       '@types/lodash.merge': ^4.6.7
       axios: ^0.27.2
       lodash.merge: ^4.6.2
       vite-plugin-dts: ^1.4.1
     dependencies:
-      '@halo-dev/api-client': 0.0.19
       '@halo-dev/components': link:../components
       axios: 0.27.2
       lodash.merge: 4.6.2
@@ -1740,6 +1742,10 @@ packages:
       - supports-color
     dev: true
 
+  /@emoji-mart/data/1.0.6:
+    resolution: {integrity: sha512-8wu3ec/kLCB0Y3K+pOKyY6Ob+xtQu3XhZvntdrpOTUQZ/PO6FW5PpFw7RE1kQ/up1fsVSJBl5mZ8Gs4SPwTYeg==}
+    dev: false
+
   /@esbuild/linux-loong64/0.15.7:
     resolution: {integrity: sha512-IKznSJOsVUuyt7cDzzSZyqBEcZe+7WlBqTVXiF1OXP/4Nm387ToaXZ0fyLwI1iBlI/bzpxVq411QE2/Bt2XWWw==}
     engines: {node: '>=12'}
@@ -1880,8 +1886,8 @@ packages:
       - windicss
     dev: false
 
-  /@halo-dev/api-client/0.0.19:
-    resolution: {integrity: sha512-5+tVk0BFeLXpqw5+yVl5b3CV0S0jjenA8/0Co8QdiQjspWmef1kXGzKpRKDBTqASTs6AOJk3cqSVoDrsVKftRg==}
+  /@halo-dev/api-client/0.0.22:
+    resolution: {integrity: sha512-0RBc2N+oqPIy+fE6otp8cjeWTvBgjH986lzhz2T8Gr6Byzp0cHzj3Y3+aT6t39Wg4Ux+wPRSV+Fh0x8VA8Jz5A==}
     dev: false
 
   /@halo-dev/richtext-editor/0.0.0-alpha.7_vue@3.2.39:
@@ -4631,6 +4637,10 @@ packages:
     resolution: {integrity: sha512-Fl5Ftk6WwXE0wqCgNoseKWndjzZlDCwuPTcoVZfCP9R3EHQF8qUtr3YUPNETegRBOKqQKPW3n4kiIWngGi8tKg==}
     dependencies:
       batch-processor: 1.0.0
+    dev: false
+
+  /emoji-mart/5.2.2:
+    resolution: {integrity: sha512-BvcrX+Ps9MxSVEjnvxupclU3MBD6WVC4WZOY26csfC6oFdaWpFhdrzeVNVBmCLPOmzY1SE0aAsqZJRNVbZ1yhQ==}
     dev: false
 
   /emoji-regex/8.0.0:

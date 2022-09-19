@@ -5,6 +5,7 @@ import {
   ApiHaloRunV1alpha1SinglePageApi,
   ApiHaloRunV1alpha1ThemeApi,
   ApiHaloRunV1alpha1UserApi,
+  ApiHaloRunV1alpha1ReplyApi,
   ContentHaloRunV1alpha1CategoryApi,
   ContentHaloRunV1alpha1CommentApi,
   ContentHaloRunV1alpha1PostApi,
@@ -27,6 +28,7 @@ import {
   V1alpha1RoleBindingApi,
   V1alpha1SettingApi,
   V1alpha1UserApi,
+  ApiHaloRunV1alpha1CommentApi,
 } from "@halo-dev/api-client";
 import type { AxiosInstance } from "axios";
 import axios from "axios";
@@ -112,6 +114,8 @@ function setupApiClient(axios: AxiosInstance) {
     post: new ApiHaloRunV1alpha1PostApi(undefined, apiUrl, axios),
     singlePage: new ApiHaloRunV1alpha1SinglePageApi(undefined, apiUrl, axios),
     content: new ApiHaloRunV1alpha1ContentApi(undefined, apiUrl, axios),
+    comment: new ApiHaloRunV1alpha1CommentApi(undefined, apiUrl, axios),
+    reply: new ApiHaloRunV1alpha1ReplyApi(undefined, apiUrl, axios),
   };
 }
 

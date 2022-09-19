@@ -1,3 +1,4 @@
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     "./index.html",
@@ -5,7 +6,18 @@ module.exports = {
     "./packages/shared/src/**/*.{vue,js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      animation: {
+        breath: "breath 1s ease-in-out infinite",
+      },
+      keyframes: {
+        breath: {
+          "0%": { transform: "scale(1)", opacity: 0.8 },
+          "50%": { transform: "scale(1.02)", opacity: 1 },
+          "100%": { transform: "scale(1)", opacity: 0.8 },
+        },
+      },
+    },
   },
   plugins: [
     require("tailwindcss-safe-area"),
