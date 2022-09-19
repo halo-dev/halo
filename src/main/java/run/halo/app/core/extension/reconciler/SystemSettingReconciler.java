@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -53,8 +54,38 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
             .ifPresent(configMap -> {
                 addFinalizerIfNecessary(configMap);
                 routeRuleReconciler.reconcile(name);
+                customizeSystem(name);
             });
         return new Result(false, null);
+    }
+
+    private void customizeSystem(String name) {
+        if (!SystemSetting.SYSTEM_CONFIG_DEFAULT.equals(name)) {
+            return;
+        }
+        // configMap named system not found then create it by system-default
+        Optional<ConfigMap> systemOpt = client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG);
+        if (systemOpt.isPresent()) {
+            return;
+        }
+        ConfigMap system = client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT)
+            .map(configMap -> {
+                // create a new configMap named system by system-default
+                ConfigMap systemConfigMap = new ConfigMap();
+                systemConfigMap.setMetadata(new Metadata());
+                systemConfigMap.getMetadata().setName(SystemSetting.SYSTEM_CONFIG);
+                systemConfigMap.setData(configMap.getData());
+                return systemConfigMap;
+            })
+            .orElseGet(() -> {
+                // empty configMap named system
+                ConfigMap configMap = new ConfigMap();
+                configMap.setMetadata(new Metadata());
+                configMap.getMetadata().setName(SystemSetting.SYSTEM_CONFIG);
+                configMap.setData(new HashMap<>());
+                return configMap;
+            });
+        client.create(system);
     }
 
     private void addFinalizerIfNecessary(ConfigMap oldConfigMap) {
