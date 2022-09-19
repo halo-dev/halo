@@ -69,6 +69,6 @@ public class Tag extends AbstractExtension {
 
         private String permalink;
 
-        private List<String> posts;
+        private List<Post.CompactPost> posts;
     }
 }
