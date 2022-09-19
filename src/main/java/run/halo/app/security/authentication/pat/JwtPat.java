@@ -7,13 +7,16 @@ public class JwtPat implements Pat {
 
     private final Jwt jwt;
 
-    public JwtPat(Jwt jwt) {
+    private final String tokenValue;
+
+    public JwtPat(Jwt jwt, String tokenValue) {
         this.jwt = jwt;
+        this.tokenValue = tokenValue;
     }
 
     @Override
     public String getTokenValue() {
-        return jwt.getTokenValue();
+        return tokenValue;
     }
 
     @Override

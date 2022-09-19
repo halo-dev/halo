@@ -16,9 +16,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtClaimsSet;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
@@ -41,7 +38,7 @@ public class PatAuthenticationTest {
     WebTestClient webClient;
 
     @Autowired
-    JwtEncoder jwtEncoder;
+    PatEncoder encoder;
 
     @Autowired
     ReactiveExtensionClient client;
@@ -54,12 +51,6 @@ public class PatAuthenticationTest {
 
     @Test
     void requestApiWithPat() {
-        var claims = JwtClaimsSet.builder()
-            .claim("patName", "my-pat")
-            .build();
-        var encoderParameters = JwtEncoderParameters.from(claims);
-        var jwt = jwtEncoder.encode(encoderParameters);
-
         var pat = new PersonalAccessToken();
         var metadata = new Metadata();
         metadata.setName("my-pat");
@@ -68,8 +59,12 @@ public class PatAuthenticationTest {
         spec.setCreatedBy("admin");
         spec.setDescription("My pat");
         spec.setScopes(Set.of("scoped:read"));
-        spec.setEncodedToken(passwordEncoder.encode(jwt.getTokenValue()));
         pat.setSpec(spec);
+
+        var accessToken = encoder.buildToken(pat).block();
+        String encodedToken = encoder.encode(accessToken).block();
+
+        spec.setEncodedToken(encodedToken);
 
         User user = new User();
         var userMetadata = new Metadata();
@@ -112,7 +107,7 @@ public class PatAuthenticationTest {
 
         webClient.get()
             .uri("/api/scoped")
-            .header(HttpHeaders.AUTHORIZATION, "Bearer pat_" + jwt.getTokenValue())
+            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
             .exchange()
             .expectStatus().isOk();
     }

@@ -5,8 +5,10 @@ import run.halo.app.core.extension.pat.PersonalAccessToken;
 
 public interface PatEncoder {
 
-    Mono<String> encode(PersonalAccessToken pat);
+    Mono<String> buildToken(PersonalAccessToken pat);
 
-    boolean matches(String rawToken, String encodedToken);
+    Mono<String> encode(String rawToken);
+
+    Mono<Boolean> matches(String rawToken, String encodedToken);
 
 }

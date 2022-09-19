@@ -45,26 +45,27 @@ public class PatAuthenticationManager implements ReactiveAuthenticationManager {
             .cast(BearerTokenAuthenticationToken.class)
             .map(BearerTokenAuthenticationToken::getToken)
             .flatMap(decoder::decode)
-            .flatMap(pat -> client.fetch(PersonalAccessToken.class, pat.getPatName())
-                .switchIfEmpty(Mono.error(
-                    () -> new InvalidBearerTokenException("Invalid PersonalAccessToken")))
-                .filter(personalAccessToken -> encoder.matches(pat.getTokenValue(),
-                    personalAccessToken.getSpec().getEncodedToken()))
-                .switchIfEmpty(Mono.error(() -> new BadCredentialsException("Invalid Credentials")))
-                .doOnNext(personalAccessToken -> this.checkTokenIsValid(pat, personalAccessToken))
-                .flatMap(personalAccessToken ->
-                    this.createPatAuthenticationToken(pat, personalAccessToken)))
+            .flatMap(this::createPatAuthenticationToken)
             .onErrorMap(JwtException.class, this::onJwtError);
     }
 
+    private Mono<Authentication> createPatAuthenticationToken(Pat pat) {
+        return client.fetch(PersonalAccessToken.class, pat.getPatName())
+            .switchIfEmpty(Mono.error(
+                () -> new InvalidBearerTokenException("Invalid PersonalAccessToken")))
+            .flatMap(personalAccessToken -> this.checkTokenIsValid(pat, personalAccessToken)
+                .thenReturn(personalAccessToken))
+            .flatMap(personalAccessToken ->
+                this.createPatAuthenticationToken(pat, personalAccessToken));
+    }
+
     private Mono<Authentication> createPatAuthenticationToken(Pat pat,
-                                                              PersonalAccessToken personalAccessToken) {
-        return userDetailsService.findByUsername(personalAccessToken.getSpec().getCreatedBy())
-            .switchIfEmpty(Mono.error(() -> new BadCredentialsException("Token deleted")))
+                                                              PersonalAccessToken accessToken) {
+        return userDetailsService.findByUsername(accessToken.getSpec().getCreatedBy())
+            .switchIfEmpty(Mono.error(() -> new BadCredentialsException("User Not Found")))
             .map(userDetails -> {
-                var authorities =
-                    new HashSet<GrantedAuthority>(userDetails.getAuthorities());
-                var scopes = personalAccessToken.getSpec().getScopes();
+                var authorities = new HashSet<GrantedAuthority>(userDetails.getAuthorities());
+                var scopes = accessToken.getSpec().getScopes();
                 if (scopes != null) {
                     scopes.stream()
                         .map(scope -> StringUtils.prependIfMissing(scope, "SCOPE_"))
@@ -75,19 +76,22 @@ public class PatAuthenticationManager implements ReactiveAuthenticationManager {
             });
     }
 
-    private void checkTokenIsValid(Pat pat, PersonalAccessToken personalAccessToken) {
+    private Mono<Void> checkTokenIsValid(Pat pat, PersonalAccessToken personalAccessToken) {
         // validate the personal access token
-        var encodedToken = personalAccessToken.getSpec().getEncodedToken();
         if (personalAccessToken.getSpec().isRevoked()) {
-            throw new BadCredentialsException("Revoked token");
+            return Mono.error(() -> new BadCredentialsException("Revoked token"));
         }
-        if (!encoder.matches(pat.getTokenValue(), encodedToken)) {
-            if (log.isDebugEnabled()) {
-                log.debug("The token doesn't match the encoded token. Token value: {}",
-                    pat.getTokenValue());
-            }
-            throw new BadCredentialsException("Mismatched token");
-        }
+        var encodedToken = personalAccessToken.getSpec().getEncodedToken();
+        return encoder.matches(pat.getTokenValue(), encodedToken)
+            .filter(match -> match)
+            .switchIfEmpty(Mono.error(() -> {
+                if (log.isDebugEnabled()) {
+                    log.debug("The token doesn't match the encoded token. Token value: {}",
+                        pat.getTokenValue());
+                }
+                return new BadCredentialsException("Mismatched token");
+            }))
+            .then();
     }
 
     private AuthenticationException onJwtError(JwtException e) {

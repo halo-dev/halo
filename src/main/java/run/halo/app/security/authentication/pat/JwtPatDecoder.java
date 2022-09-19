@@ -16,8 +16,7 @@ public class JwtPatDecoder implements PatDecoder {
 
     @Override
     public Mono<Pat> decode(String token) {
-        token = StringUtils.removeStart(token, "pat_");
-        return jwtDecoder.decode(token)
-            .map(JwtPat::new);
+        return jwtDecoder.decode(StringUtils.removeStart(token, "pat_"))
+            .map(jwt -> new JwtPat(jwt, token));
     }
 }
