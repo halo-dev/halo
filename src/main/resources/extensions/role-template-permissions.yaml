@@ -11,7 +11,7 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       ["system:permissions:manage"]
 rules:
-  - apiGroups: [ "api.halo.run" ]
+  - apiGroups: [ "api.console.halo.run" ]
     resources: [ "users/permissions" ]
     verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
 ---
@@ -27,6 +27,6 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       ["system:permissions:view"]
 rules:
-  - apiGroups: [ "api.halo.run" ]
+  - apiGroups: [ "api.console.halo.run" ]
     resources: [ "users/permissions" ]
     verbs: [ "get", "list" ]

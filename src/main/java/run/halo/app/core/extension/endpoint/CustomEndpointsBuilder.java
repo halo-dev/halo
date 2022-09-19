@@ -22,12 +22,12 @@ public class CustomEndpointsBuilder {
 
     public RouterFunction<ServerResponse> build() {
         return SpringdocRouteBuilder.route()
-            .nest(RequestPredicates.path("/apis/api.halo.run/v1alpha1"),
+            .nest(RequestPredicates.path("/apis/api.console.halo.run/v1alpha1"),
                 () -> routerFunctions.stream().reduce(RouterFunction::and).orElse(null),
                 builder -> builder
                     .operationId("CustomEndpoints")
                     .description("Custom endpoints")
-                    .tag("api.halo.run/v1alpha1/CustomEndpoint"))
+                    .tag("api.console.halo.run/v1alpha1/CustomEndpoint"))
             .build();
     }
 }

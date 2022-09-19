@@ -36,7 +36,7 @@ public class ContentEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = "api.halo.run/v1alpha1/Content";
+        final var tag = "api.console.halo.run/v1alpha1/Content";
         return SpringdocRouteBuilder.route()
             .GET("contents/{snapshotName}", this::obtainContent,
                 builder -> builder.operationId("ObtainSnapshotContent")
