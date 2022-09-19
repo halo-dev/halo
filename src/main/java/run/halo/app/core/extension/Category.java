@@ -27,6 +27,11 @@ public class Category extends AbstractExtension {
     @Schema
     private CategoryStatus status;
 
+    @JsonIgnore
+    public boolean isDeleted() {
+        return getMetadata().getDeletionTimestamp() != null;
+    }
+
     @Data
     public static class CategorySpec {
 
@@ -64,6 +69,6 @@ public class Category extends AbstractExtension {
         /**
          * 包括当前和其下所有层级的文章 name (depth=max).
          */
-        private List<String> posts;
+        private List<Post.CompactPost> posts;
     }
 }
