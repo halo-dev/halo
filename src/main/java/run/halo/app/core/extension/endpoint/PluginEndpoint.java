@@ -44,7 +44,7 @@ public class PluginEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = "api.halo.run/v1alpha1/Plugin";
+        final var tag = "api.console.halo.run/v1alpha1/Plugin";
         return SpringdocRouteBuilder.route()
             .POST("plugins/install", contentType(MediaType.MULTIPART_FORM_DATA),
                 this::install, builder -> builder.operationId("InstallPlugin")

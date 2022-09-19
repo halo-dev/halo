@@ -25,13 +25,20 @@ public class SystemConfigurableEnvironmentFetcher {
     }
 
     public <T> Mono<T> fetch(String key, Class<T> type) {
-        return getValuesInternal().map(map -> map.get(key))
+        return getValuesInternal()
+            .filter(map -> map.containsKey(key))
+            .map(map -> map.get(key))
             .mapNotNull(stringValue -> {
                 if (conversionService.canConvert(String.class, type)) {
                     return conversionService.convert(stringValue, type);
                 }
                 return JsonUtils.jsonToObject(stringValue, type);
             });
+    }
+
+    public Mono<SystemSetting.Comment> fetchComment() {
+        return fetch(SystemSetting.Comment.GROUP, SystemSetting.Comment.class)
+            .switchIfEmpty(Mono.just(new SystemSetting.Comment()));
     }
 
     @NonNull

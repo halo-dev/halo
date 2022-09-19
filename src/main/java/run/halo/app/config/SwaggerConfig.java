@@ -43,7 +43,7 @@ public class SwaggerConfig {
             .group("extension-api")
             .displayName("Extension APIs")
             .pathsToMatch("/apis/**")
-            .pathsToExclude("/apis/api.halo.run/**", "/apis/plugin.api.halo.run/**")
+            .pathsToExclude("/apis/api.console.halo.run/**", "/apis/api.plugin.halo.run/**")
             .build();
     }
 
@@ -52,7 +52,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
             .group("core-custom-api")
             .displayName("Custom APIs in Core")
-            .pathsToMatch("/apis/api.halo.run/**")
+            .pathsToMatch("/apis/api.console.halo.run/**")
             .build();
     }
 
@@ -61,7 +61,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
             .group("plugin-custom-api")
             .displayName("Custom APIs in Plugin")
-            .pathsToMatch("/apis/plugin.api.halo.run/**")
+            .pathsToMatch("/apis/api.plugin.halo.run/**")
             .build();
     }
 

@@ -71,7 +71,7 @@ class UserEndpointTest {
         void shouldResponseErrorIfUserNotFound() {
             when(client.get(User.class, "fake-user"))
                 .thenReturn(Mono.error(new ExtensionNotFoundException()));
-            webClient.get().uri("/apis/api.halo.run/v1alpha1/users/-")
+            webClient.get().uri("/apis/api.console.halo.run/v1alpha1/users/-")
                 .exchange()
                 .expectStatus().is5xxServerError();
 
@@ -85,7 +85,7 @@ class UserEndpointTest {
             var user = new User();
             user.setMetadata(metadata);
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(user));
-            webClient.get().uri("/apis/api.halo.run/v1alpha1/users/-")
+            webClient.get().uri("/apis/api.console.halo.run/v1alpha1/users/-")
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -103,7 +103,7 @@ class UserEndpointTest {
             var user = new User();
             when(userService.updateWithRawPassword("fake-user", "new-password"))
                 .thenReturn(Mono.just(user));
-            webClient.put().uri("/apis/api.halo.run/v1alpha1/users/-/password")
+            webClient.put().uri("/apis/api.console.halo.run/v1alpha1/users/-/password")
                 .bodyValue(new UserEndpoint.ChangePasswordRequest("new-password"))
                 .exchange()
                 .expectStatus().isOk()
@@ -118,7 +118,8 @@ class UserEndpointTest {
             var user = new User();
             when(userService.updateWithRawPassword("another-fake-user", "new-password"))
                 .thenReturn(Mono.just(user));
-            webClient.put().uri("/apis/api.halo.run/v1alpha1/users/another-fake-user/password")
+            webClient.put()
+                .uri("/apis/api.console.halo.run/v1alpha1/users/another-fake-user/password")
                 .bodyValue(new UserEndpoint.ChangePasswordRequest("new-password"))
                 .exchange()
                 .expectStatus().isOk()
@@ -144,7 +145,7 @@ class UserEndpointTest {
 
         @Test
         void shouldGetBadRequestIfRequestBodyIsEmpty() {
-            webClient.post().uri("/apis/api.halo.run/v1alpha1/users/fake-user/permissions")
+            webClient.post().uri("/apis/api.console.halo.run/v1alpha1/users/fake-user/permissions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest();
@@ -158,7 +159,7 @@ class UserEndpointTest {
         void shouldGrantPermission() {
             when(userService.grantRoles("fake-user", Set.of("fake-role"))).thenReturn(Mono.empty());
 
-            webClient.post().uri("/apis/api.halo.run/v1alpha1/users/fake-user/permissions")
+            webClient.post().uri("/apis/api.console.halo.run/v1alpha1/users/fake-user/permissions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UserEndpoint.GrantRequest(Set.of("fake-role")))
                 .exchange()
@@ -185,7 +186,7 @@ class UserEndpointTest {
             when(userService.listRoles(eq("fake-user"))).thenReturn(
                 Flux.fromIterable(List.of(roleA)));
 
-            webClient.get().uri("/apis/api.halo.run/v1alpha1/users/fake-user/permissions")
+            webClient.get().uri("/apis/api.console.halo.run/v1alpha1/users/fake-user/permissions")
                 .exchange()
                 .expectStatus()
                 .isOk()

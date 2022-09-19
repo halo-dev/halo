@@ -12,6 +12,7 @@ import run.halo.app.content.permalinks.CategoryPermalinkPolicy;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
 import run.halo.app.core.extension.Category;
+import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.Plugin;
@@ -24,6 +25,7 @@ import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.reconciler.CategoryReconciler;
+import run.halo.app.core.extension.reconciler.CommentReconciler;
 import run.halo.app.core.extension.reconciler.MenuItemReconciler;
 import run.halo.app.core.extension.reconciler.MenuReconciler;
 import run.halo.app.core.extension.reconciler.PluginReconciler;
@@ -193,6 +195,14 @@ public class ExtensionConfiguration {
                     applicationContext, templateRouteManager)
                 )
                 .extension(new SinglePage())
+                .build();
+        }
+
+        @Bean
+        Controller commentController(ExtensionClient client) {
+            return new ControllerBuilder("comment-controller", client)
+                .reconciler(new CommentReconciler(client))
+                .extension(new Comment())
                 .build();
         }
     }

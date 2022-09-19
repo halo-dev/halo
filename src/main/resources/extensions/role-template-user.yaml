@@ -43,6 +43,6 @@ metadata:
     rbac.authorization.halo.run/module: "Users Management"
     rbac.authorization.halo.run/display-name: "User Password Change"
 rules:
-  - apiGroups: [ "api.halo.run" ]
+  - apiGroups: [ "api.console.halo.run" ]
     resources: [ "users/password" ]
     verbs: [ "update" ]

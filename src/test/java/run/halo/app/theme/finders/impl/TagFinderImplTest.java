@@ -65,10 +65,7 @@ class TagFinderImplTest {
                      },
                      "status": {
                          "permalink": "permalink-1",
-                         "posts": [
-                             "p1",
-                             "p2"
-                         ]
+                         "posts": []
                      }
                 }
                 """,
@@ -120,7 +117,7 @@ class TagFinderImplTest {
 
         Tag.TagStatus tagStatus = new Tag.TagStatus();
         tagStatus.setPermalink("permalink-" + i);
-        tagStatus.setPosts(List.of("p1", "p2"));
+        tagStatus.setPosts(List.of());
         tag.setStatus(tagStatus);
         return tag;
     }

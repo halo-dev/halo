@@ -89,21 +89,21 @@ public class RequestInfoResolverTest {
     void pluginsScopedAndPluginManage() {
         List<CustomSuccessCase> testCases =
             List.of(
-                new CustomSuccessCase("DELETE", "/apis/plugin.api.halo.run/v1/plugins/other/posts",
-                    "delete", "apis", "plugin.api.halo.run", "v1", "", "plugins", "posts", "", "",
+                new CustomSuccessCase("DELETE", "/apis/api.plugin.halo.run/v1/plugins/other/posts",
+                    "delete", "apis", "api.plugin.halo.run", "v1", "", "plugins", "posts", "", "",
                     new String[] {"plugins", "other", "posts"}),
 
                 // api group identification
                 new CustomSuccessCase("POST",
-                    "/apis/plugin.api.halo.run/v1/plugins/other/posts/foo",
+                    "/apis/api.plugin.halo.run/v1/plugins/other/posts/foo",
                     "create", "apis",
-                    "plugin.api.halo.run", "v1", "", "plugins", "posts", "other", "foo",
+                    "api.plugin.halo.run", "v1", "", "plugins", "posts", "other", "foo",
                     new String[] {"plugins", "other", "posts", "foo"}),
 
                 // api version identification
                 new CustomSuccessCase("POST",
-                    "/apis/plugin.api.halo.run/v1beta3/plugins/other/posts/bar", "create",
-                    "apis", "plugin.api.halo.run", "v1beta3", "", "plugins", "posts", "other",
+                    "/apis/api.plugin.halo.run/v1beta3/plugins/other/posts/bar", "create",
+                    "apis", "api.plugin.halo.run", "v1beta3", "", "plugins", "posts", "other",
                     "bar",
                     new String[] {"plugins", "other", "posts", "bar"}));
 
@@ -119,14 +119,14 @@ public class RequestInfoResolverTest {
 
         List<CustomSuccessCase> pluginScopedCases =
             List.of(
-                new CustomSuccessCase("DELETE", "/apis/plugin.api.halo.run/v1/plugins/other/posts",
-                    "delete", "apis", "plugin.api.halo.run", "v1", "", "plugins", "posts",
+                new CustomSuccessCase("DELETE", "/apis/api.plugin.halo.run/v1/plugins/other/posts",
+                    "delete", "apis", "api.plugin.halo.run", "v1", "", "plugins", "posts",
                     "other", "", new String[] {"plugins", "other", "posts"}),
 
                 // api group identification
                 new CustomSuccessCase("POST",
-                    "/apis/plugin.api.halo.run/v1/plugins/other/posts/some-name", "create", "apis",
-                    "plugin.api.halo.run", "v1", "other", "plugins", "posts", "other", "some-name",
+                    "/apis/api.plugin.halo.run/v1/plugins/other/posts/some-name", "create", "apis",
+                    "api.plugin.halo.run", "v1", "other", "plugins", "posts", "other", "some-name",
                     new String[] {"plugins", "other", "posts", "some-name"}));
 
         for (CustomSuccessCase pluginScopedCase : pluginScopedCases) {
@@ -180,9 +180,9 @@ public class RequestInfoResolverTest {
             new PolicyRule.Builder().apiGroups("").resources("posts").verbs("list", "get")
                 .build(),
             new PolicyRule.Builder().apiGroups("").resources("categories").verbs("*").build(),
-            new PolicyRule.Builder().apiGroups("plugin.api.halo.run").resources("plugins/users")
+            new PolicyRule.Builder().apiGroups("api.plugin.halo.run").resources("plugins/users")
                 .resourceNames("foo/bar").verbs("*").build(),
-            new PolicyRule.Builder().apiGroups("plugin.api.halo.run").resources("plugins/users")
+            new PolicyRule.Builder().apiGroups("api.plugin.halo.run").resources("plugins/users")
                 .resourceNames("foo").verbs("*").build(),
             new PolicyRule.Builder().nonResourceURLs("/healthy").verbs("get", "post", "head")
                 .build());
@@ -239,11 +239,11 @@ public class RequestInfoResolverTest {
             new RequestResolveCase("/apis/group/v1/posts", "GET", false),
 
             // plugin custom resource url
-            new RequestResolveCase("/apis/plugin.api.halo.run/v1alpha1/plugins/foo/users", "GET",
+            new RequestResolveCase("/apis/api.plugin.halo.run/v1alpha1/plugins/foo/users", "GET",
                 true),
-            new RequestResolveCase("/apis/plugin.api.halo.run/v1alpha1/plugins/foo/users/bar",
+            new RequestResolveCase("/apis/api.plugin.halo.run/v1alpha1/plugins/foo/users/bar",
                 "GET", true),
-            new RequestResolveCase("/apis/plugin.api.halo.run/v1alpha1/plugins/foo/posts/bar",
+            new RequestResolveCase("/apis/api.plugin.halo.run/v1alpha1/plugins/foo/posts/bar",
                 "GET", false),
 
             // non resource url

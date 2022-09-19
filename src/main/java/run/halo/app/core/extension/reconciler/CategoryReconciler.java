@@ -1,9 +1,19 @@
 package run.halo.app.core.extension.reconciler;
 
+import java.time.Duration;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import org.springframework.lang.Nullable;
 import run.halo.app.content.permalinks.CategoryPermalinkPolicy;
 import run.halo.app.core.extension.Category;
+import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
@@ -27,17 +37,20 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
 
     @Override
     public Result reconcile(Request request) {
-        client.fetch(Category.class, request.name())
-            .ifPresent(category -> {
-                if (isDeleted(category)) {
+        return client.fetch(Category.class, request.name())
+            .map(category -> {
+                if (category.isDeleted()) {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
-                    return;
+                    return new Result(false, null);
                 }
                 addFinalizerIfNecessary(category);
 
-                reconcileStatus(request.name());
-            });
-        return new Result(false, null);
+                reconcileStatusPermalink(request.name());
+
+                reconcileStatusPosts(request.name());
+                return new Result(true, Duration.ofMinutes(1));
+            })
+            .orElseGet(() -> new Result(false, null));
     }
 
     private void addFinalizerIfNecessary(Category oldCategory) {
@@ -72,7 +85,7 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
         });
     }
 
-    private void reconcileStatus(String name) {
+    private void reconcileStatusPermalink(String name) {
         client.fetch(Category.class, name)
             .ifPresent(category -> {
                 Category oldCategory = JsonUtils.deepCopy(category);
@@ -88,7 +101,79 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
             });
     }
 
-    private boolean isDeleted(Category category) {
-        return category.getMetadata().getDeletionTimestamp() != null;
+    private void reconcileStatusPosts(String name) {
+        client.fetch(Category.class, name).ifPresent(category -> {
+            Category oldCategory = JsonUtils.deepCopy(category);
+
+            populatePosts(category);
+
+            if (!oldCategory.equals(category)) {
+                client.update(category);
+            }
+        });
+    }
+
+    private void populatePosts(Category category) {
+        String name = category.getMetadata().getName();
+        List<String> categoryNames = listChildrenByName(name)
+            .stream()
+            .map(item -> item.getMetadata().getName())
+            .toList();
+
+        List<Post> posts = client.list(Post.class, post -> !post.isDeleted(), null);
+
+        // populate post to status
+        List<Post.CompactPost> compactPosts = posts.stream()
+            .filter(post -> includes(post.getSpec().getCategories(), categoryNames))
+            .map(post -> Post.CompactPost.builder()
+                .name(post.getMetadata().getName())
+                .visible(post.getSpec().getVisible())
+                .published(post.isPublished())
+                .build())
+            .toList();
+        category.getStatusOrDefault().setPosts(compactPosts);
+    }
+
+    /**
+     * whether {@code categoryRefs} contains elements in {@code categoryNames}.
+     *
+     * @param categoryRefs category left to judge
+     * @param categoryNames category right to judge
+     * @return true if {@code categoryRefs} contains elements in {@code categoryNames}.
+     */
+    private boolean includes(@Nullable List<String> categoryRefs, List<String> categoryNames) {
+        if (categoryRefs == null || categoryNames == null) {
+            return false;
+        }
+        for (String categoryRef : categoryRefs) {
+            if (categoryNames.contains(categoryRef)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private List<Category> listChildrenByName(String name) {
+        List<Category> categories = client.list(Category.class, null, null);
+        Map<String, Category> nameIdentityMap = categories.stream()
+            .collect(Collectors.toMap(category -> category.getMetadata().getName(),
+                Function.identity()));
+        final List<Category> children = new ArrayList<>();
+
+        Deque<String> deque = new ArrayDeque<>();
+        deque.add(name);
+        while (!deque.isEmpty()) {
+            String itemName = deque.poll();
+            Category category = nameIdentityMap.get(itemName);
+            if (category == null) {
+                continue;
+            }
+            children.add(category);
+            List<String> childrenNames = category.getSpec().getChildren();
+            if (childrenNames != null) {
+                deque.addAll(childrenNames);
+            }
+        }
+        return children;
     }
 }

@@ -12,6 +12,7 @@ import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Reply;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.Ref;
 import run.halo.app.theme.finders.CommentFinder;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.vo.CommentVo;
@@ -40,7 +41,7 @@ public class CommentFinderImpl implements CommentFinder {
     }
 
     @Override
-    public ListResult<CommentVo> list(Comment.CommentSubjectRef ref, Integer page, Integer size) {
+    public ListResult<CommentVo> list(Ref ref, Integer page, Integer size) {
         return client.list(Comment.class, fixedPredicate(ref),
                 defaultComparator(),
                 pageNullSafe(page), sizeNullSafe(size))
@@ -69,9 +70,9 @@ public class CommentFinderImpl implements CommentFinder {
             .block();
     }
 
-    private Predicate<Comment> fixedPredicate(Comment.CommentSubjectRef ref) {
+    private Predicate<Comment> fixedPredicate(Ref ref) {
         Assert.notNull(ref, "Comment subject reference must not be null");
-        return comment -> ref.equals(comment.getSpec().getSubjectRef())
+        return comment -> comment.getSpec().getSubjectRef().equals(ref)
             && Objects.equals(false, comment.getSpec().getHidden())
             && Objects.equals(true, comment.getSpec().getApproved());
     }
