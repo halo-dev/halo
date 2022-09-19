@@ -6,6 +6,6 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "api.halo.run" ]
+  - apiGroups: [ "api.console.halo.run" ]
     resources: [ "comments", "comments/reply" ]
     verbs: [ "create" ]

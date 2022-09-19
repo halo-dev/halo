@@ -39,7 +39,7 @@ public class SinglePageEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = "api.halo.run/v1alpha1/SinglePage";
+        final var tag = "api.console.halo.run/v1alpha1/SinglePage";
         return SpringdocRouteBuilder.route()
             .GET("singlepages", this::listSinglePage, builder -> {
                     builder.operationId("ListSinglePages")

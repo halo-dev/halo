@@ -19,7 +19,7 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "api.halo.run" ]
+  - apiGroups: [ "api.console.halo.run" ]
     resources: [ "users" ]
     resourceNames: [ "-" ]
     verbs: [ "list", "get" ]
@@ -32,7 +32,7 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "api.halo.run" ]
+  - apiGroups: [ "api.console.halo.run" ]
     resources: [ "users/permissions" ]
     resourceNames: [ "-" ]
     verbs: [ "list", "get" ]
@@ -45,7 +45,7 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "api.halo.run" ]
+  - apiGroups: [ "api.console.halo.run" ]
     resources: [ "users/password" ]
     resourceNames: [ "-" ]
     verbs: [ "update" ]

@@ -128,7 +128,7 @@ public class PluginRequestMappingHandlerMapping extends RequestMappingHandlerMap
 
     protected String buildPrefix(String pluginId, String version) {
         GroupVersion groupVersion = GroupVersion.parseAPIVersion(version);
-        return String.format("/apis/plugin.api.halo.run/%s/plugins/%s", groupVersion.version(),
+        return String.format("/apis/api.plugin.halo.run/%s/plugins/%s", groupVersion.version(),
             pluginId);
     }
 }
