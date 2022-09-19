@@ -37,7 +37,6 @@ import { apiClient } from "@halo-dev/admin-shared";
 import { formatDatetime } from "@/utils/date";
 import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
 import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
-import cloneDeep from "lodash.clonedeep";
 import { postLabels } from "@/constants/labels";
 
 enum PostPhase {
@@ -217,13 +216,28 @@ const handleDelete = async (post: Post) => {
     title: "是否确认删除该文章？",
     confirmType: "danger",
     onConfirm: async () => {
-      const postToUpdate = cloneDeep(post);
-      postToUpdate.spec.deleted = true;
-      await apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
-        name: postToUpdate.metadata.name,
-        post: postToUpdate,
+      await apiClient.extension.post.deletecontentHaloRunV1alpha1Post({
+        name: post.metadata.name,
       });
       await handleFetchPosts();
+    },
+  });
+};
+
+const handleDeleteInBatch = async () => {
+  dialog.warning({
+    title: "是否确认删除选中的文章？",
+    confirmType: "danger",
+    onConfirm: async () => {
+      await Promise.all(
+        selectedPostNames.value.map((name) => {
+          return apiClient.extension.post.deletecontentHaloRunV1alpha1Post({
+            name,
+          });
+        })
+      );
+      await handleFetchPosts();
+      selectedPostNames.value.length = 0;
     },
   });
 };
@@ -445,8 +459,9 @@ function handleContributorFilterItemChange(user?: User) {
                 </div>
               </div>
               <VSpace v-else>
-                <VButton type="default">设置</VButton>
-                <VButton type="danger">删除</VButton>
+                <VButton type="danger" @click="handleDeleteInBatch">
+                  删除
+                </VButton>
               </VSpace>
             </div>
             <div class="mt-4 flex sm:mt-0">
@@ -841,6 +856,11 @@ function handleContributorFilterItemChange(user?: User) {
                     v-tooltip="`内部成员可访问`"
                     class="cursor-pointer text-sm transition-all hover:text-blue-600"
                   />
+                </template>
+              </VEntityField>
+              <VEntityField v-if="post?.post?.metadata.deletionTimestamp">
+                <template #description>
+                  <VStatusDot v-tooltip="`删除中`" state="warning" animate />
                 </template>
               </VEntityField>
               <VEntityField
