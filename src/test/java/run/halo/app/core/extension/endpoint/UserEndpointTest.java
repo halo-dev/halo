@@ -123,7 +123,8 @@ class UserEndpointTest {
             var user = new User();
             when(userService.updateWithRawPassword("another-fake-user", "new-password"))
                 .thenReturn(Mono.just(user));
-            webClient.put().uri("/apis/api.console.halo.run/v1alpha1/users/another-fake-user/password")
+            webClient.put()
+                .uri("/apis/api.console.halo.run/v1alpha1/users/another-fake-user/password")
                 .bodyValue(new UserEndpoint.ChangePasswordRequest("new-password"))
                 .exchange()
                 .expectStatus().isOk()
