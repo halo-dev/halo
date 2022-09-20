@@ -2,11 +2,12 @@ package run.halo.app.core.extension.pat.endpoint;
 
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import lombok.Data;
+import org.springdoc.core.fn.builders.apiresponse.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -45,7 +46,9 @@ public class PatEndpoint implements CustomEndpoint {
                     .tag(tag)
                     .requestBody(requestBodyBuilder()
                         .required(true)
-                        .implementation(TokenRequest.class));
+                        .implementation(NewTokenRequest.class))
+                    .response(Builder.responseBuilder()
+                        .implementation(NewTokenResponse.class));
             })
             .build();
     }
@@ -54,7 +57,7 @@ public class PatEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> newToken(ServerRequest request) {
         return ReactiveSecurityContextHolder.getContext()
             .map(SecurityContext::getAuthentication)
-            .flatMap(authentication -> request.bodyToMono(TokenRequest.class)
+            .flatMap(authentication -> request.bodyToMono(NewTokenRequest.class)
                 .switchIfEmpty(
                     Mono.error(() -> new ServerWebInputException("Request body is required")))
                 .flatMap(tokenRequest -> {
@@ -79,17 +82,26 @@ public class PatEndpoint implements CustomEndpoint {
                             })
                             .thenReturn(rawToken));
                 })
-                .flatMap(rawToken -> ServerResponse.ok()
-                    .bodyValue(Map.of("rawToken", rawToken))));
+                .flatMap(
+                    rawToken -> ServerResponse.ok().bodyValue(new NewTokenResponse(rawToken))));
     }
 
     @Data
-    public static class TokenRequest {
+    public static class NewTokenRequest {
 
+        @Schema(required = true, description = "Token description")
         private String description;
 
+        @Schema(nullable = true, description = "Expiration time")
         private Instant expiresAt;
 
+        @Schema(nullable = true, description = "Scopes the token could be accessed")
         private Set<String> scopes;
+    }
+
+    public record NewTokenResponse(
+        @Schema(required = true, description = "Raw token that could be used for authentication")
+        String rawToken) {
+
     }
 }
