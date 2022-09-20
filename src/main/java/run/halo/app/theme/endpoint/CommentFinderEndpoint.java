@@ -95,7 +95,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> getComment(ServerRequest request) {
         String name = request.pathVariable("name");
-        return Mono.defer(() -> Mono.just(commentFinder.getByName(name)))
+        return Mono.defer(() -> Mono.justOrEmpty(commentFinder.getByName(name)))
             .publishOn(Schedulers.boundedElastic())
             .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
     }
