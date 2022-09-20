@@ -73,8 +73,10 @@ public class PatEndpoint implements CustomEndpoint {
                     pat.setSpec(spec);
                     return encoder.buildToken(pat)
                         .flatMap(rawToken -> encoder.encode(rawToken)
-                            .doOnNext(spec::setEncodedToken)
-                            .then(client.create(pat))
+                            .flatMap(encodedToken -> {
+                                spec.setEncodedToken(encodedToken);
+                                return client.create(pat);
+                            })
                             .thenReturn(rawToken));
                 })
                 .flatMap(rawToken -> ServerResponse.ok()
