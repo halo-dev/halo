@@ -65,8 +65,7 @@ public class WebFluxConfig implements WebFluxConfigurer {
     @Bean
     RouterFunction<ServerResponse> customEndpoints(ApplicationContext context) {
         var builder = new CustomEndpointsBuilder();
-        context.getBeansOfType(CustomEndpoint.class).values()
-            .forEach(customEndpoint -> builder.add(customEndpoint.endpoint()));
+        context.getBeansOfType(CustomEndpoint.class).values().forEach(builder::add);
         return builder.build();
     }
 

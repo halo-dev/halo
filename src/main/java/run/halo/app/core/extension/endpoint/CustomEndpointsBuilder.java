@@ -1,33 +1,41 @@
 package run.halo.app.core.extension.endpoint;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import run.halo.app.extension.GroupVersion;
 
 public class CustomEndpointsBuilder {
 
-    private final List<RouterFunction<ServerResponse>> routerFunctions;
+    private final Map<GroupVersion, List<RouterFunction<ServerResponse>>> routerFunctionsMap;
 
     public CustomEndpointsBuilder() {
-        routerFunctions = new LinkedList<>();
+        routerFunctionsMap = new HashMap<>();
     }
 
-    public CustomEndpointsBuilder add(RouterFunction<ServerResponse> routerFunction) {
-        routerFunctions.add(routerFunction);
+    public CustomEndpointsBuilder add(CustomEndpoint customEndpoint) {
+        routerFunctionsMap
+            .computeIfAbsent(customEndpoint.groupVersion(), gv -> new LinkedList<>())
+            .add(customEndpoint.endpoint());
         return this;
     }
 
     public RouterFunction<ServerResponse> build() {
-        return SpringdocRouteBuilder.route()
-            .nest(RequestPredicates.path("/apis/api.console.halo.run/v1alpha1"),
+        SpringdocRouteBuilder routeBuilder = SpringdocRouteBuilder.route();
+        routerFunctionsMap.forEach((gv, routerFunctions) -> {
+            routeBuilder.nest(RequestPredicates.path("/apis/" + gv),
                 () -> routerFunctions.stream().reduce(RouterFunction::and).orElse(null),
-                builder -> builder
-                    .operationId("CustomEndpoints")
-                    .description("Custom endpoints")
-                    .tag("api.console.halo.run/v1alpha1/CustomEndpoint"))
-            .build();
+                builder -> builder.operationId("CustomEndpoints")
+                    .description("Custom Endpoint")
+                    .tag(gv + "/CustomEndpoint")
+            );
+        });
+        routerFunctionsMap.clear();
+        return routeBuilder.build();
     }
 }
