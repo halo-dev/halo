@@ -13,17 +13,21 @@ import {
   VAvatar,
   VEntity,
   VEntityField,
+  useDialog,
+  VStatusDot,
 } from "@halo-dev/components";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
-import { onMounted, ref } from "vue";
+import { inject, onMounted, ref, watch } from "vue";
 import { apiClient } from "@halo-dev/admin-shared";
 import type { User, UserList } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 import { useRouteQuery } from "@vueuse/router";
 
-const checkAll = ref(false);
+const dialog = useDialog();
+
+const checkedAll = ref(false);
 const editingModal = ref<boolean>(false);
 const passwordChangeModal = ref<boolean>(false);
 const users = ref<UserList>({
@@ -36,7 +40,9 @@ const users = ref<UserList>({
   hasNext: false,
   hasPrevious: false,
 });
+const selectedUserNames = ref<string[]>([]);
 const selectedUser = ref<User | null>(null);
+const currentUser = inject<User>("currentUser");
 
 const handleFetchUsers = async () => {
   try {
@@ -62,6 +68,70 @@ const handlePaginationChange = async ({
   users.value.page = page;
   users.value.size = size;
   await handleFetchUsers();
+};
+
+const handleDelete = async (user: User) => {
+  dialog.warning({
+    title: "确定要删除该用户吗？",
+    description: "该操作不可恢复。",
+    confirmType: "danger",
+    onConfirm: async () => {
+      try {
+        await apiClient.extension.user.deletev1alpha1User({
+          name: user.metadata.name,
+        });
+      } catch (e) {
+        console.error("Failed to delete user", e);
+      } finally {
+        await handleFetchUsers();
+      }
+    },
+  });
+};
+
+const handleDeleteInBatch = async () => {
+  dialog.warning({
+    title: "是否确认删除选中的用户？",
+    confirmType: "danger",
+    onConfirm: async () => {
+      const userNamesToDelete = selectedUserNames.value.filter(
+        (name) => name != currentUser?.metadata.name
+      );
+      await Promise.all(
+        userNamesToDelete.map((name) => {
+          return apiClient.extension.user.deletev1alpha1User({
+            name,
+          });
+        })
+      );
+      await handleFetchUsers();
+      selectedUserNames.value.length = 0;
+    },
+  });
+};
+
+watch(selectedUserNames, (newValue) => {
+  checkedAll.value = newValue.length === users.value.items?.length;
+});
+
+const checkSelection = (user: User) => {
+  return (
+    user.metadata.name === selectedUser.value?.metadata.name ||
+    selectedUserNames.value.includes(user.metadata.name)
+  );
+};
+
+const handleCheckAllChange = (e: Event) => {
+  const { checked } = e.target as HTMLInputElement;
+
+  if (checked) {
+    selectedUserNames.value =
+      users.value.items.map((user) => {
+        return user.metadata.name;
+      }) || [];
+  } else {
+    selectedUserNames.value.length = 0;
+  }
 };
 
 const handleOpenCreateModal = (user: User) => {
@@ -154,21 +224,23 @@ onMounted(() => {
           >
             <div class="mr-4 hidden items-center sm:flex">
               <input
-                v-model="checkAll"
+                v-model="checkedAll"
                 v-permission="['system:users:manage']"
                 class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                 type="checkbox"
+                @change="handleCheckAllChange"
               />
             </div>
             <div class="flex w-full flex-1 sm:w-auto">
               <FormKit
-                v-if="!checkAll"
+                v-if="!selectedUserNames.length"
                 placeholder="输入关键词搜索"
                 type="text"
               ></FormKit>
               <VSpace v-else>
-                <VButton type="default">设置</VButton>
-                <VButton type="danger">删除</VButton>
+                <VButton type="danger" @click="handleDeleteInBatch">
+                  删除
+                </VButton>
               </VSpace>
             </div>
             <div class="mt-4 flex sm:mt-0">
@@ -276,12 +348,14 @@ onMounted(() => {
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
         <li v-for="(user, index) in users.items" :key="index">
-          <VEntity :is-selected="checkAll">
+          <VEntity :is-selected="checkSelection(user)">
             <template #checkbox>
               <input
-                v-model="checkAll"
+                v-model="selectedUserNames"
                 v-permission="['system:users:manage']"
+                :value="user.metadata.name"
                 class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                name="post-checkbox"
                 type="checkbox"
               />
             </template>
@@ -318,6 +392,11 @@ onMounted(() => {
                   </div>
                 </template>
               </VEntityField>
+              <VEntityField v-if="user.metadata.deletionTimestamp">
+                <template #description>
+                  <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                </template>
+              </VEntityField>
               <VEntityField
                 :description="formatDatetime(user.metadata.creationTimestamp)"
               />
@@ -325,6 +404,7 @@ onMounted(() => {
             <template #dropdownItems>
               <VButton
                 v-close-popper
+                v-permission="['system:users:manage']"
                 block
                 type="secondary"
                 @click="handleOpenCreateModal(user)"
@@ -333,10 +413,21 @@ onMounted(() => {
               </VButton>
               <VButton
                 v-close-popper
+                v-permission="['system:users:manage']"
                 block
                 @click="handleOpenPasswordChangeModal(user)"
               >
                 修改密码
+              </VButton>
+              <VButton
+                v-if="currentUser?.metadata.name !== user.metadata.name"
+                v-close-popper
+                v-permission="['system:users:manage']"
+                block
+                type="danger"
+                @click="handleDelete(user)"
+              >
+                删除
               </VButton>
             </template>
           </VEntity>
