@@ -10,6 +10,7 @@ import lombok.Data;
 import org.springdoc.core.fn.builders.apiresponse.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
@@ -57,11 +58,22 @@ public class PatEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> newToken(ServerRequest request) {
         return ReactiveSecurityContextHolder.getContext()
             .map(SecurityContext::getAuthentication)
-            .flatMap(authentication -> request.bodyToMono(NewTokenRequest.class)
-                .switchIfEmpty(
-                    Mono.error(() -> new ServerWebInputException("Request body is required")))
-                .flatMap(tokenRequest -> {
-                    // create a Personal Access Token
+            .flatMap(authentication -> this.createPat(request, authentication));
+    }
+
+    private Mono<ServerResponse> createPat(ServerRequest request, Authentication authentication) {
+        return request.bodyToMono(NewTokenRequest.class)
+            .switchIfEmpty(
+                Mono.error(() -> new ServerWebInputException("Request body is required")))
+            .flatMap(tokenRequest -> this.createPat(tokenRequest, authentication))
+            .flatMap(tokenResponse -> ServerResponse.ok().bodyValue(tokenResponse));
+    }
+
+    private Mono<NewTokenResponse> createPat(NewTokenRequest tokenRequest,
+                                             Authentication authentication) {
+
+        return Mono.fromCallable(
+                () -> {
                     var metadata = new Metadata();
                     var username = authentication.getName();
                     metadata.setName(UUID.randomUUID().toString());
@@ -74,16 +86,25 @@ public class PatEndpoint implements CustomEndpoint {
                     var pat = new PersonalAccessToken();
                     pat.setMetadata(metadata);
                     pat.setSpec(spec);
-                    return encoder.buildToken(pat)
-                        .flatMap(rawToken -> encoder.encode(rawToken)
-                            .flatMap(encodedToken -> {
-                                spec.setEncodedToken(encodedToken);
-                                return client.create(pat);
-                            })
-                            .thenReturn(rawToken));
+                    return pat;
                 })
-                .flatMap(
-                    rawToken -> ServerResponse.ok().bodyValue(new NewTokenResponse(rawToken))));
+            .flatMap(this::buildToken)
+            .map(NewTokenResponse::new);
+    }
+
+    private Mono<PersonalAccessToken> createPat(String rawToken,
+                                                PersonalAccessToken pat) {
+        return encoder.encode(rawToken)
+            .doOnNext(encodedToken -> {
+                pat.getSpec().setEncodedToken(encodedToken);
+            })
+            .map(encodedToken -> pat)
+            .flatMap(client::create);
+    }
+
+    private Mono<String> buildToken(PersonalAccessToken pat) {
+        return encoder.buildToken(pat)
+            .flatMap(rawToken -> this.createPat(rawToken, pat).thenReturn(rawToken));
     }
 
     @Data
