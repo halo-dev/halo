@@ -7,5 +7,7 @@ public enum Constant {
 
     public static final String VERSION = "v1alpha1";
 
+    public static final String RAW_TOKEN_ANNO_KEY = "security.halo.run/raw-token";
+
 }
 

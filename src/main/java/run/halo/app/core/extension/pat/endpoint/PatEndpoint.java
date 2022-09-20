@@ -4,6 +4,7 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 import lombok.Data;
@@ -20,6 +21,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
+import run.halo.app.core.extension.pat.Constant;
 import run.halo.app.core.extension.pat.PersonalAccessToken;
 import run.halo.app.core.extension.pat.PersonalAccessToken.PersonalAccessTokenSpec;
 import run.halo.app.extension.Metadata;
@@ -49,7 +51,9 @@ public class PatEndpoint implements CustomEndpoint {
                         .required(true)
                         .implementation(NewTokenRequest.class))
                     .response(Builder.responseBuilder()
-                        .implementation(NewTokenResponse.class));
+                        .description("The raw token is put into the annotations which name is "
+                            + Constant.RAW_TOKEN_ANNO_KEY)
+                        .implementation(PersonalAccessToken.class));
             })
             .build();
     }
@@ -58,38 +62,17 @@ public class PatEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> newToken(ServerRequest request) {
         return ReactiveSecurityContextHolder.getContext()
             .map(SecurityContext::getAuthentication)
-            .flatMap(authentication -> this.createPat(request, authentication));
+            .flatMap(authentication -> this.buildAndCreatePat(request, authentication))
+            .flatMap(pat -> ServerResponse.ok().bodyValue(pat));
     }
 
-    private Mono<ServerResponse> createPat(ServerRequest request, Authentication authentication) {
+    private Mono<PersonalAccessToken> buildAndCreatePat(ServerRequest request,
+                                                        Authentication authentication) {
         return request.bodyToMono(NewTokenRequest.class)
             .switchIfEmpty(
                 Mono.error(() -> new ServerWebInputException("Request body is required")))
-            .flatMap(tokenRequest -> this.createPat(tokenRequest, authentication))
-            .flatMap(tokenResponse -> ServerResponse.ok().bodyValue(tokenResponse));
-    }
-
-    private Mono<NewTokenResponse> createPat(NewTokenRequest tokenRequest,
-                                             Authentication authentication) {
-
-        return Mono.fromCallable(
-                () -> {
-                    var metadata = new Metadata();
-                    var username = authentication.getName();
-                    metadata.setName(UUID.randomUUID().toString());
-                    var spec = new PersonalAccessTokenSpec();
-                    spec.setCreatedBy(username);
-                    spec.setDescription(tokenRequest.getDescription());
-                    spec.setScopes(tokenRequest.getScopes());
-                    spec.setExpiresAt(tokenRequest.getExpiresAt());
-                    spec.setRevoked(false);
-                    var pat = new PersonalAccessToken();
-                    pat.setMetadata(metadata);
-                    pat.setSpec(spec);
-                    return pat;
-                })
-            .flatMap(this::buildToken)
-            .map(NewTokenResponse::new);
+            .map(tokenRequest -> this.buildPat(tokenRequest, authentication))
+            .flatMap(this::buildTokenAndCreatePat);
     }
 
     private Mono<PersonalAccessToken> createPat(String rawToken,
@@ -99,12 +82,37 @@ public class PatEndpoint implements CustomEndpoint {
                 pat.getSpec().setEncodedToken(encodedToken);
             })
             .map(encodedToken -> pat)
-            .flatMap(client::create);
+            .flatMap(client::create)
+            .doOnNext(created -> {
+                var annotations = created.getMetadata().getAnnotations();
+                if (annotations == null) {
+                    annotations = new HashMap<>();
+                    created.getMetadata().setAnnotations(annotations);
+                }
+                annotations.put(Constant.RAW_TOKEN_ANNO_KEY, rawToken);
+            });
     }
 
-    private Mono<String> buildToken(PersonalAccessToken pat) {
-        return encoder.buildToken(pat)
-            .flatMap(rawToken -> this.createPat(rawToken, pat).thenReturn(rawToken));
+    private PersonalAccessToken buildPat(NewTokenRequest tokenRequest,
+                                         Authentication authentication) {
+        var metadata = new Metadata();
+        var username = authentication.getName();
+        metadata.setName(UUID.randomUUID().toString());
+        var spec = new PersonalAccessTokenSpec();
+        spec.setCreatedBy(username);
+        spec.setDescription(tokenRequest.getDescription());
+        spec.setScopes(tokenRequest.getScopes());
+        spec.setExpiresAt(tokenRequest.getExpiresAt());
+        spec.setRevoked(false);
+        var pat = new PersonalAccessToken();
+        pat.setMetadata(metadata);
+        pat.setSpec(spec);
+        return pat;
+    }
+
+    private Mono<PersonalAccessToken> buildTokenAndCreatePat(PersonalAccessToken pat) {
+        return this.encoder.buildToken(pat)
+            .flatMap(rawToken -> this.createPat(rawToken, pat));
     }
 
     @Data
@@ -120,9 +128,4 @@ public class PatEndpoint implements CustomEndpoint {
         private Set<String> scopes;
     }
 
-    public record NewTokenResponse(
-        @Schema(required = true, description = "Raw token that could be used for authentication")
-        String rawToken) {
-
-    }
 }
