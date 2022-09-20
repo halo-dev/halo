@@ -11,8 +11,8 @@ import run.halo.app.infra.utils.PathUtils;
  * @since 2.0.0
  */
 public class ThemeLinkBuilder extends StandardLinkBuilder {
-    private static final String THEME_ASSETS_PREFIX = "/assets";
-    private static final String THEME_PREVIEW_PREFIX = "/themes";
+    public static final String THEME_ASSETS_PREFIX = "/assets";
+    public static final String THEME_PREVIEW_PREFIX = "/themes";
 
     private final ThemeContext theme;
 
