@@ -1,8 +1,9 @@
 package run.halo.app.extension;
 
+import static run.halo.app.extension.ExtensionUtil.buildStoreName;
+
 import java.time.Instant;
 import java.util.Comparator;
-import java.util.List;
 import java.util.function.Predicate;
 import org.springframework.data.util.Predicates;
 import org.springframework.stereotype.Component;
@@ -23,7 +24,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     private final Watcher.WatcherComposite watchers;
 
     public ReactiveExtensionClientImpl(ReactiveExtensionStoreClient client,
-        ExtensionConverter converter, SchemeManager schemeManager) {
+                                       ExtensionConverter converter, SchemeManager schemeManager) {
         this.client = client;
         this.converter = converter;
         this.schemeManager = schemeManager;
@@ -32,11 +33,13 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     @Override
     public <E extends Extension> Flux<E> list(Class<E> type, Predicate<E> predicate,
-        Comparator<E> comparator) {
-        var scheme = schemeManager.get(type);
-        var prefix = ExtensionUtil.buildStoreNamePrefix(scheme);
-
-        return client.listByNamePrefix(prefix)
+                                              Comparator<E> comparator) {
+        return Mono.fromCallable(
+                () -> {
+                    var scheme = schemeManager.get(type);
+                    return ExtensionUtil.buildStoreNamePrefix(scheme);
+                })
+            .flatMapMany(client::listByNamePrefix)
             .map(extensionStore -> converter.convertFrom(type, extensionStore))
             .filter(predicate == null ? Predicates.isTrue() : predicate)
             .sort(comparator == null ? Comparator.naturalOrder() : comparator);
@@ -44,34 +47,36 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     @Override
     public <E extends Extension> Mono<ListResult<E>> list(Class<E> type, Predicate<E> predicate,
-        Comparator<E> comparator, int page, int size) {
-        var extensions = list(type, predicate, comparator);
-        var totalMono = extensions.count();
-        if (page > 0) {
-            extensions = extensions.skip(((long) (page - 1)) * (long) size);
-        }
-        if (size > 0) {
-            extensions = extensions.take(size);
-        }
-        return extensions.collectList().zipWith(totalMono)
-            .map(tuple -> {
-                List<E> content = tuple.getT1();
-                Long total = tuple.getT2();
-                return new ListResult<>(page, size, total, content);
-            });
+                                                          Comparator<E> comparator, int page,
+                                                          int size) {
+        return list(type, predicate, comparator)
+            .transform(extensions -> {
+                var countMono = extensions.count();
+                var partialExtensions = extensions;
+                if (page > 0) {
+                    partialExtensions = partialExtensions.skip(((long) (page - 1)) * (long) size);
+                }
+                if (size > 0) {
+                    partialExtensions = partialExtensions.take(size);
+                }
+                return partialExtensions.collectList()
+                    .flatMap(content ->
+                        countMono.map(count -> new ListResult<>(page, size, count, content)));
+            })
+            .next();
     }
 
     @Override
     public <E extends Extension> Mono<E> fetch(Class<E> type, String name) {
-        var storeName = ExtensionUtil.buildStoreName(schemeManager.get(type), name);
-        return client.fetchByName(storeName)
+        return Mono.fromCallable(() -> buildStoreName(schemeManager.get(type), name))
+            .flatMap(client::fetchByName)
             .map(extensionStore -> converter.convertFrom(type, extensionStore));
     }
 
     @Override
     public Mono<Unstructured> fetch(GroupVersionKind gvk, String name) {
-        var storeName = ExtensionUtil.buildStoreName(schemeManager.get(gvk), name);
-        return client.fetchByName(storeName)
+        return Mono.fromCallable(() -> buildStoreName(schemeManager.get(gvk), name))
+            .flatMap(client::fetchByName)
             .map(extensionStore -> converter.convertFrom(Unstructured.class, extensionStore));
     }
 
@@ -90,29 +95,29 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     @Override
     public <E extends Extension> Mono<E> create(E extension) {
-        var metadata = extension.getMetadata();
-        // those fields should be managed by halo.
-        metadata.setCreationTimestamp(Instant.now());
-        metadata.setDeletionTimestamp(null);
-        metadata.setVersion(null);
-
-        var extensionStore = converter.convertTo(extension);
-
-        return client.create(extensionStore.getName(), extensionStore.getData())
+        return Mono.just(extension)
+            .doOnNext(ext -> {
+                var metadata = ext.getMetadata();
+                // those fields should be managed by halo.
+                metadata.setCreationTimestamp(Instant.now());
+                metadata.setDeletionTimestamp(null);
+                metadata.setVersion(null);
+            })
+            .map(converter::convertTo)
+            .flatMap(store -> client.create(store.getName(), store.getData()))
             .map(created -> converter.convertFrom((Class<E>) extension.getClass(), created))
             .doOnNext(watchers::onAdd);
     }
 
     @Override
     public <E extends Extension> Mono<E> update(E extension) {
-        // overwrite some fields
-        Mono<? extends Extension> mono;
-        if (extension instanceof Unstructured unstructured) {
-            mono = get(unstructured.groupVersionKind(), extension.getMetadata().getName());
-        } else {
-            mono = get(extension.getClass(), extension.getMetadata().getName());
-        }
-        return mono
+        return Mono.just(extension)
+            .flatMap(ext -> {
+                if (ext instanceof Unstructured unstructured) {
+                    return get(unstructured.groupVersionKind(), ext.getMetadata().getName());
+                }
+                return get(ext.getClass(), ext.getMetadata().getName());
+            })
             .map(old -> {
                 // reset some fields
                 var oldMetadata = old.getMetadata();
@@ -120,8 +125,9 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                 newMetadata.setCreationTimestamp(oldMetadata.getCreationTimestamp());
                 newMetadata.setDeletionTimestamp(oldMetadata.getDeletionTimestamp());
                 extension.setMetadata(newMetadata);
-                return converter.convertTo(extension);
+                return extension;
             })
+            .map(converter::convertTo)
             .flatMap(extensionStore -> client.update(extensionStore.getName(),
                 extensionStore.getVersion(),
                 extensionStore.getData()))
@@ -131,11 +137,13 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     @Override
     public <E extends Extension> Mono<E> delete(E extension) {
-        // set deletionTimestamp
-        extension.getMetadata().setDeletionTimestamp(Instant.now());
-        var extensionStore = converter.convertTo(extension);
-        return client.update(extensionStore.getName(), extensionStore.getVersion(),
-                extensionStore.getData())
+        return Mono.just(extension)
+            .doOnNext(ext -> {
+                // set deletionTimestamp
+                ext.getMetadata().setDeletionTimestamp(Instant.now());
+            })
+            .map(converter::convertTo)
+            .flatMap(store -> client.update(store.getName(), store.getVersion(), store.getData()))
             .map(deleted -> converter.convertFrom((Class<E>) extension.getClass(), deleted))
             .doOnNext(watchers::onDelete);
     }

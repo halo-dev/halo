@@ -4,7 +4,6 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.reverseOrder;
 import static java.util.Comparator.comparing;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -112,26 +111,26 @@ class ReactiveExtensionClientTest {
         when(schemeManager.get(isA(GroupVersionKind.class)))
             .thenThrow(SchemeNotFoundException.class);
 
-        assertThrows(SchemeNotFoundException.class,
-            () -> client.list(UnRegisteredExtension.class, null, null));
-        assertThrows(SchemeNotFoundException.class,
-            () -> client.list(UnRegisteredExtension.class, null, null, 0, 10));
-        assertThrows(SchemeNotFoundException.class,
-            () -> client.fetch(UnRegisteredExtension.class, "fake"));
-        assertThrows(SchemeNotFoundException.class, () ->
-            client.fetch(fromAPIVersionAndKind("fake.halo.run/v1alpha1", "UnRegistered"), "fake"));
-        assertThrows(SchemeNotFoundException.class, () -> {
-            when(converter.convertTo(any())).thenThrow(SchemeNotFoundException.class);
-            client.create(createFakeExtension("fake", null));
-        });
-        assertThrows(SchemeNotFoundException.class, () -> {
-            when(converter.convertTo(any())).thenThrow(SchemeNotFoundException.class);
-            client.update(createFakeExtension("fake", 1L));
-        });
-        assertThrows(SchemeNotFoundException.class, () -> {
-            when(converter.convertTo(any())).thenThrow(SchemeNotFoundException.class);
-            client.delete(createFakeExtension("fake", 1L));
-        });
+        StepVerifier.create(client.list(UnRegisteredExtension.class, null, null))
+            .verifyError(SchemeNotFoundException.class);
+        StepVerifier.create(client.list(UnRegisteredExtension.class, null, null, 0, 10))
+            .verifyError(SchemeNotFoundException.class);
+        StepVerifier.create(client.fetch(UnRegisteredExtension.class, "fake"))
+            .verifyError(SchemeNotFoundException.class);
+        StepVerifier.create(
+                client.fetch(fromAPIVersionAndKind("fake.halo.run/v1alpha1", "UnRegistered"),
+                    "fake"))
+            .verifyError(SchemeNotFoundException.class);
+
+        when(converter.convertTo(any())).thenThrow(SchemeNotFoundException.class);
+        when(storeClient.fetchByName(any())).thenReturn(Mono.error(SchemeNotFoundException::new));
+
+        StepVerifier.create(client.create(createFakeExtension("fake", null)))
+            .verifyError(SchemeNotFoundException.class);
+        StepVerifier.create(client.update(createFakeExtension("fake", 1L)))
+            .verifyError(SchemeNotFoundException.class);
+        StepVerifier.create(client.delete(createFakeExtension("fake", 1L)))
+            .verifyError(SchemeNotFoundException.class);
     }
 
     @Test
