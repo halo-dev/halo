@@ -20,17 +20,17 @@ public class PostQuery extends IListRequest.QueryListRequest {
     }
 
     @Nullable
-    public Set<String> getContributors() {
+    public Set<String> getContributor() {
         return listToSet(queryParams.get("contributor"));
     }
 
     @Nullable
-    public Set<String> getCategories() {
+    public Set<String> getCategory() {
         return listToSet(queryParams.get("category"));
     }
 
     @Nullable
-    public Set<String> getTags() {
+    public Set<String> getTag() {
         return listToSet(queryParams.get("tag"));
     }
 
