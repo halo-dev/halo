@@ -36,6 +36,7 @@ import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.utils.JsonUtils;
 
 @SpringBootTest
@@ -54,6 +55,9 @@ class UserEndpointTest {
 
     @MockBean
     UserService userService;
+
+    @MockBean
+    SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     @BeforeEach
     void setUp() {

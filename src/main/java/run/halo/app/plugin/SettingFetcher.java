@@ -16,7 +16,7 @@ import run.halo.app.infra.utils.JsonParseException;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
- * <p>A value fetcher for pPlugin form configuration.</p>
+ * <p>A value fetcher for plugin form configuration.</p>
  *
  * @author guqing
  * @since 2.0.0

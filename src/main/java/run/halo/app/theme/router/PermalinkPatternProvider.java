@@ -2,8 +2,7 @@ package run.halo.app.theme.router;
 
 import java.util.Map;
 import org.springframework.stereotype.Component;
-import run.halo.app.extension.ConfigMap;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
@@ -18,14 +17,14 @@ import run.halo.app.theme.DefaultTemplateEnum;
 @Component
 public class PermalinkPatternProvider {
 
-    private final ExtensionClient client;
+    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
-    public PermalinkPatternProvider(ExtensionClient client) {
-        this.client = client;
+    public PermalinkPatternProvider(SystemConfigurableEnvironmentFetcher environmentFetcher) {
+        this.environmentFetcher = environmentFetcher;
     }
 
     private SystemSetting.ThemeRouteRules getPermalinkRules() {
-        return client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG)
+        return environmentFetcher.getConfigMapBlocking()
             .map(configMap -> {
                 Map<String, String> data = configMap.getData();
                 return data.get(SystemSetting.ThemeRouteRules.GROUP);

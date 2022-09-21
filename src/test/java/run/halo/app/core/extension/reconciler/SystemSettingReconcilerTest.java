@@ -8,7 +8,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -23,6 +22,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -41,11 +41,15 @@ class SystemSettingReconcilerTest {
     @Mock
     private ApplicationContext applicationContext;
 
+    @Mock
+    private SystemConfigurableEnvironmentFetcher environmentFetcher;
+
     private SystemSettingReconciler systemSettingReconciler;
 
     @BeforeEach
     void setUp() {
-        systemSettingReconciler = new SystemSettingReconciler(client, applicationContext);
+        systemSettingReconciler = new SystemSettingReconciler(client, environmentFetcher,
+            applicationContext);
     }
 
     @Test
@@ -54,14 +58,14 @@ class SystemSettingReconcilerTest {
             rules.setArchives("archives-new");
             return rules;
         });
+        when(environmentFetcher.getConfigMapBlocking()).thenReturn(Optional.of(configMap));
         when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
             .thenReturn(Optional.of(configMap));
         systemSettingReconciler.reconcile(new Reconciler.Request(SystemSetting.SYSTEM_CONFIG));
         ArgumentCaptor<ConfigMap> captor = ArgumentCaptor.forClass(ConfigMap.class);
-        verify(client, times(2)).update(captor.capture());
+        verify(client, times(1)).update(captor.capture());
 
-        List<ConfigMap> allValues = captor.getAllValues();
-        ConfigMap updatedConfigMap = allValues.get(1);
+        ConfigMap updatedConfigMap = captor.getValue();
         assertThat(rulesFrom(updatedConfigMap).getArchives()).isEqualTo("archives-new");
         assertThat(rulesFrom(updatedConfigMap).getPost()).isEqualTo("/archives-new/{slug}");
 
@@ -78,14 +82,14 @@ class SystemSettingReconcilerTest {
             rules.setTags("tags-new");
             return rules;
         });
+        when(environmentFetcher.getConfigMapBlocking()).thenReturn(Optional.of(configMap));
         when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
             .thenReturn(Optional.of(configMap));
         systemSettingReconciler.reconcile(new Reconciler.Request(SystemSetting.SYSTEM_CONFIG));
         ArgumentCaptor<ConfigMap> captor = ArgumentCaptor.forClass(ConfigMap.class);
-        verify(client, times(2)).update(captor.capture());
+        verify(client, times(1)).update(captor.capture());
 
-        List<ConfigMap> allValues = captor.getAllValues();
-        ConfigMap updatedConfigMap = allValues.get(1);
+        ConfigMap updatedConfigMap = captor.getValue();
         assertThat(rulesFrom(updatedConfigMap).getTags()).isEqualTo("tags-new");
 
         assertThat(oldRulesFromAnno(updatedConfigMap).getTags()).isEqualTo("tags-new");
@@ -99,14 +103,14 @@ class SystemSettingReconcilerTest {
             rules.setCategories("categories-new");
             return rules;
         });
+        when(environmentFetcher.getConfigMapBlocking()).thenReturn(Optional.of(configMap));
         when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
             .thenReturn(Optional.of(configMap));
         systemSettingReconciler.reconcile(new Reconciler.Request(SystemSetting.SYSTEM_CONFIG));
         ArgumentCaptor<ConfigMap> captor = ArgumentCaptor.forClass(ConfigMap.class);
-        verify(client, times(2)).update(captor.capture());
+        verify(client, times(1)).update(captor.capture());
 
-        List<ConfigMap> allValues = captor.getAllValues();
-        ConfigMap updatedConfigMap = allValues.get(1);
+        ConfigMap updatedConfigMap = captor.getValue();
         assertThat(rulesFrom(updatedConfigMap).getCategories()).isEqualTo("categories-new");
 
         assertThat(oldRulesFromAnno(updatedConfigMap).getCategories()).isEqualTo("categories-new");
@@ -120,14 +124,14 @@ class SystemSettingReconcilerTest {
             rules.setPost("/post-new/{slug}");
             return rules;
         });
+        when(environmentFetcher.getConfigMapBlocking()).thenReturn(Optional.of(configMap));
         when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
             .thenReturn(Optional.of(configMap));
         systemSettingReconciler.reconcile(new Reconciler.Request(SystemSetting.SYSTEM_CONFIG));
         ArgumentCaptor<ConfigMap> captor = ArgumentCaptor.forClass(ConfigMap.class);
-        verify(client, times(2)).update(captor.capture());
+        verify(client, times(1)).update(captor.capture());
 
-        List<ConfigMap> allValues = captor.getAllValues();
-        ConfigMap updatedConfigMap = allValues.get(1);
+        ConfigMap updatedConfigMap = captor.getValue();
         assertThat(rulesFrom(updatedConfigMap).getPost()).isEqualTo("/post-new/{slug}");
 
         assertThat(oldRulesFromAnno(updatedConfigMap).getPost()).isEqualTo("/post-new/{slug}");

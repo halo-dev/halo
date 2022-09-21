@@ -46,6 +46,7 @@ ext {
     javaDiffUtils = "4.12"
     guava = "31.1-jre"
     jsoup = "1.15.2"
+    jsonPatch = "1.13"
 }
 
 dependencies {
@@ -75,6 +76,7 @@ dependencies {
     implementation "org.jsoup:jsoup:$jsoup"
     implementation "io.github.java-diff-utils:java-diff-utils:$javaDiffUtils"
     implementation "org.springframework.integration:spring-integration-core"
+    implementation "com.github.java-json-tools:json-patch:$jsonPatch"
 
     compileOnly 'org.projectlombok:lombok'
     testCompileOnly 'org.projectlombok:lombok'
