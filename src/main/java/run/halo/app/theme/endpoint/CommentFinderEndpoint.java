@@ -168,14 +168,14 @@ public class CommentFinderEndpoint implements CustomEndpoint {
         return Mono.defer(() -> Mono.just(
                 commentFinder.list(commentQuery.toRef(), commentQuery.getPage(),
                     commentQuery.getSize())))
-            .publishOn(Schedulers.boundedElastic())
+            .subscribeOn(Schedulers.boundedElastic())
             .flatMap(list -> ServerResponse.ok().bodyValue(list));
     }
 
     Mono<ServerResponse> getComment(ServerRequest request) {
         String name = request.pathVariable("name");
         return Mono.defer(() -> Mono.justOrEmpty(commentFinder.getByName(name)))
-            .publishOn(Schedulers.boundedElastic())
+            .subscribeOn(Schedulers.boundedElastic())
             .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
     }
 
@@ -185,7 +185,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
             new IListRequest.QueryListRequest(request.queryParams());
         return Mono.defer(() -> Mono.just(
                 commentFinder.listReply(commentName, queryParams.getPage(), queryParams.getSize())))
-            .publishOn(Schedulers.boundedElastic())
+            .subscribeOn(Schedulers.boundedElastic())
             .flatMap(list -> ServerResponse.ok().bodyValue(list));
     }
 
