@@ -3,6 +3,7 @@ package run.halo.app.core.extension.pat;
 import static run.halo.app.core.extension.pat.Constant.GROUP;
 import static run.halo.app.core.extension.pat.Constant.VERSION;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,11 +18,15 @@ import run.halo.app.extension.GVK;
 @ToString(callSuper = true)
 public class Scope extends AbstractExtension {
 
+    @Schema(required = true, description = "The description of the scope")
     private String description;
 
+    @Schema(required = true, description = "The unique identity of the scope")
     private String identity;
 
-    private Set<String> include;
+    @Schema(nullable = true, description = "Parent scope")
+    private String parent;
 
+    @Schema(description = "Dependent scopes")
     private Set<String> dependsOn;
 }

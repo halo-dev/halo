@@ -1,0 +1,103 @@
+apiVersion: security.halo.run/v1alpha1
+kind: Scope
+metadata:
+  name: published-post-read
+description: Read published posts, categories and tags
+identity: published_post:read
+parent: post-write
+
+---
+apiVersion: security.halo.run/v1alpha1
+kind: Scope
+metadata:
+  name: post-read
+description: Read all posts, categories and tags
+identity: post:read
+parent: post-write
+
+---
+apiVersion: security.halo.run/v1alpha1
+kind: Scope
+metadata:
+  name: post-write
+description: Full control of posts, categories and tags.
+identity: post:write
+dependsOn:
+  - published-post-read
+
+---
+apiVersion: security.halo.run/v1alpha1
+kind: Scope
+metadata:
+  name: attachment-read
+description: Read all attachments
+identity: attachment:read
+parent: attachment-write
+
+---
+apiVersion: security.halo.run/v1alpha1
+kind: Scope
+metadata:
+  name: attachment-write
+description: Full control of attachments
+identity: attachment:write
+
+---
+apiVersion: security.halo.run/v1alpha1
+kind: Scope
+metadata:
+  name: menu-read
+description: Read all menus and menu items
+identity: menu:read
+parent: menu-write
+
+---
+apiVersion: security.halo.run/v1alpha1
+kind: Scope
+metadata:
+  name: menu-write
+description: Full control of menus and menu items
+identity: menu:write
+
+---
+apiVersion: security.halo.run/v1alpha1
+kind: Scope
+metadata:
+  name: theme-read
+description: Read all themes
+identity: theme:read
+parent: theme-write
+
+---
+apiVersion: security.halo.run/v1alpha1
+kind: Scope
+metadata:
+  name: theme-write
+description: Full control of themes
+identity: theme:write
+
+---
+apiVersion: security.halo.run/v1alpha1
+kind: Scope
+metadata:
+  name: user-read
+description: Read all users
+identity: user:read
+parent: user-write
+
+---
+apiVersion: security.halo.run/v1alpha1
+kind: Scope
+metadata:
+  name: user-email-read
+description: Read user email address
+identity: user:email:read
+parent: user-write
+
+---
+apiVersion: security.halo.run/v1alpha1
+kind: Scope
+metadata:
+  name: user-write
+description: Update all user data
+identity: user:write
