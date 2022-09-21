@@ -39,6 +39,7 @@ public class Setting extends AbstractExtension {
 
         private String label;
 
+        @Schema(required = true)
         private List<Object> formSchema;
     }
 }
