@@ -67,9 +67,9 @@ public class PostServiceImpl implements PostService {
 
     Predicate<Post> postListPredicate(PostQuery query) {
         Predicate<Post> paramPredicate = post ->
-            contains(query.getCategory(), post.getSpec().getCategories())
-                && contains(query.getTag(), post.getSpec().getTags())
-                && contains(query.getContributor(), post.getStatus().getContributors());
+            contains(query.getCategories(), post.getSpec().getCategories())
+                && contains(query.getTags(), post.getSpec().getTags())
+                && contains(query.getContributors(), post.getStatus().getContributors());
         Predicate<Post> predicate = labelAndFieldSelectorToPredicate(query.getLabelSelector(),
             query.getFieldSelector());
         return predicate.and(paramPredicate);

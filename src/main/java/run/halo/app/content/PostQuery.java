@@ -1,5 +1,6 @@
 package run.halo.app.content;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Set;
 import org.springframework.lang.Nullable;
@@ -20,17 +21,20 @@ public class PostQuery extends IListRequest.QueryListRequest {
     }
 
     @Nullable
-    public Set<String> getContributor() {
+    @Schema(name = "contributor")
+    public Set<String> getContributors() {
         return listToSet(queryParams.get("contributor"));
     }
 
     @Nullable
-    public Set<String> getCategory() {
+    @Schema(name = "category")
+    public Set<String> getCategories() {
         return listToSet(queryParams.get("category"));
     }
 
     @Nullable
-    public Set<String> getTag() {
+    @Schema(name = "tag")
+    public Set<String> getTags() {
         return listToSet(queryParams.get("tag"));
     }
 
