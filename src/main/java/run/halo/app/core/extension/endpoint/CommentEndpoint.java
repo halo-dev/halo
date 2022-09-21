@@ -124,7 +124,13 @@ public class CommentEndpoint implements CustomEndpoint {
             .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
     }
 
-    private String userAgentFrom(ServerRequest request) {
+    /**
+     * Gets user-agent from server request.
+     *
+     * @param request server request
+     * @return user-agent string if found, otherwise "UNKNOWN"
+     */
+    public static String userAgentFrom(ServerRequest request) {
         HttpHeaders httpHeaders = request.headers().asHttpHeaders();
         // https://en.wikipedia.org/wiki/User_agent
         String userAgent = httpHeaders.getFirst(HttpHeaders.USER_AGENT);

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -31,12 +32,13 @@ class CommentFinderEndpointTest {
     @Mock
     private CommentFinder commentFinder;
 
+    @InjectMocks
+    private CommentFinderEndpoint commentFinderEndpoint;
+
     private WebTestClient webTestClient;
 
     @BeforeEach
     void setUp() {
-        CommentFinderEndpoint commentFinderEndpoint = new CommentFinderEndpoint(commentFinder);
-
         webTestClient = WebTestClient
             .bindToRouterFunction(commentFinderEndpoint.endpoint())
             .build();
