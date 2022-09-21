@@ -3,8 +3,6 @@ package run.halo.app.security.authorization;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.reactive.ServerHttpRequest;
-import org.springframework.security.authentication.AuthenticationTrustResolver;
-import org.springframework.security.authentication.AuthenticationTrustResolverImpl;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.ReactiveAuthorizationManager;
 import org.springframework.security.core.Authentication;
@@ -19,8 +17,6 @@ import run.halo.app.core.extension.service.RoleService;
 @Slf4j
 public class RequestInfoAuthorizationManager
     implements ReactiveAuthorizationManager<AuthorizationContext> {
-
-    private final AuthenticationTrustResolver trustResolver = new AuthenticationTrustResolverImpl();
 
     private final AuthorizationRuleResolver ruleResolver;
 
@@ -48,12 +44,7 @@ public class RequestInfoAuthorizationManager
     }
 
     private boolean isGranted(Authentication authentication) {
-        return authentication != null && isNotAnonymous(authentication)
-            && authentication.isAuthenticated();
-    }
-
-    private boolean isNotAnonymous(Authentication authentication) {
-        return !this.trustResolver.isAnonymous(authentication);
+        return authentication != null && authentication.isAuthenticated();
     }
 
     private UserDetails createUserDetails(Authentication authentication) {

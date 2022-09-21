@@ -2,9 +2,12 @@ package run.halo.app.security.authentication.jwt;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -18,6 +21,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.Metadata;
+import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.security.LoginUtils;
 
 @SpringBootTest
@@ -32,6 +36,12 @@ class JwtAuthenticationTest {
 
     @MockBean
     RoleService roleService;
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(roleService.getMonoRole(eq(AnonymousUserConst.Role)))
+            .thenReturn(Mono.empty());
+    }
 
     @Test
     void accessProtectedApiWithoutToken() {

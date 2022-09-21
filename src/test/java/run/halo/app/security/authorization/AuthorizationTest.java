@@ -10,6 +10,7 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -32,7 +34,9 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.Role.PolicyRule;
 import run.halo.app.core.extension.service.RoleService;
+import run.halo.app.extension.Metadata;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.security.LoginUtils;
 
 @SpringBootTest
@@ -69,6 +73,8 @@ class AuthorizationTest {
         when(userDetailsService.findByUsername(eq("user"))).thenReturn(Mono.just(
             User.withDefaultPasswordEncoder().username("user").password("password")
                 .roles("post.read").build()));
+        when(roleService.getMonoRole(eq(AnonymousUserConst.Role)))
+            .thenReturn(Mono.empty());
 
         var role = new Role();
         role.setRules(List.of(
@@ -92,6 +98,68 @@ class AuthorizationTest {
 
         verify(roleService, times(2)).getMonoRole("authenticated");
         verify(roleService, times(2)).getMonoRole("post.read");
+    }
+
+    @Test
+    void anonymousUserAccessProtectedApi() {
+        when(userDetailsService.findByUsername(eq(AnonymousUserConst.PRINCIPAL)))
+            .thenReturn(Mono.empty());
+        when(roleService.getMonoRole(AnonymousUserConst.Role))
+            .thenReturn(Mono.empty());
+        webClient.get().uri("/apis/fake.halo.run/v1/posts").exchange().expectStatus()
+            .isUnauthorized();
+
+        verify(roleService, times(1)).getMonoRole(AnonymousUserConst.Role);
+    }
+
+    @Test
+    void anonymousUserAccessAuthenticationFreeApi() {
+        when(userDetailsService.findByUsername(eq(AnonymousUserConst.PRINCIPAL)))
+            .thenReturn(Mono.empty());
+        Role role = new Role();
+        role.setMetadata(new Metadata());
+        role.getMetadata().setName(AnonymousUserConst.Role);
+        role.setRules(new ArrayList<>());
+        PolicyRule policyRule = new PolicyRule.Builder()
+            .apiGroups("fake.halo.run")
+            .verbs("list")
+            .resources("posts")
+            .build();
+        role.getRules().add(policyRule);
+        when(roleService.getMonoRole(AnonymousUserConst.Role))
+            .thenReturn(Mono.just(role));
+        webClient.get().uri("/apis/fake.halo.run/v1/posts").exchange().expectStatus()
+            .isOk()
+            .expectBody(String.class).isEqualTo("returned posts");
+
+        verify(roleService, times(1)).getMonoRole(AnonymousUserConst.Role);
+
+        webClient.get().uri("/apis/fake.halo.run/v1/posts/hello-halo").exchange()
+            .expectStatus()
+            .isUnauthorized();
+        verify(roleService, times(2)).getMonoRole(AnonymousUserConst.Role);
+    }
+
+    @Test
+    @WithMockUser(username = "user", roles = "post.read")
+    void authenticatedUserAccessAuthenticationFreeApi() {
+        when(roleService.getMonoRole("authenticated")).thenReturn(Mono.empty());
+        when(roleService.getMonoRole("post.read")).thenReturn(Mono.empty());
+        Role role = new Role();
+        role.setMetadata(new Metadata());
+        role.getMetadata().setName(AnonymousUserConst.Role);
+        role.setRules(new ArrayList<>());
+        PolicyRule policyRule = new PolicyRule.Builder()
+            .apiGroups("fake.halo.run")
+            .verbs("list")
+            .resources("posts")
+            .build();
+        role.getRules().add(policyRule);
+        when(roleService.getMonoRole(AnonymousUserConst.Role))
+            .thenReturn(Mono.just(role));
+        webClient.get().uri("/apis/fake.halo.run/v1/posts").exchange().expectStatus()
+            .isOk()
+            .expectBody(String.class).isEqualTo("returned posts");
     }
 
     @TestConfiguration
