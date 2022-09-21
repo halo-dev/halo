@@ -17,6 +17,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
+import run.halo.app.content.comment.CommentRequest;
+import run.halo.app.content.comment.CommentService;
+import run.halo.app.content.comment.ReplyRequest;
+import run.halo.app.content.comment.ReplyService;
+import run.halo.app.core.extension.Comment;
+import run.halo.app.core.extension.Reply;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Ref;
 import run.halo.app.theme.finders.CommentFinder;
@@ -31,6 +38,12 @@ import run.halo.app.theme.finders.CommentFinder;
 class CommentFinderEndpointTest {
     @Mock
     private CommentFinder commentFinder;
+
+    @Mock
+    private CommentService commentService;
+
+    @Mock
+    private ReplyService replyService;
 
     @InjectMocks
     private CommentFinderEndpoint commentFinderEndpoint;
@@ -105,5 +118,58 @@ class CommentFinderEndpointTest {
             .isOk();
 
         verify(commentFinder, times(1)).listReply(eq("test-comment"), eq(2), eq(20));
+    }
+
+    @Test
+    void createComment() {
+        when(commentService.create(any())).thenReturn(Mono.empty());
+
+        final CommentRequest commentRequest = new CommentRequest();
+        Ref ref = new Ref();
+        ref.setGroup("content.halo.run");
+        ref.setVersion("v1alpha1");
+        ref.setKind("Post");
+        ref.setName("test-post");
+        commentRequest.setSubjectRef(ref);
+        commentRequest.setContent("content");
+        commentRequest.setRaw("raw");
+        commentRequest.setAllowNotification(false);
+        webTestClient.post()
+            .uri("/comments")
+            .bodyValue(commentRequest)
+            .exchange()
+            .expectStatus()
+            .isOk();
+
+        ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
+        verify(commentService, times(1)).create(captor.capture());
+        Comment value = captor.getValue();
+        assertThat(value.getSpec().getIpAddress()).isNotNull();
+        assertThat(value.getSpec().getUserAgent()).isNotNull();
+        assertThat(value.getSpec().getSubjectRef()).isEqualTo(ref);
+    }
+
+    @Test
+    void createReply() {
+        when(replyService.create(any(), any())).thenReturn(Mono.empty());
+
+        final ReplyRequest replyRequest = new ReplyRequest();
+        replyRequest.setRaw("raw");
+        replyRequest.setContent("content");
+        replyRequest.setAllowNotification(true);
+
+        webTestClient.post()
+            .uri("/comments/test-comment/reply")
+            .bodyValue(replyRequest)
+            .exchange()
+            .expectStatus()
+            .isOk();
+
+        ArgumentCaptor<Reply> captor = ArgumentCaptor.forClass(Reply.class);
+        verify(replyService, times(1)).create(eq("test-comment"), captor.capture());
+        Reply value = captor.getValue();
+        assertThat(value.getSpec().getIpAddress()).isNotNull();
+        assertThat(value.getSpec().getUserAgent()).isNotNull();
+        assertThat(value.getSpec().getQuoteReply()).isNull();
     }
 }

@@ -128,7 +128,7 @@ public class CommentEndpoint implements CustomEndpoint {
      * Gets user-agent from server request.
      *
      * @param request server request
-     * @return user-agent string if found, otherwise "UNKNOWN"
+     * @return user-agent string if found, otherwise "unknown"
      */
     public static String userAgentFrom(ServerRequest request) {
         HttpHeaders httpHeaders = request.headers().asHttpHeaders();
@@ -138,6 +138,6 @@ public class CommentEndpoint implements CustomEndpoint {
             // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Sec-CH-UA
             userAgent = httpHeaders.getFirst("Sec-CH-UA");
         }
-        return StringUtils.defaultString(userAgent, "UNKNOWN");
+        return StringUtils.defaultString(userAgent, "unknown");
     }
 }
