@@ -26,6 +26,8 @@ public class CommentVo {
     @Schema(required = true)
     Comment.CommentSpec spec;
 
+    Comment.CommentStatus status;
+
     @With
     @Schema(required = true)
     OwnerInfo owner;
@@ -40,6 +42,7 @@ public class CommentVo {
         return CommentVo.builder()
             .metadata(comment.getMetadata())
             .spec(comment.getSpec())
+            .status(comment.getStatus())
             .build();
     }
 }
