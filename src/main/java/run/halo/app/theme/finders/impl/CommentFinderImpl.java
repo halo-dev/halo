@@ -8,8 +8,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.Assert;
+import run.halo.app.content.comment.OwnerInfo;
 import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Reply;
+import run.halo.app.core.extension.User;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
@@ -36,7 +38,7 @@ public class CommentFinderImpl implements CommentFinder {
     @Override
     public CommentVo getByName(String name) {
         return client.fetch(Comment.class, name)
-            .map(CommentVo::from)
+            .map(this::toCommentVo)
             .block();
     }
 
@@ -46,7 +48,7 @@ public class CommentFinderImpl implements CommentFinder {
                 defaultComparator(),
                 pageNullSafe(page), sizeNullSafe(size))
             .map(list -> {
-                List<CommentVo> commentVos = list.get().map(CommentVo::from).toList();
+                List<CommentVo> commentVos = list.get().map(this::toCommentVo).toList();
                 return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
                     commentVos);
             })
@@ -63,11 +65,30 @@ public class CommentFinderImpl implements CommentFinder {
                     && Objects.equals(true, reply.getSpec().getApproved()),
                 comparator.reversed(), pageNullSafe(page), sizeNullSafe(size))
             .map(list -> {
-                List<ReplyVo> replyVos = list.get().map(ReplyVo::from).toList();
+                List<ReplyVo> replyVos = list.get().map(this::toReplyVo).toList();
                 return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
                     replyVos);
             })
             .block();
+    }
+
+    private CommentVo toCommentVo(Comment comment) {
+        Comment.CommentOwner owner = comment.getSpec().getOwner();
+        return CommentVo.from(comment).withOwner(getOwnerInfo(owner));
+    }
+
+    private ReplyVo toReplyVo(Reply reply) {
+        return ReplyVo.from(reply).withOwner(getOwnerInfo(reply.getSpec().getOwner()));
+    }
+
+    private OwnerInfo getOwnerInfo(Comment.CommentOwner owner) {
+        if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
+            return OwnerInfo.from(owner);
+        }
+        return client.fetch(User.class, owner.getName())
+            .blockOptional()
+            .map(OwnerInfo::from)
+            .orElse(OwnerInfo.ghostUser());
     }
 
     private Predicate<Comment> fixedPredicate(Ref ref) {
