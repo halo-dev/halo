@@ -1,6 +1,6 @@
 import { onMounted, ref, type Ref } from "vue";
 import type { Group } from "@halo-dev/api-client";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 
 interface useFetchAttachmentGroupReturn {
   groups: Ref<Group[]>;

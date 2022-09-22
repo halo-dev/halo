@@ -2,7 +2,7 @@
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import { inject, ref, watch, watchEffect } from "vue";
 import type { User } from "@halo-dev/api-client";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { reset, submitForm } from "@formkit/core";
 import { useMagicKeys } from "@vueuse/core";

@@ -4,7 +4,7 @@ import type { Group } from "@halo-dev/api-client";
 import { v4 as uuid } from "uuid";
 import { computed, ref, watch, watchEffect } from "vue";
 import cloneDeep from "lodash.clonedeep";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import { reset, submitForm } from "@formkit/core";
 import { useMagicKeys } from "@vueuse/core";
 import { setFocus } from "@/formkit/utils/focus";

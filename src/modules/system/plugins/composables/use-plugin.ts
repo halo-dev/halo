@@ -2,7 +2,7 @@ import type { ComputedRef, Ref } from "vue";
 import { computed } from "vue";
 import type { Plugin } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import { useDialog } from "@halo-dev/components";
 
 interface usePluginLifeCycleReturn {

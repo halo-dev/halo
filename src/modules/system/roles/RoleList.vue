@@ -30,7 +30,7 @@ import { useFetchRole } from "@/modules/system/roles/composables/use-role";
 
 // libs
 import cloneDeep from "lodash.clonedeep";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 
 const editingModal = ref<boolean>(false);
 const selectedRole = ref<Role | null>(null);

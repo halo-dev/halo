@@ -3,7 +3,7 @@ import { VButton, VModal, VSpace } from "@halo-dev/components";
 import { computed, ref, watch, watchEffect } from "vue";
 import type { MenuItem, Post, SinglePage } from "@halo-dev/api-client";
 import { v4 as uuid } from "uuid";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import { reset, submitForm } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
 import { useMagicKeys } from "@vueuse/core";

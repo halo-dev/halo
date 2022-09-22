@@ -2,13 +2,13 @@
 // core libs
 import { computed, nextTick, onMounted, provide, ref, watch } from "vue";
 import { RouterView, useRoute, useRouter } from "vue-router";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 
 // libs
 import cloneDeep from "lodash.clonedeep";
 
 // hooks
-import { useSettingForm } from "@halo-dev/admin-shared";
+import { useSettingForm } from "@/composables/use-setting-form";
 
 // components
 import { VButton, VCard, VPageHeader, VTabbar } from "@halo-dev/components";

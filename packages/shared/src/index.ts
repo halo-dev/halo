@@ -4,6 +4,3 @@ export * from "./core/plugins";
 export * from "./states/pages";
 export * from "./states/attachment-selector";
 export * from "./layouts";
-
-export * from "./utils/api-client";
-export * from "./composables";

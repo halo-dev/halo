@@ -18,7 +18,7 @@ import AttachmentSelectorModal from "../attachments/components/AttachmentSelecto
 import type { PostRequest } from "@halo-dev/api-client";
 import { computed, onMounted, ref, watch } from "vue";
 import cloneDeep from "lodash.clonedeep";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { v4 as uuid } from "uuid";
 import {

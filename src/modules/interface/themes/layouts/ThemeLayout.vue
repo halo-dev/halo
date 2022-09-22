@@ -10,7 +10,8 @@ import cloneDeep from "lodash.clonedeep";
 // hooks
 import { useThemeLifeCycle } from "../composables/use-theme";
 // types
-import { BasicLayout, useSettingForm } from "@halo-dev/admin-shared";
+import { BasicLayout } from "@halo-dev/admin-shared";
+import { useSettingForm } from "@/composables/use-setting-form";
 
 // components
 import {

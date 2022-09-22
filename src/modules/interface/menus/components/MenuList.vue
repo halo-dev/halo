@@ -12,7 +12,7 @@ import {
 import MenuEditingModal from "./MenuEditingModal.vue";
 import { defineExpose, onMounted, ref } from "vue";
 import type { Menu } from "@halo-dev/api-client";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 
 const props = withDefaults(

@@ -22,7 +22,7 @@ import type {
 import { formatDatetime } from "@/utils/date";
 import { computed, provide, ref, watch, type Ref } from "vue";
 import ReplyListItem from "./ReplyListItem.vue";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import type { RouteLocationRaw } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 

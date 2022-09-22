@@ -33,7 +33,7 @@ import prettyBytes from "pretty-bytes";
 import { useFetchAttachmentPolicy } from "./composables/use-attachment-policy";
 import { useAttachmentControl } from "./composables/use-attachment";
 import AttachmentFileTypeIcon from "./components/AttachmentFileTypeIcon.vue";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { isImage } from "@/utils/image";
 import { useRouteQuery } from "@vueuse/router";

@@ -17,7 +17,7 @@ import {
 import type { SinglePageRequest } from "@halo-dev/api-client";
 import { v4 as uuid } from "uuid";
 import { computed, onMounted, ref, watch } from "vue";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import cloneDeep from "lodash.clonedeep";
 import { useAttachmentSelect } from "../attachments/composables/use-attachment";

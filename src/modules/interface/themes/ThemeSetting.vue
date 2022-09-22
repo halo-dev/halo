@@ -10,7 +10,7 @@ import type { Ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 
 // hooks
-import { useSettingForm } from "@halo-dev/admin-shared";
+import { useSettingForm } from "@/composables/use-setting-form";
 import { useRouteParams } from "@vueuse/router";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useDialog, VModal } from "@halo-dev/components";
 import FilePondUpload from "@/components/upload/FilePondUpload.vue";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import type { Plugin } from "@halo-dev/api-client";
 import { computed, ref } from "vue";
 import type { AxiosResponse } from "axios";

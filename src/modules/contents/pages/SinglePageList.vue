@@ -28,7 +28,7 @@ import type {
   SinglePageRequest,
   User,
 } from "@halo-dev/api-client";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { RouterLink } from "vue-router";
 import cloneDeep from "lodash.clonedeep";

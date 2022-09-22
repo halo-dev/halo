@@ -2,7 +2,7 @@
 import { VSwitch, VTag } from "@halo-dev/components";
 import type { Ref } from "vue";
 import { computed, inject, ref, watchEffect } from "vue";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import type { Plugin, Role } from "@halo-dev/api-client";
 import { pluginLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";

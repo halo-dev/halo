@@ -27,7 +27,7 @@ import { usePostTag } from "./composables/use-post-tag";
 import { formatDatetime } from "@/utils/date";
 
 import { useRouteQuery } from "@vueuse/router";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 
 const viewTypes = [
   {

@@ -10,7 +10,7 @@ import {
   VTabs,
 } from "@halo-dev/components";
 import { onMounted, ref } from "vue";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import type { PersonalAccessToken } from "@halo-dev/api-client";
 
 const createVisible = ref(false);

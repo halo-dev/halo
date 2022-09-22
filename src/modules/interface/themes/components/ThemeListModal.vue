@@ -13,7 +13,7 @@ import {
 import ThemeInstallModal from "./ThemeInstallModal.vue";
 import { ref, watch } from "vue";
 import type { Theme } from "@halo-dev/api-client";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 
 const props = withDefaults(
   defineProps<{

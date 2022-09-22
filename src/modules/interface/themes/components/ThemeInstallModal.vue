@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { VModal } from "@halo-dev/components";
 import FilePondUpload from "@/components/upload/FilePondUpload.vue";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import { computed, ref } from "vue";
 
 withDefaults(

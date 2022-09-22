@@ -2,7 +2,7 @@
 import { VModal } from "@halo-dev/components";
 import FilePondUpload from "@/components/upload/FilePondUpload.vue";
 import { computed, ref, watch, watchEffect } from "vue";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import type { Policy, Group } from "@halo-dev/api-client";
 import { useFetchAttachmentPolicy } from "../composables/use-attachment-policy";
 import AttachmentPoliciesModal from "./AttachmentPoliciesModal.vue";

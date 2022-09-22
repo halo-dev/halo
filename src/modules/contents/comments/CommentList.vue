@@ -19,7 +19,7 @@ import type {
   User,
 } from "@halo-dev/api-client";
 import { onMounted, ref, watch } from "vue";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 
 const dialog = useDialog();
 

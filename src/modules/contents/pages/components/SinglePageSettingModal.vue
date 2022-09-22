@@ -3,7 +3,7 @@ import { VButton, VModal, VSpace, VTabItem, VTabs } from "@halo-dev/components";
 import { computed, ref, watchEffect } from "vue";
 import type { SinglePageRequest } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import { v4 as uuid } from "uuid";
 
 const initialFormState: SinglePageRequest = {

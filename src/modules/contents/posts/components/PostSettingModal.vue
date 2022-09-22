@@ -5,7 +5,7 @@ import type { PostRequest } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
 import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import { v4 as uuid } from "uuid";
 
 const initialFormState: PostRequest = {

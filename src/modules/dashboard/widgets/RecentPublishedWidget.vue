@@ -2,7 +2,7 @@
 import { VCard, VSpace } from "@halo-dev/components";
 import { onMounted, ref } from "vue";
 import type { Post } from "@halo-dev/api-client";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 
 const posts = ref<Post[]>([] as Post[]);

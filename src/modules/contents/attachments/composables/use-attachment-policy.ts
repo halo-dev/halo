@@ -1,7 +1,7 @@
 import { onMounted, ref } from "vue";
 import type { Ref } from "vue";
 import type { Policy } from "@halo-dev/api-client";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 
 interface useFetchAttachmentPolicyReturn {
   policies: Ref<Policy[]>;

@@ -38,12 +38,9 @@
   "homepage": "https://github.com/halo-dev/halo-admin/tree/next/shared/components#readme",
   "license": "MIT",
   "dependencies": {
-    "@halo-dev/components": "workspace:*",
-    "axios": "^0.27.2",
-    "lodash.merge": "^4.6.2"
+    "@halo-dev/components": "workspace:*"
   },
   "devDependencies": {
-    "@types/lodash.merge": "^4.6.7",
     "vite-plugin-dts": "^1.5.0"
   },
   "peerDependencies": {

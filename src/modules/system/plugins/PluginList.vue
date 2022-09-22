@@ -14,7 +14,7 @@ import {
 import PluginListItem from "./components/PluginListItem.vue";
 import PluginInstallModal from "./components/PluginInstallModal.vue";
 import { onMounted, ref, watch } from "vue";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import type { Plugin } from "@halo-dev/api-client";
 
 const plugins = ref<Plugin[]>([] as Plugin[]);

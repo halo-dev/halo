@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
 import { computed, ref, watch, watchEffect } from "vue";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import type { User } from "@halo-dev/api-client";
 
 // components

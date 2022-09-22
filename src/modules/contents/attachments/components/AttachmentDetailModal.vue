@@ -4,7 +4,7 @@ import LazyImage from "@/components/image/LazyImage.vue";
 import type { Attachment, Policy } from "@halo-dev/api-client";
 import prettyBytes from "pretty-bytes";
 import { ref, watch, watchEffect } from "vue";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import { isImage } from "@/utils/image";
 import { formatDatetime } from "@/utils/date";
 import { useFetchAttachmentGroup } from "../composables/use-attachment-group";

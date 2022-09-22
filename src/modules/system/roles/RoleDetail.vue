@@ -11,7 +11,7 @@ import {
 } from "@halo-dev/components";
 import { useRoute } from "vue-router";
 import { onMounted, ref, watch } from "vue";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import { pluginLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
 import {

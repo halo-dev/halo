@@ -3,7 +3,8 @@
 import { computed, ref } from "vue";
 
 // hooks
-import { apiClient, useSettingForm } from "@halo-dev/admin-shared";
+import { useSettingForm } from "@/composables/use-setting-form";
+import { apiClient } from "@/utils/api-client";
 
 // components
 import { VButton } from "@halo-dev/components";

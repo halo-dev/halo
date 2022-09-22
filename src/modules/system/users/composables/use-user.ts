@@ -1,7 +1,7 @@
 import type { Ref } from "vue";
 import { onMounted, ref } from "vue";
 import type { User } from "@halo-dev/api-client";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 
 interface useUserFetchReturn {
   users: Ref<User[]>;

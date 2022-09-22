@@ -1,4 +1,4 @@
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import type { Tag } from "@halo-dev/api-client";
 import type { Ref } from "vue";
 import { onMounted, ref } from "vue";

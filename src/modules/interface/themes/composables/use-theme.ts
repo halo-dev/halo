@@ -1,7 +1,7 @@
 import type { ComputedRef, Ref } from "vue";
 import { computed, onMounted, ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 import { useDialog } from "@halo-dev/components";
 
 interface useThemeLifeCycleReturn {

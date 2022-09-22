@@ -1,7 +1,7 @@
 <script lang="ts" name="PostStatsWidget" setup>
 import { VCard } from "@halo-dev/components";
 import { onMounted, ref } from "vue";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 
 const postTotal = ref<number>(0);
 

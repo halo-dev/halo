@@ -14,7 +14,7 @@ import { reset, submitForm } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
 import { useMagicKeys } from "@vueuse/core";
 import { setFocus } from "@/formkit/utils/focus";
-import { apiClient } from "@halo-dev/admin-shared";
+import { apiClient } from "@/utils/api-client";
 
 const props = withDefaults(
   defineProps<{
