@@ -34,6 +34,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.properties.JwtProperties;
 import run.halo.app.security.DefaultUserDetailService;
@@ -68,6 +69,10 @@ public class WebServerSecurityConfig {
             .securityMatcher(pathMatchers("/api/**", "/apis/**", "/login", "/logout"))
             .authorizeExchange(exchanges ->
                 exchanges.anyExchange().access(new RequestInfoAuthorizationManager(roleService)))
+            .anonymous(anonymousSpec -> {
+                anonymousSpec.authorities(AnonymousUserConst.Role);
+                anonymousSpec.principal(AnonymousUserConst.PRINCIPAL);
+            })
             .httpBasic(withDefaults())
             .formLogin(withDefaults())
             .logout(withDefaults())

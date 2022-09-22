@@ -19,6 +19,7 @@ import run.halo.app.core.extension.service.DefaultRoleBindingService;
 import run.halo.app.core.extension.service.RoleBindingService;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.MetadataOperator;
+import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -56,7 +57,10 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
         Set<String> roleNamesImmutable =
             roleBindingService.listBoundRoleNames(user.getAuthorities());
         Set<String> roleNames = new HashSet<>(roleNamesImmutable);
-        roleNames.add(AUTHENTICATED_ROLE);
+        if (!AnonymousUserConst.PRINCIPAL.equals(user.getUsername())) {
+            roleNames.add(AUTHENTICATED_ROLE);
+            roleNames.add(AnonymousUserConst.Role);
+        }
 
         List<Role.PolicyRule> rules = Collections.emptyList();
         for (String roleName : roleNames) {
@@ -84,7 +88,10 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
     public Mono<AuthorizingVisitor> visitRules(UserDetails user, RequestInfo requestInfo) {
         var roleNamesImmutable = roleBindingService.listBoundRoleNames(user.getAuthorities());
         var roleNames = new HashSet<>(roleNamesImmutable);
-        roleNames.add(AUTHENTICATED_ROLE);
+        if (!AnonymousUserConst.PRINCIPAL.equals(user.getUsername())) {
+            roleNames.add(AUTHENTICATED_ROLE);
+            roleNames.add(AnonymousUserConst.Role);
+        }
 
         var record = new AttributesRecord(user, requestInfo);
         var visitor = new AuthorizingVisitor(record);
