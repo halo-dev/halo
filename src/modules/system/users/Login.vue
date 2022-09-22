@@ -1,12 +1,8 @@
 <script lang="ts" setup>
-import {
-  IconShieldUser,
-  IconUserSettings,
-  VButton,
-} from "@halo-dev/components";
+import { IconShieldUser, IconUserLine, VButton } from "@halo-dev/components";
 import { v4 as uuid } from "uuid";
 import qs from "qs";
-import logo from "../../../assets/logo.svg";
+import logo from "@/assets/logo.svg";
 import { onMounted, ref } from "vue";
 import { submitForm } from "@formkit/vue";
 import router from "@/router";
@@ -17,30 +13,22 @@ interface LoginForm {
   password: string;
 }
 
-interface LoginFormState {
-  logging: boolean;
-  state: LoginForm;
-}
-
-const loginForm = ref<LoginFormState>({
-  logging: false,
-  state: {
-    _csrf: "",
-    username: "ryanwang",
-    password: "12345678",
-  },
+const loginForm = ref<LoginForm>({
+  _csrf: "",
+  username: "",
+  password: "",
 });
+const loading = ref(false);
 
 const handleGenerateToken = async () => {
   const token = uuid();
-  loginForm.value.state._csrf = token;
+  loginForm.value._csrf = token;
   document.cookie = `XSRF-TOKEN=${token}; Path=/;`;
 };
 
 const handleLogin = async () => {
   try {
-    loginForm.value.logging = true;
-
+    loading.value = true;
     await fetch(`${import.meta.env.VITE_API_URL}/login`, {
       method: "POST",
       headers: {
@@ -48,14 +36,14 @@ const handleLogin = async () => {
       },
       credentials: "include",
       redirect: "manual",
-      body: qs.stringify(loginForm.value.state),
+      body: qs.stringify(loginForm.value),
     });
     await router.push({ name: "Dashboard" });
     await router.go(0);
   } catch (e) {
-    console.error(e);
+    console.error("Failed to login", e);
   } finally {
-    loginForm.value.logging = false;
+    loading.value = false;
   }
 };
 
@@ -66,13 +54,15 @@ onMounted(() => {
 <template>
   <div class="flex h-screen flex-col items-center justify-center">
     <img :src="logo" alt="Logo" class="mb-8 w-20" />
-    <div class="login-form w-72">
+    <div class="login-form flex w-72 flex-col gap-4">
       <FormKit
-        id="login"
-        v-model="loginForm.state"
+        id="login-form"
+        v-model="loginForm"
         :actions="false"
         type="form"
+        :config="{ animation: 'none' }"
         @submit="handleLogin"
+        @keyup.enter="submitForm('login-form')"
       >
         <FormKit
           :validation-messages="{
@@ -84,7 +74,7 @@ onMounted(() => {
           validation="required"
         >
           <template #prefixIcon>
-            <IconUserSettings />
+            <IconUserLine />
           </template>
         </FormKit>
         <FormKit
@@ -100,10 +90,10 @@ onMounted(() => {
             <IconShieldUser />
           </template>
         </FormKit>
-        <VButton block type="secondary" @click="submitForm('login')">
-          登录
-        </VButton>
       </FormKit>
+      <VButton block type="secondary" @click="submitForm('login-form')">
+        登录
+      </VButton>
     </div>
   </div>
 </template>
