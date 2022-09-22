@@ -9,10 +9,16 @@ import { viteExternalsPlugin as ViteExternals } from "vite-plugin-externals";
 import { viteStaticCopy as ViteStaticCopy } from "vite-plugin-static-copy";
 import { createHtmlPlugin as VitePluginHtml } from "vite-plugin-html";
 import Icons from "unplugin-icons/vite";
+import randomstring from "randomstring";
 
 export default ({ mode }: { mode: string }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const isProduction = mode === "production";
+
+  const staticSuffix = randomstring.generate({
+    length: 8,
+    charset: "hex",
+  });
 
   return defineConfig({
     base: env.VITE_BASE_URL,
@@ -35,22 +41,24 @@ export default ({ mode }: { mode: string }) => {
               isProduction ? ".prod" : ""
             }.js`,
             dest: "assets/vue",
-            rename: "vue.global.js",
+            rename: `vue.global.${staticSuffix}.js`,
           },
           {
             src: `./node_modules/vue-router/dist/vue-router.global${
               isProduction ? ".prod" : ""
             }.js`,
             dest: "assets/vue-router",
-            rename: "vue-router.global.js",
+            rename: `vue-router.global.${staticSuffix}.js`,
           },
           {
             src: "./node_modules/@halo-dev/admin-shared/dist/halo-admin-shared.iife.js",
             dest: "assets/admin-shared",
+            rename: `halo-admin-shared.iife.${staticSuffix}.js`,
           },
           {
             src: "./node_modules/@halo-dev/components/dist/halo-components.iife.js",
             dest: "assets/components",
+            rename: `halo-components.iife.${staticSuffix}.js`,
           },
         ],
       }),
@@ -59,10 +67,10 @@ export default ({ mode }: { mode: string }) => {
         inject: {
           data: {
             injectScript: [
-              `<script src="${env.VITE_BASE_URL}assets/vue/vue.global.js"></script>`,
-              `<script src="${env.VITE_BASE_URL}assets/vue-router/vue-router.global.js"></script>`,
-              `<script src="${env.VITE_BASE_URL}assets/components/halo-components.iife.js"></script>`,
-              `<script src="${env.VITE_BASE_URL}assets/admin-shared/halo-admin-shared.iife.js"></script>`,
+              `<script src="${env.VITE_BASE_URL}assets/vue/vue.global.${staticSuffix}.js"></script>`,
+              `<script src="${env.VITE_BASE_URL}assets/vue-router/vue-router.global.${staticSuffix}.js"></script>`,
+              `<script src="${env.VITE_BASE_URL}assets/components/halo-components.iife.${staticSuffix}.js"></script>`,
+              `<script src="${env.VITE_BASE_URL}assets/admin-shared/halo-admin-shared.iife.${staticSuffix}.js"></script>`,
             ].join("\n"),
           },
         },
