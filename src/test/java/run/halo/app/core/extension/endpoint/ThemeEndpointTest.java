@@ -127,7 +127,8 @@ class ThemeEndpointTest {
             .thenReturn(Mono.just(theme));
         Setting setting = new Setting();
         setting.setMetadata(new Metadata());
-        setting.setSpec(List.of());
+        setting.setSpec(new Setting.SettingSpec());
+        setting.getSpec().setForms(List.of());
         when(extensionClient.fetch(Setting.class, "fake-setting"))
             .thenReturn(Mono.just(setting));
 
@@ -143,11 +144,12 @@ class ThemeEndpointTest {
             metadata:
               name: fake-setting
             spec:
-              - group: sns
-                label: 社交资料
-                formSchema:
-                  - $el: h1
-                    children: Register
+              forms:
+                - group: sns
+                  label: 社交资料
+                  formSchema:
+                    - $el: h1
+                      children: Register
             """);
 
         when(extensionClient.update(any(Setting.class)))
@@ -163,25 +165,28 @@ class ThemeEndpointTest {
                 verify(extensionClient, times(1)).update(captor.capture());
                 verify(extensionClient, times(0)).create(any(Setting.class));
                 Setting value = captor.getValue();
+                System.out.println(JsonUtils.objectToJson(value));
                 try {
                     JSONAssert.assertEquals("""
                             {
-                                "spec": [
-                                    {
-                                        "group": "sns",
-                                        "label": "社交资料",
-                                        "formSchema": [
-                                            {
-                                                "$el": "h1",
-                                                "children": "Register"
-                                            }
-                                        ]
-                                    }
-                                ],
-                                "apiVersion": "v1alpha1",
-                                "kind": "Setting",
-                                "metadata": {}
-                            }
+                               "spec": {
+                                 "forms": [
+                                   {
+                                     "group": "sns",
+                                     "label": "社交资料",
+                                     "formSchema": [
+                                       {
+                                         "$el": "h1",
+                                         "children": "Register"
+                                       }
+                                     ]
+                                   }
+                                 ]
+                               },
+                               "apiVersion": "v1alpha1",
+                               "kind": "Setting",
+                               "metadata": {}
+                             }
                             """,
                         JsonUtils.objectToJson(value),
                         true);
