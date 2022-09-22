@@ -33,6 +33,9 @@ export default definePlugin({
           path: "dashboard",
           name: "Dashboard",
           component: Dashboard,
+          meta: {
+            title: "仪表盘",
+          },
         },
       ],
     },

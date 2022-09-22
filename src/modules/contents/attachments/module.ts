@@ -15,6 +15,9 @@ export default definePlugin({
           path: "",
           name: "Attachments",
           component: AttachmentList,
+          meta: {
+            title: "附件",
+          },
         },
       ],
     },

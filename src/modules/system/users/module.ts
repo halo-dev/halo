@@ -28,6 +28,7 @@ export default definePlugin({
               name: "Users",
               component: UserList,
               meta: {
+                title: "用户",
                 permissions: ["system:users:view"],
               },
             },
@@ -42,11 +43,17 @@ export default definePlugin({
               path: "detail",
               name: "UserDetail",
               component: UserDetail,
+              meta: {
+                title: "用户详情",
+              },
             },
             {
               path: "tokens",
               name: "PersonalAccessTokens",
               component: PersonalAccessTokens,
+              meta: {
+                title: "个人令牌",
+              },
             },
           ],
         },

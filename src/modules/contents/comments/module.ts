@@ -14,6 +14,9 @@ export default definePlugin({
           path: "",
           name: "Comments",
           component: CommentList,
+          meta: {
+            title: "评论",
+          },
         },
       ],
     },

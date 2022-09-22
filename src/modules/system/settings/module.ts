@@ -16,6 +16,9 @@ export default definePlugin({
           path: ":group",
           name: "SystemSetting",
           component: SystemSetting,
+          meta: {
+            title: "系统设置",
+          },
         },
       ],
     },

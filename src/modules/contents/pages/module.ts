@@ -25,6 +25,9 @@ export default definePlugin({
               path: "",
               name: "FunctionalPages",
               component: FunctionalPageList,
+              meta: {
+                title: "功能页面",
+              },
             },
           ],
         },
@@ -40,6 +43,9 @@ export default definePlugin({
                   path: "",
                   name: "SinglePages",
                   component: SinglePageList,
+                  meta: {
+                    title: "自定义页面",
+                  },
                 },
               ],
             },
@@ -51,6 +57,9 @@ export default definePlugin({
                   path: "",
                   name: "SinglePageEditor",
                   component: SinglePageEditor,
+                  meta: {
+                    title: "页面编辑",
+                  },
                 },
               ],
             },

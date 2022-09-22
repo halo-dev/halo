@@ -22,6 +22,7 @@ export default definePlugin({
               name: "Plugins",
               component: PluginList,
               meta: {
+                title: "插件",
                 permissions: ["system:plugins:view"],
               },
             },
@@ -35,11 +36,17 @@ export default definePlugin({
               path: "detail",
               name: "PluginDetail",
               component: PluginDetail,
+              meta: {
+                title: "插件详情",
+              },
             },
             {
               path: "settings/:group",
               name: "PluginSetting",
               component: PluginSetting,
+              meta: {
+                title: "插件设置",
+              },
             },
           ],
         },

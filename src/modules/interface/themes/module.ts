@@ -17,11 +17,17 @@ export default definePlugin({
           path: "",
           name: "ThemeDetail",
           component: ThemeDetail,
+          meta: {
+            title: "主题",
+          },
         },
         {
           path: "settings/:group",
           name: "ThemeSetting",
           component: ThemeSetting,
+          meta: {
+            title: "主题设置",
+          },
         },
       ],
     },
@@ -33,6 +39,9 @@ export default definePlugin({
           path: "",
           name: "ThemeVisual",
           component: Visual,
+          meta: {
+            title: "可视化编辑",
+          },
         },
       ],
     },

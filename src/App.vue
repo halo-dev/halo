@@ -1,6 +1,24 @@
 <script lang="ts" setup>
-import { RouterView } from "vue-router";
+import { RouterView, useRoute } from "vue-router";
 import { VDialogProvider } from "@halo-dev/components";
+import { watch } from "vue";
+import { useTitle } from "@vueuse/core";
+
+const AppName = "Halo";
+const route = useRoute();
+const title = useTitle();
+
+watch(
+  () => route.name,
+  () => {
+    const { title: routeTitle } = route.meta;
+    if (routeTitle) {
+      title.value = `${routeTitle} - ${AppName}`;
+      return;
+    }
+    title.value = AppName;
+  }
+);
 </script>
 
 <template>

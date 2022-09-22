@@ -17,11 +17,17 @@ export default definePlugin({
           path: "",
           name: "Posts",
           component: PostList,
+          meta: {
+            title: "文章",
+          },
         },
         {
           path: "editor",
           name: "PostEditor",
           component: PostEditor,
+          meta: {
+            title: "文章编辑",
+          },
         },
         {
           path: "categories",
@@ -31,6 +37,9 @@ export default definePlugin({
               path: "",
               name: "Categories",
               component: CategoryList,
+              meta: {
+                title: "文章分类",
+              },
             },
           ],
         },
@@ -42,6 +51,9 @@ export default definePlugin({
               path: "",
               name: "Tags",
               component: TagList,
+              meta: {
+                title: "文章标签",
+              },
             },
           ],
         },

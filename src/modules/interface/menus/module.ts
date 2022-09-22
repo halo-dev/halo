@@ -14,6 +14,9 @@ export default definePlugin({
           path: "",
           name: "Menus",
           component: Menus,
+          meta: {
+            title: "菜单",
+          },
         },
       ],
     },
