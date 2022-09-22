@@ -21,17 +21,25 @@ public class Setting extends AbstractExtension {
 
     public static final String KIND = "Setting";
 
-    @Schema(required = true, minLength = 1)
-    private List<SettingSpec> spec;
+    @Schema(required = true)
+    private SettingSpec spec;
 
     @Data
     public static class SettingSpec {
+
+        @Schema(required = true, minLength = 1)
+        private List<SettingForm> forms;
+    }
+
+    @Data
+    public static class SettingForm {
 
         @Schema(required = true)
         private String group;
 
         private String label;
 
+        @Schema(required = true)
         private List<Object> formSchema;
     }
 }
