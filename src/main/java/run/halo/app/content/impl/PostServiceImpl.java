@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,7 @@ import run.halo.app.content.ListedPost;
 import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
+import run.halo.app.content.PostSorter;
 import run.halo.app.core.extension.Category;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
@@ -40,8 +42,6 @@ import run.halo.app.infra.ConditionStatus;
  */
 @Component
 public class PostServiceImpl implements PostService {
-    private static final Comparator<Post> DEFAULT_POST_COMPARATOR =
-        Comparator.comparing(post -> post.getMetadata().getCreationTimestamp());
     private final ContentService contentService;
     private final ReactiveExtensionClient client;
 
@@ -52,8 +52,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Mono<ListResult<ListedPost>> listPost(PostQuery query) {
+        Comparator<Post> comparator =
+            PostSorter.from(query.getSort(), query.getSortOrder());
         return client.list(Post.class, postListPredicate(query),
-                DEFAULT_POST_COMPARATOR.reversed(), query.getPage(), query.getSize())
+                comparator, query.getPage(), query.getSize())
             .flatMap(listResult -> Flux.fromStream(
                         listResult.get().map(this::getListedPost)
                     )
@@ -70,6 +72,40 @@ public class PostServiceImpl implements PostService {
             contains(query.getCategories(), post.getSpec().getCategories())
                 && contains(query.getTags(), post.getSpec().getTags())
                 && contains(query.getContributors(), post.getStatus().getContributors());
+
+        String keyword = query.getKeyword();
+        if (keyword != null) {
+            paramPredicate = paramPredicate.and(post -> {
+                String excerpt = post.getStatusOrDefault().getExcerpt();
+                return StringUtils.containsIgnoreCase(excerpt, keyword)
+                    || StringUtils.containsIgnoreCase(post.getSpec().getSlug(), keyword)
+                    || StringUtils.containsIgnoreCase(post.getSpec().getTitle(), keyword);
+            });
+        }
+
+        Post.PostPhase publishPhase = query.getPublishPhase();
+        if (publishPhase != null) {
+            paramPredicate = paramPredicate.and(post -> {
+                if (Post.PostPhase.PENDING_APPROVAL.equals(publishPhase)) {
+                    return !post.isPublished()
+                        && Post.PostPhase.PENDING_APPROVAL.name()
+                        .equalsIgnoreCase(post.getStatusOrDefault().getPhase());
+                }
+                // published
+                if (Post.PostPhase.PUBLISHED.equals(publishPhase)) {
+                    return post.isPublished();
+                }
+                // draft
+                return !post.isPublished();
+            });
+        }
+
+        Post.VisibleEnum visible = query.getVisible();
+        if (visible != null) {
+            paramPredicate =
+                paramPredicate.and(post -> visible.equals(post.getSpec().getVisible()));
+        }
+
         Predicate<Post> predicate = labelAndFieldSelectorToPredicate(query.getLabelSelector(),
             query.getFieldSelector());
         return predicate.and(paramPredicate);

@@ -130,6 +130,8 @@ public class Post extends AbstractExtension {
 
         private Boolean inProgress;
 
+        private Integer commentsCount;
+
         private List<String> contributors;
 
         @JsonIgnore
@@ -153,13 +155,43 @@ public class Post extends AbstractExtension {
     public enum PostPhase {
         DRAFT,
         PENDING_APPROVAL,
-        PUBLISHED
+        PUBLISHED;
+
+        /**
+         * Convert string value to {@link PostPhase}.
+         *
+         * @param value enum value string
+         * @return {@link PostPhase} if found, otherwise null
+         */
+        public static PostPhase from(String value) {
+            for (PostPhase phase : PostPhase.values()) {
+                if (phase.name().equalsIgnoreCase(value)) {
+                    return phase;
+                }
+            }
+            return null;
+        }
     }
 
     public enum VisibleEnum {
         PUBLIC,
         INTERNAL,
-        PRIVATE
+        PRIVATE;
+
+        /**
+         * Convert value string to {@link VisibleEnum}.
+         *
+         * @param value enum value string
+         * @return {@link VisibleEnum} if found, otherwise null
+         */
+        public static VisibleEnum from(String value) {
+            for (VisibleEnum visible : VisibleEnum.values()) {
+                if (visible.name().equalsIgnoreCase(value)) {
+                    return visible;
+                }
+            }
+            return null;
+        }
     }
 
     @Data
