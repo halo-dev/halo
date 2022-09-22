@@ -39,4 +39,7 @@ public class HaloProperties {
 
     @Valid
     private final SecurityProperties security = new SecurityProperties();
+
+    @Valid
+    private final ConsoleProperties console = new ConsoleProperties();
 }

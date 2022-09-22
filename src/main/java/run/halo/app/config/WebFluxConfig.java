@@ -1,8 +1,10 @@
 package run.halo.app.config;
 
 import static org.springframework.util.ResourceUtils.FILE_URL_PREFIX;
+import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.URI;
 import java.util.List;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +18,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.reactive.resource.EncodedResourceResolver;
+import org.springframework.web.reactive.resource.PathResourceResolver;
 import org.springframework.web.reactive.result.view.ViewResolutionResultHandler;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
@@ -69,10 +74,24 @@ public class WebFluxConfig implements WebFluxConfigurer {
         return builder.build();
     }
 
+    @Bean
+    RouterFunction<ServerResponse> consoleIndexRedirection() {
+        return RouterFunctions.route(GET("/console").or(GET("/console/").or(GET("/console/index"))),
+            request -> ServerResponse.permanentRedirect(URI.create("/console/index.html")).build());
+    }
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         var attachmentsRoot = haloProp.getWorkDir().resolve("attachments");
         registry.addResourceHandler("/upload/**")
             .addResourceLocations(FILE_URL_PREFIX + attachmentsRoot + "/");
+
+        // For console project
+        registry.addResourceHandler("/console/**")
+            .addResourceLocations(haloProp.getConsole().getLocation())
+            .resourceChain(true)
+            .addResolver(new EncodedResourceResolver())
+            .addResolver(new PathResourceResolver());
     }
+
 }

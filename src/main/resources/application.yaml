@@ -1,5 +1,7 @@
 server:
   port: 8090
+  compression:
+    enabled: true
 spring:
   output:
     ansi:
