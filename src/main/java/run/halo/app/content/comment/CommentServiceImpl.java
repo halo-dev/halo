@@ -68,6 +68,11 @@ public class CommentServiceImpl implements CommentService {
                     return Mono.error(
                         new AccessDeniedException("The comment function has been turned off."));
                 }
+                if (checkCommentOwner(comment, commentSetting.getSystemUserOnly())) {
+                    return Mono.error(
+                        new AccessDeniedException("Allow system user comments only."));
+                }
+
                 if (comment.getSpec().getTop() == null) {
                     comment.getSpec().setTop(false);
                 }
@@ -91,6 +96,14 @@ public class CommentServiceImpl implements CommentService {
                         Mono.error(new IllegalStateException("The owner must not be null.")));
             })
             .flatMap(client::create);
+    }
+
+    private boolean checkCommentOwner(Comment comment, Boolean onlySystemUser) {
+        Comment.CommentOwner owner = comment.getSpec().getOwner();
+        if (Boolean.TRUE.equals(onlySystemUser)) {
+            return owner != null && Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind());
+        }
+        return false;
     }
 
     private Comment.CommentOwner toCommentOwner(User user) {
@@ -122,6 +135,7 @@ public class CommentServiceImpl implements CommentService {
                     builder.subject(subject);
                     return builder;
                 })
+                .switchIfEmpty(Mono.just(builder))
             )
             .map(ListedComment.ListedCommentBuilder::build);
     }
