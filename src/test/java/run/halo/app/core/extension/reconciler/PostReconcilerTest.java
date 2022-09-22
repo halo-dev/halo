@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -54,10 +55,8 @@ class PostReconcilerTest {
         post.getSpec().setHeadSnapshot("post-A-head-snapshot");
         when(client.fetch(eq(Post.class), eq(name)))
             .thenReturn(Optional.of(post));
-        when(contentService.getContent(eq(post.getSpec().getHeadSnapshot())))
-            .thenReturn(Mono.just(
-                new ContentWrapper(post.getSpec().getHeadSnapshot(), "hello world",
-                    "<p>hello world</p>", "markdown")));
+        when(contentService.getContent(eq(post.getSpec().getReleaseSnapshot())))
+            .thenReturn(Mono.empty());
 
         Snapshot snapshotV1 = TestPost.snapshotV1();
         Snapshot snapshotV2 = TestPost.snapshotV2();
@@ -77,8 +76,39 @@ class PostReconcilerTest {
         verify(postPermalinkPolicy, times(0)).onPermalinkUpdate(any());
 
         Post value = captor.getValue();
-        assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");
+        assertThat(value.getStatus().getExcerpt()).isNull();
         assertThat(value.getStatus().getContributors()).isEqualTo(List.of("guqing", "zhangsan"));
+    }
+
+    @Test
+    void reconcileExcerpt() {
+        // https://github.com/halo-dev/halo/issues/2452
+        String name = "post-A";
+        Post post = TestPost.postV1();
+        post.getSpec().setPublished(true);
+        post.getSpec().setHeadSnapshot("post-A-head-snapshot");
+        post.getSpec().setReleaseSnapshot("post-fake-released-snapshot");
+        when(client.fetch(eq(Post.class), eq(name)))
+            .thenReturn(Optional.of(post));
+        when(contentService.getContent(eq(post.getSpec().getReleaseSnapshot())))
+            .thenReturn(Mono.just(
+                new ContentWrapper(post.getSpec().getHeadSnapshot(), "hello world",
+                    "<p>hello world</p>", "markdown")));
+
+        Snapshot snapshotV1 = TestPost.snapshotV1();
+        Snapshot snapshotV2 = TestPost.snapshotV2();
+        snapshotV2.getSpec().setPublishTime(Instant.now());
+        snapshotV1.getSpec().setContributors(Set.of("guqing"));
+        snapshotV2.getSpec().setContributors(Set.of("guqing", "zhangsan"));
+        when(contentService.listSnapshots(any()))
+            .thenReturn(Flux.just(snapshotV1, snapshotV2));
+
+        ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
+        postReconciler.reconcile(new Reconciler.Request(name));
+
+        verify(client, times(3)).update(captor.capture());
+        Post value = captor.getValue();
+        assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");
     }
 
 }
