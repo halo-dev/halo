@@ -12,6 +12,7 @@ import type { Theme } from "@halo-dev/api-client";
 // hooks
 import { useSettingForm } from "@halo-dev/admin-shared";
 import { useRouteParams } from "@vueuse/router";
+import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 
 const group = useRouteParams<string>("group");
 
@@ -21,7 +22,7 @@ const settingName = computed(() => selectedTheme?.value?.spec.settingName);
 const configMapName = computed(() => selectedTheme?.value?.spec.configMapName);
 
 const {
-  settings,
+  setting,
   configMapFormData,
   saving,
   handleFetchConfigMap,
@@ -30,11 +31,14 @@ const {
 } = useSettingForm(settingName, configMapName);
 
 const formSchema = computed(() => {
-  if (!settings?.value?.spec) {
+  if (!setting.value) {
     return;
   }
-  return settings.value.spec.find((item) => item.group === group?.value)
-    ?.formSchema;
+  const { forms } = setting.value.spec;
+  return forms.find((item) => item.group === group?.value)?.formSchema as (
+    | FormKitSchemaCondition
+    | FormKitSchemaNode
+  )[];
 });
 
 await handleFetchSettings();

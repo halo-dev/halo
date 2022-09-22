@@ -11,6 +11,7 @@ import { VButton } from "@halo-dev/components";
 // types
 import type { Plugin } from "@halo-dev/api-client";
 import { useRouteParams } from "@vueuse/router";
+import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 
 const name = useRouteParams<string>("name");
 const group = useRouteParams<string>("group");
@@ -21,7 +22,7 @@ const settingName = computed(() => plugin?.value?.spec.settingName);
 const configMapName = computed(() => plugin?.value?.spec.configMapName);
 
 const {
-  settings,
+  setting,
   configMapFormData,
   saving,
   handleFetchSettings,
@@ -30,11 +31,14 @@ const {
 } = useSettingForm(settingName, configMapName);
 
 const formSchema = computed(() => {
-  if (!settings?.value?.spec) {
+  if (!setting.value) {
     return;
   }
-  return settings.value.spec.find((item) => item.group === group.value)
-    ?.formSchema;
+  const { forms } = setting.value.spec;
+  return forms.find((item) => item.group === group.value)?.formSchema as (
+    | FormKitSchemaCondition
+    | FormKitSchemaNode
+  )[];
 });
 
 const handleFetchPlugin = async () => {

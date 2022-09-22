@@ -7,9 +7,8 @@ import { apiClient } from "../utils/api-client";
 // libs
 import cloneDeep from "lodash.clonedeep";
 import merge from "lodash.merge";
-import type { FormKitSetting, FormKitSettingSpec } from "../types/formkit";
-import type { ConfigMap } from "@halo-dev/api-client";
-import type { FormKitSchemaNode } from "@formkit/core";
+import type { ConfigMap, Setting, SettingForm } from "@halo-dev/api-client";
+import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 
 const initialConfigMap: ConfigMap = {
   apiVersion: "v1alpha1",
@@ -21,7 +20,7 @@ const initialConfigMap: ConfigMap = {
 };
 
 interface useSettingFormReturn {
-  settings: Ref<FormKitSetting | undefined>;
+  setting: Ref<Setting | undefined>;
   configMap: Ref<ConfigMap>;
   configMapFormData: Ref<Record<string, Record<string, string>> | undefined>;
   saving: Ref<boolean>;
@@ -35,7 +34,7 @@ export function useSettingForm(
   settingName: Ref<string | undefined>,
   configMapName: Ref<string | undefined>
 ): useSettingFormReturn {
-  const settings = ref<FormKitSetting | undefined>();
+  const setting = ref<Setting>();
   const configMap = ref<ConfigMap>(cloneDeep(initialConfigMap));
   const configMapFormData = ref<
     Record<string, Record<string, string>> | undefined
@@ -45,29 +44,32 @@ export function useSettingForm(
 
   const handleFetchSettings = async () => {
     if (!settingName.value) {
-      settings.value = undefined;
+      setting.value = undefined;
       return;
     }
     try {
-      const response = await apiClient.extension.setting.getv1alpha1Setting({
+      const { data } = await apiClient.extension.setting.getv1alpha1Setting({
         name: settingName.value,
       });
-      settings.value = response.data as FormKitSetting;
+      setting.value = data;
 
       // init configMapFormData
       if (!configMapFormData.value) {
-        const { spec: schemaGroups } = settings.value;
+        const { forms } = setting.value.spec;
         const initialConfigMapFormData: Record<
           string,
           Record<string, string>
         > = {};
-        schemaGroups.forEach((schemaGroup) => {
-          initialConfigMapFormData[schemaGroup.group] = {};
-          const formSchema = schemaGroup.formSchema as FormKitSchemaNode[];
+        forms.forEach((form) => {
+          initialConfigMapFormData[form.group] = {};
+          const formSchema = form.formSchema as (
+            | FormKitSchemaCondition
+            | FormKitSchemaNode
+          )[];
           formSchema.forEach((schema) => {
             // @ts-ignore
             if ("name" in schema && "$formkit" in schema) {
-              initialConfigMapFormData[schemaGroup.group][schema.name] =
+              initialConfigMapFormData[form.group][schema.name] =
                 schema.value || undefined;
             }
           });
@@ -75,7 +77,7 @@ export function useSettingForm(
         configMapFormData.value = cloneDeep(initialConfigMapFormData);
       }
     } catch (e) {
-      console.error(e);
+      console.error("Failed to fetch setting", e);
     }
   };
 
@@ -98,20 +100,20 @@ export function useSettingForm(
 
       if (data) {
         // merge objects value
-        const { spec: schemaGroups } = settings.value || {};
+        const { forms } = setting.value?.spec || {};
 
-        schemaGroups?.forEach((schemaGroup) => {
+        forms?.forEach((form) => {
           if (!configMapFormData.value) {
             return;
           }
-          configMapFormData.value[schemaGroup.group] = merge(
-            configMapFormData.value[schemaGroup.group] || {},
-            JSON.parse(data[schemaGroup.group] || "{}")
+          configMapFormData.value[form.group] = merge(
+            configMapFormData.value[form.group] || {},
+            JSON.parse(data[form.group] || "{}")
           );
         });
       }
     } catch (e) {
-      console.error(e);
+      console.error("Failed to fetch configMap", e);
     }
   };
 
@@ -123,7 +125,7 @@ export function useSettingForm(
         configMap.value.metadata.name = configMapName.value;
       }
 
-      settings?.value?.spec.forEach((item: FormKitSettingSpec) => {
+      setting.value?.spec.forms.forEach((item: SettingForm) => {
         // @ts-ignore
         configMap.value.data[item.group] = JSON.stringify(
           configMapFormData?.value?.[item.group]
@@ -141,7 +143,7 @@ export function useSettingForm(
         });
       }
     } catch (e) {
-      console.error(e);
+      console.error("Failed to save configMap", e);
     } finally {
       await handleFetchSettings();
       await handleFetchConfigMap();
@@ -150,13 +152,13 @@ export function useSettingForm(
   };
 
   const handleReset = () => {
-    settings.value = undefined;
+    setting.value = undefined;
     configMap.value = cloneDeep(initialConfigMap);
     configMapFormData.value = undefined;
   };
 
   return {
-    settings,
+    setting,
     configMap,
     configMapFormData,
     saving,

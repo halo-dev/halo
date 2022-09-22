@@ -5,7 +5,6 @@ import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 // types
-import type { FormKitSettingSpec } from "@halo-dev/admin-shared";
 import { BasicLayout, useSettingForm } from "@halo-dev/admin-shared";
 
 // components
@@ -15,6 +14,7 @@ import {
   VTabbar,
   IconSettings,
 } from "@halo-dev/components";
+import type { SettingForm } from "@halo-dev/api-client";
 
 interface SettingTab {
   id: string;
@@ -28,7 +28,7 @@ interface SettingTab {
 const tabs = ref<SettingTab[]>([] as SettingTab[]);
 const activeTab = ref("");
 
-const { settings, handleFetchSettings } = useSettingForm(
+const { setting, handleFetchSettings } = useSettingForm(
   ref("system"),
   ref("system")
 );
@@ -47,8 +47,9 @@ const handleTabChange = (id: string) => {
 onMounted(async () => {
   await handleFetchSettings();
 
-  if (settings.value && settings.value.spec) {
-    tabs.value = settings.value.spec.map((item: FormKitSettingSpec) => {
+  if (setting.value) {
+    const { forms } = setting.value.spec;
+    tabs.value = forms.map((item: SettingForm) => {
       return {
         id: item.group,
         label: item.label || "",

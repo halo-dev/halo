@@ -10,7 +10,6 @@ import cloneDeep from "lodash.clonedeep";
 // hooks
 import { useThemeLifeCycle } from "../composables/use-theme";
 // types
-import type { FormKitSettingSpec } from "@halo-dev/admin-shared";
 import { BasicLayout, useSettingForm } from "@halo-dev/admin-shared";
 
 // components
@@ -26,7 +25,7 @@ import {
   VTabbar,
 } from "@halo-dev/components";
 import ThemeListModal from "../components/ThemeListModal.vue";
-import type { Theme } from "@halo-dev/api-client";
+import type { SettingForm, Theme } from "@halo-dev/api-client";
 
 interface ThemeTab {
   id: string;
@@ -58,7 +57,7 @@ const { loading, isActivated, activatedTheme, handleActiveTheme } =
 const settingName = computed(() => selectedTheme.value?.spec.settingName);
 const configMapName = computed(() => selectedTheme.value?.spec.configMapName);
 
-const { settings, handleFetchSettings } = useSettingForm(
+const { setting, handleFetchSettings } = useSettingForm(
   settingName,
   configMapName
 );
@@ -85,10 +84,11 @@ watch(
       tabs.value = cloneDeep(initialTabs);
       await handleFetchSettings();
 
-      if (settings.value && settings.value.spec) {
+      if (setting.value) {
+        const { forms } = setting.value.spec;
         tabs.value = [
           ...tabs.value,
-          ...settings.value.spec.map((item: FormKitSettingSpec) => {
+          ...forms.map((item: SettingForm) => {
             return {
               id: item.group,
               label: item.label || "",

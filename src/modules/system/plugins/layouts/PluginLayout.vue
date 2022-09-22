@@ -16,8 +16,7 @@ import { BasicLayout } from "@halo-dev/admin-shared";
 
 // types
 import type { Ref } from "vue";
-import type { Plugin } from "@halo-dev/api-client";
-import type { FormKitSettingSpec } from "@halo-dev/admin-shared";
+import type { Plugin, SettingForm } from "@halo-dev/api-client";
 
 interface PluginTab {
   id: string;
@@ -51,7 +50,7 @@ provide<Ref<string | undefined>>("activeTab", activeTab);
 const settingName = computed(() => plugin.value?.spec.settingName);
 const configMapName = computed(() => plugin.value?.spec.configMapName);
 
-const { settings, handleFetchSettings } = useSettingForm(
+const { setting, handleFetchSettings } = useSettingForm(
   settingName,
   configMapName
 );
@@ -101,10 +100,11 @@ onMounted(async () => {
 
   tabs.value = cloneDeep(initialTabs);
 
-  if (settings.value && settings.value.spec) {
+  if (setting.value) {
+    const { forms } = setting.value.spec;
     tabs.value = [
       ...tabs.value,
-      ...settings.value.spec.map((item: FormKitSettingSpec) => {
+      ...forms.map((item: SettingForm) => {
         return {
           id: item.group,
           label: item.label || "",

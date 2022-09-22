@@ -5,7 +5,12 @@ import cloneDeep from "lodash.clonedeep";
 import { computed, ref, watch, watchEffect } from "vue";
 import { apiClient, useSettingForm } from "@halo-dev/admin-shared";
 import { v4 as uuid } from "uuid";
-import { reset, submitForm } from "@formkit/core";
+import {
+  reset,
+  submitForm,
+  type FormKitSchemaCondition,
+  type FormKitSchemaNode,
+} from "@formkit/core";
 import { useMagicKeys } from "@vueuse/core";
 import { setFocus } from "@/formkit/utils/focus";
 
@@ -51,7 +56,7 @@ const settingName = computed(
 const configMapName = computed(() => formState.value.spec.configMapRef?.name);
 
 const {
-  settings,
+  setting,
   configMapFormData,
   saving,
   handleFetchConfigMap,
@@ -61,11 +66,14 @@ const {
 } = useSettingForm(settingName, configMapName);
 
 const formSchema = computed(() => {
-  if (!settings?.value?.spec) {
+  if (!setting.value) {
     return undefined;
   }
-  return settings.value.spec.find((item) => item.group === "default")
-    ?.formSchema;
+  const { forms } = setting.value.spec;
+  return forms.find((item) => item.group === "default")?.formSchema as (
+    | FormKitSchemaCondition
+    | FormKitSchemaNode
+  )[];
 });
 
 watchEffect(() => {
@@ -75,7 +83,7 @@ watchEffect(() => {
 });
 
 watchEffect(() => {
-  if (configMapName.value && settings.value) {
+  if (configMapName.value && setting.value) {
     handleFetchConfigMap();
   }
 });
