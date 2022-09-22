@@ -57,7 +57,7 @@ public enum PostSorter {
                 .thenComparing(name);
         }
 
-        throw new IllegalStateException("Unsupported sort value: " + sorter);
+        throw new IllegalArgumentException("Unsupported sort value: " + sorter);
     }
 
     static PostSorter convertFrom(String sort) {
