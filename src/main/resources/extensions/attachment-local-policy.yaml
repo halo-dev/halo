@@ -12,10 +12,11 @@ kind: Setting
 metadata:
   name: local-policy-template-setting
 spec:
-  - group: default
-    label: Default
-    formSchema:
-      - $formkit: text
-        name: location
-        label: 存储位置
-        help: ~/halo-next/attachments 下的子目录
+  forms:
+    - group: default
+      label: Default
+      formSchema:
+        - $formkit: text
+          name: location
+          label: 存储位置
+          help: ~/halo-next/attachments 下的子目录
