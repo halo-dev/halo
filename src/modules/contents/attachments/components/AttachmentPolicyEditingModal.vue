@@ -202,6 +202,7 @@ const onVisibleChange = (visible: boolean) => {
       v-if="formSchema && configMapFormData"
       id="local-policy-form"
       v-model="configMapFormData['default']"
+      name="local-policy-form"
       :actions="false"
       :preserve="true"
       type="form"

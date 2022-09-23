@@ -59,6 +59,7 @@ watch(
         v-if="group && formSchema && configMapFormData"
         :id="group"
         v-model="configMapFormData[group]"
+        :name="group"
         :actions="false"
         :preserve="true"
         type="form"

@@ -134,6 +134,7 @@ watch(
   >
     <FormKit
       id="category-form"
+      name="category-form"
       type="form"
       :config="{ validationVisibility: 'submit' }"
       @submit="handleSaveCategory"

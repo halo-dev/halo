@@ -36,7 +36,7 @@ onMounted(() => {
   <VModal v-model:visible="createVisible" :width="720" title="创建个人令牌">
     <VTabs v-model:active-id="createActiveId" type="outline">
       <VTabItem id="general" label="基础信息">
-        <FormKit id="role-form" :actions="false" type="form">
+        <FormKit id="role-form" name="role-form" :actions="false" type="form">
           <FormKit label="名称" type="text" validation="required"></FormKit>
           <FormKit label="失效日期" type="text" validation="required"></FormKit>
         </FormKit>

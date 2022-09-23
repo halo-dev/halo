@@ -150,6 +150,7 @@ watchEffect(() => {
   >
     <FormKit
       :id="formId"
+      :name="formId"
       type="form"
       :config="{ validationVisibility: 'submit' }"
       @submit="handleCreateReply"

@@ -175,7 +175,13 @@ watchEffect(() => {
 
     <VTabs v-model:active-id="activeTab" type="outline">
       <VTabItem id="general" label="常规">
-        <FormKit id="basic" :actions="false" :preserve="true" type="form">
+        <FormKit
+          id="basic"
+          name="basic"
+          :actions="false"
+          :preserve="true"
+          type="form"
+        >
           <FormKit
             v-model="formState.page.spec.title"
             label="标题"
@@ -208,7 +214,13 @@ watchEffect(() => {
         </FormKit>
       </VTabItem>
       <VTabItem id="advanced" label="高级">
-        <FormKit id="advanced" :actions="false" :preserve="true" type="form">
+        <FormKit
+          id="advanced"
+          name="advanced"
+          :actions="false"
+          :preserve="true"
+          type="form"
+        >
           <FormKit
             v-model="formState.page.spec.allowComment"
             :options="[

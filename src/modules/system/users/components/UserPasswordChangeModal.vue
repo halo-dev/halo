@@ -108,6 +108,7 @@ const handleChangePassword = async () => {
     <FormKit
       id="password-form"
       v-model="formState"
+      name="password-form"
       :actions="false"
       type="form"
       :config="{ validationVisibility: 'submit' }"

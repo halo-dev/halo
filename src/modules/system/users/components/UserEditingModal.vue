@@ -198,6 +198,7 @@ const handleRawModeChange = () => {
     <div v-show="!rawMode">
       <FormKit
         id="user-form"
+        name="user-form"
         :config="{ validationVisibility: 'submit' }"
         type="form"
         @submit="handleCreateUser"

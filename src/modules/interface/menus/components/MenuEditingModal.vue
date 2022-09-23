@@ -119,6 +119,7 @@ watch(
   >
     <FormKit
       id="menu-form"
+      name="menu-form"
       :classes="{ form: 'w-full' }"
       type="form"
       :config="{ validationVisibility: 'submit' }"

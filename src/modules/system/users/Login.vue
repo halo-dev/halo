@@ -58,6 +58,7 @@ onMounted(() => {
       <FormKit
         id="login-form"
         v-model="loginForm"
+        name="login-form"
         :actions="false"
         type="form"
         :config="{ animation: 'none' }"

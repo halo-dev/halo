@@ -125,6 +125,7 @@ const handleResetForm = () => {
         <FormKit
           v-if="formState.metadata.annotations"
           id="role-form"
+          name="role-form"
           :actions="false"
           type="form"
           :config="{ validationVisibility: 'submit' }"

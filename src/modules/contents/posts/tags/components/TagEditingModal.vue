@@ -146,6 +146,7 @@ watch(
     </template>
     <FormKit
       id="tag-form"
+      name="tag-form"
       :config="{ validationVisibility: 'submit' }"
       type="form"
       @submit="handleSaveTag"

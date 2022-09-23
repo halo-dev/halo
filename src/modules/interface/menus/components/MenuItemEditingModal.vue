@@ -306,6 +306,7 @@ watch(
   >
     <FormKit
       id="menuitem-form"
+      name="menuitem-form"
       type="form"
       :config="{ validationVisibility: 'submit' }"
       @submit="handleSaveMenuItem"

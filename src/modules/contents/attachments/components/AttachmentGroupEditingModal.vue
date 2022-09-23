@@ -124,8 +124,10 @@ watch(
   >
     <FormKit
       id="attachment-group-form"
+      name="attachment-group-form"
       :config="{ validationVisibility: 'submit' }"
       type="form"
+      :actions="false"
       @submit="handleSave"
     >
       <FormKit
