@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FilePathUtils;
+import run.halo.app.theme.dialect.LinkExpressionObjectDialect;
 import run.halo.app.theme.dialect.ThemeJava8TimeDialect;
 
 /**
@@ -51,5 +52,10 @@ public class ThemeConfiguration {
     @Bean
     Java8TimeDialect java8TimeDialect() {
         return new ThemeJava8TimeDialect();
+    }
+
+    @Bean
+    LinkExpressionObjectDialect linkExpressionObjectDialect() {
+        return new LinkExpressionObjectDialect();
     }
 }
