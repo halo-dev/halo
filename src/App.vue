@@ -46,6 +46,11 @@ body {
   border-radius: 2em;
 }
 
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
 *::-webkit-scrollbar-thumb {
   background-color: #ddd;
   background-clip: padding-box;
