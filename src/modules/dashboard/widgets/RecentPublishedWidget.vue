@@ -1,16 +1,20 @@
 <script lang="ts" name="RecentPublishedWidget" setup>
 import { VCard, VSpace } from "@halo-dev/components";
 import { onMounted, ref } from "vue";
-import type { Post } from "@halo-dev/api-client";
+import type { ListedPost } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 
-const posts = ref<Post[]>([] as Post[]);
+const posts = ref<ListedPost[]>([] as ListedPost[]);
 
 const handleFetchPosts = async () => {
   try {
-    const { data } =
-      await apiClient.extension.post.listcontentHaloRunV1alpha1Post();
+    const { data } = await apiClient.post.listPosts({
+      sort: "PUBLISH_TIME",
+      publishPhase: "PUBLISHED",
+      page: 1,
+      size: 10,
+    });
     posts.value = data.items;
   } catch (e) {
     console.error("Failed to fetch posts", e);
@@ -23,19 +27,19 @@ onMounted(handleFetchPosts);
   <VCard
     :body-class="['h-full', '!p-0', 'overflow-y-auto']"
     class="h-full"
-    title="最近发布"
+    title="最近文章"
   >
-    <div class="h-full p-4">
+    <div class="h-full">
       <ul class="divide-y divide-gray-200" role="list">
         <li
           v-for="(post, index) in posts"
           :key="index"
-          class="cursor-pointer py-4 hover:bg-gray-50"
+          class="cursor-pointer p-4 hover:bg-gray-50"
         >
           <div class="flex items-center space-x-4">
             <div class="min-w-0 flex-1">
               <p class="truncate text-sm font-medium text-gray-900">
-                {{ post.spec.title }}
+                {{ post.post.spec.title }}
               </p>
               <div class="mt-1 flex">
                 <VSpace>
@@ -47,7 +51,7 @@ onMounted(handleFetchPosts);
 
             <div>
               <time class="text-sm text-gray-500">
-                {{ formatDatetime(post.metadata.creationTimestamp) }}
+                {{ formatDatetime(post.post.spec.publishTime) }}
               </time>
             </div>
           </div>

@@ -10,12 +10,12 @@ const { users } = useUserFetch({ fetchOnMounted: true });
     class="h-full"
     title="最近登录"
   >
-    <div class="h-full p-4">
+    <div class="h-full">
       <ul class="divide-y divide-gray-200" role="list">
         <li
           v-for="(user, index) in users"
           :key="index"
-          class="cursor-pointer py-4 hover:bg-gray-50"
+          class="cursor-pointer p-4 hover:bg-gray-50"
         >
           <div class="flex items-center space-x-4">
             <div class="flex flex-shrink-0 items-center">
@@ -34,8 +34,8 @@ const { users } = useUserFetch({ fetchOnMounted: true });
               </p>
             </div>
             <div>
-              <time class="text-sm text-gray-500" datetime="2020-01-07 20:00">
-                2020-01-07 20:00
+              <time class="text-sm text-gray-500">
+                {{ user.status?.lastLoginAt }}
               </time>
             </div>
           </div>

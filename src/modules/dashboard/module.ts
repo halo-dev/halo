@@ -3,7 +3,6 @@ import Dashboard from "./Dashboard.vue";
 import { IconDashboard } from "@halo-dev/components";
 
 import CommentStatsWidget from "./widgets/CommentStatsWidget.vue";
-import JournalPublishWidget from "./widgets/JournalPublishWidget.vue";
 import PostStatsWidget from "./widgets/PostStatsWidget.vue";
 import QuickLinkWidget from "./widgets/QuickLinkWidget.vue";
 import RecentLoginWidget from "./widgets/RecentLoginWidget.vue";
@@ -15,7 +14,6 @@ export default definePlugin({
   name: "dashboardModule",
   components: [
     CommentStatsWidget,
-    JournalPublishWidget,
     PostStatsWidget,
     QuickLinkWidget,
     RecentLoginWidget,

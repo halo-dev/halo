@@ -72,12 +72,6 @@
 
     <template v-for="(group, groupIndex) in widgetsGroup" :key="groupIndex">
       <div v-if="activeId === group.id" class="mt-4">
-        <VAlert
-          v-if="group.notice"
-          :description="group.notice"
-          class="mb-4"
-          title="提示"
-        />
         <grid-layout
           :col-num="12"
           :is-draggable="false"
@@ -114,7 +108,6 @@ import {
   IconDashboard,
   IconSave,
   IconSettings,
-  VAlert,
   VButton,
   VModal,
   VPageHeader,
@@ -125,17 +118,13 @@ import { ref } from "vue";
 import { useStorage } from "@vueuse/core";
 import cloneDeep from "lodash.clonedeep";
 
-const settings = ref(false);
-const widgetsModal = ref(false);
-const activeId = ref("post");
-
 const widgetsGroup = [
   {
     id: "post",
     label: "文章",
     widgets: [
       { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "PostStatsWidget" },
-      { x: 3, y: 0, w: 6, h: 10, i: 1, widget: "RecentPublishedWidget" },
+      { x: 0, y: 0, w: 6, h: 10, i: 1, widget: "RecentPublishedWidget" },
     ],
   },
   {
@@ -148,14 +137,8 @@ const widgetsGroup = [
     label: "用户",
     widgets: [
       { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "UserStatsWidget" },
-      { x: 3, y: 0, w: 6, h: 10, i: 1, widget: "RecentLoginWidget" },
+      { x: 0, y: 0, w: 6, h: 10, i: 1, widget: "RecentLoginWidget" },
     ],
-  },
-  {
-    id: "plugin-journal",
-    label: "日志",
-    notice: "此组件由插件 plugin-journal 提供",
-    widgets: [{ x: 0, y: 0, w: 5, h: 8, i: 0, widget: "JournalPublishWidget" }],
   },
   {
     id: "other",
@@ -167,29 +150,25 @@ const widgetsGroup = [
   },
 ];
 
+const settings = ref(false);
+const widgetsModal = ref(false);
+const activeId = ref(widgetsGroup[0].id);
+
 const layout = useStorage("widgets", [
   { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "PostStatsWidget" },
   { x: 3, y: 0, w: 3, h: 3, i: 1, widget: "UserStatsWidget" },
   { x: 6, y: 0, w: 3, h: 3, i: 2, widget: "CommentStatsWidget" },
   { x: 9, y: 0, w: 3, h: 3, i: 3, widget: "ViewsStatsWidget" },
+  { x: 8, y: 3, w: 4, h: 10, i: 4, widget: "RecentLoginWidget" },
+  { x: 0, y: 3, w: 4, h: 10, i: 5, widget: "QuickLinkWidget" },
   {
-    x: 5,
+    x: 4,
     y: 3,
     w: 4,
     h: 10,
-    i: 4,
+    i: 6,
     widget: "RecentPublishedWidget",
   },
-  { x: 9, y: 3, w: 3, h: 10, i: 5, widget: "RecentLoginWidget" },
-  {
-    x: 0,
-    y: 13,
-    w: 4,
-    h: 10,
-    i: 6,
-    widget: "JournalPublishWidget",
-  },
-  { x: 0, y: 3, w: 5, h: 10, i: 7, widget: "QuickLinkWidget" },
 ]);
 
 // eslint-disable-next-line
