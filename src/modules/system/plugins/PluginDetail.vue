@@ -7,6 +7,7 @@ import type { Plugin, Role } from "@halo-dev/api-client";
 import { pluginLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
 import { usePluginLifeCycle } from "./composables/use-plugin";
+import { formatDatetime } from "@/utils/date";
 
 const plugin = inject<Ref<Plugin | undefined>>("plugin");
 const { changeStatus, isStarted } = usePluginLifeCycle(plugin);
@@ -61,8 +62,8 @@ watchEffect(() => {
   <div class="flex items-center justify-between bg-white px-4 py-4 sm:px-6">
     <div>
       <h3 class="text-lg font-medium leading-6 text-gray-900">插件信息</h3>
-      <p class="mt-1 flex max-w-2xl items-center gap-2 text-sm text-gray-500">
-        <span>{{ plugin?.spec.version }}</span>
+      <p class="mt-1 flex max-w-2xl items-center gap-2">
+        <span class="text-sm text-gray-500">{{ plugin?.spec.version }}</span>
         <VTag>
           {{ isStarted ? "已启用" : "未启用" }}
         </VTag>
@@ -80,6 +81,14 @@ watchEffect(() => {
         <dt class="text-sm font-medium text-gray-900">名称</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
           {{ plugin?.spec.displayName }}
+        </dd>
+      </div>
+      <div
+        class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
+      >
+        <dt class="text-sm font-medium text-gray-900">描述</dt>
+        <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+          {{ plugin?.spec.description }}
         </dd>
       </div>
       <div
@@ -115,7 +124,8 @@ watchEffect(() => {
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
           <ul
             v-if="plugin?.spec.license && plugin?.spec.license.length"
-            class="list-inside list-disc"
+            class="list-inside"
+            :class="{ 'list-disc': plugin?.spec.license.length > 1 }"
           >
             <li v-for="(license, index) in plugin.spec.license" :key="index">
               <a v-if="license.url" :href="license.url" target="_blank">
@@ -128,7 +138,9 @@ watchEffect(() => {
           </ul>
         </dd>
       </div>
+      <!-- TODO add display extensions support -->
       <div
+        v-if="false"
         class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
       >
         <dt class="text-sm font-medium text-gray-900">模型定义</dt>
@@ -195,6 +207,14 @@ watchEffect(() => {
             </div>
           </dl>
           <span v-else>无</span>
+        </dd>
+      </div>
+      <div
+        class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
+      >
+        <dt class="text-sm font-medium text-gray-900">最近一次启动</dt>
+        <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+          {{ formatDatetime(plugin?.status?.lastStartTime) }}
         </dd>
       </div>
     </dl>
