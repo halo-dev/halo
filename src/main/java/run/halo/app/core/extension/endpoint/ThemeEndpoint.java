@@ -2,9 +2,11 @@ package run.halo.app.core.extension.endpoint;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
+import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +19,7 @@ import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
@@ -87,7 +90,46 @@ public class ThemeEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(Theme.class))
             )
+            .PUT("themes/{name}/reload-setting", this::reloadSetting,
+                builder -> builder.operationId("ReloadThemeSetting")
+                    .description("Reload theme setting.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .response(responseBuilder()
+                        .implementation(Setting.class))
+            )
             .build();
+    }
+
+    Mono<ServerResponse> reloadSetting(ServerRequest request) {
+        String name = request.pathVariable("name");
+        return client.fetch(Theme.class, name)
+            .filter(theme -> StringUtils.isNotBlank(theme.getSpec().getSettingName()))
+            .flatMap(theme -> {
+                String settingName = theme.getSpec().getSettingName();
+                return ThemeUtils.loadThemeSetting(getThemePath(theme))
+                    .stream()
+                    .filter(unstructured ->
+                        settingName.equals(unstructured.getMetadata().getName()))
+                    .findFirst()
+                    .map(setting -> Unstructured.OBJECT_MAPPER.convertValue(setting, Setting.class))
+                    .map(setting -> client.fetch(Setting.class, settingName)
+                        .flatMap(persistent -> {
+                            // update spec to persisted setting
+                            persistent.setSpec(setting.getSpec());
+                            return client.update(persistent);
+                        })
+                        .switchIfEmpty(Mono.defer(() -> client.create(setting))))
+                    .orElse(Mono.empty());
+            })
+            .flatMap(setting -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(setting));
     }
 
     public record InstallRequest(
@@ -180,16 +222,19 @@ public class ThemeEndpoint implements CustomEndpoint {
     static class ThemeUtils {
         private static final String THEME_TMP_PREFIX = "halo-theme-";
         private static final String[] themeManifests = {"theme.yaml", "theme.yml"};
-        private static final String[] THEME_RESOURCES = {
-            "settings.yaml",
-            "settings.yml",
-            "config.yaml",
-            "config.yml"
-        };
 
-        static List<Unstructured> loadThemeResources(Path themePath) {
+        private static final String[] THEME_CONFIG = {"config.yaml", "config.yml"};
+
+        private static final String[] THEME_SETTING = {"settings.yaml", "settings.yml"};
+
+        static List<Unstructured> loadThemeSetting(Path themePath) {
+            return loadUnstructured(themePath, THEME_SETTING);
+        }
+
+        private static List<Unstructured> loadUnstructured(Path themePath,
+            String[] themeSetting) {
             List<Resource> resources = new ArrayList<>(4);
-            for (String themeResource : THEME_RESOURCES) {
+            for (String themeResource : themeSetting) {
                 Path resourcePath = themePath.resolve(themeResource);
                 if (Files.exists(resourcePath)) {
                     resources.add(new FileSystemResource(resourcePath));
@@ -200,6 +245,11 @@ public class ThemeEndpoint implements CustomEndpoint {
             }
             return new YamlUnstructuredLoader(resources.toArray(new Resource[0]))
                 .load();
+        }
+
+        static List<Unstructured> loadThemeResources(Path themePath) {
+            String[] resourceNames = ArrayUtils.addAll(THEME_SETTING, THEME_CONFIG);
+            return loadUnstructured(themePath, resourceNames);
         }
 
         static Unstructured unzipThemeTo(InputStream inputStream, Path themeWorkDir) {
