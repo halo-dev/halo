@@ -37,7 +37,6 @@ import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
 import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
-import { postLabels } from "@/constants/labels";
 
 enum PostPhase {
   DRAFT = "未发布",
@@ -62,51 +61,42 @@ const selectedPostWithContent = ref<PostRequest | null>(null);
 const checkedAll = ref(false);
 const selectedPostNames = ref<string[]>([]);
 
-const { categories } = usePostCategory({ fetchOnMounted: true });
-const { tags } = usePostTag({ fetchOnMounted: true });
 const dialog = useDialog();
 
 const handleFetchPosts = async () => {
   try {
     loading.value = true;
 
-    const labelSelector: string[] = [];
-
-    if (selectedVisibleFilterItem.value.value) {
-      labelSelector.push(
-        `${postLabels.VISIBLE}=${selectedVisibleFilterItem.value.value}`
-      );
-    }
-
-    if (selectedPhaseFilterItem.value.value) {
-      labelSelector.push(
-        `${postLabels.PHASE}=${selectedPhaseFilterItem.value.value}`
-      );
-    }
-
     let categories: string[] | undefined;
     let tags: string[] | undefined;
     let contributors: string[] | undefined;
 
-    if (selectedCategoryFilterItem.value) {
-      categories = [selectedCategoryFilterItem.value.metadata.name];
+    if (selectedCategory.value) {
+      categories = [
+        selectedCategory.value.metadata.name,
+        selectedCategory.value.metadata.name,
+      ];
     }
 
-    if (selectedTagFilterItem.value) {
-      tags = [selectedTagFilterItem.value.metadata.name];
+    if (selectedTag.value) {
+      tags = [selectedTag.value.metadata.name];
     }
 
-    if (selectedContributorItem.value) {
-      contributors = [selectedContributorItem.value.metadata.name];
+    if (selectedContributor.value) {
+      contributors = [selectedContributor.value.metadata.name];
     }
 
     const { data } = await apiClient.post.listPosts({
       page: posts.value.page,
       size: posts.value.size,
-      labelSelector,
-      categories,
-      tags,
-      contributors,
+      visible: selectedVisibleItem.value?.value,
+      publishPhase: selectedPublishPhaseItem.value?.value,
+      sort: selectedSortItem.value?.sort,
+      sortOrder: selectedSortItem.value?.sortOrder,
+      keyword: keyword.value,
+      category: categories,
+      tag: tags,
+      contributor: contributors,
     });
     posts.value = data;
   } catch (e) {
@@ -265,15 +255,28 @@ onMounted(() => {
   handleFetchPosts();
 });
 
-interface FilterItem {
+// Filters
+
+interface VisibleItem {
   label: string;
-  value: string | undefined;
+  value?: "PUBLIC" | "INTERNAL" | "PRIVATE";
 }
 
-const VisibleFilterItems: FilterItem[] = [
+interface PublishPhaseItem {
+  label: string;
+  value?: "DRAFT" | "PENDING_APPROVAL" | "PUBLISHED";
+}
+
+interface SortItem {
+  label: string;
+  sort: "PUBLISH_TIME" | "CREATE_TIME";
+  sortOrder: boolean;
+}
+
+const VisibleItems: VisibleItem[] = [
   {
     label: "全部",
-    value: "",
+    value: undefined,
   },
   {
     label: "公开",
@@ -289,10 +292,10 @@ const VisibleFilterItems: FilterItem[] = [
   },
 ];
 
-const PhaseFilterItems: FilterItem[] = [
+const PublishPhaseItems: PublishPhaseItem[] = [
   {
     label: "全部",
-    value: "",
+    value: undefined,
   },
   {
     label: "已发布",
@@ -308,34 +311,67 @@ const PhaseFilterItems: FilterItem[] = [
   },
 ];
 
-const selectedVisibleFilterItem = ref<FilterItem>(VisibleFilterItems[0]);
-const selectedPhaseFilterItem = ref<FilterItem>(PhaseFilterItems[0]);
-const selectedCategoryFilterItem = ref<Category>();
-const selectedTagFilterItem = ref<Tag>();
-const selectedContributorItem = ref<User>();
+const SortItems: SortItem[] = [
+  {
+    label: "较近发布",
+    sort: "PUBLISH_TIME",
+    sortOrder: false,
+  },
+  {
+    label: "较早发布",
+    sort: "PUBLISH_TIME",
+    sortOrder: true,
+  },
+  {
+    label: "较近创建",
+    sort: "CREATE_TIME",
+    sortOrder: false,
+  },
+  {
+    label: "较早创建",
+    sort: "CREATE_TIME",
+    sortOrder: true,
+  },
+];
 
-function handleVisibleFilterItemChange(filterItem: FilterItem) {
-  selectedVisibleFilterItem.value = filterItem;
+const { categories } = usePostCategory({ fetchOnMounted: true });
+const { tags } = usePostTag({ fetchOnMounted: true });
+
+const selectedVisibleItem = ref<VisibleItem>(VisibleItems[0]);
+const selectedPublishPhaseItem = ref<PublishPhaseItem>(PublishPhaseItems[0]);
+const selectedSortItem = ref<SortItem>();
+const selectedCategory = ref<Category>();
+const selectedTag = ref<Tag>();
+const selectedContributor = ref<User>();
+const keyword = ref("");
+
+function handleVisibleItemChange(visibleItem: VisibleItem) {
+  selectedVisibleItem.value = visibleItem;
   handleFetchPosts();
 }
 
-function handlePhaseFilterItemChange(filterItem: FilterItem) {
-  selectedPhaseFilterItem.value = filterItem;
+function handlePublishPhaseItemChange(publishPhaseItem: PublishPhaseItem) {
+  selectedPublishPhaseItem.value = publishPhaseItem;
   handleFetchPosts();
 }
 
-function handleCategoryFilterItemChange(category?: Category) {
-  selectedCategoryFilterItem.value = category;
+function handleSortItemChange(sortItem?: SortItem) {
+  selectedSortItem.value = sortItem;
   handleFetchPosts();
 }
 
-function handleTagFilterItemChange(tag?: Tag) {
-  selectedTagFilterItem.value = tag;
+function handleCategoryChange(category?: Category) {
+  selectedCategory.value = category;
   handleFetchPosts();
 }
 
-function handleContributorFilterItemChange(user?: User) {
-  selectedContributorItem.value = user;
+function handleTagChange(tag?: Tag) {
+  selectedTag.value = tag;
+  handleFetchPosts();
+}
+
+function handleContributorChange(user?: User) {
+  selectedContributor.value = user;
   handleFetchPosts();
 }
 </script>
@@ -392,69 +428,84 @@ function handleContributorFilterItemChange(user?: User) {
                 v-if="!selectedPostNames.length"
                 class="flex items-center gap-2"
               >
-                <FormKit placeholder="输入关键词搜索" type="text"></FormKit>
+                <FormKit
+                  v-model="keyword"
+                  placeholder="输入关键词搜索"
+                  type="text"
+                  @keyup.enter="handleFetchPosts"
+                ></FormKit>
 
                 <div
-                  v-if="selectedPhaseFilterItem.value"
+                  v-if="selectedPublishPhaseItem.value"
                   class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
                 >
                   <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                    状态：{{ selectedPhaseFilterItem.label }}
+                    状态：{{ selectedPublishPhaseItem.label }}
                   </span>
                   <IconCloseCircle
                     class="h-4 w-4 text-gray-600"
-                    @click="handlePhaseFilterItemChange(PhaseFilterItems[0])"
+                    @click="handlePublishPhaseItemChange(PublishPhaseItems[0])"
                   />
                 </div>
                 <div
-                  v-if="selectedVisibleFilterItem.value"
+                  v-if="selectedVisibleItem.value"
                   class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
                 >
                   <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                    可见性：{{ selectedVisibleFilterItem.label }}
+                    可见性：{{ selectedVisibleItem.label }}
                   </span>
                   <IconCloseCircle
                     class="h-4 w-4 text-gray-600"
-                    @click="
-                      handleVisibleFilterItemChange(VisibleFilterItems[0])
-                    "
+                    @click="handleVisibleItemChange(VisibleItems[0])"
                   />
                 </div>
 
                 <div
-                  v-if="selectedCategoryFilterItem"
+                  v-if="selectedCategory"
                   class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
                 >
                   <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                    分类：{{ selectedCategoryFilterItem.spec.displayName }}
+                    分类：{{ selectedCategory.spec.displayName }}
                   </span>
                   <IconCloseCircle
                     class="h-4 w-4 text-gray-600"
-                    @click="handleCategoryFilterItemChange()"
+                    @click="handleCategoryChange()"
                   />
                 </div>
                 <div
-                  v-if="selectedTagFilterItem"
+                  v-if="selectedTag"
                   class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
                 >
                   <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                    标签：{{ selectedTagFilterItem.spec.displayName }}
+                    标签：{{ selectedTag.spec.displayName }}
                   </span>
                   <IconCloseCircle
                     class="h-4 w-4 text-gray-600"
-                    @click="handleTagFilterItemChange()"
+                    @click="handleTagChange()"
                   />
                 </div>
                 <div
-                  v-if="selectedContributorItem"
+                  v-if="selectedContributor"
                   class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
                 >
                   <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                    标签：{{ selectedContributorItem.spec.displayName }}
+                    作者：{{ selectedContributor.spec.displayName }}
                   </span>
                   <IconCloseCircle
                     class="h-4 w-4 text-gray-600"
-                    @click="handleContributorFilterItemChange()"
+                    @click="handleContributorChange()"
+                  />
+                </div>
+                <div
+                  v-if="selectedSortItem"
+                  class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                >
+                  <span class="text-xs text-gray-600 group-hover:text-gray-900">
+                    排序：{{ selectedSortItem.label }}
+                  </span>
+                  <IconCloseCircle
+                    class="h-4 w-4 text-gray-600"
+                    @click="handleSortItemChange()"
                   />
                 </div>
               </div>
@@ -479,16 +530,16 @@ function handleContributorFilterItemChange(user?: User) {
                     <div class="w-72 p-4">
                       <ul class="space-y-1">
                         <li
-                          v-for="(filterItem, index) in PhaseFilterItems"
+                          v-for="(filterItem, index) in PublishPhaseItems"
                           :key="index"
                           v-close-popper
                           :class="{
                             'bg-gray-100':
-                              selectedPhaseFilterItem.value ===
+                              selectedPublishPhaseItem.value ===
                               filterItem.value,
                           }"
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                          @click="handlePhaseFilterItemChange(filterItem)"
+                          @click="handlePublishPhaseItemChange(filterItem)"
                         >
                           <span class="truncate">{{ filterItem.label }}</span>
                         </li>
@@ -509,16 +560,15 @@ function handleContributorFilterItemChange(user?: User) {
                     <div class="w-72 p-4">
                       <ul class="space-y-1">
                         <li
-                          v-for="(filterItem, index) in VisibleFilterItems"
+                          v-for="(filterItem, index) in VisibleItems"
                           :key="index"
                           v-close-popper
                           :class="{
                             'bg-gray-100':
-                              selectedVisibleFilterItem.value ===
-                              filterItem.value,
+                              selectedVisibleItem.value === filterItem.value,
                           }"
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                          @click="handleVisibleFilterItemChange(filterItem)"
+                          @click="handleVisibleItemChange(filterItem)"
                         >
                           <span class="truncate">
                             {{ filterItem.label }}
@@ -553,13 +603,13 @@ function handleContributorFilterItemChange(user?: User) {
                             v-for="(category, index) in categories"
                             :key="index"
                             v-close-popper
-                            @click="handleCategoryFilterItemChange(category)"
+                            @click="handleCategoryChange(category)"
                           >
                             <div
                               class="group relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
                               :class="{
                                 'bg-gray-100':
-                                  selectedCategoryFilterItem?.metadata.name ===
+                                  selectedCategory?.metadata.name ===
                                   category.metadata.name,
                               }"
                             >
@@ -626,13 +676,13 @@ function handleContributorFilterItemChange(user?: User) {
                             v-for="(tag, index) in tags"
                             :key="index"
                             v-close-popper
-                            @click="handleTagFilterItemChange(tag)"
+                            @click="handleTagChange(tag)"
                           >
                             <div
                               class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
                               :class="{
                                 'bg-gray-100':
-                                  selectedTagFilterItem?.metadata.name ===
+                                  selectedTag?.metadata.name ===
                                   tag.metadata.name,
                               }"
                             >
@@ -668,8 +718,8 @@ function handleContributorFilterItemChange(user?: User) {
                   </template>
                 </FloatingDropdown>
                 <UserDropdownSelector
-                  v-model:selected="selectedContributorItem"
-                  @select="handleContributorFilterItemChange"
+                  v-model:selected="selectedContributor"
+                  @select="handleContributorChange"
                 >
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
@@ -693,34 +743,13 @@ function handleContributorFilterItemChange(user?: User) {
                     <div class="w-72 p-4">
                       <ul class="space-y-1">
                         <li
+                          v-for="(sortItem, index) in SortItems"
+                          :key="index"
+                          v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                          @click="handleSortItemChange(sortItem)"
                         >
-                          <span class="truncate">较近发布</span>
-                        </li>
-                        <li
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">较晚发布</span>
-                        </li>
-                        <li
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">浏览量最多</span>
-                        </li>
-                        <li
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">浏览量最少</span>
-                        </li>
-                        <li
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">评论量最多</span>
-                        </li>
-                        <li
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">评论量最少</span>
+                          <span class="truncate">{{ sortItem.label }}</span>
                         </li>
                       </ul>
                     </div>
