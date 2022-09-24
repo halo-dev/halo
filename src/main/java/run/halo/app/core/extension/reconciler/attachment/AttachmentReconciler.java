@@ -1,9 +1,13 @@
 package run.halo.app.core.extension.reconciler.attachment;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginManager;
+import org.springframework.web.util.UriUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.attachment.Attachment;
@@ -63,10 +67,8 @@ public class AttachmentReconciler implements Reconciler<Request> {
                 var localRelativePath = annotations.get(Constant.LOCAL_REL_PATH_ANNO_KEY);
                 if (localRelativePath != null) {
                     // TODO Add router function here.
-                    permalink = externalUrl.get()
-                        .resolve("/upload/" + localRelativePath)
-                        .normalize()
-                        .toASCIIString();
+                    var encodedPath = UriUtils.encodePath("/upload/" + localRelativePath, UTF_8);
+                    permalink = externalUrl.get().resolve(encodedPath).normalize().toString();
                 } else {
                     var externalLink = annotations.get(Constant.EXTERNAL_LINK_ANNO_KEY);
                     if (externalLink != null) {
@@ -79,17 +81,23 @@ public class AttachmentReconciler implements Reconciler<Request> {
                     var status = attachment.getStatus();
                     if (status == null) {
                         status = new AttachmentStatus();
+                        attachment.setStatus(status);
                     }
                     status.setPermalink(permalink);
-
-                    // update status
-                    attachment.setStatus(status);
-                    client.update(attachment);
                 }
             }
+            updateStatus(request.name(), attachment.getStatus());
         });
-
         return null;
+    }
+
+    void updateStatus(String attachmentName, AttachmentStatus status) {
+        client.fetch(Attachment.class, attachmentName)
+            .filter(attachment -> !Objects.deepEquals(attachment.getStatus(), status))
+            .ifPresent(attachment -> {
+                attachment.setStatus(status);
+                client.update(attachment);
+            });
     }
 
     void removeFinalizer(String attachmentName) {
