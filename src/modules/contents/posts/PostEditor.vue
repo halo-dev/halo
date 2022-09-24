@@ -16,13 +16,14 @@ import PostSettingModal from "./components/PostSettingModal.vue";
 import PostPreviewModal from "./components/PostPreviewModal.vue";
 import AttachmentSelectorModal from "../attachments/components/AttachmentSelectorModal.vue";
 import type { PostRequest } from "@halo-dev/api-client";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, markRaw, onMounted, ref, watch } from "vue";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { v4 as uuid } from "uuid";
 import {
   allExtensions,
+  Extension,
   RichTextEditor,
   useEditor,
 } from "@halo-dev/richtext-editor";
@@ -30,6 +31,12 @@ import ExtensionCharacterCount from "@tiptap/extension-character-count";
 import { formatDatetime } from "@/utils/date";
 import { useAttachmentSelect } from "../attachments/composables/use-attachment";
 import MdiFileImageBox from "~icons/mdi/file-image-box";
+import MdiFormatHeader1 from "~icons/mdi/format-header-1";
+import MdiFormatHeader2 from "~icons/mdi/format-header-2";
+import MdiFormatHeader3 from "~icons/mdi/format-header-3";
+import MdiFormatHeader4 from "~icons/mdi/format-header-4";
+import MdiFormatHeader5 from "~icons/mdi/format-header-5";
+import MdiFormatHeader6 from "~icons/mdi/format-header-6";
 
 const initialFormState: PostRequest = {
   post: {
@@ -78,16 +85,43 @@ const isUpdateMode = computed(() => {
   return !!formState.value.post.metadata.creationTimestamp;
 });
 
-interface TocNode {
+interface HeadingNode {
   id: string;
-  level: string;
+  level: number;
   text: string;
 }
 
-const toc = ref<TocNode[]>();
+const headingIcons = {
+  1: markRaw(MdiFormatHeader1),
+  2: markRaw(MdiFormatHeader2),
+  3: markRaw(MdiFormatHeader3),
+  4: markRaw(MdiFormatHeader4),
+  5: markRaw(MdiFormatHeader5),
+  6: markRaw(MdiFormatHeader6),
+};
+
+const headingNodes = ref<HeadingNode[]>();
+const selectedHeadingNode = ref<HeadingNode>();
 const editor = useEditor({
   content: formState.value.content.raw,
-  extensions: [...allExtensions, ExtensionCharacterCount],
+  extensions: [
+    ...allExtensions,
+    ExtensionCharacterCount,
+    Extension.create({
+      addGlobalAttributes() {
+        return [
+          {
+            types: ["heading"],
+            attributes: {
+              id: {
+                default: null,
+              },
+            },
+          },
+        ];
+      },
+    }),
+  ],
   autofocus: "start",
   onUpdate: () => {
     formState.value.content.raw = editor.value?.getHTML() + "";
@@ -115,7 +149,7 @@ const handleGenerateTableOfContent = () => {
     return;
   }
 
-  const headings: TocNode[] = [];
+  const headings: HeadingNode[] = [];
   const transaction = editor.value.state.tr;
 
   editor.value.state.doc.descendants((node, pos) => {
@@ -142,7 +176,16 @@ const handleGenerateTableOfContent = () => {
 
   editor.value.view.dispatch(transaction);
 
-  toc.value = headings;
+  headingNodes.value = headings;
+
+  if (!selectedHeadingNode.value) {
+    selectedHeadingNode.value = headings[0];
+  }
+};
+
+const handleSelectHeadingNode = (node: HeadingNode) => {
+  selectedHeadingNode.value = node;
+  document.getElementById(node.id)?.scrollIntoView({ behavior: "smooth" });
 };
 
 const handleSave = async () => {
@@ -274,12 +317,29 @@ onMounted(async () => {
               <div class="p-1 pt-0">
                 <ul class="space-y-1">
                   <li
-                    v-for="(item, index) in toc"
+                    v-for="(node, index) in headingNodes"
                     :key="index"
-                    :class="[{ 'bg-gray-100': index === 0 }]"
-                    class="cursor-pointer rounded-base px-1.5 py-1 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    :class="[
+                      { 'bg-gray-100': node.id === selectedHeadingNode?.id },
+                    ]"
+                    class="group cursor-pointer truncate rounded-base px-1.5 py-1 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    @click="handleSelectHeadingNode(node)"
                   >
-                    {{ item.text }}
+                    <div
+                      :style="{
+                        paddingLeft: `${(node.level - 1) * 0.8}rem`,
+                      }"
+                      class="flex items-center gap-2"
+                    >
+                      <component
+                        :is="headingIcons[node.level]"
+                        class="h-4 w-4 rounded-sm bg-gray-100 p-0.5 group-hover:bg-white"
+                        :class="[
+                          { '!bg-white': node.id === selectedHeadingNode?.id },
+                        ]"
+                      />
+                      <span class="flex-1 truncate">{{ node.text }}</span>
+                    </div>
                   </li>
                 </ul>
               </div>
