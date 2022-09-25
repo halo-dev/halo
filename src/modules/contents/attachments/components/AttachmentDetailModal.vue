@@ -63,6 +63,8 @@ const getGroupName = (name: string | undefined) => {
 const onVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
+    policy.value = undefined;
+    onlyPreview.value = false;
     emit("close");
   }
 };
