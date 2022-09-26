@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.extension.GroupVersion;
+import run.halo.app.infra.utils.MeterUtils;
 
 /**
  * Metrics counter endpoint.
@@ -25,19 +26,19 @@ import run.halo.app.extension.GroupVersion;
  * @since 2.0.0
  */
 @Component
-public class CounterEndpoint implements CustomEndpoint {
+public class CounterTrackerEndpoint implements CustomEndpoint {
 
     private final MeterRegistry meterRegistry;
 
-    public CounterEndpoint(MeterRegistry meterRegistry) {
+    public CounterTrackerEndpoint(MeterRegistry meterRegistry) {
         this.meterRegistry = meterRegistry;
     }
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = "metrics.halo.run/v1alpha1/Counter";
+        final var tag = "api.halo.run/v1alpha1/CounterTracker";
         return SpringdocRouteBuilder.route()
-            .POST("counters", this::increase,
+            .POST("countertrackers", this::increase,
                 builder -> builder.operationId("Counter")
                     .description("Counter an extension resource visits.")
                     .tag(tag)
@@ -60,27 +61,14 @@ public class CounterEndpoint implements CustomEndpoint {
                 Mono.error(new IllegalArgumentException("Counter request body must not be empty")))
             .map(counterRequest -> {
                 String counterName =
-                    nameOf(counterRequest.group(), counterRequest.plural(), counterRequest.name());
-                Counter counter = meterRegistry.counter(counterName);
+                    MeterUtils.nameOf(counterRequest.group(), counterRequest.plural(),
+                        counterRequest.name());
+
+                Counter counter = MeterUtils.counter(meterRegistry, counterName);
                 counter.increment(1D);
-                return counter.count();
+                return (int) counter.count();
             })
             .flatMap(count -> ServerResponse.ok().bodyValue(count));
-    }
-
-    /**
-     * Build a counter name.
-     *
-     * @param group extension group
-     * @param plural extension plural
-     * @param name extension name
-     * @return counter name
-     */
-    public static String nameOf(String group, String plural, String name) {
-        if (StringUtils.isBlank(group)) {
-            return String.join(".", plural, name);
-        }
-        return String.join(".", group, plural, name);
     }
 
     public record CounterRequest(String group, String plural, String name, String sessionUid) {
@@ -98,6 +86,6 @@ public class CounterEndpoint implements CustomEndpoint {
 
     @Override
     public GroupVersion groupVersion() {
-        return new GroupVersion("metrics.halo.run", "v1alpha1");
+        return new GroupVersion("api.halo.run", "v1alpha1");
     }
 }
