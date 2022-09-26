@@ -128,59 +128,70 @@ public class PostServiceImpl implements PostService {
 
     private Mono<ListedPost> getListedPost(Post post) {
         Assert.notNull(post, "The post must not be null.");
-        ListedPost listedPost = new ListedPost();
-        listedPost.setPost(post);
-        return Mono.zip(listTags(post.getSpec().getTags()),
-                listCategories(post.getSpec().getCategories()),
-                listContributors(post.getStatusOrDefault().getContributors())
-            )
-            .map(tuple -> {
-                List<Tag> tags = tuple.getT1();
-                List<Category> categories = tuple.getT2();
-                List<Contributor> contributors = tuple.getT3();
-                listedPost.setTags(tags);
-                listedPost.setCategories(categories);
-                listedPost.setContributors(contributors);
+        return Mono.just(post)
+            .map(p -> {
+                ListedPost listedPost = new ListedPost();
+                listedPost.setPost(p);
                 return listedPost;
-            });
+            })
+            .flatMap(lp -> setTags(post.getSpec().getTags(), lp))
+            .flatMap(lp -> setCategories(post.getSpec().getCategories(), lp))
+            .flatMap(lp -> setContributors(post.getStatus().getContributors(), lp));
     }
 
-    private Mono<List<Tag>> listTags(List<String> tagNames) {
+    private Mono<ListedPost> setTags(List<String> tagNames, ListedPost post) {
+        return listTags(tagNames)
+            .collectSortedList()
+            .doOnNext(post::setTags)
+            .map(tags -> post)
+            .switchIfEmpty(Mono.defer(() -> Mono.just(post)));
+    }
+
+    private Mono<ListedPost> setCategories(List<String> categoryNames, ListedPost post) {
+        return listCategories(categoryNames)
+            .collectSortedList()
+            .doOnNext(post::setCategories)
+            .map(categories -> post)
+            .switchIfEmpty(Mono.defer(() -> Mono.just(post)));
+    }
+
+    private Mono<ListedPost> setContributors(List<String> contributorNames, ListedPost post) {
+        return listContributors(contributorNames)
+            .collectSortedList()
+            .doOnNext(post::setContributors)
+            .map(contributors -> post)
+            .switchIfEmpty(Mono.defer(() -> Mono.just(post)));
+    }
+
+    private Flux<Tag> listTags(List<String> tagNames) {
         if (tagNames == null) {
-            return Mono.empty();
+            return Flux.empty();
         }
-        return Flux.fromStream(tagNames.stream()
-                .map(tagName -> client.fetch(Tag.class, tagName)))
-            .flatMap(Function.identity())
-            .collectList();
+        return Flux.fromIterable(tagNames)
+            .flatMap(tagName -> client.fetch(Tag.class, tagName));
     }
 
-    private Mono<List<Category>> listCategories(List<String> categoryNames) {
+    private Flux<Category> listCategories(List<String> categoryNames) {
         if (categoryNames == null) {
-            return Mono.empty();
+            return Flux.empty();
         }
-        return Flux.fromStream(categoryNames.stream()
-                .map(categoryName -> client.fetch(Category.class, categoryName)))
-            .flatMap(Function.identity())
-            .collectList();
+        return Flux.fromIterable(categoryNames)
+            .flatMap(categoryName -> client.fetch(Category.class, categoryName));
     }
 
-    private Mono<List<Contributor>> listContributors(List<String> usernames) {
+    private Flux<Contributor> listContributors(List<String> usernames) {
         if (usernames == null) {
-            return Mono.empty();
+            return Flux.empty();
         }
         return Flux.fromIterable(usernames)
-            .map(username -> client.fetch(User.class, username)
-                .map(user -> {
-                    Contributor contributor = new Contributor();
-                    contributor.setName(username);
-                    contributor.setDisplayName(user.getSpec().getDisplayName());
-                    contributor.setAvatar(user.getSpec().getAvatar());
-                    return contributor;
-                })
-            )
-            .flatMap(Function.identity())
-            .collectList();
+            .flatMap(username -> client.fetch(User.class, username))
+            .map(user -> {
+                Contributor contributor = new Contributor();
+                contributor.setName(user.getMetadata().getName());
+                contributor.setDisplayName(user.getSpec().getDisplayName());
+                contributor.setAvatar(user.getSpec().getAvatar());
+                return contributor;
+            });
     }
 
     @Override

@@ -1,0 +1,9 @@
+spring:
+  r2dbc:
+    url: r2dbc:pool:postgresql://localhost:5432/halo
+    username: postgres
+    password: openpostgresql
+  sql:
+    init:
+      mode: always
+      platform: postgresql
