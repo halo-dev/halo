@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { computed, ref, watch, watchEffect } from "vue";
+import { computed, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 
 // components
@@ -11,15 +11,15 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
+import SubmitButton from "@/components/button/SubmitButton.vue";
 
 // types
 import type { Tag } from "@halo-dev/api-client";
 
 // libs
 import cloneDeep from "lodash.clonedeep";
-import { reset, submitForm } from "@formkit/core";
+import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
-import { useMagicKeys } from "@vueuse/core";
 import { v4 as uuid } from "uuid";
 
 const props = withDefaults(
@@ -99,14 +99,6 @@ const handleResetForm = () => {
   reset("tag-form");
 };
 
-const { Command_Enter } = useMagicKeys();
-
-watchEffect(() => {
-  if (Command_Enter.value && props.visible) {
-    submitForm("tag-form");
-  }
-});
-
 watch(
   () => props.visible,
   (visible) => {
@@ -180,13 +172,13 @@ watch(
     </FormKit>
     <template #footer>
       <VSpace>
-        <VButton
+        <SubmitButton
+          v-if="visible"
           :loading="saving"
           type="secondary"
-          @click="$formkit.submit('tag-form')"
+          @submit="$formkit.submit('tag-form')"
         >
-          保存
-        </VButton>
+        </SubmitButton>
         <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
       </VSpace>
     </template>

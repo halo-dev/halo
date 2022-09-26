@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { VModal, VSpace, VButton, IconMotionLine } from "@halo-dev/components";
+import SubmitButton from "@/components/button/SubmitButton.vue";
 import type {
   ListedComment,
   ListedReply,
@@ -10,9 +11,8 @@ import { Picker } from "emoji-mart";
 import data from "@emoji-mart/data";
 import i18n from "@emoji-mart/data/i18n/zh.json";
 import { computed, nextTick, ref, watch, watchEffect } from "vue";
-import { reset, submitForm } from "@formkit/core";
+import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
-import { useMagicKeys } from "@vueuse/core";
 import { setFocus } from "@/formkit/utils/focus";
 import { apiClient } from "@/utils/api-client";
 
@@ -76,14 +76,6 @@ const handleResetForm = () => {
   formState.value = cloneDeep(initialFormState);
   reset(formId.value);
 };
-
-const { Command_Enter } = useMagicKeys();
-
-watchEffect(() => {
-  if (Command_Enter.value && props.visible) {
-    submitForm(formId.value);
-  }
-});
 
 watch(
   () => props.visible,
@@ -175,9 +167,13 @@ watchEffect(() => {
     </div>
     <template #footer>
       <VSpace>
-        <VButton type="secondary" :loading="saving" @click="submitForm(formId)">
-          保存 ⌘ + ↵
-        </VButton>
+        <SubmitButton
+          v-if="visible"
+          :loading="saving"
+          type="secondary"
+          @submit="$formkit.submit(formId)"
+        >
+        </SubmitButton>
         <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
       </VSpace>
     </template>

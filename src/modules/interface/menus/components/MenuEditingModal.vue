@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace } from "@halo-dev/components";
+import SubmitButton from "@/components/button/SubmitButton.vue";
 import type { Menu } from "@halo-dev/api-client";
 import { v4 as uuid } from "uuid";
-import { computed, ref, watch, watchEffect } from "vue";
+import { computed, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
-import { reset, submitForm } from "@formkit/core";
+import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
-import { useMagicKeys } from "@vueuse/core";
 import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
@@ -80,19 +80,11 @@ const handleResetForm = () => {
   reset("menu-form");
 };
 
-const { Command_Enter } = useMagicKeys();
-
-watchEffect(() => {
-  if (Command_Enter.value && props.visible) {
-    submitForm("menu-form");
-  }
-});
-
 watch(
   () => props.visible,
   (visible) => {
     if (visible) {
-      setFocus("displayNameInput");
+      setFocus("menuDisplayNameInput");
     } else {
       handleResetForm();
     }
@@ -120,13 +112,12 @@ watch(
     <FormKit
       id="menu-form"
       name="menu-form"
-      :classes="{ form: 'w-full' }"
       type="form"
       :config="{ validationVisibility: 'submit' }"
       @submit="handleCreateMenu"
     >
       <FormKit
-        id="displayNameInput"
+        id="menuDisplayNameInput"
         v-model="formState.spec.displayName"
         help="可根据此名称查询菜单项"
         label="菜单名称"
@@ -136,9 +127,12 @@ watch(
     </FormKit>
     <template #footer>
       <VSpace>
-        <VButton type="secondary" @click="$formkit.submit('menu-form')">
-          提交 ⌘ + ↵
-        </VButton>
+        <SubmitButton
+          v-if="visible"
+          type="secondary"
+          @submit="$formkit.submit('menu-form')"
+        >
+        </SubmitButton>
         <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
       </VSpace>
     </template>

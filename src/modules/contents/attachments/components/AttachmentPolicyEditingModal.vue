@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace } from "@halo-dev/components";
+import SubmitButton from "@/components/button/SubmitButton.vue";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { computed, ref, watch, watchEffect } from "vue";
@@ -8,11 +9,9 @@ import { apiClient } from "@/utils/api-client";
 import { v4 as uuid } from "uuid";
 import {
   reset,
-  submitForm,
   type FormKitSchemaCondition,
   type FormKitSchemaNode,
 } from "@formkit/core";
-import { useMagicKeys } from "@vueuse/core";
 import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
@@ -131,16 +130,8 @@ const handleSave = async () => {
 const handleResetForm = () => {
   formState.value = cloneDeep(initialFormState);
   formState.value.metadata.name = uuid();
-  reset("local-policy-form");
+  reset("attachment-policy-form");
 };
-
-const { Command_Enter } = useMagicKeys();
-
-watchEffect(() => {
-  if (Command_Enter.value && props.visible) {
-    submitForm("local-policy-form");
-  }
-});
 
 watch(
   () => props.visible,
@@ -200,9 +191,9 @@ const onVisibleChange = (visible: boolean) => {
   >
     <FormKit
       v-if="formSchema && configMapFormData"
-      id="local-policy-form"
+      id="attachment-policy-form"
       v-model="configMapFormData['default']"
-      name="local-policy-form"
+      name="attachment-policy-form"
       :actions="false"
       :preserve="true"
       type="form"
@@ -221,13 +212,13 @@ const onVisibleChange = (visible: boolean) => {
 
     <template #footer>
       <VSpace>
-        <VButton
+        <SubmitButton
+          v-if="visible"
           :loading="saving"
           type="secondary"
-          @click="$formkit.submit('local-policy-form')"
+          @submit="$formkit.submit('attachment-policy-form')"
         >
-          保存 ⌘ + ↵
-        </VButton>
+        </SubmitButton>
         <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
       </VSpace>
     </template>

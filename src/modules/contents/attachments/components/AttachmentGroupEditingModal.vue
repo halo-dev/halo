@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace } from "@halo-dev/components";
+import SubmitButton from "@/components/button/SubmitButton.vue";
 import type { Group } from "@halo-dev/api-client";
 import { v4 as uuid } from "uuid";
-import { computed, ref, watch, watchEffect } from "vue";
+import { computed, ref, watch } from "vue";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
-import { reset, submitForm } from "@formkit/core";
-import { useMagicKeys } from "@vueuse/core";
+import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
@@ -85,14 +85,6 @@ const handleResetForm = () => {
   reset("attachment-group-form");
 };
 
-const { Command_Enter } = useMagicKeys();
-
-watchEffect(() => {
-  if (Command_Enter.value && props.visible) {
-    submitForm("attachment-group-form");
-  }
-});
-
 watch(
   () => props.visible,
   (visible) => {
@@ -140,13 +132,13 @@ watch(
     </FormKit>
     <template #footer>
       <VSpace>
-        <VButton
+        <SubmitButton
+          v-if="visible"
           :loading="saving"
           type="secondary"
-          @click="$formkit.submit('attachment-group-form')"
+          @submit="$formkit.submit('attachment-group-form')"
         >
-          保存 ⌘ + ↵
-        </VButton>
+        </SubmitButton>
         <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
       </VSpace>
     </template>

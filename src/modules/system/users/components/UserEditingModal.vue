@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { computed, ref, watch, watchEffect } from "vue";
+import { computed, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { User } from "@halo-dev/api-client";
 
@@ -13,12 +13,12 @@ import {
   VModal,
   VSpace,
 } from "@halo-dev/components";
+import SubmitButton from "@/components/button/SubmitButton.vue";
 
 // libs
 import YAML from "yaml";
 import cloneDeep from "lodash.clonedeep";
-import { useMagicKeys } from "@vueuse/core";
-import { reset, submitForm } from "@formkit/core";
+import { reset } from "@formkit/core";
 
 // constants
 import { rbacAnnotations } from "@/constants/annotations";
@@ -90,14 +90,6 @@ const rolesMap = computed<FormKitOptionsList>(() => {
       value: role.metadata?.name,
     };
   });
-});
-
-const { Command_Enter } = useMagicKeys();
-
-watchEffect(() => {
-  if (Command_Enter.value && props.visible) {
-    submitForm("user-form");
-  }
 });
 
 watch(
@@ -249,13 +241,13 @@ const handleRawModeChange = () => {
     </div>
     <template #footer>
       <VSpace>
-        <VButton
+        <SubmitButton
+          v-if="visible"
           :loading="saving"
           type="secondary"
-          @click="$formkit.submit('user-form')"
+          @submit="$formkit.submit('user-form')"
         >
-          保存 ⌘ + ↵
-        </VButton>
+        </SubmitButton>
         <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
       </VSpace>
     </template>

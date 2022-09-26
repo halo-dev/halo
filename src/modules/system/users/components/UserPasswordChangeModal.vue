@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace } from "@halo-dev/components";
-import { inject, ref, watch, watchEffect } from "vue";
+import SubmitButton from "@/components/button/SubmitButton.vue";
+import { inject, ref, watch } from "vue";
 import type { User } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import cloneDeep from "lodash.clonedeep";
-import { reset, submitForm } from "@formkit/core";
-import { useMagicKeys } from "@vueuse/core";
+import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
@@ -38,14 +38,6 @@ const initialFormState: PasswordChangeFormState = {
 
 const formState = ref<PasswordChangeFormState>(cloneDeep(initialFormState));
 const saving = ref(false);
-
-const { Command_Enter } = useMagicKeys();
-
-watchEffect(() => {
-  if (Command_Enter.value && props.visible) {
-    submitForm("password-form");
-  }
-});
 
 watch(
   () => props.visible,
@@ -130,13 +122,13 @@ const handleChangePassword = async () => {
     </FormKit>
     <template #footer>
       <VSpace>
-        <VButton
+        <SubmitButton
+          v-if="visible"
           :loading="saving"
           type="secondary"
-          @click="$formkit.submit('password-form')"
+          @submit="$formkit.submit('password-form')"
         >
-          提交 ⌘ + ↵
-        </VButton>
+        </SubmitButton>
         <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
       </VSpace>
     </template>

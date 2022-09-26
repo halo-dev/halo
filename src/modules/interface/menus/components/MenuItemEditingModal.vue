@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace } from "@halo-dev/components";
-import { computed, ref, watch, watchEffect } from "vue";
+import SubmitButton from "@/components/button/SubmitButton.vue";
+import { computed, ref, watch } from "vue";
 import type { MenuItem, Post, SinglePage } from "@halo-dev/api-client";
 import { v4 as uuid } from "uuid";
 import { apiClient } from "@/utils/api-client";
-import { reset, submitForm } from "@formkit/core";
+import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
-import { useMagicKeys } from "@vueuse/core";
 import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
 import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
 import { setFocus } from "@/formkit/utils/focus";
@@ -103,14 +103,6 @@ const handleResetForm = () => {
   formState.value.metadata.name = uuid();
   reset("menuitem-form");
 };
-
-const { Command_Enter } = useMagicKeys();
-
-watchEffect(() => {
-  if (Command_Enter.value && props.visible) {
-    submitForm("menuitem-form");
-  }
-});
 
 watch(
   () => props.visible,
@@ -375,9 +367,12 @@ watch(
     </FormKit>
     <template #footer>
       <VSpace>
-        <VButton type="secondary" @click="$formkit.submit('menuitem-form')">
-          提交 ⌘ + ↵
-        </VButton>
+        <SubmitButton
+          v-if="visible"
+          type="secondary"
+          @submit="$formkit.submit('menuitem-form')"
+        >
+        </SubmitButton>
         <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
       </VSpace>
     </template>
