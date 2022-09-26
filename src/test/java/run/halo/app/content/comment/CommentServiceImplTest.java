@@ -141,7 +141,7 @@ class CommentServiceImplTest {
                         "top": false,
                         "allowNotification": true,
                         "approved": false,
-                        "hidden": false,
+                        "hidden": true,
                         "subjectRef": {
                             "group": "content.halo.run",
                             "version": "v1alpha1",
