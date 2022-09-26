@@ -22,7 +22,7 @@ halo:
       jwt:
         public-key-location: classpath:app.pub
         private-key-location: classpath:app.key
-  work-dir: ${user.home}/halo-next
+  work-dir: /halo-next
   plugin:
     plugins-root: ${halo.work-dir}/plugins
 

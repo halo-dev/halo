@@ -13,7 +13,7 @@ spring:
       platform: h2
 
 halo:
-  work-dir: ${user.home}/halo-next-test
+  work-dir: /halo-next-test
   external-url: "http://${server.address:localhost}:${server.port}"
   security:
     initializer:
