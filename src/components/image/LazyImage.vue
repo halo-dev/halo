@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useImage } from "@vueuse/core";
+import { onMounted, ref } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -14,7 +14,28 @@ const props = withDefaults(
   }
 );
 
-const { isLoading, error } = useImage({ src: props.src });
+const isLoading = ref(false);
+const error = ref(false);
+
+const loadImage = async () => {
+  const image = new Image();
+  image.src = props.src;
+  return new Promise((resolve, reject) => {
+    image.onload = () => resolve(image);
+    image.onerror = (err) => reject(err);
+  });
+};
+
+onMounted(async () => {
+  isLoading.value = true;
+  try {
+    await loadImage();
+  } catch (e) {
+    error.value = true;
+  } finally {
+    isLoading.value = false;
+  }
+});
 </script>
 <template>
   <template v-if="isLoading">
