@@ -35,6 +35,8 @@ public class PostVo {
 
     private List<Contributor> contributors;
 
+    private StatsVo stats;
+
     /**
      * Convert {@link Post} to {@link PostVo}.
      *

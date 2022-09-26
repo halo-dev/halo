@@ -64,7 +64,7 @@ public class CounterTrackerEndpoint implements CustomEndpoint {
                     MeterUtils.nameOf(counterRequest.group(), counterRequest.plural(),
                         counterRequest.name());
 
-                Counter counter = MeterUtils.counter(meterRegistry, counterName);
+                Counter counter = MeterUtils.visitCounter(meterRegistry, counterName);
                 counter.increment(1D);
                 return (int) counter.count();
             })

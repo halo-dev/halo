@@ -2,7 +2,10 @@ package run.halo.app.metrics;
 
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.DisposableBean;
@@ -15,6 +18,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.MeterUtils;
 
 /**
@@ -45,10 +49,21 @@ public class CounterMeterHandler implements DisposableBean {
         return client.list(Counter.class, null, null)
             .map(counter -> {
                 String name = counter.getMetadata().getName();
-                io.micrometer.core.instrument.Counter meterCounter =
-                    MeterUtils.counter(meterRegistry, name);
-                meterCounter.increment(counter.getCount());
-                return meterCounter;
+                // visit counter
+                io.micrometer.core.instrument.Counter visitCounter =
+                    MeterUtils.visitCounter(meterRegistry, name);
+                visitCounter.increment(counter.getVisit());
+
+                // upvote counter
+                io.micrometer.core.instrument.Counter upvoteCounter =
+                    MeterUtils.upvoteCounter(meterRegistry, name);
+                upvoteCounter.increment(counter.getUpvote());
+
+                // comment counter
+                io.micrometer.core.instrument.Counter commentCounter =
+                    MeterUtils.commentCounter(meterRegistry, name);
+                commentCounter.increment(counter.getUpvote());
+                return counter;
             })
             .then();
     }
@@ -63,36 +78,42 @@ public class CounterMeterHandler implements DisposableBean {
     }
 
     Mono<Void> save() {
-        Stream<Mono<Counter>> monoStream = meterRegistry.getMeters().stream()
+        Map<String, List<Meter>> nameMeters = meterRegistry.getMeters().stream()
             .filter(meter -> meter instanceof io.micrometer.core.instrument.Counter)
             .filter(counter -> {
                 Meter.Id id = counter.getId();
                 return id.getTag(MeterUtils.METRICS_COMMON_TAG.getKey()) != null;
             })
-            .map(meter -> {
-                String name = meter.getId().getName();
-                double count = ((io.micrometer.core.instrument.Counter) meter).count();
+            .collect(Collectors.groupingBy(meter -> meter.getId().getName()));
+        Stream<Mono<Counter>> monoStream = nameMeters.entrySet().stream()
+            .map(entry -> {
+                String name = entry.getKey();
+                List<Meter> meters = entry.getValue();
                 return client.fetch(Counter.class, name)
-                    .flatMap(counter -> {
-                        Integer oldCount = counter.getCount();
-                        counter.setCount((int) count);
-                        if (oldCount.equals(counter.getCount())) {
-                            return Mono.just(counter);
-                        }
-                        return client.update(counter);
-                    }).switchIfEmpty(Mono.defer(() -> {
+                    .switchIfEmpty(Mono.defer(() -> {
                         Counter counter = new Counter();
                         counter.setMetadata(new Metadata());
                         counter.getMetadata().setName(name);
-                        counter.setCount((int) count);
+                        counter.setUpvote(0);
+                        counter.setComment(0);
+                        counter.setVisit(0);
                         return client.create(counter);
-                    }));
+                    }))
+                    .flatMap(counter -> {
+                        Counter oldCounter = JsonUtils.deepCopy(counter);
+                        counter.populateFrom(meters);
+                        if (oldCounter.equals(counter)) {
+                            return Mono.empty();
+                        }
+                        return Mono.just(counter);
+                    })
+                    .flatMap(client::update);
             });
         return Flux.fromStream(monoStream)
             .flatMap(Function.identity())
-            .collectList()
             .then();
     }
+
 
     @Override
     public void destroy() {

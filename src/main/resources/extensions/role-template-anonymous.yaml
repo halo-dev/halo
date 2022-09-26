@@ -9,3 +9,6 @@ rules:
   - apiGroups: [ "api.console.halo.run" ]
     resources: [ "comments", "comments/reply" ]
     verbs: [ "create" ]
+  - apiGroups: [ "api.halo.run" ]
+    resources: [ "*" ]
+    verbs: [ "*" ]
