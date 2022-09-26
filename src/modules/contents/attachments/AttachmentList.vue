@@ -75,6 +75,7 @@ const {
   handleSelectNext,
   handleSelectPrevious,
   handlePaginationChange,
+  handleDelete,
   handleDeleteInBatch,
   handleCheckAll,
   handleSelect,
@@ -632,7 +633,14 @@ onMounted(() => {
                     />
                   </template>
                   <template #dropdownItems>
-                    <VButton v-close-popper block type="danger"> 删除 </VButton>
+                    <VButton
+                      v-close-popper
+                      block
+                      type="danger"
+                      @click="handleDelete(attachment)"
+                    >
+                      删除
+                    </VButton>
                   </template>
                 </VEntity>
               </li>

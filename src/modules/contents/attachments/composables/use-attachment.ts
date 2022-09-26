@@ -28,6 +28,7 @@ interface useAttachmentControlReturn {
   }) => void;
   handleSelectPrevious: () => void;
   handleSelectNext: () => void;
+  handleDelete: (attachment: Attachment) => void;
   handleDeleteInBatch: () => void;
   handleCheckAll: (checkAll: boolean) => void;
   handleSelect: (attachment: Attachment | undefined) => void;
@@ -132,10 +133,37 @@ export function useAttachmentControl(filterOptions?: {
     }
   };
 
+  const handleDelete = (attachment: Attachment) => {
+    dialog.warning({
+      title: "确定要删除该附件吗？",
+      description: "删除之后将无法恢复",
+      confirmType: "danger",
+      onConfirm: async () => {
+        try {
+          await apiClient.extension.storage.attachment.deletestorageHaloRunV1alpha1Attachment(
+            {
+              name: attachment.metadata.name,
+            }
+          );
+          if (
+            selectedAttachment.value?.metadata.name === attachment.metadata.name
+          ) {
+            selectedAttachment.value = undefined;
+          }
+          selectedAttachments.value.delete(attachment);
+        } catch (e) {
+          console.error("Failed to delete attachment", e);
+        } finally {
+          await handleFetchAttachments();
+        }
+      },
+    });
+  };
+
   const handleDeleteInBatch = () => {
     dialog.warning({
       title: "确定要删除所选的附件吗？",
-      description: "其中 20 个附件包含关联关系，删除之后将无法恢复",
+      description: "删除之后将无法恢复",
       confirmType: "danger",
       onConfirm: async () => {
         try {
@@ -211,6 +239,7 @@ export function useAttachmentControl(filterOptions?: {
     handlePaginationChange,
     handleSelectPrevious,
     handleSelectNext,
+    handleDelete,
     handleDeleteInBatch,
     handleCheckAll,
     handleSelect,
