@@ -146,6 +146,7 @@ watch(
       <FormKit
         id="displayNameInput"
         v-model="formState.spec.displayName"
+        name="displayName"
         label="名称"
         type="text"
         validation="required"
@@ -154,17 +155,20 @@ watch(
         v-model="formState.spec.slug"
         help="通常作为标签访问地址标识"
         label="别名"
+        name="slug"
         type="text"
         validation="required"
       ></FormKit>
       <FormKit
         v-model="formState.spec.color"
+        name="color"
         help="需要主题适配以支持"
         label="颜色"
         type="color"
       ></FormKit>
       <FormKit
         v-model="formState.spec.cover"
+        name="cover"
         help="需要主题适配以支持"
         label="封面图"
         type="text"

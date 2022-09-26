@@ -137,6 +137,7 @@ const handleResetForm = () => {
             help="角色别名，用于区分角色，不能重复，创建之后不能修改"
             label="别名"
             type="text"
+            name="name"
             :disabled="isUpdateMode"
             validation="required"
           ></FormKit>

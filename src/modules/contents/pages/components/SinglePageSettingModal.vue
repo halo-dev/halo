@@ -15,7 +15,7 @@ const initialFormState: SinglePageRequest = {
       cover: "",
       deleted: false,
       published: false,
-      publishTime: undefined,
+      publishTime: "",
       pinned: false,
       allowComment: true,
       visible: "PUBLIC",
@@ -186,6 +186,7 @@ watchEffect(() => {
             v-model="formState.page.spec.title"
             label="标题"
             type="text"
+            name="title"
             validation="required"
           ></FormKit>
           <FormKit
@@ -201,6 +202,7 @@ watchEffect(() => {
               { label: '是', value: true },
               { label: '否', value: false },
             ]"
+            name="autoGenerate"
             label="自动生成摘要"
             type="radio"
           >
@@ -208,6 +210,7 @@ watchEffect(() => {
           <FormKit
             v-if="!formState.page.spec.excerpt.autoGenerate"
             v-model="formState.page.spec.excerpt.raw"
+            name="raw"
             label="自定义摘要"
             type="textarea"
           ></FormKit>
@@ -227,6 +230,7 @@ watchEffect(() => {
               { label: '是', value: true },
               { label: '否', value: false },
             ]"
+            name="allowComment"
             label="禁止评论"
             type="radio"
           ></FormKit>
@@ -255,16 +259,19 @@ watchEffect(() => {
             v-model="formState.page.spec.publishTime"
             label="发表时间"
             type="datetime-local"
+            name="publishTime"
           ></FormKit>
           <FormKit
             v-model="formState.page.spec.template"
             label="自定义模板"
             type="text"
+            name="template"
           ></FormKit>
           <FormKit
             v-model="formState.page.spec.cover"
             label="封面图"
             type="text"
+            name="cover"
           ></FormKit>
         </FormKit>
       </VTabItem>

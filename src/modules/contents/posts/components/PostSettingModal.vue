@@ -17,7 +17,7 @@ const initialFormState: PostRequest = {
       cover: "",
       deleted: false,
       published: false,
-      publishTime: undefined,
+      publishTime: "",
       pinned: false,
       allowComment: true,
       visible: "PUBLIC",
@@ -220,6 +220,7 @@ watchEffect(() => {
             v-model="formState.post.spec.title"
             label="标题"
             type="text"
+            name="title"
             validation="required"
           ></FormKit>
           <FormKit
@@ -249,6 +250,7 @@ watchEffect(() => {
               { label: '是', value: true },
               { label: '否', value: false },
             ]"
+            name="autoGenerate"
             label="自动生成摘要"
             type="radio"
           >
@@ -257,6 +259,7 @@ watchEffect(() => {
             v-if="!formState.post.spec.excerpt.autoGenerate"
             v-model="formState.post.spec.excerpt.raw"
             label="自定义摘要"
+            name="raw"
             type="textarea"
           ></FormKit>
         </FormKit>
@@ -307,10 +310,12 @@ watchEffect(() => {
           <FormKit
             v-model="formState.post.spec.template"
             label="自定义模板"
+            name="template"
             type="text"
           ></FormKit>
           <FormKit
             v-model="formState.post.spec.cover"
+            name="cover"
             label="封面图"
             type="text"
           ></FormKit>

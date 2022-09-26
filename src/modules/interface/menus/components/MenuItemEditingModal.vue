@@ -319,6 +319,7 @@ watch(
         v-model="formState.spec.displayName"
         label="名称"
         type="text"
+        name="displayName"
         validation="required"
       ></FormKit>
       <FormKit
@@ -326,6 +327,7 @@ watch(
         v-model="formState.spec.href"
         label="链接地址"
         type="text"
+        name="href"
         validation="required"
       ></FormKit>
 

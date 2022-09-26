@@ -47,7 +47,7 @@ const initialFormState: PostRequest = {
       cover: "",
       deleted: false,
       published: false,
-      publishTime: undefined,
+      publishTime: "",
       pinned: false,
       allowComment: true,
       visible: "PUBLIC",

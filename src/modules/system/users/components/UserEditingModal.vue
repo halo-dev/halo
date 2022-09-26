@@ -201,6 +201,7 @@ const handleRawModeChange = () => {
           :disabled="isUpdateMode"
           label="用户名"
           type="text"
+          name="name"
           validation="required"
         ></FormKit>
         <FormKit
@@ -208,12 +209,14 @@ const handleRawModeChange = () => {
           v-model="formState.spec.displayName"
           label="显示名称"
           type="text"
+          name="displayName"
           validation="required"
         ></FormKit>
         <FormKit
           v-model="formState.spec.email"
           label="电子邮箱"
           type="email"
+          name="email"
           validation="required"
         ></FormKit>
         <FormKit
@@ -226,16 +229,19 @@ const handleRawModeChange = () => {
           v-model="formState.spec.phone"
           label="手机号"
           type="text"
+          name="phone"
         ></FormKit>
         <FormKit
           v-model="formState.spec.avatar"
           label="头像"
           type="text"
+          name="avatar"
         ></FormKit>
         <FormKit
           v-model="formState.spec.bio"
           label="描述"
           type="textarea"
+          name="bio"
         ></FormKit>
       </FormKit>
     </div>

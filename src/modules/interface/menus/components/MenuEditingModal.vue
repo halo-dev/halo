@@ -122,6 +122,7 @@ watch(
         help="可根据此名称查询菜单项"
         label="菜单名称"
         type="text"
+        name="displayName"
         validation="required"
       ></FormKit>
     </FormKit>

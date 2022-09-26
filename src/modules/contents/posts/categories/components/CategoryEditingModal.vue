@@ -36,9 +36,9 @@ const initialFormState: Category = {
   spec: {
     displayName: "",
     slug: "",
-    description: undefined,
-    cover: undefined,
-    template: undefined,
+    description: "",
+    cover: "",
+    template: "",
     priority: 0,
     children: [],
   },
@@ -134,6 +134,7 @@ watch(
       <FormKit
         id="displayNameInput"
         v-model="formState.spec.displayName"
+        name="displayName"
         label="名称"
         type="text"
         validation="required"
@@ -141,19 +142,21 @@ watch(
       <FormKit
         v-model="formState.spec.slug"
         help="通常作为分类访问地址标识"
+        name="slug"
         label="别名"
         type="text"
         validation="required"
       ></FormKit>
-      <FormKit label="上级目录" type="select"></FormKit>
       <FormKit
         v-model="formState.spec.cover"
         help="需要主题适配以支持"
+        name="cover"
         label="封面图"
         type="text"
       ></FormKit>
       <FormKit
         v-model="formState.spec.description"
+        name="description"
         help="需要主题适配以支持"
         label="描述"
         type="textarea"

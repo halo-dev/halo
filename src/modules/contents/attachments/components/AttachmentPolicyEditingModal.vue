@@ -205,6 +205,7 @@ const onVisibleChange = (visible: boolean) => {
         v-model="formState.spec.displayName"
         label="名称"
         type="text"
+        name="displayName"
         validation="required"
       ></FormKit>
       <FormKitSchema :schema="formSchema" />
