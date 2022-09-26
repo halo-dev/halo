@@ -40,7 +40,8 @@ importers:
       '@vue/tsconfig': ^0.1.3
       '@vueuse/components': ^8.9.4
       '@vueuse/core': ^8.9.4
-      '@vueuse/router': ^9.2.0
+      '@vueuse/router': ^8.9.4
+      '@vueuse/shared': ^8.9.4
       autoprefixer: ^10.4.12
       axios: ^0.27.2
       c8: ^7.12.0
@@ -106,7 +107,8 @@ importers:
       '@tiptap/extension-character-count': 2.0.0-beta.31
       '@vueuse/components': 8.9.4_vue@3.2.39
       '@vueuse/core': 8.9.4_vue@3.2.39
-      '@vueuse/router': 9.2.0_u55wpvgoaskkfdnhr4v2vlugdi
+      '@vueuse/router': 8.9.4_u55wpvgoaskkfdnhr4v2vlugdi
+      '@vueuse/shared': 8.9.4_vue@3.2.39
       axios: 0.27.2
       colorjs.io: 0.4.0
       dayjs: 1.11.5
@@ -3481,12 +3483,12 @@ packages:
     resolution: {integrity: sha512-IwSfzH80bnJMzqhaapqJl9JRIiyQU0zsRGEgnxN6jhq7992cPUJIRfV+JHRIZXjYqbwt07E1gTEp0R0zPJ1aqw==}
     dev: false
 
-  /@vueuse/router/9.2.0_u55wpvgoaskkfdnhr4v2vlugdi:
-    resolution: {integrity: sha512-N80vwh6EGFJiUIyCbfGhEDHzolNvTEPzJBLTuwy7pJU91VjNotMsSvUhwEI8l/cBpdBaIL9dUxRqXDBVrQBahA==}
+  /@vueuse/router/8.9.4_u55wpvgoaskkfdnhr4v2vlugdi:
+    resolution: {integrity: sha512-+tYxFAa6U+nd61tteJykizMWNuPY+lcxXj79FWlvd2sui0BgXUiacusX9ZNDL/mAnUktazuLXgLKJSdrJeHhkA==}
     peerDependencies:
       vue-router: '>=4.0.0-rc.1'
     dependencies:
-      '@vueuse/shared': 9.2.0_vue@3.2.39
+      '@vueuse/shared': 8.9.4_vue@3.2.39
       vue-demi: 0.12.1_vue@3.2.39
       vue-router: 4.1.5_vue@3.2.39
     transitivePeerDependencies:
@@ -3507,15 +3509,6 @@ packages:
     dependencies:
       vue: 3.2.39
       vue-demi: 0.12.1_vue@3.2.39
-    dev: false
-
-  /@vueuse/shared/9.2.0_vue@3.2.39:
-    resolution: {integrity: sha512-NnRp/noSWuXW0dKhZK5D0YLrDi0nmZ18UeEgwXQq7Ul5TTP93lcNnKjrHtd68j2xFB/l59yPGFlCryL692bnrA==}
-    dependencies:
-      vue-demi: 0.12.1_vue@3.2.39
-    transitivePeerDependencies:
-      - '@vue/composition-api'
-      - vue
     dev: false
 
   /abab/2.0.6:
