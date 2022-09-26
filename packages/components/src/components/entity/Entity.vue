@@ -36,7 +36,10 @@ const classes = computed(() => {
       </div>
       <div v-if="$slots.dropdownItems" class="entity-dropdown">
         <FloatingDropdown>
-          <div class="entity-dropdown-trigger group-hover:bg-gray-100">
+          <div
+            class="entity-dropdown-trigger group-hover:bg-gray-100"
+            @click.stop
+          >
             <IconMore />
           </div>
           <template #popper>

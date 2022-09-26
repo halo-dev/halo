@@ -162,7 +162,11 @@ watch([() => route.name, () => route.params], async () => {
           >
             启用
           </VButton>
-          <VButton :route="{ name: 'ThemeVisual' }" type="secondary">
+          <VButton
+            v-if="false"
+            :route="{ name: 'ThemeVisual' }"
+            type="secondary"
+          >
             <template #icon>
               <IconEye class="h-full w-full" />
             </template>

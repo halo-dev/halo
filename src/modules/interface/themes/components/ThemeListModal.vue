@@ -2,14 +2,17 @@
 import {
   IconAddCircle,
   IconGitHub,
-  IconMore,
   useDialog,
   VButton,
   VEmpty,
   VModal,
   VSpace,
   VTag,
+  VEntity,
+  VEntityField,
+  VStatusDot,
 } from "@halo-dev/components";
+import LazyImage from "@/components/image/LazyImage.vue";
 import ThemeInstallModal from "./ThemeInstallModal.vue";
 import { ref, watch } from "vue";
 import type { Theme } from "@halo-dev/api-client";
@@ -103,6 +106,7 @@ defineExpose({
     :body-class="['!p-0']"
     :visible="visible"
     :width="888"
+    height="calc(100vh - 20px)"
     title="已安装的主题"
     @update:visible="onVisibleChange"
   >
@@ -124,59 +128,83 @@ defineExpose({
       </template>
     </VEmpty>
 
-    <ul v-else class="flex flex-col divide-y divide-gray-100" role="list">
+    <ul
+      v-else
+      class="box-border h-full w-full divide-y divide-gray-100"
+      role="list"
+    >
       <li
         v-for="(theme, index) in themes"
         :key="index"
-        :class="{
-          'bg-gray-50': theme.metadata.name === selectedTheme?.metadata?.name,
-        }"
-        class="relative cursor-pointer py-4 transition-all hover:bg-gray-100"
         @click="handleSelectTheme(theme)"
       >
-        <div class="flex items-center">
-          <div
-            v-show="theme.metadata.name === selectedTheme?.metadata?.name"
-            class="absolute inset-y-0 left-0 w-0.5 bg-primary"
-          ></div>
-          <div class="w-40 px-4">
-            <div
-              class="group aspect-w-4 aspect-h-3 block w-full overflow-hidden rounded border bg-gray-100"
+        <VEntity
+          :is-selected="theme.metadata.name === selectedTheme?.metadata?.name"
+        >
+          <template #start>
+            <VEntityField>
+              <template #description>
+                <div class="w-32">
+                  <div
+                    class="group aspect-w-4 aspect-h-3 block w-full overflow-hidden rounded border bg-gray-100"
+                  >
+                    <LazyImage
+                      :src="theme.spec.logo"
+                      :alt="theme.spec.displayName"
+                      classes="pointer-events-none object-cover group-hover:opacity-75"
+                    >
+                      <template #loading>
+                        <div
+                          class="flex h-full items-center justify-center object-cover"
+                        >
+                          <span class="text-xs text-gray-400">加载中...</span>
+                        </div>
+                      </template>
+                      <template #error>
+                        <div
+                          class="flex h-full items-center justify-center object-cover"
+                        >
+                          <span class="text-xs text-red-400">加载异常</span>
+                        </div>
+                      </template>
+                    </LazyImage>
+                  </div>
+                </div>
+              </template>
+            </VEntityField>
+            <VEntityField
+              :title="theme.spec.displayName"
+              :description="theme.spec.version"
             >
-              <img
-                :src="theme.spec.logo"
-                alt=""
-                class="pointer-events-none object-cover group-hover:opacity-75"
-              />
-            </div>
-          </div>
-          <div class="flex-1">
-            <VSpace align="start" direction="column" spacing="xs">
-              <div class="flex items-center gap-2">
-                <span class="text-lg font-medium text-gray-900">
-                  {{ theme.spec.displayName }}
-                </span>
+              <template #extra>
                 <VTag
                   v-if="theme.metadata.name === activatedTheme?.metadata?.name"
                 >
                   当前启用
                 </VTag>
-              </div>
-              <div>
-                <span class="text-sm text-gray-400">
-                  {{ theme.spec.version }}
-                </span>
-              </div>
-            </VSpace>
-          </div>
-          <div class="px-4">
-            <VSpace spacing="lg">
-              <div>
-                <span class="text-sm text-gray-400 hover:text-blue-600">
+              </template>
+            </VEntityField>
+          </template>
+          <template #end>
+            <VEntityField v-if="theme.metadata.deletionTimestamp">
+              <template #description>
+                <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+              </template>
+            </VEntityField>
+            <VEntityField>
+              <template #description>
+                <a
+                  class="text-sm text-gray-400 hover:text-blue-600"
+                  :href="theme.spec.author.website"
+                  target="_blank"
+                  @click.stop
+                >
                   {{ theme.spec.author.name }}
-                </span>
-              </div>
-              <div v-if="theme.spec.repo">
+                </a>
+              </template>
+            </VEntityField>
+            <VEntityField>
+              <template #description>
                 <a
                   :href="theme.spec.repo"
                   class="text-gray-900 hover:text-blue-600"
@@ -184,36 +212,20 @@ defineExpose({
                 >
                   <IconGitHub />
                 </a>
-              </div>
-              <div>
-                <FloatingDropdown>
-                  <IconMore
-                    class="rounded text-gray-900 hover:bg-gray-200 hover:text-gray-600"
-                    @click.stop
-                  />
-                  <template #popper>
-                    <div class="w-48 p-2">
-                      <VSpace class="w-full" direction="column">
-                        <VButton
-                          v-close-popper
-                          :disabled="
-                            theme.metadata.name ===
-                            activatedTheme?.metadata?.name
-                          "
-                          block
-                          type="danger"
-                          @click="handleUninstall(theme)"
-                        >
-                          卸载
-                        </VButton>
-                      </VSpace>
-                    </div>
-                  </template>
-                </FloatingDropdown>
-              </div>
-            </VSpace>
-          </div>
-        </div>
+              </template>
+            </VEntityField>
+          </template>
+          <template #dropdownItems>
+            <VButton
+              v-close-popper
+              block
+              type="danger"
+              @click="handleUninstall(theme)"
+            >
+              卸载
+            </VButton>
+          </template>
+        </VEntity>
       </li>
     </ul>
     <template #footer>
