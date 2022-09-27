@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.SinglePage;
+import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.SinglePageFinder;
@@ -62,8 +63,15 @@ public class SinglePageRouteStrategy implements TemplateRouterStrategy {
                 return ServerResponse.ok()
                     .render(DefaultTemplateEnum.SINGLE_PAGE.getValue(),
                         Map.of("name", name,
+                            "groupVersionKind", gvk,
+                            "plural", getPlural(),
                             "singlePage", singlePageByName(name)));
             });
+    }
+
+    private String getPlural() {
+        GVK annotation = SinglePage.class.getAnnotation(GVK.class);
+        return annotation.plural();
     }
 
     private Mono<SinglePageVo> singlePageByName(String name) {
