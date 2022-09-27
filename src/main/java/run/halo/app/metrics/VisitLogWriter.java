@@ -40,7 +40,7 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
         Path logsPath = haloProperties.getWorkDir()
             .resolve(LOG_FILE_LOCATION);
         if (!Files.exists(logsPath)) {
-            Files.createDirectory(logsPath);
+            Files.createDirectories(logsPath);
         }
         this.logFilePath = logsPath.resolve(LOG_FILE_NAME);
         this.asyncLogWriter = new AsyncLogWriter(logFilePath);
