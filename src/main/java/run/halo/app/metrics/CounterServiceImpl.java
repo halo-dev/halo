@@ -6,9 +6,10 @@ import java.util.Collection;
 import org.springframework.stereotype.Service;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.extension.Metadata;
-import run.halo.app.infra.utils.MeterUtils;
 
 /**
+ * Counter service implementation.
+ *
  * @author guqing
  * @since 2.0.0
  */

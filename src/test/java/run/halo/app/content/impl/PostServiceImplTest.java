@@ -5,9 +5,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.LinkedMultiValueMap;
@@ -32,12 +32,8 @@ class PostServiceImplTest {
     @Mock
     private ContentService contentService;
 
+    @InjectMocks
     private PostServiceImpl postService;
-
-    @BeforeEach
-    void setUp() {
-        postService = new PostServiceImpl(contentService, client);
-    }
 
     @Test
     void listPredicate() {

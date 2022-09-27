@@ -17,7 +17,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.extension.GroupVersion;
-import run.halo.app.infra.utils.MeterUtils;
+import run.halo.app.metrics.MeterUtils;
 
 /**
  * Metrics counter endpoint.
@@ -65,7 +65,7 @@ public class CounterTrackerEndpoint implements CustomEndpoint {
                         counterRequest.name());
 
                 Counter counter = MeterUtils.visitCounter(meterRegistry, counterName);
-                counter.increment(1D);
+                counter.increment();
                 return (int) counter.count();
             })
             .flatMap(count -> ServerResponse.ok().bodyValue(count));

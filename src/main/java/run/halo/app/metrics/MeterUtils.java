@@ -1,4 +1,4 @@
-package run.halo.app.infra.utils;
+package run.halo.app.metrics;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -20,7 +20,8 @@ public class MeterUtils {
     public static final String SCENE = "scene";
     public static final String VISIT_SCENE = "visit";
     public static final String UPVOTE_SCENE = "upvote";
-    public static final String COMMENT_SCENE = "comment";
+    public static final String TOTAL_COMMENT_SCENE = "total_comment";
+    public static final String APPROVED_COMMENT_SCENE = "approved_comment";
 
     /**
      * Build a counter name.
@@ -50,8 +51,12 @@ public class MeterUtils {
         return counter(registry, name, Tag.of(SCENE, UPVOTE_SCENE));
     }
 
-    public static Counter commentCounter(MeterRegistry registry, String name) {
-        return counter(registry, name, Tag.of(SCENE, COMMENT_SCENE));
+    public static Counter totalCommentCounter(MeterRegistry registry, String name) {
+        return counter(registry, name, Tag.of(SCENE, TOTAL_COMMENT_SCENE));
+    }
+
+    public static Counter approvedCommentCounter(MeterRegistry registry, String name) {
+        return counter(registry, name, Tag.of(SCENE, APPROVED_COMMENT_SCENE));
     }
 
     public static boolean isVisitCounter(Counter counter) {
@@ -70,12 +75,20 @@ public class MeterUtils {
         return UPVOTE_SCENE.equals(sceneValue);
     }
 
-    public static boolean isCommentCounter(Counter counter) {
+    public static boolean isTotalCommentCounter(Counter counter) {
         String sceneValue = counter.getId().getTag(SCENE);
         if (StringUtils.isBlank(sceneValue)) {
             return false;
         }
-        return COMMENT_SCENE.equals(sceneValue);
+        return TOTAL_COMMENT_SCENE.equals(sceneValue);
+    }
+
+    public static boolean isApprovedCommentCounter(Counter counter) {
+        String sceneValue = counter.getId().getTag(SCENE);
+        if (StringUtils.isBlank(sceneValue)) {
+            return false;
+        }
+        return APPROVED_COMMENT_SCENE.equals(sceneValue);
     }
 
     /**
@@ -85,7 +98,7 @@ public class MeterUtils {
      * @param name counter name,build by {@link #nameOf(String, String, String)}
      * @return counter find by name from registry if exists, otherwise create a new one.
      */
-    static Counter counter(MeterRegistry registry, String name, Tag... tags) {
+    private static Counter counter(MeterRegistry registry, String name, Tag... tags) {
         Tags withTags = Tags.of(METRICS_COMMON_TAG).and(tags);
         Counter counter = registry.find(name)
             .tags(withTags)

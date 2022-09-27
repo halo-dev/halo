@@ -14,8 +14,8 @@ import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.utils.MeterUtils;
 import run.halo.app.metrics.CounterService;
+import run.halo.app.metrics.MeterUtils;
 import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.Finder;
@@ -135,7 +135,7 @@ public class PostFinderImpl implements PostFinder {
         StatsVo statsVo = StatsVo.builder()
             .visit(counter.getVisit())
             .upvote(counter.getUpvote())
-            .comment(counter.getComment())
+            .comment(counter.getApprovedComment())
             .build();
         postVo.setStats(statsVo);
     }

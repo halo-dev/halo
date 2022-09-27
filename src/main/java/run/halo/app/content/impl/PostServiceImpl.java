@@ -24,7 +24,9 @@ import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.content.PostSorter;
+import run.halo.app.content.Stats;
 import run.halo.app.core.extension.Category;
+import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.core.extension.Tag;
@@ -33,6 +35,8 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
+import run.halo.app.metrics.CounterService;
+import run.halo.app.metrics.MeterUtils;
 
 /**
  * A default implementation of {@link PostService}.
@@ -44,10 +48,13 @@ import run.halo.app.infra.ConditionStatus;
 public class PostServiceImpl implements PostService {
     private final ContentService contentService;
     private final ReactiveExtensionClient client;
+    private final CounterService counterService;
 
-    public PostServiceImpl(ContentService contentService, ReactiveExtensionClient client) {
+    public PostServiceImpl(ContentService contentService, ReactiveExtensionClient client,
+        CounterService counterService) {
         this.contentService = contentService;
         this.client = client;
+        this.counterService = counterService;
     }
 
     @Override
@@ -65,6 +72,19 @@ public class PostServiceImpl implements PostService {
                         listResult.getTotal(), listedPosts)
                     )
             );
+    }
+
+    Stats fetchStats(Post post) {
+        Assert.notNull(post, "The post must not be null.");
+        String name = post.getMetadata().getName();
+        Counter counter =
+            counterService.getByName(MeterUtils.nameOf(Post.class, name));
+        return Stats.builder()
+            .visit(counter.getVisit())
+            .upvote(counter.getUpvote())
+            .totalComment(counter.getApprovedComment())
+            .approvedComment(counter.getApprovedComment())
+            .build();
     }
 
     Predicate<Post> postListPredicate(PostQuery query) {
@@ -132,6 +152,7 @@ public class PostServiceImpl implements PostService {
             .map(p -> {
                 ListedPost listedPost = new ListedPost();
                 listedPost.setPost(p);
+                listedPost.setStats(fetchStats(post));
                 return listedPost;
             })
             .flatMap(lp -> setTags(post.getSpec().getTags(), lp))

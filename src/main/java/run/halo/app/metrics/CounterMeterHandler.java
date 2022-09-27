@@ -19,7 +19,6 @@ import run.halo.app.core.extension.Counter;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonUtils;
-import run.halo.app.infra.utils.MeterUtils;
 
 /**
  * Counter meter handler for {@link Counter}.
@@ -59,10 +58,15 @@ public class CounterMeterHandler implements DisposableBean {
                     MeterUtils.upvoteCounter(meterRegistry, name);
                 upvoteCounter.increment(counter.getUpvote());
 
-                // comment counter
-                io.micrometer.core.instrument.Counter commentCounter =
-                    MeterUtils.commentCounter(meterRegistry, name);
-                commentCounter.increment(counter.getUpvote());
+                // total comment counter
+                io.micrometer.core.instrument.Counter totalCommentCounter =
+                    MeterUtils.totalCommentCounter(meterRegistry, name);
+                totalCommentCounter.increment(counter.getTotalComment());
+
+                // approved comment counter
+                io.micrometer.core.instrument.Counter approvedCommentCounter =
+                    MeterUtils.approvedCommentCounter(meterRegistry, name);
+                approvedCommentCounter.increment(counter.getApprovedComment());
                 return counter;
             })
             .then();
@@ -91,12 +95,7 @@ public class CounterMeterHandler implements DisposableBean {
                 List<Meter> meters = entry.getValue();
                 return client.fetch(Counter.class, name)
                     .switchIfEmpty(Mono.defer(() -> {
-                        Counter counter = new Counter();
-                        counter.setMetadata(new Metadata());
-                        counter.getMetadata().setName(name);
-                        counter.setUpvote(0);
-                        counter.setComment(0);
-                        counter.setVisit(0);
+                        Counter counter = emptyCounter(name);
                         return client.create(counter);
                     }))
                     .flatMap(counter -> {
@@ -114,6 +113,16 @@ public class CounterMeterHandler implements DisposableBean {
             .then();
     }
 
+    static Counter emptyCounter(String name) {
+        Counter counter = new Counter();
+        counter.setMetadata(new Metadata());
+        counter.getMetadata().setName(name);
+        counter.setUpvote(0);
+        counter.setTotalComment(0);
+        counter.setApprovedComment(0);
+        counter.setVisit(0);
+        return counter;
+    }
 
     @Override
     public void destroy() {
