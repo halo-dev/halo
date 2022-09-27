@@ -32,11 +32,20 @@ export default defineConfig({
       fileName: (format) => `halo-components.${format}.js`,
     },
     rollupOptions: {
-      external: ["vue", "vue-router"],
+      external: [
+        "vue",
+        "vue-router",
+        "@vueuse/core",
+        "@vueuse/components",
+        "@vueuse/router",
+      ],
       output: {
         globals: {
           vue: "Vue",
           "vue-router": "VueRouter",
+          "@vueuse/core": "VueUse",
+          "@vueuse/components": "VueUse",
+          "@vueuse/router": "VueUse",
         },
         exports: "named",
         generatedCode: "es5",

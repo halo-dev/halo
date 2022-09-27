@@ -1,7 +1,13 @@
 <script lang="ts" setup>
 import { BasicLayout } from "@halo-dev/admin-shared";
 import { apiClient } from "@/utils/api-client";
-import { IconUpload, VButton, VSpace, VTabbar } from "@halo-dev/components";
+import {
+  IconUpload,
+  VButton,
+  VSpace,
+  VTabbar,
+  VAvatar,
+} from "@halo-dev/components";
 import { onMounted, provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import type { User } from "@halo-dev/api-client";
@@ -14,11 +20,11 @@ const tabs = [
     label: "详情",
     routeName: "UserDetail",
   },
-  {
-    id: "tokens",
-    label: "个人令牌",
-    routeName: "PersonalAccessTokens",
-  },
+  // {
+  //   id: "tokens",
+  //   label: "个人令牌",
+  //   routeName: "PersonalAccessTokens",
+  // },
 ];
 
 const user = ref<User>();
@@ -83,17 +89,20 @@ const handleTabChange = (id: string) => {
       <div class="h-48 bg-gradient-to-r from-gray-800 to-red-500"></div>
       <div class="px-4 sm:px-6 lg:px-8">
         <div class="-mt-12 flex items-end space-x-5 sm:-mt-16">
-          <div class="flex">
+          <div v-if="user?.spec?.avatar" class="inline-flex items-center">
             <div class="h-24 w-24 sm:h-32 sm:w-32">
-              <img
+              <VAvatar
                 :src="user?.spec?.avatar"
-                alt="Avatar"
-                class="h-full w-full rounded-full bg-white ring-4 ring-white drop-shadow-lg"
+                circle
+                width="100%"
+                height="100%"
+                class="ring-4 ring-white drop-shadow-lg"
               />
             </div>
           </div>
           <div
             class="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"
+            :class="{ '!mt-12': !user?.spec?.avatar }"
           >
             <div class="mt-6 block min-w-0 flex-1">
               <h1 class="truncate text-xl font-bold text-gray-900">
