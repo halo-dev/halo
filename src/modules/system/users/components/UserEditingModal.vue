@@ -20,22 +20,17 @@ import YAML from "yaml";
 import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
 
-// constants
-import { rbacAnnotations } from "@/constants/annotations";
-
 // hooks
-import { useFetchRole } from "@/modules/system/roles/composables/use-role";
-import type { FormKitOptionsList } from "@formkit/inputs";
 import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
   defineProps<{
     visible: boolean;
-    user: User | null;
+    user?: User;
   }>(),
   {
     visible: false,
-    user: null,
+    user: undefined,
   }
 );
 
@@ -66,7 +61,6 @@ const formState = ref<User>(cloneDeep(initialFormState));
 const saving = ref(false);
 const rawMode = ref(false);
 const raw = ref("");
-const selectedRole = ref("");
 
 const isUpdateMode = computed(() => {
   return !!formState.value.metadata.creationTimestamp;
@@ -78,18 +72,6 @@ const creationModalTitle = computed(() => {
 
 const modalWidth = computed(() => {
   return rawMode.value ? 800 : 700;
-});
-
-const { roles } = useFetchRole();
-const rolesMap = computed<FormKitOptionsList>(() => {
-  return roles.value.map((role) => {
-    return {
-      label:
-        role.metadata?.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
-        role.metadata.name,
-      value: role.metadata?.name,
-    };
-  });
 });
 
 watch(
@@ -129,33 +111,20 @@ const handleResetForm = () => {
 const handleCreateUser = async () => {
   try {
     saving.value = true;
-    let user: User;
-
     if (isUpdateMode.value) {
-      const response = await apiClient.extension.user.updatev1alpha1User({
+      await apiClient.extension.user.updatev1alpha1User({
         name: formState.value.metadata.name,
         user: formState.value,
       });
-      user = response.data;
     } else {
-      const response = await apiClient.extension.user.createv1alpha1User({
+      await apiClient.extension.user.createv1alpha1User({
         user: formState.value,
-      });
-      user = response.data;
-    }
-
-    if (selectedRole.value) {
-      await apiClient.user.grantPermission({
-        name: user.metadata.name,
-        grantRequest: {
-          roles: [selectedRole.value],
-        },
       });
     }
 
     onVisibleChange(false);
   } catch (e) {
-    console.error(e);
+    console.error("Failed to create or update user", e);
   } finally {
     saving.value = false;
   }
@@ -218,12 +187,6 @@ const handleRawModeChange = () => {
           type="email"
           name="email"
           validation="required"
-        ></FormKit>
-        <FormKit
-          v-model="selectedRole"
-          :options="rolesMap"
-          label="角色"
-          type="select"
         ></FormKit>
         <FormKit
           v-model="formState.spec.phone"

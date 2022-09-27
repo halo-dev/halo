@@ -11,11 +11,11 @@ import { setFocus } from "@/formkit/utils/focus";
 const props = withDefaults(
   defineProps<{
     visible: boolean;
-    user: User | null;
+    user?: User;
   }>(),
   {
     visible: false,
-    user: null,
+    user: undefined,
   }
 );
 

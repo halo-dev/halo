@@ -18,6 +18,7 @@ import {
 } from "@halo-dev/components";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
+import GrantPermissionModal from "./components/GrantPermissionModal.vue";
 import { inject, onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { User, UserList } from "@halo-dev/api-client";
@@ -30,6 +31,8 @@ const dialog = useDialog();
 const checkedAll = ref(false);
 const editingModal = ref<boolean>(false);
 const passwordChangeModal = ref<boolean>(false);
+const grantPermissionModal = ref<boolean>(false);
+
 const users = ref<UserList>({
   page: 1,
   size: 10,
@@ -41,7 +44,7 @@ const users = ref<UserList>({
   hasPrevious: false,
 });
 const selectedUserNames = ref<string[]>([]);
-const selectedUser = ref<User | null>(null);
+const selectedUser = ref<User>();
 const currentUser = inject<User>("currentUser");
 
 const handleFetchUsers = async () => {
@@ -54,7 +57,7 @@ const handleFetchUsers = async () => {
   } catch (e) {
     console.error(e);
   } finally {
-    selectedUser.value = null;
+    selectedUser.value = undefined;
   }
 };
 
@@ -149,6 +152,11 @@ const handleOpenPasswordChangeModal = (user: User) => {
   passwordChangeModal.value = true;
 };
 
+const handleOpenGrantPermissionModal = (user: User) => {
+  selectedUser.value = user;
+  grantPermissionModal.value = true;
+};
+
 const getRoles = (user: User) => {
   return JSON.parse(
     user.metadata.annotations?.[rbacAnnotations.ROLE_NAMES] || "[]"
@@ -180,6 +188,12 @@ onMounted(() => {
 
   <UserPasswordChangeModal
     v-model:visible="passwordChangeModal"
+    :user="selectedUser"
+    @close="handleFetchUsers"
+  />
+
+  <GrantPermissionModal
+    v-model:visible="grantPermissionModal"
     :user="selectedUser"
     @close="handleFetchUsers"
   />
@@ -418,6 +432,15 @@ onMounted(() => {
                 @click="handleOpenPasswordChangeModal(user)"
               >
                 修改密码
+              </VButton>
+              <VButton
+                v-if="currentUser?.metadata.name !== user.metadata.name"
+                v-close-popper
+                v-permission="['system:users:manage']"
+                block
+                @click="handleOpenGrantPermissionModal(user)"
+              >
+                分配角色
               </VButton>
               <VButton
                 v-if="currentUser?.metadata.name !== user.metadata.name"
