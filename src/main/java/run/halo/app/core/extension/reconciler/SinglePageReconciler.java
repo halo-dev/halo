@@ -172,7 +172,8 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
             if (excerpt.getAutoGenerate()) {
                 contentService.getContent(spec.getHeadSnapshot())
-                    .subscribe(content -> {
+                    .blockOptional()
+                    .ifPresent(content -> {
                         String contentRevised = content.content();
                         status.setExcerpt(getExcerpt(contentRevised));
                     });
@@ -184,7 +185,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
             String headSnapshot = singlePage.getSpec().getHeadSnapshot();
             contentService.listSnapshots(Snapshot.SubjectRef.of(SinglePage.KIND, name))
                 .collectList()
-                .subscribe(snapshots -> {
+                .blockOptional().ifPresent(snapshots -> {
                     List<String> contributors = snapshots.stream()
                         .map(snapshot -> {
                             Set<String> usernames = snapshot.getSpec().getContributors();

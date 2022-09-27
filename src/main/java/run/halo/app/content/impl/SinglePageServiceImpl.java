@@ -148,15 +148,24 @@ public class SinglePageServiceImpl implements SinglePageService {
 
     private Mono<ListedSinglePage> getListedSinglePage(SinglePage singlePage) {
         Assert.notNull(singlePage, "The singlePage must not be null.");
-        ListedSinglePage listedSinglePage = new ListedSinglePage();
-        listedSinglePage.setPage(singlePage);
-        listedSinglePage.setStats(fetchStats(singlePage));
-        return Mono.just(listedSinglePage)
-            .flatMap(page -> listContributors(singlePage.getStatusOrDefault().getContributors())
-                .map(contributors -> {
-                    page.setContributors(contributors);
-                    return page;
-                }));
+        return Mono.just(singlePage)
+            .map(sp -> {
+                ListedSinglePage listedSinglePage = new ListedSinglePage();
+                listedSinglePage.setPage(singlePage);
+                listedSinglePage.setStats(fetchStats(singlePage));
+                return listedSinglePage;
+            })
+            .flatMap(lsp ->
+                setContributors(singlePage.getStatusOrDefault().getContributors(), lsp));
+    }
+
+    private Mono<ListedSinglePage> setContributors(List<String> usernames,
+        ListedSinglePage singlePage) {
+        return listContributors(usernames)
+            .collectList()
+            .doOnNext(singlePage::setContributors)
+            .map(contributors -> singlePage)
+            .defaultIfEmpty(singlePage);
     }
 
     Stats fetchStats(SinglePage singlePage) {
@@ -172,22 +181,19 @@ public class SinglePageServiceImpl implements SinglePageService {
             .build();
     }
 
-    private Mono<List<Contributor>> listContributors(List<String> usernames) {
+    private Flux<Contributor> listContributors(List<String> usernames) {
         if (usernames == null) {
-            return Mono.empty();
+            return Flux.empty();
         }
         return Flux.fromIterable(usernames)
-            .map(username -> client.fetch(User.class, username)
-                .map(user -> {
-                    Contributor contributor = new Contributor();
-                    contributor.setName(username);
-                    contributor.setDisplayName(user.getSpec().getDisplayName());
-                    contributor.setAvatar(user.getSpec().getAvatar());
-                    return contributor;
-                })
-            )
-            .flatMap(Function.identity())
-            .collectList();
+            .flatMap(username -> client.fetch(User.class, username))
+            .map(user -> {
+                Contributor contributor = new Contributor();
+                contributor.setName(user.getMetadata().getName());
+                contributor.setDisplayName(user.getSpec().getDisplayName());
+                contributor.setAvatar(user.getSpec().getAvatar());
+                return contributor;
+            });
     }
 
     boolean contains(Collection<String> left, List<String> right) {
