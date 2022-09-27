@@ -138,28 +138,35 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
                 String counterName = MeterUtils.nameOf(ref.getGroup(), scheme.plural(),
                     ref.getName());
                 // meter for total comment count
-                Counter totalCommentCounter =
-                    MeterUtils.totalCommentCounter(meterRegistry, counterName);
-                double totalCountMeter = totalCommentCounter.count();
-                double totalIncrement = totalCount - totalCountMeter;
-                if (totalCountMeter + totalIncrement >= 0) {
-                    totalCommentCounter.increment(totalIncrement);
-                } else {
-                    totalCommentCounter.increment(totalCountMeter * -1);
-                }
-
+                calcTotalComments(totalCount, counterName);
                 // meter for approved comment count
-                Counter approvedCommentCounter =
-                    MeterUtils.approvedCommentCounter(meterRegistry, counterName);
-                double approvedComments = approvedCommentCounter.count();
-                double increment = approvedTotalCount - approvedCommentCounter.count();
-                if (approvedComments + increment >= 0) {
-                    approvedCommentCounter.increment(increment);
-                } else {
-                    approvedCommentCounter.increment(approvedComments * -1);
-                }
+                calcApprovedComments(approvedTotalCount, counterName);
             });
         });
+    }
+
+    private void calcTotalComments(int totalCount, String counterName) {
+        Counter totalCommentCounter =
+            MeterUtils.totalCommentCounter(meterRegistry, counterName);
+        double totalCountMeter = totalCommentCounter.count();
+        double totalIncrement = totalCount - totalCountMeter;
+        if (totalCountMeter + totalIncrement >= 0) {
+            totalCommentCounter.increment(totalIncrement);
+        } else {
+            totalCommentCounter.increment(totalCountMeter * -1);
+        }
+    }
+
+    private void calcApprovedComments(long approvedTotalCount, String counterName) {
+        Counter approvedCommentCounter =
+            MeterUtils.approvedCommentCounter(meterRegistry, counterName);
+        double approvedComments = approvedCommentCounter.count();
+        double increment = approvedTotalCount - approvedCommentCounter.count();
+        if (approvedComments + increment >= 0) {
+            approvedCommentCounter.increment(increment);
+        } else {
+            approvedCommentCounter.increment(approvedComments * -1);
+        }
     }
 
     record RefCommentTuple(Ref ref, String name, boolean approved) {

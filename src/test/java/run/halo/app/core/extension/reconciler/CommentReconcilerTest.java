@@ -149,8 +149,10 @@ class CommentReconcilerTest {
             Mockito.mock(ObjectNode.class));
         when(schemeManager.fetch(any())).thenReturn(Optional.of(scheme));
 
-        String fakePostCounterName = MeterUtils.nameOf(ref.getGroup(), scheme.plural(), "fake-post");
-        String testPostCounterName = MeterUtils.nameOf(ref.getGroup(), scheme.plural(), "test-post");
+        String fakePostCounterName =
+            MeterUtils.nameOf(ref.getGroup(), scheme.plural(), "fake-post");
+        String testPostCounterName =
+            MeterUtils.nameOf(ref.getGroup(), scheme.plural(), "test-post");
 
         Counter approvedCommentCounter =
             MeterUtils.approvedCommentCounter(meterRegistry, fakePostCounterName);
