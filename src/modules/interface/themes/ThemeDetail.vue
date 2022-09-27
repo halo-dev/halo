@@ -4,42 +4,80 @@ import { inject } from "vue";
 import { RouterLink } from "vue-router";
 
 // components
-import { VAlert, VSpace, VTag } from "@halo-dev/components";
+import { VAlert, VSpace, VTag, IconMore, VButton } from "@halo-dev/components";
 
 // types
 import type { ComputedRef, Ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 
+import { apiClient } from "@/utils/api-client";
+
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme");
 const isActivated = inject<ComputedRef<boolean>>("isActivated");
+
+const handleReloadThemeSetting = async () => {
+  if (!selectedTheme?.value) {
+    return;
+  }
+  try {
+    await apiClient.theme.reloadThemeSetting({
+      name: selectedTheme.value.metadata.name,
+    });
+  } catch (error) {
+    console.error("Failed to reload theme setting", error);
+  }
+};
 </script>
 
 <template>
   <div class="bg-white px-4 py-4 sm:px-6">
-    <div class="flex flex-row gap-3">
-      <div
-        class="h-12 w-12 overflow-hidden rounded border bg-white hover:shadow-sm"
-      >
-        <img
-          :key="selectedTheme?.metadata.name"
-          :alt="selectedTheme?.spec.displayName"
-          :src="selectedTheme?.spec.logo"
-          class="h-full w-full"
-        />
+    <div class="group flex items-center justify-between">
+      <div class="flex flex-row gap-3">
+        <div
+          class="h-12 w-12 overflow-hidden rounded border bg-white hover:shadow-sm"
+        >
+          <img
+            :key="selectedTheme?.metadata.name"
+            :alt="selectedTheme?.spec.displayName"
+            :src="selectedTheme?.spec.logo"
+            class="h-full w-full"
+          />
+        </div>
+        <div>
+          <h3 class="text-lg font-medium leading-6 text-gray-900">
+            {{ selectedTheme?.spec.displayName }}
+          </h3>
+          <p class="mt-1 flex max-w-2xl items-center gap-2">
+            <span class="text-sm text-gray-500">
+              {{ selectedTheme?.spec.version }}
+            </span>
+            <VTag>
+              {{ isActivated ? "当前启用" : "未启用" }}
+            </VTag>
+          </p>
+        </div>
       </div>
-      <div>
-        <h3 class="text-lg font-medium leading-6 text-gray-900">
-          {{ selectedTheme?.spec.displayName }}
-        </h3>
-        <p class="mt-1 flex max-w-2xl items-center gap-2">
-          <span class="text-sm text-gray-500">
-            {{ selectedTheme?.spec.version }}
-          </span>
-          <VTag>
-            {{ isActivated ? "当前启用" : "未启用" }}
-          </VTag>
-        </p>
-      </div>
+      <FloatingDropdown>
+        <div
+          class="cursor-pointer rounded p-1 transition-all hover:text-blue-600 group-hover:bg-gray-100"
+        >
+          <IconMore />
+        </div>
+        <template #popper>
+          <div class="w-48 p-2">
+            <VSpace class="w-full" direction="column">
+              <VButton
+                v-close-popper
+                block
+                type="danger"
+                @click="handleReloadThemeSetting"
+              >
+                刷新设置表单
+              </VButton>
+            </VSpace>
+          </div>
+        </template>
+      </FloatingDropdown>
     </div>
   </div>
   <div class="border-t border-gray-200">
