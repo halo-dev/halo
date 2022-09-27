@@ -1,5 +1,7 @@
 package run.halo.app.theme.router.strategy;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.springframework.util.StringUtils.uriDecode;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 
 import java.util.List;
@@ -49,12 +51,14 @@ public class SinglePageRouteStrategy implements TemplateRouterStrategy {
 
         List<String> permalinks = permalinkIndexer.getPermalinks(gvk);
         for (String permalink : permalinks) {
+            permalink = uriDecode(permalink, UTF_8);
             requestPredicate = requestPredicate.or(RequestPredicates.GET(permalink));
         }
 
         return RouterFunctions
             .route(requestPredicate.and(accept(MediaType.TEXT_HTML)), request -> {
                 String slug = StringUtils.removeStart(request.path(), "/");
+                slug = uriDecode(slug, UTF_8);
                 String name = permalinkIndexer.getNameBySlug(gvk, slug);
                 if (name == null) {
                     return ServerResponse.notFound().build();
