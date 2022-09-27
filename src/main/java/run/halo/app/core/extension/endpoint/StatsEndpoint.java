@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Counter;
+import run.halo.app.core.extension.User;
 import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
@@ -51,6 +52,14 @@ public class StatsEndpoint implements CustomEndpoint {
                 stats.setUpvotes(stats.getUpvotes() + counter.getUpvote());
                 return stats;
             })
+            .flatMap(stats -> client.list(User.class,
+                    user -> user.getMetadata().getDeletionTimestamp() == null,
+                    null)
+                .count()
+                .map(count -> {
+                    stats.setUsers(count.intValue());
+                    return stats;
+                }))
             .flatMap(stats -> ServerResponse.ok().bodyValue(stats));
     }
 
@@ -60,6 +69,7 @@ public class StatsEndpoint implements CustomEndpoint {
         private Integer comments;
         private Integer approvedComments;
         private Integer upvotes;
+        private Integer users;
 
         /**
          * Creates an empty stats that populated initialize value.
@@ -72,6 +82,7 @@ public class StatsEndpoint implements CustomEndpoint {
             stats.setComments(0);
             stats.setApprovedComments(0);
             stats.setUpvotes(0);
+            stats.setUsers(0);
             return stats;
         }
     }
