@@ -17,7 +17,9 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.extension.GroupVersion;
+import run.halo.app.infra.utils.IpAddressUtils;
 import run.halo.app.metrics.MeterUtils;
+import run.halo.app.metrics.VisitLogWriter;
 
 /**
  * Metrics counter endpoint.
@@ -29,9 +31,11 @@ import run.halo.app.metrics.MeterUtils;
 public class CounterTrackerEndpoint implements CustomEndpoint {
 
     private final MeterRegistry meterRegistry;
+    private final VisitLogWriter visitLogWriter;
 
-    public CounterTrackerEndpoint(MeterRegistry meterRegistry) {
+    public CounterTrackerEndpoint(MeterRegistry meterRegistry, VisitLogWriter visitLogWriter) {
         this.meterRegistry = meterRegistry;
+        this.visitLogWriter = visitLogWriter;
     }
 
     @Override
@@ -66,12 +70,15 @@ public class CounterTrackerEndpoint implements CustomEndpoint {
 
                 Counter counter = MeterUtils.visitCounter(meterRegistry, counterName);
                 counter.increment();
+                // async write visit log
+                writeVisitLog(request, counterRequest);
                 return (int) counter.count();
             })
             .flatMap(count -> ServerResponse.ok().bodyValue(count));
     }
 
-    public record CounterRequest(String group, String plural, String name, String sessionUid) {
+    public record CounterRequest(String group, String plural, String name, String hostname,
+                                 String screen, String language, String referrer) {
         /**
          * Construct counter request.
          * group and session uid can be empty.
@@ -79,9 +86,27 @@ public class CounterTrackerEndpoint implements CustomEndpoint {
         public CounterRequest {
             Assert.notNull(plural, "The plural must not be null.");
             Assert.notNull(name, "The name must not be null.");
-            sessionUid = StringUtils.defaultString(group);
             group = StringUtils.defaultString(group);
         }
+    }
+
+    private void writeVisitLog(ServerRequest request, CounterRequest counterRequest) {
+        String logMessage = logMessage(request, counterRequest);
+        visitLogWriter.log(logMessage);
+    }
+
+    private String logMessage(ServerRequest request, CounterRequest counterRequest) {
+        String ipAddress = IpAddressUtils.getIpAddress(request);
+        String hostname = counterRequest.hostname();
+        String screen = counterRequest.screen();
+        String language = counterRequest.language();
+        String referrer = counterRequest.referrer();
+        String counterName =
+            MeterUtils.nameOf(counterRequest.group(), counterRequest.plural(),
+                counterRequest.name());
+        return String.format(
+            "subject=[%s], ipAddress=[%s], hostname=[%s], screen=[%s], language=[%s], "
+                + "referrer=[%s]", counterName, ipAddress, hostname, screen, language, referrer);
     }
 
     @Override

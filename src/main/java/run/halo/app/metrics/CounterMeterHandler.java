@@ -4,6 +4,7 @@ import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -51,25 +52,29 @@ public class CounterMeterHandler implements DisposableBean {
                 // visit counter
                 io.micrometer.core.instrument.Counter visitCounter =
                     MeterUtils.visitCounter(meterRegistry, name);
-                visitCounter.increment(counter.getVisit());
+                visitCounter.increment(nullSafe(counter.getVisit()));
 
                 // upvote counter
                 io.micrometer.core.instrument.Counter upvoteCounter =
                     MeterUtils.upvoteCounter(meterRegistry, name);
-                upvoteCounter.increment(counter.getUpvote());
+                upvoteCounter.increment(nullSafe(counter.getUpvote()));
 
                 // total comment counter
                 io.micrometer.core.instrument.Counter totalCommentCounter =
                     MeterUtils.totalCommentCounter(meterRegistry, name);
-                totalCommentCounter.increment(counter.getTotalComment());
+                totalCommentCounter.increment(nullSafe(counter.getTotalComment()));
 
                 // approved comment counter
                 io.micrometer.core.instrument.Counter approvedCommentCounter =
                     MeterUtils.approvedCommentCounter(meterRegistry, name);
-                approvedCommentCounter.increment(counter.getApprovedComment());
+                approvedCommentCounter.increment(nullSafe(counter.getApprovedComment()));
                 return counter;
             })
             .then();
+    }
+
+    int nullSafe(Integer value) {
+        return Objects.requireNonNullElse(value, 0);
     }
 
     /**
