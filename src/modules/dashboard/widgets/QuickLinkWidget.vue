@@ -3,9 +3,10 @@ import {
   IconArrowRight,
   IconBookRead,
   IconFolder,
-  IconPalette,
+  IconPages,
   IconPlug,
   IconUserSettings,
+  IconPalette,
   VCard,
 } from "@halo-dev/components";
 import { markRaw, type Component } from "vue";
@@ -27,6 +28,13 @@ const actions: Action[] = [
     },
   },
   {
+    icon: markRaw(IconPages),
+    title: "创建页面",
+    route: {
+      name: "SinglePageEditor",
+    },
+  },
+  {
     icon: markRaw(IconFolder),
     title: "附件上传",
     route: {
@@ -38,9 +46,9 @@ const actions: Action[] = [
   },
   {
     icon: markRaw(IconPalette),
-    title: "外观编辑",
+    title: "主题管理",
     route: {
-      name: "ThemeVisual",
+      name: "ThemeDetail",
     },
   },
   {
@@ -70,13 +78,11 @@ const router = useRouter();
     class="h-full"
     title="快捷访问"
   >
-    <div
-      class="divide-y divide-x divide-gray-100 overflow-hidden sm:grid sm:grid-cols-3 sm:gap-px sm:divide-y-0"
-    >
+    <div class="overflow-hidden sm:grid sm:grid-cols-3 sm:gap-px">
       <div
         v-for="(action, index) in actions"
         :key="index"
-        class="group relative cursor-pointer bg-white p-6 hover:bg-gray-50"
+        class="group relative cursor-pointer bg-white p-6 transition-all hover:bg-gray-50"
         @click="router.push(action.route)"
       >
         <div>

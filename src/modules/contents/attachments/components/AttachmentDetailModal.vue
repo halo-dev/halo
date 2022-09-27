@@ -169,11 +169,15 @@ const onVisibleChange = (visible: boolean) => {
             </a>
           </dd>
         </div>
-        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <!-- TODO: add attachment ref support -->
+        <div
+          v-if="false"
+          class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+        >
           <dt class="text-sm font-medium text-gray-900">引用位置</dt>
           <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
             // TODO
-            <ul v-if="false" class="mt-2 space-y-2">
+            <ul class="mt-2 space-y-2">
               <li>
                 <div
                   class="inline-flex w-96 cursor-pointer flex-row gap-x-3 rounded border p-3 hover:border-primary"

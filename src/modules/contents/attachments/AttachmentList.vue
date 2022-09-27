@@ -356,7 +356,8 @@ onMounted(() => {
                         </span>
                       </div>
                     </UserDropdownSelector>
-                    <FloatingDropdown>
+                    <!-- TODO: add filter by ref support -->
+                    <FloatingDropdown v-if="false">
                       <div
                         class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                       >

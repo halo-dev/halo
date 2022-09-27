@@ -281,7 +281,13 @@ onMounted(async () => {
     </template>
     <template #actions>
       <VSpace>
-        <VButton size="sm" type="default" @click="previewModal = true">
+        <!-- TODO: add preview post support -->
+        <VButton
+          v-if="false"
+          size="sm"
+          type="default"
+          @click="previewModal = true"
+        >
           预览
         </VButton>
         <VButton :loading="saving" size="sm" type="default" @click="handleSave">
