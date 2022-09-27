@@ -109,7 +109,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 spec.setExcerpt(excerpt);
             }
             if (excerpt.getAutoGenerate()) {
-                contentService.getContent(spec.getHeadSnapshot())
+                contentService.getContent(spec.getReleaseSnapshot())
                     .subscribe(content -> {
                         String contentRevised = content.content();
                         status.setExcerpt(getExcerpt(contentRevised));
@@ -122,7 +122,8 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             String headSnapshot = post.getSpec().getHeadSnapshot();
             contentService.listSnapshots(Snapshot.SubjectRef.of(Post.KIND, name))
                 .collectList()
-                .subscribe(snapshots -> {
+                .blockOptional()
+                .ifPresent(snapshots -> {
                     List<String> contributors = snapshots.stream()
                         .map(snapshot -> {
                             Set<String> usernames = snapshot.getSpec().getContributors();
@@ -143,6 +144,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                         .ifPresent(snapshot -> {
                             status.setInProgress(!isPublished(snapshot));
                         });
+
                 });
 
             // handle cancel publish,has released version and published is false and not handled

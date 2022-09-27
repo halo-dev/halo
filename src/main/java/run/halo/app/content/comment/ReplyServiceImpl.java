@@ -56,9 +56,12 @@ public class ReplyServiceImpl implements ReplyService {
                             throw new AccessDeniedException(
                                 "The comment function has been turned off.");
                         }
+                        if (checkReplyOwner(reply, commentSetting.getSystemUserOnly())) {
+                            throw new AccessDeniedException("Allow system user reply only.");
+                        }
                         reply.getSpec().setApproved(
                             Boolean.FALSE.equals(commentSetting.getRequireReviewForNew()));
-                        reply.getSpec().setHidden(reply.getSpec().getApproved());
+                        reply.getSpec().setHidden(!reply.getSpec().getApproved());
                         return reply;
                     });
             })
@@ -80,6 +83,14 @@ public class ReplyServiceImpl implements ReplyService {
                 new IllegalArgumentException(
                     String.format("Comment not found for name [%s].", commentName)))
             );
+    }
+
+    private boolean checkReplyOwner(Reply reply, Boolean onlySystemUser) {
+        Comment.CommentOwner owner = reply.getSpec().getOwner();
+        if (Boolean.TRUE.equals(onlySystemUser)) {
+            return owner != null && Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind());
+        }
+        return false;
     }
 
     @Override

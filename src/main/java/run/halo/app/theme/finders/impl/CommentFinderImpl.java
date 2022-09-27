@@ -2,14 +2,17 @@ package run.halo.app.theme.finders.impl;
 
 import java.time.Instant;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.Assert;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import run.halo.app.content.comment.OwnerInfo;
 import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Reply;
+import run.halo.app.core.extension.User;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
@@ -36,7 +39,7 @@ public class CommentFinderImpl implements CommentFinder {
     @Override
     public CommentVo getByName(String name) {
         return client.fetch(Comment.class, name)
-            .map(CommentVo::from)
+            .flatMap(this::toCommentVo)
             .block();
     }
 
@@ -45,11 +48,13 @@ public class CommentFinderImpl implements CommentFinder {
         return client.list(Comment.class, fixedPredicate(ref),
                 defaultComparator(),
                 pageNullSafe(page), sizeNullSafe(size))
-            .map(list -> {
-                List<CommentVo> commentVos = list.get().map(CommentVo::from).toList();
-                return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
-                    commentVos);
-            })
+            .flatMap(list -> Flux.fromStream(list.get().map(this::toCommentVo))
+                .flatMap(Function.identity())
+                .collectList()
+                .map(commentVos -> new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
+                    commentVos)
+                )
+            )
             .block();
     }
 
@@ -62,12 +67,37 @@ public class CommentFinderImpl implements CommentFinder {
                     && Objects.equals(false, reply.getSpec().getHidden())
                     && Objects.equals(true, reply.getSpec().getApproved()),
                 comparator.reversed(), pageNullSafe(page), sizeNullSafe(size))
-            .map(list -> {
-                List<ReplyVo> replyVos = list.get().map(ReplyVo::from).toList();
-                return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
-                    replyVos);
-            })
+            .flatMap(list -> Flux.fromStream(list.get().map(this::toReplyVo))
+                .flatMap(Function.identity())
+                .collectList()
+                .map(replyVos -> new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
+                    replyVos))
+            )
             .block();
+    }
+
+    private Mono<CommentVo> toCommentVo(Comment comment) {
+        Comment.CommentOwner owner = comment.getSpec().getOwner();
+        return Mono.just(CommentVo.from(comment))
+            .flatMap(commentVo -> getOwnerInfo(owner)
+                .map(commentVo::withOwner)
+            );
+    }
+
+    private Mono<ReplyVo> toReplyVo(Reply reply) {
+        return Mono.just(ReplyVo.from(reply))
+            .flatMap(replyVo -> getOwnerInfo(reply.getSpec().getOwner())
+                .map(replyVo::withOwner)
+            );
+    }
+
+    private Mono<OwnerInfo> getOwnerInfo(Comment.CommentOwner owner) {
+        if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
+            return Mono.just(OwnerInfo.from(owner));
+        }
+        return client.fetch(User.class, owner.getName())
+            .map(OwnerInfo::from)
+            .switchIfEmpty(Mono.just(OwnerInfo.ghostUser()));
     }
 
     private Predicate<Comment> fixedPredicate(Ref ref) {
