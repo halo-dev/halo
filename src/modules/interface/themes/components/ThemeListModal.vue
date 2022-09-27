@@ -57,15 +57,38 @@ const handleFetchThemes = async () => {
   }
 };
 
-const handleUninstall = async (theme: Theme) => {
+const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
   dialog.warning({
-    title: "是否确定删除该主题？",
+    title: `${
+      deleteExtensions
+        ? "是否确认删除该主题以及对应的配置？"
+        : "是否确认删除该主题？"
+    }`,
     description: "删除后将无法恢复。",
     onConfirm: async () => {
       try {
         await apiClient.extension.theme.deletethemeHaloRunV1alpha1Theme({
           name: theme.metadata.name,
         });
+
+        // delete theme setting and configMap
+        if (!deleteExtensions) {
+          return;
+        }
+
+        const { settingName, configMapName } = theme.spec;
+
+        if (settingName) {
+          await apiClient.extension.setting.deletev1alpha1Setting({
+            name: settingName,
+          });
+        }
+
+        if (configMapName) {
+          await apiClient.extension.configMap.deletev1alpha1ConfigMap({
+            name: configMapName,
+          });
+        }
       } catch (e) {
         console.error("Failed to uninstall theme", e);
       } finally {
@@ -223,6 +246,15 @@ defineExpose({
               @click="handleUninstall(theme)"
             >
               卸载
+            </VButton>
+            <VButton
+              v-close-popper
+              :disabled="theme.metadata.name === activatedTheme?.metadata?.name"
+              block
+              type="danger"
+              @click="handleUninstall(theme, true)"
+            >
+              卸载并删除配置
             </VButton>
           </template>
         </VEntity>
