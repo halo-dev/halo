@@ -200,4 +200,12 @@ function handleRemove(item: any) {
 .vue-grid-layout {
   @apply -m-[10px];
 }
+.vue-grid-item {
+  transition: none !important;
+}
+
+.vue-grid-item.vue-grid-placeholder {
+  @apply bg-gray-200 !important;
+  @apply opacity-100 !important;
+}
 </style>
