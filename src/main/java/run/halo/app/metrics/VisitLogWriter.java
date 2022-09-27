@@ -159,6 +159,11 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
 
         public void close() {
             if (writer != null) {
+                try {
+                    writer.flush();
+                } catch (IOException e) {
+                    // ignore this
+                }
                 FileUtils.closeQuietly(writer);
             }
         }
