@@ -73,7 +73,6 @@ public enum PostSorter {
         Function<Post, Instant> createTime =
             post -> post.getMetadata().getCreationTimestamp();
         return Comparator.comparing(createTime)
-            .thenComparing(name)
-            .reversed();
+            .thenComparing(name);
     }
 }
