@@ -10,21 +10,18 @@ import static org.mockito.Mockito.when;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.skyscreamer.jsonassert.JSONAssert;
 import run.halo.app.content.TestPost;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
-import run.halo.app.infra.utils.JsonUtils;
 
 /**
  * Tests for {@link TagReconciler}.
@@ -85,7 +82,7 @@ class TagReconcilerTest {
     }
 
     @Test
-    void reconcileStatusPosts() throws JSONException {
+    void reconcileStatusPosts() {
         Tag tag = tag();
         when(client.fetch(eq(Tag.class), eq("fake-tag")))
             .thenReturn(Optional.of(tag));
@@ -95,20 +92,8 @@ class TagReconcilerTest {
         tagReconciler.reconcile(new TagReconciler.Request("fake-tag"));
         verify(client, times(2)).update(captor.capture());
         List<Tag> allValues = captor.getAllValues();
-        List<Post.CompactPost> posts = allValues.get(1).getStatusOrDefault().getPosts();
-        JSONAssert.assertEquals("""
-                [{
-                    "name": "fake-post-1",
-                    "published": false,
-                    "visible": "PUBLIC"
-                },
-                {
-                    "name": "fake-post-3",
-                    "published": false,
-                    "visible": "PRIVATE"
-                }]
-                """,
-            JsonUtils.objectToJson(posts), true);
+        assertThat(allValues.get(1).getStatusOrDefault().getPostCount()).isEqualTo(2);
+        assertThat(allValues.get(1).getStatusOrDefault().getVisiblePostCount()).isEqualTo(0);
     }
 
     Tag tag() {

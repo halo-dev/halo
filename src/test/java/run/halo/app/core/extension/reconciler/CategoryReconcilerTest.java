@@ -17,7 +17,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.skyscreamer.jsonassert.JSONAssert;
 import run.halo.app.content.TestPost;
 import run.halo.app.content.permalinks.CategoryPermalinkPolicy;
 import run.halo.app.core.extension.Category;
@@ -25,7 +24,6 @@ import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.infra.utils.JsonUtils;
 
 /**
  * Tests for {@link CategoryReconciler}.
@@ -50,32 +48,9 @@ class CategoryReconcilerTest {
 
         ArgumentCaptor<Category> captor = ArgumentCaptor.forClass(Category.class);
         verify(client, times(2)).update(captor.capture());
-        JSONAssert.assertEquals("""
-            [
-                {
-                    "name": "post-1",
-                    "visible": "PUBLIC",
-                    "published": false
-                },
-                {
-                    "name": "post-2",
-                    "visible": "PUBLIC",
-                    "published": false
-                },
-                {
-                    "name": "post-3",
-                    "visible": "PUBLIC",
-                    "published": false
-                },
-                {
-                    "name": "post-4",
-                    "visible": "PUBLIC",
-                    "published": false
-                }
-            ]
-            """,
-            JsonUtils.objectToJson(captor.getAllValues().get(1).getStatusOrDefault().getPosts()),
-            true);
+        assertThat(captor.getAllValues().get(1).getStatusOrDefault().getPostCount()).isEqualTo(4);
+        assertThat(
+            captor.getAllValues().get(1).getStatusOrDefault().getVisiblePostCount()).isEqualTo(0);
     }
 
     @Test
@@ -83,27 +58,9 @@ class CategoryReconcilerTest {
         reconcileStatusPostPilling("category-B");
         ArgumentCaptor<Category> captor = ArgumentCaptor.forClass(Category.class);
         verify(client, times(2)).update(captor.capture());
-        JSONAssert.assertEquals("""
-            [
-                {
-                    "name": "post-1",
-                    "visible": "PUBLIC",
-                    "published": false
-                },
-                {
-                    "name": "post-2",
-                    "visible": "PUBLIC",
-                    "published": false
-                },
-                {
-                    "name": "post-3",
-                    "visible": "PUBLIC",
-                    "published": false
-                }
-            ]
-            """,
-            JsonUtils.objectToJson(captor.getAllValues().get(1).getStatusOrDefault().getPosts()),
-            true);
+        Category category = captor.getAllValues().get(1);
+        assertThat(category.getStatusOrDefault().getPostCount()).isEqualTo(3);
+        assertThat(category.getStatusOrDefault().getVisiblePostCount()).isEqualTo(0);
     }
 
     @Test
@@ -111,22 +68,9 @@ class CategoryReconcilerTest {
         reconcileStatusPostPilling("category-C");
         ArgumentCaptor<Category> captor = ArgumentCaptor.forClass(Category.class);
         verify(client, times(2)).update(captor.capture());
-        JSONAssert.assertEquals("""
-            [
-                {
-                    "name": "post-1",
-                    "visible": "PUBLIC",
-                    "published": false
-                },
-                {
-                    "name": "post-2",
-                    "visible": "PUBLIC",
-                    "published": false
-                }
-            ]
-            """,
-            JsonUtils.objectToJson(captor.getAllValues().get(1).getStatusOrDefault().getPosts()),
-            true);
+        assertThat(captor.getAllValues().get(1).getStatusOrDefault().getPostCount()).isEqualTo(2);
+        assertThat(
+            captor.getAllValues().get(1).getStatusOrDefault().getVisiblePostCount()).isEqualTo(0);
     }
 
     @Test
@@ -134,17 +78,8 @@ class CategoryReconcilerTest {
         reconcileStatusPostPilling("category-D");
         ArgumentCaptor<Category> captor = ArgumentCaptor.forClass(Category.class);
         verify(client, times(2)).update(captor.capture());
-        JSONAssert.assertEquals("""
-            [
-                {
-                    "name": "post-1",
-                    "visible": "PUBLIC",
-                    "published": false
-                }
-            ]
-            """,
-            JsonUtils.objectToJson(captor.getAllValues().get(1).getStatusOrDefault().getPosts()),
-            true);
+        assertThat(captor.getAllValues().get(1).getStatusOrDefault().postCount).isEqualTo(1);
+        assertThat(captor.getAllValues().get(1).getStatusOrDefault().visiblePostCount).isEqualTo(0);
     }
 
 

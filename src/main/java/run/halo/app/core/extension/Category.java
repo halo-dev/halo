@@ -67,8 +67,13 @@ public class Category extends AbstractExtension {
         private String permalink;
 
         /**
-         * 包括当前和其下所有层级的文章 name (depth=max).
+         * 包括当前和其下所有层级的文章数量 (depth=max).
          */
-        private List<Post.CompactPost> posts;
+        public Integer postCount;
+
+        /**
+         * 包括当前和其下所有层级的已发布且公开的文章数量 (depth=max).
+         */
+        public Integer visiblePostCount;
     }
 }
