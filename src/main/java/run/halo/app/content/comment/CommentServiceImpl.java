@@ -81,7 +81,7 @@ public class CommentServiceImpl implements CommentService {
                 }
                 comment.getSpec()
                     .setApproved(Boolean.FALSE.equals(commentSetting.getRequireReviewForNew()));
-                comment.getSpec().setHidden(!comment.getSpec().getApproved());
+                comment.getSpec().setHidden(false);
                 if (comment.getSpec().getOwner() != null) {
                     return Mono.just(comment);
                 }
