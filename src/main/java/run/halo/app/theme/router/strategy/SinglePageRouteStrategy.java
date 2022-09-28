@@ -1,14 +1,13 @@
 package run.halo.app.theme.router.strategy;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
+import static run.halo.app.theme.router.strategy.PermalinkPredicates.get;
 
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RequestPredicate;
-import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -49,13 +48,12 @@ public class SinglePageRouteStrategy implements TemplateRouterStrategy {
 
         List<String> permalinks = permalinkIndexer.getPermalinks(gvk);
         for (String permalink : permalinks) {
-            requestPredicate = requestPredicate.or(RequestPredicates.GET(permalink));
+            requestPredicate = requestPredicate.or(get(permalink));
         }
 
         return RouterFunctions
             .route(requestPredicate.and(accept(MediaType.TEXT_HTML)), request -> {
-                String slug = StringUtils.removeStart(request.path(), "/");
-                String name = permalinkIndexer.getNameBySlug(gvk, slug);
+                var name = permalinkIndexer.getNameByPermalink(gvk, request.path());
                 if (name == null) {
                     return ServerResponse.notFound().build();
                 }

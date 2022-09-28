@@ -200,7 +200,6 @@ public class SpringWebFluxTemplateEngine extends SpringTemplateEngine
                     try {
 
                         process(templateName, markupSelectors, context, writer);
-                        Mono.empty().block();
 
                     } catch (final Throwable t) {
                         logger.error(

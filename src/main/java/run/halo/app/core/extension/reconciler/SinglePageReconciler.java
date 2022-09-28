@@ -1,5 +1,8 @@
 package run.halo.app.core.extension.reconciler;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.springframework.web.util.UriUtils.encodePath;
+
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -150,8 +153,10 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
             final SinglePage oldPage = JsonUtils.deepCopy(singlePage);
             permalinkOnDelete(oldPage);
 
+            var permalink = encodePath(singlePage.getSpec().getSlug(), UTF_8);
+            permalink = StringUtils.prependIfMissing(permalink, "/");
             singlePage.getStatusOrDefault()
-                .setPermalink(PathUtils.combinePath(singlePage.getSpec().getSlug()));
+                .setPermalink(permalink);
             if (isPublished(singlePage)) {
                 permalinkOnAdd(singlePage);
             }
