@@ -53,6 +53,7 @@ import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.DataBufferUtils;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
+import run.halo.app.theme.ThemePathPolicy;
 
 /**
  * Endpoint for managing themes.
@@ -66,10 +67,12 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     private final ReactiveExtensionClient client;
     private final HaloProperties haloProperties;
+    private final ThemePathPolicy themePathPolicy;
 
     public ThemeEndpoint(ReactiveExtensionClient client, HaloProperties haloProperties) {
         this.client = client;
         this.haloProperties = haloProperties;
+        this.themePathPolicy = new ThemePathPolicy(haloProperties.getWorkDir());
     }
 
     @Override
@@ -101,7 +104,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                         .implementation(String.class)
                     )
                     .response(responseBuilder()
-                        .implementation(Setting.class))
+                        .implementation(Theme.class))
             )
             .build();
     }
@@ -124,12 +127,26 @@ public class ThemeEndpoint implements CustomEndpoint {
                             persistent.setSpec(setting.getSpec());
                             return client.update(persistent);
                         })
-                        .switchIfEmpty(Mono.defer(() -> client.create(setting))))
-                    .orElse(Mono.empty());
+                        .switchIfEmpty(Mono.defer(() -> client.create(setting)))
+                        .thenReturn(theme)
+                    )
+                    .orElse(Mono.just(theme));
             })
-            .flatMap(setting -> ServerResponse.ok()
+            .flatMap(themeToUse -> {
+                Path themePath = themePathPolicy.generate(themeToUse);
+                Path themeManifestPath = ThemeUtils.resolveThemeManifest(themePath);
+                if (themeManifestPath == null) {
+                    return Mono.error(new IllegalArgumentException(
+                        "The manifest file [theme.yaml] is required."));
+                }
+                Unstructured unstructured = ThemeUtils.loadThemeManifest(themeManifestPath);
+                Theme newTheme = Unstructured.OBJECT_MAPPER.convertValue(unstructured, Theme.class);
+                themeToUse.setSpec(newTheme.getSpec());
+                return client.update(themeToUse);
+            })
+            .flatMap(theme -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(setting));
+                .bodyValue(theme));
     }
 
     public record InstallRequest(
@@ -299,7 +316,7 @@ public class ThemeEndpoint implements CustomEndpoint {
             }
         }
 
-        private static Unstructured loadThemeManifest(Path themeManifestPath) {
+        static Unstructured loadThemeManifest(Path themeManifestPath) {
             List<Unstructured> unstructureds =
                 new YamlUnstructuredLoader(new FileSystemResource(themeManifestPath))
                     .load();

@@ -30,6 +30,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
+import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
@@ -61,10 +62,9 @@ class ThemeEndpointTest {
     @BeforeEach
     void setUp() throws IOException {
         tmpHaloWorkDir = Files.createTempDirectory("halo-unit-test");
+        when(haloProperties.getWorkDir()).thenReturn(tmpHaloWorkDir);
 
         ThemeEndpoint themeEndpoint = new ThemeEndpoint(extensionClient, haloProperties);
-
-        when(haloProperties.getWorkDir()).thenReturn(tmpHaloWorkDir);
 
         defaultTheme = ResourceUtils.getFile("classpath:themes/test-theme.zip");
 
@@ -122,6 +122,7 @@ class ThemeEndpointTest {
         theme.setMetadata(new Metadata());
         theme.getMetadata().setName("fake-theme");
         theme.setSpec(new Theme.ThemeSpec());
+        theme.getSpec().setDisplayName("Hello");
         theme.getSpec().setSettingName("fake-setting");
         when(extensionClient.fetch(Theme.class, "fake-theme"))
             .thenReturn(Mono.just(theme));
@@ -152,9 +153,20 @@ class ThemeEndpointTest {
                       children: Register
             """);
 
+        Files.writeString(themeWorkDir.resolve("theme.yaml"), """
+            apiVersion: v1alpha1
+            kind: Theme
+            metadata:
+              name: fake-theme
+            spec:
+              displayName: Fake Theme
+            """);
+        when(extensionClient.update(any(Theme.class)))
+            .thenReturn(Mono.just(theme));
+
         when(extensionClient.update(any(Setting.class)))
             .thenReturn(Mono.just(setting));
-        ArgumentCaptor<Setting> captor = ArgumentCaptor.forClass(Setting.class);
+        ArgumentCaptor<AbstractExtension> captor = ArgumentCaptor.forClass(Setting.class);
         webTestClient.put()
             .uri("/themes/fake-theme/reload-setting")
             .exchange()
@@ -162,10 +174,12 @@ class ThemeEndpointTest {
             .isOk()
             .expectBody(Setting.class)
             .value(settingRes -> {
-                verify(extensionClient, times(1)).update(captor.capture());
+                verify(extensionClient, times(2)).update(captor.capture());
                 verify(extensionClient, times(0)).create(any(Setting.class));
-                Setting value = captor.getValue();
-                System.out.println(JsonUtils.objectToJson(value));
+                List<AbstractExtension> allValues = captor.getAllValues();
+                assertThat(allValues.get(0)).isInstanceOfAny(Setting.class);
+                Setting newSetting = (Setting) allValues.get(0);
+                Theme newTheme = (Theme) allValues.get(1);
                 try {
                     JSONAssert.assertEquals("""
                             {
@@ -188,7 +202,24 @@ class ThemeEndpointTest {
                                "metadata": {}
                              }
                             """,
-                        JsonUtils.objectToJson(value),
+                        JsonUtils.objectToJson(newSetting),
+                        true);
+
+                    JSONAssert.assertEquals("""
+                            {
+                                "spec": {
+                                    "displayName": "Fake Theme",
+                                    "version": "*",
+                                    "require": "*"
+                                },
+                                "apiVersion": "theme.halo.run/v1alpha1",
+                                "kind": "Theme",
+                                "metadata": {
+                                    "name": "fake-theme"
+                                }
+                            }
+                            """,
+                        JsonUtils.objectToJson(newTheme),
                         true);
                 } catch (JSONException e) {
                     throw new RuntimeException(e);
