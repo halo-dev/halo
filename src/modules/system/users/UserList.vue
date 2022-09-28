@@ -19,12 +19,13 @@ import {
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import GrantPermissionModal from "./components/GrantPermissionModal.vue";
-import { inject, onMounted, ref, watch } from "vue";
+import { computed, inject, onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { User, UserList } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 import { useRouteQuery } from "@vueuse/router";
+import Fuse from "fuse.js";
 
 const dialog = useDialog();
 
@@ -47,6 +48,8 @@ const selectedUserNames = ref<string[]>([]);
 const selectedUser = ref<User>();
 const currentUser = inject<User>("currentUser");
 
+let fuse: Fuse<User> | undefined = undefined;
+
 const handleFetchUsers = async () => {
   try {
     const { data } = await apiClient.extension.user.listv1alpha1User({
@@ -54,12 +57,27 @@ const handleFetchUsers = async () => {
       size: users.value.size,
     });
     users.value = data;
+
+    fuse = new Fuse(data.items, {
+      keys: ["spec.displayName", "metadata.name", "spec.email"],
+      useExtendedSearch: true,
+    });
   } catch (e) {
-    console.error(e);
+    console.error("Failed to fetch users", e);
   } finally {
     selectedUser.value = undefined;
   }
 };
+
+const keyword = ref("");
+
+const searchResults = computed(() => {
+  if (!fuse || !keyword.value) {
+    return users.value.items;
+  }
+
+  return fuse?.search(keyword.value).map((item) => item.item);
+});
 
 const handlePaginationChange = async ({
   page,
@@ -248,6 +266,7 @@ onMounted(() => {
             <div class="flex w-full flex-1 sm:w-auto">
               <FormKit
                 v-if="!selectedUserNames.length"
+                v-model="keyword"
                 placeholder="输入关键词搜索"
                 type="text"
               ></FormKit>
@@ -257,7 +276,7 @@ onMounted(() => {
                 </VButton>
               </VSpace>
             </div>
-            <div class="mt-4 flex sm:mt-0">
+            <div v-if="false" class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
                 <FloatingDropdown>
                   <div
@@ -361,7 +380,7 @@ onMounted(() => {
         </div>
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-        <li v-for="(user, index) in users.items" :key="index">
+        <li v-for="(user, index) in searchResults" :key="index">
           <VEntity :is-selected="checkSelection(user)">
             <template #checkbox>
               <input
