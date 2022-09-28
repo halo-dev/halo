@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import run.halo.app.content.ListedSinglePage;
 import run.halo.app.content.SinglePageQuery;
 import run.halo.app.content.SinglePageRequest;
 import run.halo.app.content.SinglePageService;
+import run.halo.app.content.SinglePageSorter;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.SinglePage;
 import run.halo.app.core.extension.Snapshot;
@@ -39,9 +41,6 @@ import run.halo.app.infra.ConditionStatus;
  */
 @Service
 public class SinglePageServiceImpl implements SinglePageService {
-    private static final Comparator<SinglePage> DEFAULT_PAGE_COMPARATOR =
-        Comparator.comparing(page -> page.getMetadata().getCreationTimestamp());
-
     private final ContentService contentService;
 
     private final ReactiveExtensionClient client;
@@ -53,8 +52,10 @@ public class SinglePageServiceImpl implements SinglePageService {
 
     @Override
     public Mono<ListResult<ListedSinglePage>> list(SinglePageQuery query) {
+        Comparator<SinglePage> comparator =
+            SinglePageSorter.from(query.getSort(), query.getSortOrder());
         return client.list(SinglePage.class, pageListPredicate(query),
-                DEFAULT_PAGE_COMPARATOR.reversed(), query.getPage(), query.getSize())
+                comparator, query.getPage(), query.getSize())
             .flatMap(listResult -> Flux.fromStream(
                         listResult.get().map(this::getListedSinglePage)
                     )
@@ -133,6 +134,40 @@ public class SinglePageServiceImpl implements SinglePageService {
     Predicate<SinglePage> pageListPredicate(SinglePageQuery query) {
         Predicate<SinglePage> paramPredicate = singlePage -> contains(query.getContributors(),
             singlePage.getStatusOrDefault().getContributors());
+
+        String keyword = query.getKeyword();
+        if (keyword != null) {
+            paramPredicate = paramPredicate.and(page -> {
+                String excerpt = page.getStatusOrDefault().getExcerpt();
+                return StringUtils.containsIgnoreCase(excerpt, keyword)
+                    || StringUtils.containsIgnoreCase(page.getSpec().getSlug(), keyword)
+                    || StringUtils.containsIgnoreCase(page.getSpec().getTitle(), keyword);
+            });
+        }
+
+        Post.PostPhase publishPhase = query.getPublishPhase();
+        if (publishPhase != null) {
+            paramPredicate = paramPredicate.and(page -> {
+                if (Post.PostPhase.PENDING_APPROVAL.equals(publishPhase)) {
+                    return !page.isPublished()
+                        && Post.PostPhase.PENDING_APPROVAL.name()
+                        .equalsIgnoreCase(page.getStatusOrDefault().getPhase());
+                }
+                // published
+                if (Post.PostPhase.PUBLISHED.equals(publishPhase)) {
+                    return page.isPublished();
+                }
+                // draft
+                return !page.isPublished();
+            });
+        }
+
+        Post.VisibleEnum visible = query.getVisible();
+        if (visible != null) {
+            paramPredicate =
+                paramPredicate.and(post -> visible.equals(post.getSpec().getVisible()));
+        }
+
         Predicate<SinglePage> predicate = labelAndFieldSelectorToPredicate(query.getLabelSelector(),
             query.getFieldSelector());
         return predicate.and(paramPredicate);
