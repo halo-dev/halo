@@ -49,7 +49,8 @@ class CategoryReconcilerTest {
         ArgumentCaptor<Category> captor = ArgumentCaptor.forClass(Category.class);
         verify(client, times(2)).update(captor.capture());
         assertThat(captor.getAllValues().get(1).getStatusOrDefault().getPostCount()).isEqualTo(4);
-        assertThat(captor.getAllValues().get(1).getStatusOrDefault().getVisiblePostCount()).isEqualTo(0);
+        assertThat(
+            captor.getAllValues().get(1).getStatusOrDefault().getVisiblePostCount()).isEqualTo(0);
     }
 
     @Test
@@ -68,7 +69,8 @@ class CategoryReconcilerTest {
         ArgumentCaptor<Category> captor = ArgumentCaptor.forClass(Category.class);
         verify(client, times(2)).update(captor.capture());
         assertThat(captor.getAllValues().get(1).getStatusOrDefault().getPostCount()).isEqualTo(2);
-        assertThat(captor.getAllValues().get(1).getStatusOrDefault().getVisiblePostCount()).isEqualTo(0);
+        assertThat(
+            captor.getAllValues().get(1).getStatusOrDefault().getVisiblePostCount()).isEqualTo(0);
     }
 
     @Test
