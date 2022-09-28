@@ -102,7 +102,7 @@ class ThemeReconcilerTest {
 
         themeReconciler.reconcile(new Reconciler.Request(metadata.getName()));
 
-        verify(extensionClient, times(2)).fetch(eq(Theme.class), eq(metadata.getName()));
+        verify(extensionClient, times(3)).fetch(eq(Theme.class), eq(metadata.getName()));
         verify(extensionClient, times(2)).fetch(eq(Setting.class), eq(themeSpec.getSettingName()));
 
         assertThat(Files.exists(testWorkDir)).isTrue();
@@ -133,7 +133,7 @@ class ThemeReconcilerTest {
         Reconciler.Result reconcile =
             themeReconciler.reconcile(new Reconciler.Request(metadata.getName()));
         assertThat(reconcile.reEnqueue()).isFalse();
-        verify(extensionClient, times(1)).fetch(eq(Theme.class), eq(metadata.getName()));
+        verify(extensionClient, times(2)).fetch(eq(Theme.class), eq(metadata.getName()));
 
         // setting exists
         themeSpec.setSettingName("theme-test-setting");
@@ -142,9 +142,9 @@ class ThemeReconcilerTest {
         assertThat(theme.getSpec().getConfigMapName()).isNull();
         ArgumentCaptor<Theme> captor = ArgumentCaptor.forClass(Theme.class);
         themeReconciler.reconcile(new Reconciler.Request(metadata.getName()));
-        verify(extensionClient, times(3))
+        verify(extensionClient, times(5))
             .fetch(eq(Theme.class), eq(metadata.getName()));
-        verify(extensionClient, times(1))
+        verify(extensionClient, times(2))
             .update(captor.capture());
         Theme value = captor.getValue();
         assertThat(value.getSpec().getConfigMapName()).isNotNull();

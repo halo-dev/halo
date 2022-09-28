@@ -47,8 +47,23 @@ public class ThemeReconciler implements Reconciler<Request> {
                     reconcileThemeDeletion(theme);
                 }
                 themeSettingDefaultConfig(theme);
+                reconcileStatus(request.name());
             });
         return new Result(false, null);
+    }
+
+    private void reconcileStatus(String name) {
+        client.fetch(Theme.class, name).ifPresent(theme -> {
+            Theme oldTheme = JsonUtils.deepCopy(theme);
+            if (theme.getStatus() == null) {
+                theme.setStatus(new Theme.ThemeStatus());
+            }
+            Path themePath = themePathPolicy.generate(theme);
+            theme.getStatus().setLocation(themePath.toAbsolutePath().toString());
+            if (!oldTheme.equals(theme)) {
+                client.update(theme);
+            }
+        });
     }
 
     private void themeSettingDefaultConfig(Theme theme) {

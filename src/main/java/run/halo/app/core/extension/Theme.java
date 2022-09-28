@@ -25,6 +25,8 @@ public class Theme extends AbstractExtension {
     @Schema(required = true)
     private ThemeSpec spec;
 
+    private ThemeStatus status;
+
     @Data
     @ToString
     public static class ThemeSpec {
@@ -67,6 +69,11 @@ public class Theme extends AbstractExtension {
             }
             return require;
         }
+    }
+
+    @Data
+    public static class ThemeStatus {
+        private String location;
     }
 
     @Data
