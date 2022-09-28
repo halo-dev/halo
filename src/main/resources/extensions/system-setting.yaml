@@ -14,56 +14,12 @@ spec:
         - $formkit: text
           label: "站点副标题"
           name: subtitle
-          validation: required
         - $formkit: text
           label: Logo
           name: logo
         - $formkit: text
           label: Favicon
           name: favicon
-    - group: user
-      label: 用户设置
-      formSchema:
-        - $formkit: checkbox
-          label: "是否公开注册"
-          value: false
-          name: allowRegistration
-          validation: required
-        - $formkit: text
-          label: "默认角色"
-          name: defaultRole
-          validation: required
-    - group: routeRules
-      label: 主题模板路由设置
-      formSchema:
-        - $formkit: text
-          label: "分类页路由前缀"
-          value: "categories"
-          name: categories
-          validation: required | alphanumeric
-        - $formkit: text
-          label: "标签页路由前缀"
-          value: "tags"
-          name: tags
-          validation: required | alphanumeric
-        - $formkit: text
-          label: "归档页路由前缀"
-          value: "archives"
-          name: archives
-          validation: required | alphanumeric
-        - $formkit: select
-          label: "文章详情页访问规则"
-          value: "/archives/{slug}"
-          options:
-            - /archives/{slug}
-            - /archives/{name}
-            - /?p={name}
-            - /?p={slug}
-            - /{year:\d{4}}/{slug}
-            - /{year:\d{4}}/{month:\d{2}}/{slug}
-            - /{year:\d{4}}/{month:\d{2}}/{day:\d{2}}/{slug}
-          name: post
-          validation: required
     - group: post
       label: 文章设置
       formSchema:
@@ -116,18 +72,56 @@ spec:
           name: systemUserOnly
           value: true
           label: "仅允许注册用户评论"
+    - group: routeRules
+      label: 主题路由设置
+      formSchema:
+        - $formkit: text
+          label: "分类页路由前缀"
+          value: "categories"
+          name: categories
+          validation: required | alphanumeric
+        - $formkit: text
+          label: "标签页路由前缀"
+          value: "tags"
+          name: tags
+          validation: required | alphanumeric
+        - $formkit: text
+          label: "归档页路由前缀"
+          value: "archives"
+          name: archives
+          validation: required | alphanumeric
+        - $formkit: select
+          label: 文章详情页访问规则
+          value: '/archives/{slug}'
+          options:
+            - label: '/archives/{slug}'
+              value: '/archives/{slug}'
+            - label: '/archives/{name}'
+              value: '/archives/{name}'
+            - label: '/?p={name}'
+              value: '/?p={name}'
+            - label: '/?p={slug}'
+              value: '/?p={slug}'
+            - label: '/{year}/{slug}'
+              value: '/{year:\d{4}}/{slug}'
+            - label: '/{year}/{month}/{slug}'
+              value: '/{year:\d{4}}/{month:\d{2}}/{slug}'
+            - label: '/{year}/{month}/{day}/{slug}'
+              value: '/{year:\d{4}}/{month:\d{2}}/{day:\d{2}}/{slug}'
+          name: post
+          validation: required
     - group: codeInjection
       label: 代码注入
       formSchema:
         - $formkit: textarea
-          label: "全局 head"
+          label: "全局 head 标签"
           name: globalHead
-          help: "插入代码到所有页面的 head 标签部分"
+          help: "注入代码到所有页面的 head 标签部分"
         - $formkit: textarea
-          label: "内容页 head"
+          label: "内容页 head 标签"
           name: contentHead
-          help: "插入代码到文章页面和自定义页面的 head 标签部分"
+          help: "注入代码到文章页面和自定义页面的 head 标签部分"
         - $formkit: textarea
           label: "页脚"
           name: footer
-          help: "插入代码到所有页面的页脚部分"
+          help: "注入代码到所有页面的页脚部分"
