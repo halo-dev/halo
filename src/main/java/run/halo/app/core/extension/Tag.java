@@ -69,6 +69,11 @@ public class Tag extends AbstractExtension {
 
         private String permalink;
 
+        @JsonIgnore
         private List<Post.CompactPost> posts;
+
+        public Integer getPostCount() {
+            return posts == null ? 0 : posts.size();
+        }
     }
 }

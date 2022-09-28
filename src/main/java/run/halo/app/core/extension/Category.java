@@ -69,6 +69,11 @@ public class Category extends AbstractExtension {
         /**
          * 包括当前和其下所有层级的文章 name (depth=max).
          */
+        @JsonIgnore
         private List<Post.CompactPost> posts;
+
+        public Integer getPostCount() {
+            return posts == null ? 0 : posts.size();
+        }
     }
 }
