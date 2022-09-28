@@ -64,39 +64,41 @@ class SinglePageRouteStrategyTest {
     void shouldResponse200IfPermalinkFound() {
         when(permalinkIndexer.getPermalinks(any()))
             .thenReturn(List.of("/fake-slug"));
-        when(permalinkIndexer.getNameBySlug(any(), eq("fake-slug")))
+        when(permalinkIndexer.getNameByPermalink(any(), eq("/fake-slug")))
             .thenReturn("fake-name");
         createClient().get()
             .uri("/fake-slug")
             .exchange()
             .expectStatus()
             .isOk();
+
+        verify(permalinkIndexer).getNameByPermalink(any(), eq("/fake-slug"));
     }
 
     @Test
     void shouldResponse200IfSlugNameContainsSpecialChars() {
         when(permalinkIndexer.getPermalinks(any()))
-            .thenReturn(List.of("/fake%20%2F%20slug"));
-        when(permalinkIndexer.getNameBySlug(any(), eq("fake / slug")))
+            .thenReturn(List.of("/fake%20/%20slug"));
+        when(permalinkIndexer.getNameByPermalink(any(), eq("/fake%20/%20slug")))
             .thenReturn("fake-name");
         createClient().get()
             .uri("/fake / slug")
             .exchange()
             .expectStatus().isOk();
-        verify(permalinkIndexer).getNameBySlug(any(), eq("fake / slug"));
+        verify(permalinkIndexer).getNameByPermalink(any(), eq("/fake%20/%20slug"));
     }
 
     @Test
     void shouldResponse200IfSlugNameContainsChineseChars() {
         when(permalinkIndexer.getPermalinks(any()))
             .thenReturn(List.of("/%E4%B8%AD%E6%96%87"));
-        when(permalinkIndexer.getNameBySlug(any(), eq("中文")))
+        when(permalinkIndexer.getNameByPermalink(any(), eq("/%E4%B8%AD%E6%96%87")))
             .thenReturn("fake-name");
         createClient().get()
             .uri("/中文")
             .exchange()
             .expectStatus().isOk();
-        verify(permalinkIndexer).getNameBySlug(any(), eq("中文"));
+        verify(permalinkIndexer).getNameByPermalink(any(), eq("/%E4%B8%AD%E6%96%87"));
     }
 
     WebTestClient createClient() {
