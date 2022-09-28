@@ -2,7 +2,6 @@ package run.halo.app.core.extension;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -69,11 +68,8 @@ public class Tag extends AbstractExtension {
 
         private String permalink;
 
-        @JsonIgnore
-        private List<Post.CompactPost> posts;
+        public Integer visiblePostCount;
 
-        public Integer getPostCount() {
-            return posts == null ? 0 : posts.size();
-        }
+        public Integer postCount;
     }
 }

@@ -65,8 +65,10 @@ class TagFinderImplTest {
                      },
                      "status": {
                          "permalink": "permalink-1",
-                         "posts": []
-                     }
+                         "postCount": 2,
+                         "visiblePostCount": 1
+                     },
+                     "postCount": 1
                 }
                 """,
             JsonUtils.objectToJson(tagVo),
@@ -117,7 +119,8 @@ class TagFinderImplTest {
 
         Tag.TagStatus tagStatus = new Tag.TagStatus();
         tagStatus.setPermalink("permalink-" + i);
-        tagStatus.setPosts(List.of());
+        tagStatus.setPostCount(2);
+        tagStatus.setVisiblePostCount(1);
         tag.setStatus(tagStatus);
         return tag;
     }

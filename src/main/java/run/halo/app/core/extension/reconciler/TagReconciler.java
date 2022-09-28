@@ -3,6 +3,7 @@ package run.halo.app.core.extension.reconciler;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
 import run.halo.app.core.extension.Post;
@@ -115,7 +116,13 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
                 .visible(post.getSpec().getVisible())
                 .build())
             .toList();
-        tag.getStatusOrDefault().setPosts(compactPosts);
+        tag.getStatusOrDefault().setPostCount(compactPosts.size());
+
+        long visiblePostCount = compactPosts.stream()
+            .filter(post -> Objects.equals(true, post.getPublished())
+                && Post.VisibleEnum.PUBLIC.equals(post.getVisible()))
+            .count();
+        tag.getStatusOrDefault().setVisiblePostCount((int) visiblePostCount);
     }
 
     private boolean includes(List<String> tags, String tagName) {

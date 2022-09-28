@@ -1,14 +1,12 @@
 package run.halo.app.theme.finders.vo;
 
 import java.util.List;
-import java.util.Objects;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.util.Assert;
 import run.halo.app.core.extension.Category;
-import run.halo.app.core.extension.Post;
 import run.halo.app.extension.MetadataOperator;
 
 /**
@@ -33,6 +31,8 @@ public class CategoryTreeVo {
 
     private String parentName;
 
+    private Integer postCount;
+
     /**
      * Convert {@link CategoryVo} to {@link CategoryTreeVo}.
      *
@@ -46,21 +46,7 @@ public class CategoryTreeVo {
             .spec(category.getSpec())
             .status(category.getStatus())
             .children(List.of())
+            .postCount(category.getPostCount())
             .build();
-    }
-
-    /**
-     * Gets the number of posts under the current category and its sub categories.
-     *
-     * @return the number of posts
-     */
-    public long postCount() {
-        if (this.status == null || this.status.getPosts() == null) {
-            return 0;
-        }
-        return this.status.getPosts().stream()
-            .filter(post -> Objects.equals(true, post.getPublished())
-                && Post.VisibleEnum.PUBLIC.equals(post.getVisible()))
-            .count();
     }
 }
