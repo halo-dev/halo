@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { ref } from "vue";
+import { computed, ref, watch } from "vue";
 import type { Role } from "@halo-dev/api-client";
 
 // components
@@ -31,11 +31,34 @@ import { useFetchRole } from "@/modules/system/roles/composables/use-role";
 // libs
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
+import Fuse from "fuse.js";
 
 const editingModal = ref<boolean>(false);
-const selectedRole = ref<Role | null>(null);
+const selectedRole = ref<Role>();
 
 const { roles, handleFetchRoles } = useFetchRole();
+
+let fuse: Fuse<Role> | undefined = undefined;
+
+watch(
+  () => roles.value,
+  (value) => {
+    fuse = new Fuse(value, {
+      keys: ["spec.displayName", "metadata.name"],
+      useExtendedSearch: true,
+    });
+  }
+);
+
+const keyword = ref("");
+
+const searchResults = computed(() => {
+  if (!fuse || !keyword.value) {
+    return roles.value;
+  }
+
+  return fuse?.search(keyword.value).map((item) => item.item);
+});
 
 const handleOpenEditingModal = (role: Role) => {
   selectedRole.value = role;
@@ -43,7 +66,7 @@ const handleOpenEditingModal = (role: Role) => {
 };
 
 const onEditingModalClose = () => {
-  selectedRole.value = null;
+  selectedRole.value = undefined;
   handleFetchRoles();
 };
 
@@ -106,9 +129,13 @@ const handleDelete = async (role: Role) => {
             class="relative flex flex-col items-start sm:flex-row sm:items-center"
           >
             <div class="flex w-full flex-1 sm:w-auto">
-              <FormKit placeholder="输入关键词搜索" type="text"></FormKit>
+              <FormKit
+                v-model="keyword"
+                placeholder="输入关键词搜索"
+                type="text"
+              ></FormKit>
             </div>
-            <div class="mt-4 flex sm:mt-0">
+            <div v-if="false" class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
                 <FloatingDropdown>
                   <div
@@ -200,7 +227,7 @@ const handleDelete = async (role: Role) => {
         </div>
       </template>
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-        <li v-for="(role, index) in roles" :key="index">
+        <li v-for="(role, index) in searchResults" :key="index">
           <VEntity>
             <template #start>
               <VEntityField
