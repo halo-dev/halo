@@ -201,6 +201,7 @@ watchEffect(() => {
     :visible="visible"
     :width="700"
     title="文章设置"
+    :centered="false"
     @update:visible="handleVisibleChange"
   >
     <template #actions>
@@ -320,8 +321,8 @@ watchEffect(() => {
             type="text"
           ></FormKit>
         </FormKit>
+        <!--TODO: add SEO/Metas/Inject Code form-->
       </VTabItem>
-      <!--TODO: add SEO/Metas/Inject Code form-->
     </VTabs>
 
     <template #footer>
