@@ -16,7 +16,7 @@ import PostSettingModal from "./components/PostSettingModal.vue";
 import PostPreviewModal from "./components/PostPreviewModal.vue";
 import AttachmentSelectorModal from "../attachments/components/AttachmentSelectorModal.vue";
 import type { PostRequest } from "@halo-dev/api-client";
-import { computed, markRaw, onMounted, ref, watch } from "vue";
+import { computed, markRaw, nextTick, onMounted, ref, watch } from "vue";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
@@ -125,7 +125,9 @@ const editor = useEditor({
   autofocus: "start",
   onUpdate: () => {
     formState.value.content.raw = editor.value?.getHTML() + "";
-    handleGenerateTableOfContent();
+    nextTick(() => {
+      handleGenerateTableOfContent();
+    });
   },
 });
 
