@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -41,6 +42,11 @@ public class SinglePage extends AbstractExtension {
             this.status = new SinglePageStatus();
         }
         return this.status;
+    }
+
+    @JsonIgnore
+    public boolean isPublished() {
+        return Objects.equals(true, spec.getPublished());
     }
 
     @Data
