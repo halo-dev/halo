@@ -23,6 +23,7 @@ export default definePlugin({
               component: PluginList,
               meta: {
                 title: "插件",
+                searchable: true,
                 permissions: ["system:plugins:view"],
               },
             },

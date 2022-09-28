@@ -29,6 +29,7 @@ export default definePlugin({
               component: UserList,
               meta: {
                 title: "用户",
+                searchable: true,
                 permissions: ["system:users:view"],
               },
             },

@@ -11,6 +11,7 @@ const props = withDefaults(
     fullscreen?: boolean;
     bodyClass?: string[];
     mountToBody?: boolean;
+    centered?: boolean;
   }>(),
   {
     visible: false,
@@ -20,6 +21,7 @@ const props = withDefaults(
     fullscreen: false,
     bodyClass: undefined,
     mountToBody: false,
+    centered: true,
   }
 );
 
@@ -34,6 +36,7 @@ const modelWrapper = ref<HTMLElement>();
 const wrapperClasses = computed(() => {
   return {
     "modal-wrapper-fullscreen": props.fullscreen,
+    "modal-wrapper-centered": props.centered,
   };
 });
 
@@ -123,14 +126,15 @@ watch(
 <style lang="scss">
 .modal-wrapper {
   @apply fixed
-  top-0
   left-0
   h-full
   w-full
   flex
   flex-row
-  items-center
-  justify-center;
+  items-start
+  justify-center
+  top-0
+  py-10;
   z-index: 999;
 
   .modal-layer {
@@ -154,7 +158,7 @@ watch(
     shadow-xl
     rounded-base;
     width: calc(100vw - 20px);
-    max-height: calc(100vh - 20px);
+    max-height: calc(100vh - 5rem);
 
     .modal-header {
       @apply flex
@@ -201,6 +205,13 @@ watch(
     .modal-footer {
       @apply border-t;
       padding: 12px 16px;
+    }
+  }
+
+  &.modal-wrapper-centered {
+    @apply py-0 items-center;
+    .modal-content {
+      max-height: calc(100vh - 20px) !important;
     }
   }
 

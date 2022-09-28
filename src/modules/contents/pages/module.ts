@@ -27,6 +27,7 @@ export default definePlugin({
               component: FunctionalPageList,
               meta: {
                 title: "功能页面",
+                searchable: true,
               },
             },
           ],
@@ -45,6 +46,7 @@ export default definePlugin({
                   component: SinglePageList,
                   meta: {
                     title: "自定义页面",
+                    searchable: true,
                   },
                 },
               ],
@@ -59,6 +61,7 @@ export default definePlugin({
                   component: SinglePageEditor,
                   meta: {
                     title: "页面编辑",
+                    searchable: true,
                   },
                 },
               ],

@@ -3,8 +3,6 @@ import {
   IconMore,
   IconSearch,
   IconUserSettings,
-  VInput,
-  VModal,
   VRoutesMenu,
   VTag,
   VAvatar,
@@ -13,7 +11,7 @@ import type { MenuGroupType, MenuItemType } from "../types/menus";
 import type { User } from "@halo-dev/api-client";
 import logo from "@/assets/logo.svg";
 import { RouterView, useRoute, useRouter } from "vue-router";
-import { computed, inject, ref } from "vue";
+import { computed, inject, ref, type Ref } from "vue";
 
 const menus = inject<MenuGroupType[]>("menus");
 const minimenus = inject<MenuItemType[]>("minimenus");
@@ -22,7 +20,6 @@ const router = useRouter();
 
 const moreMenuVisible = ref(false);
 const moreMenuRootVisible = ref(false);
-const spotlight = ref(false);
 
 const currentUser = inject<User>("currentUser");
 
@@ -37,6 +34,13 @@ const currentRole = computed(() => {
     ] || "[]"
   )[0];
 });
+
+const globalSearchVisible = inject<Ref<boolean>>(
+  "globalSearchVisible",
+  ref(false)
+);
+
+const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
 </script>
 
 <template>
@@ -48,13 +52,15 @@ const currentRole = computed(() => {
       <div class="px-3">
         <div
           class="flex cursor-pointer items-center rounded bg-gray-100 p-2 text-gray-400 transition-all hover:text-gray-900"
-          @click="spotlight = true"
+          @click="globalSearchVisible = true"
         >
           <span class="mr-3">
             <IconSearch />
           </span>
           <span class="flex-1 select-none text-base font-normal">搜索</span>
-          <div class="text-sm">⌘+K</div>
+          <div class="text-sm">
+            {{ `${isMac ? "⌘" : "Ctrl"}+K` }}
+          </div>
         </div>
       </div>
       <VRoutesMenu :menus="menus" />
@@ -181,12 +187,6 @@ const currentRole = computed(() => {
       </Teleport>
     </div>
   </div>
-
-  <VModal v-model:visible="spotlight" :width="600">
-    <template #header>
-      <VInput placeholder="全局搜索" size="lg"></VInput>
-    </template>
-  </VModal>
 </template>
 
 <style lang="scss">

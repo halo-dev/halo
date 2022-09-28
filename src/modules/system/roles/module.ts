@@ -16,6 +16,7 @@ export default definePlugin({
           component: RoleList,
           meta: {
             title: "角色",
+            searchable: true,
             permissions: ["system:roles:view"],
           },
         },

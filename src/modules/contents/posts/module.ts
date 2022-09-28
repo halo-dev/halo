@@ -19,6 +19,7 @@ export default definePlugin({
           component: PostList,
           meta: {
             title: "文章",
+            searchable: true,
           },
         },
         {
@@ -27,6 +28,7 @@ export default definePlugin({
           component: PostEditor,
           meta: {
             title: "文章编辑",
+            searchable: true,
           },
         },
         {
@@ -39,6 +41,7 @@ export default definePlugin({
               component: CategoryList,
               meta: {
                 title: "文章分类",
+                searchable: true,
               },
             },
           ],
@@ -53,6 +56,7 @@ export default definePlugin({
               component: TagList,
               meta: {
                 title: "文章标签",
+                searchable: true,
               },
             },
           ],

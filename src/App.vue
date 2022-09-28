@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { RouterView, useRoute } from "vue-router";
 import { VDialogProvider } from "@halo-dev/components";
-import { watch } from "vue";
+import { onMounted, provide, ref, watch, type Ref } from "vue";
 import { useTitle } from "@vueuse/core";
+import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
 
 const AppName = "Halo";
 const route = useRoute();
@@ -19,11 +20,30 @@ watch(
     title.value = AppName;
   }
 );
+
+const globalSearchVisible = ref(false);
+
+provide<Ref<boolean>>("globalSearchVisible", globalSearchVisible);
+
+const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
+
+const handleKeybinding = (e: KeyboardEvent) => {
+  const { key, ctrlKey, metaKey } = e;
+  if (key === "k" && ((ctrlKey && !isMac) || metaKey)) {
+    globalSearchVisible.value = true;
+    e.preventDefault();
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("keydown", handleKeybinding);
+});
 </script>
 
 <template>
   <VDialogProvider>
     <RouterView />
+    <GlobalSearchModal v-model:visible="globalSearchVisible" />
   </VDialogProvider>
 </template>
 

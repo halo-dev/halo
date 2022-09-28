@@ -16,6 +16,7 @@ export default definePlugin({
           component: CommentList,
           meta: {
             title: "评论",
+            searchable: true,
           },
         },
       ],

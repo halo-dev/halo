@@ -19,6 +19,7 @@ export default definePlugin({
           component: ThemeDetail,
           meta: {
             title: "主题",
+            searchable: true,
           },
         },
         {

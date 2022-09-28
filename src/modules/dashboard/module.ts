@@ -33,6 +33,7 @@ export default definePlugin({
           component: Dashboard,
           meta: {
             title: "仪表盘",
+            searchable: true,
           },
         },
       ],

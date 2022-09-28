@@ -16,6 +16,7 @@ export default definePlugin({
           component: Menus,
           meta: {
             title: "菜单",
+            searchable: true,
           },
         },
       ],
