@@ -60,9 +60,22 @@ const checkAll = ref(false);
 const handleFetchSinglePages = async () => {
   try {
     loading.value = true;
+
+    let contributors: string[] | undefined;
+
+    if (selectedContributor.value) {
+      contributors = [selectedContributor.value.metadata.name];
+    }
+
     const { data } = await apiClient.singlePage.listSinglePages({
       page: singlePages.value.page,
       size: singlePages.value.size,
+      visible: selectedVisibleItem.value.value,
+      sort: selectedSortItem.value?.sort,
+      publishPhase: selectedPublishPhaseItem.value.value,
+      sortOrder: selectedSortItem.value?.sortOrder,
+      keyword: keyword.value,
+      contributor: contributors,
     });
     singlePages.value = data;
   } catch (error) {
@@ -188,12 +201,109 @@ const finalStatus = (singlePage: SinglePage) => {
 onMounted(handleFetchSinglePages);
 
 // Filters
-const selectedUser = ref<User>();
+
+interface VisibleItem {
+  label: string;
+  value?: "PUBLIC" | "INTERNAL" | "PRIVATE";
+}
+
+interface PublishPhaseItem {
+  label: string;
+  value?: "DRAFT" | "PENDING_APPROVAL" | "PUBLISHED";
+}
+
+interface SortItem {
+  label: string;
+  sort: "PUBLISH_TIME" | "CREATE_TIME";
+  sortOrder: boolean;
+}
+
+const VisibleItems: VisibleItem[] = [
+  {
+    label: "全部",
+    value: undefined,
+  },
+  {
+    label: "公开",
+    value: "PUBLIC",
+  },
+  {
+    label: "内部成员可访问",
+    value: "INTERNAL",
+  },
+  {
+    label: "私有",
+    value: "PRIVATE",
+  },
+];
+
+const PublishPhaseItems: PublishPhaseItem[] = [
+  {
+    label: "全部",
+    value: undefined,
+  },
+  {
+    label: "已发布",
+    value: "PUBLISHED",
+  },
+  {
+    label: "未发布",
+    value: "DRAFT",
+  },
+  {
+    label: "待审核",
+    value: "PENDING_APPROVAL",
+  },
+];
+
+const SortItems: SortItem[] = [
+  {
+    label: "较近发布",
+    sort: "PUBLISH_TIME",
+    sortOrder: false,
+  },
+  {
+    label: "较早发布",
+    sort: "PUBLISH_TIME",
+    sortOrder: true,
+  },
+  {
+    label: "较近创建",
+    sort: "CREATE_TIME",
+    sortOrder: false,
+  },
+  {
+    label: "较早创建",
+    sort: "CREATE_TIME",
+    sortOrder: true,
+  },
+];
+
+const selectedContributor = ref<User>();
+const selectedVisibleItem = ref<VisibleItem>(VisibleItems[0]);
+const selectedPublishPhaseItem = ref<PublishPhaseItem>(PublishPhaseItems[0]);
+const selectedSortItem = ref<SortItem>();
+const keyword = ref("");
+
+function handleVisibleItemChange(visibleItem: VisibleItem) {
+  selectedVisibleItem.value = visibleItem;
+  handleFetchSinglePages();
+}
 
 const handleSelectUser = (user?: User) => {
-  selectedUser.value = user;
+  selectedContributor.value = user;
   handleFetchSinglePages();
 };
+
+function handlePublishPhaseItemChange(publishPhaseItem: PublishPhaseItem) {
+  selectedPublishPhaseItem.value = publishPhaseItem;
+  handleFetchSinglePages();
+}
+
+function handleSortItemChange(sortItem?: SortItem) {
+  selectedSortItem.value = sortItem;
+  handleFetchSinglePages();
+}
 </script>
 
 <template>
@@ -224,19 +334,60 @@ const handleSelectUser = (user?: User) => {
               type="checkbox"
             />
           </div>
-          <div class="flex w-full flex-1 sm:w-auto">
+          <div class="flex w-full flex-1 items-center sm:w-auto">
             <div v-if="!checkAll" class="flex items-center gap-2">
-              <FormKit placeholder="输入关键词搜索" type="text"></FormKit>
+              <FormKit
+                v-model="keyword"
+                placeholder="输入关键词搜索"
+                type="text"
+                @keyup.enter="handleFetchSinglePages"
+              ></FormKit>
               <div
-                v-if="selectedUser"
+                v-if="selectedPublishPhaseItem.value"
                 class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
               >
                 <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                  作者：{{ selectedUser?.spec.displayName }}
+                  状态：{{ selectedPublishPhaseItem.label }}
+                </span>
+                <IconCloseCircle
+                  class="h-4 w-4 text-gray-600"
+                  @click="handlePublishPhaseItemChange(PublishPhaseItems[0])"
+                />
+              </div>
+              <div
+                v-if="selectedVisibleItem.value"
+                class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+              >
+                <span class="text-xs text-gray-600 group-hover:text-gray-900">
+                  可见性：{{ selectedVisibleItem.label }}
+                </span>
+                <IconCloseCircle
+                  class="h-4 w-4 text-gray-600"
+                  @click="handleVisibleItemChange(VisibleItems[0])"
+                />
+              </div>
+              <div
+                v-if="selectedContributor"
+                class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+              >
+                <span class="text-xs text-gray-600 group-hover:text-gray-900">
+                  作者：{{ selectedContributor?.spec.displayName }}
                 </span>
                 <IconCloseCircle
                   class="h-4 w-4 text-gray-600"
                   @click="handleSelectUser(undefined)"
+                />
+              </div>
+              <div
+                v-if="selectedSortItem"
+                class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+              >
+                <span class="text-xs text-gray-600 group-hover:text-gray-900">
+                  排序：{{ selectedSortItem.label }}
+                </span>
+                <IconCloseCircle
+                  class="h-4 w-4 text-gray-600"
+                  @click="handleSortItemChange()"
                 />
               </div>
             </div>
@@ -247,8 +398,68 @@ const handleSelectUser = (user?: User) => {
           </div>
           <div class="mt-4 flex sm:mt-0">
             <VSpace spacing="lg">
+              <FloatingDropdown>
+                <div
+                  class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
+                >
+                  <span class="mr-0.5">状态</span>
+                  <span>
+                    <IconArrowDown />
+                  </span>
+                </div>
+                <template #popper>
+                  <div class="w-72 p-4">
+                    <ul class="space-y-1">
+                      <li
+                        v-for="(filterItem, index) in PublishPhaseItems"
+                        :key="index"
+                        v-close-popper
+                        :class="{
+                          'bg-gray-100':
+                            selectedPublishPhaseItem.value === filterItem.value,
+                        }"
+                        class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        @click="handlePublishPhaseItemChange(filterItem)"
+                      >
+                        <span class="truncate">{{ filterItem.label }}</span>
+                      </li>
+                    </ul>
+                  </div>
+                </template>
+              </FloatingDropdown>
+              <FloatingDropdown>
+                <div
+                  class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
+                >
+                  <span class="mr-0.5"> 可见性 </span>
+                  <span>
+                    <IconArrowDown />
+                  </span>
+                </div>
+                <template #popper>
+                  <div class="w-72 p-4">
+                    <ul class="space-y-1">
+                      <li
+                        v-for="(filterItem, index) in VisibleItems"
+                        :key="index"
+                        v-close-popper
+                        :class="{
+                          'bg-gray-100':
+                            selectedVisibleItem.value === filterItem.value,
+                        }"
+                        class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        @click="handleVisibleItemChange(filterItem)"
+                      >
+                        <span class="truncate">
+                          {{ filterItem.label }}
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </template>
+              </FloatingDropdown>
               <UserDropdownSelector
-                v-model:selected="selectedUser"
+                v-model:selected="selectedContributor"
                 @select="handleSelectUser"
               >
                 <div
@@ -273,34 +484,13 @@ const handleSelectUser = (user?: User) => {
                   <div class="w-72 p-4">
                     <ul class="space-y-1">
                       <li
+                        v-for="(sortItem, index) in SortItems"
+                        :key="index"
+                        v-close-popper
                         class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        @click="handleSortItemChange(sortItem)"
                       >
-                        <span class="truncate">较近发布</span>
-                      </li>
-                      <li
-                        class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                      >
-                        <span class="truncate">较晚发布</span>
-                      </li>
-                      <li
-                        class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                      >
-                        <span class="truncate">浏览量最多</span>
-                      </li>
-                      <li
-                        class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                      >
-                        <span class="truncate">浏览量最少</span>
-                      </li>
-                      <li
-                        class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                      >
-                        <span class="truncate">评论量最多</span>
-                      </li>
-                      <li
-                        class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                      >
-                        <span class="truncate">评论量最少</span>
+                        <span class="truncate">{{ sortItem.label }}</span>
                       </li>
                     </ul>
                   </div>
