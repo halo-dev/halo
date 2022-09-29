@@ -22,7 +22,6 @@ import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.plugin.PluginProperties;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,7 +47,8 @@ class PluginEndpointTest {
             .exchange()
             .expectStatus().isOk()
             .expectBody()
-            .json(JsonUtils.objectToJson(ListResult.emptyResult()));
+            .jsonPath("$.items.length()").isEqualTo(0)
+            .jsonPath("$.total").isEqualTo(0);
     }
 
     @Test
@@ -68,7 +68,8 @@ class PluginEndpointTest {
             .exchange()
             .expectStatus().isOk()
             .expectBody()
-            .json(JsonUtils.objectToJson(expectResult));
+            .jsonPath("$.items.length()").isEqualTo(3)
+            .jsonPath("$.total").isEqualTo(3);
     }
 
     @Test
