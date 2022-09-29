@@ -636,7 +636,7 @@ function handleContributorChange(user?: User) {
                                     <div
                                       class="cursor-pointer text-sm text-gray-500 hover:text-gray-900"
                                     >
-                                      {{ category.status?.posts?.length || 0 }}
+                                      {{ category.status?.postCount || 0 }}
                                       篇文章
                                     </div>
                                   </div>
@@ -704,7 +704,7 @@ function handleContributorChange(user?: User) {
                                     <div
                                       class="cursor-pointer text-sm text-gray-500 hover:text-gray-900"
                                     >
-                                      {{ tag.status?.posts?.length || 0 }}
+                                      {{ tag.status?.postCount || 0 }}
                                       篇文章
                                     </div>
                                   </div>

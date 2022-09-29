@@ -76,7 +76,7 @@ function onDelete(category: CategoryTree) {
               </template>
             </VEntityField>
             <VEntityField
-              :description="`${category.status?.posts?.length || 0} 篇文章`"
+              :description="`${category.status?.postCount || 0} 篇文章`"
             />
             <VEntityField
               :description="formatDatetime(category.metadata.creationTimestamp)"

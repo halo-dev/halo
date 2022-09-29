@@ -192,7 +192,7 @@ onMounted(async () => {
                   </template>
                 </VEntityField>
                 <VEntityField
-                  :description="`${tag.status?.posts?.length || 0} 篇文章`"
+                  :description="`${tag.status?.postCount || 0} 篇文章`"
                 />
                 <VEntityField
                   :description="formatDatetime(tag.metadata.creationTimestamp)"
