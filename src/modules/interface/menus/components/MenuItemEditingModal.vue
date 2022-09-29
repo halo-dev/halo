@@ -101,6 +101,8 @@ const onVisibleChange = (visible: boolean) => {
 const handleResetForm = () => {
   formState.value = cloneDeep(initialFormState);
   formState.value.metadata.name = uuid();
+  selectedMenuItemSource.value = menuItemSources[0].value;
+  selectedRef.value = "";
   reset("menuitem-form");
 };
 
@@ -109,6 +111,10 @@ watch(
   (visible) => {
     if (visible) {
       setFocus("displayNameInput");
+
+      if (!props.menuItem) {
+        selectedRef.value = "";
+      }
     } else {
       handleResetForm();
     }
@@ -300,6 +306,7 @@ watch(
       id="menuitem-form"
       name="menuitem-form"
       type="form"
+      :preserve="true"
       :config="{ validationVisibility: 'submit' }"
       @submit="handleSaveMenuItem"
     >
