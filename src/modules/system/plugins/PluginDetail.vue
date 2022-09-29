@@ -213,7 +213,9 @@ watchEffect(() => {
         class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
       >
         <dt class="text-sm font-medium text-gray-900">最近一次启动</dt>
-        <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+        <dd
+          class="mt-1 text-sm tabular-nums text-gray-900 sm:col-span-2 sm:mt-0"
+        >
           {{ formatDatetime(plugin?.status?.lastStartTime) }}
         </dd>
       </div>

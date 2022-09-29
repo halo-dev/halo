@@ -430,9 +430,13 @@ onMounted(() => {
                   <VStatusDot v-tooltip="`删除中`" state="warning" animate />
                 </template>
               </VEntityField>
-              <VEntityField
-                :description="formatDatetime(user.metadata.creationTimestamp)"
-              />
+              <VEntityField>
+                <template #description>
+                  <span class="truncate text-xs tabular-nums text-gray-500">
+                    {{ formatDatetime(user.metadata.creationTimestamp) }}
+                  </span>
+                </template>
+              </VEntityField>
             </template>
             <template #dropdownItems>
               <VButton

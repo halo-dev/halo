@@ -264,9 +264,13 @@ const handleDelete = async (role: Role) => {
                   <VTag> 系统保留</VTag>
                 </template>
               </VEntityField>
-              <VEntityField
-                :description="formatDatetime(role.metadata.creationTimestamp)"
-              />
+              <VEntityField>
+                <template #description>
+                  <span class="truncate text-xs tabular-nums text-gray-500">
+                    {{ formatDatetime(role.metadata.creationTimestamp) }}
+                  </span>
+                </template>
+              </VEntityField>
             </template>
             <template #dropdownItems>
               <VButton

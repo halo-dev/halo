@@ -50,7 +50,7 @@ onMounted(handleFetchPosts);
             </div>
 
             <div>
-              <time class="text-sm text-gray-500">
+              <time class="text-sm tabular-nums text-gray-500">
                 {{ formatDatetime(post.post.spec.publishTime) }}
               </time>
             </div>

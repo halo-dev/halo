@@ -892,11 +892,13 @@ function handleContributorChange(user?: User) {
                   <VStatusDot v-tooltip="`删除中`" state="warning" animate />
                 </template>
               </VEntityField>
-              <VEntityField
-                :description="
-                  formatDatetime(post.post.metadata.creationTimestamp)
-                "
-              />
+              <VEntityField>
+                <template #description>
+                  <span class="truncate text-xs tabular-nums text-gray-500">
+                    {{ formatDatetime(post.post.metadata.creationTimestamp) }}
+                  </span>
+                </template>
+              </VEntityField>
             </template>
             <template #dropdownItems>
               <VButton

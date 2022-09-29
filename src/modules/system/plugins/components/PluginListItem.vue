@@ -79,10 +79,13 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
         </template>
       </VEntityField>
       <VEntityField :description="plugin?.spec.version" />
-      <VEntityField
-        v-if="plugin?.metadata.creationTimestamp"
-        :description="formatDatetime(plugin?.metadata.creationTimestamp)"
-      />
+      <VEntityField v-if="plugin?.metadata.creationTimestamp">
+        <template #description>
+          <span class="truncate text-xs tabular-nums text-gray-500">
+            {{ formatDatetime(plugin?.metadata.creationTimestamp) }}
+          </span>
+        </template>
+      </VEntityField>
       <VEntityField>
         <template #description>
           <div

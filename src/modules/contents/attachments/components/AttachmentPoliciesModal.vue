@@ -189,7 +189,7 @@ watch(
               <div
                 class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
               >
-                <time class="text-sm text-gray-500">
+                <time class="text-sm tabular-nums text-gray-500">
                   {{ formatDatetime(policy.metadata.creationTimestamp) }}
                 </time>
                 <span class="cursor-pointer">

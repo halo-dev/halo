@@ -73,7 +73,9 @@ const router = useRouter();
         class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
         <dt class="text-sm font-medium text-gray-900">注册时间</dt>
-        <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
+        <dd
+          class="mt-1 text-sm tabular-nums text-gray-900 sm:col-span-3 sm:mt-0"
+        >
           {{ formatDatetime(user?.metadata?.creationTimestamp) }}
         </dd>
       </div>

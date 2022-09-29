@@ -600,11 +600,15 @@ function handleSortItemChange(sortItem?: SortItem) {
                 />
               </template>
             </VEntityField>
-            <VEntityField
-              :description="
-                formatDatetime(singlePage.page.metadata.creationTimestamp)
-              "
-            />
+            <VEntityField>
+              <template #description>
+                <span class="truncate text-xs tabular-nums text-gray-500">
+                  {{
+                    formatDatetime(singlePage.page.metadata.creationTimestamp)
+                  }}
+                </span>
+              </template>
+            </VEntityField>
           </template>
           <template #dropdownItems>
             <VButton

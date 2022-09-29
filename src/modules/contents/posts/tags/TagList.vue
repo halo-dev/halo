@@ -194,9 +194,13 @@ onMounted(async () => {
                 <VEntityField
                   :description="`${tag.status?.postCount || 0} 篇文章`"
                 />
-                <VEntityField
-                  :description="formatDatetime(tag.metadata.creationTimestamp)"
-                />
+                <VEntityField>
+                  <template #description>
+                    <span class="truncate text-xs tabular-nums text-gray-500">
+                      {{ formatDatetime(tag.metadata.creationTimestamp) }}
+                    </span>
+                  </template>
+                </VEntityField>
               </template>
               <template #dropdownItems>
                 <VButton
