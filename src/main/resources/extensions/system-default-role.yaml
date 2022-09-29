@@ -1,0 +1,5 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: guest
+rules: [ ]

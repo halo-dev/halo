@@ -143,8 +143,6 @@ public class Role extends AbstractExtension {
 
             String[] verbs;
 
-            String pluginName;
-
             public Builder apiGroups(String... apiGroups) {
                 this.apiGroups = apiGroups;
                 return this;
