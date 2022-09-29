@@ -4,12 +4,14 @@ import static java.util.Comparator.comparing;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
+import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.boot.convert.ApplicationConversionService.getSharedInstance;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static run.halo.app.extension.ListResult.generateGenericClass;
 import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,11 +21,9 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
-import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.ReactiveSortHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
@@ -67,12 +67,13 @@ public class PluginEndpoint implements CustomEndpoint {
                         .required(true)
                         .content(contentBuilder()
                             .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                            .schema(Builder.schemaBuilder().implementation(InstallRequest.class))
+                            .schema(schemaBuilder().implementation(InstallRequest.class))
                         ))
                     .response(responseBuilder().implementation(Plugin.class))
             )
             .GET("plugins", this::list, builder -> {
                 builder.operationId("ListPlugins")
+                    .tag(tag)
                     .description("List plugins using query criteria and sort params")
                     .response(responseBuilder().implementation(generateGenericClass(Plugin.class)));
                 buildParametersFromType(builder, ListRequest.class);
@@ -81,9 +82,6 @@ public class PluginEndpoint implements CustomEndpoint {
     }
 
     public static class ListRequest extends QueryListRequest {
-
-        private static final ReactiveSortHandlerMethodArgumentResolver sortResolver =
-            new ReactiveSortHandlerMethodArgumentResolver();
 
         private final ServerWebExchange exchange;
 
@@ -103,8 +101,13 @@ public class PluginEndpoint implements CustomEndpoint {
             return enabled == null ? null : getSharedInstance().convert(enabled, Boolean.class);
         }
 
-        @Schema(name = "sort", description = "Sort property and direction of the list result. "
-            + "Supported properties: creationTimestamp")
+        @ArraySchema(uniqueItems = true,
+            arraySchema = @Schema(name = "sort",
+                description = "Sort property and direction of the list result. Supported fields: "
+                    + "creationTimestamp"),
+            schema = @Schema(description = "like field,asc or field,desc",
+                implementation = String.class,
+                example = "creationtimestamp,desc"))
         public Sort getSort() {
             return SortResolver.defaultInstance.resolve(exchange);
         }
