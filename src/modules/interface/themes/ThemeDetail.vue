@@ -138,7 +138,9 @@ const handleReloadThemeSetting = async () => {
         class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
       >
         <dt class="text-sm font-medium text-gray-900">存储位置</dt>
-        <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">无</dd>
+        <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
+          {{ selectedTheme?.status?.location }}
+        </dd>
       </div>
       <!-- TODO: add display required plugins support -->
       <div
