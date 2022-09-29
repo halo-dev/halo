@@ -1,0 +1,25 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-categories
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-categories\" ]"
+rules:
+  - apiGroups: [ "content.halo.run" ]
+    resources: [ "categories" ]
+    verbs: [ "*" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-view-categories
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+rules:
+  - apiGroups: [ "content.halo.run" ]
+    resources: [ "categories" ]
+    verbs: [ "get", "list" ]
