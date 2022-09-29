@@ -40,7 +40,11 @@ const handleRouteToDetail = () => {
 </script>
 <template>
   <VTag
-    :styles="{ background: tag.spec.color, color: labelColor }"
+    :styles="{
+      background: tag.spec.color,
+      color: labelColor,
+      borderColor: tag.spec.color,
+    }"
     @click="handleRouteToDetail"
   >
     {{ tag.spec.displayName }}
