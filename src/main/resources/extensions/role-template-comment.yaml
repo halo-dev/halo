@@ -1,0 +1,38 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-comments
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-comments\" ]"
+    rbac.authorization.halo.run/module: "Comments Management"
+    rbac.authorization.halo.run/display-name: "Comment Manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:comments:manage"]
+rules:
+  - apiGroups: [ "content.halo.run" ]
+    resources: [ "comments", "replies" ]
+    verbs: [ "*" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "comments", "comments/reply", "replies" ]
+    verbs: [ "*" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-view-comments
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Comments Management"
+    rbac.authorization.halo.run/display-name: "Comment View"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:comments:view"]
+rules:
+  - apiGroups: [ "content.halo.run" ]
+    resources: [ "comments", "replies" ]
+    verbs: [ "get", "list" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "comments", "comments/reply", "replies" ]
+    verbs: [ "get", "list" ]
