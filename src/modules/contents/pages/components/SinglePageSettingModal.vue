@@ -232,7 +232,7 @@ watchEffect(() => {
               { label: '否', value: false },
             ]"
             name="allowComment"
-            label="禁止评论"
+            label="允许评论"
             type="radio"
           ></FormKit>
           <FormKit

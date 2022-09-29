@@ -279,7 +279,7 @@ watchEffect(() => {
               { label: '是', value: true },
               { label: '否', value: false },
             ]"
-            label="禁止评论"
+            label="允许评论"
             type="radio"
           ></FormKit>
           <FormKit
