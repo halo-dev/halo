@@ -2,6 +2,8 @@ package run.halo.app.theme.router;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -105,5 +107,17 @@ class PermalinkIndexerTest {
         assertThatThrownBy(() -> {
             permalinkIndexer.getNameBySlug(gvk, "nothing");
         }).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void getNameByPermalink() {
+        ExtensionLocator locator = new ExtensionLocator(gvk, "test-name", "test-slug");
+        permalinkIndexer.register(locator, "/test-permalink");
+
+        var name = permalinkIndexer.getNameByPermalink(gvk, "/test-permalink");
+        assertEquals("test-name", name);
+
+        name = permalinkIndexer.getNameByPermalink(gvk, "/invalid-permalink");
+        assertNull(name);
     }
 }

@@ -5,28 +5,28 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Function;
 import org.springframework.util.comparator.Comparators;
-import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.SinglePage;
 
 /**
- * A sorter for {@link Post}.
+ * A sorter for {@link SinglePage}.
  *
  * @author guqing
  * @since 2.0.0
  */
-public enum PostSorter {
+public enum SinglePageSorter {
     PUBLISH_TIME,
     CREATE_TIME;
 
-    static final Function<Post, String> name = post -> post.getMetadata().getName();
+    static final Function<SinglePage, String> name = page -> page.getMetadata().getName();
 
     /**
-     * Converts {@link Comparator} from {@link PostSorter} and ascending.
+     * Converts {@link Comparator} from {@link SinglePageSorter} and ascending.
      *
-     * @param sorter a {@link PostSorter}
+     * @param sorter a {@link SinglePageSorter}
      * @param ascending ascending if true, otherwise descending
-     * @return a {@link Comparator} of {@link Post}
+     * @return a {@link Comparator} of {@link SinglePage}
      */
-    public static Comparator<Post> from(PostSorter sorter, Boolean ascending) {
+    public static Comparator<SinglePage> from(SinglePageSorter sorter, Boolean ascending) {
         if (Objects.equals(true, ascending)) {
             return from(sorter);
         }
@@ -34,25 +34,25 @@ public enum PostSorter {
     }
 
     /**
-     * Converts {@link Comparator} from {@link PostSorter}.
+     * Converts {@link Comparator} from {@link SinglePageSorter}.
      *
-     * @param sorter a {@link PostSorter}
-     * @return a {@link Comparator} of {@link Post}
+     * @param sorter a {@link SinglePageSorter}
+     * @return a {@link Comparator} of {@link SinglePage}
      */
-    public static Comparator<Post> from(PostSorter sorter) {
+    public static Comparator<SinglePage> from(SinglePageSorter sorter) {
         if (sorter == null) {
             return defaultComparator();
         }
         if (CREATE_TIME.equals(sorter)) {
-            Function<Post, Instant> comparatorFunc =
-                post -> post.getMetadata().getCreationTimestamp();
+            Function<SinglePage, Instant> comparatorFunc =
+                page -> page.getMetadata().getCreationTimestamp();
             return Comparator.comparing(comparatorFunc)
                 .thenComparing(name);
         }
 
         if (PUBLISH_TIME.equals(sorter)) {
-            Function<Post, Instant> comparatorFunc =
-                post -> post.getSpec().getPublishTime();
+            Function<SinglePage, Instant> comparatorFunc =
+                page -> page.getSpec().getPublishTime();
             return Comparator.comparing(comparatorFunc, Comparators.nullsLow())
                 .thenComparing(name);
         }
@@ -60,8 +60,8 @@ public enum PostSorter {
         throw new IllegalArgumentException("Unsupported sort value: " + sorter);
     }
 
-    static PostSorter convertFrom(String sort) {
-        for (PostSorter sorter : values()) {
+    static SinglePageSorter convertFrom(String sort) {
+        for (SinglePageSorter sorter : values()) {
             if (sorter.name().equalsIgnoreCase(sort)) {
                 return sorter;
             }
@@ -69,9 +69,9 @@ public enum PostSorter {
         return null;
     }
 
-    static Comparator<Post> defaultComparator() {
-        Function<Post, Instant> createTime =
-            post -> post.getMetadata().getCreationTimestamp();
+    static Comparator<SinglePage> defaultComparator() {
+        Function<SinglePage, Instant> createTime =
+            page -> page.getMetadata().getCreationTimestamp();
         return Comparator.comparing(createTime)
             .thenComparing(name);
     }

@@ -158,6 +158,24 @@ public class PermalinkIndexer {
     }
 
     /**
+     * Get extension name by permalink.
+     *
+     * @param gvk is GroupVersionKind of extension
+     * @param permalink is encoded permalink
+     * @return extension name or null
+     */
+    @Nullable
+    public String getNameByPermalink(GroupVersionKind gvk, String permalink) {
+        readWriteLock.readLock().lock();
+        try {
+            var locator = permalinkLocatorLookup.get(permalink);
+            return locator == null ? null : locator.name();
+        } finally {
+            readWriteLock.readLock().unlock();
+        }
+    }
+
+    /**
      * Only for test.
      *
      * @return permalinkLookup map size
