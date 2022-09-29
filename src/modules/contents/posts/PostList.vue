@@ -928,6 +928,7 @@ function handleContributorChange(user?: User) {
             :page="posts.page"
             :size="posts.size"
             :total="posts.total"
+            :size-options="[20, 30, 50, 100]"
             @change="handlePaginationChange"
           />
         </div>

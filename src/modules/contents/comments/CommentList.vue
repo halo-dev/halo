@@ -428,6 +428,7 @@ function handleSelectUser(user: User | undefined) {
             :page="comments.page"
             :size="comments.size"
             :total="comments.total"
+            :size-options="[20, 30, 50, 100]"
             @change="handlePaginationChange"
           />
         </div>

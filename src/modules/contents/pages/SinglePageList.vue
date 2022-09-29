@@ -638,6 +638,7 @@ function handleSortItemChange(sortItem?: SortItem) {
           :page="singlePages.page"
           :size="singlePages.size"
           :total="singlePages.total"
+          :size-options="[20, 30, 50, 100]"
           @change="handlePaginationChange"
         />
       </div>

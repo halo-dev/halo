@@ -2,8 +2,8 @@
   <Story :init-state="initState" title="Pagination">
     <template #default="{ state }">
       <VPagination
-        :page="state.page"
-        :size="state.size"
+        v-model:page="state.page"
+        v-model:size="state.size"
         :total="state.total"
       ></VPagination>
     </template>

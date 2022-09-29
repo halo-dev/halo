@@ -36,7 +36,7 @@ const grantPermissionModal = ref<boolean>(false);
 
 const users = ref<UserList>({
   page: 1,
-  size: 10,
+  size: 20,
   total: 0,
   items: [],
   first: true,
@@ -486,6 +486,7 @@ onMounted(() => {
             :page="users.page"
             :size="users.size"
             :total="users.total"
+            :size-options="[20, 30, 50, 100]"
             @change="handlePaginationChange"
           />
         </div>

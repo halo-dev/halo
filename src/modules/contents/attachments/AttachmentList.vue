@@ -690,6 +690,7 @@ onMounted(() => {
                 :page="attachments.page"
                 :size="attachments.size"
                 :total="attachments.total"
+                :size-options="[60, 120, 200]"
                 @change="handlePaginationChange"
               />
             </div>
