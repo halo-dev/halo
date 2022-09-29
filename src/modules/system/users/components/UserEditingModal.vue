@@ -186,7 +186,7 @@ const handleRawModeChange = () => {
           label="电子邮箱"
           type="email"
           name="email"
-          validation="required"
+          validation="required|email"
         ></FormKit>
         <FormKit
           v-model="formState.spec.phone"
@@ -199,6 +199,7 @@ const handleRawModeChange = () => {
           label="头像"
           type="text"
           name="avatar"
+          validation="url"
         ></FormKit>
         <FormKit
           v-model="formState.spec.bio"
