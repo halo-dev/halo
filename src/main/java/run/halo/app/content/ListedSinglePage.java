@@ -20,4 +20,7 @@ public class ListedSinglePage {
 
     @Schema(required = true)
     private List<Contributor> contributors;
+
+    @Schema(required = true)
+    private Stats stats;
 }

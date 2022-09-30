@@ -29,6 +29,8 @@ public class SinglePageVo {
 
     private ContentVo content;
 
+    private StatsVo stats;
+
     private List<Contributor> contributors;
 
     /**

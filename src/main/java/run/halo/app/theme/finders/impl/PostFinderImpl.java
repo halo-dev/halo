@@ -10,9 +10,12 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import run.halo.app.content.ContentService;
+import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.metrics.CounterService;
+import run.halo.app.metrics.MeterUtils;
 import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.Finder;
@@ -22,6 +25,7 @@ import run.halo.app.theme.finders.vo.CategoryVo;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.Contributor;
 import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.finders.vo.StatsVo;
 import run.halo.app.theme.finders.vo.TagVo;
 
 /**
@@ -47,16 +51,19 @@ public class PostFinderImpl implements PostFinder {
 
     private final ContributorFinder contributorFinder;
 
+    private final CounterService counterService;
+
     public PostFinderImpl(ReactiveExtensionClient client,
         ContentService contentService,
         TagFinder tagFinder,
         CategoryFinder categoryFinder,
-        ContributorFinder contributorFinder) {
+        ContributorFinder contributorFinder, CounterService counterService) {
         this.client = client;
         this.contentService = contentService;
         this.tagFinder = tagFinder;
         this.categoryFinder = categoryFinder;
         this.contributorFinder = contributorFinder;
+        this.counterService = counterService;
     }
 
     @Override
@@ -116,8 +123,21 @@ public class PostFinderImpl implements PostFinder {
         }
         List<PostVo> postVos = list.get()
             .map(this::getPostVo)
+            .peek(this::populateStats)
             .toList();
         return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), postVos);
+    }
+
+    private void populateStats(PostVo postVo) {
+        Counter counter =
+            counterService.getByName(MeterUtils.nameOf(Post.class, postVo.getMetadata()
+                .getName()));
+        StatsVo statsVo = StatsVo.builder()
+            .visit(counter.getVisit())
+            .upvote(counter.getUpvote())
+            .comment(counter.getApprovedComment())
+            .build();
+        postVo.setStats(statsVo);
     }
 
     private PostVo getPostVo(@NonNull Post post) {
@@ -129,6 +149,7 @@ public class PostFinderImpl implements PostFinder {
         postVo.setCategories(categoryVos);
         postVo.setTags(tags);
         postVo.setContributors(contributors);
+        populateStats(postVo);
         return postVo;
     }
 

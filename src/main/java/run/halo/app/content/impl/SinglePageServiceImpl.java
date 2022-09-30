@@ -24,6 +24,8 @@ import run.halo.app.content.SinglePageQuery;
 import run.halo.app.content.SinglePageRequest;
 import run.halo.app.content.SinglePageService;
 import run.halo.app.content.SinglePageSorter;
+import run.halo.app.content.Stats;
+import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.SinglePage;
 import run.halo.app.core.extension.Snapshot;
@@ -32,6 +34,8 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
+import run.halo.app.metrics.CounterService;
+import run.halo.app.metrics.MeterUtils;
 
 /**
  * Single page service implementation.
@@ -45,9 +49,13 @@ public class SinglePageServiceImpl implements SinglePageService {
 
     private final ReactiveExtensionClient client;
 
-    public SinglePageServiceImpl(ContentService contentService, ReactiveExtensionClient client) {
+    private final CounterService counterService;
+
+    public SinglePageServiceImpl(ContentService contentService, ReactiveExtensionClient client,
+        CounterService counterService) {
         this.contentService = contentService;
         this.client = client;
+        this.counterService = counterService;
     }
 
     @Override
@@ -179,6 +187,7 @@ public class SinglePageServiceImpl implements SinglePageService {
             .map(sp -> {
                 ListedSinglePage listedSinglePage = new ListedSinglePage();
                 listedSinglePage.setPage(singlePage);
+                listedSinglePage.setStats(fetchStats(singlePage));
                 return listedSinglePage;
             })
             .flatMap(lsp ->
@@ -192,6 +201,19 @@ public class SinglePageServiceImpl implements SinglePageService {
             .doOnNext(singlePage::setContributors)
             .map(contributors -> singlePage)
             .defaultIfEmpty(singlePage);
+    }
+
+    Stats fetchStats(SinglePage singlePage) {
+        Assert.notNull(singlePage, "The singlePage must not be null.");
+        String name = singlePage.getMetadata().getName();
+        Counter counter =
+            counterService.getByName(MeterUtils.nameOf(SinglePage.class, name));
+        return Stats.builder()
+            .visit(counter.getVisit())
+            .upvote(counter.getUpvote())
+            .totalComment(counter.getApprovedComment())
+            .approvedComment(counter.getApprovedComment())
+            .build();
     }
 
     private Flux<Contributor> listContributors(List<String> usernames) {

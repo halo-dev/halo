@@ -49,3 +49,15 @@ rules:
     resources: [ "users/password" ]
     resourceNames: [ "-" ]
     verbs: [ "update" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-stats
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+rules:
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "stats" ]
+    verbs: [ "get", "list" ]

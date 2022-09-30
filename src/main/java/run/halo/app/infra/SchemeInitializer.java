@@ -6,6 +6,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Category;
 import run.halo.app.core.extension.Comment;
+import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.Plugin;
@@ -62,5 +63,7 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
         schemeManager.register(Policy.class);
         schemeManager.register(Attachment.class);
         schemeManager.register(PolicyTemplate.class);
+        // metrics.halo.run
+        schemeManager.register(Counter.class);
     }
 }

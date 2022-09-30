@@ -8,16 +8,20 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.ObjectUtils;
 import run.halo.app.content.ContentService;
+import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.SinglePage;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.metrics.CounterService;
+import run.halo.app.metrics.MeterUtils;
 import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.SinglePageFinder;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.Contributor;
 import run.halo.app.theme.finders.vo.SinglePageVo;
+import run.halo.app.theme.finders.vo.StatsVo;
 
 /**
  * A default implementation of {@link SinglePage}.
@@ -39,11 +43,14 @@ public class SinglePageFinderImpl implements SinglePageFinder {
 
     private final ContributorFinder contributorFinder;
 
+    private final CounterService counterService;
+
     public SinglePageFinderImpl(ReactiveExtensionClient client, ContentService contentService,
-        ContributorFinder contributorFinder) {
+        ContributorFinder contributorFinder, CounterService counterService) {
         this.client = client;
         this.contentService = contentService;
         this.contributorFinder = contributorFinder;
+        this.counterService = counterService;
     }
 
     @Override
@@ -58,6 +65,7 @@ public class SinglePageFinderImpl implements SinglePageFinder {
         SinglePageVo pageVo = SinglePageVo.from(page);
         pageVo.setContributors(contributors);
         pageVo.setContent(content(pageName));
+        populateStats(pageVo);
         return pageVo;
     }
 
@@ -79,16 +87,29 @@ public class SinglePageFinderImpl implements SinglePageFinder {
         if (list == null) {
             return new ListResult<>(0, 0, 0, List.of());
         }
-        List<SinglePageVo> postVos = list.get()
+        List<SinglePageVo> pageVos = list.get()
             .map(sp -> {
                 List<Contributor> contributors =
                     contributorFinder.getContributors(sp.getStatus().getContributors());
                 SinglePageVo pageVo = SinglePageVo.from(sp);
                 pageVo.setContributors(contributors);
+                populateStats(pageVo);
                 return pageVo;
             })
             .toList();
-        return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), postVos);
+        return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), pageVos);
+    }
+
+    void populateStats(SinglePageVo pageVo) {
+        String name = pageVo.getMetadata().getName();
+        Counter counter =
+            counterService.getByName(MeterUtils.nameOf(SinglePage.class, name));
+        StatsVo statsVo = StatsVo.builder()
+            .visit(counter.getVisit())
+            .upvote(counter.getUpvote())
+            .comment(counter.getApprovedComment())
+            .build();
+        pageVo.setStats(statsVo);
     }
 
     static Comparator<SinglePage> defaultComparator() {
