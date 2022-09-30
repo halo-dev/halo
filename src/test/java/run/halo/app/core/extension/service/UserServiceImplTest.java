@@ -229,19 +229,18 @@ class UserServiceImplTest {
 
         @Test
         void shouldUpdatePasswordIfNoPasswordBefore() {
-            var oldUser = createUser("");
+            var oldUser = createUser(null);
             var newUser = createUser("new-password");
 
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(oldUser));
             when(client.update(oldUser)).thenReturn(Mono.just(newUser));
-            when(passwordEncoder.matches("new-password", "")).thenReturn(false);
             when(passwordEncoder.encode("new-password")).thenReturn("encoded-new-password");
 
             StepVerifier.create(userService.updateWithRawPassword("fake-user", "new-password"))
                 .expectNext(newUser)
                 .verifyComplete();
 
-            verify(passwordEncoder).matches("new-password", "");
+            verify(passwordEncoder, never()).matches("new-password", null);
             verify(passwordEncoder).encode("new-password");
             verify(client).update(argThat(extension -> {
                 var user = (User) extension;

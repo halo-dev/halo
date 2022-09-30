@@ -5,6 +5,7 @@ import static run.halo.app.core.extension.RoleBinding.containsUser;
 import java.util.Objects;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
@@ -42,7 +43,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public Mono<User> updateWithRawPassword(String username, String rawPassword) {
         return getUser(username)
-            .filter(user -> !passwordEncoder.matches(rawPassword, user.getSpec().getPassword()))
+            .filter(user -> {
+                if (!StringUtils.hasText(user.getSpec().getPassword())) {
+                    // Check if the old password is set before, or the passwordEncoder#matches
+                    // will complain an error due to null password.
+                    return true;
+                }
+                return !passwordEncoder.matches(rawPassword, user.getSpec().getPassword());
+            })
             .flatMap(user -> {
                 user.getSpec().setPassword(passwordEncoder.encode(rawPassword));
                 return client.update(user);
