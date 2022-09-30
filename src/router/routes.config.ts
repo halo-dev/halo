@@ -2,6 +2,7 @@ import type { RouteRecordRaw } from "vue-router";
 import NotFound from "@/views/exceptions/NotFound.vue";
 import Forbidden from "@/views/exceptions/Forbidden.vue";
 import { BasicLayout } from "@halo-dev/admin-shared";
+import Setup from "@/views/system/Setup.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -19,6 +20,14 @@ export const routes: Array<RouteRecordRaw> = [
         component: Forbidden,
       },
     ],
+  },
+  {
+    path: "/setup",
+    name: "Setup",
+    component: Setup,
+    meta: {
+      title: "系统初始化",
+    },
   },
 ];
 
