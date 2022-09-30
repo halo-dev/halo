@@ -144,7 +144,7 @@ const handleTabChange = (id: string) => {
 
       <div class="absolute top-6 right-6">
         <div class="">
-          <IconUpload class="text-white" />
+          <IconUpload v-if="false" class="text-white" />
         </div>
       </div>
     </header>
