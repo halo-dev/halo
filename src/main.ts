@@ -201,13 +201,20 @@ async function initApp() {
 
   try {
     loadCoreModules();
-    await loadPluginModules();
+
+    try {
+      await loadPluginModules();
+    } catch (e) {
+      console.error("Failed to load plugins", e);
+    }
+
     await loadCurrentUser();
-    app.provide<MenuGroupType[]>("menus", menus);
-    app.provide<MenuItemType[]>("minimenus", minimenus);
   } catch (e) {
     console.error(e);
   } finally {
+    app.provide<MenuGroupType[]>("menus", menus);
+    app.provide<MenuItemType[]>("minimenus", minimenus);
+
     app.use(router);
     app.mount("#app");
   }
