@@ -837,8 +837,12 @@ function handleContributorChange(user?: User) {
                         {{ category.spec.displayName }}
                       </span>
                     </p>
-                    <span class="text-xs text-gray-500">访问量 0</span>
-                    <span class="text-xs text-gray-500"> 评论 0 </span>
+                    <span class="text-xs text-gray-500">
+                      访问量 {{ post.stats.visits || 0 }}
+                    </span>
+                    <span class="text-xs text-gray-500">
+                      评论 {{ post.stats.comments || 0 }}
+                    </span>
                   </VSpace>
                 </template>
               </VEntityField>

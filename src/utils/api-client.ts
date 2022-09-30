@@ -7,6 +7,7 @@ import {
   ApiConsoleHaloRunV1alpha1UserApi,
   ApiConsoleHaloRunV1alpha1CommentApi,
   ApiConsoleHaloRunV1alpha1ReplyApi,
+  ApiConsoleHaloRunV1alpha1StatsApi,
   ContentHaloRunV1alpha1CategoryApi,
   ContentHaloRunV1alpha1CommentApi,
   ContentHaloRunV1alpha1PostApi,
@@ -126,6 +127,7 @@ function setupApiClient(axios: AxiosInstance) {
     content: new ApiConsoleHaloRunV1alpha1ContentApi(undefined, baseURL, axios),
     comment: new ApiConsoleHaloRunV1alpha1CommentApi(undefined, baseURL, axios),
     reply: new ApiConsoleHaloRunV1alpha1ReplyApi(undefined, baseURL, axios),
+    stats: new ApiConsoleHaloRunV1alpha1StatsApi(undefined, baseURL, axios),
   };
 }
 

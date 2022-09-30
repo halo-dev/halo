@@ -535,7 +535,6 @@ function handleSortItemChange(sortItem?: SortItem) {
           <template #start>
             <VEntityField
               :title="singlePage.page.spec.title"
-              :description="singlePage.page.status?.permalink"
               :route="{
                 name: 'SinglePageEditor',
                 query: { name: singlePage.page.metadata.name },
@@ -553,6 +552,19 @@ function handleSortItemChange(sortItem?: SortItem) {
                 >
                   <VStatusDot state="success" animate />
                 </RouterLink>
+              </template>
+              <template #description>
+                <VSpace>
+                  <span class="text-xs text-gray-500">
+                    {{ singlePage.page.status?.permalink }}
+                  </span>
+                  <span class="text-xs text-gray-500">
+                    访问量 {{ singlePage.stats.visits || 0 }}
+                  </span>
+                  <span class="text-xs text-gray-500">
+                    评论 {{ singlePage.stats.comments || 0 }}
+                  </span>
+                </VSpace>
               </template>
             </VEntityField>
           </template>

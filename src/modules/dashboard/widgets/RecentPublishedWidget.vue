@@ -43,8 +43,12 @@ onMounted(handleFetchPosts);
               </p>
               <div class="mt-1 flex">
                 <VSpace>
-                  <span class="text-xs text-gray-500"> 阅读 0 </span>
-                  <span class="text-xs text-gray-500"> 评论 0 </span>
+                  <span class="text-xs text-gray-500">
+                    阅读 {{ post.stats.visits }}
+                  </span>
+                  <span class="text-xs text-gray-500">
+                    评论 {{ post.stats.comments }}
+                  </span>
                 </VSpace>
               </div>
             </div>
