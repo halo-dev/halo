@@ -85,7 +85,7 @@ public class PostServiceImpl implements PostService {
         return Stats.builder()
             .visit(counter.getVisit())
             .upvote(counter.getUpvote())
-            .totalComment(counter.getApprovedComment())
+            .totalComment(counter.getTotalComment())
             .approvedComment(counter.getApprovedComment())
             .build();
     }
