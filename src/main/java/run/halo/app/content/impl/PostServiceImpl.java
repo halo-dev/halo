@@ -3,6 +3,7 @@ package run.halo.app.content.impl;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
 import java.security.Principal;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Comparator;
@@ -11,12 +12,14 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.Contributor;
 import run.halo.app.content.ListedPost;
@@ -239,6 +242,8 @@ public class PostServiceImpl implements PostService {
                 post.getSpec().setHeadSnapshot(contentWrapper.snapshotName());
                 return client.update(post);
             })
+            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                .filter(throwable -> throwable instanceof OptimisticLockingFailureException))
             .then(Mono.defer(() -> client.fetch(Post.class, post.getMetadata().getName())));
     }
 
@@ -285,7 +290,9 @@ public class PostServiceImpl implements PostService {
                         return client.update(post);
                     })
                     .then(Mono.defer(() -> client.fetch(Post.class, postName)));
-            });
+            })
+            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                .filter(throwable -> throwable instanceof OptimisticLockingFailureException));
     }
 
     void appendPublishedCondition(Post post, Post.PostPhase phase) {
