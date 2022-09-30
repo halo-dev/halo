@@ -1,5 +1,11 @@
 <script lang="ts" setup>
-import { VModal } from "@halo-dev/components";
+import {
+  VModal,
+  VEmpty,
+  IconAddCircle,
+  VButton,
+  VSpace,
+} from "@halo-dev/components";
 import FilePondUpload from "@/components/upload/FilePondUpload.vue";
 import { computed, ref, watch, watchEffect } from "vue";
 import { apiClient } from "@/utils/api-client";
@@ -23,7 +29,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const { policies, handleFetchPolicies } = useFetchAttachmentPolicy();
+const { policies, loading, handleFetchPolicies } = useFetchAttachmentPolicy();
 
 const selectedPolicy = ref<Policy | null>(null);
 const policyVisible = ref(false);
@@ -80,47 +86,57 @@ watch(
     :title="modalTitle"
     @update:visible="onVisibleChange"
   >
-    <template #actions>
-      <FloatingDropdown>
-        <span v-tooltip="`选择存储策略`">
-          <span class="text-sm">
-            {{ selectedPolicy?.spec.displayName || "无存储策略" }}
-          </span>
-        </span>
-        <template #popper>
-          <div class="w-72 p-4">
-            <ul class="space-y-1">
-              <li
-                v-for="(policy, index) in policies"
-                :key="index"
-                v-close-popper
-                :class="{
-                  '!bg-gray-100 !text-gray-900':
-                    selectedPolicy?.metadata.name === policy.metadata.name,
-                }"
-                class="flex cursor-pointer flex-col rounded px-2 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                @click="selectedPolicy = policy"
-              >
-                <span class="truncate">
-                  {{ policy.spec.displayName }}
-                </span>
-                <span class="text-xs">
-                  {{ policy.spec.templateRef?.name }}
-                </span>
-              </li>
-              <li
-                v-close-popper
-                class="flex cursor-pointer flex-col rounded px-2 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                @click="policyVisible = true"
-              >
-                <span class="truncate"> 新增存储策略 </span>
-              </li>
-            </ul>
+    <VEmpty
+      v-if="!policies.length && !loading"
+      message="当前没有上传附件的存储策略，请先创建存储策略"
+      title="无存储策略"
+    >
+      <template #actions>
+        <VSpace>
+          <VButton @click="handleFetchPolicies">刷新</VButton>
+          <VButton type="secondary" @click="policyVisible = true">
+            <template #icon>
+              <IconAddCircle class="h-full w-full" />
+            </template>
+            新建策略
+          </VButton>
+        </VSpace>
+      </template>
+    </VEmpty>
+    <div v-else class="w-full p-4">
+      <div class="mb-2">
+        <span class="text-sm text-gray-900">选择存储策略：</span>
+      </div>
+      <div class="mb-3 grid grid-cols-2 gap-x-2 gap-y-3 sm:grid-cols-4">
+        <div
+          v-for="(policy, index) in policies"
+          :key="index"
+          :class="{
+            '!bg-gray-200 !text-gray-900':
+              selectedPolicy?.metadata.name === policy.metadata.name,
+          }"
+          class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
+          @click="selectedPolicy = policy"
+        >
+          <div class="flex flex-1 flex-col items-start truncate">
+            <span class="truncate text-sm">
+              {{ policy.spec.displayName }}
+            </span>
+            <span class="text-xs">
+              {{ policy.spec.templateRef?.name }}
+            </span>
           </div>
-        </template>
-      </FloatingDropdown>
-    </template>
-    <div class="w-full p-4">
+        </div>
+        <div
+          class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
+          @click="policyVisible = true"
+        >
+          <div class="flex flex-1 items-center truncate">
+            <span class="truncate text-sm">新建策略</span>
+          </div>
+          <IconAddCircle />
+        </div>
+      </div>
       <FilePondUpload
         ref="FilePondUploadRef"
         :allow-multiple="true"
