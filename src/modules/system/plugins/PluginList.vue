@@ -2,6 +2,7 @@
 import {
   IconAddCircle,
   IconArrowDown,
+  IconCloseCircle,
   IconPlug,
   VButton,
   VCard,
@@ -9,15 +10,23 @@ import {
   VPageHeader,
   VPagination,
   VSpace,
-  VTag,
 } from "@halo-dev/components";
 import PluginListItem from "./components/PluginListItem.vue";
 import PluginInstallModal from "./components/PluginInstallModal.vue";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
-import type { Plugin } from "@halo-dev/api-client";
+import type { PluginList } from "@halo-dev/api-client";
 
-const plugins = ref<Plugin[]>([] as Plugin[]);
+const plugins = ref<PluginList>({
+  page: 1,
+  size: 20,
+  total: 0,
+  items: [],
+  first: true,
+  last: false,
+  hasNext: false,
+  hasPrevious: false,
+});
 const loading = ref(false);
 const pluginInstall = ref(false);
 const keyword = ref("");
@@ -26,34 +35,87 @@ const handleFetchPlugins = async () => {
   try {
     loading.value = true;
 
-    const fieldSelector: Array<string> = [];
+    const { data } = await apiClient.plugin.listPlugins({
+      page: plugins.value.page,
+      size: plugins.value.size,
+      keyword: keyword.value,
+      enabled: selectedEnabledItem.value?.value,
+      sort: [selectedSortItem.value?.value].filter(
+        (item) => !!item
+      ) as string[],
+    });
 
-    if (keyword.value) {
-      fieldSelector.push(`name=${keyword.value}`);
-    }
-
-    const { data } =
-      await apiClient.extension.plugin.listpluginHaloRunV1alpha1Plugin({
-        page: 0,
-        size: 0,
-        fieldSelector,
-      });
-    plugins.value = data.items;
+    plugins.value = data;
   } catch (e) {
-    console.error("Fail to fetch plugins", e);
+    console.error("Failed to fetch plugins", e);
   } finally {
     loading.value = false;
   }
 };
 
-watch(
-  () => keyword.value,
-  () => {
-    handleFetchPlugins();
-  }
-);
+const handlePaginationChange = ({
+  page,
+  size,
+}: {
+  page: number;
+  size: number;
+}) => {
+  plugins.value.page = page;
+  plugins.value.size = size;
+  handleFetchPlugins();
+};
 
 onMounted(handleFetchPlugins);
+
+// Filters
+interface EnabledItem {
+  label: string;
+  value?: boolean;
+}
+
+interface SortItem {
+  label: string;
+  value: string;
+}
+
+const EnabledItems: EnabledItem[] = [
+  {
+    label: "全部",
+    value: undefined,
+  },
+  {
+    label: "已启用",
+    value: true,
+  },
+  {
+    label: "未启用",
+    value: false,
+  },
+];
+
+const SortItems: SortItem[] = [
+  {
+    label: "较近安装",
+    value: "creationTimestamp,desc",
+  },
+  {
+    label: "较早安装",
+    value: "creationTimestamp,asc",
+  },
+];
+
+const selectedEnabledItem = ref<EnabledItem>();
+const selectedSortItem = ref<SortItem>();
+
+function handleEnabledItemChange(enabledItem: EnabledItem) {
+  selectedEnabledItem.value = enabledItem;
+  handleFetchPlugins();
+}
+
+function handleSortItemChange(sortItem?: SortItem) {
+  selectedSortItem.value = sortItem;
+  handleFetchPlugins();
+}
 </script>
 <template>
   <PluginInstallModal
@@ -87,12 +149,39 @@ onMounted(handleFetchPlugins);
           <div
             class="relative flex flex-col items-start sm:flex-row sm:items-center"
           >
-            <div class="flex w-full flex-1 sm:w-auto">
+            <div class="flex w-full flex-1 items-center gap-2 sm:w-auto">
               <FormKit
                 v-model="keyword"
                 placeholder="输入关键词搜索"
                 type="text"
+                @keyup.enter="
+                  handlePaginationChange({ page: 1, size: plugins.size })
+                "
               ></FormKit>
+              <div
+                v-if="selectedEnabledItem?.value !== undefined"
+                class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+              >
+                <span class="text-xs text-gray-600 group-hover:text-gray-900">
+                  启用状态：{{ selectedEnabledItem.label }}
+                </span>
+                <IconCloseCircle
+                  class="h-4 w-4 text-gray-600"
+                  @click="handleEnabledItemChange(EnabledItems[0])"
+                />
+              </div>
+              <div
+                v-if="selectedSortItem"
+                class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+              >
+                <span class="text-xs text-gray-600 group-hover:text-gray-900">
+                  排序：{{ selectedSortItem.label }}
+                </span>
+                <IconCloseCircle
+                  class="h-4 w-4 text-gray-600"
+                  @click="handleSortItemChange()"
+                />
+              </div>
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
@@ -109,81 +198,19 @@ onMounted(handleFetchPlugins);
                     <div class="w-52 p-4">
                       <ul class="space-y-1">
                         <li
+                          v-for="(enabledItem, index) in EnabledItems"
+                          :key="index"
                           v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                          :class="{
+                            'bg-gray-100':
+                              selectedEnabledItem?.value === enabledItem.value,
+                          }"
+                          @click="handleEnabledItemChange(enabledItem)"
                         >
-                          <span class="truncate">已启用</span>
-                        </li>
-                        <li
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">未启用</span>
+                          <span class="truncate">{{ enabledItem.label }}</span>
                         </li>
                       </ul>
-                    </div>
-                  </template>
-                </FloatingDropdown>
-                <div
-                  class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                >
-                  <span class="mr-0.5">类别</span>
-                  <span>
-                    <IconArrowDown />
-                  </span>
-                </div>
-                <FloatingDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">提供方</span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <div class="h-96 w-80 p-4">
-                      <div class="bg-white">
-                        <!--TODO: Auto Focus-->
-                        <FormKit
-                          placeholder="输入关键词搜索"
-                          type="text"
-                        ></FormKit>
-                      </div>
-                      <div class="mt-2">
-                        <ul class="divide-y divide-gray-200" role="list">
-                          <li class="cursor-pointer py-4 hover:bg-gray-50">
-                            <div class="flex items-center space-x-4">
-                              <div class="flex items-center">
-                                <input
-                                  class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                                  type="checkbox"
-                                />
-                              </div>
-                              <div class="flex-shrink-0">
-                                <img
-                                  alt="halo-dev"
-                                  class="h-10 w-10 rounded"
-                                  src="https://halo.run/logo"
-                                />
-                              </div>
-                              <div class="min-w-0 flex-1">
-                                <p
-                                  class="truncate text-sm font-medium text-gray-900"
-                                >
-                                  Halo
-                                </p>
-                                <p class="truncate text-sm text-gray-500">
-                                  https://halo.run
-                                </p>
-                              </div>
-                              <div>
-                                <VTag>2 个</VTag>
-                              </div>
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
                     </div>
                   </template>
                 </FloatingDropdown>
@@ -200,16 +227,13 @@ onMounted(handleFetchPlugins);
                     <div class="w-72 p-4">
                       <ul class="space-y-1">
                         <li
+                          v-for="(sortItem, index) in SortItems"
+                          :key="index"
                           v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                          @click="handleSortItemChange(sortItem)"
                         >
-                          <span class="truncate">较近安装</span>
-                        </li>
-                        <li
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">较晚安装</span>
+                          <span class="truncate">{{ sortItem.label }}</span>
                         </li>
                       </ul>
                     </div>
@@ -222,7 +246,7 @@ onMounted(handleFetchPlugins);
       </template>
 
       <VEmpty
-        v-if="!plugins.length && !loading"
+        v-if="!plugins.total && !loading"
         message="当前没有已安装的插件，你可以尝试刷新或者安装新插件"
         title="当前没有已安装的插件"
       >
@@ -248,14 +272,20 @@ onMounted(handleFetchPlugins);
         class="box-border h-full w-full divide-y divide-gray-100"
         role="list"
       >
-        <li v-for="(plugin, index) in plugins" :key="index">
+        <li v-for="(plugin, index) in plugins.items" :key="index">
           <PluginListItem :plugin="plugin" />
         </li>
       </ul>
 
       <template #footer>
         <div class="bg-white sm:flex sm:items-center sm:justify-end">
-          <VPagination :page="1" :size="10" :total="20" />
+          <VPagination
+            :page="plugins.page"
+            :size="plugins.size"
+            :total="plugins.total"
+            :size-options="[20, 30, 50, 100]"
+            @change="handlePaginationChange"
+          />
         </div>
       </template>
     </VCard>
