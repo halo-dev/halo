@@ -5,7 +5,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -13,6 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -282,12 +286,93 @@ class UserServiceImplTest {
             verify(client).get(User.class, "fake-user");
         }
 
-        User createUser(String password) {
-            var user = new User();
-            user.setSpec(new User.UserSpec());
-            user.getSpec().setPassword(password);
-            return user;
-        }
     }
 
+    User createUser(String password) {
+        var user = new User();
+        user.setSpec(new User.UserSpec());
+        user.getSpec().setPassword(password);
+        return user;
+    }
+
+    @Nested
+    class GrantRolesTest {
+
+        @Test
+        void shouldGetNotFoundIfUserNotFound() {
+            when(client.get(User.class, "invalid-user"))
+                .thenReturn(Mono.error(new ExtensionNotFoundException()));
+
+            var grantRolesMono = userService.grantRoles("invalid-user", Set.of("fake-role"));
+            StepVerifier.create(grantRolesMono)
+                .expectError(ExtensionNotFoundException.class)
+                .verify();
+
+            verify(client).get(User.class, "invalid-user");
+        }
+
+        @Test
+        void shouldCreateRoleBindingIfNotExist() {
+            when(client.get(User.class, "fake-user"))
+                .thenReturn(Mono.just(createUser("fake-password")));
+            when(client.list(same(RoleBinding.class), any(), any())).thenReturn(Flux.empty());
+            when(client.create(isA(RoleBinding.class))).thenReturn(
+                Mono.just(mock(RoleBinding.class)));
+
+            var grantRolesMono = userService.grantRoles("fake-user", Set.of("fake-role"));
+            StepVerifier.create(grantRolesMono)
+                .expectNextCount(1)
+                .verifyComplete();
+
+            verify(client).get(User.class, "fake-user");
+            verify(client).list(same(RoleBinding.class), any(), any());
+            verify(client).create(isA(RoleBinding.class));
+        }
+
+        @Test
+        void shouldDeleteRoleBindingIfNotProvided() {
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(mock(User.class)));
+            var notProvidedRoleBinding = RoleBinding.create("fake-user", "non-provided-fake-role");
+            var existingRoleBinding = RoleBinding.create("fake-user", "fake-role");
+            when(client.list(same(RoleBinding.class), any(), any())).thenReturn(
+                Flux.fromIterable(List.of(notProvidedRoleBinding, existingRoleBinding)));
+            when(client.delete(isA(RoleBinding.class)))
+                .thenReturn(Mono.just(mock(RoleBinding.class)));
+
+            StepVerifier.create(userService.grantRoles("fake-user", Set.of("fake-role")))
+                .expectNextCount(1)
+                .verifyComplete();
+
+            verify(client).get(User.class, "fake-user");
+            verify(client).list(same(RoleBinding.class), any(), any());
+            verify(client).delete(notProvidedRoleBinding);
+        }
+
+        @Test
+        void shouldUpdateRoleBindingIfExists() {
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(mock(User.class)));
+            // add another subject
+            var anotherSubject = new RoleBinding.Subject();
+            anotherSubject.setName("another-fake-user");
+            anotherSubject.setKind(User.KIND);
+            anotherSubject.setApiGroup(User.GROUP);
+            var notProvidedRoleBinding = RoleBinding.create("fake-user", "non-provided-fake-role");
+            notProvidedRoleBinding.getSubjects().add(anotherSubject);
+
+            var existingRoleBinding = RoleBinding.create("fake-user", "fake-role");
+
+            when(client.list(same(RoleBinding.class), any(), any())).thenReturn(
+                Flux.fromIterable(List.of(notProvidedRoleBinding, existingRoleBinding)));
+            when(client.update(isA(RoleBinding.class)))
+                .thenReturn(Mono.just(mock(RoleBinding.class)));
+
+            StepVerifier.create(userService.grantRoles("fake-user", Set.of("fake-role")))
+                .expectNextCount(1)
+                .verifyComplete();
+
+            verify(client).get(User.class, "fake-user");
+            verify(client).list(same(RoleBinding.class), any(), any());
+            verify(client).update(notProvidedRoleBinding);
+        }
+    }
 }
