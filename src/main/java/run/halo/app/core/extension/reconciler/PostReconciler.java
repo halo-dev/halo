@@ -110,7 +110,8 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             }
             if (excerpt.getAutoGenerate()) {
                 contentService.getContent(spec.getReleaseSnapshot())
-                    .subscribe(content -> {
+                    .blockOptional()
+                    .ifPresent(content -> {
                         String contentRevised = content.content();
                         status.setExcerpt(getExcerpt(contentRevised));
                     });
