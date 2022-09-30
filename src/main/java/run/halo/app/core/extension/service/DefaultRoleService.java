@@ -74,7 +74,8 @@ public class DefaultRoleService implements RoleService {
             }
             visited.add(roleName);
             extensionClient.fetch(Role.class, roleName)
-                .subscribe(role -> {
+                .blockOptional()
+                .ifPresent(role -> {
                     result.add(role);
                     Map<String, String> annotations = role.getMetadata().getAnnotations();
                     if (annotations != null) {

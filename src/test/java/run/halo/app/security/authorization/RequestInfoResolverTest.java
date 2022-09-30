@@ -168,6 +168,21 @@ public class RequestInfoResolverTest {
                     String.format("%s: expected non-resource request", errorCase.desc));
             }
         }
+
+        List<ErrorCases> postCases =
+            List.of(new ErrorCases("api resource has name and no subresource but post",
+                    "/api/version/themes/install"),
+                new ErrorCases("apis resource has name and no subresource but post",
+                "/apis/api.halo.run/v1alpha1/themes/install"));
+        for (ErrorCases errorCase : postCases) {
+            var request =
+                method(HttpMethod.POST, errorCase.url).build();
+            RequestInfo apiRequestInfo = RequestInfoFactory.INSTANCE.newRequestInfo(request);
+            if (apiRequestInfo.isResourceRequest()) {
+                throw new RuntimeException(
+                    String.format("%s: expected non-resource request", errorCase.desc));
+            }
+        }
     }
 
     @Test

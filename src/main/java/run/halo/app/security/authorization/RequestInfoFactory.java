@@ -178,6 +178,12 @@ public class RequestInfoFactory {
             requestInfo.resource = requestInfo.parts[0];
         }
 
+        // has name and no subresource but verb=create, then this is a non-resource request
+        if (StringUtils.isNotBlank(requestInfo.name) && StringUtils.isBlank(requestInfo.subresource)
+            && "create".equals(requestInfo.verb)) {
+            requestInfo.isResourceRequest = false;
+        }
+
         // if there's no name on the request and we thought it was a get before, then the actual
         // verb is a list or a watch
         if (requestInfo.name.length() == 0 && "get".equals(requestInfo.verb)) {

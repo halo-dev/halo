@@ -1,0 +1,25 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-snaphosts
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-snaphosts\" ]"
+rules:
+  - apiGroups: [ "content.halo.run" ]
+    resources: [ "snaphosts" ]
+    verbs: [ "*" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-view-snaphosts
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+rules:
+  - apiGroups: [ "content.halo.run" ]
+    resources: [ "snaphosts" ]
+    verbs: [ "get", "list" ]
