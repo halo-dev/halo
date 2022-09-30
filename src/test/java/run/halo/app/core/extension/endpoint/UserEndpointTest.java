@@ -1,11 +1,8 @@
 package run.halo.app.core.extension.endpoint;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -21,11 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
@@ -169,77 +164,14 @@ class UserEndpointTest {
         }
 
         @Test
-        void shouldGetNotFoundIfUserNotFound() {
-            when(client.get(User.class, "fake-user"))
-                .thenReturn(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
-            when(client.get(Role.class, "fake-role")).thenReturn(Mono.just(mock(Role.class)));
-
-            webClient.post().uri("/apis/api.console.halo.run/v1alpha1/users/fake-user/permissions")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UserEndpoint.GrantRequest(Set.of("fake-role")))
-                .exchange()
-                .expectStatus().isNotFound();
-
-            verify(client, times(1)).get(same(User.class), eq("fake-user"));
-            verify(client, never()).get(same(Role.class), eq("fake-role"));
-        }
-
-        @Test
-        void shouldGetNotFoundIfRoleNotFound() {
-            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(mock(User.class)));
-            when(client.get(Role.class, "fake-role"))
-                .thenReturn(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
-
-            webClient.post().uri("/apis/api.console.halo.run/v1alpha1/users/fake-user/permissions")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UserEndpoint.GrantRequest(Set.of("fake-role")))
-                .exchange()
-                .expectStatus().isNotFound();
-
-            verify(client).get(User.class, "fake-user");
-            verify(client).get(Role.class, "fake-role");
-        }
-
-        @Test
-        void shouldCreateRoleBindingIfNotExist() {
-            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(mock(User.class)));
-            var role = mock(Role.class);
-            when(client.get(Role.class, "fake-role")).thenReturn(Mono.just(role));
+        void shouldGrantPermission() {
+            when(userService.grantRoles("fake-user", Set.of("fake-role"))).thenReturn(Mono.empty());
 
             webClient.post().uri("/apis/api.console.halo.run/v1alpha1/users/fake-user/permissions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UserEndpoint.GrantRequest(Set.of("fake-role")))
                 .exchange()
                 .expectStatus().isOk();
-
-            verify(client).get(User.class, "fake-user");
-            verify(client).get(Role.class, "fake-role");
-            verify(client).create(RoleBinding.create("fake-user", "fake-role"));
-            verify(client, never()).update(isA(RoleBinding.class));
-            verify(client, never()).delete(isA(RoleBinding.class));
-        }
-
-        @Test
-        void shouldDeleteRoleBindingIfNotProvided() {
-            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(mock(User.class)));
-            var role = mock(Role.class);
-            when(client.get(Role.class, "fake-role")).thenReturn(Mono.just(role));
-            var roleBinding = RoleBinding.create("fake-user", "non-provided-fake-role");
-            when(client.list(same(RoleBinding.class), any(), any()))
-                .thenReturn(Flux.fromIterable(List.of(roleBinding)));
-
-            webClient.post().uri("/apis/api.console.halo.run/v1alpha1/users/fake-user/permissions")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UserEndpoint.GrantRequest(Set.of("fake-role"))).exchange()
-                .expectStatus().isOk();
-
-            verify(client).get(User.class, "fake-user");
-            verify(client).get(Role.class, "fake-role");
-            verify(client).create(RoleBinding.create("fake-user", "fake-role"));
-            verify(client)
-                .delete(argThat(binding -> binding.getMetadata().getName()
-                    .equals(roleBinding.getMetadata().getName())));
-            verify(client, never()).update(isA(RoleBinding.class));
         }
 
         @Test
