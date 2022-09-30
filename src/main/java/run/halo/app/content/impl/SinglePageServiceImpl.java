@@ -211,7 +211,7 @@ public class SinglePageServiceImpl implements SinglePageService {
         return Stats.builder()
             .visit(counter.getVisit())
             .upvote(counter.getUpvote())
-            .totalComment(counter.getApprovedComment())
+            .totalComment(counter.getTotalComment())
             .approvedComment(counter.getApprovedComment())
             .build();
     }
