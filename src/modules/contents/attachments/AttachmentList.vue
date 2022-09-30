@@ -609,7 +609,7 @@ onMounted(() => {
                 <VEntity :is-selected="isChecked(attachment)">
                   <template
                     v-if="
-                      !currentUserHasPermission(['system:attachments:manage'])
+                      currentUserHasPermission(['system:attachments:manage'])
                     "
                     #checkbox
                   >
@@ -695,7 +695,7 @@ onMounted(() => {
                   </template>
                   <template
                     v-if="
-                      !currentUserHasPermission(['system:attachments:manage'])
+                      currentUserHasPermission(['system:attachments:manage'])
                     "
                     #dropdownItems
                   >

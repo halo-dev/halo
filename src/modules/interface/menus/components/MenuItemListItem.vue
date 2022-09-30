@@ -103,7 +103,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
             </VEntityField>
           </template>
           <template
-            v-if="!currentUserHasPermission(['system:menus:manage'])"
+            v-if="currentUserHasPermission(['system:menus:manage'])"
             #dropdownItems
           >
             <VButton

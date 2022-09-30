@@ -246,7 +246,7 @@ defineExpose({
             </VEntityField>
           </template>
           <template
-            v-if="!currentUserHasPermission(['system:themes:manage'])"
+            v-if="currentUserHasPermission(['system:themes:manage'])"
             #dropdownItems
           >
             <VButton

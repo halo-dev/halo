@@ -173,10 +173,9 @@ async function loadCurrentUser() {
   app.directive(
     "permission",
     (el: HTMLElement, binding: DirectiveBinding<string[]>) => {
-      // const uiPermissions = Array.from<string>(
-      //   currentPermissions.uiPermissions
-      // );
-      const uiPermissions = Array.from<string>(["system:attachments:view"]);
+      const uiPermissions = Array.from<string>(
+        currentPermissions.uiPermissions
+      );
       const { value } = binding;
       const { any, enable } = binding.modifiers;
 

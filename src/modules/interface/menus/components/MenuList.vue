@@ -165,7 +165,7 @@ defineExpose({
             </VEntityField>
           </template>
           <template
-            v-if="!currentUserHasPermission(['system:menus:manage'])"
+            v-if="currentUserHasPermission(['system:menus:manage'])"
             #dropdownItems
           >
             <VButton
@@ -188,7 +188,7 @@ defineExpose({
         </VEntity>
       </li>
     </ul>
-    <template v-if="!currentUserHasPermission(['system:menus:manage'])" #footer>
+    <template v-if="currentUserHasPermission(['system:menus:manage'])" #footer>
       <VButton block type="secondary" @click="handleOpenEditingModal()">
         新增
       </VButton>

@@ -800,7 +800,7 @@ function handleContributorChange(user?: User) {
         <li v-for="(post, index) in posts.items" :key="index">
           <VEntity :is-selected="checkSelection(post.post)">
             <template
-              v-if="!currentUserHasPermission(['system:posts:manage'])"
+              v-if="currentUserHasPermission(['system:posts:manage'])"
               #checkbox
             >
               <input
@@ -922,7 +922,7 @@ function handleContributorChange(user?: User) {
               </VEntityField>
             </template>
             <template
-              v-if="!currentUserHasPermission(['system:posts:manage'])"
+              v-if="currentUserHasPermission(['system:posts:manage'])"
               #dropdownItems
             >
               <VButton

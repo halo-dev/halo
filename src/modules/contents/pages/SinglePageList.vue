@@ -536,7 +536,7 @@ function handleSortItemChange(sortItem?: SortItem) {
       <li v-for="(singlePage, index) in singlePages.items" :key="index">
         <VEntity :is-selected="checkAll">
           <template
-            v-if="!currentUserHasPermission(['system:singlepages:manage'])"
+            v-if="currentUserHasPermission(['system:singlepages:manage'])"
             #checkbox
           >
             <input
@@ -636,7 +636,7 @@ function handleSortItemChange(sortItem?: SortItem) {
             </VEntityField>
           </template>
           <template
-            v-if="!currentUserHasPermission(['system:singlepages:manage'])"
+            v-if="currentUserHasPermission(['system:singlepages:manage'])"
             #dropdownItems
           >
             <VButton

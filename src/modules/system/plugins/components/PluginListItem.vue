@@ -101,7 +101,7 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
       </VEntityField>
     </template>
     <template
-      v-if="!currentUserHasPermission(['system:plugins:manage'])"
+      v-if="currentUserHasPermission(['system:plugins:manage'])"
       #dropdownItems
     >
       <VButton v-close-popper block type="danger" @click="uninstall">

@@ -251,7 +251,7 @@ const subjectRefResult = computed(() => {
       <div class="absolute inset-x-0 bottom-0 h-[1px] bg-black/50"></div>
     </template>
     <template
-      v-if="!currentUserHasPermission(['system:comments:manage'])"
+      v-if="currentUserHasPermission(['system:comments:manage'])"
       #checkbox
     >
       <slot name="checkbox" />
@@ -343,7 +343,7 @@ const subjectRefResult = computed(() => {
       </VEntityField>
     </template>
     <template
-      v-if="!currentUserHasPermission(['system:comments:manage'])"
+      v-if="currentUserHasPermission(['system:comments:manage'])"
       #dropdownItems
     >
       <VButton

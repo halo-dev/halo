@@ -388,7 +388,7 @@ onMounted(() => {
         <li v-for="(user, index) in searchResults" :key="index">
           <VEntity :is-selected="checkSelection(user)">
             <template
-              v-if="!currentUserHasPermission(['system:users:manage'])"
+              v-if="currentUserHasPermission(['system:users:manage'])"
               #checkbox
             >
               <input
@@ -446,7 +446,7 @@ onMounted(() => {
               </VEntityField>
             </template>
             <template
-              v-if="!currentUserHasPermission(['system:users:manage'])"
+              v-if="currentUserHasPermission(['system:users:manage'])"
               #dropdownItems
             >
               <VButton

@@ -276,7 +276,7 @@ const handleDelete = async (role: Role) => {
               </VEntityField>
             </template>
             <template
-              v-if="!currentUserHasPermission(['system:roles:manage'])"
+              v-if="currentUserHasPermission(['system:roles:manage'])"
               #dropdownItems
             >
               <VButton
