@@ -14,7 +14,7 @@
 <a href="https://github.com/halo-dev/halo/actions"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/halo-dev/halo/Halo%20CI?style=flat-square" /></a>
 <br />
 <a href="https://halo.run">官网</a>
-<a href="https://docs.halo.run/next">文档（2.0 Alpha）</a>
+<a href="https://docs.halo.run/2.0.0-SNAPSHOT">文档（2.0 Alpha）</a>
 <a href="https://bbs.halo.run">社区</a>
 <a href="https://gitee.com/halo-dev">Gitee</a>
 <a href="https://t.me/halo_dev">Telegram 频道</a>
@@ -24,7 +24,7 @@
 
 ## 注意
 
-当前分支为 Halo 2.0 的开发分支，目前 Halo 2.0 处于 Alpha 测试阶段，不建议从 1.5 直接升级，也不建议在生产环境使用。稳定版本（Halo 1.5）请查阅以下地址：
+当前分支为 Halo 2.0 的开发分支，目前 Halo 2.0 处于 Alpha 测试阶段，无法从 1.5 直接升级，也不建议在生产环境使用。稳定版本（Halo 1.x）请查阅以下地址：
 
 - 1.5 分支：<https://github.com/halo-dev/halo/tree/release-1.5>
 - 1.6 分支：<https://github.com/halo-dev/halo/tree/release-1.6>
