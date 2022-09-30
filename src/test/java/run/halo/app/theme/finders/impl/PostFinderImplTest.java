@@ -7,9 +7,9 @@ import static org.mockito.Mockito.when;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
@@ -47,13 +47,8 @@ class PostFinderImplTest {
     @Mock
     private ContributorFinder contributorFinder;
 
+    @InjectMocks
     private PostFinderImpl postFinder;
-
-    @BeforeEach
-    void setUp() {
-        postFinder = new PostFinderImpl(client, contentService, tagFinder, categoryFinder,
-            contributorFinder);
-    }
 
     @Test
     void content() {

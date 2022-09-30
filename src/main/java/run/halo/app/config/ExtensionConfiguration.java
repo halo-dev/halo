@@ -1,5 +1,6 @@
 package run.halo.app.config;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import org.pf4j.PluginManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
@@ -202,9 +203,10 @@ public class ExtensionConfiguration {
         }
 
         @Bean
-        Controller commentController(ExtensionClient client) {
+        Controller commentController(ExtensionClient client, MeterRegistry meterRegistry,
+            SchemeManager schemeManager) {
             return new ControllerBuilder("comment-controller", client)
-                .reconciler(new CommentReconciler(client))
+                .reconciler(new CommentReconciler(client, meterRegistry, schemeManager))
                 .extension(new Comment())
                 .build();
         }

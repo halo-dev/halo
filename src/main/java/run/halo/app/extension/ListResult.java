@@ -124,4 +124,8 @@ public class ListResult<T> implements Streamable<T> {
             .load(ListResult.class.getClassLoader())
             .getLoaded();
     }
+
+    public static <T> ListResult<T> emptyResult() {
+        return new ListResult<>(List.of());
+    }
 }

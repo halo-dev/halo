@@ -26,13 +26,13 @@ import run.halo.app.content.comment.ReplyRequest;
 import run.halo.app.content.comment.ReplyService;
 import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Reply;
-import run.halo.app.core.extension.endpoint.CommentEndpoint;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
+import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.IpAddressUtils;
 import run.halo.app.theme.finders.CommentFinder;
 import run.halo.app.theme.finders.vo.CommentVo;
@@ -145,7 +145,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
             .flatMap(commentRequest -> {
                 Comment comment = commentRequest.toComment();
                 comment.getSpec().setIpAddress(IpAddressUtils.getIpAddress(request));
-                comment.getSpec().setUserAgent(CommentEndpoint.userAgentFrom(request));
+                comment.getSpec().setUserAgent(HaloUtils.userAgentFrom(request));
                 return commentService.create(comment);
             })
             .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
@@ -157,7 +157,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
             .flatMap(replyRequest -> {
                 Reply reply = replyRequest.toReply();
                 reply.getSpec().setIpAddress(IpAddressUtils.getIpAddress(request));
-                reply.getSpec().setUserAgent(CommentEndpoint.userAgentFrom(request));
+                reply.getSpec().setUserAgent(HaloUtils.userAgentFrom(request));
                 return replyService.create(commentName, reply);
             })
             .flatMap(comment -> ServerResponse.ok().bodyValue(comment));

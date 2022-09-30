@@ -21,6 +21,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.content.permalinks.ExtensionLocator;
 import run.halo.app.core.extension.Post;
+import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
@@ -49,7 +50,7 @@ public class PostRouteStrategy implements TemplateRouterStrategy {
     public RouterFunction<ServerResponse> getRouteFunction(String template, String pattern) {
         PostRequestParamPredicate postParamPredicate =
             new PostRequestParamPredicate(pattern);
-
+        GVK gvk = Post.class.getAnnotation(GVK.class);
         if (postParamPredicate.isQueryParamPattern()) {
             String paramName = postParamPredicate.getParamName();
             String placeholderName = postParamPredicate.getPlaceholderName();
@@ -72,10 +73,14 @@ public class PostRouteStrategy implements TemplateRouterStrategy {
                     if (name == null) {
                         return ServerResponse.notFound().build();
                     }
+                    GroupVersionKind groupVersionKind =
+                        new GroupVersionKind(gvk.group(), gvk.version(), gvk.kind());
                     return ServerResponse.ok()
                         .render(DefaultTemplateEnum.POST.getValue(),
                             Map.of(PostRequestParamPredicate.NAME_PARAM, name,
-                                "post", postByName(name))
+                                "post", postByName(name),
+                                "groupVersionKind", groupVersionKind,
+                                "plural", gvk.plural())
                         );
                 });
         }
@@ -95,6 +100,8 @@ public class PostRouteStrategy implements TemplateRouterStrategy {
                         model.putAll(pathMatchInfo.getUriVariables());
                     }
                     model.put("post", postByName(locator.name()));
+                    model.put("groupVersionKind", locator.gvk());
+                    model.put("plural", gvk.plural());
                     return ServerResponse.ok()
                         .render(DefaultTemplateEnum.POST.getValue(), model);
                 });

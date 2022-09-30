@@ -8,7 +8,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import io.micrometer.common.util.StringUtils;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -19,7 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -27,7 +25,6 @@ import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
-import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -131,45 +128,14 @@ public class UserEndpoint implements CustomEndpoint {
         return request.bodyToMono(GrantRequest.class)
             .switchIfEmpty(
                 Mono.error(() -> new ServerWebInputException("Request body is empty")))
-            .flatMap(grant -> client.get(User.class, username).thenReturn(grant))
-            .flatMap(grant -> Flux.fromIterable(grant.roles)
-                .flatMap(roleName -> client.get(Role.class, roleName))
-                .then().thenReturn(grant))
-            .zipWith(client.list(RoleBinding.class, RoleBinding.containsUser(username), null)
-                .collectList())
-            .flatMap(tuple2 -> {
-                var grant = tuple2.getT1();
-                var bindings = tuple2.getT2();
-                var bindingToUpdate = new HashSet<RoleBinding>();
-                var bindingToDelete = new HashSet<RoleBinding>();
-                var existingRoles = new HashSet<String>();
-                bindings.forEach(binding -> {
-                    var roleName = binding.getRoleRef().getName();
-                    if (grant.roles.contains(roleName)) {
-                        existingRoles.add(roleName);
-                        return;
-                    }
-                    binding.getSubjects().removeIf(RoleBinding.Subject.isUser(username));
-                    if (CollectionUtils.isEmpty(binding.getSubjects())) {
-                        // remove it if subjects is empty
-                        bindingToDelete.add(binding);
-                    } else {
-                        bindingToUpdate.add(binding);
-                    }
-                });
+            .flatMap(grantRequest -> userService.grantRoles(username, grantRequest.roles())
+                .then(ServerResponse.ok().build()));
+    }
 
-                bindingToUpdate.forEach(client::update);
-                bindingToDelete.forEach(client::delete);
-
-                // remove existing roles
-                var roles = new HashSet<>(grant.roles);
-                roles.removeAll(existingRoles);
-                roles.stream()
-                    .map(roleName -> RoleBinding.create(username, roleName))
-                    .forEach(client::create);
-
-                return ServerResponse.ok().build();
-            });
+    private Mono<GrantRequest> checkRoles(GrantRequest request) {
+        return Flux.fromIterable(request.roles)
+            .flatMap(role -> client.get(Role.class, role))
+            .then(Mono.just(request));
     }
 
     record GrantRequest(Set<String> roles) {

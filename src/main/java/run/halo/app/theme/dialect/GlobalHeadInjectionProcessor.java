@@ -68,7 +68,7 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
             getTemplateHeadProcessors(appCtx);
         for (TemplateHeadProcessor processor : templateHeadProcessors) {
             processor.process(context, modelToInsert, structureHandler)
-                .subscribe();
+                .block();
         }
 
         // add to target model
