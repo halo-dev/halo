@@ -241,7 +241,10 @@ function handleSelectUser(user: User | undefined) {
           <div
             class="relative flex flex-col items-start sm:flex-row sm:items-center"
           >
-            <div class="mr-4 hidden items-center sm:flex">
+            <div
+              v-permission="['system:comments:manage']"
+              class="mr-4 hidden items-center sm:flex"
+            >
               <input
                 v-model="checkAll"
                 class="h-4 w-4 rounded border-gray-300 text-indigo-600"

@@ -25,6 +25,9 @@ import ReplyListItem from "./ReplyListItem.vue";
 import { apiClient } from "@/utils/api-client";
 import type { RouteLocationRaw } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
+import { usePermission } from "@/utils/permission";
+
+const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
@@ -247,7 +250,10 @@ const subjectRefResult = computed(() => {
       <div class="absolute inset-x-0 top-0 h-[1px] bg-black/50"></div>
       <div class="absolute inset-x-0 bottom-0 h-[1px] bg-black/50"></div>
     </template>
-    <template #checkbox>
+    <template
+      v-if="!currentUserHasPermission(['system:comments:manage'])"
+      #checkbox
+    >
       <slot name="checkbox" />
     </template>
     <template #start>
@@ -336,7 +342,10 @@ const subjectRefResult = computed(() => {
         </template>
       </VEntityField>
     </template>
-    <template #dropdownItems>
+    <template
+      v-if="!currentUserHasPermission(['system:comments:manage'])"
+      #dropdownItems
+    >
       <VButton
         v-if="!comment?.comment.spec.approved"
         v-close-popper

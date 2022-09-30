@@ -57,7 +57,7 @@ const handleReloadThemeSetting = async () => {
           </p>
         </div>
       </div>
-      <FloatingDropdown>
+      <FloatingDropdown v-permission="['system:themes:manage']">
         <div
           class="cursor-pointer rounded p-1 transition-all hover:text-blue-600 group-hover:bg-gray-100"
         >

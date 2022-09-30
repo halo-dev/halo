@@ -47,6 +47,7 @@ export default definePlugin({
                   meta: {
                     title: "自定义页面",
                     searchable: true,
+                    permissions: ["system:singlepages:view"],
                   },
                 },
               ],
@@ -62,6 +63,7 @@ export default definePlugin({
                   meta: {
                     title: "页面编辑",
                     searchable: true,
+                    permissions: ["system:singlepages:manage"],
                   },
                 },
               ],

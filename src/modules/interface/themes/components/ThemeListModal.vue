@@ -17,6 +17,9 @@ import ThemeInstallModal from "./ThemeInstallModal.vue";
 import { ref, watch } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
+import { usePermission } from "@/utils/permission";
+
+const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
@@ -141,7 +144,11 @@ defineExpose({
       <template #actions>
         <VSpace>
           <VButton @click="handleFetchThemes"> 刷新</VButton>
-          <VButton type="primary" @click="themeInstall = true">
+          <VButton
+            v-permission="['system:themes:manage']"
+            type="primary"
+            @click="themeInstall = true"
+          >
             <template #icon>
               <IconAddCircle class="h-full w-full" />
             </template>
@@ -238,7 +245,10 @@ defineExpose({
               </template>
             </VEntityField>
           </template>
-          <template #dropdownItems>
+          <template
+            v-if="!currentUserHasPermission(['system:themes:manage'])"
+            #dropdownItems
+          >
             <VButton
               v-close-popper
               block
@@ -262,7 +272,11 @@ defineExpose({
     </ul>
     <template #footer>
       <VSpace>
-        <VButton type="secondary" @click="themeInstall = true">
+        <VButton
+          v-permission="['system:themes:manage']"
+          type="secondary"
+          @click="themeInstall = true"
+        >
           安装主题
         </VButton>
         <VButton @click="onVisibleChange(false)">关闭</VButton>

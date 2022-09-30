@@ -10,6 +10,9 @@ import {
 import Draggable from "vuedraggable";
 import { ref } from "vue";
 import type { MenuTreeItem } from "@/modules/interface/menus/utils";
+import { usePermission } from "@/utils/permission";
+
+const { currentUserHasPermission } = usePermission();
 
 withDefaults(
   defineProps<{
@@ -74,6 +77,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
         <VEntity>
           <template #prepend>
             <div
+              v-permission="['system:menus:manage']"
               class="drag-element absolute inset-y-0 left-0 hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
             >
               <IconList class="h-3.5 w-3.5" />
@@ -98,7 +102,10 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
               </template>
             </VEntityField>
           </template>
-          <template #dropdownItems>
+          <template
+            v-if="!currentUserHasPermission(['system:menus:manage'])"
+            #dropdownItems
+          >
             <VButton
               v-close-popper
               block

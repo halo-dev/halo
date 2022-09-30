@@ -38,6 +38,9 @@ import cloneDeep from "lodash.clonedeep";
 import { isImage } from "@/utils/image";
 import { useRouteQuery } from "@vueuse/router";
 import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
+import { usePermission } from "@/utils/permission";
+
+const { currentUserHasPermission } = usePermission();
 
 const policyVisible = ref(false);
 const uploadVisible = ref(false);
@@ -233,13 +236,21 @@ onMounted(() => {
     </template>
     <template #actions>
       <VSpace>
-        <VButton size="sm" @click="policyVisible = true">
+        <VButton
+          v-permission="['system:attachments:manage']"
+          size="sm"
+          @click="policyVisible = true"
+        >
           <template #icon>
             <IconDatabase2Line class="h-full w-full" />
           </template>
           存储策略
         </VButton>
-        <VButton type="secondary" @click="uploadVisible = true">
+        <VButton
+          v-permission="['system:attachments:manage']"
+          type="secondary"
+          @click="uploadVisible = true"
+        >
           <template #icon>
             <IconUpload class="h-full w-full" />
           </template>
@@ -258,7 +269,10 @@ onMounted(() => {
               <div
                 class="relative flex flex-col items-start sm:flex-row sm:items-center"
               >
-                <div class="mr-4 hidden items-center sm:flex">
+                <div
+                  v-permission="['system:attachments:manage']"
+                  class="mr-4 hidden items-center sm:flex"
+                >
                   <input
                     v-model="checkedAll"
                     class="h-4 w-4 rounded border-gray-300 text-indigo-600"
@@ -489,7 +503,11 @@ onMounted(() => {
             <template #actions>
               <VSpace>
                 <VButton @click="handleFetchAttachments">刷新</VButton>
-                <VButton type="secondary" @click="uploadVisible = true">
+                <VButton
+                  v-permission="['system:attachments:manage']"
+                  type="secondary"
+                  @click="uploadVisible = true"
+                >
                   <template #icon>
                     <IconUpload class="h-full w-full" />
                   </template>
@@ -565,6 +583,7 @@ onMounted(() => {
 
                     <div
                       v-if="!attachment.metadata.deletionTimestamp"
+                      v-permission="['system:attachments:manage']"
                       :class="{ '!flex': selectedAttachments.has(attachment) }"
                       class="absolute top-0 left-0 hidden h-1/3 w-full cursor-pointer justify-end bg-gradient-to-b from-gray-300 to-transparent ease-in-out group-hover:flex"
                     >
@@ -588,7 +607,12 @@ onMounted(() => {
             >
               <li v-for="(attachment, index) in attachments.items" :key="index">
                 <VEntity :is-selected="isChecked(attachment)">
-                  <template #checkbox>
+                  <template
+                    v-if="
+                      !currentUserHasPermission(['system:attachments:manage'])
+                    "
+                    #checkbox
+                  >
                     <input
                       :checked="selectedAttachments.has(attachment)"
                       class="h-4 w-4 rounded border-gray-300 text-indigo-600"
@@ -669,7 +693,12 @@ onMounted(() => {
                       </template>
                     </VEntityField>
                   </template>
-                  <template #dropdownItems>
+                  <template
+                    v-if="
+                      !currentUserHasPermission(['system:attachments:manage'])
+                    "
+                    #dropdownItems
+                  >
                     <VButton
                       v-close-popper
                       block

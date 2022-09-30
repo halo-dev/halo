@@ -17,6 +17,7 @@ export default definePlugin({
           component: AttachmentList,
           meta: {
             title: "附件",
+            permissions: ["system:attachments:view"],
           },
         },
       ],

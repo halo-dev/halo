@@ -175,6 +175,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
                 <div class="mt-4 flex sm:mt-0">
                   <VSpace>
                     <VButton
+                      v-permission="['system:menus:manage']"
                       size="xs"
                       type="default"
                       @click="menuItemEditingModal = true"
@@ -194,7 +195,11 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
             <template #actions>
               <VSpace>
                 <VButton @click="handleFetchMenuItems"> 刷新</VButton>
-                <VButton type="primary" @click="menuItemEditingModal = true">
+                <VButton
+                  v-permission="['system:menus:manage']"
+                  type="primary"
+                  @click="menuItemEditingModal = true"
+                >
                   <template #icon>
                     <IconAddCircle class="h-full w-full" />
                   </template>

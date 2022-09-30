@@ -115,7 +115,11 @@ onMounted(async () => {
       <IconBookRead class="mr-2 self-center" />
     </template>
     <template #actions>
-      <VButton type="secondary" @click="editingModal = true">
+      <VButton
+        v-permission="['system:posts:manage']"
+        type="secondary"
+        @click="editingModal = true"
+      >
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>
@@ -204,6 +208,7 @@ onMounted(async () => {
               </template>
               <template #dropdownItems>
                 <VButton
+                  v-permission="['system:posts:manage']"
                   v-close-popper
                   block
                   type="secondary"
@@ -212,6 +217,7 @@ onMounted(async () => {
                   修改
                 </VButton>
                 <VButton
+                  v-permission="['system:posts:manage']"
                   v-close-popper
                   block
                   type="danger"

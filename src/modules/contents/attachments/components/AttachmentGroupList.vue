@@ -132,7 +132,10 @@ onMounted(async () => {
           {{ group.spec.displayName }}
         </span>
       </div>
-      <FloatingDropdown v-if="!readonly">
+      <FloatingDropdown
+        v-if="!readonly"
+        v-permission="['system:attachments:manage']"
+      >
         <IconMore @click.stop />
         <template #popper>
           <div class="w-48 p-2">
@@ -153,6 +156,7 @@ onMounted(async () => {
     </div>
     <div
       v-if="!loading && !readonly"
+      v-permission="['system:attachments:manage']"
       class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
       @click="editingModal = true"
     >

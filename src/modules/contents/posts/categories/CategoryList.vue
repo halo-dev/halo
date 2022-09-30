@@ -84,7 +84,11 @@ const onEditingModalClose = () => {
     </template>
 
     <template #actions>
-      <VButton type="secondary" @click="editingModal = true">
+      <VButton
+        v-permission="['system:posts:manage']"
+        type="secondary"
+        @click="editingModal = true"
+      >
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>
@@ -115,7 +119,11 @@ const onEditingModalClose = () => {
         <template #actions>
           <VSpace>
             <VButton @click="handleFetchCategories">刷新</VButton>
-            <VButton type="primary" @click="editingModal = true">
+            <VButton
+              v-permission="['system:posts:manage']"
+              type="primary"
+              @click="editingModal = true"
+            >
               <template #icon>
                 <IconAddCircle class="h-full w-full" />
               </template>

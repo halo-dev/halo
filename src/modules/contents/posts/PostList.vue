@@ -37,6 +37,9 @@ import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
 import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
+import { usePermission } from "@/utils/permission";
+
+const { currentUserHasPermission } = usePermission();
 
 enum PostPhase {
   DRAFT = "未发布",
@@ -398,7 +401,11 @@ function handleContributorChange(user?: User) {
       <VSpace>
         <VButton :route="{ name: 'Categories' }" size="sm">分类</VButton>
         <VButton :route="{ name: 'Tags' }" size="sm">标签</VButton>
-        <VButton :route="{ name: 'PostEditor' }" type="secondary">
+        <VButton
+          v-permission="['system:posts:manage']"
+          :route="{ name: 'PostEditor' }"
+          type="secondary"
+        >
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
@@ -415,7 +422,10 @@ function handleContributorChange(user?: User) {
           <div
             class="relative flex flex-col items-start sm:flex-row sm:items-center"
           >
-            <div class="mr-4 hidden items-center sm:flex">
+            <div
+              v-permission="['system:posts:manage']"
+              class="mr-4 hidden items-center sm:flex"
+            >
               <input
                 v-model="checkedAll"
                 class="h-4 w-4 rounded border-gray-300 text-indigo-600"
@@ -769,7 +779,11 @@ function handleContributorChange(user?: User) {
         <template #actions>
           <VSpace>
             <VButton @click="handleFetchPosts">刷新</VButton>
-            <VButton :route="{ name: 'PostEditor' }" type="primary">
+            <VButton
+              v-permission="['system:posts:manage']"
+              :route="{ name: 'PostEditor' }"
+              type="primary"
+            >
               <template #icon>
                 <IconAddCircle class="h-full w-full" />
               </template>
@@ -785,7 +799,10 @@ function handleContributorChange(user?: User) {
       >
         <li v-for="(post, index) in posts.items" :key="index">
           <VEntity :is-selected="checkSelection(post.post)">
-            <template #checkbox>
+            <template
+              v-if="!currentUserHasPermission(['system:posts:manage'])"
+              #checkbox
+            >
               <input
                 v-model="selectedPostNames"
                 :value="post.post.metadata.name"
@@ -904,7 +921,10 @@ function handleContributorChange(user?: User) {
                 </template>
               </VEntityField>
             </template>
-            <template #dropdownItems>
+            <template
+              v-if="!currentUserHasPermission(['system:posts:manage'])"
+              #dropdownItems
+            >
               <VButton
                 v-close-popper
                 block

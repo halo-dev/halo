@@ -17,6 +17,7 @@ export default definePlugin({
           meta: {
             title: "评论",
             searchable: true,
+            permissions: ["system:comments:view"],
           },
         },
       ],

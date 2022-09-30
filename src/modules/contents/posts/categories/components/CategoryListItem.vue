@@ -58,6 +58,7 @@ function onDelete(category: CategoryTree) {
         <VEntity>
           <template #prepend>
             <div
+              v-permission="['system:posts:manage']"
               class="drag-element absolute inset-y-0 left-0 hidden w-3.5 cursor-move items-center bg-gray-100 transition-all hover:bg-gray-200 group-hover:flex"
             >
               <IconList class="h-3.5 w-3.5" />
@@ -88,6 +89,7 @@ function onDelete(category: CategoryTree) {
           </template>
           <template #dropdownItems>
             <VButton
+              v-permission="['system:posts:manage']"
               v-close-popper
               block
               type="secondary"
@@ -96,6 +98,7 @@ function onDelete(category: CategoryTree) {
               修改
             </VButton>
             <VButton
+              v-permission="['system:posts:manage']"
               v-close-popper
               block
               type="danger"

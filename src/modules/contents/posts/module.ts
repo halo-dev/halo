@@ -20,6 +20,7 @@ export default definePlugin({
           meta: {
             title: "文章",
             searchable: true,
+            permissions: ["system:posts:view"],
           },
         },
         {
@@ -29,6 +30,7 @@ export default definePlugin({
           meta: {
             title: "文章编辑",
             searchable: true,
+            permissions: ["system:posts:manage"],
           },
         },
         {
@@ -42,6 +44,7 @@ export default definePlugin({
               meta: {
                 title: "文章分类",
                 searchable: true,
+                permissions: ["system:posts:view"],
               },
             },
           ],
@@ -57,6 +60,7 @@ export default definePlugin({
               meta: {
                 title: "文章标签",
                 searchable: true,
+                permissions: ["system:posts:view"],
               },
             },
           ],

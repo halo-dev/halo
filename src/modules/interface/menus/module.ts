@@ -17,6 +17,7 @@ export default definePlugin({
           meta: {
             title: "菜单",
             searchable: true,
+            permissions: ["system:menus:view"],
           },
         },
       ],

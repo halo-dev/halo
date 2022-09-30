@@ -12,6 +12,9 @@ import { toRefs } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 import type { Plugin } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
+import { usePermission } from "@/utils/permission";
+
+const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
@@ -86,12 +89,9 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
           </span>
         </template>
       </VEntityField>
-      <VEntityField>
+      <VEntityField v-permission="['system:plugins:manage']">
         <template #description>
-          <div
-            v-permission="['system:plugins:manage']"
-            class="flex items-center"
-          >
+          <div class="flex items-center">
             <VSwitch
               :model-value="plugin?.spec.enabled"
               @click="changeStatus"
@@ -100,7 +100,10 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
         </template>
       </VEntityField>
     </template>
-    <template #dropdownItems>
+    <template
+      v-if="!currentUserHasPermission(['system:plugins:manage'])"
+      #dropdownItems
+    >
       <VButton v-close-popper block type="danger" @click="uninstall">
         卸载
       </VButton>

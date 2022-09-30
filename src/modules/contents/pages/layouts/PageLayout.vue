@@ -70,7 +70,11 @@ watchEffect(() => {
         <IconPages class="mr-2 self-center" />
       </template>
       <template #actions>
-        <VButton :route="{ name: 'SinglePageEditor' }" type="secondary">
+        <VButton
+          v-permission="['system:singlepages:manage']"
+          :route="{ name: 'SinglePageEditor' }"
+          type="secondary"
+        >
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>

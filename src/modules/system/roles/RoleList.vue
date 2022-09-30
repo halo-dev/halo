@@ -32,6 +32,9 @@ import { useFetchRole } from "@/modules/system/roles/composables/use-role";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import Fuse from "fuse.js";
+import { usePermission } from "@/utils/permission";
+
+const { currentUserHasPermission } = usePermission();
 
 const editingModal = ref<boolean>(false);
 const selectedRole = ref<Role>();
@@ -272,7 +275,10 @@ const handleDelete = async (role: Role) => {
                 </template>
               </VEntityField>
             </template>
-            <template #dropdownItems>
+            <template
+              v-if="!currentUserHasPermission(['system:roles:manage'])"
+              #dropdownItems
+            >
               <VButton
                 v-close-popper
                 block

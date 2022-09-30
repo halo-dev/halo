@@ -156,6 +156,7 @@ watch([() => route.name, () => route.params], async () => {
           </VButton>
           <VButton
             v-if="!isActivated"
+            v-permission="['system:themes:manage']"
             size="sm"
             type="primary"
             @click="handleActiveTheme"

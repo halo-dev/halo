@@ -8,24 +8,35 @@ import {
   IconUserSettings,
   IconPalette,
   VCard,
+  IconUserLine,
 } from "@halo-dev/components";
-import { markRaw, type Component } from "vue";
+import { inject, markRaw, type Component } from "vue";
 import { useRouter } from "vue-router";
 import type { RouteLocationRaw } from "vue-router";
+import type { User } from "@halo-dev/api-client";
 
 interface Action {
   icon: Component;
   title: string;
   route: RouteLocationRaw;
+  permissions?: string[];
 }
 
+const currentUser = inject<User>("currentUser");
+
 const actions: Action[] = [
+  {
+    icon: markRaw(IconUserLine),
+    title: "个人资料",
+    route: { name: "UserDetail", params: { name: currentUser?.metadata.name } },
+  },
   {
     icon: markRaw(IconBookRead),
     title: "创建文章",
     route: {
       name: "PostEditor",
     },
+    permissions: ["system:posts:manage"],
   },
   {
     icon: markRaw(IconPages),
@@ -33,6 +44,7 @@ const actions: Action[] = [
     route: {
       name: "SinglePageEditor",
     },
+    permissions: ["system:singlepages:manage"],
   },
   {
     icon: markRaw(IconFolder),
@@ -43,6 +55,7 @@ const actions: Action[] = [
         action: "upload",
       },
     },
+    permissions: ["system:attachments:manage"],
   },
   {
     icon: markRaw(IconPalette),
@@ -50,6 +63,7 @@ const actions: Action[] = [
     route: {
       name: "ThemeDetail",
     },
+    permissions: ["system:themes:view"],
   },
   {
     icon: markRaw(IconPlug),
@@ -57,6 +71,7 @@ const actions: Action[] = [
     route: {
       name: "Plugins",
     },
+    permissions: ["system:plugins:view"],
   },
   {
     icon: markRaw(IconUserSettings),
@@ -67,6 +82,7 @@ const actions: Action[] = [
         action: "create",
       },
     },
+    permissions: ["system:users:manage"],
   },
 ];
 
@@ -82,6 +98,7 @@ const router = useRouter();
       <div
         v-for="(action, index) in actions"
         :key="index"
+        v-permission="action.permissions"
         class="group relative cursor-pointer bg-white p-6 transition-all hover:bg-gray-50"
         @click="router.push(action.route)"
       >

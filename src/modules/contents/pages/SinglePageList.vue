@@ -32,6 +32,9 @@ import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { RouterLink } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
+import { usePermission } from "@/utils/permission";
+
+const { currentUserHasPermission } = usePermission();
 
 enum SinglePagePhase {
   DRAFT = "未发布",
@@ -327,7 +330,10 @@ function handleSortItemChange(sortItem?: SortItem) {
         <div
           class="relative flex flex-col items-start sm:flex-row sm:items-center"
         >
-          <div class="mr-4 hidden items-center sm:flex">
+          <div
+            v-permission="['system:singlepages:manage']"
+            class="mr-4 hidden items-center sm:flex"
+          >
             <input
               v-model="checkAll"
               class="h-4 w-4 rounded border-gray-300 text-indigo-600"
@@ -509,7 +515,11 @@ function handleSortItemChange(sortItem?: SortItem) {
       <template #actions>
         <VSpace>
           <VButton @click="handleFetchSinglePages">刷新</VButton>
-          <VButton :route="{ name: 'SinglePageEditor' }" type="primary">
+          <VButton
+            v-permission="['system:singlepages:manage']"
+            :route="{ name: 'SinglePageEditor' }"
+            type="primary"
+          >
             <template #icon>
               <IconAddCircle class="h-full w-full" />
             </template>
@@ -525,7 +535,10 @@ function handleSortItemChange(sortItem?: SortItem) {
     >
       <li v-for="(singlePage, index) in singlePages.items" :key="index">
         <VEntity :is-selected="checkAll">
-          <template #checkbox>
+          <template
+            v-if="!currentUserHasPermission(['system:singlepages:manage'])"
+            #checkbox
+          >
             <input
               v-model="checkAll"
               class="h-4 w-4 rounded border-gray-300 text-indigo-600"
@@ -622,7 +635,10 @@ function handleSortItemChange(sortItem?: SortItem) {
               </template>
             </VEntityField>
           </template>
-          <template #dropdownItems>
+          <template
+            v-if="!currentUserHasPermission(['system:singlepages:manage'])"
+            #dropdownItems
+          >
             <VButton
               v-close-popper
               block

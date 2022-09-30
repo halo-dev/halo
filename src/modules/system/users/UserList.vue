@@ -26,6 +26,9 @@ import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 import { useRouteQuery } from "@vueuse/router";
 import Fuse from "fuse.js";
+import { usePermission } from "@/utils/permission";
+
+const { currentUserHasPermission } = usePermission();
 
 const dialog = useDialog();
 
@@ -254,10 +257,12 @@ onMounted(() => {
           <div
             class="relative flex flex-col items-start sm:flex-row sm:items-center"
           >
-            <div class="mr-4 hidden items-center sm:flex">
+            <div
+              v-permission="['system:users:manage']"
+              class="mr-4 hidden items-center sm:flex"
+            >
               <input
                 v-model="checkedAll"
-                v-permission="['system:users:manage']"
                 class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                 type="checkbox"
                 @change="handleCheckAllChange"
@@ -382,10 +387,12 @@ onMounted(() => {
       <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
         <li v-for="(user, index) in searchResults" :key="index">
           <VEntity :is-selected="checkSelection(user)">
-            <template #checkbox>
+            <template
+              v-if="!currentUserHasPermission(['system:users:manage'])"
+              #checkbox
+            >
               <input
                 v-model="selectedUserNames"
-                v-permission="['system:users:manage']"
                 :value="user.metadata.name"
                 class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                 name="post-checkbox"
@@ -438,10 +445,12 @@ onMounted(() => {
                 </template>
               </VEntityField>
             </template>
-            <template #dropdownItems>
+            <template
+              v-if="!currentUserHasPermission(['system:users:manage'])"
+              #dropdownItems
+            >
               <VButton
                 v-close-popper
-                v-permission="['system:users:manage']"
                 block
                 type="secondary"
                 @click="handleOpenCreateModal(user)"
@@ -450,7 +459,6 @@ onMounted(() => {
               </VButton>
               <VButton
                 v-close-popper
-                v-permission="['system:users:manage']"
                 block
                 @click="handleOpenPasswordChangeModal(user)"
               >
@@ -459,7 +467,6 @@ onMounted(() => {
               <VButton
                 v-if="currentUser?.metadata.name !== user.metadata.name"
                 v-close-popper
-                v-permission="['system:users:manage']"
                 block
                 @click="handleOpenGrantPermissionModal(user)"
               >
@@ -468,7 +475,6 @@ onMounted(() => {
               <VButton
                 v-if="currentUser?.metadata.name !== user.metadata.name"
                 v-close-popper
-                v-permission="['system:users:manage']"
                 block
                 type="danger"
                 @click="handleDelete(user)"

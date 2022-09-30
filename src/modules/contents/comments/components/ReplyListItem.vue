@@ -172,6 +172,7 @@ const isHoveredReply = computed(() => {
     <template #dropdownItems>
       <VButton
         v-if="!reply?.reply.spec.approved"
+        v-permission="['system:comments:manage']"
         v-close-popper
         type="secondary"
         block
@@ -179,7 +180,13 @@ const isHoveredReply = computed(() => {
       >
         审核通过
       </VButton>
-      <VButton v-close-popper block type="danger" @click="handleDelete">
+      <VButton
+        v-permission="['system:comments:manage']"
+        v-close-popper
+        block
+        type="danger"
+        @click="handleDelete"
+      >
         删除
       </VButton>
     </template>

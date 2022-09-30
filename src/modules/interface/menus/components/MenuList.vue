@@ -14,6 +14,9 @@ import { defineExpose, onMounted, ref } from "vue";
 import type { Menu } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
+import { usePermission } from "@/utils/permission";
+
+const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
@@ -31,13 +34,13 @@ const emit = defineEmits<{
 
 const menus = ref<Menu[]>([] as Menu[]);
 const loading = ref(false);
-const selectedMenuToUpdate = ref<Menu | null>(null);
+const selectedMenuToUpdate = ref<Menu>();
 const menuEditingModal = ref<boolean>(false);
 
 const dialog = useDialog();
 
 const handleFetchMenus = async () => {
-  selectedMenuToUpdate.value = null;
+  selectedMenuToUpdate.value = undefined;
   try {
     loading.value = true;
 
@@ -95,7 +98,7 @@ const handleDeleteMenu = async (menu: Menu) => {
   });
 };
 
-const handleOpenEditingModal = (menu: Menu | null) => {
+const handleOpenEditingModal = (menu?: Menu) => {
   selectedMenuToUpdate.value = menu;
   menuEditingModal.value = true;
 };
@@ -161,7 +164,10 @@ defineExpose({
               </template>
             </VEntityField>
           </template>
-          <template #dropdownItems>
+          <template
+            v-if="!currentUserHasPermission(['system:menus:manage'])"
+            #dropdownItems
+          >
             <VButton
               v-close-popper
               block
@@ -182,8 +188,8 @@ defineExpose({
         </VEntity>
       </li>
     </ul>
-    <template #footer>
-      <VButton block type="secondary" @click="handleOpenEditingModal(null)">
+    <template v-if="!currentUserHasPermission(['system:menus:manage'])" #footer>
+      <VButton block type="secondary" @click="handleOpenEditingModal()">
         新增
       </VButton>
     </template>

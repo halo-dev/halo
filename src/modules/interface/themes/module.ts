@@ -20,6 +20,7 @@ export default definePlugin({
           meta: {
             title: "主题",
             searchable: true,
+            permissions: ["system:themes:view"],
           },
         },
         {
@@ -28,6 +29,7 @@ export default definePlugin({
           component: ThemeSetting,
           meta: {
             title: "主题设置",
+            permissions: ["system:themes:view"],
           },
         },
       ],
