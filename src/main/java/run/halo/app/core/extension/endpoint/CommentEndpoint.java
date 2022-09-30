@@ -6,10 +6,8 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -26,6 +24,7 @@ import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Reply;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.router.QueryParamBuildUtil;
+import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.IpAddressUtils;
 
 
@@ -106,7 +105,7 @@ public class CommentEndpoint implements CustomEndpoint {
             .flatMap(commentRequest -> {
                 Comment comment = commentRequest.toComment();
                 comment.getSpec().setIpAddress(IpAddressUtils.getIpAddress(request));
-                comment.getSpec().setUserAgent(userAgentFrom(request));
+                comment.getSpec().setUserAgent(HaloUtils.userAgentFrom(request));
                 return commentService.create(comment);
             })
             .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
@@ -118,26 +117,10 @@ public class CommentEndpoint implements CustomEndpoint {
             .flatMap(replyRequest -> {
                 Reply reply = replyRequest.toReply();
                 reply.getSpec().setIpAddress(IpAddressUtils.getIpAddress(request));
-                reply.getSpec().setUserAgent(userAgentFrom(request));
+                reply.getSpec().setUserAgent(HaloUtils.userAgentFrom(request));
                 return replyService.create(commentName, reply);
             })
             .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
     }
 
-    /**
-     * Gets user-agent from server request.
-     *
-     * @param request server request
-     * @return user-agent string if found, otherwise "unknown"
-     */
-    public static String userAgentFrom(ServerRequest request) {
-        HttpHeaders httpHeaders = request.headers().asHttpHeaders();
-        // https://en.wikipedia.org/wiki/User_agent
-        String userAgent = httpHeaders.getFirst(HttpHeaders.USER_AGENT);
-        if (StringUtils.isBlank(userAgent)) {
-            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Sec-CH-UA
-            userAgent = httpHeaders.getFirst("Sec-CH-UA");
-        }
-        return StringUtils.defaultString(userAgent, "unknown");
-    }
 }

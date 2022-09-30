@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.extension.GroupVersion;
+import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.IpAddressUtils;
 import run.halo.app.metrics.MeterUtils;
 import run.halo.app.metrics.VisitLogWriter;
@@ -101,12 +102,14 @@ public class CounterTrackerEndpoint implements CustomEndpoint {
         String screen = counterRequest.screen();
         String language = counterRequest.language();
         String referrer = counterRequest.referrer();
+        String userAgent = HaloUtils.userAgentFrom(request);
         String counterName =
             MeterUtils.nameOf(counterRequest.group(), counterRequest.plural(),
                 counterRequest.name());
         return String.format(
             "subject=[%s], ipAddress=[%s], hostname=[%s], screen=[%s], language=[%s], "
-                + "referrer=[%s]", counterName, ipAddress, hostname, screen, language, referrer);
+                + "referrer=[%s], userAgent=[%s]", counterName, ipAddress, hostname, screen,
+            language, referrer, userAgent);
     }
 
     @Override

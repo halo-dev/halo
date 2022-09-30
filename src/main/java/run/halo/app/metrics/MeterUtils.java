@@ -33,9 +33,9 @@ public class MeterUtils {
      */
     public static String nameOf(String group, String plural, String name) {
         if (StringUtils.isBlank(group)) {
-            return String.join(".", plural, name);
+            return String.join("/", plural, name);
         }
-        return String.join(".", group, plural, name);
+        return String.join(".", plural, group) + "/" + name;
     }
 
     public static <T extends AbstractExtension> String nameOf(Class<T> clazz, String name) {

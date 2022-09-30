@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.util.StreamUtils;
+import org.springframework.web.reactive.function.server.ServerRequest;
 
 /**
  * @author guqing
@@ -31,4 +34,20 @@ public class HaloUtils {
         }
     }
 
+    /**
+     * Gets user-agent from server request.
+     *
+     * @param request server request
+     * @return user-agent string if found, otherwise "unknown"
+     */
+    public static String userAgentFrom(ServerRequest request) {
+        HttpHeaders httpHeaders = request.headers().asHttpHeaders();
+        // https://en.wikipedia.org/wiki/User_agent
+        String userAgent = httpHeaders.getFirst(HttpHeaders.USER_AGENT);
+        if (StringUtils.isBlank(userAgent)) {
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Sec-CH-UA
+            userAgent = httpHeaders.getFirst("Sec-CH-UA");
+        }
+        return StringUtils.defaultString(userAgent, "unknown");
+    }
 }
