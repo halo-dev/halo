@@ -29,23 +29,23 @@ import run.halo.app.metrics.VisitLogWriter;
  * @since 2.0.0
  */
 @Component
-public class CounterTrackerEndpoint implements CustomEndpoint {
+public class TrackerEndpoint implements CustomEndpoint {
 
     private final MeterRegistry meterRegistry;
     private final VisitLogWriter visitLogWriter;
 
-    public CounterTrackerEndpoint(MeterRegistry meterRegistry, VisitLogWriter visitLogWriter) {
+    public TrackerEndpoint(MeterRegistry meterRegistry, VisitLogWriter visitLogWriter) {
         this.meterRegistry = meterRegistry;
         this.visitLogWriter = visitLogWriter;
     }
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        final var tag = "api.halo.run/v1alpha1/CounterTracker";
+        final var tag = "api.halo.run/v1alpha1/Tracker";
         return SpringdocRouteBuilder.route()
-            .POST("countertrackers", this::increase,
-                builder -> builder.operationId("Counter")
-                    .description("Counter an extension resource visits.")
+            .POST("trackers/counter", this::increase,
+                builder -> builder.operationId("count")
+                    .description("Count an extension resource visits.")
                     .tag(tag)
                     .requestBody(requestBodyBuilder()
                         .required(true)
