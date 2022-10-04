@@ -32,27 +32,13 @@
 
 ## 快速开始
 
-### Fat Jar
-
-下载最新的 Halo 运行包：
-
-```bash
-curl -L https://github.com/halo-dev/halo/releases/download/v2.0.0-alpha.1/halo-2.0.0-alpha.1.jar --output halo-next.jar
-```
-
-其他地址：<https://docs.halo.run/next/getting-started/downloads>
-
-```bash
-java -jar halo-next.jar
-```
-
 ### Docker
 
 ```bash
-docker run -it -d --name halo-next -p 8090:8090 -v ~/halo-next:/root/halo-next --restart=unless-stopped halohub/halo-dev:next
+docker run -it -d --name halo-next -p 8090:8090 -v ~/halo-next:/root/halo-next --restart=unless-stopped halohub/halo-dev:2.0.0-alpha.1
 ```
 
-详细部署文档请查阅：<https://docs.halo.run/next/getting-started/install/linux>
+详细部署文档请查阅：<https://docs.halo.run/2.0.0-SNAPSHOT/getting-started/install/docker>
 
 ## 生态
 
