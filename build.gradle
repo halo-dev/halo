@@ -1,6 +1,6 @@
 plugins {
-    id 'org.springframework.boot' version '3.0.0-M4'
-    id 'io.spring.dependency-management' version '1.0.12.RELEASE'
+    id 'org.springframework.boot' version '3.0.0-M5'
+    id 'io.spring.dependency-management' version '1.0.14.RELEASE'
     id "checkstyle"
     id 'java'
 }
@@ -62,7 +62,7 @@ dependencies {
     implementation 'org.springframework.security:spring-security-oauth2-jose'
     implementation 'org.springframework.security:spring-security-oauth2-resource-server'
 
-    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.0-M5'
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.0-M6'
     implementation 'org.openapi4j:openapi-schema-validator:1.0.7'
     implementation "net.bytebuddy:byte-buddy"
 
