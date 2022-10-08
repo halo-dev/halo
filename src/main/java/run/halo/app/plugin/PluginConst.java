@@ -11,4 +11,6 @@ public interface PluginConst {
      * Plugin metadata labels key.
      */
     String PLUGIN_NAME_LABEL_NAME = "plugin.halo.run/plugin-name";
+
+    String SYSTEM_PLUGIN_NAME = "system";
 }

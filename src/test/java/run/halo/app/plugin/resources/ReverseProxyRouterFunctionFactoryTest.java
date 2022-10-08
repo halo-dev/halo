@@ -1,7 +1,5 @@
 package run.halo.app.plugin.resources;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -11,11 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.extension.Metadata;
-import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginApplicationContext;
 import run.halo.app.plugin.PluginConst;
@@ -30,9 +26,6 @@ import run.halo.app.plugin.PluginConst;
 class ReverseProxyRouterFunctionFactoryTest {
 
     @Mock
-    private ReactiveExtensionClient extensionClient;
-
-    @Mock
     private PluginApplicationContext pluginApplicationContext;
     @Mock
     private HaloPluginManager haloPluginManager;
@@ -42,19 +35,16 @@ class ReverseProxyRouterFunctionFactoryTest {
     @BeforeEach
     void setUp() {
         JsBundleRuleProvider jsBundleRuleProvider = new JsBundleRuleProvider(haloPluginManager);
-        reverseProxyRouterFunctionFactory = new ReverseProxyRouterFunctionFactory(extensionClient,
-            jsBundleRuleProvider);
-
-        ReverseProxy reverseProxy = mockReverseProxy();
+        reverseProxyRouterFunctionFactory =
+            new ReverseProxyRouterFunctionFactory(jsBundleRuleProvider);
 
         when(pluginApplicationContext.getPluginId()).thenReturn("fakeA");
-        when(extensionClient.list(eq(ReverseProxy.class), any(), any())).thenReturn(
-            Flux.just(reverseProxy));
     }
 
     @Test
     void create() {
-        var routerFunction = reverseProxyRouterFunctionFactory.create(pluginApplicationContext);
+        var routerFunction =
+            reverseProxyRouterFunctionFactory.create(mockReverseProxy(), pluginApplicationContext);
         StepVerifier.create(routerFunction)
             .expectNextCount(1)
             .verifyComplete();

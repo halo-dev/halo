@@ -18,6 +18,7 @@ import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.SinglePage;
@@ -31,6 +32,7 @@ import run.halo.app.core.extension.reconciler.MenuItemReconciler;
 import run.halo.app.core.extension.reconciler.MenuReconciler;
 import run.halo.app.core.extension.reconciler.PluginReconciler;
 import run.halo.app.core.extension.reconciler.PostReconciler;
+import run.halo.app.core.extension.reconciler.ReverseProxyReconciler;
 import run.halo.app.core.extension.reconciler.RoleBindingReconciler;
 import run.halo.app.core.extension.reconciler.RoleReconciler;
 import run.halo.app.core.extension.reconciler.SinglePageReconciler;
@@ -56,6 +58,7 @@ import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.resources.JsBundleRuleProvider;
+import run.halo.app.plugin.resources.ReverseProxyRouterFunctionRegistry;
 import run.halo.app.theme.router.TemplateRouteManager;
 
 @Configuration(proxyBeanMethods = false)
@@ -208,6 +211,15 @@ public class ExtensionConfiguration {
             return new ControllerBuilder("comment-controller", client)
                 .reconciler(new CommentReconciler(client, meterRegistry, schemeManager))
                 .extension(new Comment())
+                .build();
+        }
+
+        @Bean
+        Controller reverseProxyController(ExtensionClient client,
+            ReverseProxyRouterFunctionRegistry reverseProxyRouterFunctionRegistry) {
+            return new ControllerBuilder("reverse-proxy-controller", client)
+                .reconciler(new ReverseProxyReconciler(client, reverseProxyRouterFunctionRegistry))
+                .extension(new ReverseProxy())
                 .build();
         }
     }
