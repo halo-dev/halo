@@ -13,4 +13,4 @@ rules:
     resources: [ "*" ]
     verbs: [ "*" ]
   - nonResourceURLs: [ "/apis/api.halo.run/v1alpha1/trackers/counter" ]
-    verbs: [ "post" ]
+    verbs: [ "create" ]
