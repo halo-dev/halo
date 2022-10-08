@@ -1,7 +1,6 @@
 package run.halo.app.config;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import org.pf4j.PluginManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -54,6 +53,7 @@ import run.halo.app.extension.router.ExtensionCompositeRouterFunction;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.plugin.ExtensionComponentsFinder;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.resources.JsBundleRuleProvider;
 import run.halo.app.theme.router.TemplateRouteManager;
@@ -183,10 +183,12 @@ public class ExtensionConfiguration {
         }
 
         @Bean
-        Controller attachmentController(ExtensionClient client, PluginManager pluginManager,
+        Controller attachmentController(ExtensionClient client,
+            ExtensionComponentsFinder extensionComponentsFinder,
             ExternalUrlSupplier externalUrl) {
             return new ControllerBuilder("attachment-controller", client)
-                .reconciler(new AttachmentReconciler(client, pluginManager, externalUrl))
+                .reconciler(
+                    new AttachmentReconciler(client, extensionComponentsFinder, externalUrl))
                 .extension(new Attachment())
                 .build();
         }

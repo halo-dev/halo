@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.DefaultPluginManager;
 import org.pf4j.ExtensionFactory;
@@ -26,7 +24,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.lang.NonNull;
 import run.halo.app.plugin.event.HaloPluginBeforeStopEvent;
 import run.halo.app.plugin.event.HaloPluginLoadedEvent;
@@ -109,24 +106,6 @@ public class HaloPluginManager extends DefaultPluginManager
     @Override
     protected PluginDescriptorFinder createPluginDescriptorFinder() {
         return new YamlPluginDescriptorFinder();
-    }
-
-    @Override
-    public <T> List<T> getExtensions(Class<T> type) {
-        // we will collect implementations from Halo core at last.
-        return Stream.concat(
-                this.getExtensions(extensionFinder.find(type))
-                    .stream(),
-                rootApplicationContext.getBeansOfType(type)
-                    .values()
-                    .stream()
-                    .sorted(AnnotationAwareOrderComparator.INSTANCE))
-            .collect(Collectors.toList());
-    }
-
-    @Override
-    public <T> List<T> getExtensions(Class<T> type, String pluginId) {
-        return this.getExtensions(extensionFinder.find(type, pluginId));
     }
 
     @Override

@@ -165,7 +165,9 @@ public class SpringExtensionFactory implements ExtensionFactory {
                 "  Extension class ' " + nameOf(extensionClass) + "' belongs to halo-plugin '"
                     + nameOf(plugin)
                     + "' and will be autowired by using its application context.");
-            applicationContext = ((BasePlugin) plugin).getApplicationContext();
+            applicationContext = ExtensionContextRegistry.getInstance()
+                .getByPluginId(plugin.getWrapper().getPluginId());
+            return Optional.of(applicationContext);
         } else if (this.pluginManager instanceof HaloPluginManager && plugin != null) {
             log.debug("  Extension class ' " + nameOf(extensionClass)
                 + "' belongs to a non halo-plugin (or main application)"

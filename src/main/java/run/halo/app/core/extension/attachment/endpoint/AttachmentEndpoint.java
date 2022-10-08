@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
-import org.pf4j.PluginManager;
 import org.springdoc.core.fn.builders.requestbody.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.HttpStatus;
@@ -43,6 +42,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
+import run.halo.app.plugin.ExtensionComponentsFinder;
 
 @Slf4j
 @Component
@@ -50,11 +50,12 @@ public class AttachmentEndpoint implements CustomEndpoint {
 
     private final ReactiveExtensionClient client;
 
-    private final PluginManager pluginManager;
+    private final ExtensionComponentsFinder extensionComponentsFinder;
 
-    public AttachmentEndpoint(ReactiveExtensionClient client, PluginManager pluginManager) {
+    public AttachmentEndpoint(ReactiveExtensionClient client,
+        ExtensionComponentsFinder extensionComponentsFinder) {
         this.client = client;
-        this.pluginManager = pluginManager;
+        this.extensionComponentsFinder = extensionComponentsFinder;
     }
 
     @Override
@@ -108,7 +109,7 @@ public class AttachmentEndpoint implements CustomEndpoint {
                     })
                     // find the proper handler to handle the attachment
                     .flatMap(uploadOption -> Flux.fromIterable(
-                            pluginManager.getExtensions(AttachmentHandler.class))
+                            extensionComponentsFinder.getExtensions(AttachmentHandler.class))
                         .concatMap(uploadHandler -> uploadHandler.upload(uploadOption)
                             .doOnNext(attachment -> {
                                 var spec = attachment.getSpec();
