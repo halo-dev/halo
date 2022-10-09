@@ -23,7 +23,7 @@ metadata:
     halo.run/role-template: "true"
   annotations:
     rbac.authorization.halo.run/module: "Menus Management"
-    rbac.authorization.halo.run/display-name: "Menu Manage"
+    rbac.authorization.halo.run/display-name: "Menu View"
     rbac.authorization.halo.run/ui-permissions: |
       ["system:menus:view"]
 rules:

@@ -7,9 +7,12 @@ metadata:
     halo.run/hidden: "true"
   annotations:
     rbac.authorization.halo.run/dependencies: |
-      [ "role-template-own-user-info", "role-template-own-permissions", "role-template-change-own-password",
-      "role-template-manage-configmaps" ]
-rules: [ ]
+      [ "role-template-own-user-info", "role-template-own-permissions", "role-template-change-own-password" ]
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "configmaps" ]
+    resourceNames: [ "system-states" ]
+    verbs: [ "get" ]
 ---
 apiVersion: v1alpha1
 kind: "Role"
