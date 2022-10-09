@@ -6,9 +6,9 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,6 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.core.extension.ReverseProxy.FileReverseProxyProvider;
 import run.halo.app.core.extension.ReverseProxy.ReverseProxyRule;
-import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.plugin.PluginApplicationContext;
 import run.halo.app.plugin.PluginConst;
@@ -41,13 +40,9 @@ import run.halo.app.plugin.PluginConst;
 public class ReverseProxyRouterFunctionFactory {
     private static final String REVERSE_PROXY_API_PREFIX = "/assets";
 
-    private final ReactiveExtensionClient extensionClient;
-
     private final JsBundleRuleProvider jsBundleRuleProvider;
 
-    public ReverseProxyRouterFunctionFactory(ReactiveExtensionClient extensionClient,
-        JsBundleRuleProvider jsBundleRuleProvider) {
-        this.extensionClient = extensionClient;
+    public ReverseProxyRouterFunctionFactory(JsBundleRuleProvider jsBundleRuleProvider) {
         this.jsBundleRuleProvider = jsBundleRuleProvider;
     }
 
@@ -57,21 +52,22 @@ public class ReverseProxyRouterFunctionFactory {
      * <p>Note that: returns {@code Null} if the plugin does not have a {@link ReverseProxy} custom
      * resource.</p>
      *
-     * @param pluginApplicationContext plugin application context
+     * @param applicationContext plugin application context or system application context
      * @return A reverse proxy RouterFunction handle(nullable)
      */
     @NonNull
-    public Mono<RouterFunction<ServerResponse>> create(
-        PluginApplicationContext pluginApplicationContext) {
-        return createReverseProxyRouterFunction(pluginApplicationContext);
+    public Mono<RouterFunction<ServerResponse>> create(ReverseProxy reverseProxy,
+        ApplicationContext applicationContext) {
+        return createReverseProxyRouterFunction(reverseProxy, applicationContext);
     }
 
     private Mono<RouterFunction<ServerResponse>> createReverseProxyRouterFunction(
-        PluginApplicationContext pluginApplicationContext) {
-        Assert.notNull(pluginApplicationContext, "The pluginApplicationContext must not be null.");
-
-        var pluginId = pluginApplicationContext.getPluginId();
-        var rules = getReverseProxyRules(pluginId);
+        ReverseProxy reverseProxy,
+        ApplicationContext applicationContext) {
+        Assert.notNull(reverseProxy, "The reverseProxy must not be null.");
+        Assert.notNull(applicationContext, "The applicationContext must not be null.");
+        final var pluginId = getPluginId(applicationContext);
+        var rules = getReverseProxyRules(pluginId, reverseProxy);
 
         return rules.map(rule -> {
             String routePath = buildRoutePath(pluginId, rule);
@@ -80,7 +76,7 @@ public class ReverseProxyRouterFunctionFactory {
             return RouterFunctions.route(GET(routePath).and(accept(ALL)),
                 request -> {
                     Resource resource =
-                        loadResourceByFileRule(pluginApplicationContext, rule, request);
+                        loadResourceByFileRule(pluginId, applicationContext, rule, request);
                     if (!resource.exists()) {
                         return ServerResponse.notFound().build();
                     }
@@ -90,22 +86,17 @@ public class ReverseProxyRouterFunctionFactory {
         }).reduce(RouterFunction::and);
     }
 
-    private Flux<ReverseProxyRule> getReverseProxyRules(String pluginId) {
-        return extensionClient.list(ReverseProxy.class, hasPluginId(pluginId), null)
-            .map(ReverseProxy::getRules)
-            .flatMapIterable(rules -> rules)
-            .concatWith(Flux.fromIterable(getJsBundleRules(pluginId)));
+    private String getPluginId(ApplicationContext applicationContext) {
+        if (applicationContext instanceof PluginApplicationContext pluginApplicationContext) {
+            return pluginApplicationContext.getPluginId();
+        }
+        return PluginConst.SYSTEM_PLUGIN_NAME;
     }
 
-    private Predicate<ReverseProxy> hasPluginId(String pluginId) {
-        return proxy -> {
-            var labels = proxy.getMetadata().getLabels();
-            if (labels == null) {
-                return false;
-            }
-            var pluginName = labels.get(PluginConst.PLUGIN_NAME_LABEL_NAME);
-            return pluginId.equals(pluginName);
-        };
+    private Flux<ReverseProxyRule> getReverseProxyRules(String pluginId,
+        ReverseProxy reverseProxy) {
+        return Flux.fromIterable(reverseProxy.getRules())
+            .concatWith(Flux.fromIterable(getJsBundleRules(pluginId)));
     }
 
     private List<ReverseProxyRule> getJsBundleRules(String pluginId) {
@@ -136,7 +127,8 @@ public class ReverseProxyRouterFunctionFactory {
      * @return a Resource handle for the specified resource location by the plugin(never null);
      */
     @NonNull
-    private Resource loadResourceByFileRule(PluginApplicationContext pluginApplicationContext,
+    private Resource loadResourceByFileRule(String pluginId,
+        ApplicationContext pluginApplicationContext,
         ReverseProxyRule rule, ServerRequest request) {
         Assert.notNull(rule.file(), "File rule must not be null.");
         FileReverseProxyProvider file = rule.file();
@@ -149,7 +141,7 @@ public class ReverseProxyRouterFunctionFactory {
             filename = configuredFilename;
         } else {
             AntPathMatcher antPathMatcher = new AntPathMatcher();
-            String routePath = buildRoutePath(pluginApplicationContext.getPluginId(), rule);
+            String routePath = buildRoutePath(pluginId, rule);
             filename =
                 antPathMatcher.extractPathWithinPattern(routePath, request.path());
         }
