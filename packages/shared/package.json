@@ -41,7 +41,7 @@
     "@halo-dev/components": "workspace:*"
   },
   "devDependencies": {
-    "vite-plugin-dts": "^1.5.0"
+    "vite-plugin-dts": "^1.6.5"
   },
   "peerDependencies": {
     "vue": "^3.2.37",

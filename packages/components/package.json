@@ -47,8 +47,8 @@
     "@histoire/plugin-vue": "^0.10.7",
     "@iconify-json/ri": "^1.1.3",
     "histoire": "^0.10.7",
-    "unplugin-icons": "^0.14.10",
-    "vite-plugin-dts": "^1.5.0"
+    "unplugin-icons": "^0.14.11",
+    "vite-plugin-dts": "^1.6.5"
   },
   "peerDependencies": {
     "vue": "^3.2.37",
@@ -62,11 +62,11 @@
     "./dist/style.css": "./dist/style.css"
   },
   "dependencies": {
-    "@codemirror/commands": "^6.1.0",
+    "@codemirror/commands": "^6.1.1",
     "@codemirror/language": "^6.2.1",
     "@codemirror/legacy-modes": "^6.1.0",
-    "@codemirror/state": "^6.1.1",
-    "@codemirror/view": "^6.2.4",
+    "@codemirror/state": "^6.1.2",
+    "@codemirror/view": "^6.3.0",
     "codemirror": "^6.0.1"
   }
 }
