@@ -5,7 +5,7 @@ import { ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 // types
-import { BasicLayout } from "@halo-dev/admin-shared";
+import { BasicLayout } from "@halo-dev/console-shared";
 import { useSettingForm } from "@/composables/use-setting-form";
 
 // components

@@ -1,4 +1,4 @@
-import { definePlugin } from "@halo-dev/admin-shared";
+import { definePlugin } from "@halo-dev/console-shared";
 import SystemSettingsLayout from "./layouts/SystemSettingsLayout.vue";
 import SystemSetting from "./SystemSetting.vue";
 import { IconSettings } from "@halo-dev/components";

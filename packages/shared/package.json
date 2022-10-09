@@ -1,5 +1,5 @@
 {
-  "name": "@halo-dev/admin-shared",
+  "name": "@halo-dev/console-shared",
   "version": "0.0.0-alpha.5",
   "description": "",
   "files": [
@@ -17,25 +17,25 @@
     "name": "@halo-dev",
     "url": "https://github.com/halo-dev"
   },
-  "main": "./dist/halo-admin-shared.iife.js",
-  "module": "./dist/halo-admin-shared.es.js",
+  "main": "./dist/halo-console-shared.iife.js",
+  "module": "./dist/halo-console-shared.es.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/halo-admin-shared.es.js"
+      "import": "./dist/halo-console-shared.es.js"
     },
     "./dist/style.css": "./dist/style.css"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/halo-dev/halo-admin.git",
+    "url": "https://github.com/halo-dev/console.git",
     "directory": "packages/shared"
   },
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
   },
-  "homepage": "https://github.com/halo-dev/halo-admin/tree/next/shared/components#readme",
+  "homepage": "https://github.com/halo-dev/console/tree/main/packages/shared#readme",
   "license": "MIT",
   "dependencies": {
     "@halo-dev/components": "workspace:*"

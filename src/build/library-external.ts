@@ -63,9 +63,9 @@ export const setupLibraryExternal = (
       rename: `halo-components.iife.${staticSuffix}.js`,
     },
     {
-      src: "./node_modules/@halo-dev/admin-shared/dist/halo-admin-shared.iife.js",
-      dest: "assets/admin-shared",
-      rename: `halo-admin-shared.iife.${staticSuffix}.js`,
+      src: "./node_modules/@halo-dev/console-shared/dist/halo-console-shared.iife.js",
+      dest: "assets/console-shared",
+      rename: `halo-console-shared.iife.${staticSuffix}.js`,
     },
   ];
 
@@ -73,7 +73,7 @@ export const setupLibraryExternal = (
     ViteExternals({
       vue: "Vue",
       "vue-router": "VueRouter",
-      "@halo-dev/shared": "HaloAdminShared",
+      "@halo-dev/shared": "HaloConsoleShared",
       "@halo-dev/components": "HaloComponents",
       "@vueuse/core": "VueUse",
       "@vueuse/components": "VueUse",

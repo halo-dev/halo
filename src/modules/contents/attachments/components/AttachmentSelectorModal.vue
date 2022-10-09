@@ -6,7 +6,7 @@ import UploadSelectorProvider from "./selector-providers/UploadSelectorProvider.
 import type {
   AttachmentLike,
   AttachmentSelectorPublicState,
-} from "@halo-dev/admin-shared";
+} from "@halo-dev/console-shared";
 import { useExtensionPointsState } from "@/composables/usePlugins";
 
 withDefaults(

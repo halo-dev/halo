@@ -16,7 +16,7 @@ import { watchEffect, ref } from "vue";
 import { isImage } from "@/utils/image";
 import { useAttachmentControl } from "../../composables/use-attachment";
 import LazyImage from "@/components/image/LazyImage.vue";
-import type { AttachmentLike } from "@halo-dev/admin-shared";
+import type { AttachmentLike } from "@halo-dev/console-shared";
 import type { Attachment, Group } from "@halo-dev/api-client";
 import AttachmentUploadModal from "../AttachmentUploadModal.vue";
 import AttachmentFileTypeIcon from "../AttachmentFileTypeIcon.vue";

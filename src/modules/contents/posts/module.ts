@@ -1,4 +1,8 @@
-import { BasicLayout, BlankLayout, definePlugin } from "@halo-dev/admin-shared";
+import {
+  BasicLayout,
+  BlankLayout,
+  definePlugin,
+} from "@halo-dev/console-shared";
 import { IconBookRead } from "@halo-dev/components";
 import PostList from "./PostList.vue";
 import PostEditor from "./PostEditor.vue";

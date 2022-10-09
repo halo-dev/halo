@@ -8,7 +8,7 @@ import {
   VEntity,
   VEntityField,
 } from "@halo-dev/components";
-import type { PagesPublicState } from "@halo-dev/admin-shared";
+import type { PagesPublicState } from "@halo-dev/console-shared";
 import { useExtensionPointsState } from "@/composables/usePlugins";
 
 const pagesPublicState = ref<PagesPublicState>({

@@ -2,7 +2,7 @@ import { usePluginStore } from "@/stores/plugin";
 import type {
   ExtensionPointName,
   ExtensionPointState,
-} from "@halo-dev/admin-shared";
+} from "@halo-dev/console-shared";
 import type { Plugin } from "@halo-dev/api-client";
 import type { Ref } from "vue";
 

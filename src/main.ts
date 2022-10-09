@@ -7,7 +7,7 @@ import type {
   MenuGroupType,
   MenuItemType,
   Plugin,
-} from "@halo-dev/admin-shared";
+} from "@halo-dev/console-shared";
 import { apiClient } from "@/utils/api-client";
 import { menus, minimenus, registerMenu } from "./router/menus.config";
 // setup

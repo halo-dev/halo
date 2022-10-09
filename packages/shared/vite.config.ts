@@ -25,9 +25,9 @@ export default defineConfig({
     outDir: path.resolve(__dirname, "dist"),
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),
-      name: "HaloAdminShared",
+      name: "HaloConsoleShared",
       formats: ["es", "iife"],
-      fileName: (format) => `halo-admin-shared.${format}.js`,
+      fileName: (format) => `halo-console-shared.${format}.js`,
     },
     rollupOptions: {
       external: ["vue", "vue-router", "@halo-dev/components"],

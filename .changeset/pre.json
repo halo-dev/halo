@@ -3,7 +3,7 @@
   "tag": "alpha",
   "initialVersions": {
     "@halo-dev/components": "0.0.0-alpha.0",
-    "@halo-dev/admin-shared": "0.0.0-alpha.0"
+    "@halo-dev/console-shared": "0.0.0-alpha.0"
   },
   "changesets": []
 }

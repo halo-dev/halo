@@ -1,4 +1,4 @@
-import { BasicLayout, definePlugin } from "@halo-dev/admin-shared";
+import { BasicLayout, definePlugin } from "@halo-dev/console-shared";
 import { IconMessage } from "@halo-dev/components";
 import CommentList from "./CommentList.vue";
 

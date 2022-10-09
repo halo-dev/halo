@@ -1,4 +1,8 @@
-import { BasicLayout, BlankLayout, definePlugin } from "@halo-dev/admin-shared";
+import {
+  BasicLayout,
+  BlankLayout,
+  definePlugin,
+} from "@halo-dev/console-shared";
 import PluginLayout from "./layouts/PluginLayout.vue";
 import PluginList from "./PluginList.vue";
 import PluginSetting from "./PluginSetting.vue";

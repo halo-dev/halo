@@ -7,7 +7,7 @@ import type {
 } from "@halo-dev/api-client";
 import type { Ref } from "vue";
 import { ref, watch } from "vue";
-import type { AttachmentLike } from "@halo-dev/admin-shared";
+import type { AttachmentLike } from "@halo-dev/console-shared";
 import { apiClient } from "@/utils/api-client";
 import { useDialog } from "@halo-dev/components";
 import type { Content, Editor } from "@halo-dev/richtext-editor";

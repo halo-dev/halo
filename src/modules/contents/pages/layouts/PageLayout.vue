@@ -8,7 +8,7 @@ import {
   IconPages,
   VButton,
 } from "@halo-dev/components";
-import { BasicLayout } from "@halo-dev/admin-shared";
+import { BasicLayout } from "@halo-dev/console-shared";
 import { useRoute, useRouter } from "vue-router";
 
 const route = useRoute();

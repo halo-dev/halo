@@ -7,7 +7,7 @@ import {
   useDialog,
 } from "@halo-dev/components";
 
-import type { AttachmentLike } from "@halo-dev/admin-shared";
+import type { AttachmentLike } from "@halo-dev/console-shared";
 import { apiClient } from "@/utils/api-client";
 import LazyImage from "@/components/image/LazyImage.vue";
 import type { Attachment } from "@halo-dev/api-client";

@@ -6,7 +6,7 @@ import {
   IconUserSettings,
 } from "@halo-dev/components";
 
-import type { MenuGroupType, MenuItemType } from "@halo-dev/admin-shared";
+import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
 
 export const menus: MenuGroupType[] = [
   {
