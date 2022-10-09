@@ -17,14 +17,14 @@ import run.halo.app.plugin.HaloPluginManager;
  */
 @Component
 public class JsBundleRuleProvider {
-    private static final String JS_LOCATION = "/admin/main.js";
-    private static final String CSS_LOCATION = "/admin/style.css";
+    private static final String JS_LOCATION = "/console/main.js";
+    private static final String CSS_LOCATION = "/console/style.css";
 
     private static final FileReverseProxyProvider JS_FILE_PROXY =
-        new FileReverseProxyProvider("admin", "main.js");
+        new FileReverseProxyProvider("console", "main.js");
 
     private static final FileReverseProxyProvider CSS_FILE_PROXY =
-        new FileReverseProxyProvider("admin", "style.css");
+        new FileReverseProxyProvider("console", "style.css");
 
     private final HaloPluginManager haloPluginManager;
 
