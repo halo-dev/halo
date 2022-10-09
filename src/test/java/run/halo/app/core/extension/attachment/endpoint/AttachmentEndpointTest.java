@@ -16,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.pf4j.PluginManager;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -29,6 +28,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
+import run.halo.app.plugin.ExtensionComponentsFinder;
 
 @ExtendWith(MockitoExtension.class)
 class AttachmentEndpointTest {
@@ -37,7 +37,7 @@ class AttachmentEndpointTest {
     ReactiveExtensionClient client;
 
     @Mock
-    PluginManager pluginManager;
+    ExtensionComponentsFinder extensionComponentsFinder;
 
     @InjectMocks
     AttachmentEndpoint endpoint;
@@ -116,7 +116,8 @@ class AttachmentEndpointTest {
             attachment.setMetadata(metadata);
 
             when(handler.upload(any())).thenReturn(Mono.just(attachment));
-            when(pluginManager.getExtensions(AttachmentHandler.class)).thenReturn(List.of(handler));
+            when(extensionComponentsFinder.getExtensions(AttachmentHandler.class)).thenReturn(
+                List.of(handler));
             when(client.create(attachment)).thenReturn(Mono.just(attachment));
 
             var builder = new MultipartBodyBuilder();
@@ -143,7 +144,7 @@ class AttachmentEndpointTest {
             verify(client).get(Policy.class, "fake-policy");
             verify(client).get(ConfigMap.class, "fake-configmap");
             verify(client).create(attachment);
-            verify(pluginManager).getExtensions(AttachmentHandler.class);
+            verify(extensionComponentsFinder).getExtensions(AttachmentHandler.class);
             verify(handler).upload(any());
         }
     }

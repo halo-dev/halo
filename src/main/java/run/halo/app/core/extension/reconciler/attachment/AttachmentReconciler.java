@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.pf4j.PluginManager;
 import org.springframework.web.util.UriUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,20 +21,22 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.plugin.ExtensionComponentsFinder;
 
 @Slf4j
 public class AttachmentReconciler implements Reconciler<Request> {
 
     private final ExtensionClient client;
 
-    private final PluginManager pluginManager;
+    private final ExtensionComponentsFinder extensionComponentsFinder;
 
     private final ExternalUrlSupplier externalUrl;
 
-    public AttachmentReconciler(ExtensionClient client, PluginManager pluginManager,
+    public AttachmentReconciler(ExtensionClient client,
+        ExtensionComponentsFinder extensionComponentsFinder,
         ExternalUrlSupplier externalUrl) {
         this.client = client;
-        this.pluginManager = pluginManager;
+        this.extensionComponentsFinder = extensionComponentsFinder;
         this.externalUrl = externalUrl;
     }
 
@@ -51,7 +52,7 @@ public class AttachmentReconciler implements Reconciler<Request> {
                     client.fetch(ConfigMap.class, policy.getSpec().getConfigMapRef().getName())
                         .orElseThrow();
                 var deleteOption = new DeleteOption(attachment, policy, configMap);
-                Flux.fromIterable(pluginManager.getExtensions(AttachmentHandler.class))
+                Flux.fromIterable(extensionComponentsFinder.getExtensions(AttachmentHandler.class))
                     .concatMap(handler -> handler.delete(deleteOption)).next().switchIfEmpty(
                         Mono.error(() -> new NotFoundException(
                             "No suitable handler found to delete the attachment")))
