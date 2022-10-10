@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import com.nimbusds.jwt.JWTClaimNames;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +42,8 @@ class LoginTest {
                 .roles("USER")
                 .build()
         ));
+
+        webClient = webClient.mutateWith(csrf());
     }
 
     @Test

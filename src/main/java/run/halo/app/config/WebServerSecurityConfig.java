@@ -63,7 +63,7 @@ public class WebServerSecurityConfig {
         RoleService roleService,
         ObjectProvider<SecurityConfigurer> securityConfigurers) {
 
-        http.csrf().csrfTokenRepository(new CookieServerCsrfTokenRepository())
+        http.csrf().csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse())
             .and()
             .cors(corsSpec -> corsSpec.configurationSource(apiCorsConfigurationSource()))
             .securityMatcher(pathMatchers("/api/**", "/apis/**", "/login", "/logout"))
