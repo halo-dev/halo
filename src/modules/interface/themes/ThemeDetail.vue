@@ -4,7 +4,14 @@ import { inject } from "vue";
 import { RouterLink } from "vue-router";
 
 // components
-import { VAlert, VSpace, VTag, IconMore, VButton } from "@halo-dev/components";
+import {
+  VAlert,
+  VSpace,
+  VTag,
+  IconMore,
+  VButton,
+  useDialog,
+} from "@halo-dev/components";
 
 // types
 import type { ComputedRef, Ref } from "vue";
@@ -15,17 +22,28 @@ import { apiClient } from "@/utils/api-client";
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme");
 const isActivated = inject<ComputedRef<boolean>>("isActivated");
 
+const dialog = useDialog();
+
 const handleReloadThemeSetting = async () => {
-  if (!selectedTheme?.value) {
-    return;
-  }
-  try {
-    await apiClient.theme.reloadThemeSetting({
-      name: selectedTheme.value.metadata.name,
-    });
-  } catch (error) {
-    console.error("Failed to reload theme setting", error);
-  }
+  dialog.warning({
+    title: "是否确认刷新主题的设置表单？",
+    description: "此操作仅会刷新主题的设置表单，不会删除已有的配置。",
+    onConfirm: async () => {
+      try {
+        if (!selectedTheme?.value) {
+          return;
+        }
+
+        await apiClient.theme.reloadThemeSetting({
+          name: selectedTheme.value.metadata.name,
+        });
+
+        window.location.reload();
+      } catch (e) {
+        console.error("Failed to reload theme setting", e);
+      }
+    },
+  });
 };
 </script>
 
@@ -69,7 +87,7 @@ const handleReloadThemeSetting = async () => {
               <VButton
                 v-close-popper
                 block
-                type="danger"
+                type="secondary"
                 @click="handleReloadThemeSetting"
               >
                 刷新设置表单
