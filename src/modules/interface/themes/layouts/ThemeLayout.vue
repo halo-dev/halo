@@ -27,6 +27,9 @@ import {
 } from "@halo-dev/components";
 import ThemeListModal from "../components/ThemeListModal.vue";
 import type { SettingForm, Theme } from "@halo-dev/api-client";
+import { usePermission } from "@/utils/permission";
+
+const { currentUserHasPermission } = usePermission();
 
 interface ThemeTab {
   id: string;
@@ -83,6 +86,12 @@ watch(
     if (selectedTheme.value) {
       // reset tabs
       tabs.value = cloneDeep(initialTabs);
+
+      if (!currentUserHasPermission(["system:settings:view"])) {
+        handleTriggerTabChange();
+        return;
+      }
+
       await handleFetchSettings();
 
       if (setting.value) {

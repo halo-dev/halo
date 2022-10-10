@@ -16,6 +16,9 @@ import PluginInstallModal from "./components/PluginInstallModal.vue";
 import { onMounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { PluginList } from "@halo-dev/api-client";
+import { usePermission } from "@/utils/permission";
+
+const { currentUserHasPermission } = usePermission();
 
 const plugins = ref<PluginList>({
   page: 1,
@@ -119,8 +122,8 @@ function handleSortItemChange(sortItem?: SortItem) {
 </script>
 <template>
   <PluginInstallModal
+    v-if="currentUserHasPermission(['system:plugins:manage'])"
     v-model:visible="pluginInstall"
-    v-permission="['system:plugins:manage']"
     @close="handleFetchPlugins"
   />
 

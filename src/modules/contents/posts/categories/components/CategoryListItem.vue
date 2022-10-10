@@ -10,6 +10,9 @@ import Draggable from "vuedraggable";
 import type { CategoryTree } from "../utils";
 import { ref } from "vue";
 import { formatDatetime } from "@/utils/date";
+import { usePermission } from "@/utils/permission";
+
+const { currentUserHasPermission } = usePermission();
 
 withDefaults(
   defineProps<{
@@ -87,7 +90,10 @@ function onDelete(category: CategoryTree) {
               </template>
             </VEntityField>
           </template>
-          <template #dropdownItems>
+          <template
+            v-if="currentUserHasPermission(['system:posts:manage'])"
+            #dropdownItems
+          >
             <VButton
               v-permission="['system:posts:manage']"
               v-close-popper

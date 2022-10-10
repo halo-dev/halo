@@ -18,6 +18,7 @@ export default definePlugin({
           component: SystemSetting,
           meta: {
             title: "系统设置",
+            permissions: ["system:settings:view"],
           },
         },
       ],

@@ -28,6 +28,9 @@ import { formatDatetime } from "@/utils/date";
 
 import { useRouteQuery } from "@vueuse/router";
 import { apiClient } from "@/utils/api-client";
+import { usePermission } from "@/utils/permission";
+
+const { currentUserHasPermission } = usePermission();
 
 const viewTypes = [
   {
@@ -206,7 +209,10 @@ onMounted(async () => {
                   </template>
                 </VEntityField>
               </template>
-              <template #dropdownItems>
+              <template
+                v-if="currentUserHasPermission(['system:posts:manage'])"
+                #dropdownItems
+              >
                 <VButton
                   v-permission="['system:posts:manage']"
                   v-close-popper

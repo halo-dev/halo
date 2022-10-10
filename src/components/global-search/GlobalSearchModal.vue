@@ -15,9 +15,12 @@ import {
 import { computed, markRaw, onMounted, ref, watch, type Component } from "vue";
 import Fuse from "fuse.js";
 import { apiClient } from "@/utils/api-client";
+import { usePermission } from "@/utils/permission";
 
 const router = useRouter();
 const route = useRoute();
+
+const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
@@ -74,200 +77,217 @@ const handleBuildSearchIndex = () => {
     });
   });
 
-  apiClient.extension.user.listv1alpha1User().then((response) => {
-    response.data.items.forEach((user) => {
-      fuse.add({
-        title: user.spec.displayName,
-        icon: {
-          component: markRaw(IconUserSettings),
-        },
-        group: "用户",
-        route: {
-          name: "UserDetail",
-          params: {
-            name: user.metadata.name,
-          },
-        },
-      });
-    });
-  });
-
-  apiClient.extension.plugin
-    .listpluginHaloRunV1alpha1Plugin()
-    .then((response) => {
-      response.data.items.forEach((plugin) => {
+  if (currentUserHasPermission(["system:users:view"])) {
+    apiClient.extension.user.listv1alpha1User().then((response) => {
+      response.data.items.forEach((user) => {
         fuse.add({
-          title: plugin.spec.displayName as string,
+          title: user.spec.displayName,
           icon: {
-            src: plugin.spec.logo as string,
+            component: markRaw(IconUserSettings),
           },
-          group: "插件",
+          group: "用户",
           route: {
-            name: "PluginDetail",
+            name: "UserDetail",
             params: {
-              name: plugin.metadata.name,
+              name: user.metadata.name,
             },
           },
         });
       });
     });
+  }
 
-  apiClient.extension.post.listcontentHaloRunV1alpha1Post().then((response) => {
-    response.data.items.forEach((post) => {
-      fuse.add({
-        title: post.spec.title,
-        icon: {
-          component: markRaw(IconBookRead),
-        },
-        group: "文章",
-        route: {
-          name: "PostEditor",
-          query: {
-            name: post.metadata.name,
-          },
-        },
+  if (currentUserHasPermission(["system:plugins:view"])) {
+    apiClient.extension.plugin
+      .listpluginHaloRunV1alpha1Plugin()
+      .then((response) => {
+        response.data.items.forEach((plugin) => {
+          fuse.add({
+            title: plugin.spec.displayName as string,
+            icon: {
+              src: plugin.spec.logo as string,
+            },
+            group: "插件",
+            route: {
+              name: "PluginDetail",
+              params: {
+                name: plugin.metadata.name,
+              },
+            },
+          });
+        });
       });
-    });
-  });
+  }
 
-  apiClient.extension.category
-    .listcontentHaloRunV1alpha1Category()
-    .then((response) => {
-      response.data.items.forEach((category) => {
+  if (currentUserHasPermission(["system:posts:view"])) {
+    apiClient.extension.post
+      .listcontentHaloRunV1alpha1Post()
+      .then((response) => {
+        response.data.items.forEach((post) => {
+          fuse.add({
+            title: post.spec.title,
+            icon: {
+              component: markRaw(IconBookRead),
+            },
+            group: "文章",
+            route: {
+              name: "PostEditor",
+              query: {
+                name: post.metadata.name,
+              },
+            },
+          });
+        });
+      });
+
+    apiClient.extension.category
+      .listcontentHaloRunV1alpha1Category()
+      .then((response) => {
+        response.data.items.forEach((category) => {
+          fuse.add({
+            title: category.spec.displayName,
+            icon: {
+              component: markRaw(IconBookRead),
+            },
+            group: "分类",
+            route: {
+              name: "Categories",
+              query: {
+                name: category.metadata.name,
+              },
+            },
+          });
+        });
+      });
+
+    apiClient.extension.tag.listcontentHaloRunV1alpha1Tag().then((response) => {
+      response.data.items.forEach((tag) => {
         fuse.add({
-          title: category.spec.displayName,
+          title: tag.spec.displayName,
           icon: {
             component: markRaw(IconBookRead),
           },
-          group: "分类",
+          group: "标签",
           route: {
-            name: "Categories",
+            name: "Tags",
             query: {
-              name: category.metadata.name,
+              name: tag.metadata.name,
             },
           },
         });
       });
     });
+  }
 
-  apiClient.extension.tag.listcontentHaloRunV1alpha1Tag().then((response) => {
-    response.data.items.forEach((tag) => {
-      fuse.add({
-        title: tag.spec.displayName,
-        icon: {
-          component: markRaw(IconBookRead),
-        },
-        group: "标签",
-        route: {
-          name: "Tags",
-          query: {
-            name: tag.metadata.name,
-          },
-        },
-      });
-    });
-  });
-
-  apiClient.extension.singlePage
-    .listcontentHaloRunV1alpha1SinglePage()
-    .then((response) => {
-      response.data.items.forEach((singlePage) => {
-        fuse.add({
-          title: singlePage.spec.title,
-          icon: {
-            component: markRaw(IconPages),
-          },
-          group: "自定义页面",
-          route: {
-            name: "SinglePageEditor",
-            query: {
-              name: singlePage.metadata.name,
+  if (currentUserHasPermission(["system:singlepages:view"])) {
+    apiClient.extension.singlePage
+      .listcontentHaloRunV1alpha1SinglePage()
+      .then((response) => {
+        response.data.items.forEach((singlePage) => {
+          fuse.add({
+            title: singlePage.spec.title,
+            icon: {
+              component: markRaw(IconPages),
             },
-          },
+            group: "自定义页面",
+            route: {
+              name: "SinglePageEditor",
+              query: {
+                name: singlePage.metadata.name,
+              },
+            },
+          });
         });
       });
-    });
+  }
 
-  apiClient.extension.storage.attachment
-    .liststorageHaloRunV1alpha1Attachment()
-    .then((response) => {
-      response.data.items.forEach((attachment) => {
-        fuse.add({
-          title: attachment.spec.displayName as string,
-          icon: {
-            component: markRaw(IconFolder),
-          },
-          group: "附件",
-          route: {
-            name: "Attachments",
-            query: {
-              name: attachment.metadata.name,
+  if (currentUserHasPermission(["system:attachments:view"])) {
+    apiClient.extension.storage.attachment
+      .liststorageHaloRunV1alpha1Attachment()
+      .then((response) => {
+        response.data.items.forEach((attachment) => {
+          fuse.add({
+            title: attachment.spec.displayName as string,
+            icon: {
+              component: markRaw(IconFolder),
             },
-          },
+            group: "附件",
+            route: {
+              name: "Attachments",
+              query: {
+                name: attachment.metadata.name,
+              },
+            },
+          });
         });
       });
-    });
+  }
 
-  apiClient.extension.setting
-    .getv1alpha1Setting({ name: "system" })
-    .then((response) => {
-      response.data.spec.forms.forEach((form) => {
-        fuse.add({
-          title: form.label as string,
-          icon: {
-            component: markRaw(IconSettings),
-          },
-          group: "设置",
-          route: {
-            name: "SystemSetting",
-            params: {
-              group: form.group,
+  if (
+    currentUserHasPermission(["system:settings:view"]) &&
+    currentUserHasPermission(["system:configmaps:view"])
+  ) {
+    apiClient.extension.setting
+      .getv1alpha1Setting({ name: "system" })
+      .then((response) => {
+        response.data.spec.forms.forEach((form) => {
+          fuse.add({
+            title: form.label as string,
+            icon: {
+              component: markRaw(IconSettings),
             },
-          },
+            group: "设置",
+            route: {
+              name: "SystemSetting",
+              params: {
+                group: form.group,
+              },
+            },
+          });
         });
       });
-    });
 
-  // get theme settings
-  apiClient.extension.configMap
-    .getv1alpha1ConfigMap({
-      name: "system",
-    })
-    .then(({ data: systemConfigMap }) => {
-      if (systemConfigMap.data?.theme) {
-        const themeConfig = JSON.parse(systemConfigMap.data.theme);
+    // get theme settings
+    apiClient.extension.configMap
+      .getv1alpha1ConfigMap({
+        name: "system",
+      })
+      .then(({ data: systemConfigMap }) => {
+        if (systemConfigMap.data?.theme) {
+          const themeConfig = JSON.parse(systemConfigMap.data.theme);
 
-        apiClient.extension.theme
-          .getthemeHaloRunV1alpha1Theme({
-            name: themeConfig.active,
-          })
-          .then(({ data: theme }) => {
-            if (theme && theme.spec.settingName) {
-              apiClient.extension.setting
-                .getv1alpha1Setting({
-                  name: theme.spec.settingName,
-                })
-                .then(({ data: themeSettings }) => {
-                  themeSettings.spec.forms.forEach((form) => {
-                    fuse.add({
-                      title: `${theme.spec.displayName} / ${form.label}`,
-                      icon: {
-                        component: markRaw(IconPalette),
-                      },
-                      group: "主题设置",
-                      route: {
-                        name: "ThemeSetting",
-                        params: {
-                          group: form.group,
+          apiClient.extension.theme
+            .getthemeHaloRunV1alpha1Theme({
+              name: themeConfig.active,
+            })
+            .then(({ data: theme }) => {
+              if (theme && theme.spec.settingName) {
+                apiClient.extension.setting
+                  .getv1alpha1Setting({
+                    name: theme.spec.settingName,
+                  })
+                  .then(({ data: themeSettings }) => {
+                    themeSettings.spec.forms.forEach((form) => {
+                      fuse.add({
+                        title: `${theme.spec.displayName} / ${form.label}`,
+                        icon: {
+                          component: markRaw(IconPalette),
                         },
-                      },
+                        group: "主题设置",
+                        route: {
+                          name: "ThemeSetting",
+                          params: {
+                            group: form.group,
+                          },
+                        },
+                      });
                     });
                   });
-                });
-            }
-          });
-      }
-    });
+              }
+            });
+        }
+      });
+  }
 };
 
 const handleKeydown = (e: KeyboardEvent) => {
