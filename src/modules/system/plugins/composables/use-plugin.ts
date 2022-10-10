@@ -8,7 +8,7 @@ import { useDialog } from "@halo-dev/components";
 interface usePluginLifeCycleReturn {
   isStarted: ComputedRef<boolean | undefined>;
   changeStatus: () => void;
-  uninstall: () => void;
+  uninstall: (deleteExtensions?: boolean) => void;
 }
 
 export function usePluginLifeCycle(
@@ -45,13 +45,17 @@ export function usePluginLifeCycle(
     });
   };
 
-  const uninstall = () => {
+  const uninstall = (deleteExtensions?: boolean) => {
     if (!plugin?.value) return;
 
     const { enabled } = plugin.value.spec;
 
     dialog.warning({
-      title: `确定要卸载该插件吗？`,
+      title: `${
+        deleteExtensions
+          ? "是否确认卸载该插件以及对应的配置？"
+          : "是否确认卸载该插件？"
+      }`,
       description: `${
         enabled ? "当前插件还在启用状态，将在停止运行后卸载。" : ""
       }`,
@@ -73,8 +77,27 @@ export function usePluginLifeCycle(
           await apiClient.extension.plugin.deletepluginHaloRunV1alpha1Plugin({
             name: plugin.value.metadata.name,
           });
+
+          // delete plugin setting and configMap
+          if (!deleteExtensions) {
+            return;
+          }
+
+          const { settingName, configMapName } = plugin.value.spec;
+
+          if (settingName) {
+            await apiClient.extension.setting.deletev1alpha1Setting({
+              name: settingName,
+            });
+          }
+
+          if (configMapName) {
+            await apiClient.extension.configMap.deletev1alpha1ConfigMap({
+              name: configMapName,
+            });
+          }
         } catch (e) {
-          console.error(e);
+          console.error("Failed to uninstall plugin", e);
         } finally {
           window.location.reload();
         }

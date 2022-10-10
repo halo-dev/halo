@@ -107,6 +107,9 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
       <VButton v-close-popper block type="danger" @click="uninstall">
         卸载
       </VButton>
+      <VButton v-close-popper block type="danger" @click="uninstall(true)">
+        卸载并删除配置
+      </VButton>
     </template>
   </VEntity>
 </template>
