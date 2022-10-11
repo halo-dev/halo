@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -26,7 +27,10 @@ public class PermalinkIndexer {
     private final Map<GvkName, String> gvkNamePermalinkLookup = new HashMap<>();
     private final Map<String, ExtensionLocator> permalinkLocatorLookup = new HashMap<>();
 
-    record GvkName(GroupVersionKind gvk, String name) {
+    private final ApplicationContext applicationContext;
+
+    public PermalinkIndexer(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 
     /**
@@ -41,9 +45,15 @@ public class PermalinkIndexer {
             GvkName gvkName = new GvkName(locator.gvk(), locator.name());
             gvkNamePermalinkLookup.put(gvkName, permalink);
             permalinkLocatorLookup.put(permalink, locator);
+            publishEvent(gvkName, null, permalink);
         } finally {
             readWriteLock.writeLock().unlock();
         }
+    }
+
+    private void publishEvent(GvkName gvkName, String oldPermalink, String newPermalink) {
+        applicationContext.publishEvent(
+            new PermalinkIndexChangedEvent(this, gvkName, oldPermalink, newPermalink));
     }
 
     /**
@@ -54,10 +64,11 @@ public class PermalinkIndexer {
     public void remove(ExtensionLocator locator) {
         readWriteLock.writeLock().lock();
         try {
-            String permalink =
-                gvkNamePermalinkLookup.remove(new GvkName(locator.gvk(), locator.name()));
+            GvkName gvkName = new GvkName(locator.gvk(), locator.name());
+            String permalink = gvkNamePermalinkLookup.remove(gvkName);
             if (permalink != null) {
                 permalinkLocatorLookup.remove(permalink);
+                publishEvent(gvkName, permalink, null);
             }
         } finally {
             readWriteLock.writeLock().unlock();
@@ -76,7 +87,7 @@ public class PermalinkIndexer {
         try {
             return gvkNamePermalinkLookup.entrySet()
                 .stream()
-                .filter(entry -> entry.getKey().gvk.equals(gvk))
+                .filter(entry -> entry.getKey().gvk().equals(gvk))
                 .map(Map.Entry::getValue)
                 .toList();
         } finally {

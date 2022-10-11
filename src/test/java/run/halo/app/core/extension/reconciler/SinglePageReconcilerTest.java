@@ -30,11 +30,9 @@ import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.PermalinkIndexAddCommand;
 import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
 import run.halo.app.theme.router.PermalinkIndexUpdateCommand;
-import run.halo.app.theme.router.TemplateRouteManager;
 
 /**
  * Tests for {@link SinglePageReconciler}.
@@ -52,15 +50,11 @@ class SinglePageReconcilerTest {
     @Mock
     private ApplicationContext applicationContext;
 
-    @Mock
-    private TemplateRouteManager templateRouteManager;
-
     private SinglePageReconciler singlePageReconciler;
 
     @BeforeEach
     void setUp() {
-        singlePageReconciler = new SinglePageReconciler(client, contentService, applicationContext,
-            templateRouteManager);
+        singlePageReconciler = new SinglePageReconciler(client, contentService, applicationContext);
     }
 
     @Test
@@ -94,8 +88,6 @@ class SinglePageReconcilerTest {
         verify(applicationContext, times(0)).publishEvent(isA(PermalinkIndexAddCommand.class));
         verify(applicationContext, times(1)).publishEvent(isA(PermalinkIndexDeleteCommand.class));
         verify(applicationContext, times(0)).publishEvent(isA(PermalinkIndexUpdateCommand.class));
-        verify(templateRouteManager, times(1))
-            .changeTemplatePattern(eq(DefaultTemplateEnum.SINGLE_PAGE.getValue()));
     }
 
     public static SinglePage pageV1() {

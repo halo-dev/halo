@@ -26,10 +26,8 @@ import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.PathUtils;
-import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.PermalinkIndexAddCommand;
 import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
-import run.halo.app.theme.router.TemplateRouteManager;
 
 /**
  * <p>Reconciler for {@link SinglePage}.</p>
@@ -49,14 +47,12 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private final ExtensionClient client;
     private final ContentService contentService;
     private final ApplicationContext applicationContext;
-    private final TemplateRouteManager templateRouteManager;
 
     public SinglePageReconciler(ExtensionClient client, ContentService contentService,
-        ApplicationContext applicationContext, TemplateRouteManager templateRouteManager) {
+        ApplicationContext applicationContext) {
         this.client = client;
         this.contentService = contentService;
         this.applicationContext = applicationContext;
-        this.templateRouteManager = templateRouteManager;
     }
 
     @Override
@@ -137,7 +133,6 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         ExtensionLocator locator = new ExtensionLocator(GVK, singlePage.getMetadata().getName(),
             singlePage.getSpec().getSlug());
         applicationContext.publishEvent(new PermalinkIndexDeleteCommand(this, locator));
-        templateRouteManager.changeTemplatePattern(DefaultTemplateEnum.SINGLE_PAGE.getValue());
     }
 
     private void permalinkOnAdd(SinglePage singlePage) {
@@ -145,7 +140,6 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
             singlePage.getSpec().getSlug());
         applicationContext.publishEvent(new PermalinkIndexAddCommand(this, locator,
             singlePage.getStatusOrDefault().getPermalink()));
-        templateRouteManager.changeTemplatePattern(DefaultTemplateEnum.SINGLE_PAGE.getValue());
     }
 
     private void reconcileStatus(String name) {

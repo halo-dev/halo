@@ -6,7 +6,6 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,12 +13,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.reactive.function.server.HandlerStrategies;
+import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
-import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.router.UrlContextListResult;
 
@@ -30,36 +28,30 @@ import run.halo.app.theme.router.UrlContextListResult;
  * @since 2.0.0
  */
 @ExtendWith(MockitoExtension.class)
-class ArchivesRouteStrategyTest {
-
-    @Mock
-    private ViewResolver viewResolver;
+class ArchivesRouteStrategyTest extends RouterStrategyTestSuite {
     @Mock
     private PostFinder postFinder;
 
     @InjectMocks
     private ArchivesRouteStrategy archivesRouteStrategy;
 
-    @BeforeEach
-    void setUp() {
+    @Override
+    public void setUp() {
         lenient().when(postFinder.list(any(), any())).thenReturn(
             new UrlContextListResult<>(1, 10, 1, List.of(), null, null));
     }
 
     @Test
     void getRouteFunctionWhenDefaultPattern() {
-        RouterFunction<ServerResponse> routeFunction =
-            archivesRouteStrategy.getRouteFunction(DefaultTemplateEnum.ARCHIVES.getValue(),
-                "/archives");
+        HandlerFunction<ServerResponse> handler = archivesRouteStrategy.getHandler();
+        RouterFunction<ServerResponse> routeFunction = getRouterFunction();
 
-        WebTestClient client = WebTestClient.bindToRouterFunction(routeFunction)
-            .handlerStrategies(HandlerStrategies.builder()
-                .viewResolver(viewResolver)
-                .build())
-            .build();
+        WebTestClient client = getWebTestClient(routeFunction);
 
-        when(viewResolver.resolveViewName(eq(DefaultTemplateEnum.ARCHIVES.getValue()), any()))
-            .thenReturn(Mono.just(new EmptyView()));
+        List<String> routerPaths = archivesRouteStrategy.getRouterPaths("/archives");
+        for (String routerPath : routerPaths) {
+            permalinkHttpGetRouter.insert(routerPath, handler);
+        }
 
         fixedAssertion(client, "/archives");
 
@@ -100,18 +92,14 @@ class ArchivesRouteStrategyTest {
 
     @Test
     void getRouteFunctionWhenOtherPattern() {
-        RouterFunction<ServerResponse> routeFunction =
-            archivesRouteStrategy.getRouteFunction(DefaultTemplateEnum.ARCHIVES.getValue(),
-                "/archives-test");
+        HandlerFunction<ServerResponse> handler = archivesRouteStrategy.getHandler();
+        RouterFunction<ServerResponse> routeFunction = request -> Mono.just(handler);
+        SystemSetting.ThemeRouteRules themeRouteRules = getThemeRouteRules();
+        themeRouteRules.setArchives("/archives-test");
+        when(environmentFetcher.fetch(eq(SystemSetting.ThemeRouteRules.GROUP),
+            eq(SystemSetting.ThemeRouteRules.class))).thenReturn(Mono.just(themeRouteRules));
 
-        when(viewResolver.resolveViewName(eq(DefaultTemplateEnum.ARCHIVES.getValue()), any()))
-            .thenReturn(Mono.just(new EmptyView()));
-
-        WebTestClient client = WebTestClient.bindToRouterFunction(routeFunction)
-            .handlerStrategies(HandlerStrategies.builder()
-                .viewResolver(viewResolver)
-                .build())
-            .build();
+        WebTestClient client = getWebTestClient(routeFunction);
 
         fixedAssertion(client, "/archives-test");
 
