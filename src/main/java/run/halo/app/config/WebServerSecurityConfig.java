@@ -95,7 +95,9 @@ public class WebServerSecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration);
         source.registerCorsConfiguration("/apis/**", configuration);
+        // TODO Remove both login and logout path until we provide the console proxy.
         source.registerCorsConfiguration("/login", configuration);
+        source.registerCorsConfiguration("/logout", configuration);
         return source;
     }
 
