@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.PUT;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
@@ -12,6 +13,7 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -52,6 +54,11 @@ class AuthorizationTest {
 
     @MockBean
     RoleService roleService;
+
+    @BeforeEach
+    void setUp() {
+        webClient = webClient.mutateWith(csrf());
+    }
 
     @Test
     void accessProtectedApiWithoutSufficientRole() {

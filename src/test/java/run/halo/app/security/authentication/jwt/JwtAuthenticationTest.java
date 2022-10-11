@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +42,7 @@ class JwtAuthenticationTest {
     void setUp() {
         lenient().when(roleService.getMonoRole(eq(AnonymousUserConst.Role)))
             .thenReturn(Mono.empty());
+        webClient = webClient.mutateWith(csrf());
     }
 
     @Test
