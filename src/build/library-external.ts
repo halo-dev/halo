@@ -69,6 +69,16 @@ export const setupLibraryExternal = (
     },
   ];
 
+  const injectScript = staticTargets
+    .map((target) => {
+      return `<script src="${isProduction ? baseUrl : "/"}${target.dest}/${
+        target.rename
+      }"></script>`;
+    })
+    .join("\n");
+
+  console.log(injectScript);
+
   return [
     ViteExternals({
       vue: "Vue",
@@ -86,11 +96,7 @@ export const setupLibraryExternal = (
       minify: false,
       inject: {
         data: {
-          injectScript: staticTargets
-            .map((target) => {
-              return `<script src="${baseUrl}${target.dest}/${target.rename}"></script>`;
-            })
-            .join("\n"),
+          injectScript,
         },
       },
     }),
