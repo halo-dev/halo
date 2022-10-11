@@ -2,7 +2,7 @@
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { computed, ref, watch } from "vue";
-import type { MenuItem, Post, SinglePage } from "@halo-dev/api-client";
+import type { Menu, MenuItem, Post, SinglePage } from "@halo-dev/api-client";
 import { v4 as uuid } from "uuid";
 import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
@@ -10,15 +10,20 @@ import cloneDeep from "lodash.clonedeep";
 import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
 import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
 import { setFocus } from "@/formkit/utils/focus";
+import type { FormKitOptionsProp } from "@formkit/inputs";
 
 const props = withDefaults(
   defineProps<{
     visible: boolean;
-    menuItem: MenuItem | null;
+    menu?: Menu;
+    parentMenuItem: MenuItem;
+    menuItem?: MenuItem;
   }>(),
   {
     visible: false,
-    menuItem: null,
+    menu: undefined,
+    parentMenuItem: undefined,
+    menuItem: undefined,
   }
 );
 
@@ -42,12 +47,33 @@ const initialFormState: MenuItem = {
   },
 };
 
+const menuItemMap = ref<FormKitOptionsProp>();
+const selectedParentMenuItem = ref<string>("");
 const formState = ref<MenuItem>(cloneDeep(initialFormState));
 const saving = ref(false);
 
 const isUpdateMode = computed(() => {
   return !!formState.value.metadata.creationTimestamp;
 });
+
+const handleFetchMenuItems = async () => {
+  try {
+    const { data } = await apiClient.extension.menuItem.listv1alpha1MenuItem({
+      fieldSelector: [`name=(${props.menu?.spec.menuItems?.join(",")})`],
+    });
+    menuItemMap.value = [
+      { label: "无", value: undefined },
+      ...data.items.map((menuItem) => {
+        return {
+          label: menuItem.status?.displayName as string,
+          value: menuItem.metadata.name,
+        };
+      }),
+    ];
+  } catch (error) {
+    console.log("Failed to fetch menu items", error);
+  }
+};
 
 const handleSaveMenuItem = async () => {
   try {
@@ -81,6 +107,25 @@ const handleSaveMenuItem = async () => {
         await apiClient.extension.menuItem.createv1alpha1MenuItem({
           menuItem: formState.value,
         });
+
+      // if parent menu item is selected, add the new menu item to the parent menu item
+      if (selectedParentMenuItem.value) {
+        const { data: menuItemToUpdate } =
+          await apiClient.extension.menuItem.getv1alpha1MenuItem({
+            name: selectedParentMenuItem.value,
+          });
+
+        menuItemToUpdate.spec.children = [
+          ...(menuItemToUpdate.spec.children || []),
+          data.metadata.name,
+        ];
+
+        await apiClient.extension.menuItem.updatev1alpha1MenuItem({
+          name: menuItemToUpdate.metadata.name,
+          menuItem: menuItemToUpdate,
+        });
+      }
+
       onVisibleChange(false);
       emit("saved", data);
     }
@@ -103,6 +148,7 @@ const handleResetForm = () => {
   formState.value.metadata.name = uuid();
   selectedMenuItemSource.value = menuItemSources[0].value;
   selectedRef.value = "";
+  selectedParentMenuItem.value = "";
   reset("menuitem-form");
 };
 
@@ -110,6 +156,7 @@ watch(
   () => props.visible,
   (visible) => {
     if (visible) {
+      selectedParentMenuItem.value = props.parentMenuItem?.metadata.name;
       setFocus("displayNameInput");
 
       if (!props.menuItem) {
@@ -287,6 +334,7 @@ watch(
   () => props.visible,
   (newValue) => {
     if (newValue) {
+      handleFetchMenuItems();
       handleFetchCategories();
       handleFetchTags();
       handleFetchPosts();
@@ -311,14 +359,21 @@ watch(
       @submit="handleSaveMenuItem"
     >
       <FormKit
+        v-if="!isUpdateMode && menuItemMap"
+        v-model="selectedParentMenuItem"
+        label="上级菜单项"
+        type="select"
+        :options="menuItemMap"
+      />
+
+      <FormKit
         v-model="selectedMenuItemSource"
         :options="menuItemSources"
         :disabled="isUpdateMode"
         label="类型"
         type="select"
         @change="onMenuItemSourceChange"
-      >
-      </FormKit>
+      />
 
       <FormKit
         v-if="selectedMenuItemSource === 'custom'"
@@ -328,7 +383,8 @@ watch(
         type="text"
         name="displayName"
         validation="required"
-      ></FormKit>
+      />
+
       <FormKit
         v-if="selectedMenuItemSource === 'custom'"
         v-model="formState.spec.href"
@@ -336,7 +392,7 @@ watch(
         type="text"
         name="href"
         validation="required"
-      ></FormKit>
+      />
 
       <FormKit
         v-if="selectedMenuItemSource === 'post'"
@@ -345,7 +401,7 @@ watch(
         type="select"
         :options="postMap"
         validation="required"
-      ></FormKit>
+      />
 
       <FormKit
         v-if="selectedMenuItemSource === 'singlePage'"
@@ -354,7 +410,7 @@ watch(
         type="select"
         :options="singlePageMap"
         validation="required"
-      ></FormKit>
+      />
 
       <FormKit
         v-if="selectedMenuItemSource === 'tag'"
@@ -363,7 +419,7 @@ watch(
         type="select"
         :options="tagMap"
         validation="required"
-      ></FormKit>
+      />
 
       <FormKit
         v-if="selectedMenuItemSource === 'category'"
@@ -372,7 +428,7 @@ watch(
         type="select"
         :options="categoryMap"
         validation="required"
-      ></FormKit>
+      />
     </FormKit>
     <template #footer>
       <VSpace>

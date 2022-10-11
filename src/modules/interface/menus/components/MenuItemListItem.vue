@@ -26,6 +26,7 @@ withDefaults(
 const emit = defineEmits<{
   (event: "change"): void;
   (event: "open-editing", menuItem: MenuTreeItem): void;
+  (event: "open-create-by-parent", menuItem: MenuTreeItem): void;
   (event: "delete", menuItem: MenuTreeItem): void;
 }>();
 
@@ -37,6 +38,10 @@ function onChange() {
 
 function onOpenEditingModal(menuItem: MenuTreeItem) {
   emit("open-editing", menuItem);
+}
+
+function onOpenCreateByParentModal(menuItem: MenuTreeItem) {
+  emit("open-create-by-parent", menuItem);
 }
 
 function onDelete(menuItem: MenuTreeItem) {
@@ -117,6 +122,14 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
             <VButton
               v-close-popper
               block
+              type="default"
+              @click="onOpenCreateByParentModal(menuItem)"
+            >
+              添加子菜单项
+            </VButton>
+            <VButton
+              v-close-popper
+              block
               type="danger"
               @click="onDelete(menuItem)"
             >
@@ -130,6 +143,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
           @change="onChange"
           @delete="onDelete"
           @open-editing="onOpenEditingModal"
+          @open-create-by-parent="onOpenCreateByParentModal"
         />
       </li>
     </template>

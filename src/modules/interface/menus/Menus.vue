@@ -28,8 +28,9 @@ import { useDebounceFn } from "@vueuse/core";
 
 const menuItems = ref<MenuItem[]>([] as MenuItem[]);
 const menuTreeItems = ref<MenuTreeItem[]>([] as MenuTreeItem[]);
-const selectedMenu = ref<Menu | undefined>();
-const selectedMenuItem = ref<MenuItem | null>(null);
+const selectedMenu = ref<Menu>();
+const selectedMenuItem = ref<MenuItem>();
+const selectedParentMenuItem = ref<MenuItem>();
 const loading = ref(false);
 const menuListRef = ref();
 const menuItemEditingModal = ref();
@@ -64,6 +65,16 @@ const handleFetchMenuItems = async () => {
 const handleOpenEditingModal = (menuItem: MenuTreeItem) => {
   selectedMenuItem.value = convertMenuTreeItemToMenuItem(menuItem);
   menuItemEditingModal.value = true;
+};
+
+const handleOpenCreateByParentModal = (menuItem: MenuTreeItem) => {
+  selectedParentMenuItem.value = convertMenuTreeItemToMenuItem(menuItem);
+  menuItemEditingModal.value = true;
+};
+
+const onMenuItemEditingModalClose = () => {
+  selectedParentMenuItem.value = undefined;
+  selectedMenuItem.value = undefined;
 };
 
 const onMenuItemSaved = async (menuItem: MenuItem) => {
@@ -143,7 +154,9 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
   <MenuItemEditingModal
     v-model:visible="menuItemEditingModal"
     :menu-item="selectedMenuItem"
-    @close="selectedMenuItem = null"
+    :parent-menu-item="selectedParentMenuItem"
+    :menu="selectedMenu"
+    @close="onMenuItemEditingModalClose"
     @saved="onMenuItemSaved"
   />
   <VPageHeader title="菜单">
@@ -214,6 +227,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
             @change="handleUpdateInBatch"
             @delete="handleDelete"
             @open-editing="handleOpenEditingModal"
+            @open-create-by-parent="handleOpenCreateByParentModal"
           />
         </VCard>
       </div>
