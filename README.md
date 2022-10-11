@@ -40,6 +40,13 @@ docker run -it -d --name halo-next -p 8090:8090 -v ~/halo-next:/root/halo-next -
 
 详细部署文档请查阅：<https://docs.halo.run/2.0.0-SNAPSHOT/getting-started/install/docker>
 
+## 在线体验
+
+- 环境地址：<https://demo.halo.run>
+- 后台地址：<https://demo.halo.run/console>
+- 用户名：`demo`
+- 密码：`P@ssw0rd123..`
+
 ## 生态
 
 可访问 [awesome-halo](https://github.com/halo-sigs/awesome-halo) 查看已经适用于 Halo 2.0 的主题和插件，以及适用于 Halo 1.x 的相关仓库。
