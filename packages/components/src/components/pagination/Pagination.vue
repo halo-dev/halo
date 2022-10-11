@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
-import { ref, toRefs, watch, watchEffect } from "vue";
+import { ref, watch } from "vue";
 import { useOffsetPagination } from "@vueuse/core";
 
 const props = withDefaults(
