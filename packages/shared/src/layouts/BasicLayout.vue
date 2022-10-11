@@ -6,25 +6,47 @@ import {
   VRoutesMenu,
   VTag,
   VAvatar,
+  VSpace,
+  VButton,
+  useDialog,
 } from "@halo-dev/components";
 import type { MenuGroupType, MenuItemType } from "../types/menus";
 import type { User } from "@halo-dev/api-client";
 import logo from "@/assets/logo.svg";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { computed, inject, ref, type Ref } from "vue";
+import axios from "axios";
 
 const menus = inject<MenuGroupType[]>("menus");
 const minimenus = inject<MenuItemType[]>("minimenus");
 const route = useRoute();
 const router = useRouter();
+const dialog = useDialog();
 
 const moreMenuVisible = ref(false);
 const moreMenuRootVisible = ref(false);
 
 const currentUser = inject<User>("currentUser");
+const apiUrl = inject<string>("apiUrl");
 
 const handleRouteToProfile = () => {
   router.push({ path: `/users/${currentUser?.metadata.name}/detail` });
+};
+
+const handleLogout = () => {
+  dialog.warning({
+    title: "是否确认退出登录？",
+    onConfirm: async () => {
+      try {
+        await axios.post(`${apiUrl}/logout`, undefined, {
+          withCredentials: true,
+        });
+        router.replace({ name: "Login" });
+      } catch (error) {
+        console.error("Failed to logout", error);
+      }
+    },
+  });
 };
 
 const currentRole = computed(() => {
@@ -86,12 +108,33 @@ const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
             </VTag>
           </div>
         </div>
-        <div
+        <FloatingDropdown
           class="profile-control cursor-pointer rounded p-1 transition-all hover:bg-gray-100"
-          @click="handleRouteToProfile"
         >
           <IconMore />
-        </div>
+          <template #popper>
+            <div class="w-48 p-2">
+              <VSpace class="w-full" direction="column">
+                <VButton
+                  v-close-popper
+                  block
+                  type="secondary"
+                  @click="handleRouteToProfile"
+                >
+                  个人资料
+                </VButton>
+                <VButton
+                  v-close-popper
+                  block
+                  type="default"
+                  @click="handleLogout"
+                >
+                  退出登录
+                </VButton>
+              </VSpace>
+            </div>
+          </template>
+        </FloatingDropdown>
       </div>
     </aside>
     <main class="content w-full overflow-y-auto pb-12 mb-safe md:pb-0">

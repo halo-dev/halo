@@ -214,6 +214,7 @@ async function initApp() {
   } finally {
     app.provide<MenuGroupType[]>("menus", menus);
     app.provide<MenuItemType[]>("minimenus", minimenus);
+    app.provide<string>("apiUrl", import.meta.env.VITE_API_URL);
 
     app.use(router);
     app.mount("#app");

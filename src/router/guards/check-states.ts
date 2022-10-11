@@ -5,6 +5,7 @@ export function setupCheckStatesGuard(router: Router) {
   router.beforeEach(async (to, from, next) => {
     if (to.name === "Setup" || to.name === "Login") {
       next();
+      return;
     }
 
     const systemStateStore = useSystemStatesStore();

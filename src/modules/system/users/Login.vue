@@ -3,9 +3,12 @@ import { IconShieldUser, IconUserLine, VButton } from "@halo-dev/components";
 import { v4 as uuid } from "uuid";
 import qs from "qs";
 import logo from "@/assets/logo.svg";
-import { onMounted, ref } from "vue";
+import { inject, onBeforeMount, onMounted, ref } from "vue";
 import { submitForm } from "@formkit/vue";
 import router from "@/router";
+import axios from "axios";
+import type { User } from "@halo-dev/api-client";
+import { setFocus } from "@/formkit/utils/focus";
 
 interface LoginForm {
   _csrf: string;
@@ -18,6 +21,7 @@ const loginForm = ref<LoginForm>({
   username: "",
   password: "",
 });
+
 const loading = ref(false);
 
 const handleGenerateToken = async () => {
@@ -29,23 +33,34 @@ const handleGenerateToken = async () => {
 const handleLogin = async () => {
   try {
     loading.value = true;
-    await fetch(`${import.meta.env.VITE_API_URL}/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      credentials: "include",
-      redirect: "manual",
-      body: qs.stringify(loginForm.value),
-    });
-    await router.push({ name: "Dashboard" });
-    await router.go(0);
+    await axios.post(
+      `${import.meta.env.VITE_API_URL}/login`,
+      qs.stringify(loginForm.value),
+      {
+        withCredentials: true,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    localStorage.setItem("logged_in", "true");
+    router.go(0);
   } catch (e) {
     console.error("Failed to login", e);
+    alert("登录失败，用户名或密码错误");
+    loginForm.value.password = "";
+    setFocus("passwordInput");
   } finally {
     loading.value = false;
   }
 };
+
+onBeforeMount(() => {
+  const currentUser = inject<User>("currentUser");
+  if (currentUser) {
+    router.push({ name: "Dashboard" });
+  }
+});
 
 onMounted(() => {
   handleGenerateToken();
@@ -61,7 +76,7 @@ onMounted(() => {
         name="login-form"
         :actions="false"
         type="form"
-        :config="{ animation: 'none' }"
+        :config="{ validationVisibility: 'submit' }"
         @submit="handleLogin"
         @keyup.enter="submitForm('login-form')"
       >
@@ -79,6 +94,7 @@ onMounted(() => {
           </template>
         </FormKit>
         <FormKit
+          id="passwordInput"
           :validation-messages="{
             required: '请输入密码',
           }"
@@ -92,7 +108,12 @@ onMounted(() => {
           </template>
         </FormKit>
       </FormKit>
-      <VButton block type="secondary" @click="submitForm('login-form')">
+      <VButton
+        block
+        :loading="loading"
+        type="secondary"
+        @click="submitForm('login-form')"
+      >
         登录
       </VButton>
     </div>
