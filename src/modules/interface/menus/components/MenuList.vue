@@ -10,7 +10,7 @@ import {
   VEntityField,
 } from "@halo-dev/components";
 import MenuEditingModal from "./MenuEditingModal.vue";
-import { defineExpose, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import type { Menu } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
