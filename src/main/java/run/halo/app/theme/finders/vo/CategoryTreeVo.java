@@ -1,6 +1,8 @@
 package run.halo.app.theme.finders.vo;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -46,7 +48,25 @@ public class CategoryTreeVo {
             .spec(category.getSpec())
             .status(category.getStatus())
             .children(List.of())
-            .postCount(category.getPostCount())
+            .postCount(Objects.requireNonNullElse(category.getPostCount(), 0))
             .build();
+    }
+
+    public void print(StringBuilder buffer, String prefix, String childrenPrefix) {
+        buffer.append(prefix);
+        buffer.append(getSpec().getDisplayName())
+            .append(" (").append(getPostCount()).append(")");
+        buffer.append('\n');
+        if (children == null) {
+            return;
+        }
+        for (Iterator<CategoryTreeVo> it = children.iterator(); it.hasNext(); ) {
+            CategoryTreeVo next = it.next();
+            if (it.hasNext()) {
+                next.print(buffer, childrenPrefix + "├── ", childrenPrefix + "│   ");
+            } else {
+                next.print(buffer, childrenPrefix + "└── ", childrenPrefix + "    ");
+            }
+        }
     }
 }

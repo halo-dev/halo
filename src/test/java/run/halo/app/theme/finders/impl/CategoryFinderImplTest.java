@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +100,28 @@ class CategoryFinderImplTest {
         assertThat(treeVos).hasSize(1);
     }
 
+    /**
+     * Test for {@link CategoryFinderImpl#listAsTree()}.
+     *
+     * @see <a href="https://github.com/halo-dev/halo/issues/2532">Fix #2532</a>
+     */
+    @Test
+    void listAsTreeMore() {
+        when(client.list(eq(Category.class), eq(null), any()))
+            .thenReturn(Flux.fromIterable(moreCategories()));
+        List<CategoryTreeVo> treeVos = categoryFinder.listAsTree();
+        String s = CategoryFinderImpl.visualizeTree(treeVos);
+        assertThat(s).isEqualTo("""
+            全部 (5)
+            ├── 默认分类 (3)
+            └── FIT2CLOUD (2)
+                ├── Halo (2)
+                ├── JumpServer (0)
+                ├── MeterSphere (0)
+                └── DataEase (0)
+              """);
+    }
+
     private List<Category> categoriesForTree() {
         /*
          *  D
@@ -175,5 +198,177 @@ class CategoryFinderImplTest {
         categorySpec.setChildren(List.of("C1", "C2"));
         category.setSpec(categorySpec);
         return category;
+    }
+
+    private List<Category> moreCategories() {
+        String s = """
+            [
+               {
+                  "spec":{
+                     "displayName":"默认分类",
+                     "slug":"default",
+                     "description":"这是你的默认分类，如不需要，删除即可。",
+                     "cover":"",
+                     "template":"",
+                     "priority":1,
+                     "children":[
+                     ]
+                  },
+                  "status":{
+                     "permalink":"/categories/default",
+                     "postCount":3,
+                     "visiblePostCount":3
+                  },
+                  "apiVersion":"content.halo.run/v1alpha1",
+                  "kind":"Category",
+                  "metadata":{
+                     "name":"76514a40-6ef1-4ed9-b58a-e26945bde3ca",
+                     "version":16,
+                     "creationTimestamp":"2022-10-08T06:17:47.589181Z"
+                  }
+               },
+               {
+                  "spec":{
+                     "displayName":"MeterSphere",
+                     "slug":"metersphere",
+                     "description":"",
+                     "cover":"",
+                     "template":"",
+                     "priority":2,
+                     "children":[
+                     ]
+                  },
+                  "status":{
+                     "permalink":"/categories/metersphere",
+                     "postCount":0,
+                     "visiblePostCount":0
+                  },
+                  "apiVersion":"content.halo.run/v1alpha1",
+                  "kind":"Category",
+                  "metadata":{
+                     "finalizers":[
+                        "category-protection"
+                     ],
+                     "name":"acf09686-d5a7-4227-ba8c-3aeff063f12f",
+                     "version":13,
+                     "creationTimestamp":"2022-10-08T06:32:36.650974Z"
+                  }
+               },
+               {
+                  "spec":{
+                     "displayName":"DataEase",
+                     "slug":"dataease",
+                     "description":"",
+                     "cover":"",
+                     "template":"",
+                     "priority":0,
+                     "children":[
+                     ]
+                  },
+                  "status":{
+                     "permalink":"/categories/dataease",
+                     "postCount":0,
+                     "visiblePostCount":0
+                  },
+                  "apiVersion":"content.halo.run/v1alpha1",
+                  "kind":"Category",
+                  "metadata":{
+                     "finalizers":[
+                        "category-protection"
+                     ],
+                     "name":"bd95f914-22fc-4de5-afcc-a9ffba2f6401",
+                     "version":13,
+                     "creationTimestamp":"2022-10-08T06:32:53.353838Z"
+                  }
+               },
+               {
+                  "spec":{
+                     "displayName":"FIT2CLOUD",
+                     "slug":"fit2cloud",
+                     "description":"",
+                     "cover":"",
+                     "template":"",
+                     "priority":0,
+                     "children":[
+                        "bd95f914-22fc-4de5-afcc-a9ffba2f6401",
+                        "e1150fd9-4512-453c-9186-f8de9c156c3d",
+                        "acf09686-d5a7-4227-ba8c-3aeff063f12f",
+                        "ed064d5e-2b6f-4123-8114-78d0c6f2c4e2"
+                     ]
+                  },
+                  "status":{
+                     "permalink":"/categories/fit2cloud",
+                     "postCount":2,
+                     "visiblePostCount":2
+                  },
+                  "apiVersion":"content.halo.run/v1alpha1",
+                  "kind":"Category",
+                  "metadata":{
+                     "finalizers":[
+                        "category-protection"
+                     ],
+                     "name":"c25c17ae-4a7b-43c5-a424-76950b9622cd",
+                     "version":14,
+                     "creationTimestamp":"2022-10-08T06:32:27.802025Z"
+                  }
+               },
+               {
+                  "spec":{
+                     "displayName":"Halo",
+                     "slug":"halo",
+                     "description":"",
+                     "cover":"",
+                     "template":"",
+                     "priority":1,
+                     "children":[
+                     ]
+                  },
+                  "status":{
+                     "permalink":"/categories/halo",
+                     "postCount":2,
+                     "visiblePostCount":2
+                  },
+                  "apiVersion":"content.halo.run/v1alpha1",
+                  "kind":"Category",
+                  "metadata":{
+                     "finalizers":[
+                        "category-protection"
+                     ],
+                     "name":"e1150fd9-4512-453c-9186-f8de9c156c3d",
+                     "version":15,
+                     "creationTimestamp":"2022-10-08T06:32:42.991788Z"
+                  }
+               },
+               {
+                  "spec":{
+                     "displayName":"JumpServer",
+                     "slug":"jumpserver",
+                     "description":"",
+                     "cover":"",
+                     "template":"",
+                     "priority":3,
+                     "children":[
+                     ]
+                  },
+                  "status":{
+                     "permalink":"/categories/jumpserver",
+                     "postCount":0,
+                     "visiblePostCount":0
+                  },
+                  "apiVersion":"content.halo.run/v1alpha1",
+                  "kind":"Category",
+                  "metadata":{
+                     "finalizers":[
+                        "category-protection"
+                     ],
+                     "name":"ed064d5e-2b6f-4123-8114-78d0c6f2c4e2",
+                     "version":13,
+                     "creationTimestamp":"2022-10-08T06:33:00.557435Z"
+                  }
+               }
+            ]
+            """;
+        return JsonUtils.jsonToObject(s, new TypeReference<>() {
+        });
     }
 }

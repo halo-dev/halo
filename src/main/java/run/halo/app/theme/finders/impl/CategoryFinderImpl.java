@@ -3,16 +3,16 @@ package run.halo.app.theme.finders.impl;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.springframework.util.CollectionUtils;
 import run.halo.app.core.extension.Category;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.Finder;
@@ -25,6 +25,7 @@ import run.halo.app.theme.finders.vo.CategoryVo;
  * @author guqing
  * @since 2.0.0
  */
+@Slf4j
 @Finder("categoryFinder")
 public class CategoryFinderImpl implements CategoryFinder {
     private final ReactiveExtensionClient client;
@@ -75,33 +76,54 @@ public class CategoryFinderImpl implements CategoryFinder {
     @Override
     public List<CategoryTreeVo> listAsTree() {
         List<CategoryVo> categoryVos = listAll();
-        Map<String, CategoryVo> nameIdentityMap = categoryVos.stream()
+        Map<String, CategoryTreeVo> nameIdentityMap = categoryVos.stream()
+            .map(CategoryTreeVo::from)
             .collect(Collectors.toMap(categoryVo -> categoryVo.getMetadata().getName(),
                 Function.identity()));
 
-        Map<String, CategoryTreeVo> treeVoMap = new HashMap<>();
-        // populate parentName
-        categoryVos.forEach(categoryVo -> {
-            final String parentName = categoryVo.getMetadata().getName();
-            treeVoMap.putIfAbsent(parentName, CategoryTreeVo.from(categoryVo));
-            List<String> children = categoryVo.getSpec().getChildren();
-            if (CollectionUtils.isEmpty(children)) {
-                return;
+        nameIdentityMap.forEach((name, value) -> {
+            List<String> children = value.getSpec().getChildren();
+            if (children != null) {
+                for (String child : children) {
+                    CategoryTreeVo childNode = nameIdentityMap.get(child);
+                    childNode.setParentName(name);
+                }
             }
-            children.forEach(childrenName -> {
-                CategoryVo childrenVo = nameIdentityMap.get(childrenName);
-                CategoryTreeVo treeVo = CategoryTreeVo.from(childrenVo);
-                treeVo.setParentName(parentName);
-                treeVoMap.putIfAbsent(treeVo.getMetadata().getName(), treeVo);
-            });
         });
+        List<CategoryTreeVo> categoryTreeVos = listToTree(nameIdentityMap.values());
+        if (log.isTraceEnabled()) {
+            log.trace(visualizeTree(categoryTreeVos));
+        }
         nameIdentityMap.clear();
-        return listToTree(treeVoMap.values());
+        return categoryTreeVos;
+    }
+
+    /**
+     * Visualize a tree.
+     */
+    public static String visualizeTree(List<CategoryTreeVo> categoryTreeVos) {
+        Category.CategorySpec categorySpec = new Category.CategorySpec();
+        categorySpec.setSlug("/");
+        categorySpec.setDisplayName("全部");
+        Integer postCount = categoryTreeVos.stream()
+            .map(CategoryTreeVo::getPostCount)
+            .filter(Objects::nonNull)
+            .reduce(Integer::sum)
+            .orElse(0);
+        CategoryTreeVo root = CategoryTreeVo.builder()
+            .spec(categorySpec)
+            .postCount(postCount)
+            .children(categoryTreeVos)
+            .metadata(new Metadata())
+            .build();
+        StringBuilder stringBuilder = new StringBuilder();
+        root.print(stringBuilder, "", "");
+        return stringBuilder.toString();
     }
 
     static List<CategoryTreeVo> listToTree(Collection<CategoryTreeVo> list) {
         Map<String, List<CategoryTreeVo>> nameIdentityMap = list.stream()
-            .filter(item -> item.getParentName() != null)
+            .filter(categoryTreeVo -> categoryTreeVo.getParentName() != null)
             .collect(Collectors.groupingBy(CategoryTreeVo::getParentName));
         list.forEach(node -> node.setChildren(nameIdentityMap.get(node.getMetadata().getName())));
         return list.stream()
