@@ -1,9 +1,7 @@
 package run.halo.app.theme.router.strategy;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -16,8 +14,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Mono;
-import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.router.UrlContextListResult;
 
@@ -93,13 +89,14 @@ class ArchivesRouteStrategyTest extends RouterStrategyTestSuite {
     @Test
     void getRouteFunctionWhenOtherPattern() {
         HandlerFunction<ServerResponse> handler = archivesRouteStrategy.getHandler();
-        RouterFunction<ServerResponse> routeFunction = request -> Mono.just(handler);
-        SystemSetting.ThemeRouteRules themeRouteRules = getThemeRouteRules();
-        themeRouteRules.setArchives("/archives-test");
-        when(environmentFetcher.fetch(eq(SystemSetting.ThemeRouteRules.GROUP),
-            eq(SystemSetting.ThemeRouteRules.class))).thenReturn(Mono.just(themeRouteRules));
+        RouterFunction<ServerResponse> routeFunction = getRouterFunction();
 
-        WebTestClient client = getWebTestClient(routeFunction);
+        final WebTestClient client = getWebTestClient(routeFunction);
+
+        List<String> routerPaths = archivesRouteStrategy.getRouterPaths("/archives-test");
+        for (String routerPath : routerPaths) {
+            permalinkHttpGetRouter.insert(routerPath, handler);
+        }
 
         fixedAssertion(client, "/archives-test");
 

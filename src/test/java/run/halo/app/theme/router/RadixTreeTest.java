@@ -1,0 +1,135 @@
+package run.halo.app.theme.router;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
+
+/**
+ * Tests for {@link RadixTree}.
+ *
+ * @author guqing
+ * @since 2.0.0
+ */
+class RadixTreeTest {
+
+    @Test
+    void insert() {
+        RadixTree<String> radixTree = new RadixTree<>();
+        radixTree.insert("/users", "users");
+        radixTree.insert("/users/a", "users-a");
+        radixTree.insert("/users/a/b/c", "users-a-b-c");
+        radixTree.insert("/users/a/b/c/d", "users-a-b-c-d");
+        radixTree.insert("/users/a/b/e/f", "users-a-b-c-d");
+        radixTree.insert("/users/b/d", "users-b-d");
+        radixTree.insert("/users/b/d/e/f", "users-b-d-e-f");
+        radixTree.insert("/users/b/d/g/h", "users-b-d-g-h");
+        radixTree.insert("/users/b/f/g/h", "users-b-f-g-h");
+        radixTree.insert("/users/c/d/g/h", "users-c-d-g-h");
+        radixTree.insert("/users/c/f/g/h", "users-c-f-g-h");
+        radixTree.insert("/test/hello", "test-hello");
+        radixTree.insert("/test/中文/abc", "test-中文-abc");
+        radixTree.insert("/test/中/test", "test-中-test");
+
+        radixTree.checkPriorities();
+        radixTree.checkIndices();
+        String display = radixTree.display();
+        assertThat(display).isEqualTo("""
+            / [indices=ut, priority=14]
+            ├── users [value=users, priority=11]*
+            │   └── / [indices=abc, priority=10]
+            │       ├── a [value=users-a, priority=4]*
+            │       │   └── /b/ [indices=ce, priority=3]
+            │       │       ├── c [value=users-a-b-c, priority=2]*
+            │       │       │   └── /d [value=users-a-b-c-d, priority=1]*
+            │       │       └── e/f [value=users-a-b-c-d, priority=1]*
+            │       ├── b/ [indices=df, priority=4]
+            │       │   ├── d [value=users-b-d, priority=3]*
+            │       │   │   └── / [indices=eg, priority=2]
+            │       │   │       ├── e/f [value=users-b-d-e-f, priority=1]*
+            │       │   │       └── g/h [value=users-b-d-g-h, priority=1]*
+            │       │   └── f/g/h [value=users-b-f-g-h, priority=1]*
+            │       └── c/ [indices=df, priority=2]
+            │           ├── d/g/h [value=users-c-d-g-h, priority=1]*
+            │           └── f/g/h [value=users-c-f-g-h, priority=1]*
+            └── test/ [indices=中h, priority=3]
+                ├── 中 [indices=文/, priority=2]
+                │   ├── 文/abc [value=test-中文-abc, priority=1]*
+                │   └── /test [value=test-中-test, priority=1]*
+                └── hello [value=test-hello, priority=1]*
+            """);
+    }
+
+    @Test
+    void delete() {
+        RadixTree<String> radixTree = new RadixTree<>();
+        radixTree.insert("/", "index");
+        radixTree.insert("/categories/default", "categories-default");
+        radixTree.insert("/tags/halo", "tags-halo");
+        radixTree.insert("/archives/hello-halo", "archives-hello-halo");
+        radixTree.insert("/about", "about");
+        radixTree.delete("/tags/halo");
+        radixTree.delete("/archives/hello-halo");
+        radixTree.insert("/tags/halo", "tags-halo");
+        radixTree.delete("/");
+
+        String display = radixTree.display();
+        assertThat(display).isEqualTo("""
+            / [indices=act, priority=3]
+            ├── about [value=about, priority=1]*
+            ├── categories/default [value=categories-default, priority=1]*
+            └── tags/halo [value=tags-halo, priority=1]*
+            """);
+
+        radixTree.checkIndices();
+        radixTree.checkPriorities();
+    }
+
+    @Test
+    void getSize() {
+        RadixTree<String> radixTree = new RadixTree<>();
+        radixTree.insert("/", "index");
+        radixTree.insert("/categories/default", "categories-default");
+        radixTree.insert("/tags/halo", "tags-halo");
+        radixTree.insert("/archives/hello-halo", "archives-hello-halo");
+
+        assertThat(radixTree.getSize()).isEqualTo(4);
+
+        radixTree.insert("/about", "about");
+        radixTree.delete("/tags/halo");
+        assertThat(radixTree.getSize()).isEqualTo(4);
+
+        radixTree.delete("/archives/hello-halo");
+        radixTree.insert("/tags/halo", "tags-halo");
+        radixTree.delete("/");
+        assertThat(radixTree.getSize()).isEqualTo(3);
+    }
+
+    @Test
+    void contains() {
+        RadixTree<String> radixTree = new RadixTree<>();
+        radixTree.insert("/", "index");
+        radixTree.insert("/categories/default", "categories-default");
+        radixTree.insert("/tags/halo", "tags-halo");
+        radixTree.insert("/archives/hello-halo", "archives-hello-halo");
+
+        assertThat(radixTree.contains("/tags/halo")).isTrue();
+        assertThat(radixTree.contains("/archives/hello-halo")).isTrue();
+        assertThat(radixTree.contains("/categories/default")).isTrue();
+
+        assertThat(radixTree.contains("/tags/test")).isFalse();
+        assertThat(radixTree.contains("/tags/abc")).isFalse();
+        assertThat(radixTree.contains("/archives/abc")).isFalse();
+        assertThat(radixTree.contains("/archives")).isFalse();
+    }
+
+    @Test
+    void replace() {
+        RadixTree<String> radixTree = new RadixTree<>();
+        radixTree.insert("/", "index");
+        radixTree.insert("/categories/default", "categories-default");
+
+        boolean replaced = radixTree.replace("/categories/default", "categories-new");
+        assertThat(replaced).isTrue();
+        assertThat(radixTree.find("/categories/default")).isEqualTo("categories-new");
+    }
+}

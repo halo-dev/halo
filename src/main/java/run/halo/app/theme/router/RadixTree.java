@@ -382,7 +382,6 @@ public class RadixTree<T> {
             //base condition
             return;
         }
-        System.out.println(node.getKey());
         node.checkIndices();
         for (RadixTreeNode<T> child : node.getChildren()) {
             checkIndices(child);

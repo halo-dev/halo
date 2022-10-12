@@ -23,6 +23,7 @@ public class PageUrlUtils {
         }
         return 1;
     }
+
     public static boolean isPageUrl(String path) {
         String[] split = StringUtils.split(path, "/");
         if (split.length > 1) {
