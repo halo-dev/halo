@@ -2,7 +2,6 @@ package run.halo.app.theme.router;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import lombok.Data;
 
 /**
@@ -21,7 +20,6 @@ public class RadixTree<T> {
     public RadixTree() {
         root = new RadixTreeNode<T>();
         root.setKey("/");
-        root.setPriority(0);
         root.setIndices("");
         size = 0;
     }
@@ -90,8 +88,7 @@ public class RadixTree<T> {
                                 // delete node
                                 it.remove();
 
-                                // update indices and priority
-                                parent.setPriority(parent.getPriority() - 1);
+                                // update indices
                                 StringBuilder indices = new StringBuilder(parent.getIndices());
                                 indices.deleteCharAt(index);
                                 parent.setIndices(indices.toString());
@@ -129,23 +126,13 @@ public class RadixTree<T> {
                 parent.setValue(child.getValue());
                 parent.setChildren(child.getChildren());
                 parent.setIndices(child.getIndices());
-                parent.setPriority(child.getPriority());
             }
         };
         visit(key, visitor);
         if (visitor.getResult()) {
             size--;
-            calcRootPriority();
         }
         return visitor.getResult();
-    }
-
-    private void calcRootPriority() {
-        int priority = root.isReal() ? 1 : 0;
-        for (RadixTreeNode<T> child : root.getChildren()) {
-            priority += child.getPriority();
-        }
-        root.setPriority(priority);
     }
 
     /**
@@ -156,7 +143,6 @@ public class RadixTree<T> {
     public void insert(String key, T value) throws IllegalArgumentException {
         try {
             insert(key, root, value);
-            calcRootPriority();
         } catch (IllegalArgumentException e) {
             // re-throw the exception with 'key' in the message
             throw new IllegalArgumentException("A handle is already registered for key:" + key);
@@ -187,8 +173,7 @@ public class RadixTree<T> {
             char idxc = newText.charAt(0);
             for (int i = 0; i < node.getIndices().length(); i++) {
                 if (node.getIndices().charAt(i) == idxc) {
-                    int pos = incrementChildPriority(node, i);
-                    RadixTreeNode<T> child = node.getChildren().get(pos);
+                    RadixTreeNode<T> child = node.getChildren().get(i);
                     flag = true;
                     insert(newText, child, value);
                     break;
@@ -199,7 +184,6 @@ public class RadixTree<T> {
                 RadixTreeNode<T> n = new RadixTreeNode<T>();
                 n.setKey(newText);
                 n.setReal(true);
-                n.setPriority(1);
                 n.setValue(value);
                 // 往后追加与child对于的首字母到 indices
                 node.setIndices(node.getIndices() + idxc);
@@ -221,7 +205,6 @@ public class RadixTree<T> {
             n1.setKey(node.getKey().substring(numberOfMatchingCharacters));
             n1.setReal(node.isReal());
             n1.setValue(node.getValue());
-            n1.setPriority(node.getPriority() - 1);
             n1.setIndices(node.getIndices());
             n1.setChildren(node.getChildren());
 
@@ -230,7 +213,6 @@ public class RadixTree<T> {
             node.setChildren(new ArrayList<>());
             node.getChildren().add(n1);
             node.setIndices("");
-            node.setPriority(n1.getPriority());
             // 往后追加与child对于的首字母到 indices
             node.setIndices(node.getIndices() + n1.getKey().charAt(0));
             // 新公共前缀比原公共前缀短，需要将当前的节点按公共前缀分开
@@ -239,23 +221,18 @@ public class RadixTree<T> {
                 n2.setKey(key.substring(numberOfMatchingCharacters));
                 n2.setReal(true);
                 n2.setValue(value);
-                n2.setPriority(1);
 
                 node.getChildren().add(n2);
-                node.setPriority(node.getPriority() + 1);
                 node.setIndices(node.getIndices() + n2.getKey().charAt(0));
             } else {
                 node.setValue(value);
                 node.setReal(true);
-                node.setPriority(node.getPriority() + 1);
             }
         } else {
             // this key need to be added as the child of the current node
             RadixTreeNode<T> n = new RadixTreeNode<T>();
             n.setKey(node.getKey().substring(numberOfMatchingCharacters));
             n.setChildren(node.getChildren());
-            n.setPriority(node.getPriority());
-            incrementChildPriority(n, n.getIndices().length() - 1);
             n.setReal(node.isReal());
             n.setValue(node.getValue());
 
@@ -266,33 +243,7 @@ public class RadixTree<T> {
             char idxc = node.getKey().charAt(0);
             // 往后追加与child对于的首字母到 indices
             n.setIndices(n.getIndices() + idxc);
-            incrementChildPriority(node, node.getIndices().length() - 1);
         }
-    }
-
-    int incrementChildPriority(RadixTreeNode<T> n, int pos) {
-        List<RadixTreeNode<T>> cs = n.getChildren();
-        cs.get(pos).priority++;
-        int prio = cs.get(pos).priority;
-
-        // Adjust position (move to front)
-        int newPos = pos;
-        for (; newPos > 0 && cs.get(newPos - 1).priority < prio; newPos--) {
-            // Swap node positions
-            RadixTreeNode<T> temp = cs.get(newPos);
-            cs.set(newPos, cs.get(newPos - 1));
-            cs.set(newPos - 1, temp);
-        }
-
-        // Build new index char string
-        if (newPos != pos) {
-            n.indices = n.indices.substring(0, newPos) // Unchanged prefix, might be empty
-                + n.indices.charAt(pos)// The index char we move
-                + n.indices.substring(newPos, pos)
-                + n.indices.substring(pos + 1); // Rest without char at 'pos'
-        }
-
-        return newPos;
     }
 
     /**
@@ -386,37 +337,6 @@ public class RadixTree<T> {
         for (RadixTreeNode<T> child : node.getChildren()) {
             checkIndices(child);
         }
-    }
-
-    /**
-     * Only used for testing purpose.
-     */
-    public void checkPriorities() {
-        checkPriorities(root);
-    }
-
-    /**
-     * Check the correctness of priority in node of the tree.
-     *
-     * @param n node to check
-     * @return priority in the node {@param #n}
-     */
-    public int checkPriorities(RadixTreeNode<T> n) {
-        int prio = 0;
-        for (RadixTreeNode<T> child : n.getChildren()) {
-            prio += checkPriorities(child);
-        }
-
-        if (n.isReal()) {
-            prio++;
-        }
-
-        if (n.getPriority() != prio) {
-            throw new IllegalStateException(
-                String.format("priority mismatch for node '%s': is %d, should be %d", n.getKey(),
-                    n.getPriority(), prio));
-        }
-        return prio;
     }
 
     public abstract static class Visitor<T, R> {

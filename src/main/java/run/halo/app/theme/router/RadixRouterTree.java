@@ -27,7 +27,6 @@ public class RadixRouterTree extends RadixTree<HandlerFunction<ServerResponse>> 
         super.insert(key, value);
         if (log.isDebugEnabled()) {
             checkIndices();
-            checkPriorities();
         }
     }
 
@@ -36,7 +35,6 @@ public class RadixRouterTree extends RadixTree<HandlerFunction<ServerResponse>> 
         boolean result = super.delete(key);
         if (log.isDebugEnabled()) {
             checkIndices();
-            checkPriorities();
         }
         return result;
     }

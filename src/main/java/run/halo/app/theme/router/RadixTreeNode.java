@@ -22,11 +22,6 @@ public class RadixTreeNode<T> {
     protected String indices;
 
     /**
-     * Priority, used when searching, indicates the number of the current node plus all child nodes.
-     */
-    protected int priority;
-
-    /**
      * intailize the fields with default values to avoid null reference checks
      * all over the places.
      */
@@ -66,11 +61,9 @@ public class RadixTreeNode<T> {
 
     String printNode() {
         if (isReal()) {
-            return String.format("%s [value=%s, priority=%d]*", getKey(), getValue(),
-                getPriority());
+            return String.format("%s [value=%s]*", getKey(), getValue());
         } else {
-            return String.format("%s [indices=%s, priority=%d]", getKey(), getIndices(),
-                getPriority());
+            return String.format("%s [indices=%s]", getKey(), getIndices());
         }
     }
 

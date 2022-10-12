@@ -30,33 +30,32 @@ class RadixTreeTest {
         radixTree.insert("/test/中文/abc", "test-中文-abc");
         radixTree.insert("/test/中/test", "test-中-test");
 
-        radixTree.checkPriorities();
         radixTree.checkIndices();
         String display = radixTree.display();
         assertThat(display).isEqualTo("""
-            / [indices=ut, priority=14]
-            ├── users [value=users, priority=11]*
-            │   └── / [indices=abc, priority=10]
-            │       ├── a [value=users-a, priority=4]*
-            │       │   └── /b/ [indices=ce, priority=3]
-            │       │       ├── c [value=users-a-b-c, priority=2]*
-            │       │       │   └── /d [value=users-a-b-c-d, priority=1]*
-            │       │       └── e/f [value=users-a-b-c-d, priority=1]*
-            │       ├── b/ [indices=df, priority=4]
-            │       │   ├── d [value=users-b-d, priority=3]*
-            │       │   │   └── / [indices=eg, priority=2]
-            │       │   │       ├── e/f [value=users-b-d-e-f, priority=1]*
-            │       │   │       └── g/h [value=users-b-d-g-h, priority=1]*
-            │       │   └── f/g/h [value=users-b-f-g-h, priority=1]*
-            │       └── c/ [indices=df, priority=2]
-            │           ├── d/g/h [value=users-c-d-g-h, priority=1]*
-            │           └── f/g/h [value=users-c-f-g-h, priority=1]*
-            └── test/ [indices=中h, priority=3]
-                ├── 中 [indices=文/, priority=2]
-                │   ├── 文/abc [value=test-中文-abc, priority=1]*
-                │   └── /test [value=test-中-test, priority=1]*
-                └── hello [value=test-hello, priority=1]*
-            """);
+            / [indices=ut]
+            ├── users [value=users]*
+            │   └── / [indices=abc]
+            │       ├── a [value=users-a]*
+            │       │   └── /b/ [indices=ce]
+            │       │       ├── c [value=users-a-b-c]*
+            │       │       │   └── /d [value=users-a-b-c-d]*
+            │       │       └── e/f [value=users-a-b-c-d]*
+            │       ├── b/ [indices=df]
+            │       │   ├── d [value=users-b-d]*
+            │       │   │   └── / [indices=eg]
+            │       │   │       ├── e/f [value=users-b-d-e-f]*
+            │       │   │       └── g/h [value=users-b-d-g-h]*
+            │       │   └── f/g/h [value=users-b-f-g-h]*
+            │       └── c/ [indices=df]
+            │           ├── d/g/h [value=users-c-d-g-h]*
+            │           └── f/g/h [value=users-c-f-g-h]*
+            └── test/ [indices=h中]
+                ├── hello [value=test-hello]*
+                └── 中 [indices=文/]
+                    ├── 文/abc [value=test-中文-abc]*
+                    └── /test [value=test-中-test]*
+               """);
     }
 
     @Test
@@ -74,14 +73,13 @@ class RadixTreeTest {
 
         String display = radixTree.display();
         assertThat(display).isEqualTo("""
-            / [indices=act, priority=3]
-            ├── about [value=about, priority=1]*
-            ├── categories/default [value=categories-default, priority=1]*
-            └── tags/halo [value=tags-halo, priority=1]*
-            """);
+            / [indices=cat]
+            ├── categories/default [value=categories-default]*
+            ├── about [value=about]*
+            └── tags/halo [value=tags-halo]*
+                """);
 
         radixTree.checkIndices();
-        radixTree.checkPriorities();
     }
 
     @Test
