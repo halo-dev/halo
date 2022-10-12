@@ -35,7 +35,7 @@
 ### Docker
 
 ```bash
-docker run -it -d --name halo-next -p 8090:8090 -v ~/halo-next:/root/halo-next --restart=unless-stopped halohub/halo-dev:2.0.0-alpha.1
+docker run -it -d --name halo-next -p 8090:8090 -v ~/halo-next:/root/halo-next --restart=unless-stopped halohub/halo-dev:2.0.0-alpha.2
 ```
 
 详细部署文档请查阅：<https://docs.halo.run/2.0.0-SNAPSHOT/getting-started/install/docker>
