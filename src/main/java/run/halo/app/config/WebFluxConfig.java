@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,7 @@ import org.springframework.web.reactive.resource.PathResourceResolver;
 import org.springframework.web.reactive.result.view.ViewResolutionResultHandler;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
+import run.halo.app.console.ConsoleProxyFilter;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.endpoint.CustomEndpointsBuilder;
 import run.halo.app.infra.properties.HaloProperties;
@@ -123,4 +125,10 @@ public class WebFluxConfig implements WebFluxConfigurer {
             .addResolver(new PathResourceResolver());
     }
 
+
+    @ConditionalOnProperty(name = "halo.console.proxy.enabled", havingValue = "true")
+    @Bean
+    ConsoleProxyFilter consoleProxyFilter() {
+        return new ConsoleProxyFilter(haloProp);
+    }
 }

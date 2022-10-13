@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import java.time.Instant;
 import java.util.List;
@@ -59,6 +60,8 @@ class ExtensionConfigurationTest {
 
         // register scheme
         schemeManager.register(FakeExtension.class);
+
+        webClient = webClient.mutateWith(csrf());
     }
 
     @AfterEach

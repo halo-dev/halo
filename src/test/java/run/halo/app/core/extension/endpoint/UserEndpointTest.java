@@ -7,6 +7,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import java.util.List;
 import java.util.Set;
@@ -69,6 +70,7 @@ class UserEndpointTest {
         var role = new Role();
         role.setRules(List.of(rule));
         when(roleService.getMonoRole("authenticated")).thenReturn(Mono.just(role));
+        webClient = webClient.mutateWith(csrf());
     }
 
     @Nested

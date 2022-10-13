@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +27,7 @@ import run.halo.app.core.extension.RoleBinding.Subject;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.exception.ExtensionNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultUserDetailServiceTest {
@@ -161,13 +163,14 @@ class DefaultUserDetailServiceTest {
 
     @Test
     void shouldNotFindUserDetailsByNonExistingUsername() {
-        when(userService.getUser("non-existing-user")).thenReturn(Mono.empty());
+        when(userService.getUser("non-existing-user")).thenReturn(
+            Mono.error(() -> new ExtensionNotFoundException("The user was not found")));
 
         var userDetailsMono = userDetailService.findByUsername("non-existing-user");
 
         StepVerifier.create(userDetailsMono)
-            .expectSubscription()
-            .verifyComplete();
+            .expectError(AuthenticationException.class)
+            .verify();
     }
 
     UserDetails createFakeUserDetails() {

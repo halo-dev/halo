@@ -9,15 +9,14 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
-import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -28,10 +27,10 @@ import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.SupplierReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -40,8 +39,7 @@ import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.properties.JwtProperties;
 import run.halo.app.security.DefaultUserDetailService;
 import run.halo.app.security.SuperAdminInitializer;
-import run.halo.app.security.authentication.jwt.LoginAuthenticationFilter;
-import run.halo.app.security.authentication.jwt.LoginAuthenticationManager;
+import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authorization.RequestInfoAuthorizationManager;
 
 /**
@@ -62,11 +60,11 @@ public class WebServerSecurityConfig {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     SecurityWebFilterChain apiFilterChain(ServerHttpSecurity http,
-        ServerCodecConfigurer codec,
-        ServerResponse.Context context,
-        UserService userService,
-        RoleService roleService) {
-        http.csrf().disable()
+        RoleService roleService,
+        ObjectProvider<SecurityConfigurer> securityConfigurers) {
+
+        http.csrf().csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse())
+            .and()
             .cors(corsSpec -> corsSpec.configurationSource(apiCorsConfigurationSource()))
             .securityMatcher(pathMatchers("/api/**", "/apis/**", "/login", "/logout"))
             .authorizeExchange(exchanges ->
@@ -76,21 +74,13 @@ public class WebServerSecurityConfig {
                 anonymousSpec.principal(AnonymousUserConst.PRINCIPAL);
             })
             .httpBasic(withDefaults())
-            .formLogin(withDefaults())
-            .logout(withDefaults())
             // for reuse the JWT authentication
             .oauth2ResourceServer().jwt();
 
-        var loginManager = new LoginAuthenticationManager(
-            userDetailsService(userService, roleService),
-            passwordEncoder());
-        var loginFilter = new LoginAuthenticationFilter(loginManager,
-            codec,
-            jwtEncoder(),
-            jwtProp,
-            context);
+        // Integrate with other configurers separately
+        securityConfigurers.orderedStream()
+            .forEach(securityConfigurer -> securityConfigurer.configure(http));
 
-        http.addFilterAt(loginFilter, SecurityWebFiltersOrder.FORM_LOGIN);
         return http.build();
     }
 
@@ -105,7 +95,9 @@ public class WebServerSecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration);
         source.registerCorsConfiguration("/apis/**", configuration);
+        // TODO Remove both login and logout path until we provide the console proxy.
         source.registerCorsConfiguration("/login", configuration);
+        source.registerCorsConfiguration("/logout", configuration);
         return source;
     }
 
