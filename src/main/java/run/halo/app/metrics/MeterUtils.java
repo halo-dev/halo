@@ -20,6 +20,7 @@ public class MeterUtils {
     public static final String SCENE = "scene";
     public static final String VISIT_SCENE = "visit";
     public static final String UPVOTE_SCENE = "upvote";
+    public static final String DOWNVOTE_SCENE = "downvote";
     public static final String TOTAL_COMMENT_SCENE = "total_comment";
     public static final String APPROVED_COMMENT_SCENE = "approved_comment";
 
@@ -51,6 +52,10 @@ public class MeterUtils {
         return counter(registry, name, Tag.of(SCENE, UPVOTE_SCENE));
     }
 
+    public static Counter downvoteCounter(MeterRegistry registry, String name) {
+        return counter(registry, name, Tag.of(SCENE, DOWNVOTE_SCENE));
+    }
+
     public static Counter totalCommentCounter(MeterRegistry registry, String name) {
         return counter(registry, name, Tag.of(SCENE, TOTAL_COMMENT_SCENE));
     }
@@ -73,6 +78,14 @@ public class MeterUtils {
             return false;
         }
         return UPVOTE_SCENE.equals(sceneValue);
+    }
+
+    public static boolean isDownvoteCounter(Counter counter) {
+        String sceneValue = counter.getId().getTag(SCENE);
+        if (StringUtils.isBlank(sceneValue)) {
+            return false;
+        }
+        return DOWNVOTE_SCENE.equals(sceneValue);
     }
 
     public static boolean isTotalCommentCounter(Counter counter) {

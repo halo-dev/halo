@@ -24,6 +24,8 @@ public class Counter extends AbstractExtension {
 
     private Integer upvote;
 
+    private Integer downvote;
+
     private Integer totalComment;
 
     private Integer approvedComment;
@@ -41,6 +43,8 @@ public class Counter extends AbstractExtension {
                     this.visit = (int) meterCounter.count();
                 } else if (MeterUtils.isUpvoteCounter(meterCounter)) {
                     this.upvote = (int) meterCounter.count();
+                } else if (MeterUtils.isDownvoteCounter(meterCounter)) {
+                    this.downvote = (int) meterCounter.count();
                 } else if (MeterUtils.isTotalCommentCounter(meterCounter)) {
                     this.totalComment = (int) meterCounter.count();
                 } else if (MeterUtils.isApprovedCommentCounter(meterCounter)) {
@@ -53,6 +57,7 @@ public class Counter extends AbstractExtension {
     private void populateDefaultValue() {
         this.visit = 0;
         this.upvote = 0;
+        this.downvote = 0;
         this.totalComment = 0;
         this.approvedComment = 0;
     }
