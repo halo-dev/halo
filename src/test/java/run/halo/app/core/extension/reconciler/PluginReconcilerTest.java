@@ -25,7 +25,6 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginStartingError;
-import run.halo.app.plugin.resources.JsBundleRuleProvider;
 
 /**
  * Tests for {@link PluginReconciler}.
@@ -49,8 +48,7 @@ class PluginReconcilerTest {
 
     @BeforeEach
     void setUp() {
-        JsBundleRuleProvider jsBundleRule = new JsBundleRuleProvider(haloPluginManager);
-        pluginReconciler = new PluginReconciler(extensionClient, haloPluginManager, jsBundleRule);
+        pluginReconciler = new PluginReconciler(extensionClient, haloPluginManager);
 
         when(haloPluginManager.getPlugin(any())).thenReturn(pluginWrapper);
         when(haloPluginManager.getUnresolvedPlugins()).thenReturn(List.of());

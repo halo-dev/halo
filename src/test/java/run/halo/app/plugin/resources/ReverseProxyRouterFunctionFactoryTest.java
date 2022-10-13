@@ -12,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.extension.Metadata;
-import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginApplicationContext;
 import run.halo.app.plugin.PluginConst;
 
@@ -27,16 +26,13 @@ class ReverseProxyRouterFunctionFactoryTest {
 
     @Mock
     private PluginApplicationContext pluginApplicationContext;
-    @Mock
-    private HaloPluginManager haloPluginManager;
 
     private ReverseProxyRouterFunctionFactory reverseProxyRouterFunctionFactory;
 
     @BeforeEach
     void setUp() {
-        JsBundleRuleProvider jsBundleRuleProvider = new JsBundleRuleProvider(haloPluginManager);
         reverseProxyRouterFunctionFactory =
-            new ReverseProxyRouterFunctionFactory(jsBundleRuleProvider);
+            new ReverseProxyRouterFunctionFactory();
 
         when(pluginApplicationContext.getPluginId()).thenReturn("fakeA");
     }
@@ -49,7 +45,6 @@ class ReverseProxyRouterFunctionFactoryTest {
             .expectNextCount(1)
             .verifyComplete();
     }
-
 
     private ReverseProxy mockReverseProxy() {
         ReverseProxy.ReverseProxyRule reverseProxyRule =

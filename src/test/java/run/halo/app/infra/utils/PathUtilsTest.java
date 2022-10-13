@@ -21,6 +21,9 @@ class PathUtilsTest {
             String s = PathUtils.combinePath(segments.split(","));
             assertThat(s).isEqualTo(expected);
         });
+
+        String s = PathUtils.combinePath("a", "", "c");
+        assertThat(s).isEqualTo("/a/c");
     }
 
     private Map<String, String> getCombinePathCases() {
