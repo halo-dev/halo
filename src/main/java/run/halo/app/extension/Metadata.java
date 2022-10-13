@@ -21,6 +21,11 @@ public class Metadata implements MetadataOperator {
     private String name;
 
     /**
+     * Generate name is for generating metadata name automatically.
+     */
+    private String generateName;
+
+    /**
      * Labels are like key-value format.
      */
     private Map<String, String> labels;

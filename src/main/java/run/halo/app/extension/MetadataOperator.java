@@ -17,34 +17,40 @@ import java.util.Set;
 @Schema(implementation = Metadata.class)
 public interface MetadataOperator {
 
-    @Schema(required = true)
+    @Schema(name = "name", description = "Metadata name")
     @JsonProperty("name")
     String getName();
 
-    @Schema(nullable = true)
+    @Schema(name = "generateName", description = "The name field will be generated automatically "
+        + "according to the given generateName field")
+    String getGenerateName();
+
+    @Schema(name = "labels", nullable = true)
     @JsonProperty("labels")
     Map<String, String> getLabels();
 
-    @Schema(nullable = true)
+    @Schema(name = "annotations", nullable = true)
     @JsonProperty("annotations")
     Map<String, String> getAnnotations();
 
-    @Schema(nullable = true)
+    @Schema(name = "version", nullable = true)
     @JsonProperty("version")
     Long getVersion();
 
-    @Schema(nullable = true)
+    @Schema(name = "creationTimestamp", nullable = true)
     @JsonProperty("creationTimestamp")
     Instant getCreationTimestamp();
 
-    @Schema(nullable = true)
+    @Schema(name = "deletionTimestamp", nullable = true)
     @JsonProperty("deletionTimestamp")
     Instant getDeletionTimestamp();
 
-    @Schema(nullable = true)
+    @Schema(name = "finalizers", nullable = true)
     Set<String> getFinalizers();
 
     void setName(String name);
+
+    void setGenerateName(String generateName);
 
     void setLabels(Map<String, String> labels);
 

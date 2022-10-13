@@ -1,13 +1,19 @@
 package run.halo.app.extension;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.springframework.util.StringUtils.hasText;
+
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.util.Predicates;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.extension.store.ReactiveExtensionStoreClient;
 
@@ -90,17 +96,33 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     @Override
     public <E extends Extension> Mono<E> create(E extension) {
-        var metadata = extension.getMetadata();
-        // those fields should be managed by halo.
-        metadata.setCreationTimestamp(Instant.now());
-        metadata.setDeletionTimestamp(null);
-        metadata.setVersion(null);
+        return Mono.just(extension)
+            .doOnNext(ext -> {
+                var metadata = extension.getMetadata();
+                // those fields should be managed by halo.
+                metadata.setCreationTimestamp(Instant.now());
+                metadata.setDeletionTimestamp(null);
+                metadata.setVersion(null);
 
-        var extensionStore = converter.convertTo(extension);
-
-        return client.create(extensionStore.getName(), extensionStore.getData())
-            .map(created -> converter.convertFrom((Class<E>) extension.getClass(), created))
-            .doOnNext(watchers::onAdd);
+                if (!hasText(metadata.getName())) {
+                    if (!hasText(metadata.getGenerateName())) {
+                        throw new IllegalArgumentException(
+                            "The metadata.generateName must not be blank when metadata.name is "
+                                + "blank");
+                    }
+                    // generate name with random text
+                    metadata.setName(metadata.getGenerateName() + randomAlphabetic(5));
+                }
+                extension.setMetadata(metadata);
+            })
+            .map(converter::convertTo)
+            .flatMap(extStore -> client.create(extStore.getName(), extStore.getData())
+                .map(created -> converter.convertFrom((Class<E>) extension.getClass(), created))
+                .doOnNext(watchers::onAdd))
+            .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
+                // retry when generateName is set
+                .filter(t -> t instanceof DataIntegrityViolationException
+                    && hasText(extension.getMetadata().getGenerateName())));
     }
 
     @Override
