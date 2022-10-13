@@ -113,12 +113,12 @@ class CategoryFinderImplTest {
         String s = CategoryFinderImpl.visualizeTree(treeVos);
         assertThat(s).isEqualTo("""
             全部 (5)
-            ├── 默认分类 (3)
-            └── FIT2CLOUD (2)
-                ├── Halo (2)
-                ├── JumpServer (0)
-                ├── MeterSphere (0)
-                └── DataEase (0)
+            ├── FIT2CLOUD (2)
+            │   ├── DataEase (0)
+            │   ├── Halo (2)
+            │   ├── MeterSphere (0)
+            │   └── JumpServer (0)
+            └── 默认分类 (3)
               """);
     }
 

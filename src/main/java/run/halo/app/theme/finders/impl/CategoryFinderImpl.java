@@ -122,13 +122,35 @@ public class CategoryFinderImpl implements CategoryFinder {
     }
 
     static List<CategoryTreeVo> listToTree(Collection<CategoryTreeVo> list) {
-        Map<String, List<CategoryTreeVo>> nameIdentityMap = list.stream()
+        Map<String, List<CategoryTreeVo>> parentNameIdentityMap = list.stream()
             .filter(categoryTreeVo -> categoryTreeVo.getParentName() != null)
             .collect(Collectors.groupingBy(CategoryTreeVo::getParentName));
-        list.forEach(node -> node.setChildren(nameIdentityMap.get(node.getMetadata().getName())));
+
+        list.forEach(node -> {
+            // sort children
+            List<CategoryTreeVo> children =
+                parentNameIdentityMap.getOrDefault(node.getMetadata().getName(), List.of())
+                    .stream()
+                    .sorted(defaultTreeNodeComparator())
+                    .toList();
+            node.setChildren(children);
+        });
         return list.stream()
             .filter(v -> v.getParentName() == null)
+            .sorted(defaultTreeNodeComparator())
             .collect(Collectors.toList());
+    }
+
+    static Comparator<CategoryTreeVo> defaultTreeNodeComparator() {
+        Function<CategoryTreeVo, Integer> priority =
+            category -> Objects.requireNonNullElse(category.getSpec().getPriority(), 0);
+        Function<CategoryTreeVo, Instant> creationTimestamp =
+            category -> category.getMetadata().getCreationTimestamp();
+        Function<CategoryTreeVo, String> name =
+            category -> category.getMetadata().getName();
+        return Comparator.comparing(priority)
+            .thenComparing(creationTimestamp)
+            .thenComparing(name);
     }
 
     static Comparator<Category> defaultComparator() {
