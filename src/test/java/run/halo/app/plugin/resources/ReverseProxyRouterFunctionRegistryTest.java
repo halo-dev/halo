@@ -1,6 +1,9 @@
 package run.halo.app.plugin.resources;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.AfterEach;
@@ -8,10 +11,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.extension.Metadata;
@@ -19,6 +24,8 @@ import run.halo.app.plugin.ExtensionContextRegistry;
 import run.halo.app.plugin.PluginApplicationContext;
 
 /**
+ * Tests for {@link ReverseProxyRouterFunctionRegistry}.
+ *
  * @author guqing
  * @since 2.0.0
  */
@@ -28,7 +35,7 @@ class ReverseProxyRouterFunctionRegistryTest {
     @InjectMocks
     private ReverseProxyRouterFunctionRegistry registry;
 
-    @MockBean
+    @Mock
     private ReverseProxyRouterFunctionFactory reverseProxyRouterFunctionFactory;
 
     @BeforeEach
@@ -48,11 +55,23 @@ class ReverseProxyRouterFunctionRegistryTest {
         Metadata metadata = new Metadata();
         metadata.setName("test-reverse-proxy");
         when(mock.getMetadata()).thenReturn(metadata);
+        RouterFunction<ServerResponse> routerFunction = request -> Mono.empty();
 
         when(reverseProxyRouterFunctionFactory.create(any(), any()))
-            .thenReturn(Mockito.mock(RouterFunction.class));
+            .thenReturn(Mono.just(routerFunction));
         registry.register("fake-plugin", mock)
             .as(StepVerifier::create)
             .verifyComplete();
+
+        assertThat(registry.reverseProxySize("fake-plugin")).isEqualTo(1);
+
+        // repeat register a same reverse proxy
+        registry.register("fake-plugin", mock)
+            .as(StepVerifier::create)
+            .verifyComplete();
+
+        assertThat(registry.reverseProxySize("fake-plugin")).isEqualTo(1);
+
+        verify(reverseProxyRouterFunctionFactory, times(1)).create(any(), any());
     }
 }

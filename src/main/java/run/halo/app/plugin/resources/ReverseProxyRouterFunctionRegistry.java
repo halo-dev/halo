@@ -68,6 +68,14 @@ public class ReverseProxyRouterFunctionRegistry {
     }
 
     /**
+     * Only for test.
+     */
+    protected int reverseProxySize(String pluginId) {
+        List<String> names = pluginIdReverseProxyMap.get(pluginId);
+        return names == null ? 0 : names.size();
+    }
+
+    /**
      * Remove reverse proxy router function by plugin id.
      *
      * @param pluginId plugin id
