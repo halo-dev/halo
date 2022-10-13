@@ -30,6 +30,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -366,18 +367,10 @@ class ReactiveExtensionClientTest {
         when(converter.convertTo(any())).thenReturn(
             createExtensionStore("/registry/fake.halo.run/fakes/fake"));
         when(storeClient.create(any(), any())).thenThrow(DataIntegrityViolationException.class);
-        when(converter.convertFrom(same(FakeExtension.class), any())).thenReturn(fake);
 
         StepVerifier.create(client.create(fake))
-            .expectNext(fake)
-            .verifyComplete();
-
-        verify(converter, times(1)).convertTo(argThat(ext -> {
-            var name = ext.getMetadata().getName();
-            return name.startsWith(ext.getMetadata().getGenerateName());
-        }));
-        verify(storeClient, times(1)).create(eq("/registry/fake.halo.run/fakes/fake"), any());
-        assertNotNull(fake.getMetadata().getCreationTimestamp());
+            .expectErrorMatches(Exceptions::isRetryExhausted)
+            .verify();
     }
 
     @Test

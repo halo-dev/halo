@@ -84,8 +84,9 @@ class JsonExtensionConverterTest {
         fake.setKind("Fake");
         var error = assertThrows(SchemaViolationException.class, () -> converter.convertTo(fake));
         assertEquals(1, error.getErrors().size());
+        var result = error.getErrors().items().get(0);
         // error.getErrors().items().get(0).message();
-        assertTrue(error.getErrors().items().get(0).toString().contains("'name' is required"));
+        assertTrue(result.toString().contains("name, generateName"));
     }
 
     FakeExtension createFakeExtension(String name, Long version) {
