@@ -1,6 +1,7 @@
 package run.halo.app.theme.dialect;
 
 import java.util.Collection;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
@@ -9,6 +10,7 @@ import org.thymeleaf.processor.element.AbstractElementModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import org.thymeleaf.spring6.context.SpringContextUtils;
 import org.thymeleaf.templatemode.TemplateMode;
+import run.halo.app.plugin.ExtensionComponentsFinder;
 
 /**
  * Global head injection processor.
@@ -50,10 +52,6 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
         structureHandler.setLocalVariable(PROCESS_FLAG, true);
 
         // handle <head> tag
-        /*
-         * Obtain the Spring application context.
-         */
-        final ApplicationContext appCtx = SpringContextUtils.getApplicationContext(context);
 
         /*
          * Create the DOM structure that will be substituting our custom tag.
@@ -65,7 +63,8 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
 
         // apply processors to modelToInsert
         Collection<TemplateHeadProcessor> templateHeadProcessors =
-            getTemplateHeadProcessors(appCtx);
+            getTemplateHeadProcessors(context);
+
         for (TemplateHeadProcessor processor : templateHeadProcessors) {
             processor.process(context, modelToInsert, structureHandler)
                 .block();
@@ -75,8 +74,18 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
         model.insertModel(model.size() - 1, modelToInsert);
     }
 
-    private Collection<TemplateHeadProcessor> getTemplateHeadProcessors(ApplicationContext ctx) {
-        return ctx.getBeansOfType(TemplateHeadProcessor.class)
-            .values();
+    private ExtensionComponentsFinder extensionComponentsFinder(ITemplateContext context) {
+        final ApplicationContext appCtx = SpringContextUtils.getApplicationContext(context);
+        return appCtx.getBean(ExtensionComponentsFinder.class);
+    }
+
+    private Collection<TemplateHeadProcessor> getTemplateHeadProcessors(ITemplateContext context) {
+        try {
+            ExtensionComponentsFinder componentsFinder = extensionComponentsFinder(context);
+            return componentsFinder.getExtensions(TemplateHeadProcessor.class);
+        } catch (NoSuchBeanDefinitionException e) {
+            ApplicationContext appCtx = SpringContextUtils.getApplicationContext(context);
+            return appCtx.getBeansOfType(TemplateHeadProcessor.class).values();
+        }
     }
 }
