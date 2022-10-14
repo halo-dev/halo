@@ -5,7 +5,7 @@
     "prepare": "husky install",
     "dev": "vite --host",
     "build": "vue-tsc --noEmit && vite build",
-    "build:packages": "pnpm --filter './packages/**' build",
+    "build:packages": "pnpm --filter \"./packages/**\" build",
     "preview": "vite preview --port 5050",
     "test:unit": "vitest --environment jsdom --run && pnpm run test:unit:packages",
     "test:unit:watch": "vitest --environment jsdom --watch",
@@ -16,10 +16,10 @@
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false && pnpm run typecheck:packages",
     "lint": "eslint ./src --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore && pnpm run lint:packages",
     "prettier": "prettier --write './src/**/*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}' && pnpm run prettier:packages",
-    "typecheck:packages": "pnpm --parallel --filter './packages/**' run typecheck",
-    "lint:packages": "pnpm --parallel --filter './packages/**' lint",
-    "prettier:packages": "pnpm --parallel --filter './packages/**' prettier",
-    "test:unit:packages": "pnpm --parallel --filter './packages/**' run test:unit"
+    "typecheck:packages": "pnpm --parallel --filter \"./packages/**\" run typecheck",
+    "lint:packages": "pnpm --parallel --filter \"./packages/**\" lint",
+    "prettier:packages": "pnpm --parallel --filter \"./packages/**\" prettier",
+    "test:unit:packages": "pnpm --parallel --filter \"./packages/**\" run test:unit"
   },
   "workspaces": [
     "packages/*"
