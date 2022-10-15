@@ -110,7 +110,7 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer>
     }
 
     @Override
-    public Map<Integer, List<Tag>> listTagListMapBy(Collection<Integer> postIds) {
+    public Map<Integer, List<TagWithPostCountDTO>> listTagListMapBy(Collection<Integer> postIds) {
         if (CollectionUtils.isEmpty(postIds)) {
             return Collections.emptyMap();
         }
@@ -123,12 +123,24 @@ public class PostTagServiceImpl extends AbstractCrudService<PostTag, Integer>
 
         // Find all tags
         List<Tag> tags = tagRepository.findAllById(tagIds);
+        // Find all post count
+        Map<Integer, Long> tagPostCountMap = ServiceUtils
+            .convertToMap(postTagRepository.findPostCountByTagIds(tagIds), TagPostPostCountProjection::getTagId,
+                TagPostPostCountProjection::getPostCount);
+        List<TagWithPostCountDTO> tagWithPostCountList = tags.stream().map(
+            tag -> {
+                TagWithPostCountDTO tagWithCountOutputDTO =
+                    new TagWithPostCountDTO().convertFrom(tag);
+                tagWithCountOutputDTO.setPostCount(tagPostCountMap.getOrDefault(tag.getId(), 0L));
+                return tagWithCountOutputDTO;
+            }
+        ).collect(Collectors.toList());
 
         // Convert to tag map
-        Map<Integer, Tag> tagMap = ServiceUtils.convertToMap(tags, Tag::getId);
+        Map<Integer, TagWithPostCountDTO> tagMap = ServiceUtils.convertToMap(tagWithPostCountList, TagWithPostCountDTO::getId);
 
         // Create tag list map
-        Map<Integer, List<Tag>> tagListMap = new HashMap<>();
+        Map<Integer, List<TagWithPostCountDTO>> tagListMap = new HashMap<>();
 
         // Foreach and collect
         postTags.forEach(

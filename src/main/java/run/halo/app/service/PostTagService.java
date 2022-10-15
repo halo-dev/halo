@@ -51,7 +51,7 @@ public interface PostTagService extends CrudService<PostTag, Integer> {
      * @return tag map (key: postId, value: a list of tags)
      */
     @NonNull
-    Map<Integer, List<Tag>> listTagListMapBy(@Nullable Collection<Integer> postIds);
+    Map<Integer, List<TagWithPostCountDTO>> listTagListMapBy(@Nullable Collection<Integer> postIds);
 
     /**
      * Lists posts by tag id.

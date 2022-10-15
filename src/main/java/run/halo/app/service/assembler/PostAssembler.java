@@ -18,6 +18,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.model.dto.TagWithPostCountDTO;
 import run.halo.app.model.dto.post.BasePostMinimalDTO;
 import run.halo.app.model.entity.Category;
 import run.halo.app.model.entity.Content.PatchedContent;
@@ -150,7 +151,7 @@ public class PostAssembler extends BasePostAssembler<Post> {
         Set<Integer> postIds = ServiceUtils.fetchProperty(posts, Post::getId);
 
         // Get tag list map
-        Map<Integer, List<Tag>> tagListMap = postTagService.listTagListMapBy(postIds);
+        Map<Integer, List<TagWithPostCountDTO>> tagListMap = postTagService.listTagListMapBy(postIds);
 
         // Get category list map
         Map<Integer, List<Category>> categoryListMap = postCategoryService
@@ -175,7 +176,6 @@ public class PostAssembler extends BasePostAssembler<Post> {
                 .orElseGet(LinkedList::new)
                 .stream()
                 .filter(Objects::nonNull)
-                .map(tagService::convertTo)
                 .collect(Collectors.toList()));
 
             // Set categories
@@ -210,7 +210,7 @@ public class PostAssembler extends BasePostAssembler<Post> {
         Set<Integer> postIds = ServiceUtils.fetchProperty(posts, Post::getId);
 
         // Get tag list map
-        Map<Integer, List<Tag>> tagListMap = postTagService.listTagListMapBy(postIds);
+        Map<Integer, List<TagWithPostCountDTO>> tagListMap = postTagService.listTagListMapBy(postIds);
 
         // Get category list map
         Map<Integer, List<Category>> categoryListMap = postCategoryService
@@ -235,7 +235,6 @@ public class PostAssembler extends BasePostAssembler<Post> {
                 .orElseGet(LinkedList::new)
                 .stream()
                 .filter(Objects::nonNull)
-                .map(tagService::convertTo)
                 .collect(Collectors.toList()));
 
             // Set categories

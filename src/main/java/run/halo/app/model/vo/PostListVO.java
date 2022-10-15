@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import run.halo.app.model.dto.CategoryDTO;
 import run.halo.app.model.dto.TagDTO;
+import run.halo.app.model.dto.TagWithPostCountDTO;
 import run.halo.app.model.dto.post.BasePostSimpleDTO;
 
 /**
@@ -22,7 +23,7 @@ public class PostListVO extends BasePostSimpleDTO {
 
     private Long commentCount;
 
-    private List<TagDTO> tags;
+    private List<TagWithPostCountDTO> tags;
 
     private List<CategoryDTO> categories;
 
