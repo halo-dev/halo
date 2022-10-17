@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import run.halo.app.core.extension.Category;
 import run.halo.app.extension.ListResult;
-import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.Finder;
@@ -90,35 +89,7 @@ public class CategoryFinderImpl implements CategoryFinder {
                 }
             }
         });
-        List<CategoryTreeVo> categoryTreeVos = listToTree(nameIdentityMap.values());
-        if (log.isTraceEnabled()) {
-            log.trace(visualizeTree(categoryTreeVos));
-        }
-        nameIdentityMap.clear();
-        return categoryTreeVos;
-    }
-
-    /**
-     * Visualize a tree.
-     */
-    public static String visualizeTree(List<CategoryTreeVo> categoryTreeVos) {
-        Category.CategorySpec categorySpec = new Category.CategorySpec();
-        categorySpec.setSlug("/");
-        categorySpec.setDisplayName("全部");
-        Integer postCount = categoryTreeVos.stream()
-            .map(CategoryTreeVo::getPostCount)
-            .filter(Objects::nonNull)
-            .reduce(Integer::sum)
-            .orElse(0);
-        CategoryTreeVo root = CategoryTreeVo.builder()
-            .spec(categorySpec)
-            .postCount(postCount)
-            .children(categoryTreeVos)
-            .metadata(new Metadata())
-            .build();
-        StringBuilder stringBuilder = new StringBuilder();
-        root.print(stringBuilder, "", "");
-        return stringBuilder.toString();
+        return listToTree(nameIdentityMap.values());
     }
 
     static List<CategoryTreeVo> listToTree(Collection<CategoryTreeVo> list) {

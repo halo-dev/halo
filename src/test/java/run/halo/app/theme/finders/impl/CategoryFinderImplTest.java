@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -110,7 +111,7 @@ class CategoryFinderImplTest {
         when(client.list(eq(Category.class), eq(null), any()))
             .thenReturn(Flux.fromIterable(moreCategories()));
         List<CategoryTreeVo> treeVos = categoryFinder.listAsTree();
-        String s = CategoryFinderImpl.visualizeTree(treeVos);
+        String s = visualizeTree(treeVos);
         assertThat(s).isEqualTo("""
             全部 (5)
             ├── FIT2CLOUD (2)
@@ -166,6 +167,30 @@ class CategoryFinderImplTest {
         h.getSpec().setChildren(null);
         return List.of(d, e, a, b, c, g, f, h);
     }
+
+    /**
+     * Visualize a tree.
+     */
+    String visualizeTree(List<CategoryTreeVo> categoryTreeVos) {
+        Category.CategorySpec categorySpec = new Category.CategorySpec();
+        categorySpec.setSlug("/");
+        categorySpec.setDisplayName("全部");
+        Integer postCount = categoryTreeVos.stream()
+            .map(CategoryTreeVo::getPostCount)
+            .filter(Objects::nonNull)
+            .reduce(Integer::sum)
+            .orElse(0);
+        CategoryTreeVo root = CategoryTreeVo.builder()
+            .spec(categorySpec)
+            .postCount(postCount)
+            .children(categoryTreeVos)
+            .metadata(new Metadata())
+            .build();
+        StringBuilder stringBuilder = new StringBuilder();
+        root.print(stringBuilder, "", "");
+        return stringBuilder.toString();
+    }
+
 
     private List<Category> categories() {
         Category category2 = JsonUtils.deepCopy(category());
