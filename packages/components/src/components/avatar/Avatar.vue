@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { IconErrorWarning } from "../../icons/icons";
 import type { Size } from "./interface";
-import { useImage } from "@vueuse/core";
-import { IconUserLine } from "@/icons/icons";
 
 const props = withDefaults(
   defineProps<{
@@ -16,12 +15,40 @@ const props = withDefaults(
   {
     src: undefined,
     alt: undefined,
-    size: undefined,
+    size: "md",
     width: undefined,
     height: undefined,
     circle: false,
   }
 );
+
+const isLoading = ref(false);
+const error = ref(false);
+
+const loadImage = async () => {
+  const image = new Image();
+  image.src = props.src;
+  return new Promise((resolve, reject) => {
+    image.onload = () => resolve(image);
+    image.onerror = (err) => reject(err);
+  });
+};
+
+onMounted(async () => {
+  if (!props.src) {
+    error.value = true;
+    return;
+  }
+
+  isLoading.value = true;
+  try {
+    await loadImage();
+  } catch (e) {
+    error.value = true;
+  } finally {
+    isLoading.value = false;
+  }
+});
 
 const classes = computed(() => {
   const result = [`avatar-${props.circle ? "circle" : "square"}`];
@@ -42,13 +69,49 @@ const styles = computed(() => {
   return result;
 });
 
-const { isLoading, error } = useImage({ src: props.src });
+const placeholderText = computed(() => {
+  if (!props.alt) {
+    return undefined;
+  }
+  const words = props.alt.split(" ");
+  if (words.length === 1) {
+    return words[0].charAt(0).toUpperCase();
+  }
+  if (words.length > 1) {
+    return words[0].charAt(0).toUpperCase() + words[1].charAt(0).toUpperCase();
+  }
+  return undefined;
+});
 </script>
 
 <template>
   <div class="avatar-wrapper" :class="classes" :style="styles">
-    <div v-if="isLoading || error" class="w-full h-full">
-      <IconUserLine class="w-full h-full" />
+    <div v-if="isLoading || error" class="avatar-fallback">
+      <svg
+        v-if="isLoading"
+        class="avatar-loading"
+        fill="none"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"
+        ></circle>
+        <path
+          class="opacity-75"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          fill="currentColor"
+        ></path>
+      </svg>
+      <span v-else-if="placeholderText" class="avatar-placeholder">
+        {{ placeholderText }}
+      </span>
+      <IconErrorWarning v-else class="avatar-error" />
     </div>
     <img v-else :src="src" :alt="alt" />
   </div>
@@ -56,10 +119,26 @@ const { isLoading, error } = useImage({ src: props.src });
 
 <style lang="scss">
 .avatar-wrapper {
-  @apply inline-flex items-center justify-center overflow-hidden bg-white;
+  @apply inline-flex items-center justify-center overflow-hidden bg-gray-100;
 
   img {
     @apply w-full h-full object-cover;
+  }
+
+  .avatar-fallback {
+    @apply w-full h-full flex items-center justify-center;
+  }
+
+  .avatar-loading {
+    @apply animate-spin w-5 h-5;
+  }
+
+  .avatar-placeholder {
+    @apply text-sm text-gray-800 font-medium;
+  }
+
+  .avatar-error {
+    @apply w-5 h-5 text-red-500;
   }
 
   &.avatar-circle {
@@ -72,10 +151,18 @@ const { isLoading, error } = useImage({ src: props.src });
 
   &.avatar-xs {
     @apply w-6 h-6;
+
+    .avatar-placeholder {
+      @apply text-xs;
+    }
   }
 
   &.avatar-sm {
     @apply w-8 h-8;
+
+    .avatar-placeholder {
+      @apply text-xs;
+    }
   }
 
   &.avatar-md {

@@ -93,6 +93,7 @@ const handleTabChange = (id: string) => {
             <div class="h-24 w-24 sm:h-32 sm:w-32">
               <VAvatar
                 :src="user?.spec?.avatar"
+                :alt="user?.spec?.displayName"
                 circle
                 width="100%"
                 height="100%"

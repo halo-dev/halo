@@ -104,7 +104,12 @@ const isHoveredReply = computed(() => {
     <template #start>
       <VEntityField>
         <template #description>
-          <VAvatar circle :src="reply?.owner.avatar" size="md"></VAvatar>
+          <VAvatar
+            circle
+            :src="reply?.owner.avatar"
+            :alt="reply?.owner.displayName"
+            size="md"
+          ></VAvatar>
         </template>
       </VEntityField>
       <VEntityField
