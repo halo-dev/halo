@@ -22,8 +22,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
+import org.springframework.web.reactive.function.server.ServerResponse;
+import run.halo.app.plugin.resources.BundleResourceUtils;
 
 /**
  * Plugin autoconfiguration for Spring Boot.
@@ -149,5 +154,23 @@ public class PluginAutoConfiguration {
         pluginManager.setExactVersionAllowed(pluginProperties.isExactVersionAllowed());
         pluginManager.setSystemVersion(pluginProperties.getSystemVersion());
         return pluginManager;
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> pluginJsBundleRoute(HaloPluginManager haloPluginManager) {
+        return RouterFunctions.route()
+            .GET("/plugins/{name}/assets/console/{*resource}", request -> {
+                String pluginName = request.pathVariable("name");
+                String fileName = request.pathVariable("resource");
+
+                Resource jsBundleResource =
+                    BundleResourceUtils.getJsBundleResource(haloPluginManager, pluginName,
+                        fileName);
+                if (jsBundleResource == null) {
+                    return ServerResponse.notFound().build();
+                }
+                return ServerResponse.ok().bodyValue(jsBundleResource);
+            })
+            .build();
     }
 }

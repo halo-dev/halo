@@ -57,7 +57,6 @@ import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.plugin.ExtensionComponentsFinder;
 import run.halo.app.plugin.HaloPluginManager;
-import run.halo.app.plugin.resources.JsBundleRuleProvider;
 import run.halo.app.plugin.resources.ReverseProxyRouterFunctionRegistry;
 import run.halo.app.theme.router.TemplateRouteManager;
 
@@ -116,10 +115,9 @@ public class ExtensionConfiguration {
         }
 
         @Bean
-        Controller pluginController(ExtensionClient client, HaloPluginManager haloPluginManager,
-            JsBundleRuleProvider jsBundleRule) {
+        Controller pluginController(ExtensionClient client, HaloPluginManager haloPluginManager) {
             return new ControllerBuilder("plugin-controller", client)
-                .reconciler(new PluginReconciler(client, haloPluginManager, jsBundleRule))
+                .reconciler(new PluginReconciler(client, haloPluginManager))
                 .extension(new Plugin())
                 .build();
         }
