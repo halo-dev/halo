@@ -69,15 +69,14 @@ export function useAttachmentControl(filterOptions?: {
   const handleFetchAttachments = async () => {
     try {
       loading.value = true;
-      const { data } =
-        await apiClient.extension.storage.attachment.searchAttachments({
-          policy: policy?.value?.metadata.name,
-          displayName: keyword?.value,
-          group: group?.value?.metadata.name,
-          uploadedBy: user?.value?.metadata.name,
-          page: attachments.value.page,
-          size: attachments.value.size,
-        });
+      const { data } = await apiClient.attachment.searchAttachments({
+        policy: policy?.value?.metadata.name,
+        displayName: keyword?.value,
+        group: group?.value?.metadata.name,
+        uploadedBy: user?.value?.metadata.name,
+        page: attachments.value.page,
+        size: attachments.value.size,
+      });
       attachments.value = data;
     } catch (e) {
       console.error("Failed to fetch attachments", e);

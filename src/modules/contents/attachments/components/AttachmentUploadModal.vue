@@ -59,7 +59,7 @@ const onVisibleChange = (visible: boolean) => {
 
 const uploadHandler = computed(() => {
   return (file, config) =>
-    apiClient.extension.storage.attachment.uploadAttachment(
+    apiClient.attachment.uploadAttachment(
       {
         file,
         policyName: selectedPolicy.value?.metadata.name as string,

@@ -71,7 +71,7 @@ const selectedAttachments = ref<Set<Attachment>>(new Set<Attachment>());
 
 const uploadHandler = computed(() => {
   return (file, config) =>
-    apiClient.extension.storage.attachment.uploadAttachment(
+    apiClient.attachment.uploadAttachment(
       {
         file,
         policyName: selectedPolicy.value,
