@@ -1,9 +1,11 @@
 package run.halo.app.theme.finders.vo;
 
+import java.util.Iterator;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.extension.MetadataOperator;
 
@@ -29,6 +31,16 @@ public class MenuItemVo {
     String parentName;
 
     /**
+     * Gets menu item's display name.
+     */
+    public String getDisplayName() {
+        if (status != null && StringUtils.isNotBlank(status.getDisplayName())) {
+            return status.getDisplayName();
+        }
+        return spec.getDisplayName();
+    }
+
+    /**
      * Convert {@link MenuItem} to {@link MenuItemVo}.
      *
      * @param menuItem menu item extension
@@ -42,5 +54,22 @@ public class MenuItemVo {
             .status(status)
             .children(List.of())
             .build();
+    }
+
+    void print(StringBuilder buffer, String prefix, String childrenPrefix) {
+        buffer.append(prefix);
+        buffer.append(getDisplayName());
+        buffer.append('\n');
+        if (children == null) {
+            return;
+        }
+        for (Iterator<MenuItemVo> it = children.iterator(); it.hasNext(); ) {
+            MenuItemVo next = it.next();
+            if (it.hasNext()) {
+                next.print(buffer, childrenPrefix + "├── ", childrenPrefix + "│   ");
+            } else {
+                next.print(buffer, childrenPrefix + "└── ", childrenPrefix + "    ");
+            }
+        }
     }
 }
