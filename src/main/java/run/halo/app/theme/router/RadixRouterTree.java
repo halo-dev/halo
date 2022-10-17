@@ -77,18 +77,37 @@ public class RadixRouterTree extends RadixTree<HandlerFunction<ServerResponse>> 
         }
 
         PathContainer pathContainer = PathContainer.parsePath(path);
-        List<String> pathPatterns = getKeys();
-        for (String pathPattern : pathPatterns) {
+
+        List<PathPattern> matches = new ArrayList<>();
+        for (String pathPattern : getKeys()) {
             if (!hasPatternSyntax(pathPattern)) {
                 continue;
             }
             log.trace("PathPatternParser handle pathPattern [{}]", pathPattern);
             PathPattern parse = PathPatternParser.defaultInstance.parse(pathPattern);
             if (parse.matches(pathContainer)) {
-                return find(pathPattern);
+                matches.add(parse);
             }
         }
-        return null;
+
+        if (matches.isEmpty()) {
+            return null;
+        }
+        matches.sort(PathPattern.SPECIFICITY_COMPARATOR);
+        PathPattern bestMatch = matches.get(0);
+        if (matches.size() > 1) {
+            if (log.isTraceEnabled()) {
+                log.trace("request [GET {}] matching mappings: [{}]", path, matches);
+            }
+            PathPattern secondBestMatch = matches.get(1);
+            if (PathPattern.SPECIFICITY_COMPARATOR.compare(bestMatch, secondBestMatch) == 0) {
+                throw new IllegalStateException(
+                    "Ambiguous mapping mapped for '" + path + "': {" + bestMatch + ", "
+                        + secondBestMatch + "}");
+            }
+        }
+
+        return find(bestMatch.getPatternString());
     }
 
     private String processRequestPath(String requestPath) {

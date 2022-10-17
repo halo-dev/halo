@@ -3,11 +3,13 @@ package run.halo.app.theme.router;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.lang.Nullable;
@@ -17,7 +19,9 @@ import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.util.UriUtils;
+import run.halo.app.core.extension.reconciler.SystemSettingReconciler;
 import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.properties.HaloProperties;
@@ -37,9 +41,10 @@ import run.halo.app.theme.router.strategy.ListPageRouteHandlerStrategy;
 public class PermalinkHttpGetRouter implements InitializingBean {
     private static final ReentrantLock LOCK = new ReentrantLock();
     private final RadixRouterTree routeTree = new RadixRouterTree();
-    private SystemConfigurableEnvironmentFetcher environmentFetcher;
-    private ApplicationContext applicationContext;
-    private HaloProperties haloProperties;
+    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final ReactiveExtensionClient client;
+    private final ApplicationContext applicationContext;
+    private final HaloProperties haloProperties;
 
     /**
      * Match permalink according to {@link ServerRequest}.
@@ -113,18 +118,36 @@ public class PermalinkHttpGetRouter implements InitializingBean {
             if (StringUtils.isNotBlank(oldRule)) {
                 routeTree.delete(oldRule);
             }
-            ListPageRouteHandlerStrategy routeStrategy = getRouteStrategy(event.getTemplate());
-            if (routeStrategy == null) {
-                return;
-            }
-            List<String> routerPaths = routeStrategy.getRouterPaths(oldRule);
-            routeTreeBatchOperation(routerPaths, routeTree::delete);
-            if (StringUtils.isNotBlank(rule)) {
-                routeTreeBatchOperation(routeStrategy.getRouterPaths(rule),
-                    path -> routeTree.insert(path, routeStrategy.getHandler()));
-            }
+            registerByTemplate(event.getTemplate(), rule);
         } finally {
             LOCK.unlock();
+        }
+    }
+
+    /**
+     * delete theme route old rules to trigger register.
+     */
+    @EventListener(ApplicationReadyEvent.class)
+    public void onApplicationReady() {
+        environmentFetcher.getConfigMap().flatMap(configMap -> {
+            Map<String, String> annotations = configMap.getMetadata().getAnnotations();
+            if (annotations != null) {
+                annotations.remove(SystemSettingReconciler.OLD_THEME_ROUTE_RULES);
+            }
+            return client.update(configMap);
+        }).block();
+    }
+
+    private void registerByTemplate(DefaultTemplateEnum template, String rule) {
+        ListPageRouteHandlerStrategy routeStrategy = getRouteStrategy(template);
+        if (routeStrategy == null) {
+            return;
+        }
+        List<String> routerPaths = routeStrategy.getRouterPaths(rule);
+        routeTreeBatchOperation(routerPaths, routeTree::delete);
+        if (StringUtils.isNotBlank(rule)) {
+            routeTreeBatchOperation(routeStrategy.getRouterPaths(rule),
+                path -> routeTree.insert(path, routeStrategy.getHandler()));
         }
     }
 
