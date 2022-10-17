@@ -117,7 +117,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                         .description("List themes.")
                         .tag(tag)
                         .response(responseBuilder()
-                            .implementationArray(Theme.class));
+                            .implementation(ListResult.generateGenericClass(Theme.class)));
                     QueryParamBuildUtil.buildParametersFromType(builder, ThemeQuery.class);
                 }
             )
