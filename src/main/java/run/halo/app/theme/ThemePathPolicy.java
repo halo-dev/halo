@@ -23,6 +23,10 @@ public class ThemePathPolicy {
     public Path generate(Theme theme) {
         Assert.notNull(theme, "The theme must not be null.");
         String name = theme.getMetadata().getName();
-        return workDir.resolve(THEME_WORK_DIR).resolve(name);
+        return themesDir().resolve(name);
+    }
+
+    public Path themesDir() {
+        return workDir.resolve(ThemePathPolicy.THEME_WORK_DIR);
     }
 }

@@ -18,7 +18,7 @@ rules:
     resources: [ "themes", "themes/reload-setting" ]
     verbs: [ "*" ]
   - nonResourceURLs: [ "/apis/api.console.halo.run/themes/install" ]
-    verbs: [ "post" ]
+    verbs: [ "create" ]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -36,5 +36,6 @@ rules:
     resources: [ "themes" ]
     verbs: [ "get", "list" ]
   - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "singlepages" ]
+    resources: [ "themes" ]
     verbs: [ "get", "list" ]
+

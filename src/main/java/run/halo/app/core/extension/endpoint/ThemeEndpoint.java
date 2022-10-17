@@ -14,8 +14,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -46,8 +49,10 @@ import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
+import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.infra.exception.ThemeInstallationException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.DataBufferUtils;
@@ -106,7 +111,78 @@ public class ThemeEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(Theme.class))
             )
+            .GET("themes", this::listThemes,
+                builder -> {
+                    builder.operationId("ListThemes")
+                        .description("List themes.")
+                        .tag(tag)
+                        .response(responseBuilder()
+                            .implementationArray(Theme.class));
+                    QueryParamBuildUtil.buildParametersFromType(builder, ThemeQuery.class);
+                }
+            )
             .build();
+    }
+
+    public static class ThemeQuery extends PluginEndpoint.ListRequest.QueryListRequest {
+
+        public ThemeQuery(MultiValueMap<String, String> queryParams) {
+            super(queryParams);
+        }
+
+        @NonNull
+        public Boolean getUninstalled() {
+            return Boolean.parseBoolean(queryParams.getFirst("uninstalled"));
+        }
+    }
+
+    Mono<ServerResponse> listThemes(ServerRequest request) {
+        MultiValueMap<String, String> queryParams = request.queryParams();
+        ThemeQuery query = new ThemeQuery(queryParams);
+        return Mono.defer(() -> {
+            if (query.getUninstalled()) {
+                return listUninstalled(query);
+            }
+            return client.list(Theme.class, null, null, query.getPage(), query.getSize());
+        }).flatMap(extensions -> ServerResponse.ok().bodyValue(extensions));
+    }
+
+    Mono<ListResult<Theme>> listUninstalled(ThemeQuery query) {
+        return Mono.just(themePathPolicy.themesDir())
+            .map(ThemeEndpoint::listAllThemesFromThemeDir)
+            .subscribeOn(Schedulers.boundedElastic())
+            .flatMap(this::filterUnInstalledThemes)
+            .map(themes -> {
+                Integer page = query.getPage();
+                Integer size = query.getSize();
+                List<Theme> subList = ListResult.subList(themes, page, size);
+                return new ListResult<>(page, size, themes.size(), subList);
+            });
+    }
+
+    private static List<Theme> listAllThemesFromThemeDir(Path themesDir) {
+        try (Stream<Path> paths = Files.walk(themesDir, 2)) {
+            return paths.filter(Files::isDirectory)
+                .map(themePath -> ThemeUtils.loadUnstructured(themePath,
+                    ThemeUtils.THEME_MANIFESTS))
+                .flatMap(List::stream)
+                .map(unstructured -> Unstructured.OBJECT_MAPPER.convertValue(unstructured,
+                    Theme.class))
+                .sorted(Comparator.comparing(theme -> theme.getMetadata().getName()))
+                .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Mono<List<Theme>> filterUnInstalledThemes(@NonNull List<Theme> allThemes) {
+        return client.list(Theme.class, null, null)
+            .map(theme -> theme.getMetadata().getName())
+            .collectList()
+            .map(installed -> allThemes.stream()
+                .filter(theme -> !installed.contains(theme.getMetadata().getName()))
+                .toList()
+            );
     }
 
     Mono<ServerResponse> reloadSetting(ServerRequest request) {
@@ -238,7 +314,7 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     static class ThemeUtils {
         private static final String THEME_TMP_PREFIX = "halo-theme-";
-        private static final String[] themeManifests = {"theme.yaml", "theme.yml"};
+        public static final String[] THEME_MANIFESTS = {"theme.yaml", "theme.yml"};
 
         private static final String[] THEME_CONFIG = {"config.yaml", "config.yml"};
 
@@ -329,7 +405,7 @@ public class ThemeEndpoint implements CustomEndpoint {
 
         @Nullable
         private static Path resolveThemeManifest(Path tempDirectory) {
-            for (String themeManifest : themeManifests) {
+            for (String themeManifest : THEME_MANIFESTS) {
                 Path path = tempDirectory.resolve(themeManifest);
                 if (Files.exists(path)) {
                     return path;
