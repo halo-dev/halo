@@ -1,7 +1,6 @@
 package run.halo.app.theme.dialect;
 
 import java.util.Collection;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
@@ -74,18 +73,10 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
         model.insertModel(model.size() - 1, modelToInsert);
     }
 
-    private ExtensionComponentsFinder extensionComponentsFinder(ITemplateContext context) {
-        final ApplicationContext appCtx = SpringContextUtils.getApplicationContext(context);
-        return appCtx.getBean(ExtensionComponentsFinder.class);
-    }
-
     private Collection<TemplateHeadProcessor> getTemplateHeadProcessors(ITemplateContext context) {
-        try {
-            ExtensionComponentsFinder componentsFinder = extensionComponentsFinder(context);
-            return componentsFinder.getExtensions(TemplateHeadProcessor.class);
-        } catch (NoSuchBeanDefinitionException e) {
-            ApplicationContext appCtx = SpringContextUtils.getApplicationContext(context);
-            return appCtx.getBeansOfType(TemplateHeadProcessor.class).values();
-        }
+        ApplicationContext appCtx = SpringContextUtils.getApplicationContext(context);
+        ExtensionComponentsFinder componentsFinder =
+            appCtx.getBean(ExtensionComponentsFinder.class);
+        return componentsFinder.getExtensions(TemplateHeadProcessor.class);
     }
 }
