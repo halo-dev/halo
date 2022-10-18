@@ -1,6 +1,5 @@
 package run.halo.app.theme.finders.vo;
 
-import java.util.Iterator;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +17,7 @@ import run.halo.app.extension.MetadataOperator;
 @Data
 @ToString
 @Builder
-public class MenuItemVo {
+public class MenuItemVo implements VisualizableTreeNode<MenuItemVo> {
 
     MetadataOperator metadata;
 
@@ -56,20 +55,8 @@ public class MenuItemVo {
             .build();
     }
 
-    void print(StringBuilder buffer, String prefix, String childrenPrefix) {
-        buffer.append(prefix);
-        buffer.append(getDisplayName());
-        buffer.append('\n');
-        if (children == null) {
-            return;
-        }
-        for (Iterator<MenuItemVo> it = children.iterator(); it.hasNext(); ) {
-            MenuItemVo next = it.next();
-            if (it.hasNext()) {
-                next.print(buffer, childrenPrefix + "├── ", childrenPrefix + "│   ");
-            } else {
-                next.print(buffer, childrenPrefix + "└── ", childrenPrefix + "    ");
-            }
-        }
+    @Override
+    public String nodeText() {
+        return getDisplayName();
     }
 }
