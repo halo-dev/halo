@@ -1,5 +1,6 @@
 package run.halo.app.theme.finders.vo;
 
+import java.util.Iterator;
 import java.util.List;
 import lombok.Builder;
 import lombok.ToString;
@@ -38,5 +39,21 @@ public class MenuVo {
             .spec(menu.getSpec())
             .menuItems(List.of())
             .build();
+    }
+
+    public void print(StringBuilder buffer) {
+        buffer.append(getSpec().getDisplayName());
+        buffer.append('\n');
+        if (menuItems == null) {
+            return;
+        }
+        for (Iterator<MenuItemVo> it = menuItems.iterator(); it.hasNext(); ) {
+            MenuItemVo next = it.next();
+            if (it.hasNext()) {
+                next.print(buffer, "├── ", "│   ");
+            } else {
+                next.print(buffer, "└── ", "    ");
+            }
+        }
     }
 }

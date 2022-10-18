@@ -1,19 +1,18 @@
 package run.halo.app.theme.finders.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
-import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.skyscreamer.jsonassert.JSONAssert;
 import reactor.core.publisher.Flux;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
@@ -21,7 +20,6 @@ import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.finders.vo.MenuVo;
 
 /**
@@ -44,7 +42,7 @@ class MenuFinderImplTest {
     }
 
     @Test
-    void listAsTree() throws JSONException {
+    void listAsTree() {
         Tuple2<List<Menu>, List<MenuItem>> tuple = testTree();
         Mockito.when(client.list(eq(Menu.class), eq(null), eq(null)))
             .thenReturn(Flux.fromIterable(tuple.getT1()));
@@ -52,141 +50,29 @@ class MenuFinderImplTest {
             .thenReturn(Flux.fromIterable(tuple.getT2()));
 
         List<MenuVo> menuVos = menuFinder.listAsTree();
-        JSONAssert.assertEquals("""
-                [
-                     {
-                         "metadata": {
-                             "name": "D"
-                         },
-                         "spec": {
-                             "displayName": "D",
-                             "menuItems": [
-                                 "E"
-                             ]
-                         },
-                         "menuItems": [
-                             {
-                                 "metadata": {
-                                     "name": "E"
-                                 },
-                                 "spec": {
-                                     "displayName": "E",
-                                     "priority": 0,
-                                     "children": [
-                                         "A",
-                                         "C"
-                                     ]
-                                 },
-                                 "status": {},
-                                 "children": [
-                                     {
-                                         "metadata": {
-                                             "name": "A"
-                                         },
-                                         "spec": {
-                                             "displayName": "A",
-                                             "priority": 0,
-                                             "children": [
-                                                 "B"
-                                             ]
-                                         },
-                                         "status": {},
-                                         "children": [
-                                             {
-                                                 "metadata": {
-                                                     "name": "B"
-                                                 },
-                                                 "spec": {
-                                                     "displayName": "B",
-                                                     "priority": 0
-                                                 },
-                                                 "status": {},
-                                                 "parentName": "A"
-                                             }
-                                         ],
-                                         "parentName": "E"
-                                     },
-                                     {
-                                         "metadata": {
-                                             "name": "C"
-                                         },
-                                         "spec": {
-                                             "displayName": "C",
-                                             "priority": 0
-                                         },
-                                         "status": {},
-                                         "parentName": "E"
-                                     }
-                                 ]
-                             }
-                         ]
-                     },
-                     {
-                         "metadata": {
-                             "name": "X"
-                         },
-                         "spec": {
-                             "displayName": "X",
-                             "menuItems": [
-                                 "G"
-                             ]
-                         },
-                         "menuItems": [
-                             {
-                                 "metadata": {
-                                     "name": "G"
-                                 },
-                                 "spec": {
-                                     "displayName": "G",
-                                     "priority": 0
-                                 },
-                                 "status": {}
-                             }
-                         ]
-                     },
-                     {
-                         "metadata": {
-                             "name": "Y"
-                         },
-                         "spec": {
-                             "displayName": "Y",
-                             "menuItems": [
-                                 "F"
-                             ]
-                         },
-                         "menuItems": [
-                             {
-                                 "metadata": {
-                                     "name": "F"
-                                 },
-                                 "spec": {
-                                     "displayName": "F",
-                                     "priority": 0,
-                                     "children": [
-                                         "H"
-                                     ]
-                                 },
-                                 "status": {},
-                                 "children": [
-                                     {
-                                         "metadata": {
-                                             "name": "H"
-                                         },
-                                         "spec": {
-                                             "displayName": "H",
-                                             "priority": 0
-                                         },
-                                         "status": {},
-                                         "parentName": "F"
-                                     }
-                                 ]
-                             }
-                         ]
-                     }
-                ]
-                """,
-            JsonUtils.objectToJson(menuVos),
-            true);
+        assertThat(visualizeTree(menuVos)).isEqualTo("""
+            D
+            └── E
+                ├── A
+                │   └── B
+                └── C
+            X
+            └── G
+            Y
+            └── F
+                └── H
+            """);
+    }
+
+    /**
+     * Visualize a tree.
+     */
+    String visualizeTree(List<MenuVo> menuVos) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (MenuVo menuVo : menuVos) {
+            menuVo.print(stringBuilder);
+        }
+        return stringBuilder.toString();
     }
 
     Tuple2<List<Menu>, List<MenuItem>> testTree() {
