@@ -59,6 +59,11 @@ public class CounterMeterHandler implements DisposableBean {
                     MeterUtils.upvoteCounter(meterRegistry, name);
                 upvoteCounter.increment(nullSafe(counter.getUpvote()));
 
+                // downvote counter
+                io.micrometer.core.instrument.Counter downvoteCounter =
+                    MeterUtils.downvoteCounter(meterRegistry, name);
+                downvoteCounter.increment(nullSafe(counter.getDownvote()));
+
                 // total comment counter
                 io.micrometer.core.instrument.Counter totalCommentCounter =
                     MeterUtils.totalCommentCounter(meterRegistry, name);

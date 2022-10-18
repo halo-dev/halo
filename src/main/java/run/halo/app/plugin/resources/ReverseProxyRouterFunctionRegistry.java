@@ -47,7 +47,12 @@ public class ReverseProxyRouterFunctionRegistry {
         final String proxyName = reverseProxy.getMetadata().getName();
         long stamp = lock.writeLock();
         try {
+            List<String> reverseProxyNames = pluginIdReverseProxyMap.get(pluginId);
+            if (reverseProxyNames != null && reverseProxyNames.contains(proxyName)) {
+                return Mono.empty();
+            }
             pluginIdReverseProxyMap.add(pluginId, proxyName);
+
             // Obtain plugin application context
             PluginApplicationContext pluginApplicationContext =
                 ExtensionContextRegistry.getInstance().getByPluginId(pluginId);
@@ -60,6 +65,14 @@ public class ReverseProxyRouterFunctionRegistry {
         } finally {
             lock.unlockWrite(stamp);
         }
+    }
+
+    /**
+     * Only for test.
+     */
+    protected int reverseProxySize(String pluginId) {
+        List<String> names = pluginIdReverseProxyMap.get(pluginId);
+        return names == null ? 0 : names.size();
     }
 
     /**

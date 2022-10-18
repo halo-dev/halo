@@ -125,7 +125,7 @@ public class RbacRequestEvaluation {
             if (Objects.equals(ruleURL, requestedURL)) {
                 return true;
             }
-            if (StringUtils.startsWith(ruleURL, WildCard.NonResourceAll)
+            if (StringUtils.endsWith(ruleURL, WildCard.NonResourceAll)
                 && StringUtils.startsWith(requestedURL,
                 StringUtils.stripEnd(ruleURL, WildCard.NonResourceAll))) {
                 return true;

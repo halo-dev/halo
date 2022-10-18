@@ -100,6 +100,15 @@ class MeterUtilsTest {
     }
 
     @Test
+    void isDownvoteCounter() {
+        MeterRegistry meterRegistry = new SimpleMeterRegistry();
+        Counter downvoteCounter =
+            MeterUtils.downvoteCounter(meterRegistry, "posts.content.halo.run/fake-post");
+        assertThat(MeterUtils.isDownvoteCounter(downvoteCounter)).isTrue();
+        assertThat(MeterUtils.isVisitCounter(downvoteCounter)).isFalse();
+    }
+
+    @Test
     void isTotalCommentCounter() {
         MeterRegistry meterRegistry = new SimpleMeterRegistry();
         Counter totalCommentCounter =

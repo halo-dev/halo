@@ -12,5 +12,5 @@ rules:
   - apiGroups: [ "api.halo.run" ]
     resources: [ "*" ]
     verbs: [ "*" ]
-  - nonResourceURLs: [ "/apis/api.halo.run/v1alpha1/trackers/counter" ]
+  - nonResourceURLs: [ "/apis/api.halo.run/v1alpha1/trackers/*" ]
     verbs: [ "create" ]

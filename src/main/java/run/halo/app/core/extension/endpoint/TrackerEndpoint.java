@@ -43,7 +43,7 @@ public class TrackerEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "api.halo.run/v1alpha1/Tracker";
         return SpringdocRouteBuilder.route()
-            .POST("trackers/counter", this::increase,
+            .POST("trackers/counter", this::increaseVisit,
                 builder -> builder.operationId("count")
                     .description("Count an extension resource visits.")
                     .tag(tag)
@@ -55,12 +55,40 @@ public class TrackerEndpoint implements CustomEndpoint {
                                 .implementation(CounterRequest.class))
                         ))
                     .response(responseBuilder()
-                        .implementation(Double.class))
+                        .implementation(Integer.class))
+            )
+            .POST("trackers/upvote", this::upvote,
+                builder -> builder.operationId("upvote")
+                    .description("Upvote an extension resource.")
+                    .tag(tag)
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(Builder.schemaBuilder()
+                                .implementation(VoteRequest.class))
+                        ))
+                    .response(responseBuilder()
+                        .implementation(Integer.class))
+            )
+            .POST("trackers/downvote", this::downvote,
+                builder -> builder.operationId("downvote")
+                    .description("Downvote an extension resource.")
+                    .tag(tag)
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(Builder.schemaBuilder()
+                                .implementation(VoteRequest.class))
+                        ))
+                    .response(responseBuilder()
+                        .implementation(Integer.class))
             )
             .build();
     }
 
-    private Mono<ServerResponse> increase(ServerRequest request) {
+    private Mono<ServerResponse> increaseVisit(ServerRequest request) {
         return request.bodyToMono(CounterRequest.class)
             .switchIfEmpty(
                 Mono.error(new IllegalArgumentException("Counter request body must not be empty")))
@@ -76,6 +104,41 @@ public class TrackerEndpoint implements CustomEndpoint {
                 return (int) counter.count();
             })
             .flatMap(count -> ServerResponse.ok().bodyValue(count));
+    }
+
+    private Mono<ServerResponse> upvote(ServerRequest request) {
+        return request.bodyToMono(VoteRequest.class)
+            .switchIfEmpty(
+                Mono.error(new IllegalArgumentException("Upvote request body must not be empty")))
+            .map(voteRequest -> {
+                String counterName =
+                    MeterUtils.nameOf(voteRequest.group(), voteRequest.plural(),
+                        voteRequest.name());
+
+                Counter counter = MeterUtils.upvoteCounter(meterRegistry, counterName);
+                counter.increment();
+                return (int) counter.count();
+            })
+            .flatMap(count -> ServerResponse.ok().bodyValue(count));
+    }
+
+    private Mono<ServerResponse> downvote(ServerRequest request) {
+        return request.bodyToMono(VoteRequest.class)
+            .switchIfEmpty(
+                Mono.error(new IllegalArgumentException("Downvote request body must not be empty")))
+            .map(voteRequest -> {
+                String counterName =
+                    MeterUtils.nameOf(voteRequest.group(), voteRequest.plural(),
+                        voteRequest.name());
+
+                Counter counter = MeterUtils.downvoteCounter(meterRegistry, counterName);
+                counter.increment();
+                return (int) counter.count();
+            })
+            .flatMap(count -> ServerResponse.ok().bodyValue(count));
+    }
+
+    public record VoteRequest(String group, String plural, String name) {
     }
 
     public record CounterRequest(String group, String plural, String name, String hostname,
