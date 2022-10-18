@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.ArgumentMatchers.same;
@@ -28,6 +29,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -120,10 +123,11 @@ class ReactiveExtensionClientTest {
             () -> client.fetch(UnRegisteredExtension.class, "fake"));
         assertThrows(SchemeNotFoundException.class, () ->
             client.fetch(fromAPIVersionAndKind("fake.halo.run/v1alpha1", "UnRegistered"), "fake"));
-        assertThrows(SchemeNotFoundException.class, () -> {
-            when(converter.convertTo(any())).thenThrow(SchemeNotFoundException.class);
-            client.create(createFakeExtension("fake", null));
-        });
+
+        when(converter.convertTo(any())).thenThrow(SchemeNotFoundException.class);
+        StepVerifier.create(client.create(createFakeExtension("fake", null)))
+            .verifyError(SchemeNotFoundException.class);
+
         assertThrows(SchemeNotFoundException.class, () -> {
             when(converter.convertTo(any())).thenThrow(SchemeNotFoundException.class);
             client.update(createFakeExtension("fake", 1L));
@@ -320,6 +324,53 @@ class ReactiveExtensionClientTest {
         verify(converter, times(1)).convertTo(eq(fake));
         verify(storeClient, times(1)).create(eq("/registry/fake.halo.run/fakes/fake"), any());
         assertNotNull(fake.getMetadata().getCreationTimestamp());
+    }
+
+    @Test
+    void shouldCreateWithGenerateNameSuccessfully() {
+        var fake = createFakeExtension("fake", null);
+        fake.getMetadata().setName("");
+        fake.getMetadata().setGenerateName("fake-");
+        when(converter.convertTo(any())).thenReturn(
+            createExtensionStore("/registry/fake.halo.run/fakes/fake"));
+        when(storeClient.create(any(), any())).thenReturn(
+            Mono.just(createExtensionStore("/registry/fake.halo.run/fakes/fake")));
+        when(converter.convertFrom(same(FakeExtension.class), any())).thenReturn(fake);
+
+        StepVerifier.create(client.create(fake))
+            .expectNext(fake)
+            .verifyComplete();
+
+        verify(converter, times(1)).convertTo(argThat(ext -> {
+            var name = ext.getMetadata().getName();
+            return name.startsWith(ext.getMetadata().getGenerateName());
+        }));
+        verify(storeClient, times(1)).create(eq("/registry/fake.halo.run/fakes/fake"), any());
+        assertNotNull(fake.getMetadata().getCreationTimestamp());
+    }
+
+    @Test
+    void shouldThrowExceptionIfCreatingWithoutGenerateName() {
+        var fake = createFakeExtension("fake", null);
+        fake.getMetadata().setName("");
+        fake.getMetadata().setGenerateName("");
+
+        StepVerifier.create(client.create(fake))
+            .verifyError(IllegalArgumentException.class);
+    }
+
+    @Test
+    void shouldThrowExceptionIfPrimaryKeyDuplicated() {
+        var fake = createFakeExtension("fake", null);
+        fake.getMetadata().setName("");
+        fake.getMetadata().setGenerateName("fake-");
+        when(converter.convertTo(any())).thenReturn(
+            createExtensionStore("/registry/fake.halo.run/fakes/fake"));
+        when(storeClient.create(any(), any())).thenThrow(DataIntegrityViolationException.class);
+
+        StepVerifier.create(client.create(fake))
+            .expectErrorMatches(Exceptions::isRetryExhausted)
+            .verify();
     }
 
     @Test
