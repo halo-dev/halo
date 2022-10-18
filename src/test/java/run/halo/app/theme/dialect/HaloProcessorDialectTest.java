@@ -30,6 +30,7 @@ import run.halo.app.core.extension.Post;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.plugin.ExtensionComponentsFinder;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
@@ -57,6 +58,9 @@ class HaloProcessorDialectTest {
     @Mock
     private SystemConfigurableEnvironmentFetcher fetcher;
 
+    @Mock
+    private ExtensionComponentsFinder extensionComponentsFinder;
+
     private TemplateEngine templateEngine;
 
     @BeforeEach
@@ -70,7 +74,7 @@ class HaloProcessorDialectTest {
         map.put("postTemplateHeadProcessor", new PostTemplateHeadProcessor(postFinder));
         map.put("templateGlobalHeadProcessor", new TemplateGlobalHeadProcessor(fetcher));
         map.put("faviconHeadProcessor", new DefaultFaviconHeadProcessor(fetcher));
-        lenient().when(applicationContext.getBeansOfType(TemplateHeadProcessor.class))
+        lenient().when(applicationContext.getBeansOfType(eq(TemplateHeadProcessor.class)))
             .thenReturn(map);
 
         SystemSetting.CodeInjection codeInjection = new SystemSetting.CodeInjection();
@@ -80,8 +84,14 @@ class HaloProcessorDialectTest {
         when(fetcher.fetch(eq(SystemSetting.CodeInjection.GROUP),
             eq(SystemSetting.CodeInjection.class))).thenReturn(Mono.just(codeInjection));
 
-        when(applicationContext.getBean(SystemConfigurableEnvironmentFetcher.class))
+        when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
             .thenReturn(fetcher);
+
+        when(applicationContext.getBean(eq(ExtensionComponentsFinder.class)))
+            .thenReturn(extensionComponentsFinder);
+
+        when(extensionComponentsFinder.getExtensions(eq(TemplateHeadProcessor.class)))
+            .thenReturn(new ArrayList<>(map.values()));
     }
 
     @Test
