@@ -69,6 +69,7 @@ class HaloProcessorDialectTest {
         Map<String, TemplateHeadProcessor> map = new HashMap<>();
         map.put("postTemplateHeadProcessor", new PostTemplateHeadProcessor(postFinder));
         map.put("templateGlobalHeadProcessor", new TemplateGlobalHeadProcessor(fetcher));
+        map.put("faviconHeadProcessor", new DefaultFaviconHeadProcessor(fetcher));
         lenient().when(applicationContext.getBeansOfType(TemplateHeadProcessor.class))
             .thenReturn(map);
 
@@ -85,6 +86,11 @@ class HaloProcessorDialectTest {
 
     @Test
     void globalHeadAndFooterProcessors() {
+        SystemSetting.Basic basic = new SystemSetting.Basic();
+        basic.setFavicon("favicon.ico");
+        when(fetcher.fetch(eq(SystemSetting.Basic.GROUP),
+            eq(SystemSetting.Basic.class))).thenReturn(Mono.just(basic));
+
         Context context = getContext();
 
         String result = templateEngine.process("index", context);
@@ -95,6 +101,7 @@ class HaloProcessorDialectTest {
                 <meta charset="UTF-8" />
                 <title>Index</title>
               <meta name="global-head-test" content="test" />
+            <link rel="icon" href="favicon.ico" />
             </head>
               <body>
                 <p>index</p>
@@ -123,6 +130,11 @@ class HaloProcessorDialectTest {
             .spec(postSpec)
             .metadata(metadata).build();
         when(postFinder.getByName(eq("fake-post"))).thenReturn(postVo);
+
+        SystemSetting.Basic basic = new SystemSetting.Basic();
+        basic.setFavicon(null);
+        when(fetcher.fetch(eq(SystemSetting.Basic.GROUP),
+            eq(SystemSetting.Basic.class))).thenReturn(Mono.just(basic));
 
         String result = templateEngine.process("post", context);
         assertThat(result).isEqualTo("""
