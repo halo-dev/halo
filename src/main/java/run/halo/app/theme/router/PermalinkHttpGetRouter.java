@@ -22,9 +22,9 @@ import org.springframework.web.util.UriUtils;
 import run.halo.app.core.extension.reconciler.SystemSettingReconciler;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
-import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.strategy.DetailsPageRouteHandlerStrategy;
 import run.halo.app.theme.router.strategy.IndexRouteStrategy;
@@ -39,12 +39,12 @@ import run.halo.app.theme.router.strategy.ListPageRouteHandlerStrategy;
 @Component
 @AllArgsConstructor
 public class PermalinkHttpGetRouter implements InitializingBean {
-    private static final ReentrantLock LOCK = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
     private final RadixRouterTree routeTree = new RadixRouterTree();
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
     private final ReactiveExtensionClient client;
     private final ApplicationContext applicationContext;
-    private final HaloProperties haloProperties;
+    private final ExternalUrlSupplier externalUrlSupplier;
 
     /**
      * Match permalink according to {@link ServerRequest}.
@@ -85,7 +85,7 @@ public class PermalinkHttpGetRouter implements InitializingBean {
         String oldPath = getPath(event.getOldPermalink());
         String path = getPath(event.getPermalink());
         GvkName gvkName = event.getGvkName();
-        LOCK.lock();
+        lock.lock();
         try {
             if (oldPath == null && path != null) {
                 onPermalinkAdded(gvkName, path);
@@ -100,7 +100,7 @@ public class PermalinkHttpGetRouter implements InitializingBean {
                 }
             }
         } finally {
-            LOCK.unlock();
+            lock.unlock();
         }
     }
 
@@ -113,14 +113,14 @@ public class PermalinkHttpGetRouter implements InitializingBean {
     public void onPermalinkRuleChanged(PermalinkRuleChangedEvent event) {
         final String rule = event.getRule();
         final String oldRule = event.getOldRule();
-        LOCK.lock();
+        lock.lock();
         try {
             if (StringUtils.isNotBlank(oldRule)) {
                 routeTree.delete(oldRule);
             }
             registerByTemplate(event.getTemplate(), rule);
         } finally {
-            LOCK.unlock();
+            lock.unlock();
         }
     }
 
@@ -187,7 +187,7 @@ public class PermalinkHttpGetRouter implements InitializingBean {
             return null;
         }
         String decode = UriUtils.decode(permalink, StandardCharsets.UTF_8);
-        URI externalUrl = haloProperties.getExternalUrl();
+        URI externalUrl = externalUrlSupplier.get();
         if (externalUrl != null) {
             String externalAsciiUrl = externalUrl.toASCIIString();
             return StringUtils.prependIfMissing(
