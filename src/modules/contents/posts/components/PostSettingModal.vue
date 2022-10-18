@@ -1,10 +1,8 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace, VTabItem, VTabs } from "@halo-dev/components";
-import { computed, ref, watch, watchEffect } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import type { PostRequest } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
-import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
-import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
 import { apiClient } from "@/utils/api-client";
 import { v4 as uuid } from "uuid";
 
@@ -66,26 +64,6 @@ const formState = ref<PostRequest>(cloneDeep(initialFormState));
 const saving = ref(false);
 const publishing = ref(false);
 const publishCanceling = ref(false);
-
-const { categories, handleFetchCategories } = usePostCategory();
-const categoriesMap = computed(() => {
-  return categories.value.map((category) => {
-    return {
-      value: category.metadata.name,
-      label: category.spec.displayName,
-    };
-  });
-});
-
-const { tags, handleFetchTags } = usePostTag();
-const tagsMap = computed(() => {
-  return tags.value.map((tag) => {
-    return {
-      value: tag.metadata.name,
-      label: tag.spec.displayName,
-    };
-  });
-});
 
 const isUpdateMode = computed(() => {
   return !!formState.value.post.metadata.creationTimestamp;
@@ -180,16 +158,6 @@ const handlePublishCanceling = async () => {
   }
 };
 
-watch(
-  () => props.visible,
-  (visible) => {
-    if (visible) {
-      handleFetchCategories();
-      handleFetchTags();
-    }
-  }
-);
-
 watchEffect(() => {
   if (props.post) {
     formState.value = cloneDeep(props.post);
@@ -233,17 +201,15 @@ watchEffect(() => {
           ></FormKit>
           <FormKit
             v-model="formState.post.spec.categories"
-            :options="categoriesMap"
             label="分类目录"
             name="categories"
-            type="checkbox"
+            type="categoryCheckbox"
           />
           <FormKit
             v-model="formState.post.spec.tags"
-            :options="tagsMap"
             label="标签"
             name="tags"
-            type="checkbox"
+            type="tagCheckbox"
           />
           <FormKit
             v-model="formState.post.spec.excerpt.autoGenerate"

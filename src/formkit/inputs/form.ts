@@ -31,6 +31,7 @@ export const form: FormKitTypeDefinition = {
     "submitBehavior",
     "incompleteMessage",
   ],
+  forceTypeProp: "form",
   /**
    * Additional features that should be added to your input
    */

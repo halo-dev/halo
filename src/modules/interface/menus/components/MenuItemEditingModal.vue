@@ -2,15 +2,12 @@
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { computed, ref, watch } from "vue";
-import type { Menu, MenuItem, Post, SinglePage } from "@halo-dev/api-client";
+import type { Menu, MenuItem } from "@halo-dev/api-client";
 import { v4 as uuid } from "uuid";
 import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
-import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
-import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
 import { setFocus } from "@/formkit/utils/focus";
-import type { FormKitOptionsProp } from "@formkit/inputs";
 
 const props = withDefaults(
   defineProps<{
@@ -47,7 +44,6 @@ const initialFormState: MenuItem = {
   },
 };
 
-const menuItemMap = ref<FormKitOptionsProp>();
 const selectedParentMenuItem = ref<string>("");
 const formState = ref<MenuItem>(cloneDeep(initialFormState));
 const saving = ref(false);
@@ -55,25 +51,6 @@ const saving = ref(false);
 const isUpdateMode = computed(() => {
   return !!formState.value.metadata.creationTimestamp;
 });
-
-const handleFetchMenuItems = async () => {
-  try {
-    const { data } = await apiClient.extension.menuItem.listv1alpha1MenuItem({
-      fieldSelector: [`name=(${props.menu?.spec.menuItems?.join(",")})`],
-    });
-    menuItemMap.value = [
-      { label: "无", value: undefined },
-      ...data.items.map((menuItem) => {
-        return {
-          label: menuItem.status?.displayName as string,
-          value: menuItem.metadata.name,
-        };
-      }),
-    ];
-  } catch (error) {
-    console.log("Failed to fetch menu items", error);
-  }
-};
 
 const handleSaveMenuItem = async () => {
   try {
@@ -244,104 +221,11 @@ const menuItemSources: MenuItemSource[] = [
 
 const selectedMenuItemSource = ref<string>(menuItemSources[0].value);
 
-const { categories, handleFetchCategories } = usePostCategory();
-const { tags, handleFetchTags } = usePostTag();
-const posts = ref<Post[]>([] as Post[]);
-const singlePages = ref<SinglePage[]>([] as SinglePage[]);
-
-const postMap = computed(() => {
-  return [
-    { label: "请选择文章", value: undefined },
-    ...posts.value.map((post) => {
-      return {
-        label: post.spec.title,
-        value: post.metadata.name,
-      };
-    }),
-  ];
-});
-
-const singlePageMap = computed(() => {
-  return [
-    {
-      label: "请选择自定义页面",
-      value: undefined,
-    },
-    ...singlePages.value.map((singlePage) => {
-      return {
-        label: singlePage.spec.title,
-        value: singlePage.metadata.name,
-      };
-    }),
-  ];
-});
-
-const categoryMap = computed(() => {
-  return [
-    {
-      label: "请选择分类",
-      value: undefined,
-    },
-    ...categories.value.map((category) => {
-      return {
-        label: category.spec.displayName,
-        value: category.metadata.name,
-      };
-    }),
-  ];
-});
-
-const tagMap = computed(() => {
-  return [
-    {
-      label: "请选择标签",
-      value: undefined,
-    },
-    ...tags.value.map((tag) => {
-      return {
-        label: tag.spec.displayName,
-        value: tag.metadata.name,
-      };
-    }),
-  ];
-});
-
 const selectedRef = ref<string>("");
-
-const handleFetchPosts = async () => {
-  const { data } =
-    await apiClient.extension.post.listcontentHaloRunV1alpha1Post({
-      page: 0,
-      size: 0,
-    });
-  posts.value = data.items;
-};
-
-const handleFetchSinglePages = async () => {
-  const { data } =
-    await apiClient.extension.singlePage.listcontentHaloRunV1alpha1SinglePage({
-      page: 0,
-      size: 0,
-    });
-  singlePages.value = data.items;
-};
 
 const onMenuItemSourceChange = () => {
   selectedRef.value = "";
 };
-
-watch(
-  () => props.visible,
-  (newValue) => {
-    if (newValue) {
-      handleFetchMenuItems();
-      handleFetchCategories();
-      handleFetchTags();
-      handleFetchPosts();
-      handleFetchSinglePages();
-    }
-  }
-);
 </script>
 <template>
   <VModal
@@ -359,11 +243,12 @@ watch(
       @submit="handleSaveMenuItem"
     >
       <FormKit
-        v-if="!isUpdateMode && menuItemMap"
+        v-if="!isUpdateMode && menu"
         v-model="selectedParentMenuItem"
         label="上级菜单项"
-        type="select"
-        :options="menuItemMap"
+        placeholder="选择上级菜单项"
+        type="menuItemSelect"
+        :menu-items="menu?.spec.menuItems || []"
       />
 
       <FormKit
@@ -397,9 +282,9 @@ watch(
       <FormKit
         v-if="selectedMenuItemSource === 'post'"
         v-model="selectedRef"
+        placeholder="请选择文章"
         label="文章"
-        type="select"
-        :options="postMap"
+        type="postSelect"
         validation="required"
       />
 
@@ -407,26 +292,25 @@ watch(
         v-if="selectedMenuItemSource === 'singlePage'"
         v-model="selectedRef"
         label="自定义页面"
-        type="select"
-        :options="singlePageMap"
+        type="singlePageSelect"
         validation="required"
       />
 
       <FormKit
         v-if="selectedMenuItemSource === 'tag'"
         v-model="selectedRef"
+        placeholder="请选择标签"
         label="标签"
-        type="select"
-        :options="tagMap"
+        type="tagSelect"
         validation="required"
       />
 
       <FormKit
         v-if="selectedMenuItemSource === 'category'"
         v-model="selectedRef"
+        placeholder="请选择分类"
         label="分类"
-        type="select"
-        :options="categoryMap"
+        type="categorySelect"
         validation="required"
       />
     </FormKit>
