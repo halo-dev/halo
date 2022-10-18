@@ -283,7 +283,7 @@ public class RadixTree<T> {
      * @param visitor The Visitor that will be called if a node with "key" as its key is found
      * @param node The Node from where onward to search
      */
-    private <R> void visit(String prefix, Visitor<T, R> visitor,
+    <R> void visit(String prefix, Visitor<T, R> visitor,
         RadixTreeNode<T> parent, RadixTreeNode<T> node) {
         int numberOfMatchingCharacters = node.getNumberOfMatchingCharacters(prefix);
         // if the node key and prefix match, we found a match!

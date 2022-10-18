@@ -2,6 +2,9 @@ package run.halo.app.theme.router;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -129,5 +132,136 @@ class RadixTreeTest {
         boolean replaced = radixTree.replace("/categories/default", "categories-new");
         assertThat(replaced).isTrue();
         assertThat(radixTree.find("/categories/default")).isEqualTo("categories-new");
+    }
+
+    @Test
+    void find() {
+        RadixTree<String> radixTree = new RadixTree<>();
+        for (String testCase : testCases()) {
+            radixTree.insert(testCase, testCase);
+        }
+
+        for (String testCase : testCases()) {
+            String s = radixTree.find(testCase);
+            assertThat(s).isEqualTo(testCase);
+        }
+    }
+
+    @Test
+    void visitTimes() {
+        AtomicInteger visitCount = new AtomicInteger(0);
+        RadixTree<String> radixTree = new RadixTree<>() {
+            @Override
+            protected <R> void visit(String prefix, Visitor<String, R> visitor,
+                RadixTreeNode<String> parent, RadixTreeNode<String> node) {
+                visitCount.getAndIncrement();
+                super.visit(prefix, visitor, parent, node);
+            }
+        };
+
+        for (String testCase : testCases()) {
+            radixTree.insert(testCase, testCase);
+        }
+
+        /*
+         *  / [indices=hbAscxy01adnΠuvw] 1
+         *  ├── s [indices=er] 2
+            │   ├── earch/query [value=/search/query]* 3
+            │   └── rc/*filepath [value=/src/*filepath]* 3
+         *  ├── u [indices=/s] 2
+         *  │   └── sers/a/b/c [indices=/c] 3
+         *  │       ├── /d [value=/users/a/b/c/d]* 4
+         *  │       └── c/d [value=/users/a/b/cc/d]* 4
+         *  //...
+         */
+
+        String key = "/users/a/b/c/d";
+        AtomicInteger resultVisitorCount = new AtomicInteger(0);
+        RadixTree.Visitor<String, String> visitor = new RadixTree.Visitor<>() {
+            public void visit(String key, RadixTreeNode<String> parent,
+                RadixTreeNode<String> node) {
+                resultVisitorCount.getAndIncrement();
+                if (node.isReal()) {
+                    result = node.getValue();
+                }
+            }
+        };
+
+        RadixTreeNode<String> root = radixTree.getRoot();
+        radixTree.visit(key, visitor, null, root);
+        assertThat(resultVisitorCount.get()).isEqualTo(1);
+        assertThat(visitor.result).isEqualTo(key);
+        assertThat(visitCount.get()).isEqualTo(4);
+
+        // clear counter
+        visitCount.set(0);
+        resultVisitorCount.set(0);
+        visitor.result = null;
+        key = "/search/query";
+        radixTree.visit(key, visitor, null, root);
+        assertThat(resultVisitorCount.get()).isEqualTo(1);
+        assertThat(visitCount.get()).isEqualTo(3);
+        assertThat(visitor.getResult()).isEqualTo(key);
+
+        // clear counter
+        visitCount.set(0);
+        resultVisitorCount.set(0);
+        visitor.result = null;
+        // not exists key
+        key = "/search";
+        radixTree.visit(key, visitor, null, root);
+        assertThat(resultVisitorCount.get()).isEqualTo(0);
+        assertThat(visitCount.get()).isEqualTo(3);
+        assertThat(visitor.getResult()).isEqualTo(null);
+
+        // clear counter
+        visitCount.set(0);
+        resultVisitorCount.set(0);
+        visitor.result = null;
+        // not exists key
+        key = "/s";
+        radixTree.visit(key, visitor, null, root);
+        assertThat(resultVisitorCount.get()).isEqualTo(1);
+        assertThat(visitCount.get()).isEqualTo(2);
+        assertThat(visitor.getResult()).isEqualTo(null);
+    }
+
+    private List<String> testCases() {
+        return Arrays.asList(
+            "/hi",
+            "/b/",
+            "/ABC/",
+            "/search/query",
+            "/cmd/tool/",
+            "/src/*filepath",
+            "/x",
+            "/x/y",
+            "/y/",
+            "/y/z",
+            "/0/id",
+            "/0/id/1",
+            "/1/id/",
+            "/1/id/2",
+            "/aa",
+            "/a/",
+            "/doc",
+            "/doc/go_faq.html",
+            "/doc/go1.html",
+            "/doc/go/away",
+            "/no/a",
+            "/no/b",
+            "/Π",
+            "/u/apfêl/",
+            "/u/äpfêl/",
+            "/u/öpfêl",
+            "/v/Äpfêl/",
+            "/v/Öpfêl",
+            "/w/♬",
+            "/w/♭/",
+            "/w/𠜎",
+            "/w/𠜏/",
+            "/users/a/b/c/d",
+            "/users/a/b/cc/d"
+        );
     }
 }
