@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.extension.MetadataOperator;
 
@@ -16,7 +17,7 @@ import run.halo.app.extension.MetadataOperator;
 @Data
 @ToString
 @Builder
-public class MenuItemVo {
+public class MenuItemVo implements VisualizableTreeNode<MenuItemVo> {
 
     MetadataOperator metadata;
 
@@ -27,6 +28,16 @@ public class MenuItemVo {
     List<MenuItemVo> children;
 
     String parentName;
+
+    /**
+     * Gets menu item's display name.
+     */
+    public String getDisplayName() {
+        if (status != null && StringUtils.isNotBlank(status.getDisplayName())) {
+            return status.getDisplayName();
+        }
+        return spec.getDisplayName();
+    }
 
     /**
      * Convert {@link MenuItem} to {@link MenuItemVo}.
@@ -42,5 +53,10 @@ public class MenuItemVo {
             .status(status)
             .children(List.of())
             .build();
+    }
+
+    @Override
+    public String nodeText() {
+        return getDisplayName();
     }
 }

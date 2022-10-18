@@ -17,8 +17,7 @@ import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginStartingError;
-import run.halo.app.plugin.resources.JsBundleRuleProvider;
-import run.halo.app.plugin.resources.ReverseProxyRouterFunctionFactory;
+import run.halo.app.plugin.resources.BundleResourceUtils;
 
 /**
  * Plugin reconciler.
@@ -32,14 +31,10 @@ public class PluginReconciler implements Reconciler<Request> {
     private final ExtensionClient client;
     private final HaloPluginManager haloPluginManager;
 
-    private final JsBundleRuleProvider jsBundleRule;
-
     public PluginReconciler(ExtensionClient client,
-        HaloPluginManager haloPluginManager,
-        JsBundleRuleProvider jsBundleRule) {
+        HaloPluginManager haloPluginManager) {
         this.client = client;
         this.haloPluginManager = haloPluginManager;
-        this.jsBundleRule = jsBundleRule;
     }
 
     @Override
@@ -129,15 +124,12 @@ public class PluginReconciler implements Reconciler<Request> {
         PluginState currentState = haloPluginManager.startPlugin(pluginName);
         handleStatus(plugin, currentState, PluginState.STARTED);
         Plugin.PluginStatus status = plugin.statusNonNull();
-        // TODO Check whether the JS bundle rule exists. If it does not exist, do not populate
-        // populate stylesheet path
-        jsBundleRule.jsRule(pluginName)
-            .map(jsRule -> ReverseProxyRouterFunctionFactory.buildRoutePath(pluginName, jsRule))
-            .ifPresent(status::setEntry);
 
-        jsBundleRule.cssRule(pluginName)
-            .map(cssRule -> ReverseProxyRouterFunctionFactory.buildRoutePath(pluginName, cssRule))
-            .ifPresent(status::setStylesheet);
+        String jsBundlePath = BundleResourceUtils.getJsBundlePath(haloPluginManager, pluginName);
+        status.setEntry(jsBundlePath);
+
+        String cssBundlePath = BundleResourceUtils.getCssBundlePath(haloPluginManager, pluginName);
+        status.setStylesheet(cssBundlePath);
 
         status.setLastStartTime(Instant.now());
     }

@@ -9,6 +9,7 @@ import org.thymeleaf.processor.element.AbstractElementModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import org.thymeleaf.spring6.context.SpringContextUtils;
 import org.thymeleaf.templatemode.TemplateMode;
+import run.halo.app.plugin.ExtensionComponentsFinder;
 
 /**
  * Global head injection processor.
@@ -50,10 +51,6 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
         structureHandler.setLocalVariable(PROCESS_FLAG, true);
 
         // handle <head> tag
-        /*
-         * Obtain the Spring application context.
-         */
-        final ApplicationContext appCtx = SpringContextUtils.getApplicationContext(context);
 
         /*
          * Create the DOM structure that will be substituting our custom tag.
@@ -65,7 +62,8 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
 
         // apply processors to modelToInsert
         Collection<TemplateHeadProcessor> templateHeadProcessors =
-            getTemplateHeadProcessors(appCtx);
+            getTemplateHeadProcessors(context);
+
         for (TemplateHeadProcessor processor : templateHeadProcessors) {
             processor.process(context, modelToInsert, structureHandler)
                 .block();
@@ -75,8 +73,10 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
         model.insertModel(model.size() - 1, modelToInsert);
     }
 
-    private Collection<TemplateHeadProcessor> getTemplateHeadProcessors(ApplicationContext ctx) {
-        return ctx.getBeansOfType(TemplateHeadProcessor.class)
-            .values();
+    private Collection<TemplateHeadProcessor> getTemplateHeadProcessors(ITemplateContext context) {
+        ApplicationContext appCtx = SpringContextUtils.getApplicationContext(context);
+        ExtensionComponentsFinder componentsFinder =
+            appCtx.getBean(ExtensionComponentsFinder.class);
+        return componentsFinder.getExtensions(TemplateHeadProcessor.class);
     }
 }

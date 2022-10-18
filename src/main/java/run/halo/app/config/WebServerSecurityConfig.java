@@ -7,15 +7,12 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
-import java.util.Arrays;
-import java.util.List;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
@@ -27,10 +24,6 @@ import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.SupplierReactiveJwtDecoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.CorsConfigurationSource;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -63,10 +56,7 @@ public class WebServerSecurityConfig {
         RoleService roleService,
         ObjectProvider<SecurityConfigurer> securityConfigurers) {
 
-        http.csrf().csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse())
-            .and()
-            .cors(corsSpec -> corsSpec.configurationSource(apiCorsConfigurationSource()))
-            .securityMatcher(pathMatchers("/api/**", "/apis/**", "/login", "/logout"))
+        http.securityMatcher(pathMatchers("/api/**", "/apis/**", "/login", "/logout"))
             .authorizeExchange(exchanges ->
                 exchanges.anyExchange().access(new RequestInfoAuthorizationManager(roleService)))
             .anonymous(anonymousSpec -> {
@@ -82,23 +72,6 @@ public class WebServerSecurityConfig {
             .forEach(securityConfigurer -> securityConfigurer.configure(http));
 
         return http.build();
-    }
-
-    CorsConfigurationSource apiCorsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedHeaders(
-            List.of(HttpHeaders.AUTHORIZATION, HttpHeaders.CONTENT_TYPE, HttpHeaders.ACCEPT,
-                "X-XSRF-TOKEN", HttpHeaders.COOKIE));
-        configuration.setAllowCredentials(true);
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", configuration);
-        source.registerCorsConfiguration("/apis/**", configuration);
-        // TODO Remove both login and logout path until we provide the console proxy.
-        source.registerCorsConfiguration("/login", configuration);
-        source.registerCorsConfiguration("/logout", configuration);
-        return source;
     }
 
     @Bean

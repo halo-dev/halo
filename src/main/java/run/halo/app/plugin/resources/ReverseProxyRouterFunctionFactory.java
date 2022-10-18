@@ -4,20 +4,19 @@ import static org.springframework.http.MediaType.ALL;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 
-import java.util.ArrayList;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
+import org.springframework.http.server.PathContainer;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.util.pattern.PathPatternParser;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.ReverseProxy;
@@ -38,13 +37,6 @@ import run.halo.app.plugin.PluginConst;
 @Slf4j
 @Component
 public class ReverseProxyRouterFunctionFactory {
-    private static final String REVERSE_PROXY_API_PREFIX = "/assets";
-
-    private final JsBundleRuleProvider jsBundleRuleProvider;
-
-    public ReverseProxyRouterFunctionFactory(JsBundleRuleProvider jsBundleRuleProvider) {
-        this.jsBundleRuleProvider = jsBundleRuleProvider;
-    }
 
     /**
      * <p>Create {@link RouterFunction} according to the {@link ReverseProxy} custom resource
@@ -67,7 +59,7 @@ public class ReverseProxyRouterFunctionFactory {
         Assert.notNull(reverseProxy, "The reverseProxy must not be null.");
         Assert.notNull(applicationContext, "The applicationContext must not be null.");
         final var pluginId = getPluginId(applicationContext);
-        var rules = getReverseProxyRules(pluginId, reverseProxy);
+        var rules = getReverseProxyRules(reverseProxy);
 
         return rules.map(rule -> {
             String routePath = buildRoutePath(pluginId, rule);
@@ -93,21 +85,13 @@ public class ReverseProxyRouterFunctionFactory {
         return PluginConst.SYSTEM_PLUGIN_NAME;
     }
 
-    private Flux<ReverseProxyRule> getReverseProxyRules(String pluginId,
-        ReverseProxy reverseProxy) {
-        return Flux.fromIterable(reverseProxy.getRules())
-            .concatWith(Flux.fromIterable(getJsBundleRules(pluginId)));
-    }
-
-    private List<ReverseProxyRule> getJsBundleRules(String pluginId) {
-        List<ReverseProxyRule> rules = new ArrayList<>(2);
-        jsBundleRuleProvider.jsRule(pluginId).ifPresent(rules::add);
-        jsBundleRuleProvider.cssRule(pluginId).ifPresent(rules::add);
-        return rules;
+    private Flux<ReverseProxyRule> getReverseProxyRules(ReverseProxy reverseProxy) {
+        return Flux.fromIterable(reverseProxy.getRules());
     }
 
     public static String buildRoutePath(String pluginId, ReverseProxyRule reverseProxyRule) {
-        return PathUtils.combinePath(REVERSE_PROXY_API_PREFIX, pluginId, reverseProxyRule.path());
+        return PathUtils.combinePath(PluginConst.assertsRoutePrefix(pluginId),
+            reverseProxyRule.path());
     }
 
     /**
@@ -140,13 +124,13 @@ public class ReverseProxyRouterFunctionFactory {
         if (StringUtils.isNotBlank(configuredFilename)) {
             filename = configuredFilename;
         } else {
-            AntPathMatcher antPathMatcher = new AntPathMatcher();
             String routePath = buildRoutePath(pluginId, rule);
-            filename =
-                antPathMatcher.extractPathWithinPattern(routePath, request.path());
+            PathContainer pathContainer = PathPatternParser.defaultInstance.parse(routePath)
+                .extractPathWithinPattern(PathContainer.parsePath(request.path()));
+            filename = pathContainer.value();
         }
 
-        String filePath = PathUtils.appendPathSeparatorIfMissing(directory) + filename;
+        String filePath = PathUtils.combinePath(directory, filename);
         return pluginApplicationContext.getResource(filePath);
     }
 }
