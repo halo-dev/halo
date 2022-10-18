@@ -2,7 +2,7 @@ import type { ComputedRef, Ref } from "vue";
 import { computed, onMounted, ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
-import { useDialog } from "@halo-dev/components";
+import { Dialog } from "@halo-dev/components";
 
 interface useThemeLifeCycleReturn {
   loading: Ref<boolean>;
@@ -20,8 +20,6 @@ export function useThemeLifeCycle(
   const isActivated = computed(() => {
     return activatedTheme.value?.metadata.name === theme.value?.metadata.name;
   });
-
-  const dialog = useDialog();
 
   const handleFetchActivatedTheme = async () => {
     try {
@@ -54,7 +52,7 @@ export function useThemeLifeCycle(
   };
 
   const handleActiveTheme = async () => {
-    dialog.info({
+    Dialog.info({
       title: "是否确认启用当前主题",
       description: theme.value?.spec.displayName,
       onConfirm: async () => {

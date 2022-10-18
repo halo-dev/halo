@@ -2,7 +2,7 @@
 import {
   IconAddCircle,
   IconListSettings,
-  useDialog,
+  Dialog,
   VButton,
   VCard,
   VEmpty,
@@ -34,8 +34,6 @@ const selectedParentMenuItem = ref<MenuItem>();
 const loading = ref(false);
 const menuListRef = ref();
 const menuItemEditingModal = ref();
-
-const dialog = useDialog();
 
 const handleFetchMenuItems = async () => {
   try {
@@ -115,7 +113,7 @@ const handleUpdateInBatch = useDebounceFn(async () => {
 }, 500);
 
 const handleDelete = async (menuItem: MenuTreeItem) => {
-  dialog.info({
+  Dialog.info({
     title: "是否确定删除该菜单？",
     description: "删除后将无法恢复",
     confirmType: "danger",
@@ -128,7 +126,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
 
       if (childrenNames.length) {
         setTimeout(() => {
-          dialog.info({
+          Dialog.info({
             title: "检查到当前菜单下包含子菜单，是否删除？",
             description: "如果选择否，那么所有子菜单将转移到一级菜单",
             confirmType: "danger",

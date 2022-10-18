@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { RouterView, useRoute } from "vue-router";
-import { VDialogProvider } from "@halo-dev/components";
 import { onMounted, provide, ref, watch, type Ref } from "vue";
 import { useTitle } from "@vueuse/core";
 import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
@@ -41,10 +40,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <VDialogProvider>
-    <RouterView />
-    <GlobalSearchModal v-model:visible="globalSearchVisible" />
-  </VDialogProvider>
+  <RouterView />
+  <GlobalSearchModal v-model:visible="globalSearchVisible" />
 </template>
 
 <style lang="scss">

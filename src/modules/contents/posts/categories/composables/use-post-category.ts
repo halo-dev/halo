@@ -4,7 +4,7 @@ import type { Ref } from "vue";
 import { onMounted, ref } from "vue";
 import type { CategoryTree } from "@/modules/contents/posts/categories/utils";
 import { buildCategoriesTree } from "@/modules/contents/posts/categories/utils";
-import { useDialog } from "@halo-dev/components";
+import { Dialog } from "@halo-dev/components";
 
 interface usePostCategoryReturn {
   categories: Ref<Category[]>;
@@ -22,8 +22,6 @@ export function usePostCategory(options?: {
   const categories = ref<Category[]>([] as Category[]);
   const categoriesTree = ref<CategoryTree[]>([] as CategoryTree[]);
   const loading = ref(false);
-
-  const dialog = useDialog();
 
   const handleFetchCategories = async () => {
     try {
@@ -43,7 +41,7 @@ export function usePostCategory(options?: {
   };
 
   const handleDelete = async (category: CategoryTree) => {
-    dialog.warning({
+    Dialog.warning({
       title: "确定要删除该分类吗？",
       description: "删除此分类之后，对应文章的关联将被解除。该操作不可恢复。",
       confirmType: "danger",

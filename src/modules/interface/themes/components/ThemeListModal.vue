@@ -2,7 +2,7 @@
 import {
   IconAddCircle,
   IconGitHub,
-  useDialog,
+  Dialog,
   VButton,
   VEmpty,
   VModal,
@@ -45,8 +45,6 @@ const themes = ref<Theme[]>([]);
 const loading = ref(false);
 const themeInstall = ref(false);
 
-const dialog = useDialog();
-
 const handleFetchThemes = async () => {
   try {
     loading.value = true;
@@ -61,7 +59,7 @@ const handleFetchThemes = async () => {
 };
 
 const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
-  dialog.warning({
+  Dialog.warning({
     title: `${
       deleteExtensions
         ? "是否确认删除该主题以及对应的配置？"

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-  useDialog,
+  Dialog,
   VAvatar,
   VButton,
   VEntity,
@@ -44,8 +44,6 @@ const emit = defineEmits<{
   (event: "reload"): void;
 }>();
 
-const dialog = useDialog();
-
 const replies = ref<ListedReply[]>([] as ListedReply[]);
 const selectedReply = ref<ListedReply>();
 const hoveredReply = ref<ListedReply>();
@@ -56,7 +54,7 @@ const replyModal = ref(false);
 provide<Ref<ListedReply | undefined>>("hoveredReply", hoveredReply);
 
 const handleDelete = async () => {
-  dialog.warning({
+  Dialog.warning({
     title: "是否确认删除该评论？",
     description: "删除评论的同时会删除该评论下的所有回复，该操作不可恢复。",
     confirmType: "danger",
@@ -75,7 +73,7 @@ const handleDelete = async () => {
 };
 
 const handleApproveReplyInBatch = async () => {
-  dialog.warning({
+  Dialog.warning({
     title: "确定要审核通过该评论的所有回复吗？",
     onConfirm: async () => {
       try {

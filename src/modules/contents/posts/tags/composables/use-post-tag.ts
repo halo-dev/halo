@@ -2,7 +2,7 @@ import { apiClient } from "@/utils/api-client";
 import type { Tag } from "@halo-dev/api-client";
 import type { Ref } from "vue";
 import { onMounted, ref } from "vue";
-import { useDialog } from "@halo-dev/components";
+import { Dialog } from "@halo-dev/components";
 
 interface usePostTagReturn {
   tags: Ref<Tag[]>;
@@ -18,8 +18,6 @@ export function usePostTag(options?: {
 
   const tags = ref<Tag[]>([] as Tag[]);
   const loading = ref(false);
-
-  const dialog = useDialog();
 
   const handleFetchTags = async () => {
     try {
@@ -39,7 +37,7 @@ export function usePostTag(options?: {
   };
 
   const handleDelete = async (tag: Tag) => {
-    dialog.warning({
+    Dialog.warning({
       title: "确定要删除该标签吗？",
       description: "删除此标签之后，对应文章的关联将被解除。该操作不可恢复。",
       confirmType: "danger",

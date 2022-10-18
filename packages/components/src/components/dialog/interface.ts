@@ -14,4 +14,16 @@ export interface useDialogOptions {
   onCancel?: () => void;
 }
 
+export interface DialogProps {
+  type?: Type;
+  visible?: boolean;
+  title?: string;
+  description?: string;
+  confirmType?: ButtonType;
+  confirmText?: string;
+  cancelText?: string;
+  onConfirm?: () => void;
+  onCancel?: () => void;
+}
+
 export type useDialogUserOptions = Omit<useDialogOptions, "type" | "visible">;

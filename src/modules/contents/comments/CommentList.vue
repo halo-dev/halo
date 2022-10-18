@@ -9,7 +9,7 @@ import {
   VSpace,
   IconCloseCircle,
   VEmpty,
-  useDialog,
+  Dialog,
 } from "@halo-dev/components";
 import CommentListItem from "./components/CommentListItem.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
@@ -20,8 +20,6 @@ import type {
 } from "@halo-dev/api-client";
 import { onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
-
-const dialog = useDialog();
 
 const comments = ref<ListedCommentList>({
   page: 1,
@@ -101,7 +99,7 @@ watch(
 );
 
 const handleDeleteInBatch = async () => {
-  dialog.warning({
+  Dialog.warning({
     title: "确定要删除所选的评论吗？",
     description: "将同时删除所有评论下的回复，该操作不可恢复。",
     confirmType: "danger",
@@ -126,7 +124,7 @@ const handleDeleteInBatch = async () => {
 };
 
 const handleApproveInBatch = async () => {
-  dialog.warning({
+  Dialog.warning({
     title: "确定要审核通过所选评论吗？",
     onConfirm: async () => {
       try {

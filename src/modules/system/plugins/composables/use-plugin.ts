@@ -3,7 +3,7 @@ import { computed } from "vue";
 import type { Plugin } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
-import { useDialog } from "@halo-dev/components";
+import { Dialog } from "@halo-dev/components";
 
 interface usePluginLifeCycleReturn {
   isStarted: ComputedRef<boolean | undefined>;
@@ -14,8 +14,6 @@ interface usePluginLifeCycleReturn {
 export function usePluginLifeCycle(
   plugin?: Ref<Plugin | undefined>
 ): usePluginLifeCycleReturn {
-  const dialog = useDialog();
-
   const isStarted = computed(() => {
     return (
       plugin?.value?.status?.phase === "STARTED" && plugin.value?.spec.enabled
@@ -27,7 +25,7 @@ export function usePluginLifeCycle(
 
     const pluginToUpdate = cloneDeep(plugin.value);
 
-    dialog.info({
+    Dialog.info({
       title: `确定要${pluginToUpdate.spec.enabled ? "停止" : "启动"}该插件吗？`,
       onConfirm: async () => {
         try {
@@ -50,7 +48,7 @@ export function usePluginLifeCycle(
 
     const { enabled } = plugin.value.spec;
 
-    dialog.warning({
+    Dialog.warning({
       title: `${
         deleteExtensions
           ? "是否确认卸载该插件以及对应的配置？"

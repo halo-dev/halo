@@ -9,7 +9,7 @@ import {
   IconEyeOff,
   IconTeam,
   IconCloseCircle,
-  useDialog,
+  Dialog,
   VButton,
   VCard,
   VEmpty,
@@ -63,8 +63,6 @@ const selectedPost = ref<Post | null>(null);
 const selectedPostWithContent = ref<PostRequest | null>(null);
 const checkedAll = ref(false);
 const selectedPostNames = ref<string[]>([]);
-
-const dialog = useDialog();
 
 const handleFetchPosts = async () => {
   try {
@@ -205,7 +203,7 @@ const handleCheckAllChange = (e: Event) => {
 };
 
 const handleDelete = async (post: Post) => {
-  dialog.warning({
+  Dialog.warning({
     title: "是否确认删除该文章？",
     confirmType: "danger",
     onConfirm: async () => {
@@ -218,7 +216,7 @@ const handleDelete = async (post: Post) => {
 };
 
 const handleDeleteInBatch = async () => {
-  dialog.warning({
+  Dialog.warning({
     title: "是否确认删除选中的文章？",
     confirmType: "danger",
     onConfirm: async () => {

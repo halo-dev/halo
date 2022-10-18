@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import {
-  useDialog,
+  Dialog,
   VButton,
   VCard,
   VEmpty,
@@ -37,8 +37,6 @@ const loading = ref(false);
 const selectedMenuToUpdate = ref<Menu>();
 const menuEditingModal = ref<boolean>(false);
 
-const dialog = useDialog();
-
 const handleFetchMenus = async () => {
   selectedMenuToUpdate.value = undefined;
   try {
@@ -71,7 +69,7 @@ const handleSelect = (menu: Menu) => {
 };
 
 const handleDeleteMenu = async (menu: Menu) => {
-  dialog.warning({
+  Dialog.warning({
     title: "确定要删除该菜单吗？",
     description: "将同时删除该菜单下的所有菜单项，该操作不可恢复。",
     confirmType: "danger",

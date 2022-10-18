@@ -8,7 +8,7 @@ import {
   IconAddCircle,
   IconArrowDown,
   IconShieldUser,
-  useDialog,
+  Dialog,
   VButton,
   VCard,
   VPageHeader,
@@ -81,9 +81,8 @@ const handleCloneRole = (role: Role) => {
   editingModal.value = true;
 };
 
-const dialog = useDialog();
 const handleDelete = async (role: Role) => {
-  dialog.warning({
+  Dialog.warning({
     title: "是否确定删除该权限？",
     description: "此权限删除之后，相关联的用户将被删除角色绑定，此操作不可恢复",
     confirmType: "danger",

@@ -12,7 +12,7 @@ import {
   VCard,
   VPagination,
   VSpace,
-  useDialog,
+  Dialog,
   VEmpty,
   VAvatar,
   VStatusDot,
@@ -41,8 +41,6 @@ enum SinglePagePhase {
   PENDING_APPROVAL = "待审核",
   PUBLISHED = "已发布",
 }
-
-const dialog = useDialog();
 
 const singlePages = ref<ListedSinglePageList>({
   page: 1,
@@ -177,7 +175,7 @@ const handleSelectNext = async () => {
 };
 
 const handleDelete = async (singlePage: SinglePage) => {
-  dialog.warning({
+  Dialog.warning({
     title: "是否确认删除该自定义页面？",
     confirmType: "danger",
     onConfirm: async () => {

@@ -10,7 +10,7 @@ import {
   VTag,
   IconMore,
   VButton,
-  useDialog,
+  Dialog,
 } from "@halo-dev/components";
 
 // types
@@ -22,10 +22,8 @@ import { apiClient } from "@/utils/api-client";
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme");
 const isActivated = inject<ComputedRef<boolean>>("isActivated");
 
-const dialog = useDialog();
-
 const handleReloadThemeSetting = async () => {
-  dialog.warning({
+  Dialog.warning({
     title: "是否确认刷新主题的设置表单？",
     description: "此操作仅会刷新主题的设置表单，不会删除已有的配置。",
     onConfirm: async () => {

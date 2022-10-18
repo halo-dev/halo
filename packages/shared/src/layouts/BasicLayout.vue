@@ -8,7 +8,7 @@ import {
   VAvatar,
   VSpace,
   VButton,
-  useDialog,
+  Dialog,
 } from "@halo-dev/components";
 import type { MenuGroupType, MenuItemType } from "../types/menus";
 import type { User } from "@halo-dev/api-client";
@@ -21,7 +21,6 @@ const menus = inject<MenuGroupType[]>("menus");
 const minimenus = inject<MenuItemType[]>("minimenus");
 const route = useRoute();
 const router = useRouter();
-const dialog = useDialog();
 
 const moreMenuVisible = ref(false);
 const moreMenuRootVisible = ref(false);
@@ -34,7 +33,7 @@ const handleRouteToProfile = () => {
 };
 
 const handleLogout = () => {
-  dialog.warning({
+  Dialog.warning({
     title: "是否确认退出登录？",
     onConfirm: async () => {
       try {

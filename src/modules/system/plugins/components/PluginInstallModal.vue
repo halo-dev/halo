@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useDialog, VModal } from "@halo-dev/components";
+import { VModal, Dialog } from "@halo-dev/components";
 import FilePondUpload from "@/components/upload/FilePondUpload.vue";
 import { apiClient } from "@/utils/api-client";
 import type { Plugin } from "@halo-dev/api-client";
@@ -20,7 +20,6 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const dialog = useDialog();
 const FilePondUploadRef = ref();
 
 const handleVisibleChange = (visible: boolean) => {
@@ -44,7 +43,7 @@ const uploadHandler = computed(() => {
 const onUploaded = async (response: AxiosResponse) => {
   const plugin = response.data as Plugin;
   handleVisibleChange(false);
-  dialog.success({
+  Dialog.success({
     title: "上传成功",
     description: "是否启动当前安装的插件？",
     onConfirm: async () => {

@@ -13,7 +13,7 @@ import {
   VAvatar,
   VEntity,
   VEntityField,
-  useDialog,
+  Dialog,
   VStatusDot,
 } from "@halo-dev/components";
 import UserEditingModal from "./components/UserEditingModal.vue";
@@ -29,8 +29,6 @@ import Fuse from "fuse.js";
 import { usePermission } from "@/utils/permission";
 
 const { currentUserHasPermission } = usePermission();
-
-const dialog = useDialog();
 
 const checkedAll = ref(false);
 const editingModal = ref<boolean>(false);
@@ -95,7 +93,7 @@ const handlePaginationChange = async ({
 };
 
 const handleDelete = async (user: User) => {
-  dialog.warning({
+  Dialog.warning({
     title: "确定要删除该用户吗？",
     description: "该操作不可恢复。",
     confirmType: "danger",
@@ -114,7 +112,7 @@ const handleDelete = async (user: User) => {
 };
 
 const handleDeleteInBatch = async () => {
-  dialog.warning({
+  Dialog.warning({
     title: "是否确认删除选中的用户？",
     confirmType: "danger",
     onConfirm: async () => {
