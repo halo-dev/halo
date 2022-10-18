@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.util.stream.BaseStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +52,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
+import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.infra.exception.ThemeInstallationException;
 import run.halo.app.infra.properties.HaloProperties;
@@ -124,7 +125,7 @@ public class ThemeEndpoint implements CustomEndpoint {
             .build();
     }
 
-    public static class ThemeQuery extends PluginEndpoint.ListRequest.QueryListRequest {
+    public static class ThemeQuery extends IListRequest.QueryListRequest {
 
         public ThemeQuery(MultiValueMap<String, String> queryParams) {
             super(queryParams);
@@ -148,9 +149,9 @@ public class ThemeEndpoint implements CustomEndpoint {
     }
 
     Mono<ListResult<Theme>> listUninstalled(ThemeQuery query) {
-        return Mono.just(themePathPolicy.themesDir())
-            .map(ThemeEndpoint::listAllThemesFromThemeDir)
-            .subscribeOn(Schedulers.boundedElastic())
+        Path path = themePathPolicy.themesDir();
+        return ThemeUtils.listAllThemesFromThemeDir(path)
+            .collectList()
             .flatMap(this::filterUnInstalledThemes)
             .map(themes -> {
                 Integer page = query.getPage();
@@ -158,21 +159,6 @@ public class ThemeEndpoint implements CustomEndpoint {
                 List<Theme> subList = ListResult.subList(themes, page, size);
                 return new ListResult<>(page, size, themes.size(), subList);
             });
-    }
-
-    private static List<Theme> listAllThemesFromThemeDir(Path themesDir) {
-        try (Stream<Path> paths = Files.walk(themesDir, 2)) {
-            return paths.filter(Files::isDirectory)
-                .map(themePath -> ThemeUtils.loadUnstructured(themePath,
-                    ThemeUtils.THEME_MANIFESTS))
-                .flatMap(List::stream)
-                .map(unstructured -> Unstructured.OBJECT_MAPPER.convertValue(unstructured,
-                    Theme.class))
-                .sorted(Comparator.comparing(theme -> theme.getMetadata().getName()))
-                .toList();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private Mono<List<Theme>> filterUnInstalledThemes(@NonNull List<Theme> allThemes) {
@@ -319,6 +305,23 @@ public class ThemeEndpoint implements CustomEndpoint {
         private static final String[] THEME_CONFIG = {"config.yaml", "config.yml"};
 
         private static final String[] THEME_SETTING = {"settings.yaml", "settings.yml"};
+
+        static Flux<Theme> listAllThemesFromThemeDir(Path themesDir) {
+            return walkThemesFromPath(themesDir)
+                .filter(Files::isDirectory)
+                .map(themePath -> loadUnstructured(themePath, THEME_MANIFESTS))
+                .map(unstructured -> Unstructured.OBJECT_MAPPER.convertValue(unstructured,
+                    Theme.class))
+                .sort(Comparator.comparing(theme -> theme.getMetadata().getName()));
+        }
+
+        private static Flux<Path> walkThemesFromPath(Path path) {
+            return Flux.using(() -> Files.walk(path, 2),
+                    Flux::fromStream,
+                    BaseStream::close
+                )
+                .subscribeOn(Schedulers.boundedElastic());
+        }
 
         static List<Unstructured> loadThemeSetting(Path themePath) {
             return loadUnstructured(themePath, THEME_SETTING);
