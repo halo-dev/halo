@@ -310,6 +310,7 @@ public class ThemeEndpoint implements CustomEndpoint {
             return walkThemesFromPath(themesDir)
                 .filter(Files::isDirectory)
                 .map(themePath -> loadUnstructured(themePath, THEME_MANIFESTS))
+                .flatMap(Flux::fromIterable)
                 .map(unstructured -> Unstructured.OBJECT_MAPPER.convertValue(unstructured,
                     Theme.class))
                 .sort(Comparator.comparing(theme -> theme.getMetadata().getName()));
