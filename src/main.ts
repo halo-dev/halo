@@ -8,6 +8,7 @@ import type {
   MenuItemType,
   Plugin,
 } from "@halo-dev/console-shared";
+import { Toast } from "@halo-dev/components";
 import { apiClient } from "@/utils/api-client";
 import { menus, minimenus, registerMenu } from "./router/menus.config";
 // setup
@@ -135,7 +136,7 @@ async function loadPluginModules() {
           registerModule(pluginModule);
         }
       } catch (e) {
-        const message = `${plugin.metadata.name}: Failed load plugin entry module`;
+        const message = `${plugin.metadata.name}: 加载插件入口文件失败`;
         console.error(message, e);
         pluginErrorMessages.push(message);
       }
@@ -145,7 +146,7 @@ async function loadPluginModules() {
       try {
         await loadStyle(`${import.meta.env.VITE_API_URL}${stylesheet}`);
       } catch (e) {
-        const message = `${plugin.metadata.name}: Failed load plugin stylesheet`;
+        const message = `${plugin.metadata.name}: 加载插件样式文件失败`;
         console.error(message, e);
         pluginErrorMessages.push(message);
       }
@@ -155,7 +156,9 @@ async function loadPluginModules() {
   }
 
   if (pluginErrorMessages.length > 0) {
-    alert(pluginErrorMessages.join("\n"));
+    pluginErrorMessages.forEach((message) => {
+      Toast.error(message);
+    });
   }
 }
 

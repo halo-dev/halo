@@ -1,5 +1,10 @@
 <script lang="ts" setup>
-import { IconShieldUser, IconUserLine, VButton } from "@halo-dev/components";
+import {
+  IconShieldUser,
+  IconUserLine,
+  VButton,
+  Toast,
+} from "@halo-dev/components";
 import { v4 as uuid } from "uuid";
 import qs from "qs";
 import logo from "@/assets/logo.svg";
@@ -47,7 +52,7 @@ const handleLogin = async () => {
     router.go(0);
   } catch (e) {
     console.error("Failed to login", e);
-    alert("登录失败，用户名或密码错误");
+    Toast.error("登录失败，用户名或密码错误");
     loginForm.value.password = "";
     setFocus("passwordInput");
   } finally {
