@@ -139,7 +139,7 @@ public class UpOssFileHandler implements FileHandler {
         try {
             Response result = manager.deleteFile(key, null);
             HashMap respondBody = JsonUtils.jsonToObject(result.body().string(), HashMap.class);
-            if (!result.isSuccessful()
+            if (result.code() != 200
                 && !(result.code() == 404 && respondBody.get("code").equals(40400001))) {
                 log.warn("附件 " + key + " 从又拍云删除失败");
                 throw new FileOperationException("附件 " + key + " 从又拍云删除失败");
