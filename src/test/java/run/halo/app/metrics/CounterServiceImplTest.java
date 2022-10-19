@@ -50,7 +50,8 @@ class CounterServiceImplTest {
         counter.setVisit(2);
 
         lenient().when(client.delete(any())).thenReturn(Mono.just(counter));
-        lenient().when(client.fetch(eq(Counter.class), eq(counterName))).thenReturn(Mono.just(counter));
+        lenient().when(client.fetch(eq(Counter.class), eq(counterName)))
+            .thenReturn(Mono.just(counter));
     }
 
     @Test
