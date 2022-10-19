@@ -1,10 +1,11 @@
-package run.halo.app.core.extension.endpoint;
+package run.halo.app.core.extension.theme;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.web.reactive.function.BodyInserters.fromMultipartData;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +27,6 @@ import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ResourceUtils;
-import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
@@ -87,7 +87,7 @@ class ThemeEndpointTest {
                 return new YamlUnstructuredLoader(new FileSystemResource(defaultThemeManifestPath))
                     .load()
                     .get(0);
-            })).thenReturn(Mono.empty()).thenReturn(Mono.empty());
+            }));
 
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part("file", new FileSystemResource(defaultTheme))
@@ -95,10 +95,9 @@ class ThemeEndpointTest {
 
         webTestClient.post()
             .uri("/themes/install")
-            .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+            .body(fromMultipartData(multipartBodyBuilder.build()))
             .exchange()
-            .expectStatus()
-            .isOk()
+            .expectStatus().isOk()
             .expectBody(Theme.class)
             .value(theme -> {
                 verify(extensionClient, times(1)).create(any(Unstructured.class));
@@ -110,10 +109,9 @@ class ThemeEndpointTest {
         // Verify the theme is installed.
         webTestClient.post()
             .uri("/themes/install")
-            .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+            .body(fromMultipartData(multipartBodyBuilder.build()))
             .exchange()
-            .expectStatus()
-            .is5xxServerError();
+            .expectStatus().is5xxServerError();
     }
 
     @Test

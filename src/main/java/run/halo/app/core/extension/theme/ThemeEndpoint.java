@@ -1,53 +1,57 @@
-package run.halo.app.core.extension.endpoint;
+package run.halo.app.core.extension.theme;
 
+import static java.nio.file.Files.createTempDirectory;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
+import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
+import static org.springframework.util.FileSystemUtils.copyRecursively;
+import static org.springframework.util.FileSystemUtils.deleteRecursively;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
+import static reactor.core.scheduler.Schedulers.boundedElastic;
+import static run.halo.app.core.extension.theme.ThemeUtils.loadThemeManifest;
+import static run.halo.app.core.extension.theme.ThemeUtils.locateThemeManifest;
+import static run.halo.app.core.extension.theme.ThemeUtils.unzipThemeTo;
+import static run.halo.app.infra.utils.DataBufferUtils.toInputStream;
+import static run.halo.app.infra.utils.FileUtils.unzip;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
-import java.util.stream.BaseStream;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
+import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
+import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -56,9 +60,6 @@ import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.infra.exception.ThemeInstallationException;
 import run.halo.app.infra.properties.HaloProperties;
-import run.halo.app.infra.utils.DataBufferUtils;
-import run.halo.app.infra.utils.FileUtils;
-import run.halo.app.infra.utils.YamlUnstructuredLoader;
 import run.halo.app.theme.ThemePathPolicy;
 
 /**
@@ -93,12 +94,22 @@ public class ThemeEndpoint implements CustomEndpoint {
                         .required(true)
                         .content(contentBuilder()
                             .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                            .schema(Builder.schemaBuilder()
+                            .schema(schemaBuilder()
                                 .implementation(InstallRequest.class))
                         ))
                     .response(responseBuilder()
                         .implementation(Theme.class))
             )
+            .POST("themes/{name}/upgrade", this::upgrade, builder -> {
+                builder.operationId("UpgradeTheme")
+                    .description("Upgrade theme")
+                    .tag(tag)
+                    .parameter(parameterBuilder().in(ParameterIn.PATH).name("name").required(true))
+                    .requestBody(requestBodyBuilder().required(true)
+                        .content(contentBuilder().mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                            .schema(schemaBuilder().implementation(UpgradeRequest.class))))
+                    .build();
+            })
             .PUT("themes/{name}/reload-setting", this::reloadSetting,
                 builder -> builder.operationId("ReloadThemeSetting")
                     .description("Reload theme setting.")
@@ -146,6 +157,110 @@ public class ThemeEndpoint implements CustomEndpoint {
             }
             return client.list(Theme.class, null, null, query.getPage(), query.getSize());
         }).flatMap(extensions -> ServerResponse.ok().bodyValue(extensions));
+    }
+
+    // public record UpgradeRequest(
+    //     @Schema(required = true, description = "Theme zip file.") FilePart file) {
+    // }
+
+    public static interface IUpgradeRequest {
+
+        @Schema(required = true, description = "Theme zip file.")
+        FilePart getFile();
+
+    }
+
+    public static class UpgradeRequest implements IUpgradeRequest {
+
+        private final MultiValueMap<String, Part> multipartData;
+
+        public UpgradeRequest(MultiValueMap<String, Part> multipartData) {
+            this.multipartData = multipartData;
+        }
+
+        @Override
+        public FilePart getFile() {
+            var part = multipartData.getFirst("file");
+            if (!(part instanceof FilePart filePart)) {
+                throw new ServerWebInputException("Invalid multipart type of file");
+            }
+            if (!filePart.filename().endsWith(".zip")) {
+                throw new ServerWebInputException("Only zip extension supported");
+            }
+            return filePart;
+        }
+
+    }
+
+    private Mono<ServerResponse> upgrade(ServerRequest request) {
+        final var tempDir = new AtomicReference<Path>();
+        final var tempThemeRoot = new AtomicReference<Path>();
+        return request.multipartData()
+            .map(UpgradeRequest::new)
+            .map(UpgradeRequest::getFile)
+            .publishOn(boundedElastic())
+            .flatMap(file -> {
+                try (var zis = new ZipInputStream(toInputStream(file.content()))) {
+                    tempDir.set(createTempDirectory("halo-theme-"));
+                    unzip(zis, tempDir.get());
+                    return locateThemeManifest(tempDir.get());
+                } catch (IOException e) {
+                    return Mono.error(Exceptions.propagate(e));
+                }
+            })
+            .switchIfEmpty(Mono.error(() -> new ThemeInstallationException(
+                "Missing theme manifest file: theme.yaml or theme.yml")))
+            .doOnNext(themeManifest -> {
+                if (log.isDebugEnabled()) {
+                    log.debug("Found theme manifest file: {}", themeManifest);
+                }
+                tempThemeRoot.set(themeManifest.getParent());
+            })
+            .map(ThemeUtils::loadThemeManifest)
+            .doOnNext(newTheme -> {
+                var themeNameInPath = request.pathVariable("name");
+                if (!Objects.equals(themeNameInPath, newTheme.getMetadata().getName())) {
+                    if (log.isDebugEnabled()) {
+                        log.error("Want theme name: {}, but provided: {}", themeNameInPath,
+                            newTheme.getMetadata().getName());
+                    }
+                    throw new ServerWebInputException(
+                        "please make sure the theme name is correct");
+                }
+            })
+            .flatMap(newTheme -> {
+                // Remove the theme before upgrading
+                return deleteThemeAndWaitForComplete(newTheme.getMetadata().getName())
+                    .thenReturn(newTheme);
+            })
+            .doOnNext(newTheme -> {
+                // prepare the theme
+                var themePath = getThemeWorkDir().resolve(newTheme.getMetadata().getName());
+                try {
+                    copyRecursively(tempThemeRoot.get(), themePath);
+                } catch (IOException e) {
+                    throw Exceptions.propagate(e);
+                }
+            })
+            .flatMap(this::persistent)
+            .flatMap(updatedTheme -> ServerResponse.ok()
+                .bodyValue(updatedTheme))
+            .doFinally(signalType -> {
+                // clear the temporary folder
+                try {
+                    var deleted = deleteRecursively(tempDir.get());
+                    if (deleted) {
+                        log.debug(
+                            "Clean up temporary directory {} successfully after upgrading "
+                                + "theme", tempDir.get());
+                    }
+                } catch (IOException e) {
+                    // Ignore this error
+                    if (log.isTraceEnabled()) {
+                        log.warn("Failed to delete folder " + tempDir.get(), e);
+                    }
+                }
+            });
     }
 
     Mono<ListResult<Theme>> listUninstalled(ThemeQuery query) {
@@ -201,7 +316,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                     return Mono.error(new IllegalArgumentException(
                         "The manifest file [theme.yaml] is required."));
                 }
-                Unstructured unstructured = ThemeUtils.loadThemeManifest(themeManifestPath);
+                Unstructured unstructured = loadThemeManifest(themeManifestPath);
                 Theme newTheme = Unstructured.OBJECT_MAPPER.convertValue(unstructured, Theme.class);
                 themeToUse.setSpec(newTheme.getSpec());
                 return client.update(themeToUse);
@@ -218,19 +333,18 @@ public class ThemeEndpoint implements CustomEndpoint {
     Mono<ServerResponse> install(ServerRequest request) {
         return request.body(BodyExtractors.toMultipartData())
             .flatMap(this::getZipFilePart)
-            .map(file -> {
+            .flatMap(file -> {
                 try {
-                    var is = DataBufferUtils.toInputStream(file.content());
+                    var is = toInputStream(file.content());
                     var themeWorkDir = getThemeWorkDir();
                     if (log.isDebugEnabled()) {
                         log.debug("Transferring {} into {}", file.filename(), themeWorkDir);
                     }
-                    return ThemeUtils.unzipThemeTo(is, themeWorkDir);
+                    return unzipThemeTo(is, themeWorkDir);
                 } catch (IOException e) {
-                    throw Exceptions.propagate(e);
+                    return Mono.error(Exceptions.propagate(e));
                 }
             })
-            .subscribeOn(Schedulers.boundedElastic())
             .flatMap(this::persistent)
             .flatMap(theme -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -298,127 +412,6 @@ public class ThemeEndpoint implements CustomEndpoint {
             && theme.getSpec().getConfigMapName().equals(unstructured.getMetadata().getName());
     }
 
-    static class ThemeUtils {
-        private static final String THEME_TMP_PREFIX = "halo-theme-";
-        public static final String[] THEME_MANIFESTS = {"theme.yaml", "theme.yml"};
-
-        private static final String[] THEME_CONFIG = {"config.yaml", "config.yml"};
-
-        private static final String[] THEME_SETTING = {"settings.yaml", "settings.yml"};
-
-        static Flux<Theme> listAllThemesFromThemeDir(Path themesDir) {
-            return walkThemesFromPath(themesDir)
-                .filter(Files::isDirectory)
-                .map(themePath -> loadUnstructured(themePath, THEME_MANIFESTS))
-                .flatMap(Flux::fromIterable)
-                .map(unstructured -> Unstructured.OBJECT_MAPPER.convertValue(unstructured,
-                    Theme.class))
-                .sort(Comparator.comparing(theme -> theme.getMetadata().getName()));
-        }
-
-        private static Flux<Path> walkThemesFromPath(Path path) {
-            return Flux.using(() -> Files.walk(path, 2),
-                    Flux::fromStream,
-                    BaseStream::close
-                )
-                .subscribeOn(Schedulers.boundedElastic());
-        }
-
-        static List<Unstructured> loadThemeSetting(Path themePath) {
-            return loadUnstructured(themePath, THEME_SETTING);
-        }
-
-        private static List<Unstructured> loadUnstructured(Path themePath,
-            String[] themeSetting) {
-            List<Resource> resources = new ArrayList<>(4);
-            for (String themeResource : themeSetting) {
-                Path resourcePath = themePath.resolve(themeResource);
-                if (Files.exists(resourcePath)) {
-                    resources.add(new FileSystemResource(resourcePath));
-                }
-            }
-            if (CollectionUtils.isEmpty(resources)) {
-                return List.of();
-            }
-            return new YamlUnstructuredLoader(resources.toArray(new Resource[0]))
-                .load();
-        }
-
-        static List<Unstructured> loadThemeResources(Path themePath) {
-            String[] resourceNames = ArrayUtils.addAll(THEME_SETTING, THEME_CONFIG);
-            return loadUnstructured(themePath, resourceNames);
-        }
-
-        static Unstructured unzipThemeTo(InputStream inputStream, Path themeWorkDir) {
-            return unzipThemeTo(inputStream, themeWorkDir, false);
-        }
-
-        static Unstructured unzipThemeTo(InputStream inputStream, Path themeWorkDir,
-            boolean override) {
-
-            Path tempDirectory = null;
-            try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
-                tempDirectory = Files.createTempDirectory(THEME_TMP_PREFIX);
-
-                ZipEntry firstEntry = zipInputStream.getNextEntry();
-                if (firstEntry == null) {
-                    throw new IllegalArgumentException("Theme zip file is empty.");
-                }
-
-                Path themeTempWorkDir = tempDirectory.resolve(firstEntry.getName());
-                FileUtils.unzip(zipInputStream, tempDirectory);
-
-                Path themeManifestPath = resolveThemeManifest(themeTempWorkDir);
-                if (themeManifestPath == null) {
-                    throw new IllegalArgumentException(
-                        "It's an invalid zip format for the theme, manifest "
-                            + "file [theme.yaml] is required.");
-                }
-                Unstructured unstructured = loadThemeManifest(themeManifestPath);
-                String themeName = unstructured.getMetadata().getName();
-                Path themeTargetPath = themeWorkDir.resolve(themeName);
-                if (!override && !FileUtils.isEmpty(themeTargetPath)) {
-                    throw new ThemeInstallationException("Theme already exists.");
-                }
-                // install theme to theme work dir
-                FileSystemUtils.copyRecursively(themeTempWorkDir, themeTargetPath);
-                return unstructured;
-            } catch (IOException e) {
-                throw new ThemeInstallationException("Unable to install theme", e);
-            } finally {
-                // clean temp directory
-                try {
-                    // null safe
-                    FileSystemUtils.deleteRecursively(tempDirectory);
-                } catch (IOException e) {
-                    // ignore this exception
-                }
-            }
-        }
-
-        static Unstructured loadThemeManifest(Path themeManifestPath) {
-            List<Unstructured> unstructureds =
-                new YamlUnstructuredLoader(new FileSystemResource(themeManifestPath))
-                    .load();
-            if (CollectionUtils.isEmpty(unstructureds)) {
-                throw new IllegalArgumentException(
-                    "The [theme.yaml] does not conform to the theme specification.");
-            }
-            return unstructureds.get(0);
-        }
-
-        @Nullable
-        private static Path resolveThemeManifest(Path tempDirectory) {
-            for (String themeManifest : THEME_MANIFESTS) {
-                Path path = tempDirectory.resolve(themeManifest);
-                if (Files.exists(path)) {
-                    return path;
-                }
-            }
-            return null;
-        }
-    }
-
     private Path getThemeWorkDir() {
         Path themePath = haloProperties.getWorkDir()
             .resolve("themes");
@@ -444,5 +437,24 @@ public class ThemeEndpoint implements CustomEndpoint {
                 "Invalid file type, only zip format is supported"));
         }
         return Mono.just(file);
+    }
+
+    Mono<Theme> deleteThemeAndWaitForComplete(String themeName) {
+        return client.fetch(Theme.class, themeName)
+            .flatMap(client::delete)
+            .flatMap(deletingTheme -> waitForThemeDeleted(themeName)
+                .thenReturn(deletingTheme));
+    }
+
+    Mono<Void> waitForThemeDeleted(String themeName) {
+        return client.fetch(Theme.class, themeName)
+            .doOnNext(theme -> {
+                throw new RetryException("Re-check if the theme is deleted successfully");
+            })
+            .retryWhen(Retry.fixedDelay(20, Duration.ofMillis(100))
+                .filter(t -> t instanceof RetryException))
+            .onErrorMap(Exceptions::isRetryExhausted,
+                throwable -> new ServerErrorException("Wait timeout for theme deleted", throwable))
+            .then();
     }
 }
