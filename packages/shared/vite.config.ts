@@ -30,12 +30,11 @@ export default defineConfig({
       fileName: (format) => `halo-console-shared.${format}.js`,
     },
     rollupOptions: {
-      external: ["vue", "vue-router", "@halo-dev/components"],
+      external: ["vue", "vue-router"],
       output: {
         globals: {
           vue: "Vue",
           "vue-router": "VueRouter",
-          "@halo-dev/components": "HaloComponents",
         },
         exports: "named",
         generatedCode: "es5",

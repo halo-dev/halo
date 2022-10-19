@@ -3,22 +3,30 @@ import {
   IconMore,
   IconSearch,
   IconUserSettings,
-  VRoutesMenu,
   VTag,
   VAvatar,
   VSpace,
   VButton,
   Dialog,
 } from "@halo-dev/components";
-import type { MenuGroupType, MenuItemType } from "../types/menus";
+import { RoutesMenu } from "@/components/menu/RoutesMenu";
+import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
 import type { User } from "@halo-dev/api-client";
 import logo from "@/assets/logo.svg";
-import { RouterView, useRoute, useRouter } from "vue-router";
-import { computed, inject, ref, type Ref } from "vue";
+import {
+  RouterView,
+  useRoute,
+  useRouter,
+  type RouteRecordRaw,
+} from "vue-router";
+import { computed, inject, onMounted, onUnmounted, ref } from "vue";
 import axios from "axios";
+import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
+import { coreMenuGroups } from "@/router/routes.config";
+import sortBy from "lodash.sortby";
+import { useRoleStore } from "@/stores/role";
+import { hasPermission } from "@/utils/permission";
 
-const menus = inject<MenuGroupType[]>("menus");
-const minimenus = inject<MenuItemType[]>("minimenus");
 const route = useRoute();
 const router = useRouter();
 
@@ -26,18 +34,13 @@ const moreMenuVisible = ref(false);
 const moreMenuRootVisible = ref(false);
 
 const currentUser = inject<User>("currentUser");
-const apiUrl = inject<string>("apiUrl");
-
-const handleRouteToProfile = () => {
-  router.push({ path: `/users/${currentUser?.metadata.name}/detail` });
-};
 
 const handleLogout = () => {
   Dialog.warning({
     title: "是否确认退出登录？",
     onConfirm: async () => {
       try {
-        await axios.post(`${apiUrl}/logout`, undefined, {
+        await axios.post(`${import.meta.env.VITE_API_URL}/logout`, undefined, {
           withCredentials: true,
         });
         router.replace({ name: "Login" });
@@ -56,12 +59,126 @@ const currentRole = computed(() => {
   )[0];
 });
 
-const globalSearchVisible = inject<Ref<boolean>>(
-  "globalSearchVisible",
-  ref(false)
-);
+// Global Search
+const globalSearchVisible = ref(false);
 
 const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
+
+const handleGlobalSearchKeybinding = (e: KeyboardEvent) => {
+  const { key, ctrlKey, metaKey } = e;
+  if (key === "k" && ((ctrlKey && !isMac) || metaKey)) {
+    globalSearchVisible.value = true;
+    e.preventDefault();
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("keydown", handleGlobalSearchKeybinding);
+});
+
+onUnmounted(() => {
+  document.addEventListener("keydown", handleGlobalSearchKeybinding);
+});
+
+// Generate menus by routes
+const menus = ref<MenuGroupType[]>([] as MenuGroupType[]);
+const minimenus = ref<MenuItemType[]>([] as MenuItemType[]);
+
+const roleStore = useRoleStore();
+const { uiPermissions } = roleStore.permissions;
+
+const generateMenus = () => {
+  // sort by menu.priority and meta.core
+  const currentRoutes = sortBy(
+    router.getRoutes().filter((route) => {
+      const { meta } = route;
+      if (!meta?.menu) {
+        return false;
+      }
+      if (meta.permissions) {
+        return hasPermission(uiPermissions, meta.permissions as string[], true);
+      }
+      return true;
+    }),
+    [
+      (route: RouteRecordRaw) => !route.meta?.core,
+      (route: RouteRecordRaw) => route.meta?.menu?.priority || 0,
+    ]
+  );
+
+  // group by menu.group
+  menus.value = currentRoutes.reduce((acc, route) => {
+    const { menu } = route.meta;
+    if (!menu) {
+      return acc;
+    }
+    const group = acc.find((item) => item.id === menu.group);
+    const childRoute = route.children[0];
+    const childMetaMenu = childRoute?.meta?.menu;
+
+    // only support one level
+    const menuChildren = childMetaMenu
+      ? [
+          {
+            name: childMetaMenu.name,
+            path: childRoute.path,
+            icon: childMetaMenu.icon,
+          },
+        ]
+      : undefined;
+    if (group) {
+      group.items?.push({
+        name: menu.name,
+        path: route.path,
+        icon: menu.icon,
+        mobile: menu.mobile,
+        children: menuChildren,
+      });
+    } else {
+      const menuGroup = coreMenuGroups.find((item) => item.id === menu.group);
+      let name = "";
+      if (!menuGroup) {
+        name = menu.group;
+      } else if (menuGroup.name) {
+        name = menuGroup.name;
+      }
+      acc.push({
+        id: menuGroup?.id || menu.group,
+        name: name,
+        priority: menuGroup?.priority || 0,
+        items: [
+          {
+            name: menu.name,
+            path: route.path,
+            icon: menu.icon,
+            mobile: menu.mobile,
+            children: menuChildren,
+          },
+        ],
+      });
+    }
+    return acc;
+  }, [] as MenuGroupType[]);
+
+  // sort by menu.priority
+  menus.value = sortBy(menus.value, [
+    (menu: MenuGroupType) => {
+      return coreMenuGroups.findIndex((item) => item.id === menu.id) < 0;
+    },
+    (menu: MenuGroupType) => menu.priority || 0,
+  ]);
+
+  minimenus.value = menus.value
+    .reduce((acc, group) => {
+      if (group?.items) {
+        acc.push(...group.items);
+      }
+      return acc;
+    }, [] as MenuItemType[])
+    .filter((item) => item.mobile);
+};
+
+onMounted(generateMenus);
 </script>
 
 <template>
@@ -84,7 +201,7 @@ const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
           </div>
         </div>
       </div>
-      <VRoutesMenu :menus="menus" />
+      <RoutesMenu :menus="menus" />
       <div class="current-profile">
         <div v-if="currentUser?.spec.avatar" class="profile-avatar">
           <VAvatar
@@ -118,7 +235,10 @@ const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
                   v-close-popper
                   block
                   type="secondary"
-                  @click="handleRouteToProfile"
+                  :route="{
+                    name: 'UserDetail',
+                    params: { name: currentUser?.metadata.name },
+                  }"
                 >
                   个人资料
                 </VButton>
@@ -136,6 +256,7 @@ const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
         </FloatingDropdown>
       </div>
     </aside>
+
     <main class="content w-full overflow-y-auto pb-12 mb-safe md:pb-0">
       <slot v-if="$slots.default" />
       <RouterView v-else />
@@ -144,7 +265,7 @@ const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
     <!--bottom nav bar-->
     <div
       v-if="minimenus"
-      class="bottom-nav-bar fixed left-0 bottom-0 right-0 grid grid-cols-6 border-t-2 border-black drop-shadow-2xl mt-safe pb-safe md:hidden bg-secondary"
+      class="bottom-nav-bar fixed left-0 bottom-0 right-0 grid grid-cols-6 border-t-2 border-black bg-secondary drop-shadow-2xl mt-safe pb-safe md:hidden"
     >
       <div
         v-for="(menu, index) in minimenus"
@@ -217,7 +338,7 @@ const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
               class="drawer-content relative flex h-3/4 w-screen flex-col items-stretch overflow-y-auto rounded-t-md bg-white shadow-xl"
             >
               <div class="drawer-body">
-                <VRoutesMenu
+                <RoutesMenu
                   :menus="menus"
                   class="p-0"
                   @select="moreMenuVisible = false"
@@ -229,6 +350,7 @@ const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
       </Teleport>
     </div>
   </div>
+  <GlobalSearchModal v-model:visible="globalSearchVisible" />
 </template>
 
 <style lang="scss">
@@ -241,24 +363,24 @@ const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
 
   .current-profile {
     height: 70px;
-    @apply w-64
-    bg-white
-    p-3
-    flex
-    fixed
+    @apply fixed
     left-0
     bottom-0
-    gap-3;
+    flex
+    w-64
+    gap-3
+    bg-white
+    p-3;
 
     .profile-avatar {
-      @apply self-center
-      flex 
-      items-center;
+      @apply flex
+      items-center 
+      self-center;
     }
 
     .profile-name {
-      @apply self-center
-      flex-1;
+      @apply flex-1
+      self-center;
     }
 
     .profile-control {

@@ -12,7 +12,7 @@ import { useSettingForm } from "@/composables/use-setting-form";
 
 // components
 import { VButton, VCard, VPageHeader, VTabbar } from "@halo-dev/components";
-import { BasicLayout } from "@halo-dev/console-shared";
+import BasicLayout from "@/layouts/BasicLayout.vue";
 
 // types
 import type { Ref } from "vue";

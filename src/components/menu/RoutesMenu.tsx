@@ -1,12 +1,12 @@
 import type { Component, PropType } from "vue";
 import { computed, defineComponent } from "vue";
-import type { MenuGroupType, MenuItemType } from "./interface";
-import { VMenu, VMenuItem, VMenuLabel } from "./index";
+import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
+import { VMenu, VMenuItem, VMenuLabel } from "@halo-dev/components";
 import type { RouteLocationMatched } from "vue-router";
 import { useRoute, useRouter } from "vue-router";
 
-const VRoutesMenu = defineComponent({
-  name: "VRoutesMenu",
+const RoutesMenu = defineComponent({
+  name: "RoutesMenu",
   props: {
     menus: {
       type: Object as PropType<MenuGroupType[]>,
@@ -80,4 +80,4 @@ const VRoutesMenu = defineComponent({
   },
 });
 
-export { VRoutesMenu };
+export { RoutesMenu };

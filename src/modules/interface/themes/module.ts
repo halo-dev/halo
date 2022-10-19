@@ -1,9 +1,11 @@
-import { BlankLayout, definePlugin } from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/console-shared";
+import BlankLayout from "@/layouts/BlankLayout.vue";
 import ThemeLayout from "./layouts/ThemeLayout.vue";
 import ThemeDetail from "./ThemeDetail.vue";
 import ThemeSetting from "./ThemeSetting.vue";
 import Visual from "./Visual.vue";
 import { IconPalette } from "@halo-dev/components";
+import { markRaw } from "vue";
 
 export default definePlugin({
   name: "themeModule",
@@ -21,6 +23,12 @@ export default definePlugin({
             title: "主题",
             searchable: true,
             permissions: ["system:themes:view"],
+            menu: {
+              name: "主题",
+              group: "interface",
+              icon: markRaw(IconPalette),
+              priority: 0,
+            },
           },
         },
         {
@@ -45,18 +53,6 @@ export default definePlugin({
           meta: {
             title: "可视化编辑",
           },
-        },
-      ],
-    },
-  ],
-  menus: [
-    {
-      name: "外观",
-      items: [
-        {
-          name: "主题",
-          path: "/theme",
-          icon: IconPalette,
         },
       ],
     },

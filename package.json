@@ -52,6 +52,7 @@
     "lodash.clonedeep": "^4.5.0",
     "lodash.isequal": "^4.5.0",
     "lodash.merge": "^4.6.2",
+    "lodash.sortby": "^4.7.0",
     "path-browserify": "^1.0.1",
     "pinia": "^2.0.23",
     "pretty-bytes": "^6.0.0",

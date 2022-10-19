@@ -37,9 +37,6 @@
   },
   "homepage": "https://github.com/halo-dev/console/tree/main/packages/shared#readme",
   "license": "MIT",
-  "dependencies": {
-    "@halo-dev/components": "workspace:*"
-  },
   "devDependencies": {
     "vite-plugin-dts": "^1.6.5"
   },

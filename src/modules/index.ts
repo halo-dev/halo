@@ -10,18 +10,32 @@ import userModule from "./system/users/module";
 import roleModule from "./system/roles/module";
 import settingModule from "./system/settings/module";
 
+// const coreModules = [
+//   dashboardModule,
+//   postModule,
+//   pageModule,
+//   commentModule,
+//   attachmentModule,
+//   themeModule,
+//   menuModule,
+//   pluginModule,
+//   userModule,
+//   roleModule,
+//   settingModule,
+// ];
+
 const coreModules = [
-  dashboardModule,
   postModule,
-  pageModule,
+  pluginModule,
+  settingModule,
+  dashboardModule,
+  menuModule,
   commentModule,
   attachmentModule,
+  pageModule,
   themeModule,
-  menuModule,
-  pluginModule,
   userModule,
   roleModule,
-  settingModule,
 ];
 
 export { coreModules };

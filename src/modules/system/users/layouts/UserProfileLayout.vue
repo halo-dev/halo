@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { BasicLayout } from "@halo-dev/console-shared";
+import BasicLayout from "@/layouts/BasicLayout.vue";
 import { apiClient } from "@/utils/api-client";
 import {
   IconUpload,

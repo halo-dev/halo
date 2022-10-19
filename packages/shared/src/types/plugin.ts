@@ -1,6 +1,5 @@
 import type { Component, Ref } from "vue";
 import type { RouteRecordRaw, RouteRecordName } from "vue-router";
-import type { MenuGroupType } from "./menus";
 import type { PagesPublicState } from "../states/pages";
 import type { AttachmentSelectorPublicState } from "../states/attachment-selector";
 
@@ -10,7 +9,7 @@ export type ExtensionPointState =
   | PagesPublicState
   | AttachmentSelectorPublicState;
 
-interface RouteRecordAppend {
+export interface RouteRecordAppend {
   parentName: RouteRecordName;
   route: RouteRecordRaw;
 }
@@ -34,8 +33,6 @@ export interface Plugin {
   deactivated?: () => void;
 
   routes?: RouteRecordRaw[] | RouteRecordAppend[];
-
-  menus?: MenuGroupType[];
 
   extensionPoints?: {
     [key in ExtensionPointName]?: (state: Ref<ExtensionPointState>) => void;

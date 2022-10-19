@@ -1,13 +1,12 @@
-import {
-  BasicLayout,
-  BlankLayout,
-  definePlugin,
-} from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/console-shared";
+import BasicLayout from "@/layouts/BasicLayout.vue";
+import BlankLayout from "@/layouts/BlankLayout.vue";
 import PageLayout from "./layouts/PageLayout.vue";
 import FunctionalPageList from "./FunctionalPageList.vue";
 import SinglePageList from "./SinglePageList.vue";
 import SinglePageEditor from "./SinglePageEditor.vue";
 import { IconPages } from "@halo-dev/components";
+import { markRaw } from "vue";
 
 export default definePlugin({
   name: "pageModule",
@@ -19,6 +18,14 @@ export default definePlugin({
       name: "BasePages",
       redirect: {
         name: "FunctionalPages",
+      },
+      meta: {
+        menu: {
+          name: "页面",
+          group: "content",
+          icon: markRaw(IconPages),
+          priority: 1,
+        },
       },
       children: [
         {
@@ -73,18 +80,6 @@ export default definePlugin({
               ],
             },
           ],
-        },
-      ],
-    },
-  ],
-  menus: [
-    {
-      name: "内容",
-      items: [
-        {
-          name: "页面",
-          path: "/pages",
-          icon: IconPages,
         },
       ],
     },

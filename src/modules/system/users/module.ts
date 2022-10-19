@@ -1,14 +1,13 @@
-import {
-  BasicLayout,
-  BlankLayout,
-  definePlugin,
-} from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/console-shared";
+import BasicLayout from "@/layouts/BasicLayout.vue";
+import BlankLayout from "@/layouts/BlankLayout.vue";
 import UserProfileLayout from "./layouts/UserProfileLayout.vue";
 import UserList from "./UserList.vue";
 import UserDetail from "./UserDetail.vue";
 import PersonalAccessTokens from "./PersonalAccessTokens.vue";
 import Login from "./Login.vue";
 import { IconUserSettings } from "@halo-dev/components";
+import { markRaw } from "vue";
 
 export default definePlugin({
   name: "userModule",
@@ -35,6 +34,13 @@ export default definePlugin({
                 title: "用户",
                 searchable: true,
                 permissions: ["system:users:view"],
+                menu: {
+                  name: "用户",
+                  group: "system",
+                  icon: markRaw(IconUserSettings),
+                  priority: 1,
+                  mobile: true,
+                },
               },
             },
           ],
@@ -61,18 +67,6 @@ export default definePlugin({
               },
             },
           ],
-        },
-      ],
-    },
-  ],
-  menus: [
-    {
-      name: "系统",
-      items: [
-        {
-          name: "用户",
-          path: "/users",
-          icon: IconUserSettings,
         },
       ],
     },

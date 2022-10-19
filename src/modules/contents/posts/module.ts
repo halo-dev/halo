@@ -1,13 +1,12 @@
-import {
-  BasicLayout,
-  BlankLayout,
-  definePlugin,
-} from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/console-shared";
+import BasicLayout from "@/layouts/BasicLayout.vue";
+import BlankLayout from "@/layouts/BlankLayout.vue";
 import { IconBookRead } from "@halo-dev/components";
 import PostList from "./PostList.vue";
 import PostEditor from "./PostEditor.vue";
 import CategoryList from "./categories/CategoryList.vue";
 import TagList from "./tags/TagList.vue";
+import { markRaw } from "vue";
 
 export default definePlugin({
   name: "postModule",
@@ -25,6 +24,13 @@ export default definePlugin({
             title: "文章",
             searchable: true,
             permissions: ["system:posts:view"],
+            menu: {
+              name: "文章",
+              group: "content",
+              icon: markRaw(IconBookRead),
+              priority: 0,
+              mobile: true,
+            },
           },
         },
         {
@@ -68,18 +74,6 @@ export default definePlugin({
               },
             },
           ],
-        },
-      ],
-    },
-  ],
-  menus: [
-    {
-      name: "内容",
-      items: [
-        {
-          name: "文章",
-          path: "/posts",
-          icon: IconBookRead,
         },
       ],
     },

@@ -1,4 +1,5 @@
-import { BasicLayout, definePlugin } from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/console-shared";
+import BasicLayout from "@/layouts/BasicLayout.vue";
 import RoleList from "./RoleList.vue";
 import RoleDetail from "./RoleDetail.vue";
 
@@ -32,5 +33,4 @@ export default definePlugin({
       ],
     },
   ],
-  menus: [],
 });

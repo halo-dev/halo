@@ -10,7 +10,7 @@ import cloneDeep from "lodash.clonedeep";
 // hooks
 import { useThemeLifeCycle } from "../composables/use-theme";
 // types
-import { BasicLayout } from "@halo-dev/console-shared";
+import BasicLayout from "@/layouts/BasicLayout.vue";
 import { useSettingForm } from "@/composables/use-setting-form";
 
 // components

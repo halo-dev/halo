@@ -60,6 +60,7 @@ importers:
       lodash.clonedeep: ^4.5.0
       lodash.isequal: ^4.5.0
       lodash.merge: ^4.6.2
+      lodash.sortby: ^4.7.0
       path-browserify: ^1.0.1
       pinia: ^2.0.23
       postcss: ^8.4.17
@@ -119,6 +120,7 @@ importers:
       lodash.clonedeep: 4.5.0
       lodash.isequal: 4.5.0
       lodash.merge: 4.6.2
+      lodash.sortby: 4.7.0
       path-browserify: 1.0.1
       pinia: 2.0.23_rg374xhldfcyvjtaj3qktyfz5y
       pretty-bytes: 6.0.0
@@ -166,7 +168,7 @@ importers:
       randomstring: 1.2.2
       sass: 1.55.0
       start-server-and-test: 1.14.0
-      tailwindcss: 3.1.8_postcss@8.4.17
+      tailwindcss: 3.1.8
       tailwindcss-safe-area: 0.2.2
       tailwindcss-themer: 2.0.2_tailwindcss@3.1.8
       typescript: 4.7.4
@@ -210,10 +212,7 @@ importers:
 
   packages/shared:
     specifiers:
-      '@halo-dev/components': workspace:*
       vite-plugin-dts: ^1.6.5
-    dependencies:
-      '@halo-dev/components': link:../components
     devDependencies:
       vite-plugin-dts: 1.6.5
 
@@ -1862,7 +1861,7 @@ packages:
         optional: true
     dependencies:
       '@formkit/core': 1.0.0-beta.11
-      tailwindcss: 3.1.8_postcss@8.4.17
+      tailwindcss: 3.1.8
     dev: false
 
   /@formkit/utils/1.0.0-beta.11:
@@ -2563,7 +2562,7 @@ packages:
     peerDependencies:
       tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
     dependencies:
-      tailwindcss: 3.1.8_postcss@8.4.17
+      tailwindcss: 3.1.8
     dev: true
 
   /@tiptap/core/2.0.0-beta.195:
@@ -6552,7 +6551,6 @@ packages:
 
   /lodash.sortby/4.7.0:
     resolution: {integrity: sha512-HDWXG8isMntAyRF5vZ7xKuEvOhT4AhlRt/3czTSjvGUxjYCBVRQY48ViDHyfYz9VIoBkW4TMGQNapx+l3RUwdA==}
-    dev: true
 
   /lodash.startcase/4.4.0:
     resolution: {integrity: sha512-+WKqsK294HMSc2jEbNgpHpd0JfIBhp7rEV4aqXWqFr6AlXov+SlcgB1Fv01y2kGe3Gc8nMW7VA0SrGuSkRfIEg==}
@@ -8180,15 +8178,13 @@ packages:
       just-unique: 4.1.1
       lodash.merge: 4.6.2
       lodash.mergewith: 4.6.2
-      tailwindcss: 3.1.8_postcss@8.4.17
+      tailwindcss: 3.1.8
     dev: true
 
-  /tailwindcss/3.1.8_postcss@8.4.17:
+  /tailwindcss/3.1.8:
     resolution: {integrity: sha512-YSneUCZSFDYMwk+TGq8qYFdCA3yfBRdBlS7txSq0LUmzyeqRe3a8fBQzbz9M3WS/iFT4BNf/nmw9mEzrnSaC0g==}
     engines: {node: '>=12.13.0'}
     hasBin: true
-    peerDependencies:
-      postcss: ^8.0.9
     dependencies:
       arg: 5.0.2
       chokidar: 3.5.3

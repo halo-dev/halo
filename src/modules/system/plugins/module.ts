@@ -1,13 +1,12 @@
-import {
-  BasicLayout,
-  BlankLayout,
-  definePlugin,
-} from "@halo-dev/console-shared";
+import { definePlugin } from "@halo-dev/console-shared";
+import BasicLayout from "@/layouts/BasicLayout.vue";
+import BlankLayout from "@/layouts/BlankLayout.vue";
 import PluginLayout from "./layouts/PluginLayout.vue";
 import PluginList from "./PluginList.vue";
 import PluginSetting from "./PluginSetting.vue";
 import PluginDetail from "./PluginDetail.vue";
 import { IconPlug } from "@halo-dev/components";
+import { markRaw } from "vue";
 
 export default definePlugin({
   name: "pluginModule",
@@ -29,6 +28,12 @@ export default definePlugin({
                 title: "插件",
                 searchable: true,
                 permissions: ["system:plugins:view"],
+                menu: {
+                  name: "插件",
+                  group: "system",
+                  icon: markRaw(IconPlug),
+                  priority: 0,
+                },
               },
             },
           ],
@@ -56,18 +61,6 @@ export default definePlugin({
               },
             },
           ],
-        },
-      ],
-    },
-  ],
-  menus: [
-    {
-      name: "系统",
-      items: [
-        {
-          name: "插件",
-          path: "/plugins",
-          icon: IconPlug,
         },
       ],
     },
