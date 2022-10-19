@@ -4,6 +4,7 @@ import org.springframework.lang.Nullable;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.theme.finders.vo.ContentVo;
+import run.halo.app.theme.finders.vo.PostArchiveVo;
 import run.halo.app.theme.finders.vo.PostVo;
 
 /**
@@ -24,4 +25,10 @@ public interface PostFinder {
         String categoryName);
 
     ListResult<PostVo> listByTag(@Nullable Integer page, @Nullable Integer size, String tag);
+
+    ListResult<PostArchiveVo> archives(Integer page, Integer size);
+
+    ListResult<PostArchiveVo> archives(Integer page, Integer size, String year);
+
+    ListResult<PostArchiveVo> archives(Integer page, Integer size, String year, String month);
 }

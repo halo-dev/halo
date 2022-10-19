@@ -18,6 +18,7 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
+import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -78,6 +79,11 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             labels.put(Post.VISIBLE_LABEL,
                 Objects.requireNonNullElse(spec.getVisible(), Post.VisibleEnum.PUBLIC).name());
             labels.put(Post.OWNER_LABEL, spec.getOwner());
+            Instant publishTime = post.getSpec().getPublishTime();
+            if (publishTime != null) {
+                labels.put(Post.ARCHIVE_YEAR_LABEL, HaloUtils.getYearText(publishTime));
+                labels.put(Post.ARCHIVE_MONTH_LABEL, HaloUtils.getMonthText(publishTime));
+            }
 
             if (!oldPost.equals(post)) {
                 client.update(post);
