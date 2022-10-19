@@ -12,9 +12,11 @@ import org.jsoup.Jsoup;
 import org.springframework.util.Assert;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
+import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
@@ -198,6 +200,21 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     private void cleanUpResources(Post post) {
         // remove permalink from permalink indexer
         postPermalinkPolicy.onPermalinkDelete(post);
+
+        if (post.getMetadata().getDeletionTimestamp() != null) {
+            // clean up snapshots
+            Snapshot.SubjectRef subjectRef =
+                Snapshot.SubjectRef.of(Post.KIND, post.getMetadata().getName());
+            client.list(Snapshot.class,
+                    snapshot -> subjectRef.equals(snapshot.getSpec().getSubjectRef()), null)
+                .forEach(client::delete);
+
+            // clean up comments
+            Ref ref = Ref.of(post);
+            client.list(Comment.class, comment -> comment.getSpec().getSubjectRef().equals(ref),
+                    null)
+                .forEach(client::delete);
+        }
     }
 
     private Map<String, String> getLabelsOrDefault(Post post) {

@@ -16,11 +16,13 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.permalinks.ExtensionLocator;
+import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.SinglePage;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
@@ -96,6 +98,21 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private void cleanUpResources(SinglePage singlePage) {
         // remove permalink from permalink indexer
         permalinkOnDelete(singlePage);
+
+        if (singlePage.getMetadata().getDeletionTimestamp() != null) {
+            // clean up snapshot
+            Snapshot.SubjectRef subjectRef =
+                Snapshot.SubjectRef.of(SinglePage.KIND, singlePage.getMetadata().getName());
+            client.list(Snapshot.class,
+                    snapshot -> subjectRef.equals(snapshot.getSpec().getSubjectRef()), null)
+                .forEach(client::delete);
+
+            // clean up comments
+            Ref ref = Ref.of(singlePage);
+            client.list(Comment.class, comment -> comment.getSpec().getSubjectRef().equals(ref),
+                    null)
+                .forEach(client::delete);
+        }
     }
 
     private void cleanUpResourcesAndRemoveFinalizer(String pageName) {
