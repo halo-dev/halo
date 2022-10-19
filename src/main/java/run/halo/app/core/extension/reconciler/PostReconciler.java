@@ -21,6 +21,8 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.metrics.CounterService;
+import run.halo.app.metrics.MeterUtils;
 
 /**
  * <p>Reconciler for {@link Post}.</p>
@@ -39,12 +41,14 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     private final ExtensionClient client;
     private final ContentService contentService;
     private final PostPermalinkPolicy postPermalinkPolicy;
+    private final CounterService counterService;
 
     public PostReconciler(ExtensionClient client, ContentService contentService,
-        PostPermalinkPolicy postPermalinkPolicy) {
+        PostPermalinkPolicy postPermalinkPolicy, CounterService counterService) {
         this.client = client;
         this.contentService = contentService;
         this.postPermalinkPolicy = postPermalinkPolicy;
+        this.counterService = counterService;
     }
 
     @Override
@@ -214,6 +218,10 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             client.list(Comment.class, comment -> comment.getSpec().getSubjectRef().equals(ref),
                     null)
                 .forEach(client::delete);
+
+            // delete counter
+            counterService.deleteByName(MeterUtils.nameOf(Post.class, post.getMetadata().getName()))
+                .block();
         }
     }
 

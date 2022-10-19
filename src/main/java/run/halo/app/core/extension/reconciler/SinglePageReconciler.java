@@ -28,6 +28,8 @@ import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.PathUtils;
+import run.halo.app.metrics.CounterService;
+import run.halo.app.metrics.MeterUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.PermalinkIndexAddCommand;
 import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
@@ -52,13 +54,16 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private final ContentService contentService;
     private final ApplicationContext applicationContext;
     private final TemplateRouteManager templateRouteManager;
+    private final CounterService counterService;
 
     public SinglePageReconciler(ExtensionClient client, ContentService contentService,
-        ApplicationContext applicationContext, TemplateRouteManager templateRouteManager) {
+        ApplicationContext applicationContext, TemplateRouteManager templateRouteManager,
+        CounterService counterService) {
         this.client = client;
         this.contentService = contentService;
         this.applicationContext = applicationContext;
         this.templateRouteManager = templateRouteManager;
+        this.counterService = counterService;
     }
 
     @Override
@@ -112,6 +117,11 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
             client.list(Comment.class, comment -> comment.getSpec().getSubjectRef().equals(ref),
                     null)
                 .forEach(client::delete);
+
+            // delete counter for single page
+            counterService.deleteByName(
+                    MeterUtils.nameOf(SinglePage.class, singlePage.getMetadata().getName()))
+                .block();
         }
     }
 
