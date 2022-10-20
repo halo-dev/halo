@@ -196,7 +196,12 @@ public class PluginEndpoint implements CustomEndpoint {
                         String fileName = created.generateFileName();
                         var pluginRoot = Paths.get(pluginProperties.getPluginsRoot());
                         createDirectoriesIfNotExists(pluginRoot);
-                        FileUtils.copy(tempJarFilePath, pluginRoot.resolve(fileName));
+                        Path pluginFilePath = pluginRoot.resolve(fileName);
+                        if (Files.exists(pluginFilePath)) {
+                            throw new IllegalArgumentException(
+                                "Plugin already installed : " + pluginFilePath);
+                        }
+                        FileUtils.copy(tempJarFilePath, pluginFilePath);
                         return created;
                     })
                     .doOnError(error -> {

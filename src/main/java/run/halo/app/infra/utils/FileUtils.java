@@ -2,6 +2,7 @@ package run.halo.app.infra.utils;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.nio.file.CopyOption;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -171,9 +172,9 @@ public abstract class FileUtils {
         checkDirectoryTraversal(parentPath, Paths.get(pathToCheck));
     }
 
-    public static void copy(Path source, Path dest) {
+    public static void copy(Path source, Path dest, CopyOption... options) {
         try {
-            Files.copy(source, dest);
+            Files.copy(source, dest, options);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

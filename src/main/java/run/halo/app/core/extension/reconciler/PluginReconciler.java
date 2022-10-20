@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
+import org.pf4j.RuntimeMode;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
@@ -200,11 +201,14 @@ public class PluginReconciler implements Reconciler<Request> {
         if (pluginWrapper == null) {
             return;
         }
-        // delete plugin file
-        try {
-            Files.deleteIfExists(pluginWrapper.getPluginPath());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+        if (RuntimeMode.DEPLOYMENT.equals(pluginWrapper.getRuntimeMode())) {
+            // delete plugin file
+            try {
+                Files.deleteIfExists(pluginWrapper.getPluginPath());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
