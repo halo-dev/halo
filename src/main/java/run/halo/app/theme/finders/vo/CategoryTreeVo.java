@@ -1,6 +1,7 @@
 package run.halo.app.theme.finders.vo;
 
 import java.util.List;
+import java.util.Objects;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,7 +20,7 @@ import run.halo.app.extension.MetadataOperator;
 @Builder
 @ToString
 @EqualsAndHashCode
-public class CategoryTreeVo {
+public class CategoryTreeVo implements VisualizableTreeNode<CategoryTreeVo> {
 
     private MetadataOperator metadata;
 
@@ -46,7 +47,12 @@ public class CategoryTreeVo {
             .spec(category.getSpec())
             .status(category.getStatus())
             .children(List.of())
-            .postCount(category.getPostCount())
+            .postCount(Objects.requireNonNullElse(category.getPostCount(), 0))
             .build();
+    }
+
+    @Override
+    public String nodeText() {
+        return String.format("%s (%s)", getSpec().getDisplayName(), getPostCount());
     }
 }

@@ -92,7 +92,6 @@ public class JSONExtensionConverter implements ExtensionConverter {
         throws MalformedURLException, ResolutionException {
         var context = new ValidationContext<OAI3>(
             new OAI3Context(new URL("file:/"), scheme.openApiSchema()));
-        context.addValidator("x-validation", ExtraValidationValidator::new);
         context.setFastFail(false);
         return new SchemaValidator(context, null, scheme.openApiSchema());
     }

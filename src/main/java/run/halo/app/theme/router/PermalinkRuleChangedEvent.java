@@ -5,17 +5,23 @@ import run.halo.app.theme.DefaultTemplateEnum;
 
 public class PermalinkRuleChangedEvent extends ApplicationEvent {
     private final DefaultTemplateEnum template;
+    private final String oldRule;
     private final String rule;
 
     public PermalinkRuleChangedEvent(Object source, DefaultTemplateEnum template,
-        String rule) {
+        String oldRule, String rule) {
         super(source);
         this.template = template;
+        this.oldRule = oldRule;
         this.rule = rule;
     }
 
     public DefaultTemplateEnum getTemplate() {
         return template;
+    }
+
+    public String getOldRule() {
+        return oldRule;
     }
 
     public String getRule() {

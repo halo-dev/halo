@@ -2,7 +2,6 @@ package run.halo.app.extension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -85,8 +84,8 @@ class JsonExtensionConverterTest {
         var error = assertThrows(SchemaViolationException.class, () -> converter.convertTo(fake));
         assertEquals(1, error.getErrors().size());
         var result = error.getErrors().items().get(0);
-        // error.getErrors().items().get(0).message();
-        assertTrue(result.toString().contains("name, generateName"));
+        assertEquals(1026, result.code());
+        assertEquals("Field 'name' is required.", result.message());
     }
 
     FakeExtension createFakeExtension(String name, Long version) {
