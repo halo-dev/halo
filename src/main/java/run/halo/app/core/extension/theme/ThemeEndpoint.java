@@ -7,13 +7,13 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.util.FileSystemUtils.copyRecursively;
-import static org.springframework.util.FileSystemUtils.deleteRecursively;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static reactor.core.scheduler.Schedulers.boundedElastic;
 import static run.halo.app.core.extension.theme.ThemeUtils.loadThemeManifest;
 import static run.halo.app.core.extension.theme.ThemeUtils.locateThemeManifest;
 import static run.halo.app.core.extension.theme.ThemeUtils.unzipThemeTo;
 import static run.halo.app.infra.utils.DataBufferUtils.toInputStream;
+import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
 import static run.halo.app.infra.utils.FileUtils.unzip;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -100,16 +100,15 @@ public class ThemeEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(Theme.class))
             )
-            .POST("themes/{name}/upgrade", this::upgrade, builder -> {
-                builder.operationId("UpgradeTheme")
+            .POST("themes/{name}/upgrade", this::upgrade,
+                builder -> builder.operationId("UpgradeTheme")
                     .description("Upgrade theme")
                     .tag(tag)
                     .parameter(parameterBuilder().in(ParameterIn.PATH).name("name").required(true))
                     .requestBody(requestBodyBuilder().required(true)
                         .content(contentBuilder().mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .schema(schemaBuilder().implementation(UpgradeRequest.class))))
-                    .build();
-            })
+                    .build())
             .PUT("themes/{name}/reload-setting", this::reloadSetting,
                 builder -> builder.operationId("ReloadThemeSetting")
                     .description("Reload theme setting.")
@@ -159,11 +158,7 @@ public class ThemeEndpoint implements CustomEndpoint {
         }).flatMap(extensions -> ServerResponse.ok().bodyValue(extensions));
     }
 
-    // public record UpgradeRequest(
-    //     @Schema(required = true, description = "Theme zip file.") FilePart file) {
-    // }
-
-    public static interface IUpgradeRequest {
+    public interface IUpgradeRequest {
 
         @Schema(required = true, description = "Theme zip file.")
         FilePart getFile();
@@ -193,9 +188,14 @@ public class ThemeEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> upgrade(ServerRequest request) {
+        var themeNameInPath = request.pathVariable("name");
         final var tempDir = new AtomicReference<Path>();
         final var tempThemeRoot = new AtomicReference<Path>();
-        return request.multipartData()
+        // validate the theme first
+        return client.fetch(Theme.class, themeNameInPath)
+            .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
+                "The given theme with name " + themeNameInPath + " does not exist")))
+            .then(request.multipartData())
             .map(UpgradeRequest::new)
             .map(UpgradeRequest::getFile)
             .publishOn(boundedElastic())
@@ -218,14 +218,12 @@ public class ThemeEndpoint implements CustomEndpoint {
             })
             .map(ThemeUtils::loadThemeManifest)
             .doOnNext(newTheme -> {
-                var themeNameInPath = request.pathVariable("name");
                 if (!Objects.equals(themeNameInPath, newTheme.getMetadata().getName())) {
                     if (log.isDebugEnabled()) {
                         log.error("Want theme name: {}, but provided: {}", themeNameInPath,
                             newTheme.getMetadata().getName());
                     }
-                    throw new ServerWebInputException(
-                        "please make sure the theme name is correct");
+                    throw new ServerWebInputException("please make sure the theme name is correct");
                 }
             })
             .flatMap(newTheme -> {
@@ -247,19 +245,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                 .bodyValue(updatedTheme))
             .doFinally(signalType -> {
                 // clear the temporary folder
-                try {
-                    var deleted = deleteRecursively(tempDir.get());
-                    if (deleted) {
-                        log.debug(
-                            "Clean up temporary directory {} successfully after upgrading "
-                                + "theme", tempDir.get());
-                    }
-                } catch (IOException e) {
-                    // Ignore this error
-                    if (log.isTraceEnabled()) {
-                        log.warn("Failed to delete folder " + tempDir.get(), e);
-                    }
-                }
+                deleteRecursivelyAndSilently(tempDir.get());
             });
     }
 
