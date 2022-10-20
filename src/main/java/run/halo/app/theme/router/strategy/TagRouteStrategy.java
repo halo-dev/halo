@@ -1,29 +1,25 @@
 package run.halo.app.theme.router.strategy;
 
-import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
-import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
-import static run.halo.app.theme.router.TemplateRouterStrategy.PageUrlUtils.pageNum;
-import static run.halo.app.theme.router.TemplateRouterStrategy.PageUrlUtils.totalPage;
+import static run.halo.app.theme.router.PageUrlUtils.pageNum;
+import static run.halo.app.theme.router.PageUrlUtils.totalPage;
 
 import java.util.Map;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.extension.GroupVersionKind;
-import run.halo.app.infra.utils.PathUtils;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.finders.vo.TagVo;
-import run.halo.app.theme.router.PermalinkIndexer;
-import run.halo.app.theme.router.TemplateRouterStrategy;
+import run.halo.app.theme.router.PageUrlUtils;
 import run.halo.app.theme.router.UrlContextListResult;
 
 /**
@@ -34,41 +30,16 @@ import run.halo.app.theme.router.UrlContextListResult;
  * @since 2.0.0
  */
 @Component
-public class TagRouteStrategy implements TemplateRouterStrategy {
-
-    private final PermalinkIndexer permalinkIndexer;
+public class TagRouteStrategy implements DetailsPageRouteHandlerStrategy {
+    private final GroupVersionKind gvk = GroupVersionKind.fromExtension(Tag.class);
     private final PostFinder postFinder;
 
     private final TagFinder tagFinder;
 
-    public TagRouteStrategy(PermalinkIndexer permalinkIndexer, PostFinder postFinder,
+    public TagRouteStrategy(PostFinder postFinder,
         TagFinder tagFinder) {
-        this.permalinkIndexer = permalinkIndexer;
         this.postFinder = postFinder;
         this.tagFinder = tagFinder;
-    }
-
-    @Override
-    public RouterFunction<ServerResponse> getRouteFunction(String template, String prefix) {
-        return RouterFunctions
-            .route(GET(PathUtils.combinePath(prefix, "/{slug}"))
-                    .or(GET(PathUtils.combinePath(prefix, "/{slug}/page/{page:\\d+}")))
-                    .and(accept(MediaType.TEXT_HTML)),
-                request -> {
-                    GroupVersionKind gvk = GroupVersionKind.fromExtension(Tag.class);
-                    String slug = request.pathVariable("slug");
-                    if (!permalinkIndexer.containsSlug(gvk, slug)) {
-                        return ServerResponse.notFound().build();
-                    }
-
-                    String name = permalinkIndexer.getNameBySlug(gvk, slug);
-                    return ServerResponse.ok()
-                        .render(DefaultTemplateEnum.TAG.getValue(),
-                            Map.of("name", name,
-                                "posts", postList(request, name),
-                                "tag", tagByName(name))
-                        );
-                });
     }
 
     private Mono<UrlContextListResult<PostVo>> postList(ServerRequest request, String name) {
@@ -85,5 +56,21 @@ public class TagRouteStrategy implements TemplateRouterStrategy {
     private Mono<TagVo> tagByName(String name) {
         return Mono.defer(() -> Mono.just(tagFinder.getByName(name)))
             .publishOn(Schedulers.boundedElastic());
+    }
+
+    @Override
+    public HandlerFunction<ServerResponse> getHandler(SystemSetting.ThemeRouteRules routeRules,
+        String name) {
+        return request -> ServerResponse.ok()
+            .render(DefaultTemplateEnum.TAG.getValue(),
+                Map.of("name", name,
+                    "posts", postList(request, name),
+                    "tag", tagByName(name))
+            );
+    }
+
+    @Override
+    public boolean supports(GroupVersionKind gvk) {
+        return this.gvk.equals(gvk);
     }
 }

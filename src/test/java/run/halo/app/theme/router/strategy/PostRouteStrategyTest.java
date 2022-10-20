@@ -1,11 +1,8 @@
 package run.halo.app.theme.router.strategy;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,19 +10,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.reactive.function.server.HandlerStrategies;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.reactive.result.view.ViewResolver;
-import reactor.core.publisher.Mono;
 import run.halo.app.content.TestPost;
-import run.halo.app.content.permalinks.ExtensionLocator;
-import run.halo.app.core.extension.Post;
-import run.halo.app.extension.GroupVersionKind;
-import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
-import run.halo.app.theme.router.PermalinkIndexer;
 
 /**
  * Tests for {@link PostRouteStrategy}.
@@ -34,13 +24,7 @@ import run.halo.app.theme.router.PermalinkIndexer;
  * @since 2.0.0
  */
 @ExtendWith(MockitoExtension.class)
-class PostRouteStrategyTest {
-
-    @Mock
-    private ViewResolver viewResolver;
-
-    @Mock
-    private PermalinkIndexer permalinkIndexer;
+class PostRouteStrategyTest extends RouterStrategyTestSuite {
 
     @Mock
     private PostFinder postFinder;
@@ -48,20 +32,21 @@ class PostRouteStrategyTest {
     @InjectMocks
     private PostRouteStrategy postRouteStrategy;
 
-    @BeforeEach
-    void setUp() {
+    @Override
+    public void setUp() {
         lenient().when(postFinder.getByName(any())).thenReturn(PostVo.from(TestPost.postV1()));
     }
 
     @Test
     void getRouteFunctionWhenSlugPathVariable() {
-        RouterFunction<ServerResponse> routeFunction =
-            postRouteStrategy.getRouteFunction(DefaultTemplateEnum.POST.getValue(),
-                "/posts-test/{slug}");
+        RouterFunction<ServerResponse> routeFunction = getRouterFunction();
+
+        SystemSetting.ThemeRouteRules themeRouteRules = getThemeRouteRules();
+        themeRouteRules.setPost("/posts-test/{slug}");
+        permalinkHttpGetRouter.insert("/posts-test/fake-slug",
+            postRouteStrategy.getHandler(themeRouteRules, "fake-slug"));
 
         WebTestClient client = getWebTestClient(routeFunction);
-
-        piling();
 
         client.get()
             .uri("/posts-test/fake-slug")
@@ -72,13 +57,14 @@ class PostRouteStrategyTest {
 
     @Test
     void getRouteFunctionWhenNamePathVariable() {
-        RouterFunction<ServerResponse> routeFunction =
-            postRouteStrategy.getRouteFunction(DefaultTemplateEnum.POST.getValue(),
-                "/posts-test/{name}");
+        RouterFunction<ServerResponse> routeFunction = getRouterFunction();
+
+        SystemSetting.ThemeRouteRules themeRouteRules = getThemeRouteRules();
+        themeRouteRules.setPost("/posts-test/{slug}");
+        permalinkHttpGetRouter.insert("/posts-test/fake-name",
+            postRouteStrategy.getHandler(themeRouteRules, "fake-name"));
 
         WebTestClient client = getWebTestClient(routeFunction);
-
-        piling();
 
         client.get()
             .uri("/posts-test/fake-name")
@@ -89,13 +75,14 @@ class PostRouteStrategyTest {
 
     @Test
     void getRouteFunctionWhenYearMonthSlugPathVariable() {
-        RouterFunction<ServerResponse> routeFunction =
-            postRouteStrategy.getRouteFunction(DefaultTemplateEnum.POST.getValue(),
-                "/{year}/{month}/{slug}");
+        RouterFunction<ServerResponse> routeFunction = getRouterFunction();
+
+        SystemSetting.ThemeRouteRules themeRouteRules = getThemeRouteRules();
+        themeRouteRules.setPost("/{year}/{month}/{slug}");
+        permalinkHttpGetRouter.insert("/{year}/{month}/{slug}",
+            postRouteStrategy.getHandler(themeRouteRules, "fake-name"));
 
         WebTestClient client = getWebTestClient(routeFunction);
-
-        piling();
 
         client.get()
             .uri("/2022/08/fake-slug")
@@ -106,17 +93,18 @@ class PostRouteStrategyTest {
 
     @Test
     void getRouteFunctionWhenQueryParam() {
-        RouterFunction<ServerResponse> routeFunction =
-            postRouteStrategy.getRouteFunction(DefaultTemplateEnum.POST.getValue(),
-                "/?pp={name}");
+        RouterFunction<ServerResponse> routeFunction = getRouterFunction();
+
+        SystemSetting.ThemeRouteRules themeRouteRules = getThemeRouteRules();
+        themeRouteRules.setPost("/?p={slug}");
+        permalinkHttpGetRouter.insert("/?p=fake-name",
+            postRouteStrategy.getHandler(themeRouteRules, "fake-name"));
 
         WebTestClient client = getWebTestClient(routeFunction);
 
-        piling();
-
         client.get()
             .uri(uriBuilder -> uriBuilder.path("/")
-                .queryParam("pp", "fake-name")
+                .queryParam("p", "fake-name")
                 .build()
             )
             .exchange()
@@ -125,41 +113,11 @@ class PostRouteStrategyTest {
 
         client.get()
             .uri(uriBuilder -> uriBuilder.path("/")
-                .queryParam("pp", "nothing")
+                .queryParam("p", "nothing")
                 .build()
             )
             .exchange()
             .expectStatus()
             .isEqualTo(HttpStatus.NOT_FOUND);
-    }
-
-    private void piling() {
-        GroupVersionKind postGvk = GroupVersionKind.fromExtension(Post.class);
-        lenient().when(permalinkIndexer.containsName(eq(postGvk), eq("fake-name")))
-            .thenReturn(true);
-        lenient().when(permalinkIndexer.containsSlug(eq(postGvk), eq("fake-slug")))
-            .thenReturn(true);
-
-        lenient().when(permalinkIndexer.getNameBySlug(any(), eq("fake-slug")))
-            .thenReturn("fake-name");
-
-        ExtensionLocator extensionLocator =
-            new ExtensionLocator(GroupVersionKind.fromExtension(Post.class), "fake-name",
-                "fake-slug");
-        lenient().when(permalinkIndexer.lookup(any()))
-            .thenReturn(extensionLocator);
-
-    }
-
-    private WebTestClient getWebTestClient(RouterFunction<ServerResponse> routeFunction) {
-        WebTestClient client = WebTestClient.bindToRouterFunction(routeFunction)
-            .handlerStrategies(HandlerStrategies.builder()
-                .viewResolver(viewResolver)
-                .build())
-            .build();
-
-        when(viewResolver.resolveViewName(eq(DefaultTemplateEnum.POST.getValue()), any()))
-            .thenReturn(Mono.just(new EmptyView()));
-        return client;
     }
 }
