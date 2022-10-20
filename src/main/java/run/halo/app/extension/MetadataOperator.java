@@ -17,7 +17,7 @@ import java.util.Set;
 @Schema(implementation = Metadata.class)
 public interface MetadataOperator {
 
-    @Schema(name = "name", description = "Metadata name")
+    @Schema(name = "name", description = "Metadata name", required = true)
     @JsonProperty("name")
     String getName();
 
