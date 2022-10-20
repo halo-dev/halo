@@ -27,7 +27,8 @@ public class YamlUnstructuredLoader extends YamlProcessor {
     private static final DocumentMatcher DEFAULT_UNSTRUCTURED_MATCHER = properties -> {
         if (properties.containsKey("apiVersion")
             && properties.containsKey("kind")
-            && properties.containsKey("metadata.name")) {
+            && (properties.containsKey("metadata.name")
+            || properties.containsKey("metadata.generateName"))) {
             return YamlProcessor.MatchStatus.FOUND;
         }
         return MatchStatus.NOT_FOUND;
