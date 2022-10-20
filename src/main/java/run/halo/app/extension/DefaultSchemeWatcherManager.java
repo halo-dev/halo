@@ -1,7 +1,8 @@
 package run.halo.app.extension;
 
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
@@ -10,7 +11,7 @@ public class DefaultSchemeWatcherManager implements SchemeWatcherManager {
     private final List<SchemeWatcher> watchers;
 
     public DefaultSchemeWatcherManager() {
-        watchers = new LinkedList<>();
+        watchers = new CopyOnWriteArrayList<>();
     }
 
     @Override
@@ -28,6 +29,6 @@ public class DefaultSchemeWatcherManager implements SchemeWatcherManager {
     @Override
     public List<SchemeWatcher> watchers() {
         // we have to copy the watchers entirely to prevent concurrent modification.
-        return List.copyOf(watchers);
+        return Collections.unmodifiableList(watchers);
     }
 }

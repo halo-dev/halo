@@ -1,12 +1,15 @@
 package run.halo.app.extension.controller;
 
+import static java.util.concurrent.Executors.newSingleThreadExecutor;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.springframework.util.StopWatch;
 import run.halo.app.extension.controller.RequestQueue.DelayedEntry;
 
@@ -68,7 +71,16 @@ public class DefaultController<R> implements Controller {
         Duration minDelay,
         Duration maxDelay) {
         this(name, reconciler, queue, synchronizer, nowSupplier, minDelay, maxDelay,
-            Executors.newSingleThreadExecutor());
+            newSingleThreadExecutor(threadFactory()));
+    }
+
+    private static ThreadFactory threadFactory() {
+        return new BasicThreadFactory.Builder()
+            .namingPattern("reconciler-thread-%d")
+            .daemon(false)
+            .uncaughtExceptionHandler((t, e) ->
+                log.error("Controller " + t.getName() + " encountered an error unexpectedly", e))
+            .build();
     }
 
     @Override
