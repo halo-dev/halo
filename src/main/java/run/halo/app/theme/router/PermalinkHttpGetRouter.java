@@ -68,7 +68,7 @@ public class PermalinkHttpGetRouter implements InitializingBean {
                 requestPath = requestPath.substring(0, i);
             }
         }
-        return routeTree.match(requestPath);
+        return routeTree.match(request);
     }
 
     public void insert(String key, HandlerFunction<ServerResponse> handlerFunction) {

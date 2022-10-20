@@ -2,11 +2,17 @@ package run.halo.app.theme.router;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.server.PathContainer;
+import org.springframework.lang.Nullable;
 import org.springframework.web.reactive.function.server.HandlerFunction;
+import org.springframework.web.reactive.function.server.RouterFunctions;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.util.UriUtils;
 import org.springframework.web.util.pattern.PathPattern;
@@ -66,11 +72,11 @@ public class RadixRouterTree extends RadixTree<HandlerFunction<ServerResponse>> 
      * TODO Optimize matching algorithm to improve efficiency and try your best to get results
      *   through one search
      *
-     * @param requestPath request path
+     * @param request server request
      * @return a handler function if matched, otherwise null
      */
-    public HandlerFunction<ServerResponse> match(String requestPath) {
-        String path = processRequestPath(requestPath);
+    public HandlerFunction<ServerResponse> match(ServerRequest request) {
+        String path = processRequestPath(request.path());
         HandlerFunction<ServerResponse> result = find(path);
         if (result != null) {
             return result;
@@ -106,8 +112,45 @@ public class RadixRouterTree extends RadixTree<HandlerFunction<ServerResponse>> 
                         + secondBestMatch + "}");
             }
         }
-
+        PathPattern.PathMatchInfo info =
+            bestMatch.matchAndExtract(request.requestPath().pathWithinApplication());
+        if (info != null) {
+            mergeAttributes(request, info.getUriVariables(), bestMatch);
+        }
         return find(bestMatch.getPatternString());
+    }
+
+    private static void mergeAttributes(ServerRequest request, Map<String, String> variables,
+        PathPattern pattern) {
+        Map<String, String> pathVariables = mergePathVariables(request.pathVariables(), variables);
+        request.attributes().put(RouterFunctions.URI_TEMPLATE_VARIABLES_ATTRIBUTE,
+            Collections.unmodifiableMap(pathVariables));
+
+        pattern = mergePatterns(
+            (PathPattern) request.attributes().get(RouterFunctions.MATCHING_PATTERN_ATTRIBUTE),
+            pattern);
+        request.attributes().put(RouterFunctions.MATCHING_PATTERN_ATTRIBUTE, pattern);
+    }
+
+    private static PathPattern mergePatterns(@Nullable PathPattern oldPattern,
+        PathPattern newPattern) {
+        if (oldPattern != null) {
+            return oldPattern.combine(newPattern);
+        } else {
+            return newPattern;
+        }
+    }
+
+    private static Map<String, String> mergePathVariables(Map<String, String> oldVariables,
+        Map<String, String> newVariables) {
+
+        if (!newVariables.isEmpty()) {
+            Map<String, String> mergedVariables = new LinkedHashMap<>(oldVariables);
+            mergedVariables.putAll(newVariables);
+            return mergedVariables;
+        } else {
+            return oldVariables;
+        }
     }
 
     private String processRequestPath(String requestPath) {

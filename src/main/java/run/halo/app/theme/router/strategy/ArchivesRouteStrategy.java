@@ -14,7 +14,7 @@ import reactor.core.scheduler.Schedulers;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
-import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.finders.vo.PostArchiveVo;
 import run.halo.app.theme.router.PageUrlUtils;
 import run.halo.app.theme.router.UrlContextListResult;
 
@@ -33,11 +33,13 @@ public class ArchivesRouteStrategy implements ListPageRouteHandlerStrategy {
         this.postFinder = postFinder;
     }
 
-    private Mono<UrlContextListResult<PostVo>> postList(ServerRequest request) {
+    private Mono<UrlContextListResult<PostArchiveVo>> postList(ServerRequest request) {
+        String year = request.pathVariable("year");
+        String month = request.pathVariable("month");
         String path = request.path();
-        return Mono.defer(() -> Mono.just(postFinder.list(pageNum(request), 10)))
+        return Mono.defer(() -> Mono.just(postFinder.archives(pageNum(request), 10, year, month)))
             .publishOn(Schedulers.boundedElastic())
-            .map(list -> new UrlContextListResult.Builder<PostVo>()
+            .map(list -> new UrlContextListResult.Builder<PostArchiveVo>()
                 .listResult(list)
                 .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
                 .prevUrl(PageUrlUtils.prevPageUrl(path))
@@ -48,7 +50,7 @@ public class ArchivesRouteStrategy implements ListPageRouteHandlerStrategy {
     public HandlerFunction<ServerResponse> getHandler() {
         return request -> ServerResponse.ok()
             .render(DefaultTemplateEnum.ARCHIVES.getValue(),
-                Map.of("posts", postList(request)));
+                Map.of("archives", postList(request)));
     }
 
     @Override
@@ -56,6 +58,8 @@ public class ArchivesRouteStrategy implements ListPageRouteHandlerStrategy {
         return List.of(
             prefix,
             PathUtils.combinePath(prefix, "/page/{page:\\d+}"),
+            PathUtils.combinePath(prefix, "/{year:\\d{4}}"),
+            PathUtils.combinePath(prefix, "/{year:\\d{4}}/page/{page:\\d+}"),
             PathUtils.combinePath(prefix, "/{year:\\d{4}}/{month:\\d{2}}"),
             PathUtils.combinePath(prefix,
                 "/{year:\\d{4}}/{month:\\d{2}}/page/{page:\\d+}")
