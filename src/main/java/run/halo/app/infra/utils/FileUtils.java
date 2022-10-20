@@ -171,4 +171,12 @@ public abstract class FileUtils {
         checkDirectoryTraversal(parentPath, Paths.get(pathToCheck));
     }
 
+    public static void copy(Path source, Path dest) {
+        try {
+            Files.copy(source, dest);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

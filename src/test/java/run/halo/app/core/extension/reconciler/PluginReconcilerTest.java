@@ -189,7 +189,7 @@ class PluginReconcilerTest {
         assertThat(result).isNotNull();
         assertThat(result.reEnqueue()).isEqualTo(true);
 
-        verify(extensionClient, times(1)).update(any());
+        verify(extensionClient, times(2)).update(any());
         return pluginCaptor;
     }
 
@@ -202,7 +202,7 @@ class PluginReconcilerTest {
         assertThat(result).isNotNull();
         assertThat(result.reEnqueue()).isEqualTo(false);
 
-        verify(extensionClient, times(1)).update(any());
+        verify(extensionClient, times(2)).update(any());
         return pluginCaptor;
     }
 
