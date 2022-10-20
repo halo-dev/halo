@@ -13,7 +13,7 @@ importers:
       '@formkit/inputs': ^1.0.0-beta.11
       '@formkit/themes': ^1.0.0-beta.11
       '@formkit/vue': ^1.0.0-beta.11
-      '@halo-dev/api-client': ^0.0.36
+      '@halo-dev/api-client': ^0.0.38
       '@halo-dev/components': workspace:*
       '@halo-dev/console-shared': workspace:*
       '@halo-dev/richtext-editor': ^0.0.0-alpha.7
@@ -101,7 +101,7 @@ importers:
       '@formkit/inputs': 1.0.0-beta.11
       '@formkit/themes': 1.0.0-beta.11_tailwindcss@3.1.8
       '@formkit/vue': 1.0.0-beta.11_k5hp3txgeyj6le63abiyc7wx3u
-      '@halo-dev/api-client': 0.0.36
+      '@halo-dev/api-client': 0.0.38
       '@halo-dev/components': link:packages/components
       '@halo-dev/console-shared': link:packages/shared
       '@halo-dev/richtext-editor': 0.0.0-alpha.7_vue@3.2.40
@@ -1625,12 +1625,8 @@ packages:
       prettier: 2.7.1
     dev: true
 
-  /@codemirror/autocomplete/6.3.0_ns4lkgy3plcpdn5wn7powl4wzy:
+  /@codemirror/autocomplete/6.3.0:
     resolution: {integrity: sha512-4jEvh3AjJZTDKazd10J6ZsCIqaYxDMCeua5ouQxY8hlFIml+nr7le0SgBhT3SIytFBmdzPK3AUhXGuW3T79nVg==}
-    peerDependencies:
-      '@codemirror/language': ^6.0.0
-      '@codemirror/state': ^6.0.0
-      '@codemirror/view': ^6.0.0
     dependencies:
       '@codemirror/language': 6.2.1
       '@codemirror/state': 6.1.2
@@ -1896,8 +1892,8 @@ packages:
       - windicss
     dev: false
 
-  /@halo-dev/api-client/0.0.36:
-    resolution: {integrity: sha512-ZwJ9GBH6WxETCE/BD4PZWv3GUbHJXO33kvyEPsS/A4Qt7kmaQJKHuzI4wVqEoxcewNjC/PdnzuTiNSuSG4FzVA==}
+  /@halo-dev/api-client/0.0.38:
+    resolution: {integrity: sha512-7Vlc/tXkpERi2xWxtoWOVtYbZi+sksrueBAj64gr0cAUOqRy7A82oJXpeabLKeJAjDNdQKZ7eL7CClnf9NJTEA==}
     dev: false
 
   /@halo-dev/richtext-editor/0.0.0-alpha.7_vue@3.2.40:
@@ -4126,7 +4122,7 @@ packages:
   /codemirror/6.0.1:
     resolution: {integrity: sha512-J8j+nZ+CdWmIeFIGXEFbFPtpiYacFMDR8GlHK3IyHQJMCaVRfGx9NT+Hxivv1ckLWPvNdZqndbr/7lVhrf/Svg==}
     dependencies:
-      '@codemirror/autocomplete': 6.3.0_ns4lkgy3plcpdn5wn7powl4wzy
+      '@codemirror/autocomplete': 6.3.0
       '@codemirror/commands': 6.1.1
       '@codemirror/language': 6.2.1
       '@codemirror/lint': 6.0.0

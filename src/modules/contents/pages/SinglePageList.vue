@@ -570,10 +570,10 @@ function handleSortItemChange(sortItem?: SortItem) {
                     {{ singlePage.page.status?.permalink }}
                   </span>
                   <span class="text-xs text-gray-500">
-                    访问量 {{ singlePage.stats.visits || 0 }}
+                    访问量 {{ singlePage.stats.visit || 0 }}
                   </span>
                   <span class="text-xs text-gray-500">
-                    评论 {{ singlePage.stats.comments || 0 }}
+                    评论 {{ singlePage.stats.totalComment || 0 }}
                   </span>
                 </VSpace>
               </template>

@@ -1,10 +1,10 @@
 <script lang="ts" name="ViewsStatsWidget" setup>
 import { apiClient } from "@/utils/api-client";
-import type { Stats } from "@halo-dev/api-client";
+import type { DashboardStats } from "@halo-dev/api-client";
 import { VCard } from "@halo-dev/components";
 import { onMounted, ref } from "vue";
 
-const stats = ref<Stats>({
+const stats = ref<DashboardStats>({
   visits: 0,
 });
 
