@@ -1,8 +1,10 @@
 package run.halo.app.core.extension.endpoint;
 
+import static java.nio.file.Files.copy;
 import static java.util.Comparator.comparing;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
+import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.boot.convert.ApplicationConversionService.getSharedInstance;
@@ -10,32 +12,40 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static run.halo.app.extension.ListResult.generateGenericClass;
 import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
+import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
 
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
+import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
@@ -71,6 +81,16 @@ public class PluginEndpoint implements CustomEndpoint {
                         ))
                     .response(responseBuilder().implementation(Plugin.class))
             )
+            .POST("plugins/{name}/upgrade", contentType(MediaType.MULTIPART_FORM_DATA),
+                this::upgrade, builder -> builder.operationId("UpgradePlugin")
+                    .description("Upgrade a plugin by uploading a Jar file")
+                    .tag(tag)
+                    .parameter(parameterBuilder().name("name").in(ParameterIn.PATH).required(true))
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder().mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                            .schema(schemaBuilder().implementation(InstallRequest.class))))
+            )
             .GET("plugins", this::list, builder -> {
                 builder.operationId("ListPlugins")
                     .tag(tag)
@@ -79,6 +99,76 @@ public class PluginEndpoint implements CustomEndpoint {
                 buildParametersFromType(builder, ListRequest.class);
             })
             .build();
+    }
+
+    private Mono<ServerResponse> upgrade(ServerRequest request) {
+        // TODO Handle the upgrade
+        var pluginNameInPath = request.pathVariable("name");
+        var tempDirRef = new AtomicReference<Path>();
+        var tempPluginPathRef = new AtomicReference<Path>();
+        return request.multipartData()
+            .flatMap(this::getJarFilePart)
+            .flatMap(jarFilePart -> createTempDirectory()
+                .doOnNext(tempDirRef::set)
+                .flatMap(tempDirectory -> {
+                    var pluginPath = tempDirectory.resolve(jarFilePart.filename());
+                    return jarFilePart.transferTo(pluginPath).thenReturn(pluginPath);
+                }))
+            .doOnNext(tempPluginPathRef::set)
+            .map(pluginPath -> new YamlPluginFinder().find(pluginPath))
+            .doOnNext(newPlugin -> {
+                // validate the plugin name
+                if (!Objects.equals(pluginNameInPath, newPlugin.getMetadata().getName())) {
+                    throw new ServerWebInputException(
+                        "The uploaded plugin doesn't match the given plugin name");
+                }
+            })
+            .flatMap(newPlugin ->
+                deletePluginAndWaitForComplete(newPlugin.getMetadata().getName())
+                    .doOnNext(oldPlugin -> {
+                        var enabled = oldPlugin.getSpec().getEnabled();
+                        newPlugin.getSpec().setEnabled(enabled);
+                    })
+                    .thenReturn(newPlugin))
+            .publishOn(Schedulers.boundedElastic())
+            .doOnNext(newPlugin -> {
+                // copy the Jar file into plugin root
+                try {
+                    var pluginRoot = Paths.get(pluginProperties.getPluginsRoot());
+                    createDirectoriesIfNotExists(pluginRoot);
+                    var tempPluginPath = tempPluginPathRef.get();
+                    var filename = tempPluginPath.getFileName().toString();
+                    copy(tempPluginPath, pluginRoot.resolve(filename));
+                } catch (IOException e) {
+                    throw Exceptions.propagate(e);
+                }
+            })
+            .flatMap(client::create)
+            .flatMap(newPlugin -> ServerResponse.ok().bodyValue(newPlugin))
+            .doFinally(signalType -> deleteRecursivelyAndSilently(tempDirRef.get()));
+    }
+
+    private Mono<Plugin> deletePluginAndWaitForComplete(String pluginName) {
+        return client.fetch(Plugin.class, pluginName)
+            .flatMap(client::delete)
+            .flatMap(plugin -> waitForDeleted(plugin.getMetadata().getName()).thenReturn(plugin));
+    }
+
+    private Mono<Void> waitForDeleted(String pluginName) {
+        return client.fetch(Plugin.class, pluginName)
+            .flatMap(plugin -> Mono.error(
+                new RetryException("Re-check if the plugin is deleted successfully")))
+            .retryWhen(Retry.fixedDelay(20, Duration.ofMillis(100))
+                .filter(t -> t instanceof RetryException)
+            )
+            .onErrorMap(Exceptions::isRetryExhausted,
+                t -> new ServerErrorException("Wait timeout for plugin deleted", t))
+            .then();
+    }
+
+    private Mono<Path> createTempDirectory() {
+        return Mono.fromCallable(() -> Files.createTempDirectory("halo-plugin-"))
+            .subscribeOn(Schedulers.boundedElastic());
     }
 
     public static class ListRequest extends QueryListRequest {
@@ -181,8 +271,7 @@ public class PluginEndpoint implements CustomEndpoint {
     }
 
     Mono<ServerResponse> install(ServerRequest request) {
-        return request.bodyToMono(new ParameterizedTypeReference<MultiValueMap<String, Part>>() {
-            })
+        return request.multipartData()
             .flatMap(this::getJarFilePart)
             .flatMap(file -> {
                 var pluginRoot = Paths.get(pluginProperties.getPluginsRoot());
