@@ -201,7 +201,10 @@ public class PluginReconciler implements Reconciler<Request> {
         if (pluginWrapper == null) {
             return;
         }
-
+        // stop and unload plugin, see also PluginBeforeStopSyncListener
+        haloPluginManager.stopPlugin(pluginWrapper.getPluginId());
+        haloPluginManager.unloadPlugin(pluginWrapper.getPluginId());
+        // delete plugin resources
         if (RuntimeMode.DEPLOYMENT.equals(pluginWrapper.getRuntimeMode())) {
             // delete plugin file
             try {
