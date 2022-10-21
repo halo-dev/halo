@@ -59,6 +59,13 @@ public class ContentPatchLogServiceImpl extends AbstractCrudService<ContentPatch
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ContentPatchLog createOrUpdate(Integer postId, String content, String originalContent) {
+        if (originalContent == null) {
+            originalContent = "";
+        }
+        if (content == null) {
+            content = "";
+        }
+
         Integer version = getVersionByPostId(postId);
         if (existDraftBy(postId)) {
             return updateDraftBy(postId, content, originalContent);
@@ -148,13 +155,6 @@ public class ContentPatchLogServiceImpl extends AbstractCrudService<ContentPatch
 
     private ContentPatchLog updateDraftBy(Integer postId, String formatContent,
         String originalContent) {
-        if (originalContent == null) {
-            originalContent = "";
-        }
-        if (formatContent == null) {
-            formatContent = "";
-        }
-
         ContentPatchLog draftPatchLog = findLatestDraftBy(postId);
         if (draftPatchLog == null) {
             throw new NotFoundException("The latest draft version must not be null to update.");
