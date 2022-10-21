@@ -68,8 +68,12 @@ public class SystemConfigurableEnvironmentFetcher {
      * @return a new {@link ConfigMap} named <code>system</code> by json merge patch.
      */
     public Mono<ConfigMap> getConfigMap() {
-        return extensionClient.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT)
-            .flatMap(systemDefault ->
+        Mono<ConfigMap> mapMono =
+            extensionClient.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG_DEFAULT);
+        if (mapMono == null) {
+            return Mono.empty();
+        }
+        return mapMono.flatMap(systemDefault ->
                 extensionClient.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG)
                     .map(system -> {
                         Map<String, String> defaultData = systemDefault.getData();

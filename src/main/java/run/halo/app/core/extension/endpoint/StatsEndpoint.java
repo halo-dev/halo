@@ -37,7 +37,7 @@ public class StatsEndpoint implements CustomEndpoint {
                 .description("Get stats.")
                 .tag(tag)
                 .response(responseBuilder()
-                    .implementation(Stats.class)
+                    .implementation(DashboardStats.class)
                 )
             )
             .build();
@@ -45,7 +45,7 @@ public class StatsEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> getStats(ServerRequest request) {
         return client.list(Counter.class, null, null)
-            .reduce(Stats.emptyStats(), (stats, counter) -> {
+            .reduce(DashboardStats.emptyStats(), (stats, counter) -> {
                 stats.setVisits(stats.getVisits() + counter.getVisit());
                 stats.setComments(stats.getComments() + counter.getTotalComment());
                 stats.setApprovedComments(
@@ -72,7 +72,7 @@ public class StatsEndpoint implements CustomEndpoint {
     }
 
     @Data
-    public static class Stats {
+    public static class DashboardStats {
         private Integer visits;
         private Integer comments;
         private Integer approvedComments;
@@ -85,8 +85,8 @@ public class StatsEndpoint implements CustomEndpoint {
          *
          * @return stats with initialize value.
          */
-        public static Stats emptyStats() {
-            Stats stats = new Stats();
+        public static DashboardStats emptyStats() {
+            DashboardStats stats = new DashboardStats();
             stats.setVisits(0);
             stats.setComments(0);
             stats.setApprovedComments(0);

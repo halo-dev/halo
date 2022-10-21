@@ -144,7 +144,7 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
                         newRules.getArchives());
                     applicationContext.publishEvent(new PermalinkRuleChangedEvent(this,
                         DefaultTemplateEnum.ARCHIVES,
-                        newRules.getArchives()));
+                        oldArchivesPrefix, newRules.getArchives()));
                 }
 
                 if (postPatternChanged) {
@@ -152,7 +152,7 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
                         newRules.getPost());
                     // post rule changed
                     applicationContext.publishEvent(new PermalinkRuleChangedEvent(this,
-                        DefaultTemplateEnum.POST, newRules.getPost()));
+                        DefaultTemplateEnum.POST, oldPostPattern, newRules.getPost()));
                 }
             });
         }
@@ -181,7 +181,7 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
                     // then publish event
                     applicationContext.publishEvent(new PermalinkRuleChangedEvent(this,
                         DefaultTemplateEnum.TAGS,
-                        newRules.getTags()));
+                        oldTagsPrefix, newRules.getTags()));
                 }
             });
         }
@@ -200,7 +200,7 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
                     // categories rule changed
                     applicationContext.publishEvent(new PermalinkRuleChangedEvent(this,
                         DefaultTemplateEnum.CATEGORIES,
-                        newRules.getCategories()));
+                        oldCategoriesPrefix, newRules.getCategories()));
                 }
             });
         }
@@ -215,12 +215,12 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
                     oldRules.setPost(newRules.getPost());
                     updateNewRuleToConfigMap(configMap, oldRules, newRules);
 
-                    log.debug("Categories prefix changed from [{}] to [{}].", oldPostPattern,
+                    log.debug("Post pattern changed from [{}] to [{}].", oldPostPattern,
                         newRules.getPost());
                     // post rule changed
                     applicationContext.publishEvent(new PermalinkRuleChangedEvent(this,
                         DefaultTemplateEnum.POST,
-                        newRules.getPost()));
+                        oldPostPattern, newRules.getPost()));
                 }
             });
         }
