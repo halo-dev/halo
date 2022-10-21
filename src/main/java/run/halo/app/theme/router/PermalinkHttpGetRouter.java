@@ -14,7 +14,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -53,21 +52,6 @@ public class PermalinkHttpGetRouter implements InitializingBean {
      * @return a handler function if matched, otherwise null
      */
     public HandlerFunction<ServerResponse> route(ServerRequest request) {
-        MultiValueMap<String, String> queryParams = request.queryParams();
-        String requestPath = request.path();
-        // 文章的 permalink 规则需要对 p 参数规则特殊处理
-        if (requestPath.equals("/") && queryParams.containsKey("p")) {
-            // post special route path
-            String postSlug = queryParams.getFirst("p");
-            requestPath = requestPath + "?p=" + postSlug;
-        }
-        // /categories/{slug}/page/{page} 和 /tags/{slug}/page/{page} 需要去掉 page 部分
-        if (PageUrlUtils.isPageUrl(requestPath)) {
-            int i = requestPath.lastIndexOf("/page/");
-            if (i != -1) {
-                requestPath = requestPath.substring(0, i);
-            }
-        }
         return routeTree.match(request);
     }
 

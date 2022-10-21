@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.server.PathContainer;
 import org.springframework.lang.Nullable;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -76,7 +77,7 @@ public class RadixRouterTree extends RadixTree<HandlerFunction<ServerResponse>> 
      * @return a handler function if matched, otherwise null
      */
     public HandlerFunction<ServerResponse> match(ServerRequest request) {
-        String path = processRequestPath(request.path());
+        String path = pathToFind(request);
         HandlerFunction<ServerResponse> result = find(path);
         if (result != null) {
             return result;
@@ -118,6 +119,29 @@ public class RadixRouterTree extends RadixTree<HandlerFunction<ServerResponse>> 
             mergeAttributes(request, info.getUriVariables(), bestMatch);
         }
         return find(bestMatch.getPatternString());
+    }
+
+    /**
+     * TODO Optimize parameter route matching query.
+     * Router 仅匹配请求方法和请求的 URL 路径, 形如 /?p=post-name 是 URL query，而不是 URL 路径的一部分。
+     */
+    private String pathToFind(ServerRequest request) {
+        String requestPath = processRequestPath(request.path());
+        MultiValueMap<String, String> queryParams = request.queryParams();
+        // 文章的 permalink 规则需要对 p 参数规则特殊处理
+        if (requestPath.equals("/") && queryParams.containsKey("p")) {
+            // post special route path
+            String postSlug = queryParams.getFirst("p");
+            requestPath = requestPath + "?p=" + postSlug;
+        }
+        // /categories/{slug}/page/{page} 和 /tags/{slug}/page/{page} 需要去掉 page 部分
+        if (PageUrlUtils.isPageUrl(requestPath)) {
+            int i = requestPath.lastIndexOf("/page/");
+            if (i != -1) {
+                requestPath = requestPath.substring(0, i);
+            }
+        }
+        return requestPath;
     }
 
     private static void mergeAttributes(ServerRequest request, Map<String, String> variables,

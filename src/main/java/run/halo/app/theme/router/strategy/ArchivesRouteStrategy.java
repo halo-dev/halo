@@ -34,8 +34,8 @@ public class ArchivesRouteStrategy implements ListPageRouteHandlerStrategy {
     }
 
     private Mono<UrlContextListResult<PostArchiveVo>> postList(ServerRequest request) {
-        String year = request.pathVariable("year");
-        String month = request.pathVariable("month");
+        String year = pathVariable(request, "year");
+        String month = pathVariable(request, "month");
         String path = request.path();
         return Mono.defer(() -> Mono.just(postFinder.archives(pageNum(request), 10, year, month)))
             .publishOn(Schedulers.boundedElastic())
@@ -44,6 +44,14 @@ public class ArchivesRouteStrategy implements ListPageRouteHandlerStrategy {
                 .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
                 .prevUrl(PageUrlUtils.prevPageUrl(path))
                 .build());
+    }
+
+    private String pathVariable(ServerRequest request, String name) {
+        Map<String, String> pathVariables = request.pathVariables();
+        if (pathVariables.containsKey(name)) {
+            return pathVariables.get(name);
+        }
+        return null;
     }
 
     @Override
