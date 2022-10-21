@@ -116,5 +116,20 @@ class DefaultSchemeManagerTest {
         schemeManager.unregister(schemeManager.get(FakeExtension.class));
         assertEquals(0, schemeManager.size());
     }
+
+    @Test
+    void shouldReturnCopyOnWriteList() {
+        schemeManager.register(FakeExtension.class);
+        var schemes = schemeManager.schemes();
+        schemes.forEach(scheme -> {
+            // make sure concurrent modification won't happen
+            schemeManager.register(FooExtension.class);
+        });
+    }
+
+    @GVK(group = "fake.halo.run", version = "v1alpha1", kind = "Foo",
+        plural = "foos", singular = "foo")
+    static class FooExtension extends AbstractExtension {
+    }
 }
 

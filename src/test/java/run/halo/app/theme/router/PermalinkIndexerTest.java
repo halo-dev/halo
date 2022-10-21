@@ -4,11 +4,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationContext;
 import run.halo.app.content.permalinks.ExtensionLocator;
 import run.halo.app.extension.FakeExtension;
 import run.halo.app.extension.GroupVersionKind;
@@ -19,15 +26,18 @@ import run.halo.app.extension.GroupVersionKind;
  * @author guqing
  * @since 2.0.0
  */
+@ExtendWith(MockitoExtension.class)
 class PermalinkIndexerTest {
 
     private final GroupVersionKind gvk = GroupVersionKind.fromExtension(FakeExtension.class);
 
     private PermalinkIndexer permalinkIndexer;
+    @Mock
+    private ApplicationContext applicationContext;
 
     @BeforeEach
     void setUp() {
-        permalinkIndexer = new PermalinkIndexer();
+        permalinkIndexer = new PermalinkIndexer(applicationContext);
 
         ExtensionLocator locator = new ExtensionLocator(gvk, "fake-name", "fake-slug");
         permalinkIndexer.register(locator, "/fake-permalink");
@@ -39,6 +49,7 @@ class PermalinkIndexerTest {
     void register() {
         ExtensionLocator locator = new ExtensionLocator(gvk, "test-name", "test-slug");
         permalinkIndexer.register(locator, "/test-permalink");
+        verify(applicationContext, times(2)).publishEvent(any(PermalinkIndexChangedEvent.class));
 
         assertThat(permalinkIndexer.permalinkLocatorMapSize()).isEqualTo(2);
         assertThat(permalinkIndexer.permalinkLocatorMapSize()).isEqualTo(2);
@@ -54,6 +65,8 @@ class PermalinkIndexerTest {
         permalinkIndexer.remove(locator);
         assertThat(permalinkIndexer.permalinkLocatorMapSize()).isEqualTo(0);
         assertThat(permalinkIndexer.permalinkLocatorMapSize()).isEqualTo(0);
+
+        verify(applicationContext, times(2)).publishEvent(any(PermalinkIndexChangedEvent.class));
     }
 
     @Test

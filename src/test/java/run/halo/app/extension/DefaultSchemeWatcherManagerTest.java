@@ -49,15 +49,11 @@ class DefaultSchemeWatcherManagerTest {
 
     @Test
     void shouldReturnCopyOfWatchers() {
-        var watcher = mock(SchemeWatcher.class);
-        watcherManager.register(watcher);
-        assertEquals(List.of(watcher), watcherManager.watchers());
+        var firstWatcher = mock(SchemeWatcher.class);
+        var secondWatcher = mock(SchemeWatcher.class);
+        watcherManager.register(firstWatcher);
 
-        var watchersBeforeRegister = watcherManager.watchers();
-        watcherManager.unregister(watcher);
-
-        // watchers are not changed even if unregistered
-        assertEquals(List.of(watcher), watchersBeforeRegister);
-        assertEquals(Collections.emptyList(), watcherManager.watchers());
+        var watchers = watcherManager.watchers();
+        watchers.forEach(watcher -> watcherManager.register(secondWatcher));
     }
 }

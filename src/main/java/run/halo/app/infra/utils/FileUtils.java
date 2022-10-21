@@ -1,5 +1,7 @@
 package run.halo.app.infra.utils;
 
+import static org.springframework.util.FileSystemUtils.deleteRecursively;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.CopyOption;
@@ -22,6 +24,9 @@ import run.halo.app.infra.exception.AccessDeniedException;
  */
 @Slf4j
 public abstract class FileUtils {
+
+    private FileUtils() {
+    }
 
     public static void unzip(@NonNull ZipInputStream zis, @NonNull Path targetPath)
         throws IOException {
@@ -172,6 +177,25 @@ public abstract class FileUtils {
         checkDirectoryTraversal(parentPath, Paths.get(pathToCheck));
     }
 
+    /**
+     * Delete folder recursively without exception throwing.
+     *
+     * @param root the root File to delete
+     */
+    public static void deleteRecursivelyAndSilently(Path root) {
+        try {
+            var deleted = deleteRecursively(root);
+            if (log.isDebugEnabled()) {
+                log.debug("Delete {} result: {}", root, deleted);
+            }
+        } catch (IOException e) {
+            // Ignore this error
+            if (log.isTraceEnabled()) {
+                log.trace("Failed to delete {} recursively", root);
+            }
+        }
+    }
+
     public static void copy(Path source, Path dest, CopyOption... options) {
         try {
             Files.copy(source, dest, options);
@@ -179,5 +203,4 @@ public abstract class FileUtils {
             throw new RuntimeException(e);
         }
     }
-
 }

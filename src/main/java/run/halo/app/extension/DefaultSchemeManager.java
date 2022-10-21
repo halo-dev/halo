@@ -1,9 +1,9 @@
 package run.halo.app.extension;
 
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import run.halo.app.extension.SchemeWatcherManager.SchemeRegistered;
@@ -18,7 +18,9 @@ public class DefaultSchemeManager implements SchemeManager {
 
     public DefaultSchemeManager(@Nullable SchemeWatcherManager watcherManager) {
         this.watcherManager = watcherManager;
-        schemes = new LinkedList<>();
+        // we have to use CopyOnWriteArrayList at here to prevent concurrent modification between
+        // registering and listing.
+        schemes = new CopyOnWriteArrayList<>();
     }
 
     @Override

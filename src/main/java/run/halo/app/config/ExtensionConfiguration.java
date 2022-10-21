@@ -58,7 +58,6 @@ import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.plugin.ExtensionComponentsFinder;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.resources.ReverseProxyRouterFunctionRegistry;
-import run.halo.app.theme.router.TemplateRouteManager;
 
 @Configuration(proxyBeanMethods = false)
 public class ExtensionConfiguration {
@@ -196,10 +195,10 @@ public class ExtensionConfiguration {
 
         @Bean
         Controller singlePageController(ExtensionClient client, ContentService contentService,
-            ApplicationContext applicationContext, TemplateRouteManager templateRouteManager) {
+            ApplicationContext applicationContext) {
             return new ControllerBuilder("single-page-controller", client)
                 .reconciler(new SinglePageReconciler(client, contentService,
-                    applicationContext, templateRouteManager)
+                    applicationContext)
                 )
                 .extension(new SinglePage())
                 .build();
