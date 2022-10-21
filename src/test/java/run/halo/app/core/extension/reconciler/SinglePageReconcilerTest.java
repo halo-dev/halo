@@ -31,7 +31,6 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.metrics.CounterService;
-import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.PermalinkIndexAddCommand;
 import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
 import run.halo.app.theme.router.PermalinkIndexUpdateCommand;
@@ -59,7 +58,6 @@ class SinglePageReconcilerTest {
 
     @BeforeEach
     void setUp() {
-        singlePageReconciler = new SinglePageReconciler(client, contentService, applicationContext);
         singlePageReconciler = new SinglePageReconciler(client, contentService, applicationContext,
             counterService);
     }

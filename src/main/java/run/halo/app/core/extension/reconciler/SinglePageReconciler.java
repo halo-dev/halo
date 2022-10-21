@@ -16,18 +16,20 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.permalinks.ExtensionLocator;
+import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.SinglePage;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.metrics.CounterService;
-import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.metrics.MeterUtils;
 import run.halo.app.theme.router.PermalinkIndexAddCommand;
 import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
 
@@ -52,8 +54,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private final CounterService counterService;
 
     public SinglePageReconciler(ExtensionClient client, ContentService contentService,
-        ApplicationContext applicationContext) {
-        CounterService counterService) {
+        ApplicationContext applicationContext, CounterService counterService) {
         this.client = client;
         this.contentService = contentService;
         this.applicationContext = applicationContext;
