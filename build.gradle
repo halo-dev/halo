@@ -1,15 +1,16 @@
 plugins {
-    id 'org.springframework.boot' version '3.0.0-M5'
-    id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+    id "org.springframework.boot" version "2.5.12"
+    id "io.spring.dependency-management" version "1.0.11.RELEASE"
     id "checkstyle"
-    id 'java'
+    id "java"
 }
 
 group = "run.halo.app"
-sourceCompatibility = JavaVersion.VERSION_17
+description = "Halo, An excellent open source blog publishing application."
+sourceCompatibility = JavaVersion.VERSION_11
 
 checkstyle {
-    toolVersion = "9.3"
+    toolVersion = "8.39"
     showViolations = false
     ignoreFailures = false
 }
@@ -17,17 +18,27 @@ checkstyle {
 repositories {
     maven { url 'https://maven.aliyun.com/repository/public/' }
     maven { url 'https://maven.aliyun.com/repository/spring/' }
-    maven { url 'https://repo.spring.io/milestone' }
-
     mavenLocal()
     mavenCentral()
-
 }
 
-
 configurations {
+    implementation {
+        exclude module: "spring-boot-starter-tomcat"
+        exclude module: "slf4j-log4j12"
+        exclude module: 'junit'
+    }
     compileOnly {
         extendsFrom annotationProcessor
+    }
+}
+
+configurations.all {
+    // Aligning log4j dependency versions to 2.17.1
+    resolutionStrategy.eachDependency { DependencyResolveDetails details ->
+        if (details.requested.group == 'org.apache.logging.log4j') {
+            details.useVersion '2.17.1'
+        }
     }
 }
 
@@ -39,66 +50,106 @@ bootJar {
 }
 
 ext {
-    commonsLang3 = "3.12.0"
-    base62 = "0.1.3"
-    pf4j = '3.7.0'
-    javaDiffUtils = "4.12"
-    guava = "31.1-jre"
-    jsoup = '1.15.3'
-    jsonPatch = "1.13"
+    guavaVersion = '31.0.1-jre'
+    upyunSdkVersion = '4.2.3'
+    qiniuSdkVersion = '7.8.0'
+    aliyunSdkVersion = '3.13.2'
+    baiduSdkVersion = '0.10.36'
+    qcloudSdkVersion = '5.6.61'
+    minioSdkVersion = '7.1.4'
+    swaggerVersion = "3.0.0"
+    commonsFileUploadVersion = "1.4"
+    commonsLangVersion = '3.12.0'
+    httpclientVersion = '4.5.13'
+    jgitVersion = "5.9.0.202009080501-r"
+    flexmarkVersion = "0.62.2"
+    thumbnailatorVersion = '0.4.14'
+    image4jVersion = "0.7zensight1"
+    flywayVersion = "7.15.0"
+    h2Version = "1.4.199"
+    levelDbVersion = "0.12"
+    annotationsVersion = "3.0.1u2"
+    zxingVersion = '3.4.1'
+    huaweiObsVersion = '3.21.4'
+    templateInheritanceVersion = "0.4.RELEASE"
+    jsoupVersion = '1.14.3'
+    embeddedRedisVersion = '0.6'
+    diffUtilsVersion = '4.11'
+    commonsImagingVersion = "1.0-alpha3"
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-jetty"
+    implementation "org.springframework.boot:spring-boot-starter-freemarker"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis"
 
-    // Spring Security
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.security:spring-security-oauth2-jose'
-    implementation 'org.springframework.security:spring-security-oauth2-resource-server'
+    implementation "com.sun.mail:jakarta.mail"
+    implementation "com.google.guava:guava:$guavaVersion"
+    implementation "com.upyun:java-sdk:$upyunSdkVersion"
+    implementation "com.qiniu:qiniu-java-sdk:$qiniuSdkVersion"
+    implementation "com.aliyun.oss:aliyun-sdk-oss:$aliyunSdkVersion"
+    implementation "com.baidubce:bce-java-sdk:$baiduSdkVersion"
+    implementation "com.qcloud:cos_api:$qcloudSdkVersion"
+    // TODO Upgrade huaweicloud sdk dependence to fix log4j 0-day vulnerability
+    implementation("com.huaweicloud:esdk-obs-java:$huaweiObsVersion")
+    implementation "io.minio:minio:$minioSdkVersion"
+    implementation "io.springfox:springfox-boot-starter:$swaggerVersion"
+    implementation "commons-fileupload:commons-fileupload:$commonsFileUploadVersion"
+    implementation "org.apache.commons:commons-lang3:$commonsLangVersion"
+    implementation "org.apache.httpcomponents:httpclient:$httpclientVersion"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml"
+    implementation "org.eclipse.jgit:org.eclipse.jgit:$jgitVersion"
+    implementation "com.google.code.findbugs:annotations:$annotationsVersion"
 
-    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.0-M7'
-    implementation 'org.openapi4j:openapi-schema-validator:1.0.7'
-    implementation "net.bytebuddy:byte-buddy"
+    implementation "com.vladsch.flexmark:flexmark:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-attributes:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-autolink:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-emoji:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-escaped-character:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-gfm-tasklist:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-ins:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-media-tags:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-tables:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-toc:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-superscript:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-yaml-front-matter:$flexmarkVersion"
+    implementation "com.vladsch.flexmark:flexmark-ext-gitlab:$flexmarkVersion"
 
-    implementation "org.apache.commons:commons-lang3:$commonsLang3"
-    implementation "io.seruco.encoding:base62:$base62"
-    implementation "org.pf4j:pf4j:$pf4j"
-    implementation "com.google.guava:guava:$guava"
-    implementation "org.jsoup:jsoup:$jsoup"
-    implementation "io.github.java-diff-utils:java-diff-utils:$javaDiffUtils"
-    implementation "org.springframework.integration:spring-integration-core"
-    implementation "com.github.java-json-tools:json-patch:$jsonPatch"
+    implementation "kr.pe.kwonnam.freemarker:freemarker-template-inheritance:$templateInheritanceVersion"
+    implementation "net.coobird:thumbnailator:$thumbnailatorVersion"
+    implementation "net.sf.image4j:image4j:$image4jVersion"
+    implementation "org.flywaydb:flyway-core:$flywayVersion"
+    implementation "com.google.zxing:core:$zxingVersion"
+    implementation "io.github.java-diff-utils:java-diff-utils:$diffUtilsVersion"
+    implementation "org.apache.commons:commons-imaging:$commonsImagingVersion"
 
-    compileOnly 'org.projectlombok:lombok'
-    testCompileOnly 'org.projectlombok:lombok'
+    implementation "org.iq80.leveldb:leveldb:$levelDbVersion"
+    runtimeOnly "com.h2database:h2:$h2Version"
+    runtimeOnly "mysql:mysql-connector-java"
 
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    compileOnly "org.projectlombok:lombok"
+    annotationProcessor "org.projectlombok:lombok"
 
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    testCompileOnly "org.projectlombok:lombok"
+    testAnnotationProcessor "org.projectlombok:lombok"
 
-    // R2DBC
-    // Currently, official doesn't support mssql and mariadb yet until drivers are available.
-    // See https://github.com/spring-projects/spring-data-relational/commit/ee6c2c89b5c433748b22a79cf40dc8e01142caa3
-    // for more.
-    runtimeOnly 'io.r2dbc:r2dbc-h2'
-    runtimeOnly 'com.github.jasync-sql:jasync-r2dbc-mysql:2.1.5'
-    runtimeOnly 'org.postgresql:postgresql'
-    runtimeOnly 'org.postgresql:r2dbc-postgresql'
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testImplementation "org.jsoup:jsoup:$jsoupVersion"
 
-    annotationProcessor 'org.projectlombok:lombok'
-    testAnnotationProcessor 'org.projectlombok:lombok'
+    testImplementation ("com.github.kstyrc:embedded-redis:$embeddedRedisVersion") {
+        exclude group: 'org.slf4j', module: 'slf4j-simple'
+    }
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'io.projectreactor:reactor-test'
+    developmentOnly "org.springframework.boot:spring-boot-devtools"
 }
 
-tasks.named('test') {
+test {
     useJUnitPlatform()
 }
