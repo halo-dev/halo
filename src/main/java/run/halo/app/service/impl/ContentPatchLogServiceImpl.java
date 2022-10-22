@@ -59,6 +59,13 @@ public class ContentPatchLogServiceImpl extends AbstractCrudService<ContentPatch
     @Override
     @Transactional(rollbackFor = Exception.class)
     public ContentPatchLog createOrUpdate(Integer postId, String content, String originalContent) {
+        if (originalContent == null) {
+            originalContent = "";
+        }
+        if (content == null) {
+            content = "";
+        }
+
         Integer version = getVersionByPostId(postId);
         if (existDraftBy(postId)) {
             return updateDraftBy(postId, content, originalContent);
