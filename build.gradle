@@ -148,6 +148,8 @@ dependencies {
     }
 
     developmentOnly "org.springframework.boot:spring-boot-devtools"
+
+    implementation 'org.pf4j:pf4j:3.7.0'
 }
 
 test {
