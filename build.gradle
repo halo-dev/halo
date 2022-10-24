@@ -15,13 +15,9 @@ checkstyle {
 }
 
 repositories {
-    maven { url 'https://maven.aliyun.com/repository/public/' }
-    maven { url 'https://maven.aliyun.com/repository/spring/' }
-    maven { url 'https://repo.spring.io/milestone' }
-
-    mavenLocal()
     mavenCentral()
 
+    maven { url 'https://repo.spring.io/milestone' }
 }
 
 
