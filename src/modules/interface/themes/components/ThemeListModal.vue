@@ -2,6 +2,8 @@
 import {
   IconAddCircle,
   IconGitHub,
+  IconArrowLeft,
+  IconArrowRight,
   Dialog,
   VButton,
   VEmpty,
@@ -15,6 +17,7 @@ import {
   VTabs,
 } from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
+import UrlPreviewModal from "@/components/preview/UrlPreviewModal.vue";
 import ThemeUploadModal from "./ThemeUploadModal.vue";
 import { computed, ref, watch } from "vue";
 import type { Theme } from "@halo-dev/api-client";
@@ -57,6 +60,8 @@ const handleFetchThemes = async () => {
   try {
     loading.value = true;
     const { data } = await apiClient.theme.listThemes({
+      page: 0,
+      size: 0,
       uninstalled: activeTab.value !== "installed",
     });
     themes.value = data.items;
@@ -161,6 +166,50 @@ watch(
 defineExpose({
   handleFetchThemes,
 });
+
+const preview = ref(false);
+const selectedPreviewTheme = ref<Theme>();
+
+const previewUrl = computed(() => {
+  if (!selectedPreviewTheme.value) {
+    return "";
+  }
+  return `${import.meta.env.VITE_API_URL}/?preview-theme=${
+    selectedPreviewTheme.value.metadata.name
+  }`;
+});
+
+const previewModalTitle = computed(() => {
+  if (!selectedPreviewTheme.value) {
+    return "";
+  }
+  return `预览主题：${selectedPreviewTheme.value.spec.displayName}`;
+});
+
+const handleOpenPreview = (theme: Theme) => {
+  selectedPreviewTheme.value = theme;
+  preview.value = true;
+};
+
+const handleSelectPreviousPreviewTheme = async () => {
+  const index = themes.value.findIndex(
+    (theme) => theme.metadata.name === selectedPreviewTheme.value?.metadata.name
+  );
+  if (index > 0) {
+    selectedPreviewTheme.value = themes.value[index - 1];
+    return;
+  }
+};
+
+const handleSelectNextPreviewTheme = () => {
+  const index = themes.value.findIndex(
+    (theme) => theme.metadata.name === selectedPreviewTheme.value?.metadata.name
+  );
+  if (index < themes.value.length - 1) {
+    selectedPreviewTheme.value = themes.value[index + 1];
+    return;
+  }
+};
 </script>
 <template>
   <VModal
@@ -299,6 +348,14 @@ defineExpose({
                 v-if="currentUserHasPermission(['system:themes:manage'])"
                 #dropdownItems
               >
+                <VButton
+                  v-close-popper
+                  block
+                  type="secondary"
+                  @click="handleOpenPreview(theme)"
+                >
+                  预览
+                </VButton>
                 <VButton
                   v-close-popper
                   block
@@ -442,4 +499,19 @@ defineExpose({
     v-model:visible="themeInstall"
     @close="handleFetchThemes"
   />
+
+  <UrlPreviewModal
+    v-model:visible="preview"
+    :title="previewModalTitle"
+    :url="previewUrl"
+  >
+    <template #actions>
+      <span @click="handleSelectPreviousPreviewTheme">
+        <IconArrowLeft />
+      </span>
+      <span @click="handleSelectNextPreviewTheme">
+        <IconArrowRight />
+      </span>
+    </template>
+  </UrlPreviewModal>
 </template>
