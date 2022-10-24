@@ -7,6 +7,7 @@ import {
   VStatusDot,
   VEntity,
   VEntityField,
+  VAvatar,
 } from "@halo-dev/components";
 import { toRefs } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
@@ -34,13 +35,11 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
     <template #start>
       <VEntityField>
         <template #description>
-          <div class="h-12 w-12 rounded border bg-white p-1 hover:shadow-sm">
-            <img
-              :alt="plugin?.metadata.name"
-              :src="plugin?.spec.logo"
-              class="h-full w-full"
-            />
-          </div>
+          <VAvatar
+            :alt="plugin?.spec.displayName"
+            :src="plugin?.spec.logo"
+            size="md"
+          ></VAvatar>
         </template>
       </VEntityField>
       <VEntityField

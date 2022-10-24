@@ -11,7 +11,13 @@ import cloneDeep from "lodash.clonedeep";
 import { useSettingForm } from "@/composables/use-setting-form";
 
 // components
-import { VButton, VCard, VPageHeader, VTabbar } from "@halo-dev/components";
+import {
+  VButton,
+  VCard,
+  VPageHeader,
+  VTabbar,
+  VAvatar,
+} from "@halo-dev/components";
 import BasicLayout from "@/layouts/BasicLayout.vue";
 
 // types
@@ -141,7 +147,13 @@ watch([() => route.name, () => route.params], () => {
   <BasicLayout>
     <VPageHeader :title="plugin?.spec?.displayName">
       <template #icon>
-        <img :src="plugin?.spec?.logo" class="mr-2 h-8 w-8" />
+        <VAvatar
+          v-if="plugin"
+          :src="plugin.spec.logo"
+          :alt="plugin.spec.displayName"
+          class="mr-2"
+          size="sm"
+        />
       </template>
       <template #actions>
         <VButton class="opacity-0" type="secondary">安装</VButton>

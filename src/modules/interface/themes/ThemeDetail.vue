@@ -11,6 +11,7 @@ import {
   IconMore,
   VButton,
   Dialog,
+  VAvatar,
 } from "@halo-dev/components";
 import ThemeUploadModal from "./components/ThemeUploadModal.vue";
 
@@ -56,17 +57,13 @@ const onUpgradeModalClose = () => {
 <template>
   <div class="bg-white px-4 py-4 sm:px-6">
     <div class="group flex items-center justify-between">
-      <div class="flex flex-row gap-3">
-        <div
-          class="h-12 w-12 overflow-hidden rounded border bg-white hover:shadow-sm"
-        >
-          <img
-            :key="selectedTheme?.metadata.name"
-            :alt="selectedTheme?.spec.displayName"
-            :src="selectedTheme?.spec.logo"
-            class="h-full w-full"
-          />
-        </div>
+      <div class="flex flex-row items-center gap-3">
+        <VAvatar
+          :key="selectedTheme?.metadata.name"
+          :alt="selectedTheme?.spec.displayName"
+          :src="selectedTheme?.spec.logo"
+          size="lg"
+        />
         <div>
           <h3 class="text-lg font-medium leading-6 text-gray-900">
             {{ selectedTheme?.spec.displayName }}
