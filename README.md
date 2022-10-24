@@ -54,4 +54,4 @@ pnpm build
 
 ## 状态
 
-![Repobeats analytics](https://repobeats.axiom.co/api/embed/9ae12e8e0b9ed7df1b5364169186544d89c1c6bc.svg "Repobeats analytics image")
+![Repobeats analytics](https://repobeats.axiom.co/api/embed/2db66f0e740d300f1bc6417d4465594755a5545d.svg "Repobeats analytics image")
