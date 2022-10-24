@@ -10,11 +10,12 @@ import {
   VEntityField,
 } from "@halo-dev/components";
 import MenuEditingModal from "./MenuEditingModal.vue";
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import type { Menu } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { usePermission } from "@/utils/permission";
+import { onBeforeRouteLeave } from "vue-router";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -36,10 +37,13 @@ const menus = ref<Menu[]>([] as Menu[]);
 const loading = ref(false);
 const selectedMenuToUpdate = ref<Menu>();
 const menuEditingModal = ref<boolean>(false);
+const refreshInterval = ref();
 
 const handleFetchMenus = async () => {
   selectedMenuToUpdate.value = undefined;
   try {
+    clearInterval(refreshInterval.value);
+
     loading.value = true;
 
     const { data } = await apiClient.extension.menu.listv1alpha1Menu();
@@ -54,12 +58,30 @@ const handleFetchMenus = async () => {
         emit("update:selectedMenu", updatedMenu);
       }
     }
+
+    const deletedMenus = menus.value.filter(
+      (menu) => !!menu.metadata.deletionTimestamp
+    );
+
+    if (deletedMenus.length) {
+      refreshInterval.value = setInterval(() => {
+        handleFetchMenus();
+      }, 3000);
+    }
   } catch (e) {
     console.error("Failed to fetch menus", e);
   } finally {
     loading.value = false;
   }
 };
+
+onUnmounted(() => {
+  clearInterval(refreshInterval.value);
+});
+
+onBeforeRouteLeave(() => {
+  clearInterval(refreshInterval.value);
+});
 
 const menuQuery = useRouteQuery("menu");
 const handleSelect = (menu: Menu) => {

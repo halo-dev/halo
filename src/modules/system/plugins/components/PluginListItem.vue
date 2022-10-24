@@ -69,6 +69,11 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
           />
         </template>
       </VEntityField>
+      <VEntityField v-if="plugin?.metadata.deletionTimestamp">
+        <template #description>
+          <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+        </template>
+      </VEntityField>
       <VEntityField>
         <template #description>
           <a

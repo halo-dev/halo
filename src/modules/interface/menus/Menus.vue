@@ -12,7 +12,7 @@ import {
 import MenuItemEditingModal from "./components/MenuItemEditingModal.vue";
 import MenuItemListItem from "./components/MenuItemListItem.vue";
 import MenuList from "./components/MenuList.vue";
-import { ref } from "vue";
+import { onUnmounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { Menu, MenuItem } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
@@ -25,6 +25,7 @@ import {
   resetMenuItemsTreePriority,
 } from "./utils";
 import { useDebounceFn } from "@vueuse/core";
+import { onBeforeRouteLeave } from "vue-router";
 
 const menuItems = ref<MenuItem[]>([] as MenuItem[]);
 const menuTreeItems = ref<MenuTreeItem[]>([] as MenuTreeItem[]);
@@ -34,9 +35,12 @@ const selectedParentMenuItem = ref<MenuItem>();
 const loading = ref(false);
 const menuListRef = ref();
 const menuItemEditingModal = ref();
+const refreshInterval = ref();
 
 const handleFetchMenuItems = async () => {
   try {
+    clearInterval(refreshInterval.value);
+
     loading.value = true;
 
     if (!selectedMenu.value?.spec.menuItems) {
@@ -53,12 +57,30 @@ const handleFetchMenuItems = async () => {
     menuItems.value = data.items;
     // Build the menu tree
     menuTreeItems.value = buildMenuItemsTree(data.items);
+
+    const deletedMenuItems = menuItems.value.filter(
+      (menuItem) => !!menuItem.metadata.deletionTimestamp
+    );
+
+    if (deletedMenuItems.length) {
+      refreshInterval.value = setInterval(() => {
+        handleFetchMenuItems();
+      }, 3000);
+    }
   } catch (e) {
     console.error("Failed to fetch menu items", e);
   } finally {
     loading.value = false;
   }
 };
+
+onUnmounted(() => {
+  clearInterval(refreshInterval.value);
+});
+
+onBeforeRouteLeave(() => {
+  clearInterval(refreshInterval.value);
+});
 
 const handleOpenEditingModal = (menuItem: MenuTreeItem) => {
   selectedMenuItem.value = convertMenuTreeItemToMenuItem(menuItem);

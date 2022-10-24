@@ -20,10 +20,10 @@ import type {
   SinglePage,
 } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
-import { computed, provide, ref, watch, type Ref } from "vue";
+import { computed, onMounted, provide, ref, watch, type Ref } from "vue";
 import ReplyListItem from "./ReplyListItem.vue";
 import { apiClient } from "@/utils/api-client";
-import type { RouteLocationRaw } from "vue-router";
+import { onBeforeRouteLeave, type RouteLocationRaw } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
 
@@ -50,6 +50,7 @@ const hoveredReply = ref<ListedReply>();
 const loading = ref(false);
 const showReplies = ref(false);
 const replyModal = ref(false);
+const refreshInterval = ref();
 
 provide<Ref<ListedReply | undefined>>("hoveredReply", hoveredReply);
 
@@ -115,17 +116,37 @@ const handleApprove = async () => {
 
 const handleFetchReplies = async () => {
   try {
+    clearInterval(refreshInterval.value);
+
     loading.value = true;
     const { data } = await apiClient.reply.listReplies({
       commentName: props.comment.comment.metadata.name,
     });
     replies.value = data.items;
+
+    const deletedReplies = replies.value.filter(
+      (reply) => !!reply.reply.metadata.deletionTimestamp
+    );
+
+    if (deletedReplies.length) {
+      refreshInterval.value = setInterval(() => {
+        handleFetchReplies();
+      }, 3000);
+    }
   } catch (error) {
     console.error("Failed to fetch comment replies", error);
   } finally {
     loading.value = false;
   }
 };
+
+onMounted(() => {
+  clearInterval(refreshInterval.value);
+});
+
+onBeforeRouteLeave(() => {
+  clearInterval(refreshInterval.value);
+});
 
 watch(
   () => showReplies.value,

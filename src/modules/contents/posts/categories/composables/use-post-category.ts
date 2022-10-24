@@ -1,10 +1,11 @@
 import { apiClient } from "@/utils/api-client";
 import type { Category } from "@halo-dev/api-client";
-import type { Ref } from "vue";
+import { onUnmounted, type Ref } from "vue";
 import { onMounted, ref } from "vue";
 import type { CategoryTree } from "@/modules/contents/posts/categories/utils";
 import { buildCategoriesTree } from "@/modules/contents/posts/categories/utils";
 import { Dialog } from "@halo-dev/components";
+import { onBeforeRouteLeave } from "vue-router";
 
 interface usePostCategoryReturn {
   categories: Ref<Category[]>;
@@ -22,9 +23,12 @@ export function usePostCategory(options?: {
   const categories = ref<Category[]>([] as Category[]);
   const categoriesTree = ref<CategoryTree[]>([] as CategoryTree[]);
   const loading = ref(false);
+  const refreshInterval = ref();
 
   const handleFetchCategories = async () => {
     try {
+      clearInterval(refreshInterval.value);
+
       loading.value = true;
       const { data } =
         await apiClient.extension.category.listcontentHaloRunV1alpha1Category({
@@ -33,12 +37,30 @@ export function usePostCategory(options?: {
         });
       categories.value = data.items;
       categoriesTree.value = buildCategoriesTree(data.items);
+
+      const deletedCategories = categories.value.filter(
+        (category) => !!category.metadata.deletionTimestamp
+      );
+
+      if (deletedCategories.length) {
+        refreshInterval.value = setInterval(() => {
+          handleFetchCategories();
+        }, 3000);
+      }
     } catch (e) {
       console.error("Failed to fetch categories", e);
     } finally {
       loading.value = false;
     }
   };
+
+  onUnmounted(() => {
+    clearInterval(refreshInterval.value);
+  });
+
+  onBeforeRouteLeave(() => {
+    clearInterval(refreshInterval.value);
+  });
 
   const handleDelete = async (category: CategoryTree) => {
     Dialog.warning({

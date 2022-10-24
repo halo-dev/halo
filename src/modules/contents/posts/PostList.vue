@@ -39,6 +39,7 @@ import { formatDatetime } from "@/utils/date";
 import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
 import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
 import { usePermission } from "@/utils/permission";
+import { onBeforeRouteLeave } from "vue-router";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -64,9 +65,12 @@ const selectedPost = ref<Post | null>(null);
 const selectedPostWithContent = ref<PostRequest | null>(null);
 const checkedAll = ref(false);
 const selectedPostNames = ref<string[]>([]);
+const refreshInterval = ref();
 
 const handleFetchPosts = async () => {
   try {
+    clearInterval(refreshInterval.value);
+
     loading.value = true;
 
     let categories: string[] | undefined;
@@ -101,12 +105,26 @@ const handleFetchPosts = async () => {
       contributor: contributors,
     });
     posts.value = data;
+
+    const deletedPosts = posts.value.items.filter(
+      (post) => !!post.post.metadata.deletionTimestamp
+    );
+
+    if (deletedPosts.length) {
+      refreshInterval.value = setInterval(() => {
+        handleFetchPosts();
+      }, 3000);
+    }
   } catch (e) {
     console.error("Failed to fetch posts", e);
   } finally {
     loading.value = false;
   }
 };
+
+onBeforeRouteLeave(() => {
+  clearInterval(refreshInterval.value);
+});
 
 const handlePaginationChange = ({
   page,

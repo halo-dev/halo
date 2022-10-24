@@ -11,6 +11,7 @@ import type { AttachmentLike } from "@halo-dev/console-shared";
 import { apiClient } from "@/utils/api-client";
 import { Dialog } from "@halo-dev/components";
 import type { Content, Editor } from "@halo-dev/richtext-editor";
+import { onBeforeRouteLeave } from "vue-router";
 
 interface useAttachmentControlReturn {
   attachments: Ref<AttachmentList>;
@@ -63,9 +64,12 @@ export function useAttachmentControl(filterOptions?: {
   const selectedAttachment = ref<Attachment>();
   const selectedAttachments = ref<Set<Attachment>>(new Set<Attachment>());
   const checkedAll = ref(false);
+  const refreshInterval = ref();
 
   const handleFetchAttachments = async () => {
     try {
+      clearInterval(refreshInterval.value);
+
       loading.value = true;
       const { data } = await apiClient.attachment.searchAttachments({
         policy: policy?.value?.metadata.name,
@@ -76,12 +80,26 @@ export function useAttachmentControl(filterOptions?: {
         size: attachments.value.size,
       });
       attachments.value = data;
+
+      const deletedAttachments = attachments.value.items.filter(
+        (attachment) => !!attachment.metadata.deletionTimestamp
+      );
+
+      if (deletedAttachments.length) {
+        refreshInterval.value = setInterval(() => {
+          handleFetchAttachments();
+        }, 3000);
+      }
     } catch (e) {
       console.error("Failed to fetch attachments", e);
     } finally {
       loading.value = false;
     }
   };
+
+  onBeforeRouteLeave(() => {
+    clearInterval(refreshInterval.value);
+  });
 
   const handlePaginationChange = async ({
     page,

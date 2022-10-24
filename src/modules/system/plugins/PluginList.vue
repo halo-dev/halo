@@ -18,6 +18,7 @@ import { onMounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { PluginList } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
+import { onBeforeRouteLeave } from "vue-router";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -34,9 +35,12 @@ const plugins = ref<PluginList>({
 const loading = ref(false);
 const pluginInstall = ref(false);
 const keyword = ref("");
+const refreshInterval = ref();
 
 const handleFetchPlugins = async () => {
   try {
+    clearInterval(refreshInterval.value);
+
     loading.value = true;
 
     const { data } = await apiClient.plugin.listPlugins({
@@ -50,12 +54,26 @@ const handleFetchPlugins = async () => {
     });
 
     plugins.value = data;
+
+    const deletedPlugins = plugins.value.items.filter(
+      (plugin) => !!plugin.metadata.deletionTimestamp
+    );
+
+    if (deletedPlugins.length) {
+      refreshInterval.value = setInterval(() => {
+        handleFetchPlugins();
+      }, 3000);
+    }
   } catch (e) {
     console.error("Failed to fetch plugins", e);
   } finally {
     loading.value = false;
   }
 };
+
+onBeforeRouteLeave(() => {
+  clearInterval(refreshInterval.value);
+});
 
 const handlePaginationChange = ({
   page,

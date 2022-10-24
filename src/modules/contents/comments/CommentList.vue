@@ -21,6 +21,7 @@ import type {
 } from "@halo-dev/api-client";
 import { onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
+import { onBeforeRouteLeave } from "vue-router";
 
 const comments = ref<ListedCommentList>({
   page: 1,
@@ -37,9 +38,12 @@ const checkAll = ref(false);
 const selectedComment = ref<ListedComment>();
 const selectedCommentNames = ref<string[]>([]);
 const keyword = ref("");
+const refreshInterval = ref();
 
 const handleFetchComments = async () => {
   try {
+    clearInterval(refreshInterval.value);
+
     loading.value = true;
     const { data } = await apiClient.comment.listComments({
       page: comments.value.page,
@@ -47,16 +51,29 @@ const handleFetchComments = async () => {
       approved: selectedApprovedFilterItem.value.value,
       sort: selectedSortFilterItem.value.value,
       keyword: keyword.value,
-      ownerKind: "User",
       ownerName: selectedUser.value?.metadata.name,
     });
     comments.value = data;
+
+    const deletedComments = comments.value.items.filter(
+      (comment) => !!comment.comment.metadata.deletionTimestamp
+    );
+
+    if (deletedComments.length) {
+      refreshInterval.value = setInterval(() => {
+        handleFetchComments();
+      }, 3000);
+    }
   } catch (error) {
     console.log("Failed to fetch comments", error);
   } finally {
     loading.value = false;
   }
 };
+
+onBeforeRouteLeave(() => {
+  clearInterval(refreshInterval.value);
+});
 
 const handlePaginationChange = ({
   page,

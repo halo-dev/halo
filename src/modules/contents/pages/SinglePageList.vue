@@ -31,7 +31,7 @@ import type {
 } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
-import { RouterLink } from "vue-router";
+import { onBeforeRouteLeave, RouterLink } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
 
@@ -58,9 +58,12 @@ const settingModal = ref(false);
 const selectedSinglePage = ref<SinglePage>();
 const selectedSinglePageWithContent = ref<SinglePageRequest>();
 const checkAll = ref(false);
+const refreshInterval = ref();
 
 const handleFetchSinglePages = async () => {
   try {
+    clearInterval(refreshInterval.value);
+
     loading.value = true;
 
     let contributors: string[] | undefined;
@@ -80,12 +83,26 @@ const handleFetchSinglePages = async () => {
       contributor: contributors,
     });
     singlePages.value = data;
+
+    const deletedSinglePages = singlePages.value.items.filter(
+      (singlePage) => !!singlePage.page.metadata.deletionTimestamp
+    );
+
+    if (deletedSinglePages.length) {
+      refreshInterval.value = setInterval(() => {
+        handleFetchSinglePages();
+      }, 3000);
+    }
   } catch (error) {
     console.error("Failed to fetch single pages", error);
   } finally {
     loading.value = false;
   }
 };
+
+onBeforeRouteLeave(() => {
+  clearInterval(refreshInterval.value);
+});
 
 const handlePaginationChange = ({
   page,

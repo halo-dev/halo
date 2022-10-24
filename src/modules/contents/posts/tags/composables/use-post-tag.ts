@@ -1,8 +1,9 @@
 import { apiClient } from "@/utils/api-client";
 import type { Tag } from "@halo-dev/api-client";
-import type { Ref } from "vue";
+import { onUnmounted, type Ref } from "vue";
 import { onMounted, ref } from "vue";
 import { Dialog } from "@halo-dev/components";
+import { onBeforeRouteLeave } from "vue-router";
 
 interface usePostTagReturn {
   tags: Ref<Tag[]>;
@@ -18,9 +19,12 @@ export function usePostTag(options?: {
 
   const tags = ref<Tag[]>([] as Tag[]);
   const loading = ref(false);
+  const refreshInterval = ref();
 
   const handleFetchTags = async () => {
     try {
+      clearInterval(refreshInterval.value);
+
       loading.value = true;
       const { data } =
         await apiClient.extension.tag.listcontentHaloRunV1alpha1Tag({
@@ -29,12 +33,30 @@ export function usePostTag(options?: {
         });
 
       tags.value = data.items;
+
+      const deletedTags = tags.value.filter(
+        (tag) => !!tag.metadata.deletionTimestamp
+      );
+
+      if (deletedTags.length) {
+        refreshInterval.value = setInterval(() => {
+          handleFetchTags();
+        }, 3000);
+      }
     } catch (e) {
       console.error("Failed to fetch tags", e);
     } finally {
       loading.value = false;
     }
   };
+
+  onUnmounted(() => {
+    clearInterval(refreshInterval.value);
+  });
+
+  onBeforeRouteLeave(() => {
+    clearInterval(refreshInterval.value);
+  });
 
   const handleDelete = async (tag: Tag) => {
     Dialog.warning({
