@@ -2,14 +2,17 @@
 import { VModal } from "@halo-dev/components";
 import FilePondUpload from "@/components/upload/FilePondUpload.vue";
 import { apiClient } from "@/utils/api-client";
-import { computed, ref } from "vue";
+import { computed, mergeProps, ref } from "vue";
+import type { Theme } from "@halo-dev/api-client";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     visible: boolean;
+    upgradeTheme?: Theme;
   }>(),
   {
     visible: false,
+    upgradeTheme: undefined,
   }
 );
 
@@ -20,6 +23,12 @@ const emit = defineEmits<{
 
 const FilePondUploadRef = ref();
 
+const modalTitle = computed(() => {
+  return props.upgradeTheme
+    ? `升级主题（${props.upgradeTheme.spec.displayName}）`
+    : "安装主题";
+});
+
 const handleVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
@@ -29,6 +38,16 @@ const handleVisibleChange = (visible: boolean) => {
 };
 
 const uploadHandler = computed(() => {
+  if (props.upgradeTheme) {
+    return (file, config) =>
+      apiClient.theme.upgradeTheme(
+        {
+          name: props.upgradeTheme.metadata.name as string,
+          file: file,
+        },
+        config
+      );
+  }
   return (file, config) =>
     apiClient.theme.installTheme(
       {
@@ -42,10 +61,11 @@ const uploadHandler = computed(() => {
   <VModal
     :visible="visible"
     :width="500"
-    title="安装主题"
+    :title="modalTitle"
     @update:visible="handleVisibleChange"
   >
     <FilePondUpload
+      v-if="visible && uploadHandler"
       ref="FilePondUploadRef"
       :allow-multiple="false"
       :handler="uploadHandler"

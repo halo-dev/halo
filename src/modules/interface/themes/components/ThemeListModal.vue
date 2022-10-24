@@ -15,7 +15,7 @@ import {
   VTabs,
 } from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
-import ThemeInstallModal from "./ThemeInstallModal.vue";
+import ThemeUploadModal from "./ThemeUploadModal.vue";
 import { computed, ref, watch } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
@@ -437,7 +437,8 @@ defineExpose({
     </template>
   </VModal>
 
-  <ThemeInstallModal
+  <ThemeUploadModal
+    v-if="visible"
     v-model:visible="themeInstall"
     @close="handleFetchThemes"
   />

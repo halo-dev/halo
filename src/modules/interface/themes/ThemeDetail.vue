@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { inject } from "vue";
+import { inject, ref } from "vue";
 import { RouterLink } from "vue-router";
 
 // components
@@ -12,6 +12,7 @@ import {
   VButton,
   Dialog,
 } from "@halo-dev/components";
+import ThemeUploadModal from "./components/ThemeUploadModal.vue";
 
 // types
 import type { ComputedRef, Ref } from "vue";
@@ -21,6 +22,7 @@ import { apiClient } from "@/utils/api-client";
 
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme");
 const isActivated = inject<ComputedRef<boolean>>("isActivated");
+const upgradeModal = ref(false);
 
 const handleReloadThemeSetting = async () => {
   Dialog.warning({
@@ -33,7 +35,7 @@ const handleReloadThemeSetting = async () => {
         }
 
         await apiClient.theme.reloadThemeSetting({
-          name: selectedTheme.value.metadata.name,
+          name: selectedTheme.value.metadata.name as string,
         });
 
         window.location.reload();
@@ -42,6 +44,12 @@ const handleReloadThemeSetting = async () => {
       }
     },
   });
+};
+
+const onUpgradeModalClose = () => {
+  setTimeout(() => {
+    window.location.reload();
+  }, 200);
 };
 </script>
 
@@ -86,6 +94,14 @@ const handleReloadThemeSetting = async () => {
                 v-close-popper
                 block
                 type="secondary"
+                @click="upgradeModal = true"
+              >
+                更新
+              </VButton>
+              <VButton
+                v-close-popper
+                block
+                type="default"
                 @click="handleReloadThemeSetting"
               >
                 刷新设置表单
@@ -206,4 +222,9 @@ const handleReloadThemeSetting = async () => {
       </div>
     </dl>
   </div>
+  <ThemeUploadModal
+    v-model:visible="upgradeModal"
+    :upgrade-theme="selectedTheme"
+    @close="onUpgradeModalClose"
+  />
 </template>
