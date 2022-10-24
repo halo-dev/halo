@@ -40,7 +40,7 @@ const FileTypeIconsMap = {
   ".webp": markRaw(VscodeIconsFileTypeImage),
   ".svg": markRaw(VscodeIconsFileTypeImage),
 
-  // documnet
+  // document
   ".docx": markRaw(VscodeIconsFileTypeWord),
   ".pptx": markRaw(VscodeIconsFileTypePowerpoint),
   ".xlsx": markRaw(VscodeIconsFileTypeExcel),

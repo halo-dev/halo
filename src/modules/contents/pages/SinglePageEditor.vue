@@ -61,7 +61,7 @@ const formState = ref<SinglePageRequest>(cloneDeep(initialFormState));
 const saving = ref(false);
 const settingModal = ref(false);
 const previewModal = ref(false);
-const attachemntSelectorModal = ref(false);
+const attachmentSelectorModal = ref(false);
 
 const isUpdateMode = computed(() => {
   return !!formState.value.page.metadata.creationTimestamp;
@@ -173,7 +173,7 @@ onMounted(async () => {
   />
   <PostPreviewModal v-model:visible="previewModal" />
   <AttachmentSelectorModal
-    v-model:visible="attachemntSelectorModal"
+    v-model:visible="attachmentSelectorModal"
     @select="onAttachmentSelect"
   />
   <VPageHeader title="自定义页面">
@@ -207,12 +207,12 @@ onMounted(async () => {
     <RichTextEditor
       v-if="editor"
       :editor="editor"
-      :addtional-menu-items="[
+      :additional-menu-items="[
         {
           type: 'button',
           icon: MdiFileImageBox,
           title: 'SuperScript',
-          action: () => (attachemntSelectorModal = true),
+          action: () => (attachmentSelectorModal = true),
           isActive: () => false,
         },
       ]"

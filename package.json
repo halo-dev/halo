@@ -36,7 +36,7 @@
     "@halo-dev/api-client": "^0.0.38",
     "@halo-dev/components": "workspace:*",
     "@halo-dev/console-shared": "workspace:*",
-    "@halo-dev/richtext-editor": "^0.0.0-alpha.7",
+    "@halo-dev/richtext-editor": "^0.0.0-alpha.8",
     "@tiptap/extension-character-count": "^2.0.0-beta.199",
     "@vueuse/components": "^9.3.0",
     "@vueuse/core": "^9.3.0",
