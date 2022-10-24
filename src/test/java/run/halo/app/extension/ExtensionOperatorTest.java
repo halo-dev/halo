@@ -22,4 +22,20 @@ class ExtensionOperatorTest {
         when(metadata.getDeletionTimestamp()).thenReturn(Instant.now());
         assertFalse(ExtensionOperator.isNotDeleted().test(ext));
     }
+
+    @Test
+    void testIsDeleted() {
+        var ext = mock(ExtensionOperator.class);
+
+        when(ext.getMetadata()).thenReturn(null);
+        assertFalse(ExtensionOperator.isDeleted(ext));
+
+        var metadata = mock(Metadata.class);
+        when(ext.getMetadata()).thenReturn(metadata);
+        when(metadata.getDeletionTimestamp()).thenReturn(null);
+        assertFalse(ExtensionOperator.isDeleted(ext));
+
+        when(metadata.getDeletionTimestamp()).thenReturn(Instant.now());
+        assertTrue(ExtensionOperator.isDeleted(ext));
+    }
 }

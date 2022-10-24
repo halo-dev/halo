@@ -55,6 +55,7 @@ import run.halo.app.extension.router.ExtensionCompositeRouterFunction;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.metrics.CounterService;
 import run.halo.app.plugin.ExtensionComponentsFinder;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.resources.ReverseProxyRouterFunctionRegistry;
@@ -147,9 +148,10 @@ public class ExtensionConfiguration {
 
         @Bean
         Controller postController(ExtensionClient client, ContentService contentService,
-            PostPermalinkPolicy postPermalinkPolicy) {
+            PostPermalinkPolicy postPermalinkPolicy, CounterService counterService) {
             return new ControllerBuilder("post-controller", client)
-                .reconciler(new PostReconciler(client, contentService, postPermalinkPolicy))
+                .reconciler(new PostReconciler(client, contentService, postPermalinkPolicy,
+                    counterService))
                 .extension(new Post())
                 .build();
         }
@@ -195,10 +197,10 @@ public class ExtensionConfiguration {
 
         @Bean
         Controller singlePageController(ExtensionClient client, ContentService contentService,
-            ApplicationContext applicationContext) {
+            ApplicationContext applicationContext, CounterService counterService) {
             return new ControllerBuilder("single-page-controller", client)
                 .reconciler(new SinglePageReconciler(client, contentService,
-                    applicationContext)
+                    applicationContext, counterService)
                 )
                 .extension(new SinglePage())
                 .build();

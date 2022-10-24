@@ -12,13 +12,18 @@ import org.jsoup.Jsoup;
 import org.springframework.util.Assert;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
+import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ExtensionOperator;
+import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.metrics.CounterService;
+import run.halo.app.metrics.MeterUtils;
 
 /**
  * <p>Reconciler for {@link Post}.</p>
@@ -37,20 +42,27 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     private final ExtensionClient client;
     private final ContentService contentService;
     private final PostPermalinkPolicy postPermalinkPolicy;
+    private final CounterService counterService;
 
     public PostReconciler(ExtensionClient client, ContentService contentService,
-        PostPermalinkPolicy postPermalinkPolicy) {
+        PostPermalinkPolicy postPermalinkPolicy, CounterService counterService) {
         this.client = client;
         this.contentService = contentService;
         this.postPermalinkPolicy = postPermalinkPolicy;
+        this.counterService = counterService;
     }
 
     @Override
     public Result reconcile(Request request) {
         client.fetch(Post.class, request.name())
             .ifPresent(post -> {
-                if (isDeleted(post)) {
+                if (ExtensionOperator.isDeleted(post)) {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
+                    return;
+                }
+                if (Objects.equals(true, post.getSpec().getDeleted())) {
+                    // remove permalink from permalink indexer
+                    postPermalinkPolicy.onPermalinkDelete(post);
                     return;
                 }
                 addFinalizerIfNecessary(post);
@@ -198,6 +210,23 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     private void cleanUpResources(Post post) {
         // remove permalink from permalink indexer
         postPermalinkPolicy.onPermalinkDelete(post);
+
+        // clean up snapshots
+        Snapshot.SubjectRef subjectRef =
+            Snapshot.SubjectRef.of(Post.KIND, post.getMetadata().getName());
+        client.list(Snapshot.class,
+                snapshot -> subjectRef.equals(snapshot.getSpec().getSubjectRef()), null)
+            .forEach(client::delete);
+
+        // clean up comments
+        Ref ref = Ref.of(post);
+        client.list(Comment.class, comment -> comment.getSpec().getSubjectRef().equals(ref),
+                null)
+            .forEach(client::delete);
+
+        // delete counter
+        counterService.deleteByName(MeterUtils.nameOf(Post.class, post.getMetadata().getName()))
+            .block();
     }
 
     private Map<String, String> getLabelsOrDefault(Post post) {
@@ -223,10 +252,5 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
 
     private boolean isPublished(Post post) {
         return Objects.equals(true, post.getSpec().getPublished());
-    }
-
-    private boolean isDeleted(Post post) {
-        return Objects.equals(true, post.getSpec().getDeleted())
-            || post.getMetadata().getDeletionTimestamp() != null;
     }
 }

@@ -30,6 +30,7 @@ import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.metrics.CounterService;
 import run.halo.app.theme.router.PermalinkIndexAddCommand;
 import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
 import run.halo.app.theme.router.PermalinkIndexUpdateCommand;
@@ -50,11 +51,15 @@ class SinglePageReconcilerTest {
     @Mock
     private ApplicationContext applicationContext;
 
+    @Mock
+    private CounterService counterService;
+
     private SinglePageReconciler singlePageReconciler;
 
     @BeforeEach
     void setUp() {
-        singlePageReconciler = new SinglePageReconciler(client, contentService, applicationContext);
+        singlePageReconciler = new SinglePageReconciler(client, contentService, applicationContext,
+            counterService);
     }
 
     @Test

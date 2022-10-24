@@ -95,4 +95,9 @@ public interface ExtensionOperator {
     static <T extends ExtensionOperator> Predicate<T> isNotDeleted() {
         return ext -> ext.getMetadata().getDeletionTimestamp() == null;
     }
+
+    static boolean isDeleted(ExtensionOperator extension) {
+        return extension.getMetadata() != null
+            && extension.getMetadata().getDeletionTimestamp() != null;
+    }
 }
