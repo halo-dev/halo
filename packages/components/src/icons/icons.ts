@@ -50,6 +50,7 @@ import IconUserLine from "~icons/ri/user-line";
 import IconMotionLine from "~icons/ri/emotion-line";
 import IconReplyLine from "~icons/ri/reply-line";
 import IconExternalLinkLine from "~icons/ri/external-link-line";
+import IconRefreshLine from "~icons/ri/refresh-line";
 
 export {
   IconDashboard,
@@ -104,4 +105,5 @@ export {
   IconMotionLine,
   IconReplyLine,
   IconExternalLinkLine,
+  IconRefreshLine,
 };
