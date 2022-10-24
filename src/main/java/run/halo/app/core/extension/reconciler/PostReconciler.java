@@ -16,6 +16,7 @@ import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ExtensionOperator;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.Condition;
@@ -55,10 +56,11 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     public Result reconcile(Request request) {
         client.fetch(Post.class, request.name())
             .ifPresent(post -> {
-                if (post.isDeleted()) {
-                    if (post.getMetadata().getDeletionTimestamp() != null) {
-                        cleanUpResourcesAndRemoveFinalizer(request.name());
-                    }
+                if (ExtensionOperator.isDeleted(post)) {
+                    cleanUpResourcesAndRemoveFinalizer(request.name());
+                    return;
+                }
+                if (Objects.equals(true, post.getSpec().getDeleted())) {
                     // remove permalink from permalink indexer
                     postPermalinkPolicy.onPermalinkDelete(post);
                     return;
@@ -206,6 +208,9 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void cleanUpResources(Post post) {
+        // remove permalink from permalink indexer
+        postPermalinkPolicy.onPermalinkDelete(post);
+
         // clean up snapshots
         Snapshot.SubjectRef subjectRef =
             Snapshot.SubjectRef.of(Post.KIND, post.getMetadata().getName());

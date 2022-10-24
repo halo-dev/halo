@@ -21,6 +21,7 @@ import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.SinglePage;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ExtensionOperator;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Reconciler;
@@ -66,10 +67,12 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         client.fetch(SinglePage.class, request.name())
             .ifPresent(singlePage -> {
                 SinglePage oldPage = JsonUtils.deepCopy(singlePage);
-                if (isDeleted(oldPage)) {
-                    if (singlePage.getMetadata().getDeletionTimestamp() != null) {
-                        cleanUpResourcesAndRemoveFinalizer(request.name());
-                    }
+                if (ExtensionOperator.isDeleted(singlePage)) {
+                    cleanUpResourcesAndRemoveFinalizer(request.name());
+                    return;
+                }
+
+                if (Objects.equals(true, singlePage.getSpec().getDeleted())) {
                     // remove permalink from permalink indexer
                     permalinkOnDelete(singlePage);
                     return;
@@ -100,6 +103,9 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void cleanUpResources(SinglePage singlePage) {
+        // remove permalink from permalink indexer
+        permalinkOnDelete(singlePage);
+
         // clean up snapshot
         Snapshot.SubjectRef subjectRef =
             Snapshot.SubjectRef.of(SinglePage.KIND, singlePage.getMetadata().getName());
