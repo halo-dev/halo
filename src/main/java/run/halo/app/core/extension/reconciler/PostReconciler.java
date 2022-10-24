@@ -55,8 +55,12 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     public Result reconcile(Request request) {
         client.fetch(Post.class, request.name())
             .ifPresent(post -> {
-                if (isDeleted(post)) {
-                    cleanUpResourcesAndRemoveFinalizer(request.name());
+                if (post.isDeleted()) {
+                    if (post.getMetadata().getDeletionTimestamp() != null) {
+                        cleanUpResourcesAndRemoveFinalizer(request.name());
+                    }
+                    // remove permalink from permalink indexer
+                    postPermalinkPolicy.onPermalinkDelete(post);
                     return;
                 }
                 addFinalizerIfNecessary(post);
@@ -202,27 +206,22 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void cleanUpResources(Post post) {
-        // remove permalink from permalink indexer
-        postPermalinkPolicy.onPermalinkDelete(post);
+        // clean up snapshots
+        Snapshot.SubjectRef subjectRef =
+            Snapshot.SubjectRef.of(Post.KIND, post.getMetadata().getName());
+        client.list(Snapshot.class,
+                snapshot -> subjectRef.equals(snapshot.getSpec().getSubjectRef()), null)
+            .forEach(client::delete);
 
-        if (post.getMetadata().getDeletionTimestamp() != null) {
-            // clean up snapshots
-            Snapshot.SubjectRef subjectRef =
-                Snapshot.SubjectRef.of(Post.KIND, post.getMetadata().getName());
-            client.list(Snapshot.class,
-                    snapshot -> subjectRef.equals(snapshot.getSpec().getSubjectRef()), null)
-                .forEach(client::delete);
+        // clean up comments
+        Ref ref = Ref.of(post);
+        client.list(Comment.class, comment -> comment.getSpec().getSubjectRef().equals(ref),
+                null)
+            .forEach(client::delete);
 
-            // clean up comments
-            Ref ref = Ref.of(post);
-            client.list(Comment.class, comment -> comment.getSpec().getSubjectRef().equals(ref),
-                    null)
-                .forEach(client::delete);
-
-            // delete counter
-            counterService.deleteByName(MeterUtils.nameOf(Post.class, post.getMetadata().getName()))
-                .block();
-        }
+        // delete counter
+        counterService.deleteByName(MeterUtils.nameOf(Post.class, post.getMetadata().getName()))
+            .block();
     }
 
     private Map<String, String> getLabelsOrDefault(Post post) {
@@ -248,10 +247,5 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
 
     private boolean isPublished(Post post) {
         return Objects.equals(true, post.getSpec().getPublished());
-    }
-
-    private boolean isDeleted(Post post) {
-        return Objects.equals(true, post.getSpec().getDeleted())
-            || post.getMetadata().getDeletionTimestamp() != null;
     }
 }

@@ -67,7 +67,11 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
             .ifPresent(singlePage -> {
                 SinglePage oldPage = JsonUtils.deepCopy(singlePage);
                 if (isDeleted(oldPage)) {
-                    cleanUpResourcesAndRemoveFinalizer(request.name());
+                    if (singlePage.getMetadata().getDeletionTimestamp() != null) {
+                        cleanUpResourcesAndRemoveFinalizer(request.name());
+                    }
+                    // remove permalink from permalink indexer
+                    permalinkOnDelete(singlePage);
                     return;
                 }
                 addFinalizerIfNecessary(oldPage);
@@ -96,28 +100,23 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void cleanUpResources(SinglePage singlePage) {
-        // remove permalink from permalink indexer
-        permalinkOnDelete(singlePage);
+        // clean up snapshot
+        Snapshot.SubjectRef subjectRef =
+            Snapshot.SubjectRef.of(SinglePage.KIND, singlePage.getMetadata().getName());
+        client.list(Snapshot.class,
+                snapshot -> subjectRef.equals(snapshot.getSpec().getSubjectRef()), null)
+            .forEach(client::delete);
 
-        if (singlePage.getMetadata().getDeletionTimestamp() != null) {
-            // clean up snapshot
-            Snapshot.SubjectRef subjectRef =
-                Snapshot.SubjectRef.of(SinglePage.KIND, singlePage.getMetadata().getName());
-            client.list(Snapshot.class,
-                    snapshot -> subjectRef.equals(snapshot.getSpec().getSubjectRef()), null)
-                .forEach(client::delete);
+        // clean up comments
+        Ref ref = Ref.of(singlePage);
+        client.list(Comment.class, comment -> comment.getSpec().getSubjectRef().equals(ref),
+                null)
+            .forEach(client::delete);
 
-            // clean up comments
-            Ref ref = Ref.of(singlePage);
-            client.list(Comment.class, comment -> comment.getSpec().getSubjectRef().equals(ref),
-                    null)
-                .forEach(client::delete);
-
-            // delete counter for single page
-            counterService.deleteByName(
-                    MeterUtils.nameOf(SinglePage.class, singlePage.getMetadata().getName()))
-                .block();
-        }
+        // delete counter for single page
+        counterService.deleteByName(
+                MeterUtils.nameOf(SinglePage.class, singlePage.getMetadata().getName()))
+            .block();
     }
 
     private void cleanUpResourcesAndRemoveFinalizer(String pageName) {
