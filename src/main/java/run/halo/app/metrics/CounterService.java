@@ -1,5 +1,6 @@
 package run.halo.app.metrics;
 
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Counter;
 
 /**
@@ -9,4 +10,6 @@ import run.halo.app.core.extension.Counter;
 public interface CounterService {
 
     Counter getByName(String counterName);
+
+    Mono<Counter> deleteByName(String counterName);
 }

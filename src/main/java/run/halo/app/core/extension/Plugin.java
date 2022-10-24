@@ -53,6 +53,13 @@ public class Plugin extends AbstractExtension {
 
         private String displayName;
 
+        /**
+         * @see <a href="semver.org">semantic version</a>
+         */
+        @Schema(required = true, pattern = "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-("
+            + "(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\."
+            + "(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\"
+            + ".[0-9a-zA-Z-]+)*))?$")
         private String version;
 
         private String author;
@@ -105,5 +112,10 @@ public class Plugin extends AbstractExtension {
         private String entry;
 
         private String stylesheet;
+    }
+
+    @JsonIgnore
+    public String generateFileName() {
+        return String.format("%s-%s.jar", getMetadata().getName(), spec.getVersion());
     }
 }

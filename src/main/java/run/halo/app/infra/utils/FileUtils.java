@@ -4,6 +4,7 @@ import static org.springframework.util.FileSystemUtils.deleteRecursively;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.nio.file.CopyOption;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -192,6 +193,14 @@ public abstract class FileUtils {
             if (log.isTraceEnabled()) {
                 log.trace("Failed to delete {} recursively", root);
             }
+        }
+    }
+
+    public static void copy(Path source, Path dest, CopyOption... options) {
+        try {
+            Files.copy(source, dest, options);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

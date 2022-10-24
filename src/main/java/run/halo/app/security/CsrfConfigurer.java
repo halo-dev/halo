@@ -5,6 +5,7 @@ import static org.springframework.security.web.server.util.matcher.ServerWebExch
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.security.web.server.csrf.CsrfWebFilter;
+import org.springframework.security.web.server.csrf.ServerCsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,9 @@ public class CsrfConfigurer implements SecurityConfigurer {
             ));
 
         http.csrf().csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse())
+            // TODO Use XorServerCsrfTokenRequestAttributeHandler instead when console implements
+            // the algorithm
+            .csrfTokenRequestHandler(new ServerCsrfTokenRequestAttributeHandler())
             .requireCsrfProtectionMatcher(csrfMatcher);
     }
 

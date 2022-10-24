@@ -16,16 +16,21 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.permalinks.ExtensionLocator;
+import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.SinglePage;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ExtensionOperator;
 import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.PathUtils;
+import run.halo.app.metrics.CounterService;
+import run.halo.app.metrics.MeterUtils;
 import run.halo.app.theme.router.PermalinkIndexAddCommand;
 import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
 
@@ -47,12 +52,14 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private final ExtensionClient client;
     private final ContentService contentService;
     private final ApplicationContext applicationContext;
+    private final CounterService counterService;
 
     public SinglePageReconciler(ExtensionClient client, ContentService contentService,
-        ApplicationContext applicationContext) {
+        ApplicationContext applicationContext, CounterService counterService) {
         this.client = client;
         this.contentService = contentService;
         this.applicationContext = applicationContext;
+        this.counterService = counterService;
     }
 
     @Override
@@ -60,8 +67,14 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         client.fetch(SinglePage.class, request.name())
             .ifPresent(singlePage -> {
                 SinglePage oldPage = JsonUtils.deepCopy(singlePage);
-                if (isDeleted(oldPage)) {
+                if (ExtensionOperator.isDeleted(singlePage)) {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
+                    return;
+                }
+
+                if (Objects.equals(true, singlePage.getSpec().getDeleted())) {
+                    // remove permalink from permalink indexer
+                    permalinkOnDelete(singlePage);
                     return;
                 }
                 addFinalizerIfNecessary(oldPage);
@@ -92,6 +105,24 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private void cleanUpResources(SinglePage singlePage) {
         // remove permalink from permalink indexer
         permalinkOnDelete(singlePage);
+
+        // clean up snapshot
+        Snapshot.SubjectRef subjectRef =
+            Snapshot.SubjectRef.of(SinglePage.KIND, singlePage.getMetadata().getName());
+        client.list(Snapshot.class,
+                snapshot -> subjectRef.equals(snapshot.getSpec().getSubjectRef()), null)
+            .forEach(client::delete);
+
+        // clean up comments
+        Ref ref = Ref.of(singlePage);
+        client.list(Comment.class, comment -> comment.getSpec().getSubjectRef().equals(ref),
+                null)
+            .forEach(client::delete);
+
+        // delete counter for single page
+        counterService.deleteByName(
+                MeterUtils.nameOf(SinglePage.class, singlePage.getMetadata().getName()))
+            .block();
     }
 
     private void cleanUpResourcesAndRemoveFinalizer(String pageName) {
