@@ -103,7 +103,6 @@ public class PluginEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> upgrade(ServerRequest request) {
-        // TODO Handle the upgrade
         var pluginNameInPath = request.pathVariable("name");
         var tempDirRef = new AtomicReference<Path>();
         var tempPluginPathRef = new AtomicReference<Path>();
@@ -124,13 +123,13 @@ public class PluginEndpoint implements CustomEndpoint {
                         "The uploaded plugin doesn't match the given plugin name");
                 }
             })
-            .flatMap(newPlugin ->
-                deletePluginAndWaitForComplete(newPlugin.getMetadata().getName())
-                    .doOnNext(oldPlugin -> {
-                        var enabled = oldPlugin.getSpec().getEnabled();
-                        newPlugin.getSpec().setEnabled(enabled);
-                    })
-                    .thenReturn(newPlugin))
+            .flatMap(newPlugin -> deletePluginAndWaitForComplete(newPlugin.getMetadata().getName())
+                .map(oldPlugin -> {
+                    var enabled = oldPlugin.getSpec().getEnabled();
+                    newPlugin.getSpec().setEnabled(enabled);
+                    return newPlugin;
+                })
+            )
             .publishOn(Schedulers.boundedElastic())
             .doOnNext(newPlugin -> {
                 // copy the Jar file into plugin root
@@ -139,7 +138,7 @@ public class PluginEndpoint implements CustomEndpoint {
                     createDirectoriesIfNotExists(pluginRoot);
                     var tempPluginPath = tempPluginPathRef.get();
                     var filename = tempPluginPath.getFileName().toString();
-                    copy(tempPluginPath, pluginRoot.resolve(filename));
+                    copy(tempPluginPath, pluginRoot.resolve(newPlugin.generateFileName()));
                 } catch (IOException e) {
                     throw Exceptions.propagate(e);
                 }
@@ -198,7 +197,7 @@ public class PluginEndpoint implements CustomEndpoint {
                     + "creationTimestamp"),
             schema = @Schema(description = "like field,asc or field,desc",
                 implementation = String.class,
-                example = "creationtimestamp,desc"))
+                example = "creationTimestamp,desc"))
         public Sort getSort() {
             return SortResolver.defaultInstance.resolve(exchange);
         }
