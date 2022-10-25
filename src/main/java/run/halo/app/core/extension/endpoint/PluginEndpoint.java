@@ -189,6 +189,8 @@ public class PluginEndpoint implements CustomEndpoint {
             .flatMap(this::transferToTemp)
             .flatMap(tempJarFilePath -> {
                 var plugin = new YamlPluginFinder().find(tempJarFilePath);
+                // Disable auto enable during installation
+                plugin.getSpec().setEnabled(false);
                 return client.fetch(Plugin.class, plugin.getMetadata().getName())
                     .switchIfEmpty(Mono.defer(() -> client.create(plugin)))
                     .publishOn(Schedulers.boundedElastic())
@@ -204,12 +206,11 @@ public class PluginEndpoint implements CustomEndpoint {
                         FileUtils.copy(tempJarFilePath, pluginFilePath);
                         return created;
                     })
-                    .doOnError(error -> {
-                        log.error("Failed to install plugin", error);
-                        client.fetch(Plugin.class, plugin.getMetadata().getName())
-                            .map(client::delete)
-                            .subscribe();
-                    })
+                    .onErrorResume(
+                        error -> client.fetch(Plugin.class, plugin.getMetadata().getName())
+                            .flatMap(client::delete)
+                            .then(Mono.error(error))
+                    )
                     .doFinally(signalType -> {
                         try {
                             Files.deleteIfExists(tempJarFilePath);

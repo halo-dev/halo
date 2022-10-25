@@ -44,67 +44,51 @@ public class PluginReconciler implements Reconciler<Request> {
 
     @Override
     public Result reconcile(Request request) {
-        return client.fetch(Plugin.class, request.name())
-            .map(plugin -> {
+        client.fetch(Plugin.class, request.name())
+            .ifPresent(plugin -> {
                 if (plugin.getMetadata().getDeletionTimestamp() != null) {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
-                    return new Result(false, null);
+                    return;
                 }
                 addFinalizerIfNecessary(plugin);
-
-                final Plugin oldPlugin = JsonUtils.deepCopy(plugin);
-                try {
-                    reconcilePluginState(plugin);
-                    // TODO: reconcile other plugin resources
-
-                    if (!Objects.equals(oldPlugin, plugin)) {
-                        // update plugin when attributes changed
-                        client.update(plugin);
-                    }
-                } catch (Exception e) {
-                    // update plugin and requeue
-                    client.update(plugin);
-                    log.error(e.getMessage(), e);
-                    return new Result(true, null);
-                }
-                return new Result(false, null);
-            })
-            .orElse(new Result(false, null));
+                reconcilePluginState(plugin.getMetadata().getName());
+            });
+        return new Result(false, null);
     }
 
-    private void reconcilePluginState(Plugin plugin) {
-        Plugin.PluginStatus pluginStatus = plugin.statusNonNull();
-        String name = plugin.getMetadata().getName();
-        PluginWrapper pluginWrapper = haloPluginManager.getPlugin(name);
-        if (pluginWrapper == null) {
+    private void reconcilePluginState(String name) {
+        if (haloPluginManager.getPlugin(name) == null) {
             ensurePluginLoaded();
-            pluginWrapper = haloPluginManager.getPlugin(name);
         }
 
-        if (pluginWrapper == null) {
-            pluginStatus.setPhase(PluginState.FAILED);
-            pluginStatus.setReason("PluginNotFound");
-            pluginStatus.setMessage("Plugin " + name + " not found in plugin manager");
-            return;
-        }
+        client.fetch(Plugin.class, name).ifPresent(plugin -> {
+            Plugin oldPlugin = JsonUtils.deepCopy(plugin);
+            Plugin.PluginStatus pluginStatus = plugin.statusNonNull();
+            PluginWrapper pluginWrapper = haloPluginManager.getPlugin(name);
+            if (pluginWrapper == null) {
+                pluginStatus.setPhase(PluginState.FAILED);
+                pluginStatus.setReason("PluginNotFound");
+                pluginStatus.setMessage("Plugin " + name + " not found in plugin manager");
+            } else {
+                if (!Objects.equals(pluginStatus.getPhase(), pluginWrapper.getPluginState())) {
+                    // Set to the correct state
+                    pluginStatus.setPhase(pluginWrapper.getPluginState());
+                }
 
-        if (!Objects.equals(pluginStatus.getPhase(), pluginWrapper.getPluginState())) {
-            // Set to the correct state
-            pluginStatus.setPhase(pluginWrapper.getPluginState());
-        }
+                if (haloPluginManager.getUnresolvedPlugins().contains(pluginWrapper)) {
+                    // load and resolve plugin
+                    haloPluginManager.loadPlugin(pluginWrapper.getPluginPath());
+                }
+            }
 
-        if (haloPluginManager.getUnresolvedPlugins().contains(pluginWrapper)) {
-            // load and resolve plugin
-            haloPluginManager.loadPlugin(pluginWrapper.getPluginPath());
-        }
+            if (!plugin.equals(oldPlugin)) {
+                client.update(plugin);
+            }
+        });
 
-        if (shouldReconcileStartState(plugin)) {
-            startPlugin(plugin);
-        }
+        startPlugin(name);
 
-        if (shouldReconcileStopState(plugin)) {
-            stopPlugin(plugin);
-        }
+        stopPlugin(name);
     }
 
     private void ensurePluginLoaded() {
@@ -126,19 +110,28 @@ public class PluginReconciler implements Reconciler<Request> {
             && plugin.statusNonNull().getPhase() != PluginState.STARTED;
     }
 
-    private void startPlugin(Plugin plugin) {
-        String pluginName = plugin.getMetadata().getName();
-        PluginState currentState = haloPluginManager.startPlugin(pluginName);
-        handleStatus(plugin, currentState, PluginState.STARTED);
-        Plugin.PluginStatus status = plugin.statusNonNull();
+    private void startPlugin(String pluginName) {
+        client.fetch(Plugin.class, pluginName).ifPresent(plugin -> {
+            final Plugin oldPlugin = JsonUtils.deepCopy(plugin);
+            if (shouldReconcileStartState(plugin)) {
+                PluginState currentState = haloPluginManager.startPlugin(pluginName);
+                handleStatus(plugin, currentState, PluginState.STARTED);
+                plugin.statusNonNull().setLastStartTime(Instant.now());
+            }
 
-        String jsBundlePath = BundleResourceUtils.getJsBundlePath(haloPluginManager, pluginName);
-        status.setEntry(jsBundlePath);
+            Plugin.PluginStatus status = plugin.statusNonNull();
+            String jsBundlePath =
+                BundleResourceUtils.getJsBundlePath(haloPluginManager, pluginName);
+            status.setEntry(jsBundlePath);
 
-        String cssBundlePath = BundleResourceUtils.getCssBundlePath(haloPluginManager, pluginName);
-        status.setStylesheet(cssBundlePath);
+            String cssBundlePath =
+                BundleResourceUtils.getCssBundlePath(haloPluginManager, pluginName);
+            status.setStylesheet(cssBundlePath);
 
-        status.setLastStartTime(Instant.now());
+            if (!plugin.equals(oldPlugin)) {
+                client.update(plugin);
+            }
+        });
     }
 
     private boolean shouldReconcileStopState(Plugin plugin) {
@@ -146,10 +139,19 @@ public class PluginReconciler implements Reconciler<Request> {
             && plugin.statusNonNull().getPhase() == PluginState.STARTED;
     }
 
-    private void stopPlugin(Plugin plugin) {
-        String pluginName = plugin.getMetadata().getName();
-        PluginState currentState = haloPluginManager.stopPlugin(pluginName);
-        handleStatus(plugin, currentState, PluginState.STOPPED);
+    private void stopPlugin(String pluginName) {
+        client.fetch(Plugin.class, pluginName).ifPresent(plugin -> {
+            Plugin oldPlugin = JsonUtils.deepCopy(plugin);
+
+            if (shouldReconcileStopState(plugin)) {
+                PluginState currentState = haloPluginManager.stopPlugin(pluginName);
+                handleStatus(plugin, currentState, PluginState.STOPPED);
+            }
+
+            if (!plugin.equals(oldPlugin)) {
+                client.update(plugin);
+            }
+        });
     }
 
     private void handleStatus(Plugin plugin, PluginState currentState,
