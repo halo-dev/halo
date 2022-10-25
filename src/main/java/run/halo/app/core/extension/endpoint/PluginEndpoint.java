@@ -36,9 +36,11 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
+import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.YamlPluginFinder;
 
@@ -184,23 +186,49 @@ public class PluginEndpoint implements CustomEndpoint {
         return request.bodyToMono(new ParameterizedTypeReference<MultiValueMap<String, Part>>() {
             })
             .flatMap(this::getJarFilePart)
-            .flatMap(file -> {
-                var pluginRoot = Paths.get(pluginProperties.getPluginsRoot());
-                createDirectoriesIfNotExists(pluginRoot);
-                var pluginPath = pluginRoot.resolve(file.filename());
-                return file.transferTo(pluginPath).thenReturn(pluginPath);
-            })
-            .flatMap(pluginPath -> {
-                log.info("Plugin uploaded at {}", pluginPath);
-                var plugin = new YamlPluginFinder().find(pluginPath);
-                // overwrite the enabled flag
-                plugin.getSpec().setEnabled(false);
+            .flatMap(this::transferToTemp)
+            .flatMap(tempJarFilePath -> {
+                var plugin = new YamlPluginFinder().find(tempJarFilePath);
                 return client.fetch(Plugin.class, plugin.getMetadata().getName())
-                    .switchIfEmpty(Mono.defer(() -> client.create(plugin)));
+                    .switchIfEmpty(Mono.defer(() -> client.create(plugin)))
+                    .publishOn(Schedulers.boundedElastic())
+                    .map(created -> {
+                        String fileName = created.generateFileName();
+                        var pluginRoot = Paths.get(pluginProperties.getPluginsRoot());
+                        createDirectoriesIfNotExists(pluginRoot);
+                        Path pluginFilePath = pluginRoot.resolve(fileName);
+                        if (Files.exists(pluginFilePath)) {
+                            throw new IllegalArgumentException(
+                                "Plugin already installed : " + pluginFilePath);
+                        }
+                        FileUtils.copy(tempJarFilePath, pluginFilePath);
+                        return created;
+                    })
+                    .doOnError(error -> {
+                        log.error("Failed to install plugin", error);
+                        client.fetch(Plugin.class, plugin.getMetadata().getName())
+                            .map(client::delete)
+                            .subscribe();
+                    })
+                    .doFinally(signalType -> {
+                        try {
+                            Files.deleteIfExists(tempJarFilePath);
+                        } catch (IOException e) {
+                            log.error("Failed to delete temp file: {}", tempJarFilePath, e);
+                        }
+                    });
             })
             .flatMap(plugin -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(plugin));
+    }
+
+    private Mono<Path> transferToTemp(FilePart filePart) {
+        return Mono.fromCallable(() -> Files.createTempFile("halo-plugins", ".jar"))
+            .subscribeOn(Schedulers.boundedElastic())
+            .flatMap(path -> filePart.transferTo(path)
+                .thenReturn(path)
+            );
     }
 
     void createDirectoriesIfNotExists(Path directory) {

@@ -1,15 +1,20 @@
 package run.halo.app.core.extension.reconciler;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
+import org.pf4j.RuntimeMode;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
@@ -27,7 +32,7 @@ import run.halo.app.plugin.resources.BundleResourceUtils;
  */
 @Slf4j
 public class PluginReconciler implements Reconciler<Request> {
-
+    private static final String FINALIZER_NAME = "plugin-protection";
     private final ExtensionClient client;
     private final HaloPluginManager haloPluginManager;
 
@@ -41,7 +46,13 @@ public class PluginReconciler implements Reconciler<Request> {
     public Result reconcile(Request request) {
         return client.fetch(Plugin.class, request.name())
             .map(plugin -> {
-                final Plugin oldPlugin = deepCopy(plugin);
+                if (plugin.getMetadata().getDeletionTimestamp() != null) {
+                    cleanUpResourcesAndRemoveFinalizer(request.name());
+                    return new Result(false, null);
+                }
+                addFinalizerIfNecessary(plugin);
+
+                final Plugin oldPlugin = JsonUtils.deepCopy(plugin);
                 try {
                     reconcilePluginState(plugin);
                     // TODO: reconcile other plugin resources
@@ -94,10 +105,6 @@ public class PluginReconciler implements Reconciler<Request> {
         if (shouldReconcileStopState(plugin)) {
             stopPlugin(plugin);
         }
-    }
-
-    private Plugin deepCopy(Plugin plugin) {
-        return JsonUtils.jsonToObject(JsonUtils.objectToJson(plugin), Plugin.class);
     }
 
     private void ensurePluginLoaded() {
@@ -159,6 +166,52 @@ public class PluginReconciler implements Reconciler<Request> {
             status.setMessage(startingError.getDevMessage());
             // requeue the plugin for reconciliation
             throw new PluginRuntimeException(startingError.getMessage());
+        }
+    }
+
+    private void addFinalizerIfNecessary(Plugin oldPlugin) {
+        Set<String> finalizers = oldPlugin.getMetadata().getFinalizers();
+        if (finalizers != null && finalizers.contains(FINALIZER_NAME)) {
+            return;
+        }
+        client.fetch(Plugin.class, oldPlugin.getMetadata().getName())
+            .ifPresent(plugin -> {
+                Set<String> newFinalizers = plugin.getMetadata().getFinalizers();
+                if (newFinalizers == null) {
+                    newFinalizers = new HashSet<>();
+                    plugin.getMetadata().setFinalizers(newFinalizers);
+                }
+                newFinalizers.add(FINALIZER_NAME);
+                client.update(plugin);
+            });
+    }
+
+    private void cleanUpResourcesAndRemoveFinalizer(String pluginName) {
+        client.fetch(Plugin.class, pluginName).ifPresent(plugin -> {
+            cleanUpResources(plugin);
+            if (plugin.getMetadata().getFinalizers() != null) {
+                plugin.getMetadata().getFinalizers().remove(FINALIZER_NAME);
+            }
+            client.update(plugin);
+        });
+    }
+
+    private void cleanUpResources(Plugin plugin) {
+        PluginWrapper pluginWrapper = haloPluginManager.getPlugin(plugin.getMetadata().getName());
+        if (pluginWrapper == null) {
+            return;
+        }
+        // stop and unload plugin, see also PluginBeforeStopSyncListener
+        haloPluginManager.stopPlugin(pluginWrapper.getPluginId());
+        haloPluginManager.unloadPlugin(pluginWrapper.getPluginId());
+        // delete plugin resources
+        if (RuntimeMode.DEPLOYMENT.equals(pluginWrapper.getRuntimeMode())) {
+            // delete plugin file
+            try {
+                Files.deleteIfExists(pluginWrapper.getPluginPath());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }
