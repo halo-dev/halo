@@ -70,7 +70,7 @@ public class SinglePageServiceImpl implements SinglePageService {
             .flatMap(listResult -> Flux.fromStream(
                         listResult.get().map(this::getListedSinglePage)
                     )
-                    .flatMap(Function.identity())
+                    .concatMap(Function.identity())
                     .collectList()
                     .map(listedSinglePages -> new ListResult<>(listResult.getPage(),
                         listResult.getSize(),

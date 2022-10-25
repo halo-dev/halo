@@ -99,7 +99,7 @@ public class ReplyServiceImpl implements ReplyService {
                 query.getPage(), query.getSize())
             .flatMap(list -> Flux.fromStream(list.get()
                     .map(this::toListedReply))
-                .flatMap(Function.identity())
+                .concatMap(Function.identity())
                 .collectList()
                 .map(listedReplies -> new ListResult<>(list.getPage(), list.getSize(),
                     list.getTotal(), listedReplies))

@@ -69,7 +69,7 @@ public class PostServiceImpl implements PostService {
             .flatMap(listResult -> Flux.fromStream(
                         listResult.get().map(this::getListedPost)
                     )
-                    .flatMap(Function.identity())
+                    .concatMap(Function.identity())
                     .collectList()
                     .map(listedPosts -> new ListResult<>(listResult.getPage(), listResult.getSize(),
                         listResult.getTotal(), listedPosts)
