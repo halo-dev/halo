@@ -3,17 +3,21 @@ package run.halo.app.theme.finders.impl;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
+import org.springframework.util.comparator.Comparators;
 import run.halo.app.content.ContentService;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
 import run.halo.app.theme.finders.CategoryFinder;
@@ -24,6 +28,8 @@ import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.CategoryVo;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.Contributor;
+import run.halo.app.theme.finders.vo.PostArchiveVo;
+import run.halo.app.theme.finders.vo.PostArchiveYearMonthVo;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.finders.vo.StatsVo;
 import run.halo.app.theme.finders.vo.TagVo;
@@ -90,19 +96,72 @@ public class PostFinderImpl implements PostFinder {
 
     @Override
     public ListResult<PostVo> list(Integer page, Integer size) {
-        return listPost(page, size, null);
+        return listPost(page, size, null, defaultComparator());
     }
 
     @Override
     public ListResult<PostVo> listByCategory(Integer page, Integer size, String categoryName) {
         return listPost(page, size,
-            post -> contains(post.getSpec().getCategories(), categoryName));
+            post -> contains(post.getSpec().getCategories(), categoryName), defaultComparator());
     }
 
     @Override
     public ListResult<PostVo> listByTag(Integer page, Integer size, String tag) {
         return listPost(page, size,
-            post -> contains(post.getSpec().getTags(), tag));
+            post -> contains(post.getSpec().getTags(), tag), defaultComparator());
+    }
+
+    @Override
+    public ListResult<PostArchiveVo> archives(Integer page, Integer size) {
+        return archives(page, size, null, null);
+    }
+
+    @Override
+    public ListResult<PostArchiveVo> archives(Integer page, Integer size, String year) {
+        return archives(page, size, year, null);
+    }
+
+    @Override
+    public ListResult<PostArchiveVo> archives(Integer page, Integer size, String year,
+        String month) {
+        ListResult<PostVo> list = listPost(page, size, post -> {
+            Map<String, String> labels = post.getMetadata().getLabels();
+            if (labels == null) {
+                return false;
+            }
+            boolean yearMatch = StringUtils.isBlank(year)
+                || year.equals(labels.get(Post.ARCHIVE_YEAR_LABEL));
+            boolean monthMatch = StringUtils.isBlank(month)
+                || month.equals(labels.get(Post.ARCHIVE_MONTH_LABEL));
+            return yearMatch && monthMatch;
+        }, archiveComparator());
+
+        Map<String, List<PostVo>> yearPosts = list.get()
+            .collect(Collectors.groupingBy(
+                post -> HaloUtils.getYearText(post.getSpec().getPublishTime())));
+        List<PostArchiveVo> postArchives =
+            yearPosts.entrySet().stream().map(entry -> {
+                String key = entry.getKey();
+                // archives by month
+                Map<String, List<PostVo>> monthPosts = entry.getValue().stream()
+                    .collect(Collectors.groupingBy(
+                        post -> HaloUtils.getMonthText(post.getSpec().getPublishTime())));
+                // convert to archive year month value objects
+                List<PostArchiveYearMonthVo> monthArchives = monthPosts.entrySet()
+                    .stream()
+                    .sorted(Map.Entry.comparingByKey())
+                    .map(monthEntry -> PostArchiveYearMonthVo.builder()
+                        .posts(monthEntry.getValue())
+                        .month(monthEntry.getKey())
+                        .build()
+                    )
+                    .toList();
+                return PostArchiveVo.builder()
+                    .year(String.valueOf(key))
+                    .months(monthArchives)
+                    .build();
+            }).toList();
+        return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), postArchives);
     }
 
     private boolean contains(List<String> c, String key) {
@@ -112,14 +171,15 @@ public class PostFinderImpl implements PostFinder {
         return c.contains(key);
     }
 
-    private ListResult<PostVo> listPost(Integer page, Integer size, Predicate<Post> postPredicate) {
+    private ListResult<PostVo> listPost(Integer page, Integer size, Predicate<Post> postPredicate,
+        Comparator<Post> comparator) {
         Predicate<Post> predicate = FIXED_PREDICATE
             .and(postPredicate == null ? post -> true : postPredicate);
         ListResult<Post> list = client.list(Post.class, predicate,
-                defaultComparator(), pageNullSafe(page), sizeNullSafe(size))
+                comparator, pageNullSafe(page), sizeNullSafe(size))
             .block();
         if (list == null) {
-            return new ListResult<>(0, 0, 0, List.of());
+            return new ListResult<>(List.of());
         }
         List<PostVo> postVos = list.get()
             .map(this::getPostVo)
@@ -164,6 +224,15 @@ public class PostFinderImpl implements PostFinder {
         return Comparator.comparing(pinned)
             .thenComparing(priority)
             .thenComparing(creationTimestamp)
+            .thenComparing(name)
+            .reversed();
+    }
+
+    static Comparator<Post> archiveComparator() {
+        Function<Post, Instant> publishTime =
+            post -> post.getSpec().getPublishTime();
+        Function<Post, String> name = post -> post.getMetadata().getName();
+        return Comparator.comparing(publishTime, Comparators.nullsLow())
             .thenComparing(name)
             .reversed();
     }

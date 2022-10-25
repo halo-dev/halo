@@ -35,6 +35,10 @@ public class Post extends AbstractExtension {
     public static final String VISIBLE_LABEL = "content.halo.run/visible";
     public static final String PHASE_LABEL = "content.halo.run/phase";
 
+    public static final String ARCHIVE_YEAR_LABEL = "content.halo.run/archive-year";
+
+    public static final String ARCHIVE_MONTH_LABEL = "content.halo.run/archive-month";
+
     @Schema(required = true)
     private PostSpec spec;
 

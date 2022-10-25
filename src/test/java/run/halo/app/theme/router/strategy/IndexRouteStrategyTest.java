@@ -56,6 +56,12 @@ class IndexRouteStrategyTest extends RouterStrategyTestSuite {
             .isOk();
 
         client.get()
+            .uri("/page/1")
+            .exchange()
+            .expectStatus()
+            .isOk();
+
+        client.get()
             .uri("/nothing")
             .exchange()
             .expectStatus()
