@@ -1,13 +1,14 @@
 package run.halo.app.infra.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 
 class FileNameUtilsTest {
 
     @Test
-    public void shouldNotRemovExtIfNoExt() {
+    public void shouldNotRemoveExtIfNoExt() {
         assertEquals("halo", FileNameUtils.removeFileExtension("halo", true));
         assertEquals("halo", FileNameUtils.removeFileExtension("halo", false));
     }
@@ -40,5 +41,11 @@ class FileNameUtilsTest {
     public void shouldRemoveExtIfDotfileHasTwoExt() {
         assertEquals(".halo", FileNameUtils.removeFileExtension(".halo.tar.gz", true));
         assertEquals(".halo.tar", FileNameUtils.removeFileExtension(".halo.tar.gz", false));
+    }
+
+    @Test
+    void shouldReturnNullIfFilenameIsNull() {
+        assertNull(FileNameUtils.removeFileExtension(null, true));
+        assertNull(FileNameUtils.removeFileExtension(null, false));
     }
 }

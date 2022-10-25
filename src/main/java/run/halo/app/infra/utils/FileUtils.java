@@ -6,13 +6,19 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.function.Consumer;
+import java.util.jar.JarEntry;
+import java.util.jar.JarOutputStream;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
@@ -62,6 +68,42 @@ public abstract class FileUtils {
             }
 
             zipEntry = zis.getNextEntry();
+        }
+    }
+
+    public static void zip(Path sourcePath, Path targetPath) throws IOException {
+        try (var zos = new ZipOutputStream(Files.newOutputStream(targetPath))) {
+            Files.walkFileTree(sourcePath, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                    throws IOException {
+                    checkDirectoryTraversal(sourcePath, file);
+                    var relativePath = sourcePath.relativize(file);
+                    var entry = new ZipEntry(relativePath.toString());
+                    zos.putNextEntry(entry);
+                    Files.copy(file, zos);
+                    zos.closeEntry();
+                    return super.visitFile(file, attrs);
+                }
+            });
+        }
+    }
+
+    public static void jar(Path sourcePath, Path targetPath) throws IOException {
+        try (var jos = new JarOutputStream(Files.newOutputStream(targetPath))) {
+            Files.walkFileTree(sourcePath, new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                    throws IOException {
+                    checkDirectoryTraversal(sourcePath, file);
+                    var relativePath = sourcePath.relativize(file);
+                    var entry = new JarEntry(relativePath.toString());
+                    jos.putNextEntry(entry);
+                    Files.copy(file, jos);
+                    jos.closeEntry();
+                    return super.visitFile(file, attrs);
+                }
+            });
         }
     }
 

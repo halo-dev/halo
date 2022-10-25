@@ -2,7 +2,6 @@ package run.halo.app.security;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,7 +64,7 @@ class DefaultUserDetailServiceTest {
     void shouldReturnErrorWhenFailedToUpdatePassword() {
         var fakeUser = createFakeUserDetails();
 
-        var exception = mock(RuntimeException.class);
+        var exception = new RuntimeException("failed to update password");
         when(userService.updatePassword("faker", "new-fake-password")).thenReturn(
             Mono.error(exception)
         );

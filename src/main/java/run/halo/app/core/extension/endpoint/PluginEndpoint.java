@@ -106,7 +106,10 @@ public class PluginEndpoint implements CustomEndpoint {
         var pluginNameInPath = request.pathVariable("name");
         var tempDirRef = new AtomicReference<Path>();
         var tempPluginPathRef = new AtomicReference<Path>();
-        return request.multipartData()
+        return client.fetch(Plugin.class, pluginNameInPath)
+            .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
+                "The given plugin with name " + pluginNameInPath + " does not exit")))
+            .then(request.multipartData())
             .flatMap(this::getJarFilePart)
             .flatMap(jarFilePart -> createTempDirectory()
                 .doOnNext(tempDirRef::set)
