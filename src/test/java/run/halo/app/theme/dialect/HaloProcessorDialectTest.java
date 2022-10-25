@@ -34,6 +34,7 @@ import run.halo.app.plugin.ExtensionComponentsFinder;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.router.strategy.ModelConst;
 
 /**
  * Tests for {@link HaloProcessorDialect}.
@@ -128,6 +129,8 @@ class HaloProcessorDialectTest {
     void contentHeadAndFooterAndPostProcessors() {
         Context context = getContext();
         context.setVariable("name", "fake-post");
+        // template id flag is used by TemplateGlobalHeadProcessor
+        context.setVariable(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.POST.getValue());
 
         List<Map<String, String>> htmlMetas = new ArrayList<>();
         htmlMetas.add(ImmutableSortedMap.of("name", "post-meta-V1", "content", "post-meta-V1"));

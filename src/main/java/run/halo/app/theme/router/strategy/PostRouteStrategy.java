@@ -50,8 +50,12 @@ public class PostRouteStrategy implements DetailsPageRouteHandlerStrategy {
                 model.putAll(pathMatchInfo.getUriVariables());
             }
             model.put("post", postByName(name));
+            // used by HaloTrackerProcessor
             model.put("groupVersionKind", groupVersionKind);
             model.put("plural", gvk.plural());
+            // used by TemplateGlobalHeadProcessor and PostTemplateHeadProcessor
+            model.put(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.POST.getValue());
+
             return ServerResponse.ok()
                 .render(DefaultTemplateEnum.POST.getValue(), model);
         };

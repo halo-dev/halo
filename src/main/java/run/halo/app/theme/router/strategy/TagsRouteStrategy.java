@@ -37,7 +37,10 @@ public class TagsRouteStrategy implements ListPageRouteHandlerStrategy {
     public HandlerFunction<ServerResponse> getHandler() {
         return request -> ServerResponse.ok()
             .render(DefaultTemplateEnum.TAGS.getValue(),
-                Map.of("tags", tags()));
+                Map.of("tags", tags(),
+                    ModelConst.TEMPLATE_ID, DefaultTemplateEnum.TAGS.getValue()
+                )
+            );
     }
 
     @Override

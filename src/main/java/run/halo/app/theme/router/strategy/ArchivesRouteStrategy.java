@@ -48,7 +48,8 @@ public class ArchivesRouteStrategy implements ListPageRouteHandlerStrategy {
     public HandlerFunction<ServerResponse> getHandler() {
         return request -> ServerResponse.ok()
             .render(DefaultTemplateEnum.ARCHIVES.getValue(),
-                Map.of("posts", postList(request)));
+                Map.of("posts", postList(request),
+                    ModelConst.TEMPLATE_ID, DefaultTemplateEnum.ARCHIVES.getValue()));
     }
 
     @Override
