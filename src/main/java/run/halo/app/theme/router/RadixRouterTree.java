@@ -141,7 +141,7 @@ public class RadixRouterTree extends RadixTree<HandlerFunction<ServerResponse>> 
                 requestPath = requestPath.substring(0, i);
             }
         }
-        return requestPath;
+        return StringUtils.prependIfMissing(requestPath, "/");
     }
 
     private static void mergeAttributes(ServerRequest request, Map<String, String> variables,
