@@ -52,7 +52,7 @@ public class CommentServiceImpl implements CommentService {
                 commentQuery.getPage(), commentQuery.getSize())
             .flatMap(comments -> Flux.fromStream(comments.get()
                     .map(this::toListedComment))
-                .flatMap(Function.identity())
+                .concatMap(Function.identity())
                 .collectList()
                 .map(list -> new ListResult<>(comments.getPage(), comments.getSize(),
                     comments.getTotal(), list)

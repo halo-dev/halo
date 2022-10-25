@@ -49,7 +49,7 @@ public class CommentFinderImpl implements CommentFinder {
                 defaultComparator(),
                 pageNullSafe(page), sizeNullSafe(size))
             .flatMap(list -> Flux.fromStream(list.get().map(this::toCommentVo))
-                .flatMap(Function.identity())
+                .concatMap(Function.identity())
                 .collectList()
                 .map(commentVos -> new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
                     commentVos)
@@ -68,7 +68,7 @@ public class CommentFinderImpl implements CommentFinder {
                     && Objects.equals(true, reply.getSpec().getApproved()),
                 comparator.reversed(), pageNullSafe(page), sizeNullSafe(size))
             .flatMap(list -> Flux.fromStream(list.get().map(this::toReplyVo))
-                .flatMap(Function.identity())
+                .concatMap(Function.identity())
                 .collectList()
                 .map(replyVos -> new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
                     replyVos))
