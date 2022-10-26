@@ -5,6 +5,8 @@ spring:
   output:
     ansi:
       enabled: always
+  thymeleaf:
+    cache: false
 
 halo:
   security:
