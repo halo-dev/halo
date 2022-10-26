@@ -6,9 +6,8 @@ import {
   VButton,
   VSpace,
 } from "@halo-dev/components";
-import FilePondUpload from "@/components/upload/FilePondUpload.vue";
+import UppyUpload from "@/components/upload/UppyUpload.vue";
 import { computed, ref, watch, watchEffect } from "vue";
-import { apiClient } from "@/utils/api-client";
 import type { Policy, Group } from "@halo-dev/api-client";
 import { useFetchAttachmentPolicy } from "../composables/use-attachment-policy";
 import AttachmentPoliciesModal from "./AttachmentPoliciesModal.vue";
@@ -33,7 +32,7 @@ const { policies, loading, handleFetchPolicies } = useFetchAttachmentPolicy();
 
 const selectedPolicy = ref<Policy | null>(null);
 const policyVisible = ref(false);
-const FilePondUploadRef = ref();
+const uploadVisible = ref(false);
 
 const modalTitle = computed(() => {
   if (props.group && props.group.metadata.name) {
@@ -53,27 +52,20 @@ const onVisibleChange = (visible: boolean) => {
   if (!visible) {
     emit("close");
     policyVisible.value = false;
-    FilePondUploadRef.value.handleRemoveFiles();
   }
 };
-
-const uploadHandler = computed(() => {
-  return (file, config) =>
-    apiClient.attachment.uploadAttachment(
-      {
-        file,
-        policyName: selectedPolicy.value?.metadata.name as string,
-        groupName: props.group?.metadata.name as string,
-      },
-      config
-    );
-});
 
 watch(
   () => props.visible,
   (newValue) => {
     if (newValue) {
       handleFetchPolicies();
+      uploadVisible.value = true;
+    } else {
+      const uploadVisibleTimer = setTimeout(() => {
+        uploadVisible.value = false;
+        clearTimeout(uploadVisibleTimer);
+      }, 200);
     }
   }
 );
@@ -137,15 +129,16 @@ watch(
           <IconAddCircle />
         </div>
       </div>
-      <FilePondUpload
-        ref="FilePondUploadRef"
-        :allow-multiple="true"
-        :handler="uploadHandler"
+      <UppyUpload
+        v-if="uploadVisible"
+        endpoint="/apis/api.console.halo.run/v1alpha1/attachments/upload"
         :disabled="!selectedPolicy"
-        :max-parallel-uploads="5"
-        :label-idle="
-          selectedPolicy ? '点击选择文件或者拖拽文件到此处' : '请先选择存储策略'
-        "
+        :meta="{ 
+          policyName: selectedPolicy?.metadata.name as string,
+          groupName: props.group?.metadata.name as string
+        }"
+        :allowed-meta-fields="['policyName', 'groupName']"
+        :note="selectedPolicy ? '' : '请先选择存储策略'"
       />
     </div>
   </VModal>

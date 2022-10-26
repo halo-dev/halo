@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { VModal } from "@halo-dev/components";
-import FilePondUpload from "@/components/upload/FilePondUpload.vue";
-import { apiClient } from "@/utils/api-client";
-import { computed, ref } from "vue";
+import UppyUpload from "@/components/upload/UppyUpload.vue";
+import { computed, ref, watch } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 
 const props = withDefaults(
@@ -21,7 +20,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const FilePondUploadRef = ref();
+const uploadVisible = ref(false);
 
 const modalTitle = computed(() => {
   return props.upgradeTheme
@@ -33,43 +32,45 @@ const handleVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
     emit("close");
-    FilePondUploadRef.value.handleRemoveFiles();
   }
 };
 
-const uploadHandler = computed(() => {
+const endpoint = computed(() => {
   if (props.upgradeTheme) {
-    return (file, config) =>
-      apiClient.theme.upgradeTheme(
-        {
-          name: props.upgradeTheme.metadata.name as string,
-          file: file,
-        },
-        config
-      );
+    return `/apis/api.console.halo.run/v1alpha1/themes/${props.upgradeTheme.metadata.name}/upgrade`;
   }
-  return (file, config) =>
-    apiClient.theme.installTheme(
-      {
-        file: file,
-      },
-      config
-    );
+  return "/apis/api.console.halo.run/v1alpha1/themes/install";
 });
+
+watch(
+  () => props.visible,
+  (newValue) => {
+    if (newValue) {
+      uploadVisible.value = true;
+    } else {
+      const uploadVisibleTimer = setTimeout(() => {
+        uploadVisible.value = false;
+        clearTimeout(uploadVisibleTimer);
+      }, 200);
+    }
+  }
+);
 </script>
 <template>
   <VModal
     :visible="visible"
-    :width="500"
+    :width="600"
     :title="modalTitle"
     @update:visible="handleVisibleChange"
   >
-    <FilePondUpload
-      v-if="visible && uploadHandler"
-      ref="FilePondUploadRef"
-      :allow-multiple="false"
-      :handler="uploadHandler"
-      label-idle="点击选择文件或者拖拽文件到此处"
+    <UppyUpload
+      v-if="uploadVisible"
+      :restrictions="{
+        maxNumberOfFiles: 1,
+        allowedFileTypes: ['.zip'],
+      }"
+      :endpoint="endpoint"
+      auto-proceed
     />
   </VModal>
 </template>

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { VModal, Dialog } from "@halo-dev/components";
-import FilePondUpload from "@/components/upload/FilePondUpload.vue";
+import UppyUpload from "@/components/upload/UppyUpload.vue";
 import { apiClient } from "@/utils/api-client";
 import type { Plugin } from "@halo-dev/api-client";
-import { computed, ref } from "vue";
-import type { AxiosResponse } from "axios";
+import { computed, ref, watch } from "vue";
+import type { SuccessResponse } from "@uppy/core";
 
 const props = withDefaults(
   defineProps<{
@@ -22,7 +22,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const FilePondUploadRef = ref();
+const uploadVisible = ref(false);
 
 const modalTitle = computed(() => {
   return props.upgradePlugin
@@ -34,37 +34,23 @@ const handleVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
     emit("close");
-    FilePondUploadRef.value.handleRemoveFiles();
   }
 };
 
-const uploadHandler = computed(() => {
+const endpoint = computed(() => {
   if (props.upgradePlugin) {
-    return (file, config) =>
-      apiClient.plugin.upgradePlugin(
-        {
-          name: props.upgradePlugin.metadata.name as string,
-          file: file,
-        },
-        config
-      );
+    return `/apis/api.console.halo.run/v1alpha1/plugins/${props.upgradePlugin.metadata.name}/upgrade`;
   }
-  return (file, config) =>
-    apiClient.plugin.installPlugin(
-      {
-        file: file,
-      },
-      config
-    );
+  return "/apis/api.console.halo.run/v1alpha1/plugins/install";
 });
 
-const onUploaded = async (response: AxiosResponse) => {
+const onUploaded = async (response: SuccessResponse) => {
   if (props.upgradePlugin) {
     handleVisibleChange(false);
     return;
   }
 
-  const plugin = response.data as Plugin;
+  const plugin = response.body as Plugin;
   handleVisibleChange(false);
   Dialog.success({
     title: "上传成功",
@@ -89,20 +75,36 @@ const onUploaded = async (response: AxiosResponse) => {
     },
   });
 };
+
+watch(
+  () => props.visible,
+  (newValue) => {
+    if (newValue) {
+      uploadVisible.value = true;
+    } else {
+      const uploadVisibleTimer = setTimeout(() => {
+        uploadVisible.value = false;
+        clearTimeout(uploadVisibleTimer);
+      }, 200);
+    }
+  }
+);
 </script>
 <template>
   <VModal
     :visible="visible"
-    :width="500"
+    :width="600"
     :title="modalTitle"
     @update:visible="handleVisibleChange"
   >
-    <FilePondUpload
-      v-if="visible && uploadHandler"
-      ref="FilePondUploadRef"
-      :allow-multiple="false"
-      :handler="uploadHandler"
-      label-idle="点击选择文件或者拖拽文件到此处"
+    <UppyUpload
+      v-if="uploadVisible"
+      :restrictions="{
+        maxNumberOfFiles: 1,
+        allowedFileTypes: ['.jar'],
+      }"
+      :endpoint="endpoint"
+      auto-proceed
       @uploaded="onUploaded"
     />
   </VModal>

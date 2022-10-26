@@ -11,13 +11,13 @@ import type { AttachmentLike } from "@halo-dev/console-shared";
 import { apiClient } from "@/utils/api-client";
 import LazyImage from "@/components/image/LazyImage.vue";
 import type { Attachment } from "@halo-dev/api-client";
-import FilePondUpload from "@/components/upload/FilePondUpload.vue";
+import UppyUpload from "@/components/upload/UppyUpload.vue";
 import AttachmentFileTypeIcon from "../AttachmentFileTypeIcon.vue";
 import { computed, ref, watchEffect } from "vue";
-import type { AxiosResponse } from "axios";
 import { isImage } from "@/utils/image";
 import { useFetchAttachmentPolicy } from "../../composables/use-attachment-policy";
 import { useFetchAttachmentGroup } from "../../composables/use-attachment-group";
+import type { SuccessResponse } from "@uppy/core";
 
 withDefaults(
   defineProps<{
@@ -69,20 +69,8 @@ const selectedGroup = ref("");
 const attachments = ref<Set<Attachment>>(new Set<Attachment>());
 const selectedAttachments = ref<Set<Attachment>>(new Set<Attachment>());
 
-const uploadHandler = computed(() => {
-  return (file, config) =>
-    apiClient.attachment.uploadAttachment(
-      {
-        file,
-        policyName: selectedPolicy.value,
-        groupName: selectedGroup.value,
-      },
-      config
-    );
-});
-
-const onUploaded = async (response: AxiosResponse) => {
-  const attachment = response.data as Attachment;
+const onUploaded = async (response: SuccessResponse) => {
+  const attachment = response.body as Attachment;
 
   const { data } =
     await apiClient.extension.storage.attachment.getstorageHaloRunV1alpha1Attachment(
@@ -145,15 +133,16 @@ watchEffect(() => {
           label="分组"
         ></FormKit>
       </FormKit>
-      <FilePondUpload
-        ref="FilePondUploadRef"
-        :allow-multiple="true"
-        :handler="uploadHandler"
-        :max-parallel-uploads="5"
+      <UppyUpload
+        v-if="selectedPolicy"
+        endpoint="/apis/api.console.halo.run/v1alpha1/attachments/upload"
         :disabled="!selectedPolicy"
-        :label-idle="
-          selectedPolicy ? '点击选择文件或者拖拽文件到此处' : '请先选择存储策略'
-        "
+        :meta="{
+          policyName: selectedPolicy,
+          groupName: selectedGroup,
+        }"
+        :allowed-meta-fields="['policyName', 'groupName']"
+        :note="selectedPolicy ? '' : '请先选择存储策略'"
         @uploaded="onUploaded"
       />
     </div>
