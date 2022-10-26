@@ -5,6 +5,7 @@ import static run.halo.app.theme.router.PageUrlUtils.totalPage;
 
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -64,7 +65,7 @@ public class ArchivesRouteStrategy implements ListPageRouteHandlerStrategy {
     @Override
     public List<String> getRouterPaths(String prefix) {
         return List.of(
-            prefix,
+            StringUtils.prependIfMissing(prefix, "/"),
             PathUtils.combinePath(prefix, "/page/{page:\\d+}"),
             PathUtils.combinePath(prefix, "/{year:\\d{4}}"),
             PathUtils.combinePath(prefix, "/{year:\\d{4}}/page/{page:\\d+}"),
