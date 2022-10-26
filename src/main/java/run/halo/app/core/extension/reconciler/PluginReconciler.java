@@ -7,7 +7,6 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -70,10 +69,8 @@ public class PluginReconciler implements Reconciler<Request> {
                 pluginStatus.setReason("PluginNotFound");
                 pluginStatus.setMessage("Plugin " + name + " not found in plugin manager");
             } else {
-                if (!Objects.equals(pluginStatus.getPhase(), pluginWrapper.getPluginState())) {
-                    // Set to the correct state
-                    pluginStatus.setPhase(pluginWrapper.getPluginState());
-                }
+                // Set to the correct state
+                pluginStatus.setPhase(pluginWrapper.getPluginState());
 
                 if (haloPluginManager.getUnresolvedPlugins().contains(pluginWrapper)) {
                     // load and resolve plugin
