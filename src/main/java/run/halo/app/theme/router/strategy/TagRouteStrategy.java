@@ -65,7 +65,9 @@ public class TagRouteStrategy implements DetailsPageRouteHandlerStrategy {
             .render(DefaultTemplateEnum.TAG.getValue(),
                 Map.of("name", name,
                     "posts", postList(request, name),
-                    "tag", tagByName(name))
+                    "tag", tagByName(name),
+                    ModelConst.TEMPLATE_ID, DefaultTemplateEnum.TAG.getValue()
+                )
             );
     }
 

@@ -48,7 +48,8 @@ public class IndexRouteStrategy implements ListPageRouteHandlerStrategy {
     public HandlerFunction<ServerResponse> getHandler() {
         return request -> ServerResponse.ok()
             .render(DefaultTemplateEnum.INDEX.getValue(),
-                Map.of("posts", postList(request)));
+                Map.of("posts", postList(request),
+                    ModelConst.TEMPLATE_ID, DefaultTemplateEnum.INDEX.getValue()));
     }
 
     @Override

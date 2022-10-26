@@ -11,6 +11,7 @@ import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import reactor.core.publisher.Mono;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
+import run.halo.app.theme.router.strategy.ModelConst;
 
 /**
  * <p>The <code>head</code> html snippet injection processor for post template.</p>
@@ -31,9 +32,10 @@ public class PostTemplateHeadProcessor implements TemplateHeadProcessor {
     @Override
     public Mono<Void> process(ITemplateContext context, IModel model,
         IElementModelStructureHandler structureHandler) {
-        return Mono.just(context.getTemplateData().getTemplate())
-            .filter(this::isPostTemplate)
-            .map(template -> (String) context.getVariable(POST_NAME_VARIABLE))
+        if (!isPostTemplate(context)) {
+            return Mono.empty();
+        }
+        return Mono.justOrEmpty((String) context.getVariable(POST_NAME_VARIABLE))
             .map(postFinder::getByName)
             .doOnNext(postVo -> {
                 List<Map<String, String>> htmlMetas = postVo.getSpec().getHtmlMetas();
@@ -59,7 +61,8 @@ public class PostTemplateHeadProcessor implements TemplateHeadProcessor {
         return sb.toString();
     }
 
-    private boolean isPostTemplate(String template) {
-        return DefaultTemplateEnum.POST.getValue().equals(template);
+    private boolean isPostTemplate(ITemplateContext context) {
+        return DefaultTemplateEnum.POST.getValue()
+            .equals(context.getVariable(ModelConst.TEMPLATE_ID));
     }
 }

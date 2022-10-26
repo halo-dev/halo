@@ -36,7 +36,8 @@ public class CategoriesRouteStrategy implements ListPageRouteHandlerStrategy {
     public HandlerFunction<ServerResponse> getHandler() {
         return request -> ServerResponse.ok()
             .render(DefaultTemplateEnum.CATEGORIES.getValue(),
-                Map.of("categories", categories()));
+                Map.of("categories", categories(),
+                    ModelConst.TEMPLATE_ID, DefaultTemplateEnum.CATEGORIES.getValue()));
     }
 
     @Override

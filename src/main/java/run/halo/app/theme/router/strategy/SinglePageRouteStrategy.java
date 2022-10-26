@@ -48,7 +48,10 @@ public class SinglePageRouteStrategy implements DetailsPageRouteHandlerStrategy 
                 Map.of("name", name,
                     "groupVersionKind", gvk,
                     "plural", getPlural(),
-                    "singlePage", singlePageByName(name)));
+                    "singlePage", singlePageByName(name),
+                    ModelConst.TEMPLATE_ID, DefaultTemplateEnum.SINGLE_PAGE.getValue()
+                )
+            );
     }
 
     @Override

@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.router.strategy.ModelConst;
 
 /**
  * <p>Global custom head snippet injection for theme global setting.</p>
@@ -39,8 +40,7 @@ public class TemplateGlobalHeadProcessor implements TemplateHeadProcessor {
 
                 // add content head to model
                 String contentHeader = codeInjection.getContentHead();
-                String template = context.getTemplateData().getTemplate();
-                if (StringUtils.isNotBlank(contentHeader) && isContentTemplate(template)) {
+                if (StringUtils.isNotBlank(contentHeader) && isContentTemplate(context)) {
                     model.add(modelFactory.createText(contentHeader + "\n"));
                 }
             })
@@ -51,8 +51,9 @@ public class TemplateGlobalHeadProcessor implements TemplateHeadProcessor {
         return fetcher.fetch(SystemSetting.CodeInjection.GROUP, SystemSetting.CodeInjection.class);
     }
 
-    private boolean isContentTemplate(String template) {
-        // TODO includes custom page template
-        return DefaultTemplateEnum.POST.getValue().equals(template);
+    private boolean isContentTemplate(ITemplateContext context) {
+        String templateId = (String) context.getVariable(ModelConst.TEMPLATE_ID);
+        return DefaultTemplateEnum.POST.getValue().equals(templateId)
+            || DefaultTemplateEnum.SINGLE_PAGE.getValue().equals(templateId);
     }
 }

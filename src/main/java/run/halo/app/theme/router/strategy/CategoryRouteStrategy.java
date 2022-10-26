@@ -65,7 +65,8 @@ public class CategoryRouteStrategy implements DetailsPageRouteHandlerStrategy {
             .render(DefaultTemplateEnum.CATEGORY.getValue(),
                 Map.of("name", name,
                     "posts", postListByCategoryName(name, request),
-                    "category", categoryByName(name)));
+                    "category", categoryByName(name),
+                    ModelConst.TEMPLATE_ID, DefaultTemplateEnum.CATEGORY.getValue()));
     }
 
     @Override
