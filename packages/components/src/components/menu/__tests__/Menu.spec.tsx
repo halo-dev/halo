@@ -39,7 +39,7 @@ describe("Menu", () => {
     await wrapper.find(".has-submenus").trigger("click");
     expect(
       wrapper.find(".has-submenus .sub-menu-items").attributes().style
-    ).toBeUndefined(); // visible
+    ).toBe(""); // visible
   });
 
   it("should work with openIds prop", function () {
