@@ -6,6 +6,7 @@ package run.halo.app.theme.router.strategy;
  * @author guqing
  * @since 2.0.0
  */
-public interface ModelConst {
-    String TEMPLATE_ID = "templateId";
+public enum ModelConst {
+    ;
+    public static final String TEMPLATE_ID = "_templateId";
 }
