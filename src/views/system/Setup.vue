@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import logo from "@/assets/logo.svg";
+import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
 import { useSettingForm } from "@/composables/use-setting-form";
 import { useSystemStatesStore } from "@/stores/system-states";
 import { apiClient } from "@/utils/api-client";
@@ -115,7 +115,7 @@ onMounted(async () => {
 
 <template>
   <div class="flex h-screen flex-col items-center justify-center">
-    <img :src="logo" alt="Logo" class="mb-8 w-20" />
+    <IconLogo class="mb-8" />
     <div class="flex w-72 flex-col gap-4">
       <FormKit
         id="setup-form"

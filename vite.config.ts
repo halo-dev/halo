@@ -1,4 +1,5 @@
 import { fileURLToPath, URL } from "url";
+import fs from "fs";
 import { defineConfig, loadEnv } from "vite";
 import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
@@ -8,6 +9,30 @@ import { VitePWA } from "vite-plugin-pwa";
 import Icons from "unplugin-icons/vite";
 import { setupLibraryExternal } from "./src/build/library-external";
 
+export const sharedPlugins = [
+  Vue(),
+  VueJsx(),
+  VueSetupExtend(),
+  Compression(),
+  Icons({
+    compiler: "vue3",
+    customCollections: {
+      core: {
+        logo: () => fs.readFileSync("./src/assets/logo.svg", "utf-8"),
+      },
+    },
+  }),
+  VitePWA({
+    manifest: {
+      name: "Halo",
+      short_name: "Halo",
+      description: "Web Client For Halo",
+      theme_color: "#fff",
+    },
+    disable: true,
+  }),
+];
+
 export default ({ mode }: { mode: string }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const isProduction = mode === "production";
@@ -15,20 +40,7 @@ export default ({ mode }: { mode: string }) => {
   return defineConfig({
     base: env.VITE_BASE_URL,
     plugins: [
-      Vue(),
-      VueJsx(),
-      VueSetupExtend(),
-      Compression(),
-      Icons({ compiler: "vue3" }),
-      VitePWA({
-        manifest: {
-          name: "Halo",
-          short_name: "Halo",
-          description: "Web Client For Halo",
-          theme_color: "#fff",
-        },
-        disable: true,
-      }),
+      ...sharedPlugins,
       ...setupLibraryExternal(isProduction, env.VITE_BASE_URL),
     ],
     resolve: {

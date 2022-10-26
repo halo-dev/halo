@@ -12,7 +12,7 @@ import {
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
 import type { User } from "@halo-dev/api-client";
-import logo from "@/assets/logo.svg";
+import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
 import {
   RouterView,
   useRoute,
@@ -185,7 +185,7 @@ onMounted(generateMenus);
   <div class="flex h-full">
     <aside class="navbar fixed hidden h-full overflow-y-auto md:block">
       <div class="logo flex justify-center pt-5 pb-7">
-        <img :src="logo" alt="Halo Logo" style="width: 78px" />
+        <IconLogo />
       </div>
       <div class="px-3">
         <div

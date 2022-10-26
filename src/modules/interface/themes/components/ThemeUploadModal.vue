@@ -2,7 +2,7 @@
 import { VModal } from "@halo-dev/components";
 import FilePondUpload from "@/components/upload/FilePondUpload.vue";
 import { apiClient } from "@/utils/api-client";
-import { computed, mergeProps, ref } from "vue";
+import { computed, ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 
 const props = withDefaults(

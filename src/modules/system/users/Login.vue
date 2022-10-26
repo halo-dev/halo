@@ -7,13 +7,13 @@ import {
 } from "@halo-dev/components";
 import { v4 as uuid } from "uuid";
 import qs from "qs";
-import logo from "@/assets/logo.svg";
 import { inject, onBeforeMount, onMounted, ref } from "vue";
 import { submitForm } from "@formkit/vue";
 import router from "@/router";
 import axios from "axios";
 import type { User } from "@halo-dev/api-client";
 import { setFocus } from "@/formkit/utils/focus";
+import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
 
 interface LoginForm {
   _csrf: string;
@@ -73,7 +73,7 @@ onMounted(() => {
 </script>
 <template>
   <div class="flex h-screen flex-col items-center justify-center">
-    <img :src="logo" alt="Logo" class="mb-8 w-20" />
+    <IconLogo class="mb-8" />
     <div class="login-form flex w-72 flex-col gap-4">
       <FormKit
         id="login-form"

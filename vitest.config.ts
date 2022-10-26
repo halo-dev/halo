@@ -1,10 +1,10 @@
 import { defineConfig } from "vitest/config";
-import Vue from "@vitejs/plugin-vue";
-import VueJsx from "@vitejs/plugin-vue-jsx";
 import { fileURLToPath, URL } from "url";
 
+import { sharedPlugins } from "./vite.config";
+
 export default defineConfig({
-  plugins: [Vue(), VueJsx()],
+  plugins: [sharedPlugins],
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

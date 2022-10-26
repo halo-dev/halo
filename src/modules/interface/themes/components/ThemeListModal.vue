@@ -67,8 +67,6 @@ const handleFetchThemes = async () => {
       page: 0,
       size: 0,
       uninstalled: activeTab.value !== "installed",
-      page: 0,
-      size: 0,
     });
     themes.value = data.items;
 
