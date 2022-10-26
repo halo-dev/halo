@@ -1,13 +1,13 @@
 package run.halo.app.plugin.resources;
 
+import com.google.common.collect.LinkedHashMultimap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.StampedLock;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -27,8 +27,8 @@ public class ReverseProxyRouterFunctionRegistry {
     private final StampedLock lock = new StampedLock();
     private final Map<String, RouterFunction<ServerResponse>> proxyNameRouterFunctionRegistry =
         new HashMap<>();
-    private final MultiValueMap<String, String> pluginIdReverseProxyMap =
-        new LinkedMultiValueMap<>();
+    private final LinkedHashMultimap<String, String> pluginIdReverseProxyMap =
+        LinkedHashMultimap.create();
 
     public ReverseProxyRouterFunctionRegistry(
         ReverseProxyRouterFunctionFactory reverseProxyRouterFunctionFactory) {
@@ -47,11 +47,7 @@ public class ReverseProxyRouterFunctionRegistry {
         final String proxyName = reverseProxy.getMetadata().getName();
         long stamp = lock.writeLock();
         try {
-            List<String> reverseProxyNames = pluginIdReverseProxyMap.get(pluginId);
-            if (reverseProxyNames != null && reverseProxyNames.contains(proxyName)) {
-                return Mono.empty();
-            }
-            pluginIdReverseProxyMap.add(pluginId, proxyName);
+            pluginIdReverseProxyMap.put(pluginId, proxyName);
 
             // Obtain plugin application context
             PluginApplicationContext pluginApplicationContext =
@@ -71,8 +67,8 @@ public class ReverseProxyRouterFunctionRegistry {
      * Only for test.
      */
     protected int reverseProxySize(String pluginId) {
-        List<String> names = pluginIdReverseProxyMap.get(pluginId);
-        return names == null ? 0 : names.size();
+        Set<String> names = pluginIdReverseProxyMap.get(pluginId);
+        return names.size();
     }
 
     /**
@@ -84,10 +80,7 @@ public class ReverseProxyRouterFunctionRegistry {
         Assert.notNull(pluginId, "The plugin id must not be null.");
         long stamp = lock.writeLock();
         try {
-            List<String> proxyNames = pluginIdReverseProxyMap.remove(pluginId);
-            if (proxyNames == null) {
-                return Mono.empty();
-            }
+            Set<String> proxyNames = pluginIdReverseProxyMap.removeAll(pluginId);
             for (String proxyName : proxyNames) {
                 proxyNameRouterFunctionRegistry.remove(proxyName);
             }
@@ -103,11 +96,7 @@ public class ReverseProxyRouterFunctionRegistry {
     public Mono<Void> remove(String pluginId, String reverseProxyName) {
         long stamp = lock.writeLock();
         try {
-            List<String> proxyNames = pluginIdReverseProxyMap.get(pluginId);
-            if (proxyNames == null) {
-                return Mono.empty();
-            }
-            proxyNames.remove(reverseProxyName);
+            pluginIdReverseProxyMap.remove(pluginId, reverseProxyName);
             proxyNameRouterFunctionRegistry.remove(reverseProxyName);
             return Mono.empty();
         } finally {
