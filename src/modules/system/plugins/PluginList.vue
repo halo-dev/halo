@@ -13,7 +13,7 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import PluginListItem from "./components/PluginListItem.vue";
-import PluginInstallModal from "./components/PluginInstallModal.vue";
+import PluginUploadModal from "./components/PluginUploadModal.vue";
 import { onMounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { PluginList } from "@halo-dev/api-client";
@@ -140,7 +140,7 @@ function handleSortItemChange(sortItem?: SortItem) {
 }
 </script>
 <template>
-  <PluginInstallModal
+  <PluginUploadModal
     v-if="currentUserHasPermission(['system:plugins:manage'])"
     v-model:visible="pluginInstall"
     @close="handleFetchPlugins"
@@ -306,7 +306,7 @@ function handleSortItemChange(sortItem?: SortItem) {
         role="list"
       >
         <li v-for="(plugin, index) in plugins.items" :key="index">
-          <PluginListItem :plugin="plugin" />
+          <PluginListItem :plugin="plugin" @reload="handleFetchPlugins" />
         </li>
       </ul>
 

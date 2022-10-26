@@ -6,12 +6,14 @@ import type { Plugin } from "@halo-dev/api-client";
 import { computed, ref } from "vue";
 import type { AxiosResponse } from "axios";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     visible: boolean;
+    upgradePlugin?: Plugin;
   }>(),
   {
     visible: false,
+    upgradePlugin: undefined,
   }
 );
 
@@ -22,6 +24,12 @@ const emit = defineEmits<{
 
 const FilePondUploadRef = ref();
 
+const modalTitle = computed(() => {
+  return props.upgradePlugin
+    ? `升级插件（${props.upgradePlugin.spec.displayName}）`
+    : "安装插件";
+});
+
 const handleVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
@@ -31,6 +39,16 @@ const handleVisibleChange = (visible: boolean) => {
 };
 
 const uploadHandler = computed(() => {
+  if (props.upgradePlugin) {
+    return (file, config) =>
+      apiClient.plugin.upgradePlugin(
+        {
+          name: props.upgradePlugin.metadata.name as string,
+          file: file,
+        },
+        config
+      );
+  }
   return (file, config) =>
     apiClient.plugin.installPlugin(
       {
@@ -41,6 +59,11 @@ const uploadHandler = computed(() => {
 });
 
 const onUploaded = async (response: AxiosResponse) => {
+  if (props.upgradePlugin) {
+    handleVisibleChange(false);
+    return;
+  }
+
   const plugin = response.data as Plugin;
   handleVisibleChange(false);
   Dialog.success({
@@ -71,10 +94,11 @@ const onUploaded = async (response: AxiosResponse) => {
   <VModal
     :visible="visible"
     :width="500"
-    title="安装插件"
+    :title="modalTitle"
     @update:visible="handleVisibleChange"
   >
     <FilePondUpload
+      v-if="visible && uploadHandler"
       ref="FilePondUploadRef"
       :allow-multiple="false"
       :handler="uploadHandler"

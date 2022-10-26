@@ -9,7 +9,8 @@ import {
   VEntityField,
   VAvatar,
 } from "@halo-dev/components";
-import { toRefs } from "vue";
+import PluginUploadModal from "./PluginUploadModal.vue";
+import { ref, toRefs } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 import type { Plugin } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
@@ -26,11 +27,26 @@ const props = withDefaults(
   }
 );
 
+const emit = defineEmits<{
+  (event: "reload"): void;
+}>();
+
 const { plugin } = toRefs(props);
 
+const upgradeModal = ref(false);
+
 const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
+
+const onUpgradeModalClose = () => {
+  emit("reload");
+};
 </script>
 <template>
+  <PluginUploadModal
+    v-model:visible="upgradeModal"
+    :upgrade-plugin="plugin"
+    @close="onUpgradeModalClose"
+  />
   <VEntity>
     <template #start>
       <VEntityField>
@@ -108,6 +124,14 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
       v-if="currentUserHasPermission(['system:plugins:manage'])"
       #dropdownItems
     >
+      <VButton
+        v-close-popper
+        block
+        type="secondary"
+        @click="upgradeModal = true"
+      >
+        升级
+      </VButton>
       <VButton v-close-popper block type="danger" @click="uninstall">
         卸载
       </VButton>
