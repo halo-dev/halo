@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/console",
-  "version": "0.0.0",
+  "version": "2.0.0-alpha.3",
   "scripts": {
     "prepare": "husky install",
     "dev": "vite --host",
