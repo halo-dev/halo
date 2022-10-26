@@ -83,7 +83,7 @@ dependencies {
     // See https://github.com/spring-projects/spring-data-relational/commit/ee6c2c89b5c433748b22a79cf40dc8e01142caa3
     // for more.
     runtimeOnly 'io.r2dbc:r2dbc-h2'
-    runtimeOnly 'com.github.jasync-sql:jasync-r2dbc-mysql:2.1.5'
+    runtimeOnly 'com.github.jasync-sql:jasync-r2dbc-mysql:2.1.7'
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'org.postgresql:r2dbc-postgresql'
 
