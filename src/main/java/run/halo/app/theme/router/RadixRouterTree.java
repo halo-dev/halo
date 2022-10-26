@@ -125,7 +125,7 @@ public class RadixRouterTree extends RadixTree<HandlerFunction<ServerResponse>> 
      * TODO Optimize parameter route matching query.
      * Router 仅匹配请求方法和请求的 URL 路径, 形如 /?p=post-name 是 URL query，而不是 URL 路径的一部分。
      */
-    private String pathToFind(ServerRequest request) {
+    static String pathToFind(ServerRequest request) {
         String requestPath = processRequestPath(request.path());
         MultiValueMap<String, String> queryParams = request.queryParams();
         // 文章的 permalink 规则需要对 p 参数规则特殊处理
@@ -141,6 +141,7 @@ public class RadixRouterTree extends RadixTree<HandlerFunction<ServerResponse>> 
                 requestPath = requestPath.substring(0, i);
             }
         }
+        requestPath = StringUtils.removeEnd(requestPath, "/");
         return StringUtils.prependIfMissing(requestPath, "/");
     }
 
@@ -177,7 +178,7 @@ public class RadixRouterTree extends RadixTree<HandlerFunction<ServerResponse>> 
         }
     }
 
-    private String processRequestPath(String requestPath) {
+    private static String processRequestPath(String requestPath) {
         String path = StringUtils.prependIfMissing(requestPath, "/");
         return UriUtils.decode(path, StandardCharsets.UTF_8);
     }
