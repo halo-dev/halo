@@ -1,6 +1,7 @@
 package run.halo.app.core.extension.reconciler;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import run.halo.app.core.extension.Plugin;
@@ -64,6 +66,7 @@ class PluginReconcilerTest {
         when(pluginWrapper.getPluginState()).thenReturn(PluginState.STOPPED);
 
         ArgumentCaptor<Plugin> pluginCaptor = doReconcileWithoutRequeue();
+        verify(extensionClient, times(2)).update(any());
 
         Plugin updateArgs = pluginCaptor.getValue();
         assertThat(updateArgs).isNotNull();
@@ -87,18 +90,22 @@ class PluginReconcilerTest {
             PluginStartingError.of("apples", "error message", "dev message");
         when(haloPluginManager.getPluginStartingError(any())).thenReturn(pluginStartingError);
 
-        ArgumentCaptor<Plugin> pluginCaptor = doReconcileNeedRequeue();
+        assertThatThrownBy(() -> {
+            ArgumentCaptor<Plugin> pluginCaptor = doReconcileNeedRequeue();
 
-        // Verify the state before the update plugin
-        Plugin updateArgs = pluginCaptor.getValue();
-        assertThat(updateArgs).isNotNull();
-        assertThat(updateArgs.getSpec().getEnabled()).isTrue();
+            // Verify the state before the update plugin
+            Plugin updateArgs = pluginCaptor.getValue();
+            assertThat(updateArgs).isNotNull();
+            assertThat(updateArgs.getSpec().getEnabled()).isTrue();
 
-        Plugin.PluginStatus status = updateArgs.getStatus();
-        assertThat(status.getPhase()).isEqualTo(PluginState.FAILED);
-        assertThat(status.getReason()).isEqualTo("error message");
-        assertThat(status.getMessage()).isEqualTo("dev message");
-        assertThat(status.getLastStartTime()).isNull();
+            Plugin.PluginStatus status = updateArgs.getStatus();
+            assertThat(status.getPhase()).isEqualTo(PluginState.FAILED);
+            assertThat(status.getReason()).isEqualTo("error message");
+            assertThat(status.getMessage()).isEqualTo("dev message");
+            assertThat(status.getLastStartTime()).isNull();
+        }).isInstanceOf(PluginRuntimeException.class)
+            .hasMessage("error message");
+
     }
 
     @Test
@@ -111,6 +118,7 @@ class PluginReconcilerTest {
         when(pluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
 
         ArgumentCaptor<Plugin> pluginCaptor = doReconcileWithoutRequeue();
+        verify(extensionClient, times(2)).update(any());
 
         Plugin updateArgs = pluginCaptor.getValue();
         assertThat(updateArgs).isNotNull();
@@ -145,6 +153,7 @@ class PluginReconcilerTest {
         when(pluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
 
         ArgumentCaptor<Plugin> pluginCaptor = doReconcileWithoutRequeue();
+        verify(extensionClient, times(3)).update(any());
 
         Plugin updateArgs = pluginCaptor.getValue();
         assertThat(updateArgs).isNotNull();
@@ -168,16 +177,19 @@ class PluginReconcilerTest {
             PluginStartingError.of("apples", "error message", "dev message");
         when(haloPluginManager.getPluginStartingError(any())).thenReturn(pluginStartingError);
 
-        ArgumentCaptor<Plugin> pluginCaptor = doReconcileNeedRequeue();
+        assertThatThrownBy(() -> {
+            ArgumentCaptor<Plugin> pluginCaptor = doReconcileNeedRequeue();
 
-        Plugin updateArgs = pluginCaptor.getValue();
-        assertThat(updateArgs).isNotNull();
-        assertThat(updateArgs.getSpec().getEnabled()).isFalse();
+            Plugin updateArgs = pluginCaptor.getValue();
+            assertThat(updateArgs).isNotNull();
+            assertThat(updateArgs.getSpec().getEnabled()).isFalse();
 
-        Plugin.PluginStatus status = updateArgs.getStatus();
-        assertThat(status.getPhase()).isEqualTo(PluginState.FAILED);
-        assertThat(status.getReason()).isEqualTo("error message");
-        assertThat(status.getMessage()).isEqualTo("dev message");
+            Plugin.PluginStatus status = updateArgs.getStatus();
+            assertThat(status.getPhase()).isEqualTo(PluginState.FAILED);
+            assertThat(status.getReason()).isEqualTo("error message");
+            assertThat(status.getMessage()).isEqualTo("dev message");
+        }).isInstanceOf(PluginRuntimeException.class)
+            .hasMessage("error message");
     }
 
     private ArgumentCaptor<Plugin> doReconcileNeedRequeue() {
@@ -201,8 +213,6 @@ class PluginReconcilerTest {
         Reconciler.Result result = pluginReconciler.reconcile(new Reconciler.Request("apples"));
         assertThat(result).isNotNull();
         assertThat(result.reEnqueue()).isEqualTo(false);
-
-        verify(extensionClient, times(2)).update(any());
         return pluginCaptor;
     }
 

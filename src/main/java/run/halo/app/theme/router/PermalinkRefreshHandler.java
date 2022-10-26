@@ -59,7 +59,7 @@ public class PermalinkRefreshHandler implements ApplicationListener<PermalinkRul
                 String oldPermalink = post.getStatusOrDefault().getPermalink();
                 String permalink = postPermalinkPolicy.permalink(post);
                 post.getStatusOrDefault().setPermalink(permalink);
-                if (oldPermalink.equals(permalink)) {
+                if (StringUtils.equals(oldPermalink, permalink)) {
                     return;
                 }
                 // update permalink
