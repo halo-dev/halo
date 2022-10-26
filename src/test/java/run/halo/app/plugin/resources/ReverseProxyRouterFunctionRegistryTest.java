@@ -51,14 +51,7 @@ class ReverseProxyRouterFunctionRegistryTest {
 
     @Test
     void register() {
-        ReverseProxy mock = Mockito.mock(ReverseProxy.class);
-        Metadata metadata = new Metadata();
-        metadata.setName("test-reverse-proxy");
-        when(mock.getMetadata()).thenReturn(metadata);
-        RouterFunction<ServerResponse> routerFunction = request -> Mono.empty();
-
-        when(reverseProxyRouterFunctionFactory.create(any(), any()))
-            .thenReturn(Mono.just(routerFunction));
+        ReverseProxy mock = getMockReverseProxy();
         registry.register("fake-plugin", mock)
             .as(StepVerifier::create)
             .verifyComplete();
@@ -72,6 +65,42 @@ class ReverseProxyRouterFunctionRegistryTest {
 
         assertThat(registry.reverseProxySize("fake-plugin")).isEqualTo(1);
 
-        verify(reverseProxyRouterFunctionFactory, times(1)).create(any(), any());
+        verify(reverseProxyRouterFunctionFactory, times(2)).create(any(), any());
+    }
+
+    @Test
+    void remove() {
+        ReverseProxy mock = getMockReverseProxy();
+        registry.register("fake-plugin", mock)
+            .as(StepVerifier::create)
+            .verifyComplete();
+
+        registry.remove("fake-plugin").block();
+
+        assertThat(registry.reverseProxySize("fake-plugin")).isEqualTo(0);
+    }
+
+    @Test
+    void removeByKeyValue() {
+        ReverseProxy mock = getMockReverseProxy();
+        registry.register("fake-plugin", mock)
+            .as(StepVerifier::create)
+            .verifyComplete();
+
+        registry.remove("fake-plugin", "test-reverse-proxy").block();
+
+        assertThat(registry.reverseProxySize("fake-plugin")).isEqualTo(0);
+    }
+
+    private ReverseProxy getMockReverseProxy() {
+        ReverseProxy mock = Mockito.mock(ReverseProxy.class);
+        Metadata metadata = new Metadata();
+        metadata.setName("test-reverse-proxy");
+        when(mock.getMetadata()).thenReturn(metadata);
+        RouterFunction<ServerResponse> routerFunction = request -> Mono.empty();
+
+        when(reverseProxyRouterFunctionFactory.create(any(), any()))
+            .thenReturn(Mono.just(routerFunction));
+        return mock;
     }
 }
