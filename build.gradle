@@ -58,7 +58,7 @@ dependencies {
     implementation 'org.springframework.security:spring-security-oauth2-jose'
     implementation 'org.springframework.security:spring-security-oauth2-resource-server'
 
-    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.0-M7'
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.0-RC1'
     implementation 'org.openapi4j:openapi-schema-validator:1.0.7'
     implementation "net.bytebuddy:byte-buddy"
 
