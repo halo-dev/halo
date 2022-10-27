@@ -5,6 +5,7 @@ import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.PostArchiveVo;
+import run.halo.app.theme.finders.vo.PostCursorVo;
 import run.halo.app.theme.finders.vo.PostVo;
 
 /**
@@ -18,6 +19,8 @@ public interface PostFinder {
     PostVo getByName(String postName);
 
     ContentVo content(String postName);
+
+    PostCursorVo cursor(String current);
 
     ListResult<PostVo> list(@Nullable Integer page, @Nullable Integer size);
 
