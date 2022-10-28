@@ -17,6 +17,7 @@ import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.router.ViewNameResolver;
 
 /**
  * The {@link PostRouteStrategy} for generate {@link HandlerFunction} specific to the template
@@ -30,9 +31,11 @@ public class PostRouteStrategy implements DetailsPageRouteHandlerStrategy {
     static final String NAME_PARAM = "name";
     private final GroupVersionKind groupVersionKind = GroupVersionKind.fromExtension(Post.class);
     private final PostFinder postFinder;
+    private final ViewNameResolver viewNameResolver;
 
-    public PostRouteStrategy(PostFinder postFinder) {
+    public PostRouteStrategy(PostFinder postFinder, ViewNameResolver viewNameResolver) {
         this.postFinder = postFinder;
+        this.viewNameResolver = viewNameResolver;
     }
 
     @Override
@@ -49,15 +52,19 @@ public class PostRouteStrategy implements DetailsPageRouteHandlerStrategy {
             if (pathMatchInfo != null) {
                 model.putAll(pathMatchInfo.getUriVariables());
             }
-            model.put("post", postByName(name));
             // used by HaloTrackerProcessor
             model.put("groupVersionKind", groupVersionKind);
             model.put("plural", gvk.plural());
             // used by TemplateGlobalHeadProcessor and PostTemplateHeadProcessor
             model.put(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.POST.getValue());
-
-            return ServerResponse.ok()
-                .render(DefaultTemplateEnum.POST.getValue(), model);
+            return postByName(name)
+                .flatMap(postVo -> {
+                    model.put("post", postVo);
+                    String template = postVo.getSpec().getTemplate();
+                    return viewNameResolver.resolveViewNameOrDefault(request, template,
+                            DefaultTemplateEnum.POST.getValue())
+                        .flatMap(templateName -> ServerResponse.ok().render(templateName, model));
+                });
         };
     }
 
@@ -67,7 +74,7 @@ public class PostRouteStrategy implements DetailsPageRouteHandlerStrategy {
     }
 
     private Mono<PostVo> postByName(String name) {
-        return Mono.defer(() -> Mono.just(postFinder.getByName(name)))
-            .publishOn(Schedulers.boundedElastic());
+        return Mono.fromCallable(() -> postFinder.getByName(name))
+            .subscribeOn(Schedulers.boundedElastic());
     }
 }

@@ -12,10 +12,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
 import run.halo.app.content.TestPost;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.router.ViewNameResolver;
 
 /**
  * Tests for {@link PostRouteStrategy}.
@@ -29,11 +32,16 @@ class PostRouteStrategyTest extends RouterStrategyTestSuite {
     @Mock
     private PostFinder postFinder;
 
+    @Mock
+    private ViewNameResolver viewNameResolver;
+
     @InjectMocks
     private PostRouteStrategy postRouteStrategy;
 
     @Override
     public void setUp() {
+        lenient().when(viewNameResolver.resolveViewNameOrDefault(any(), any(), any()))
+            .thenReturn(Mono.just(DefaultTemplateEnum.POST.getValue()));
         lenient().when(postFinder.getByName(any())).thenReturn(PostVo.from(TestPost.postV1()));
     }
 

@@ -1,6 +1,7 @@
 package run.halo.app.core.extension;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -10,6 +11,8 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 
 /**
+ * <p>Theme extension.</p>
+ *
  * @author guqing
  * @since 2.0.0
  */
@@ -54,6 +57,9 @@ public class Theme extends AbstractExtension {
 
         private String configMapName;
 
+        @Schema
+        private CustomTemplates customTemplates;
+
         @NonNull
         public String getVersion() {
             if (StringUtils.isBlank(this.version)) {
@@ -85,4 +91,33 @@ public class Theme extends AbstractExtension {
 
         private String website;
     }
+
+    @Data
+    public static class CustomTemplates {
+        private List<TemplateDescriptor> post;
+        private List<TemplateDescriptor> category;
+        private List<TemplateDescriptor> page;
+    }
+
+
+    /**
+     * Type used to describe custom template page.
+     *
+     * @author guqing
+     * @since 2.0.0
+     */
+    @Data
+    public static class TemplateDescriptor {
+
+        @Schema(required = true, minLength = 1)
+        private String name;
+
+        private String description;
+
+        private String screenshot;
+
+        @Schema(required = true, minLength = 1)
+        private String file;
+    }
+
 }
