@@ -9,8 +9,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.DisposableBean;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -29,8 +29,8 @@ import run.halo.app.infra.utils.JsonUtils;
  */
 @Slf4j
 @Component
-public class CounterMeterHandler implements DisposableBean {
-
+public class CounterMeterHandler implements SmartLifecycle {
+    private volatile boolean started = false;
     private final ReactiveExtensionClient client;
     private final MeterRegistry meterRegistry;
 
@@ -135,8 +135,23 @@ public class CounterMeterHandler implements DisposableBean {
     }
 
     @Override
-    public void destroy() {
+    public void start() {
+        this.started = true;
+    }
+
+    @Override
+    public void stop() {
         log.debug("Persist counter meters to database before destroy...");
-        save().block();
+        try {
+            save().block();
+        } catch (Exception e) {
+            log.error("Persist counter meters to database failed.", e);
+        }
+        this.started = false;
+    }
+
+    @Override
+    public boolean isRunning() {
+        return started;
     }
 }

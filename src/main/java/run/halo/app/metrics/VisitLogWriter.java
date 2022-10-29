@@ -178,7 +178,6 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
                 }
                 FileUtils.closeQuietly(writer);
             }
-            Thread.currentThread().interrupt();
         }
 
         @Override
