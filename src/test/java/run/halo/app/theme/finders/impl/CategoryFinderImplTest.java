@@ -226,6 +226,7 @@ class CategoryFinderImplTest {
     }
 
     private List<Category> moreCategories() {
+        // see also https://github.com/halo-dev/halo/issues/2643
         String s = """
             [
                {
@@ -318,7 +319,8 @@ class CategoryFinderImplTest {
                         "bd95f914-22fc-4de5-afcc-a9ffba2f6401",
                         "e1150fd9-4512-453c-9186-f8de9c156c3d",
                         "acf09686-d5a7-4227-ba8c-3aeff063f12f",
-                        "ed064d5e-2b6f-4123-8114-78d0c6f2c4e2"
+                        "ed064d5e-2b6f-4123-8114-78d0c6f2c4e2",
+                        "non-existent-children-name"
                      ]
                   },
                   "status":{

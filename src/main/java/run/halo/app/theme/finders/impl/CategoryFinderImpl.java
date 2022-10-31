@@ -82,9 +82,12 @@ public class CategoryFinderImpl implements CategoryFinder {
 
         nameIdentityMap.forEach((name, value) -> {
             List<String> children = value.getSpec().getChildren();
-            if (children != null) {
-                for (String child : children) {
-                    CategoryTreeVo childNode = nameIdentityMap.get(child);
+            if (children == null) {
+                return;
+            }
+            for (String child : children) {
+                CategoryTreeVo childNode = nameIdentityMap.get(child);
+                if (childNode != null) {
                     childNode.setParentName(name);
                 }
             }

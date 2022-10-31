@@ -127,9 +127,12 @@ public class MenuFinderImpl implements MenuFinder {
 
         nameIdentityMap.forEach((name, value) -> {
             LinkedHashSet<String> children = value.getSpec().getChildren();
-            if (children != null) {
-                for (String child : children) {
-                    MenuItemVo childNode = nameIdentityMap.get(child);
+            if (children == null) {
+                return;
+            }
+            for (String child : children) {
+                MenuItemVo childNode = nameIdentityMap.get(child);
+                if (childNode != null) {
                     childNode.setParentName(name);
                 }
             }
