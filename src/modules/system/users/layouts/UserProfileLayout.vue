@@ -87,7 +87,7 @@ const handleTabChange = (id: string) => {
     />
     <header class="bg-white">
       <div class="h-48 bg-gradient-to-r from-gray-800 to-red-500"></div>
-      <div class="px-4 sm:px-6 lg:px-8">
+      <div class="px-4">
         <div class="-mt-12 flex items-end space-x-5 sm:-mt-16">
           <div v-if="user?.spec?.avatar" class="inline-flex items-center">
             <div class="h-24 w-24 sm:h-32 sm:w-32">
@@ -149,7 +149,7 @@ const handleTabChange = (id: string) => {
         </div>
       </div>
     </header>
-    <section class="bg-white p-4 sm:px-6 lg:px-8">
+    <section class="bg-white p-4">
       <VTabbar
         v-model:active-id="activeTab"
         :items="tabs"

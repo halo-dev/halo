@@ -137,7 +137,7 @@ watchEffect(() => {
   <VModal
     title="回复"
     :visible="visible"
-    :width="600"
+    :width="500"
     @update:visible="onVisibleChange"
   >
     <FormKit
@@ -153,6 +153,7 @@ watchEffect(() => {
         type="textarea"
         validation="required"
         validation-label="内容"
+        :rows="6"
       ></FormKit>
     </FormKit>
     <div class="mt-2 flex justify-end">

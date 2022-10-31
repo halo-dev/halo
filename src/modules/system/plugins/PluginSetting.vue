@@ -62,8 +62,8 @@ const handleFetchPlugin = async () => {
 await handleFetchPlugin();
 </script>
 <template>
-  <div class="bg-white p-4 sm:px-6">
-    <div class="w-1/3">
+  <div class="bg-white p-4">
+    <div>
       <FormKit
         v-if="group && formSchema && configMapFormData"
         :id="group"

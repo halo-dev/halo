@@ -228,6 +228,7 @@ watchEffect(() => {
             label="自定义摘要"
             name="raw"
             type="textarea"
+            :rows="5"
           ></FormKit>
         </FormKit>
       </VTabItem>

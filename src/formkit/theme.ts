@@ -1,21 +1,21 @@
 const textClassification = {
-  label: "block font-bold text-sm formkit-invalid:text-red-500 w-56",
-  wrapper: "flex flex-col sm:flex-row items-start sm:items-center",
+  label: "block text-sm font-medium text-gray-700 formkit-invalid:text-red-500",
+  wrapper: "flex flex-col gap-4",
   inner:
-    "inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 h-9 rounded-base overflow-hidden focus-within:border-primary mt-2 sm:mt-0",
+    "inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 h-9 rounded-base overflow-hidden focus-within:border-primary focus-within:shadow-sm w-full sm:max-w-lg transition-all",
   input:
     "outline-0 bg-white antialiased resize-none w-full text-black block transition-all appearance-none h-full px-3 text-sm",
 };
 
 const boxClassification = {
+  label: textClassification.label,
+  legend: textClassification.label,
   fieldset:
-    "border border-gray-300 rounded-base px-2 py-2 focus-within:border-primary",
-  legend: "font-bold text-sm",
+    "border border-gray-300 rounded-base px-2 py-2 focus-within:border-primary max-w-lg",
   wrapper: "flex items-center mb-1 cursor-pointer",
-  help: "mb-2",
+  help: "mb-2 mt-0",
   input:
-    "form-check-input appearance-none h-4 w-4 mr-2 border border-gray-500 rounded-sm bg-white checked:bg-primary focus:outline-none focus:ring-0 transition duration-200",
-  label: "text-sm text-gray-700",
+    "form-check-input h-4 w-4 mr-2 border border-gray-500 rounded-sm bg-white checked:bg-primary focus:outline-none focus:ring-0 transition duration-200",
   inner: "flex items-center",
 };
 
@@ -27,23 +27,21 @@ const buttonClassification = {
 
 const theme: Record<string, Record<string, string>> = {
   global: {
-    outer: "formkit-disabled:opacity-50",
-    help: "text-xs mt-1.5 text-gray-500",
+    form: "divide-y divide-gray-100",
+    outer: "formkit-disabled:opacity-50 py-4 first:pt-0 last:pb-0",
+    help: "text-xs mt-2 text-gray-500",
     messages: "list-none p-0 mt-1.5 mb-0",
-    message: "text-red-500 mb-1 text-xs",
-    form: "flex flex-col space-y-4",
+    message: "text-red-500 mt-2 text-xs",
   },
   button: buttonClassification,
   color: {
-    label: "block mb-1 font-bold text-sm",
+    ...textClassification,
+    inner: "",
     input:
       "w-16 h-8 appearance-none cursor-pointer border border-gray-300 rounded-md mb-2 p-1",
   },
   file: {
-    label: "block mb-1 font-bold text-sm",
-    inner: "cursor-pointer",
-    input:
-      "text-gray-600 text-sm mb-1 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-blue-500 file:text-white hover:file:bg-blue-600",
+    ...textClassification,
     noFiles: "block text-gray-800 text-sm mb-1",
     fileItem: "block flex text-gray-800 text-sm mb-1",
     fileRemove: "ml-auto text-blue-500 text-sm",
@@ -54,7 +52,8 @@ const theme: Record<string, Record<string, string>> = {
     input: boxClassification.input.replace("rounded-sm", "rounded-full"),
   },
   range: {
-    inner: "",
+    ...textClassification,
+    inner: "w-full sm:max-w-lg",
     input:
       "form-range appearance-none w-full h-2 p-0 bg-gray-200 rounded-full focus:outline-none focus:ring-0 focus:shadow-none",
   },
@@ -74,10 +73,9 @@ const theme: Record<string, Record<string, string>> = {
   "datetime-local": textClassification,
   textarea: {
     ...textClassification,
-    inner:
-      "inline-flex items-center w-full relative box-border border border-gray-300 formkit-invalid:border-red-500 h-32 rounded-base overflow-hidden focus-within:border-primary mt-2 sm:mt-0",
+    inner: textClassification.inner.replace("h-9", "h-full"),
     input:
-      "outline-0 bg-white antialiased w-full text-black block transition-all appearance-none h-full px-3 py-2 text-sm",
+      textClassification.input.replace("resize-none", "resize-y") + " py-2",
   },
 };
 
