@@ -4,14 +4,14 @@ import lombok.Builder;
 import lombok.Value;
 
 /**
- * Post cursor vo to hold previous and next item.
+ * Post navigation vo to hold previous and next item.
  *
  * @author guqing
  * @since 2.0.0
  */
 @Value
 @Builder
-public class PostCursorVo {
+public class NavigationPostVo {
 
     PostVo previous;
 
@@ -27,7 +27,7 @@ public class PostCursorVo {
         return previous != null;
     }
 
-    public static PostCursorVo empty() {
-        return PostCursorVo.builder().build();
+    public static NavigationPostVo empty() {
+        return NavigationPostVo.builder().build();
     }
 }

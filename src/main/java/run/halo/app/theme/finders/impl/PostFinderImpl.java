@@ -33,9 +33,9 @@ import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.CategoryVo;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.Contributor;
+import run.halo.app.theme.finders.vo.NavigationPostVo;
 import run.halo.app.theme.finders.vo.PostArchiveVo;
 import run.halo.app.theme.finders.vo.PostArchiveYearMonthVo;
-import run.halo.app.theme.finders.vo.PostCursorVo;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.finders.vo.StatsVo;
 import run.halo.app.theme.finders.vo.TagVo;
@@ -101,16 +101,17 @@ public class PostFinderImpl implements PostFinder {
     }
 
     @Override
-    public PostCursorVo cursor(String currentName) {
+    public NavigationPostVo cursor(String currentName) {
+        // TODO Optimize the post names query here
         List<String> postNames = client.list(Post.class, FIXED_PREDICATE, defaultComparator())
             .map(post -> post.getMetadata().getName())
             .collectList()
             .block();
         if (postNames == null) {
-            return PostCursorVo.empty();
+            return NavigationPostVo.empty();
         }
 
-        PostCursorVo.PostCursorVoBuilder builder = PostCursorVo.builder()
+        NavigationPostVo.NavigationPostVoBuilder builder = NavigationPostVo.builder()
             .current(getByName(currentName));
 
         Pair<String, String> previousNextPair = postPreviousNextPair(postNames, currentName);
