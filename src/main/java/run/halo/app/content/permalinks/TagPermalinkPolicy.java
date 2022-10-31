@@ -1,9 +1,12 @@
 package run.halo.app.content.permalinks;
 
+import java.nio.charset.StandardCharsets;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriUtils;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.PermalinkIndexAddCommand;
@@ -22,15 +25,22 @@ public class TagPermalinkPolicy implements PermalinkPolicy<Tag>, PermalinkWatch<
     private final PermalinkPatternProvider permalinkPatternProvider;
     private final ApplicationContext applicationContext;
 
+    private final ExternalUrlSupplier externalUrlSupplier;
+
     public TagPermalinkPolicy(PermalinkPatternProvider permalinkPatternProvider,
-        ApplicationContext applicationContext) {
+        ApplicationContext applicationContext, ExternalUrlSupplier externalUrlSupplier) {
         this.permalinkPatternProvider = permalinkPatternProvider;
         this.applicationContext = applicationContext;
+        this.externalUrlSupplier = externalUrlSupplier;
     }
 
     @Override
     public String permalink(Tag tag) {
-        return PathUtils.combinePath(pattern(), tag.getSpec().getSlug());
+        String slug = UriUtils.encode(tag.getSpec().getSlug(), StandardCharsets.UTF_8);
+        String path = PathUtils.combinePath(pattern(), slug);
+        return externalUrlSupplier.get()
+            .resolve(path)
+            .normalize().toString();
     }
 
     @Override

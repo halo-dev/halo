@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import java.net.URI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
 import run.halo.app.core.extension.Category;
 import run.halo.app.extension.Metadata;
+import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.PermalinkPatternProvider;
 
@@ -30,12 +32,16 @@ class CategoryPermalinkPolicyTest {
     @Mock
     private ApplicationContext applicationContext;
 
+    @Mock
+    private ExternalUrlSupplier externalUrlSupplier;
+
     private CategoryPermalinkPolicy categoryPermalinkPolicy;
 
     @BeforeEach
     void setUp() {
         categoryPermalinkPolicy =
-            new CategoryPermalinkPolicy(applicationContext, permalinkPatternProvider);
+            new CategoryPermalinkPolicy(applicationContext, permalinkPatternProvider,
+                externalUrlSupplier);
     }
 
     @Test
@@ -50,8 +56,19 @@ class CategoryPermalinkPolicyTest {
         categorySpec.setSlug("slug-test");
         category.setSpec(categorySpec);
 
+        when(externalUrlSupplier.get()).thenReturn(URI.create(""));
         String permalink = categoryPermalinkPolicy.permalink(category);
         assertThat(permalink).isEqualTo("/categories/slug-test");
+
+        when(externalUrlSupplier.get()).thenReturn(URI.create("http://exmaple.com"));
+        permalink = categoryPermalinkPolicy.permalink(category);
+        assertThat(permalink).isEqualTo("http://exmaple.com/categories/slug-test");
+        String path = URI.create(permalink).getPath();
+        assertThat(path).isEqualTo("/categories/slug-test");
+
+        category.getSpec().setSlug("中文 slug");
+        permalink = categoryPermalinkPolicy.permalink(category);
+        assertThat(permalink).isEqualTo("http://exmaple.com/categories/%E4%B8%AD%E6%96%87%20slug");
     }
 
     @Test
