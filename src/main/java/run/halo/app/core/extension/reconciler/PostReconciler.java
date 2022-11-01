@@ -61,11 +61,6 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
                     return;
                 }
-                if (Objects.equals(true, post.getSpec().getDeleted())) {
-                    // remove permalink from permalink indexer
-                    postPermalinkPolicy.onPermalinkDelete(post);
-                    return;
-                }
                 addFinalizerIfNecessary(post);
 
                 reconcileMetadata(request.name());
@@ -110,9 +105,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
 
             post.getStatusOrDefault()
                 .setPermalink(postPermalinkPolicy.permalink(post));
-            if (isPublished(post)) {
-                postPermalinkPolicy.onPermalinkAdd(post);
-            }
+            postPermalinkPolicy.onPermalinkAdd(post);
 
             Post.PostStatus status = post.getStatusOrDefault();
             if (status.getPhase() == null) {
