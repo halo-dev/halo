@@ -2,12 +2,16 @@
 
 ## 原由
 
-目前不管是在 Console 中，还是在插件 / 主题设置表单中，都有可能选择系统当中的资源，所以可以通过自定义 FormKit 组件的方式提供常用的选择器。
+目前在 Console 端的所有表单都使用了 FormKit，但 FormKit 内置的 Input 组件并不满足所有的需求，因此需要自定义一些 Input 组件。此外，为了插件和主题能够更加方便的使用系统内的一些数据，所以同样需要自定义一些带数据的选择组件。
 
 ## 使用方式
 
 目前已提供以下类型：
 
+- `code`: 代码编辑器
+  - 参数
+    1. language: 目前支持 `yaml`, `html`, `css`, `javascript`, `json`
+    2. height: 编辑器高度，如：`100px`
 - `menuCheckbox`：选择一组菜单
 - `menuRadio`：选择一个菜单
 - `menuItemSelect`：选择菜单项
