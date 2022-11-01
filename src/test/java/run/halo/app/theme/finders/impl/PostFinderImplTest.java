@@ -104,7 +104,6 @@ class PostFinderImplTest {
             .thenReturn(Mono.just(listResult));
         ListResult<PostArchiveVo> archives = postFinder.archives(1, 10);
         List<PostArchiveVo> items = archives.getItems();
-
         assertThat(items.size()).isEqualTo(2);
         assertThat(items.get(0).getYear()).isEqualTo("2022");
         assertThat(items.get(0).getMonths().size()).isEqualTo(1);
