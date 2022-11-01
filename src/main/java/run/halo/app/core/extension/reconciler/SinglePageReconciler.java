@@ -163,8 +163,6 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void permalinkOnDelete(SinglePage singlePage) {
-        singlePage.getStatusOrDefault()
-            .setPermalink(createPermalink(singlePage));
         ExtensionLocator locator = new ExtensionLocator(GVK, singlePage.getMetadata().getName(),
             singlePage.getSpec().getSlug());
         applicationContext.publishEvent(new PermalinkIndexDeleteCommand(this, locator));

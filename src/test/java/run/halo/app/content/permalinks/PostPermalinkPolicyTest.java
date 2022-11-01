@@ -102,7 +102,7 @@ class PostPermalinkPolicyTest {
         Post post = TestPost.postV1();
         post.getMetadata().setName("test-post");
         post.getSpec().setSlug("test-post-slug");
-        Instant now = Instant.now();
+        Instant now = Instant.parse("2022-11-01T02:40:06.806310Z");
         post.getSpec().setPublishTime(now);
 
         when(externalUrlSupplier.get()).thenReturn(URI.create("http://example.com"));
@@ -110,11 +110,11 @@ class PostPermalinkPolicyTest {
         when(permalinkPatternProvider.getPattern(DefaultTemplateEnum.POST))
             .thenReturn("/{year}/{month}/{day}/{slug}");
         String permalink = postPermalinkPolicy.permalink(post);
-        assertThat(permalink).isEqualTo("http://example.com/2022/10/31/test-post-slug");
+        assertThat(permalink).isEqualTo("http://example.com/2022/11/01/test-post-slug");
 
         post.getSpec().setSlug("中文 slug");
         permalink = postPermalinkPolicy.permalink(post);
-        assertThat(permalink).isEqualTo("http://example.com/2022/10/31/%E4%B8%AD%E6%96%87%20slug");
+        assertThat(permalink).isEqualTo("http://example.com/2022/11/01/%E4%B8%AD%E6%96%87%20slug");
     }
 
     @Test

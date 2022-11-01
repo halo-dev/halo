@@ -28,6 +28,7 @@ import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.PostArchiveVo;
+import run.halo.app.theme.finders.vo.PostArchiveYearMonthVo;
 
 /**
  * Tests for {@link PostFinderImpl}.
@@ -100,14 +101,12 @@ class PostFinderImplTest {
             .thenReturn(Mono.just(listResult));
         ListResult<PostArchiveVo> archives = postFinder.archives(1, 10);
         List<PostArchiveVo> items = archives.getItems();
-
         assertThat(items.size()).isEqualTo(2);
         assertThat(items.get(0).getYear()).isEqualTo("2022");
-        assertThat(items.get(0).getMonths().size()).isEqualTo(2);
-        assertThat(items.get(0).getMonths().get(0).getMonth()).isEqualTo("10");
-        assertThat(items.get(0).getMonths().get(1).getMonth()).isEqualTo("12");
-        assertThat(items.get(0).getMonths().get(1).getPosts().size()).isEqualTo(1);
-        assertThat(items.get(0).getMonths().get(1).getPosts().size()).isEqualTo(1);
+        assertThat(items.get(0).getMonths().size()).isEqualTo(1);
+        List<PostArchiveYearMonthVo> months = items.get(0).getMonths();
+        assertThat(months.get(0).getMonth()).isEqualTo("12");
+        assertThat(months.get(0).getPosts()).hasSize(2);
 
         assertThat(items.get(1).getYear()).isEqualTo("2021");
         assertThat(items.get(1).getMonths()).hasSize(1);
@@ -126,8 +125,8 @@ class PostFinderImplTest {
         post2.getMetadata().setCreationTimestamp(Instant.now());
 
         Post post3 = post(3);
-        post2.getSpec().setPublished(true);
-        post2.getSpec().setPublishTime(Instant.parse("2022-12-03T00:00:00Z"));
+        post3.getSpec().setPublished(true);
+        post3.getSpec().setPublishTime(Instant.parse("2022-12-03T00:00:00Z"));
         post3.getMetadata().setCreationTimestamp(Instant.now());
         return List.of(post1, post2, post3);
     }
