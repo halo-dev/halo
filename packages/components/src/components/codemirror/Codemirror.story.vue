@@ -10,7 +10,7 @@ function initState() {
 <template>
   <Story :init-state="initState" title="Codemirror">
     <template #default="{ state }">
-      <VCodemirror v-model="state.value" height="500px" language="yaml" />
+      <VCodemirror v-model="state.value" height="500px" language="html" />
     </template>
   </Story>
 </template>

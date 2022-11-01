@@ -4,18 +4,29 @@ import type { EditorStateConfig } from "@codemirror/state";
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { basicSetup } from "codemirror";
-import { StreamLanguage } from "@codemirror/language";
+import { LanguageSupport, StreamLanguage } from "@codemirror/language";
 import { yaml } from "@codemirror/legacy-modes/mode/yaml";
+import { html } from "@codemirror/lang-html";
+import { javascript } from "@codemirror/lang-javascript";
+import { css } from "@codemirror/lang-css";
+import { json } from "@codemirror/lang-json";
 
-const languages = {
+const presetLanguages = {
   yaml: StreamLanguage.define(yaml),
+  html: html(),
+  javascript: javascript({
+    jsx: true,
+    typescript: true,
+  }),
+  css: css(),
+  json: json(),
 };
 
 const props = withDefaults(
   defineProps<{
     modelValue?: string;
     height?: string;
-    language?: "yaml";
+    language: keyof typeof presetLanguages | LanguageSupport;
     extensions?: EditorStateConfig["extensions"];
   }>(),
   {
@@ -42,11 +53,16 @@ const cmState = shallowRef<EditorState>();
 const cmView = shallowRef<EditorView>();
 
 const createCmEditor = () => {
+  const language =
+    typeof props.language === "string"
+      ? presetLanguages[props.language]
+      : props.language;
+
   let extensions = [
     basicSetup,
     EditorView.lineWrapping,
     customTheme,
-    languages[props.language],
+    language,
     EditorView.updateListener.of((viewUpdate) => {
       if (viewUpdate.docChanged) {
         const doc = viewUpdate.state.doc.toString();
