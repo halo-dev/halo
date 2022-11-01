@@ -152,7 +152,8 @@ watch(
         help="需要主题适配以支持"
         name="cover"
         label="封面图"
-        type="text"
+        type="attachment"
+        validation="required"
       ></FormKit>
       <FormKit
         v-model="formState.spec.description"

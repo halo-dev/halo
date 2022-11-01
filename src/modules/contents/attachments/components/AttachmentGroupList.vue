@@ -98,6 +98,7 @@ onMounted(async () => {
 </script>
 <template>
   <AttachmentGroupEditingModal
+    v-if="!readonly"
     v-model:visible="editingModal"
     :group="groupToUpdate"
     @close="onEditingModalClose"

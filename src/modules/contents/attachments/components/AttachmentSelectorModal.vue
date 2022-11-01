@@ -61,6 +61,7 @@ const handleConfirm = () => {
   <VModal
     :visible="visible"
     :width="1240"
+    :mount-to-body="true"
     title="选择附件"
     height="calc(100vh - 20px)"
     @update:visible="onVisibleChange"

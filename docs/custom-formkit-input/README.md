@@ -12,6 +12,7 @@
   - 参数
     1. language: 目前支持 `yaml`, `html`, `css`, `javascript`, `json`
     2. height: 编辑器高度，如：`100px`
+- `attachment`: 附件选择
 - `menuCheckbox`：选择一组菜单
 - `menuRadio`：选择一个菜单
 - `menuItemSelect`：选择菜单项

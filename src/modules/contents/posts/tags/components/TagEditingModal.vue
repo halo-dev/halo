@@ -171,7 +171,7 @@ watch(
         name="cover"
         help="需要主题适配以支持"
         label="封面图"
-        type="text"
+        type="attachment"
       ></FormKit>
     </FormKit>
     <template #footer>

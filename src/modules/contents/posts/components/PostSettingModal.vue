@@ -285,7 +285,7 @@ watchEffect(() => {
             v-model="formState.post.spec.cover"
             name="cover"
             label="封面图"
-            type="text"
+            type="attachment"
           ></FormKit>
         </FormKit>
         <!--TODO: add SEO/Metas/Inject Code form-->

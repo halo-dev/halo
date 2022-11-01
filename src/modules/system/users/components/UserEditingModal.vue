@@ -197,7 +197,7 @@ const handleRawModeChange = () => {
         <FormKit
           v-model="formState.spec.avatar"
           label="头像"
-          type="text"
+          type="attachment"
           name="avatar"
           validation="url"
         ></FormKit>
