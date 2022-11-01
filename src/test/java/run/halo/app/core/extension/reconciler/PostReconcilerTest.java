@@ -71,7 +71,7 @@ class PostReconcilerTest {
         verify(client, times(3)).update(captor.capture());
 
         verify(postPermalinkPolicy, times(1)).permalink(any());
-        verify(postPermalinkPolicy, times(0)).onPermalinkAdd(any());
+        verify(postPermalinkPolicy, times(1)).onPermalinkAdd(any());
         verify(postPermalinkPolicy, times(1)).onPermalinkDelete(any());
         verify(postPermalinkPolicy, times(0)).onPermalinkUpdate(any());
 

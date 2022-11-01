@@ -75,12 +75,6 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
                     return;
                 }
-
-                if (Objects.equals(true, singlePage.getSpec().getDeleted())) {
-                    // remove permalink from permalink indexer
-                    permalinkOnDelete(singlePage);
-                    return;
-                }
                 addFinalizerIfNecessary(oldPage);
 
                 reconcileStatus(request.name());
@@ -175,6 +169,9 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void permalinkOnAdd(SinglePage singlePage) {
+        if (!singlePage.isPublished() || Objects.equals(true, singlePage.getSpec().getDeleted())) {
+            return;
+        }
         ExtensionLocator locator = new ExtensionLocator(GVK, singlePage.getMetadata().getName(),
             singlePage.getSpec().getSlug());
         applicationContext.publishEvent(new PermalinkIndexAddCommand(this, locator,
@@ -188,9 +185,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
             singlePage.getStatusOrDefault()
                 .setPermalink(createPermalink(singlePage));
-            if (isPublished(singlePage)) {
-                permalinkOnAdd(singlePage);
-            }
+            permalinkOnAdd(singlePage);
 
             SinglePage.SinglePageSpec spec = singlePage.getSpec();
             SinglePage.SinglePageStatus status = singlePage.getStatusOrDefault();

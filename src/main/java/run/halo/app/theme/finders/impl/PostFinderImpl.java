@@ -1,7 +1,10 @@
 package run.halo.app.theme.finders.impl;
 
 import java.time.Instant;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -10,8 +13,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.lang.NonNull;
 import org.springframework.util.comparator.Comparators;
+import reactor.util.function.Tuple2;
 import run.halo.app.content.ContentService;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.Post;
@@ -28,6 +33,7 @@ import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.CategoryVo;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.Contributor;
+import run.halo.app.theme.finders.vo.NavigationPostVo;
 import run.halo.app.theme.finders.vo.PostArchiveVo;
 import run.halo.app.theme.finders.vo.PostArchiveYearMonthVo;
 import run.halo.app.theme.finders.vo.PostVo;
@@ -92,6 +98,107 @@ public class PostFinderImpl implements PostFinder {
             .map(wrapper -> ContentVo.builder().content(wrapper.content())
                 .raw(wrapper.raw()).build())
             .block();
+    }
+
+    @Override
+    public NavigationPostVo cursor(String currentName) {
+        // TODO Optimize the post names query here
+        List<String> postNames = client.list(Post.class, FIXED_PREDICATE, defaultComparator())
+            .map(post -> post.getMetadata().getName())
+            .collectList()
+            .block();
+        if (postNames == null) {
+            return NavigationPostVo.empty();
+        }
+
+        NavigationPostVo.NavigationPostVoBuilder builder = NavigationPostVo.builder()
+            .current(getByName(currentName));
+
+        Pair<String, String> previousNextPair = postPreviousNextPair(postNames, currentName);
+        String previousPostName = previousNextPair.getLeft();
+        String nextPostName = previousNextPair.getRight();
+
+        if (previousPostName != null) {
+            builder.previous(getByName(previousPostName));
+        }
+
+        if (nextPostName != null) {
+            builder.next(getByName(nextPostName));
+        }
+        return builder.build();
+    }
+
+    static Pair<String, String> postPreviousNextPair(List<String> postNames,
+        String currentName) {
+        FixedSizeSlidingWindow<String> window = new FixedSizeSlidingWindow<>(3);
+        for (String postName : postNames) {
+            window.add(postName);
+            if (!window.isFull()) {
+                continue;
+            }
+            int index = window.indexOf(currentName);
+            if (index == -1) {
+                continue;
+            }
+            // got expected window
+            if (index < 2) {
+                break;
+            }
+        }
+
+        List<String> elements = window.elements();
+        Tuple2<String, String> previousNext;
+        // current post index
+        int index = elements.indexOf(currentName);
+
+        String previousPostName = null;
+        if (index != 0) {
+            previousPostName = elements.get(index - 1);
+        }
+
+        String nextPostName = null;
+        if (elements.size() - 1 > index) {
+            nextPostName = elements.get(index + 1);
+        }
+        return Pair.of(previousPostName, nextPostName);
+    }
+
+    static class FixedSizeSlidingWindow<T> {
+        Deque<T> queue;
+        int size;
+
+        public FixedSizeSlidingWindow(int size) {
+            this.size = size;
+            // FIFO
+            queue = new ArrayDeque<>(size);
+        }
+
+        /**
+         * Add element to the window.
+         * The element added first will be deleted when the element in the collection exceeds
+         * {@code size}.
+         */
+        public void add(T t) {
+            if (queue.size() == size) {
+                // remove first
+                queue.poll();
+            }
+            // add to last
+            queue.add(t);
+        }
+
+        public int indexOf(T o) {
+            List<T> elements = elements();
+            return elements.indexOf(o);
+        }
+
+        public List<T> elements() {
+            return new ArrayList<>(queue);
+        }
+
+        public boolean isFull() {
+            return queue.size() == size;
+        }
     }
 
     @Override

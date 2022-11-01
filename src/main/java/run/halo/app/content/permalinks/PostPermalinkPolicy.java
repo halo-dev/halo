@@ -8,6 +8,7 @@ import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.Properties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -59,6 +60,10 @@ public class PostPermalinkPolicy implements PermalinkPolicy<Post>, PermalinkWatc
 
     @Override
     public void onPermalinkAdd(Post post) {
+        if (!post.isPublished() || Objects.equals(true, post.getSpec().getDeleted())) {
+            return;
+        }
+        // publish when post is published and not deleted
         applicationContext.publishEvent(new PermalinkIndexAddCommand(this, getLocator(post),
             post.getStatusOrDefault().getPermalink()));
     }
