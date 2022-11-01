@@ -944,7 +944,7 @@ function handleContributorChange(user?: User) {
               <VEntityField>
                 <template #description>
                   <span class="truncate text-xs tabular-nums text-gray-500">
-                    {{ formatDatetime(post.post.metadata.creationTimestamp) }}
+                    {{ formatDatetime(post.post.spec.publishTime) }}
                   </span>
                 </template>
               </VEntityField>

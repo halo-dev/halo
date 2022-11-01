@@ -403,7 +403,7 @@ onMounted(async () => {
                       <div
                         class="text-sm text-gray-500 group-hover:text-gray-900"
                       >
-                        创建时间
+                        发布时间
                       </div>
                       <div class="rounded bg-gray-200 p-0.5">
                         <IconCalendar
@@ -413,9 +413,8 @@ onMounted(async () => {
                     </div>
                     <div class="text-base font-medium text-gray-900">
                       {{
-                        formatDatetime(
-                          formState.post.metadata.creationTimestamp
-                        ) || "未发布"
+                        formatDatetime(formState.post.spec.publishTime) ||
+                        "未发布"
                       }}
                     </div>
                   </div>

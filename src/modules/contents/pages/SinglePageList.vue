@@ -655,9 +655,7 @@ function handleSortItemChange(sortItem?: SortItem) {
             <VEntityField>
               <template #description>
                 <span class="truncate text-xs tabular-nums text-gray-500">
-                  {{
-                    formatDatetime(singlePage.page.metadata.creationTimestamp)
-                  }}
+                  {{ formatDatetime(singlePage.page.spec.publishTime) }}
                 </span>
               </template>
             </VEntityField>
