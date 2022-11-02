@@ -40,6 +40,7 @@ import { usePostCategory } from "@/modules/contents/posts/categories/composables
 import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
 import { usePermission } from "@/utils/permission";
 import { onBeforeRouteLeave } from "vue-router";
+import cloneDeep from "lodash.clonedeep";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -93,6 +94,7 @@ const handleFetchPosts = async () => {
     }
 
     const { data } = await apiClient.post.listPosts({
+      labelSelector: [`content.halo.run/deleted=false`],
       page: posts.value.page,
       size: posts.value.size,
       visible: selectedVisibleItem.value?.value,
@@ -107,7 +109,7 @@ const handleFetchPosts = async () => {
     posts.value = data;
 
     const deletedPosts = posts.value.items.filter(
-      (post) => !!post.post.metadata.deletionTimestamp
+      (post) => post.post.spec.deleted
     );
 
     if (deletedPosts.length) {
@@ -217,17 +219,21 @@ const handleCheckAllChange = (e: Event) => {
         return post.post.metadata.name;
       }) || [];
   } else {
-    selectedPostNames.value.length = 0;
+    selectedPostNames.value = [];
   }
 };
 
 const handleDelete = async (post: Post) => {
   Dialog.warning({
     title: "是否确认删除该文章？",
+    description: "此操作会将文章放入回收站，后续可以从回收站恢复",
     confirmType: "danger",
     onConfirm: async () => {
-      await apiClient.extension.post.deletecontentHaloRunV1alpha1Post({
-        name: post.metadata.name,
+      const postToUpdate = cloneDeep(post);
+      postToUpdate.spec.deleted = true;
+      await apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
+        name: postToUpdate.metadata.name,
+        post: postToUpdate,
       });
       await handleFetchPosts();
     },
@@ -237,17 +243,28 @@ const handleDelete = async (post: Post) => {
 const handleDeleteInBatch = async () => {
   Dialog.warning({
     title: "是否确认删除选中的文章？",
+    description: "此操作会将文章放入回收站，后续可以从回收站恢复",
     confirmType: "danger",
     onConfirm: async () => {
       await Promise.all(
         selectedPostNames.value.map((name) => {
-          return apiClient.extension.post.deletecontentHaloRunV1alpha1Post({
-            name,
+          const post = posts.value.items.find(
+            (item) => item.post.metadata.name === name
+          )?.post;
+
+          if (!post) {
+            return Promise.resolve();
+          }
+
+          post.spec.deleted = true;
+          return apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
+            name: post.metadata.name,
+            post: post,
           });
         })
       );
       await handleFetchPosts();
-      selectedPostNames.value.length = 0;
+      selectedPostNames.value = [];
     },
   });
 };
@@ -418,6 +435,7 @@ function handleContributorChange(user?: User) {
       <VSpace>
         <VButton :route="{ name: 'Categories' }" size="sm">分类</VButton>
         <VButton :route="{ name: 'Tags' }" size="sm">标签</VButton>
+        <VButton :route="{ name: 'DeletedPosts' }" size="sm">回收站</VButton>
         <VButton
           v-permission="['system:posts:manage']"
           :route="{ name: 'PostEditor' }"
@@ -457,6 +475,7 @@ function handleContributorChange(user?: User) {
               >
                 <FormKit
                   v-model="keyword"
+                  outer-class="!p-0"
                   placeholder="输入关键词搜索"
                   type="text"
                   @keyup.enter="handleFetchPosts"
@@ -936,7 +955,7 @@ function handleContributorChange(user?: User) {
                   />
                 </template>
               </VEntityField>
-              <VEntityField v-if="post?.post?.metadata.deletionTimestamp">
+              <VEntityField v-if="post?.post?.spec.deleted">
                 <template #description>
                   <VStatusDot v-tooltip="`删除中`" state="warning" animate />
                 </template>

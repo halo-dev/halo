@@ -22,7 +22,7 @@ import {
 } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
-import { onMounted, ref, watchEffect } from "vue";
+import { onMounted, ref, watch, watchEffect } from "vue";
 import type {
   ListedSinglePageList,
   SinglePage,
@@ -57,7 +57,8 @@ const loading = ref(false);
 const settingModal = ref(false);
 const selectedSinglePage = ref<SinglePage>();
 const selectedSinglePageWithContent = ref<SinglePageRequest>();
-const checkAll = ref(false);
+const selectedPageNames = ref<string[]>([]);
+const checkedAll = ref(false);
 const refreshInterval = ref();
 
 const handleFetchSinglePages = async () => {
@@ -73,6 +74,7 @@ const handleFetchSinglePages = async () => {
     }
 
     const { data } = await apiClient.singlePage.listSinglePages({
+      labelSelector: [`content.halo.run/deleted=false`],
       page: singlePages.value.page,
       size: singlePages.value.size,
       visible: selectedVisibleItem.value.value,
@@ -85,7 +87,7 @@ const handleFetchSinglePages = async () => {
     singlePages.value = data;
 
     const deletedSinglePages = singlePages.value.items.filter(
-      (singlePage) => !!singlePage.page.metadata.deletionTimestamp
+      (singlePage) => singlePage.page.spec.deleted
     );
 
     if (deletedSinglePages.length) {
@@ -192,9 +194,30 @@ const handleSelectNext = async () => {
   }
 };
 
+const checkSelection = (singlePage: SinglePage) => {
+  return (
+    singlePage.metadata.name === selectedSinglePage.value?.metadata.name ||
+    selectedPageNames.value.includes(singlePage.metadata.name)
+  );
+};
+
+const handleCheckAllChange = (e: Event) => {
+  const { checked } = e.target as HTMLInputElement;
+
+  if (checked) {
+    selectedPageNames.value =
+      singlePages.value.items.map((singlePage) => {
+        return singlePage.page.metadata.name;
+      }) || [];
+  } else {
+    selectedPageNames.value = [];
+  }
+};
+
 const handleDelete = async (singlePage: SinglePage) => {
   Dialog.warning({
     title: "是否确认删除该自定义页面？",
+    description: "此操作会将自定义页面放入回收站，后续可以从回收站恢复",
     confirmType: "danger",
     onConfirm: async () => {
       const singlePageToUpdate = cloneDeep(singlePage);
@@ -210,12 +233,65 @@ const handleDelete = async (singlePage: SinglePage) => {
   });
 };
 
+const handleDeleteInBatch = async () => {
+  Dialog.warning({
+    title: "是否确认删除选中的自定义页面？",
+    description: "此操作会将自定义页面放入回收站，后续可以从回收站恢复",
+    confirmType: "danger",
+    onConfirm: async () => {
+      await Promise.all(
+        selectedPageNames.value.map((name) => {
+          const page = singlePages.value.items.find(
+            (item) => item.page.metadata.name === name
+          )?.page;
+
+          if (!page) {
+            return Promise.resolve();
+          }
+
+          page.spec.deleted = true;
+          return apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+            {
+              name: page.metadata.name,
+              singlePage: page,
+            }
+          );
+        })
+      );
+      await handleFetchSinglePages();
+      selectedPageNames.value = [];
+    },
+  });
+};
+
 const finalStatus = (singlePage: SinglePage) => {
   if (singlePage.status?.phase) {
     return SinglePagePhase[singlePage.status.phase];
   }
   return "";
 };
+
+watch(selectedPageNames, (newValue) => {
+  checkedAll.value = newValue.length === singlePages.value.items?.length;
+});
+
+watchEffect(async () => {
+  if (
+    !selectedSinglePage.value ||
+    !selectedSinglePage.value.spec.headSnapshot
+  ) {
+    return;
+  }
+
+  const { data: content } = await apiClient.content.obtainSnapshotContent({
+    snapshotName: selectedSinglePage.value.spec.headSnapshot,
+  });
+
+  selectedSinglePageWithContent.value = {
+    page: selectedSinglePage.value,
+    content: content,
+  };
+});
 
 onMounted(handleFetchSinglePages);
 
@@ -351,15 +427,20 @@ function handleSortItemChange(sortItem?: SortItem) {
             class="mr-4 hidden items-center sm:flex"
           >
             <input
-              v-model="checkAll"
+              v-model="checkedAll"
               class="h-4 w-4 rounded border-gray-300 text-indigo-600"
               type="checkbox"
+              @change="handleCheckAllChange"
             />
           </div>
           <div class="flex w-full flex-1 items-center sm:w-auto">
-            <div v-if="!checkAll" class="flex items-center gap-2">
+            <div
+              v-if="!selectedPageNames.length"
+              class="flex items-center gap-2"
+            >
               <FormKit
                 v-model="keyword"
+                outer-class="!p-0"
                 placeholder="输入关键词搜索"
                 type="text"
                 @keyup.enter="handleFetchSinglePages"
@@ -414,8 +495,7 @@ function handleSortItemChange(sortItem?: SortItem) {
               </div>
             </div>
             <VSpace v-else>
-              <VButton type="default">设置</VButton>
-              <VButton type="danger">删除</VButton>
+              <VButton type="danger" @click="handleDeleteInBatch">删除</VButton>
             </VSpace>
           </div>
           <div class="mt-4 flex sm:mt-0">
@@ -561,13 +641,14 @@ function handleSortItemChange(sortItem?: SortItem) {
       role="list"
     >
       <li v-for="(singlePage, index) in singlePages.items" :key="index">
-        <VEntity :is-selected="checkAll">
+        <VEntity :is-selected="checkSelection(singlePage.page)">
           <template
             v-if="currentUserHasPermission(['system:singlepages:manage'])"
             #checkbox
           >
             <input
-              v-model="checkAll"
+              v-model="selectedPageNames"
+              :value="singlePage.page.metadata.name"
               class="h-4 w-4 rounded border-gray-300 text-indigo-600"
               type="checkbox"
             />
@@ -650,6 +731,11 @@ function handleSortItemChange(sortItem?: SortItem) {
                   v-tooltip="`内部成员可访问`"
                   class="cursor-pointer text-sm transition-all hover:text-blue-600"
                 />
+              </template>
+            </VEntityField>
+            <VEntityField v-if="singlePage?.page?.spec.deleted">
+              <template #description>
+                <VStatusDot v-tooltip="`删除中`" state="warning" animate />
               </template>
             </VEntityField>
             <VEntityField>

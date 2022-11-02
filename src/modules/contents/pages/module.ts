@@ -4,6 +4,7 @@ import BlankLayout from "@/layouts/BlankLayout.vue";
 import PageLayout from "./layouts/PageLayout.vue";
 import FunctionalPageList from "./FunctionalPageList.vue";
 import SinglePageList from "./SinglePageList.vue";
+import DeletedSinglePageList from "./DeletedSinglePageList.vue";
 import SinglePageEditor from "./SinglePageEditor.vue";
 import { IconPages } from "@halo-dev/components";
 import { markRaw } from "vue";
@@ -57,6 +58,22 @@ export default definePlugin({
                   component: SinglePageList,
                   meta: {
                     title: "自定义页面",
+                    searchable: true,
+                    permissions: ["system:singlepages:view"],
+                  },
+                },
+              ],
+            },
+            {
+              path: "deleted",
+              component: BasicLayout,
+              children: [
+                {
+                  path: "",
+                  name: "DeletedSinglePages",
+                  component: DeletedSinglePageList,
+                  meta: {
+                    title: "自定义页面回收站",
                     searchable: true,
                     permissions: ["system:singlepages:view"],
                   },

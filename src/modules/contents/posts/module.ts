@@ -3,6 +3,7 @@ import BasicLayout from "@/layouts/BasicLayout.vue";
 import BlankLayout from "@/layouts/BlankLayout.vue";
 import { IconBookRead } from "@halo-dev/components";
 import PostList from "./PostList.vue";
+import DeletedPostList from "./DeletedPostList.vue";
 import PostEditor from "./PostEditor.vue";
 import CategoryList from "./categories/CategoryList.vue";
 import TagList from "./tags/TagList.vue";
@@ -31,6 +32,16 @@ export default definePlugin({
               priority: 0,
               mobile: true,
             },
+          },
+        },
+        {
+          path: "deleted",
+          name: "DeletedPosts",
+          component: DeletedPostList,
+          meta: {
+            title: "文章回收站",
+            searchable: true,
+            permissions: ["system:posts:view"],
           },
         },
         {
