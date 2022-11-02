@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static run.halo.app.content.TestPost.snapshotV1;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -30,6 +31,7 @@ import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.theme.router.PermalinkIndexAddCommand;
 import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
@@ -54,12 +56,15 @@ class SinglePageReconcilerTest {
     @Mock
     private CounterService counterService;
 
+    @Mock
+    private ExternalUrlSupplier externalUrlSupplier;
+
     private SinglePageReconciler singlePageReconciler;
 
     @BeforeEach
     void setUp() {
         singlePageReconciler = new SinglePageReconciler(client, contentService, applicationContext,
-            counterService);
+            counterService, externalUrlSupplier);
     }
 
     @Test
@@ -80,6 +85,7 @@ class SinglePageReconcilerTest {
         snapshotV2.getSpec().setContributors(Set.of("guqing", "zhangsan"));
         when(contentService.listSnapshots(any()))
             .thenReturn(Flux.just(snapshotV1, snapshotV2));
+        when(externalUrlSupplier.get()).thenReturn(URI.create(""));
 
         ArgumentCaptor<SinglePage> captor = ArgumentCaptor.forClass(SinglePage.class);
         singlePageReconciler.reconcile(new Reconciler.Request(name));
@@ -93,6 +99,25 @@ class SinglePageReconcilerTest {
         verify(applicationContext, times(0)).publishEvent(isA(PermalinkIndexAddCommand.class));
         verify(applicationContext, times(1)).publishEvent(isA(PermalinkIndexDeleteCommand.class));
         verify(applicationContext, times(0)).publishEvent(isA(PermalinkIndexUpdateCommand.class));
+    }
+
+    @Test
+    void createPermalink() {
+        SinglePage page = pageV1();
+        page.getSpec().setSlug("page-slug");
+
+        when(externalUrlSupplier.get()).thenReturn(URI.create(""));
+
+        String permalink = singlePageReconciler.createPermalink(page);
+        assertThat(permalink).isEqualTo("/page-slug");
+
+        when(externalUrlSupplier.get()).thenReturn(URI.create("http://example.com"));
+        permalink = singlePageReconciler.createPermalink(page);
+        assertThat(permalink).isEqualTo("http://example.com/page-slug");
+
+        page.getSpec().setSlug("中文 slug");
+        permalink = singlePageReconciler.createPermalink(page);
+        assertThat(permalink).isEqualTo("http://example.com/%E4%B8%AD%E6%96%87%20slug");
     }
 
     public static SinglePage pageV1() {

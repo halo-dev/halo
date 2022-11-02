@@ -233,7 +233,7 @@ public class PluginReconciler implements Reconciler<Request> {
 
     void createInitialReverseProxyIfNotPresent(Plugin plugin) {
         String pluginName = plugin.getMetadata().getName();
-        String reverseProxyName = pluginName + "system-generated-reverse-proxy";
+        String reverseProxyName = initialReverseProxyName(pluginName);
         ReverseProxy reverseProxy = new ReverseProxy();
         reverseProxy.setMetadata(new Metadata());
         reverseProxy.getMetadata().setName(reverseProxyName);
@@ -258,6 +258,10 @@ public class PluginReconciler implements Reconciler<Request> {
                     client.update(reverseProxy);
                 }
             }, () -> client.create(reverseProxy));
+    }
+
+    static String initialReverseProxyName(String pluginName) {
+        return pluginName + "-system-generated-reverse-proxy";
     }
 
     private boolean isDevelopmentMode(String name) {

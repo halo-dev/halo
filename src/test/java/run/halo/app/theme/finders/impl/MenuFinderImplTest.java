@@ -90,7 +90,7 @@ class MenuFinderImplTest {
         Menu menuX = menu("X", of("G"));
         Menu menuY = menu("Y", of("F"));
 
-        MenuItem itemE = menuItem("E", of("A", "C"));
+        MenuItem itemE = menuItem("E", of("A", "C", "non-existent-children-name"));
         MenuItem itemG = menuItem("G", null);
         MenuItem itemF = menuItem("F", of("H"));
         MenuItem itemA = menuItem("A", of("B"));

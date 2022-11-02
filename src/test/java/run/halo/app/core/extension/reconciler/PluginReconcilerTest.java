@@ -10,6 +10,7 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static run.halo.app.core.extension.reconciler.PluginReconciler.initialReverseProxyName;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -203,7 +204,7 @@ class PluginReconcilerTest {
     @Test
     void createInitialReverseProxyWhenNotExistAndLogoIsPath() throws JSONException {
         Plugin plugin = need2ReconcileForStopState();
-        String reverseProxyName = plugin.getMetadata().getName() + "system-generated-reverse-proxy";
+        String reverseProxyName = initialReverseProxyName(plugin.getMetadata().getName());
         when(extensionClient.fetch(eq(ReverseProxy.class), eq(reverseProxyName)))
             .thenReturn(Optional.empty());
 
@@ -225,7 +226,7 @@ class PluginReconcilerTest {
                     "apiVersion": "plugin.halo.run/v1alpha1",
                     "kind": "ReverseProxy",
                     "metadata": {
-                        "name": "applessystem-generated-reverse-proxy",
+                        "name": "apples-system-generated-reverse-proxy",
                         "labels": {
                             "plugin.halo.run/plugin-name": "apples"
                         }
@@ -239,7 +240,7 @@ class PluginReconcilerTest {
     @Test
     void createInitialReverseProxyWhenNotExistAndLogoIsAbsolute() {
         Plugin plugin = need2ReconcileForStopState();
-        String reverseProxyName = plugin.getMetadata().getName() + "system-generated-reverse-proxy";
+        String reverseProxyName = initialReverseProxyName(plugin.getMetadata().getName());
         when(extensionClient.fetch(eq(ReverseProxy.class), eq(reverseProxyName)))
             .thenReturn(Optional.empty());
 
@@ -256,7 +257,7 @@ class PluginReconcilerTest {
         Plugin plugin = need2ReconcileForStopState();
         plugin.getSpec().setLogo("/logo.png");
 
-        String reverseProxyName = plugin.getMetadata().getName() + "system-generated-reverse-proxy";
+        String reverseProxyName = initialReverseProxyName(plugin.getMetadata().getName());
         ReverseProxy reverseProxy = new ReverseProxy();
         reverseProxy.setMetadata(new Metadata());
         reverseProxy.getMetadata().setName(reverseProxyName);

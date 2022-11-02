@@ -1,9 +1,13 @@
 package run.halo.app.content.permalinks;
 
+import static org.springframework.web.util.UriUtils.encode;
+
+import java.nio.charset.StandardCharsets;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Category;
 import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.PermalinkIndexAddCommand;
@@ -23,15 +27,23 @@ public class CategoryPermalinkPolicy
     private final ApplicationContext applicationContext;
     private final PermalinkPatternProvider permalinkPatternProvider;
 
+    private final ExternalUrlSupplier externalUrlSupplier;
+
     public CategoryPermalinkPolicy(ApplicationContext applicationContext,
-        PermalinkPatternProvider permalinkPatternProvider) {
+        PermalinkPatternProvider permalinkPatternProvider,
+        ExternalUrlSupplier externalUrlSupplier) {
         this.applicationContext = applicationContext;
         this.permalinkPatternProvider = permalinkPatternProvider;
+        this.externalUrlSupplier = externalUrlSupplier;
     }
 
     @Override
     public String permalink(Category category) {
-        return PathUtils.combinePath(pattern(), category.getSpec().getSlug());
+        String slug = encode(category.getSpec().getSlug(), StandardCharsets.UTF_8);
+        String path = PathUtils.combinePath(pattern(), slug);
+        return externalUrlSupplier.get()
+            .resolve(path)
+            .normalize().toString();
     }
 
     @Override

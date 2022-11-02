@@ -197,10 +197,11 @@ public class ExtensionConfiguration {
 
         @Bean
         Controller singlePageController(ExtensionClient client, ContentService contentService,
-            ApplicationContext applicationContext, CounterService counterService) {
+            ApplicationContext applicationContext, CounterService counterService,
+            ExternalUrlSupplier externalUrlSupplier) {
             return new ControllerBuilder("single-page-controller", client)
                 .reconciler(new SinglePageReconciler(client, contentService,
-                    applicationContext, counterService)
+                    applicationContext, counterService, externalUrlSupplier)
                 )
                 .extension(new SinglePage())
                 .build();

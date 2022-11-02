@@ -27,8 +27,8 @@ import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
+import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.JsonUtils;
-import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
 import run.halo.app.theme.router.PermalinkIndexAddCommand;
@@ -54,12 +54,16 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private final ApplicationContext applicationContext;
     private final CounterService counterService;
 
+    private final ExternalUrlSupplier externalUrlSupplier;
+
     public SinglePageReconciler(ExtensionClient client, ContentService contentService,
-        ApplicationContext applicationContext, CounterService counterService) {
+        ApplicationContext applicationContext, CounterService counterService,
+        ExternalUrlSupplier externalUrlSupplier) {
         this.client = client;
         this.contentService = contentService;
         this.applicationContext = applicationContext;
         this.counterService = counterService;
+        this.externalUrlSupplier = externalUrlSupplier;
     }
 
     @Override
@@ -69,12 +73,6 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
                 SinglePage oldPage = JsonUtils.deepCopy(singlePage);
                 if (ExtensionOperator.isDeleted(singlePage)) {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
-                    return;
-                }
-
-                if (Objects.equals(true, singlePage.getSpec().getDeleted())) {
-                    // remove permalink from permalink indexer
-                    permalinkOnDelete(singlePage);
                     return;
                 }
                 addFinalizerIfNecessary(oldPage);
@@ -159,14 +157,21 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void permalinkOnDelete(SinglePage singlePage) {
-        singlePage.getStatusOrDefault()
-            .setPermalink(PathUtils.combinePath(singlePage.getSpec().getSlug()));
         ExtensionLocator locator = new ExtensionLocator(GVK, singlePage.getMetadata().getName(),
             singlePage.getSpec().getSlug());
         applicationContext.publishEvent(new PermalinkIndexDeleteCommand(this, locator));
     }
 
+    String createPermalink(SinglePage page) {
+        var permalink = encodePath(page.getSpec().getSlug(), UTF_8);
+        permalink = StringUtils.prependIfMissing(permalink, "/");
+        return externalUrlSupplier.get().resolve(permalink).normalize().toString();
+    }
+
     private void permalinkOnAdd(SinglePage singlePage) {
+        if (!singlePage.isPublished() || Objects.equals(true, singlePage.getSpec().getDeleted())) {
+            return;
+        }
         ExtensionLocator locator = new ExtensionLocator(GVK, singlePage.getMetadata().getName(),
             singlePage.getSpec().getSlug());
         applicationContext.publishEvent(new PermalinkIndexAddCommand(this, locator,
@@ -178,13 +183,9 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
             final SinglePage oldPage = JsonUtils.deepCopy(singlePage);
             permalinkOnDelete(oldPage);
 
-            var permalink = encodePath(singlePage.getSpec().getSlug(), UTF_8);
-            permalink = StringUtils.prependIfMissing(permalink, "/");
             singlePage.getStatusOrDefault()
-                .setPermalink(permalink);
-            if (isPublished(singlePage)) {
-                permalinkOnAdd(singlePage);
-            }
+                .setPermalink(createPermalink(singlePage));
+            permalinkOnAdd(singlePage);
 
             SinglePage.SinglePageSpec spec = singlePage.getSpec();
             SinglePage.SinglePageStatus status = singlePage.getStatusOrDefault();

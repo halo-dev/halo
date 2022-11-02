@@ -1,15 +1,20 @@
 package run.halo.app.content.permalinks;
 
+import static org.springframework.web.util.UriUtils.encode;
+
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import java.util.Properties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.router.PermalinkIndexAddCommand;
@@ -29,11 +34,13 @@ public class PostPermalinkPolicy implements PermalinkPolicy<Post>, PermalinkWatc
 
     private final PermalinkPatternProvider permalinkPatternProvider;
     private final ApplicationContext applicationContext;
+    private final ExternalUrlSupplier externalUrlSupplier;
 
     public PostPermalinkPolicy(PermalinkPatternProvider permalinkPatternProvider,
-        ApplicationContext applicationContext) {
+        ApplicationContext applicationContext, ExternalUrlSupplier externalUrlSupplier) {
         this.permalinkPatternProvider = permalinkPatternProvider;
         this.applicationContext = applicationContext;
+        this.externalUrlSupplier = externalUrlSupplier;
     }
 
     @Override
@@ -53,6 +60,10 @@ public class PostPermalinkPolicy implements PermalinkPolicy<Post>, PermalinkWatc
 
     @Override
     public void onPermalinkAdd(Post post) {
+        if (!post.isPublished() || Objects.equals(true, post.getSpec().getDeleted())) {
+            return;
+        }
+        // publish when post is published and not deleted
         applicationContext.publishEvent(new PermalinkIndexAddCommand(this, getLocator(post),
             post.getStatusOrDefault().getPermalink()));
     }
@@ -80,12 +91,17 @@ public class PostPermalinkPolicy implements PermalinkPolicy<Post>, PermalinkWatc
         ZonedDateTime zonedDateTime = archiveTime.atZone(ZoneId.systemDefault());
         Properties properties = new Properties();
         properties.put("name", post.getMetadata().getName());
-        properties.put("slug", post.getSpec().getSlug());
+        properties.put("slug", encode(post.getSpec().getSlug(), StandardCharsets.UTF_8));
         properties.put("year", String.valueOf(zonedDateTime.getYear()));
         properties.put("month", NUMBER_FORMAT.format(zonedDateTime.getMonthValue()));
         properties.put("day", NUMBER_FORMAT.format(zonedDateTime.getDayOfMonth()));
 
         String simplifiedPattern = PathUtils.simplifyPathPattern(pattern);
-        return PROPERTY_PLACEHOLDER_HELPER.replacePlaceholders(simplifiedPattern, properties);
+        String permalink =
+            PROPERTY_PLACEHOLDER_HELPER.replacePlaceholders(simplifiedPattern, properties);
+        return externalUrlSupplier.get()
+            .resolve(permalink)
+            .normalize()
+            .toString();
     }
 }
