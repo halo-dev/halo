@@ -1,5 +1,7 @@
 package run.halo.app.infra.utils;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 
@@ -11,6 +13,38 @@ import org.apache.commons.lang3.StringUtils;
  */
 @UtilityClass
 public class PathUtils {
+
+    /**
+     * Every HTTP URL conforms to the syntax of a generic URI. The URI generic syntax consists of
+     * components organized hierarchically in order of decreasing significance from left to
+     * right:
+     * <pre>
+     * URI = scheme ":" ["//" authority] path ["?" query] ["#" fragment]
+     * </pre>
+     * The authority component consists of subcomponents:
+     * <pre>
+     * authority = [userinfo "@"] host [":" port]
+     * </pre>
+     * Examples of popular schemes include http, https, ftp, mailto, file, data and irc. URI
+     * schemes should be registered with the
+     * <a href="https://en.wikipedia.org/wiki/Internet_Assigned_Numbers_Authority">Internet Assigned Numbers Authority (IANA)</a>, although
+     * non-registered schemes are used in practice.
+     *
+     * @param uriString url or path
+     * @return true if the linkBase is absolute, otherwise false
+     * @see <a href="https://en.wikipedia.org/wiki/URL">URL</a>
+     */
+    public static boolean isAbsoluteUri(final String uriString) {
+        if (StringUtils.isBlank(uriString)) {
+            return false;
+        }
+        try {
+            URI uri = new URI(uriString);
+            return uri.isAbsolute();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Combine paths based on the passed in path segments parameters.

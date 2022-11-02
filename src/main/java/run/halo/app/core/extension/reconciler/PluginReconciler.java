@@ -4,22 +4,29 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
 import run.halo.app.core.extension.Plugin;
+import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.plugin.HaloPluginManager;
+import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginStartingError;
 import run.halo.app.plugin.resources.BundleResourceUtils;
 
@@ -51,6 +58,7 @@ public class PluginReconciler implements Reconciler<Request> {
                 }
                 addFinalizerIfNecessary(plugin);
                 reconcilePluginState(plugin.getMetadata().getName());
+                createInitialReverseProxyIfNotPresent(plugin);
             });
         return new Result(false, null);
     }
@@ -76,6 +84,15 @@ public class PluginReconciler implements Reconciler<Request> {
                     // load and resolve plugin
                     haloPluginManager.loadPlugin(pluginWrapper.getPluginPath());
                 }
+            }
+
+            String logo = plugin.getSpec().getLogo();
+            if (PathUtils.isAbsoluteUri(logo)) {
+                pluginStatus.setLogo(logo);
+            } else {
+                String assetsPrefix =
+                    PluginConst.assertsRoutePrefix(plugin.getMetadata().getName());
+                pluginStatus.setLogo(PathUtils.combinePath(assetsPrefix, logo));
             }
 
             if (!plugin.equals(oldPlugin)) {
@@ -212,5 +229,42 @@ public class PluginReconciler implements Reconciler<Request> {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    void createInitialReverseProxyIfNotPresent(Plugin plugin) {
+        String pluginName = plugin.getMetadata().getName();
+        String reverseProxyName = pluginName + "system-generated-reverse-proxy";
+        ReverseProxy reverseProxy = new ReverseProxy();
+        reverseProxy.setMetadata(new Metadata());
+        reverseProxy.getMetadata().setName(reverseProxyName);
+        // put label to identify this reverse
+        reverseProxy.getMetadata().setLabels(new HashMap<>());
+        reverseProxy.getMetadata().getLabels().put(PluginConst.PLUGIN_NAME_LABEL_NAME, pluginName);
+
+        reverseProxy.setRules(new ArrayList<>());
+
+        String logo = plugin.getSpec().getLogo();
+        if (StringUtils.isNotBlank(logo) && !PathUtils.isAbsoluteUri(logo)) {
+            ReverseProxy.ReverseProxyRule logoRule = new ReverseProxy.ReverseProxyRule(logo,
+                new ReverseProxy.FileReverseProxyProvider(null, logo));
+            reverseProxy.getRules().add(logoRule);
+        }
+
+        client.fetch(ReverseProxy.class, reverseProxyName)
+            .ifPresentOrElse(persisted -> {
+                if (isDevelopmentMode(pluginName)) {
+                    reverseProxy.getMetadata()
+                        .setVersion(persisted.getMetadata().getVersion());
+                    client.update(reverseProxy);
+                }
+            }, () -> client.create(reverseProxy));
+    }
+
+    private boolean isDevelopmentMode(String name) {
+        PluginWrapper pluginWrapper = haloPluginManager.getPlugin(name);
+        if (pluginWrapper == null) {
+            return false;
+        }
+        return RuntimeMode.DEVELOPMENT.equals(pluginWrapper.getRuntimeMode());
     }
 }

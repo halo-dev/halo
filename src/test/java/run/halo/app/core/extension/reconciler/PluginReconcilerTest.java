@@ -4,13 +4,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,8 +25,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
+import org.pf4j.RuntimeMode;
+import org.skyscreamer.jsonassert.JSONAssert;
 import run.halo.app.core.extension.Plugin;
+import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.plugin.HaloPluginManager;
@@ -52,8 +60,8 @@ class PluginReconcilerTest {
     void setUp() {
         pluginReconciler = new PluginReconciler(extensionClient, haloPluginManager);
 
-        when(haloPluginManager.getPlugin(any())).thenReturn(pluginWrapper);
-        when(haloPluginManager.getUnresolvedPlugins()).thenReturn(List.of());
+        lenient().when(haloPluginManager.getPlugin(any())).thenReturn(pluginWrapper);
+        lenient().when(haloPluginManager.getUnresolvedPlugins()).thenReturn(List.of());
     }
 
     @Test
@@ -66,7 +74,7 @@ class PluginReconcilerTest {
         when(pluginWrapper.getPluginState()).thenReturn(PluginState.STOPPED);
 
         ArgumentCaptor<Plugin> pluginCaptor = doReconcileWithoutRequeue();
-        verify(extensionClient, times(2)).update(any());
+        verify(extensionClient, times(3)).update(isA(Plugin.class));
 
         Plugin updateArgs = pluginCaptor.getValue();
         assertThat(updateArgs).isNotNull();
@@ -118,7 +126,7 @@ class PluginReconcilerTest {
         when(pluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
 
         ArgumentCaptor<Plugin> pluginCaptor = doReconcileWithoutRequeue();
-        verify(extensionClient, times(2)).update(any());
+        verify(extensionClient, times(3)).update(any(Plugin.class));
 
         Plugin updateArgs = pluginCaptor.getValue();
         assertThat(updateArgs).isNotNull();
@@ -153,7 +161,7 @@ class PluginReconcilerTest {
         when(pluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
 
         ArgumentCaptor<Plugin> pluginCaptor = doReconcileWithoutRequeue();
-        verify(extensionClient, times(3)).update(any());
+        verify(extensionClient, times(3)).update(any(Plugin.class));
 
         Plugin updateArgs = pluginCaptor.getValue();
         assertThat(updateArgs).isNotNull();
@@ -190,6 +198,80 @@ class PluginReconcilerTest {
             assertThat(status.getMessage()).isEqualTo("dev message");
         }).isInstanceOf(PluginRuntimeException.class)
             .hasMessage("error message");
+    }
+
+    @Test
+    void createInitialReverseProxyWhenNotExistAndLogoIsPath() throws JSONException {
+        Plugin plugin = need2ReconcileForStopState();
+        String reverseProxyName = plugin.getMetadata().getName() + "system-generated-reverse-proxy";
+        when(extensionClient.fetch(eq(ReverseProxy.class), eq(reverseProxyName)))
+            .thenReturn(Optional.empty());
+
+        plugin.getSpec().setLogo("/logo.png");
+        pluginReconciler.createInitialReverseProxyIfNotPresent(plugin);
+        ArgumentCaptor<ReverseProxy> captor = ArgumentCaptor.forClass(ReverseProxy.class);
+        verify(extensionClient, times(1)).create(captor.capture());
+        ReverseProxy value = captor.getValue();
+        JSONAssert.assertEquals("""
+                {
+                    "rules": [
+                        {
+                            "path": "/logo.png",
+                            "file": {
+                                "filename": "/logo.png"
+                            }
+                        }
+                    ],
+                    "apiVersion": "plugin.halo.run/v1alpha1",
+                    "kind": "ReverseProxy",
+                    "metadata": {
+                        "name": "applessystem-generated-reverse-proxy",
+                        "labels": {
+                            "plugin.halo.run/plugin-name": "apples"
+                        }
+                    }
+                }
+                """,
+            JsonUtils.objectToJson(value),
+            true);
+    }
+
+    @Test
+    void createInitialReverseProxyWhenNotExistAndLogoIsAbsolute() {
+        Plugin plugin = need2ReconcileForStopState();
+        String reverseProxyName = plugin.getMetadata().getName() + "system-generated-reverse-proxy";
+        when(extensionClient.fetch(eq(ReverseProxy.class), eq(reverseProxyName)))
+            .thenReturn(Optional.empty());
+
+        plugin.getSpec().setLogo("http://example.com/logo");
+        pluginReconciler.createInitialReverseProxyIfNotPresent(plugin);
+        ArgumentCaptor<ReverseProxy> captor = ArgumentCaptor.forClass(ReverseProxy.class);
+        verify(extensionClient, times(1)).create(captor.capture());
+        ReverseProxy value = captor.getValue();
+        assertThat(value.getRules()).isEmpty();
+    }
+
+    @Test
+    void createInitialReverseProxyWhenExist() {
+        Plugin plugin = need2ReconcileForStopState();
+        plugin.getSpec().setLogo("/logo.png");
+
+        String reverseProxyName = plugin.getMetadata().getName() + "system-generated-reverse-proxy";
+        ReverseProxy reverseProxy = new ReverseProxy();
+        reverseProxy.setMetadata(new Metadata());
+        reverseProxy.getMetadata().setName(reverseProxyName);
+        reverseProxy.setRules(new ArrayList<>());
+
+        when(extensionClient.fetch(eq(ReverseProxy.class), eq(reverseProxyName)))
+            .thenReturn(Optional.of(reverseProxy));
+        when(pluginWrapper.getRuntimeMode()).thenReturn(RuntimeMode.DEPLOYMENT);
+
+        pluginReconciler.createInitialReverseProxyIfNotPresent(plugin);
+        verify(extensionClient, times(0)).update(any());
+
+        when(pluginWrapper.getRuntimeMode()).thenReturn(RuntimeMode.DEVELOPMENT);
+        pluginReconciler.createInitialReverseProxyIfNotPresent(plugin);
+        verify(extensionClient, times(1)).update(any());
     }
 
     private ArgumentCaptor<Plugin> doReconcileNeedRequeue() {

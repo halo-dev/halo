@@ -1,18 +1,17 @@
 package run.halo.app.plugin.resources;
 
-import static org.mockito.Mockito.when;
-
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationContext;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.extension.Metadata;
-import run.halo.app.plugin.PluginApplicationContext;
+import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginConst;
 
 /**
@@ -25,22 +24,18 @@ import run.halo.app.plugin.PluginConst;
 class ReverseProxyRouterFunctionFactoryTest {
 
     @Mock
-    private PluginApplicationContext pluginApplicationContext;
+    private HaloPluginManager haloPluginManager;
 
+    @Mock
+    private ApplicationContext applicationContext;
+
+    @InjectMocks
     private ReverseProxyRouterFunctionFactory reverseProxyRouterFunctionFactory;
-
-    @BeforeEach
-    void setUp() {
-        reverseProxyRouterFunctionFactory =
-            new ReverseProxyRouterFunctionFactory();
-
-        when(pluginApplicationContext.getPluginId()).thenReturn("fakeA");
-    }
 
     @Test
     void create() {
         var routerFunction =
-            reverseProxyRouterFunctionFactory.create(mockReverseProxy(), pluginApplicationContext);
+            reverseProxyRouterFunctionFactory.create(mockReverseProxy(), "fakeA");
         StepVerifier.create(routerFunction)
             .expectNextCount(1)
             .verifyComplete();

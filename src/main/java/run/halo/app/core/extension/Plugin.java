@@ -112,6 +112,8 @@ public class Plugin extends AbstractExtension {
         private String entry;
 
         private String stylesheet;
+
+        private String logo;
     }
 
     @JsonIgnore

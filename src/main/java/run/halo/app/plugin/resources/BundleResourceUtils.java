@@ -76,7 +76,7 @@ public abstract class BundleResourceUtils {
     }
 
     @Nullable
-    private static DefaultResourceLoader getResourceLoader(HaloPluginManager pluginManager,
+    public static DefaultResourceLoader getResourceLoader(HaloPluginManager pluginManager,
         String pluginName) {
         Assert.notNull(pluginManager, "Plugin manager must not be null");
         PluginWrapper plugin = pluginManager.getPlugin(pluginName);
