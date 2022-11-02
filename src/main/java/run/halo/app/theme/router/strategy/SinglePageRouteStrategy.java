@@ -1,5 +1,6 @@
 package run.halo.app.theme.router.strategy;
 
+import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFunction;
@@ -13,6 +14,7 @@ import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.SinglePageFinder;
 import run.halo.app.theme.finders.vo.SinglePageVo;
+import run.halo.app.theme.router.ViewNameResolver;
 
 /**
  * The {@link SinglePageRouteStrategy} for generate {@link HandlerFunction} specific to the template
@@ -25,9 +27,12 @@ import run.halo.app.theme.finders.vo.SinglePageVo;
 public class SinglePageRouteStrategy implements DetailsPageRouteHandlerStrategy {
     private final GroupVersionKind gvk = GroupVersionKind.fromExtension(SinglePage.class);
     private final SinglePageFinder singlePageFinder;
+    private final ViewNameResolver viewNameResolver;
 
-    public SinglePageRouteStrategy(SinglePageFinder singlePageFinder) {
+    public SinglePageRouteStrategy(SinglePageFinder singlePageFinder,
+        ViewNameResolver viewNameResolver) {
         this.singlePageFinder = singlePageFinder;
+        this.viewNameResolver = viewNameResolver;
     }
 
     private String getPlural() {
@@ -36,22 +41,27 @@ public class SinglePageRouteStrategy implements DetailsPageRouteHandlerStrategy 
     }
 
     private Mono<SinglePageVo> singlePageByName(String name) {
-        return Mono.defer(() -> Mono.just(singlePageFinder.getByName(name)))
-            .publishOn(Schedulers.boundedElastic());
+        return Mono.fromCallable(() -> singlePageFinder.getByName(name))
+            .subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
     public HandlerFunction<ServerResponse> getHandler(SystemSetting.ThemeRouteRules routeRules,
         String name) {
-        return request -> ServerResponse.ok()
-            .render(DefaultTemplateEnum.SINGLE_PAGE.getValue(),
-                Map.of("name", name,
-                    "groupVersionKind", gvk,
-                    "plural", getPlural(),
-                    "singlePage", singlePageByName(name),
-                    ModelConst.TEMPLATE_ID, DefaultTemplateEnum.SINGLE_PAGE.getValue()
-                )
-            );
+        return request -> {
+            Map<String, Object> model = new HashMap<>();
+            model.put("groupVersionKind", gvk);
+            model.put("plural", getPlural());
+            model.put(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.SINGLE_PAGE.getValue());
+
+            return singlePageByName(name).flatMap(singlePageVo -> {
+                model.put("singlePage", singlePageVo);
+                String template = singlePageVo.getSpec().getTemplate();
+                return viewNameResolver.resolveViewNameOrDefault(request, template,
+                        DefaultTemplateEnum.SINGLE_PAGE.getValue())
+                    .flatMap(viewName -> ServerResponse.ok().render(viewName, model));
+            });
+        };
     }
 
     @Override

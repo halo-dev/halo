@@ -15,6 +15,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.extension.ListResult;
+import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.PostFinder;
 
 /**
@@ -28,6 +29,9 @@ class CategoryRouteStrategyTest extends RouterStrategyTestSuite {
 
     @Mock
     private PostFinder postFinder;
+
+    @Mock
+    private CategoryFinder categoryFinder;
 
     @InjectMocks
     private CategoryRouteStrategy categoryRouteStrategy;

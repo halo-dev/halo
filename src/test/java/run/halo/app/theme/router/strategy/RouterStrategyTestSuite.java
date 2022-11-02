@@ -3,7 +3,6 @@ package run.halo.app.theme.router.strategy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.when;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -51,7 +50,7 @@ abstract class RouterStrategyTestSuite {
         lenient().when(environmentFetcher.fetch(eq(SystemSetting.ThemeRouteRules.GROUP),
             eq(SystemSetting.ThemeRouteRules.class))).thenReturn(Mono.just(getThemeRouteRules()));
         lenient().when(haloProperties.getExternalUrl()).thenReturn(new URI("http://example.com"));
-        when(viewResolver.resolveViewName(any(), any()))
+        lenient().when(viewResolver.resolveViewName(any(), any()))
             .thenReturn(Mono.just(new EmptyView()));
         setUp();
     }
