@@ -1,5 +1,5 @@
-import type { DirectiveBinding } from "vue";
 import { createApp } from "vue";
+import type { DirectiveBinding } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
 import router from "./router";
@@ -17,6 +17,7 @@ import type { User } from "@halo-dev/api-client";
 import { hasPermission } from "@/utils/permission";
 import { useRoleStore } from "@/stores/role";
 import type { RouteRecordRaw } from "vue-router";
+import { useThemeStore } from "./stores/theme";
 
 const app = createApp(App);
 
@@ -175,9 +176,12 @@ async function loadPluginModules() {
   }
 }
 
+let currentUser: User | undefined = undefined;
+
 async function loadCurrentUser() {
   const { data: user } = await apiClient.user.getCurrentUserDetail();
   app.provide<User>("currentUser", user);
+  currentUser = user;
 
   const { data: currentPermissions } = await apiClient.user.getPermissions({
     name: "-",
@@ -204,6 +208,11 @@ async function loadCurrentUser() {
   );
 }
 
+async function loadActivatedTheme() {
+  const themeStore = useThemeStore();
+  await themeStore.fetchActivatedTheme();
+}
+
 (async function () {
   await initApp();
 })();
@@ -218,13 +227,19 @@ async function initApp() {
   try {
     loadCoreModules();
 
+    await loadCurrentUser();
+
+    if (!currentUser) {
+      return;
+    }
+
+    await loadActivatedTheme();
+
     try {
       await loadPluginModules();
     } catch (e) {
       console.error("Failed to load plugins", e);
     }
-
-    await loadCurrentUser();
   } catch (e) {
     console.error(e);
   } finally {

@@ -15,6 +15,7 @@ import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 import { v4 as uuid } from "uuid";
+import { useThemeCustomTemplates } from "@/modules/interface/themes/composables/use-theme";
 
 const props = withDefaults(
   defineProps<{
@@ -116,6 +117,9 @@ watch(
     }
   }
 );
+
+// custom templates
+const { templates } = useThemeCustomTemplates("category");
 </script>
 <template>
   <VModal
@@ -146,6 +150,13 @@ watch(
         label="别名"
         type="text"
         validation="required"
+      ></FormKit>
+      <FormKit
+        v-model="formState.spec.template"
+        :options="templates"
+        label="自定义模板"
+        type="select"
+        name="template"
       ></FormKit>
       <FormKit
         v-model="formState.spec.cover"

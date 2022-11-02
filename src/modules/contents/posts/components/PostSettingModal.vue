@@ -5,6 +5,7 @@ import type { PostRequest } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { v4 as uuid } from "uuid";
+import { useThemeCustomTemplates } from "@/modules/interface/themes/composables/use-theme";
 
 const initialFormState: PostRequest = {
   post: {
@@ -163,6 +164,9 @@ watchEffect(() => {
     formState.value = cloneDeep(props.post);
   }
 });
+
+// custom templates
+const { templates } = useThemeCustomTemplates("post");
 </script>
 <template>
   <VModal
@@ -277,9 +281,10 @@ watchEffect(() => {
           ></FormKit>
           <FormKit
             v-model="formState.post.spec.template"
+            :options="templates"
             label="自定义模板"
             name="template"
-            type="text"
+            type="select"
           ></FormKit>
           <FormKit
             v-model="formState.post.spec.cover"

@@ -24,6 +24,8 @@ import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
 import { onBeforeRouteLeave } from "vue-router";
+import { useThemeStore } from "@/stores/theme";
+import { storeToRefs } from "pinia";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -31,12 +33,10 @@ const props = withDefaults(
   defineProps<{
     visible: boolean;
     selectedTheme: Theme | null;
-    activatedTheme: Theme | null;
   }>(),
   {
     visible: false,
     selectedTheme: null,
-    activatedTheme: null,
   }
 );
 
@@ -57,6 +57,8 @@ const refreshInterval = ref();
 const modalTitle = computed(() => {
   return activeTab.value === "installed" ? "已安装的主题" : "未安装的主题";
 });
+
+const { activatedTheme } = storeToRefs(useThemeStore());
 
 const handleFetchThemes = async () => {
   try {

@@ -5,6 +5,7 @@ import type { SinglePageRequest } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { v4 as uuid } from "uuid";
+import { useThemeCustomTemplates } from "@/modules/interface/themes/composables/use-theme";
 
 const initialFormState: SinglePageRequest = {
   page: {
@@ -160,6 +161,9 @@ watchEffect(() => {
     formState.value = cloneDeep(props.singlePage);
   }
 });
+
+// custom templates
+const { templates } = useThemeCustomTemplates("page");
 </script>
 
 <template>
@@ -265,8 +269,9 @@ watchEffect(() => {
           ></FormKit>
           <FormKit
             v-model="formState.page.spec.template"
+            :options="templates"
             label="自定义模板"
-            type="text"
+            type="select"
             name="template"
           ></FormKit>
           <FormKit

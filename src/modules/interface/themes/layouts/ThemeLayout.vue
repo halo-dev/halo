@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { nextTick, type ComputedRef, type Ref } from "vue";
+import { nextTick, onMounted, type ComputedRef, type Ref } from "vue";
 import { computed, provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -28,6 +28,8 @@ import {
 import ThemeListModal from "../components/ThemeListModal.vue";
 import type { SettingForm, Theme } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
+import { useThemeStore } from "@/stores/theme";
+import { storeToRefs } from "pinia";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -55,7 +57,7 @@ const selectedTheme = ref<Theme | undefined>();
 const themesModal = ref(false);
 const activeTab = ref("");
 
-const { loading, isActivated, activatedTheme, handleActiveTheme } =
+const { loading, isActivated, handleActiveTheme } =
   useThemeLifeCycle(selectedTheme);
 
 const settingName = computed(() => selectedTheme.value?.spec.settingName);
@@ -143,11 +145,18 @@ const handleTriggerTabChange = () => {
 watch([() => route.name, () => route.params], async () => {
   handleTriggerTabChange();
 });
+
+onMounted(() => {
+  const themeStore = useThemeStore();
+
+  const { activatedTheme } = storeToRefs(themeStore);
+
+  selectedTheme.value = activatedTheme?.value;
+});
 </script>
 <template>
   <BasicLayout>
     <ThemeListModal
-      v-model:activated-theme="activatedTheme"
       v-model:selected-theme="selectedTheme"
       v-model:visible="themesModal"
     />
