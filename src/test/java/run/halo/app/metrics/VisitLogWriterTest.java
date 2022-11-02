@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,29 +49,5 @@ class VisitLogWriterTest {
         assertThat(visitLogWriter.isStarted()).isFalse();
         visitLogWriter.start();
         assertThat(visitLogWriter.isStarted()).isTrue();
-    }
-
-    @Test
-    void log() throws IOException, InterruptedException {
-        visitLogWriter.start();
-        Path logPath = workDir.resolve(visitLogWriter.getLogFilePath());
-        List<String> logs = Files.readAllLines(logPath);
-        assertThat(logs.size()).isEqualTo(0);
-
-        for (int i = 0; i < 5; i++) {
-            visitLogWriter.log("log-" + i);
-        }
-
-        logs = Files.readAllLines(logPath);
-        assertThat(logs.size()).isEqualTo(0);
-
-        for (int i = 5; i < 10; i++) {
-            visitLogWriter.log("log-" + i);
-        }
-        // wait for flush
-        Thread.sleep(1000);
-
-        logs = Files.readAllLines(logPath);
-        assertThat(logs.size()).isEqualTo(10);
     }
 }

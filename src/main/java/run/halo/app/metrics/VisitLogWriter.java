@@ -12,7 +12,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.DisposableBean;
@@ -106,7 +105,6 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
     static class AsyncLogWriter implements Disposable {
         private static final int MAX_LOG_SIZE = 10000;
         private static final int BATCH_SIZE = 10;
-        private final ReentrantLock lock = new ReentrantLock();
         private final BufferedOutputStream writer;
         private final Queue<String> logQueue;
         private final AtomicInteger logBatch = new AtomicInteger(0);
@@ -126,22 +124,16 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
         }
 
         public void writeLog() throws InterruptedException {
-            lock.lockInterruptibly();
-            try {
-                if (logQueue.isEmpty()) {
-                    return;
-                }
-                String logMessage = logQueue.poll();
-                writeToDisk(logMessage);
-                log.debug("Consumption visit log message: [{}]", logMessage);
-            } finally {
-                lock.unlock();
+            if (logQueue.isEmpty()) {
+                return;
             }
+            String logMessage = logQueue.poll();
+            writeToDisk(logMessage);
+            log.debug("Consumption visit log message: [{}]", logMessage);
         }
 
         void writeToDisk(String logMsg) throws InterruptedException {
             String format = String.format("%s %s\n", Instant.now(), logMsg);
-            lock.lockInterruptibly();
             try {
                 writer.write(format.getBytes(), 0, format.length());
                 int size = logBatch.incrementAndGet();
@@ -151,20 +143,13 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
                 }
             } catch (IOException e) {
                 log.warn("Record access log failure: ", ExceptionUtils.getRootCause(e));
-            } finally {
-                lock.unlock();
             }
         }
 
         public void put(String logMessage) throws InterruptedException {
-            lock.lockInterruptibly();
-            try {
-                // add log message to queue tail
-                logQueue.add(logMessage);
-                log.info("Production a log messages [{}]", logMessage);
-            } finally {
-                lock.unlock();
-            }
+            // add log message to queue tail
+            logQueue.add(logMessage);
+            log.info("Production a log messages [{}]", logMessage);
         }
 
         @Override
