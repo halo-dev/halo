@@ -67,8 +67,10 @@ public class SiteSettingVo {
             .favicon(basicSetting.getFavicon())
             .allowRegistration(userSetting.getAllowRegistration())
             .post(PostSetting.builder()
-                .sortOrder(postSetting.getSortOrder())
-                .pageSize(postSetting.getPageSize())
+                .postPageSize(postSetting.getPostPageSize())
+                .archivePageSize(postSetting.getArchivePageSize())
+                .categoryPageSize(postSetting.getCategoryPageSize())
+                .tagPageSize(postSetting.getTagPageSize())
                 .build())
             .seo(SeoSetting.builder()
                 .blockSpiders(seoSetting.getBlockSpiders())
@@ -94,9 +96,13 @@ public class SiteSettingVo {
     @Value
     @Builder
     public static class PostSetting {
-        String sortOrder;
+        Integer postPageSize;
 
-        Integer pageSize;
+        Integer archivePageSize;
+
+        Integer categoryPageSize;
+
+        Integer tagPageSize;
     }
 
     @Value

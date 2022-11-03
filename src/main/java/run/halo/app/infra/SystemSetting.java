@@ -59,8 +59,10 @@ public class SystemSetting {
     @Data
     public static class Post {
         public static final String GROUP = "post";
-        String sortOrder;
-        Integer pageSize;
+        Integer postPageSize;
+        Integer archivePageSize;
+        Integer categoryPageSize;
+        Integer tagPageSize;
         Boolean review;
     }
 

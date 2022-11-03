@@ -2,6 +2,7 @@ package run.halo.app.theme.router.strategy;
 
 import java.util.List;
 import java.util.Map;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFunction;
@@ -20,12 +21,9 @@ import run.halo.app.theme.finders.vo.CategoryTreeVo;
  * @since 2.0.0
  */
 @Component
+@AllArgsConstructor
 public class CategoriesRouteStrategy implements ListPageRouteHandlerStrategy {
     private final CategoryFinder categoryFinder;
-
-    public CategoriesRouteStrategy(CategoryFinder categoryFinder) {
-        this.categoryFinder = categoryFinder;
-    }
 
     private Mono<List<CategoryTreeVo>> categories() {
         return Mono.defer(() -> Mono.just(categoryFinder.listAsTree()))
