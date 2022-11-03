@@ -100,20 +100,23 @@ const onVisibleChange = (visible: boolean) => {
         >
           <dt class="text-sm font-medium text-gray-900">预览</dt>
           <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-            <LazyImage
+            <div
               v-if="isImage(attachment?.spec.mediaType)"
-              :alt="attachment?.spec.displayName"
-              :src="attachment?.status?.permalink"
-              class="max-w-full cursor-pointer rounded sm:max-w-[50%]"
               @click="onlyPreview = !onlyPreview"
             >
-              <template #loading>
-                <span class="text-gray-400">加载中...</span>
-              </template>
-              <template #error>
-                <span class="text-red-400">加载异常</span>
-              </template>
-            </LazyImage>
+              <LazyImage
+                :alt="attachment?.spec.displayName"
+                :src="attachment?.status?.permalink"
+                classes="max-w-full cursor-pointer rounded sm:max-w-[50%]"
+              >
+                <template #loading>
+                  <span class="text-gray-400">加载中...</span>
+                </template>
+                <template #error>
+                  <span class="text-red-400">加载异常</span>
+                </template>
+              </LazyImage>
+            </div>
             <span v-else> 此文件不支持预览 </span>
           </dd>
         </div>

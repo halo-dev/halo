@@ -118,7 +118,7 @@ await handleFetchAttachments();
             :key="attachment.metadata.name"
             :alt="attachment.spec.displayName"
             :src="attachment.status?.permalink"
-            class="pointer-events-none object-cover group-hover:opacity-75"
+            classes="pointer-events-none object-cover group-hover:opacity-75"
           >
             <template #loading>
               <div class="flex h-full items-center justify-center object-cover">
