@@ -7,16 +7,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
+import reactor.core.Disposable;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
 
@@ -33,10 +34,12 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
     private static final String LOG_FILE_LOCATION = "logs";
     private final AsyncLogWriter asyncLogWriter;
     private volatile boolean interruptThread = false;
+    private volatile boolean started = false;
+    private final ExecutorService executorService;
 
     private final Path logFilePath;
 
-    private VisitLogWriter(HaloProperties haloProperties) throws IOException {
+    public VisitLogWriter(HaloProperties haloProperties) throws IOException {
         Path logsPath = haloProperties.getWorkDir()
             .resolve(LOG_FILE_LOCATION);
         if (!Files.exists(logsPath)) {
@@ -44,10 +47,15 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
         }
         this.logFilePath = logsPath.resolve(LOG_FILE_NAME);
         this.asyncLogWriter = new AsyncLogWriter(logFilePath);
+        this.executorService = Executors.newFixedThreadPool(1);
     }
 
-    public synchronized void log(String logMsg) {
-        asyncLogWriter.put(logMsg);
+    public void log(String logMsg) {
+        try {
+            asyncLogWriter.put(logMsg);
+        } catch (InterruptedException e) {
+            log.error("Failed to log visit log: {}", ExceptionUtils.getStackTrace(e));
+        }
     }
 
     public Path getLogFilePath() {
@@ -55,13 +63,22 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
     }
 
     void start() {
+        if (started) {
+            return;
+        }
         log.debug("Starting write visit log...");
-        Thread thread = new Thread(() -> {
-            while (!interruptThread) {
-                asyncLogWriter.writeLog();
+        this.started = true;
+        executorService.submit(() -> {
+            while (!interruptThread && !Thread.currentThread().isInterrupted()) {
+                try {
+                    asyncLogWriter.writeLog();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    log.info("VisitLogWrite thread [{}] interrupted",
+                        Thread.currentThread().getName());
+                }
             }
-        }, "visits-log-writer");
-        thread.start();
+        });
     }
 
     @Override
@@ -69,21 +86,29 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
         start();
     }
 
-    @Override
-    public void destroy() throws Exception {
-        asyncLogWriter.close();
-        interruptThread = true;
+    public boolean isStarted() {
+        return started;
     }
 
-    static class AsyncLogWriter {
+    public long queuedSize() {
+        return asyncLogWriter.logQueue.size();
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        this.started = false;
+        interruptThread = true;
+        asyncLogWriter.dispose();
+        executorService.shutdown();
+    }
+
+    static class AsyncLogWriter implements Disposable {
         private static final int MAX_LOG_SIZE = 10000;
         private static final int BATCH_SIZE = 10;
-        private final ReentrantLock lock = new ReentrantLock();
-        private final Condition fullCondition = lock.newCondition();
-        private final Condition emptyCondition = lock.newCondition();
         private final BufferedOutputStream writer;
-        private final Deque<String> logQueue;
+        private final Queue<String> logQueue;
         private final AtomicInteger logBatch = new AtomicInteger(0);
+        private volatile boolean disposed = false;
 
         public AsyncLogWriter(Path logFilePath) {
             OutputStream outputStream;
@@ -95,33 +120,20 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
                 throw new RuntimeException(e);
             }
             this.writer = new BufferedOutputStream(outputStream);
-            this.logQueue = new ArrayDeque<>();
+            this.logQueue = new LinkedBlockingDeque<>(MAX_LOG_SIZE);
         }
 
-        public void writeLog() {
-            lock.lock();
-            try {
-                // queue is empty, wait for new log
-                while (logQueue.isEmpty()) {
-                    try {
-                        emptyCondition.await();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                String logMessage = logQueue.poll();
-                writeToDisk(logMessage);
-                log.debug("Consumption visit log message: [{}]", logMessage);
-                // signal log producer
-                fullCondition.signal();
-            } finally {
-                lock.unlock();
+        public void writeLog() throws InterruptedException {
+            if (logQueue.isEmpty()) {
+                return;
             }
+            String logMessage = logQueue.poll();
+            writeToDisk(logMessage);
+            log.debug("Consumption visit log message: [{}]", logMessage);
         }
 
-        void writeToDisk(String logMsg) {
+        void writeToDisk(String logMsg) throws InterruptedException {
             String format = String.format("%s %s\n", Instant.now(), logMsg);
-            lock.lock();
             try {
                 writer.write(format.getBytes(), 0, format.length());
                 int size = logBatch.incrementAndGet();
@@ -131,33 +143,18 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
                 }
             } catch (IOException e) {
                 log.warn("Record access log failure: ", ExceptionUtils.getRootCause(e));
-            } finally {
-                lock.unlock();
             }
         }
 
-        public void put(String logMessage) {
-            lock.lock();
-            try {
-                while (logQueue.size() == MAX_LOG_SIZE) {
-                    try {
-                        log.debug("Queue full, producer thread waiting...");
-                        fullCondition.await();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                // add log message to queue tail
-                logQueue.add(logMessage);
-                log.info("Production a log messages [{}]", logMessage);
-                // signal consumer thread
-                emptyCondition.signal();
-            } finally {
-                lock.unlock();
-            }
+        public void put(String logMessage) throws InterruptedException {
+            // add log message to queue tail
+            logQueue.add(logMessage);
+            log.info("Production a log messages [{}]", logMessage);
         }
 
-        public void close() {
+        @Override
+        public void dispose() {
+            this.disposed = true;
             if (writer != null) {
                 try {
                     writer.flush();
@@ -166,6 +163,11 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
                 }
                 FileUtils.closeQuietly(writer);
             }
+        }
+
+        @Override
+        public boolean isDisposed() {
+            return this.disposed;
         }
     }
 }
