@@ -149,7 +149,7 @@ watch([() => route.name, () => route.params], () => {
       <template #icon>
         <VAvatar
           v-if="plugin"
-          :src="plugin.spec.logo"
+          :src="plugin.status?.logo"
           :alt="plugin.spec.displayName"
           class="mr-2"
           size="sm"

@@ -105,7 +105,7 @@ const handleBuildSearchIndex = () => {
           fuse.add({
             title: plugin.spec.displayName as string,
             icon: {
-              src: plugin.spec.logo as string,
+              src: plugin.status?.logo as string,
             },
             group: "插件",
             route: {

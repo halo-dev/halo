@@ -53,7 +53,7 @@ const onUpgradeModalClose = () => {
         <template #description>
           <VAvatar
             :alt="plugin?.spec.displayName"
-            :src="plugin?.spec.logo"
+            :src="plugin?.status?.logo"
             size="md"
           ></VAvatar>
         </template>
