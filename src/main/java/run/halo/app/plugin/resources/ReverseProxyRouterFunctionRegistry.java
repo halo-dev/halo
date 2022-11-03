@@ -12,8 +12,6 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.ReverseProxy;
-import run.halo.app.plugin.ExtensionContextRegistry;
-import run.halo.app.plugin.PluginApplicationContext;
 
 /**
  * A registry for {@link RouterFunction} of plugin.
@@ -48,11 +46,7 @@ public class ReverseProxyRouterFunctionRegistry {
         long stamp = lock.writeLock();
         try {
             pluginIdReverseProxyMap.put(pluginId, proxyName);
-
-            // Obtain plugin application context
-            PluginApplicationContext pluginApplicationContext =
-                ExtensionContextRegistry.getInstance().getByPluginId(pluginId);
-            return reverseProxyRouterFunctionFactory.create(reverseProxy, pluginApplicationContext)
+            return reverseProxyRouterFunctionFactory.create(reverseProxy, pluginId)
                 .map(routerFunction -> {
                     proxyNameRouterFunctionRegistry.put(proxyName, routerFunction);
                     return routerFunction;
