@@ -1,9 +1,10 @@
 package run.halo.app.theme;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.lenient;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ class ThemeLinkBuilderTest {
     @BeforeEach
     void setUp() {
         // Mock external url supplier
-        when(externalUrlSupplier.get()).thenReturn(URI.create(""));
+        lenient().when(externalUrlSupplier.get()).thenReturn(URI.create(""));
     }
 
     @Test
@@ -98,24 +99,28 @@ class ThemeLinkBuilderTest {
     }
 
     @Test
-    void linkInSite() {
-        when(externalUrlSupplier.get()).thenReturn(URI.create(""));
+    void linkInSite() throws URISyntaxException {
+        URI uri = new URI("");
         // relative link is always in site
-        assertThat(ThemeLinkBuilder.linkInSite(externalUrlSupplier.get(), "/post")).isTrue();
+        assertThat(ThemeLinkBuilder.linkInSite(uri, "/post")).isTrue();
 
         // absolute link is not in site
-        assertThat(ThemeLinkBuilder.linkInSite(externalUrlSupplier.get(), "https://example.com")).isFalse();
+        assertThat(ThemeLinkBuilder.linkInSite(uri, "https://example.com")).isFalse();
 
-        when(externalUrlSupplier.get()).thenReturn(URI.create("http://example.com"));
+        uri = new URI("https://example.com");
         // link in externalUrl is in site link
-        assertThat(ThemeLinkBuilder.linkInSite(externalUrlSupplier.get(), "http://example.com/hello/world")).isTrue();
+        assertThat(ThemeLinkBuilder.linkInSite(uri, "http://example.com/hello/world")).isTrue();
         // scheme is different but authority is same
-        assertThat(ThemeLinkBuilder.linkInSite(externalUrlSupplier.get(), "https://example.com/hello/world")).isTrue();
+        assertThat(ThemeLinkBuilder.linkInSite(uri, "https://example.com/hello/world")).isTrue();
 
         // scheme is same and authority is different
-        assertThat(ThemeLinkBuilder.linkInSite(externalUrlSupplier.get(), "http://halo.run/hello/world")).isFalse();
+        assertThat(ThemeLinkBuilder.linkInSite(uri, "http://halo.run/hello/world")).isFalse();
         // scheme is different and authority is different
-        assertThat(ThemeLinkBuilder.linkInSite(externalUrlSupplier.get(), "https://halo.run/hello/world")).isFalse();
+        assertThat(ThemeLinkBuilder.linkInSite(uri, "https://halo.run/hello/world")).isFalse();
+
+        // port is different
+        uri = new URI("http://localhost:8090");
+        assertThat(ThemeLinkBuilder.linkInSite(uri, "http://localhost:3000")).isFalse();
     }
 
     private ThemeContext getTheme(boolean isActive) {
