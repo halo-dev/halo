@@ -10,10 +10,12 @@ import {
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
 import { ref, watch } from "vue";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
 import { v4 as uuid } from "uuid";
 import { formatDatetime } from "@/utils/date";
-import { useFetchAttachmentPolicy } from "../composables/use-attachment-policy";
+import {
+  useFetchAttachmentPolicy,
+  useFetchAttachmentPolicyTemplate,
+} from "../composables/use-attachment-policy";
 
 const props = withDefaults(
   defineProps<{
@@ -30,21 +32,14 @@ const emit = defineEmits<{
 }>();
 
 const { policies, loading, handleFetchPolicies } = useFetchAttachmentPolicy();
+const { policyTemplates, handleFetchPolicyTemplates } =
+  useFetchAttachmentPolicyTemplate({
+    fetchOnMounted: false,
+  });
 
-const selectedPolicy = ref<Policy | null>(null);
-const policyTemplates = ref<PolicyTemplate[]>([] as PolicyTemplate[]);
+const selectedPolicy = ref<Policy>();
 
 const policyEditingModal = ref(false);
-
-const handleFetchPolicyTemplates = async () => {
-  try {
-    const { data } =
-      await apiClient.extension.storage.policyTemplate.liststorageHaloRunV1alpha1PolicyTemplate();
-    policyTemplates.value = data.items;
-  } catch (e) {
-    console.error("Failed to fetch attachment policy templates", e);
-  }
-};
 
 function onVisibleChange(visible: boolean) {
   emit("update:visible", visible);
@@ -79,14 +74,14 @@ const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
 };
 
 const onEditingModalClose = () => {
-  selectedPolicy.value = null;
+  selectedPolicy.value = undefined;
   handleFetchPolicies();
 };
 
 watch(
   () => props.visible,
-  (newValue) => {
-    if (newValue) {
+  (visible) => {
+    if (visible) {
       handleFetchPolicyTemplates();
       handleFetchPolicies();
     }

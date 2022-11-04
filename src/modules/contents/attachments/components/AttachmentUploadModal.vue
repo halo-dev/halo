@@ -1,16 +1,14 @@
 <script lang="ts" setup>
-import {
-  VModal,
-  VEmpty,
-  IconAddCircle,
-  VButton,
-  VSpace,
-} from "@halo-dev/components";
+import { VModal, IconAddCircle, VAlert } from "@halo-dev/components";
 import UppyUpload from "@/components/upload/UppyUpload.vue";
 import { computed, ref, watch, watchEffect } from "vue";
-import type { Policy, Group } from "@halo-dev/api-client";
-import { useFetchAttachmentPolicy } from "../composables/use-attachment-policy";
-import AttachmentPoliciesModal from "./AttachmentPoliciesModal.vue";
+import type { Policy, Group, PolicyTemplate } from "@halo-dev/api-client";
+import {
+  useFetchAttachmentPolicy,
+  useFetchAttachmentPolicyTemplate,
+} from "../composables/use-attachment-policy";
+import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
+import { v4 as uuid } from "uuid";
 
 const props = withDefaults(
   defineProps<{
@@ -28,15 +26,19 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const { policies, loading, handleFetchPolicies } = useFetchAttachmentPolicy();
+const { policies, handleFetchPolicies } = useFetchAttachmentPolicy({
+  fetchOnMounted: false,
+});
+const { policyTemplates, handleFetchPolicyTemplates } =
+  useFetchAttachmentPolicyTemplate();
 
-const selectedPolicy = ref<Policy | null>(null);
-const policyVisible = ref(false);
+const selectedPolicy = ref<Policy>();
 const uploadVisible = ref(false);
+const policyEditingModal = ref(false);
 
 const modalTitle = computed(() => {
   if (props.group && props.group.metadata.name) {
-    return `上传附件：${props.group.spec.displayName}`;
+    return `上传附件到分组：${props.group.spec.displayName}`;
   }
   return "上传附件";
 });
@@ -47,11 +49,36 @@ watchEffect(() => {
   }
 });
 
+const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
+  selectedPolicy.value = {
+    spec: {
+      displayName: "",
+      templateRef: {
+        name: policyTemplate.metadata.name,
+      },
+      configMapRef: {
+        name: uuid(),
+      },
+    },
+    apiVersion: "storage.halo.run/v1alpha1",
+    kind: "Policy",
+    metadata: {
+      name: uuid(),
+    },
+  };
+  policyEditingModal.value = true;
+};
+
+const onEditingModalClose = async () => {
+  await handleFetchPolicies();
+  selectedPolicy.value = policies.value[0];
+};
+
 const onVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
     emit("close");
-    policyVisible.value = false;
+    policyEditingModal.value = false;
   }
 };
 
@@ -60,6 +87,7 @@ watch(
   (newValue) => {
     if (newValue) {
       handleFetchPolicies();
+      handleFetchPolicyTemplates();
       uploadVisible.value = true;
     } else {
       const uploadVisibleTimer = setTimeout(() => {
@@ -74,28 +102,11 @@ watch(
   <VModal
     :body-class="['!p-0']"
     :visible="visible"
-    :width="600"
+    :width="650"
     :title="modalTitle"
     @update:visible="onVisibleChange"
   >
-    <VEmpty
-      v-if="!policies.length && !loading"
-      message="当前没有上传附件的存储策略，请先创建存储策略"
-      title="无存储策略"
-    >
-      <template #actions>
-        <VSpace>
-          <VButton @click="handleFetchPolicies">刷新</VButton>
-          <VButton type="secondary" @click="policyVisible = true">
-            <template #icon>
-              <IconAddCircle class="h-full w-full" />
-            </template>
-            新建策略
-          </VButton>
-        </VSpace>
-      </template>
-    </VEmpty>
-    <div v-else class="w-full p-4">
+    <div class="w-full p-4">
       <div class="mb-2">
         <span class="text-sm text-gray-900">选择存储策略：</span>
       </div>
@@ -119,15 +130,41 @@ watch(
             </span>
           </div>
         </div>
-        <div
-          class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
-          @click="policyVisible = true"
-        >
-          <div class="flex flex-1 items-center truncate">
-            <span class="truncate text-sm">新建策略</span>
+
+        <FloatingDropdown>
+          <div
+            class="flex h-full cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
+          >
+            <div class="flex flex-1 items-center truncate">
+              <span class="truncate text-sm">新建策略</span>
+            </div>
+            <IconAddCircle />
           </div>
-          <IconAddCircle />
-        </div>
+          <template #popper>
+            <div class="w-72 p-4">
+              <ul class="space-y-1">
+                <li
+                  v-for="(policyTemplate, index) in policyTemplates"
+                  :key="index"
+                  v-close-popper
+                  class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  @click="handleOpenCreateNewPolicyModal(policyTemplate)"
+                >
+                  <span class="truncate">
+                    {{ policyTemplate.spec?.displayName }}
+                  </span>
+                </li>
+              </ul>
+            </div>
+          </template>
+        </FloatingDropdown>
+      </div>
+      <div v-if="policies.length <= 0" class="mb-3">
+        <VAlert
+          title="没有存储策略"
+          description="在上传之前，需要新建一个存储策略"
+          :closable="false"
+        />
       </div>
       <UppyUpload
         v-if="uploadVisible"
@@ -143,8 +180,9 @@ watch(
     </div>
   </VModal>
 
-  <AttachmentPoliciesModal
-    v-model:visible="policyVisible"
-    @close="handleFetchPolicies"
+  <AttachmentPolicyEditingModal
+    v-model:visible="policyEditingModal"
+    :policy="selectedPolicy"
+    @close="onEditingModalClose"
   />
 </template>

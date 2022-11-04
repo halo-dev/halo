@@ -52,6 +52,18 @@ const onVisibleChange = (visible: boolean) => {
   }
 };
 
+const onChangeProvider = (providerId: string) => {
+  const provider = attachmentSelectorPublicState.value.providers.find(
+    (provider) => provider.id === providerId
+  );
+
+  if (!provider) {
+    return;
+  }
+
+  activeId.value = providerId;
+};
+
 const handleConfirm = () => {
   emit("select", Array.from(selected.value));
   onVisibleChange(false);
@@ -69,7 +81,7 @@ const handleConfirm = () => {
     <VTabbar
       v-model:active-id="activeId"
       :items="attachmentSelectorPublicState.providers"
-      class="w-full !rounded-none"
+      class="w-full"
       type="outline"
     ></VTabbar>
 
@@ -83,6 +95,7 @@ const handleConfirm = () => {
             :is="provider.component"
             v-if="activeId === provider.id"
             v-model:selected="selected"
+            @change-provider="onChangeProvider"
           ></component>
           <template #fallback> 加载中 </template>
         </Suspense>

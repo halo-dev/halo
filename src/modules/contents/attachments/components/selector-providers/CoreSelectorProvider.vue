@@ -34,6 +34,7 @@ withDefaults(
 
 const emit = defineEmits<{
   (event: "update:selected", attachments: AttachmentLike[]): void;
+  (event: "change-provider", providerId: string): void;
 }>();
 
 const selectedGroup = ref<Group>();
@@ -85,7 +86,7 @@ await handleFetchAttachments();
     <template #actions>
       <VSpace>
         <VButton @click="handleFetchAttachments">刷新</VButton>
-        <VButton type="secondary" @click="uploadVisible = true">
+        <VButton type="secondary" @click="emit('change-provider', 'upload')">
           <template #icon>
             <IconUpload class="h-full w-full" />
           </template>

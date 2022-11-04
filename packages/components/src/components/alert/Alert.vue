@@ -95,7 +95,7 @@ const handleClose = () => {
       mr-3
       flex-1
       font-medium
-      text-base;
+      text-sm;
     }
 
     .alert-close {
@@ -113,7 +113,7 @@ const handleClose = () => {
   }
 
   .alert-description {
-    @apply text-sm
+    @apply text-xs
     mt-2;
   }
 
