@@ -11,6 +11,7 @@ import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.spring6.ISpringWebFluxTemplateEngine;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
+import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.dialect.HaloProcessorDialect;
 import run.halo.app.theme.engine.SpringWebFluxTemplateEngine;
@@ -38,14 +39,18 @@ public class TemplateEngineManager {
 
     private final ThymeleafProperties thymeleafProperties;
 
+    private final ExternalUrlSupplier externalUrlSupplier;
+
     private final ObjectProvider<ITemplateResolver> templateResolvers;
 
     private final ObjectProvider<IDialect> dialects;
 
     public TemplateEngineManager(ThymeleafProperties thymeleafProperties,
+        ExternalUrlSupplier externalUrlSupplier,
         ObjectProvider<ITemplateResolver> templateResolvers,
         ObjectProvider<IDialect> dialects) {
         this.thymeleafProperties = thymeleafProperties;
+        this.externalUrlSupplier = externalUrlSupplier;
         this.templateResolvers = templateResolvers;
         this.dialects = dialects;
         engineCache = new ConcurrentLruCache<>(CACHE_SIZE_LIMIT, this::templateEngineGenerator);
@@ -74,7 +79,7 @@ public class TemplateEngineManager {
         var engine = new SpringWebFluxTemplateEngine();
         engine.setEnableSpringELCompiler(thymeleafProperties.isEnableSpringElCompiler());
         engine.setMessageResolver(new ThemeMessageResolver(theme));
-        engine.setLinkBuilder(new ThemeLinkBuilder(theme));
+        engine.setLinkBuilder(new ThemeLinkBuilder(theme, externalUrlSupplier));
         engine.setRenderHiddenMarkersBeforeCheckboxes(
             thymeleafProperties.isRenderHiddenMarkersBeforeCheckboxes());
 

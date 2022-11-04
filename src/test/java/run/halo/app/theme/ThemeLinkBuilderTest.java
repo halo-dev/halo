@@ -1,9 +1,16 @@
 package run.halo.app.theme;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+import java.net.URI;
 import java.nio.file.Paths;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import run.halo.app.infra.ExternalUrlSupplier;
 
 /**
  * Tests for {@link ThemeLinkBuilder}.
@@ -11,12 +18,21 @@ import org.junit.jupiter.api.Test;
  * @author guqing
  * @since 2.0.0
  */
+@ExtendWith(MockitoExtension.class)
 class ThemeLinkBuilderTest {
-    private ThemeLinkBuilder themeLinkBuilder;
+    @Mock
+    private ExternalUrlSupplier externalUrlSupplier;
+
+    @BeforeEach
+    void setUp() {
+        // Mock external url supplier
+        when(externalUrlSupplier.get()).thenReturn(URI.create(""));
+    }
 
     @Test
     void processTemplateLinkWithNoActive() {
-        themeLinkBuilder = new ThemeLinkBuilder(getTheme(false));
+        ThemeLinkBuilder themeLinkBuilder =
+            new ThemeLinkBuilder(getTheme(false), externalUrlSupplier);
 
         String link = "/post";
         String processed = themeLinkBuilder.processLink(null, link);
@@ -28,7 +44,8 @@ class ThemeLinkBuilderTest {
 
     @Test
     void processTemplateLinkWithActive() {
-        themeLinkBuilder = new ThemeLinkBuilder(getTheme(true));
+        ThemeLinkBuilder themeLinkBuilder =
+            new ThemeLinkBuilder(getTheme(true), externalUrlSupplier);
 
         String link = "/post";
         String processed = themeLinkBuilder.processLink(null, link);
@@ -38,7 +55,8 @@ class ThemeLinkBuilderTest {
     @Test
     void processAssetsLink() {
         // activated theme
-        themeLinkBuilder = new ThemeLinkBuilder(getTheme(true));
+        ThemeLinkBuilder themeLinkBuilder =
+            new ThemeLinkBuilder(getTheme(true), externalUrlSupplier);
 
         String link = "/assets/css/style.css";
         String processed = themeLinkBuilder.processLink(null, link);
@@ -53,7 +71,8 @@ class ThemeLinkBuilderTest {
 
     @Test
     void processNullLink() {
-        themeLinkBuilder = new ThemeLinkBuilder(getTheme(false));
+        ThemeLinkBuilder themeLinkBuilder =
+            new ThemeLinkBuilder(getTheme(false), externalUrlSupplier);
 
         String link = null;
         String processed = themeLinkBuilder.processLink(null, link);
@@ -67,7 +86,8 @@ class ThemeLinkBuilderTest {
 
     @Test
     void processAbsoluteLink() {
-        themeLinkBuilder = new ThemeLinkBuilder(getTheme(false));
+        ThemeLinkBuilder themeLinkBuilder =
+            new ThemeLinkBuilder(getTheme(false), externalUrlSupplier);
         String link = "https://github.com/halo-dev";
         String processed = themeLinkBuilder.processLink(null, link);
         assertThat(processed).isEqualTo(link);
@@ -75,10 +95,27 @@ class ThemeLinkBuilderTest {
         link = "http://example.com";
         processed = themeLinkBuilder.processLink(null, link);
         assertThat(processed).isEqualTo(link);
+    }
 
-        link = "//example.com";
-        processed = themeLinkBuilder.processLink(null, link);
-        assertThat(processed).isEqualTo(link);
+    @Test
+    void linkInSite() {
+        when(externalUrlSupplier.get()).thenReturn(URI.create(""));
+        // relative link is always in site
+        assertThat(ThemeLinkBuilder.linkInSite(externalUrlSupplier.get(), "/post")).isTrue();
+
+        // absolute link is not in site
+        assertThat(ThemeLinkBuilder.linkInSite(externalUrlSupplier.get(), "https://example.com")).isFalse();
+
+        when(externalUrlSupplier.get()).thenReturn(URI.create("http://example.com"));
+        // link in externalUrl is in site link
+        assertThat(ThemeLinkBuilder.linkInSite(externalUrlSupplier.get(), "http://example.com/hello/world")).isTrue();
+        // scheme is different but authority is same
+        assertThat(ThemeLinkBuilder.linkInSite(externalUrlSupplier.get(), "https://example.com/hello/world")).isTrue();
+
+        // scheme is same and authority is different
+        assertThat(ThemeLinkBuilder.linkInSite(externalUrlSupplier.get(), "http://halo.run/hello/world")).isFalse();
+        // scheme is different and authority is different
+        assertThat(ThemeLinkBuilder.linkInSite(externalUrlSupplier.get(), "https://halo.run/hello/world")).isFalse();
     }
 
     private ThemeContext getTheme(boolean isActive) {
