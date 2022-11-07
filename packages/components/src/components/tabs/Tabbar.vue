@@ -60,18 +60,45 @@ const handleChange = (id: number | string) => {
   .tabbar-items {
     @apply flex
     items-center
-    flex-row;
+    flex-row
+    overflow-x-auto
+    py-0.5;
+
+    &::-webkit-scrollbar-track-piece {
+      background-color: #f8f8f8;
+      -webkit-border-radius: 2em;
+      -moz-border-radius: 2em;
+      border-radius: 2em;
+    }
+
+    &::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #ddd;
+      background-clip: padding-box;
+      -webkit-border-radius: 2em;
+      -moz-border-radius: 2em;
+      border-radius: 2em;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: #bbb;
+    }
   }
 
   .tabbar-item {
-    @apply flex
+    @apply inline-flex
     cursor-pointer
     self-center
     transition-all
     text-sm
     justify-center
     gap-2
-    h-9;
+    h-9
+    whitespace-nowrap;
 
     .tabbar-item-label,
     .tabbar-item-icon {
@@ -126,7 +153,8 @@ const handleChange = (id: number | string) => {
   }
 
   &.tabbar-outline {
-    @apply p-1
+    @apply px-1
+    py-0.5
     bg-gray-100
     rounded-base;
 

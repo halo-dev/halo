@@ -26,6 +26,7 @@ import {
   VTabbar,
 } from "@halo-dev/components";
 import ThemeListModal from "../components/ThemeListModal.vue";
+import ThemePreviewModal from "../components/preview/ThemePreviewModal.vue";
 import type { SettingForm, Theme } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import { useThemeStore } from "@/stores/theme";
@@ -53,8 +54,9 @@ const initialTabs: ThemeTab[] = [
 ];
 
 const tabs = ref<ThemeTab[]>(cloneDeep(initialTabs));
-const selectedTheme = ref<Theme | undefined>();
+const selectedTheme = ref<Theme>();
 const themesModal = ref(false);
+const previewModal = ref(false);
 const activeTab = ref("");
 
 const { loading, isActivated, handleActiveTheme } =
@@ -181,15 +183,11 @@ onMounted(() => {
           >
             启用
           </VButton>
-          <VButton
-            v-if="false"
-            :route="{ name: 'ThemeVisual' }"
-            type="secondary"
-          >
+          <VButton type="secondary" size="sm" @click="previewModal = true">
             <template #icon>
               <IconEye class="h-full w-full" />
             </template>
-            可视化编辑
+            预览
           </VButton>
         </VSpace>
       </template>
@@ -242,5 +240,7 @@ onMounted(() => {
         </div>
       </div>
     </div>
+
+    <ThemePreviewModal v-model:visible="previewModal" :theme="selectedTheme" />
   </BasicLayout>
 </template>

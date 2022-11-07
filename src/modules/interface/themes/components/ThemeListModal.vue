@@ -2,8 +2,6 @@
 import {
   IconAddCircle,
   IconGitHub,
-  IconArrowLeft,
-  IconArrowRight,
   Dialog,
   VButton,
   VEmpty,
@@ -17,7 +15,7 @@ import {
   VTabs,
 } from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
-import UrlPreviewModal from "@/components/preview/UrlPreviewModal.vue";
+import ThemePreviewModal from "./preview/ThemePreviewModal.vue";
 import ThemeUploadModal from "./ThemeUploadModal.vue";
 import { computed, ref, watch } from "vue";
 import type { Theme } from "@halo-dev/api-client";
@@ -32,18 +30,18 @@ const { currentUserHasPermission } = usePermission();
 const props = withDefaults(
   defineProps<{
     visible: boolean;
-    selectedTheme: Theme | null;
+    selectedTheme?: Theme;
   }>(),
   {
     visible: false,
-    selectedTheme: null,
+    selectedTheme: undefined,
   }
 );
 
 const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
-  (event: "update:selectedTheme", theme: Theme | null): void;
+  (event: "update:selectedTheme", theme?: Theme): void;
   (event: "select", theme: Theme | null): void;
 }>();
 
@@ -193,48 +191,12 @@ defineExpose({
   handleFetchThemes,
 });
 
-const preview = ref(false);
+const previewVisible = ref(false);
 const selectedPreviewTheme = ref<Theme>();
-
-const previewUrl = computed(() => {
-  if (!selectedPreviewTheme.value) {
-    return "";
-  }
-  return `${import.meta.env.VITE_API_URL}/?preview-theme=${
-    selectedPreviewTheme.value.metadata.name
-  }`;
-});
-
-const previewModalTitle = computed(() => {
-  if (!selectedPreviewTheme.value) {
-    return "";
-  }
-  return `预览主题：${selectedPreviewTheme.value.spec.displayName}`;
-});
 
 const handleOpenPreview = (theme: Theme) => {
   selectedPreviewTheme.value = theme;
-  preview.value = true;
-};
-
-const handleSelectPreviousPreviewTheme = async () => {
-  const index = themes.value.findIndex(
-    (theme) => theme.metadata.name === selectedPreviewTheme.value?.metadata.name
-  );
-  if (index > 0) {
-    selectedPreviewTheme.value = themes.value[index - 1];
-    return;
-  }
-};
-
-const handleSelectNextPreviewTheme = () => {
-  const index = themes.value.findIndex(
-    (theme) => theme.metadata.name === selectedPreviewTheme.value?.metadata.name
-  );
-  if (index < themes.value.length - 1) {
-    selectedPreviewTheme.value = themes.value[index + 1];
-    return;
-  }
+  previewVisible.value = true;
 };
 </script>
 <template>
@@ -526,18 +488,9 @@ const handleSelectNextPreviewTheme = () => {
     @close="handleFetchThemes"
   />
 
-  <UrlPreviewModal
-    v-model:visible="preview"
-    :title="previewModalTitle"
-    :url="previewUrl"
-  >
-    <template #actions>
-      <span @click="handleSelectPreviousPreviewTheme">
-        <IconArrowLeft />
-      </span>
-      <span @click="handleSelectNextPreviewTheme">
-        <IconArrowRight />
-      </span>
-    </template>
-  </UrlPreviewModal>
+  <ThemePreviewModal
+    v-if="visible"
+    v-model:visible="previewVisible"
+    :theme="selectedPreviewTheme"
+  />
 </template>

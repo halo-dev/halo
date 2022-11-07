@@ -7,86 +7,113 @@ import {
   IconPlug,
   IconUserSettings,
   IconPalette,
+  IconWindowLine,
   VCard,
   IconUserLine,
 } from "@halo-dev/components";
-import { inject, markRaw, type Component } from "vue";
+import { inject, markRaw, ref, type Component } from "vue";
 import { useRouter } from "vue-router";
-import type { RouteLocationRaw } from "vue-router";
 import type { User } from "@halo-dev/api-client";
+import ThemePreviewModal from "@/modules/interface/themes/components/preview/ThemePreviewModal.vue";
 
 interface Action {
   icon: Component;
   title: string;
-  route: RouteLocationRaw;
+  action: () => void;
   permissions?: string[];
 }
 
 const currentUser = inject<User>("currentUser");
 
+const router = useRouter();
+
+const themePreviewVisible = ref(false);
+
 const actions: Action[] = [
   {
     icon: markRaw(IconUserLine),
     title: "个人资料",
-    route: { name: "UserDetail", params: { name: currentUser?.metadata.name } },
+    action: () => {
+      router.push({
+        name: "UserDetail",
+        params: { name: currentUser?.metadata.name },
+      });
+    },
+  },
+  {
+    icon: markRaw(IconWindowLine),
+    title: "查看站点",
+    action: () => {
+      themePreviewVisible.value = true;
+    },
   },
   {
     icon: markRaw(IconBookRead),
     title: "创建文章",
-    route: {
-      name: "PostEditor",
+    action: () => {
+      router.push({
+        name: "PostEditor",
+      });
     },
     permissions: ["system:posts:manage"],
   },
   {
     icon: markRaw(IconPages),
     title: "创建页面",
-    route: {
-      name: "SinglePageEditor",
+    action: () => {
+      router.push({
+        name: "SinglePageEditor",
+      });
     },
     permissions: ["system:singlepages:manage"],
   },
   {
     icon: markRaw(IconFolder),
     title: "附件上传",
-    route: {
-      name: "Attachments",
-      query: {
-        action: "upload",
-      },
+    action: () => {
+      router.push({
+        name: "Attachments",
+        query: {
+          action: "upload",
+        },
+      });
     },
     permissions: ["system:attachments:manage"],
   },
   {
     icon: markRaw(IconPalette),
     title: "主题管理",
-    route: {
-      name: "ThemeDetail",
+    action: () => {
+      router.push({
+        name: "ThemeDetail",
+      });
     },
     permissions: ["system:themes:view"],
   },
   {
     icon: markRaw(IconPlug),
     title: "插件管理",
-    route: {
-      name: "Plugins",
+    action: () => {
+      router.push({
+        name: "Plugins",
+      });
     },
     permissions: ["system:plugins:view"],
   },
   {
     icon: markRaw(IconUserSettings),
     title: "新建用户",
-    route: {
-      name: "Users",
-      query: {
-        action: "create",
-      },
+    action: () => {
+      router.push({
+        name: "Users",
+        query: {
+          action: "create",
+        },
+      });
     },
     permissions: ["system:users:manage"],
   },
 ];
-
-const router = useRouter();
 </script>
 <template>
   <VCard
@@ -100,7 +127,7 @@ const router = useRouter();
         :key="index"
         v-permission="action.permissions"
         class="group relative cursor-pointer bg-white p-6 transition-all hover:bg-gray-50"
-        @click="router.push(action.route)"
+        @click="action.action"
       >
         <div>
           <span
@@ -124,4 +151,5 @@ const router = useRouter();
       </div>
     </div>
   </VCard>
+  <ThemePreviewModal v-model:visible="themePreviewVisible" title="查看站点" />
 </template>

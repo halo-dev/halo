@@ -103,6 +103,9 @@ watch(
           <div v-if="$slots.header || title" class="modal-header group">
             <slot name="header">
               <div class="modal-header-title">{{ title }}</div>
+              <div v-if="$slots.center" class="modal-header-center">
+                <slot name="center"></slot>
+              </div>
               <div class="modal-header-actions">
                 <slot name="actions"></slot>
                 <span class="bg-gray-50" @click="handleClose()">
