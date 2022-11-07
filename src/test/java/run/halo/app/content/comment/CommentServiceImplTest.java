@@ -244,6 +244,7 @@ class CommentServiceImplTest {
                 "page": 1,
                 "size": 10,
                 "total": 3,
+                "totalPages": 1,
                 "items": [
                     {
                         "comment": {
