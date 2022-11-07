@@ -79,4 +79,10 @@ public class SystemSetting {
         Boolean requireReviewForNew;
         Boolean systemUserOnly;
     }
+
+    @Data
+    public static class Menu {
+        public static final String GROUP = "menu";
+        public String primary;
+    }
 }
