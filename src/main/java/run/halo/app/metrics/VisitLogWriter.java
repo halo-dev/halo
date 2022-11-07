@@ -7,12 +7,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.Instant;
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
@@ -51,11 +52,7 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
     }
 
     public void log(String logMsg) {
-        try {
-            asyncLogWriter.put(logMsg);
-        } catch (InterruptedException e) {
-            log.error("Failed to log visit log: {}", ExceptionUtils.getStackTrace(e));
-        }
+        asyncLogWriter.put(logMsg);
     }
 
     public Path getLogFilePath() {
@@ -74,7 +71,7 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
                     asyncLogWriter.writeLog();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
-                    log.info("VisitLogWrite thread [{}] interrupted",
+                    log.warn("VisitLogWrite thread [{}] interrupted",
                         Thread.currentThread().getName());
                 }
             }
@@ -106,7 +103,7 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
         private static final int MAX_LOG_SIZE = 10000;
         private static final int BATCH_SIZE = 10;
         private final BufferedOutputStream writer;
-        private final Queue<String> logQueue;
+        private final BlockingQueue<String> logQueue;
         private final AtomicInteger logBatch = new AtomicInteger(0);
         private volatile boolean disposed = false;
 
@@ -124,15 +121,15 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
         }
 
         public void writeLog() throws InterruptedException {
-            if (logQueue.isEmpty()) {
+            String logMessage = logQueue.take();
+            if (StringUtils.isBlank(logMessage)) {
                 return;
             }
-            String logMessage = logQueue.poll();
             writeToDisk(logMessage);
             log.debug("Consumption visit log message: [{}]", logMessage);
         }
 
-        void writeToDisk(String logMsg) throws InterruptedException {
+        void writeToDisk(String logMsg) {
             String format = String.format("%s %s\n", Instant.now(), logMsg);
             try {
                 writer.write(format.getBytes(), 0, format.length());
@@ -146,10 +143,10 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
             }
         }
 
-        public void put(String logMessage) throws InterruptedException {
+        public void put(String logMessage) {
             // add log message to queue tail
             logQueue.add(logMessage);
-            log.info("Production a log messages [{}]", logMessage);
+            log.debug("Production a log messages [{}]", logMessage);
         }
 
         @Override
