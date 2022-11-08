@@ -23,22 +23,34 @@ spec:
     - group: post
       label: 文章设置
       formSchema:
-        - $formkit: select
-          label: "列表排序方式"
-          name: sortOrder
-          value: "publishTime"
-          options:
-            visitCount: "浏览量"
-            publishTime: "发布时间"
-            updateTime: "更新时间"
-          validation: required
         - $formkit: number
-          label: "列表显示条数"
-          name: pageSize
+          label: "文章列表显示条数"
+          name: postPageSize
           value: 10
           min: 1
           max: 100
-          validation: required
+          validation: required | max:100
+        - $formkit: number
+          label: "归档页文章显示条数"
+          name: archivePageSize
+          value: 10
+          min: 1
+          max: 100
+          validation: required | max:100
+        - $formkit: number
+          label: "分类页文章显示条数"
+          name: categoryPageSize
+          value: 10
+          min: 1
+          max: 100
+          validation: required | max:100
+        - $formkit: number
+          label: "标签页文章显示条数"
+          name: tagPageSize
+          value: 10
+          min: 1
+          max: 100
+          validation: required | max:100
         - $formkit: checkbox
           label: "新文章审核"
           value: false

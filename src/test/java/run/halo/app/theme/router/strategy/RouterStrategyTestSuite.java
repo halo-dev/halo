@@ -47,6 +47,8 @@ abstract class RouterStrategyTestSuite {
 
     @BeforeEach
     final void setUpParent() throws URISyntaxException {
+        lenient().when(environmentFetcher.fetchPost())
+            .thenReturn(Mono.just(new SystemSetting.Post()));
         lenient().when(environmentFetcher.fetch(eq(SystemSetting.ThemeRouteRules.GROUP),
             eq(SystemSetting.ThemeRouteRules.class))).thenReturn(Mono.just(getThemeRouteRules()));
         lenient().when(haloProperties.getExternalUrl()).thenReturn(new URI("http://example.com"));

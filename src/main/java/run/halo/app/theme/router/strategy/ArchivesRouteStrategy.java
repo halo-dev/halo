@@ -1,7 +1,9 @@
 package run.halo.app.theme.router.strategy;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.theme.router.PageUrlUtils.pageNum;
 import static run.halo.app.theme.router.PageUrlUtils.totalPage;
+import static run.halo.app.theme.router.strategy.ModelConst.DEFAULT_PAGE_SIZE;
 
 import java.util.List;
 import java.util.Map;
@@ -12,6 +14,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import run.halo.app.extension.ListResult;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
@@ -29,22 +33,31 @@ import run.halo.app.theme.router.UrlContextListResult;
 @Component
 public class ArchivesRouteStrategy implements ListPageRouteHandlerStrategy {
     private final PostFinder postFinder;
+    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
-    public ArchivesRouteStrategy(PostFinder postFinder) {
+    public ArchivesRouteStrategy(PostFinder postFinder,
+        SystemConfigurableEnvironmentFetcher environmentFetcher) {
         this.postFinder = postFinder;
+        this.environmentFetcher = environmentFetcher;
     }
 
     private Mono<UrlContextListResult<PostArchiveVo>> postList(ServerRequest request) {
         String year = pathVariable(request, "year");
         String month = pathVariable(request, "month");
         String path = request.path();
-        return Mono.defer(() -> Mono.just(postFinder.archives(pageNum(request), 10, year, month)))
-            .publishOn(Schedulers.boundedElastic())
+        return environmentFetcher.fetchPost()
+            .map(postSetting -> defaultIfNull(postSetting.getArchivePageSize(), DEFAULT_PAGE_SIZE))
+            .flatMap(pageSize -> listPost(pageNum(request), pageSize, year, month))
             .map(list -> new UrlContextListResult.Builder<PostArchiveVo>()
                 .listResult(list)
                 .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
                 .prevUrl(PageUrlUtils.prevPageUrl(path))
                 .build());
+    }
+
+    Mono<ListResult<PostArchiveVo>> listPost(int pageNum, int pageSize, String year, String month) {
+        return Mono.fromCallable(() -> postFinder.archives(pageNum, pageSize, year, month))
+            .subscribeOn(Schedulers.boundedElastic());
     }
 
     private String pathVariable(ServerRequest request, String name) {
