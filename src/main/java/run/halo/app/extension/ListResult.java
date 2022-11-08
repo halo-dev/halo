@@ -1,5 +1,7 @@
 package run.halo.app.extension;
 
+import static run.halo.app.infra.utils.GenericClassUtils.generateConcreteClass;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -115,15 +117,8 @@ public class ListResult<T> implements Streamable<T> {
      * @return generic ListResult class.
      */
     public static <T> Class<?> generateGenericClass(Class<T> type) {
-        var generic =
-            TypeDescription.Generic.Builder.parameterizedType(ListResult.class, type)
-                .build();
-        return new ByteBuddy()
-            .subclass(generic)
-            .name(type.getSimpleName() + "List")
-            .make()
-            .load(ListResult.class.getClassLoader())
-            .getLoaded();
+        return generateConcreteClass(ListResult.class, type,
+            () -> type.getSimpleName() + "List");
     }
 
     public static <T> ListResult<T> emptyResult() {

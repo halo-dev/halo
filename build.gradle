@@ -62,6 +62,12 @@ dependencies {
     implementation 'org.openapi4j:openapi-schema-validator:1.0.7'
     implementation "net.bytebuddy:byte-buddy"
 
+    // Apache Lucene
+    implementation 'org.apache.lucene:lucene-core:9.4.1'
+    implementation 'org.apache.lucene:lucene-queryparser:9.4.1'
+    implementation 'org.apache.lucene:lucene-highlighter:9.4.1'
+    implementation 'cn.shenyanchao.ik-analyzer:ik-analyzer:9.0.0'
+
     implementation "org.apache.commons:commons-lang3:$commonsLang3"
     implementation "io.seruco.encoding:base62:$base62"
     implementation "org.pf4j:pf4j:$pf4j"

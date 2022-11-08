@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -43,6 +44,10 @@ public class Unstructured implements Extension {
 
     public Unstructured(Map data) {
         this.data = data;
+    }
+
+    public Map getData() {
+        return Collections.unmodifiableMap(data);
     }
 
     @Override
@@ -161,7 +166,7 @@ public class Unstructured implements Extension {
         data.put("metadata", metadataMap);
     }
 
-    static Optional<Object> getNestedValue(Map map, String... fields) {
+    public static Optional<Object> getNestedValue(Map map, String... fields) {
         if (fields == null || fields.length == 0) {
             return Optional.of(map);
         }
@@ -177,11 +182,11 @@ public class Unstructured implements Extension {
     }
 
     @SuppressWarnings("unchecked")
-    static Optional<List<String>> getNestedStringList(Map map, String... fields) {
+    public static Optional<List<String>> getNestedStringList(Map map, String... fields) {
         return getNestedValue(map, fields).map(value -> (List<String>) value);
     }
 
-    static Optional<Set<String>> getNestedStringSet(Map map, String... fields) {
+    public static Optional<Set<String>> getNestedStringSet(Map map, String... fields) {
         return getNestedValue(map, fields).map(value -> {
             if (value instanceof Collection collection) {
                 return new LinkedHashSet<>(collection);
@@ -192,7 +197,7 @@ public class Unstructured implements Extension {
     }
 
     @SuppressWarnings("unchecked")
-    static void setNestedValue(Map map, Object value, String... fields) {
+    public static void setNestedValue(Map map, Object value, String... fields) {
         if (fields == null || fields.length == 0) {
             // do nothing when no fields provided
             return;
@@ -205,12 +210,12 @@ public class Unstructured implements Extension {
         });
     }
 
-    static Optional<Map> getNestedMap(Map map, String... fields) {
+    public static Optional<Map> getNestedMap(Map map, String... fields) {
         return getNestedValue(map, fields).map(value -> (Map) value);
     }
 
     @SuppressWarnings("unchecked")
-    static Optional<Map<String, String>> getNestedStringStringMap(Map map, String... fields) {
+    public static Optional<Map<String, String>> getNestedStringStringMap(Map map, String... fields) {
         return getNestedValue(map, fields)
             .map(labelsObj -> {
                 var labels = (Map) labelsObj;
@@ -220,7 +225,7 @@ public class Unstructured implements Extension {
             });
     }
 
-    static Optional<Instant> getNestedInstant(Map map, String... fields) {
+    public static Optional<Instant> getNestedInstant(Map map, String... fields) {
         return getNestedValue(map, fields)
             .map(instantValue -> {
                 if (instantValue instanceof Instant instant) {
@@ -231,7 +236,7 @@ public class Unstructured implements Extension {
 
     }
 
-    static Optional<Long> getNestedLong(Map map, String... fields) {
+    public static Optional<Long> getNestedLong(Map map, String... fields) {
         return getNestedValue(map, fields)
             .map(longObj -> {
                 if (longObj instanceof Long l) {
