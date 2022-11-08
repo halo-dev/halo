@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GVK;
 import run.halo.app.infra.Condition;
 
@@ -31,9 +32,9 @@ public class Post extends AbstractExtension {
     public static final String CATEGORIES_ANNO = "content.halo.run/categories";
     public static final String TAGS_ANNO = "content.halo.run/tags";
     public static final String DELETED_LABEL = "content.halo.run/deleted";
+    public static final String PUBLISHED_LABEL = "content.halo.run/published";
     public static final String OWNER_LABEL = "content.halo.run/owner";
     public static final String VISIBLE_LABEL = "content.halo.run/visible";
-    public static final String PHASE_LABEL = "content.halo.run/phase";
 
     public static final String ARCHIVE_YEAR_LABEL = "content.halo.run/archive-year";
 
@@ -61,7 +62,8 @@ public class Post extends AbstractExtension {
 
     @JsonIgnore
     public boolean isPublished() {
-        return Objects.equals(true, spec.getPublished());
+        Map<String, String> labels = getMetadata().getLabels();
+        return labels != null && labels.getOrDefault(PUBLISHED_LABEL, "false").equals("true");
     }
 
     @Data
@@ -91,7 +93,7 @@ public class Post extends AbstractExtension {
         private Boolean deleted;
 
         @Schema(required = true, defaultValue = "false")
-        private Boolean published;
+        private Boolean publish;
 
         private Instant publishTime;
 
@@ -138,6 +140,8 @@ public class Post extends AbstractExtension {
 
         private List<String> contributors;
 
+        private List<String> releasedSnapshots;
+
         @JsonIgnore
         public List<Condition> getConditionsOrDefault() {
             if (this.conditions == null) {
@@ -159,7 +163,9 @@ public class Post extends AbstractExtension {
     public enum PostPhase {
         DRAFT,
         PENDING_APPROVAL,
-        PUBLISHED;
+        PENDING,
+        PUBLISHED,
+        FAILED;
 
         /**
          * Convert string value to {@link PostPhase}.
@@ -251,5 +257,10 @@ public class Post extends AbstractExtension {
                 return compactPost;
             }
         }
+    }
+
+    public static void changePublishedState(Post post, boolean value) {
+        Map<String, String> labels = ExtensionUtil.nullSafeLabels(post);
+        labels.put(PUBLISHED_LABEL, String.valueOf(value));
     }
 }

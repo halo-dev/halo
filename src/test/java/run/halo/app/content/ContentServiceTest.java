@@ -11,6 +11,7 @@ import static run.halo.app.content.TestPost.snapshotV2;
 import static run.halo.app.content.TestPost.snapshotV3;
 
 import java.time.Instant;
+import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +26,7 @@ import run.halo.app.content.impl.ContentServiceImpl;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.Ref;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -50,20 +52,23 @@ class ContentServiceTest {
     @Test
     void draftContent() {
         Snapshot snapshotV1 = snapshotV1();
-        Snapshot.SubjectRef subjectRef = Snapshot.SubjectRef.of(Post.KIND, "test-post");
-        snapshotV1.getSpec().setSubjectRef(subjectRef);
+        Ref ref = postRef("test-post");
+        snapshotV1.getSpec().setSubjectRef(ref);
 
         ContentRequest contentRequest =
-            new ContentRequest(subjectRef, null,
+            new ContentRequest(ref, null,
                 snapshotV1.getSpec().getRawPatch(),
                 snapshotV1.getSpec().getContentPatch(),
                 snapshotV1.getSpec().getRawType());
 
         pilingBaseSnapshot(snapshotV1);
-
-        ContentWrapper contentWrapper =
-            new ContentWrapper("snapshot-A", contentRequest.raw(),
-                contentRequest.content(), snapshotV1.getSpec().getRawType());
+        ContentWrapper contentWrapper = ContentWrapper.builder()
+            .snapshotName("snapshot-A")
+            .version(1)
+            .raw(contentRequest.raw())
+            .content(contentRequest.content())
+            .rawType(snapshotV1.getSpec().getRawType())
+            .build();
 
         ArgumentCaptor<Snapshot> captor = ArgumentCaptor.forClass(Snapshot.class);
         when(client.create(any())).thenReturn(Mono.just(snapshotV1));
@@ -77,7 +82,7 @@ class ContentServiceTest {
         Snapshot snapshot = captor.getValue();
 
         snapshotV1.getMetadata().setName(snapshot.getMetadata().getName());
-        snapshotV1.getSpec().setSubjectRef(subjectRef);
+        snapshotV1.getSpec().setSubjectRef(ref);
         assertThat(snapshot).isEqualTo(snapshotV1);
     }
 
@@ -85,14 +90,14 @@ class ContentServiceTest {
     void updateContent() {
         String headSnapshot = "snapshot-A";
         Snapshot snapshotV1 = snapshotV1();
-        Snapshot.SubjectRef subjectRef = Snapshot.SubjectRef.of(Post.KIND, "test-post");
+        Ref ref = postRef("test-post");
 
         Snapshot updated = snapshotV1();
         updated.getSpec().setRawPatch("hello");
         updated.getSpec().setContentPatch("<p>hello</p>");
-        updated.getSpec().setSubjectRef(subjectRef);
+        updated.getSpec().setSubjectRef(ref);
         ContentRequest contentRequest =
-            new ContentRequest(subjectRef, headSnapshot,
+            new ContentRequest(ref, headSnapshot,
                 snapshotV1.getSpec().getRawPatch(),
                 snapshotV1.getSpec().getContentPatch(),
                 snapshotV1.getSpec().getRawType());
@@ -102,9 +107,13 @@ class ContentServiceTest {
         when(client.fetch(eq(Snapshot.class), eq(contentRequest.headSnapshotName())))
             .thenReturn(Mono.just(updated));
 
-        ContentWrapper contentWrapper =
-            new ContentWrapper(headSnapshot, contentRequest.raw(),
-                contentRequest.content(), snapshotV1.getSpec().getRawType());
+        ContentWrapper contentWrapper = ContentWrapper.builder()
+            .snapshotName(headSnapshot)
+            .version(1)
+            .raw(contentRequest.raw())
+            .content(contentRequest.content())
+            .rawType(snapshotV1.getSpec().getRawType())
+            .build();
 
         ArgumentCaptor<Snapshot> captor = ArgumentCaptor.forClass(Snapshot.class);
         when(client.update(any())).thenReturn(Mono.just(updated));
@@ -124,12 +133,15 @@ class ContentServiceTest {
     void updateContentWhenHasDraftVersionButHeadPoints2Published() {
         final String headSnapshot = "snapshot-A";
         Snapshot snapshotV1 = snapshotV1();
+        final Ref ref = postRef("test-post");
 
         Snapshot snapshotV2 = snapshotV2();
         snapshotV2.getSpec().setPublishTime(null);
 
 
         // v1(released),v2
+        snapshotV1.getMetadata().setLabels(new HashMap<>());
+        Snapshot.putPublishedLabel(snapshotV1.getMetadata().getLabels());
         snapshotV1.getSpec().setPublishTime(Instant.now());
         pilingBaseSnapshot(snapshotV2, snapshotV1);
 
@@ -138,23 +150,21 @@ class ContentServiceTest {
         when(client.fetch(eq(Snapshot.class), eq(snapshotV1.getMetadata().getName())))
             .thenReturn(Mono.just(snapshotV1));
 
-        Snapshot.SubjectRef subjectRef = Snapshot.SubjectRef.of(Post.KIND, "test-post");
-
         ContentRequest contentRequest =
-            new ContentRequest(subjectRef, headSnapshot, "C",
+            new ContentRequest(ref, headSnapshot, "C",
                 "<p>C</p>", snapshotV1.getSpec().getRawType());
 
         when(client.create(any())).thenReturn(Mono.just(snapshotV3()));
 
-        StepVerifier.create(contentService.latestSnapshotVersion(subjectRef))
+        StepVerifier.create(contentService.latestSnapshotVersion(ref))
             .expectNext(snapshotV2)
             .expectComplete()
             .verify();
 
         StepVerifier.create(contentService.updateContent(contentRequest))
             .consumeNextWith(created -> {
-                assertThat(created.raw()).isEqualTo("C");
-                assertThat(created.content()).isEqualTo("<p>C</p>");
+                assertThat(created.getRaw()).isEqualTo("C");
+                assertThat(created.getContent()).isEqualTo("<p>C</p>");
             })
             .expectComplete()
             .verify();
@@ -162,15 +172,16 @@ class ContentServiceTest {
 
     @Test
     void updateContentWhenHeadPoints2Published() {
-        Snapshot.SubjectRef subjectRef = Snapshot.SubjectRef.of(Post.KIND, "test-post");
-
+        final Ref ref = postRef("test-post");
         // v1(released),v2
         Snapshot snapshotV1 = snapshotV1();
+        snapshotV1.getMetadata().setLabels(new HashMap<>());
+        Snapshot.putPublishedLabel(snapshotV1.getMetadata().getLabels());
         snapshotV1.getSpec().setPublishTime(Instant.now());
-        snapshotV1.getSpec().setSubjectRef(subjectRef);
+        snapshotV1.getSpec().setSubjectRef(ref);
 
         Snapshot snapshotV2 = snapshotV2();
-        snapshotV2.getSpec().setSubjectRef(subjectRef);
+        snapshotV2.getSpec().setSubjectRef(ref);
         snapshotV2.getSpec().setPublishTime(null);
 
         final String headSnapshot = snapshotV2.getMetadata().getName();
@@ -184,20 +195,20 @@ class ContentServiceTest {
             .thenReturn(Mono.just(snapshotV1));
 
         ContentRequest contentRequest =
-            new ContentRequest(subjectRef, headSnapshot, "C",
+            new ContentRequest(ref, headSnapshot, "C",
                 "<p>C</p>", snapshotV1.getSpec().getRawType());
 
         when(client.update(any())).thenReturn(Mono.just(snapshotV2()));
 
-        StepVerifier.create(contentService.latestSnapshotVersion(subjectRef))
+        StepVerifier.create(contentService.latestSnapshotVersion(ref))
             .expectNext(snapshotV2)
             .expectComplete()
             .verify();
 
         StepVerifier.create(contentService.updateContent(contentRequest))
             .consumeNextWith(updated -> {
-                assertThat(updated.raw()).isEqualTo("C");
-                assertThat(updated.content()).isEqualTo("<p>C</p>");
+                assertThat(updated.getRaw()).isEqualTo("C");
+                assertThat(updated.getContent()).isEqualTo("<p>C</p>");
             })
             .expectComplete()
             .verify();
@@ -207,12 +218,11 @@ class ContentServiceTest {
 
     @Test
     void publishContent() {
-        Snapshot.SubjectRef subjectRef = Snapshot.SubjectRef.of(Post.KIND, "test-post");
-
+        Ref ref = postRef("test-post");
         // v1(released),v2
         Snapshot snapshotV1 = snapshotV1();
         snapshotV1.getSpec().setPublishTime(null);
-        snapshotV1.getSpec().setSubjectRef(subjectRef);
+        snapshotV1.getSpec().setSubjectRef(ref);
 
         final String headSnapshot = snapshotV1.getMetadata().getName();
 
@@ -223,7 +233,7 @@ class ContentServiceTest {
 
         when(client.update(any())).thenReturn(Mono.just(snapshotV2()));
 
-        StepVerifier.create(contentService.publish(headSnapshot, subjectRef))
+        StepVerifier.create(contentService.publish(headSnapshot, ref))
             .expectNext()
             .consumeNextWith(p -> {
                 System.out.println(JsonUtils.objectToJson(p));
@@ -234,14 +244,25 @@ class ContentServiceTest {
         verify(client, times(1)).update(any());
     }
 
+    private static Ref postRef(String name) {
+        Ref ref = new Ref();
+        ref.setGroup("content.halo.run");
+        ref.setVersion("v1alpha1");
+        ref.setKind(Post.KIND);
+        ref.setName(name);
+        return ref;
+    }
+
     @Test
     void publishContentWhenHasPublishedThenDoNothing() {
-        Snapshot.SubjectRef subjectRef = Snapshot.SubjectRef.of(Post.KIND, "test-post");
+        final Ref ref = postRef("test-post");
 
         // v1(released),v2
         Snapshot snapshotV1 = snapshotV1();
+        snapshotV1.getMetadata().setLabels(new HashMap<>());
+        Snapshot.putPublishedLabel(snapshotV1.getMetadata().getLabels());
         snapshotV1.getSpec().setPublishTime(Instant.now());
-        snapshotV1.getSpec().setSubjectRef(subjectRef);
+        snapshotV1.getSpec().setSubjectRef(ref);
 
         final String headSnapshot = snapshotV1.getMetadata().getName();
 
@@ -252,7 +273,7 @@ class ContentServiceTest {
 
         when(client.update(any())).thenReturn(Mono.just(snapshotV2()));
 
-        StepVerifier.create(contentService.publish(headSnapshot, subjectRef))
+        StepVerifier.create(contentService.publish(headSnapshot, ref))
             .expectNext()
             .consumeNextWith(p -> {
                 System.out.println(JsonUtils.objectToJson(p));
@@ -271,21 +292,23 @@ class ContentServiceTest {
     @Test
     void baseSnapshotVersion() {
         String postName = "post-1";
+        final Ref ref = postRef(postName);
         Snapshot snapshotV1 = snapshotV1();
+        snapshotV1.getMetadata().setLabels(new HashMap<>());
+        Snapshot.putPublishedLabel(snapshotV1.getMetadata().getLabels());
         snapshotV1.getSpec().setPublishTime(Instant.now());
-        snapshotV1.setSubjectRef(Post.KIND, postName);
+        snapshotV1.getSpec().setSubjectRef(ref);
 
         Snapshot snapshotV2 = TestPost.snapshotV2();
-        snapshotV2.setSubjectRef(Post.KIND, postName);
+        snapshotV2.getSpec().setSubjectRef(ref);
 
         Snapshot snapshotV3 = TestPost.snapshotV3();
-        snapshotV3.setSubjectRef(Post.KIND, postName);
+        snapshotV3.getSpec().setSubjectRef(ref);
 
         when(client.list(eq(Snapshot.class), any(), any()))
             .thenReturn(Flux.just(snapshotV2, snapshotV1, snapshotV3));
 
-        Snapshot.SubjectRef subjectRef = Snapshot.SubjectRef.of(Post.KIND, postName);
-        StepVerifier.create(contentService.getBaseSnapshot(subjectRef))
+        StepVerifier.create(contentService.getBaseSnapshot(ref))
             .expectNext(snapshotV1)
             .expectComplete()
             .verify();
@@ -294,24 +317,26 @@ class ContentServiceTest {
     @Test
     void latestSnapshotVersion() {
         String postName = "post-1";
+        final Ref ref = postRef(postName);
         Snapshot snapshotV1 = snapshotV1();
+        snapshotV1.getMetadata().setLabels(new HashMap<>());
+        Snapshot.putPublishedLabel(snapshotV1.getMetadata().getLabels());
         snapshotV1.getSpec().setPublishTime(Instant.now());
-        snapshotV1.setSubjectRef(Post.KIND, postName);
+        snapshotV1.getSpec().setSubjectRef(ref);
         Snapshot snapshotV2 = TestPost.snapshotV2();
-        snapshotV2.setSubjectRef(Post.KIND, postName);
+        snapshotV2.getSpec().setSubjectRef(ref);
 
         when(client.list(eq(Snapshot.class), any(), any()))
             .thenReturn(Flux.just(snapshotV1, snapshotV2));
 
-        Snapshot.SubjectRef subjectRef = Snapshot.SubjectRef.of(Post.KIND, postName);
-        StepVerifier.create(contentService.latestSnapshotVersion(subjectRef))
+        StepVerifier.create(contentService.latestSnapshotVersion(ref))
             .expectNext(snapshotV2)
             .expectComplete()
             .verify();
 
         when(client.list(eq(Snapshot.class), any(), any()))
             .thenReturn(Flux.just(snapshotV1, snapshotV2, snapshotV3()));
-        StepVerifier.create(contentService.latestSnapshotVersion(subjectRef))
+        StepVerifier.create(contentService.latestSnapshotVersion(ref))
             .expectNext(snapshotV3())
             .expectComplete()
             .verify();
@@ -320,19 +345,21 @@ class ContentServiceTest {
     @Test
     void latestPublishedSnapshotThenV1() {
         String postName = "post-1";
+        Ref ref = postRef(postName);
         Snapshot snapshotV1 = snapshotV1();
-        snapshotV1.setSubjectRef(Post.KIND, postName);
+        snapshotV1.getSpec().setSubjectRef(ref);
+        snapshotV1.getMetadata().setLabels(new HashMap<>());
+        Snapshot.putPublishedLabel(snapshotV1.getMetadata().getLabels());
         snapshotV1.getSpec().setPublishTime(Instant.now());
 
         Snapshot snapshotV2 = TestPost.snapshotV2();
-        snapshotV2.setSubjectRef(Post.KIND, postName);
+        snapshotV2.getSpec().setSubjectRef(ref);
         snapshotV2.getSpec().setPublishTime(null);
 
         when(client.list(eq(Snapshot.class), any(), any()))
             .thenReturn(Flux.just(snapshotV1, snapshotV2));
 
-        Snapshot.SubjectRef subjectRef = Snapshot.SubjectRef.of(Post.KIND, postName);
-        StepVerifier.create(contentService.latestPublishedSnapshot(subjectRef))
+        StepVerifier.create(contentService.latestPublishedSnapshot(ref))
             .expectNext(snapshotV1)
             .expectComplete()
             .verify();
@@ -341,20 +368,23 @@ class ContentServiceTest {
     @Test
     void latestPublishedSnapshotThenV2() {
         String postName = "post-1";
+        Ref ref = postRef(postName);
         Snapshot snapshotV1 = snapshotV1();
-        snapshotV1.setSubjectRef(Post.KIND, postName);
+        snapshotV1.getSpec().setSubjectRef(ref);
+        snapshotV1.getMetadata().setLabels(new HashMap<>());
+        Snapshot.putPublishedLabel(snapshotV1.getMetadata().getLabels());
         snapshotV1.getSpec().setPublishTime(Instant.now());
 
         Snapshot snapshotV2 = TestPost.snapshotV2();
-        snapshotV2.setSubjectRef(Post.KIND, postName);
+        snapshotV2.getSpec().setSubjectRef(ref);
+        snapshotV2.getMetadata().setLabels(new HashMap<>());
+        Snapshot.putPublishedLabel(snapshotV2.getMetadata().getLabels());
         snapshotV2.getSpec().setPublishTime(Instant.now());
 
         when(client.list(eq(Snapshot.class), any(), any()))
             .thenReturn(Flux.just(snapshotV2, snapshotV1));
 
-        Snapshot.SubjectRef subjectRef = Snapshot.SubjectRef.of(Post.KIND, postName);
-
-        StepVerifier.create(contentService.latestPublishedSnapshot(subjectRef))
+        StepVerifier.create(contentService.latestPublishedSnapshot(ref))
             .expectNext(snapshotV2)
             .expectComplete()
             .verify();

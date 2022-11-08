@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.content.ContentService;
+import run.halo.app.content.PostService;
+import run.halo.app.content.SinglePageService;
 import run.halo.app.content.permalinks.CategoryPermalinkPolicy;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
@@ -148,9 +150,11 @@ public class ExtensionConfiguration {
 
         @Bean
         Controller postController(ExtensionClient client, ContentService contentService,
-            PostPermalinkPolicy postPermalinkPolicy, CounterService counterService) {
+            PostPermalinkPolicy postPermalinkPolicy, CounterService counterService,
+            PostService postService) {
             return new ControllerBuilder("post-controller", client)
-                .reconciler(new PostReconciler(client, contentService, postPermalinkPolicy,
+                .reconciler(new PostReconciler(client, contentService, postService,
+                    postPermalinkPolicy,
                     counterService))
                 .extension(new Post())
                 .build();
@@ -198,10 +202,10 @@ public class ExtensionConfiguration {
         @Bean
         Controller singlePageController(ExtensionClient client, ContentService contentService,
             ApplicationContext applicationContext, CounterService counterService,
-            ExternalUrlSupplier externalUrlSupplier) {
+            SinglePageService singlePageService, ExternalUrlSupplier externalUrlSupplier) {
             return new ControllerBuilder("single-page-controller", client)
                 .reconciler(new SinglePageReconciler(client, contentService,
-                    applicationContext, counterService, externalUrlSupplier)
+                    applicationContext, singlePageService, counterService, externalUrlSupplier)
                 )
                 .extension(new SinglePage())
                 .build();

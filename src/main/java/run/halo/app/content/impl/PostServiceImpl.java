@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -36,8 +37,10 @@ import run.halo.app.core.extension.Tag;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.Ref;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
+import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
 
@@ -47,6 +50,7 @@ import run.halo.app.metrics.MeterUtils;
  * @author guqing
  * @since 2.0.0
  */
+@Slf4j
 @Component
 public class PostServiceImpl implements PostService {
     private final ContentService contentService;
@@ -160,7 +164,8 @@ public class PostServiceImpl implements PostService {
             })
             .flatMap(lp -> setTags(post.getSpec().getTags(), lp))
             .flatMap(lp -> setCategories(post.getSpec().getCategories(), lp))
-            .flatMap(lp -> setContributors(post.getStatus().getContributors(), lp));
+            .flatMap(lp -> setContributors(post.getStatus().getContributors(), lp))
+            .flatMap(lp -> setOwner(post.getSpec().getOwner(), lp));
     }
 
     private Mono<ListedPost> setTags(List<String> tagNames, ListedPost post) {
@@ -185,6 +190,19 @@ public class PostServiceImpl implements PostService {
             .doOnNext(post::setContributors)
             .map(contributors -> post)
             .switchIfEmpty(Mono.defer(() -> Mono.just(post)));
+    }
+
+    private Mono<ListedPost> setOwner(String ownerName, ListedPost post) {
+        return client.fetch(User.class, ownerName)
+            .map(user -> {
+                Contributor contributor = new Contributor();
+                contributor.setName(user.getMetadata().getName());
+                contributor.setDisplayName(user.getSpec().getDisplayName());
+                contributor.setAvatar(user.getSpec().getAvatar());
+                return contributor;
+            })
+            .doOnNext(post::setOwner)
+            .thenReturn(post);
     }
 
     private Flux<Tag> listTags(List<String> tagNames) {
@@ -224,8 +242,8 @@ public class PostServiceImpl implements PostService {
             .flatMap(contentWrapper -> getContextUsername()
                 .flatMap(username -> {
                     Post post = postRequest.post();
-                    post.getSpec().setBaseSnapshot(contentWrapper.snapshotName());
-                    post.getSpec().setHeadSnapshot(contentWrapper.snapshotName());
+                    post.getSpec().setBaseSnapshot(contentWrapper.getSnapshotName());
+                    post.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
                     post.getSpec().setOwner(username);
                     appendPublishedCondition(post, Post.PostPhase.DRAFT);
                     return client.create(post)
@@ -239,7 +257,7 @@ public class PostServiceImpl implements PostService {
         Post post = postRequest.post();
         return contentService.updateContent(postRequest.contentRequest())
             .flatMap(contentWrapper -> {
-                post.getSpec().setHeadSnapshot(contentWrapper.snapshotName());
+                post.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
                 return client.update(post);
             })
             .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
@@ -256,43 +274,59 @@ public class PostServiceImpl implements PostService {
     @Override
     public Mono<Post> publishPost(String postName) {
         return client.fetch(Post.class, postName)
+            .filter(post -> Objects.equals(true, post.getSpec().getPublish()))
             .flatMap(post -> {
-                Post.PostSpec spec = post.getSpec();
-                // publish snapshot
-                return Mono.zip(Mono.just(post),
-                    client.fetch(Snapshot.class, spec.getHeadSnapshot()));
-            })
-            .flatMap(tuple -> {
-                Post post = tuple.getT1();
-                Snapshot snapshot = tuple.getT2();
-
-                Post.PostSpec postSpec = post.getSpec();
-                if (Objects.equals(true, postSpec.getPublished())) {
-                    // has been published before
-                    postSpec.setVersion(postSpec.getVersion() + 1);
-                } else {
-                    postSpec.setPublished(true);
+                final Post oldPost = JsonUtils.deepCopy(post);
+                final Post.PostSpec postSpec = post.getSpec();
+                // if it's published state but releaseSnapshot is null, it means that need to
+                // publish headSnapshot
+                // if releaseSnapshot is draft and publish state is true, it means that need to
+                // publish releaseSnapshot
+                if (StringUtils.isBlank(postSpec.getHeadSnapshot())) {
+                    postSpec.setHeadSnapshot(postSpec.getBaseSnapshot());
                 }
 
-                if (postSpec.getPublishTime() == null) {
-                    postSpec.setPublishTime(Instant.now());
+                if (StringUtils.isBlank(postSpec.getReleaseSnapshot())) {
+                    postSpec.setReleaseSnapshot(postSpec.getHeadSnapshot());
+                    postSpec.setVersion(0);
                 }
-
-                // update release snapshot name and condition
-                postSpec.setReleaseSnapshot(snapshot.getMetadata().getName());
-                appendPublishedCondition(post, Post.PostPhase.PUBLISHED);
-
-                Snapshot.SubjectRef subjectRef =
-                    Snapshot.SubjectRef.of(Post.KIND, post.getMetadata().getName());
-                return contentService.publish(snapshot.getMetadata().getName(), subjectRef)
-                    .flatMap(contentWrapper -> {
-                        post.getSpec().setReleaseSnapshot(contentWrapper.snapshotName());
-                        return client.update(post);
+                return client.fetch(Snapshot.class, postSpec.getReleaseSnapshot())
+                    .flatMap(releasedSnapshot -> {
+                        Ref ref = Ref.of(post);
+                        // not published state, need to publish
+                        return contentService.publish(releasedSnapshot.getMetadata().getName(),
+                                ref)
+                            .flatMap(contentWrapper -> {
+                                appendPublishedCondition(post, Post.PostPhase.PUBLISHED);
+                                postSpec.setVersion(contentWrapper.getVersion());
+                                Post.changePublishedState(post, true);
+                                if (postSpec.getPublishTime() == null) {
+                                    postSpec.setPublishTime(Instant.now());
+                                }
+                                if (!oldPost.equals(post)) {
+                                    return client.update(post);
+                                }
+                                return Mono.just(post);
+                            });
                     })
-                    .then(Mono.defer(() -> client.fetch(Post.class, postName)));
+                    .switchIfEmpty(Mono.just(post));
             })
-            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
-                .filter(throwable -> throwable instanceof OptimisticLockingFailureException));
+            .onErrorResume(error -> {
+                log.error("Post [{}] publishing failed.", postName, error);
+                return client.fetch(Post.class, postName)
+                    .flatMap(post -> {
+                        Post.PostStatus status = post.getStatusOrDefault();
+                        Post.PostPhase phase = Post.PostPhase.FAILED;
+                        status.setPhase(phase.name());
+                        Condition condition = createCondition(phase);
+                        condition.setMessage(error.getMessage());
+                        condition.setStatus(ConditionStatus.FALSE);
+                        status.getConditionsOrDefault().add(condition);
+                        // update status and resume with post
+                        return client.update(post)
+                            .then(Mono.error(error));
+                    });
+            });
     }
 
     void appendPublishedCondition(Post post, Post.PostPhase phase) {
@@ -300,13 +334,16 @@ public class PostServiceImpl implements PostService {
         Post.PostStatus status = post.getStatusOrDefault();
         status.setPhase(phase.name());
         List<Condition> conditions = status.getConditionsOrDefault();
-        Condition condition = new Condition();
-        conditions.add(condition);
+        conditions.add(createCondition(phase));
+    }
 
+    Condition createCondition(Post.PostPhase phase) {
+        Condition condition = new Condition();
         condition.setType(phase.name());
         condition.setReason(phase.name());
         condition.setMessage("");
         condition.setStatus(ConditionStatus.TRUE);
         condition.setLastTransitionTime(Instant.now());
+        return condition;
     }
 }
