@@ -1,9 +1,13 @@
 package run.halo.app.theme;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.NonNull;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thymeleaf.context.IExpressionContext;
 import org.thymeleaf.linkbuilder.StandardLinkBuilder;
+import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.PathUtils;
 
 /**
@@ -15,14 +19,16 @@ public class ThemeLinkBuilder extends StandardLinkBuilder {
     public static final String THEME_PREVIEW_PREFIX = "/themes";
 
     private final ThemeContext theme;
+    private final ExternalUrlSupplier externalUrlSupplier;
 
-    public ThemeLinkBuilder(ThemeContext theme) {
+    public ThemeLinkBuilder(ThemeContext theme, ExternalUrlSupplier externalUrlSupplier) {
         this.theme = theme;
+        this.externalUrlSupplier = externalUrlSupplier;
     }
 
     @Override
     protected String processLink(IExpressionContext context, String link) {
-        if (link == null || isLinkBaseAbsolute(link)) {
+        if (link == null || !linkInSite(externalUrlSupplier.get(), link)) {
             return link;
         }
 
@@ -44,38 +50,22 @@ public class ThemeLinkBuilder extends StandardLinkBuilder {
             .build().toString();
     }
 
-    private static boolean isLinkBaseAbsolute(final CharSequence linkBase) {
-        final int linkBaseLen = linkBase.length();
-        if (linkBaseLen < 2) {
-            return false;
+    static boolean linkInSite(@NonNull URI externalUri, @NonNull String link) {
+        if (!PathUtils.isAbsoluteUri(link)) {
+            // relative uri is always in site
+            return true;
         }
-        final char c0 = linkBase.charAt(0);
-        if (c0 == 'm' || c0 == 'M') {
-            // Let's check for "mailto:"
-            if (linkBase.length() >= 7
-                && Character.toLowerCase(linkBase.charAt(1)) == 'a'
-                && Character.toLowerCase(linkBase.charAt(2)) == 'i'
-                && Character.toLowerCase(linkBase.charAt(3)) == 'l'
-                && Character.toLowerCase(linkBase.charAt(4)) == 't'
-                && Character.toLowerCase(linkBase.charAt(5)) == 'o'
-                && Character.toLowerCase(linkBase.charAt(6)) == ':') {
-                return true;
-            }
-        } else if (c0 == '/') {
-            return linkBase.charAt(1)
-                == '/'; // It starts with '//' -> true, any other '/x' -> false
-        }
-        for (int i = 0; i < (linkBaseLen - 2); i++) {
-            // Let's try to find the '://' sequence anywhere in the base --> true
-            if (linkBase.charAt(i) == ':' && linkBase.charAt(i + 1) == '/'
-                && linkBase.charAt(i + 2) == '/') {
-                return true;
-            }
+        try {
+            URI requestUri = new URI(link);
+            return StringUtils.equals(externalUri.getAuthority(), requestUri.getAuthority());
+        } catch (URISyntaxException e) {
+            // ignore this link
         }
         return false;
     }
 
     private boolean isAssetsRequest(String link) {
-        return link.startsWith(THEME_ASSETS_PREFIX);
+        String assetsPrefix = externalUrlSupplier.get().resolve(THEME_ASSETS_PREFIX).toString();
+        return link.startsWith(assetsPrefix) || link.startsWith(THEME_ASSETS_PREFIX);
     }
 }
