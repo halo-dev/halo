@@ -13,7 +13,7 @@ import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
-import run.halo.app.plugin.ExtensionComponentsFinder;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.search.SearchParam;
 import run.halo.app.search.SearchResult;
 
@@ -22,15 +22,10 @@ public class PostSearchEndpoint implements CustomEndpoint {
 
     private static final String API_VERSION = "api.halo.run/v1alpha1";
 
-    @Deprecated
-    private final PostSearchService searchService;
+    private final ExtensionGetter extensionGetter;
 
-    private final ExtensionComponentsFinder extensionFinder;
-
-    public PostSearchEndpoint(PostSearchService searchService,
-        ExtensionComponentsFinder extensionFinder) {
-        this.searchService = searchService;
-        this.extensionFinder = extensionFinder;
+    public PostSearchEndpoint(ExtensionGetter extensionGetter) {
+        this.extensionGetter = extensionGetter;
     }
 
     @Override
@@ -52,15 +47,18 @@ public class PostSearchEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> search(ServerRequest request) {
-        return Mono.fromCallable(
+        return Mono.fromSupplier(
                 () -> new SearchParam(request.queryParams()))
-            .map(param -> {
-                try {
-                    return searchService.search(param);
-                } catch (Exception e) {
-                    throw Exceptions.propagate(e);
-                }
-            })
+            .flatMap(param -> extensionGetter.getEnabledExtension(PostSearchService.class)
+                .switchIfEmpty(Mono.error(() ->
+                    new RuntimeException("Please enable any post search service before searching")))
+                .map(searchService -> {
+                    try {
+                        return searchService.search(param);
+                    } catch (Exception e) {
+                        throw Exceptions.propagate(e);
+                    }
+                }))
             .flatMap(result -> ServerResponse.ok().bodyValue(result));
     }
 
