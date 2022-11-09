@@ -10,8 +10,6 @@ export function setupCheckStatesGuard(router: Router) {
 
     const systemStateStore = useSystemStatesStore();
 
-    await systemStateStore.fetchSystemStates();
-
     if (!systemStateStore.states.isSetup) {
       next({ name: "Setup" });
       return;

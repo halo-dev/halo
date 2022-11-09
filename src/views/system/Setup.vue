@@ -92,6 +92,9 @@ const handleSubmit = async () => {
       },
     });
 
+    const systemStateStore = useSystemStatesStore();
+    await systemStateStore.fetchSystemStates();
+
     router.push({ name: "Dashboard" });
   } catch (error) {
     console.error("Failed to setup", error);

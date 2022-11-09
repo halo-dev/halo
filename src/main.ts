@@ -18,6 +18,7 @@ import { hasPermission } from "@/utils/permission";
 import { useRoleStore } from "@/stores/role";
 import type { RouteRecordRaw } from "vue-router";
 import { useThemeStore } from "./stores/theme";
+import { useSystemStatesStore } from "./stores/system-states";
 
 const app = createApp(App);
 
@@ -240,6 +241,9 @@ async function initApp() {
     } catch (e) {
       console.error("Failed to load plugins", e);
     }
+
+    const systemStateStore = useSystemStatesStore();
+    await systemStateStore.fetchSystemStates();
   } catch (e) {
     console.error(e);
   } finally {
