@@ -12,5 +12,5 @@ public interface MenuFinder {
 
     MenuVo getByName(String name);
 
-    MenuVo getDefault();
+    MenuVo getPrimary();
 }

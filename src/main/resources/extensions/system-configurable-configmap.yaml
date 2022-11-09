@@ -23,3 +23,7 @@ data:
     {
       "review": false
     }
+  menu: |
+    {
+      "primary": "primary"
+    }
