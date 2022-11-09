@@ -27,6 +27,7 @@ import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.PolicyTemplate;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.SchemeManager;
+import run.halo.app.search.extension.SearchEngine;
 import run.halo.app.security.authentication.pat.PersonalAccessToken;
 
 @Component
@@ -42,7 +43,11 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
     public void onApplicationEvent(@NonNull ApplicationStartedEvent event) {
         schemeManager.register(Role.class);
         schemeManager.register(PersonalAccessToken.class);
+
+        // plugin.halo.run
         schemeManager.register(Plugin.class);
+        schemeManager.register(SearchEngine.class);
+
         schemeManager.register(RoleBinding.class);
         schemeManager.register(User.class);
         schemeManager.register(ReverseProxy.class);

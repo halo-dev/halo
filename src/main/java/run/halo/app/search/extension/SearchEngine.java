@@ -8,11 +8,11 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.Ref;
 
-@GVK(group = "", version = "v1alpha1", kind = "SearchEngine",
-    plural = "searchengines", singular = "searchengine")
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
+@GVK(group = "plugin.halo.run", version = "v1alpha1", kind = "SearchEngine",
+    plural = "searchengines", singular = "searchengine")
 public class SearchEngine extends AbstractExtension {
 
     @Schema(required = true)
@@ -32,7 +32,7 @@ public class SearchEngine extends AbstractExtension {
 
         private Ref settingRef;
 
-        private String extensionPointImpl;
+        private String postSearchImpl;
 
     }
 
