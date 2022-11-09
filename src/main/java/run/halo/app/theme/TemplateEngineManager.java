@@ -9,6 +9,8 @@ import org.springframework.util.ConcurrentLruCache;
 import org.springframework.util.ResourceUtils;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.spring6.ISpringWebFluxTemplateEngine;
+import org.thymeleaf.spring6.dialect.SpringStandardDialect;
+import org.thymeleaf.standard.expression.IStandardVariableExpressionEvaluator;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 import run.halo.app.infra.ExternalUrlSupplier;
@@ -86,6 +88,13 @@ public class TemplateEngineManager {
         var mainResolver = haloTemplateResolver();
         mainResolver.setPrefix(theme.getPath() + "/templates/");
         engine.addTemplateResolver(mainResolver);
+        // replace StandardDialect with SpringStandardDialect
+        engine.setDialect(new SpringStandardDialect() {
+            @Override
+            public IStandardVariableExpressionEvaluator getVariableExpressionEvaluator() {
+                return ReactiveSpelVariableExpressionEvaluator.INSTANCE;
+            }
+        });
         engine.addDialect(new HaloProcessorDialect());
 
         templateResolvers.orderedStream().forEach(engine::addTemplateResolver);
