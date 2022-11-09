@@ -150,7 +150,7 @@ class ContentServiceTest {
         when(client.fetch(eq(Snapshot.class), eq(snapshotV1.getMetadata().getName())))
             .thenReturn(Mono.just(snapshotV1));
 
-        ContentRequest contentRequest =
+        final ContentRequest contentRequest =
             new ContentRequest(ref, headSnapshot, "C",
                 "<p>C</p>", snapshotV1.getSpec().getRawType());
 
@@ -161,6 +161,10 @@ class ContentServiceTest {
             .expectComplete()
             .verify();
 
+        Snapshot publishedV2 = snapshotV2();
+        publishedV2.getMetadata().setLabels(new HashMap<>());
+        Snapshot.putPublishedLabel(publishedV2.getMetadata().getLabels());
+        when(client.update(any())).thenReturn(Mono.just(publishedV2));
         StepVerifier.create(contentService.updateContent(contentRequest))
             .consumeNextWith(created -> {
                 assertThat(created.getRaw()).isEqualTo("C");

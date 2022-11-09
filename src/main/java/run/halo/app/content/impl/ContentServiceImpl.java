@@ -142,6 +142,14 @@ public class ContentServiceImpl implements ContentService {
                                 latestReleasedSnapshot.getMetadata().getName();
                             if (headSnapshot.isPublished() || StringUtils.equals(headSnapshotName,
                                 releasedSnapshotName)) {
+                                String latestSnapshotName = latestSnapshot.getMetadata().getName();
+                                if (!headSnapshotName.equals(latestSnapshotName)
+                                    && !latestSnapshot.isPublished()) {
+                                    // publish it then create new one
+                                    return publish(latestSnapshotName, subjectRef)
+                                        .then(createNewSnapshot(newSnapshot, baseSnapshotName,
+                                            contentRequest));
+                                }
                                 // create a new snapshot,done
                                 return createNewSnapshot(newSnapshot, baseSnapshotName,
                                     contentRequest);
