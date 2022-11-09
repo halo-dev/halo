@@ -98,7 +98,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
             SinglePage oldPage = JsonUtils.deepCopy(page);
             if (page.isPublished() && Objects.equals(false, page.getSpec().getPublish())) {
                 SinglePage.changePublishedState(page, false);
-                final SinglePage.SinglePageStatus status = oldPage.getStatusOrDefault();
+                final SinglePage.SinglePageStatus status = page.getStatusOrDefault();
                 Condition condition = new Condition();
                 condition.setType("CancelledPublish");
                 condition.setStatus(ConditionStatus.TRUE);

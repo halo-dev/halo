@@ -134,8 +134,6 @@ public class SinglePageServiceImpl implements SinglePageService {
                     spec.setVersion(0);
                 }
                 return client.fetch(Snapshot.class, spec.getReleaseSnapshot())
-                    // not published snapshot to use
-                    .filter(snapshot -> !snapshot.isPublished())
                     .flatMap(releasedSnapshot -> {
                         Ref ref = Ref.of(page);
                         // not published state, need to publish
