@@ -69,8 +69,7 @@ public class ListResult<T> implements Streamable<T> {
         if (page <= 0) {
             return false;
         }
-        var totalPages = size == 0 ? 1 : (int) Math.ceil((double) total / (double) size);
-        return page < totalPages;
+        return page < getTotalPages();
     }
 
     @Schema(description = "Indicates whether current page has previous page.", required = true)
@@ -88,6 +87,12 @@ public class ListResult<T> implements Streamable<T> {
     @JsonIgnore
     public boolean isEmpty() {
         return Streamable.super.isEmpty();
+    }
+
+    @Schema(description = "Indicates total pages.", required = true)
+    @JsonProperty("totalPages")
+    public long getTotalPages() {
+        return size == 0 ? 1 : (total + size - 1) / size;
     }
 
     /**

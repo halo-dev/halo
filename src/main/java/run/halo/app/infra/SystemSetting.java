@@ -84,6 +84,12 @@ public class SystemSetting {
         Boolean systemUserOnly;
     }
 
+    @Data
+    public static class Menu {
+        public static final String GROUP = "menu";
+        public String primary;
+    }
+
     /**
      * ExtensionPointEnabled key is full qualified name of extension point and value is a list of
      * full qualified name of implementation.
