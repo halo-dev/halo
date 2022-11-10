@@ -215,7 +215,8 @@ public class Unstructured implements Extension {
     }
 
     @SuppressWarnings("unchecked")
-    public static Optional<Map<String, String>> getNestedStringStringMap(Map map, String... fields) {
+    public static Optional<Map<String, String>> getNestedStringStringMap(Map map,
+        String... fields) {
         return getNestedValue(map, fields)
             .map(labelsObj -> {
                 var labels = (Map) labelsObj;
