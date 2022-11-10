@@ -20,7 +20,7 @@ public class PluginFinderImpl implements PluginFinder {
     private final HaloPluginManager haloPluginManager;
 
     @Override
-    public boolean enabled(String pluginName) {
+    public boolean available(String pluginName) {
         if (StringUtils.isBlank(pluginName)) {
             return false;
         }

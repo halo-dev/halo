@@ -30,9 +30,9 @@ class PluginFinderImplTest {
 
     @Test
     void enabled() {
-        assertThat(pluginFinder.enabled(null)).isFalse();
+        assertThat(pluginFinder.available(null)).isFalse();
 
-        boolean enabled = pluginFinder.enabled("fake-plugin");
+        boolean enabled = pluginFinder.available("fake-plugin");
         assertThat(enabled).isFalse();
 
         PluginWrapper mockPluginWrapper = Mockito.mock(PluginWrapper.class);
@@ -40,11 +40,11 @@ class PluginFinderImplTest {
             .thenReturn(mockPluginWrapper);
         when(mockPluginWrapper.getPluginState()).thenReturn(PluginState.RESOLVED);
 
-        enabled = pluginFinder.enabled("fake-plugin");
+        enabled = pluginFinder.available("fake-plugin");
         assertThat(enabled).isFalse();
 
         when(mockPluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
-        enabled = pluginFinder.enabled("fake-plugin");
+        enabled = pluginFinder.available("fake-plugin");
         assertThat(enabled).isTrue();
     }
 }

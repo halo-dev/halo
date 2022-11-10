@@ -8,5 +8,5 @@ package run.halo.app.theme.finders;
  */
 public interface PluginFinder {
 
-    boolean enabled(String pluginName);
+    boolean available(String pluginName);
 }
