@@ -10,5 +10,5 @@ public interface PluginFinder {
 
     boolean enabled(String pluginName);
 
-    boolean hasInstalled(String pluginName);
+    boolean installed(String pluginName);
 }

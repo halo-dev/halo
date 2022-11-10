@@ -36,7 +36,7 @@ public class PluginFinderImpl implements PluginFinder {
     }
 
     @Override
-    public boolean hasInstalled(String pluginName) {
+    public boolean installed(String pluginName) {
         if (StringUtils.isBlank(pluginName)) {
             return false;
         }
