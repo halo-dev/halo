@@ -40,6 +40,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
+import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
@@ -309,23 +310,9 @@ public class PostServiceImpl implements PostService {
                                 return Mono.just(post);
                             });
                     })
-                    .switchIfEmpty(Mono.just(post));
-            })
-            .onErrorResume(error -> {
-                log.error("Post [{}] publishing failed.", postName, error);
-                return client.fetch(Post.class, postName)
-                    .flatMap(post -> {
-                        Post.PostStatus status = post.getStatusOrDefault();
-                        Post.PostPhase phase = Post.PostPhase.FAILED;
-                        status.setPhase(phase.name());
-                        Condition condition = createCondition(phase);
-                        condition.setMessage(error.getMessage());
-                        condition.setStatus(ConditionStatus.FALSE);
-                        status.getConditionsOrDefault().add(condition);
-                        // update status and resume with post
-                        return client.update(post)
-                            .then(Mono.error(error));
-                    });
+                    .switchIfEmpty(Mono.defer(() -> Mono.error(new NotFoundException(
+                        String.format("Snapshot [%s] not found", postSpec.getReleaseSnapshot()))))
+                    );
             });
     }
 

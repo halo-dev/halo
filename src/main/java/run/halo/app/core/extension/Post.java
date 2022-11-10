@@ -163,7 +163,6 @@ public class Post extends AbstractExtension {
     public enum PostPhase {
         DRAFT,
         PENDING_APPROVAL,
-        PENDING,
         PUBLISHED,
         FAILED;
 

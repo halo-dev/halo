@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
+import org.springframework.util.Assert;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.PostService;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
@@ -77,7 +78,12 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
 
     private void reconcileSpec(String name) {
         // publish post if necessary
-        postService.publishPost(name).block();
+        try {
+            postService.publishPost(name).block();
+        } catch (Throwable e) {
+            publishFailed(name, e);
+            throw e;
+        }
 
         client.fetch(Post.class, name).ifPresent(post -> {
             Post oldPost = JsonUtils.deepCopy(post);
@@ -93,6 +99,41 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 status.getConditionsOrDefault().add(condition);
                 status.setPhase(Post.PostPhase.DRAFT.name());
             }
+            if (!oldPost.equals(post)) {
+                client.update(post);
+            }
+        });
+    }
+
+    private void publishFailed(String name, Throwable error) {
+        Assert.notNull(name, "Name must not be null");
+        Assert.notNull(error, "Error must not be null");
+        client.fetch(Post.class, name).ifPresent(post -> {
+            final Post oldPost = JsonUtils.deepCopy(post);
+
+            Post.PostStatus status = post.getStatusOrDefault();
+            Post.PostPhase phase = Post.PostPhase.FAILED;
+            status.setPhase(phase.name());
+
+            final List<Condition> conditions = status.getConditionsOrDefault();
+            Condition condition = new Condition();
+            condition.setType(phase.name());
+            condition.setReason(phase.name());
+            condition.setMessage("");
+            condition.setStatus(ConditionStatus.TRUE);
+            condition.setLastTransitionTime(Instant.now());
+            condition.setMessage(error.getMessage());
+            condition.setStatus(ConditionStatus.FALSE);
+
+            if (conditions.size() > 0) {
+                Condition lastCondition = conditions.get(conditions.size() - 1);
+                if (!StringUtils.equals(lastCondition.getType(), condition.getType())
+                    && !StringUtils.equals(lastCondition.getMessage(), condition.getMessage())) {
+                    conditions.add(condition);
+                }
+            }
+            post.setStatus(status);
+
             if (!oldPost.equals(post)) {
                 client.update(post);
             }

@@ -10,9 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.springframework.context.ApplicationContext;
+import org.springframework.util.Assert;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.SinglePageService;
 import run.halo.app.content.permalinks.ExtensionLocator;
@@ -47,6 +49,7 @@ import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
  * @author guqing
  * @since 2.0.0
  */
+@Slf4j
 public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private static final String FINALIZER_NAME = "single-page-protection";
     private static final GroupVersionKind GVK = GroupVersionKind.fromExtension(SinglePage.class);
@@ -92,7 +95,12 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
     private void reconcileSpec(String name) {
         // publish single page if necessary
-        singlePageService.publish(name).block();
+        try {
+            singlePageService.publish(name).block();
+        } catch (Throwable e) {
+            publishFailed(name, e);
+            throw e;
+        }
 
         client.fetch(SinglePage.class, name).ifPresent(page -> {
             SinglePage oldPage = JsonUtils.deepCopy(page);
@@ -108,6 +116,41 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
                 status.getConditionsOrDefault().add(condition);
                 status.setPhase(Post.PostPhase.DRAFT.name());
             }
+            if (!oldPage.equals(page)) {
+                client.update(page);
+            }
+        });
+    }
+
+    private void publishFailed(String name, Throwable error) {
+        Assert.notNull(name, "Name must not be null");
+        Assert.notNull(error, "Error must not be null");
+        client.fetch(SinglePage.class, name).ifPresent(page -> {
+            final SinglePage oldPage = JsonUtils.deepCopy(page);
+
+            SinglePage.SinglePageStatus status = page.getStatusOrDefault();
+            Post.PostPhase phase = Post.PostPhase.FAILED;
+            status.setPhase(phase.name());
+
+            final List<Condition> conditions = status.getConditionsOrDefault();
+            Condition condition = new Condition();
+            condition.setType(phase.name());
+            condition.setReason(phase.name());
+            condition.setMessage("");
+            condition.setStatus(ConditionStatus.TRUE);
+            condition.setLastTransitionTime(Instant.now());
+            condition.setMessage(error.getMessage());
+            condition.setStatus(ConditionStatus.FALSE);
+
+            if (conditions.size() > 0) {
+                Condition lastCondition = conditions.get(conditions.size() - 1);
+                if (!StringUtils.equals(lastCondition.getType(), condition.getType())
+                    && !StringUtils.equals(lastCondition.getMessage(), condition.getMessage())) {
+                    conditions.add(condition);
+                }
+            }
+            page.setStatus(status);
+
             if (!oldPage.equals(page)) {
                 client.update(page);
             }

@@ -39,6 +39,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
+import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
@@ -152,23 +153,9 @@ public class SinglePageServiceImpl implements SinglePageService {
                                 return Mono.just(page);
                             });
                     })
-                    .switchIfEmpty(Mono.just(page));
-            })
-            .onErrorResume(error -> {
-                log.error("SinglePage [{}] publishing failed.", name, error);
-                return client.fetch(SinglePage.class, name)
-                    .flatMap(page -> {
-                        SinglePage.SinglePageStatus status = page.getStatusOrDefault();
-                        Post.PostPhase phase = Post.PostPhase.FAILED;
-                        status.setPhase(phase.name());
-                        Condition condition = createCondition(phase);
-                        condition.setMessage(error.getMessage());
-                        condition.setStatus(ConditionStatus.FALSE);
-                        status.getConditionsOrDefault().add(condition);
-                        // update status and resume with post
-                        return client.update(page)
-                            .then(Mono.error(error));
-                    });
+                    .switchIfEmpty(Mono.defer(() -> Mono.error(new NotFoundException(
+                        String.format("Snapshot [%s] not found", spec.getReleaseSnapshot()))))
+                    );
             });
     }
 
