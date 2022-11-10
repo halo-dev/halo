@@ -8,6 +8,7 @@ import {
   VStatusDot,
   VEntity,
   VEntityField,
+  VTag,
 } from "@halo-dev/components";
 import MenuEditingModal from "./MenuEditingModal.vue";
 import { onMounted, onUnmounted, ref } from "vue";
@@ -142,6 +143,44 @@ onMounted(async () => {
 defineExpose({
   handleFetchMenus,
 });
+
+// primary menu
+const primaryMenuName = ref<string>();
+
+const handleFetchPrimaryMenuName = async () => {
+  const { data } = await apiClient.extension.configMap.getv1alpha1ConfigMap({
+    name: "system",
+  });
+
+  if (!data.data?.menu) {
+    return;
+  }
+
+  const menuConfig = JSON.parse(data.data.menu);
+
+  primaryMenuName.value = menuConfig.primary;
+};
+
+const handleSetPrimaryMenu = async (menu: Menu) => {
+  const { data: systemConfigMap } =
+    await apiClient.extension.configMap.getv1alpha1ConfigMap({
+      name: "system",
+    });
+
+  if (systemConfigMap.data) {
+    const menuConfigToUpdate = JSON.parse(systemConfigMap.data?.menu || "{}");
+    menuConfigToUpdate.primary = menu.metadata.name;
+    systemConfigMap.data["menu"] = JSON.stringify(menuConfigToUpdate);
+
+    await apiClient.extension.configMap.updatev1alpha1ConfigMap({
+      name: "system",
+      configMap: systemConfigMap,
+    });
+  }
+  await handleFetchPrimaryMenuName();
+};
+
+onMounted(handleFetchPrimaryMenuName);
 </script>
 <template>
   <MenuEditingModal
@@ -175,7 +214,11 @@ defineExpose({
             <VEntityField
               :title="menu.spec?.displayName"
               :description="`${menu.spec.menuItems?.length || 0} 个菜单项`"
-            ></VEntityField>
+            >
+              <template v-if="menu.metadata.name === primaryMenuName" #extra>
+                <VTag>主菜单</VTag>
+              </template>
+            </VEntityField>
           </template>
           <template #end>
             <VEntityField v-if="menu.metadata.deletionTimestamp">
@@ -192,6 +235,14 @@ defineExpose({
               v-close-popper
               block
               type="secondary"
+              @click="handleSetPrimaryMenu(menu)"
+            >
+              设置为主菜单
+            </VButton>
+            <VButton
+              v-close-popper
+              block
+              type="default"
               @click="handleOpenEditingModal(menu)"
             >
               修改

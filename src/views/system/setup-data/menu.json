@@ -10,5 +10,5 @@
   },
   "apiVersion": "v1alpha1",
   "kind": "Menu",
-  "metadata": { "name": "2f0ef354-6f8f-40b9-b41d-2163f3e51b4f" }
+  "metadata": { "name": "primary" }
 }
