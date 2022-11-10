@@ -6,22 +6,15 @@ import {
   VButton,
   IconSave,
 } from "@halo-dev/components";
+import DefaultEditor from "@/components/editor/DefaultEditor.vue";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import PostPreviewModal from "../posts/components/PostPreviewModal.vue";
-import AttachmentSelectorModal from "../attachments/components/AttachmentSelectorModal.vue";
-import {
-  allExtensions,
-  RichTextEditor,
-  useEditor,
-} from "@halo-dev/richtext-editor";
 import type { SinglePageRequest } from "@halo-dev/api-client";
 import { v4 as uuid } from "uuid";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import cloneDeep from "lodash.clonedeep";
-import { useAttachmentSelect } from "../attachments/composables/use-attachment";
-import MdiFileImageBox from "~icons/mdi/file-image-box";
 
 const initialFormState: SinglePageRequest = {
   page: {
@@ -61,36 +54,10 @@ const formState = ref<SinglePageRequest>(cloneDeep(initialFormState));
 const saving = ref(false);
 const settingModal = ref(false);
 const previewModal = ref(false);
-const attachmentSelectorModal = ref(false);
 
 const isUpdateMode = computed(() => {
   return !!formState.value.page.metadata.creationTimestamp;
 });
-
-// Editor
-const editor = useEditor({
-  content: formState.value.content.raw,
-  extensions: [...allExtensions],
-  autofocus: "start",
-  onUpdate: () => {
-    formState.value.content.raw = editor.value?.getHTML() + "";
-  },
-});
-
-watch(
-  () => formState.value.content.raw,
-  (newValue) => {
-    const isSame = editor.value?.getHTML() === newValue;
-
-    if (isSame) {
-      return;
-    }
-
-    editor.value?.commands.setContent(newValue as string, false);
-  }
-);
-
-const { onAttachmentSelect } = useAttachmentSelect(editor);
 
 const routeQueryName = useRouteQuery<string>("name");
 
@@ -172,10 +139,6 @@ onMounted(async () => {
     @saved="onSettingSaved"
   />
   <PostPreviewModal v-model:visible="previewModal" />
-  <AttachmentSelectorModal
-    v-model:visible="attachmentSelectorModal"
-    @select="onAttachmentSelect"
-  />
   <VPageHeader title="自定义页面">
     <template #icon>
       <IconPages class="mr-2 self-center" />
@@ -204,19 +167,11 @@ onMounted(async () => {
     </template>
   </VPageHeader>
   <div class="editor border-t" style="height: calc(100vh - 3.5rem)">
-    <RichTextEditor
-      v-if="editor"
-      :editor="editor"
-      :additional-menu-items="[
-        {
-          type: 'button',
-          icon: MdiFileImageBox,
-          title: 'SuperScript',
-          action: () => (attachmentSelectorModal = true),
-          isActive: () => false,
-        },
-      ]"
-    >
-    </RichTextEditor>
+    <DefaultEditor
+      v-model="formState.content.raw"
+      :owner="formState.page.spec.owner"
+      :permalink="formState.page.status?.permalink"
+      :publish-time="formState.page.spec.publishTime"
+    />
   </div>
 </template>

@@ -62,6 +62,8 @@ const searchResults = computed((): SearchableItem[] => {
 });
 
 const handleBuildSearchIndex = () => {
+  fuse.remove(() => true);
+
   const routes = router.getRoutes().filter((route) => {
     return !!route.meta?.title && route.meta?.searchable;
   });
