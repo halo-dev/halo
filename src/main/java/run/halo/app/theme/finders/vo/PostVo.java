@@ -35,6 +35,8 @@ public class PostVo {
 
     private List<Contributor> contributors;
 
+    private Contributor owner;
+
     private StatsVo stats;
 
     /**

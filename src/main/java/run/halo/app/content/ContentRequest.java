@@ -1,14 +1,16 @@
 package run.halo.app.content;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.apache.commons.lang3.StringUtils;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.Ref;
 
 /**
  * @author guqing
  * @since 2.0.0
  */
-public record ContentRequest(@Schema(required = true) Snapshot.SubjectRef subjectRef,
+public record ContentRequest(@Schema(required = true) Ref subjectRef,
                              String headSnapshotName,
                              @Schema(required = true) String raw,
                              @Schema(required = true) String content,
@@ -25,8 +27,8 @@ public record ContentRequest(@Schema(required = true) Snapshot.SubjectRef subjec
         snapShotSpec.setSubjectRef(subjectRef);
         snapShotSpec.setVersion(1);
         snapShotSpec.setRawType(rawType);
-        snapShotSpec.setRawPatch(raw);
-        snapShotSpec.setContentPatch(content);
+        snapShotSpec.setRawPatch(StringUtils.defaultString(raw()));
+        snapShotSpec.setContentPatch(StringUtils.defaultString(content()));
         String displayVersion = Snapshot.displayVersionFrom(snapShotSpec.getVersion());
         snapShotSpec.setDisplayVersion(displayVersion);
 
@@ -34,7 +36,7 @@ public record ContentRequest(@Schema(required = true) Snapshot.SubjectRef subjec
         return snapshot;
     }
 
-    private String defaultName(Snapshot.SubjectRef subjectRef) {
+    private String defaultName(Ref subjectRef) {
         // example: Post-apost-v1-snapshot
         return String.join("-", subjectRef.getKind(),
             subjectRef.getName(), "v1", "snapshot");

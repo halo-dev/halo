@@ -49,9 +49,8 @@ import run.halo.app.theme.finders.vo.TagVo;
 @Finder("postFinder")
 public class PostFinderImpl implements PostFinder {
 
-    public static final Predicate<Post> FIXED_PREDICATE = post ->
-        Objects.equals(false, post.getSpec().getDeleted())
-            && Objects.equals(true, post.getSpec().getPublished())
+    public static final Predicate<Post> FIXED_PREDICATE = post -> post.isPublished()
+            && Objects.equals(false, post.getSpec().getDeleted())
             && Post.VisibleEnum.PUBLIC.equals(post.getSpec().getVisible());
     private final ReactiveExtensionClient client;
 
@@ -95,8 +94,8 @@ public class PostFinderImpl implements PostFinder {
         return client.fetch(Post.class, postName)
             .map(post -> post.getSpec().getReleaseSnapshot())
             .flatMap(contentService::getContent)
-            .map(wrapper -> ContentVo.builder().content(wrapper.content())
-                .raw(wrapper.raw()).build())
+            .map(wrapper -> ContentVo.builder().content(wrapper.getContent())
+                .raw(wrapper.getRaw()).build())
             .block();
     }
 
@@ -316,6 +315,7 @@ public class PostFinderImpl implements PostFinder {
         postVo.setCategories(categoryVos);
         postVo.setTags(tags);
         postVo.setContributors(contributors);
+        postVo.setOwner(contributorFinder.getContributor(post.getSpec().getOwner()));
         populateStats(postVo);
         return postVo;
     }

@@ -19,6 +19,10 @@ data:
      "globalHead": "",
      "footer": ""
     }
+  post: |
+    {
+      "review": false
+    }
   menu: |
     {
       "primary": "primary"
