@@ -1,73 +1,72 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace, VTabItem, VTabs } from "@halo-dev/components";
 import { computed, ref, watchEffect } from "vue";
-import type { PostRequest } from "@halo-dev/api-client";
+import type { Post } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { v4 as uuid } from "uuid";
 import { useThemeCustomTemplates } from "@/modules/interface/themes/composables/use-theme";
+import { postLabels } from "@/constants/labels";
 
-const initialFormState: PostRequest = {
-  post: {
-    spec: {
-      title: "",
-      slug: "",
-      template: "",
-      cover: "",
-      deleted: false,
-      published: false,
-      publishTime: "",
-      pinned: false,
-      allowComment: true,
-      visible: "PUBLIC",
-      version: 1,
-      priority: 0,
-      excerpt: {
-        autoGenerate: true,
-        raw: "",
-      },
-      categories: [],
-      tags: [],
-      htmlMetas: [],
+const initialFormState: Post = {
+  spec: {
+    title: "",
+    slug: "",
+    template: "",
+    cover: "",
+    deleted: false,
+    publish: false,
+    publishTime: "",
+    pinned: false,
+    allowComment: true,
+    visible: "PUBLIC",
+    version: 1,
+    priority: 0,
+    excerpt: {
+      autoGenerate: true,
+      raw: "",
     },
-    apiVersion: "content.halo.run/v1alpha1",
-    kind: "Post",
-    metadata: {
-      name: uuid(),
-    },
+    categories: [],
+    tags: [],
+    htmlMetas: [],
   },
-  content: {
-    raw: "",
-    content: "",
-    rawType: "HTML",
+  apiVersion: "content.halo.run/v1alpha1",
+  kind: "Post",
+  metadata: {
+    name: uuid(),
   },
 };
 
 const props = withDefaults(
   defineProps<{
     visible: boolean;
-    post?: PostRequest | null;
+    post?: Post;
+    publishSupport?: boolean;
+    onlyEmit?: boolean;
   }>(),
   {
     visible: false,
-    post: null,
+    post: undefined,
+    publishSupport: true,
+    onlyEmit: false,
   }
 );
 
 const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
-  (event: "saved", post: PostRequest): void;
+  (event: "saved", post: Post): void;
+  (event: "published", post: Post): void;
 }>();
 
 const activeTab = ref("general");
-const formState = ref<PostRequest>(cloneDeep(initialFormState));
+const formState = ref<Post>(cloneDeep(initialFormState));
 const saving = ref(false);
 const publishing = ref(false);
 const publishCanceling = ref(false);
 
 const isUpdateMode = computed(() => {
-  return !!formState.value.post.metadata.creationTimestamp;
+  return !!formState.value.metadata.creationTimestamp;
 });
 
 const handleVisibleChange = (visible: boolean) => {
@@ -78,26 +77,27 @@ const handleVisibleChange = (visible: boolean) => {
 };
 
 const handleSave = async () => {
+  if (props.onlyEmit) {
+    emit("saved", formState.value);
+    return;
+  }
+
   try {
     saving.value = true;
 
-    // Set rendered content
-    formState.value.content.content = formState.value.content.raw;
+    const { data } = isUpdateMode.value
+      ? await apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
+          name: formState.value.metadata.name,
+          post: formState.value,
+        })
+      : await apiClient.extension.post.createcontentHaloRunV1alpha1Post({
+          post: formState.value,
+        });
 
-    if (isUpdateMode.value) {
-      const { data } = await apiClient.post.updateDraftPost({
-        name: formState.value.post.metadata.name,
-        postRequest: formState.value,
-      });
-      formState.value.post = data;
-      emit("saved", formState.value);
-    } else {
-      const { data } = await apiClient.post.draftPost({
-        postRequest: formState.value,
-      });
-      formState.value.post = data;
-      emit("saved", formState.value);
-    }
+    formState.value = data;
+    emit("saved", data);
+
+    handleVisibleChange(false);
   } catch (e) {
     console.error("Failed to save post", e);
   } finally {
@@ -105,56 +105,46 @@ const handleSave = async () => {
   }
 };
 
-const handlePublish = async () => {
+const handleSwitchPublish = async (publish: boolean) => {
+  if (props.onlyEmit) {
+    emit("published", formState.value);
+    return;
+  }
+
   try {
-    publishing.value = true;
+    if (publish) {
+      publishing.value = true;
+    } else {
+      publishCanceling.value = true;
+    }
 
-    // Save post
-    await handleSave();
+    if (publish) {
+      formState.value.spec.releaseSnapshot = formState.value.spec.headSnapshot;
+    }
 
-    // Get latest version post
-    const { data: latestData } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
-        name: formState.value.post.metadata.name,
+    const { data } =
+      await apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
+        name: formState.value.metadata.name,
+        post: {
+          ...formState.value,
+          spec: {
+            ...formState.value.spec,
+            publish: publish,
+          },
+        },
       });
-    formState.value.post = latestData;
 
-    // Publish post
-    const { data } = await apiClient.post.publishPost({
-      name: formState.value.post.metadata.name,
-    });
-    formState.value.post = data;
-    emit("saved", formState.value);
+    formState.value = data;
+
+    if (publish) {
+      emit("published", data);
+    }
+
+    handleVisibleChange(false);
   } catch (e) {
     console.error("Failed to publish post", e);
   } finally {
     publishing.value = false;
-  }
-};
-
-const handlePublishCanceling = async () => {
-  try {
-    publishCanceling.value = true;
-
-    // Update published spec = false
-    const postToUpdate = cloneDeep(formState.value);
-    postToUpdate.post.spec.published = false;
-    await apiClient.post.updateDraftPost({
-      name: postToUpdate.post.metadata.name,
-      postRequest: postToUpdate,
-    });
-
-    // Get latest version post
-    const { data: latestData } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
-        name: formState.value.post.metadata.name,
-      });
-
-    formState.value.post = latestData;
-    emit("saved", formState.value);
-  } catch (e) {
-    console.log("Failed to cancel publish", e);
-  } finally {
     publishCanceling.value = false;
   }
 };
@@ -190,33 +180,33 @@ const { templates } = useThemeCustomTemplates("post");
           type="form"
         >
           <FormKit
-            v-model="formState.post.spec.title"
+            v-model="formState.spec.title"
             label="标题"
             type="text"
             name="title"
             validation="required"
           ></FormKit>
           <FormKit
-            v-model="formState.post.spec.slug"
+            v-model="formState.spec.slug"
             label="别名"
             name="slug"
             type="text"
             validation="required"
           ></FormKit>
           <FormKit
-            v-model="formState.post.spec.categories"
+            v-model="formState.spec.categories"
             label="分类目录"
             name="categories"
             type="categoryCheckbox"
           />
           <FormKit
-            v-model="formState.post.spec.tags"
+            v-model="formState.spec.tags"
             label="标签"
             name="tags"
             type="tagCheckbox"
           />
           <FormKit
-            v-model="formState.post.spec.excerpt.autoGenerate"
+            v-model="formState.spec.excerpt.autoGenerate"
             :options="[
               { label: '是', value: true },
               { label: '否', value: false },
@@ -227,8 +217,8 @@ const { templates } = useThemeCustomTemplates("post");
           >
           </FormKit>
           <FormKit
-            v-if="!formState.post.spec.excerpt.autoGenerate"
-            v-model="formState.post.spec.excerpt.raw"
+            v-if="!formState.spec.excerpt.autoGenerate"
+            v-model="formState.spec.excerpt.raw"
             label="自定义摘要"
             name="raw"
             type="textarea"
@@ -245,7 +235,7 @@ const { templates } = useThemeCustomTemplates("post");
           type="form"
         >
           <FormKit
-            v-model="formState.post.spec.allowComment"
+            v-model="formState.spec.allowComment"
             :options="[
               { label: '是', value: true },
               { label: '否', value: false },
@@ -254,7 +244,7 @@ const { templates } = useThemeCustomTemplates("post");
             type="radio"
           ></FormKit>
           <FormKit
-            v-model="formState.post.spec.pinned"
+            v-model="formState.spec.pinned"
             :options="[
               { label: '是', value: true },
               { label: '否', value: false },
@@ -264,7 +254,7 @@ const { templates } = useThemeCustomTemplates("post");
             type="radio"
           ></FormKit>
           <FormKit
-            v-model="formState.post.spec.visible"
+            v-model="formState.spec.visible"
             :options="[
               { label: '公开', value: 'PUBLIC' },
               { label: '内部成员可访问', value: 'INTERNAL' },
@@ -275,19 +265,19 @@ const { templates } = useThemeCustomTemplates("post");
             type="select"
           ></FormKit>
           <FormKit
-            v-model="formState.post.spec.publishTime"
+            v-model="formState.spec.publishTime"
             label="发表时间"
             type="datetime-local"
           ></FormKit>
           <FormKit
-            v-model="formState.post.spec.template"
+            v-model="formState.spec.template"
             :options="templates"
             label="自定义模板"
             name="template"
             type="select"
           ></FormKit>
           <FormKit
-            v-model="formState.post.spec.cover"
+            v-model="formState.spec.cover"
             name="cover"
             label="封面图"
             type="attachment"
@@ -299,29 +289,28 @@ const { templates } = useThemeCustomTemplates("post");
 
     <template #footer>
       <VSpace>
-        <VButton :loading="publishing" type="secondary" @click="handlePublish">
-          {{
-            formState.post.status?.phase === "PUBLISHED" ? "重新发布" : "发布"
-          }}
+        <template v-if="publishSupport">
+          <VButton
+            v-if="formState.metadata.labels?.[postLabels.PUBLISHED] !== 'true'"
+            :loading="publishing"
+            type="secondary"
+            @click="handleSwitchPublish(true)"
+          >
+            发布
+          </VButton>
+          <VButton
+            v-else
+            :loading="publishCanceling"
+            type="danger"
+            @click="handleSwitchPublish(false)"
+          >
+            取消发布
+          </VButton>
+        </template>
+        <VButton :loading="saving" type="secondary" @click="handleSave">
+          保存
         </VButton>
-        <VButton
-          :loading="saving"
-          size="sm"
-          type="secondary"
-          @click="handleSave"
-        >
-          仅保存
-        </VButton>
-        <VButton
-          v-if="formState.post.status?.phase === 'PUBLISHED'"
-          :loading="publishCanceling"
-          type="danger"
-          size="sm"
-          @click="handlePublishCanceling"
-        >
-          取消发布
-        </VButton>
-        <VButton size="sm" type="default" @click="handleVisibleChange(false)">
+        <VButton type="default" @click="handleVisibleChange(false)">
           关闭
         </VButton>
       </VSpace>

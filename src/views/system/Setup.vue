@@ -50,24 +50,10 @@ const handleSubmit = async () => {
     });
     await apiClient.post.draftPost({ postRequest: post as PostRequest });
 
-    try {
-      await apiClient.post.publishPost({ name: post.post.metadata.name });
-    } catch (error) {
-      console.error("Failed to publish post", error);
-    }
-
     // Create singlePage
     await apiClient.singlePage.draftSinglePage({
       singlePageRequest: singlePage as SinglePageRequest,
     });
-
-    try {
-      await apiClient.singlePage.publishSinglePage({
-        name: singlePage.page.metadata.name,
-      });
-    } catch (error) {
-      console.error("Failed to publish singlePage", error);
-    }
 
     // Create menu and menu items
     const menuItemPromises = menuItems.map((item) => {

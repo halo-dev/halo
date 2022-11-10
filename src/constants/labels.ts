@@ -11,6 +11,16 @@ export enum roleLabels {
 // post
 export enum postLabels {
   DELETED = "content.halo.run/deleted",
+  PUBLISHED = "content.halo.run/published",
+  OWNER = "content.halo.run/owner",
+  VISIBLE = "content.halo.run/visible",
+  PHASE = "content.halo.run/phase",
+}
+
+// singlePage
+export enum singlePageLabels {
+  DELETED = "content.halo.run/deleted",
+  PUBLISHED = "content.halo.run/published",
   OWNER = "content.halo.run/owner",
   VISIBLE = "content.halo.run/visible",
   PHASE = "content.halo.run/phase",

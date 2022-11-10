@@ -1,71 +1,70 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace, VTabItem, VTabs } from "@halo-dev/components";
 import { computed, ref, watchEffect } from "vue";
-import type { SinglePageRequest } from "@halo-dev/api-client";
+import type { SinglePage } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { v4 as uuid } from "uuid";
 import { useThemeCustomTemplates } from "@/modules/interface/themes/composables/use-theme";
+import { singlePageLabels } from "@/constants/labels";
 
-const initialFormState: SinglePageRequest = {
-  page: {
-    spec: {
-      title: "",
-      slug: "",
-      template: "",
-      cover: "",
-      deleted: false,
-      published: false,
-      publishTime: "",
-      pinned: false,
-      allowComment: true,
-      visible: "PUBLIC",
-      version: 1,
-      priority: 0,
-      excerpt: {
-        autoGenerate: true,
-        raw: "",
-      },
-      htmlMetas: [],
+const initialFormState: SinglePage = {
+  spec: {
+    title: "",
+    slug: "",
+    template: "",
+    cover: "",
+    deleted: false,
+    publish: false,
+    publishTime: "",
+    pinned: false,
+    allowComment: true,
+    visible: "PUBLIC",
+    version: 1,
+    priority: 0,
+    excerpt: {
+      autoGenerate: true,
+      raw: "",
     },
-    apiVersion: "content.halo.run/v1alpha1",
-    kind: "SinglePage",
-    metadata: {
-      name: uuid(),
-    },
+    htmlMetas: [],
   },
-  content: {
-    raw: "",
-    content: "",
-    rawType: "HTML",
+  apiVersion: "content.halo.run/v1alpha1",
+  kind: "SinglePage",
+  metadata: {
+    name: uuid(),
   },
 };
 
 const props = withDefaults(
   defineProps<{
     visible: boolean;
-    singlePage?: SinglePageRequest;
+    singlePage?: SinglePage;
+    publishSupport?: boolean;
+    onlyEmit?: boolean;
   }>(),
   {
     visible: false,
     singlePage: undefined,
+    publishSupport: true,
+    onlyEmit: false,
   }
 );
 
 const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
-  (event: "saved", singlePage: SinglePageRequest): void;
+  (event: "saved", singlePage: SinglePage): void;
+  (event: "published", singlePage: SinglePage): void;
 }>();
 
 const activeTab = ref("general");
-const formState = ref<SinglePageRequest>(cloneDeep(initialFormState));
+const formState = ref<SinglePage>(cloneDeep(initialFormState));
 const saving = ref(false);
 const publishing = ref(false);
 const publishCanceling = ref(false);
 
 const isUpdateMode = computed(() => {
-  return !!formState.value.page.metadata.creationTimestamp;
+  return !!formState.value.metadata.creationTimestamp;
 });
 
 const onVisibleChange = (visible: boolean) => {
@@ -76,26 +75,33 @@ const onVisibleChange = (visible: boolean) => {
 };
 
 const handleSave = async () => {
+  if (props.onlyEmit) {
+    emit("saved", formState.value);
+    return;
+  }
+
   try {
     saving.value = true;
 
-    // Set rendered content
-    formState.value.content.content = formState.value.content.raw;
+    saving.value = true;
 
-    if (isUpdateMode.value) {
-      const { data } = await apiClient.singlePage.updateDraftSinglePage({
-        name: formState.value.page.metadata.name,
-        singlePageRequest: formState.value,
-      });
-      formState.value.page = data;
-      emit("saved", formState.value);
-    } else {
-      const { data } = await apiClient.singlePage.draftSinglePage({
-        singlePageRequest: formState.value,
-      });
-      formState.value.page = data;
-      emit("saved", formState.value);
-    }
+    const { data } = isUpdateMode.value
+      ? await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+          {
+            name: formState.value.metadata.name,
+            singlePage: formState.value,
+          }
+        )
+      : await apiClient.extension.singlePage.createcontentHaloRunV1alpha1SinglePage(
+          {
+            singlePage: formState.value,
+          }
+        );
+
+    formState.value = data;
+    emit("saved", data);
+
+    onVisibleChange(false);
   } catch (error) {
     console.error("Failed to save single page", error);
   } finally {
@@ -103,55 +109,48 @@ const handleSave = async () => {
   }
 };
 
-const handlePublish = async () => {
+const handleSwitchPublish = async (publish: boolean) => {
+  if (props.onlyEmit) {
+    emit("published", formState.value);
+    return;
+  }
+
   try {
-    publishing.value = true;
+    if (publish) {
+      publishing.value = true;
+    } else {
+      publishCanceling.value = true;
+    }
 
-    // Save single page
-    await handleSave();
+    if (publish) {
+      formState.value.spec.releaseSnapshot = formState.value.spec.headSnapshot;
+    }
 
-    // Get latest version single page
-    const { data: latestData } =
-      await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
-        name: formState.value.page.metadata.name,
-      });
-    formState.value.page = latestData;
+    const { data } =
+      await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+        {
+          name: formState.value.metadata.name,
+          singlePage: {
+            ...formState.value,
+            spec: {
+              ...formState.value.spec,
+              publish: publish,
+            },
+          },
+        }
+      );
 
-    // Publish single page
-    const { data } = await apiClient.singlePage.publishSinglePage({
-      name: formState.value.page.metadata.name,
-    });
-    formState.value.page = data;
-    emit("saved", formState.value);
+    formState.value = data;
+
+    if (publish) {
+      emit("published", data);
+    }
+
+    onVisibleChange(false);
   } catch (error) {
     console.error("Failed to publish single page", error);
   } finally {
     publishing.value = false;
-  }
-};
-
-const handleCancelPublish = async () => {
-  try {
-    publishCanceling.value = true;
-
-    // Update published spec = false
-    const singlePageToUpdate = cloneDeep(formState.value);
-    singlePageToUpdate.page.spec.published = false;
-    await apiClient.singlePage.updateDraftSinglePage({
-      name: singlePageToUpdate.page.metadata.name,
-      singlePageRequest: singlePageToUpdate,
-    });
-
-    // Get latest version single page
-    const { data: latestData } =
-      await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
-        name: formState.value.page.metadata.name,
-      });
-    formState.value.page = latestData;
-    emit("saved", formState.value);
-  } catch (error) {
-    console.error("Failed to cancel publish single page", error);
-  } finally {
     publishCanceling.value = false;
   }
 };
@@ -188,21 +187,21 @@ const { templates } = useThemeCustomTemplates("page");
           type="form"
         >
           <FormKit
-            v-model="formState.page.spec.title"
+            v-model="formState.spec.title"
             label="标题"
             type="text"
             name="title"
             validation="required"
           ></FormKit>
           <FormKit
-            v-model="formState.page.spec.slug"
+            v-model="formState.spec.slug"
             label="别名"
             name="slug"
             type="text"
             validation="required"
           ></FormKit>
           <FormKit
-            v-model="formState.page.spec.excerpt.autoGenerate"
+            v-model="formState.spec.excerpt.autoGenerate"
             :options="[
               { label: '是', value: true },
               { label: '否', value: false },
@@ -213,8 +212,8 @@ const { templates } = useThemeCustomTemplates("page");
           >
           </FormKit>
           <FormKit
-            v-if="!formState.page.spec.excerpt.autoGenerate"
-            v-model="formState.page.spec.excerpt.raw"
+            v-if="!formState.spec.excerpt.autoGenerate"
+            v-model="formState.spec.excerpt.raw"
             name="raw"
             label="自定义摘要"
             type="textarea"
@@ -231,7 +230,7 @@ const { templates } = useThemeCustomTemplates("page");
           type="form"
         >
           <FormKit
-            v-model="formState.page.spec.allowComment"
+            v-model="formState.spec.allowComment"
             :options="[
               { label: '是', value: true },
               { label: '否', value: false },
@@ -241,7 +240,7 @@ const { templates } = useThemeCustomTemplates("page");
             type="radio"
           ></FormKit>
           <FormKit
-            v-model="formState.page.spec.pinned"
+            v-model="formState.spec.pinned"
             :options="[
               { label: '是', value: true },
               { label: '否', value: false },
@@ -251,7 +250,7 @@ const { templates } = useThemeCustomTemplates("page");
             type="radio"
           ></FormKit>
           <FormKit
-            v-model="formState.page.spec.visible"
+            v-model="formState.spec.visible"
             :options="[
               { label: '公开', value: 'PUBLIC' },
               { label: '内部成员可访问', value: 'INTERNAL' },
@@ -262,20 +261,20 @@ const { templates } = useThemeCustomTemplates("page");
             type="select"
           ></FormKit>
           <FormKit
-            v-model="formState.page.spec.publishTime"
+            v-model="formState.spec.publishTime"
             label="发表时间"
             type="datetime-local"
             name="publishTime"
           ></FormKit>
           <FormKit
-            v-model="formState.page.spec.template"
+            v-model="formState.spec.template"
             :options="templates"
             label="自定义模板"
             type="select"
             name="template"
           ></FormKit>
           <FormKit
-            v-model="formState.page.spec.cover"
+            v-model="formState.spec.cover"
             label="封面图"
             type="attachment"
             name="cover"
@@ -287,27 +286,28 @@ const { templates } = useThemeCustomTemplates("page");
 
     <template #footer>
       <VSpace>
-        <VButton :loading="publishing" type="secondary" @click="handlePublish">
-          {{
-            formState.page.status?.phase === "PUBLISHED" ? "重新发布" : "发布"
-          }}
-        </VButton>
-        <VButton
-          :loading="saving"
-          size="sm"
-          type="secondary"
-          @click="handleSave"
-        >
-          仅保存
-        </VButton>
-        <VButton
-          v-if="formState.page.status?.phase === 'PUBLISHED'"
-          :loading="publishCanceling"
-          type="danger"
-          size="sm"
-          @click="handleCancelPublish"
-        >
-          取消发布
+        <template v-if="publishSupport">
+          <VButton
+            v-if="
+              formState.metadata.labels?.[singlePageLabels.PUBLISHED] !== 'true'
+            "
+            :loading="publishing"
+            type="secondary"
+            @click="handleSwitchPublish(true)"
+          >
+            发布
+          </VButton>
+          <VButton
+            v-else
+            :loading="publishCanceling"
+            type="danger"
+            @click="handleSwitchPublish(false)"
+          >
+            取消发布
+          </VButton>
+        </template>
+        <VButton :loading="saving" type="secondary" @click="handleSave">
+          保存
         </VButton>
         <VButton size="sm" type="default" @click="onVisibleChange(false)">
           关闭

@@ -4,14 +4,16 @@ import { onMounted, ref } from "vue";
 import type { ListedPost } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
+import { postLabels } from "@/constants/labels";
 
 const posts = ref<ListedPost[]>([] as ListedPost[]);
 
 const handleFetchPosts = async () => {
   try {
     const { data } = await apiClient.post.listPosts({
+      labelSelector: [`${postLabels.PUBLISHED}=true`],
       sort: "PUBLISH_TIME",
-      publishPhase: "PUBLISHED",
+      sortOrder: false,
       page: 1,
       size: 10,
     });

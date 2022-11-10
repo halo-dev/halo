@@ -2,6 +2,8 @@
 import {
   IconBookRead,
   IconSave,
+  IconSettings,
+  IconSendPlaneFill,
   VButton,
   VPageHeader,
   VSpace,
@@ -9,12 +11,15 @@ import {
 import DefaultEditor from "@/components/editor/DefaultEditor.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import PostPreviewModal from "./components/PostPreviewModal.vue";
-import type { PostRequest } from "@halo-dev/api-client";
+import type { Post, PostRequest } from "@halo-dev/api-client";
 import { computed, onMounted, ref } from "vue";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { v4 as uuid } from "uuid";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const initialFormState: PostRequest = {
   post: {
@@ -24,7 +29,7 @@ const initialFormState: PostRequest = {
       template: "",
       cover: "",
       deleted: false,
-      published: false,
+      publish: false,
       publishTime: "",
       pinned: false,
       allowComment: true,
@@ -56,6 +61,7 @@ const formState = ref<PostRequest>(cloneDeep(initialFormState));
 const settingModal = ref(false);
 const previewModal = ref(false);
 const saving = ref(false);
+const publishing = ref(false);
 
 const isUpdateMode = computed(() => {
   return !!formState.value.post.metadata.creationTimestamp;
@@ -72,15 +78,25 @@ const handleSave = async () => {
     if (!formState.value.post.spec.title) {
       formState.value.post.spec.title = "无标题文章";
     }
+
     if (!formState.value.post.spec.slug) {
       formState.value.post.spec.slug = uuid();
     }
 
     if (isUpdateMode.value) {
+      // Get latest post
+      const { data: latestPost } =
+        await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+          name: formState.value.post.metadata.name,
+        });
+
+      formState.value.post = latestPost;
+
       const { data } = await apiClient.post.updateDraftPost({
         name: formState.value.post.metadata.name,
         postRequest: formState.value,
       });
+
       formState.value.post = data;
     } else {
       const { data } = await apiClient.post.draftPost({
@@ -98,10 +114,77 @@ const handleSave = async () => {
   }
 };
 
+const handlePublish = async () => {
+  try {
+    publishing.value = true;
+
+    // Set rendered content
+    formState.value.content.content = formState.value.content.raw;
+
+    if (isUpdateMode.value) {
+      const { headSnapshot } = formState.value.post.spec;
+      const { name: postName } = formState.value.post.metadata;
+      const { data: latestContent } =
+        await apiClient.content.updateSnapshotContent({
+          snapshotName: headSnapshot as string,
+          contentRequest: {
+            raw: formState.value.content.raw as string,
+            content: formState.value.content.content as string,
+            rawType: formState.value.content.rawType as string,
+            headSnapshotName: headSnapshot,
+            subjectRef: {
+              kind: "Post",
+              version: "v1alpha1",
+              group: "content.halo.run",
+              name: postName,
+            },
+          },
+        });
+
+      // Get latest post
+      const { data: latestPost } =
+        await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+          name: postName,
+        });
+
+      formState.value.post = latestPost;
+      formState.value.post.spec.publish = true;
+      formState.value.post.spec.headSnapshot = latestContent.snapshotName;
+      formState.value.post.spec.releaseSnapshot =
+        formState.value.post.spec.headSnapshot;
+
+      await apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
+        name: postName,
+        post: formState.value.post,
+      });
+    } else {
+      formState.value.post.spec.publish = true;
+      await apiClient.post.draftPost({
+        postRequest: formState.value,
+      });
+    }
+
+    router.push({ name: "Posts" });
+  } catch (error) {
+    console.error("Failed to publish post", error);
+  } finally {
+    publishing.value = false;
+  }
+};
+
+const handlePublishClick = () => {
+  if (isUpdateMode.value) {
+    handlePublish();
+  } else {
+    settingModal.value = true;
+  }
+};
+
 const handleFetchContent = async () => {
   if (!formState.value.post.spec.headSnapshot) {
     return;
   }
+
   const { data } = await apiClient.content.obtainSnapshotContent({
     snapshotName: formState.value.post.spec.headSnapshot,
   });
@@ -109,14 +192,33 @@ const handleFetchContent = async () => {
   formState.value.content = data;
 };
 
-const onSettingSaved = (post: PostRequest) => {
+const handleOpenSettingModal = async () => {
+  const { data: latestPost } =
+    await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+      name: formState.value.post.metadata.name,
+    });
+  formState.value.post = latestPost;
+  settingModal.value = true;
+};
+
+const onSettingSaved = (post: Post) => {
   // Set route query parameter
   if (!isUpdateMode.value) {
-    name.value = post.post.metadata.name;
+    name.value = post.metadata.name;
   }
 
-  formState.value = post;
+  formState.value.post = post;
   settingModal.value = false;
+
+  if (!isUpdateMode.value) {
+    handleSave();
+  }
+};
+
+const onSettingPublished = (post: Post) => {
+  formState.value.post = post;
+  settingModal.value = false;
+  handlePublish();
 };
 
 // Get post data when the route contains the name parameter
@@ -139,8 +241,11 @@ onMounted(async () => {
 <template>
   <PostSettingModal
     v-model:visible="settingModal"
-    :post="formState"
+    :post="formState.post"
+    :publish-support="!isUpdateMode"
+    :only-emit="!isUpdateMode"
     @saved="onSettingSaved"
+    @published="onSettingPublished"
   />
   <PostPreviewModal v-model:visible="previewModal" :post="formState.post" />
   <VPageHeader title="文章">
@@ -159,11 +264,29 @@ onMounted(async () => {
           预览
         </VButton>
         <VButton :loading="saving" size="sm" type="default" @click="handleSave">
-          保存
-        </VButton>
-        <VButton type="secondary" @click="settingModal = true">
           <template #icon>
             <IconSave class="h-full w-full" />
+          </template>
+          保存
+        </VButton>
+        <VButton
+          v-if="isUpdateMode"
+          size="sm"
+          type="default"
+          @click="handleOpenSettingModal"
+        >
+          <template #icon>
+            <IconSettings class="h-full w-full" />
+          </template>
+          设置
+        </VButton>
+        <VButton
+          type="secondary"
+          :loading="publishing"
+          @click="handlePublishClick"
+        >
+          <template #icon>
+            <IconSendPlaneFill class="h-full w-full" />
           </template>
           发布
         </VButton>

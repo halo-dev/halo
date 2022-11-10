@@ -52,6 +52,8 @@ import IconReplyLine from "~icons/ri/reply-line";
 import IconExternalLinkLine from "~icons/ri/external-link-line";
 import IconRefreshLine from "~icons/ri/refresh-line";
 import IconWindowLine from "~icons/ri/window-line";
+import IconSendPlaneFill from "~icons/ri/send-plane-fill";
+import IconRocketLine from "~icons/ri/rocket-line";
 
 export {
   IconDashboard,
@@ -108,4 +110,6 @@ export {
   IconExternalLinkLine,
   IconRefreshLine,
   IconWindowLine,
+  IconSendPlaneFill,
+  IconRocketLine,
 };

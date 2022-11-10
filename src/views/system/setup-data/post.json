@@ -6,7 +6,7 @@
       "template": "",
       "cover": "",
       "deleted": false,
-      "published": false,
+      "publish": true,
       "publishTime": "",
       "pinned": false,
       "allowComment": true,
