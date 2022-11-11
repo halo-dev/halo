@@ -32,6 +32,7 @@ const comments = ref<ListedCommentList>({
   last: false,
   hasNext: false,
   hasPrevious: false,
+  totalPages: 0,
 });
 const loading = ref(false);
 const checkAll = ref(false);

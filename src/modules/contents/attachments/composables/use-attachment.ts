@@ -58,6 +58,7 @@ export function useAttachmentControl(filterOptions?: {
     last: false,
     hasNext: false,
     hasPrevious: false,
+    totalPages: 0,
   });
   const loading = ref<boolean>(false);
 

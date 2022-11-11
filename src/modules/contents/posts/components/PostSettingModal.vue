@@ -105,46 +105,43 @@ const handleSave = async () => {
   }
 };
 
-const handleSwitchPublish = async (publish: boolean) => {
+const handlePublish = async () => {
   if (props.onlyEmit) {
     emit("published", formState.value);
     return;
   }
 
   try {
-    if (publish) {
-      publishing.value = true;
-    } else {
-      publishCanceling.value = true;
-    }
+    publishing.value = true;
 
-    if (publish) {
-      formState.value.spec.releaseSnapshot = formState.value.spec.headSnapshot;
-    }
-
-    const { data } =
-      await apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
-        name: formState.value.metadata.name,
-        post: {
-          ...formState.value,
-          spec: {
-            ...formState.value.spec,
-            publish: publish,
-          },
-        },
-      });
+    const { data } = await apiClient.post.publishPost({
+      name: formState.value.metadata.name,
+    });
 
     formState.value = data;
 
-    if (publish) {
-      emit("published", data);
-    }
+    emit("published", data);
 
     handleVisibleChange(false);
   } catch (e) {
     console.error("Failed to publish post", e);
   } finally {
     publishing.value = false;
+  }
+};
+
+const handleUnpublish = async () => {
+  try {
+    publishCanceling.value = true;
+
+    await apiClient.post.unpublishPost({
+      name: formState.value.metadata.name,
+    });
+
+    handleVisibleChange(false);
+  } catch (e) {
+    console.error("Failed to publish post", e);
+  } finally {
     publishCanceling.value = false;
   }
 };
@@ -294,7 +291,7 @@ const { templates } = useThemeCustomTemplates("post");
             v-if="formState.metadata.labels?.[postLabels.PUBLISHED] !== 'true'"
             :loading="publishing"
             type="secondary"
-            @click="handleSwitchPublish(true)"
+            @click="handlePublish()"
           >
             发布
           </VButton>
@@ -302,7 +299,7 @@ const { templates } = useThemeCustomTemplates("post");
             v-else
             :loading="publishCanceling"
             type="danger"
-            @click="handleSwitchPublish(false)"
+            @click="handleUnpublish()"
           >
             取消发布
           </VButton>

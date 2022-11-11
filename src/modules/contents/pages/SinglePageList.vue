@@ -46,6 +46,7 @@ const singlePages = ref<ListedSinglePageList>({
   last: false,
   hasNext: false,
   hasPrevious: false,
+  totalPages: 0,
 });
 const loading = ref(false);
 const settingModal = ref(false);

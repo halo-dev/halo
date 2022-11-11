@@ -35,6 +35,7 @@ const posts = ref<ListedPostList>({
   last: false,
   hasNext: false,
   hasPrevious: false,
+  totalPages: 0,
 });
 const loading = ref(false);
 const checkedAll = ref(false);

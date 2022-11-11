@@ -31,6 +31,7 @@ const plugins = ref<PluginList>({
   last: false,
   hasNext: false,
   hasPrevious: false,
+  totalPages: 0,
 });
 const loading = ref(false);
 const pluginInstall = ref(false);

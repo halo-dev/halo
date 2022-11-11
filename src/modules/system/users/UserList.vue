@@ -44,6 +44,7 @@ const users = ref<UserList>({
   last: false,
   hasNext: false,
   hasPrevious: false,
+  totalPages: 0,
 });
 const selectedUserNames = ref<string[]>([]);
 const selectedUser = ref<User>();

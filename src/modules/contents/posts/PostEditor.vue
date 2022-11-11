@@ -141,26 +141,17 @@ const handlePublish = async () => {
           },
         });
 
-      // Get latest post
-      const { data: latestPost } =
-        await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
-          name: postName,
-        });
-
-      formState.value.post = latestPost;
-      formState.value.post.spec.publish = true;
-      formState.value.post.spec.headSnapshot = latestContent.snapshotName;
-      formState.value.post.spec.releaseSnapshot =
-        formState.value.post.spec.headSnapshot;
-
-      await apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
+      await apiClient.post.publishPost({
         name: postName,
-        post: formState.value.post,
+        headSnapshot: latestContent.snapshotName,
       });
     } else {
-      formState.value.post.spec.publish = true;
-      await apiClient.post.draftPost({
+      const { data } = await apiClient.post.draftPost({
         postRequest: formState.value,
+      });
+
+      await apiClient.post.publishPost({
+        name: data.metadata.name,
       });
     }
 

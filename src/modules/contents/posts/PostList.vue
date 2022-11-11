@@ -39,7 +39,6 @@ import { usePostCategory } from "@/modules/contents/posts/categories/composables
 import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
 import { usePermission } from "@/utils/permission";
 import { onBeforeRouteLeave } from "vue-router";
-import cloneDeep from "lodash.clonedeep";
 import { postLabels } from "@/constants/labels";
 
 const { currentUserHasPermission } = usePermission();
@@ -53,6 +52,7 @@ const posts = ref<ListedPostList>({
   last: false,
   hasNext: false,
   hasPrevious: false,
+  totalPages: 0,
 });
 const loading = ref(false);
 const settingModal = ref(false);
@@ -239,11 +239,8 @@ const handleDelete = async (post: Post) => {
     description: "此操作会将文章放入回收站，后续可以从回收站恢复",
     confirmType: "danger",
     onConfirm: async () => {
-      const postToUpdate = cloneDeep(post);
-      postToUpdate.spec.deleted = true;
-      await apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
-        name: postToUpdate.metadata.name,
-        post: postToUpdate,
+      await apiClient.post.recyclePost({
+        name: post.metadata.name,
       });
       await handleFetchPosts();
     },
