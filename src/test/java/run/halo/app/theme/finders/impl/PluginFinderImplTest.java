@@ -29,22 +29,22 @@ class PluginFinderImplTest {
     private PluginFinderImpl pluginFinder;
 
     @Test
-    void enabled() {
+    void available() {
         assertThat(pluginFinder.available(null)).isFalse();
 
-        boolean enabled = pluginFinder.available("fake-plugin");
-        assertThat(enabled).isFalse();
+        boolean available = pluginFinder.available("fake-plugin");
+        assertThat(available).isFalse();
 
         PluginWrapper mockPluginWrapper = Mockito.mock(PluginWrapper.class);
         when(haloPluginManager.getPlugin(eq("fake-plugin")))
             .thenReturn(mockPluginWrapper);
-        when(mockPluginWrapper.getPluginState()).thenReturn(PluginState.RESOLVED);
 
-        enabled = pluginFinder.available("fake-plugin");
-        assertThat(enabled).isFalse();
+        when(mockPluginWrapper.getPluginState()).thenReturn(PluginState.RESOLVED);
+        available = pluginFinder.available("fake-plugin");
+        assertThat(available).isFalse();
 
         when(mockPluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
-        enabled = pluginFinder.available("fake-plugin");
-        assertThat(enabled).isTrue();
+        available = pluginFinder.available("fake-plugin");
+        assertThat(available).isTrue();
     }
 }
