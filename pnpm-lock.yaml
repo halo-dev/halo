@@ -6,8 +6,6 @@ importers:
     specifiers:
       '@changesets/cli': ^2.25.0
       '@emoji-mart/data': ^1.0.6
-      '@formkit/addons': ^1.0.0-beta.11
-      '@formkit/auto-animate': 1.0.0-beta.3
       '@formkit/core': ^1.0.0-beta.11
       '@formkit/i18n': ^1.0.0-beta.11
       '@formkit/inputs': ^1.0.0-beta.11
@@ -101,8 +99,6 @@ importers:
       yaml: ^2.1.3
     dependencies:
       '@emoji-mart/data': 1.0.6
-      '@formkit/addons': 1.0.0-beta.11
-      '@formkit/auto-animate': 1.0.0-beta.3
       '@formkit/core': 1.0.0-beta.11
       '@formkit/i18n': 1.0.0-beta.11
       '@formkit/inputs': 1.0.0-beta.11
@@ -1847,18 +1843,6 @@ packages:
     resolution: {integrity: sha512-4kAVoogvQm2N0XE0G6APQJuCNuErjOfPW8Ux7DFxh8+AfugWflwVJ5LDlHOwrwut7z/30NUvdtHzQ3zSip4EzQ==}
     dependencies:
       '@floating-ui/core': 0.3.1
-    dev: false
-
-  /@formkit/addons/1.0.0-beta.11:
-    resolution: {integrity: sha512-p8q34aOZ54OyxWyjJ6Y3Je/EcCFJTpu4uX5sNbPbgYvn0G3hogdDzC/ysVc42dcpZXg6qgwPZtNMKLGMKH24CQ==}
-    dependencies:
-      '@formkit/auto-animate': 1.0.0-beta.3
-      '@formkit/core': 1.0.0-beta.11
-      '@formkit/utils': 1.0.0-beta.11
-    dev: false
-
-  /@formkit/auto-animate/1.0.0-beta.3:
-    resolution: {integrity: sha512-glsi+ytwQpxT/Ctr9GtcIfVr4dO6mJ04mQbNU8MFSdCdqMopHtyfU5Fib0+9lNFIeR0luY4/0NW95/2R5pKsag==}
     dev: false
 
   /@formkit/core/1.0.0-beta.11:

@@ -26,8 +26,6 @@
   ],
   "dependencies": {
     "@emoji-mart/data": "^1.0.6",
-    "@formkit/addons": "^1.0.0-beta.11",
-    "@formkit/auto-animate": "1.0.0-beta.3",
     "@formkit/core": "^1.0.0-beta.11",
     "@formkit/i18n": "^1.0.0-beta.11",
     "@formkit/inputs": "^1.0.0-beta.11",

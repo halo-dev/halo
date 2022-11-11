@@ -29,9 +29,10 @@ const buttonClassification = {
 const theme: Record<string, Record<string, string>> = {
   global: {
     form: "divide-y divide-gray-100",
-    outer: "formkit-disabled:opacity-50 py-4 first:pt-0 last:pb-0",
+    outer:
+      "formkit-disabled:opacity-50 py-4 first:pt-0 last:pb-0 transition-all",
     help: "text-xs mt-2 text-gray-500",
-    messages: "list-none p-0 mt-1.5 mb-0",
+    messages: "list-none p-0 mt-1.5 mb-0 transition-all",
     message: "text-red-500 mt-2 text-xs",
   },
   button: buttonClassification,
