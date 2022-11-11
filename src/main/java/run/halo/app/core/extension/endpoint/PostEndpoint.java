@@ -6,6 +6,7 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import lombok.AllArgsConstructor;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.QueryParamBuildUtil;
 
 /**
@@ -29,13 +31,11 @@ import run.halo.app.extension.router.QueryParamBuildUtil;
  * @since 2.0.0
  */
 @Component
+@AllArgsConstructor
 public class PostEndpoint implements CustomEndpoint {
 
     private final PostService postService;
-
-    public PostEndpoint(PostService postService) {
-        this.postService = postService;
-    }
+    private final ReactiveExtensionClient client;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -111,7 +111,14 @@ public class PostEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> publishPost(ServerRequest request) {
         String name = request.pathVariable("name");
-        return postService.publishPost(name)
+        return client.fetch(Post.class, name)
+            .flatMap(post -> {
+                Post.PostSpec spec = post.getSpec();
+                spec.setPublish(true);
+                spec.setReleaseSnapshot(spec.getHeadSnapshot());
+                return client.update(post);
+            })
+            .flatMap(post -> postService.publishPost(post.getMetadata().getName()))
             .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }
 

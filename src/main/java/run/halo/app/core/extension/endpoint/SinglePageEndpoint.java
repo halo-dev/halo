@@ -6,6 +6,7 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import lombok.AllArgsConstructor;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
@@ -20,6 +21,7 @@ import run.halo.app.content.SinglePageRequest;
 import run.halo.app.content.SinglePageService;
 import run.halo.app.core.extension.SinglePage;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.QueryParamBuildUtil;
 
 /**
@@ -29,13 +31,11 @@ import run.halo.app.extension.router.QueryParamBuildUtil;
  * @since 2.0.0
  */
 @Component
+@AllArgsConstructor
 public class SinglePageEndpoint implements CustomEndpoint {
 
     private final SinglePageService singlePageService;
-
-    public SinglePageEndpoint(SinglePageService singlePageService) {
-        this.singlePageService = singlePageService;
-    }
+    private final ReactiveExtensionClient client;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -111,8 +111,15 @@ public class SinglePageEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> publishSinglePage(ServerRequest request) {
         String name = request.pathVariable("name");
-        return singlePageService.publish(name)
-            .flatMap(singlePage -> ServerResponse.ok().bodyValue(singlePage));
+        return client.fetch(SinglePage.class, name)
+            .flatMap(singlePage -> {
+                SinglePage.SinglePageSpec spec = singlePage.getSpec();
+                spec.setPublish(true);
+                spec.setReleaseSnapshot(spec.getHeadSnapshot());
+                return client.update(singlePage);
+            })
+            .flatMap(singlePage -> singlePageService.publish(singlePage.getMetadata().getName()))
+            .flatMap(page -> ServerResponse.ok().bodyValue(page));
     }
 
     Mono<ServerResponse> listSinglePage(ServerRequest request) {

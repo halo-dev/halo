@@ -6,6 +6,8 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
@@ -17,7 +19,6 @@ import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentRequest;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.ContentWrapper;
-import run.halo.app.core.extension.Snapshot;
 
 /**
  * Endpoint for managing content.
@@ -47,7 +48,7 @@ public class ContentEndpoint implements CustomEndpoint {
                         .name("snapshotName")
                         .in(ParameterIn.PATH))
                     .response(responseBuilder()
-                        .implementation(ContentWrapper.class))
+                        .implementation(ContentResponse.class))
             )
             .POST("contents", this::draftSnapshotContent,
                 builder -> builder.operationId("DraftSnapshotContent")
@@ -61,7 +62,7 @@ public class ContentEndpoint implements CustomEndpoint {
                                 .implementation(ContentRequest.class))
                         ))
                     .response(responseBuilder()
-                        .implementation(ContentWrapper.class))
+                        .implementation(ContentResponse.class))
             )
             .PUT("contents/{snapshotName}", this::updateSnapshotContent,
                 builder -> builder.operationId("UpdateSnapshotContent")
@@ -79,25 +80,7 @@ public class ContentEndpoint implements CustomEndpoint {
                                 .implementation(ContentRequest.class))
                         ))
                     .response(responseBuilder()
-                        .implementation(ContentWrapper.class))
-            )
-            .PUT("contents/{snapshotName}/publish", this::publishSnapshotContent,
-                builder -> builder.operationId("PublishSnapshotContent")
-                    .description("Publish a snapshot content.")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .required(true)
-                        .name("snapshotName")
-                        .in(ParameterIn.PATH))
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder()
-                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(Builder.schemaBuilder()
-                                .implementation(Snapshot.SubjectRef.class))
-                        ))
-                    .response(responseBuilder()
-                        .implementation(ContentWrapper.class))
+                        .implementation(ContentResponse.class))
             )
             .build();
     }
@@ -105,6 +88,7 @@ public class ContentEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> obtainContent(ServerRequest request) {
         String snapshotName = request.pathVariable("snapshotName");
         return contentService.getContent(snapshotName)
+            .map(ContentResponse::from)
             .flatMap(content -> ServerResponse.ok().bodyValue(content));
     }
 
@@ -117,19 +101,41 @@ public class ContentEndpoint implements CustomEndpoint {
                         content.raw(), content.content(), content.rawType());
                 return contentService.updateContent(contentRequest);
             })
-            .flatMap(content -> ServerResponse.ok().bodyValue(content));
-    }
-
-    private Mono<ServerResponse> publishSnapshotContent(ServerRequest request) {
-        String snapshotName = request.pathVariable("snapshotName");
-        return request.bodyToMono(Snapshot.SubjectRef.class)
-            .flatMap(subjectRef -> contentService.publish(snapshotName, subjectRef))
+            .map(ContentResponse::from)
             .flatMap(content -> ServerResponse.ok().bodyValue(content));
     }
 
     private Mono<ServerResponse> draftSnapshotContent(ServerRequest request) {
         return request.bodyToMono(ContentRequest.class)
             .flatMap(contentService::draftContent)
+            .map(ContentResponse::from)
             .flatMap(content -> ServerResponse.ok().bodyValue(content));
+    }
+
+    @Data
+    public static class ContentResponse {
+        @Schema(required = true, description = "The headSnapshotName if updated or new name if "
+            + "created.")
+        private String snapshotName;
+        @Schema(required = true)
+        private String raw;
+
+        @Schema(required = true)
+        private String content;
+
+        @Schema(required = true)
+        private String rawType;
+
+        /**
+         * Converts content response from {@link ContentWrapper}.
+         */
+        public static ContentResponse from(ContentWrapper wrapper) {
+            ContentResponse response = new ContentResponse();
+            response.raw = wrapper.getRaw();
+            response.setSnapshotName(wrapper.getSnapshotName());
+            response.content = wrapper.getContent();
+            response.rawType = wrapper.getRawType();
+            return response;
+        }
     }
 }

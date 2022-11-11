@@ -5,11 +5,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GVK;
 
 /**
@@ -26,9 +26,9 @@ import run.halo.app.extension.GVK;
 public class SinglePage extends AbstractExtension {
     public static final String KIND = "SinglePage";
     public static final String DELETED_LABEL = "content.halo.run/deleted";
+    public static final String PUBLISHED_LABEL = "content.halo.run/published";
     public static final String OWNER_LABEL = "content.halo.run/owner";
     public static final String VISIBLE_LABEL = "content.halo.run/visible";
-    public static final String PHASE_LABEL = "content.halo.run/phase";
 
     @Schema(required = true)
     private SinglePageSpec spec;
@@ -46,7 +46,8 @@ public class SinglePage extends AbstractExtension {
 
     @JsonIgnore
     public boolean isPublished() {
-        return Objects.equals(true, spec.getPublished());
+        Map<String, String> labels = getMetadata().getLabels();
+        return labels != null && labels.getOrDefault(PUBLISHED_LABEL, "false").equals("true");
     }
 
     @Data
@@ -76,7 +77,7 @@ public class SinglePage extends AbstractExtension {
         private Boolean deleted;
 
         @Schema(required = true, defaultValue = "false")
-        private Boolean published;
+        private Boolean publish;
 
         private Instant publishTime;
 
@@ -105,5 +106,10 @@ public class SinglePage extends AbstractExtension {
     @EqualsAndHashCode(callSuper = true)
     public static class SinglePageStatus extends Post.PostStatus {
 
+    }
+
+    public static void changePublishedState(SinglePage page, boolean value) {
+        Map<String, String> labels = ExtensionUtil.nullSafeLabels(page);
+        labels.put(PUBLISHED_LABEL, String.valueOf(value));
     }
 }

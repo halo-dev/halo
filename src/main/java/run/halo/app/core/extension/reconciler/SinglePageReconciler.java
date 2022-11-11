@@ -4,17 +4,19 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.web.util.UriUtils.encodePath;
 
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
 import run.halo.app.content.ContentService;
+import run.halo.app.content.SinglePageService;
 import run.halo.app.content.permalinks.ExtensionLocator;
 import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Post;
@@ -22,6 +24,7 @@ import run.halo.app.core.extension.SinglePage;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Reconciler;
@@ -46,22 +49,26 @@ import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
  * @author guqing
  * @since 2.0.0
  */
+@Slf4j
 public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private static final String FINALIZER_NAME = "single-page-protection";
     private static final GroupVersionKind GVK = GroupVersionKind.fromExtension(SinglePage.class);
     private final ExtensionClient client;
     private final ContentService contentService;
     private final ApplicationContext applicationContext;
+    private final SinglePageService singlePageService;
     private final CounterService counterService;
 
     private final ExternalUrlSupplier externalUrlSupplier;
 
     public SinglePageReconciler(ExtensionClient client, ContentService contentService,
-        ApplicationContext applicationContext, CounterService counterService,
+        ApplicationContext applicationContext, SinglePageService singlePageService,
+        CounterService counterService,
         ExternalUrlSupplier externalUrlSupplier) {
         this.client = client;
         this.contentService = contentService;
         this.applicationContext = applicationContext;
+        this.singlePageService = singlePageService;
         this.counterService = counterService;
         this.externalUrlSupplier = externalUrlSupplier;
     }
@@ -77,10 +84,77 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
                 }
                 addFinalizerIfNecessary(oldPage);
 
-                reconcileStatus(request.name());
+                // reconcile spec first
+                reconcileSpec(request.name());
+                // then
                 reconcileMetadata(request.name());
+                reconcileStatus(request.name());
             });
         return new Result(false, null);
+    }
+
+    private void reconcileSpec(String name) {
+        // publish single page if necessary
+        try {
+            singlePageService.publish(name).block();
+        } catch (Throwable e) {
+            publishFailed(name, e);
+            throw e;
+        }
+
+        client.fetch(SinglePage.class, name).ifPresent(page -> {
+            SinglePage oldPage = JsonUtils.deepCopy(page);
+            if (page.isPublished() && Objects.equals(false, page.getSpec().getPublish())) {
+                SinglePage.changePublishedState(page, false);
+                final SinglePage.SinglePageStatus status = page.getStatusOrDefault();
+                Condition condition = new Condition();
+                condition.setType("CancelledPublish");
+                condition.setStatus(ConditionStatus.TRUE);
+                condition.setReason(condition.getType());
+                condition.setMessage("CancelledPublish");
+                condition.setLastTransitionTime(Instant.now());
+                status.getConditionsOrDefault().add(condition);
+                status.setPhase(Post.PostPhase.DRAFT.name());
+            }
+            if (!oldPage.equals(page)) {
+                client.update(page);
+            }
+        });
+    }
+
+    private void publishFailed(String name, Throwable error) {
+        Assert.notNull(name, "Name must not be null");
+        Assert.notNull(error, "Error must not be null");
+        client.fetch(SinglePage.class, name).ifPresent(page -> {
+            final SinglePage oldPage = JsonUtils.deepCopy(page);
+
+            SinglePage.SinglePageStatus status = page.getStatusOrDefault();
+            Post.PostPhase phase = Post.PostPhase.FAILED;
+            status.setPhase(phase.name());
+
+            final List<Condition> conditions = status.getConditionsOrDefault();
+            Condition condition = new Condition();
+            condition.setType(phase.name());
+            condition.setReason(phase.name());
+            condition.setMessage("");
+            condition.setStatus(ConditionStatus.TRUE);
+            condition.setLastTransitionTime(Instant.now());
+            condition.setMessage(error.getMessage());
+            condition.setStatus(ConditionStatus.FALSE);
+
+            if (conditions.size() > 0) {
+                Condition lastCondition = conditions.get(conditions.size() - 1);
+                if (!StringUtils.equals(lastCondition.getType(), condition.getType())
+                    && !StringUtils.equals(lastCondition.getMessage(), condition.getMessage())) {
+                    conditions.add(condition);
+                }
+            }
+            page.setStatus(status);
+
+            if (!oldPage.equals(page)) {
+                client.update(page);
+            }
+        });
     }
 
     private void addFinalizerIfNecessary(SinglePage oldSinglePage) {
@@ -105,14 +179,12 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         permalinkOnDelete(singlePage);
 
         // clean up snapshot
-        Snapshot.SubjectRef subjectRef =
-            Snapshot.SubjectRef.of(SinglePage.KIND, singlePage.getMetadata().getName());
+        Ref ref = Ref.of(singlePage);
         client.list(Snapshot.class,
-                snapshot -> subjectRef.equals(snapshot.getSpec().getSubjectRef()), null)
+                snapshot -> ref.equals(snapshot.getSpec().getSubjectRef()), null)
             .forEach(client::delete);
 
         // clean up comments
-        Ref ref = Ref.of(singlePage);
         client.list(Comment.class, comment -> comment.getSpec().getSubjectRef().equals(ref),
                 null)
             .forEach(client::delete);
@@ -139,17 +211,18 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
             SinglePage.SinglePageSpec spec = singlePage.getSpec();
             // handle logic delete
-            Map<String, String> labels = getLabelsOrDefault(singlePage);
+            Map<String, String> labels = ExtensionUtil.nullSafeLabels(singlePage);
             if (isDeleted(singlePage)) {
                 labels.put(SinglePage.DELETED_LABEL, Boolean.TRUE.toString());
             } else {
                 labels.put(SinglePage.DELETED_LABEL, Boolean.FALSE.toString());
             }
-            // synchronize some fields to labels to query
-            labels.put(SinglePage.PHASE_LABEL, singlePage.getStatusOrDefault().getPhase());
             labels.put(SinglePage.VISIBLE_LABEL,
                 Objects.requireNonNullElse(spec.getVisible(), Post.VisibleEnum.PUBLIC).name());
             labels.put(SinglePage.OWNER_LABEL, spec.getOwner());
+            if (!labels.containsKey(SinglePage.PUBLISHED_LABEL)) {
+                labels.put(Post.PUBLISHED_LABEL, Boolean.FALSE.toString());
+            }
             if (!oldPage.equals(singlePage)) {
                 client.update(singlePage);
             }
@@ -205,7 +278,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
                 contentService.getContent(spec.getHeadSnapshot())
                     .blockOptional()
                     .ifPresent(content -> {
-                        String contentRevised = content.content();
+                        String contentRevised = content.getContent();
                         status.setExcerpt(getExcerpt(contentRevised));
                     });
             } else {
@@ -214,7 +287,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
             // handle contributors
             String headSnapshot = singlePage.getSpec().getHeadSnapshot();
-            contentService.listSnapshots(Snapshot.SubjectRef.of(SinglePage.KIND, name))
+            contentService.listSnapshots(Ref.of(singlePage))
                 .collectList()
                 .blockOptional().ifPresent(snapshots -> {
                     List<String> contributors = snapshots.stream()
@@ -234,38 +307,23 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
                         .filter(snapshot -> snapshot.getMetadata().getName().equals(headSnapshot))
                         .findAny()
                         .ifPresent(snapshot -> {
-                            status.setInProgress(!isPublished(snapshot));
+                            status.setInProgress(!snapshot.isPublished());
                         });
+
+                    List<String> releasedSnapshots = snapshots.stream()
+                        .filter(Snapshot::isPublished)
+                        .sorted(Comparator.comparing(snapshot -> snapshot.getSpec().getVersion()))
+                        .map(snapshot -> snapshot.getMetadata().getName())
+                        .toList();
+                    status.setReleasedSnapshots(releasedSnapshots);
                 });
 
-            // handle cancel publish,has released version and published is false and not handled
-            if (StringUtils.isNotBlank(spec.getReleaseSnapshot())
-                && Objects.equals(false, spec.getPublished())
-                && !StringUtils.equals(status.getPhase(), Post.PostPhase.DRAFT.name())) {
-                Condition condition = new Condition();
-                condition.setType("CancelledPublish");
-                condition.setStatus(ConditionStatus.TRUE);
-                condition.setReason(condition.getType());
-                condition.setMessage(StringUtils.EMPTY);
-                condition.setLastTransitionTime(Instant.now());
-                status.getConditionsOrDefault().add(condition);
-                status.setPhase(Post.PostPhase.DRAFT.name());
-            }
+            status.setConditions(limitConditionSize(status.getConditions()));
 
             if (!oldPage.equals(singlePage)) {
                 client.update(singlePage);
             }
         });
-    }
-
-    private Map<String, String> getLabelsOrDefault(SinglePage singlePage) {
-        Assert.notNull(singlePage, "The singlePage must not be null.");
-        Map<String, String> labels = singlePage.getMetadata().getLabels();
-        if (labels == null) {
-            labels = new LinkedHashMap<>();
-            singlePage.getMetadata().setLabels(labels);
-        }
-        return labels;
     }
 
     private String getExcerpt(String htmlContent) {
@@ -275,16 +333,16 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         return StringUtils.substring(text, 0, 150);
     }
 
-    private boolean isPublished(Snapshot snapshot) {
-        return snapshot.getSpec().getPublishTime() != null;
-    }
-
-    private boolean isPublished(SinglePage singlePage) {
-        return Objects.equals(true, singlePage.getSpec().getPublished());
-    }
-
     private boolean isDeleted(SinglePage singlePage) {
         return Objects.equals(true, singlePage.getSpec().getDeleted())
             || singlePage.getMetadata().getDeletionTimestamp() != null;
+    }
+
+    static List<Condition> limitConditionSize(List<Condition> conditions) {
+        if (conditions == null || conditions.size() <= 10) {
+            return conditions;
+        }
+        // Retain the last ten conditions
+        return conditions.subList(conditions.size() - 10, conditions.size());
     }
 }

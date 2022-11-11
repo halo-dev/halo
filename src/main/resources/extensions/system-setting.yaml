@@ -50,12 +50,7 @@ spec:
           value: 10
           min: 1
           max: 100
-          validation: required | max:100
-        - $formkit: checkbox
-          label: "新文章审核"
-          value: false
-          name: review
-          help: "用户发布文章是否需要管理员审核"
+          validation: required
     - group: seo
       label: SEO 设置
       formSchema:

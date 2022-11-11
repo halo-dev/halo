@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
+import run.halo.app.extension.Ref;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -19,8 +20,11 @@ class ContentRequestTest {
 
     @BeforeEach
     void setUp() {
-        Snapshot.SubjectRef subjectRef = Snapshot.SubjectRef.of(Post.KIND, "test-post");
-        contentRequest = new ContentRequest(subjectRef, "snapshot-1", """
+        Ref ref = new Ref();
+        ref.setKind(Post.KIND);
+        ref.setGroup("content.halo.run");
+        ref.setName("test-post");
+        contentRequest = new ContentRequest(ref, "snapshot-1", """
             Four score and seven
             years ago our fathers
 
@@ -50,6 +54,7 @@ class ContentRequestTest {
                     "spec": {
                         "subjectRef": {
                             "kind": "Post",
+                            "group": "content.halo.run",
                             "name": "test-post"
                         },
                         "rawType": "MARKDOWN",

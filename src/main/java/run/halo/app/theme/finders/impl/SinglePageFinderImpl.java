@@ -32,10 +32,9 @@ import run.halo.app.theme.finders.vo.StatsVo;
 @Finder("singlePageFinder")
 public class SinglePageFinderImpl implements SinglePageFinder {
 
-    public static final Predicate<SinglePage> FIXED_PREDICATE = page ->
-        Objects.equals(false, page.getSpec().getDeleted())
-            && Objects.equals(true, page.getSpec().getPublished())
-            && Post.VisibleEnum.PUBLIC.equals(page.getSpec().getVisible());
+    public static final Predicate<SinglePage> FIXED_PREDICATE = page -> page.isPublished()
+        && Objects.equals(false, page.getSpec().getDeleted())
+        && Post.VisibleEnum.PUBLIC.equals(page.getSpec().getVisible());
 
     private final ReactiveExtensionClient client;
 
@@ -65,6 +64,7 @@ public class SinglePageFinderImpl implements SinglePageFinder {
         SinglePageVo pageVo = SinglePageVo.from(page);
         pageVo.setContributors(contributors);
         pageVo.setContent(content(pageName));
+        pageVo.setOwner(contributorFinder.getContributor(page.getSpec().getOwner()));
         populateStats(pageVo);
         return pageVo;
     }
@@ -74,8 +74,8 @@ public class SinglePageFinderImpl implements SinglePageFinder {
         return client.fetch(SinglePage.class, pageName)
             .map(page -> page.getSpec().getReleaseSnapshot())
             .flatMap(contentService::getContent)
-            .map(wrapper -> ContentVo.builder().content(wrapper.content())
-                .raw(wrapper.raw()).build())
+            .map(wrapper -> ContentVo.builder().content(wrapper.getContent())
+                .raw(wrapper.getRaw()).build())
             .block();
     }
 
