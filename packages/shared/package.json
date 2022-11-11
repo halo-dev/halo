@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/console-shared",
-  "version": "2.0.0-alpha.4",
+  "version": "2.0.0-beta.1",
   "description": "",
   "files": [
     "dist"
