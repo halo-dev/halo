@@ -29,7 +29,8 @@ public interface PostFinder {
     Mono<ListResult<ListedPostVo>> listByCategory(@Nullable Integer page, @Nullable Integer size,
         String categoryName);
 
-    Mono<ListResult<ListedPostVo>> listByTag(@Nullable Integer page, @Nullable Integer size, String tag);
+    Mono<ListResult<ListedPostVo>> listByTag(@Nullable Integer page, @Nullable Integer size,
+        String tag);
 
     Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size);
 
