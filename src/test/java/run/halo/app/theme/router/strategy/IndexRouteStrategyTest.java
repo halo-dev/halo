@@ -1,8 +1,5 @@
 package run.halo.app.theme.router.strategy;
 
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.lenient;
-
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +11,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import run.halo.app.extension.ListResult;
 import run.halo.app.theme.finders.PostFinder;
 
 /**
@@ -30,12 +26,6 @@ class IndexRouteStrategyTest extends RouterStrategyTestSuite {
 
     @InjectMocks
     private IndexRouteStrategy indexRouteStrategy;
-
-    @Override
-    public void setUp() {
-        lenient().when(postFinder.list(anyInt(), anyInt()))
-            .thenReturn(new ListResult<>(1, 10, 0, List.of()));
-    }
 
     @Test
     void getRouteFunction() {

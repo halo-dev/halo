@@ -13,8 +13,6 @@ import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-import run.halo.app.extension.ListResult;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
@@ -47,17 +45,12 @@ public class ArchivesRouteStrategy implements ListPageRouteHandlerStrategy {
         String path = request.path();
         return environmentFetcher.fetchPost()
             .map(postSetting -> defaultIfNull(postSetting.getArchivePageSize(), DEFAULT_PAGE_SIZE))
-            .flatMap(pageSize -> listPost(pageNum(request), pageSize, year, month))
+            .flatMap(pageSize -> postFinder.archives(pageNum(request), pageSize, year, month))
             .map(list -> new UrlContextListResult.Builder<PostArchiveVo>()
                 .listResult(list)
                 .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
                 .prevUrl(PageUrlUtils.prevPageUrl(path))
                 .build());
-    }
-
-    Mono<ListResult<PostArchiveVo>> listPost(int pageNum, int pageSize, String year, String month) {
-        return Mono.fromCallable(() -> postFinder.archives(pageNum, pageSize, year, month))
-            .subscribeOn(Schedulers.boundedElastic());
     }
 
     private String pathVariable(ServerRequest request, String name) {

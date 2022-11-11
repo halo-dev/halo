@@ -7,6 +7,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.util.Assert;
 import run.halo.app.core.extension.SinglePage;
+import run.halo.app.extension.MetadataOperator;
 
 /**
  * A value object for {@link SinglePage}.
@@ -17,27 +18,36 @@ import run.halo.app.core.extension.SinglePage;
 @Data
 @SuperBuilder
 @ToString
-@EqualsAndHashCode(callSuper = true)
-public class SinglePageVo extends ListedSinglePageVo {
+@EqualsAndHashCode
+public class ListedSinglePageVo {
 
-    private ContentVo content;
+    private MetadataOperator metadata;
+
+    private SinglePage.SinglePageSpec spec;
+
+    private SinglePage.SinglePageStatus status;
+
+    private StatsVo stats;
+
+    private List<Contributor> contributors;
+
+    private Contributor owner;
 
     /**
-     * Convert {@link SinglePage} to {@link SinglePageVo}.
+     * Convert {@link SinglePage} to {@link ListedSinglePageVo}.
      *
      * @param singlePage single page extension
      * @return special page value object
      */
-    public static SinglePageVo from(SinglePage singlePage) {
+    public static ListedSinglePageVo from(SinglePage singlePage) {
         Assert.notNull(singlePage, "The singlePage must not be null.");
         SinglePage.SinglePageSpec spec = singlePage.getSpec();
         SinglePage.SinglePageStatus pageStatus = singlePage.getStatus();
-        return SinglePageVo.builder()
+        return ListedSinglePageVo.builder()
             .metadata(singlePage.getMetadata())
             .spec(spec)
             .status(pageStatus)
             .contributors(List.of())
-            .content(new ContentVo(null, null))
             .build();
     }
 }

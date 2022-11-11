@@ -22,7 +22,7 @@ public class SiteStatsFinderImpl implements SiteStatsFinder {
     private final ReactiveExtensionClient client;
 
     @Override
-    public SiteStatsVo getStats() {
+    public Mono<SiteStatsVo> getStats() {
         return client.list(Counter.class, null, null)
             .reduce(SiteStatsVo.empty(), (stats, counter) -> {
                 stats.setVisit(stats.getVisit() + counter.getVisit());
@@ -36,8 +36,7 @@ public class SiteStatsFinderImpl implements SiteStatsFinder {
             )
             .flatMap(siteStatsVo -> categoryCount()
                 .doOnNext(siteStatsVo::setCategory)
-                .thenReturn(siteStatsVo))
-            .block();
+                .thenReturn(siteStatsVo));
     }
 
     Mono<Integer> postCount() {

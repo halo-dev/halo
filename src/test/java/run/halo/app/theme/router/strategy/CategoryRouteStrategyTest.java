@@ -1,10 +1,8 @@
 package run.halo.app.theme.router.strategy;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,7 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import run.halo.app.extension.ListResult;
+import reactor.core.publisher.Mono;
 import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.PostFinder;
 
@@ -36,12 +34,6 @@ class CategoryRouteStrategyTest extends RouterStrategyTestSuite {
     @InjectMocks
     private CategoryRouteStrategy categoryRouteStrategy;
 
-    @Override
-    public void setUp() {
-        lenient().when(postFinder.listByCategory(anyInt(), anyInt(), any()))
-            .thenReturn(new ListResult<>(1, 10, 0, List.of()));
-    }
-
     @Test
     void getRouteFunction() {
         RouterFunction<ServerResponse> routeFunction = getRouterFunction();
@@ -51,6 +43,8 @@ class CategoryRouteStrategyTest extends RouterStrategyTestSuite {
             categoryRouteStrategy.getHandler(null, "category-slug-1"));
         permalinkHttpGetRouter.insert("/categories-test/category-slug-2",
             categoryRouteStrategy.getHandler(null, "category-slug-2"));
+
+        when(categoryFinder.getByName(any())).thenReturn(Mono.empty());
 
         // /{prefix}/{slug}
         client.get()

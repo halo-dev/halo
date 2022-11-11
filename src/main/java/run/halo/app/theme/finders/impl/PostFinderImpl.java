@@ -15,7 +15,10 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.lang.NonNull;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.comparator.Comparators;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import run.halo.app.content.ContentService;
 import run.halo.app.core.extension.Counter;
@@ -30,15 +33,13 @@ import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.TagFinder;
-import run.halo.app.theme.finders.vo.CategoryVo;
 import run.halo.app.theme.finders.vo.ContentVo;
-import run.halo.app.theme.finders.vo.Contributor;
+import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.NavigationPostVo;
 import run.halo.app.theme.finders.vo.PostArchiveVo;
 import run.halo.app.theme.finders.vo.PostArchiveYearMonthVo;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.finders.vo.StatsVo;
-import run.halo.app.theme.finders.vo.TagVo;
 
 /**
  * A finder for {@link Post}.
@@ -50,8 +51,8 @@ import run.halo.app.theme.finders.vo.TagVo;
 public class PostFinderImpl implements PostFinder {
 
     public static final Predicate<Post> FIXED_PREDICATE = post -> post.isPublished()
-            && Objects.equals(false, post.getSpec().getDeleted())
-            && Post.VisibleEnum.PUBLIC.equals(post.getSpec().getVisible());
+        && Objects.equals(false, post.getSpec().getDeleted())
+        && Post.VisibleEnum.PUBLIC.equals(post.getSpec().getVisible());
     private final ReactiveExtensionClient client;
 
     private final ContentService contentService;
@@ -78,53 +79,49 @@ public class PostFinderImpl implements PostFinder {
     }
 
     @Override
-    public PostVo getByName(String postName) {
-        Post post = client.fetch(Post.class, postName)
-            .block();
-        if (post == null) {
-            return null;
-        }
-        PostVo postVo = getPostVo(post);
-        postVo.setContent(content(postName));
-        return postVo;
+    public Mono<PostVo> getByName(String postName) {
+        return client.fetch(Post.class, postName)
+            .flatMap(this::getListedPostVo)
+            .map(PostVo::from)
+            .flatMap(postVo -> content(postName)
+                .doOnNext(postVo::setContent)
+                .thenReturn(postVo)
+            );
     }
 
     @Override
-    public ContentVo content(String postName) {
+    public Mono<ContentVo> content(String postName) {
         return client.fetch(Post.class, postName)
             .map(post -> post.getSpec().getReleaseSnapshot())
             .flatMap(contentService::getContent)
             .map(wrapper -> ContentVo.builder().content(wrapper.getContent())
-                .raw(wrapper.getRaw()).build())
-            .block();
+                .raw(wrapper.getRaw()).build());
     }
 
     @Override
-    public NavigationPostVo cursor(String currentName) {
+    public Mono<NavigationPostVo> cursor(String currentName) {
         // TODO Optimize the post names query here
-        List<String> postNames = client.list(Post.class, FIXED_PREDICATE, defaultComparator())
+        return client.list(Post.class, FIXED_PREDICATE, defaultComparator())
             .map(post -> post.getMetadata().getName())
             .collectList()
-            .block();
-        if (postNames == null) {
-            return NavigationPostVo.empty();
-        }
-
-        NavigationPostVo.NavigationPostVoBuilder builder = NavigationPostVo.builder()
-            .current(getByName(currentName));
-
-        Pair<String, String> previousNextPair = postPreviousNextPair(postNames, currentName);
-        String previousPostName = previousNextPair.getLeft();
-        String nextPostName = previousNextPair.getRight();
-
-        if (previousPostName != null) {
-            builder.previous(getByName(previousPostName));
-        }
-
-        if (nextPostName != null) {
-            builder.next(getByName(nextPostName));
-        }
-        return builder.build();
+            .flatMap(postNames -> Mono.just(NavigationPostVo.builder())
+                .flatMap(builder -> getByName(currentName)
+                    .doOnNext(builder::current)
+                    .thenReturn(builder)
+                )
+                .flatMap(builder -> {
+                    Pair<String, String> previousNextPair =
+                        postPreviousNextPair(postNames, currentName);
+                    String previousPostName = previousNextPair.getLeft();
+                    String nextPostName = previousNextPair.getRight();
+                    return getByName(previousPostName)
+                        .doOnNext(builder::previous)
+                        .then(getByName(nextPostName))
+                        .doOnNext(builder::next)
+                        .thenReturn(builder);
+                })
+                .map(NavigationPostVo.NavigationPostVoBuilder::build))
+            .defaultIfEmpty(NavigationPostVo.empty());
     }
 
     static Pair<String, String> postPreviousNextPair(List<String> postNames,
@@ -201,36 +198,37 @@ public class PostFinderImpl implements PostFinder {
     }
 
     @Override
-    public ListResult<PostVo> list(Integer page, Integer size) {
+    public Mono<ListResult<ListedPostVo>> list(Integer page, Integer size) {
         return listPost(page, size, null, defaultComparator());
     }
 
     @Override
-    public ListResult<PostVo> listByCategory(Integer page, Integer size, String categoryName) {
+    public Mono<ListResult<ListedPostVo>> listByCategory(Integer page, Integer size,
+        String categoryName) {
         return listPost(page, size,
             post -> contains(post.getSpec().getCategories(), categoryName), defaultComparator());
     }
 
     @Override
-    public ListResult<PostVo> listByTag(Integer page, Integer size, String tag) {
+    public Mono<ListResult<ListedPostVo>> listByTag(Integer page, Integer size, String tag) {
         return listPost(page, size,
             post -> contains(post.getSpec().getTags(), tag), defaultComparator());
     }
 
     @Override
-    public ListResult<PostArchiveVo> archives(Integer page, Integer size) {
+    public Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size) {
         return archives(page, size, null, null);
     }
 
     @Override
-    public ListResult<PostArchiveVo> archives(Integer page, Integer size, String year) {
+    public Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size, String year) {
         return archives(page, size, year, null);
     }
 
     @Override
-    public ListResult<PostArchiveVo> archives(Integer page, Integer size, String year,
+    public Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size, String year,
         String month) {
-        ListResult<PostVo> list = listPost(page, size, post -> {
+        return listPost(page, size, post -> {
             Map<String, String> labels = post.getMetadata().getLabels();
             if (labels == null) {
                 return false;
@@ -240,34 +238,37 @@ public class PostFinderImpl implements PostFinder {
             boolean monthMatch = StringUtils.isBlank(month)
                 || month.equals(labels.get(Post.ARCHIVE_MONTH_LABEL));
             return yearMatch && monthMatch;
-        }, archiveComparator());
-
-        Map<String, List<PostVo>> yearPosts = list.get()
-            .collect(Collectors.groupingBy(
-                post -> HaloUtils.getYearText(post.getSpec().getPublishTime())));
-        List<PostArchiveVo> postArchives =
-            yearPosts.entrySet().stream().map(entry -> {
-                String key = entry.getKey();
-                // archives by month
-                Map<String, List<PostVo>> monthPosts = entry.getValue().stream()
+        }, archiveComparator())
+            .map(list -> {
+                Map<String, List<ListedPostVo>> yearPosts = list.get()
                     .collect(Collectors.groupingBy(
-                        post -> HaloUtils.getMonthText(post.getSpec().getPublishTime())));
-                // convert to archive year month value objects
-                List<PostArchiveYearMonthVo> monthArchives = monthPosts.entrySet()
-                    .stream()
-                    .sorted(Map.Entry.comparingByKey())
-                    .map(monthEntry -> PostArchiveYearMonthVo.builder()
-                        .posts(monthEntry.getValue())
-                        .month(monthEntry.getKey())
-                        .build()
-                    )
-                    .toList();
-                return PostArchiveVo.builder()
-                    .year(String.valueOf(key))
-                    .months(monthArchives)
-                    .build();
-            }).toList();
-        return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), postArchives);
+                        post -> HaloUtils.getYearText(post.getSpec().getPublishTime())));
+                List<PostArchiveVo> postArchives =
+                    yearPosts.entrySet().stream().map(entry -> {
+                        String key = entry.getKey();
+                        // archives by month
+                        Map<String, List<ListedPostVo>> monthPosts = entry.getValue().stream()
+                            .collect(Collectors.groupingBy(
+                                post -> HaloUtils.getMonthText(post.getSpec().getPublishTime())));
+                        // convert to archive year month value objects
+                        List<PostArchiveYearMonthVo> monthArchives = monthPosts.entrySet()
+                            .stream()
+                            .sorted(Map.Entry.comparingByKey())
+                            .map(monthEntry -> PostArchiveYearMonthVo.builder()
+                                .posts(monthEntry.getValue())
+                                .month(monthEntry.getKey())
+                                .build()
+                            )
+                            .toList();
+                        return PostArchiveVo.builder()
+                            .year(String.valueOf(key))
+                            .months(monthArchives)
+                            .build();
+                    }).toList();
+                return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
+                    postArchives);
+            })
+            .defaultIfEmpty(new ListResult<>(page, size, 0, List.of()));
     }
 
     private boolean contains(List<String> c, String key) {
@@ -277,24 +278,29 @@ public class PostFinderImpl implements PostFinder {
         return c.contains(key);
     }
 
-    private ListResult<PostVo> listPost(Integer page, Integer size, Predicate<Post> postPredicate,
+    private Mono<ListResult<ListedPostVo>> listPost(Integer page, Integer size,
+        Predicate<Post> postPredicate,
         Comparator<Post> comparator) {
         Predicate<Post> predicate = FIXED_PREDICATE
             .and(postPredicate == null ? post -> true : postPredicate);
-        ListResult<Post> list = client.list(Post.class, predicate,
+        return client.list(Post.class, predicate,
                 comparator, pageNullSafe(page), sizeNullSafe(size))
-            .block();
-        if (list == null) {
-            return new ListResult<>(List.of());
-        }
-        List<PostVo> postVos = list.get()
-            .map(this::getPostVo)
-            .peek(this::populateStats)
-            .toList();
-        return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), postVos);
+            .flatMap(list -> Flux.fromStream(list.get())
+                .flatMap(post -> getListedPostVo(post)
+                    .map(postVo -> {
+                        populateStats(postVo);
+                        return postVo;
+                    })
+                )
+                .collectList()
+                .map(postVos -> new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
+                    postVos)
+                )
+            )
+            .defaultIfEmpty(new ListResult<>(page, size, 0L, List.of()));
     }
 
-    private void populateStats(PostVo postVo) {
+    private <T extends ListedPostVo> void populateStats(T postVo) {
         Counter counter =
             counterService.getByName(MeterUtils.nameOf(Post.class, postVo.getMetadata()
                 .getName()));
@@ -306,18 +312,45 @@ public class PostFinderImpl implements PostFinder {
         postVo.setStats(statsVo);
     }
 
-    private PostVo getPostVo(@NonNull Post post) {
-        List<TagVo> tags = tagFinder.getByNames(post.getSpec().getTags());
-        List<CategoryVo> categoryVos = categoryFinder.getByNames(post.getSpec().getCategories());
-        List<Contributor> contributors =
-            contributorFinder.getContributors(post.getStatus().getContributors());
-        PostVo postVo = PostVo.from(post);
-        postVo.setCategories(categoryVos);
-        postVo.setTags(tags);
-        postVo.setContributors(contributors);
-        postVo.setOwner(contributorFinder.getContributor(post.getSpec().getOwner()));
+    private Mono<ListedPostVo> getListedPostVo(@NonNull Post post) {
+        ListedPostVo postVo = ListedPostVo.from(post);
+        postVo.setCategories(List.of());
+        postVo.setTags(List.of());
+        postVo.setContributors(List.of());
         populateStats(postVo);
-        return postVo;
+        return Mono.just(postVo)
+            .flatMap(p -> {
+                String owner = p.getSpec().getOwner();
+                return contributorFinder.getContributor(owner)
+                    .doOnNext(p::setOwner)
+                    .thenReturn(p);
+            })
+            .flatMap(p -> {
+                List<String> tagNames = p.getSpec().getTags();
+                if (CollectionUtils.isEmpty(tagNames)) {
+                    return Mono.just(p);
+                }
+                return tagFinder.getByNames(tagNames)
+                    .collectList()
+                    .doOnNext(p::setTags)
+                    .thenReturn(p);
+            })
+            .flatMap(p -> {
+                List<String> categoryNames = p.getSpec().getCategories();
+                if (CollectionUtils.isEmpty(categoryNames)) {
+                    return Mono.just(p);
+                }
+                return categoryFinder.getByNames(categoryNames)
+                    .collectList()
+                    .doOnNext(p::setCategories)
+                    .thenReturn(p);
+            })
+            .flatMap(p -> contributorFinder.getContributors(p.getStatus().getContributors())
+                .collectList()
+                .doOnNext(p::setContributors)
+                .thenReturn(p)
+            )
+            .defaultIfEmpty(postVo);
     }
 
     static Comparator<Post> defaultComparator() {

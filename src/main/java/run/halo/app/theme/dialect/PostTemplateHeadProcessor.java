@@ -36,7 +36,7 @@ public class PostTemplateHeadProcessor implements TemplateHeadProcessor {
             return Mono.empty();
         }
         return Mono.justOrEmpty((String) context.getVariable(POST_NAME_VARIABLE))
-            .map(postFinder::getByName)
+            .flatMap(postFinder::getByName)
             .doOnNext(postVo -> {
                 List<Map<String, String>> htmlMetas = postVo.getSpec().getHtmlMetas();
                 String metaHtml = headMetaBuilder(htmlMetas);

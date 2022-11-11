@@ -1,6 +1,8 @@
 package run.halo.app.theme.finders;
 
 import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.theme.finders.vo.Contributor;
 
@@ -9,7 +11,7 @@ import run.halo.app.theme.finders.vo.Contributor;
  */
 public interface ContributorFinder {
 
-    Contributor getContributor(String name);
+    Mono<Contributor> getContributor(String name);
 
-    List<Contributor> getContributors(List<String> names);
+    Flux<Contributor> getContributors(List<String> names);
 }

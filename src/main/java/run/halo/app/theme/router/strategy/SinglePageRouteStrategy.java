@@ -5,15 +5,12 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.SinglePage;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.SinglePageFinder;
-import run.halo.app.theme.finders.vo.SinglePageVo;
 import run.halo.app.theme.router.ViewNameResolver;
 
 /**
@@ -40,11 +37,6 @@ public class SinglePageRouteStrategy implements DetailsPageRouteHandlerStrategy 
         return annotation.plural();
     }
 
-    private Mono<SinglePageVo> singlePageByName(String name) {
-        return Mono.fromCallable(() -> singlePageFinder.getByName(name))
-            .subscribeOn(Schedulers.boundedElastic());
-    }
-
     @Override
     public HandlerFunction<ServerResponse> getHandler(SystemSetting.ThemeRouteRules routeRules,
         String name) {
@@ -54,7 +46,7 @@ public class SinglePageRouteStrategy implements DetailsPageRouteHandlerStrategy 
             model.put("plural", getPlural());
             model.put(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.SINGLE_PAGE.getValue());
 
-            return singlePageByName(name).flatMap(singlePageVo -> {
+            return singlePageFinder.getByName(name).flatMap(singlePageVo -> {
                 model.put("singlePage", singlePageVo);
                 String template = singlePageVo.getSpec().getTemplate();
                 return viewNameResolver.resolveViewNameOrDefault(request, template,

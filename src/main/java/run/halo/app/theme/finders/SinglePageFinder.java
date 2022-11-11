@@ -1,9 +1,11 @@
 package run.halo.app.theme.finders;
 
 import org.springframework.lang.Nullable;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.SinglePage;
 import run.halo.app.extension.ListResult;
 import run.halo.app.theme.finders.vo.ContentVo;
+import run.halo.app.theme.finders.vo.ListedSinglePageVo;
 import run.halo.app.theme.finders.vo.SinglePageVo;
 
 /**
@@ -14,9 +16,9 @@ import run.halo.app.theme.finders.vo.SinglePageVo;
  */
 public interface SinglePageFinder {
 
-    SinglePageVo getByName(String pageName);
+    Mono<SinglePageVo> getByName(String pageName);
 
-    ContentVo content(String pageName);
+    Mono<ContentVo> content(String pageName);
 
-    ListResult<SinglePageVo> list(@Nullable Integer page, @Nullable Integer size);
+    Mono<ListResult<ListedSinglePageVo>> list(@Nullable Integer page, @Nullable Integer size);
 }

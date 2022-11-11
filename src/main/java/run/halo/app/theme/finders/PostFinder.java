@@ -1,9 +1,11 @@
 package run.halo.app.theme.finders;
 
 import org.springframework.lang.Nullable;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.theme.finders.vo.ContentVo;
+import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.NavigationPostVo;
 import run.halo.app.theme.finders.vo.PostArchiveVo;
 import run.halo.app.theme.finders.vo.PostVo;
@@ -16,22 +18,22 @@ import run.halo.app.theme.finders.vo.PostVo;
  */
 public interface PostFinder {
 
-    PostVo getByName(String postName);
+    Mono<PostVo> getByName(String postName);
 
-    ContentVo content(String postName);
+    Mono<ContentVo> content(String postName);
 
-    NavigationPostVo cursor(String current);
+    Mono<NavigationPostVo> cursor(String current);
 
-    ListResult<PostVo> list(@Nullable Integer page, @Nullable Integer size);
+    Mono<ListResult<ListedPostVo>> list(@Nullable Integer page, @Nullable Integer size);
 
-    ListResult<PostVo> listByCategory(@Nullable Integer page, @Nullable Integer size,
+    Mono<ListResult<ListedPostVo>> listByCategory(@Nullable Integer page, @Nullable Integer size,
         String categoryName);
 
-    ListResult<PostVo> listByTag(@Nullable Integer page, @Nullable Integer size, String tag);
+    Mono<ListResult<ListedPostVo>> listByTag(@Nullable Integer page, @Nullable Integer size, String tag);
 
-    ListResult<PostArchiveVo> archives(Integer page, Integer size);
+    Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size);
 
-    ListResult<PostArchiveVo> archives(Integer page, Integer size, String year);
+    Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size, String year);
 
-    ListResult<PostArchiveVo> archives(Integer page, Integer size, String year, String month);
+    Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size, String year, String month);
 }

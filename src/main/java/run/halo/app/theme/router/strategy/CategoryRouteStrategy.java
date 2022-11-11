@@ -12,17 +12,14 @@ import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Category;
 import run.halo.app.extension.GroupVersionKind;
-import run.halo.app.extension.ListResult;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.PostFinder;
-import run.halo.app.theme.finders.vo.CategoryVo;
-import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.router.PageUrlUtils;
 import run.halo.app.theme.router.UrlContextListResult;
 import run.halo.app.theme.router.ViewNameResolver;
@@ -46,27 +43,18 @@ public class CategoryRouteStrategy implements DetailsPageRouteHandlerStrategy {
 
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
-    private Mono<UrlContextListResult<PostVo>> postListByCategoryName(String name,
+    private Mono<UrlContextListResult<ListedPostVo>> postListByCategoryName(String name,
         ServerRequest request) {
         String path = request.path();
         return environmentFetcher.fetchPost()
             .map(post -> defaultIfNull(post.getCategoryPageSize(), ModelConst.DEFAULT_PAGE_SIZE))
-            .flatMap(pageSize -> listPostsByCategory(pageNum(request), pageSize, name))
-            .map(list -> new UrlContextListResult.Builder<PostVo>()
+            .flatMap(
+                pageSize -> postFinder.listByCategory(pageNum(request), pageSize, name))
+            .map(list -> new UrlContextListResult.Builder<ListedPostVo>()
                 .listResult(list)
                 .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
                 .prevUrl(PageUrlUtils.prevPageUrl(path))
                 .build());
-    }
-
-    private Mono<CategoryVo> categoryByName(String name) {
-        return Mono.fromCallable(() -> categoryFinder.getByName(name))
-            .subscribeOn(Schedulers.boundedElastic());
-    }
-
-    public Mono<ListResult<PostVo>> listPostsByCategory(int page, int size, String categoryName) {
-        return Mono.fromCallable(() -> postFinder.listByCategory(page, size, categoryName))
-            .subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override
@@ -78,7 +66,7 @@ public class CategoryRouteStrategy implements DetailsPageRouteHandlerStrategy {
             model.put("posts", postListByCategoryName(name, request));
 
             model.put(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.CATEGORY.getValue());
-            return categoryByName(name).flatMap(categoryVo -> {
+            return categoryFinder.getByName(name).flatMap(categoryVo -> {
                 model.put("category", categoryVo);
                 String template = categoryVo.getSpec().getTemplate();
                 return viewNameResolver.resolveViewNameOrDefault(request, template,

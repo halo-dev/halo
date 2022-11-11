@@ -2,6 +2,8 @@ package run.halo.app.theme.finders;
 
 import java.util.List;
 import org.springframework.lang.Nullable;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Category;
 import run.halo.app.extension.ListResult;
 import run.halo.app.theme.finders.vo.CategoryTreeVo;
@@ -15,13 +17,13 @@ import run.halo.app.theme.finders.vo.CategoryVo;
  */
 public interface CategoryFinder {
 
-    CategoryVo getByName(String name);
+    Mono<CategoryVo> getByName(String name);
 
-    List<CategoryVo> getByNames(List<String> names);
+    Flux<CategoryVo> getByNames(List<String> names);
 
-    ListResult<CategoryVo> list(@Nullable Integer page, @Nullable Integer size);
+    Mono<ListResult<CategoryVo>> list(@Nullable Integer page, @Nullable Integer size);
 
-    List<CategoryVo> listAll();
+    Flux<CategoryVo> listAll();
 
-    List<CategoryTreeVo> listAsTree();
+    Flux<CategoryTreeVo> listAsTree();
 }

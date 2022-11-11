@@ -6,11 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.TagFinder;
-import run.halo.app.theme.finders.vo.TagVo;
 
 /**
  * The {@link TagsRouteStrategy} for generate {@link HandlerFunction} specific to the template
@@ -28,16 +25,11 @@ public class TagsRouteStrategy implements ListPageRouteHandlerStrategy {
         this.tagFinder = tagFinder;
     }
 
-    private Mono<List<TagVo>> tags() {
-        return Mono.defer(() -> Mono.just(tagFinder.listAll()))
-            .publishOn(Schedulers.boundedElastic());
-    }
-
     @Override
     public HandlerFunction<ServerResponse> getHandler() {
         return request -> ServerResponse.ok()
             .render(DefaultTemplateEnum.TAGS.getValue(),
-                Map.of("tags", tags(),
+                Map.of("tags", tagFinder.listAll(),
                     ModelConst.TEMPLATE_ID, DefaultTemplateEnum.TAGS.getValue()
                 )
             );

@@ -10,6 +10,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Category;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -34,24 +36,22 @@ public class CategoryFinderImpl implements CategoryFinder {
     }
 
     @Override
-    public CategoryVo getByName(String name) {
+    public Mono<CategoryVo> getByName(String name) {
         return client.fetch(Category.class, name)
-            .map(CategoryVo::from)
-            .block();
+            .map(CategoryVo::from);
     }
 
     @Override
-    public List<CategoryVo> getByNames(List<String> names) {
+    public Flux<CategoryVo> getByNames(List<String> names) {
         if (names == null) {
-            return List.of();
+            return Flux.empty();
         }
-        return names.stream().map(this::getByName)
-            .filter(Objects::nonNull)
-            .toList();
+        return Flux.fromIterable(names)
+            .flatMap(this::getByName);
     }
 
     @Override
-    public ListResult<CategoryVo> list(Integer page, Integer size) {
+    public Mono<ListResult<CategoryVo>> list(Integer page, Integer size) {
         return client.list(Category.class, null,
                 defaultComparator(), pageNullSafe(page), sizeNullSafe(size))
             .map(list -> {
@@ -61,38 +61,39 @@ public class CategoryFinderImpl implements CategoryFinder {
                 return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
                     categoryVos);
             })
-            .block();
+            .defaultIfEmpty(new ListResult<>(page, size, 0L, List.of()));
     }
 
     @Override
-    public List<CategoryVo> listAll() {
+    public Flux<CategoryVo> listAll() {
         return client.list(Category.class, null, defaultComparator())
-            .map(CategoryVo::from)
-            .collectList()
-            .block();
+            .map(CategoryVo::from);
     }
 
     @Override
-    public List<CategoryTreeVo> listAsTree() {
-        List<CategoryVo> categoryVos = listAll();
-        Map<String, CategoryTreeVo> nameIdentityMap = categoryVos.stream()
-            .map(CategoryTreeVo::from)
-            .collect(Collectors.toMap(categoryVo -> categoryVo.getMetadata().getName(),
-                Function.identity()));
+    public Flux<CategoryTreeVo> listAsTree() {
+        return listAll()
+            .collectList()
+            .flatMapIterable(categoryVos -> {
+                Map<String, CategoryTreeVo> nameIdentityMap = categoryVos.stream()
+                    .map(CategoryTreeVo::from)
+                    .collect(Collectors.toMap(categoryVo -> categoryVo.getMetadata().getName(),
+                        Function.identity()));
 
-        nameIdentityMap.forEach((name, value) -> {
-            List<String> children = value.getSpec().getChildren();
-            if (children == null) {
-                return;
-            }
-            for (String child : children) {
-                CategoryTreeVo childNode = nameIdentityMap.get(child);
-                if (childNode != null) {
-                    childNode.setParentName(name);
-                }
-            }
-        });
-        return listToTree(nameIdentityMap.values());
+                nameIdentityMap.forEach((name, value) -> {
+                    List<String> children = value.getSpec().getChildren();
+                    if (children == null) {
+                        return;
+                    }
+                    for (String child : children) {
+                        CategoryTreeVo childNode = nameIdentityMap.get(child);
+                        if (childNode != null) {
+                            childNode.setParentName(name);
+                        }
+                    }
+                });
+                return listToTree(nameIdentityMap.values());
+            });
     }
 
     static List<CategoryTreeVo> listToTree(Collection<CategoryTreeVo> list) {

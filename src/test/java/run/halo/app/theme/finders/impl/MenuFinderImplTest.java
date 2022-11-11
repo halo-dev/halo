@@ -45,7 +45,7 @@ class MenuFinderImplTest {
         Mockito.when(client.list(eq(MenuItem.class), eq(null), any()))
             .thenReturn(Flux.fromIterable(tuple.getT2()));
 
-        List<MenuVo> menuVos = menuFinder.listAsTree();
+        List<MenuVo> menuVos = menuFinder.listAsTree().collectList().block();
         assertThat(visualizeTree(menuVos)).isEqualTo("""
             D
             └── E
