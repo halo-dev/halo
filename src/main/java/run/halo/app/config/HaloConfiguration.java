@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @Configuration(proxyBeanMethods = false)
+@EnableAsync
 public class HaloConfiguration {
 
     @Bean

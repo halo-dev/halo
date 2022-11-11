@@ -1,5 +1,7 @@
 package run.halo.app.infra;
 
+import java.util.LinkedHashMap;
+import java.util.Set;
 import lombok.Data;
 
 /**
@@ -87,4 +89,17 @@ public class SystemSetting {
         public static final String GROUP = "menu";
         public String primary;
     }
+
+    /**
+     * ExtensionPointEnabled key is full qualified name of extension point and value is a list of
+     * full qualified name of implementation.
+     */
+    public static class ExtensionPointEnabled extends LinkedHashMap<String, Set<String>> {
+
+        public static final ExtensionPointEnabled EMPTY = new ExtensionPointEnabled();
+
+        public static final String GROUP = "extensionPointEnabled";
+
+    }
+
 }
