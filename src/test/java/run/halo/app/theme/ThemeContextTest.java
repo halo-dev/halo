@@ -1,6 +1,6 @@
 package run.halo.app.theme;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -16,20 +16,20 @@ class ThemeContextTest {
 
     @Test
     void constructorBuilderTest() throws JSONException {
-        ThemeContext testTheme = ThemeContext.builder()
+        var path = Path.of("/tmp/themes/testTheme");
+        var testTheme = ThemeContext.builder()
             .name("testTheme")
-            .path(Paths.get("/tmp/themes/testTheme"))
+            .path(path)
             .active(true)
             .build();
-        String s = JsonUtils.objectToJson(testTheme);
-        JSONAssert.assertEquals("""
+        var got = JsonUtils.objectToJson(testTheme);
+        var expect = String.format("""
                 {
                     "name": "testTheme",
-                    "path": "file:///tmp/themes/testTheme",
+                    "path": "%s",
                     "active": true
                 }
-                """,
-            s,
-            false);
+                """, path.toUri());
+        JSONAssert.assertEquals(expect, got, false);
     }
 }

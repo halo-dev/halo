@@ -55,6 +55,7 @@ public class PathUtils {
      *
      * @param pathSegments Path segments to be combined
      * @return the combined path
+     * @apiNote This method doesn't work for Windows system currently.
      */
     public static String combinePath(String... pathSegments) {
         StringBuilder sb = new StringBuilder();
