@@ -25,7 +25,7 @@ class SettingTest {
             apiVersion: v1alpha1
             kind: Setting
             metadata:
-                name: setting-name
+              name: setting-name
             spec:
               forms:
                 - group: basic

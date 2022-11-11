@@ -102,9 +102,7 @@ public class YamlPluginFinder {
     protected Path getManifestPath(Path pluginPath, String propertiesFileName) {
         if (Files.isDirectory(pluginPath)) {
             for (String location : PLUGIN_CLASSPATH.getClassesDirectories()) {
-                String s = PathUtils.combinePath(pluginPath.toString(),
-                    location, propertiesFileName);
-                Path path = Paths.get(s);
+                var path = pluginPath.resolve(location).resolve(propertiesFileName);
                 Resource propertyResource = new FileSystemResource(path);
                 if (propertyResource.exists()) {
                     return path;

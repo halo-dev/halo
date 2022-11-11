@@ -3,7 +3,9 @@ package run.halo.app.theme.message;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Map;
@@ -25,7 +27,7 @@ class ThemeMessageResolutionUtilsTest {
     }
 
     @Test
-    void resolveMessagesForTemplateForDefault() {
+    void resolveMessagesForTemplateForDefault() throws URISyntaxException {
         Map<String, String> properties =
             ThemeMessageResolutionUtils.resolveMessagesForTemplate(Locale.CHINESE, getTheme());
         assertThat(properties).hasSize(1);
@@ -33,7 +35,7 @@ class ThemeMessageResolutionUtilsTest {
     }
 
     @Test
-    void resolveMessagesForTemplateForEnglish() {
+    void resolveMessagesForTemplateForEnglish() throws URISyntaxException {
         Map<String, String> properties =
             ThemeMessageResolutionUtils.resolveMessagesForTemplate(Locale.ENGLISH, getTheme());
         assertThat(properties).hasSize(1);
@@ -48,10 +50,10 @@ class ThemeMessageResolutionUtilsTest {
         assertThat(s).isEqualTo("Welcome Halo to the index");
     }
 
-    ThemeContext getTheme() {
+    ThemeContext getTheme() throws URISyntaxException {
         return ThemeContext.builder()
             .name("default")
-            .path(Paths.get(defaultThemeUrl.getPath()))
+            .path(Path.of(defaultThemeUrl.toURI()))
             .active(true)
             .build();
     }

@@ -2,6 +2,9 @@ package run.halo.app.infra.utils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -55,6 +58,7 @@ public class PathUtils {
      *
      * @param pathSegments Path segments to be combined
      * @return the combined path
+     * @apiNote This method doesn't work for Windows system currently.
      */
     public static String combinePath(String... pathSegments) {
         StringBuilder sb = new StringBuilder();

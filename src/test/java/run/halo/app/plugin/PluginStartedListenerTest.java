@@ -34,7 +34,8 @@ class PluginStartedListenerTest {
 
             Set<String> extensionResources =
                 PluginStartedListener.PluginExtensionLoaderUtils.lookupFromClasses(tempPluginPath);
-            assertThat(extensionResources).containsAll(Set.of("extensions/roles.yaml"));
+            assertThat(extensionResources)
+                .containsAll(Set.of(Path.of("extensions/roles.yaml").toString()));
         }
 
         @Test
