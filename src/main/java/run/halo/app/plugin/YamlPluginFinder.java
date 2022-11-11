@@ -3,7 +3,6 @@ package run.halo.app.plugin;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.DevelopmentPluginClasspath;
@@ -14,7 +13,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.Unstructured;
-import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
 
 /**

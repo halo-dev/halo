@@ -1,8 +1,8 @@
 package run.halo.app.core.extension;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -47,8 +47,9 @@ class SettingTest {
                       name: color
                       validation: required
             """;
-        List<Unstructured> unstructureds =
-            new YamlUnstructuredLoader(new InMemoryResource(settingYaml)).load();
+        var unstructureds = new YamlUnstructuredLoader(
+            new InMemoryResource(settingYaml.getBytes(UTF_8), "In-memory setting YAML"))
+            .load();
         assertThat(unstructureds).hasSize(1);
         Unstructured unstructured = unstructureds.get(0);
 

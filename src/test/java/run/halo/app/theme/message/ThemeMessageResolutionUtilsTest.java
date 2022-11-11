@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,7 +1,6 @@
 package run.halo.app.theme;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
