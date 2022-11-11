@@ -105,10 +105,9 @@ class YamlPluginFinderTest {
 
     @Test
     void findFailedWhenFileNotFound() {
-        Path test = Paths.get("/tmp");
-        assertThatThrownBy(() -> {
-            pluginFinder.find(test);
-        }).isInstanceOf(PluginRuntimeException.class)
+        var test = Paths.get("");
+        assertThatThrownBy(() -> pluginFinder.find(test))
+            .isInstanceOf(PluginRuntimeException.class)
             .hasMessage("Unable to find plugin descriptor file: plugin.yaml");
     }
 

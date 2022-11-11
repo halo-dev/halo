@@ -1,8 +1,9 @@
 package run.halo.app.theme.message;
 
 import java.io.FileNotFoundException;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -45,7 +46,7 @@ public class ThemeMessageResolverIntegrationTest {
     private WebTestClient webTestClient;
 
     @BeforeEach
-    void setUp() throws FileNotFoundException {
+    void setUp() throws FileNotFoundException, URISyntaxException {
         defaultThemeUrl = ResourceUtils.getURL("classpath:themes/default");
         otherThemeUrl = ResourceUtils.getURL("classpath:themes/other");
 
@@ -126,7 +127,7 @@ public class ThemeMessageResolverIntegrationTest {
     }
 
     @Test
-    void switchTheme() {
+    void switchTheme() throws URISyntaxException {
         webTestClient.get()
             .uri("/index?language=zh")
             .exchange()
@@ -185,18 +186,18 @@ public class ThemeMessageResolverIntegrationTest {
                 """);
     }
 
-    ThemeContext createDefaultContext() {
+    ThemeContext createDefaultContext() throws URISyntaxException {
         return ThemeContext.builder()
             .name("default")
-            .path(Paths.get(defaultThemeUrl.getPath()))
+            .path(Path.of(defaultThemeUrl.toURI()))
             .active(true)
             .build();
     }
 
-    ThemeContext createOtherContext() {
+    ThemeContext createOtherContext() throws URISyntaxException {
         return ThemeContext.builder()
             .name("other")
-            .path(Paths.get(otherThemeUrl.getPath()))
+            .path(Path.of(otherThemeUrl.toURI()))
             .active(false)
             .build();
     }
