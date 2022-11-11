@@ -2,11 +2,13 @@ package run.halo.app.core.extension.endpoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -15,6 +17,7 @@ import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.content.TestPost;
 import run.halo.app.core.extension.Post;
+import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
  * Tests for @{@link PostEndpoint}.
@@ -26,13 +29,16 @@ import run.halo.app.core.extension.Post;
 class PostEndpointTest {
     @Mock
     private PostService postService;
+    @Mock
+    private ReactiveExtensionClient client;
+
+    @InjectMocks
+    private PostEndpoint postEndpoint;
 
     private WebTestClient webTestClient;
 
     @BeforeEach
     void setUp() {
-        PostEndpoint postEndpoint = new PostEndpoint(postService);
-
         webTestClient = WebTestClient
             .bindToRouterFunction(postEndpoint.endpoint())
             .build();
@@ -41,7 +47,6 @@ class PostEndpointTest {
     @Test
     void draftPost() {
         when(postService.draftPost(any())).thenReturn(Mono.just(TestPost.postV1()));
-
         webTestClient.post()
             .uri("/posts")
             .bodyValue(postRequest(TestPost.postV1()))
@@ -68,7 +73,11 @@ class PostEndpointTest {
 
     @Test
     void publishPost() {
-        when(postService.publishPost(any())).thenReturn(Mono.just(TestPost.postV1()));
+        Post post = TestPost.postV1();
+        when(postService.publishPost(any())).thenReturn(Mono.just(post));
+        when(client.fetch(eq(Post.class), eq(post.getMetadata().getName())))
+            .thenReturn(Mono.just(post));
+        when(client.update(any())).thenReturn(Mono.just(post));
 
         webTestClient.put()
             .uri("/posts/post-A/publish")
@@ -77,7 +86,7 @@ class PostEndpointTest {
             .expectStatus()
             .isOk()
             .expectBody(Post.class)
-            .value(post -> assertThat(post).isEqualTo(TestPost.postV1()));
+            .value(p -> assertThat(p).isEqualTo(post));
     }
 
     PostRequest postRequest(Post post) {

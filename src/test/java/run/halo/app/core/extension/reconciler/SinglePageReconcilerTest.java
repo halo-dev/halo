@@ -13,10 +13,10 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
@@ -24,6 +24,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.ContentWrapper;
+import run.halo.app.content.SinglePageService;
 import run.halo.app.content.TestPost;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.SinglePage;
@@ -57,15 +58,13 @@ class SinglePageReconcilerTest {
     private CounterService counterService;
 
     @Mock
+    private SinglePageService singlePageService;
+
+    @Mock
     private ExternalUrlSupplier externalUrlSupplier;
 
+    @InjectMocks
     private SinglePageReconciler singlePageReconciler;
-
-    @BeforeEach
-    void setUp() {
-        singlePageReconciler = new SinglePageReconciler(client, contentService, applicationContext,
-            counterService, externalUrlSupplier);
-    }
 
     @Test
     void reconcile() {
@@ -75,9 +74,13 @@ class SinglePageReconcilerTest {
         when(client.fetch(eq(SinglePage.class), eq(name)))
             .thenReturn(Optional.of(page));
         when(contentService.getContent(eq(page.getSpec().getHeadSnapshot())))
-            .thenReturn(Mono.just(
-                new ContentWrapper(page.getSpec().getHeadSnapshot(), "hello world",
-                    "<p>hello world</p>", "markdown")));
+            .thenReturn(Mono.just(ContentWrapper.builder()
+                .snapshotName(page.getSpec().getHeadSnapshot())
+                .raw("hello world")
+                .content("<p>hello world</p>")
+                .rawType("markdown")
+                .build())
+            );
 
         Snapshot snapshotV1 = snapshotV1();
         Snapshot snapshotV2 = TestPost.snapshotV2();
@@ -86,6 +89,7 @@ class SinglePageReconcilerTest {
         when(contentService.listSnapshots(any()))
             .thenReturn(Flux.just(snapshotV1, snapshotV2));
         when(externalUrlSupplier.get()).thenReturn(URI.create(""));
+        when(singlePageService.publish(eq(name))).thenReturn(Mono.empty());
 
         ArgumentCaptor<SinglePage> captor = ArgumentCaptor.forClass(SinglePage.class);
         singlePageReconciler.reconcile(new Reconciler.Request(name));

@@ -22,5 +22,8 @@ public class ListedSinglePage {
     private List<Contributor> contributors;
 
     @Schema(required = true)
+    private Contributor owner;
+
+    @Schema(required = true)
     private Stats stats;
 }

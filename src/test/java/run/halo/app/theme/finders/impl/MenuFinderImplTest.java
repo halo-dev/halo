@@ -7,9 +7,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -34,12 +34,8 @@ class MenuFinderImplTest {
     @Mock
     private ReactiveExtensionClient client;
 
+    @InjectMocks
     private MenuFinderImpl menuFinder;
-
-    @BeforeEach
-    void setUp() {
-        menuFinder = new MenuFinderImpl(client);
-    }
 
     @Test
     void listAsTree() {

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
@@ -67,14 +68,19 @@ class PostFinderImplTest {
     void content() {
         Post post = post(1);
         post.getSpec().setReleaseSnapshot("release-snapshot");
-        ContentWrapper contentWrapper = new ContentWrapper("snapshot", "raw", "content", "rawType");
+        ContentWrapper contentWrapper = ContentWrapper.builder()
+            .snapshotName("snapshot")
+            .raw("raw")
+            .content("content")
+            .rawType("rawType")
+            .build();
         when(client.fetch(eq(Post.class), eq("post-1")))
             .thenReturn(Mono.just(post));
         when(contentService.getContent(post.getSpec().getReleaseSnapshot()))
             .thenReturn(Mono.just(contentWrapper));
         ContentVo content = postFinder.content("post-1");
-        assertThat(content.getContent()).isEqualTo(contentWrapper.content());
-        assertThat(content.getRaw()).isEqualTo(contentWrapper.raw());
+        assertThat(content.getContent()).isEqualTo(contentWrapper.getContent());
+        assertThat(content.getRaw()).isEqualTo(contentWrapper.getRaw());
     }
 
     @Test
@@ -166,17 +172,17 @@ class PostFinderImplTest {
 
     List<Post> postsForArchives() {
         Post post1 = post(1);
-        post1.getSpec().setPublished(true);
+        post1.getSpec().setPublish(true);
         post1.getSpec().setPublishTime(Instant.parse("2021-01-01T00:00:00Z"));
         post1.getMetadata().setCreationTimestamp(Instant.now());
 
         Post post2 = post(2);
-        post2.getSpec().setPublished(true);
+        post2.getSpec().setPublish(true);
         post2.getSpec().setPublishTime(Instant.parse("2022-12-01T00:00:00Z"));
         post2.getMetadata().setCreationTimestamp(Instant.now());
 
         Post post3 = post(3);
-        post3.getSpec().setPublished(true);
+        post3.getSpec().setPublish(true);
         post3.getSpec().setPublishTime(Instant.parse("2022-12-03T00:00:00Z"));
         post3.getMetadata().setCreationTimestamp(Instant.now());
         return List.of(post1, post2, post3);
@@ -205,7 +211,8 @@ class PostFinderImplTest {
         post4.getMetadata().setCreationTimestamp(Instant.now());
 
         Post post5 = post(5);
-        post5.getSpec().setPublished(false);
+        post5.getSpec().setPublish(false);
+        post5.getMetadata().getLabels().clear();
         post5.getMetadata().setCreationTimestamp(Instant.now());
 
         Post post6 = post(6);
@@ -222,6 +229,8 @@ class PostFinderImplTest {
         metadata.setName("post-" + i);
         metadata.setCreationTimestamp(Instant.now());
         metadata.setAnnotations(Map.of("K1", "V1"));
+        metadata.setLabels(new HashMap<>());
+        metadata.getLabels().put(Post.PUBLISHED_LABEL, "true");
         post.setMetadata(metadata);
 
         Post.PostSpec postSpec = new Post.PostSpec();
@@ -230,7 +239,7 @@ class PostFinderImplTest {
         postSpec.setPublishTime(Instant.now());
         postSpec.setPinned(false);
         postSpec.setPriority(0);
-        postSpec.setPublished(true);
+        postSpec.setPublish(true);
         postSpec.setVisible(Post.VisibleEnum.PUBLIC);
         postSpec.setTitle("title-" + i);
         postSpec.setSlug("slug-" + i);

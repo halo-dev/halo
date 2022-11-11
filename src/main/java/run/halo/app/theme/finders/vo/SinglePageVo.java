@@ -33,6 +33,8 @@ public class SinglePageVo {
 
     private List<Contributor> contributors;
 
+    private Contributor owner;
+
     /**
      * Convert {@link SinglePage} to {@link SinglePageVo}.
      *

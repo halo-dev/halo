@@ -3,6 +3,7 @@ package run.halo.app.infra.utils;
 import java.net.URI;
 import java.net.URISyntaxException;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -11,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author guqing
  * @since 2.0.0
  */
+@Slf4j
 @UtilityClass
 public class PathUtils {
 
@@ -42,7 +44,9 @@ public class PathUtils {
             URI uri = new URI(uriString);
             return uri.isAbsolute();
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            log.debug("Failed to parse uri: " + uriString, e);
+            // ignore this exception
+            return false;
         }
     }
 

@@ -9,11 +9,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.comparator.Comparators;
 import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.MenuFinder;
 import run.halo.app.theme.finders.vo.MenuItemVo;
@@ -26,13 +30,11 @@ import run.halo.app.theme.finders.vo.MenuVo;
  * @since 2.0.0
  */
 @Finder("menuFinder")
+@AllArgsConstructor
 public class MenuFinderImpl implements MenuFinder {
 
     private final ReactiveExtensionClient client;
-
-    public MenuFinderImpl(ReactiveExtensionClient client) {
-        this.client = client;
-    }
+    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     @Override
     public MenuVo getByName(String name) {
@@ -43,14 +45,19 @@ public class MenuFinderImpl implements MenuFinder {
     }
 
     @Override
-    public MenuVo getDefault() {
+    public MenuVo getPrimary() {
         List<MenuVo> menuVos = listAsTree();
         if (CollectionUtils.isEmpty(menuVos)) {
             return null;
         }
-        // TODO If there are multiple groups of menus,
-        //  return the first as the default, and consider optimizing it later
-        return menuVos.get(0);
+        return environmentFetcher.fetch(SystemSetting.Menu.GROUP, SystemSetting.Menu.class)
+            .blockOptional()
+            .map(SystemSetting.Menu::getPrimary)
+            .filter(StringUtils::isNotBlank)
+            .flatMap(primary -> menuVos.stream()
+                .filter(menuVo -> menuVo.getMetadata().getName().equals(primary))
+                .findAny())
+            .orElse(menuVos.get(0));
     }
 
     List<MenuVo> listAll() {
