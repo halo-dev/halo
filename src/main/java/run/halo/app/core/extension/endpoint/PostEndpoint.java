@@ -6,16 +6,19 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import java.time.Duration;
 import lombok.AllArgsConstructor;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 import run.halo.app.content.ListedPost;
 import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
@@ -138,14 +141,16 @@ public class PostEndpoint implements CustomEndpoint {
     Mono<ServerResponse> publishPost(ServerRequest request) {
         var name = request.pathVariable("name");
         return client.get(Post.class, name)
-            .flatMap(post -> {
+            .doOnNext(post -> {
                 var spec = post.getSpec();
                 request.queryParam("headSnapshot").ifPresent(spec::setHeadSnapshot);
                 spec.setPublish(true);
                 // TODO Provide release snapshot query param to control
                 spec.setReleaseSnapshot(spec.getHeadSnapshot());
-                return client.update(post);
             })
+            .flatMap(client::update)
+            .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
+                .filter(t -> t instanceof OptimisticLockingFailureException))
             .flatMap(post -> postService.publishPost(post.getMetadata().getName()))
             // TODO Fire published event in reconciler in the future
             .doOnNext(post -> eventPublisher.publishEvent(
@@ -161,6 +166,8 @@ public class PostEndpoint implements CustomEndpoint {
                 spec.setPublish(false);
             })
             .flatMap(client::update)
+            .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
+                .filter(t -> t instanceof OptimisticLockingFailureException))
             // TODO Fire unpublished event in reconciler in the future
             .doOnNext(post -> eventPublisher.publishEvent(
                 new PostUnpublishedEvent(this, post.getMetadata().getName())))
@@ -175,6 +182,8 @@ public class PostEndpoint implements CustomEndpoint {
                 spec.setDeleted(true);
             })
             .flatMap(client::update)
+            .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
+                .filter(t -> t instanceof OptimisticLockingFailureException))
             // TODO Fire recycled event in reconciler in the future
             .doOnNext(post -> eventPublisher.publishEvent(
                 new PostRecycledEvent(this, post.getMetadata().getName())))
