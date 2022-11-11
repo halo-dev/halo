@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.AllArgsConstructor;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -20,6 +21,9 @@ import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.Post;
+import run.halo.app.event.post.PostPublishedEvent;
+import run.halo.app.event.post.PostRecycledEvent;
+import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.QueryParamBuildUtil;
@@ -36,6 +40,8 @@ public class PostEndpoint implements CustomEndpoint {
 
     private final PostService postService;
     private final ReactiveExtensionClient client;
+
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -94,6 +100,22 @@ public class PostEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(Post.class))
             )
+            .PUT("posts/{name}/unpublish", this::unpublishPost,
+                builder -> builder.operationId("UnpublishPost")
+                    .description("Publish a post.")
+                    .tag(tag)
+                    .parameter(parameterBuilder().name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true))
+                    .response(responseBuilder()
+                        .implementation(Post.class)))
+            .PUT("posts/{name}/recycle", this::recyclePost,
+                builder -> builder.operationId("RecyclePost")
+                    .description("Recycle a post.")
+                    .tag(tag)
+                    .parameter(parameterBuilder().name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)))
             .build();
     }
 
@@ -111,7 +133,7 @@ public class PostEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> publishPost(ServerRequest request) {
         String name = request.pathVariable("name");
-        return client.fetch(Post.class, name)
+        return client.get(Post.class, name)
             .flatMap(post -> {
                 Post.PostSpec spec = post.getSpec();
                 spec.setPublish(true);
@@ -119,6 +141,37 @@ public class PostEndpoint implements CustomEndpoint {
                 return client.update(post);
             })
             .flatMap(post -> postService.publishPost(post.getMetadata().getName()))
+            // TODO Fire published event in reconciler in the future
+            .doOnNext(post -> eventPublisher.publishEvent(
+                new PostPublishedEvent(this, post.getMetadata().getName())))
+            .flatMap(post -> ServerResponse.ok().bodyValue(post));
+    }
+
+    private Mono<ServerResponse> unpublishPost(ServerRequest request) {
+        var name = request.pathVariable("name");
+        return client.get(Post.class, name)
+            .doOnNext(post -> {
+                var spec = post.getSpec();
+                spec.setPublish(false);
+            })
+            .flatMap(client::update)
+            // TODO Fire unpublished event in reconciler in the future
+            .doOnNext(post -> eventPublisher.publishEvent(
+                new PostUnpublishedEvent(this, post.getMetadata().getName())))
+            .flatMap(post -> ServerResponse.ok().bodyValue(post));
+    }
+
+    private Mono<ServerResponse> recyclePost(ServerRequest request) {
+        var name = request.pathVariable("name");
+        return client.get(Post.class, name)
+            .doOnNext(post -> {
+                var spec = post.getSpec();
+                spec.setDeleted(true);
+            })
+            .flatMap(client::update)
+            // TODO Fire recycled event in reconciler in the future
+            .doOnNext(post -> eventPublisher.publishEvent(
+                new PostRecycledEvent(this, post.getMetadata().getName())))
             .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }
 

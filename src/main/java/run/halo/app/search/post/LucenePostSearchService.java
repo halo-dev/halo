@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
@@ -112,12 +113,12 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
     }
 
     @Override
-    public void removeDocuments(List<PostDoc> posts) throws IOException {
+    public void removeDocuments(Set<String> postNames) throws IOException {
         var writeConfig = new IndexWriterConfig(analyzer);
         writeConfig.setOpenMode(APPEND);
         try (var writer = new IndexWriter(postIndexDir, writeConfig)) {
-            var terms = posts.stream()
-                .map(post -> new Term(PostDoc.ID_FIELD, post.getName()))
+            var terms = postNames.stream()
+                .map(postName -> new Term(PostDoc.ID_FIELD, postName))
                 .toArray(Term[]::new);
             long seqNum = writer.deleteDocuments(terms);
             log.debug("Deleted documents({}) with sequence number {}", terms.length, seqNum);

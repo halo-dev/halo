@@ -1,6 +1,7 @@
 package run.halo.app.infra;
 
 import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -35,8 +36,12 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
 
     private final SchemeManager schemeManager;
 
-    public SchemeInitializer(SchemeManager schemeManager) {
+    private final ApplicationEventPublisher eventPublisher;
+
+    public SchemeInitializer(SchemeManager schemeManager,
+        ApplicationEventPublisher eventPublisher) {
         this.schemeManager = schemeManager;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -70,5 +75,7 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
         schemeManager.register(PolicyTemplate.class);
         // metrics.halo.run
         schemeManager.register(Counter.class);
+
+        eventPublisher.publishEvent(new SchemeInitializedEvent(this));
     }
 }

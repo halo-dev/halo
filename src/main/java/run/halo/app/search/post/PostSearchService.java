@@ -1,6 +1,7 @@
 package run.halo.app.search.post;
 
 import java.util.List;
+import java.util.Set;
 import org.pf4j.ExtensionPoint;
 import run.halo.app.search.SearchParam;
 import run.halo.app.search.SearchResult;
@@ -11,6 +12,6 @@ public interface PostSearchService extends ExtensionPoint {
 
     void addDocuments(List<PostDoc> posts) throws Exception;
 
-    void removeDocuments(List<PostDoc> posts) throws Exception;
+    void removeDocuments(Set<String> postNames) throws Exception;
 
 }
