@@ -1,5 +1,7 @@
 package run.halo.app.core.extension;
 
+import static java.lang.Boolean.parseBoolean;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
@@ -68,7 +70,7 @@ public class Post extends AbstractExtension {
 
     public static boolean isPublished(MetadataOperator metadata) {
         var labels = metadata.getLabels();
-        return labels != null && labels.getOrDefault(PUBLISHED_LABEL, "false").equals("true");
+        return labels != null && parseBoolean(labels.getOrDefault(PUBLISHED_LABEL, "false"));
     }
 
     @Data

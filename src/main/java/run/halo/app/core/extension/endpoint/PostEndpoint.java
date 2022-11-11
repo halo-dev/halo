@@ -97,6 +97,10 @@ public class PostEndpoint implements CustomEndpoint {
                         .in(ParameterIn.PATH)
                         .required(true)
                         .implementation(String.class))
+                    .parameter(parameterBuilder().name("headSnapshot")
+                        .description("Head snapshot name of content.")
+                        .in(ParameterIn.QUERY)
+                        .required(false))
                     .response(responseBuilder()
                         .implementation(Post.class))
             )
@@ -132,12 +136,14 @@ public class PostEndpoint implements CustomEndpoint {
     }
 
     Mono<ServerResponse> publishPost(ServerRequest request) {
-        String name = request.pathVariable("name");
+        var name = request.pathVariable("name");
         return client.get(Post.class, name)
             .flatMap(post -> {
-                Post.PostSpec spec = post.getSpec();
+                var spec = post.getSpec();
+                var headSnapshot =
+                    request.queryParam("headSnapshot").orElse(spec.getHeadSnapshot());
                 spec.setPublish(true);
-                spec.setReleaseSnapshot(spec.getHeadSnapshot());
+                spec.setReleaseSnapshot(headSnapshot);
                 return client.update(post);
             })
             .flatMap(post -> postService.publishPost(post.getMetadata().getName()))
