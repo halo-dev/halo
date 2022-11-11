@@ -140,10 +140,10 @@ public class PostEndpoint implements CustomEndpoint {
         return client.get(Post.class, name)
             .flatMap(post -> {
                 var spec = post.getSpec();
-                var headSnapshot =
-                    request.queryParam("headSnapshot").orElse(spec.getHeadSnapshot());
+                request.queryParam("headSnapshot").ifPresent(spec::setHeadSnapshot);
                 spec.setPublish(true);
-                spec.setReleaseSnapshot(headSnapshot);
+                // TODO Provide release snapshot query param to control
+                spec.setReleaseSnapshot(spec.getHeadSnapshot());
                 return client.update(post);
             })
             .flatMap(post -> postService.publishPost(post.getMetadata().getName()))
