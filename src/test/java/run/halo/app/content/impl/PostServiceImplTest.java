@@ -8,7 +8,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +29,7 @@ import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.Ref;
-import run.halo.app.infra.Condition;
+import run.halo.app.infra.ConditionList;
 import run.halo.app.infra.ConditionStatus;
 
 /**
@@ -101,7 +99,6 @@ class PostServiceImplTest {
         // v1 not published
         Snapshot snapshotV1 = TestPost.snapshotV1();
         snapshotV1.getMetadata().setName(snapV1name);
-        snapshotV1.getSpec().setPublishTime(null);
         post.getSpec().setBaseSnapshot(snapshotV1.getMetadata().getName());
 
         post.getSpec().setHeadSnapshot(null);
@@ -109,7 +106,7 @@ class PostServiceImplTest {
         when(client.fetch(eq(Post.class), eq(postName))).thenReturn(Mono.just(post));
         verify(client, times(0)).fetch(eq(Snapshot.class), eq(snapV1name));
 
-        postService.publishPost(postName)
+        postService.publishPost(postName, post.getSpec().getReleaseSnapshot())
             .as(StepVerifier::create)
             .verifyComplete();
     }
@@ -130,18 +127,14 @@ class PostServiceImplTest {
         // v1 not published
         Snapshot snapshotV1 = TestPost.snapshotV1();
         snapshotV1.getMetadata().setName(snapV1name);
-        snapshotV1.getSpec().setPublishTime(null);
         when(client.fetch(eq(Snapshot.class), eq(snapV1name))).thenReturn(Mono.just(snapshotV1));
-
-        when(contentService.publish(eq(snapV1name), eq(Ref.of(post))))
-            .thenReturn(Mono.just(snapshotV1.applyPatch(snapshotV1)));
 
         when(client.update(any(Post.class))).thenAnswer((Answer<Mono<Post>>) invocation -> {
             Post updated = invocation.getArgument(0);
             return Mono.just(updated);
         });
 
-        postService.publishPost(postName)
+        postService.publishPost(postName, post.getSpec().getReleaseSnapshot())
             .as(StepVerifier::create)
             .consumeNextWith(expected -> {
                 ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
@@ -150,11 +143,10 @@ class PostServiceImplTest {
                 assertThat(updated.getSpec().getReleaseSnapshot()).isEqualTo(snapV1name);
                 assertThat(updated.getSpec().getHeadSnapshot()).isEqualTo(snapV1name);
                 assertThat(updated.getSpec().getPublishTime()).isNotNull();
-                assertThat(updated.getSpec().getVersion()).isEqualTo(1);
-                List<Condition> conditions = updated.getStatus().getConditions();
+                ConditionList conditions = updated.getStatus().getConditions();
                 assertThat(conditions).hasSize(1);
-                assertThat(conditions.get(0).getType()).isEqualTo("PUBLISHED");
-                assertThat(conditions.get(0).getStatus()).isEqualTo(ConditionStatus.TRUE);
+                assertThat(conditions.peek().getType()).isEqualTo("PUBLISHED");
+                assertThat(conditions.peek().getStatus()).isEqualTo(ConditionStatus.TRUE);
                 assertThat(expected).isNotNull();
             })
             .verifyComplete();
@@ -179,24 +171,20 @@ class PostServiceImplTest {
         Snapshot snapshotV1 = TestPost.snapshotV1();
         snapshotV1.getMetadata().setName(snapV1name);
         snapshotV1.getMetadata().setLabels(new HashMap<>());
-        Snapshot.putPublishedLabel(snapshotV1.getMetadata().getLabels());
-        snapshotV1.getSpec().setPublishTime(Instant.now());
+        ExtensionUtil.nullSafeAnnotations(snapshotV1)
+            .put(Post.PUBLISHED_ANNO, Boolean.TRUE.toString());
 
         // v1 not published
         Snapshot snapshotV2 = TestPost.snapshotV2();
         snapshotV2.getMetadata().setName(snapV2name);
-        snapshotV2.getSpec().setPublishTime(null);
         when(client.fetch(eq(Snapshot.class), eq(snapV2name))).thenReturn(Mono.just(snapshotV2));
-
-        when(contentService.publish(eq(snapV2name), eq(Ref.of(post))))
-            .thenReturn(Mono.just(snapshotV2.applyPatch(snapshotV1)));
 
         when(client.update(any(Post.class))).thenAnswer((Answer<Mono<Post>>) invocation -> {
             Post updated = invocation.getArgument(0);
             return Mono.just(updated);
         });
 
-        postService.publishPost(postName)
+        postService.publishPost(postName, post.getSpec().getReleaseSnapshot())
             .as(StepVerifier::create)
             .consumeNextWith(expected -> {
                 assertThat(expected).isNotNull();
@@ -206,7 +194,6 @@ class PostServiceImplTest {
                 assertThat(updated.getSpec().getReleaseSnapshot()).isEqualTo(snapV2name);
                 assertThat(updated.getSpec().getHeadSnapshot()).isEqualTo(snapV2name);
                 assertThat(updated.getSpec().getPublishTime()).isNotNull();
-                assertThat(updated.getSpec().getVersion()).isEqualTo(2);
             })
             .verifyComplete();
     }

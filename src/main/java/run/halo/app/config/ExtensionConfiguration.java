@@ -151,11 +151,11 @@ public class ExtensionConfiguration {
         @Bean
         Controller postController(ExtensionClient client, ContentService contentService,
             PostPermalinkPolicy postPermalinkPolicy, CounterService counterService,
-            PostService postService) {
+            PostService postService, ApplicationContext applicationContext) {
             return new ControllerBuilder("post-controller", client)
                 .reconciler(new PostReconciler(client, contentService, postService,
                     postPermalinkPolicy,
-                    counterService))
+                    counterService, applicationContext))
                 .extension(new Post())
                 .build();
         }

@@ -8,11 +8,15 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.A;
+import org.springframework.context.ApplicationContext;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -34,10 +38,13 @@ import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.SinglePage;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.core.extension.User;
+import run.halo.app.event.post.PostPublishedEvent;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.Condition;
+import run.halo.app.infra.ConditionList;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
@@ -52,6 +59,7 @@ import run.halo.app.metrics.MeterUtils;
  */
 @Slf4j
 @Service
+@AllArgsConstructor
 public class SinglePageServiceImpl implements SinglePageService {
     private final ContentService contentService;
 
@@ -59,12 +67,7 @@ public class SinglePageServiceImpl implements SinglePageService {
 
     private final CounterService counterService;
 
-    public SinglePageServiceImpl(ContentService contentService, ReactiveExtensionClient client,
-        CounterService counterService) {
-        this.contentService = contentService;
-        this.client = client;
-        this.counterService = counterService;
-    }
+    private final ApplicationContext applicationContext;
 
     @Override
     public Mono<ListResult<ListedSinglePage>> list(SinglePageQuery query) {
@@ -115,48 +118,27 @@ public class SinglePageServiceImpl implements SinglePageService {
     }
 
     @Override
-    public Mono<SinglePage> publish(String name) {
+    public Mono<Boolean> publish(String name, String releaseSnapshot) {
         return client.fetch(SinglePage.class, name)
             .filter(page -> Objects.equals(true, page.getSpec().getPublish()))
-            .flatMap(page -> {
-                final SinglePage oldPage = JsonUtils.deepCopy(page);
-                final SinglePage.SinglePageSpec spec = page.getSpec();
-                // if it's published state but releaseSnapshot is null, it means that need to
-                // publish headSnapshot
-                // if releaseSnapshot is draft and publish state is true, it means that need to
-                // publish releaseSnapshot
-                if (StringUtils.isBlank(spec.getHeadSnapshot())) {
-                    spec.setHeadSnapshot(spec.getBaseSnapshot());
-                }
-
-                if (StringUtils.isBlank(spec.getReleaseSnapshot())) {
-                    spec.setReleaseSnapshot(spec.getHeadSnapshot());
-                    // first-time to publish reset version to 0
-                    spec.setVersion(0);
-                }
-                return client.fetch(Snapshot.class, spec.getReleaseSnapshot())
-                    .flatMap(releasedSnapshot -> {
-                        Ref ref = Ref.of(page);
-                        // not published state, need to publish
-                        return contentService.publish(releasedSnapshot.getMetadata().getName(),
-                                ref)
-                            .flatMap(contentWrapper -> {
-                                appendPublishedCondition(page, Post.PostPhase.PUBLISHED);
-                                spec.setVersion(contentWrapper.getVersion());
-                                SinglePage.changePublishedState(page, true);
-                                if (spec.getPublishTime() == null) {
-                                    spec.setPublishTime(Instant.now());
-                                }
-                                if (!oldPage.equals(page)) {
-                                    return client.update(page);
-                                }
-                                return Mono.just(page);
-                            });
-                    })
-                    .switchIfEmpty(Mono.defer(() -> Mono.error(new NotFoundException(
-                        String.format("Snapshot [%s] not found", spec.getReleaseSnapshot()))))
-                    );
-            });
+            .flatMap(page -> client.fetch(Snapshot.class, releaseSnapshot)
+                .flatMap(releasedSnapshot -> {
+                    Map<String, String> annotations =
+                        ExtensionUtil.nullSafeAnnotations(releasedSnapshot);
+                    if (Boolean.TRUE.toString().equals(annotations.get(Post.PUBLISHED_ANNO))) {
+                        return Mono.just(false);
+                    }
+                    annotations.put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
+                    appendPublishedCondition(page, Post.PostPhase.PUBLISHED);
+                    SinglePage.changePublishedState(page, true);
+                    return client.update(releasedSnapshot)
+                        .then(client.update(page))
+                        .thenReturn(true)
+                        .doOnSuccess(published -> applicationContext.publishEvent(
+                            new PostPublishedEvent(this, name)));
+                })
+            )
+            .defaultIfEmpty(false);
     }
 
     private Mono<String> getContextUsername() {
@@ -290,9 +272,8 @@ public class SinglePageServiceImpl implements SinglePageService {
         Assert.notNull(page, "The singlePage must not be null.");
         SinglePage.SinglePageStatus status = page.getStatusOrDefault();
         status.setPhase(phase.name());
-        List<Condition> conditions = status.getConditionsOrDefault();
-        Condition condition = new Condition();
-        conditions.add(createCondition(phase));
+        ConditionList conditions = status.getConditionsOrDefault();
+        conditions.addAndEvictFIFO(createCondition(phase));
     }
 
     Condition createCondition(Post.PostPhase phase) {

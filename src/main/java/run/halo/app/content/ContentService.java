@@ -19,8 +19,6 @@ public interface ContentService {
 
     Mono<ContentWrapper> updateContent(ContentRequest content);
 
-    Mono<ContentWrapper> publish(String headSnapshotName, Ref subjectRef);
-
     Mono<Snapshot> getBaseSnapshot(Ref subjectRef);
 
     Mono<Snapshot> latestSnapshotVersion(Ref subjectRef);

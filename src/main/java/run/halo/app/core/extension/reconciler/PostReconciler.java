@@ -1,14 +1,15 @@
 package run.halo.app.core.extension.reconciler;
 
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
+import org.springframework.context.ApplicationContext;
 import org.springframework.util.Assert;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.PostService;
@@ -16,12 +17,14 @@ import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
+import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.Condition;
+import run.halo.app.infra.ConditionList;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.JsonUtils;
@@ -40,6 +43,7 @@ import run.halo.app.metrics.MeterUtils;
  * @author guqing
  * @since 2.0.0
  */
+@AllArgsConstructor
 public class PostReconciler implements Reconciler<Reconciler.Request> {
     private static final String FINALIZER_NAME = "post-protection";
     private final ExtensionClient client;
@@ -48,15 +52,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     private final PostPermalinkPolicy postPermalinkPolicy;
     private final CounterService counterService;
 
-    public PostReconciler(ExtensionClient client, ContentService contentService,
-        PostService postService, PostPermalinkPolicy postPermalinkPolicy,
-        CounterService counterService) {
-        this.client = client;
-        this.contentService = contentService;
-        this.postService = postService;
-        this.postPermalinkPolicy = postPermalinkPolicy;
-        this.counterService = counterService;
-    }
+    private final ApplicationContext applicationContext;
 
     @Override
     public Result reconcile(Request request) {
@@ -77,17 +73,31 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void reconcileSpec(String name) {
-        // publish post if necessary
-        try {
-            postService.publishPost(name).block();
-        } catch (Throwable e) {
-            publishFailed(name, e);
-            throw e;
-        }
-
         client.fetch(Post.class, name).ifPresent(post -> {
-            Post oldPost = JsonUtils.deepCopy(post);
-            if (post.isPublished() && Objects.equals(false, post.getSpec().getPublish())) {
+            // un-publish post if necessary
+            if (post.isPublished()
+                && Objects.equals(false, post.getSpec().getPublish())) {
+                boolean success = unPublishReconcile(name);
+                if (success) {
+                    applicationContext.publishEvent(new PostUnpublishedEvent(this, name));
+                }
+                return;
+            }
+
+            // publish post if necessary
+            try {
+                postService.publishPost(name, post.getSpec().getReleaseSnapshot()).block();
+            } catch (Throwable e) {
+                publishFailed(name, e);
+                throw e;
+            }
+        });
+    }
+
+    private boolean unPublishReconcile(String name) {
+        return client.fetch(Post.class, name)
+            .map(post -> {
+                final Post oldPost = JsonUtils.deepCopy(post);
                 Post.changePublishedState(post, false);
                 final Post.PostStatus status = post.getStatusOrDefault();
                 Condition condition = new Condition();
@@ -98,11 +108,12 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 condition.setLastTransitionTime(Instant.now());
                 status.getConditionsOrDefault().add(condition);
                 status.setPhase(Post.PostPhase.DRAFT.name());
-            }
-            if (!oldPost.equals(post)) {
-                client.update(post);
-            }
-        });
+                if (!oldPost.equals(post)) {
+                    client.update(post);
+                }
+                return true;
+            })
+            .orElse(false);
     }
 
     private void publishFailed(String name, Throwable error) {
@@ -115,7 +126,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             Post.PostPhase phase = Post.PostPhase.FAILED;
             status.setPhase(phase.name());
 
-            final List<Condition> conditions = status.getConditionsOrDefault();
+            final ConditionList conditions = status.getConditionsOrDefault();
             Condition condition = new Condition();
             condition.setType(phase.name());
             condition.setReason(phase.name());
@@ -124,14 +135,8 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             condition.setLastTransitionTime(Instant.now());
             condition.setMessage(error.getMessage());
             condition.setStatus(ConditionStatus.FALSE);
+            conditions.addAndEvictFIFO(condition);
 
-            if (conditions.size() > 0) {
-                Condition lastCondition = conditions.get(conditions.size() - 1);
-                if (!StringUtils.equals(lastCondition.getType(), condition.getType())
-                    && !StringUtils.equals(lastCondition.getMessage(), condition.getMessage())) {
-                    conditions.add(condition);
-                }
-            }
             post.setStatus(status);
 
             if (!oldPost.equals(post)) {
@@ -221,23 +226,9 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                     status.setContributors(contributors);
 
                     // update in progress status
-                    snapshots.stream()
-                        .filter(
-                            snapshot -> snapshot.getMetadata().getName().equals(headSnapshot))
-                        .findAny()
-                        .ifPresent(snapshot -> {
-                            status.setInProgress(!snapshot.isPublished());
-                        });
-
-                    List<String> releasedSnapshots = snapshots.stream()
-                        .filter(Snapshot::isPublished)
-                        .sorted(Comparator.comparing(snapshot -> snapshot.getSpec().getVersion()))
-                        .map(snapshot -> snapshot.getMetadata().getName())
-                        .toList();
-                    status.setReleasedSnapshots(releasedSnapshots);
+                    status.setInProgress(
+                        !StringUtils.equals(headSnapshot, post.getSpec().getReleaseSnapshot()));
                 });
-
-            status.setConditions(limitConditionSize(status.getConditions()));
 
             if (!oldPost.equals(post)) {
                 client.update(post);
@@ -297,13 +288,5 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         String text = Jsoup.parse(shortHtmlContent).text();
         // TODO The default capture 150 words as excerpt
         return StringUtils.substring(text, 0, 150);
-    }
-
-    static List<Condition> limitConditionSize(List<Condition> conditions) {
-        if (conditions == null || conditions.size() <= 10) {
-            return conditions;
-        }
-        // Retain the last ten conditions
-        return conditions.subList(conditions.size() - 10, conditions.size());
     }
 }

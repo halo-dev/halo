@@ -24,7 +24,6 @@ import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.Post;
-import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.event.post.PostRecycledEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.extension.ListResult;
@@ -145,17 +144,17 @@ public class PostEndpoint implements CustomEndpoint {
                 var spec = post.getSpec();
                 request.queryParam("headSnapshot").ifPresent(spec::setHeadSnapshot);
                 spec.setPublish(true);
+                if (spec.getHeadSnapshot() == null) {
+                    spec.setHeadSnapshot(spec.getBaseSnapshot());
+                }
                 // TODO Provide release snapshot query param to control
                 spec.setReleaseSnapshot(spec.getHeadSnapshot());
             })
             .flatMap(client::update)
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 .filter(t -> t instanceof OptimisticLockingFailureException))
-            .flatMap(post -> postService.publishPost(post.getMetadata().getName()))
-            // TODO Fire published event in reconciler in the future
-            .doOnNext(post -> eventPublisher.publishEvent(
-                new PostPublishedEvent(this, post.getMetadata().getName())))
-            .flatMap(post -> ServerResponse.ok().bodyValue(post));
+            .flatMap(post -> postService.publishPost(name, post.getSpec().getReleaseSnapshot()))
+            .flatMap(publishResult -> ServerResponse.ok().bodyValue(publishResult));
     }
 
     private Mono<ServerResponse> unpublishPost(ServerRequest request) {

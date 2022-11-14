@@ -18,5 +18,5 @@ public interface PostService {
 
     Mono<Post> updatePost(PostRequest postRequest);
 
-    Mono<Post> publishPost(String postName);
+    Mono<Boolean> publishPost(String postName, String releaseSnapshotName);
 }

@@ -1,9 +1,7 @@
 package run.halo.app.content.impl;
 
 import java.security.Principal;
-import java.time.Instant;
 import java.util.Comparator;
-import java.util.Map;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -16,7 +14,6 @@ import run.halo.app.content.ContentRequest;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.core.extension.Snapshot;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 
@@ -29,7 +26,7 @@ import run.halo.app.extension.Ref;
 @Component
 public class ContentServiceImpl implements ContentService {
     private static final Comparator<Snapshot> SNAPSHOT_COMPARATOR =
-        Comparator.comparing(snapshot -> snapshot.getSpec().getVersion());
+        Comparator.comparing(Snapshot::getVersionAnno);
     public static Comparator<Snapshot> LATEST_SNAPSHOT_COMPARATOR = SNAPSHOT_COMPARATOR.reversed();
 
     private final ReactiveExtensionClient client;
@@ -71,29 +68,6 @@ public class ContentServiceImpl implements ContentService {
             .flatMap(this::restoredContent);
     }
 
-    @Override
-    public Mono<ContentWrapper> publish(String headSnapshotName, Ref subjectRef) {
-        Assert.notNull(headSnapshotName, "The headSnapshotName must not be null");
-        return client.fetch(Snapshot.class, headSnapshotName)
-            .flatMap(snapshot -> {
-                if (snapshot.isPublished()) {
-                    // there is nothing to publish
-                    return restoredContent(snapshot.getMetadata().getName(),
-                        subjectRef);
-                }
-                Map<String, String> labels = ExtensionUtil.nullSafeLabels(snapshot);
-                Snapshot.putPublishedLabel(labels);
-                Snapshot.SnapShotSpec snapshotSpec = snapshot.getSpec();
-                snapshotSpec.setPublishTime(Instant.now());
-                snapshotSpec.setDisplayVersion(
-                    Snapshot.displayVersionFrom(snapshotSpec.getVersion()));
-                return client.update(snapshot)
-                    .then(Mono.defer(
-                        () -> restoredContent(snapshot.getMetadata().getName(), subjectRef))
-                    );
-            });
-    }
-
     private Mono<ContentWrapper> restoredContent(String snapshotName,
         Ref subjectRef) {
         return getBaseSnapshot(subjectRef)
@@ -109,7 +83,7 @@ public class ContentServiceImpl implements ContentService {
     @Override
     public Mono<Snapshot> getBaseSnapshot(Ref subjectRef) {
         return listSnapshots(subjectRef)
-            .filter(snapshot -> snapshot.getSpec().getVersion() == 1)
+            .filter(snapshot -> Snapshot.getVersionAnno(snapshot) == 1)
             .next();
     }
 
@@ -229,7 +203,7 @@ public class ContentServiceImpl implements ContentService {
         String originalContent = baseSnapshot.getSpec().getContentPatch();
 
         // it is the v1 snapshot, set the content directly
-        if (snapshotToUse.getSpec().getVersion() == 1) {
+        if (Snapshot.getVersionAnno(snapshotToUse) == 1) {
             snapshotToUse.getSpec().setRawPatch(contentRequest.raw());
             snapshotToUse.getSpec().setContentPatch(contentRequest.content());
         } else {

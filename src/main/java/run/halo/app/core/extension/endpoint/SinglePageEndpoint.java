@@ -115,10 +115,15 @@ public class SinglePageEndpoint implements CustomEndpoint {
             .flatMap(singlePage -> {
                 SinglePage.SinglePageSpec spec = singlePage.getSpec();
                 spec.setPublish(true);
+                if (spec.getHeadSnapshot() == null) {
+                    spec.setHeadSnapshot(spec.getBaseSnapshot());
+                }
                 spec.setReleaseSnapshot(spec.getHeadSnapshot());
                 return client.update(singlePage);
             })
-            .flatMap(singlePage -> singlePageService.publish(singlePage.getMetadata().getName()))
+            .flatMap(singlePage -> singlePageService.publish(name,
+                singlePage.getSpec().getReleaseSnapshot())
+            )
             .flatMap(page -> ServerResponse.ok().bodyValue(page));
     }
 

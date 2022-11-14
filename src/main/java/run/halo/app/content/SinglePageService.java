@@ -18,5 +18,5 @@ public interface SinglePageService {
 
     Mono<SinglePage> update(SinglePageRequest pageRequest);
 
-    Mono<SinglePage> publish(String name);
+    Mono<Boolean> publish(String name, String releaseSnapshot);
 }

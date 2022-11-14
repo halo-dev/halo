@@ -5,7 +5,6 @@ import static java.lang.Boolean.parseBoolean;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -16,7 +15,7 @@ import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.MetadataOperator;
-import run.halo.app.infra.Condition;
+import run.halo.app.infra.ConditionList;
 
 /**
  * <p>Post extension.</p>
@@ -33,6 +32,7 @@ import run.halo.app.infra.Condition;
 public class Post extends AbstractExtension {
     public static final String KIND = "Post";
     public static final String CATEGORIES_ANNO = "content.halo.run/categories";
+    public static final String PUBLISHED_ANNO = "content.halo.run/published";
     public static final String TAGS_ANNO = "content.halo.run/tags";
     public static final String DELETED_LABEL = "content.halo.run/deleted";
     public static final String PUBLISHED_LABEL = "content.halo.run/published";
@@ -113,9 +113,6 @@ public class Post extends AbstractExtension {
         @Schema(required = true, defaultValue = "PUBLIC")
         private VisibleEnum visible;
 
-        @Schema(required = true, defaultValue = "1")
-        private Integer version;
-
         @Schema(required = true, defaultValue = "0")
         private Integer priority;
 
@@ -135,7 +132,7 @@ public class Post extends AbstractExtension {
         private String phase;
 
         @Schema
-        private List<Condition> conditions;
+        private ConditionList conditions;
 
         private String permalink;
 
@@ -147,12 +144,10 @@ public class Post extends AbstractExtension {
 
         private List<String> contributors;
 
-        private List<String> releasedSnapshots;
-
         @JsonIgnore
-        public List<Condition> getConditionsOrDefault() {
+        public ConditionList getConditionsOrDefault() {
             if (this.conditions == null) {
-                this.conditions = new ArrayList<>();
+                this.conditions = new ConditionList();
             }
             return conditions;
         }

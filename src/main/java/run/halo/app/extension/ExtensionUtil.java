@@ -58,4 +58,21 @@ public final class ExtensionUtil {
         }
         return labels;
     }
+
+    /**
+     * Gets extension metadata annotations null safe.
+     *
+     * @param extension extension must not be null
+     * @return extension metadata annotations
+     */
+    public static Map<String, String> nullSafeAnnotations(AbstractExtension extension) {
+        Assert.notNull(extension, "The extension must not be null.");
+        Assert.notNull(extension.getMetadata(), "The extension metadata must not be null.");
+        Map<String, String> annotations = extension.getMetadata().getAnnotations();
+        if (annotations == null) {
+            annotations = new HashMap<>();
+            extension.getMetadata().setLabels(annotations);
+        }
+        return annotations;
+    }
 }

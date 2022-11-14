@@ -94,28 +94,37 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void reconcileSpec(String name) {
-        // publish single page if necessary
-        try {
-            singlePageService.publish(name).block();
-        } catch (Throwable e) {
-            publishFailed(name, e);
-            throw e;
-        }
-
         client.fetch(SinglePage.class, name).ifPresent(page -> {
-            SinglePage oldPage = JsonUtils.deepCopy(page);
+            // un-publish if necessary
             if (page.isPublished() && Objects.equals(false, page.getSpec().getPublish())) {
-                SinglePage.changePublishedState(page, false);
-                final SinglePage.SinglePageStatus status = page.getStatusOrDefault();
-                Condition condition = new Condition();
-                condition.setType("CancelledPublish");
-                condition.setStatus(ConditionStatus.TRUE);
-                condition.setReason(condition.getType());
-                condition.setMessage("CancelledPublish");
-                condition.setLastTransitionTime(Instant.now());
-                status.getConditionsOrDefault().add(condition);
-                status.setPhase(Post.PostPhase.DRAFT.name());
+                unPublish(name);
+                return;
             }
+
+            // publish single page if necessary
+            try {
+                singlePageService.publish(name, page.getSpec().getReleaseSnapshot()).block();
+            } catch (Throwable e) {
+                publishFailed(name, e);
+                throw e;
+            }
+        });
+    }
+
+    private void unPublish(String name) {
+        client.fetch(SinglePage.class, name).ifPresent(page -> {
+            final SinglePage oldPage = JsonUtils.deepCopy(page);
+
+            SinglePage.changePublishedState(page, false);
+            final SinglePage.SinglePageStatus status = page.getStatusOrDefault();
+            Condition condition = new Condition();
+            condition.setType("CancelledPublish");
+            condition.setStatus(ConditionStatus.TRUE);
+            condition.setReason(condition.getType());
+            condition.setMessage("CancelledPublish");
+            condition.setLastTransitionTime(Instant.now());
+            status.getConditionsOrDefault().add(condition);
+            status.setPhase(Post.PostPhase.DRAFT.name());
             if (!oldPage.equals(page)) {
                 client.update(page);
             }

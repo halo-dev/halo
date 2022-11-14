@@ -10,7 +10,6 @@ import static run.halo.app.content.TestPost.snapshotV1;
 import static run.halo.app.content.TestPost.snapshotV2;
 import static run.halo.app.content.TestPost.snapshotV3;
 
-import java.time.Instant;
 import java.util.HashMap;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,10 +23,11 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.content.impl.ContentServiceImpl;
 import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.SinglePage;
 import run.halo.app.core.extension.Snapshot;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
-import run.halo.app.infra.utils.JsonUtils;
 
 /**
  * Tests for {@link ContentService}.
@@ -136,13 +136,11 @@ class ContentServiceTest {
         final Ref ref = postRef("test-post");
 
         Snapshot snapshotV2 = snapshotV2();
-        snapshotV2.getSpec().setPublishTime(null);
-
 
         // v1(released),v2
         snapshotV1.getMetadata().setLabels(new HashMap<>());
-        Snapshot.putPublishedLabel(snapshotV1.getMetadata().getLabels());
-        snapshotV1.getSpec().setPublishTime(Instant.now());
+        ExtensionUtil.nullSafeAnnotations(snapshotV1)
+            .put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
         pilingBaseSnapshot(snapshotV2, snapshotV1);
 
         when(client.fetch(eq(Snapshot.class), eq(snapshotV2.getMetadata().getName())))
@@ -163,7 +161,8 @@ class ContentServiceTest {
 
         Snapshot publishedV2 = snapshotV2();
         publishedV2.getMetadata().setLabels(new HashMap<>());
-        Snapshot.putPublishedLabel(publishedV2.getMetadata().getLabels());
+        ExtensionUtil.nullSafeAnnotations(snapshotV2)
+            .put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
         when(client.update(any())).thenReturn(Mono.just(publishedV2));
         StepVerifier.create(contentService.updateContent(contentRequest))
             .consumeNextWith(created -> {
@@ -180,13 +179,12 @@ class ContentServiceTest {
         // v1(released),v2
         Snapshot snapshotV1 = snapshotV1();
         snapshotV1.getMetadata().setLabels(new HashMap<>());
-        Snapshot.putPublishedLabel(snapshotV1.getMetadata().getLabels());
-        snapshotV1.getSpec().setPublishTime(Instant.now());
+        ExtensionUtil.nullSafeAnnotations(snapshotV1)
+            .put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
         snapshotV1.getSpec().setSubjectRef(ref);
 
         Snapshot snapshotV2 = snapshotV2();
         snapshotV2.getSpec().setSubjectRef(ref);
-        snapshotV2.getSpec().setPublishTime(null);
 
         final String headSnapshot = snapshotV2.getMetadata().getName();
 
@@ -220,34 +218,6 @@ class ContentServiceTest {
         verify(client, times(1)).update(any());
     }
 
-    @Test
-    void publishContent() {
-        Ref ref = postRef("test-post");
-        // v1(released),v2
-        Snapshot snapshotV1 = snapshotV1();
-        snapshotV1.getSpec().setPublishTime(null);
-        snapshotV1.getSpec().setSubjectRef(ref);
-
-        final String headSnapshot = snapshotV1.getMetadata().getName();
-
-        pilingBaseSnapshot(snapshotV1);
-
-        when(client.fetch(eq(Snapshot.class), eq(snapshotV1.getMetadata().getName())))
-            .thenReturn(Mono.just(snapshotV1));
-
-        when(client.update(any())).thenReturn(Mono.just(snapshotV2()));
-
-        StepVerifier.create(contentService.publish(headSnapshot, ref))
-            .expectNext()
-            .consumeNextWith(p -> {
-                System.out.println(JsonUtils.objectToJson(p));
-            })
-            .expectComplete()
-            .verify();
-        // has benn published,do nothing
-        verify(client, times(1)).update(any());
-    }
-
     private static Ref postRef(String name) {
         Ref ref = new Ref();
         ref.setGroup("content.halo.run");
@@ -255,37 +225,6 @@ class ContentServiceTest {
         ref.setKind(Post.KIND);
         ref.setName(name);
         return ref;
-    }
-
-    @Test
-    void publishContentWhenHasPublishedThenDoNothing() {
-        final Ref ref = postRef("test-post");
-
-        // v1(released),v2
-        Snapshot snapshotV1 = snapshotV1();
-        snapshotV1.getMetadata().setLabels(new HashMap<>());
-        Snapshot.putPublishedLabel(snapshotV1.getMetadata().getLabels());
-        snapshotV1.getSpec().setPublishTime(Instant.now());
-        snapshotV1.getSpec().setSubjectRef(ref);
-
-        final String headSnapshot = snapshotV1.getMetadata().getName();
-
-        pilingBaseSnapshot(snapshotV1);
-
-        when(client.fetch(eq(Snapshot.class), eq(snapshotV1.getMetadata().getName())))
-            .thenReturn(Mono.just(snapshotV1));
-
-        when(client.update(any())).thenReturn(Mono.just(snapshotV2()));
-
-        StepVerifier.create(contentService.publish(headSnapshot, ref))
-            .expectNext()
-            .consumeNextWith(p -> {
-                System.out.println(JsonUtils.objectToJson(p));
-            })
-            .expectComplete()
-            .verify();
-        // has benn published,do nothing
-        verify(client, times(0)).update(any());
     }
 
     private void pilingBaseSnapshot(Snapshot... expected) {
@@ -299,8 +238,8 @@ class ContentServiceTest {
         final Ref ref = postRef(postName);
         Snapshot snapshotV1 = snapshotV1();
         snapshotV1.getMetadata().setLabels(new HashMap<>());
-        Snapshot.putPublishedLabel(snapshotV1.getMetadata().getLabels());
-        snapshotV1.getSpec().setPublishTime(Instant.now());
+        ExtensionUtil.nullSafeAnnotations(snapshotV1)
+            .put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
         snapshotV1.getSpec().setSubjectRef(ref);
 
         Snapshot snapshotV2 = TestPost.snapshotV2();
@@ -324,8 +263,8 @@ class ContentServiceTest {
         final Ref ref = postRef(postName);
         Snapshot snapshotV1 = snapshotV1();
         snapshotV1.getMetadata().setLabels(new HashMap<>());
-        Snapshot.putPublishedLabel(snapshotV1.getMetadata().getLabels());
-        snapshotV1.getSpec().setPublishTime(Instant.now());
+        ExtensionUtil.nullSafeAnnotations(snapshotV1)
+            .put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
         snapshotV1.getSpec().setSubjectRef(ref);
         Snapshot snapshotV2 = TestPost.snapshotV2();
         snapshotV2.getSpec().setSubjectRef(ref);
@@ -353,12 +292,11 @@ class ContentServiceTest {
         Snapshot snapshotV1 = snapshotV1();
         snapshotV1.getSpec().setSubjectRef(ref);
         snapshotV1.getMetadata().setLabels(new HashMap<>());
-        Snapshot.putPublishedLabel(snapshotV1.getMetadata().getLabels());
-        snapshotV1.getSpec().setPublishTime(Instant.now());
+        ExtensionUtil.nullSafeAnnotations(snapshotV1)
+            .put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
 
         Snapshot snapshotV2 = TestPost.snapshotV2();
         snapshotV2.getSpec().setSubjectRef(ref);
-        snapshotV2.getSpec().setPublishTime(null);
 
         when(client.list(eq(Snapshot.class), any(), any()))
             .thenReturn(Flux.just(snapshotV1, snapshotV2));
@@ -376,14 +314,14 @@ class ContentServiceTest {
         Snapshot snapshotV1 = snapshotV1();
         snapshotV1.getSpec().setSubjectRef(ref);
         snapshotV1.getMetadata().setLabels(new HashMap<>());
-        Snapshot.putPublishedLabel(snapshotV1.getMetadata().getLabels());
-        snapshotV1.getSpec().setPublishTime(Instant.now());
+        ExtensionUtil.nullSafeAnnotations(snapshotV1)
+            .put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
 
         Snapshot snapshotV2 = TestPost.snapshotV2();
         snapshotV2.getSpec().setSubjectRef(ref);
         snapshotV2.getMetadata().setLabels(new HashMap<>());
-        Snapshot.putPublishedLabel(snapshotV2.getMetadata().getLabels());
-        snapshotV2.getSpec().setPublishTime(Instant.now());
+        ExtensionUtil.nullSafeAnnotations(snapshotV2)
+            .put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
 
         when(client.list(eq(Snapshot.class), any(), any()))
             .thenReturn(Flux.just(snapshotV2, snapshotV1));

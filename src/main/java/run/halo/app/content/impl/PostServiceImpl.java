@@ -8,15 +8,19 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationContext;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,13 +39,13 @@ import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.core.extension.User;
+import run.halo.app.event.post.PostPublishedEvent;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.Ref;
 import run.halo.app.infra.Condition;
+import run.halo.app.infra.ConditionList;
 import run.halo.app.infra.ConditionStatus;
-import run.halo.app.infra.exception.NotFoundException;
-import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
 
@@ -53,17 +57,12 @@ import run.halo.app.metrics.MeterUtils;
  */
 @Slf4j
 @Component
+@AllArgsConstructor
 public class PostServiceImpl implements PostService {
     private final ContentService contentService;
     private final ReactiveExtensionClient client;
     private final CounterService counterService;
-
-    public PostServiceImpl(ContentService contentService, ReactiveExtensionClient client,
-        CounterService counterService) {
-        this.contentService = contentService;
-        this.client = client;
-        this.counterService = counterService;
-    }
+    private final ApplicationContext applicationContext;
 
     @Override
     public Mono<ListResult<ListedPost>> listPost(PostQuery query) {
@@ -273,55 +272,36 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Mono<Post> publishPost(String postName) {
+    @Transactional(rollbackFor = Exception.class)
+    public Mono<Boolean> publishPost(String postName, String releaseSnapshot) {
         return client.fetch(Post.class, postName)
             .filter(post -> Objects.equals(true, post.getSpec().getPublish()))
-            .flatMap(post -> {
-                final Post oldPost = JsonUtils.deepCopy(post);
-                final Post.PostSpec postSpec = post.getSpec();
-                // if it's published state but releaseSnapshot is null, it means that need to
-                // publish headSnapshot
-                // if releaseSnapshot is draft and publish state is true, it means that need to
-                // publish releaseSnapshot
-                if (StringUtils.isBlank(postSpec.getHeadSnapshot())) {
-                    postSpec.setHeadSnapshot(postSpec.getBaseSnapshot());
-                }
-
-                if (StringUtils.isBlank(postSpec.getReleaseSnapshot())) {
-                    postSpec.setReleaseSnapshot(postSpec.getHeadSnapshot());
-                    postSpec.setVersion(0);
-                }
-                return client.fetch(Snapshot.class, postSpec.getReleaseSnapshot())
-                    .flatMap(releasedSnapshot -> {
-                        Ref ref = Ref.of(post);
-                        // not published state, need to publish
-                        return contentService.publish(releasedSnapshot.getMetadata().getName(),
-                                ref)
-                            .flatMap(contentWrapper -> {
-                                appendPublishedCondition(post, Post.PostPhase.PUBLISHED);
-                                postSpec.setVersion(contentWrapper.getVersion());
-                                Post.changePublishedState(post, true);
-                                if (postSpec.getPublishTime() == null) {
-                                    postSpec.setPublishTime(Instant.now());
-                                }
-                                if (!oldPost.equals(post)) {
-                                    return client.update(post);
-                                }
-                                return Mono.just(post);
-                            });
-                    })
-                    .switchIfEmpty(Mono.defer(() -> Mono.error(new NotFoundException(
-                        String.format("Snapshot [%s] not found", postSpec.getReleaseSnapshot()))))
-                    );
-            });
+            .flatMap(post -> client.fetch(Snapshot.class, releaseSnapshot)
+                .flatMap(releasedSnapshot -> {
+                    Map<String, String> annotations =
+                        ExtensionUtil.nullSafeAnnotations(releasedSnapshot);
+                    if (Boolean.TRUE.toString().equals(annotations.get(Post.PUBLISHED_ANNO))) {
+                        return Mono.just(false);
+                    }
+                    annotations.put(Post.PUBLISHED_ANNO, Boolean.TRUE.toString());
+                    appendPublishedCondition(post, Post.PostPhase.PUBLISHED);
+                    Post.changePublishedState(post, true);
+                    return client.update(releasedSnapshot)
+                        .then(client.update(post))
+                        .thenReturn(true)
+                        .doOnSuccess(published -> applicationContext.publishEvent(
+                            new PostPublishedEvent(this, postName)));
+                })
+            )
+            .defaultIfEmpty(false);
     }
 
     void appendPublishedCondition(Post post, Post.PostPhase phase) {
         Assert.notNull(post, "The post must not be null.");
         Post.PostStatus status = post.getStatusOrDefault();
         status.setPhase(phase.name());
-        List<Condition> conditions = status.getConditionsOrDefault();
-        conditions.add(createCondition(phase));
+        ConditionList conditions = status.getConditionsOrDefault();
+        conditions.addAndEvictFIFO(createCondition(phase));
     }
 
     Condition createCondition(Post.PostPhase phase) {

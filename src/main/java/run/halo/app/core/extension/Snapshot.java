@@ -2,9 +2,7 @@ package run.halo.app.core.extension;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.time.Instant;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,6 +11,7 @@ import org.springframework.util.Assert;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PatchUtils;
 import run.halo.app.extension.AbstractExtension;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.Ref;
 
@@ -28,7 +27,9 @@ import run.halo.app.extension.Ref;
 @EqualsAndHashCode(callSuper = true)
 public class Snapshot extends AbstractExtension {
     public static final String KIND = "Snapshot";
-    public static final String PUBLISHED_LABEL = "content.halo.run/published";
+    public static final String LAST_MODIFY_TIME_ANNO = "content.halo.run/last-modify-time";
+    public static final String VERSION_ANNO = "content.halo.run/version";
+    public static final String VERSION_LABEL = "content.halo.run/version";
 
     @Schema(required = true)
     private SnapShotSpec spec;
@@ -54,11 +55,6 @@ public class Snapshot extends AbstractExtension {
         @Schema(required = true)
         private String displayVersion;
 
-        @Schema(required = true, defaultValue = "1")
-        private Integer version;
-
-        private Instant publishTime;
-
         private Set<String> contributors;
 
         @JsonIgnore
@@ -68,17 +64,6 @@ public class Snapshot extends AbstractExtension {
             }
             return this.contributors;
         }
-    }
-
-    public static String displayVersionFrom(Integer version) {
-        Assert.notNull(version, "The version must not be null");
-        return "v" + version;
-    }
-
-    @JsonIgnore
-    public boolean isPublished() {
-        Map<String, String> labels = getMetadata().getLabels();
-        return labels != null && labels.getOrDefault(PUBLISHED_LABEL, "false").equals("true");
     }
 
     @JsonIgnore
@@ -91,10 +76,11 @@ public class Snapshot extends AbstractExtension {
     @JsonIgnore
     public ContentWrapper applyPatch(Snapshot baseSnapshot) {
         Assert.notNull(baseSnapshot, "The baseSnapshot must not be null.");
-        if (this.spec.version == 1) {
+        Integer version = getVersionAnno(this);
+        if (version == 1) {
             return ContentWrapper.builder()
                 .snapshotName(this.getMetadata().getName())
-                .version(this.spec.version)
+                .version(version)
                 .raw(this.spec.rawPatch)
                 .content(this.spec.contentPatch)
                 .rawType(this.spec.rawType)
@@ -106,15 +92,19 @@ public class Snapshot extends AbstractExtension {
             PatchUtils.applyPatch(baseSnapshot.getSpec().getRawPatch(), this.spec.rawPatch);
         return ContentWrapper.builder()
             .snapshotName(this.getMetadata().getName())
-            .version(this.spec.version)
+            .version(version)
             .raw(patchedRaw)
             .content(patchedContent)
             .rawType(this.spec.rawType)
             .build();
     }
 
-    public static void putPublishedLabel(Map<String, String> labels) {
-        Assert.notNull(labels, "The labels must not be null.");
-        labels.put(PUBLISHED_LABEL, "true");
+    /**
+     * Get snapshot version.
+     */
+    public static Integer getVersionAnno(Snapshot snapshot) {
+        String version = ExtensionUtil.nullSafeLabels(snapshot)
+            .getOrDefault(VERSION_ANNO, "1");
+        return Integer.parseInt(version);
     }
 }
