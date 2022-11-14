@@ -1,6 +1,5 @@
 package run.halo.app.plugin;
 
-import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEvent;
@@ -30,13 +29,13 @@ public class PluginApplicationEventBridgeDispatcher
         List<PluginApplicationContext> pluginApplicationContexts =
             ExtensionContextRegistry.getInstance().getPluginApplicationContexts();
         for (PluginApplicationContext pluginApplicationContext : pluginApplicationContexts) {
-            log.debug("Bridging broadcast event [{}] to plugin [{}]", event,
+            log.trace("Bridging broadcast event [{}] to plugin [{}]", event,
                 pluginApplicationContext.getPluginId());
             pluginApplicationContext.publishEvent(event);
         }
     }
 
-    private boolean isSharedEventAnnotationPresent(AnnotatedElement annotatedElement) {
-        return AnnotationUtils.findAnnotation(annotatedElement, SharedEvent.class) != null;
+    private boolean isSharedEventAnnotationPresent(Class<?> clazz) {
+        return AnnotationUtils.findAnnotation(clazz, SharedEvent.class) != null;
     }
 }
