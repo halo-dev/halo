@@ -27,7 +27,6 @@ import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.controller.Reconciler;
 
 /**
@@ -62,7 +61,6 @@ class PostReconcilerTest {
             .thenReturn(Optional.of(post));
         when(contentService.getContent(eq(post.getSpec().getReleaseSnapshot())))
             .thenReturn(Mono.empty());
-        when(postService.publishPost(eq(name), any())).thenReturn(Mono.empty());
 
         Snapshot snapshotV1 = TestPost.snapshotV1();
         Snapshot snapshotV2 = TestPost.snapshotV2();
@@ -106,8 +104,6 @@ class PostReconcilerTest {
 
         Snapshot snapshotV2 = TestPost.snapshotV2();
         snapshotV2.getMetadata().setLabels(new HashMap<>());
-        ExtensionUtil.nullSafeAnnotations(snapshotV2)
-            .put(Post.PUBLISHED_ANNO, Boolean.TRUE.toString());
         snapshotV2.getSpec().setContributors(Set.of("guqing", "zhangsan"));
 
         Snapshot snapshotV1 = TestPost.snapshotV1();
@@ -115,12 +111,11 @@ class PostReconcilerTest {
 
         when(contentService.listSnapshots(any()))
             .thenReturn(Flux.just(snapshotV1, snapshotV2));
-        when(postService.publishPost(eq(name), any())).thenReturn(Mono.empty());
 
         ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
         postReconciler.reconcile(new Reconciler.Request(name));
 
-        verify(client, times(3)).update(captor.capture());
+        verify(client, times(4)).update(captor.capture());
         Post value = captor.getValue();
         assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");
     }

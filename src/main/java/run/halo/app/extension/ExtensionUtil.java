@@ -71,7 +71,7 @@ public final class ExtensionUtil {
         Map<String, String> annotations = extension.getMetadata().getAnnotations();
         if (annotations == null) {
             annotations = new HashMap<>();
-            extension.getMetadata().setLabels(annotations);
+            extension.getMetadata().setAnnotations(annotations);
         }
         return annotations;
     }

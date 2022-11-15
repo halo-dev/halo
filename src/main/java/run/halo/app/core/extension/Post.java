@@ -32,7 +32,8 @@ import run.halo.app.infra.ConditionList;
 public class Post extends AbstractExtension {
     public static final String KIND = "Post";
     public static final String CATEGORIES_ANNO = "content.halo.run/categories";
-    public static final String PUBLISHED_ANNO = "content.halo.run/published";
+    public static final String LAST_RELEASED_SNAPSHOT_ANNO =
+        "content.halo.run/last-released-snapshot";
     public static final String TAGS_ANNO = "content.halo.run/tags";
     public static final String DELETED_LABEL = "content.halo.run/deleted";
     public static final String PUBLISHED_LABEL = "content.halo.run/published";

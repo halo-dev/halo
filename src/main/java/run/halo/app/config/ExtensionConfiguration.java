@@ -9,7 +9,6 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.PostService;
-import run.halo.app.content.SinglePageService;
 import run.halo.app.content.permalinks.CategoryPermalinkPolicy;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
@@ -202,10 +201,10 @@ public class ExtensionConfiguration {
         @Bean
         Controller singlePageController(ExtensionClient client, ContentService contentService,
             ApplicationContext applicationContext, CounterService counterService,
-            SinglePageService singlePageService, ExternalUrlSupplier externalUrlSupplier) {
+            ExternalUrlSupplier externalUrlSupplier) {
             return new ControllerBuilder("single-page-controller", client)
                 .reconciler(new SinglePageReconciler(client, contentService,
-                    applicationContext, singlePageService, counterService, externalUrlSupplier)
+                    applicationContext, counterService, externalUrlSupplier)
                 )
                 .extension(new SinglePage())
                 .build();

@@ -2,7 +2,10 @@ package run.halo.app.infra;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author guqing
@@ -11,6 +14,9 @@ import lombok.Data;
  * @since 2.0.0
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Condition {
     /**
      * type of condition in CamelCase or in foo.example.com/CamelCase.

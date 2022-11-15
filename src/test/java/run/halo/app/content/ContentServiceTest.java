@@ -11,6 +11,7 @@ import static run.halo.app.content.TestPost.snapshotV2;
 import static run.halo.app.content.TestPost.snapshotV3;
 
 import java.util.HashMap;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +24,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.content.impl.ContentServiceImpl;
 import run.halo.app.core.extension.Post;
-import run.halo.app.core.extension.SinglePage;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -64,7 +64,6 @@ class ContentServiceTest {
         pilingBaseSnapshot(snapshotV1);
         ContentWrapper contentWrapper = ContentWrapper.builder()
             .snapshotName("snapshot-A")
-            .version(1)
             .raw(contentRequest.raw())
             .content(contentRequest.content())
             .rawType(snapshotV1.getSpec().getRawType())
@@ -81,9 +80,12 @@ class ContentServiceTest {
         verify(client, times(1)).create(captor.capture());
         Snapshot snapshot = captor.getValue();
 
-        snapshotV1.getMetadata().setName(snapshot.getMetadata().getName());
-        snapshotV1.getSpec().setSubjectRef(ref);
-        assertThat(snapshot).isEqualTo(snapshotV1);
+        assertThat(snapshot.getMetadata().getName())
+            .isNotEqualTo(snapshotV1.getMetadata().getName());
+        assertThat(snapshot.getSpec().getLastModifyTime()).isNotNull();
+        assertThat(snapshot.getSpec().getOwner()).isEqualTo("guqing");
+        assertThat(snapshot.getSpec().getContributors()).isEqualTo(Set.of("guqing"));
+        assertThat(snapshot.getSpec().getSubjectRef()).isEqualTo(ref);
     }
 
     @Test
@@ -109,7 +111,6 @@ class ContentServiceTest {
 
         ContentWrapper contentWrapper = ContentWrapper.builder()
             .snapshotName(headSnapshot)
-            .version(1)
             .raw(contentRequest.raw())
             .content(contentRequest.content())
             .rawType(snapshotV1.getSpec().getRawType())
@@ -130,64 +131,19 @@ class ContentServiceTest {
     }
 
     @Test
-    void updateContentWhenHasDraftVersionButHeadPoints2Published() {
-        final String headSnapshot = "snapshot-A";
-        Snapshot snapshotV1 = snapshotV1();
-        final Ref ref = postRef("test-post");
-
-        Snapshot snapshotV2 = snapshotV2();
-
-        // v1(released),v2
-        snapshotV1.getMetadata().setLabels(new HashMap<>());
-        ExtensionUtil.nullSafeAnnotations(snapshotV1)
-            .put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
-        pilingBaseSnapshot(snapshotV2, snapshotV1);
-
-        when(client.fetch(eq(Snapshot.class), eq(snapshotV2.getMetadata().getName())))
-            .thenReturn(Mono.just(snapshotV2));
-        when(client.fetch(eq(Snapshot.class), eq(snapshotV1.getMetadata().getName())))
-            .thenReturn(Mono.just(snapshotV1));
-
-        final ContentRequest contentRequest =
-            new ContentRequest(ref, headSnapshot, "C",
-                "<p>C</p>", snapshotV1.getSpec().getRawType());
-
-        when(client.create(any())).thenReturn(Mono.just(snapshotV3()));
-
-        StepVerifier.create(contentService.latestSnapshotVersion(ref))
-            .expectNext(snapshotV2)
-            .expectComplete()
-            .verify();
-
-        Snapshot publishedV2 = snapshotV2();
-        publishedV2.getMetadata().setLabels(new HashMap<>());
-        ExtensionUtil.nullSafeAnnotations(snapshotV2)
-            .put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
-        when(client.update(any())).thenReturn(Mono.just(publishedV2));
-        StepVerifier.create(contentService.updateContent(contentRequest))
-            .consumeNextWith(created -> {
-                assertThat(created.getRaw()).isEqualTo("C");
-                assertThat(created.getContent()).isEqualTo("<p>C</p>");
-            })
-            .expectComplete()
-            .verify();
-    }
-
-    @Test
     void updateContentWhenHeadPoints2Published() {
         final Ref ref = postRef("test-post");
         // v1(released),v2
         Snapshot snapshotV1 = snapshotV1();
         snapshotV1.getMetadata().setLabels(new HashMap<>());
         ExtensionUtil.nullSafeAnnotations(snapshotV1)
-            .put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
+            .put(Snapshot.KEEP_RAW_ANNO, "true");
         snapshotV1.getSpec().setSubjectRef(ref);
 
         Snapshot snapshotV2 = snapshotV2();
         snapshotV2.getSpec().setSubjectRef(ref);
 
         final String headSnapshot = snapshotV2.getMetadata().getName();
-
 
         pilingBaseSnapshot(snapshotV2, snapshotV1);
 
@@ -200,7 +156,7 @@ class ContentServiceTest {
             new ContentRequest(ref, headSnapshot, "C",
                 "<p>C</p>", snapshotV1.getSpec().getRawType());
 
-        when(client.update(any())).thenReturn(Mono.just(snapshotV2()));
+        when(client.update(any())).thenReturn(Mono.just(snapshotV2));
 
         StepVerifier.create(contentService.latestSnapshotVersion(ref))
             .expectNext(snapshotV2)
@@ -238,8 +194,6 @@ class ContentServiceTest {
         final Ref ref = postRef(postName);
         Snapshot snapshotV1 = snapshotV1();
         snapshotV1.getMetadata().setLabels(new HashMap<>());
-        ExtensionUtil.nullSafeAnnotations(snapshotV1)
-            .put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
         snapshotV1.getSpec().setSubjectRef(ref);
 
         Snapshot snapshotV2 = TestPost.snapshotV2();
@@ -263,8 +217,6 @@ class ContentServiceTest {
         final Ref ref = postRef(postName);
         Snapshot snapshotV1 = snapshotV1();
         snapshotV1.getMetadata().setLabels(new HashMap<>());
-        ExtensionUtil.nullSafeAnnotations(snapshotV1)
-            .put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
         snapshotV1.getSpec().setSubjectRef(ref);
         Snapshot snapshotV2 = TestPost.snapshotV2();
         snapshotV2.getSpec().setSubjectRef(ref);
@@ -277,59 +229,12 @@ class ContentServiceTest {
             .expectComplete()
             .verify();
 
+        Snapshot snapshotV3 = snapshotV3();
         when(client.list(eq(Snapshot.class), any(), any()))
-            .thenReturn(Flux.just(snapshotV1, snapshotV2, snapshotV3()));
+            .thenReturn(Flux.just(snapshotV1, snapshotV2, snapshotV3));
         StepVerifier.create(contentService.latestSnapshotVersion(ref))
-            .expectNext(snapshotV3())
+            .expectNext(snapshotV3)
             .expectComplete()
             .verify();
     }
-
-    @Test
-    void latestPublishedSnapshotThenV1() {
-        String postName = "post-1";
-        Ref ref = postRef(postName);
-        Snapshot snapshotV1 = snapshotV1();
-        snapshotV1.getSpec().setSubjectRef(ref);
-        snapshotV1.getMetadata().setLabels(new HashMap<>());
-        ExtensionUtil.nullSafeAnnotations(snapshotV1)
-            .put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
-
-        Snapshot snapshotV2 = TestPost.snapshotV2();
-        snapshotV2.getSpec().setSubjectRef(ref);
-
-        when(client.list(eq(Snapshot.class), any(), any()))
-            .thenReturn(Flux.just(snapshotV1, snapshotV2));
-
-        StepVerifier.create(contentService.latestPublishedSnapshot(ref))
-            .expectNext(snapshotV1)
-            .expectComplete()
-            .verify();
-    }
-
-    @Test
-    void latestPublishedSnapshotThenV2() {
-        String postName = "post-1";
-        Ref ref = postRef(postName);
-        Snapshot snapshotV1 = snapshotV1();
-        snapshotV1.getSpec().setSubjectRef(ref);
-        snapshotV1.getMetadata().setLabels(new HashMap<>());
-        ExtensionUtil.nullSafeAnnotations(snapshotV1)
-            .put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
-
-        Snapshot snapshotV2 = TestPost.snapshotV2();
-        snapshotV2.getSpec().setSubjectRef(ref);
-        snapshotV2.getMetadata().setLabels(new HashMap<>());
-        ExtensionUtil.nullSafeAnnotations(snapshotV2)
-            .put(SinglePage.PUBLISHED_ANNO, Boolean.TRUE.toString());
-
-        when(client.list(eq(Snapshot.class), any(), any()))
-            .thenReturn(Flux.just(snapshotV2, snapshotV1));
-
-        StepVerifier.create(contentService.latestPublishedSnapshot(ref))
-            .expectNext(snapshotV2)
-            .expectComplete()
-            .verify();
-    }
-
 }

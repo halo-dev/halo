@@ -285,8 +285,7 @@ class CommentServiceImplTest {
                             "spec": {
                                 "title": "post-A",
                                 "headSnapshot": "base-snapshot",
-                                "baseSnapshot": "snapshot-A",
-                                "version": 1
+                                "baseSnapshot": "snapshot-A"
                             },
                             "apiVersion": "content.halo.run/v1alpha1",
                             "kind": "Post",
@@ -330,8 +329,7 @@ class CommentServiceImplTest {
                             "spec": {
                                 "title": "post-A",
                                 "headSnapshot": "base-snapshot",
-                                "baseSnapshot": "snapshot-A",
-                                "version": 1
+                                "baseSnapshot": "snapshot-A"
                             },
                             "apiVersion": "content.halo.run/v1alpha1",
                             "kind": "Post",
@@ -374,8 +372,7 @@ class CommentServiceImplTest {
                             "spec": {
                                 "title": "post-A",
                                 "headSnapshot": "base-snapshot",
-                                "baseSnapshot": "snapshot-A",
-                                "version": 1
+                                "baseSnapshot": "snapshot-A"
                             },
                             "apiVersion": "content.halo.run/v1alpha1",
                             "kind": "Post",

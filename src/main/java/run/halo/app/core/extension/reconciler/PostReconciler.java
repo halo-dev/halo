@@ -17,6 +17,7 @@ import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
+import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
@@ -84,9 +85,8 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 return;
             }
 
-            // publish post if necessary
             try {
-                postService.publishPost(name, post.getSpec().getReleaseSnapshot()).block();
+                publishPost(name);
             } catch (Throwable e) {
                 publishFailed(name, e);
                 throw e;
@@ -94,11 +94,67 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         });
     }
 
+    private void publishPost(String name) {
+        client.fetch(Post.class, name)
+            .filter(post -> Objects.equals(true, post.getSpec().getPublish()))
+            .ifPresent(post -> {
+                Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(post);
+                String lastReleasedSnapshot = annotations.get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
+                String releaseSnapshot = post.getSpec().getReleaseSnapshot();
+                if (StringUtils.isBlank(releaseSnapshot)) {
+                    return;
+                }
+                // do nothing if release snapshot is not changed
+                if (StringUtils.equals(lastReleasedSnapshot, releaseSnapshot)) {
+                    return;
+                }
+                Post.PostStatus status = post.getStatusOrDefault();
+
+                // validate release snapshot
+                boolean present = client.fetch(Snapshot.class, releaseSnapshot)
+                    .isPresent();
+                if (!present) {
+                    Condition condition = Condition.builder()
+                        .type(Post.PostPhase.FAILED.name())
+                        .reason("SnapshotNotFound")
+                        .message(
+                            String.format("Snapshot [%s] not found for publish", releaseSnapshot))
+                        .status(ConditionStatus.FALSE)
+                        .lastTransitionTime(Instant.now())
+                        .build();
+                    status.getConditionsOrDefault().addAndEvictFIFO(condition);
+                    status.setPhase(Post.PostPhase.FAILED.name());
+                    client.update(post);
+                    return;
+                }
+                // do publish
+                annotations.put(Post.LAST_RELEASED_SNAPSHOT_ANNO, releaseSnapshot);
+                status.setPhase(Post.PostPhase.PUBLISHED.name());
+                Condition condition = Condition.builder()
+                    .type(Post.PostPhase.PUBLISHED.name())
+                    .reason("Published")
+                    .message("Post published successfully.")
+                    .lastTransitionTime(Instant.now())
+                    .status(ConditionStatus.TRUE)
+                    .build();
+                status.getConditionsOrDefault().addAndEvictFIFO(condition);
+
+                Post.changePublishedState(post, true);
+                if (post.getSpec().getPublishTime() == null) {
+                    post.getSpec().setPublishTime(Instant.now());
+                }
+
+                client.update(post);
+                applicationContext.publishEvent(new PostPublishedEvent(this, name));
+            });
+    }
+
     private boolean unPublishReconcile(String name) {
         return client.fetch(Post.class, name)
             .map(post -> {
                 final Post oldPost = JsonUtils.deepCopy(post);
                 Post.changePublishedState(post, false);
+
                 final Post.PostStatus status = post.getStatusOrDefault();
                 Condition condition = new Condition();
                 condition.setType("CancelledPublish");
@@ -106,7 +162,8 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 condition.setReason(condition.getType());
                 condition.setMessage("CancelledPublish");
                 condition.setLastTransitionTime(Instant.now());
-                status.getConditionsOrDefault().add(condition);
+                status.getConditionsOrDefault().addAndEvictFIFO(condition);
+
                 status.setPhase(Post.PostPhase.DRAFT.name());
                 if (!oldPost.equals(post)) {
                     client.update(post);
@@ -127,14 +184,13 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             status.setPhase(phase.name());
 
             final ConditionList conditions = status.getConditionsOrDefault();
-            Condition condition = new Condition();
-            condition.setType(phase.name());
-            condition.setReason(phase.name());
-            condition.setMessage("");
-            condition.setStatus(ConditionStatus.TRUE);
-            condition.setLastTransitionTime(Instant.now());
-            condition.setMessage(error.getMessage());
-            condition.setStatus(ConditionStatus.FALSE);
+            Condition condition = Condition.builder()
+                .type(phase.name())
+                .reason("PublishFailed")
+                .message(error.getMessage())
+                .status(ConditionStatus.FALSE)
+                .lastTransitionTime(Instant.now())
+                .build();
             conditions.addAndEvictFIFO(condition);
 
             post.setStatus(status);

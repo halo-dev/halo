@@ -6,20 +6,26 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import java.time.Duration;
 import lombok.AllArgsConstructor;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
+import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.thymeleaf.util.StringUtils;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 import run.halo.app.content.ListedSinglePage;
 import run.halo.app.content.SinglePageQuery;
 import run.halo.app.content.SinglePageRequest;
 import run.halo.app.content.SinglePageService;
+import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.SinglePage;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.QueryParamBuildUtil;
@@ -121,8 +127,19 @@ public class SinglePageEndpoint implements CustomEndpoint {
                 spec.setReleaseSnapshot(spec.getHeadSnapshot());
                 return client.update(singlePage);
             })
-            .flatMap(singlePage -> singlePageService.publish(name,
-                singlePage.getSpec().getReleaseSnapshot())
+            .flatMap(post -> client.fetch(SinglePage.class, name)
+                .map(latest -> {
+                    String latestReleasedSnapshotName =
+                        ExtensionUtil.nullSafeAnnotations(latest)
+                            .get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
+                    if (StringUtils.equals(latestReleasedSnapshotName,
+                        latest.getSpec().getReleaseSnapshot())) {
+                        return latest;
+                    }
+                    throw new RetryException("SinglePage publishing status is not as expected");
+                })
+                .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
+                    .filter(t -> t instanceof RetryException))
             )
             .flatMap(page -> ServerResponse.ok().bodyValue(page));
     }

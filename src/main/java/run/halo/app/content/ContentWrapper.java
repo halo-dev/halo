@@ -11,7 +11,6 @@ import lombok.Data;
 @Builder
 public class ContentWrapper {
     private String snapshotName;
-    private Integer version;
     private String raw;
     private String content;
     private String rawType;

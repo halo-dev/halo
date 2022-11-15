@@ -2,16 +2,17 @@ package run.halo.app.core.extension;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PatchUtils;
 import run.halo.app.extension.AbstractExtension;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.Ref;
 
@@ -27,9 +28,7 @@ import run.halo.app.extension.Ref;
 @EqualsAndHashCode(callSuper = true)
 public class Snapshot extends AbstractExtension {
     public static final String KIND = "Snapshot";
-    public static final String LAST_MODIFY_TIME_ANNO = "content.halo.run/last-modify-time";
-    public static final String VERSION_ANNO = "content.halo.run/version";
-    public static final String VERSION_LABEL = "content.halo.run/version";
+    public static final String KEEP_RAW_ANNO = "content.halo.run/keep-raw";
 
     @Schema(required = true)
     private SnapShotSpec spec;
@@ -52,35 +51,31 @@ public class Snapshot extends AbstractExtension {
 
         private String parentSnapshotName;
 
-        @Schema(required = true)
-        private String displayVersion;
+        private Instant lastModifyTime;
+
+        @Schema(required = true, minLength = 1)
+        private String owner;
 
         private Set<String> contributors;
-
-        @JsonIgnore
-        public Set<String> getContributorsOrDefault() {
-            if (this.contributors == null) {
-                this.contributors = new LinkedHashSet<>();
-            }
-            return this.contributors;
-        }
     }
 
-    @JsonIgnore
-    public void addContributor(String name) {
+    public static void addContributor(Snapshot snapshot, String name) {
         Assert.notNull(name, "The username must not be null.");
-        Set<String> contributors = spec.getContributorsOrDefault();
+        Set<String> contributors = snapshot.getSpec().getContributors();
+        if (contributors == null) {
+            contributors = new LinkedHashSet<>();
+            snapshot.getSpec().setContributors(contributors);
+        }
         contributors.add(name);
     }
 
     @JsonIgnore
     public ContentWrapper applyPatch(Snapshot baseSnapshot) {
         Assert.notNull(baseSnapshot, "The baseSnapshot must not be null.");
-        Integer version = getVersionAnno(this);
-        if (version == 1) {
+        String baseSnapshotName = baseSnapshot.getMetadata().getName();
+        if (StringUtils.equals(getMetadata().getName(), baseSnapshotName)) {
             return ContentWrapper.builder()
                 .snapshotName(this.getMetadata().getName())
-                .version(version)
                 .raw(this.spec.rawPatch)
                 .content(this.spec.contentPatch)
                 .rawType(this.spec.rawType)
@@ -92,19 +87,9 @@ public class Snapshot extends AbstractExtension {
             PatchUtils.applyPatch(baseSnapshot.getSpec().getRawPatch(), this.spec.rawPatch);
         return ContentWrapper.builder()
             .snapshotName(this.getMetadata().getName())
-            .version(version)
             .raw(patchedRaw)
             .content(patchedContent)
             .rawType(this.spec.rawType)
             .build();
-    }
-
-    /**
-     * Get snapshot version.
-     */
-    public static Integer getVersionAnno(Snapshot snapshot) {
-        String version = ExtensionUtil.nullSafeLabels(snapshot)
-            .getOrDefault(VERSION_ANNO, "1");
-        return Integer.parseInt(version);
     }
 }

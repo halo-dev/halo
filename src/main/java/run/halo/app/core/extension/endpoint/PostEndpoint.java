@@ -13,10 +13,12 @@ import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
+import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.thymeleaf.util.StringUtils;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.content.ListedPost;
@@ -26,6 +28,7 @@ import run.halo.app.content.PostService;
 import run.halo.app.core.extension.Post;
 import run.halo.app.event.post.PostRecycledEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.QueryParamBuildUtil;
@@ -153,7 +156,20 @@ public class PostEndpoint implements CustomEndpoint {
             .flatMap(client::update)
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 .filter(t -> t instanceof OptimisticLockingFailureException))
-            .flatMap(post -> postService.publishPost(name, post.getSpec().getReleaseSnapshot()))
+            .flatMap(post -> client.fetch(Post.class, name)
+                .map(latest -> {
+                    String latestReleasedSnapshotName =
+                        ExtensionUtil.nullSafeAnnotations(latest)
+                            .get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
+                    if (StringUtils.equals(latestReleasedSnapshotName,
+                        latest.getSpec().getReleaseSnapshot())) {
+                        return latest;
+                    }
+                    throw new RetryException("Post publishing status is not as expected");
+                })
+                .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
+                    .filter(t -> t instanceof RetryException))
+            )
             .flatMap(publishResult -> ServerResponse.ok().bodyValue(publishResult));
     }
 
