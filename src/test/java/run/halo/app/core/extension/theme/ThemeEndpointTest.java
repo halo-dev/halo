@@ -2,15 +2,17 @@ package run.halo.app.core.extension.theme;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.reactive.function.BodyInserters.fromMultipartData;
-import static run.halo.app.extension.Unstructured.OBJECT_MAPPER;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -21,6 +23,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -30,16 +33,15 @@ import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ResourceUtils;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.Unstructured;
-import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.utils.JsonUtils;
-import run.halo.app.infra.utils.YamlUnstructuredLoader;
 
 /**
  * Tests for {@link ThemeEndpoint}.
@@ -51,10 +53,16 @@ import run.halo.app.infra.utils.YamlUnstructuredLoader;
 class ThemeEndpointTest {
 
     @Mock
-    private ReactiveExtensionClient extensionClient;
+    ReactiveExtensionClient extensionClient;
 
     @Mock
-    private HaloProperties haloProperties;
+    ThemeRootGetter themeRoot;
+
+    @Mock
+    ThemeService themeService;
+
+    @InjectMocks
+    ThemeEndpoint themeEndpoint;
 
     private Path tmpHaloWorkDir;
 
@@ -64,21 +72,17 @@ class ThemeEndpointTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        tmpHaloWorkDir = Files.createTempDirectory("halo-unit-test");
-        when(haloProperties.getWorkDir()).thenReturn(tmpHaloWorkDir);
-
-        ThemeEndpoint themeEndpoint = new ThemeEndpoint(extensionClient, haloProperties);
-
+        tmpHaloWorkDir = Files.createTempDirectory("halo-theme-endpoint-test");
+        lenient().when(themeRoot.get()).thenReturn(tmpHaloWorkDir);
         defaultTheme = ResourceUtils.getFile("classpath:themes/test-theme.zip");
-
         webTestClient = WebTestClient
             .bindToRouterFunction(themeEndpoint.endpoint())
             .build();
     }
 
     @AfterEach
-    void tearDown() {
-        FileSystemUtils.deleteRecursively(tmpHaloWorkDir.toFile());
+    void tearDown() throws IOException {
+        FileSystemUtils.deleteRecursively(tmpHaloWorkDir);
     }
 
     @Nested
@@ -90,13 +94,17 @@ class ThemeEndpointTest {
             bodyBuilder.part("file", new FileSystemResource(defaultTheme))
                 .contentType(MediaType.MULTIPART_FORM_DATA);
 
-            when(extensionClient.fetch(Theme.class, "invalid-theme")).thenReturn(Mono.empty());
+            when(themeService.upgrade(eq("invalid-missing-manifest"), isA(InputStream.class)))
+                .thenReturn(
+                    Mono.error(() -> new ServerWebInputException("Failed to upgrade theme")));
 
             webTestClient.post()
-                .uri("/themes/invalid-theme/upgrade")
+                .uri("/themes/invalid-missing-manifest/upgrade")
                 .body(fromMultipartData(bodyBuilder.build()))
                 .exchange()
                 .expectStatus().isBadRequest();
+
+            verify(themeService).upgrade(eq("invalid-missing-manifest"), isA(InputStream.class));
         }
 
         @Test
@@ -105,24 +113,13 @@ class ThemeEndpointTest {
             bodyBuilder.part("file", new FileSystemResource(defaultTheme))
                 .contentType(MediaType.MULTIPART_FORM_DATA);
 
-            var oldTheme = mock(Theme.class);
-            when(extensionClient.fetch(Theme.class, "default"))
-                // for old theme check
-                .thenReturn(Mono.just(oldTheme))
-                // for theme deletion
-                .thenReturn(Mono.just(oldTheme))
-                // for theme deleted check
-                .thenReturn(Mono.empty());
-
-            when(extensionClient.delete(oldTheme)).thenReturn(Mono.just(oldTheme));
-
             var metadata = new Metadata();
             metadata.setName("default");
             var newTheme = new Theme();
             newTheme.setMetadata(metadata);
 
-            when(extensionClient.create(any(Unstructured.class))).thenReturn(
-                Mono.just(OBJECT_MAPPER.convertValue(newTheme, Unstructured.class)));
+            when(themeService.upgrade(eq("default"), isA(InputStream.class)))
+                .thenReturn(Mono.just(newTheme));
 
             webTestClient.post()
                 .uri("/themes/default/upgrade")
@@ -130,27 +127,22 @@ class ThemeEndpointTest {
                 .exchange()
                 .expectStatus().isOk();
 
-            verify(extensionClient, times(3)).fetch(Theme.class, "default");
-            verify(extensionClient).delete(oldTheme);
-            verify(extensionClient).create(any(Unstructured.class));
+            verify(themeService).upgrade(eq("default"), isA(InputStream.class));
         }
 
     }
 
     @Test
     void install() {
-        when(extensionClient.create(any(Unstructured.class))).thenReturn(
-            Mono.fromCallable(() -> {
-                var defaultThemeManifestPath = tmpHaloWorkDir.resolve("themes/default/theme.yaml");
-                assertThat(Files.exists(defaultThemeManifestPath)).isTrue();
-                return new YamlUnstructuredLoader(new FileSystemResource(defaultThemeManifestPath))
-                    .load()
-                    .get(0);
-            }));
-
-        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+        var multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part("file", new FileSystemResource(defaultTheme))
             .contentType(MediaType.MULTIPART_FORM_DATA);
+
+        var installedTheme = new Theme();
+        var metadata = new Metadata();
+        metadata.setName("fake-name");
+        installedTheme.setMetadata(metadata);
+        when(themeService.install(any())).thenReturn(Mono.just(installedTheme));
 
         webTestClient.post()
             .uri("/themes/install")
@@ -158,13 +150,13 @@ class ThemeEndpointTest {
             .exchange()
             .expectStatus().isOk()
             .expectBody(Theme.class)
-            .value(theme -> {
-                verify(extensionClient, times(1)).create(any(Unstructured.class));
+            .isEqualTo(installedTheme);
 
-                assertThat(theme).isNotNull();
-                assertThat(theme.getMetadata().getName()).isEqualTo("default");
-            });
+        verify(themeService).install(any());
 
+
+        when(themeService.install(any())).thenReturn(
+            Mono.error(new RuntimeException("Fake exception")));
         // Verify the theme is installed.
         webTestClient.post()
             .uri("/themes/install")
@@ -190,9 +182,8 @@ class ThemeEndpointTest {
         when(extensionClient.fetch(Setting.class, "fake-setting"))
             .thenReturn(Mono.just(setting));
 
-        when(haloProperties.getWorkDir()).thenReturn(tmpHaloWorkDir);
-        Path themeWorkDir = tmpHaloWorkDir.resolve("themes")
-            .resolve(theme.getMetadata().getName());
+        // when(haloProperties.getWorkDir()).thenReturn(tmpHaloWorkDir);
+        Path themeWorkDir = themeRoot.get().resolve(theme.getMetadata().getName());
         if (!Files.exists(themeWorkDir)) {
             Files.createDirectories(themeWorkDir);
         }
