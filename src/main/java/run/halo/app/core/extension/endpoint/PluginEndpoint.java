@@ -248,7 +248,8 @@ public class PluginEndpoint implements CustomEndpoint {
             var ctOrder = sort.getOrderFor("creationTimestamp");
             List<Comparator<Plugin>> comparators = new ArrayList<>();
             if (ctOrder != null) {
-                Comparator<Plugin> comparator = comparing(plugin -> plugin.getMetadata().getCreationTimestamp());
+                Comparator<Plugin> comparator =
+                    comparing(plugin -> plugin.getMetadata().getCreationTimestamp());
                 if (ctOrder.isDescending()) {
                     comparator = comparator.reversed();
                 }
