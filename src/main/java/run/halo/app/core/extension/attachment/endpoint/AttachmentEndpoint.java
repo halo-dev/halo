@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.attachment.endpoint;
 
+import static java.util.Comparator.comparing;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
@@ -9,12 +10,17 @@ import static run.halo.app.extension.ListResult.generateGenericClass;
 import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.fn.builders.requestbody.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
@@ -30,6 +36,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -37,6 +44,8 @@ import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler.UploadOption;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
+import run.halo.app.core.extension.endpoint.SortResolver;
+import run.halo.app.extension.Comparators;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
@@ -139,8 +148,9 @@ public class AttachmentEndpoint implements CustomEndpoint {
     }
 
     Mono<ServerResponse> search(ServerRequest request) {
-        var searchRequest = new SearchRequest(request.queryParams());
-        return client.list(Attachment.class, searchRequest.toPredicate(), null,
+        var searchRequest = new SearchRequest(request);
+        return client.list(Attachment.class,
+                searchRequest.toPredicate(), searchRequest.toComparator(),
                 searchRequest.getPage(), searchRequest.getSize())
             .flatMap(listResult -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
@@ -161,12 +171,24 @@ public class AttachmentEndpoint implements CustomEndpoint {
         @Schema(description = "Name of user who uploaded the attachment")
         Optional<String> getUploadedBy();
 
+        @ArraySchema(uniqueItems = true,
+            arraySchema = @Schema(name = "sort",
+                description = "Sort property and direction of the list result. Supported fields: "
+                    + "creationTimestamp, size"),
+            schema = @Schema(description = "like field,asc or field,desc",
+                implementation = String.class,
+                example = "creationTimestamp,desc"))
+        Sort getSort();
+
     }
 
     public static class SearchRequest extends QueryListRequest implements ISearchRequest {
 
-        public SearchRequest(MultiValueMap<String, String> queryParams) {
-            super(queryParams);
+        private final ServerWebExchange exchange;
+
+        public SearchRequest(ServerRequest request) {
+            super(request.queryParams());
+            this.exchange = request.exchange();
         }
 
         @Override
@@ -191,6 +213,11 @@ public class AttachmentEndpoint implements CustomEndpoint {
         public Optional<String> getUploadedBy() {
             return Optional.ofNullable(queryParams.getFirst("uploadedBy"))
                 .filter(StringUtils::hasText);
+        }
+
+        @Override
+        public Sort getSort() {
+            return SortResolver.defaultInstance.resolve(exchange);
         }
 
         public Predicate<Attachment> toPredicate() {
@@ -221,6 +248,37 @@ public class AttachmentEndpoint implements CustomEndpoint {
                 getFieldSelector());
 
             return predicate.and(selectorPredicate);
+        }
+
+        public Comparator<Attachment> toComparator() {
+            var sort = getSort();
+            List<Comparator<Attachment>> comparators = new ArrayList<>();
+            var creationOrder = sort.getOrderFor("creationTimestamp");
+            if (creationOrder != null) {
+                Comparator<Attachment> comparator = comparing(
+                    attachment -> attachment.getMetadata().getCreationTimestamp());
+                if (creationOrder.isDescending()) {
+                    comparator = comparator.reversed();
+                }
+                comparators.add(comparator);
+            }
+
+            var sizeOrder = sort.getOrderFor("size");
+            if (sizeOrder != null) {
+                Comparator<Attachment> comparator =
+                    comparing(attachment -> attachment.getSpec().getSize());
+                if (sizeOrder.isDescending()) {
+                    comparator = comparator.reversed();
+                }
+                comparators.add(comparator);
+            }
+
+            // add default comparator
+            comparators.add(Comparators.compareCreationTimestamp(false));
+            comparators.add(Comparators.compareName(true));
+            return comparators.stream()
+                .reduce(Comparator::thenComparing)
+                .orElse(null);
         }
     }
 
