@@ -5,6 +5,7 @@ import type { DefaultConfigOptions } from "@formkit/vue";
 import { form } from "./inputs/form";
 import { attachment } from "./inputs/attachment";
 import { code } from "./inputs/code";
+import { repeater } from "./inputs/repeater";
 import { menuCheckbox } from "./inputs/menu-checkbox";
 import { menuRadio } from "./inputs/menu-radio";
 import { menuItemSelect } from "./inputs/menu-item-select";
@@ -15,14 +16,18 @@ import { tagSelect } from "./inputs/tag-select";
 import { categoryCheckbox } from "./inputs/category-checkbox";
 import { tagCheckbox } from "./inputs/tag-checkbox";
 
+import radioAlt from "./plugins/radio-alt";
+
 const config: DefaultConfigOptions = {
   config: {
     classes: generateClasses(theme),
   },
+  plugins: [radioAlt],
   inputs: {
     form,
     attachment,
     code,
+    repeater,
     menuCheckbox,
     menuRadio,
     menuItemSelect,

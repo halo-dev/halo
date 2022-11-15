@@ -74,7 +74,7 @@ await handleFetchPlugin();
         type="form"
         @submit="handleSaveConfigMap"
       >
-        <FormKitSchema :schema="formSchema" />
+        <FormKitSchema :schema="formSchema" :data="configMapFormData[group]" />
       </FormKit>
     </div>
     <div v-permission="['system:configmaps:manage']" class="pt-5">

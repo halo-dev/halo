@@ -13,6 +13,7 @@
     1. language: 目前支持 `yaml`, `html`, `css`, `javascript`, `json`
     2. height: 编辑器高度，如：`100px`
 - `attachment`: 附件选择
+- `repeater`: 定义一个对象集合，可以让使用者可视化的操作集合。
 - `menuCheckbox`：选择一组菜单
 - `menuRadio`：选择一个菜单
 - `menuItemSelect`：选择菜单项
@@ -47,4 +48,69 @@ const postName = ref("")
 - $formkit: menuRadio
   name: menus
   label: 底部菜单组
+```
+
+### Repeater
+
+Repeater 是一个集合类型的输入组件，可以让使用者可视化的操作集合。
+
+在 Vue SFC 中以组件形式使用：
+
+```vue
+<script lang="ts" setup>
+const users = ref([])
+</script>
+
+<template>
+  <FormKit
+    v-model="users"
+    type="repeater"
+    label="Users"
+  >
+    <FormKit
+      type="text"
+      label="Full Name"
+      name="full_name"
+      validation="required"
+    />
+    <FormKit
+      type="email"
+      label="Email"
+      name="email"
+      validation="required|email"
+    />
+  </FormKit>
+</template>
+```
+
+在 FormKit Schema 中使用：
+
+```yaml
+- $formkit: repeater
+  name: users
+  label: Users
+  items:
+    - $formkit: text
+      name: full_name
+      label: Full Name
+      validation: required
+    - $formkit: email
+      name: email
+      label: Email
+      validation: required|email
+```
+
+最终得到的数据类似于：
+
+```json
+[
+  {
+    "full_name": "Jack",
+    "email": "jack@example.com"
+  },
+  {
+    "full_name": "John",
+    "email": "john@example.com"
+  }
+]
 ```

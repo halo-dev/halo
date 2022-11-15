@@ -3,6 +3,7 @@
     :class="classes"
     :disabled="disabled"
     class="btn"
+    type="button"
     @click="handleClick"
   >
     <span v-if="$slots.icon || loading" class="btn-icon">
@@ -128,11 +129,11 @@ function handleClick() {
 }
 
 .btn-primary {
-  @apply text-white bg-primary;
+  @apply text-white bg-primary #{!important};
 }
 
 .btn-secondary {
-  @apply text-white bg-secondary;
+  @apply text-white bg-secondary #{!important};
 }
 
 .btn-danger {

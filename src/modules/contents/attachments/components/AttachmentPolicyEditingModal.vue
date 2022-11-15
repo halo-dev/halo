@@ -208,7 +208,10 @@ const onVisibleChange = (visible: boolean) => {
         name="displayName"
         validation="required"
       ></FormKit>
-      <FormKitSchema :schema="formSchema" />
+      <FormKitSchema
+        :schema="formSchema"
+        :data="configMapFormData['default']"
+      />
     </FormKit>
 
     <template #footer>

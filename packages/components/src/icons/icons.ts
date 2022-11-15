@@ -54,6 +54,8 @@ import IconRefreshLine from "~icons/ri/refresh-line";
 import IconWindowLine from "~icons/ri/window-line";
 import IconSendPlaneFill from "~icons/ri/send-plane-fill";
 import IconRocketLine from "~icons/ri/rocket-line";
+import IconArrowUpCircleLine from "~icons/ri/arrow-up-circle-line";
+import IconArrowDownCircleLine from "~icons/ri/arrow-down-circle-line";
 
 export {
   IconDashboard,
@@ -112,4 +114,6 @@ export {
   IconWindowLine,
   IconSendPlaneFill,
   IconRocketLine,
+  IconArrowUpCircleLine,
+  IconArrowDownCircleLine,
 };

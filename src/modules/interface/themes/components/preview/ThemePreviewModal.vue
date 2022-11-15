@@ -297,7 +297,10 @@ const iframeClasses = computed(() => {
                     type="form"
                     @submit="handleSaveThemeConfigMap"
                   >
-                    <FormKitSchema :schema="formSchema" />
+                    <FormKitSchema
+                      :schema="formSchema"
+                      :data="configMapFormData[tab.id]"
+                    />
                   </FormKit>
                 </div>
                 <div v-permission="['system:configmaps:manage']" class="pt-5">
