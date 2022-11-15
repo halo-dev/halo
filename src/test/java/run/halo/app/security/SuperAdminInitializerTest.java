@@ -20,7 +20,8 @@ import run.halo.app.extension.ReactiveExtensionClient;
 @SpringBootTest(properties = {"halo.security.initializer.disabled=false",
     "halo.security.initializer.super-admin-username=fake-admin",
     "halo.security.initializer.super-admin-password=fake-password",
-    "halo.required-extension-disabled=true"})
+    "halo.required-extension-disabled=true",
+    "halo.theme.initializer.disabled=true"})
 @AutoConfigureWebTestClient
 @AutoConfigureTestDatabase
 class SuperAdminInitializerTest {

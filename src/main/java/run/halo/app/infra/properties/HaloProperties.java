@@ -42,4 +42,7 @@ public class HaloProperties {
 
     @Valid
     private final ConsoleProperties console = new ConsoleProperties();
+
+    @Valid
+    private final ThemeProperties theme = new ThemeProperties();
 }
