@@ -5,7 +5,7 @@ metadata:
 data:
   theme: |
     {
-      "active": "default"
+      "active": "theme-earth"
     }
   routeRules: |
     {
