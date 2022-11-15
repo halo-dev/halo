@@ -110,7 +110,8 @@ class ThemeUtils {
                 }
             })
             .flatMap(is -> ThemeUtils.locateThemeManifest(tempDir.get()))
-            .switchIfEmpty(Mono.error(() -> new ThemeInstallationException("Missing theme manifest")))
+            .switchIfEmpty(
+                Mono.error(() -> new ThemeInstallationException("Missing theme manifest")))
             .map(themeManifestPath -> {
                 var theme = loadThemeManifest(themeManifestPath);
                 var themeName = theme.getMetadata().getName();
