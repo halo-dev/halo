@@ -91,22 +91,26 @@ class ThemeUtils {
 
     static Mono<Unstructured> unzipThemeTo(InputStream inputStream, Path themeWorkDir,
         boolean override) {
-        AtomicReference<Path> tempDir = new AtomicReference<>();
-        return Mono.fromCallable(
-                () -> {
-                    Path tempDirectory = null;
-                    Path themeTargetPath = null;
-                    try (ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
-                        tempDirectory = createTempDirectory(THEME_TMP_PREFIX);
-                        unzip(zipInputStream, tempDirectory);
-                        return tempDirectory;
-                    } catch (IOException e) {
-                        deleteRecursivelyAndSilently(themeTargetPath);
-                        throw new ThemeInstallationException("Unable to install theme", e);
-                    }
-                })
-            .doOnNext(tempDir::set)
-            .flatMap(ThemeUtils::locateThemeManifest)
+        var tempDir = new AtomicReference<Path>();
+        return Mono.just(inputStream)
+            .publishOn(Schedulers.boundedElastic())
+            .doFirst(() -> {
+                try {
+                    tempDir.set(createTempDirectory(THEME_TMP_PREFIX));
+                } catch (IOException e) {
+                    throw Exceptions.propagate(e);
+                }
+            })
+            .doOnNext(is -> {
+                try (var zipIs = new ZipInputStream(is)) {
+                    // unzip input stream into temporary directory
+                    unzip(zipIs, tempDir.get());
+                } catch (IOException e) {
+                    throw Exceptions.propagate(e);
+                }
+            })
+            .flatMap(is -> ThemeUtils.locateThemeManifest(tempDir.get()))
+            .switchIfEmpty(Mono.error(() -> new ThemeInstallationException("Missing theme manifest")))
             .map(themeManifestPath -> {
                 var theme = loadThemeManifest(themeManifestPath);
                 var themeName = theme.getMetadata().getName();
@@ -123,8 +127,7 @@ class ThemeUtils {
                     throw Exceptions.propagate(e);
                 }
             })
-            .doFinally(signalType -> deleteRecursivelyAndSilently(tempDir.get()))
-            .subscribeOn(Schedulers.boundedElastic());
+            .doFinally(signalType -> deleteRecursivelyAndSilently(tempDir.get()));
     }
 
     static Unstructured loadThemeManifest(Path themeManifestPath) {
