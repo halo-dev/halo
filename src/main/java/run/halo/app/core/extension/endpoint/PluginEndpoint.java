@@ -22,7 +22,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
@@ -47,6 +49,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Plugin;
+import run.halo.app.extension.Comparators;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
 import run.halo.app.infra.utils.FileUtils;
@@ -243,14 +246,20 @@ public class PluginEndpoint implements CustomEndpoint {
         public Comparator<Plugin> toComparator() {
             var sort = getSort();
             var ctOrder = sort.getOrderFor("creationTimestamp");
-            Comparator<Plugin> comparator = null;
+            List<Comparator<Plugin>> comparators = new ArrayList<>();
             if (ctOrder != null) {
-                comparator = comparing(plugin -> plugin.getMetadata().getCreationTimestamp());
+                Comparator<Plugin> comparator =
+                    comparing(plugin -> plugin.getMetadata().getCreationTimestamp());
                 if (ctOrder.isDescending()) {
                     comparator = comparator.reversed();
                 }
+                comparators.add(comparator);
             }
-            return comparator;
+            comparators.add(Comparators.compareCreationTimestamp(false));
+            comparators.add(Comparators.compareName(true));
+            return comparators.stream()
+                .reduce(Comparator::thenComparing)
+                .orElse(null);
         }
     }
 
