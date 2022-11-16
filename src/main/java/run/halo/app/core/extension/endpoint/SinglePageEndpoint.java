@@ -89,6 +89,24 @@ public class SinglePageEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(SinglePage.class))
             )
+            .PUT("singlepages/{name}/content", this::updateContent,
+                builder -> builder.operationId("UpdateSinglePageContent")
+                    .description("Update a single page's content.")
+                    .tag(tag)
+                    .parameter(parameterBuilder().name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class))
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(Builder.schemaBuilder()
+                                .implementation(SinglePageRequest.Content.class))
+                        ))
+                    .response(responseBuilder()
+                        .implementation(Post.class))
+            )
             .PUT("singlepages/{name}/publish", this::publishSinglePage,
                 builder -> builder.operationId("PublishSinglePage")
                     .description("Publish a single page.")
@@ -107,6 +125,18 @@ public class SinglePageEndpoint implements CustomEndpoint {
         return request.bodyToMono(SinglePageRequest.class)
             .flatMap(singlePageService::draft)
             .flatMap(singlePage -> ServerResponse.ok().bodyValue(singlePage));
+    }
+
+    Mono<ServerResponse> updateContent(ServerRequest request) {
+        String pageName = request.pathVariable("name");
+        return request.bodyToMono(SinglePageRequest.Content.class)
+            .flatMap(content -> client.fetch(SinglePage.class, pageName)
+                .flatMap(page -> {
+                    SinglePageRequest pageRequest = new SinglePageRequest(page, content);
+                    return singlePageService.update(pageRequest);
+                })
+            )
+            .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }
 
     Mono<ServerResponse> updateSinglePage(ServerRequest request) {

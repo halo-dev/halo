@@ -94,6 +94,24 @@ public class PostEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(Post.class))
             )
+            .PUT("posts/{name}/content", this::updateContent,
+                builder -> builder.operationId("UpdatePostContent")
+                    .description("Update a post's content.")
+                    .tag(tag)
+                    .parameter(parameterBuilder().name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class))
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(Builder.schemaBuilder()
+                                .implementation(PostRequest.Content.class))
+                        ))
+                    .response(responseBuilder()
+                        .implementation(Post.class))
+            )
             .PUT("posts/{name}/publish", this::publishPost,
                 builder -> builder.operationId("PublishPost")
                     .description("Publish a post.")
@@ -131,6 +149,18 @@ public class PostEndpoint implements CustomEndpoint {
     Mono<ServerResponse> draftPost(ServerRequest request) {
         return request.bodyToMono(PostRequest.class)
             .flatMap(postService::draftPost)
+            .flatMap(post -> ServerResponse.ok().bodyValue(post));
+    }
+
+    Mono<ServerResponse> updateContent(ServerRequest request) {
+        String postName = request.pathVariable("name");
+        return request.bodyToMono(PostRequest.Content.class)
+            .flatMap(content -> client.fetch(Post.class, postName)
+                .flatMap(post -> {
+                    PostRequest postRequest = new PostRequest(post, content);
+                    return postService.updatePost(postRequest);
+                })
+            )
             .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }
 

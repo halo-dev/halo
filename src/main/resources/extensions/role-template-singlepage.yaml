@@ -15,7 +15,7 @@ rules:
     resources: [ "singlepages" ]
     verbs: [ "*" ]
   - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "singlepages", "singlepages/publish", "contents", "contents/publish" ]
+    resources: [ "singlepages", "singlepages/publish", "singlepages/content", "contents", "contents/publish" ]
     verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
 ---
 apiVersion: v1alpha1
