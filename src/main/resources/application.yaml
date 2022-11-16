@@ -7,7 +7,7 @@ spring:
     ansi:
       enabled: detect
   r2dbc:
-    url: r2dbc:h2:file:///${halo.work-dir}/db/halo-next?options=AUTO_SERVER=TRUE;MODE=MySQL
+    url: r2dbc:h2:file:///${halo.work-dir}/db/halo-next?MODE=MySQL&DB_CLOSE_ON_EXIT=FALSE
     username: admin
     password: 123456
   sql:
