@@ -9,7 +9,9 @@ import run.halo.app.core.extension.Theme;
  *
  * @author guqing
  * @since 2.0.0
+ * @deprecated Use {@code run.halo.app.infra.ThemeRootGetter}
  */
+@Deprecated(forRemoval = true)
 public class ThemePathPolicy {
     public static final String THEME_WORK_DIR = "themes";
 
