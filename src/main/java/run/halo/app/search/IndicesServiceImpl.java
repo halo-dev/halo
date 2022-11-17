@@ -4,12 +4,12 @@ import org.springframework.stereotype.Service;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Post;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.search.post.PostDoc;
 import run.halo.app.search.post.PostSearchService;
 import run.halo.app.theme.finders.PostFinder;
+import run.halo.app.theme.finders.vo.PostVo;
 
 @Service
 public class IndicesServiceImpl implements IndicesService {
@@ -25,13 +25,19 @@ public class IndicesServiceImpl implements IndicesService {
     @Override
     public Mono<Void> rebuildPostIndices() {
         return extensionGetter.getEnabledExtension(PostSearchService.class)
-            // TODO Optimize listing posts with non-blocking.
-            .flatMap(searchService -> Flux.fromStream(() -> postFinder.list(0, 0)
-                    .stream()
-                    .filter(post -> Post.isPublished(post.getMetadata()))
-                    .peek(post -> postFinder.content(post.getMetadata().getName()))
-                    .map(PostDoc::from))
-                .subscribeOn(Schedulers.boundedElastic())
+            .flatMap(searchService -> postFinder.list(0, 0)
+                .flatMapMany(list -> Flux.fromStream(list.get()))
+                .filter(post -> Post.isPublished(post.getMetadata()))
+                .flatMap(listedPostVo -> {
+                    PostVo postVo = PostVo.from(listedPostVo);
+                    return postFinder.content(postVo.getMetadata().getName())
+                        .map(content -> {
+                            postVo.setContent(content);
+                            return postVo;
+                        })
+                        .defaultIfEmpty(postVo);
+                })
+                .map(PostDoc::from)
                 .limitRate(100)
                 .buffer(100)
                 .doOnNext(postDocs -> {
