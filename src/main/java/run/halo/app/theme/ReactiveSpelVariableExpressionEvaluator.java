@@ -37,7 +37,7 @@ public class ReactiveSpelVariableExpressionEvaluator
             return ((Mono<?>) returnValue).block();
         }
         if (Flux.class.isAssignableFrom(clazz)) {
-            return ((Flux<?>) returnValue).toIterable();
+            return ((Flux<?>) returnValue).collectList().block();
         }
         return returnValue;
     }

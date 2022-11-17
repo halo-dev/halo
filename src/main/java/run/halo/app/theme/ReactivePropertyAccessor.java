@@ -57,7 +57,7 @@ public class ReactivePropertyAccessor implements PropertyAccessor {
         if (Mono.class.isAssignableFrom(clazz)) {
             value = ((Mono<?>) target).block();
         } else if (Flux.class.isAssignableFrom(clazz)) {
-            value = ((Flux<?>) target).toIterable();
+            value = ((Flux<?>) target).collectList().block();
         }
 
         if (value == null) {
