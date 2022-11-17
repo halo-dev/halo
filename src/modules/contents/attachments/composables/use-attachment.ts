@@ -46,8 +46,9 @@ export function useAttachmentControl(filterOptions?: {
   group?: Ref<Group | undefined>;
   user?: Ref<User | undefined>;
   keyword?: Ref<string | undefined>;
+  sort?: Ref<string | undefined>;
 }): useAttachmentControlReturn {
-  const { user, policy, group, keyword } = filterOptions || {};
+  const { user, policy, group, keyword, sort } = filterOptions || {};
 
   const attachments = ref<AttachmentList>({
     page: 1,
@@ -79,6 +80,7 @@ export function useAttachmentControl(filterOptions?: {
         uploadedBy: user?.value?.metadata.name,
         page: attachments.value.page,
         size: attachments.value.size,
+        sort: [sort?.value as string].filter(Boolean),
       });
       attachments.value = data;
 

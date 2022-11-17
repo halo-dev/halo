@@ -27,7 +27,7 @@ import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
 import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
 import AttachmentPoliciesModal from "./components/AttachmentPoliciesModal.vue";
 import AttachmentGroupList from "./components/AttachmentGroupList.vue";
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import type { Attachment, Group, Policy, User } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import prettyBytes from "pretty-bytes";
@@ -55,9 +55,38 @@ const { groups, handleFetchGroups } = useFetchAttachmentGroup({
 const selectedGroup = ref<Group>();
 
 // Filter
+interface SortItem {
+  label: string;
+  value: string;
+}
+
+const SortItems: SortItem[] = [
+  {
+    label: "较近上传",
+    value: "creationTimestamp,desc",
+  },
+  {
+    label: "较晚上传",
+    value: "creationTimestamp,asc",
+  },
+  {
+    label: "文件大小降序",
+    value: "size,desc",
+  },
+  {
+    label: "文件大小升序",
+    value: "size,asc",
+  },
+];
+
 const selectedPolicy = ref<Policy>();
 const selectedUser = ref<User>();
 const keyword = ref<string>("");
+const selectedSortItem = ref<SortItem>();
+
+const selectedSortItemValue = computed(() => {
+  return selectedSortItem.value?.value;
+});
 
 function handleSelectPolicy(policy: Policy | undefined) {
   selectedPolicy.value = policy;
@@ -66,6 +95,11 @@ function handleSelectPolicy(policy: Policy | undefined) {
 
 function handleSelectUser(user: User | undefined) {
   selectedUser.value = user;
+  handleFetchAttachments();
+}
+
+function handleSortItemChange(sortItem?: SortItem) {
+  selectedSortItem.value = sortItem;
   handleFetchAttachments();
 }
 
@@ -90,6 +124,7 @@ const {
   policy: selectedPolicy,
   user: selectedUser,
   keyword: keyword,
+  sort: selectedSortItemValue,
 });
 
 const handleMove = async (group: Group) => {
@@ -288,6 +323,7 @@ onMounted(() => {
                   >
                     <FormKit
                       v-model="keyword"
+                      outer-class="!p-0"
                       placeholder="输入关键词搜索"
                       type="text"
                       @keyup.enter="handleFetchAttachments()"
@@ -320,6 +356,21 @@ onMounted(() => {
                       <IconCloseCircle
                         class="h-4 w-4 text-gray-600"
                         @click="handleSelectUser(undefined)"
+                      />
+                    </div>
+
+                    <div
+                      v-if="selectedSortItem"
+                      class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                    >
+                      <span
+                        class="text-xs text-gray-600 group-hover:text-gray-900"
+                      >
+                        排序：{{ selectedSortItem.label }}
+                      </span>
+                      <IconCloseCircle
+                        class="h-4 w-4 text-gray-600"
+                        @click="handleSortItemChange()"
                       />
                     </div>
                   </div>
@@ -441,28 +492,13 @@ onMounted(() => {
                         <div class="w-72 p-4">
                           <ul class="space-y-1">
                             <li
+                              v-for="(sortItem, index) in SortItems"
+                              :key="index"
                               v-close-popper
                               class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                              @click="handleSortItemChange(sortItem)"
                             >
-                              <span class="truncate">较近上传</span>
-                            </li>
-                            <li
-                              v-close-popper
-                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                            >
-                              <span class="truncate">较晚上传</span>
-                            </li>
-                            <li
-                              v-close-popper
-                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                            >
-                              <span class="truncate">文件大小降序</span>
-                            </li>
-                            <li
-                              v-close-popper
-                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                            >
-                              <span class="truncate">文件大小升序</span>
+                              <span class="truncate">{{ sortItem.label }}</span>
                             </li>
                           </ul>
                         </div>
