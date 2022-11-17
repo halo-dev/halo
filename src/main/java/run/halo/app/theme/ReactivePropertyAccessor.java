@@ -1,18 +1,16 @@
 package run.halo.app.theme;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.PropertyAccessor;
 import org.springframework.expression.TypedValue;
+import org.springframework.expression.spel.ast.AstUtils;
 import org.springframework.integration.json.JsonPropertyAccessor;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.utils.JsonUtils;
 
 /**
  * A SpEL PropertyAccessor that knows how to read properties from {@link Mono} or {@link Flux}
@@ -24,25 +22,25 @@ import run.halo.app.infra.utils.JsonUtils;
  * @since 2.0.0
  */
 public class ReactivePropertyAccessor implements PropertyAccessor {
-    private static final Class<?>[] SUPPORTED_CLASSES = {
-        Mono.class,
-        Flux.class
-    };
-    private final JsonPropertyAccessor jsonPropertyAccessor = new JsonPropertyAccessor();
 
     @Override
     public Class<?>[] getSpecificTargetClasses() {
-        return SUPPORTED_CLASSES;
+        return null;
     }
 
     @Override
     public boolean canRead(@NonNull EvaluationContext context, Object target, @NonNull String name)
         throws AccessException {
-        if (target == null) {
-            return false;
+        if (isReactiveType(target)) {
+            return true;
         }
-        return Mono.class.isAssignableFrom(target.getClass())
-            || Flux.class.isAssignableFrom(target.getClass());
+        List<PropertyAccessor> propertyAccessors = context.getPropertyAccessors();
+        for (PropertyAccessor propertyAccessor : propertyAccessors) {
+            if (propertyAccessor.canRead(context, target, name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -52,29 +50,44 @@ public class ReactivePropertyAccessor implements PropertyAccessor {
         if (target == null) {
             return TypedValue.NULL;
         }
-        Class<?> clazz = target.getClass();
-        Object value = null;
-        if (Mono.class.isAssignableFrom(clazz)) {
-            value = ((Mono<?>) target).block();
-        } else if (Flux.class.isAssignableFrom(clazz)) {
-            value = ((Flux<?>) target).collectList().block();
-        }
-
-        if (value == null) {
-            return TypedValue.NULL;
-        }
+        Object value = blockingGetForReactive(target);
 
         List<PropertyAccessor> propertyAccessorsToTry =
             getPropertyAccessorsToTry(value, context.getPropertyAccessors());
         for (PropertyAccessor propertyAccessor : propertyAccessorsToTry) {
             try {
-                return propertyAccessor.read(context, target, name);
+                TypedValue result = propertyAccessor.read(context, value, name);
+                return new TypedValue(blockingGetForReactive(result.getValue()));
             } catch (AccessException e) {
-                // ignore
+                // ignore this
             }
         }
-        JsonNode jsonNode = JsonUtils.DEFAULT_JSON_MAPPER.convertValue(value, JsonNode.class);
-        return jsonPropertyAccessor.read(context, jsonNode, name);
+
+        throw new AccessException("Cannot read property '" + name + "' from [" + value + "]");
+    }
+
+    @Nullable
+    private static Object blockingGetForReactive(@Nullable Object target) {
+        if (target == null) {
+            return null;
+        }
+        Class<?> clazz = target.getClass();
+        Object value = target;
+        if (Mono.class.isAssignableFrom(clazz)) {
+            value = ((Mono<?>) target).block();
+        } else if (Flux.class.isAssignableFrom(clazz)) {
+            value = ((Flux<?>) target).collectList().block();
+        }
+        return value;
+    }
+
+    private boolean isReactiveType(Object target) {
+        if (target == null) {
+            return false;
+        }
+        Class<?> clazz = target.getClass();
+        return Mono.class.isAssignableFrom(clazz)
+            || Flux.class.isAssignableFrom(clazz);
     }
 
     private List<PropertyAccessor> getPropertyAccessorsToTry(
@@ -82,27 +95,10 @@ public class ReactivePropertyAccessor implements PropertyAccessor {
 
         Class<?> targetType = (contextObject != null ? contextObject.getClass() : null);
 
-        List<PropertyAccessor> specificAccessors = new ArrayList<>();
-        List<PropertyAccessor> generalAccessors = new ArrayList<>();
-        for (PropertyAccessor resolver : propertyAccessors) {
-            Class<?>[] targets = resolver.getSpecificTargetClasses();
-            if (targets == null) {
-                // generic resolver that says it can be used for any type
-                generalAccessors.add(resolver);
-            } else if (targetType != null) {
-                for (Class<?> clazz : targets) {
-                    if (clazz == targetType) {
-                        specificAccessors.add(resolver);
-                        break;
-                    } else if (clazz.isAssignableFrom(targetType)) {
-                        generalAccessors.add(resolver);
-                    }
-                }
-            }
-        }
-        List<PropertyAccessor> resolvers = new ArrayList<>(specificAccessors);
-        generalAccessors.removeAll(specificAccessors);
-        resolvers.addAll(generalAccessors);
+        List<PropertyAccessor> resolvers =
+            AstUtils.getPropertyAccessorsToTry(targetType, propertyAccessors);
+        // remove this resolver to avoid infinite loop
+        resolvers.remove(this);
         return resolvers;
     }
 

@@ -1,5 +1,10 @@
 package run.halo.app.theme;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +24,7 @@ import org.thymeleaf.templateresource.ITemplateResource;
 import org.thymeleaf.templateresource.StringTemplateResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.dialect.HaloProcessorDialect;
 
 /**
@@ -52,9 +58,26 @@ public class ReactiveFinderExpressionParserTests {
     @Test
     void javascriptInlineParser() {
         Context context = getContext();
-        context.setVariable("testReactiveFinder", new TestReactiveFinder());
+        context.setVariable("target", new TestReactiveFinder());
+        context.setVariable("genericMap", Map.of("key", "value"));
         String result = templateEngine.process("javascriptInline", context);
-        System.out.println(result);
+        assertThat(result).isEqualTo("""
+            <p>value</p>
+            <p>ruibaby</p>
+            <p>guqing</p>
+            <p>bar</p>
+            <script>
+                var genericValue = "value";
+                var name = "guqing";
+                var names = ["guqing","johnniang","ruibaby"];
+                var users = [{"name":"guqing"},{"name":"ruibaby"},{"name":"johnniang"}];
+                var userListItem = "guqing";
+                var objectJsonNodeFlux = [{"name":"guqing"}];
+                var objectJsonNodeFluxChain = "guqing";
+                var mapMono = "bar";
+                var arrayNodeMono = "bar";
+            </script>
+            """);
     }
 
     static class TestReactiveFinder {
@@ -70,6 +93,22 @@ public class ReactiveFinderExpressionParserTests {
             return Flux.just(
                 new TestUser("guqing"), new TestUser("ruibaby"), new TestUser("johnniang")
             );
+        }
+
+        public Flux<JsonNode> objectJsonNodeFlux() {
+            ObjectNode objectNode = JsonUtils.DEFAULT_JSON_MAPPER.createObjectNode();
+            objectNode.put("name", "guqing");
+            return Flux.just(objectNode);
+        }
+
+        public Mono<Map<String, Object>> mapMono() {
+            return Mono.just(Map.of("foo", "bar"));
+        }
+
+        public Mono<JsonNode> arrayNodeMono() {
+            ArrayNode arrayNode = JsonUtils.DEFAULT_JSON_MAPPER.createArrayNode();
+            arrayNode.add(arrayNode.objectNode().put("foo", "bar"));
+            return Mono.just(arrayNode);
         }
     }
 
@@ -90,13 +129,23 @@ public class ReactiveFinderExpressionParserTests {
             String ownerTemplate, String template,
             Map<String, Object> templateResolutionAttributes) {
             return new StringTemplateResource("""
+                <p th:text="${genericMap.key}"></p>
+                <p th:text="${target.users[1].name}"></p>
+                <p th:text="${target.objectJsonNodeFlux[0].name}"></p>
+                <p th:text="${target.arrayNodeMono.get(0).foo}"></p>
                 <script th:inline="javascript">
-                    var name = /*[[${testReactiveFinder.getName()}]]*/;
-                    var names = /*[[${testReactiveFinder.names()}]]*/;
-                    var users = /*[[${testReactiveFinder.users()}]]*/;
-                    var userListItem = /*[[${testReactiveFinder.users[0]}]]*/;
+                    var genericValue = /*[[${genericMap.key}]]*/;
+                    var name = /*[[${target.getName()}]]*/;
+                    var names = /*[[${target.names()}]]*/;
+                    var users = /*[[${target.users()}]]*/;
+                    var userListItem = /*[[${target.users[0].name}]]*/;
+                    var objectJsonNodeFlux = /*[[${target.objectJsonNodeFlux()}]]*/;
+                    var objectJsonNodeFluxChain = /*[[${target.objectJsonNodeFlux[0].name}]]*/;
+                    var mapMono = /*[[${target.mapMono.foo}]]*/;
+                    var arrayNodeMono = /*[[${target.arrayNodeMono.get(0).foo}]]*/;
                 </script>
                  """);
         }
+
     }
 }
