@@ -124,6 +124,12 @@ public class PostFinderImpl implements PostFinder {
             .defaultIfEmpty(NavigationPostVo.empty());
     }
 
+    @Override
+    public Flux<ListedPostVo> listAll() {
+        return client.list(Post.class, FIXED_PREDICATE, defaultComparator())
+            .flatMap(this::getListedPostVo);
+    }
+
     static Pair<String, String> postPreviousNextPair(List<String> postNames,
         String currentName) {
         FixedSizeSlidingWindow<String> window = new FixedSizeSlidingWindow<>(3);

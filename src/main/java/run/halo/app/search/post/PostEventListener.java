@@ -29,18 +29,18 @@ public class PostEventListener {
     @Async
     @EventListener(PostPublishedEvent.class)
     public void handlePostPublished(PostPublishedEvent publishedEvent) throws InterruptedException {
-        var postVo = postFinder.getByName(publishedEvent.getPostName());
-        var postDoc = PostDoc.from(postVo);
-
         var latch = new CountDownLatch(1);
-        extensionGetter.getEnabledExtension(PostSearchService.class)
-            .doOnNext(searchService -> {
-                try {
-                    searchService.addDocuments(List.of(postDoc));
-                } catch (Exception e) {
-                    throw Exceptions.propagate(e);
-                }
-            })
+        postFinder.getByName(publishedEvent.getPostName())
+            .map(PostDoc::from)
+            .flatMap(postDoc -> extensionGetter.getEnabledExtension(PostSearchService.class)
+                .doOnNext(searchService -> {
+                    try {
+                        searchService.addDocuments(List.of(postDoc));
+                    } catch (Exception e) {
+                        throw Exceptions.propagate(e);
+                    }
+                })
+            )
             .doFinally(signalType -> latch.countDown())
             .subscribe();
         latch.await();

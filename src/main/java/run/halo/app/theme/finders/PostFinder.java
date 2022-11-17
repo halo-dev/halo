@@ -1,6 +1,7 @@
 package run.halo.app.theme.finders;
 
 import org.springframework.lang.Nullable;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ListResult;
@@ -23,6 +24,8 @@ public interface PostFinder {
     Mono<ContentVo> content(String postName);
 
     Mono<NavigationPostVo> cursor(String current);
+
+    Flux<ListedPostVo> listAll();
 
     Mono<ListResult<ListedPostVo>> list(@Nullable Integer page, @Nullable Integer size);
 
