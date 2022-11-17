@@ -1,6 +1,6 @@
 package run.halo.app.theme.router.strategy;
 
-import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -13,6 +13,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
 import run.halo.app.theme.finders.CategoryFinder;
 
 /**
@@ -29,12 +30,6 @@ class CategoriesRouteStrategyTest extends RouterStrategyTestSuite {
     @InjectMocks
     private CategoriesRouteStrategy categoriesRouteStrategy;
 
-    @Override
-    public void setUp() {
-        lenient().when(categoryFinder.listAsTree())
-            .thenReturn(List.of());
-    }
-
     @Test
     void getRouteFunction() {
         HandlerFunction<ServerResponse> handler = categoriesRouteStrategy.getHandler();
@@ -47,6 +42,7 @@ class CategoriesRouteStrategyTest extends RouterStrategyTestSuite {
             permalinkHttpGetRouter.insert(routerPath, handler);
         }
 
+        when(categoryFinder.listAsTree()).thenReturn(Flux.empty());
         client.get()
             .uri("/categories-test")
             .exchange()

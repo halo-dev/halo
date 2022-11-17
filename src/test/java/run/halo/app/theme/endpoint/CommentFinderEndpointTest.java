@@ -60,7 +60,7 @@ class CommentFinderEndpointTest {
     @Test
     void listComments() {
         when(commentFinder.list(any(), anyInt(), anyInt()))
-            .thenReturn(new ListResult<>(1, 10, 0, List.of()));
+            .thenReturn(Mono.just(new ListResult<>(1, 10, 0, List.of())));
 
         Ref ref = new Ref();
         ref.setGroup("content.halo.run");
@@ -104,15 +104,13 @@ class CommentFinderEndpointTest {
     @Test
     void listCommentReplies() {
         when(commentFinder.listReply(any(), anyInt(), anyInt()))
-            .thenReturn(new ListResult<>(2, 20, 0, List.of()));
+            .thenReturn(Mono.just(new ListResult<>(2, 20, 0, List.of())));
 
         webTestClient.get()
-            .uri(uriBuilder -> {
-                return uriBuilder.path("/comments/test-comment/reply")
-                    .queryParam("page", 2)
-                    .queryParam("size", 20)
-                    .build();
-            })
+            .uri(uriBuilder -> uriBuilder.path("/comments/test-comment/reply")
+                .queryParam("page", 2)
+                .queryParam("size", 20)
+                .build())
             .exchange()
             .expectStatus()
             .isOk();

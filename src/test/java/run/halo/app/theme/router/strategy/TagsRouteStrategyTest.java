@@ -1,6 +1,6 @@
 package run.halo.app.theme.router.strategy;
 
-import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -13,6 +13,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
 import run.halo.app.theme.finders.TagFinder;
 
 /**
@@ -30,11 +31,6 @@ class TagsRouteStrategyTest extends RouterStrategyTestSuite {
     @InjectMocks
     private TagsRouteStrategy tagsRouteStrategy;
 
-    @Override
-    public void setUp() {
-        lenient().when(tagFinder.listAll()).thenReturn(List.of());
-    }
-
     @Test
     void getRouteFunction() {
         RouterFunction<ServerResponse> routeFunction = getRouterFunction();
@@ -45,6 +41,7 @@ class TagsRouteStrategyTest extends RouterStrategyTestSuite {
         for (String routerPath : routerPaths) {
             permalinkHttpGetRouter.insert(routerPath, handler);
         }
+        when(tagFinder.listAll()).thenReturn(Flux.empty());
 
         client.get()
             .uri("/tags-test")

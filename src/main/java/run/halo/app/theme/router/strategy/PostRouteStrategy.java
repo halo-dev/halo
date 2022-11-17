@@ -8,15 +8,12 @@ import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.util.pattern.PathPattern;
 import org.springframework.web.util.pattern.PathPatternParser;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
-import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.router.ViewNameResolver;
 
 /**
@@ -57,7 +54,7 @@ public class PostRouteStrategy implements DetailsPageRouteHandlerStrategy {
             model.put("plural", gvk.plural());
             // used by TemplateGlobalHeadProcessor and PostTemplateHeadProcessor
             model.put(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.POST.getValue());
-            return postByName(name)
+            return postFinder.getByName(name)
                 .flatMap(postVo -> {
                     model.put("post", postVo);
                     String template = postVo.getSpec().getTemplate();
@@ -71,10 +68,5 @@ public class PostRouteStrategy implements DetailsPageRouteHandlerStrategy {
     @Override
     public boolean supports(GroupVersionKind gvk) {
         return groupVersionKind.equals(gvk);
-    }
-
-    private Mono<PostVo> postByName(String name) {
-        return Mono.fromCallable(() -> postFinder.getByName(name))
-            .subscribeOn(Schedulers.boundedElastic());
     }
 }

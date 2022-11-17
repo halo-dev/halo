@@ -10,9 +10,10 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.comparator.Comparators;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -37,56 +38,58 @@ public class MenuFinderImpl implements MenuFinder {
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     @Override
-    public MenuVo getByName(String name) {
-        return listAsTree().stream()
+    public Mono<MenuVo> getByName(String name) {
+        return listAsTree()
             .filter(menu -> menu.getMetadata().getName().equals(name))
-            .findAny()
-            .orElse(null);
+            .next();
     }
 
     @Override
-    public MenuVo getPrimary() {
-        List<MenuVo> menuVos = listAsTree();
-        if (CollectionUtils.isEmpty(menuVos)) {
-            return null;
-        }
-        return environmentFetcher.fetch(SystemSetting.Menu.GROUP, SystemSetting.Menu.class)
-            .blockOptional()
-            .map(SystemSetting.Menu::getPrimary)
-            .filter(StringUtils::isNotBlank)
-            .flatMap(primary -> menuVos.stream()
-                .filter(menuVo -> menuVo.getMetadata().getName().equals(primary))
-                .findAny())
-            .orElse(menuVos.get(0));
-    }
-
-    List<MenuVo> listAll() {
-        return client.list(Menu.class, null, null)
-            .map(MenuVo::from)
-            .collectList()
-            .block();
-    }
-
-    List<MenuVo> listAsTree() {
-        Collection<MenuItemVo> menuItemVos = populateParentName(listAllMenuItem());
-        List<MenuItemVo> treeList = listToTree(menuItemVos);
-        Map<String, MenuItemVo> nameItemRootNodeMap = treeList.stream()
-            .collect(Collectors.toMap(item -> item.getMetadata().getName(), Function.identity()));
-
-        return listAll().stream()
-            .map(menuVo -> {
-                LinkedHashSet<String> menuItemNames = menuVo.getSpec().getMenuItems();
-                if (menuItemNames == null) {
-                    return menuVo.withMenuItems(List.of());
+    public Mono<MenuVo> getPrimary() {
+        return listAsTree().collectList()
+            .flatMap(menuVos -> {
+                if (CollectionUtils.isEmpty(menuVos)) {
+                    return Mono.empty();
                 }
-                List<MenuItemVo> menuItems = menuItemNames.stream()
-                    .map(nameItemRootNodeMap::get)
-                    .filter(Objects::nonNull)
-                    .sorted(defaultTreeNodeComparator())
-                    .toList();
-                return menuVo.withMenuItems(menuItems);
-            })
-            .toList();
+                return environmentFetcher.fetch(SystemSetting.Menu.GROUP, SystemSetting.Menu.class)
+                    .map(SystemSetting.Menu::getPrimary)
+                    .map(primaryConfig -> menuVos.stream()
+                        .filter(menuVo -> menuVo.getMetadata().getName().equals(primaryConfig))
+                        .findAny()
+                        .orElse(menuVos.get(0))
+                    )
+                    .defaultIfEmpty(menuVos.get(0));
+            });
+    }
+
+    Flux<MenuVo> listAll() {
+        return client.list(Menu.class, null, null)
+            .map(MenuVo::from);
+    }
+
+    Flux<MenuVo> listAsTree() {
+        return listAllMenuItem()
+            .collectList()
+            .map(MenuFinderImpl::populateParentName)
+            .flatMapMany(menuItemVos -> {
+                List<MenuItemVo> treeList = listToTree(menuItemVos);
+                Map<String, MenuItemVo> nameItemRootNodeMap = treeList.stream()
+                    .collect(Collectors.toMap(item -> item.getMetadata().getName(),
+                        Function.identity()));
+                return listAll()
+                    .map(menuVo -> {
+                        LinkedHashSet<String> menuItemNames = menuVo.getSpec().getMenuItems();
+                        if (menuItemNames == null) {
+                            return menuVo.withMenuItems(List.of());
+                        }
+                        List<MenuItemVo> menuItems = menuItemNames.stream()
+                            .map(nameItemRootNodeMap::get)
+                            .filter(Objects::nonNull)
+                            .sorted(defaultTreeNodeComparator())
+                            .toList();
+                        return menuVo.withMenuItems(menuItems);
+                    });
+            });
     }
 
     static List<MenuItemVo> listToTree(Collection<MenuItemVo> list) {
@@ -109,11 +112,9 @@ public class MenuFinderImpl implements MenuFinder {
             .collect(Collectors.toList());
     }
 
-    List<MenuItemVo> listAllMenuItem() {
+    Flux<MenuItemVo> listAllMenuItem() {
         return client.list(MenuItem.class, null, null)
-            .map(MenuItemVo::from)
-            .collectList()
-            .block();
+            .map(MenuItemVo::from);
     }
 
     static Comparator<MenuItemVo> defaultTreeNodeComparator() {

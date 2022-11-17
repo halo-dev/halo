@@ -1,8 +1,5 @@
 package run.halo.app.theme.router.strategy;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
-
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +12,6 @@ import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.theme.finders.PostFinder;
-import run.halo.app.theme.router.UrlContextListResult;
 
 /**
  * Tests for {@link ArchivesRouteStrategy}.
@@ -30,12 +26,6 @@ class ArchivesRouteStrategyTest extends RouterStrategyTestSuite {
 
     @InjectMocks
     private ArchivesRouteStrategy archivesRouteStrategy;
-
-    @Override
-    public void setUp() {
-        lenient().when(postFinder.list(any(), any())).thenReturn(
-            new UrlContextListResult<>(1, 10, 1, List.of(), null, null));
-    }
 
     @Test
     void getRouteFunctionWhenDefaultPattern() {

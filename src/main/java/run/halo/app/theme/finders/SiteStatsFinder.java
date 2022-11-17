@@ -1,5 +1,6 @@
 package run.halo.app.theme.finders;
 
+import reactor.core.publisher.Mono;
 import run.halo.app.theme.finders.vo.SiteStatsVo;
 
 /**
@@ -10,5 +11,5 @@ import run.halo.app.theme.finders.vo.SiteStatsVo;
  */
 public interface SiteStatsFinder {
 
-    SiteStatsVo getStats();
+    Mono<SiteStatsVo> getStats();
 }

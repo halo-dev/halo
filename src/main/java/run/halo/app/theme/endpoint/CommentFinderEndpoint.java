@@ -165,10 +165,8 @@ public class CommentFinderEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> listComments(ServerRequest request) {
         CommentQuery commentQuery = new CommentQuery(request.queryParams());
-        return Mono.defer(() -> Mono.just(
-                commentFinder.list(commentQuery.toRef(), commentQuery.getPage(),
-                    commentQuery.getSize())))
-            .subscribeOn(Schedulers.boundedElastic())
+        return commentFinder.list(commentQuery.toRef(), commentQuery.getPage(),
+                    commentQuery.getSize())
             .flatMap(list -> ServerResponse.ok().bodyValue(list));
     }
 
@@ -183,9 +181,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
         String commentName = request.pathVariable("name");
         IListRequest.QueryListRequest queryParams =
             new IListRequest.QueryListRequest(request.queryParams());
-        return Mono.defer(() -> Mono.just(
-                commentFinder.listReply(commentName, queryParams.getPage(), queryParams.getSize())))
-            .subscribeOn(Schedulers.boundedElastic())
+        return commentFinder.listReply(commentName, queryParams.getPage(), queryParams.getSize())
             .flatMap(list -> ServerResponse.ok().bodyValue(list));
     }
 

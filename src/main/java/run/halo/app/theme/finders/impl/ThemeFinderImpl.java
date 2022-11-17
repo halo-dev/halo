@@ -34,19 +34,17 @@ public class ThemeFinderImpl implements ThemeFinder {
     }
 
     @Override
-    public ThemeVo activation() {
+    public Mono<ThemeVo> activation() {
         return environmentFetcher.fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class)
             .map(SystemSetting.Theme::getActive)
             .flatMap(themeName -> client.fetch(Theme.class, themeName))
-            .flatMap(theme -> themeWithConfig(ThemeVo.from(theme)))
-            .block();
+            .flatMap(theme -> themeWithConfig(ThemeVo.from(theme)));
     }
 
     @Override
-    public ThemeVo getByName(String themeName) {
+    public Mono<ThemeVo> getByName(String themeName) {
         return client.fetch(Theme.class, themeName)
-            .flatMap(theme -> themeWithConfig(ThemeVo.from(theme)))
-            .block();
+            .flatMap(theme -> themeWithConfig(ThemeVo.from(theme)));
     }
 
     private Mono<ThemeVo> themeWithConfig(ThemeVo themeVo) {
@@ -63,6 +61,6 @@ public class ThemeFinderImpl implements ThemeFinder {
                 JsonNode configJson = JsonUtils.mapToObject(config, JsonNode.class);
                 return themeVo.withConfig(configJson);
             })
-            .switchIfEmpty(Mono.just(themeVo));
+            .defaultIfEmpty(themeVo);
     }
 }

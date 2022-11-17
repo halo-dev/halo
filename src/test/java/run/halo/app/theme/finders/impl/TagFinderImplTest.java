@@ -47,7 +47,7 @@ class TagFinderImplTest {
     void getByName() throws JSONException {
         when(client.fetch(eq(Tag.class), eq("t1")))
             .thenReturn(Mono.just(tag(1)));
-        TagVo tagVo = tagFinder.getByName("t1");
+        TagVo tagVo = tagFinder.getByName("t1").block();
         tagVo.getMetadata().setCreationTimestamp(null);
         JSONAssert.assertEquals("""
                 {
@@ -82,7 +82,7 @@ class TagFinderImplTest {
                     tags().stream().sorted(TagFinderImpl.DEFAULT_COMPARATOR.reversed()).toList()
                 )
             );
-        List<TagVo> tags = tagFinder.listAll();
+        List<TagVo> tags = tagFinder.listAll().collectList().block();
         assertThat(tags).hasSize(3);
         assertThat(tags.stream()
             .map(tag -> tag.getMetadata().getName())
