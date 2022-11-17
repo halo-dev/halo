@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.ExternalUrlSupplier;
 
 /**
  * <p>This {@link SharedApplicationContextHolder} class is used to hold a singleton instance of
@@ -61,6 +62,8 @@ public class SharedApplicationContextHolder {
         DefaultSchemeManager defaultSchemeManager =
             rootApplicationContext.getBean(DefaultSchemeManager.class);
         beanFactory.registerSingleton("schemeManager", defaultSchemeManager);
+        beanFactory.registerSingleton("externalUrlSupplier",
+            rootApplicationContext.getBean(ExternalUrlSupplier.class));
         // TODO add more shared instance here
 
         return sharedApplicationContext;
