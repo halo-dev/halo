@@ -18,6 +18,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.ContentWrapper;
@@ -78,7 +79,7 @@ class PostFinderImplTest {
             .thenReturn(Mono.just(post));
         when(contentService.getContent(post.getSpec().getReleaseSnapshot()))
             .thenReturn(Mono.just(contentWrapper));
-        ContentVo content = postFinder.content("post-1");
+        ContentVo content = postFinder.content("post-1").block();
         assertThat(content.getContent()).isEqualTo(contentWrapper.getContent());
         assertThat(content.getRaw()).isEqualTo(contentWrapper.getRaw());
     }
@@ -108,7 +109,12 @@ class PostFinderImplTest {
         ListResult<Post> listResult = new ListResult<>(1, 10, 3, postsForArchives());
         when(client.list(eq(Post.class), any(), any(), anyInt(), anyInt()))
             .thenReturn(Mono.just(listResult));
-        ListResult<PostArchiveVo> archives = postFinder.archives(1, 10);
+        when(contributorFinder.getContributor(any())).thenReturn(Mono.empty());
+        when(contributorFinder.getContributors(any())).thenReturn(Flux.empty());
+
+        ListResult<PostArchiveVo> archives = postFinder.archives(1, 10).block();
+        assertThat(archives).isNotNull();
+
         List<PostArchiveVo> items = archives.getItems();
         assertThat(items.size()).isEqualTo(2);
         assertThat(items.get(0).getYear()).isEqualTo("2022");

@@ -1,6 +1,7 @@
 package run.halo.app.theme.finders;
 
 import org.springframework.lang.Nullable;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Comment;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Ref;
@@ -15,11 +16,11 @@ import run.halo.app.theme.finders.vo.ReplyVo;
  */
 public interface CommentFinder {
 
-    CommentVo getByName(String name);
+    Mono<CommentVo> getByName(String name);
 
-    ListResult<CommentVo> list(Ref ref, @Nullable Integer page,
+    Mono<ListResult<CommentVo>> list(Ref ref, @Nullable Integer page,
         @Nullable Integer size);
 
-    ListResult<ReplyVo> listReply(String commentName, @Nullable Integer page,
+    Mono<ListResult<ReplyVo>> listReply(String commentName, @Nullable Integer page,
         @Nullable Integer size);
 }

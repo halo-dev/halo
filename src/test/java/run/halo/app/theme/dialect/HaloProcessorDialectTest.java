@@ -142,7 +142,7 @@ class HaloProcessorDialectTest {
         PostVo postVo = PostVo.builder()
             .spec(postSpec)
             .metadata(metadata).build();
-        when(postFinder.getByName(eq("fake-post"))).thenReturn(postVo);
+        when(postFinder.getByName(eq("fake-post"))).thenReturn(Mono.just(postVo));
 
         SystemSetting.Basic basic = new SystemSetting.Basic();
         basic.setFavicon(null);

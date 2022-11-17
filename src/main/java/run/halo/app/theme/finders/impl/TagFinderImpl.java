@@ -2,9 +2,10 @@ package run.halo.app.theme.finders.impl;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -31,21 +32,19 @@ public class TagFinderImpl implements TagFinder {
     }
 
     @Override
-    public TagVo getByName(String name) {
+    public Mono<TagVo> getByName(String name) {
         return client.fetch(Tag.class, name)
-            .map(TagVo::from)
-            .block();
+            .map(TagVo::from);
     }
 
     @Override
-    public List<TagVo> getByNames(List<String> names) {
-        return names.stream().map(this::getByName)
-            .filter(Objects::nonNull)
-            .toList();
+    public Flux<TagVo> getByNames(List<String> names) {
+        return Flux.fromIterable(names)
+            .flatMap(this::getByName);
     }
 
     @Override
-    public ListResult<TagVo> list(Integer page, Integer size) {
+    public Mono<ListResult<TagVo>> list(Integer page, Integer size) {
         return client.list(Tag.class, null,
                 DEFAULT_COMPARATOR.reversed(), pageNullSafe(page), sizeNullSafe(size))
             .map(list -> {
@@ -54,16 +53,14 @@ public class TagFinderImpl implements TagFinder {
                     .collect(Collectors.toList());
                 return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), tagVos);
             })
-            .block();
+            .defaultIfEmpty(new ListResult<>(page, size, 0L, List.of()));
     }
 
     @Override
-    public List<TagVo> listAll() {
+    public Flux<TagVo> listAll() {
         return client.list(Tag.class, null,
                 DEFAULT_COMPARATOR.reversed())
-            .map(TagVo::from)
-            .collectList()
-            .block();
+            .map(TagVo::from);
     }
 
     int pageNullSafe(Integer page) {

@@ -1,5 +1,6 @@
 package run.halo.app.theme.finders;
 
+import reactor.core.publisher.Mono;
 import run.halo.app.theme.finders.vo.MenuVo;
 
 /**
@@ -10,7 +11,7 @@ import run.halo.app.theme.finders.vo.MenuVo;
  */
 public interface MenuFinder {
 
-    MenuVo getByName(String name);
+    Mono<MenuVo> getByName(String name);
 
-    MenuVo getPrimary();
+    Mono<MenuVo> getPrimary();
 }

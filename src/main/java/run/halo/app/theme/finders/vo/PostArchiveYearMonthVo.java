@@ -16,5 +16,5 @@ public class PostArchiveYearMonthVo {
 
     String month;
 
-    List<PostVo> posts;
+    List<ListedPostVo> posts;
 }

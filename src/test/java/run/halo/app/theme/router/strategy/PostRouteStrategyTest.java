@@ -42,7 +42,8 @@ class PostRouteStrategyTest extends RouterStrategyTestSuite {
     public void setUp() {
         lenient().when(viewNameResolver.resolveViewNameOrDefault(any(), any(), any()))
             .thenReturn(Mono.just(DefaultTemplateEnum.POST.getValue()));
-        lenient().when(postFinder.getByName(any())).thenReturn(PostVo.from(TestPost.postV1()));
+        lenient().when(postFinder.getByName(any()))
+            .thenReturn(Mono.just(PostVo.from(TestPost.postV1())));
     }
 
     @Test

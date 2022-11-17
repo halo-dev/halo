@@ -2,6 +2,7 @@ package run.halo.app.theme.finders.impl;
 
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -37,14 +38,13 @@ public class CommentFinderImpl implements CommentFinder {
     }
 
     @Override
-    public CommentVo getByName(String name) {
+    public Mono<CommentVo> getByName(String name) {
         return client.fetch(Comment.class, name)
-            .flatMap(this::toCommentVo)
-            .block();
+            .flatMap(this::toCommentVo);
     }
 
     @Override
-    public ListResult<CommentVo> list(Ref ref, Integer page, Integer size) {
+    public Mono<ListResult<CommentVo>> list(Ref ref, Integer page, Integer size) {
         return client.list(Comment.class, fixedPredicate(ref),
                 defaultComparator(),
                 pageNullSafe(page), sizeNullSafe(size))
@@ -55,11 +55,11 @@ public class CommentFinderImpl implements CommentFinder {
                     commentVos)
                 )
             )
-            .block();
+            .defaultIfEmpty(new ListResult<>(page, size, 0L, List.of()));
     }
 
     @Override
-    public ListResult<ReplyVo> listReply(String commentName, Integer page, Integer size) {
+    public Mono<ListResult<ReplyVo>> listReply(String commentName, Integer page, Integer size) {
         Comparator<Reply> comparator =
             Comparator.comparing(reply -> reply.getMetadata().getCreationTimestamp());
         return client.list(Reply.class,
@@ -73,7 +73,7 @@ public class CommentFinderImpl implements CommentFinder {
                 .map(replyVos -> new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
                     replyVos))
             )
-            .block();
+            .defaultIfEmpty(new ListResult<>(page, size, 0L, List.of()));
     }
 
     private Mono<CommentVo> toCommentVo(Comment comment) {
@@ -81,6 +81,7 @@ public class CommentFinderImpl implements CommentFinder {
         return Mono.just(CommentVo.from(comment))
             .flatMap(commentVo -> getOwnerInfo(owner)
                 .map(commentVo::withOwner)
+                .defaultIfEmpty(commentVo)
             );
     }
 
@@ -88,6 +89,7 @@ public class CommentFinderImpl implements CommentFinder {
         return Mono.just(ReplyVo.from(reply))
             .flatMap(replyVo -> getOwnerInfo(reply.getSpec().getOwner())
                 .map(replyVo::withOwner)
+                .defaultIfEmpty(replyVo)
             );
     }
 
@@ -97,7 +99,7 @@ public class CommentFinderImpl implements CommentFinder {
         }
         return client.fetch(User.class, owner.getName())
             .map(OwnerInfo::from)
-            .switchIfEmpty(Mono.just(OwnerInfo.ghostUser()));
+            .defaultIfEmpty(OwnerInfo.ghostUser());
     }
 
     private Predicate<Comment> fixedPredicate(Ref ref) {

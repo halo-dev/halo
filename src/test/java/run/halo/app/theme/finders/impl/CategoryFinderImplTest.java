@@ -51,7 +51,7 @@ class CategoryFinderImplTest {
     void getByName() throws JSONException {
         when(client.fetch(eq(Category.class), eq("hello")))
             .thenReturn(Mono.just(category()));
-        CategoryVo categoryVo = categoryFinder.getByName("hello");
+        CategoryVo categoryVo = categoryFinder.getByName("hello").block();
         categoryVo.getMetadata().setCreationTimestamp(null);
         JSONAssert.assertEquals("""
                 {
@@ -87,7 +87,7 @@ class CategoryFinderImplTest {
                 .toList());
         when(client.list(eq(Category.class), eq(null), any(), anyInt(), anyInt()))
             .thenReturn(Mono.just(categories));
-        ListResult<CategoryVo> list = categoryFinder.list(1, 10);
+        ListResult<CategoryVo> list = categoryFinder.list(1, 10).block();
         assertThat(list.getItems()).hasSize(3);
         assertThat(list.get().map(categoryVo -> categoryVo.getMetadata().getName()).toList())
             .isEqualTo(List.of("c3", "c2", "hello"));
@@ -97,7 +97,7 @@ class CategoryFinderImplTest {
     void listAsTree() {
         when(client.list(eq(Category.class), eq(null), any()))
             .thenReturn(Flux.fromIterable(categoriesForTree()));
-        List<CategoryTreeVo> treeVos = categoryFinder.listAsTree();
+        List<CategoryTreeVo> treeVos = categoryFinder.listAsTree().collectList().block();
         assertThat(treeVos).hasSize(1);
     }
 
@@ -110,7 +110,7 @@ class CategoryFinderImplTest {
     void listAsTreeMore() {
         when(client.list(eq(Category.class), eq(null), any()))
             .thenReturn(Flux.fromIterable(moreCategories()));
-        List<CategoryTreeVo> treeVos = categoryFinder.listAsTree();
+        List<CategoryTreeVo> treeVos = categoryFinder.listAsTree().collectList().block();
         String s = visualizeTree(treeVos);
         assertThat(s).isEqualTo("""
             全部 (5)

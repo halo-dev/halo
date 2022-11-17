@@ -1,12 +1,11 @@
 package run.halo.app.theme.router.strategy;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 import static run.halo.app.theme.DefaultTemplateEnum.SINGLE_PAGE;
 
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,7 +15,6 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import run.halo.app.extension.ListResult;
 import run.halo.app.theme.finders.SinglePageFinder;
 
 /**
@@ -35,8 +33,6 @@ class SinglePageRouteStrategyTest extends RouterStrategyTestSuite {
 
     @Override
     public void setUp() {
-        lenient().when(singlePageFinder.list(anyInt(), anyInt()))
-            .thenReturn(new ListResult<>(1, 10, 0, List.of()));
         lenient().when(viewResolver.resolveViewName(eq(SINGLE_PAGE.getValue()), any()))
             .thenReturn(Mono.just(new EmptyView()));
     }
@@ -53,6 +49,7 @@ class SinglePageRouteStrategyTest extends RouterStrategyTestSuite {
     void shouldResponse200IfPermalinkFound() {
         permalinkHttpGetRouter.insert("/fake-slug",
             strategy.getHandler(getThemeRouteRules(), "fake-name"));
+        when(singlePageFinder.getByName(any())).thenReturn(Mono.empty());
         createClient().get()
             .uri("/fake-slug")
             .exchange()
@@ -64,6 +61,8 @@ class SinglePageRouteStrategyTest extends RouterStrategyTestSuite {
     void shouldResponse200IfSlugNameContainsSpecialChars() {
         permalinkHttpGetRouter.insert("/fake / slug",
             strategy.getHandler(getThemeRouteRules(), "fake-name"));
+
+        when(singlePageFinder.getByName(any())).thenReturn(Mono.empty());
         createClient().get()
             .uri("/fake / slug")
             .exchange()
@@ -74,6 +73,9 @@ class SinglePageRouteStrategyTest extends RouterStrategyTestSuite {
     void shouldResponse200IfSlugNameContainsChineseChars() {
         permalinkHttpGetRouter.insert("/中文",
             strategy.getHandler(getThemeRouteRules(), "fake-name"));
+
+        when(singlePageFinder.getByName(any())).thenReturn(Mono.empty());
+
         createClient().get()
             .uri("/中文")
             .exchange()

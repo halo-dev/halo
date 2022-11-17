@@ -19,4 +19,14 @@ public class ContentVo {
     String raw;
 
     String content;
+
+    /**
+     * Empty content object.
+     */
+    public static ContentVo empty() {
+        return ContentVo.builder()
+            .raw("")
+            .content("")
+            .build();
+    }
 }

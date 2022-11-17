@@ -13,12 +13,10 @@ import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-import run.halo.app.extension.ListResult;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
-import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.router.PageUrlUtils;
 import run.halo.app.theme.router.UrlContextListResult;
 
@@ -36,21 +34,16 @@ public class IndexRouteStrategy implements ListPageRouteHandlerStrategy {
     private final PostFinder postFinder;
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
-    private Mono<UrlContextListResult<PostVo>> postList(ServerRequest request) {
+    private Mono<UrlContextListResult<ListedPostVo>> postList(ServerRequest request) {
         String path = request.path();
         return environmentFetcher.fetchPost()
             .map(p -> defaultIfNull(p.getPostPageSize(), DEFAULT_PAGE_SIZE))
-            .flatMap(pageSize -> listPost(pageNum(request), pageSize))
-            .map(list -> new UrlContextListResult.Builder<PostVo>()
+            .flatMap(pageSize -> postFinder.list(pageNum(request), pageSize))
+            .map(list -> new UrlContextListResult.Builder<ListedPostVo>()
                 .listResult(list)
                 .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
                 .prevUrl(PageUrlUtils.prevPageUrl(path))
                 .build());
-    }
-
-    private Mono<ListResult<PostVo>> listPost(int page, int size) {
-        return Mono.fromCallable(() -> postFinder.list(page, size))
-            .subscribeOn(Schedulers.boundedElastic());
     }
 
     @Override

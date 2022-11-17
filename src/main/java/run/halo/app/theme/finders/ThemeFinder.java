@@ -1,5 +1,6 @@
 package run.halo.app.theme.finders;
 
+import reactor.core.publisher.Mono;
 import run.halo.app.theme.finders.vo.ThemeVo;
 
 /**
@@ -10,7 +11,7 @@ import run.halo.app.theme.finders.vo.ThemeVo;
  */
 public interface ThemeFinder {
 
-    ThemeVo activation();
+    Mono<ThemeVo> activation();
 
-    ThemeVo getByName(String themeName);
+    Mono<ThemeVo> getByName(String themeName);
 }
