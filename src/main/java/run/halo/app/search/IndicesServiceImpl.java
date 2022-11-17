@@ -2,7 +2,6 @@ package run.halo.app.search;
 
 import org.springframework.stereotype.Service;
 import reactor.core.Exceptions;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Post;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
@@ -25,8 +24,7 @@ public class IndicesServiceImpl implements IndicesService {
     @Override
     public Mono<Void> rebuildPostIndices() {
         return extensionGetter.getEnabledExtension(PostSearchService.class)
-            .flatMap(searchService -> postFinder.list(0, 0)
-                .flatMapMany(list -> Flux.fromStream(list.get()))
+            .flatMap(searchService -> postFinder.listAll()
                 .filter(post -> Post.isPublished(post.getMetadata()))
                 .flatMap(listedPostVo -> {
                     PostVo postVo = PostVo.from(listedPostVo);
