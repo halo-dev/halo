@@ -96,7 +96,7 @@ const handleCreateReply = async () => {
       formState.value.quoteReply = props.reply.reply.metadata.name;
     }
     await apiClient.comment.createReply({
-      name: props.comment?.comment.metadata.name,
+      name: props.comment?.comment.metadata.name as string,
       replyRequest: formState.value,
     });
     onVisibleChange(false);
@@ -118,7 +118,7 @@ const handleCreateEmojiPicker = () => {
     i18n: i18n,
     onEmojiSelect: onEmojiSelect,
   });
-  emojiPickerRef.value?.appendChild(emojiPicker);
+  emojiPickerRef.value?.appendChild(emojiPicker as unknown as Node);
 };
 
 const onEmojiSelect = (emoji: { native: string }) => {

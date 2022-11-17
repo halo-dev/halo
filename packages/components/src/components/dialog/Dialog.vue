@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import { VModal } from "@/components/modal";
-import { VButton } from "@/components/button";
+import { VModal } from "../modal";
+import { VButton } from "../button";
 import {
   IconCheckboxCircle,
   IconClose,
   IconErrorWarning,
   IconForbidLine,
   IconInformation,
-} from "@/icons/icons";
+} from "../../icons/icons";
 import { computed, ref } from "vue";
 import type { Type } from "@/components/dialog/interface";
 import type { Type as ButtonType } from "@/components/button/interface";

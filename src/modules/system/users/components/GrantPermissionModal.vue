@@ -49,7 +49,7 @@ const handleGrantPermission = async () => {
   try {
     saving.value = true;
     await apiClient.user.grantPermission({
-      name: props.user.metadata.name,
+      name: props.user?.metadata.name as string,
       grantRequest: {
         roles: [selectedRole.value],
       },

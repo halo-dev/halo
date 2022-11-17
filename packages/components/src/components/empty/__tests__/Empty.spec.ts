@@ -12,7 +12,11 @@ describe("Empty", () => {
   it("should match snapshot", () => {
     expect(
       mount(VEmpty, {
-        props: { title: "Not found", message: "No posts found" },
+        props: {
+          title: "Not found",
+          message: "No posts found",
+          image: "./Empty.svg",
+        },
         slots: {
           actions: h(VButton, { type: "primary" }, "New Post"),
         },
@@ -69,9 +73,9 @@ describe("Empty", () => {
       },
     });
 
-    expect(wrapper.find(".empty-image > img").attributes().src).toEqual(
-      "/src/components/empty/Empty.svg"
-    );
+    expect(
+      wrapper.find(".empty-image > img").attributes().src.endsWith("/Empty.svg")
+    ).toBe(true);
 
     await wrapper.setData({ image: "./empty.png" });
 

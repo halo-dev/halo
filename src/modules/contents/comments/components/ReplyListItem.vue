@@ -17,7 +17,7 @@ import cloneDeep from "lodash.clonedeep";
 
 const props = withDefaults(
   defineProps<{
-    reply?: ListedReply;
+    reply: ListedReply;
     replies?: ListedReply[];
   }>(),
   {

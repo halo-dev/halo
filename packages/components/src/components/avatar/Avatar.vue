@@ -26,6 +26,10 @@ const isLoading = ref(false);
 const error = ref(false);
 
 const loadImage = async () => {
+  if (!props.src) {
+    return Promise.reject();
+  }
+
   const image = new Image();
   image.src = props.src;
   return new Promise((resolve, reject) => {

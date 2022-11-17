@@ -31,7 +31,7 @@ const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
-    comment?: ListedComment;
+    comment: ListedComment;
     isSelected?: boolean;
   }>(),
   {
