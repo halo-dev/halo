@@ -178,8 +178,8 @@ public class ThemeEndpoint implements CustomEndpoint {
             .map(UpgradeRequest::new)
             .map(UpgradeRequest::getFile)
             .flatMap(file -> {
-                try (var inputStream = toInputStream(file.content())) {
-                    return themeService.upgrade(themeNameInPath, inputStream);
+                try {
+                    return themeService.upgrade(themeNameInPath, toInputStream(file.content()));
                 } catch (IOException e) {
                     return Mono.error(e);
                 }
@@ -261,8 +261,7 @@ public class ThemeEndpoint implements CustomEndpoint {
             .flatMap(this::getZipFilePart)
             .flatMap(file -> {
                 try {
-                    var is = toInputStream(file.content());
-                    return themeService.install(is);
+                    return themeService.install(toInputStream(file.content()));
                 } catch (IOException e) {
                     return Mono.error(Exceptions.propagate(e));
                 }
