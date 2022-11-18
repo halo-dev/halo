@@ -20,7 +20,6 @@ const initialFormState: SinglePage = {
     pinned: false,
     allowComment: true,
     visible: "PUBLIC",
-    version: 1,
     priority: 0,
     excerpt: {
       autoGenerate: true,

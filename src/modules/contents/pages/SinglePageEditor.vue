@@ -7,6 +7,7 @@ import {
   VSpace,
   VButton,
   IconSave,
+  Toast,
 } from "@halo-dev/components";
 import DefaultEditor from "@/components/editor/DefaultEditor.vue";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
@@ -34,7 +35,6 @@ const initialFormState: SinglePageRequest = {
       pinned: false,
       allowComment: true,
       visible: "PUBLIC",
-      version: 1,
       priority: 0,
       excerpt: {
         autoGenerate: true,
@@ -83,19 +83,9 @@ const handleSave = async () => {
     }
 
     if (isUpdateMode.value) {
-      // Get latest single page
-      const { data: latestSinglePage } =
-        await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage(
-          {
-            name: formState.value.page.metadata.name,
-          }
-        );
-
-      formState.value.page = latestSinglePage;
-
-      const { data } = await apiClient.singlePage.updateDraftSinglePage({
+      const { data } = await apiClient.singlePage.updateSinglePageContent({
         name: formState.value.page.metadata.name,
-        singlePageRequest: formState.value,
+        content: formState.value.content,
       });
 
       formState.value.page = data;
@@ -107,9 +97,12 @@ const handleSave = async () => {
       routeQueryName.value = data.metadata.name;
     }
 
+    Toast.success("保存成功");
+
     await handleFetchContent();
   } catch (error) {
     console.error("Failed to save single page", error);
+    Toast.error("保存失败，请重试");
   } finally {
     saving.value = false;
   }
@@ -123,45 +116,16 @@ const handlePublish = async () => {
     formState.value.content.content = formState.value.content.raw;
 
     if (isUpdateMode.value) {
-      const { headSnapshot } = formState.value.page.spec;
       const { name: singlePageName } = formState.value.page.metadata;
-      const { data: latestContent } =
-        await apiClient.content.updateSnapshotContent({
-          snapshotName: headSnapshot as string,
-          contentRequest: {
-            raw: formState.value.content.raw as string,
-            content: formState.value.content.content as string,
-            rawType: formState.value.content.rawType as string,
-            headSnapshotName: headSnapshot,
-            subjectRef: {
-              kind: "SinglePage",
-              version: "v1alpha1",
-              group: "content.halo.run",
-              name: singlePageName,
-            },
-          },
-        });
 
-      // Get latest single page
-      const { data: latestSinglePage } =
-        await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage(
-          {
-            name: formState.value.page.metadata.name,
-          }
-        );
+      await apiClient.singlePage.updateSinglePageContent({
+        name: singlePageName,
+        content: formState.value.content,
+      });
 
-      formState.value.page = latestSinglePage;
-      formState.value.page.spec.publish = true;
-      formState.value.page.spec.headSnapshot = latestContent.snapshotName;
-      formState.value.page.spec.releaseSnapshot =
-        formState.value.page.spec.headSnapshot;
-
-      await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
-        {
-          name: singlePageName,
-          singlePage: formState.value.page,
-        }
-      );
+      await apiClient.singlePage.publishSinglePage({
+        name: singlePageName,
+      });
     } else {
       formState.value.page.spec.publish = true;
       await apiClient.singlePage.draftSinglePage({
@@ -169,9 +133,12 @@ const handlePublish = async () => {
       });
     }
 
+    Toast.success("发布成功");
+
     router.push({ name: "SinglePages" });
   } catch (error) {
     console.error("Failed to publish single page", error);
+    Toast.error("发布失败，请重试");
   } finally {
     publishing.value = false;
   }

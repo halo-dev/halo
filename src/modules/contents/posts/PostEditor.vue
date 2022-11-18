@@ -7,6 +7,7 @@ import {
   VButton,
   VPageHeader,
   VSpace,
+  Toast,
 } from "@halo-dev/components";
 import DefaultEditor from "@/components/editor/DefaultEditor.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";
@@ -34,7 +35,6 @@ const initialFormState: PostRequest = {
       pinned: false,
       allowComment: true,
       visible: "PUBLIC",
-      version: 1,
       priority: 0,
       excerpt: {
         autoGenerate: true,
@@ -84,17 +84,9 @@ const handleSave = async () => {
     }
 
     if (isUpdateMode.value) {
-      // Get latest post
-      const { data: latestPost } =
-        await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
-          name: formState.value.post.metadata.name,
-        });
-
-      formState.value.post = latestPost;
-
-      const { data } = await apiClient.post.updateDraftPost({
+      const { data } = await apiClient.post.updatePostContent({
         name: formState.value.post.metadata.name,
-        postRequest: formState.value,
+        content: formState.value.content,
       });
 
       formState.value.post = data;
@@ -106,9 +98,12 @@ const handleSave = async () => {
       name.value = data.metadata.name;
     }
 
+    Toast.success("保存成功");
+
     await handleFetchContent();
   } catch (e) {
     console.error("Failed to save post", e);
+    Toast.error("保存失败，请重试");
   } finally {
     saving.value = false;
   }
@@ -122,28 +117,15 @@ const handlePublish = async () => {
     formState.value.content.content = formState.value.content.raw;
 
     if (isUpdateMode.value) {
-      const { headSnapshot } = formState.value.post.spec;
       const { name: postName } = formState.value.post.metadata;
-      const { data: latestContent } =
-        await apiClient.content.updateSnapshotContent({
-          snapshotName: headSnapshot as string,
-          contentRequest: {
-            raw: formState.value.content.raw as string,
-            content: formState.value.content.content as string,
-            rawType: formState.value.content.rawType as string,
-            headSnapshotName: headSnapshot,
-            subjectRef: {
-              kind: "Post",
-              version: "v1alpha1",
-              group: "content.halo.run",
-              name: postName,
-            },
-          },
-        });
+
+      await apiClient.post.updatePostContent({
+        name: postName,
+        content: formState.value.content,
+      });
 
       await apiClient.post.publishPost({
         name: postName,
-        headSnapshot: latestContent.snapshotName,
       });
     } else {
       const { data } = await apiClient.post.draftPost({
@@ -155,9 +137,12 @@ const handlePublish = async () => {
       });
     }
 
+    Toast.success("发布成功", { duration: 2000 });
+
     router.push({ name: "Posts" });
   } catch (error) {
     console.error("Failed to publish post", error);
+    Toast.error("发布失败，请重试");
   } finally {
     publishing.value = false;
   }
