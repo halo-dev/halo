@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PatchUtils;
@@ -28,7 +28,7 @@ import run.halo.app.extension.Ref;
 @EqualsAndHashCode(callSuper = true)
 public class Snapshot extends AbstractExtension {
     public static final String KIND = "Snapshot";
-    public static final String PUBLISHED_LABEL = "content.halo.run/published";
+    public static final String KEEP_RAW_ANNO = "content.halo.run/keep-raw";
 
     @Schema(required = true)
     private SnapShotSpec spec;
@@ -51,50 +51,31 @@ public class Snapshot extends AbstractExtension {
 
         private String parentSnapshotName;
 
-        @Schema(required = true)
-        private String displayVersion;
+        private Instant lastModifyTime;
 
-        @Schema(required = true, defaultValue = "1")
-        private Integer version;
-
-        private Instant publishTime;
+        @Schema(required = true, minLength = 1)
+        private String owner;
 
         private Set<String> contributors;
-
-        @JsonIgnore
-        public Set<String> getContributorsOrDefault() {
-            if (this.contributors == null) {
-                this.contributors = new LinkedHashSet<>();
-            }
-            return this.contributors;
-        }
     }
 
-    public static String displayVersionFrom(Integer version) {
-        Assert.notNull(version, "The version must not be null");
-        return "v" + version;
-    }
-
-    @JsonIgnore
-    public boolean isPublished() {
-        Map<String, String> labels = getMetadata().getLabels();
-        return labels != null && labels.getOrDefault(PUBLISHED_LABEL, "false").equals("true");
-    }
-
-    @JsonIgnore
-    public void addContributor(String name) {
+    public static void addContributor(Snapshot snapshot, String name) {
         Assert.notNull(name, "The username must not be null.");
-        Set<String> contributors = spec.getContributorsOrDefault();
+        Set<String> contributors = snapshot.getSpec().getContributors();
+        if (contributors == null) {
+            contributors = new LinkedHashSet<>();
+            snapshot.getSpec().setContributors(contributors);
+        }
         contributors.add(name);
     }
 
     @JsonIgnore
     public ContentWrapper applyPatch(Snapshot baseSnapshot) {
         Assert.notNull(baseSnapshot, "The baseSnapshot must not be null.");
-        if (this.spec.version == 1) {
+        String baseSnapshotName = baseSnapshot.getMetadata().getName();
+        if (StringUtils.equals(getMetadata().getName(), baseSnapshotName)) {
             return ContentWrapper.builder()
                 .snapshotName(this.getMetadata().getName())
-                .version(this.spec.version)
                 .raw(this.spec.rawPatch)
                 .content(this.spec.contentPatch)
                 .rawType(this.spec.rawType)
@@ -106,15 +87,9 @@ public class Snapshot extends AbstractExtension {
             PatchUtils.applyPatch(baseSnapshot.getSpec().getRawPatch(), this.spec.rawPatch);
         return ContentWrapper.builder()
             .snapshotName(this.getMetadata().getName())
-            .version(this.spec.version)
             .raw(patchedRaw)
             .content(patchedContent)
             .rawType(this.spec.rawType)
             .build();
-    }
-
-    public static void putPublishedLabel(Map<String, String> labels) {
-        Assert.notNull(labels, "The labels must not be null.");
-        labels.put(PUBLISHED_LABEL, "true");
     }
 }

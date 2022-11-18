@@ -8,15 +8,18 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.time.Duration;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
+import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.thymeleaf.util.StringUtils;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.content.ListedPost;
@@ -24,9 +27,9 @@ import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.Post;
-import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.event.post.PostRecycledEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.QueryParamBuildUtil;
@@ -37,6 +40,7 @@ import run.halo.app.extension.router.QueryParamBuildUtil;
  * @author guqing
  * @since 2.0.0
  */
+@Slf4j
 @Component
 @AllArgsConstructor
 public class PostEndpoint implements CustomEndpoint {
@@ -92,6 +96,24 @@ public class PostEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(Post.class))
             )
+            .PUT("posts/{name}/content", this::updateContent,
+                builder -> builder.operationId("UpdatePostContent")
+                    .description("Update a post's content.")
+                    .tag(tag)
+                    .parameter(parameterBuilder().name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class))
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(Builder.schemaBuilder()
+                                .implementation(PostRequest.Content.class))
+                        ))
+                    .response(responseBuilder()
+                        .implementation(Post.class))
+            )
             .PUT("posts/{name}/publish", this::publishPost,
                 builder -> builder.operationId("PublishPost")
                     .description("Publish a post.")
@@ -132,6 +154,18 @@ public class PostEndpoint implements CustomEndpoint {
             .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }
 
+    Mono<ServerResponse> updateContent(ServerRequest request) {
+        String postName = request.pathVariable("name");
+        return request.bodyToMono(PostRequest.Content.class)
+            .flatMap(content -> client.fetch(Post.class, postName)
+                .flatMap(post -> {
+                    PostRequest postRequest = new PostRequest(post, content);
+                    return postService.updatePost(postRequest);
+                })
+            )
+            .flatMap(post -> ServerResponse.ok().bodyValue(post));
+    }
+
     Mono<ServerResponse> updatePost(ServerRequest request) {
         return request.bodyToMono(PostRequest.class)
             .flatMap(postService::updatePost)
@@ -140,22 +174,46 @@ public class PostEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> publishPost(ServerRequest request) {
         var name = request.pathVariable("name");
+        boolean asyncPublish = request.queryParam("async")
+            .map(Boolean::parseBoolean)
+            .orElse(false);
         return client.get(Post.class, name)
             .doOnNext(post -> {
                 var spec = post.getSpec();
                 request.queryParam("headSnapshot").ifPresent(spec::setHeadSnapshot);
                 spec.setPublish(true);
+                if (spec.getHeadSnapshot() == null) {
+                    spec.setHeadSnapshot(spec.getBaseSnapshot());
+                }
                 // TODO Provide release snapshot query param to control
                 spec.setReleaseSnapshot(spec.getHeadSnapshot());
             })
             .flatMap(client::update)
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 .filter(t -> t instanceof OptimisticLockingFailureException))
-            .flatMap(post -> postService.publishPost(post.getMetadata().getName()))
-            // TODO Fire published event in reconciler in the future
-            .doOnNext(post -> eventPublisher.publishEvent(
-                new PostPublishedEvent(this, post.getMetadata().getName())))
-            .flatMap(post -> ServerResponse.ok().bodyValue(post));
+            .flatMap(post -> {
+                if (asyncPublish) {
+                    return Mono.just(post);
+                }
+                return client.fetch(Post.class, name)
+                    .map(latest -> {
+                        String latestReleasedSnapshotName =
+                            ExtensionUtil.nullSafeAnnotations(latest)
+                                .get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
+                        if (StringUtils.equals(latestReleasedSnapshotName,
+                            latest.getSpec().getReleaseSnapshot())) {
+                            return latest;
+                        }
+                        throw new RetryException("Post publishing status is not as expected");
+                    })
+                    .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
+                        .filter(t -> t instanceof RetryException))
+                    .doOnError(IllegalStateException.class, err -> {
+                        log.error("Failed to publish post [{}]", name, err);
+                        throw new IllegalStateException("Publishing wait timeout.");
+                    });
+            })
+            .flatMap(publishResult -> ServerResponse.ok().bodyValue(publishResult));
     }
 
     private Mono<ServerResponse> unpublishPost(ServerRequest request) {

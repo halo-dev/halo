@@ -1,8 +1,10 @@
 package run.halo.app.content;
 
+import java.time.Instant;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Snapshot;
 import run.halo.app.extension.AbstractExtension;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.Metadata;
 
@@ -23,7 +25,6 @@ public class TestPost {
         post.setSpec(postSpec);
 
         postSpec.setTitle("post-A");
-        postSpec.setVersion(1);
         postSpec.setBaseSnapshot(snapshotV1().getMetadata().getName());
         postSpec.setHeadSnapshot("base-snapshot");
         postSpec.setReleaseSnapshot(null);
@@ -37,13 +38,13 @@ public class TestPost {
         snapshot.setApiVersion(getApiVersion(Snapshot.class));
         Metadata metadata = new Metadata();
         metadata.setName("snapshot-A");
+        metadata.setCreationTimestamp(Instant.now());
         snapshot.setMetadata(metadata);
+        ExtensionUtil.nullSafeAnnotations(snapshot).put(Snapshot.KEEP_RAW_ANNO, "true");
         Snapshot.SnapShotSpec spec = new Snapshot.SnapShotSpec();
         snapshot.setSpec(spec);
 
-        spec.setDisplayVersion("v1");
-        spec.setVersion(1);
-        snapshot.addContributor("guqing");
+        Snapshot.addContributor(snapshot, "guqing");
         spec.setRawType("MARKDOWN");
         spec.setRawPatch("A");
         spec.setContentPatch("<p>A</p>");
@@ -56,14 +57,12 @@ public class TestPost {
         snapshot.setKind(Snapshot.KIND);
         snapshot.setApiVersion(getApiVersion(Snapshot.class));
         Metadata metadata = new Metadata();
+        metadata.setCreationTimestamp(Instant.now().plusSeconds(10));
         metadata.setName("snapshot-B");
         snapshot.setMetadata(metadata);
         Snapshot.SnapShotSpec spec = new Snapshot.SnapShotSpec();
         snapshot.setSpec(spec);
-
-        spec.setDisplayVersion("v2");
-        spec.setVersion(2);
-        snapshot.addContributor("guqing");
+        Snapshot.addContributor(snapshot, "guqing");
         spec.setRawType("MARKDOWN");
         spec.setRawPatch(PatchUtils.diffToJsonPatch("A", "B"));
         spec.setContentPatch(PatchUtils.diffToJsonPatch("<p>A</p>", "<p>B</p>"));
@@ -74,10 +73,9 @@ public class TestPost {
     public static Snapshot snapshotV3() {
         Snapshot snapshotV3 = snapshotV2();
         snapshotV3.getMetadata().setName("snapshot-C");
+        snapshotV3.getMetadata().setCreationTimestamp(Instant.now().plusSeconds(20));
         Snapshot.SnapShotSpec spec = snapshotV3.getSpec();
-        spec.setDisplayVersion("v3");
-        spec.setVersion(3);
-        snapshotV3.addContributor("guqing");
+        Snapshot.addContributor(snapshotV3, "guqing");
         spec.setRawType("MARKDOWN");
         spec.setRawPatch(PatchUtils.diffToJsonPatch("B", "C"));
         spec.setContentPatch(PatchUtils.diffToJsonPatch("<p>B</p>", "<p>C</p>"));

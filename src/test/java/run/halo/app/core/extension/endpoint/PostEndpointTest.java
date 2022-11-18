@@ -2,9 +2,6 @@ package run.halo.app.core.extension.endpoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +17,6 @@ import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.content.TestPost;
 import run.halo.app.core.extension.Post;
-import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
@@ -77,25 +73,6 @@ class PostEndpointTest {
             .isOk()
             .expectBody(Post.class)
             .value(post -> assertThat(post).isEqualTo(TestPost.postV1()));
-    }
-
-    @Test
-    void publishPost() {
-        Post post = TestPost.postV1();
-        when(postService.publishPost(any())).thenReturn(Mono.just(post));
-        when(client.get(eq(Post.class), eq(post.getMetadata().getName())))
-            .thenReturn(Mono.just(post));
-        when(client.update(any())).thenReturn(Mono.just(post));
-        doNothing().when(eventPublisher).publishEvent(isA(PostPublishedEvent.class));
-
-        webTestClient.put()
-            .uri("/posts/post-A/publish")
-            .bodyValue(postRequest(TestPost.postV1()))
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(Post.class)
-            .value(p -> assertThat(p).isEqualTo(post));
     }
 
     PostRequest postRequest(Post post) {

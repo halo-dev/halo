@@ -17,6 +17,4 @@ public interface SinglePageService {
     Mono<SinglePage> draft(SinglePageRequest pageRequest);
 
     Mono<SinglePage> update(SinglePageRequest pageRequest);
-
-    Mono<SinglePage> publish(String name);
 }

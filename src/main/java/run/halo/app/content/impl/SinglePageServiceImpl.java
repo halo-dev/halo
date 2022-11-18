@@ -11,8 +11,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationContext;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -21,7 +23,9 @@ import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.content.ContentRequest;
 import run.halo.app.content.ContentService;
+import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.Contributor;
 import run.halo.app.content.ListedSinglePage;
 import run.halo.app.content.SinglePageQuery;
@@ -32,15 +36,12 @@ import run.halo.app.content.Stats;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.SinglePage;
-import run.halo.app.core.extension.Snapshot;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
-import run.halo.app.infra.exception.NotFoundException;
-import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
 
@@ -52,6 +53,7 @@ import run.halo.app.metrics.MeterUtils;
  */
 @Slf4j
 @Service
+@AllArgsConstructor
 public class SinglePageServiceImpl implements SinglePageService {
     private final ContentService contentService;
 
@@ -59,12 +61,7 @@ public class SinglePageServiceImpl implements SinglePageService {
 
     private final CounterService counterService;
 
-    public SinglePageServiceImpl(ContentService contentService, ReactiveExtensionClient client,
-        CounterService counterService) {
-        this.contentService = contentService;
-        this.client = client;
-        this.counterService = counterService;
-    }
+    private final ApplicationContext applicationContext;
 
     @Override
     public Mono<ListResult<ListedSinglePage>> list(SinglePageQuery query) {
@@ -86,77 +83,80 @@ public class SinglePageServiceImpl implements SinglePageService {
 
     @Override
     public Mono<SinglePage> draft(SinglePageRequest pageRequest) {
-        return contentService.draftContent(pageRequest.contentRequest())
-            .flatMap(contentWrapper -> getContextUsername()
-                .flatMap(username -> {
+        return Mono.defer(
+                () -> {
                     SinglePage page = pageRequest.page();
-                    page.getSpec().setBaseSnapshot(contentWrapper.getSnapshotName());
-                    page.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
-                    page.getSpec().setOwner(username);
-                    appendPublishedCondition(page, Post.PostPhase.DRAFT);
-                    return client.create(page)
-                        .then(Mono.defer(() ->
-                            client.fetch(SinglePage.class,
-                                pageRequest.page().getMetadata().getName())));
-                }));
+                    return getContextUsername()
+                        .map(username -> {
+                            page.getSpec().setOwner(username);
+                            return page;
+                        })
+                        .defaultIfEmpty(page);
+                }
+            )
+            .flatMap(client::create)
+            .flatMap(page -> {
+                var contentRequest =
+                    new ContentRequest(Ref.of(page), page.getSpec().getHeadSnapshot(),
+                        pageRequest.content().raw(), pageRequest.content().content(),
+                        pageRequest.content().rawType());
+                return contentService.draftContent(contentRequest)
+                    .flatMap(
+                        contentWrapper -> waitForPageToDraftConcludingWork(
+                            page.getMetadata().getName(),
+                            contentWrapper
+                        )
+                    );
+            });
+    }
+
+    private Mono<SinglePage> waitForPageToDraftConcludingWork(String pageName,
+        ContentWrapper contentWrapper) {
+        return client.fetch(SinglePage.class, pageName)
+            .flatMap(page -> {
+                page.getSpec().setBaseSnapshot(contentWrapper.getSnapshotName());
+                page.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
+                if (Objects.equals(true, page.getSpec().getPublish())) {
+                    page.getSpec().setReleaseSnapshot(page.getSpec().getHeadSnapshot());
+                }
+                Condition condition = Condition.builder()
+                    .type(Post.PostPhase.DRAFT.name())
+                    .reason("DraftedSuccessfully")
+                    .message("Drafted page successfully")
+                    .status(ConditionStatus.TRUE)
+                    .lastTransitionTime(Instant.now())
+                    .build();
+                SinglePage.SinglePageStatus status = page.getStatusOrDefault();
+                status.getConditionsOrDefault().addAndEvictFIFO(condition);
+                status.setPhase(Post.PostPhase.DRAFT.name());
+                return client.update(page);
+            })
+            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                .filter(OptimisticLockingFailureException.class::isInstance)
+            );
     }
 
     @Override
     public Mono<SinglePage> update(SinglePageRequest pageRequest) {
         SinglePage page = pageRequest.page();
+        String headSnapshot = page.getSpec().getHeadSnapshot();
+        String releaseSnapshot = page.getSpec().getReleaseSnapshot();
+
+        // create new snapshot to update first
+        if (StringUtils.equals(headSnapshot, releaseSnapshot)) {
+            return contentService.draftContent(pageRequest.contentRequest(), headSnapshot)
+                .flatMap(contentWrapper -> {
+                    page.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
+                    return client.update(page);
+                });
+        }
         return contentService.updateContent(pageRequest.contentRequest())
             .flatMap(contentWrapper -> {
                 page.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
                 return client.update(page);
             })
             .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
-                .filter(throwable -> throwable instanceof OptimisticLockingFailureException))
-            .then(Mono.defer(() -> client.fetch(SinglePage.class, page.getMetadata().getName())));
-    }
-
-    @Override
-    public Mono<SinglePage> publish(String name) {
-        return client.fetch(SinglePage.class, name)
-            .filter(page -> Objects.equals(true, page.getSpec().getPublish()))
-            .flatMap(page -> {
-                final SinglePage oldPage = JsonUtils.deepCopy(page);
-                final SinglePage.SinglePageSpec spec = page.getSpec();
-                // if it's published state but releaseSnapshot is null, it means that need to
-                // publish headSnapshot
-                // if releaseSnapshot is draft and publish state is true, it means that need to
-                // publish releaseSnapshot
-                if (StringUtils.isBlank(spec.getHeadSnapshot())) {
-                    spec.setHeadSnapshot(spec.getBaseSnapshot());
-                }
-
-                if (StringUtils.isBlank(spec.getReleaseSnapshot())) {
-                    spec.setReleaseSnapshot(spec.getHeadSnapshot());
-                    // first-time to publish reset version to 0
-                    spec.setVersion(0);
-                }
-                return client.fetch(Snapshot.class, spec.getReleaseSnapshot())
-                    .flatMap(releasedSnapshot -> {
-                        Ref ref = Ref.of(page);
-                        // not published state, need to publish
-                        return contentService.publish(releasedSnapshot.getMetadata().getName(),
-                                ref)
-                            .flatMap(contentWrapper -> {
-                                appendPublishedCondition(page, Post.PostPhase.PUBLISHED);
-                                spec.setVersion(contentWrapper.getVersion());
-                                SinglePage.changePublishedState(page, true);
-                                if (spec.getPublishTime() == null) {
-                                    spec.setPublishTime(Instant.now());
-                                }
-                                if (!oldPage.equals(page)) {
-                                    return client.update(page);
-                                }
-                                return Mono.just(page);
-                            });
-                    })
-                    .switchIfEmpty(Mono.defer(() -> Mono.error(new NotFoundException(
-                        String.format("Snapshot [%s] not found", spec.getReleaseSnapshot()))))
-                    );
-            });
+                .filter(throwable -> throwable instanceof OptimisticLockingFailureException));
     }
 
     private Mono<String> getContextUsername() {
@@ -284,24 +284,5 @@ public class SinglePageServiceImpl implements SinglePageService {
             return false;
         }
         return right.stream().anyMatch(left::contains);
-    }
-
-    void appendPublishedCondition(SinglePage page, Post.PostPhase phase) {
-        Assert.notNull(page, "The singlePage must not be null.");
-        SinglePage.SinglePageStatus status = page.getStatusOrDefault();
-        status.setPhase(phase.name());
-        List<Condition> conditions = status.getConditionsOrDefault();
-        Condition condition = new Condition();
-        conditions.add(createCondition(phase));
-    }
-
-    Condition createCondition(Post.PostPhase phase) {
-        Condition condition = new Condition();
-        condition.setType(phase.name());
-        condition.setReason(phase.name());
-        condition.setMessage("");
-        condition.setStatus(ConditionStatus.TRUE);
-        condition.setLastTransitionTime(Instant.now());
-        return condition;
     }
 }

@@ -89,7 +89,6 @@ class SinglePageReconcilerTest {
         when(contentService.listSnapshots(any()))
             .thenReturn(Flux.just(snapshotV1, snapshotV2));
         when(externalUrlSupplier.get()).thenReturn(URI.create(""));
-        when(singlePageService.publish(eq(name))).thenReturn(Mono.empty());
 
         ArgumentCaptor<SinglePage> captor = ArgumentCaptor.forClass(SinglePage.class);
         singlePageReconciler.reconcile(new Reconciler.Request(name));
@@ -138,7 +137,6 @@ class SinglePageReconcilerTest {
 
         spec.setTitle("page-A");
         spec.setSlug("page-slug");
-        spec.setVersion(1);
         spec.setBaseSnapshot(snapshotV1().getMetadata().getName());
         spec.setHeadSnapshot("base-snapshot");
         spec.setReleaseSnapshot(null);

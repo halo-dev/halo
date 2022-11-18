@@ -27,6 +27,8 @@ public class SinglePage extends AbstractExtension {
     public static final String KIND = "SinglePage";
     public static final String DELETED_LABEL = "content.halo.run/deleted";
     public static final String PUBLISHED_LABEL = "content.halo.run/published";
+    public static final String LAST_RELEASED_SNAPSHOT_ANNO =
+        "content.halo.run/last-released-snapshot";
     public static final String OWNER_LABEL = "content.halo.run/owner";
     public static final String VISIBLE_LABEL = "content.halo.run/visible";
 
@@ -89,9 +91,6 @@ public class SinglePage extends AbstractExtension {
 
         @Schema(required = true, defaultValue = "PUBLIC")
         private Post.VisibleEnum visible;
-
-        @Schema(required = true, defaultValue = "1")
-        private Integer version;
 
         @Schema(required = true, defaultValue = "0")
         private Integer priority;

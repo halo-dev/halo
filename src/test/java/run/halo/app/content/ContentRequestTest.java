@@ -59,14 +59,13 @@ class ContentRequestTest {
                         },
                         "rawType": "MARKDOWN",
                         "rawPatch": "%s",
-                        "contentPatch": "%s",
-                        "displayVersion": "v1",
-                        "version": 1
+                        "contentPatch": "%s"
                     },
                     "apiVersion": "content.halo.run/v1alpha1",
                     "kind": "Snapshot",
                     "metadata": {
-                        "name": "7b149646-ac60-4a5c-98ee-78b2dd0631b2"
+                        "name": "7b149646-ac60-4a5c-98ee-78b2dd0631b2",
+                        "annotations": {}
                     }
                 }
                 """.formatted(expectedRawPatch, expectedContentPath),

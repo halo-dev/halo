@@ -17,6 +17,4 @@ public interface PostService {
     Mono<Post> draftPost(PostRequest postRequest);
 
     Mono<Post> updatePost(PostRequest postRequest);
-
-    Mono<Post> publishPost(String postName);
 }

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -21,7 +22,9 @@ import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.content.ContentRequest;
 import run.halo.app.content.ContentService;
+import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.Contributor;
 import run.halo.app.content.ListedPost;
 import run.halo.app.content.PostQuery;
@@ -32,7 +35,6 @@ import run.halo.app.content.Stats;
 import run.halo.app.core.extension.Category;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.Post;
-import run.halo.app.core.extension.Snapshot;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ListResult;
@@ -40,8 +42,6 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
-import run.halo.app.infra.exception.NotFoundException;
-import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
 
@@ -53,17 +53,11 @@ import run.halo.app.metrics.MeterUtils;
  */
 @Slf4j
 @Component
+@AllArgsConstructor
 public class PostServiceImpl implements PostService {
     private final ContentService contentService;
     private final ReactiveExtensionClient client;
     private final CounterService counterService;
-
-    public PostServiceImpl(ContentService contentService, ReactiveExtensionClient client,
-        CounterService counterService) {
-        this.contentService = contentService;
-        this.client = client;
-        this.counterService = counterService;
-    }
 
     @Override
     public Mono<ListResult<ListedPost>> listPost(PostQuery query) {
@@ -239,98 +233,84 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Mono<Post> draftPost(PostRequest postRequest) {
-        return contentService.draftContent(postRequest.contentRequest())
-            .flatMap(contentWrapper -> getContextUsername()
-                .flatMap(username -> {
+        return Mono.defer(
+                () -> {
                     Post post = postRequest.post();
-                    post.getSpec().setBaseSnapshot(contentWrapper.getSnapshotName());
-                    post.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
-                    post.getSpec().setOwner(username);
-                    appendPublishedCondition(post, Post.PostPhase.DRAFT);
-                    return client.create(post)
-                        .then(Mono.defer(() ->
-                            client.fetch(Post.class, postRequest.post().getMetadata().getName())));
-                }));
+                    return getContextUsername()
+                        .map(username -> {
+                            post.getSpec().setOwner(username);
+                            return post;
+                        })
+                        .defaultIfEmpty(post);
+                }
+            )
+            .flatMap(client::create)
+            .flatMap(post -> {
+                var contentRequest =
+                    new ContentRequest(Ref.of(post), post.getSpec().getHeadSnapshot(),
+                        postRequest.content().raw(), postRequest.content().content(),
+                        postRequest.content().rawType());
+                return contentService.draftContent(contentRequest)
+                    .flatMap(contentWrapper -> waitForPostToDraftConcludingWork(
+                        post.getMetadata().getName(),
+                        contentWrapper)
+                    );
+            })
+            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                .filter(OptimisticLockingFailureException.class::isInstance));
+    }
+
+    private Mono<Post> waitForPostToDraftConcludingWork(String postName,
+        ContentWrapper contentWrapper) {
+        return client.fetch(Post.class, postName)
+            .flatMap(post -> {
+                post.getSpec().setBaseSnapshot(contentWrapper.getSnapshotName());
+                post.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
+                if (Objects.equals(true, post.getSpec().getPublish())) {
+                    post.getSpec().setReleaseSnapshot(post.getSpec().getHeadSnapshot());
+                }
+                Condition condition = Condition.builder()
+                    .type(Post.PostPhase.DRAFT.name())
+                    .reason("DraftedSuccessfully")
+                    .message("Drafted post successfully.")
+                    .status(ConditionStatus.TRUE)
+                    .lastTransitionTime(Instant.now())
+                    .build();
+                Post.PostStatus status = post.getStatusOrDefault();
+                status.setPhase(Post.PostPhase.DRAFT.name());
+                status.getConditionsOrDefault().addAndEvictFIFO(condition);
+                return client.update(post);
+            })
+            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                .filter(OptimisticLockingFailureException.class::isInstance));
     }
 
     @Override
     public Mono<Post> updatePost(PostRequest postRequest) {
         Post post = postRequest.post();
+        String headSnapshot = post.getSpec().getHeadSnapshot();
+        String releaseSnapshot = post.getSpec().getReleaseSnapshot();
+
+        if (StringUtils.equals(releaseSnapshot, headSnapshot)) {
+            // create new snapshot to update first
+            return contentService.draftContent(postRequest.contentRequest(), headSnapshot)
+                .flatMap(contentWrapper -> {
+                    post.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
+                    return client.update(post);
+                });
+        }
         return contentService.updateContent(postRequest.contentRequest())
             .flatMap(contentWrapper -> {
                 post.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
                 return client.update(post);
             })
             .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
-                .filter(throwable -> throwable instanceof OptimisticLockingFailureException))
-            .then(Mono.defer(() -> client.fetch(Post.class, post.getMetadata().getName())));
+                .filter(throwable -> throwable instanceof OptimisticLockingFailureException));
     }
 
     private Mono<String> getContextUsername() {
         return ReactiveSecurityContextHolder.getContext()
             .map(SecurityContext::getAuthentication)
             .map(Principal::getName);
-    }
-
-    @Override
-    public Mono<Post> publishPost(String postName) {
-        return client.fetch(Post.class, postName)
-            .filter(post -> Objects.equals(true, post.getSpec().getPublish()))
-            .flatMap(post -> {
-                final Post oldPost = JsonUtils.deepCopy(post);
-                final Post.PostSpec postSpec = post.getSpec();
-                // if it's published state but releaseSnapshot is null, it means that need to
-                // publish headSnapshot
-                // if releaseSnapshot is draft and publish state is true, it means that need to
-                // publish releaseSnapshot
-                if (StringUtils.isBlank(postSpec.getHeadSnapshot())) {
-                    postSpec.setHeadSnapshot(postSpec.getBaseSnapshot());
-                }
-
-                if (StringUtils.isBlank(postSpec.getReleaseSnapshot())) {
-                    postSpec.setReleaseSnapshot(postSpec.getHeadSnapshot());
-                    postSpec.setVersion(0);
-                }
-                return client.fetch(Snapshot.class, postSpec.getReleaseSnapshot())
-                    .flatMap(releasedSnapshot -> {
-                        Ref ref = Ref.of(post);
-                        // not published state, need to publish
-                        return contentService.publish(releasedSnapshot.getMetadata().getName(),
-                                ref)
-                            .flatMap(contentWrapper -> {
-                                appendPublishedCondition(post, Post.PostPhase.PUBLISHED);
-                                postSpec.setVersion(contentWrapper.getVersion());
-                                Post.changePublishedState(post, true);
-                                if (postSpec.getPublishTime() == null) {
-                                    postSpec.setPublishTime(Instant.now());
-                                }
-                                if (!oldPost.equals(post)) {
-                                    return client.update(post);
-                                }
-                                return Mono.just(post);
-                            });
-                    })
-                    .switchIfEmpty(Mono.defer(() -> Mono.error(new NotFoundException(
-                        String.format("Snapshot [%s] not found", postSpec.getReleaseSnapshot()))))
-                    );
-            });
-    }
-
-    void appendPublishedCondition(Post post, Post.PostPhase phase) {
-        Assert.notNull(post, "The post must not be null.");
-        Post.PostStatus status = post.getStatusOrDefault();
-        status.setPhase(phase.name());
-        List<Condition> conditions = status.getConditionsOrDefault();
-        conditions.add(createCondition(phase));
-    }
-
-    Condition createCondition(Post.PostPhase phase) {
-        Condition condition = new Condition();
-        condition.setType(phase.name());
-        condition.setReason(phase.name());
-        condition.setMessage("");
-        condition.setStatus(ConditionStatus.TRUE);
-        condition.setLastTransitionTime(Instant.now());
-        return condition;
     }
 }

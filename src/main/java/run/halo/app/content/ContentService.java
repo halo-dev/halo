@@ -17,15 +17,13 @@ public interface ContentService {
 
     Mono<ContentWrapper> draftContent(ContentRequest content);
 
-    Mono<ContentWrapper> updateContent(ContentRequest content);
+    Mono<ContentWrapper> draftContent(ContentRequest content, String parentName);
 
-    Mono<ContentWrapper> publish(String headSnapshotName, Ref subjectRef);
+    Mono<ContentWrapper> updateContent(ContentRequest content);
 
     Mono<Snapshot> getBaseSnapshot(Ref subjectRef);
 
     Mono<Snapshot> latestSnapshotVersion(Ref subjectRef);
-
-    Mono<Snapshot> latestPublishedSnapshot(Ref subjectRef);
 
     Flux<Snapshot> listSnapshots(Ref subjectRef);
 }

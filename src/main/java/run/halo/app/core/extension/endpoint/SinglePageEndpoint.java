@@ -6,20 +6,27 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import java.time.Duration;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
+import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.thymeleaf.util.StringUtils;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 import run.halo.app.content.ListedSinglePage;
 import run.halo.app.content.SinglePageQuery;
 import run.halo.app.content.SinglePageRequest;
 import run.halo.app.content.SinglePageService;
+import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.SinglePage;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.QueryParamBuildUtil;
@@ -30,6 +37,7 @@ import run.halo.app.extension.router.QueryParamBuildUtil;
  * @author guqing
  * @since 2.0.0
  */
+@Slf4j
 @Component
 @AllArgsConstructor
 public class SinglePageEndpoint implements CustomEndpoint {
@@ -83,6 +91,24 @@ public class SinglePageEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(SinglePage.class))
             )
+            .PUT("singlepages/{name}/content", this::updateContent,
+                builder -> builder.operationId("UpdateSinglePageContent")
+                    .description("Update a single page's content.")
+                    .tag(tag)
+                    .parameter(parameterBuilder().name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class))
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(Builder.schemaBuilder()
+                                .implementation(SinglePageRequest.Content.class))
+                        ))
+                    .response(responseBuilder()
+                        .implementation(Post.class))
+            )
             .PUT("singlepages/{name}/publish", this::publishSinglePage,
                 builder -> builder.operationId("PublishSinglePage")
                     .description("Publish a single page.")
@@ -103,6 +129,18 @@ public class SinglePageEndpoint implements CustomEndpoint {
             .flatMap(singlePage -> ServerResponse.ok().bodyValue(singlePage));
     }
 
+    Mono<ServerResponse> updateContent(ServerRequest request) {
+        String pageName = request.pathVariable("name");
+        return request.bodyToMono(SinglePageRequest.Content.class)
+            .flatMap(content -> client.fetch(SinglePage.class, pageName)
+                .flatMap(page -> {
+                    SinglePageRequest pageRequest = new SinglePageRequest(page, content);
+                    return singlePageService.update(pageRequest);
+                })
+            )
+            .flatMap(post -> ServerResponse.ok().bodyValue(post));
+    }
+
     Mono<ServerResponse> updateSinglePage(ServerRequest request) {
         return request.bodyToMono(SinglePageRequest.class)
             .flatMap(singlePageService::update)
@@ -111,14 +149,41 @@ public class SinglePageEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> publishSinglePage(ServerRequest request) {
         String name = request.pathVariable("name");
+        boolean asyncPublish = request.queryParam("async")
+            .map(Boolean::parseBoolean)
+            .orElse(false);
         return client.fetch(SinglePage.class, name)
             .flatMap(singlePage -> {
                 SinglePage.SinglePageSpec spec = singlePage.getSpec();
                 spec.setPublish(true);
+                if (spec.getHeadSnapshot() == null) {
+                    spec.setHeadSnapshot(spec.getBaseSnapshot());
+                }
                 spec.setReleaseSnapshot(spec.getHeadSnapshot());
                 return client.update(singlePage);
             })
-            .flatMap(singlePage -> singlePageService.publish(singlePage.getMetadata().getName()))
+            .flatMap(post -> {
+                if (asyncPublish) {
+                    return Mono.just(post);
+                }
+                return client.fetch(SinglePage.class, name)
+                    .map(latest -> {
+                        String latestReleasedSnapshotName =
+                            ExtensionUtil.nullSafeAnnotations(latest)
+                                .get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
+                        if (StringUtils.equals(latestReleasedSnapshotName,
+                            latest.getSpec().getReleaseSnapshot())) {
+                            return latest;
+                        }
+                        throw new RetryException("SinglePage publishing status is not as expected");
+                    })
+                    .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
+                        .filter(t -> t instanceof RetryException))
+                    .doOnError(IllegalStateException.class, err -> {
+                        log.error("Failed to publish single page [{}]", name, err);
+                        throw new IllegalStateException("Publishing wait timeout.");
+                    });
+            })
             .flatMap(page -> ServerResponse.ok().bodyValue(page));
     }
 
