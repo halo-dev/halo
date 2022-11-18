@@ -8,6 +8,7 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.time.Duration;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.context.ApplicationEventPublisher;
@@ -39,6 +40,7 @@ import run.halo.app.extension.router.QueryParamBuildUtil;
  * @author guqing
  * @since 2.0.0
  */
+@Slf4j
 @Component
 @AllArgsConstructor
 public class PostEndpoint implements CustomEndpoint {
@@ -172,6 +174,9 @@ public class PostEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> publishPost(ServerRequest request) {
         var name = request.pathVariable("name");
+        boolean asyncPublish = request.queryParam("async")
+            .map(Boolean::parseBoolean)
+            .orElse(false);
         return client.get(Post.class, name)
             .doOnNext(post -> {
                 var spec = post.getSpec();
@@ -186,20 +191,28 @@ public class PostEndpoint implements CustomEndpoint {
             .flatMap(client::update)
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 .filter(t -> t instanceof OptimisticLockingFailureException))
-            .flatMap(post -> client.fetch(Post.class, name)
-                .map(latest -> {
-                    String latestReleasedSnapshotName =
-                        ExtensionUtil.nullSafeAnnotations(latest)
-                            .get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
-                    if (StringUtils.equals(latestReleasedSnapshotName,
-                        latest.getSpec().getReleaseSnapshot())) {
-                        return latest;
-                    }
-                    throw new RetryException("Post publishing status is not as expected");
-                })
-                .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
-                    .filter(t -> t instanceof RetryException))
-            )
+            .flatMap(post -> {
+                if (asyncPublish) {
+                    return Mono.just(post);
+                }
+                return client.fetch(Post.class, name)
+                    .map(latest -> {
+                        String latestReleasedSnapshotName =
+                            ExtensionUtil.nullSafeAnnotations(latest)
+                                .get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
+                        if (StringUtils.equals(latestReleasedSnapshotName,
+                            latest.getSpec().getReleaseSnapshot())) {
+                            return latest;
+                        }
+                        throw new RetryException("Post publishing status is not as expected");
+                    })
+                    .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
+                        .filter(t -> t instanceof RetryException))
+                    .doOnError(IllegalStateException.class, err -> {
+                        log.error("Failed to publish post [{}]", name, err);
+                        throw new IllegalStateException("Publishing wait timeout.");
+                    });
+            })
             .flatMap(publishResult -> ServerResponse.ok().bodyValue(publishResult));
     }
 

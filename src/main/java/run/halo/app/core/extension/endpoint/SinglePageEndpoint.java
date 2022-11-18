@@ -8,6 +8,7 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.time.Duration;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
@@ -36,6 +37,7 @@ import run.halo.app.extension.router.QueryParamBuildUtil;
  * @author guqing
  * @since 2.0.0
  */
+@Slf4j
 @Component
 @AllArgsConstructor
 public class SinglePageEndpoint implements CustomEndpoint {
@@ -147,6 +149,9 @@ public class SinglePageEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> publishSinglePage(ServerRequest request) {
         String name = request.pathVariable("name");
+        boolean asyncPublish = request.queryParam("async")
+            .map(Boolean::parseBoolean)
+            .orElse(false);
         return client.fetch(SinglePage.class, name)
             .flatMap(singlePage -> {
                 SinglePage.SinglePageSpec spec = singlePage.getSpec();
@@ -157,20 +162,28 @@ public class SinglePageEndpoint implements CustomEndpoint {
                 spec.setReleaseSnapshot(spec.getHeadSnapshot());
                 return client.update(singlePage);
             })
-            .flatMap(post -> client.fetch(SinglePage.class, name)
-                .map(latest -> {
-                    String latestReleasedSnapshotName =
-                        ExtensionUtil.nullSafeAnnotations(latest)
-                            .get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
-                    if (StringUtils.equals(latestReleasedSnapshotName,
-                        latest.getSpec().getReleaseSnapshot())) {
-                        return latest;
-                    }
-                    throw new RetryException("SinglePage publishing status is not as expected");
-                })
-                .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
-                    .filter(t -> t instanceof RetryException))
-            )
+            .flatMap(post -> {
+                if (asyncPublish) {
+                    return Mono.just(post);
+                }
+                return client.fetch(SinglePage.class, name)
+                    .map(latest -> {
+                        String latestReleasedSnapshotName =
+                            ExtensionUtil.nullSafeAnnotations(latest)
+                                .get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
+                        if (StringUtils.equals(latestReleasedSnapshotName,
+                            latest.getSpec().getReleaseSnapshot())) {
+                            return latest;
+                        }
+                        throw new RetryException("SinglePage publishing status is not as expected");
+                    })
+                    .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
+                        .filter(t -> t instanceof RetryException))
+                    .doOnError(IllegalStateException.class, err -> {
+                        log.error("Failed to publish single page [{}]", name, err);
+                        throw new IllegalStateException("Publishing wait timeout.");
+                    });
+            })
             .flatMap(page -> ServerResponse.ok().bodyValue(page));
     }
 
