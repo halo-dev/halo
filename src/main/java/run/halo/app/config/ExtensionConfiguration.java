@@ -94,7 +94,7 @@ public class ExtensionConfiguration {
 
         @Bean
         Controller userController(ExtensionClient client) {
-            return new ControllerBuilder("user-controller", client)
+            return new ControllerBuilder("user", client)
                 .reconciler(new UserReconciler(client))
                 .extension(new User())
                 .build();
@@ -102,7 +102,7 @@ public class ExtensionConfiguration {
 
         @Bean
         Controller roleController(ExtensionClient client, RoleService roleService) {
-            return new ControllerBuilder("role-controller", client)
+            return new ControllerBuilder("role", client)
                 .reconciler(new RoleReconciler(client, roleService))
                 .extension(new Role())
                 .build();
@@ -110,7 +110,7 @@ public class ExtensionConfiguration {
 
         @Bean
         Controller roleBindingController(ExtensionClient client) {
-            return new ControllerBuilder("role-binding-controller", client)
+            return new ControllerBuilder("role-binding", client)
                 .reconciler(new RoleBindingReconciler(client))
                 .extension(new RoleBinding())
                 .build();
@@ -118,7 +118,7 @@ public class ExtensionConfiguration {
 
         @Bean
         Controller pluginController(ExtensionClient client, HaloPluginManager haloPluginManager) {
-            return new ControllerBuilder("plugin-controller", client)
+            return new ControllerBuilder("plugin", client)
                 .reconciler(new PluginReconciler(client, haloPluginManager))
                 .extension(new Plugin())
                 .build();
@@ -126,7 +126,7 @@ public class ExtensionConfiguration {
 
         @Bean
         Controller menuController(ExtensionClient client) {
-            return new ControllerBuilder("menu-controller", client)
+            return new ControllerBuilder("menu", client)
                 .reconciler(new MenuReconciler(client))
                 .extension(new Menu())
                 .build();
@@ -134,7 +134,7 @@ public class ExtensionConfiguration {
 
         @Bean
         Controller menuItemController(ExtensionClient client) {
-            return new ControllerBuilder("menu-item-controller", client)
+            return new ControllerBuilder("menu-item", client)
                 .reconciler(new MenuItemReconciler(client))
                 .extension(new MenuItem())
                 .build();
@@ -142,7 +142,7 @@ public class ExtensionConfiguration {
 
         @Bean
         Controller themeController(ExtensionClient client, HaloProperties haloProperties) {
-            return new ControllerBuilder("theme-controller", client)
+            return new ControllerBuilder("theme", client)
                 .reconciler(new ThemeReconciler(client, haloProperties))
                 .extension(new Theme())
                 .build();
@@ -152,18 +152,20 @@ public class ExtensionConfiguration {
         Controller postController(ExtensionClient client, ContentService contentService,
             PostPermalinkPolicy postPermalinkPolicy, CounterService counterService,
             PostService postService) {
-            return new ControllerBuilder("post-controller", client)
+            return new ControllerBuilder("post", client)
                 .reconciler(new PostReconciler(client, contentService, postService,
                     postPermalinkPolicy,
                     counterService))
                 .extension(new Post())
+                // TODO Make it configurable
+                .workerCount(10)
                 .build();
         }
 
         @Bean
         Controller categoryController(ExtensionClient client,
             CategoryPermalinkPolicy categoryPermalinkPolicy) {
-            return new ControllerBuilder("category-controller", client)
+            return new ControllerBuilder("category", client)
                 .reconciler(new CategoryReconciler(client, categoryPermalinkPolicy))
                 .extension(new Category())
                 .build();
@@ -171,7 +173,7 @@ public class ExtensionConfiguration {
 
         @Bean
         Controller tagController(ExtensionClient client, TagPermalinkPolicy tagPermalinkPolicy) {
-            return new ControllerBuilder("tag-controller", client)
+            return new ControllerBuilder("tag", client)
                 .reconciler(new TagReconciler(client, tagPermalinkPolicy))
                 .extension(new Tag())
                 .build();
@@ -181,7 +183,7 @@ public class ExtensionConfiguration {
         Controller systemSettingController(ExtensionClient client,
             SystemConfigurableEnvironmentFetcher environmentFetcher,
             ApplicationContext applicationContext) {
-            return new ControllerBuilder("system-setting-controller", client)
+            return new ControllerBuilder("system-setting", client)
                 .reconciler(new SystemSettingReconciler(client, environmentFetcher,
                     applicationContext))
                 .extension(new ConfigMap())
@@ -192,7 +194,7 @@ public class ExtensionConfiguration {
         Controller attachmentController(ExtensionClient client,
             ExtensionComponentsFinder extensionComponentsFinder,
             ExternalUrlSupplier externalUrl) {
-            return new ControllerBuilder("attachment-controller", client)
+            return new ControllerBuilder("attachment", client)
                 .reconciler(
                     new AttachmentReconciler(client, extensionComponentsFinder, externalUrl))
                 .extension(new Attachment())
@@ -203,7 +205,7 @@ public class ExtensionConfiguration {
         Controller singlePageController(ExtensionClient client, ContentService contentService,
             ApplicationContext applicationContext, CounterService counterService,
             SinglePageService singlePageService, ExternalUrlSupplier externalUrlSupplier) {
-            return new ControllerBuilder("single-page-controller", client)
+            return new ControllerBuilder("single-page", client)
                 .reconciler(new SinglePageReconciler(client, contentService,
                     applicationContext, singlePageService, counterService, externalUrlSupplier)
                 )
@@ -214,7 +216,9 @@ public class ExtensionConfiguration {
         @Bean
         Controller commentController(ExtensionClient client, MeterRegistry meterRegistry,
             SchemeManager schemeManager) {
-            return new ControllerBuilder("comment-controller", client)
+            return new ControllerBuilder("comment", client)
+                // TODO Make it configurable
+                .workerCount(10)
                 .reconciler(new CommentReconciler(client, meterRegistry, schemeManager))
                 .extension(new Comment())
                 .build();
@@ -223,7 +227,7 @@ public class ExtensionConfiguration {
         @Bean
         Controller reverseProxyController(ExtensionClient client,
             ReverseProxyRouterFunctionRegistry reverseProxyRouterFunctionRegistry) {
-            return new ControllerBuilder("reverse-proxy-controller", client)
+            return new ControllerBuilder("reverse-proxy", client)
                 .reconciler(new ReverseProxyReconciler(client, reverseProxyRouterFunctionRegistry))
                 .extension(new ReverseProxy())
                 .build();
