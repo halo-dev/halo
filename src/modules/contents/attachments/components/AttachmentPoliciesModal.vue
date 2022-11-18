@@ -1,11 +1,14 @@
 <script lang="ts" setup>
 import {
   IconAddCircle,
-  IconMore,
   VButton,
   VModal,
   VSpace,
   VEmpty,
+  Dialog,
+  VEntity,
+  VEntityField,
+  VStatusDot,
 } from "@halo-dev/components";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
 import { ref, watch } from "vue";
@@ -15,6 +18,7 @@ import {
   useFetchAttachmentPolicy,
   useFetchAttachmentPolicyTemplate,
 } from "../composables/use-attachment-policy";
+import { apiClient } from "@/utils/api-client";
 
 const props = withDefaults(
   defineProps<{
@@ -71,6 +75,31 @@ const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
     },
   };
   policyEditingModal.value = true;
+};
+
+const handleDelete = async (policy: Policy) => {
+  const { data } = await apiClient.attachment.searchAttachments({
+    policy: policy.metadata.name,
+  });
+
+  if (data.total > 0) {
+    Dialog.warning({
+      title: "删除失败",
+      description: "该策略下存在附件，无法删除。",
+    });
+    return;
+  }
+
+  Dialog.warning({
+    title: "确定删除该策略吗？",
+    description: "当前策略下没有已上传的附件。",
+    onConfirm: async () => {
+      await apiClient.extension.storage.policy.deletestorageHaloRunV1alpha1Policy(
+        { name: policy.metadata.name }
+      );
+      handleFetchPolicies();
+    },
+  });
 };
 
 const onEditingModalClose = () => {
@@ -162,57 +191,46 @@ watch(
       role="list"
     >
       <li v-for="(policy, index) in policies" :key="index">
-        <div
-          class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
-        >
-          <div class="relative flex flex-row items-center">
-            <div class="flex-1">
-              <div class="flex flex-col sm:flex-row">
-                <span
-                  class="mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2"
-                >
-                  {{ policy.spec.displayName }}
-                </span>
-              </div>
-              <div class="mt-1 flex">
-                <span class="text-xs text-gray-500">
-                  {{ policy.spec.templateRef?.name }}
-                </span>
-              </div>
-            </div>
-            <div class="flex">
-              <div
-                class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
-              >
-                <time class="text-sm tabular-nums text-gray-500">
+        <VEntity>
+          <template #start>
+            <VEntityField
+              :title="policy.spec.displayName"
+              :description="policy.spec.templateRef?.name"
+            ></VEntityField>
+          </template>
+          <template #end>
+            <VEntityField v-if="policy.metadata.deletionTimestamp">
+              <template #description>
+                <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+              </template>
+            </VEntityField>
+            <VEntityField>
+              <template #description>
+                <span class="truncate text-xs tabular-nums text-gray-500">
                   {{ formatDatetime(policy.metadata.creationTimestamp) }}
-                </time>
-                <span class="cursor-pointer">
-                  <FloatingDropdown>
-                    <IconMore />
-                    <template #popper>
-                      <div class="w-48 p-2">
-                        <VSpace class="w-full" direction="column">
-                          <VButton
-                            v-close-popper
-                            block
-                            type="secondary"
-                            @click="handleOpenEditingModal(policy)"
-                          >
-                            编辑
-                          </VButton>
-                          <VButton v-close-popper block type="danger">
-                            删除
-                          </VButton>
-                        </VSpace>
-                      </div>
-                    </template>
-                  </FloatingDropdown>
                 </span>
-              </div>
-            </div>
-          </div>
-        </div>
+              </template>
+            </VEntityField>
+          </template>
+          <template #dropdownItems>
+            <VButton
+              v-close-popper
+              block
+              type="secondary"
+              @click="handleOpenEditingModal(policy)"
+            >
+              编辑
+            </VButton>
+            <VButton
+              v-close-popper
+              block
+              type="danger"
+              @click="handleDelete(policy)"
+            >
+              删除
+            </VButton>
+          </template>
+        </VEntity>
       </li>
     </ul>
     <template #footer>

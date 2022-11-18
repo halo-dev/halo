@@ -1,9 +1,17 @@
 <script lang="ts" setup>
 // core libs
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 
 // components
-import { IconAddCircle, IconMore, VButton, VSpace } from "@halo-dev/components";
+import {
+  Dialog,
+  IconAddCircle,
+  IconMore,
+  Toast,
+  VButton,
+  VSpace,
+  VStatusDot,
+} from "@halo-dev/components";
 import AttachmentGroupEditingModal from "./AttachmentGroupEditingModal.vue";
 
 // types
@@ -11,6 +19,7 @@ import type { Group } from "@halo-dev/api-client";
 
 import { useRouteQuery } from "@vueuse/router";
 import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
+import { apiClient } from "@/utils/api-client";
 
 const props = withDefaults(
   defineProps<{
@@ -27,6 +36,7 @@ const emit = defineEmits<{
   (event: "update:selectedGroup", group: Group): void;
   (event: "select", group: Group): void;
   (event: "update"): void;
+  (event: "reload-attachments"): void;
 }>();
 
 const defaultGroups: Group[] = [
@@ -79,6 +89,93 @@ const onEditingModalClose = () => {
   handleFetchGroups();
 };
 
+const handleDelete = (group: Group) => {
+  Dialog.warning({
+    title: "是否确认删除该分组？",
+    description:
+      "此操作将删除分组，并将分组下的附件移动至未分组，此操作无法恢复。",
+    confirmType: "danger",
+    onConfirm: async () => {
+      // TODO: 后续将修改为在后端进行批量操作处理
+      const { data } = await apiClient.attachment.searchAttachments({
+        group: group.metadata.name,
+        page: 0,
+        size: 0,
+      });
+
+      await apiClient.extension.storage.group.deletestorageHaloRunV1alpha1Group(
+        { name: group.metadata.name }
+      );
+
+      // move attachments to none group
+      const moveToUnGroupRequests = data.items.map((attachment) => {
+        attachment.spec.groupRef = undefined;
+        return apiClient.extension.storage.attachment.updatestorageHaloRunV1alpha1Attachment(
+          {
+            name: attachment.metadata.name,
+            attachment: attachment,
+          }
+        );
+      });
+
+      await Promise.all(moveToUnGroupRequests);
+
+      handleFetchGroups();
+      emit("reload-attachments");
+      emit("update");
+
+      Toast.success(`删除成功，${data.total} 个附件已移动至未分组`);
+    },
+  });
+};
+
+const handleDeleteWithAttachments = (group: Group) => {
+  Dialog.warning({
+    title: "是否确认删除该分组？",
+    description: "此操作将删除分组以及分组下的所有附件，此操作无法恢复。",
+    confirmType: "danger",
+    onConfirm: async () => {
+      // TODO: 后续将修改为在后端进行批量操作处理
+      const { data } = await apiClient.attachment.searchAttachments({
+        group: group.metadata.name,
+        page: 0,
+        size: 0,
+      });
+
+      await apiClient.extension.storage.group.deletestorageHaloRunV1alpha1Group(
+        { name: group.metadata.name }
+      );
+
+      const deleteAttachmentRequests = data.items.map((attachment) => {
+        return apiClient.extension.storage.attachment.deletestorageHaloRunV1alpha1Attachment(
+          { name: attachment.metadata.name }
+        );
+      });
+
+      await Promise.all(deleteAttachmentRequests);
+
+      handleFetchGroups();
+      emit("reload-attachments");
+      emit("update");
+
+      Toast.success(`删除成功，${data.total} 个附件已被同时删除`);
+    },
+  });
+};
+
+watch(
+  () => groups.value.length,
+  () => {
+    const groupIndex = groups.value.findIndex(
+      (group) => group.metadata.name === routeQuery.value
+    );
+
+    if (groupIndex < 0) {
+      handleSelectGroup(defaultGroups[0]);
+    }
+  }
+);
+
 onMounted(async () => {
   await handleFetchGroups();
 
@@ -128,10 +225,16 @@ onMounted(async () => {
       class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
       @click="handleSelectGroup(group)"
     >
-      <div class="flex flex-1 items-center truncate">
+      <div class="flex flex-1 items-center gap-2 truncate">
         <span class="truncate text-sm">
           {{ group.spec.displayName }}
         </span>
+        <VStatusDot
+          v-if="group.metadata.deletionTimestamp"
+          v-tooltip="`删除中`"
+          state="warning"
+          animate
+        />
       </div>
       <FloatingDropdown
         v-if="!readonly"
@@ -149,7 +252,37 @@ onMounted(async () => {
               >
                 重命名
               </VButton>
-              <VButton v-close-popper block type="danger"> 删除</VButton>
+              <FloatingDropdown
+                class="w-full"
+                placement="right"
+                :triggers="['click']"
+              >
+                <VButton block type="danger">删除</VButton>
+                <template #popper>
+                  <div class="w-52 p-2">
+                    <VSpace class="w-full" direction="column">
+                      <VButton
+                        v-close-popper.all
+                        block
+                        type="danger"
+                        size="sm"
+                        @click="handleDelete(group)"
+                      >
+                        删除并将附件移动至未分组
+                      </VButton>
+                      <VButton
+                        v-close-popper.all
+                        block
+                        type="danger"
+                        size="sm"
+                        @click="handleDeleteWithAttachments(group)"
+                      >
+                        删除并同时删除附件
+                      </VButton>
+                    </VSpace>
+                  </div>
+                </template>
+              </FloatingDropdown>
             </VSpace>
           </div>
         </template>

@@ -1,4 +1,4 @@
-import { onMounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import type { Ref } from "vue";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
@@ -22,13 +22,26 @@ export function useFetchAttachmentPolicy(options?: {
 
   const policies = ref<Policy[]>([] as Policy[]);
   const loading = ref<boolean>(false);
+  const refreshInterval = ref();
 
   const handleFetchPolicies = async () => {
     try {
+      clearInterval(refreshInterval.value);
+
       loading.value = true;
       const { data } =
         await apiClient.extension.storage.policy.liststorageHaloRunV1alpha1Policy();
       policies.value = data.items;
+
+      const deletedPolicies = policies.value.filter(
+        (policy) => !!policy.metadata.deletionTimestamp
+      );
+
+      if (deletedPolicies.length) {
+        refreshInterval.value = setInterval(() => {
+          handleFetchPolicies();
+        }, 1000);
+      }
     } catch (e) {
       console.error("Failed to fetch attachment policies", e);
     } finally {
@@ -38,6 +51,10 @@ export function useFetchAttachmentPolicy(options?: {
 
   onMounted(() => {
     fetchOnMounted && handleFetchPolicies();
+  });
+
+  onUnmounted(() => {
+    clearInterval(refreshInterval.value);
   });
 
   return {

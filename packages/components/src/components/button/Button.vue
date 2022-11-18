@@ -137,7 +137,7 @@ function handleClick() {
 }
 
 .btn-danger {
-  background: #d71d1d;
+  background-color: #d71d1d !important;
   @apply text-white;
 }
 
