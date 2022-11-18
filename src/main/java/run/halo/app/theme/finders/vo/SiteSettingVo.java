@@ -1,8 +1,10 @@
 package run.halo.app.theme.finders.vo;
 
+import java.net.URI;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Value;
+import lombok.With;
 import org.springframework.util.Assert;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.infra.SystemSetting;
@@ -19,6 +21,9 @@ import run.halo.app.infra.utils.JsonUtils;
 public class SiteSettingVo {
 
     String title;
+
+    @With
+    URI url;
 
     String subtitle;
 
