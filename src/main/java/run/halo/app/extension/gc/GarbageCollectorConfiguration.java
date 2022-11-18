@@ -15,7 +15,6 @@ import run.halo.app.extension.store.ExtensionStoreClient;
 @Configuration(proxyBeanMethods = false)
 public class GarbageCollectorConfiguration {
 
-
     @Bean
     Controller garbageCollector(ExtensionClient client,
         ExtensionStoreClient storeClient,
@@ -30,7 +29,8 @@ public class GarbageCollectorConfiguration {
             queue,
             synchronizer,
             Duration.ofMillis(500),
-            Duration.ofSeconds(1000)
-        );
+            Duration.ofSeconds(1000),
+            // TODO Make it configurable
+            10);
     }
 }

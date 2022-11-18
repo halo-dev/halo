@@ -35,6 +35,8 @@ public class ControllerBuilder {
 
     private boolean syncAllOnStart = true;
 
+    private int workerCount = 1;
+
     public ControllerBuilder(String name, ExtensionClient client) {
         Assert.hasText(name, "Extension name is required");
         Assert.notNull(client, "Extension client must not be null");
@@ -88,6 +90,11 @@ public class ControllerBuilder {
         return this;
     }
 
+    public ControllerBuilder workerCount(int workerCount) {
+        this.workerCount = workerCount;
+        return this;
+    }
+
     public Controller build() {
         if (nowSupplier == null) {
             nowSupplier = Instant::now;
@@ -116,6 +123,7 @@ public class ControllerBuilder {
             extension,
             watcher,
             predicates.onAddPredicate());
-        return new DefaultController<>(name, reconciler, queue, synchronizer, minDelay, maxDelay);
+        return new DefaultController<>(name, reconciler, queue, synchronizer, minDelay, maxDelay,
+            workerCount);
     }
 }
