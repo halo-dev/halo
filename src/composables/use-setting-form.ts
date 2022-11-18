@@ -133,14 +133,19 @@ export function useSettingForm(
       });
 
       if (!configMap.value.metadata.creationTimestamp) {
-        await apiClient.extension.configMap.createv1alpha1ConfigMap({
-          configMap: configMap.value,
-        });
+        const { data } =
+          await apiClient.extension.configMap.createv1alpha1ConfigMap({
+            configMap: configMap.value,
+          });
+
+        configMapName.value = data.metadata.name;
       } else {
-        await apiClient.extension.configMap.updatev1alpha1ConfigMap({
-          configMap: configMap.value,
-          name: configMap.value.metadata.name,
-        });
+        const { data } =
+          await apiClient.extension.configMap.updatev1alpha1ConfigMap({
+            configMap: configMap.value,
+            name: configMap.value.metadata.name,
+          });
+        configMapName.value = data.metadata.name;
       }
     } catch (e) {
       console.error("Failed to save configMap", e);

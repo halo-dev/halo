@@ -28,7 +28,6 @@ importers:
       '@types/node': ^18.11.9
       '@types/qs': ^6.9.7
       '@types/randomstring': ^1.1.8
-      '@types/uuid': ^8.3.4
       '@uppy/core': ^3.0.4
       '@uppy/dashboard': ^3.2.0
       '@uppy/drag-drop': ^3.0.1
@@ -83,7 +82,6 @@ importers:
       tailwindcss-themer: ^2.0.2
       typescript: ~4.7.4
       unplugin-icons: ^0.14.13
-      uuid: ^9.0.0
       vite: ^3.2.3
       vite-compression-plugin: ^0.0.4
       vite-plugin-externals: ^0.5.1
@@ -138,7 +136,6 @@ importers:
       pinia: 2.0.23_e7lp6ggkpgyi5vqd44m2kxvk6i
       pretty-bytes: 6.0.0
       qs: 6.11.0
-      uuid: 9.0.0
       vue: 3.2.45
       vue-grid-layout: 3.0.0-beta1
       vue-router: 4.1.6_vue@3.2.45
@@ -157,7 +154,6 @@ importers:
       '@types/node': 18.11.9
       '@types/qs': 6.9.7
       '@types/randomstring': 1.1.8
-      '@types/uuid': 8.3.4
       '@vitejs/plugin-vue': 3.2.0_vite@3.2.4+vue@3.2.45
       '@vitejs/plugin-vue-jsx': 2.1.1_vite@3.2.4+vue@3.2.45
       '@vitest/ui': 0.25.2
@@ -3228,10 +3224,6 @@ packages:
   /@types/unist/2.0.6:
     resolution: {integrity: sha512-PBjIUxZHOuj0R15/xuwJYjFi+KZdNFrehocChv4g5hu6aFroHue8m0lBP0POdK2nKzbw0cgV1mws8+V/JAcEkQ==}
     dev: false
-
-  /@types/uuid/8.3.4:
-    resolution: {integrity: sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==}
-    dev: true
 
   /@types/web-bluetooth/0.0.16:
     resolution: {integrity: sha512-oh8q2Zc32S6gd/j50GowEjKLoOVOwHP/bWVjKJInBwQqdOYMdPrf1oVlelTlyfFK3CKxL1uahMDAr+vy8T7yMQ==}
@@ -9042,11 +9034,6 @@ packages:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
     hasBin: true
     dev: true
-
-  /uuid/9.0.0:
-    resolution: {integrity: sha512-MXcSTerfPa4uqyzStbRoTgt5XIe3x5+42+q1sDuy3R5MDk66URdLMOZe5aPX/SQd+kuYAh0FdP/pO28IkQyTeg==}
-    hasBin: true
-    dev: false
 
   /v8-to-istanbul/9.0.1:
     resolution: {integrity: sha512-74Y4LqY74kLE6IFyIjPtkSTWzUZmj8tdHT9Ii/26dvQ6K9Dl2NbEfj0XgU2sHCtKgt5VupqhlO/5aWuqS+IY1w==}

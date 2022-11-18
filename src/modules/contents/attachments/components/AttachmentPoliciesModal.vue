@@ -10,7 +10,6 @@ import {
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
 import { ref, watch } from "vue";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
-import { v4 as uuid } from "uuid";
 import { formatDatetime } from "@/utils/date";
 import {
   useFetchAttachmentPolicy,
@@ -61,13 +60,14 @@ const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
         name: policyTemplate.metadata.name,
       },
       configMapRef: {
-        name: uuid(),
+        name: "",
       },
     },
     apiVersion: "storage.halo.run/v1alpha1",
     kind: "Policy",
     metadata: {
-      name: uuid(),
+      name: "",
+      generateName: "attachment-policy-",
     },
   };
   policyEditingModal.value = true;
@@ -221,6 +221,7 @@ watch(
   </VModal>
 
   <AttachmentPolicyEditingModal
+    v-if="visible"
     v-model:visible="policyEditingModal"
     :policy="selectedPolicy"
     @close="onEditingModalClose"

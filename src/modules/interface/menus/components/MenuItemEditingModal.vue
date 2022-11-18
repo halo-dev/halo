@@ -3,7 +3,6 @@ import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { computed, ref, watch } from "vue";
 import type { Menu, MenuItem } from "@halo-dev/api-client";
-import { v4 as uuid } from "uuid";
 import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
@@ -40,7 +39,8 @@ const initialFormState: MenuItem = {
   apiVersion: "v1alpha1",
   kind: "MenuItem",
   metadata: {
-    name: uuid(),
+    name: "",
+    generateName: "menu-item-",
   },
 };
 
@@ -122,7 +122,6 @@ const onVisibleChange = (visible: boolean) => {
 
 const handleResetForm = () => {
   formState.value = cloneDeep(initialFormState);
-  formState.value.metadata.name = uuid();
   selectedMenuItemSource.value = menuItemSources[0].value;
   selectedRef.value = "";
   selectedParentMenuItem.value = "";

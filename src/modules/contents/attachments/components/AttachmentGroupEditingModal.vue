@@ -2,7 +2,6 @@
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import type { Group } from "@halo-dev/api-client";
-import { v4 as uuid } from "uuid";
 import { computed, ref, watch } from "vue";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
@@ -32,7 +31,8 @@ const initialFormState: Group = {
   apiVersion: "storage.halo.run/v1alpha1",
   kind: "Group",
   metadata: {
-    name: uuid(),
+    name: "",
+    generateName: "attachment-group-",
   },
 };
 
@@ -81,7 +81,6 @@ const onVisibleChange = (visible: boolean) => {
 
 const handleResetForm = () => {
   formState.value = cloneDeep(initialFormState);
-  formState.value.metadata.name = uuid();
   reset("attachment-group-form");
 };
 

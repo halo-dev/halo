@@ -8,7 +8,6 @@ import {
   useFetchAttachmentPolicyTemplate,
 } from "../composables/use-attachment-policy";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
-import { v4 as uuid } from "uuid";
 
 const props = withDefaults(
   defineProps<{
@@ -33,6 +32,7 @@ const { policyTemplates, handleFetchPolicyTemplates } =
   useFetchAttachmentPolicyTemplate();
 
 const selectedPolicy = ref<Policy>();
+const policyToCreate = ref<Policy>();
 const uploadVisible = ref(false);
 const policyEditingModal = ref(false);
 
@@ -50,20 +50,21 @@ watchEffect(() => {
 });
 
 const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
-  selectedPolicy.value = {
+  policyToCreate.value = {
     spec: {
       displayName: "",
       templateRef: {
         name: policyTemplate.metadata.name,
       },
       configMapRef: {
-        name: uuid(),
+        name: "",
       },
     },
     apiVersion: "storage.halo.run/v1alpha1",
     kind: "Policy",
     metadata: {
-      name: uuid(),
+      name: "",
+      generateName: "attachment-policy-",
     },
   };
   policyEditingModal.value = true;
@@ -71,7 +72,7 @@ const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
 
 const onEditingModalClose = async () => {
   await handleFetchPolicies();
-  selectedPolicy.value = policies.value[0];
+  policyToCreate.value = policies.value[0];
 };
 
 const onVisibleChange = (visible: boolean) => {
@@ -181,8 +182,9 @@ watch(
   </VModal>
 
   <AttachmentPolicyEditingModal
+    v-if="visible"
     v-model:visible="policyEditingModal"
-    :policy="selectedPolicy"
+    :policy="policyToCreate"
     @close="onEditingModalClose"
   />
 </template>

@@ -15,6 +15,7 @@ const initialFormState: Role = {
   kind: "Role",
   metadata: {
     name: "",
+    generateName: "role-",
     labels: {},
     annotations: {
       [rbacAnnotations.DEPENDENCIES]: "",

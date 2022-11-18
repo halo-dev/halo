@@ -10,7 +10,6 @@ import {
 } from "@/modules/system/roles/composables/use-role";
 import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
-import { v4 as uuid } from "uuid";
 import { setFocus } from "@/formkit/utils/focus";
 
 const props = withDefaults(
@@ -101,7 +100,6 @@ const onVisibleChange = (visible: boolean) => {
 
 const handleResetForm = () => {
   formState.value = cloneDeep(initialFormState);
-  formState.value.metadata.name = uuid();
   reset("role-form");
 };
 </script>
@@ -130,15 +128,6 @@ const handleResetForm = () => {
             "
             label="名称"
             type="text"
-            validation="required"
-          ></FormKit>
-          <FormKit
-            v-model="formState.metadata.name"
-            help="角色别名，用于区分角色，不能重复，创建之后不能修改"
-            label="别名"
-            type="text"
-            name="name"
-            :disabled="isUpdateMode"
             validation="required"
           ></FormKit>
         </FormKit>

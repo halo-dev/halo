@@ -16,8 +16,8 @@ import { computed, onMounted, ref } from "vue";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
-import { v4 as uuid } from "uuid";
 import { useRouter } from "vue-router";
+import { randomUUID } from "@/utils/id";
 
 const router = useRouter();
 
@@ -47,7 +47,7 @@ const initialFormState: PostRequest = {
     apiVersion: "content.halo.run/v1alpha1",
     kind: "Post",
     metadata: {
-      name: uuid(),
+      name: randomUUID(),
     },
   },
   content: {
@@ -80,7 +80,7 @@ const handleSave = async () => {
     }
 
     if (!formState.value.post.spec.slug) {
-      formState.value.post.spec.slug = uuid();
+      formState.value.post.spec.slug = new Date().getTime().toString();
     }
 
     if (isUpdateMode.value) {

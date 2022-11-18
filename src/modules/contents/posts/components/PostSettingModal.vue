@@ -4,9 +4,9 @@ import { computed, ref, watchEffect } from "vue";
 import type { Post } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
-import { v4 as uuid } from "uuid";
 import { useThemeCustomTemplates } from "@/modules/interface/themes/composables/use-theme";
 import { postLabels } from "@/constants/labels";
+import { randomUUID } from "@/utils/id";
 
 const initialFormState: Post = {
   spec: {
@@ -33,7 +33,7 @@ const initialFormState: Post = {
   apiVersion: "content.halo.run/v1alpha1",
   kind: "Post",
   metadata: {
-    name: uuid(),
+    name: randomUUID(),
   },
 };
 

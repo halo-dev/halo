@@ -2,7 +2,6 @@
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import type { Menu } from "@halo-dev/api-client";
-import { v4 as uuid } from "uuid";
 import { computed, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
@@ -34,7 +33,8 @@ const initialFormState: Menu = {
   apiVersion: "v1alpha1",
   kind: "Menu",
   metadata: {
-    name: uuid(),
+    name: "",
+    generateName: "menu-",
   },
 };
 
@@ -76,7 +76,6 @@ const onVisibleChange = (visible: boolean) => {
 
 const handleResetForm = () => {
   formState.value = cloneDeep(initialFormState);
-  formState.value.metadata.name = uuid();
   reset("menu-form");
 };
 

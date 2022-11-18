@@ -20,7 +20,6 @@ import type { Tag } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
-import { v4 as uuid } from "uuid";
 
 const props = withDefaults(
   defineProps<{
@@ -50,7 +49,8 @@ const initialFormState: Tag = {
   apiVersion: "content.halo.run/v1alpha1",
   kind: "Tag",
   metadata: {
-    name: uuid(),
+    name: "",
+    generateName: "tag-",
   },
 };
 
@@ -95,7 +95,6 @@ const onVisibleChange = (visible: boolean) => {
 
 const handleResetForm = () => {
   formState.value = cloneDeep(initialFormState);
-  formState.value.metadata.name = uuid();
   reset("tag-form");
 };
 

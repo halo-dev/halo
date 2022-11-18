@@ -6,7 +6,6 @@ import cloneDeep from "lodash.clonedeep";
 import { computed, ref, watch, watchEffect } from "vue";
 import { useSettingForm } from "@/composables/use-setting-form";
 import { apiClient } from "@/utils/api-client";
-import { v4 as uuid } from "uuid";
 import {
   reset,
   type FormKitSchemaCondition,
@@ -43,7 +42,8 @@ const initialFormState: Policy = {
   apiVersion: "storage.halo.run/v1alpha1",
   kind: "Policy",
   metadata: {
-    name: uuid(),
+    name: "",
+    generateName: "attachment-policy-",
   },
 };
 
@@ -53,11 +53,22 @@ const policyTemplate = ref<PolicyTemplate | undefined>();
 const settingName = computed(
   () => policyTemplate.value?.spec?.settingRef?.name
 );
-const configMapName = computed(() => formState.value.spec.configMapRef?.name);
+
+const configMapName = computed({
+  get() {
+    return formState.value.spec.configMapRef?.name;
+  },
+  set(value) {
+    formState.value.spec.configMapRef = {
+      name: value as string,
+    };
+  },
+});
 
 const {
   setting,
   configMapFormData,
+  configMap,
   saving,
   handleFetchConfigMap,
   handleFetchSettings,
@@ -102,6 +113,11 @@ const handleSave = async () => {
   try {
     saving.value = true;
 
+    if (!isUpdateMode.value) {
+      configMap.value.metadata.name = "";
+      configMap.value.metadata.generateName = "configMap-";
+    }
+
     await handleSaveConfigMap();
 
     if (isUpdateMode.value) {
@@ -112,6 +128,9 @@ const handleSave = async () => {
         }
       );
     } else {
+      formState.value.spec.configMapRef = {
+        name: configMap.value.metadata.name,
+      };
       await apiClient.extension.storage.policy.createstorageHaloRunV1alpha1Policy(
         {
           policy: formState.value,
@@ -129,7 +148,6 @@ const handleSave = async () => {
 
 const handleResetForm = () => {
   formState.value = cloneDeep(initialFormState);
-  formState.value.metadata.name = uuid();
   reset("attachment-policy-form");
 };
 

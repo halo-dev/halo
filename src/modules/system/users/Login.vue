@@ -5,7 +5,6 @@ import {
   VButton,
   Toast,
 } from "@halo-dev/components";
-import { v4 as uuid } from "uuid";
 import qs from "qs";
 import { inject, onBeforeMount, onMounted, ref } from "vue";
 import { submitForm } from "@formkit/vue";
@@ -14,6 +13,7 @@ import axios from "axios";
 import type { User } from "@halo-dev/api-client";
 import { setFocus } from "@/formkit/utils/focus";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
+import { randomUUID } from "@/utils/id";
 
 interface LoginForm {
   _csrf: string;
@@ -30,7 +30,7 @@ const loginForm = ref<LoginForm>({
 const loading = ref(false);
 
 const handleGenerateToken = async () => {
-  const token = uuid();
+  const token = randomUUID();
   loginForm.value._csrf = token;
   document.cookie = `XSRF-TOKEN=${token}; Path=/;`;
 };
