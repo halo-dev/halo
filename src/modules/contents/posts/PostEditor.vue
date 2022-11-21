@@ -109,6 +109,8 @@ const handleSave = async () => {
   }
 };
 
+const returnToView = useRouteQuery<string>("returnToView");
+
 const handlePublish = async () => {
   try {
     publishing.value = true;
@@ -118,6 +120,7 @@ const handlePublish = async () => {
 
     if (isUpdateMode.value) {
       const { name: postName } = formState.value.post.metadata;
+      const { permalink } = formState.value.post.status || {};
 
       await apiClient.post.updatePostContent({
         name: postName,
@@ -127,6 +130,12 @@ const handlePublish = async () => {
       await apiClient.post.publishPost({
         name: postName,
       });
+
+      if (returnToView.value === "true" && permalink) {
+        window.location.href = permalink;
+      } else {
+        router.push({ name: "Posts" });
+      }
     } else {
       const { data } = await apiClient.post.draftPost({
         postRequest: formState.value,
@@ -138,8 +147,6 @@ const handlePublish = async () => {
     }
 
     Toast.success("发布成功", { duration: 2000 });
-
-    router.push({ name: "Posts" });
   } catch (error) {
     console.error("Failed to publish post", error);
     Toast.error("发布失败，请重试");
