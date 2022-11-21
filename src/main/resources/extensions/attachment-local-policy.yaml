@@ -19,4 +19,4 @@ spec:
         - $formkit: text
           name: location
           label: 存储位置
-          help: ~/halo-next/attachments 下的子目录
+          help: ~/.halo2/attachments 下的子目录
