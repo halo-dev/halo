@@ -56,9 +56,9 @@ public class WebServerSecurityConfig {
         ObjectProvider<SecurityConfigurer> securityConfigurers) {
 
         http.authorizeExchange()
-            .pathMatchers("/**").permitAll()
             .pathMatchers("/api/**", "/apis/**", "/login", "/logout")
             .access(new RequestInfoAuthorizationManager(roleService))
+            .pathMatchers("/**").permitAll()
             .and()
             .anonymous(anonymousSpec -> {
                 anonymousSpec.authorities(AnonymousUserConst.Role);
