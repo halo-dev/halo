@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.PostService;
@@ -23,6 +24,8 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.Ref;
+import run.halo.app.extension.controller.Controller;
+import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionList;
@@ -45,6 +48,7 @@ import run.halo.app.metrics.MeterUtils;
  * @since 2.0.0
  */
 @AllArgsConstructor
+@Component
 public class PostReconciler implements Reconciler<Reconciler.Request> {
     private static final String FINALIZER_NAME = "post-protection";
     private final ExtensionClient client;
@@ -71,6 +75,15 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 reconcileStatus(request.name());
             });
         return new Result(false, null);
+    }
+
+    @Override
+    public Controller setupWith(ControllerBuilder builder) {
+        return builder
+            .extension(new Post())
+            // TODO Make it configurable
+            .workerCount(10)
+            .build();
     }
 
     private void reconcileSpec(String name) {

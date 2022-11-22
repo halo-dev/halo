@@ -20,28 +20,23 @@ class ControllerBuilderTest {
     ExtensionClient client;
 
     @Test
-    void buildWithBlankName() {
+    void buildWithNullReconciler() {
         assertThrows(IllegalArgumentException.class,
-            () -> new ControllerBuilder("", client).build());
+            () -> new ControllerBuilder(null, client).build(), "Reconciler must not be null");
     }
 
     @Test
     void buildWithNullClient() {
         assertThrows(IllegalArgumentException.class,
-            () -> new ControllerBuilder("fake-name", null).build());
+            () -> new ControllerBuilder(new FakeReconciler(), null).build());
     }
 
     @Test
     void buildTest() {
         assertThrows(IllegalArgumentException.class,
-            () -> new ControllerBuilder("fake-name", client)
+            () -> new ControllerBuilder(new FakeReconciler(), client)
                 .build(),
             "Extension must not be null");
-        assertThrows(IllegalArgumentException.class,
-            () -> new ControllerBuilder("fake-name", client)
-                .extension(new FakeExtension())
-                .build(),
-            "Reconciler must not be null");
 
         assertNotNull(fakeBuilder().build());
 
@@ -92,9 +87,21 @@ class ControllerBuilderTest {
     }
 
     ControllerBuilder fakeBuilder() {
-        return new ControllerBuilder("fake-name", client)
-            .extension(new FakeExtension())
-            .reconciler(request -> new Reconciler.Result(false, null));
+        return new ControllerBuilder(new FakeReconciler(), client)
+            .extension(new FakeExtension());
+    }
+
+    static class FakeReconciler implements Reconciler<Reconciler.Request> {
+
+        @Override
+        public Result reconcile(Request request) {
+            return new Reconciler.Result(false, null);
+        }
+
+        @Override
+        public Controller setupWith(ControllerBuilder builder) {
+            return null;
+        }
     }
 
 }

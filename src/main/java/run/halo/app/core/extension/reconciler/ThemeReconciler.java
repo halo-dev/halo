@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.FileSystemUtils;
 import run.halo.app.core.extension.Setting;
@@ -16,6 +17,8 @@ import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.controller.Controller;
+import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.exception.ThemeUninstallException;
@@ -29,6 +32,7 @@ import run.halo.app.theme.ThemePathPolicy;
  * @author guqing
  * @since 2.0.0
  */
+@Component
 public class ThemeReconciler implements Reconciler<Request> {
 
     private final ExtensionClient client;
@@ -50,6 +54,13 @@ public class ThemeReconciler implements Reconciler<Request> {
                 reconcileStatus(request.name());
             });
         return new Result(false, null);
+    }
+
+    @Override
+    public Controller setupWith(ControllerBuilder builder) {
+        return builder
+            .extension(new Theme())
+            .build();
     }
 
     private void reconcileStatus(String name) {

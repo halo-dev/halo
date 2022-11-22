@@ -17,10 +17,13 @@ import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
+import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.controller.Controller;
+import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.utils.JsonUtils;
@@ -37,6 +40,7 @@ import run.halo.app.plugin.resources.BundleResourceUtils;
  * @since 2.0.0
  */
 @Slf4j
+@Component
 public class PluginReconciler implements Reconciler<Request> {
     private static final String FINALIZER_NAME = "plugin-protection";
     private final ExtensionClient client;
@@ -61,6 +65,13 @@ public class PluginReconciler implements Reconciler<Request> {
                 createInitialReverseProxyIfNotPresent(plugin);
             });
         return new Result(false, null);
+    }
+
+    @Override
+    public Controller setupWith(ControllerBuilder builder) {
+        return builder
+            .extension(new Plugin())
+            .build();
     }
 
     private void reconcilePluginState(String name) {

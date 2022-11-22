@@ -8,9 +8,12 @@ import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.controller.Controller;
+import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -26,6 +29,7 @@ import run.halo.app.theme.router.PermalinkRuleChangedEvent;
  * @since 2.0.0
  */
 @Slf4j
+@Component
 public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
     public static final String OLD_THEME_ROUTE_RULES = "halo.run/old-theme-route-rules";
     public static final String FINALIZER_NAME = "system-setting-protection";
@@ -57,6 +61,13 @@ public class SystemSettingReconciler implements Reconciler<Reconciler.Request> {
                 customizeSystem(name);
             });
         return new Result(false, null);
+    }
+
+    @Override
+    public Controller setupWith(ControllerBuilder builder) {
+        return builder
+            .extension(new ConfigMap())
+            .build();
     }
 
     private void customizeSystem(String name) {
