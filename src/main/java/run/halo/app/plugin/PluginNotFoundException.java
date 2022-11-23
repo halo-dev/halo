@@ -1,6 +1,6 @@
 package run.halo.app.plugin;
 
-import org.pf4j.PluginRuntimeException;
+import run.halo.app.infra.exception.NotFoundException;
 
 /**
  * Exception for plugin not found.
@@ -8,7 +8,7 @@ import org.pf4j.PluginRuntimeException;
  * @author guqing
  * @since 2.0.0
  */
-public class PluginNotFoundException extends PluginRuntimeException {
+public class PluginNotFoundException extends NotFoundException {
     public PluginNotFoundException(String message) {
         super(message);
     }

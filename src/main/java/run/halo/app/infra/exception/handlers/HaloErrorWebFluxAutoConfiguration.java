@@ -14,10 +14,12 @@ import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.reactive.result.view.ViewResolver;
 
 /**
- * https://docs.spring.io/spring-framework/docs/6.0.0-SNAPSHOT/reference/html/web-reactive
- * .html#webflux-ann-rest-exceptions-render
+ * Global exception handler auto configuration.
  *
  * @author guqing
+ * @see GlobalErrorWebExceptionHandler
+ * @see
+ * <a href="https://docs.spring.io/spring-framework/docs/6.0.0-SNAPSHOT/reference/html/web-reactive.html#webflux-ann-rest-exceptions-render>webflux-ann-rest-exceptions-render</a>
  * @since 2.0.0
  */
 @Configuration
