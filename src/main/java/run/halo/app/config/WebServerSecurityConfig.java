@@ -1,7 +1,6 @@
 package run.halo.app.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
-import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -56,9 +55,11 @@ public class WebServerSecurityConfig {
         RoleService roleService,
         ObjectProvider<SecurityConfigurer> securityConfigurers) {
 
-        http.securityMatcher(pathMatchers("/api/**", "/apis/**", "/login", "/logout"))
-            .authorizeExchange(exchanges ->
-                exchanges.anyExchange().access(new RequestInfoAuthorizationManager(roleService)))
+        http.authorizeExchange()
+            .pathMatchers("/api/**", "/apis/**", "/login", "/logout")
+            .access(new RequestInfoAuthorizationManager(roleService))
+            .pathMatchers("/**").permitAll()
+            .and()
             .anonymous(anonymousSpec -> {
                 anonymousSpec.authorities(AnonymousUserConst.Role);
                 anonymousSpec.principal(AnonymousUserConst.PRINCIPAL);
