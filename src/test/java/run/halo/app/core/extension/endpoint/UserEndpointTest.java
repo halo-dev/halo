@@ -79,7 +79,7 @@ class UserEndpointTest {
                 .thenReturn(Mono.error(new ExtensionNotFoundException()));
             webClient.get().uri("/apis/api.console.halo.run/v1alpha1/users/-")
                 .exchange()
-                .expectStatus().is5xxServerError();
+                .expectStatus().isNotFound();
 
             verify(client).get(User.class, "fake-user");
         }
