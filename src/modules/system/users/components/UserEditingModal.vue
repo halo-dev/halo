@@ -171,7 +171,7 @@ const handleRawModeChange = () => {
           label="用户名"
           type="text"
           name="name"
-          validation="required"
+          validation="required|alphanumeric|length:0,50"
         ></FormKit>
         <FormKit
           id="displayNameInput"
@@ -179,33 +179,35 @@ const handleRawModeChange = () => {
           label="显示名称"
           type="text"
           name="displayName"
-          validation="required"
+          validation="required|length:0,50"
         ></FormKit>
         <FormKit
           v-model="formState.spec.email"
           label="电子邮箱"
           type="email"
           name="email"
-          validation="required|email"
+          validation="required|email|length:0,100"
         ></FormKit>
         <FormKit
           v-model="formState.spec.phone"
           label="手机号"
           type="text"
           name="phone"
+          validation="length:0,20"
         ></FormKit>
         <FormKit
           v-model="formState.spec.avatar"
           label="头像"
           type="attachment"
           name="avatar"
-          validation="url"
+          validation="url|length:0,1024"
         ></FormKit>
         <FormKit
           v-model="formState.spec.bio"
           label="描述"
           type="textarea"
           name="bio"
+          validation="length:0,2048"
         ></FormKit>
       </FormKit>
     </div>

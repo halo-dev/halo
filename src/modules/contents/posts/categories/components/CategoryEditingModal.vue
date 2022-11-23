@@ -140,7 +140,7 @@ const { templates } = useThemeCustomTemplates("category");
         name="displayName"
         label="名称"
         type="text"
-        validation="required"
+        validation="required|length:0,50"
       ></FormKit>
       <FormKit
         v-model="formState.spec.slug"
@@ -148,7 +148,7 @@ const { templates } = useThemeCustomTemplates("category");
         name="slug"
         label="别名"
         type="text"
-        validation="required"
+        validation="required|length:0,50"
       ></FormKit>
       <FormKit
         v-model="formState.spec.template"
@@ -163,7 +163,7 @@ const { templates } = useThemeCustomTemplates("category");
         name="cover"
         label="封面图"
         type="attachment"
-        validation="required"
+        validation="length:0,1024"
       ></FormKit>
       <FormKit
         v-model="formState.spec.description"
@@ -171,6 +171,7 @@ const { templates } = useThemeCustomTemplates("category");
         help="需要主题适配以支持"
         label="描述"
         type="textarea"
+        validation="length:0,200"
       ></FormKit>
     </FormKit>
     <template #footer>

@@ -190,14 +190,14 @@ const { templates } = useThemeCustomTemplates("page");
             label="标题"
             type="text"
             name="title"
-            validation="required"
+            validation="required|length:0,100"
           ></FormKit>
           <FormKit
             v-model="formState.spec.slug"
             label="别名"
             name="slug"
             type="text"
-            validation="required"
+            validation="required|length:0,100"
           ></FormKit>
           <FormKit
             v-model="formState.spec.excerpt.autoGenerate"
@@ -216,6 +216,7 @@ const { templates } = useThemeCustomTemplates("page");
             name="raw"
             label="自定义摘要"
             type="textarea"
+            validation="length:0,1024"
             :rows="5"
           ></FormKit>
         </FormKit>
@@ -277,6 +278,7 @@ const { templates } = useThemeCustomTemplates("page");
             label="封面图"
             type="attachment"
             name="cover"
+            validation="length:0,1024"
           ></FormKit>
         </FormKit>
         <!--TODO: add SEO/Metas/Inject Code form-->

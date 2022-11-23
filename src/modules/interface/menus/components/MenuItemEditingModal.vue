@@ -266,7 +266,7 @@ const onMenuItemSourceChange = () => {
         label="名称"
         type="text"
         name="displayName"
-        validation="required"
+        validation="required|length:0,100"
       />
 
       <FormKit
@@ -275,7 +275,7 @@ const onMenuItemSourceChange = () => {
         label="链接地址"
         type="text"
         name="href"
-        validation="required"
+        validation="required|length:0,1024"
       />
 
       <FormKit

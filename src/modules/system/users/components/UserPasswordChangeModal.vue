@@ -111,13 +111,13 @@ const handleChangePassword = async () => {
         label="新密码"
         name="password"
         type="password"
-        validation="required"
+        validation="required|length:0,100"
       ></FormKit>
       <FormKit
         label="确认密码"
         name="password_confirm"
         type="password"
-        validation="required|confirm"
+        validation="required|confirm|length:0,50"
       ></FormKit>
     </FormKit>
     <template #footer>

@@ -128,7 +128,7 @@ const handleResetForm = () => {
             "
             label="名称"
             type="text"
-            validation="required"
+            validation="required|length:0,50"
           ></FormKit>
         </FormKit>
       </VTabItem>

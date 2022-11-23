@@ -224,7 +224,7 @@ const onVisibleChange = (visible: boolean) => {
         label="名称"
         type="text"
         name="displayName"
-        validation="required"
+        validation="required|length:0,50"
       ></FormKit>
       <FormKitSchema
         :schema="formSchema"

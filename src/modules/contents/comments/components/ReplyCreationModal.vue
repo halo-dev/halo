@@ -151,9 +151,9 @@ watchEffect(() => {
         :id="contentInputId"
         v-model="formState.raw"
         type="textarea"
-        validation="required"
         validation-label="内容"
         :rows="6"
+        validation="required|length:0,1024"
       ></FormKit>
     </FormKit>
     <div class="mt-2 flex justify-end">

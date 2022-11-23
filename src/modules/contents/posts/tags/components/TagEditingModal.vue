@@ -148,7 +148,7 @@ watch(
         name="displayName"
         label="名称"
         type="text"
-        validation="required"
+        validation="required|length:0,50"
       ></FormKit>
       <FormKit
         v-model="formState.spec.slug"
@@ -156,7 +156,7 @@ watch(
         label="别名"
         name="slug"
         type="text"
-        validation="required"
+        validation="required|length:0,50"
       ></FormKit>
       <FormKit
         v-model="formState.spec.color"
@@ -164,6 +164,7 @@ watch(
         help="需要主题适配以支持"
         label="颜色"
         type="color"
+        validation="length:0,50"
       ></FormKit>
       <FormKit
         v-model="formState.spec.cover"
@@ -171,6 +172,7 @@ watch(
         help="需要主题适配以支持"
         label="封面图"
         type="attachment"
+        validation="length:0,1024"
       ></FormKit>
     </FormKit>
     <template #footer>

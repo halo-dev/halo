@@ -121,7 +121,7 @@ onMounted(async () => {
           }"
           type="text"
           placeholder="站点名称"
-          validation="required"
+          validation="required|length:0,100"
         ></FormKit>
       </FormKit>
       <VButton
