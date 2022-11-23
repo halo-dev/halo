@@ -19,7 +19,7 @@ import {
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import GrantPermissionModal from "./components/GrantPermissionModal.vue";
-import { computed, inject, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { User, UserList } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
@@ -27,6 +27,7 @@ import { formatDatetime } from "@/utils/date";
 import { useRouteQuery } from "@vueuse/router";
 import Fuse from "fuse.js";
 import { usePermission } from "@/utils/permission";
+import { useUserStore } from "@/stores/user";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -48,7 +49,8 @@ const users = ref<UserList>({
 });
 const selectedUserNames = ref<string[]>([]);
 const selectedUser = ref<User>();
-const currentUser = inject<User>("currentUser");
+
+const userStore = useUserStore();
 
 let fuse: Fuse<User> | undefined = undefined;
 
@@ -118,7 +120,7 @@ const handleDeleteInBatch = async () => {
     confirmType: "danger",
     onConfirm: async () => {
       const userNamesToDelete = selectedUserNames.value.filter(
-        (name) => name != currentUser?.metadata.name
+        (name) => name != userStore.currentUser?.metadata.name
       );
       await Promise.all(
         userNamesToDelete.map((name) => {
@@ -464,7 +466,9 @@ onMounted(() => {
                 修改密码
               </VButton>
               <VButton
-                v-if="currentUser?.metadata.name !== user.metadata.name"
+                v-if="
+                  userStore.currentUser?.metadata.name !== user.metadata.name
+                "
                 v-close-popper
                 block
                 @click="handleOpenGrantPermissionModal(user)"
@@ -472,7 +476,9 @@ onMounted(() => {
                 分配角色
               </VButton>
               <VButton
-                v-if="currentUser?.metadata.name !== user.metadata.name"
+                v-if="
+                  userStore.currentUser?.metadata.name !== user.metadata.name
+                "
                 v-close-popper
                 block
                 type="danger"

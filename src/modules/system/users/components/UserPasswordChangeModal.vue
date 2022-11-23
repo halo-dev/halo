@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import { inject, ref, watch } from "vue";
+import { ref, watch } from "vue";
 import type { User } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
+import { useUserStore } from "@/stores/user";
 
 const props = withDefaults(
   defineProps<{
@@ -24,7 +25,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const currentUser = inject<User>("currentUser");
+const userStore = useUserStore();
 
 interface PasswordChangeFormState {
   password: string;
@@ -69,7 +70,7 @@ const handleChangePassword = async () => {
     const changePasswordRequest = cloneDeep(formState.value);
     delete changePasswordRequest.password_confirm;
 
-    if (props.user?.metadata.name === currentUser?.metadata.name) {
+    if (props.user?.metadata.name === userStore.currentUser?.metadata.name) {
       await apiClient.user.changePassword({
         name: "-",
         changePasswordRequest,

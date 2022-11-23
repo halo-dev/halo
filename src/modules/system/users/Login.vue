@@ -6,20 +6,22 @@ import {
   Toast,
 } from "@halo-dev/components";
 import qs from "qs";
-import { inject, onBeforeMount, onMounted, ref } from "vue";
+import { onBeforeMount, onMounted, ref } from "vue";
 import { submitForm } from "@formkit/vue";
 import router from "@/router";
 import axios from "axios";
-import type { User } from "@halo-dev/api-client";
 import { setFocus } from "@/formkit/utils/focus";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
 import { randomUUID } from "@/utils/id";
+import { useUserStore } from "@/stores/user";
 
 interface LoginForm {
   _csrf: string;
   username: string;
   password: string;
 }
+
+const userStore = useUserStore();
 
 const loginForm = ref<LoginForm>({
   _csrf: "",
@@ -48,6 +50,9 @@ const handleLogin = async () => {
         },
       }
     );
+
+    await userStore.fetchCurrentUser();
+
     localStorage.setItem("logged_in", "true");
     router.go(0);
   } catch (e) {
@@ -61,8 +66,7 @@ const handleLogin = async () => {
 };
 
 onBeforeMount(() => {
-  const currentUser = inject<User>("currentUser");
-  if (currentUser) {
+  if (!userStore.isAnonymous) {
     router.push({ name: "Dashboard" });
   }
 });

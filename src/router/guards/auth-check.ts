@@ -1,3 +1,4 @@
+import { useUserStore } from "@/stores/user";
 import type { Router } from "vue-router";
 
 export function setupAuthCheckGuard(router: Router) {
@@ -6,7 +7,10 @@ export function setupAuthCheckGuard(router: Router) {
       next();
       return;
     }
-    if (localStorage.getItem("logged_in") !== "true") {
+
+    const userStore = useUserStore();
+
+    if (localStorage.getItem("logged_in") !== "true" || userStore.isAnonymous) {
       next({ name: "Login" });
       return;
     }

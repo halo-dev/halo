@@ -11,10 +11,10 @@ import {
   VCard,
   IconUserLine,
 } from "@halo-dev/components";
-import { inject, markRaw, ref, type Component } from "vue";
+import { markRaw, ref, type Component } from "vue";
 import { useRouter } from "vue-router";
-import type { User } from "@halo-dev/api-client";
 import ThemePreviewModal from "@/modules/interface/themes/components/preview/ThemePreviewModal.vue";
+import { useUserStore } from "@/stores/user";
 
 interface Action {
   icon: Component;
@@ -23,7 +23,7 @@ interface Action {
   permissions?: string[];
 }
 
-const currentUser = inject<User>("currentUser");
+const userStore = useUserStore();
 
 const router = useRouter();
 
@@ -36,7 +36,7 @@ const actions: Action[] = [
     action: () => {
       router.push({
         name: "UserDetail",
-        params: { name: currentUser?.metadata.name },
+        params: { name: userStore.currentUser?.metadata.name },
       });
     },
   },

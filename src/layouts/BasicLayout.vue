@@ -11,7 +11,6 @@ import {
 } from "@halo-dev/components";
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
-import type { User } from "@halo-dev/api-client";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
 import {
   RouterView,
@@ -19,13 +18,14 @@ import {
   useRouter,
   type RouteRecordRaw,
 } from "vue-router";
-import { computed, inject, onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import axios from "axios";
 import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
 import { coreMenuGroups } from "@/router/routes.config";
 import sortBy from "lodash.sortby";
 import { useRoleStore } from "@/stores/role";
 import { hasPermission } from "@/utils/permission";
+import { useUserStore } from "@/stores/user";
 
 const route = useRoute();
 const router = useRouter();
@@ -33,7 +33,7 @@ const router = useRouter();
 const moreMenuVisible = ref(false);
 const moreMenuRootVisible = ref(false);
 
-const currentUser = inject<User>("currentUser");
+const userStore = useUserStore();
 
 const handleLogout = () => {
   Dialog.warning({
@@ -43,6 +43,9 @@ const handleLogout = () => {
         await axios.post(`${import.meta.env.VITE_API_URL}/logout`, undefined, {
           withCredentials: true,
         });
+
+        await userStore.fetchCurrentUser();
+
         router.replace({ name: "Login" });
       } catch (error) {
         console.error("Failed to logout", error);
@@ -53,7 +56,7 @@ const handleLogout = () => {
 
 const currentRole = computed(() => {
   return JSON.parse(
-    currentUser?.metadata.annotations?.[
+    userStore.currentUser?.metadata.annotations?.[
       "rbac.authorization.halo.run/role-names"
     ] || "[]"
   )[0];
@@ -203,17 +206,17 @@ onMounted(generateMenus);
       </div>
       <RoutesMenu :menus="menus" />
       <div class="current-profile">
-        <div v-if="currentUser?.spec.avatar" class="profile-avatar">
+        <div v-if="userStore.currentUser?.spec.avatar" class="profile-avatar">
           <VAvatar
-            :src="currentUser?.spec.avatar"
-            :alt="currentUser?.spec.displayName"
+            :src="userStore.currentUser?.spec.avatar"
+            :alt="userStore.currentUser?.spec.displayName"
             size="md"
             circle
           ></VAvatar>
         </div>
         <div class="profile-name">
           <div class="flex text-sm font-medium">
-            {{ currentUser?.spec.displayName }}
+            {{ userStore.currentUser?.spec.displayName }}
           </div>
           <div class="flex">
             <VTag>
@@ -237,7 +240,7 @@ onMounted(generateMenus);
                   type="secondary"
                   :route="{
                     name: 'UserDetail',
-                    params: { name: currentUser?.metadata.name },
+                    params: { name: userStore.currentUser?.metadata.name },
                   }"
                 >
                   个人资料
