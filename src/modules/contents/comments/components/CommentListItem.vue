@@ -300,7 +300,7 @@ const subjectRefResult = computed(() => {
       <VEntityField>
         <template #description>
           <div class="flex flex-col gap-2">
-            <div class="w-1/2 text-sm text-gray-900">
+            <div class="text-sm text-gray-900">
               {{ comment?.comment?.spec.content }}
             </div>
             <div class="flex items-center gap-3 text-xs">

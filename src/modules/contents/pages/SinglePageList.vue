@@ -648,17 +648,21 @@ function handleSortItemChange(sortItem?: SortItem) {
                 </RouterLink>
               </template>
               <template #description>
-                <VSpace>
-                  <span class="text-xs text-gray-500">
-                    {{ singlePage.page.status?.permalink }}
-                  </span>
-                  <span class="text-xs text-gray-500">
-                    访问量 {{ singlePage.stats.visit || 0 }}
-                  </span>
-                  <span class="text-xs text-gray-500">
-                    评论 {{ singlePage.stats.totalComment || 0 }}
-                  </span>
-                </VSpace>
+                <div class="flex w-full flex-col gap-1">
+                  <VSpace class="w-full">
+                    <span class="text-xs text-gray-500">
+                      访问量 {{ singlePage.stats.visit || 0 }}
+                    </span>
+                    <span class="text-xs text-gray-500">
+                      评论 {{ singlePage.stats.totalComment || 0 }}
+                    </span>
+                  </VSpace>
+                  <VSpace class="w-full">
+                    <span class="truncate text-xs text-gray-500">
+                      {{ singlePage.page.status?.permalink }}
+                    </span>
+                  </VSpace>
+                </div>
               </template>
             </VEntityField>
           </template>

@@ -1,33 +1,45 @@
 <script lang="ts" setup>
+import { computed, mergeProps } from "vue";
 import type { RouteLocationRaw } from "vue-router";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     title?: string;
     description?: string;
     route?: RouteLocationRaw;
+    width?: string | number;
   }>(),
   {
     title: undefined,
     description: undefined,
     route: undefined,
+    width: undefined,
   }
 );
 
 const emit = defineEmits<{
   (event: "click"): void;
 }>();
+
+const wrapperStyles = computed(() => {
+  if (props.width) {
+    return {
+      width: typeof props.width === "string" ? props.width : `${props.width}px`,
+    };
+  }
+  return {};
+});
 </script>
 
 <template>
-  <div class="entity-field-wrapper">
+  <div class="entity-field-wrapper" :style="wrapperStyles">
     <div v-if="title || $slots.title" class="entity-field-title-body">
       <slot name="title">
         <div class="entity-field-title" @click="emit('click')">
-          <RouterLink v-if="route" :to="route">
+          <RouterLink v-if="route" :to="route" :title="title">
             {{ title }}
           </RouterLink>
-          <span v-else>
+          <span v-else :title="title">
             {{ title }}
           </span>
         </div>
@@ -39,7 +51,11 @@ const emit = defineEmits<{
       class="entity-field-description-body"
     >
       <slot name="description">
-        <span v-if="description" class="entity-field-description">
+        <span
+          v-if="description"
+          class="entity-field-description"
+          :title="description"
+        >
           {{ description }}
         </span>
       </slot>
@@ -49,10 +65,10 @@ const emit = defineEmits<{
 
 <style lang="scss">
 .entity-field-wrapper {
-  @apply inline-flex flex-col gap-1;
+  @apply inline-flex flex-col gap-1 max-w-xs;
 
   .entity-field-title-body {
-    @apply inline-flex flex-col items-center sm:flex-row;
+    @apply inline-flex items-center flex-row;
 
     .entity-field-title {
       @apply mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2;

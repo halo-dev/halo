@@ -59,7 +59,7 @@ const classes = computed(() => {
 </template>
 <style lang="scss">
 .entity-wrapper {
-  @apply relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50;
+  @apply relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50 w-full;
 
   &.entity-selected {
     @apply bg-gray-100;
@@ -70,7 +70,7 @@ const classes = computed(() => {
   }
 
   .entity-body {
-    @apply relative flex flex-row items-center;
+    @apply relative flex flex-row items-center w-full;
   }
 
   .entity-checkbox {
