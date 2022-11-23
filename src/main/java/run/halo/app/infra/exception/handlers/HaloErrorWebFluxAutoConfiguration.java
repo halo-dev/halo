@@ -3,6 +3,7 @@ package run.halo.app.infra.exception.handlers;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.autoconfigure.web.WebProperties;
+import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
@@ -31,6 +32,11 @@ public class HaloErrorWebFluxAutoConfiguration {
         this.serverProperties = serverProperties;
     }
 
+    /**
+     * The default exception handler order is <code>-1</code>, so it is set before it here.
+     *
+     * @see ErrorWebFluxAutoConfiguration
+     */
     @Bean
     @Order(-2)
     public ErrorWebExceptionHandler errorWebExceptionHandler(ErrorAttributes errorAttributes,
