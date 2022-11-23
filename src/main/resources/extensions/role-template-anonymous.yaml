@@ -5,6 +5,9 @@ metadata:
   labels:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: |
+      [ "role-template-own-user-info", "role-template-own-permissions"]
 rules:
   - apiGroups: [ "api.halo.run" ]
     resources: [ "comments", "comments/reply" ]

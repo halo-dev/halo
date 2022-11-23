@@ -1,0 +1,8 @@
+apiVersion: v1alpha1
+kind: User
+metadata:
+  name: anonymousUser
+spec:
+  displayName: Anonymous User
+  email: anonymous@example.com
+  disabled: true
