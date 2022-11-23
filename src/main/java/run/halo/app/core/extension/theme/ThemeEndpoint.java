@@ -6,7 +6,6 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
-import static run.halo.app.core.extension.theme.ThemeUtils.loadThemeManifest;
 import static run.halo.app.infra.utils.DataBufferUtils.toInputStream;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -17,7 +16,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
@@ -32,12 +30,10 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.Unstructured;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.infra.ThemeRootGetter;
@@ -92,7 +88,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                         .content(contentBuilder().mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .schema(schemaBuilder().implementation(UpgradeRequest.class))))
                     .build())
-            .PUT("themes/{name}/reload-setting", this::reloadSetting,
+            .PUT("themes/{name}/reload", this::reloadTheme,
                 builder -> builder.operationId("ReloadThemeSetting")
                     .description("Reload theme setting.")
                     .tag(tag)
@@ -211,42 +207,9 @@ public class ThemeEndpoint implements CustomEndpoint {
             );
     }
 
-    // TODO Extract the method into ThemeService
-    Mono<ServerResponse> reloadSetting(ServerRequest request) {
+    Mono<ServerResponse> reloadTheme(ServerRequest request) {
         String name = request.pathVariable("name");
-        return client.fetch(Theme.class, name)
-            .filter(theme -> StringUtils.isNotBlank(theme.getSpec().getSettingName()))
-            .flatMap(theme -> {
-                String settingName = theme.getSpec().getSettingName();
-                return ThemeUtils.loadThemeSetting(getThemePath(theme))
-                    .stream()
-                    .filter(unstructured ->
-                        settingName.equals(unstructured.getMetadata().getName()))
-                    .findFirst()
-                    .map(setting -> Unstructured.OBJECT_MAPPER.convertValue(setting, Setting.class))
-                    .map(setting -> client.fetch(Setting.class, settingName)
-                        .flatMap(persistent -> {
-                            // update spec to persisted setting
-                            persistent.setSpec(setting.getSpec());
-                            return client.update(persistent);
-                        })
-                        .switchIfEmpty(Mono.defer(() -> client.create(setting)))
-                        .thenReturn(theme)
-                    )
-                    .orElse(Mono.just(theme));
-            })
-            .flatMap(themeToUse -> {
-                Path themePath = themeRoot.get().resolve(themeToUse.getMetadata().getName());
-                Path themeManifestPath = ThemeUtils.resolveThemeManifest(themePath);
-                if (themeManifestPath == null) {
-                    return Mono.error(new IllegalArgumentException(
-                        "The manifest file [theme.yaml] is required."));
-                }
-                Unstructured unstructured = loadThemeManifest(themeManifestPath);
-                Theme newTheme = Unstructured.OBJECT_MAPPER.convertValue(unstructured, Theme.class);
-                themeToUse.setSpec(newTheme.getSpec());
-                return client.update(themeToUse);
-            })
+        return themeService.reloadTheme(name)
             .flatMap(theme -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(theme));

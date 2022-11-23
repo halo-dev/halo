@@ -2,6 +2,7 @@ package run.halo.app.core.extension.theme;
 
 import static java.nio.file.Files.createTempDirectory;
 import static org.springframework.util.FileSystemUtils.copyRecursively;
+import static run.halo.app.core.extension.theme.ThemeUtils.loadThemeManifest;
 import static run.halo.app.core.extension.theme.ThemeUtils.locateThemeManifest;
 import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
 import static run.halo.app.infra.utils.FileUtils.unzip;
@@ -161,6 +162,40 @@ public class ThemeServiceImpl implements ThemeService {
                     })
                     .then(Mono.just(theme));
             });
+    }
+
+    @Override
+    public Mono<Theme> reloadTheme(String name) {
+        return client.fetch(Theme.class, name)
+            .flatMap(theme -> {
+                String settingName = theme.getSpec().getSettingName();
+                return ThemeUtils.loadThemeSetting(getThemePath(theme))
+                    .stream()
+                    .findFirst()
+                    .map(setting -> Unstructured.OBJECT_MAPPER.convertValue(setting, Setting.class))
+                    .map(newSetting -> client.fetch(Setting.class, settingName)
+                        .flatMap(client::delete)
+                        .then(client.create(newSetting))
+                    )
+                    .orElse(Mono.empty());
+            })
+            .then(Mono.defer(() -> {
+                Path themePath = themeRoot.get().resolve(name);
+                Path themeManifestPath = ThemeUtils.resolveThemeManifest(themePath);
+                if (themeManifestPath == null) {
+                    throw new IllegalArgumentException(
+                        "The manifest file [theme.yaml] is required.");
+                }
+                Unstructured unstructured = loadThemeManifest(themeManifestPath);
+                Theme newTheme = Unstructured.OBJECT_MAPPER.convertValue(unstructured,
+                    Theme.class);
+                return client.fetch(Theme.class, name)
+                    .map(oldTheme -> {
+                        newTheme.getMetadata().setVersion(oldTheme.getMetadata().getVersion());
+                        return newTheme;
+                    })
+                    .flatMap(client::update);
+            }));
     }
 
     private Path getThemePath(Theme theme) {
