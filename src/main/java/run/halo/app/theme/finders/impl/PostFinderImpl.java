@@ -127,7 +127,7 @@ public class PostFinderImpl implements PostFinder {
     @Override
     public Flux<ListedPostVo> listAll() {
         return client.list(Post.class, FIXED_PREDICATE, defaultComparator())
-            .flatMap(this::getListedPostVo);
+            .concatMap(this::getListedPostVo);
     }
 
     static Pair<String, String> postPreviousNextPair(List<String> postNames,
@@ -292,7 +292,7 @@ public class PostFinderImpl implements PostFinder {
         return client.list(Post.class, predicate,
                 comparator, pageNullSafe(page), sizeNullSafe(size))
             .flatMap(list -> Flux.fromStream(list.get())
-                .flatMap(post -> getListedPostVo(post)
+                .concatMap(post -> getListedPostVo(post)
                     .map(postVo -> {
                         populateStats(postVo);
                         return postVo;
