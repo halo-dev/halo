@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -62,6 +63,11 @@ public class ReplyServiceImpl implements ReplyService {
                         reply.getSpec().setApproved(
                             Boolean.FALSE.equals(commentSetting.getRequireReviewForNew()));
                         reply.getSpec().setHidden(!reply.getSpec().getApproved());
+
+                        if (BooleanUtils.isTrue(reply.getSpec().getApproved())
+                            && reply.getSpec().getApprovedTime() == null) {
+                            reply.getSpec().setApprovedTime(Instant.now());
+                        }
                         return reply;
                     });
             })
