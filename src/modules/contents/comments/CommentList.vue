@@ -7,7 +7,6 @@ import {
   VPageHeader,
   VPagination,
   VSpace,
-  IconCloseCircle,
   IconRefreshLine,
   VEmpty,
   Dialog,
@@ -19,9 +18,12 @@ import type {
   ListedCommentList,
   User,
 } from "@halo-dev/api-client";
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { onBeforeRouteLeave } from "vue-router";
+import FilterTag from "@/components/filter/FilterTag.vue";
+import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
+import { getNode } from "@formkit/core";
 
 const comments = ref<ListedCommentList>({
   page: 1,
@@ -41,11 +43,16 @@ const selectedCommentNames = ref<string[]>([]);
 const keyword = ref("");
 const refreshInterval = ref();
 
-const handleFetchComments = async () => {
+const handleFetchComments = async (page?: number) => {
   try {
     clearInterval(refreshInterval.value);
 
     loading.value = true;
+
+    if (page) {
+      comments.value.page = page;
+    }
+
     const { data } = await apiClient.comment.listComments({
       page: comments.value.page,
       size: comments.value.size,
@@ -212,13 +219,16 @@ const SortFilterItems: {
     value: "CREATE_TIME",
   },
 ];
+
 const selectedApprovedFilterItem = ref<{ label: string; value?: boolean }>(
   ApprovedFilterItems[0]
 );
+
 const selectedSortFilterItem = ref<{
   label: string;
   value?: Sort;
 }>(SortFilterItems[0]);
+
 const selectedUser = ref<User>();
 
 const handleApprovedFilterItemChange = (filterItem: {
@@ -227,7 +237,7 @@ const handleApprovedFilterItemChange = (filterItem: {
 }) => {
   selectedApprovedFilterItem.value = filterItem;
   selectedCommentNames.value = [];
-  handlePaginationChange({ page: 1, size: 20 });
+  handleFetchComments(1);
 };
 
 const handleSortFilterItemChange = (filterItem: {
@@ -236,12 +246,42 @@ const handleSortFilterItemChange = (filterItem: {
 }) => {
   selectedSortFilterItem.value = filterItem;
   selectedCommentNames.value = [];
-  handlePaginationChange({ page: 1, size: 20 });
+  handleFetchComments(1);
 };
 
 function handleSelectUser(user: User | undefined) {
   selectedUser.value = user;
-  handlePaginationChange({ page: 1, size: 20 });
+  handleFetchComments(1);
+}
+
+function handleKeywordChange() {
+  const keywordNode = getNode("keywordInput");
+  if (keywordNode) {
+    keyword.value = keywordNode._value as string;
+  }
+  handleFetchComments(1);
+}
+
+function handleClearKeyword() {
+  keyword.value = "";
+  handleFetchComments(1);
+}
+
+const hasFilters = computed(() => {
+  return (
+    selectedApprovedFilterItem.value.value !== undefined ||
+    selectedSortFilterItem.value.value !== "LAST_REPLY_TIME" ||
+    selectedUser.value ||
+    keyword.value
+  );
+});
+
+function handleClearFilters() {
+  selectedApprovedFilterItem.value = ApprovedFilterItems[0];
+  selectedSortFilterItem.value = SortFilterItems[0];
+  selectedUser.value = undefined;
+  keyword.value = "";
+  handleFetchComments(1);
 }
 </script>
 <template>
@@ -275,49 +315,46 @@ function handleSelectUser(user: User | undefined) {
                 class="flex items-center gap-2"
               >
                 <FormKit
-                  v-model="keyword"
+                  id="keywordInput"
+                  outer-class="!p-0"
                   placeholder="输入关键词搜索"
                   type="text"
-                  @keyup.enter="handleFetchComments"
+                  name="keyword"
+                  :model-value="keyword"
+                  @keyup.enter="handleKeywordChange"
                 ></FormKit>
-                <div
+
+                <FilterTag v-if="keyword" @close="handleClearKeyword()">
+                  关键词：{{ keyword }}
+                </FilterTag>
+
+                <FilterTag
                   v-if="selectedApprovedFilterItem.value != undefined"
-                  class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                  @close="
+                    handleApprovedFilterItemChange(ApprovedFilterItems[0])
+                  "
                 >
-                  <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                    状态：{{ selectedApprovedFilterItem.label }}
-                  </span>
-                  <IconCloseCircle
-                    class="h-4 w-4 text-gray-600"
-                    @click="
-                      handleApprovedFilterItemChange(ApprovedFilterItems[0])
-                    "
-                  />
-                </div>
-                <div
+                  状态：{{ selectedApprovedFilterItem.label }}
+                </FilterTag>
+
+                <FilterTag
                   v-if="selectedUser"
-                  class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                  @close="handleSelectUser(undefined)"
                 >
-                  <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                    评论者：{{ selectedUser?.spec.displayName }}
-                  </span>
-                  <IconCloseCircle
-                    class="h-4 w-4 text-gray-600"
-                    @click="handleSelectUser(undefined)"
-                  />
-                </div>
-                <div
+                  评论者：{{ selectedUser?.spec.displayName }}
+                </FilterTag>
+
+                <FilterTag
                   v-if="selectedSortFilterItem.value != 'LAST_REPLY_TIME'"
-                  class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                  @close="handleSortFilterItemChange(SortFilterItems[0])"
                 >
-                  <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                    排序：{{ selectedSortFilterItem.label }}
-                  </span>
-                  <IconCloseCircle
-                    class="h-4 w-4 text-gray-600"
-                    @click="handleSortFilterItemChange(SortFilterItems[0])"
-                  />
-                </div>
+                  排序：{{ selectedSortFilterItem.label }}
+                </FilterTag>
+
+                <FilterCleanButton
+                  v-if="hasFilters"
+                  @click="handleClearFilters"
+                />
               </div>
               <VSpace v-else>
                 <VButton type="secondary" @click="handleApproveInBatch">
@@ -409,7 +446,7 @@ function handleSelectUser(user: User | undefined) {
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                    @click="handleFetchComments"
+                    @click="handleFetchComments()"
                   >
                     <IconRefreshLine
                       :class="{ 'animate-spin text-gray-900': loading }"

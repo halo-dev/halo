@@ -23,6 +23,8 @@ import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { onBeforeRouteLeave } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
+import { getNode } from "@formkit/core";
+import FilterTag from "@/components/filter/FilterTag.vue";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -43,11 +45,15 @@ const selectedPostNames = ref<string[]>([]);
 const refreshInterval = ref();
 const keyword = ref("");
 
-const handleFetchPosts = async () => {
+const handleFetchPosts = async (page?: number) => {
   try {
     clearInterval(refreshInterval.value);
 
     loading.value = true;
+
+    if (page) {
+      posts.value.page = page;
+    }
 
     const { data } = await apiClient.post.listPosts({
       labelSelector: [`content.halo.run/deleted=true`],
@@ -191,6 +197,19 @@ watch(selectedPostNames, (newValue) => {
 onMounted(() => {
   handleFetchPosts();
 });
+
+function handleKeywordChange() {
+  const keywordNode = getNode("keywordInput");
+  if (keywordNode) {
+    keyword.value = keywordNode._value as string;
+  }
+  handleFetchPosts(1);
+}
+
+function handleClearKeyword() {
+  keyword.value = "";
+  handleFetchPosts(1);
+}
 </script>
 <template>
   <VPageHeader title="文章回收站">
@@ -238,12 +257,18 @@ onMounted(() => {
                 class="flex items-center gap-2"
               >
                 <FormKit
-                  v-model="keyword"
+                  id="keywordInput"
                   outer-class="!p-0"
                   placeholder="输入关键词搜索"
                   type="text"
-                  @keyup.enter="handleFetchPosts"
+                  name="keyword"
+                  :model-value="keyword"
+                  @keyup.enter="handleKeywordChange"
                 ></FormKit>
+
+                <FilterTag v-if="keyword" @close="handleClearKeyword()">
+                  关键词：{{ keyword }}
+                </FilterTag>
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeletePermanentlyInBatch">
@@ -259,7 +284,7 @@ onMounted(() => {
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                    @click="handleFetchPosts"
+                    @click="handleFetchPosts()"
                   >
                     <IconRefreshLine
                       :class="{ 'animate-spin text-gray-900': loading }"

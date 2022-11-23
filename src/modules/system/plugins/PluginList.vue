@@ -2,7 +2,6 @@
 import {
   IconAddCircle,
   IconArrowDown,
-  IconCloseCircle,
   IconPlug,
   IconRefreshLine,
   VButton,
@@ -14,11 +13,14 @@ import {
 } from "@halo-dev/components";
 import PluginListItem from "./components/PluginListItem.vue";
 import PluginUploadModal from "./components/PluginUploadModal.vue";
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { PluginList } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import { onBeforeRouteLeave } from "vue-router";
+import FilterTag from "@/components/filter/FilterTag.vue";
+import FilteCleanButton from "@/components/filter/FilterCleanButton.vue";
+import { getNode } from "@formkit/core";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -38,11 +40,15 @@ const pluginInstall = ref(false);
 const keyword = ref("");
 const refreshInterval = ref();
 
-const handleFetchPlugins = async () => {
+const handleFetchPlugins = async (page?: number) => {
   try {
     clearInterval(refreshInterval.value);
 
     loading.value = true;
+
+    if (page) {
+      plugins.value.page = page;
+    }
 
     const { data } = await apiClient.plugin.listPlugins({
       page: plugins.value.page,
@@ -132,12 +138,40 @@ const selectedSortItem = ref<SortItem>();
 
 function handleEnabledItemChange(enabledItem: EnabledItem) {
   selectedEnabledItem.value = enabledItem;
-  handleFetchPlugins();
+  handleFetchPlugins(1);
 }
 
 function handleSortItemChange(sortItem?: SortItem) {
   selectedSortItem.value = sortItem;
-  handleFetchPlugins();
+  handleFetchPlugins(1);
+}
+
+function handleKeywordChange() {
+  const keywordNode = getNode("keywordInput");
+  if (keywordNode) {
+    keyword.value = keywordNode._value as string;
+  }
+  handleFetchPlugins(1);
+}
+
+function handleClearKeyword() {
+  keyword.value = "";
+  handleFetchPlugins(1);
+}
+
+const hasFilters = computed(() => {
+  return (
+    selectedEnabledItem.value?.value !== undefined ||
+    selectedSortItem.value?.value ||
+    keyword.value
+  );
+});
+
+function handleClearFilters() {
+  selectedEnabledItem.value = undefined;
+  selectedSortItem.value = undefined;
+  keyword.value = "";
+  handleFetchPlugins(1);
 }
 </script>
 <template>
@@ -174,37 +208,34 @@ function handleSortItemChange(sortItem?: SortItem) {
           >
             <div class="flex w-full flex-1 items-center gap-2 sm:w-auto">
               <FormKit
-                v-model="keyword"
+                id="keywordInput"
+                outer-class="!p-0"
                 placeholder="输入关键词搜索"
                 type="text"
-                @keyup.enter="
-                  handlePaginationChange({ page: 1, size: plugins.size })
-                "
+                name="keyword"
+                :model-value="keyword"
+                @keyup.enter="handleKeywordChange"
               ></FormKit>
-              <div
+
+              <FilterTag v-if="keyword" @close="handleClearKeyword()">
+                关键词：{{ keyword }}
+              </FilterTag>
+
+              <FilterTag
                 v-if="selectedEnabledItem?.value !== undefined"
-                class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                @close="handleEnabledItemChange(EnabledItems[0])"
               >
-                <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                  启用状态：{{ selectedEnabledItem.label }}
-                </span>
-                <IconCloseCircle
-                  class="h-4 w-4 text-gray-600"
-                  @click="handleEnabledItemChange(EnabledItems[0])"
-                />
-              </div>
-              <div
+                启用状态：{{ selectedEnabledItem.label }}
+              </FilterTag>
+
+              <FilterTag
                 v-if="selectedSortItem"
-                class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                @close="handleSortItemChange()"
               >
-                <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                  排序：{{ selectedSortItem.label }}
-                </span>
-                <IconCloseCircle
-                  class="h-4 w-4 text-gray-600"
-                  @click="handleSortItemChange()"
-                />
-              </div>
+                排序：{{ selectedSortItem.label }}
+              </FilterTag>
+
+              <FilteCleanButton v-if="hasFilters" @click="handleClearFilters" />
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
@@ -265,7 +296,7 @@ function handleSortItemChange(sortItem?: SortItem) {
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                    @click="handleFetchPlugins"
+                    @click="handleFetchPlugins()"
                   >
                     <IconRefreshLine
                       :class="{ 'animate-spin text-gray-900': loading }"

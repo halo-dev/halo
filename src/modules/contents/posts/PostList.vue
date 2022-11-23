@@ -8,7 +8,6 @@ import {
   IconEye,
   IconEyeOff,
   IconTeam,
-  IconCloseCircle,
   IconRefreshLine,
   Dialog,
   VButton,
@@ -25,7 +24,7 @@ import {
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import PostTag from "../posts/tags/components/PostTag.vue";
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import type {
   User,
   Category,
@@ -40,6 +39,9 @@ import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-t
 import { usePermission } from "@/utils/permission";
 import { onBeforeRouteLeave } from "vue-router";
 import { postLabels } from "@/constants/labels";
+import FilterTag from "@/components/filter/FilterTag.vue";
+import FilteCleanButton from "@/components/filter/FilterCleanButton.vue";
+import { getNode } from "@formkit/core";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -61,7 +63,7 @@ const checkedAll = ref(false);
 const selectedPostNames = ref<string[]>([]);
 const refreshInterval = ref();
 
-const handleFetchPosts = async () => {
+const handleFetchPosts = async (page?: number) => {
   try {
     clearInterval(refreshInterval.value);
 
@@ -91,6 +93,10 @@ const handleFetchPosts = async () => {
       labelSelector.push(
         `${postLabels.PUBLISHED}=${selectedPublishStatusItem.value.value}`
       );
+    }
+
+    if (page) {
+      posts.value.page = page;
     }
 
     const { data } = await apiClient.post.listPosts({
@@ -372,33 +378,69 @@ const keyword = ref("");
 
 function handleVisibleItemChange(visibleItem: VisibleItem) {
   selectedVisibleItem.value = visibleItem;
-  handleFetchPosts();
+  handleFetchPosts(1);
 }
 
 function handlePublishStatusItemChange(publishStatusItem: PublishStatuItem) {
   selectedPublishStatusItem.value = publishStatusItem;
-  handleFetchPosts();
+  handleFetchPosts(1);
 }
 
 function handleSortItemChange(sortItem?: SortItem) {
   selectedSortItem.value = sortItem;
-  handleFetchPosts();
+  handleFetchPosts(1);
 }
 
 function handleCategoryChange(category?: Category) {
   selectedCategory.value = category;
-  handleFetchPosts();
+  handleFetchPosts(1);
 }
 
 function handleTagChange(tag?: Tag) {
   selectedTag.value = tag;
-  handleFetchPosts();
+  handleFetchPosts(1);
 }
 
 function handleContributorChange(user?: User) {
   selectedContributor.value = user;
-  handleFetchPosts();
+  handleFetchPosts(1);
 }
+
+function handleKeywordChange() {
+  const keywordNode = getNode("keywordInput");
+  if (keywordNode) {
+    keyword.value = keywordNode._value as string;
+  }
+  handleFetchPosts(1);
+}
+
+function handleClearKeyword() {
+  keyword.value = "";
+  handleFetchPosts(1);
+}
+
+function handleClearFilters() {
+  selectedVisibleItem.value = VisibleItems[0];
+  selectedPublishStatusItem.value = PublishStatuItems[0];
+  selectedSortItem.value = undefined;
+  selectedCategory.value = undefined;
+  selectedTag.value = undefined;
+  selectedContributor.value = undefined;
+  keyword.value = "";
+  handleFetchPosts(1);
+}
+
+const hasFilters = computed(() => {
+  return (
+    selectedVisibleItem.value.value ||
+    selectedPublishStatusItem.value.value !== undefined ||
+    selectedSortItem.value ||
+    selectedCategory.value ||
+    selectedTag.value ||
+    selectedContributor.value ||
+    keyword.value
+  );
+});
 </script>
 <template>
   <PostSettingModal
@@ -462,86 +504,62 @@ function handleContributorChange(user?: User) {
                 class="flex items-center gap-2"
               >
                 <FormKit
-                  v-model="keyword"
+                  id="keywordInput"
                   outer-class="!p-0"
                   placeholder="输入关键词搜索"
                   type="text"
-                  @keyup.enter="handleFetchPosts"
+                  name="keyword"
+                  :model-value="keyword"
+                  @keyup.enter="handleKeywordChange"
                 ></FormKit>
 
-                <div
-                  v-if="selectedPublishStatusItem.value"
-                  class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
-                >
-                  <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                    状态：{{ selectedPublishStatusItem.label }}
-                  </span>
-                  <IconCloseCircle
-                    class="h-4 w-4 text-gray-600"
-                    @click="handlePublishStatusItemChange(PublishStatuItems[0])"
-                  />
-                </div>
-                <div
-                  v-if="selectedVisibleItem.value"
-                  class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
-                >
-                  <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                    可见性：{{ selectedVisibleItem.label }}
-                  </span>
-                  <IconCloseCircle
-                    class="h-4 w-4 text-gray-600"
-                    @click="handleVisibleItemChange(VisibleItems[0])"
-                  />
-                </div>
+                <FilterTag v-if="keyword" @close="handleClearKeyword()">
+                  关键词：{{ keyword }}
+                </FilterTag>
 
-                <div
+                <FilterTag
+                  v-if="selectedPublishStatusItem.value !== undefined"
+                  @close="handlePublishStatusItemChange(PublishStatuItems[0])"
+                >
+                  状态：{{ selectedPublishStatusItem.label }}
+                </FilterTag>
+
+                <FilterTag
+                  v-if="selectedVisibleItem.value"
+                  @close="handleVisibleItemChange(VisibleItems[0])"
+                >
+                  可见性：{{ selectedVisibleItem.label }}
+                </FilterTag>
+
+                <FilterTag
                   v-if="selectedCategory"
-                  class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                  @close="handleCategoryChange()"
                 >
-                  <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                    分类：{{ selectedCategory.spec.displayName }}
-                  </span>
-                  <IconCloseCircle
-                    class="h-4 w-4 text-gray-600"
-                    @click="handleCategoryChange()"
-                  />
-                </div>
-                <div
-                  v-if="selectedTag"
-                  class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
-                >
-                  <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                    标签：{{ selectedTag.spec.displayName }}
-                  </span>
-                  <IconCloseCircle
-                    class="h-4 w-4 text-gray-600"
-                    @click="handleTagChange()"
-                  />
-                </div>
-                <div
+                  分类：{{ selectedCategory.spec.displayName }}
+                </FilterTag>
+
+                <FilterTag v-if="selectedTag" @click="handleTagChange()">
+                  标签：{{ selectedTag.spec.displayName }}
+                </FilterTag>
+
+                <FilterTag
                   v-if="selectedContributor"
-                  class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                  @close="handleContributorChange()"
                 >
-                  <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                    作者：{{ selectedContributor.spec.displayName }}
-                  </span>
-                  <IconCloseCircle
-                    class="h-4 w-4 text-gray-600"
-                    @click="handleContributorChange()"
-                  />
-                </div>
-                <div
+                  作者：{{ selectedContributor.spec.displayName }}
+                </FilterTag>
+
+                <FilterTag
                   v-if="selectedSortItem"
-                  class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                  @close="handleSortItemChange()"
                 >
-                  <span class="text-xs text-gray-600 group-hover:text-gray-900">
-                    排序：{{ selectedSortItem.label }}
-                  </span>
-                  <IconCloseCircle
-                    class="h-4 w-4 text-gray-600"
-                    @click="handleSortItemChange()"
-                  />
-                </div>
+                  排序：{{ selectedSortItem.label }}
+                </FilterTag>
+
+                <FilteCleanButton
+                  v-if="hasFilters"
+                  @click="handleClearFilters"
+                />
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeleteInBatch">
@@ -792,7 +810,7 @@ function handleContributorChange(user?: User) {
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                    @click="handleFetchPosts"
+                    @click="handleFetchPosts()"
                   >
                     <IconRefreshLine
                       :class="{ 'animate-spin text-gray-900': loading }"

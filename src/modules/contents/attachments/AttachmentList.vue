@@ -15,7 +15,6 @@ import {
   VPagination,
   VSpace,
   VEmpty,
-  IconCloseCircle,
   IconFolder,
   VStatusDot,
   VEntity,
@@ -40,6 +39,9 @@ import { isImage } from "@/utils/image";
 import { useRouteQuery } from "@vueuse/router";
 import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
 import { usePermission } from "@/utils/permission";
+import FilterTag from "@/components/filter/FilterTag.vue";
+import FilteCleanButton from "@/components/filter/FilterCleanButton.vue";
+import { getNode } from "@formkit/core";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -90,17 +92,47 @@ const selectedSortItemValue = computed(() => {
 
 function handleSelectPolicy(policy: Policy | undefined) {
   selectedPolicy.value = policy;
-  handleFetchAttachments();
+  handleFetchAttachments(1);
 }
 
 function handleSelectUser(user: User | undefined) {
   selectedUser.value = user;
-  handleFetchAttachments();
+  handleFetchAttachments(1);
 }
 
 function handleSortItemChange(sortItem?: SortItem) {
   selectedSortItem.value = sortItem;
-  handleFetchAttachments();
+  handleFetchAttachments(1);
+}
+
+function handleKeywordChange() {
+  const keywordNode = getNode("keywordInput");
+  if (keywordNode) {
+    keyword.value = keywordNode._value as string;
+  }
+  handleFetchAttachments(1);
+}
+
+function handleClearKeyword() {
+  keyword.value = "";
+  handleFetchAttachments(1);
+}
+
+const hasFilters = computed(() => {
+  return (
+    selectedPolicy.value ||
+    selectedUser.value ||
+    selectedSortItem.value ||
+    keyword.value
+  );
+});
+
+function handleClearFilters() {
+  selectedPolicy.value = undefined;
+  selectedUser.value = undefined;
+  selectedSortItem.value = undefined;
+  keyword.value = "";
+  handleFetchAttachments(1);
 }
 
 const {
@@ -322,57 +354,44 @@ onMounted(() => {
                     class="flex items-center gap-2"
                   >
                     <FormKit
-                      v-model="keyword"
+                      id="keywordInput"
                       outer-class="!p-0"
                       placeholder="输入关键词搜索"
                       type="text"
-                      @keyup.enter="handleFetchAttachments()"
+                      name="keyword"
+                      :model-value="keyword"
+                      @keyup.enter="handleKeywordChange"
                     ></FormKit>
 
-                    <div
+                    <FilterTag v-if="keyword" @close="handleClearKeyword()">
+                      关键词：{{ keyword }}
+                    </FilterTag>
+
+                    <FilterTag
                       v-if="selectedPolicy"
-                      class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                      @close="handleSelectPolicy(undefined)"
                     >
-                      <span
-                        class="text-xs text-gray-600 group-hover:text-gray-900"
-                      >
-                        存储策略：{{ selectedPolicy?.spec.displayName }}
-                      </span>
-                      <IconCloseCircle
-                        class="h-4 w-4 text-gray-600"
-                        @click="handleSelectPolicy(undefined)"
-                      />
-                    </div>
+                      存储策略：{{ selectedPolicy?.spec.displayName }}
+                    </FilterTag>
 
-                    <div
+                    <FilterTag
                       v-if="selectedUser"
-                      class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                      @close="handleSelectUser(undefined)"
                     >
-                      <span
-                        class="text-xs text-gray-600 group-hover:text-gray-900"
-                      >
-                        上传者：{{ selectedUser?.spec.displayName }}
-                      </span>
-                      <IconCloseCircle
-                        class="h-4 w-4 text-gray-600"
-                        @click="handleSelectUser(undefined)"
-                      />
-                    </div>
+                      上传者：{{ selectedUser?.spec.displayName }}
+                    </FilterTag>
 
-                    <div
+                    <FilterTag
                       v-if="selectedSortItem"
-                      class="group flex cursor-pointer items-center justify-center gap-1 rounded-full bg-gray-200 px-2 py-1 hover:bg-gray-300"
+                      @click="handleSortItemChange()"
                     >
-                      <span
-                        class="text-xs text-gray-600 group-hover:text-gray-900"
-                      >
-                        排序：{{ selectedSortItem.label }}
-                      </span>
-                      <IconCloseCircle
-                        class="h-4 w-4 text-gray-600"
-                        @click="handleSortItemChange()"
-                      />
-                    </div>
+                      排序：{{ selectedSortItem.label }}
+                    </FilterTag>
+
+                    <FilteCleanButton
+                      v-if="hasFilters"
+                      @click="handleClearFilters"
+                    />
                   </div>
                   <VSpace v-else>
                     <VButton type="danger" @click="handleDeleteInBatch">
@@ -521,7 +540,7 @@ onMounted(() => {
                     <div class="flex flex-row gap-2">
                       <div
                         class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                        @click="handleFetchAttachments"
+                        @click="handleFetchAttachments()"
                       >
                         <IconRefreshLine
                           :class="{ 'animate-spin text-gray-900': loading }"

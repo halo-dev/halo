@@ -22,6 +22,8 @@ import { formatDatetime } from "@/utils/date";
 import { onBeforeRouteLeave, RouterLink } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
+import { getNode } from "@formkit/core";
+import FilterTag from "@/components/filter/FilterTag.vue";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -42,11 +44,15 @@ const checkedAll = ref(false);
 const refreshInterval = ref();
 const keyword = ref("");
 
-const handleFetchSinglePages = async () => {
+const handleFetchSinglePages = async (page?: number) => {
   try {
     clearInterval(refreshInterval.value);
 
     loading.value = true;
+
+    if (page) {
+      singlePages.value.page = page;
+    }
 
     const { data } = await apiClient.singlePage.listSinglePages({
       labelSelector: [`content.halo.run/deleted=true`],
@@ -198,6 +204,20 @@ watch(selectedPageNames, (newValue) => {
 });
 
 onMounted(handleFetchSinglePages);
+
+// Filters
+function handleKeywordChange() {
+  const keywordNode = getNode("keywordInput");
+  if (keywordNode) {
+    keyword.value = keywordNode._value as string;
+  }
+  handleFetchSinglePages(1);
+}
+
+function handleClearKeyword() {
+  keyword.value = "";
+  handleFetchSinglePages(1);
+}
 </script>
 
 <template>
@@ -245,11 +265,18 @@ onMounted(handleFetchSinglePages);
                 class="flex items-center gap-2"
               >
                 <FormKit
-                  v-model="keyword"
+                  id="keywordInput"
+                  outer-class="!p-0"
                   placeholder="输入关键词搜索"
                   type="text"
-                  @keyup.enter="handleFetchSinglePages"
+                  name="keyword"
+                  :model-value="keyword"
+                  @keyup.enter="handleKeywordChange"
                 ></FormKit>
+
+                <FilterTag v-if="keyword" @close="handleClearKeyword()">
+                  关键词：{{ keyword }}
+                </FilterTag>
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeletePermanentlyInBatch">
@@ -265,7 +292,7 @@ onMounted(handleFetchSinglePages);
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                    @click="handleFetchSinglePages"
+                    @click="handleFetchSinglePages()"
                   >
                     <IconRefreshLine
                       :class="{ 'animate-spin text-gray-900': loading }"
