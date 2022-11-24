@@ -104,8 +104,10 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 if (StringUtils.isBlank(releaseSnapshot)) {
                     return;
                 }
-                // do nothing if release snapshot is not changed
-                if (StringUtils.equals(lastReleasedSnapshot, releaseSnapshot)) {
+
+                // do nothing if release snapshot is not changed and post is published
+                if (post.isPublished()
+                    && StringUtils.equals(lastReleasedSnapshot, releaseSnapshot)) {
                     return;
                 }
                 Post.PostStatus status = post.getStatusOrDefault();
