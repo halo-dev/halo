@@ -9,7 +9,14 @@ spring:
     cache: false
 
 halo:
+  console:
+    proxy:
+      endpoint: http://localhost:3000/
+      enabled: true
   security:
+    initializer:
+      super-admin-username: admin
+      super-admin-password: admin
     oauth2:
       jwt:
         jwsAlgorithm: rs512
@@ -22,7 +29,7 @@ halo:
       - "build/resources"
     lib-directories:
       - "libs"
-  work-dir: ${user.home}/halo2-dev
+  work-dir: ./halo2-dev
 logging:
   level:
     run.halo.app: DEBUG
