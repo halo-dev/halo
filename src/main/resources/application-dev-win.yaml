@@ -29,7 +29,7 @@ halo:
       - "build/resources"
     lib-directories:
       - "libs"
-  work-dir: ${user.home}/halo2-dev
+  work-dir: ../halo2-dev
 logging:
   level:
     run.halo.app: DEBUG
