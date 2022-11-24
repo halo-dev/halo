@@ -5,6 +5,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.MediaTypeServerWebExchangeMatcher;
+import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.web.reactive.function.BodyExtractors;
@@ -31,6 +32,8 @@ public class ConsoleProxyFilter implements WebFilter {
         var consoleMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.GET, "/console/**");
         consoleMatcher = new AndServerWebExchangeMatcher(consoleMatcher,
             new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML));
+        consoleMatcher = new AndServerWebExchangeMatcher(consoleMatcher,
+            new NegatedServerWebExchangeMatcher(new WebSocketServerWebExchangeMatcher()));
         this.consoleMatcher = consoleMatcher;
         this.webClient = WebClient.create(proxyProperties.getEndpoint().toString());
         log.info("Initialized ConsoleProxyFilter to proxy console");
