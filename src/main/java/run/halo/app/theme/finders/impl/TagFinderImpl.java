@@ -40,7 +40,7 @@ public class TagFinderImpl implements TagFinder {
     @Override
     public Flux<TagVo> getByNames(List<String> names) {
         return Flux.fromIterable(names)
-            .flatMap(this::getByName);
+            .concatMap(this::getByName);
     }
 
     @Override

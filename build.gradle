@@ -76,6 +76,7 @@ dependencies {
     implementation "io.github.java-diff-utils:java-diff-utils:$javaDiffUtils"
     implementation "org.springframework.integration:spring-integration-core"
     implementation "com.github.java-json-tools:json-patch:$jsonPatch"
+    implementation "org.thymeleaf.extras:thymeleaf-extras-springsecurity6"
 
     compileOnly 'org.projectlombok:lombok'
     testCompileOnly 'org.projectlombok:lombok'
