@@ -23,6 +23,7 @@ import {
   VLoading,
 } from "@halo-dev/components";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
+import CategoryDropdownSelector from "@/components/dropdown-selector/CategoryDropdownSelector.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import PostTag from "../posts/tags/components/PostTag.vue";
 import { computed, onMounted, ref, watch } from "vue";
@@ -35,14 +36,13 @@ import type {
 } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
-import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
-import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
 import { usePermission } from "@/utils/permission";
 import { onBeforeRouteLeave } from "vue-router";
 import { postLabels } from "@/constants/labels";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import FilteCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
+import TagDropdownSelector from "@/components/dropdown-selector/TagDropdownSelector.vue";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -366,9 +366,6 @@ const SortItems: SortItem[] = [
   },
 ];
 
-const { categories } = usePostCategory({ fetchOnMounted: true });
-const { tags } = usePostTag({ fetchOnMounted: true });
-
 const selectedVisibleItem = ref<VisibleItem>(VisibleItems[0]);
 const selectedPublishStatusItem = ref<PublishStatuItem>(PublishStatuItems[0]);
 const selectedSortItem = ref<SortItem>();
@@ -631,7 +628,10 @@ const hasFilters = computed(() => {
                     </div>
                   </template>
                 </FloatingDropdown>
-                <FloatingDropdown>
+                <CategoryDropdownSelector
+                  v-model:selected="selectedCategory"
+                  @select="handleCategoryChange"
+                >
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
@@ -640,69 +640,11 @@ const hasFilters = computed(() => {
                       <IconArrowDown />
                     </span>
                   </div>
-                  <template #popper>
-                    <div class="h-96 w-80">
-                      <div class="bg-white p-4">
-                        <FormKit
-                          placeholder="输入关键词搜索"
-                          type="text"
-                        ></FormKit>
-                      </div>
-                      <div class="mt-2">
-                        <ul
-                          class="box-border h-full w-full divide-y divide-gray-100"
-                        >
-                          <li
-                            v-for="(category, index) in categories"
-                            :key="index"
-                            v-close-popper
-                            @click="handleCategoryChange(category)"
-                          >
-                            <div
-                              class="group relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
-                              :class="{
-                                'bg-gray-100':
-                                  selectedCategory?.metadata.name ===
-                                  category.metadata.name,
-                              }"
-                            >
-                              <div class="relative flex flex-row items-center">
-                                <div class="flex-1">
-                                  <div class="flex flex-col sm:flex-row">
-                                    <span
-                                      class="mr-0 truncate text-sm font-medium text-gray-900 sm:mr-2"
-                                    >
-                                      {{ category.spec.displayName }}
-                                    </span>
-                                    <VSpace class="mt-1 sm:mt-0"></VSpace>
-                                  </div>
-                                  <div class="mt-1 flex">
-                                    <span class="text-xs text-gray-500">
-                                      {{ category.status?.permalink }}
-                                    </span>
-                                  </div>
-                                </div>
-                                <div class="flex">
-                                  <div
-                                    class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
-                                  >
-                                    <div
-                                      class="cursor-pointer text-sm text-gray-500 hover:text-gray-900"
-                                    >
-                                      {{ category.status?.postCount || 0 }}
-                                      篇文章
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </template>
-                </FloatingDropdown>
-                <FloatingDropdown>
+                </CategoryDropdownSelector>
+                <TagDropdownSelector
+                  v-model:selected="selectedTag"
+                  @select="handleTagChange"
+                >
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
@@ -711,65 +653,7 @@ const hasFilters = computed(() => {
                       <IconArrowDown />
                     </span>
                   </div>
-                  <template #popper>
-                    <div class="h-96 w-80">
-                      <div class="bg-white p-4">
-                        <FormKit
-                          placeholder="输入关键词搜索"
-                          type="text"
-                        ></FormKit>
-                      </div>
-
-                      <div class="mt-2">
-                        <ul
-                          class="box-border h-full w-full divide-y divide-gray-100"
-                          role="list"
-                        >
-                          <li
-                            v-for="(tag, index) in tags"
-                            :key="index"
-                            v-close-popper
-                            @click="handleTagChange(tag)"
-                          >
-                            <div
-                              class="relative block cursor-pointer px-4 py-3 transition-all hover:bg-gray-50"
-                              :class="{
-                                'bg-gray-100':
-                                  selectedTag?.metadata.name ===
-                                  tag.metadata.name,
-                              }"
-                            >
-                              <div class="relative flex flex-row items-center">
-                                <div class="flex-1">
-                                  <div class="flex flex-col sm:flex-row">
-                                    <PostTag :tag="tag" />
-                                  </div>
-                                  <div class="mt-1 flex">
-                                    <span class="text-xs text-gray-500">
-                                      {{ tag.status?.permalink }}
-                                    </span>
-                                  </div>
-                                </div>
-                                <div class="flex">
-                                  <div
-                                    class="inline-flex flex-col items-end gap-4 sm:flex-row sm:items-center sm:gap-6"
-                                  >
-                                    <div
-                                      class="cursor-pointer text-sm text-gray-500 hover:text-gray-900"
-                                    >
-                                      {{ tag.status?.postCount || 0 }}
-                                      篇文章
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </template>
-                </FloatingDropdown>
+                </TagDropdownSelector>
                 <UserDropdownSelector
                   v-model:selected="selectedContributor"
                   @select="handleContributorChange"

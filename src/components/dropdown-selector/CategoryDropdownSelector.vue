@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import type { User } from "@halo-dev/api-client";
-import { useUserFetch } from "@/modules/system/users/composables/use-user";
-import { VAvatar, VEntity, VEntityField } from "@halo-dev/components";
+import type { Category } from "@halo-dev/api-client";
+import { VEntity, VEntityField } from "@halo-dev/components";
 import { setFocus } from "@/formkit/utils/focus";
 import { computed, ref, watch } from "vue";
 import Fuse from "fuse.js";
+import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
 
 const props = withDefaults(
   defineProps<{
-    selected?: User;
+    selected?: Category;
   }>(),
   {
     selected: undefined,
@@ -16,40 +16,45 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (event: "update:selected", user?: User): void;
-  (event: "select", user?: User): void;
+  (event: "update:selected", category?: Category): void;
+  (event: "select", category?: Category): void;
 }>();
 
-const { users, handleFetchUsers } = useUserFetch();
+const { categories, handleFetchCategories } = usePostCategory({
+  fetchOnMounted: false,
+});
 
-const handleSelect = (user: User) => {
-  if (props.selected && user.metadata.name === props.selected.metadata.name) {
+const handleSelect = (category: Category) => {
+  if (
+    props.selected &&
+    category.metadata.name === props.selected.metadata.name
+  ) {
     emit("update:selected", undefined);
     emit("select", undefined);
     return;
   }
 
-  emit("update:selected", user);
-  emit("select", user);
+  emit("update:selected", category);
+  emit("select", category);
 };
 
 function onDropdownShow() {
-  handleFetchUsers();
+  handleFetchCategories();
   setTimeout(() => {
-    setFocus("userDropdownSelectorInput");
+    setFocus("categoryDropdownSelectorInput");
   }, 200);
 }
 
 // search
 const keyword = ref("");
 
-let fuse: Fuse<User> | undefined = undefined;
+let fuse: Fuse<Category> | undefined = undefined;
 
 watch(
-  () => users.value,
+  () => categories.value,
   () => {
-    fuse = new Fuse(users.value, {
-      keys: ["spec.displayName", "metadata.name", "spec.email"],
+    fuse = new Fuse(categories.value, {
+      keys: ["spec.displayName", "metadata.name"],
       useExtendedSearch: true,
     });
   }
@@ -57,7 +62,7 @@ watch(
 
 const searchResults = computed(() => {
   if (!fuse || !keyword.value) {
-    return users.value;
+    return categories.value;
   }
 
   return fuse?.search(keyword.value).map((item) => item.item);
@@ -71,7 +76,7 @@ const searchResults = computed(() => {
       <div class="h-96 w-80">
         <div class="border-b border-b-gray-100 bg-white p-4">
           <FormKit
-            id="userDropdownSelectorInput"
+            id="categoryDropdownSelectorInput"
             v-model="keyword"
             placeholder="输入关键词搜索"
             type="text"
@@ -83,27 +88,25 @@ const searchResults = computed(() => {
             role="list"
           >
             <li
-              v-for="(user, index) in searchResults"
+              v-for="(category, index) in searchResults"
               :key="index"
               v-close-popper
-              @click="handleSelect(user)"
+              @click="handleSelect(category)"
             >
               <VEntity
-                :is-selected="selected?.metadata.name === user.metadata.name"
+                :is-selected="
+                  selected?.metadata.name === category.metadata.name
+                "
               >
                 <template #start>
-                  <VEntityField>
-                    <template #description>
-                      <VAvatar
-                        :alt="user.spec.displayName"
-                        :src="user.spec.avatar"
-                        size="md"
-                      ></VAvatar>
-                    </template>
-                  </VEntityField>
                   <VEntityField
-                    :title="user.spec.displayName"
-                    :description="user.metadata.name"
+                    :title="category.spec.displayName"
+                    :description="category.status?.permalink"
+                  />
+                </template>
+                <template #end>
+                  <VEntityField
+                    :description="`${category.status?.postCount || 0} 篇文章`"
                   />
                 </template>
               </VEntity>

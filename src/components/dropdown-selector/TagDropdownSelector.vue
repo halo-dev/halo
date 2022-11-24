@@ -1,14 +1,15 @@
 <script lang="ts" setup>
-import type { User } from "@halo-dev/api-client";
-import { useUserFetch } from "@/modules/system/users/composables/use-user";
-import { VAvatar, VEntity, VEntityField } from "@halo-dev/components";
+import type { Tag } from "@halo-dev/api-client";
+import { VEntity, VEntityField } from "@halo-dev/components";
 import { setFocus } from "@/formkit/utils/focus";
 import { computed, ref, watch } from "vue";
 import Fuse from "fuse.js";
+import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
+import PostTag from "@/modules/contents/posts/tags/components/PostTag.vue";
 
 const props = withDefaults(
   defineProps<{
-    selected?: User;
+    selected?: Tag;
   }>(),
   {
     selected: undefined,
@@ -16,39 +17,39 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (event: "update:selected", user?: User): void;
-  (event: "select", user?: User): void;
+  (event: "update:selected", tag?: Tag): void;
+  (event: "select", tag?: Tag): void;
 }>();
 
-const { users, handleFetchUsers } = useUserFetch();
+const { tags, handleFetchTags } = usePostTag({ fetchOnMounted: false });
 
-const handleSelect = (user: User) => {
-  if (props.selected && user.metadata.name === props.selected.metadata.name) {
+const handleSelect = (tag: Tag) => {
+  if (props.selected && tag.metadata.name === props.selected.metadata.name) {
     emit("update:selected", undefined);
     emit("select", undefined);
     return;
   }
 
-  emit("update:selected", user);
-  emit("select", user);
+  emit("update:selected", tag);
+  emit("select", tag);
 };
 
 function onDropdownShow() {
-  handleFetchUsers();
+  handleFetchTags();
   setTimeout(() => {
-    setFocus("userDropdownSelectorInput");
+    setFocus("tagDropdownSelectorInput");
   }, 200);
 }
 
 // search
 const keyword = ref("");
 
-let fuse: Fuse<User> | undefined = undefined;
+let fuse: Fuse<Tag> | undefined = undefined;
 
 watch(
-  () => users.value,
+  () => tags.value,
   () => {
-    fuse = new Fuse(users.value, {
+    fuse = new Fuse(tags.value, {
       keys: ["spec.displayName", "metadata.name", "spec.email"],
       useExtendedSearch: true,
     });
@@ -57,7 +58,7 @@ watch(
 
 const searchResults = computed(() => {
   if (!fuse || !keyword.value) {
-    return users.value;
+    return tags.value;
   }
 
   return fuse?.search(keyword.value).map((item) => item.item);
@@ -71,7 +72,7 @@ const searchResults = computed(() => {
       <div class="h-96 w-80">
         <div class="border-b border-b-gray-100 bg-white p-4">
           <FormKit
-            id="userDropdownSelectorInput"
+            id="tagDropdownSelectorInput"
             v-model="keyword"
             placeholder="输入关键词搜索"
             type="text"
@@ -83,27 +84,24 @@ const searchResults = computed(() => {
             role="list"
           >
             <li
-              v-for="(user, index) in searchResults"
+              v-for="(tag, index) in searchResults"
               :key="index"
               v-close-popper
-              @click="handleSelect(user)"
+              @click="handleSelect(tag)"
             >
               <VEntity
-                :is-selected="selected?.metadata.name === user.metadata.name"
+                :is-selected="selected?.metadata.name === tag.metadata.name"
               >
                 <template #start>
-                  <VEntityField>
-                    <template #description>
-                      <VAvatar
-                        :alt="user.spec.displayName"
-                        :src="user.spec.avatar"
-                        size="md"
-                      ></VAvatar>
+                  <VEntityField :description="tag.status?.permalink">
+                    <template #title>
+                      <PostTag :tag="tag" />
                     </template>
                   </VEntityField>
+                </template>
+                <template #end>
                   <VEntityField
-                    :title="user.spec.displayName"
-                    :description="user.metadata.name"
+                    :description="`${tag.status?.postCount || 0} 篇文章`"
                   />
                 </template>
               </VEntity>
