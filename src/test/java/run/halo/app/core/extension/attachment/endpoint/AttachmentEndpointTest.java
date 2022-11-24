@@ -1,6 +1,10 @@
 package run.halo.app.core.extension.attachment.endpoint;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,13 +22,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
+import org.springframework.mock.web.reactive.function.server.MockServerRequest;
+import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.attachment.Attachment;
+import run.halo.app.core.extension.attachment.Attachment.AttachmentSpec;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.Policy.PolicySpec;
+import run.halo.app.core.extension.attachment.endpoint.AttachmentEndpoint.SearchRequest;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
@@ -146,6 +156,47 @@ class AttachmentEndpointTest {
             verify(client).create(attachment);
             verify(extensionComponentsFinder).getExtensions(AttachmentHandler.class);
             verify(handler).upload(any());
+        }
+    }
+
+    @Nested
+    class SearchTest {
+
+        @Test
+        void shouldListUngroupedAttachments() {
+            when(client.list(same(Attachment.class), any(), any(), anyInt(), anyInt()))
+                .thenReturn(Mono.just(ListResult.emptyResult()));
+
+            webClient
+                .get()
+                .uri("/attachments")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("items.length()").isEqualTo(0);
+        }
+
+        @Test
+        void shouldFilterWithUngrouped() {
+            var httpRequest = MockServerHttpRequest.get("/attachments")
+                .build();
+            var exchange = new MockServerWebExchange.Builder(httpRequest)
+                .build();
+            MockServerRequest request = MockServerRequest.builder()
+                .queryParam("ungrouped", "true")
+                .queryParam("group", "halo")
+                .exchange(exchange)
+                .build();
+            var searchRequest = new SearchRequest(request);
+            var pred = searchRequest.toPredicate();
+            var attachment = new Attachment();
+            var spec = new AttachmentSpec();
+            attachment.setSpec(spec);
+
+            assertTrue(pred.test(attachment));
+
+            spec.setGroupRef(Ref.of("halo"));
+            assertFalse(pred.test(attachment));
         }
     }
 

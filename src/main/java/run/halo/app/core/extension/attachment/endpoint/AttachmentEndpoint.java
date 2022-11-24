@@ -4,6 +4,7 @@ import static java.util.Comparator.comparing;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
+import static org.springframework.boot.convert.ApplicationConversionService.getSharedInstance;
 import static org.springframework.web.reactive.function.BodyExtractors.toMultipartData;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static run.halo.app.extension.ListResult.generateGenericClass;
@@ -168,6 +169,10 @@ public class AttachmentEndpoint implements CustomEndpoint {
         @Schema(description = "Name of group")
         Optional<String> getGroup();
 
+        @Schema(description = "Filter attachments without group. This parameter will ignore group"
+            + " parameter.")
+        Optional<Boolean> getUngrouped();
+
         @Schema(description = "Name of user who uploaded the attachment")
         Optional<String> getUploadedBy();
 
@@ -210,6 +215,12 @@ public class AttachmentEndpoint implements CustomEndpoint {
         }
 
         @Override
+        public Optional<Boolean> getUngrouped() {
+            return Optional.ofNullable(queryParams.getFirst("ungrouped"))
+                .map(ungroupedStr -> getSharedInstance().convert(ungroupedStr, Boolean.class));
+        }
+
+        @Override
         public Optional<String> getUploadedBy() {
             return Optional.ofNullable(queryParams.getFirst("uploadedBy"))
                 .filter(StringUtils::hasText);
@@ -221,33 +232,49 @@ public class AttachmentEndpoint implements CustomEndpoint {
         }
 
         public Predicate<Attachment> toPredicate() {
-            var predicate = (Predicate<Attachment>) (attachment) -> getDisplayName()
+            Predicate<Attachment> displayNamePred = attachment -> getDisplayName()
                 .map(displayNameInParam -> {
                     String displayName = attachment.getSpec().getDisplayName();
                     return displayName.contains(displayNameInParam);
-                }).orElse(true)
-                && getPolicy()
+                }).orElse(true);
+
+            Predicate<Attachment> policyPred = attachment -> getPolicy()
                 .map(policy -> {
                     var policyRef = attachment.getSpec().getPolicyRef();
                     return policyRef != null && policy.equals(policyRef.getName());
-                }).orElse(true)
-                && getGroup()
+                }).orElse(true);
+
+            Predicate<Attachment> groupPred = attachment -> getGroup()
                 .map(group -> {
                     var groupRef = attachment.getSpec().getGroupRef();
                     return groupRef != null && group.equals(groupRef.getName());
                 })
-                .orElse(true)
-                && getUploadedBy()
+                .orElse(true);
+
+            Predicate<Attachment> ungroupedPred = attachment -> getUngrouped()
+                .filter(Boolean::booleanValue)
+                .map(ungrouped -> {
+                    var groupRef = attachment.getSpec().getGroupRef();
+                    return groupRef == null || !StringUtils.hasText(groupRef.getName());
+                })
+                .orElseGet(() -> groupPred.test(attachment));
+
+            Predicate<Attachment> uploadedByPred = attachment -> getUploadedBy()
                 .map(uploadedBy -> {
                     var uploadedByRef = attachment.getSpec().getUploadedBy();
                     return uploadedByRef != null && uploadedBy.equals(uploadedByRef.getName());
                 })
                 .orElse(true);
 
-            var selectorPredicate = labelAndFieldSelectorToPredicate(getLabelSelector(),
-                getFieldSelector());
 
-            return predicate.and(selectorPredicate);
+            var selectorPred =
+                labelAndFieldSelectorToPredicate(getLabelSelector(), getFieldSelector());
+
+            return displayNamePred
+                .and(policyPred)
+                .and(ungroupedPred)
+                .and(uploadedByPred)
+                .and(selectorPred);
         }
 
         public Comparator<Attachment> toComparator() {
