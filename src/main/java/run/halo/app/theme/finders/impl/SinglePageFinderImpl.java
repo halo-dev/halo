@@ -96,7 +96,7 @@ public class SinglePageFinderImpl implements SinglePageFinder {
                     populateStats(pageVo);
                     return pageVo;
                 })
-                .flatMap(this::populateContributors)
+                .concatMap(this::populateContributors)
                 .collectList()
                 .map(pageVos -> new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
                     pageVos)
