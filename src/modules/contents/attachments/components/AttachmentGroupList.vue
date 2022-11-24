@@ -57,7 +57,7 @@ const defaultGroups: Group[] = [
     apiVersion: "",
     kind: "",
     metadata: {
-      name: "none",
+      name: "ungrouped",
     },
   },
 ];
@@ -68,7 +68,7 @@ const groupToUpdate = ref<Group | null>(null);
 const loading = ref<boolean>(false);
 const editingModal = ref(false);
 
-const routeQuery = useRouteQuery("group");
+const routeQuery = useRouteQuery<string>("group");
 
 const handleSelectGroup = (group: Group) => {
   emit("update:selectedGroup", group);
@@ -166,7 +166,8 @@ const handleDeleteWithAttachments = (group: Group) => {
 watch(
   () => groups.value.length,
   () => {
-    const groupIndex = groups.value.findIndex(
+    const allGroups = [...defaultGroups, ...groups.value];
+    const groupIndex = allGroups.findIndex(
       (group) => group.metadata.name === routeQuery.value
     );
 
@@ -186,8 +187,8 @@ onMounted(async () => {
     );
     if (group) {
       handleSelectGroup(group);
+      return;
     }
-    return;
   }
 
   handleSelectGroup(defaultGroups[0]);

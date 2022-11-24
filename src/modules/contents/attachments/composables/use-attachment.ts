@@ -82,6 +82,7 @@ export function useAttachmentControl(filterOptions?: {
         policy: policy?.value?.metadata.name,
         displayName: keyword?.value,
         group: group?.value?.metadata.name,
+        ungrouped: group?.value?.metadata.name === "ungrouped",
         uploadedBy: user?.value?.metadata.name,
         page: attachments.value.page,
         size: attachments.value.size,

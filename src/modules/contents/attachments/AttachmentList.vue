@@ -208,12 +208,16 @@ const onDetailModalClose = () => {
   selectedAttachment.value = undefined;
   nameQuery.value = undefined;
   nameQueryAttachment.value = undefined;
-  handleFetchAttachments();
+  setTimeout(() => {
+    handleFetchAttachments();
+  }, 200);
 };
 
 const onUploadModalClose = () => {
   routeQueryAction.value = undefined;
-  handleFetchAttachments();
+  setTimeout(() => {
+    handleFetchAttachments();
+  }, 200);
 };
 
 const onGroupChange = () => {
