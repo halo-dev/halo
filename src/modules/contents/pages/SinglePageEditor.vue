@@ -140,6 +140,7 @@ const handlePublish = async () => {
       await apiClient.singlePage.draftSinglePage({
         singlePageRequest: formState.value,
       });
+      router.push({ name: "SinglePages" });
     }
 
     Toast.success("发布成功");

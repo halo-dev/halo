@@ -144,6 +144,8 @@ const handlePublish = async () => {
       await apiClient.post.publishPost({
         name: data.metadata.name,
       });
+
+      router.push({ name: "Posts" });
     }
 
     Toast.success("发布成功", { duration: 2000 });
