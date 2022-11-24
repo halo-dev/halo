@@ -33,31 +33,36 @@ await handleFetchSettings();
 await handleFetchConfigMap();
 </script>
 <template>
-  <div class="bg-white p-4">
-    <div>
-      <FormKit
-        v-if="group && formSchema && configMapFormData"
-        :id="group"
-        v-model="configMapFormData[group]"
-        :name="group"
-        :actions="false"
-        :preserve="true"
-        type="form"
-        @submit="handleSaveConfigMap"
-      >
-        <FormKitSchema :schema="formSchema" :data="configMapFormData[group]" />
-      </FormKit>
-    </div>
-    <div v-permission="['system:configmaps:manage']" class="pt-5">
-      <div class="flex justify-start">
-        <VButton
-          :loading="saving"
-          type="secondary"
-          @click="$formkit.submit(group || '')"
+  <Transition appear mode="out-in" name="fade">
+    <div class="bg-white p-4">
+      <div>
+        <FormKit
+          v-if="group && formSchema && configMapFormData"
+          :id="group"
+          v-model="configMapFormData[group]"
+          :name="group"
+          :actions="false"
+          :preserve="true"
+          type="form"
+          @submit="handleSaveConfigMap"
         >
-          保存
-        </VButton>
+          <FormKitSchema
+            :schema="formSchema"
+            :data="configMapFormData[group]"
+          />
+        </FormKit>
+      </div>
+      <div v-permission="['system:configmaps:manage']" class="pt-5">
+        <div class="flex justify-start">
+          <VButton
+            :loading="saving"
+            type="secondary"
+            @click="$formkit.submit(group || '')"
+          >
+            保存
+          </VButton>
+        </div>
       </div>
     </div>
-  </div>
+  </Transition>
 </template>

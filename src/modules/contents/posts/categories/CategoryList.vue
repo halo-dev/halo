@@ -12,6 +12,7 @@ import {
   VEmpty,
   VPageHeader,
   VSpace,
+  VLoading,
 } from "@halo-dev/components";
 import CategoryEditingModal from "./components/CategoryEditingModal.vue";
 import CategoryListItem from "./components/CategoryListItem.vue";
@@ -111,34 +112,34 @@ const onEditingModalClose = () => {
           </div>
         </div>
       </template>
-      <VEmpty
-        v-if="!categories.length && !loading"
-        message="你可以尝试刷新或者新建分类"
-        title="当前没有分类"
-      >
-        <template #actions>
-          <VSpace>
-            <VButton @click="handleFetchCategories">刷新</VButton>
-            <VButton
-              v-permission="['system:posts:manage']"
-              type="primary"
-              @click="editingModal = true"
-            >
-              <template #icon>
-                <IconAddCircle class="h-full w-full" />
-              </template>
-              新建分类
-            </VButton>
-          </VSpace>
-        </template>
-      </VEmpty>
-      <CategoryListItem
-        v-else
-        :categories="categoriesTree"
-        @change="handleUpdateInBatch"
-        @delete="handleDelete"
-        @open-editing="handleOpenEditingModal"
-      />
+      <VLoading v-if="loading" />
+      <Transition v-else-if="!categories.length" appear name="fade">
+        <VEmpty message="你可以尝试刷新或者新建分类" title="当前没有分类">
+          <template #actions>
+            <VSpace>
+              <VButton @click="handleFetchCategories">刷新</VButton>
+              <VButton
+                v-permission="['system:posts:manage']"
+                type="primary"
+                @click="editingModal = true"
+              >
+                <template #icon>
+                  <IconAddCircle class="h-full w-full" />
+                </template>
+                新建分类
+              </VButton>
+            </VSpace>
+          </template>
+        </VEmpty>
+      </Transition>
+      <Transition v-else appear name="fade">
+        <CategoryListItem
+          :categories="categoriesTree"
+          @change="handleUpdateInBatch"
+          @delete="handleDelete"
+          @open-editing="handleOpenEditingModal"
+        />
+      </Transition>
     </VCard>
   </div>
 </template>

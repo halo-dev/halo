@@ -10,6 +10,7 @@ import {
   IconRefreshLine,
   VEmpty,
   Dialog,
+  VLoading,
 } from "@halo-dev/components";
 import CommentListItem from "./components/CommentListItem.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
@@ -459,36 +460,40 @@ function handleClearFilters() {
           </div>
         </div>
       </template>
-      <VEmpty
-        v-if="!comments.items.length && !loading"
-        message="你可以尝试刷新或者修改筛选条件"
-        title="当前没有评论"
-      >
-        <template #actions>
-          <VSpace>
-            <VButton @click="handleFetchComments">刷新</VButton>
-          </VSpace>
-        </template>
-      </VEmpty>
-      <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-        <li v-for="(comment, index) in comments.items" :key="index">
-          <CommentListItem
-            :comment="comment"
-            :is-selected="checkSelection(comment)"
-            @reload="handleFetchComments"
-          >
-            <template #checkbox>
-              <input
-                v-model="selectedCommentNames"
-                :value="comment?.comment?.metadata.name"
-                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                name="comment-checkbox"
-                type="checkbox"
-              />
-            </template>
-          </CommentListItem>
-        </li>
-      </ul>
+      <VLoading v-if="loading" />
+      <Transition v-else-if="!comments.items.length" appear name="fade">
+        <VEmpty message="你可以尝试刷新或者修改筛选条件" title="当前没有评论">
+          <template #actions>
+            <VSpace>
+              <VButton @click="handleFetchComments">刷新</VButton>
+            </VSpace>
+          </template>
+        </VEmpty>
+      </Transition>
+      <Transition v-else appear name="fade">
+        <ul
+          class="box-border h-full w-full divide-y divide-gray-100"
+          role="list"
+        >
+          <li v-for="(comment, index) in comments.items" :key="index">
+            <CommentListItem
+              :comment="comment"
+              :is-selected="checkSelection(comment)"
+              @reload="handleFetchComments"
+            >
+              <template #checkbox>
+                <input
+                  v-model="selectedCommentNames"
+                  :value="comment?.comment?.metadata.name"
+                  class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                  name="comment-checkbox"
+                  type="checkbox"
+                />
+              </template>
+            </CommentListItem>
+          </li>
+        </ul>
+      </Transition>
 
       <template #footer>
         <div class="bg-white sm:flex sm:items-center sm:justify-end">

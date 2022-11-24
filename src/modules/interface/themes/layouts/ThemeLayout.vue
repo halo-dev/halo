@@ -24,6 +24,7 @@ import {
   VPageHeader,
   VSpace,
   VTabbar,
+  VLoading,
 } from "@halo-dev/components";
 import ThemeListModal from "../components/ThemeListModal.vue";
 import ThemePreviewModal from "../components/preview/ThemePreviewModal.vue";
@@ -224,15 +225,13 @@ onMounted(() => {
             ></VTabbar>
           </template>
         </VCard>
-        <div>
+        <div class="bg-white">
           <RouterView :key="activeTab" v-slot="{ Component }">
             <template v-if="Component">
               <Suspense>
                 <component :is="Component"></component>
                 <template #fallback>
-                  <div class="flex h-32 w-full justify-center bg-white">
-                    <span class="text-sm text-gray-600">加载中...</span>
-                  </div>
+                  <VLoading />
                 </template>
               </Suspense>
             </template>

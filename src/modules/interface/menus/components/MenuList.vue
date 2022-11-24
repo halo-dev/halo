@@ -9,6 +9,7 @@ import {
   VEntity,
   VEntityField,
   VTag,
+  VLoading,
 } from "@halo-dev/components";
 import MenuEditingModal from "./MenuEditingModal.vue";
 import { onMounted, onUnmounted, ref } from "vue";
@@ -190,75 +191,76 @@ onMounted(handleFetchPrimaryMenuName);
     @created="handleSelect"
   />
   <VCard :body-class="['!p-0']" title="菜单">
-    <VEmpty
-      v-if="!menus.length && !loading"
-      message="你可以尝试刷新或者新建菜单"
-      title="当前没有菜单"
-    >
-      <template #actions>
-        <VSpace>
-          <VButton size="sm" @click="handleFetchMenus"> 刷新</VButton>
-        </VSpace>
-      </template>
-    </VEmpty>
-    <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-      <li
-        v-for="(menu, index) in menus"
-        :key="index"
-        @click="handleSelect(menu)"
-      >
-        <VEntity
-          :is-selected="selectedMenu?.metadata.name === menu.metadata.name"
+    <VLoading v-if="loading" />
+    <Transition v-else-if="!menus.length" appear name="fade">
+      <VEmpty message="你可以尝试刷新或者新建菜单" title="当前没有菜单">
+        <template #actions>
+          <VSpace>
+            <VButton size="sm" @click="handleFetchMenus"> 刷新</VButton>
+          </VSpace>
+        </template>
+      </VEmpty>
+    </Transition>
+    <Transition v-else appear name="fade">
+      <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
+        <li
+          v-for="(menu, index) in menus"
+          :key="index"
+          @click="handleSelect(menu)"
         >
-          <template #start>
-            <VEntityField
-              :title="menu.spec?.displayName"
-              :description="`${menu.spec.menuItems?.length || 0} 个菜单项`"
-            >
-              <template v-if="menu.metadata.name === primaryMenuName" #extra>
-                <VTag>主菜单</VTag>
-              </template>
-            </VEntityField>
-          </template>
-          <template #end>
-            <VEntityField v-if="menu.metadata.deletionTimestamp">
-              <template #description>
-                <VStatusDot v-tooltip="`删除中`" state="warning" animate />
-              </template>
-            </VEntityField>
-          </template>
-          <template
-            v-if="currentUserHasPermission(['system:menus:manage'])"
-            #dropdownItems
+          <VEntity
+            :is-selected="selectedMenu?.metadata.name === menu.metadata.name"
           >
-            <VButton
-              v-close-popper
-              block
-              type="secondary"
-              @click="handleSetPrimaryMenu(menu)"
+            <template #start>
+              <VEntityField
+                :title="menu.spec?.displayName"
+                :description="`${menu.spec.menuItems?.length || 0} 个菜单项`"
+              >
+                <template v-if="menu.metadata.name === primaryMenuName" #extra>
+                  <VTag>主菜单</VTag>
+                </template>
+              </VEntityField>
+            </template>
+            <template #end>
+              <VEntityField v-if="menu.metadata.deletionTimestamp">
+                <template #description>
+                  <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                </template>
+              </VEntityField>
+            </template>
+            <template
+              v-if="currentUserHasPermission(['system:menus:manage'])"
+              #dropdownItems
             >
-              设置为主菜单
-            </VButton>
-            <VButton
-              v-close-popper
-              block
-              type="default"
-              @click="handleOpenEditingModal(menu)"
-            >
-              修改
-            </VButton>
-            <VButton
-              v-close-popper
-              block
-              type="danger"
-              @click="handleDeleteMenu(menu)"
-            >
-              删除
-            </VButton>
-          </template>
-        </VEntity>
-      </li>
-    </ul>
+              <VButton
+                v-close-popper
+                block
+                type="secondary"
+                @click="handleSetPrimaryMenu(menu)"
+              >
+                设置为主菜单
+              </VButton>
+              <VButton
+                v-close-popper
+                block
+                type="default"
+                @click="handleOpenEditingModal(menu)"
+              >
+                修改
+              </VButton>
+              <VButton
+                v-close-popper
+                block
+                type="danger"
+                @click="handleDeleteMenu(menu)"
+              >
+                删除
+              </VButton>
+            </template>
+          </VEntity>
+        </li>
+      </ul>
+    </Transition>
     <template v-if="currentUserHasPermission(['system:menus:manage'])" #footer>
       <VButton block type="secondary" @click="handleOpenEditingModal()">
         新增

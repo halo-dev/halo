@@ -19,6 +19,7 @@ import {
   VStatusDot,
   VEntity,
   VEntityField,
+  VLoading,
 } from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
@@ -563,30 +564,33 @@ onMounted(() => {
             />
           </div>
 
-          <VEmpty
-            v-if="!attachments.total && !loading"
-            message="当前分组没有附件，你可以尝试刷新或者上传附件"
-            title="当前分组没有附件"
-          >
-            <template #actions>
-              <VSpace>
-                <VButton @click="handleFetchAttachments">刷新</VButton>
-                <VButton
-                  v-permission="['system:attachments:manage']"
-                  type="secondary"
-                  @click="uploadVisible = true"
-                >
-                  <template #icon>
-                    <IconUpload class="h-full w-full" />
-                  </template>
-                  上传附件
-                </VButton>
-              </VSpace>
-            </template>
-          </VEmpty>
+          <VLoading v-if="loading" />
+
+          <Transition v-else-if="!attachments.total" appear name="fade">
+            <VEmpty
+              message="当前分组没有附件，你可以尝试刷新或者上传附件"
+              title="当前分组没有附件"
+            >
+              <template #actions>
+                <VSpace>
+                  <VButton @click="handleFetchAttachments">刷新</VButton>
+                  <VButton
+                    v-permission="['system:attachments:manage']"
+                    type="secondary"
+                    @click="uploadVisible = true"
+                  >
+                    <template #icon>
+                      <IconUpload class="h-full w-full" />
+                    </template>
+                    上传附件
+                  </VButton>
+                </VSpace>
+              </template>
+            </VEmpty>
+          </Transition>
 
           <div v-else>
-            <div v-if="viewType === 'grid'">
+            <Transition v-if="viewType === 'grid'" appear name="fade">
               <div
                 class="mt-2 grid grid-cols-3 gap-x-2 gap-y-3 sm:grid-cols-3 md:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-12"
                 role="list"
@@ -666,119 +670,126 @@ onMounted(() => {
                   </div>
                 </VCard>
               </div>
-            </div>
-
-            <ul
-              v-if="viewType === 'list'"
-              class="box-border h-full w-full divide-y divide-gray-100"
-              role="list"
-            >
-              <li v-for="(attachment, index) in attachments.items" :key="index">
-                <VEntity :is-selected="isChecked(attachment)">
-                  <template
-                    v-if="
-                      currentUserHasPermission(['system:attachments:manage'])
-                    "
-                    #checkbox
-                  >
-                    <input
-                      :checked="selectedAttachments.has(attachment)"
-                      class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                      type="checkbox"
-                      @click="handleSelect(attachment)"
-                    />
-                  </template>
-                  <template #start>
-                    <VEntityField>
-                      <template #description>
-                        <div
-                          class="h-10 w-10 rounded border bg-white p-1 hover:shadow-sm"
-                        >
-                          <AttachmentFileTypeIcon
-                            :display-ext="false"
-                            :file-name="attachment.spec.displayName"
-                            :width="8"
-                            :height="8"
-                          />
-                        </div>
-                      </template>
-                    </VEntityField>
-                    <VEntityField
-                      :title="attachment.spec.displayName"
-                      @click="handleClickItem(attachment)"
-                    >
-                      <template #description>
-                        <VSpace>
-                          <span class="text-xs text-gray-500">
-                            {{ attachment.spec.mediaType }}
-                          </span>
-                          <span class="text-xs text-gray-500">
-                            {{ prettyBytes(attachment.spec.size || 0) }}
-                          </span>
-                        </VSpace>
-                      </template>
-                    </VEntityField>
-                  </template>
-                  <template #end>
-                    <VEntityField
-                      :description="
-                        getPolicyName(attachment.spec.policyRef?.name)
+            </Transition>
+            <Transition v-if="viewType === 'list'" appear name="fade">
+              <ul
+                class="box-border h-full w-full divide-y divide-gray-100"
+                role="list"
+              >
+                <li
+                  v-for="(attachment, index) in attachments.items"
+                  :key="index"
+                >
+                  <VEntity :is-selected="isChecked(attachment)">
+                    <template
+                      v-if="
+                        currentUserHasPermission(['system:attachments:manage'])
                       "
-                    />
-                    <VEntityField>
-                      <template #description>
-                        <RouterLink
-                          :to="{
-                            name: 'UserDetail',
-                            params: { name: attachment.spec.uploadedBy?.name },
-                          }"
-                          class="text-xs text-gray-500"
-                        >
-                          {{ attachment.spec.uploadedBy?.name }}
-                        </RouterLink>
-                      </template>
-                    </VEntityField>
-                    <VEntityField v-if="attachment.metadata.deletionTimestamp">
-                      <template #description>
-                        <VStatusDot
-                          v-tooltip="`删除中`"
-                          state="warning"
-                          animate
-                        />
-                      </template>
-                    </VEntityField>
-                    <VEntityField>
-                      <template #description>
-                        <span
-                          class="truncate text-xs tabular-nums text-gray-500"
-                        >
-                          {{
-                            formatDatetime(
-                              attachment.metadata.creationTimestamp
-                            )
-                          }}
-                        </span>
-                      </template>
-                    </VEntityField>
-                  </template>
-                  <template
-                    v-if="
-                      currentUserHasPermission(['system:attachments:manage'])
-                    "
-                    #dropdownItems
-                  >
-                    <VButton
-                      v-close-popper
-                      block
-                      type="danger"
-                      @click="handleDelete(attachment)"
+                      #checkbox
                     >
-                      删除
-                    </VButton>
-                  </template>
-                </VEntity>
-              </li>
-            </ul>
+                      <input
+                        :checked="selectedAttachments.has(attachment)"
+                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                        type="checkbox"
+                        @click="handleSelect(attachment)"
+                      />
+                    </template>
+                    <template #start>
+                      <VEntityField>
+                        <template #description>
+                          <div
+                            class="h-10 w-10 rounded border bg-white p-1 hover:shadow-sm"
+                          >
+                            <AttachmentFileTypeIcon
+                              :display-ext="false"
+                              :file-name="attachment.spec.displayName"
+                              :width="8"
+                              :height="8"
+                            />
+                          </div>
+                        </template>
+                      </VEntityField>
+                      <VEntityField
+                        :title="attachment.spec.displayName"
+                        @click="handleClickItem(attachment)"
+                      >
+                        <template #description>
+                          <VSpace>
+                            <span class="text-xs text-gray-500">
+                              {{ attachment.spec.mediaType }}
+                            </span>
+                            <span class="text-xs text-gray-500">
+                              {{ prettyBytes(attachment.spec.size || 0) }}
+                            </span>
+                          </VSpace>
+                        </template>
+                      </VEntityField>
+                    </template>
+                    <template #end>
+                      <VEntityField
+                        :description="
+                          getPolicyName(attachment.spec.policyRef?.name)
+                        "
+                      />
+                      <VEntityField>
+                        <template #description>
+                          <RouterLink
+                            :to="{
+                              name: 'UserDetail',
+                              params: {
+                                name: attachment.spec.uploadedBy?.name,
+                              },
+                            }"
+                            class="text-xs text-gray-500"
+                          >
+                            {{ attachment.spec.uploadedBy?.name }}
+                          </RouterLink>
+                        </template>
+                      </VEntityField>
+                      <VEntityField
+                        v-if="attachment.metadata.deletionTimestamp"
+                      >
+                        <template #description>
+                          <VStatusDot
+                            v-tooltip="`删除中`"
+                            state="warning"
+                            animate
+                          />
+                        </template>
+                      </VEntityField>
+                      <VEntityField>
+                        <template #description>
+                          <span
+                            class="truncate text-xs tabular-nums text-gray-500"
+                          >
+                            {{
+                              formatDatetime(
+                                attachment.metadata.creationTimestamp
+                              )
+                            }}
+                          </span>
+                        </template>
+                      </VEntityField>
+                    </template>
+                    <template
+                      v-if="
+                        currentUserHasPermission(['system:attachments:manage'])
+                      "
+                      #dropdownItems
+                    >
+                      <VButton
+                        v-close-popper
+                        block
+                        type="danger"
+                        @click="handleDelete(attachment)"
+                      >
+                        删除
+                      </VButton>
+                    </template>
+                  </VEntity>
+                </li>
+              </ul>
+            </Transition>
           </div>
 
           <template #footer>

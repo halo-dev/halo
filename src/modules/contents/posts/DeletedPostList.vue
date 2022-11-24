@@ -14,6 +14,7 @@ import {
   VStatusDot,
   VEntity,
   VEntityField,
+  VLoading,
 } from "@halo-dev/components";
 import PostTag from "./tags/components/PostTag.vue";
 import { onMounted, ref, watch } from "vue";
@@ -298,138 +299,146 @@ function handleClearKeyword() {
         </div>
       </template>
 
-      <VEmpty
-        v-if="!posts.items.length && !loading"
-        message="你可以尝试刷新或者返回文章管理"
-        title="没有文章被放入回收站"
-      >
-        <template #actions>
-          <VSpace>
-            <VButton @click="handleFetchPosts">刷新</VButton>
-            <VButton :route="{ name: 'Posts' }" type="primary"> 返回 </VButton>
-          </VSpace>
-        </template>
-      </VEmpty>
+      <VLoading v-if="loading" />
 
-      <ul
-        v-else
-        class="box-border h-full w-full divide-y divide-gray-100"
-        role="list"
-      >
-        <li v-for="(post, index) in posts.items" :key="index">
-          <VEntity :is-selected="checkSelection(post.post)">
-            <template
-              v-if="currentUserHasPermission(['system:posts:manage'])"
-              #checkbox
-            >
-              <input
-                v-model="selectedPostNames"
-                :value="post.post.metadata.name"
-                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                name="post-checkbox"
-                type="checkbox"
-              />
-            </template>
-            <template #start>
-              <VEntityField :title="post.post.spec.title">
-                <template #extra>
-                  <VSpace class="mt-1 sm:mt-0">
-                    <PostTag
-                      v-for="(tag, tagIndex) in post.tags"
-                      :key="tagIndex"
-                      :tag="tag"
-                      route
-                    ></PostTag>
-                  </VSpace>
-                </template>
-                <template #description>
-                  <VSpace>
-                    <p
-                      v-if="post.categories.length"
-                      class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
-                    >
-                      分类：<span
-                        v-for="(category, categoryIndex) in post.categories"
-                        :key="categoryIndex"
-                        class="cursor-pointer hover:text-gray-900"
+      <Transition v-else-if="!posts.items.length" appear name="fade">
+        <VEmpty
+          message="你可以尝试刷新或者返回文章管理"
+          title="没有文章被放入回收站"
+        >
+          <template #actions>
+            <VSpace>
+              <VButton @click="handleFetchPosts">刷新</VButton>
+              <VButton :route="{ name: 'Posts' }" type="primary">
+                返回
+              </VButton>
+            </VSpace>
+          </template>
+        </VEmpty>
+      </Transition>
+
+      <Transition v-else appear name="fade">
+        <ul
+          class="box-border h-full w-full divide-y divide-gray-100"
+          role="list"
+        >
+          <li v-for="(post, index) in posts.items" :key="index">
+            <VEntity :is-selected="checkSelection(post.post)">
+              <template
+                v-if="currentUserHasPermission(['system:posts:manage'])"
+                #checkbox
+              >
+                <input
+                  v-model="selectedPostNames"
+                  :value="post.post.metadata.name"
+                  class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                  name="post-checkbox"
+                  type="checkbox"
+                />
+              </template>
+              <template #start>
+                <VEntityField :title="post.post.spec.title">
+                  <template #extra>
+                    <VSpace class="mt-1 sm:mt-0">
+                      <PostTag
+                        v-for="(tag, tagIndex) in post.tags"
+                        :key="tagIndex"
+                        :tag="tag"
+                        route
+                      ></PostTag>
+                    </VSpace>
+                  </template>
+                  <template #description>
+                    <VSpace>
+                      <p
+                        v-if="post.categories.length"
+                        class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
                       >
-                        {{ category.spec.displayName }}
+                        分类：<span
+                          v-for="(category, categoryIndex) in post.categories"
+                          :key="categoryIndex"
+                          class="cursor-pointer hover:text-gray-900"
+                        >
+                          {{ category.spec.displayName }}
+                        </span>
+                      </p>
+                      <span class="text-xs text-gray-500">
+                        访问量 {{ post.stats.visit || 0 }}
                       </span>
-                    </p>
-                    <span class="text-xs text-gray-500">
-                      访问量 {{ post.stats.visit || 0 }}
+                      <span class="text-xs text-gray-500">
+                        评论 {{ post.stats.totalComment || 0 }}
+                      </span>
+                    </VSpace>
+                  </template>
+                </VEntityField>
+              </template>
+              <template #end>
+                <VEntityField>
+                  <template #description>
+                    <RouterLink
+                      v-for="(
+                        contributor, contributorIndex
+                      ) in post.contributors"
+                      :key="contributorIndex"
+                      :to="{
+                        name: 'UserDetail',
+                        params: { name: contributor.name },
+                      }"
+                      class="flex items-center"
+                    >
+                      <VAvatar
+                        v-tooltip="contributor.displayName"
+                        size="xs"
+                        :src="contributor.avatar"
+                        :alt="contributor.displayName"
+                        circle
+                      ></VAvatar>
+                    </RouterLink>
+                  </template>
+                </VEntityField>
+                <VEntityField v-if="!post?.post?.spec.deleted">
+                  <template #description>
+                    <VStatusDot v-tooltip="`恢复中`" state="success" animate />
+                  </template>
+                </VEntityField>
+                <VEntityField v-if="post?.post?.metadata.deletionTimestamp">
+                  <template #description>
+                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                  </template>
+                </VEntityField>
+                <VEntityField>
+                  <template #description>
+                    <span class="truncate text-xs tabular-nums text-gray-500">
+                      {{ formatDatetime(post.post.spec.publishTime) }}
                     </span>
-                    <span class="text-xs text-gray-500">
-                      评论 {{ post.stats.totalComment || 0 }}
-                    </span>
-                  </VSpace>
-                </template>
-              </VEntityField>
-            </template>
-            <template #end>
-              <VEntityField>
-                <template #description>
-                  <RouterLink
-                    v-for="(contributor, contributorIndex) in post.contributors"
-                    :key="contributorIndex"
-                    :to="{
-                      name: 'UserDetail',
-                      params: { name: contributor.name },
-                    }"
-                    class="flex items-center"
-                  >
-                    <VAvatar
-                      v-tooltip="contributor.displayName"
-                      size="xs"
-                      :src="contributor.avatar"
-                      :alt="contributor.displayName"
-                      circle
-                    ></VAvatar>
-                  </RouterLink>
-                </template>
-              </VEntityField>
-              <VEntityField v-if="!post?.post?.spec.deleted">
-                <template #description>
-                  <VStatusDot v-tooltip="`恢复中`" state="success" animate />
-                </template>
-              </VEntityField>
-              <VEntityField v-if="post?.post?.metadata.deletionTimestamp">
-                <template #description>
-                  <VStatusDot v-tooltip="`删除中`" state="warning" animate />
-                </template>
-              </VEntityField>
-              <VEntityField>
-                <template #description>
-                  <span class="truncate text-xs tabular-nums text-gray-500">
-                    {{ formatDatetime(post.post.spec.publishTime) }}
-                  </span>
-                </template>
-              </VEntityField>
-            </template>
-            <template
-              v-if="currentUserHasPermission(['system:posts:manage'])"
-              #dropdownItems
-            >
-              <VButton
-                v-close-popper
-                block
-                type="danger"
-                @click="handleDeletePermanently(post.post)"
+                  </template>
+                </VEntityField>
+              </template>
+              <template
+                v-if="currentUserHasPermission(['system:posts:manage'])"
+                #dropdownItems
               >
-                永久删除
-              </VButton>
-              <VButton
-                v-close-popper
-                block
-                type="default"
-                @click="handleRecovery(post.post)"
-              >
-                恢复
-              </VButton>
-            </template>
-          </VEntity>
-        </li>
-      </ul>
+                <VButton
+                  v-close-popper
+                  block
+                  type="danger"
+                  @click="handleDeletePermanently(post.post)"
+                >
+                  永久删除
+                </VButton>
+                <VButton
+                  v-close-popper
+                  block
+                  type="default"
+                  @click="handleRecovery(post.post)"
+                >
+                  恢复
+                </VButton>
+              </template>
+            </VEntity>
+          </li>
+        </ul>
+      </Transition>
 
       <template #footer>
         <div class="bg-white sm:flex sm:items-center sm:justify-end">

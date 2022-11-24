@@ -16,6 +16,7 @@ import {
   VStatusDot,
   VEntity,
   VEntityField,
+  VLoading,
 } from "@halo-dev/components";
 import TagEditingModal from "./components/TagEditingModal.vue";
 import PostTag from "./components/PostTag.vue";
@@ -158,92 +159,99 @@ onMounted(async () => {
           </div>
         </div>
       </template>
-      <VEmpty
-        v-if="!tags.length && !loading"
-        message="你可以尝试刷新或者新建标签"
-        title="当前没有标签"
-      >
-        <template #actions>
-          <VSpace>
-            <VButton @click="handleFetchTags">刷新</VButton>
-            <VButton type="primary" @click="editingModal = true">
-              <template #icon>
-                <IconAddCircle class="h-full w-full" />
-              </template>
-              新建标签
-            </VButton>
-          </VSpace>
-        </template>
-      </VEmpty>
-      <div v-else>
-        <ul
-          v-if="viewType === 'list'"
-          class="box-border h-full w-full divide-y divide-gray-100"
-          role="list"
-        >
-          <li v-for="(tag, index) in tags" :key="index">
-            <VEntity
-              :is-selected="selectedTag?.metadata.name === tag.metadata.name"
-            >
-              <template #start>
-                <VEntityField :description="tag.status?.permalink">
-                  <template #title>
-                    <PostTag :tag="tag" />
-                  </template>
-                </VEntityField>
-              </template>
-              <template #end>
-                <VEntityField v-if="tag.metadata.deletionTimestamp">
-                  <template #description>
-                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
-                  </template>
-                </VEntityField>
-                <VEntityField
-                  :description="`${tag.status?.postCount || 0} 篇文章`"
-                />
-                <VEntityField>
-                  <template #description>
-                    <span class="truncate text-xs tabular-nums text-gray-500">
-                      {{ formatDatetime(tag.metadata.creationTimestamp) }}
-                    </span>
-                  </template>
-                </VEntityField>
-              </template>
-              <template
-                v-if="currentUserHasPermission(['system:posts:manage'])"
-                #dropdownItems
-              >
-                <VButton
-                  v-permission="['system:posts:manage']"
-                  v-close-popper
-                  block
-                  type="secondary"
-                  @click="handleOpenEditingModal(tag)"
-                >
-                  修改
-                </VButton>
-                <VButton
-                  v-permission="['system:posts:manage']"
-                  v-close-popper
-                  block
-                  type="danger"
-                  @click="handleDelete(tag)"
-                >
-                  删除
-                </VButton>
-              </template>
-            </VEntity>
-          </li>
-        </ul>
+      <VLoading v-if="loading" />
+      <Transition v-else-if="!tags.length" appear name="fade">
+        <VEmpty message="你可以尝试刷新或者新建标签" title="当前没有标签">
+          <template #actions>
+            <VSpace>
+              <VButton @click="handleFetchTags">刷新</VButton>
+              <VButton type="primary" @click="editingModal = true">
+                <template #icon>
+                  <IconAddCircle class="h-full w-full" />
+                </template>
+                新建标签
+              </VButton>
+            </VSpace>
+          </template>
+        </VEmpty>
+      </Transition>
 
-        <div v-else class="flex flex-wrap gap-3 p-4" role="list">
-          <PostTag
-            v-for="(tag, index) in tags"
-            :key="index"
-            :tag="tag"
-            @click="handleOpenEditingModal(tag)"
-          />
-        </div>
+      <div v-else>
+        <Transition v-if="viewType === 'list'" appear name="fade">
+          <ul
+            class="box-border h-full w-full divide-y divide-gray-100"
+            role="list"
+          >
+            <li v-for="(tag, index) in tags" :key="index">
+              <VEntity
+                :is-selected="selectedTag?.metadata.name === tag.metadata.name"
+              >
+                <template #start>
+                  <VEntityField :description="tag.status?.permalink">
+                    <template #title>
+                      <PostTag :tag="tag" />
+                    </template>
+                  </VEntityField>
+                </template>
+                <template #end>
+                  <VEntityField v-if="tag.metadata.deletionTimestamp">
+                    <template #description>
+                      <VStatusDot
+                        v-tooltip="`删除中`"
+                        state="warning"
+                        animate
+                      />
+                    </template>
+                  </VEntityField>
+                  <VEntityField
+                    :description="`${tag.status?.postCount || 0} 篇文章`"
+                  />
+                  <VEntityField>
+                    <template #description>
+                      <span class="truncate text-xs tabular-nums text-gray-500">
+                        {{ formatDatetime(tag.metadata.creationTimestamp) }}
+                      </span>
+                    </template>
+                  </VEntityField>
+                </template>
+                <template
+                  v-if="currentUserHasPermission(['system:posts:manage'])"
+                  #dropdownItems
+                >
+                  <VButton
+                    v-permission="['system:posts:manage']"
+                    v-close-popper
+                    block
+                    type="secondary"
+                    @click="handleOpenEditingModal(tag)"
+                  >
+                    修改
+                  </VButton>
+                  <VButton
+                    v-permission="['system:posts:manage']"
+                    v-close-popper
+                    block
+                    type="danger"
+                    @click="handleDelete(tag)"
+                  >
+                    删除
+                  </VButton>
+                </template>
+              </VEntity>
+            </li>
+          </ul>
+        </Transition>
+
+        <Transition v-else appear name="fade">
+          <div class="flex flex-wrap gap-3 p-4" role="list">
+            <PostTag
+              v-for="(tag, index) in tags"
+              :key="index"
+              :tag="tag"
+              @click="handleOpenEditingModal(tag)"
+            />
+          </div>
+        </Transition>
       </div>
     </VCard>
   </div>

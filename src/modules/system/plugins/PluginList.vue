@@ -10,6 +10,7 @@ import {
   VPageHeader,
   VPagination,
   VSpace,
+  VLoading,
 } from "@halo-dev/components";
 import PluginListItem from "./components/PluginListItem.vue";
 import PluginUploadModal from "./components/PluginUploadModal.vue";
@@ -310,37 +311,41 @@ function handleClearFilters() {
         </div>
       </template>
 
-      <VEmpty
-        v-if="!plugins.total && !loading"
-        message="当前没有已安装的插件，你可以尝试刷新或者安装新插件"
-        title="当前没有已安装的插件"
-      >
-        <template #actions>
-          <VSpace>
-            <VButton @click="handleFetchPlugins">刷新</VButton>
-            <VButton
-              v-permission="['system:plugins:manage']"
-              type="secondary"
-              @click="pluginInstall = true"
-            >
-              <template #icon>
-                <IconAddCircle class="h-full w-full" />
-              </template>
-              安装插件
-            </VButton>
-          </VSpace>
-        </template>
-      </VEmpty>
+      <VLoading v-if="loading" />
 
-      <ul
-        v-else
-        class="box-border h-full w-full divide-y divide-gray-100"
-        role="list"
-      >
-        <li v-for="(plugin, index) in plugins.items" :key="index">
-          <PluginListItem :plugin="plugin" @reload="handleFetchPlugins" />
-        </li>
-      </ul>
+      <Transition v-else-if="!plugins.total" appear name="fade">
+        <VEmpty
+          message="当前没有已安装的插件，你可以尝试刷新或者安装新插件"
+          title="当前没有已安装的插件"
+        >
+          <template #actions>
+            <VSpace>
+              <VButton @click="handleFetchPlugins">刷新</VButton>
+              <VButton
+                v-permission="['system:plugins:manage']"
+                type="secondary"
+                @click="pluginInstall = true"
+              >
+                <template #icon>
+                  <IconAddCircle class="h-full w-full" />
+                </template>
+                安装插件
+              </VButton>
+            </VSpace>
+          </template>
+        </VEmpty>
+      </Transition>
+
+      <Transition v-else appear name="fade">
+        <ul
+          class="box-border h-full w-full divide-y divide-gray-100"
+          role="list"
+        >
+          <li v-for="(plugin, index) in plugins.items" :key="index">
+            <PluginListItem :plugin="plugin" @reload="handleFetchPlugins" />
+          </li>
+        </ul>
+      </Transition>
 
       <template #footer>
         <div class="bg-white sm:flex sm:items-center sm:justify-end">

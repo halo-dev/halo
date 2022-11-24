@@ -8,6 +8,7 @@ import {
   VEmpty,
   VPageHeader,
   VSpace,
+  VLoading,
 } from "@halo-dev/components";
 import MenuItemEditingModal from "./components/MenuItemEditingModal.vue";
 import MenuItemListItem from "./components/MenuItemListItem.vue";
@@ -220,35 +221,38 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
               </div>
             </div>
           </template>
-          <VEmpty
-            v-if="!menuItems.length && !loading"
-            message="你可以尝试刷新或者新建菜单项"
-            title="当前没有菜单项"
-          >
-            <template #actions>
-              <VSpace>
-                <VButton @click="handleFetchMenuItems"> 刷新</VButton>
-                <VButton
-                  v-permission="['system:menus:manage']"
-                  type="primary"
-                  @click="menuItemEditingModal = true"
-                >
-                  <template #icon>
-                    <IconAddCircle class="h-full w-full" />
-                  </template>
-                  新增菜单项
-                </VButton>
-              </VSpace>
-            </template>
-          </VEmpty>
-          <MenuItemListItem
-            v-else
-            :menu-tree-items="menuTreeItems"
-            @change="handleUpdateInBatch"
-            @delete="handleDelete"
-            @open-editing="handleOpenEditingModal"
-            @open-create-by-parent="handleOpenCreateByParentModal"
-          />
+          <VLoading v-if="loading" />
+          <Transition v-else-if="!menuItems.length" appear name="fade">
+            <VEmpty
+              message="你可以尝试刷新或者新建菜单项"
+              title="当前没有菜单项"
+            >
+              <template #actions>
+                <VSpace>
+                  <VButton @click="handleFetchMenuItems"> 刷新</VButton>
+                  <VButton
+                    v-permission="['system:menus:manage']"
+                    type="primary"
+                    @click="menuItemEditingModal = true"
+                  >
+                    <template #icon>
+                      <IconAddCircle class="h-full w-full" />
+                    </template>
+                    新增菜单项
+                  </VButton>
+                </VSpace>
+              </template>
+            </VEmpty>
+          </Transition>
+          <Transition v-else appear name="fade">
+            <MenuItemListItem
+              :menu-tree-items="menuTreeItems"
+              @change="handleUpdateInBatch"
+              @delete="handleDelete"
+              @open-editing="handleOpenEditingModal"
+              @open-create-by-parent="handleOpenCreateByParentModal"
+            />
+          </Transition>
         </VCard>
       </div>
     </div>

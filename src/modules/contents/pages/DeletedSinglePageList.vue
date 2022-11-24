@@ -14,6 +14,7 @@ import {
   VEntityField,
   VPageHeader,
   VStatusDot,
+  VLoading,
 } from "@halo-dev/components";
 import { onMounted, ref, watch } from "vue";
 import type { ListedSinglePageList, SinglePage } from "@halo-dev/api-client";
@@ -305,125 +306,130 @@ function handleClearKeyword() {
           </div>
         </div>
       </template>
-      <VEmpty
-        v-if="!singlePages.items.length && !loading"
-        message="你可以尝试刷新或者返回自定义页面管理"
-        title="没有自定义页面被放入回收站"
-      >
-        <template #actions>
-          <VSpace>
-            <VButton @click="handleFetchSinglePages">刷新</VButton>
-            <VButton
-              v-permission="['system:singlepages:view']"
-              :route="{ name: 'SinglePages' }"
-              type="primary"
-            >
-              返回
-            </VButton>
-          </VSpace>
-        </template>
-      </VEmpty>
-      <ul
-        v-else
-        class="box-border h-full w-full divide-y divide-gray-100"
-        role="list"
-      >
-        <li v-for="(singlePage, index) in singlePages.items" :key="index">
-          <VEntity :is-selected="checkSelection(singlePage.page)">
-            <template
-              v-if="currentUserHasPermission(['system:singlepages:manage'])"
-              #checkbox
-            >
-              <input
-                v-model="selectedPageNames"
-                :value="singlePage.page.metadata.name"
-                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                type="checkbox"
-              />
-            </template>
-            <template #start>
-              <VEntityField :title="singlePage.page.spec.title">
-                <template #description>
-                  <VSpace>
-                    <span class="text-xs text-gray-500">
-                      {{ singlePage.page.status?.permalink }}
-                    </span>
-                    <span class="text-xs text-gray-500">
-                      访问量 {{ singlePage.stats.visit || 0 }}
-                    </span>
-                    <span class="text-xs text-gray-500">
-                      评论 {{ singlePage.stats.totalComment || 0 }}
-                    </span>
-                  </VSpace>
-                </template>
-              </VEntityField>
-            </template>
-            <template #end>
-              <VEntityField>
-                <template #description>
-                  <RouterLink
-                    v-for="(
-                      contributor, contributorIndex
-                    ) in singlePage.contributors"
-                    :key="contributorIndex"
-                    :to="{
-                      name: 'UserDetail',
-                      params: { name: contributor.name },
-                    }"
-                    class="flex items-center"
-                  >
-                    <VAvatar
-                      v-tooltip="contributor.displayName"
-                      size="xs"
-                      :src="contributor.avatar"
-                      :alt="contributor.displayName"
-                      circle
-                    ></VAvatar>
-                  </RouterLink>
-                </template>
-              </VEntityField>
-              <VEntityField v-if="!singlePage?.page?.spec.deleted">
-                <template #description>
-                  <VStatusDot v-tooltip="`恢复中`" state="success" animate />
-                </template>
-              </VEntityField>
-              <VEntityField v-if="singlePage?.page?.metadata.deletionTimestamp">
-                <template #description>
-                  <VStatusDot v-tooltip="`删除中`" state="warning" animate />
-                </template>
-              </VEntityField>
-              <VEntityField>
-                <template #description>
-                  <span class="truncate text-xs tabular-nums text-gray-500">
-                    {{ formatDatetime(singlePage.page.spec.publishTime) }}
-                  </span>
-                </template>
-              </VEntityField>
-            </template>
-            <template
-              v-if="currentUserHasPermission(['system:singlepages:manage'])"
-              #dropdownItems
-            >
+      <VLoading v-if="loading" />
+      <Transition v-else-if="!singlePages.items.length" appear name="fade">
+        <VEmpty
+          message="你可以尝试刷新或者返回自定义页面管理"
+          title="没有自定义页面被放入回收站"
+        >
+          <template #actions>
+            <VSpace>
+              <VButton @click="handleFetchSinglePages">刷新</VButton>
               <VButton
-                v-close-popper
-                block
-                type="danger"
-                @click="handleDeletePermanently(singlePage.page)"
+                v-permission="['system:singlepages:view']"
+                :route="{ name: 'SinglePages' }"
+                type="primary"
               >
-                永久删除
+                返回
               </VButton>
-              <VButton
-                v-close-popper
-                block
-                type="default"
-                @click="handleRecovery(singlePage.page)"
+            </VSpace>
+          </template>
+        </VEmpty>
+      </Transition>
+      <Transition v-else appear name="fade">
+        <ul
+          class="box-border h-full w-full divide-y divide-gray-100"
+          role="list"
+        >
+          <li v-for="(singlePage, index) in singlePages.items" :key="index">
+            <VEntity :is-selected="checkSelection(singlePage.page)">
+              <template
+                v-if="currentUserHasPermission(['system:singlepages:manage'])"
+                #checkbox
               >
-                恢复
-              </VButton>
-            </template>
-          </VEntity>
-        </li>
-      </ul>
+                <input
+                  v-model="selectedPageNames"
+                  :value="singlePage.page.metadata.name"
+                  class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                  type="checkbox"
+                />
+              </template>
+              <template #start>
+                <VEntityField :title="singlePage.page.spec.title">
+                  <template #description>
+                    <VSpace>
+                      <span class="text-xs text-gray-500">
+                        {{ singlePage.page.status?.permalink }}
+                      </span>
+                      <span class="text-xs text-gray-500">
+                        访问量 {{ singlePage.stats.visit || 0 }}
+                      </span>
+                      <span class="text-xs text-gray-500">
+                        评论 {{ singlePage.stats.totalComment || 0 }}
+                      </span>
+                    </VSpace>
+                  </template>
+                </VEntityField>
+              </template>
+              <template #end>
+                <VEntityField>
+                  <template #description>
+                    <RouterLink
+                      v-for="(
+                        contributor, contributorIndex
+                      ) in singlePage.contributors"
+                      :key="contributorIndex"
+                      :to="{
+                        name: 'UserDetail',
+                        params: { name: contributor.name },
+                      }"
+                      class="flex items-center"
+                    >
+                      <VAvatar
+                        v-tooltip="contributor.displayName"
+                        size="xs"
+                        :src="contributor.avatar"
+                        :alt="contributor.displayName"
+                        circle
+                      ></VAvatar>
+                    </RouterLink>
+                  </template>
+                </VEntityField>
+                <VEntityField v-if="!singlePage?.page?.spec.deleted">
+                  <template #description>
+                    <VStatusDot v-tooltip="`恢复中`" state="success" animate />
+                  </template>
+                </VEntityField>
+                <VEntityField
+                  v-if="singlePage?.page?.metadata.deletionTimestamp"
+                >
+                  <template #description>
+                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                  </template>
+                </VEntityField>
+                <VEntityField>
+                  <template #description>
+                    <span class="truncate text-xs tabular-nums text-gray-500">
+                      {{ formatDatetime(singlePage.page.spec.publishTime) }}
+                    </span>
+                  </template>
+                </VEntityField>
+              </template>
+              <template
+                v-if="currentUserHasPermission(['system:singlepages:manage'])"
+                #dropdownItems
+              >
+                <VButton
+                  v-close-popper
+                  block
+                  type="danger"
+                  @click="handleDeletePermanently(singlePage.page)"
+                >
+                  永久删除
+                </VButton>
+                <VButton
+                  v-close-popper
+                  block
+                  type="default"
+                  @click="handleRecovery(singlePage.page)"
+                >
+                  恢复
+                </VButton>
+              </template>
+            </VEntity>
+          </li>
+        </ul>
+      </Transition>
 
       <template #footer>
         <div class="bg-white sm:flex sm:items-center sm:justify-end">

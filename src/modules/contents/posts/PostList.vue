@@ -20,6 +20,7 @@ import {
   VStatusDot,
   VEntity,
   VEntityField,
+  VLoading,
 } from "@halo-dev/components";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";
@@ -823,183 +824,184 @@ const hasFilters = computed(() => {
           </div>
         </div>
       </template>
-
-      <VEmpty
-        v-if="!posts.items.length && !loading"
-        message="你可以尝试刷新或者新建文章"
-        title="当前没有文章"
-      >
-        <template #actions>
-          <VSpace>
-            <VButton @click="handleFetchPosts">刷新</VButton>
-            <VButton
-              v-permission="['system:posts:manage']"
-              :route="{ name: 'PostEditor' }"
-              type="primary"
-            >
-              <template #icon>
-                <IconAddCircle class="h-full w-full" />
-              </template>
-              新建文章
-            </VButton>
-          </VSpace>
-        </template>
-      </VEmpty>
-      <ul
-        v-else
-        class="box-border h-full w-full divide-y divide-gray-100"
-        role="list"
-      >
-        <li v-for="(post, index) in posts.items" :key="index">
-          <VEntity :is-selected="checkSelection(post.post)">
-            <template
-              v-if="currentUserHasPermission(['system:posts:manage'])"
-              #checkbox
-            >
-              <input
-                v-model="selectedPostNames"
-                :value="post.post.metadata.name"
-                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                name="post-checkbox"
-                type="checkbox"
-              />
-            </template>
-            <template #start>
-              <VEntityField
-                :title="post.post.spec.title"
-                :route="{
-                  name: 'PostEditor',
-                  query: { name: post.post.metadata.name },
-                }"
+      <VLoading v-if="loading" />
+      <Transition v-else-if="!posts.items.length" appear name="fade">
+        <VEmpty message="你可以尝试刷新或者新建文章" title="当前没有文章">
+          <template #actions>
+            <VSpace>
+              <VButton @click="handleFetchPosts">刷新</VButton>
+              <VButton
+                v-permission="['system:posts:manage']"
+                :route="{ name: 'PostEditor' }"
+                type="primary"
               >
-                <template #extra>
-                  <VSpace class="mt-1 sm:mt-0">
+                <template #icon>
+                  <IconAddCircle class="h-full w-full" />
+                </template>
+                新建文章
+              </VButton>
+            </VSpace>
+          </template>
+        </VEmpty>
+      </Transition>
+      <Transition v-else appear name="fade">
+        <ul
+          class="box-border h-full w-full divide-y divide-gray-100"
+          role="list"
+        >
+          <li v-for="(post, index) in posts.items" :key="index">
+            <VEntity :is-selected="checkSelection(post.post)">
+              <template
+                v-if="currentUserHasPermission(['system:posts:manage'])"
+                #checkbox
+              >
+                <input
+                  v-model="selectedPostNames"
+                  :value="post.post.metadata.name"
+                  class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                  name="post-checkbox"
+                  type="checkbox"
+                />
+              </template>
+              <template #start>
+                <VEntityField
+                  :title="post.post.spec.title"
+                  :route="{
+                    name: 'PostEditor',
+                    query: { name: post.post.metadata.name },
+                  }"
+                >
+                  <template #extra>
+                    <VSpace class="mt-1 sm:mt-0">
+                      <RouterLink
+                        v-if="post.post.status?.inProgress"
+                        v-tooltip="`当前有内容已保存，但还未发布。`"
+                        :to="{
+                          name: 'PostEditor',
+                          query: { name: post.post.metadata.name },
+                        }"
+                        class="flex items-center"
+                      >
+                        <VStatusDot state="success" animate />
+                      </RouterLink>
+                      <PostTag
+                        v-for="(tag, tagIndex) in post.tags"
+                        :key="tagIndex"
+                        :tag="tag"
+                        route
+                      ></PostTag>
+                    </VSpace>
+                  </template>
+                  <template #description>
+                    <VSpace>
+                      <p
+                        v-if="post.categories.length"
+                        class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
+                      >
+                        分类：<span
+                          v-for="(category, categoryIndex) in post.categories"
+                          :key="categoryIndex"
+                          class="cursor-pointer hover:text-gray-900"
+                        >
+                          {{ category.spec.displayName }}
+                        </span>
+                      </p>
+                      <span class="text-xs text-gray-500">
+                        访问量 {{ post.stats.visit || 0 }}
+                      </span>
+                      <span class="text-xs text-gray-500">
+                        评论 {{ post.stats.totalComment || 0 }}
+                      </span>
+                    </VSpace>
+                  </template>
+                </VEntityField>
+              </template>
+              <template #end>
+                <VEntityField>
+                  <template #description>
                     <RouterLink
-                      v-if="post.post.status?.inProgress"
-                      v-tooltip="`当前有内容已保存，但还未发布。`"
+                      v-for="(
+                        contributor, contributorIndex
+                      ) in post.contributors"
+                      :key="contributorIndex"
                       :to="{
-                        name: 'PostEditor',
-                        query: { name: post.post.metadata.name },
+                        name: 'UserDetail',
+                        params: { name: contributor.name },
                       }"
                       class="flex items-center"
                     >
-                      <VStatusDot state="success" animate />
+                      <VAvatar
+                        v-tooltip="contributor.displayName"
+                        size="xs"
+                        :src="contributor.avatar"
+                        :alt="contributor.displayName"
+                        circle
+                      ></VAvatar>
                     </RouterLink>
-                    <PostTag
-                      v-for="(tag, tagIndex) in post.tags"
-                      :key="tagIndex"
-                      :tag="tag"
-                      route
-                    ></PostTag>
-                  </VSpace>
-                </template>
-                <template #description>
-                  <VSpace>
-                    <p
-                      v-if="post.categories.length"
-                      class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
-                    >
-                      分类：<span
-                        v-for="(category, categoryIndex) in post.categories"
-                        :key="categoryIndex"
-                        class="cursor-pointer hover:text-gray-900"
-                      >
-                        {{ category.spec.displayName }}
-                      </span>
-                    </p>
-                    <span class="text-xs text-gray-500">
-                      访问量 {{ post.stats.visit || 0 }}
+                  </template>
+                </VEntityField>
+                <VEntityField :description="getPublishStatus(post.post)">
+                  <template v-if="isPublishing(post.post)" #description>
+                    <VStatusDot text="发布中" animate />
+                  </template>
+                </VEntityField>
+                <VEntityField>
+                  <template #description>
+                    <IconEye
+                      v-if="post.post.spec.visible === 'PUBLIC'"
+                      v-tooltip="`公开访问`"
+                      class="cursor-pointer text-sm transition-all hover:text-blue-600"
+                    />
+                    <IconEyeOff
+                      v-if="post.post.spec.visible === 'PRIVATE'"
+                      v-tooltip="`私有访问`"
+                      class="cursor-pointer text-sm transition-all hover:text-blue-600"
+                    />
+                    <IconTeam
+                      v-if="post.post.spec.visible === 'INTERNAL'"
+                      v-tooltip="`内部成员可访问`"
+                      class="cursor-pointer text-sm transition-all hover:text-blue-600"
+                    />
+                  </template>
+                </VEntityField>
+                <VEntityField v-if="post?.post?.spec.deleted">
+                  <template #description>
+                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                  </template>
+                </VEntityField>
+                <VEntityField>
+                  <template #description>
+                    <span class="truncate text-xs tabular-nums text-gray-500">
+                      {{ formatDatetime(post.post.spec.publishTime) }}
                     </span>
-                    <span class="text-xs text-gray-500">
-                      评论 {{ post.stats.totalComment || 0 }}
-                    </span>
-                  </VSpace>
-                </template>
-              </VEntityField>
-            </template>
-            <template #end>
-              <VEntityField>
-                <template #description>
-                  <RouterLink
-                    v-for="(contributor, contributorIndex) in post.contributors"
-                    :key="contributorIndex"
-                    :to="{
-                      name: 'UserDetail',
-                      params: { name: contributor.name },
-                    }"
-                    class="flex items-center"
-                  >
-                    <VAvatar
-                      v-tooltip="contributor.displayName"
-                      size="xs"
-                      :src="contributor.avatar"
-                      :alt="contributor.displayName"
-                      circle
-                    ></VAvatar>
-                  </RouterLink>
-                </template>
-              </VEntityField>
-              <VEntityField :description="getPublishStatus(post.post)">
-                <template v-if="isPublishing(post.post)" #description>
-                  <VStatusDot text="发布中" animate />
-                </template>
-              </VEntityField>
-              <VEntityField>
-                <template #description>
-                  <IconEye
-                    v-if="post.post.spec.visible === 'PUBLIC'"
-                    v-tooltip="`公开访问`"
-                    class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                  />
-                  <IconEyeOff
-                    v-if="post.post.spec.visible === 'PRIVATE'"
-                    v-tooltip="`私有访问`"
-                    class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                  />
-                  <IconTeam
-                    v-if="post.post.spec.visible === 'INTERNAL'"
-                    v-tooltip="`内部成员可访问`"
-                    class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                  />
-                </template>
-              </VEntityField>
-              <VEntityField v-if="post?.post?.spec.deleted">
-                <template #description>
-                  <VStatusDot v-tooltip="`删除中`" state="warning" animate />
-                </template>
-              </VEntityField>
-              <VEntityField>
-                <template #description>
-                  <span class="truncate text-xs tabular-nums text-gray-500">
-                    {{ formatDatetime(post.post.spec.publishTime) }}
-                  </span>
-                </template>
-              </VEntityField>
-            </template>
-            <template
-              v-if="currentUserHasPermission(['system:posts:manage'])"
-              #dropdownItems
-            >
-              <VButton
-                v-close-popper
-                block
-                type="secondary"
-                @click="handleOpenSettingModal(post.post)"
+                  </template>
+                </VEntityField>
+              </template>
+              <template
+                v-if="currentUserHasPermission(['system:posts:manage'])"
+                #dropdownItems
               >
-                设置
-              </VButton>
-              <VButton
-                v-close-popper
-                block
-                type="danger"
-                @click="handleDelete(post.post)"
-              >
-                删除
-              </VButton>
-            </template>
-          </VEntity>
-        </li>
-      </ul>
+                <VButton
+                  v-close-popper
+                  block
+                  type="secondary"
+                  @click="handleOpenSettingModal(post.post)"
+                >
+                  设置
+                </VButton>
+                <VButton
+                  v-close-popper
+                  block
+                  type="danger"
+                  @click="handleDelete(post.post)"
+                >
+                  删除
+                </VButton>
+              </template>
+            </VEntity>
+          </li>
+        </ul>
+      </Transition>
 
       <template #footer>
         <div class="bg-white sm:flex sm:items-center sm:justify-end">

@@ -18,6 +18,7 @@ import {
   VStatusDot,
   VEntity,
   VEntityField,
+  VLoading,
 } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
@@ -613,170 +614,167 @@ function handleClearFilters() {
         </div>
       </div>
     </template>
-    <VEmpty
-      v-if="!singlePages.items.length && !loading"
-      message="你可以尝试刷新或者新建页面"
-      title="当前没有页面"
-    >
-      <template #actions>
-        <VSpace>
-          <VButton @click="handleFetchSinglePages">刷新</VButton>
-          <VButton
-            v-permission="['system:singlepages:manage']"
-            :route="{ name: 'SinglePageEditor' }"
-            type="primary"
-          >
-            <template #icon>
-              <IconAddCircle class="h-full w-full" />
+    <VLoading v-if="loading" />
+    <Transition v-else-if="!singlePages.items.length" appear name="fade">
+      <VEmpty message="你可以尝试刷新或者新建页面" title="当前没有页面">
+        <template #actions>
+          <VSpace>
+            <VButton @click="handleFetchSinglePages">刷新</VButton>
+            <VButton
+              v-permission="['system:singlepages:manage']"
+              :route="{ name: 'SinglePageEditor' }"
+              type="primary"
+            >
+              <template #icon>
+                <IconAddCircle class="h-full w-full" />
+              </template>
+              新建页面
+            </VButton>
+          </VSpace>
+        </template>
+      </VEmpty>
+    </Transition>
+    <Transition v-else appear name="fade">
+      <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
+        <li v-for="(singlePage, index) in singlePages.items" :key="index">
+          <VEntity :is-selected="checkSelection(singlePage.page)">
+            <template
+              v-if="currentUserHasPermission(['system:singlepages:manage'])"
+              #checkbox
+            >
+              <input
+                v-model="selectedPageNames"
+                :value="singlePage.page.metadata.name"
+                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                type="checkbox"
+              />
             </template>
-            新建页面
-          </VButton>
-        </VSpace>
-      </template>
-    </VEmpty>
-    <ul
-      v-else
-      class="box-border h-full w-full divide-y divide-gray-100"
-      role="list"
-    >
-      <li v-for="(singlePage, index) in singlePages.items" :key="index">
-        <VEntity :is-selected="checkSelection(singlePage.page)">
-          <template
-            v-if="currentUserHasPermission(['system:singlepages:manage'])"
-            #checkbox
-          >
-            <input
-              v-model="selectedPageNames"
-              :value="singlePage.page.metadata.name"
-              class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-              type="checkbox"
-            />
-          </template>
-          <template #start>
-            <VEntityField
-              :title="singlePage.page.spec.title"
-              :route="{
-                name: 'SinglePageEditor',
-                query: { name: singlePage.page.metadata.name },
-              }"
+            <template #start>
+              <VEntityField
+                :title="singlePage.page.spec.title"
+                :route="{
+                  name: 'SinglePageEditor',
+                  query: { name: singlePage.page.metadata.name },
+                }"
+              >
+                <template #extra>
+                  <RouterLink
+                    v-if="singlePage.page.status?.inProgress"
+                    v-tooltip="`当前有内容已保存，但还未发布。`"
+                    :to="{
+                      name: 'SinglePageEditor',
+                      query: { name: singlePage.page.metadata.name },
+                    }"
+                    class="flex items-center"
+                  >
+                    <VStatusDot state="success" animate />
+                  </RouterLink>
+                </template>
+                <template #description>
+                  <div class="flex w-full flex-col gap-1">
+                    <VSpace class="w-full">
+                      <span class="text-xs text-gray-500">
+                        访问量 {{ singlePage.stats.visit || 0 }}
+                      </span>
+                      <span class="text-xs text-gray-500">
+                        评论 {{ singlePage.stats.totalComment || 0 }}
+                      </span>
+                    </VSpace>
+                    <VSpace class="w-full">
+                      <span class="truncate text-xs text-gray-500">
+                        {{ singlePage.page.status?.permalink }}
+                      </span>
+                    </VSpace>
+                  </div>
+                </template>
+              </VEntityField>
+            </template>
+            <template #end>
+              <VEntityField>
+                <template #description>
+                  <RouterLink
+                    v-for="(
+                      contributor, contributorIndex
+                    ) in singlePage.contributors"
+                    :key="contributorIndex"
+                    :to="{
+                      name: 'UserDetail',
+                      params: { name: contributor.name },
+                    }"
+                    class="flex items-center"
+                  >
+                    <VAvatar
+                      v-tooltip="contributor.displayName"
+                      size="xs"
+                      :src="contributor.avatar"
+                      :alt="contributor.displayName"
+                      circle
+                    ></VAvatar>
+                  </RouterLink>
+                </template>
+              </VEntityField>
+              <VEntityField :description="getPublishStatus(singlePage.page)">
+                <template v-if="isPublishing(singlePage.page)" #description>
+                  <VStatusDot text="发布中" animate />
+                </template>
+              </VEntityField>
+              <VEntityField>
+                <template #description>
+                  <IconEye
+                    v-if="singlePage.page.spec.visible === 'PUBLIC'"
+                    v-tooltip="`公开访问`"
+                    class="cursor-pointer text-sm transition-all hover:text-blue-600"
+                  />
+                  <IconEyeOff
+                    v-if="singlePage.page.spec.visible === 'PRIVATE'"
+                    v-tooltip="`私有访问`"
+                    class="cursor-pointer text-sm transition-all hover:text-blue-600"
+                  />
+                  <IconTeam
+                    v-if="singlePage.page.spec.visible === 'INTERNAL'"
+                    v-tooltip="`内部成员可访问`"
+                    class="cursor-pointer text-sm transition-all hover:text-blue-600"
+                  />
+                </template>
+              </VEntityField>
+              <VEntityField v-if="singlePage?.page?.spec.deleted">
+                <template #description>
+                  <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                </template>
+              </VEntityField>
+              <VEntityField>
+                <template #description>
+                  <span class="truncate text-xs tabular-nums text-gray-500">
+                    {{ formatDatetime(singlePage.page.spec.publishTime) }}
+                  </span>
+                </template>
+              </VEntityField>
+            </template>
+            <template
+              v-if="currentUserHasPermission(['system:singlepages:manage'])"
+              #dropdownItems
             >
-              <template #extra>
-                <RouterLink
-                  v-if="singlePage.page.status?.inProgress"
-                  v-tooltip="`当前有内容已保存，但还未发布。`"
-                  :to="{
-                    name: 'SinglePageEditor',
-                    query: { name: singlePage.page.metadata.name },
-                  }"
-                  class="flex items-center"
-                >
-                  <VStatusDot state="success" animate />
-                </RouterLink>
-              </template>
-              <template #description>
-                <div class="flex w-full flex-col gap-1">
-                  <VSpace class="w-full">
-                    <span class="text-xs text-gray-500">
-                      访问量 {{ singlePage.stats.visit || 0 }}
-                    </span>
-                    <span class="text-xs text-gray-500">
-                      评论 {{ singlePage.stats.totalComment || 0 }}
-                    </span>
-                  </VSpace>
-                  <VSpace class="w-full">
-                    <span class="truncate text-xs text-gray-500">
-                      {{ singlePage.page.status?.permalink }}
-                    </span>
-                  </VSpace>
-                </div>
-              </template>
-            </VEntityField>
-          </template>
-          <template #end>
-            <VEntityField>
-              <template #description>
-                <RouterLink
-                  v-for="(
-                    contributor, contributorIndex
-                  ) in singlePage.contributors"
-                  :key="contributorIndex"
-                  :to="{
-                    name: 'UserDetail',
-                    params: { name: contributor.name },
-                  }"
-                  class="flex items-center"
-                >
-                  <VAvatar
-                    v-tooltip="contributor.displayName"
-                    size="xs"
-                    :src="contributor.avatar"
-                    :alt="contributor.displayName"
-                    circle
-                  ></VAvatar>
-                </RouterLink>
-              </template>
-            </VEntityField>
-            <VEntityField :description="getPublishStatus(singlePage.page)">
-              <template v-if="isPublishing(singlePage.page)" #description>
-                <VStatusDot text="发布中" animate />
-              </template>
-            </VEntityField>
-            <VEntityField>
-              <template #description>
-                <IconEye
-                  v-if="singlePage.page.spec.visible === 'PUBLIC'"
-                  v-tooltip="`公开访问`"
-                  class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                />
-                <IconEyeOff
-                  v-if="singlePage.page.spec.visible === 'PRIVATE'"
-                  v-tooltip="`私有访问`"
-                  class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                />
-                <IconTeam
-                  v-if="singlePage.page.spec.visible === 'INTERNAL'"
-                  v-tooltip="`内部成员可访问`"
-                  class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                />
-              </template>
-            </VEntityField>
-            <VEntityField v-if="singlePage?.page?.spec.deleted">
-              <template #description>
-                <VStatusDot v-tooltip="`删除中`" state="warning" animate />
-              </template>
-            </VEntityField>
-            <VEntityField>
-              <template #description>
-                <span class="truncate text-xs tabular-nums text-gray-500">
-                  {{ formatDatetime(singlePage.page.spec.publishTime) }}
-                </span>
-              </template>
-            </VEntityField>
-          </template>
-          <template
-            v-if="currentUserHasPermission(['system:singlepages:manage'])"
-            #dropdownItems
-          >
-            <VButton
-              v-close-popper
-              block
-              type="secondary"
-              @click="handleOpenSettingModal(singlePage.page)"
-            >
-              设置
-            </VButton>
-            <VButton
-              v-close-popper
-              block
-              type="danger"
-              @click="handleDelete(singlePage.page)"
-            >
-              删除
-            </VButton>
-          </template>
-        </VEntity>
-      </li>
-    </ul>
+              <VButton
+                v-close-popper
+                block
+                type="secondary"
+                @click="handleOpenSettingModal(singlePage.page)"
+              >
+                设置
+              </VButton>
+              <VButton
+                v-close-popper
+                block
+                type="danger"
+                @click="handleDelete(singlePage.page)"
+              >
+                删除
+              </VButton>
+            </template>
+          </VEntity>
+        </li>
+      </ul>
+    </Transition>
 
     <template #footer>
       <div class="bg-white sm:flex sm:items-center sm:justify-end">

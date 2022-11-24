@@ -12,12 +12,12 @@ import {
   VButton,
   VCard,
   VPageHeader,
-  VPagination,
   VSpace,
   VTag,
   VStatusDot,
   VEntity,
   VEntityField,
+  VLoading,
 } from "@halo-dev/components";
 import RoleEditingModal from "./components/RoleEditingModal.vue";
 
@@ -39,7 +39,7 @@ const { currentUserHasPermission } = usePermission();
 const editingModal = ref<boolean>(false);
 const selectedRole = ref<Role>();
 
-const { roles, handleFetchRoles } = useFetchRole();
+const { roles, handleFetchRoles, loading } = useFetchRole();
 
 let fuse: Fuse<Role> | undefined = undefined;
 
@@ -228,16 +228,21 @@ const handleDelete = async (role: Role) => {
           </div>
         </div>
       </template>
-      <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-        <li v-for="(role, index) in searchResults" :key="index">
-          <VEntity>
-            <template #start>
-              <VEntityField
-                :title="
-                  role.metadata.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
-                  role.metadata.name
-                "
-                :description="`包含
+      <VLoading v-if="loading" />
+      <Transition v-else appear name="fade">
+        <ul
+          class="box-border h-full w-full divide-y divide-gray-100"
+          role="list"
+        >
+          <li v-for="(role, index) in searchResults" :key="index">
+            <VEntity>
+              <template #start>
+                <VEntityField
+                  :title="
+                    role.metadata.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
+                    role.metadata.name
+                  "
+                  :description="`包含
                     ${
                       JSON.parse(
                         role.metadata.annotations?.[
@@ -246,67 +251,62 @@ const handleDelete = async (role: Role) => {
                       ).length
                     }
                     个权限`"
-                :route="{
-                  name: 'RoleDetail',
-                  params: {
-                    name: role.metadata.name,
-                  },
-                }"
-              ></VEntityField>
-            </template>
-            <template #end>
-              <VEntityField v-if="role.metadata.deletionTimestamp">
-                <template #description>
-                  <VStatusDot v-tooltip="`删除中`" state="warning" animate />
-                </template>
-              </VEntityField>
-              <VEntityField description="0 个用户" />
-              <VEntityField>
-                <template #description>
-                  <VTag> 系统保留</VTag>
-                </template>
-              </VEntityField>
-              <VEntityField>
-                <template #description>
-                  <span class="truncate text-xs tabular-nums text-gray-500">
-                    {{ formatDatetime(role.metadata.creationTimestamp) }}
-                  </span>
-                </template>
-              </VEntityField>
-            </template>
-            <template
-              v-if="currentUserHasPermission(['system:roles:manage'])"
-              #dropdownItems
-            >
-              <VButton
-                v-close-popper
-                block
-                type="secondary"
-                @click="handleOpenEditingModal(role)"
+                  :route="{
+                    name: 'RoleDetail',
+                    params: {
+                      name: role.metadata.name,
+                    },
+                  }"
+                ></VEntityField>
+              </template>
+              <template #end>
+                <VEntityField v-if="role.metadata.deletionTimestamp">
+                  <template #description>
+                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                  </template>
+                </VEntityField>
+                <VEntityField description="0 个用户" />
+                <VEntityField>
+                  <template #description>
+                    <VTag> 系统保留</VTag>
+                  </template>
+                </VEntityField>
+                <VEntityField>
+                  <template #description>
+                    <span class="truncate text-xs tabular-nums text-gray-500">
+                      {{ formatDatetime(role.metadata.creationTimestamp) }}
+                    </span>
+                  </template>
+                </VEntityField>
+              </template>
+              <template
+                v-if="currentUserHasPermission(['system:roles:manage'])"
+                #dropdownItems
               >
-                编辑
-              </VButton>
-              <VButton
-                v-close-popper
-                block
-                type="danger"
-                @click="handleDelete(role)"
-              >
-                删除
-              </VButton>
-              <VButton v-close-popper block @click="handleCloneRole(role)">
-                基于此角色创建
-              </VButton>
-            </template>
-          </VEntity>
-        </li>
-      </ul>
-
-      <template #footer>
-        <div class="bg-white sm:flex sm:items-center sm:justify-end">
-          <VPagination :page="1" :size="10" :total="20" />
-        </div>
-      </template>
+                <VButton
+                  v-close-popper
+                  block
+                  type="secondary"
+                  @click="handleOpenEditingModal(role)"
+                >
+                  编辑
+                </VButton>
+                <VButton
+                  v-close-popper
+                  block
+                  type="danger"
+                  @click="handleDelete(role)"
+                >
+                  删除
+                </VButton>
+                <VButton v-close-popper block @click="handleCloneRole(role)">
+                  基于此角色创建
+                </VButton>
+              </template>
+            </VEntity>
+          </li>
+        </ul>
+      </Transition>
     </VCard>
   </div>
 </template>

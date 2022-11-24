@@ -21,3 +21,4 @@ export * from "./components/empty";
 export * from "./components/status";
 export * from "./components/entity";
 export * from "./components/toast";
+export * from "./components/loading";

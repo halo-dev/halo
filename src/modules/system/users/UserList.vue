@@ -15,6 +15,7 @@ import {
   VEntityField,
   Dialog,
   VStatusDot,
+  VLoading,
 } from "@halo-dev/components";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
@@ -47,6 +48,7 @@ const users = ref<UserList>({
   hasPrevious: false,
   totalPages: 0,
 });
+const loading = ref(false);
 const selectedUserNames = ref<string[]>([]);
 const selectedUser = ref<User>();
 
@@ -56,6 +58,8 @@ let fuse: Fuse<User> | undefined = undefined;
 
 const handleFetchUsers = async () => {
   try {
+    loading.value = true;
+
     const { data } = await apiClient.extension.user.listv1alpha1User({
       page: users.value.page,
       size: users.value.size,
@@ -70,6 +74,7 @@ const handleFetchUsers = async () => {
     console.error("Failed to fetch users", e);
   } finally {
     selectedUser.value = undefined;
+    loading.value = false;
   }
 };
 
@@ -385,111 +390,117 @@ onMounted(() => {
           </div>
         </div>
       </template>
-      <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-        <li v-for="(user, index) in searchResults" :key="index">
-          <VEntity :is-selected="checkSelection(user)">
-            <template
-              v-if="currentUserHasPermission(['system:users:manage'])"
-              #checkbox
-            >
-              <input
-                v-model="selectedUserNames"
-                :value="user.metadata.name"
-                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                name="post-checkbox"
-                type="checkbox"
-              />
-            </template>
-            <template #start>
-              <VEntityField>
-                <template #description>
-                  <VAvatar
-                    :alt="user.spec.displayName"
-                    :src="user.spec.avatar"
-                    size="md"
-                  ></VAvatar>
-                </template>
-              </VEntityField>
-              <VEntityField
-                :title="user.spec.displayName"
-                :description="user.metadata.name"
-                :route="{
-                  name: 'UserDetail',
-                  params: { name: user.metadata.name },
-                }"
-              />
-            </template>
-            <template #end>
-              <VEntityField>
-                <template #description>
-                  <div
-                    v-for="(role, roleIndex) in getRoles(user)"
-                    :key="roleIndex"
-                    class="flex items-center"
-                  >
-                    <VTag>
-                      {{ role }}
-                    </VTag>
-                  </div>
-                </template>
-              </VEntityField>
-              <VEntityField v-if="user.metadata.deletionTimestamp">
-                <template #description>
-                  <VStatusDot v-tooltip="`删除中`" state="warning" animate />
-                </template>
-              </VEntityField>
-              <VEntityField>
-                <template #description>
-                  <span class="truncate text-xs tabular-nums text-gray-500">
-                    {{ formatDatetime(user.metadata.creationTimestamp) }}
-                  </span>
-                </template>
-              </VEntityField>
-            </template>
-            <template
-              v-if="currentUserHasPermission(['system:users:manage'])"
-              #dropdownItems
-            >
-              <VButton
-                v-close-popper
-                block
-                type="secondary"
-                @click="handleOpenCreateModal(user)"
+      <VLoading v-if="loading" />
+      <Transition v-else appear name="fade">
+        <ul
+          class="box-border h-full w-full divide-y divide-gray-100"
+          role="list"
+        >
+          <li v-for="(user, index) in searchResults" :key="index">
+            <VEntity :is-selected="checkSelection(user)">
+              <template
+                v-if="currentUserHasPermission(['system:users:manage'])"
+                #checkbox
               >
-                修改资料
-              </VButton>
-              <VButton
-                v-close-popper
-                block
-                @click="handleOpenPasswordChangeModal(user)"
+                <input
+                  v-model="selectedUserNames"
+                  :value="user.metadata.name"
+                  class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                  name="post-checkbox"
+                  type="checkbox"
+                />
+              </template>
+              <template #start>
+                <VEntityField>
+                  <template #description>
+                    <VAvatar
+                      :alt="user.spec.displayName"
+                      :src="user.spec.avatar"
+                      size="md"
+                    ></VAvatar>
+                  </template>
+                </VEntityField>
+                <VEntityField
+                  :title="user.spec.displayName"
+                  :description="user.metadata.name"
+                  :route="{
+                    name: 'UserDetail',
+                    params: { name: user.metadata.name },
+                  }"
+                />
+              </template>
+              <template #end>
+                <VEntityField>
+                  <template #description>
+                    <div
+                      v-for="(role, roleIndex) in getRoles(user)"
+                      :key="roleIndex"
+                      class="flex items-center"
+                    >
+                      <VTag>
+                        {{ role }}
+                      </VTag>
+                    </div>
+                  </template>
+                </VEntityField>
+                <VEntityField v-if="user.metadata.deletionTimestamp">
+                  <template #description>
+                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                  </template>
+                </VEntityField>
+                <VEntityField>
+                  <template #description>
+                    <span class="truncate text-xs tabular-nums text-gray-500">
+                      {{ formatDatetime(user.metadata.creationTimestamp) }}
+                    </span>
+                  </template>
+                </VEntityField>
+              </template>
+              <template
+                v-if="currentUserHasPermission(['system:users:manage'])"
+                #dropdownItems
               >
-                修改密码
-              </VButton>
-              <VButton
-                v-if="
-                  userStore.currentUser?.metadata.name !== user.metadata.name
-                "
-                v-close-popper
-                block
-                @click="handleOpenGrantPermissionModal(user)"
-              >
-                分配角色
-              </VButton>
-              <VButton
-                v-if="
-                  userStore.currentUser?.metadata.name !== user.metadata.name
-                "
-                v-close-popper
-                block
-                type="danger"
-                @click="handleDelete(user)"
-              >
-                删除
-              </VButton>
-            </template>
-          </VEntity>
-        </li>
-      </ul>
+                <VButton
+                  v-close-popper
+                  block
+                  type="secondary"
+                  @click="handleOpenCreateModal(user)"
+                >
+                  修改资料
+                </VButton>
+                <VButton
+                  v-close-popper
+                  block
+                  @click="handleOpenPasswordChangeModal(user)"
+                >
+                  修改密码
+                </VButton>
+                <VButton
+                  v-if="
+                    userStore.currentUser?.metadata.name !== user.metadata.name
+                  "
+                  v-close-popper
+                  block
+                  @click="handleOpenGrantPermissionModal(user)"
+                >
+                  分配角色
+                </VButton>
+                <VButton
+                  v-if="
+                    userStore.currentUser?.metadata.name !== user.metadata.name
+                  "
+                  v-close-popper
+                  block
+                  type="danger"
+                  @click="handleDelete(user)"
+                >
+                  删除
+                </VButton>
+              </template>
+            </VEntity>
+          </li>
+        </ul>
+      </Transition>
 
       <template #footer>
         <div class="bg-white sm:flex sm:items-center sm:justify-end">
