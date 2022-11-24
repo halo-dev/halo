@@ -59,11 +59,13 @@ const modalTitle = computed(() => {
 
 const { activatedTheme } = storeToRefs(useThemeStore());
 
-const handleFetchThemes = async () => {
+const handleFetchThemes = async (options?: { mute?: boolean }) => {
   try {
     clearInterval(refreshInterval.value);
 
-    loading.value = true;
+    if (!options?.mute) {
+      loading.value = true;
+    }
     const { data } = await apiClient.theme.listThemes({
       page: 0,
       size: 0,
@@ -81,7 +83,7 @@ const handleFetchThemes = async () => {
 
     if (deletedThemes.length) {
       refreshInterval.value = setInterval(() => {
-        handleFetchThemes();
+        handleFetchThemes({ mute: true });
       }, 3000);
     }
   } catch (e) {
@@ -223,7 +225,7 @@ const handleOpenPreview = (theme: Theme) => {
           >
             <template #actions>
               <VSpace>
-                <VButton :loading="loading" @click="handleFetchThemes">
+                <VButton :loading="loading" @click="handleFetchThemes()">
                   刷新
                 </VButton>
                 <VButton

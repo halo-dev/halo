@@ -10,6 +10,7 @@ import {
   VEmpty,
   IconAddCircle,
   IconExternalLinkLine,
+  VLoading,
 } from "@halo-dev/components";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import type {
@@ -114,13 +115,18 @@ const handleApprove = async () => {
   }
 };
 
-const handleFetchReplies = async () => {
+const handleFetchReplies = async (options?: { mute?: boolean }) => {
   try {
     clearInterval(refreshInterval.value);
 
-    loading.value = true;
+    if (!options?.mute) {
+      loading.value = true;
+    }
+
     const { data } = await apiClient.reply.listReplies({
       commentName: props.comment.comment.metadata.name,
+      page: 0,
+      size: 0,
     });
     replies.value = data.items;
 
@@ -130,7 +136,7 @@ const handleFetchReplies = async () => {
 
     if (deletedReplies.length) {
       refreshInterval.value = setInterval(() => {
-        handleFetchReplies();
+        handleFetchReplies({ mute: true });
       }, 3000);
     }
   } catch (error) {
@@ -185,7 +191,7 @@ const onTriggerReply = (reply: ListedReply) => {
 
 const onReplyCreationModalClose = () => {
   selectedReply.value = undefined;
-  handleFetchReplies();
+  handleFetchReplies({ mute: true });
 };
 
 // Subject ref processing
@@ -391,33 +397,35 @@ const subjectRefResult = computed(() => {
       <div
         class="ml-8 mt-3 divide-y divide-gray-100 rounded-base border-t border-gray-100 pt-3"
       >
-        <VEmpty
-          v-if="!replies.length && !loading"
-          message="你可以尝试刷新或者创建新回复"
-          title="当前没有回复"
-        >
-          <template #actions>
-            <VSpace>
-              <VButton @click="handleFetchReplies">刷新</VButton>
-              <VButton type="secondary" @click="replyModal = true">
-                <template #icon>
-                  <IconAddCircle class="h-full w-full" />
-                </template>
-                创建新回复
-              </VButton>
-            </VSpace>
-          </template>
-        </VEmpty>
-        <ReplyListItem
-          v-for="reply in replies"
-          v-else
-          :key="reply.reply.metadata.name"
-          :class="{ 'hover:bg-white': showReplies }"
-          :reply="reply"
-          :replies="replies"
-          @reload="handleFetchReplies"
-          @reply="onTriggerReply"
-        ></ReplyListItem>
+        <VLoading v-if="loading" />
+        <Transition v-else-if="!replies.length" appear name="fade">
+          <VEmpty message="你可以尝试刷新或者创建新回复" title="当前没有回复">
+            <template #actions>
+              <VSpace>
+                <VButton @click="handleFetchReplies">刷新</VButton>
+                <VButton type="secondary" @click="replyModal = true">
+                  <template #icon>
+                    <IconAddCircle class="h-full w-full" />
+                  </template>
+                  创建新回复
+                </VButton>
+              </VSpace>
+            </template>
+          </VEmpty>
+        </Transition>
+        <Transition v-else appear name="fade">
+          <div>
+            <ReplyListItem
+              v-for="reply in replies"
+              :key="reply.reply.metadata.name"
+              :class="{ 'hover:bg-white': showReplies }"
+              :reply="reply"
+              :replies="replies"
+              @reload="handleFetchReplies({ mute: true })"
+              @reply="onTriggerReply"
+            ></ReplyListItem>
+          </div>
+        </Transition>
       </div>
     </template>
   </VEntity>

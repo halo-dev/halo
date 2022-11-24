@@ -93,17 +93,17 @@ const selectedSortItemValue = computed(() => {
 
 function handleSelectPolicy(policy: Policy | undefined) {
   selectedPolicy.value = policy;
-  handleFetchAttachments(1);
+  handleFetchAttachments({ page: 1 });
 }
 
 function handleSelectUser(user: User | undefined) {
   selectedUser.value = user;
-  handleFetchAttachments(1);
+  handleFetchAttachments({ page: 1 });
 }
 
 function handleSortItemChange(sortItem?: SortItem) {
   selectedSortItem.value = sortItem;
-  handleFetchAttachments(1);
+  handleFetchAttachments({ page: 1 });
 }
 
 function handleKeywordChange() {
@@ -111,12 +111,12 @@ function handleKeywordChange() {
   if (keywordNode) {
     keyword.value = keywordNode._value as string;
   }
-  handleFetchAttachments(1);
+  handleFetchAttachments({ page: 1 });
 }
 
 function handleClearKeyword() {
   keyword.value = "";
-  handleFetchAttachments(1);
+  handleFetchAttachments({ page: 1 });
 }
 
 const hasFilters = computed(() => {
@@ -133,7 +133,7 @@ function handleClearFilters() {
   selectedUser.value = undefined;
   selectedSortItem.value = undefined;
   keyword.value = "";
-  handleFetchAttachments(1);
+  handleFetchAttachments({ page: 1 });
 }
 
 const {
@@ -208,16 +208,12 @@ const onDetailModalClose = () => {
   selectedAttachment.value = undefined;
   nameQuery.value = undefined;
   nameQueryAttachment.value = undefined;
-  setTimeout(() => {
-    handleFetchAttachments();
-  }, 200);
+  handleFetchAttachments({ mute: true });
 };
 
 const onUploadModalClose = () => {
   routeQueryAction.value = undefined;
-  setTimeout(() => {
-    handleFetchAttachments();
-  }, 200);
+  handleFetchAttachments({ mute: true });
 };
 
 const onGroupChange = () => {

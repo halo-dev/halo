@@ -41,14 +41,19 @@ const pluginInstall = ref(false);
 const keyword = ref("");
 const refreshInterval = ref();
 
-const handleFetchPlugins = async (page?: number) => {
+const handleFetchPlugins = async (options?: {
+  mute?: boolean;
+  page?: number;
+}) => {
   try {
     clearInterval(refreshInterval.value);
 
-    loading.value = true;
+    if (!options?.mute) {
+      loading.value = true;
+    }
 
-    if (page) {
-      plugins.value.page = page;
+    if (options?.page) {
+      plugins.value.page = options.page;
     }
 
     const { data } = await apiClient.plugin.listPlugins({
@@ -69,7 +74,7 @@ const handleFetchPlugins = async (page?: number) => {
 
     if (deletedPlugins.length) {
       refreshInterval.value = setInterval(() => {
-        handleFetchPlugins();
+        handleFetchPlugins({ mute: true });
       }, 3000);
     }
   } catch (e) {
@@ -139,12 +144,12 @@ const selectedSortItem = ref<SortItem>();
 
 function handleEnabledItemChange(enabledItem: EnabledItem) {
   selectedEnabledItem.value = enabledItem;
-  handleFetchPlugins(1);
+  handleFetchPlugins({ page: 1 });
 }
 
 function handleSortItemChange(sortItem?: SortItem) {
   selectedSortItem.value = sortItem;
-  handleFetchPlugins(1);
+  handleFetchPlugins({ page: 1 });
 }
 
 function handleKeywordChange() {
@@ -152,12 +157,12 @@ function handleKeywordChange() {
   if (keywordNode) {
     keyword.value = keywordNode._value as string;
   }
-  handleFetchPlugins(1);
+  handleFetchPlugins({ page: 1 });
 }
 
 function handleClearKeyword() {
   keyword.value = "";
-  handleFetchPlugins(1);
+  handleFetchPlugins({ page: 1 });
 }
 
 const hasFilters = computed(() => {
@@ -172,14 +177,14 @@ function handleClearFilters() {
   selectedEnabledItem.value = undefined;
   selectedSortItem.value = undefined;
   keyword.value = "";
-  handleFetchPlugins(1);
+  handleFetchPlugins({ page: 1 });
 }
 </script>
 <template>
   <PluginUploadModal
     v-if="currentUserHasPermission(['system:plugins:manage'])"
     v-model:visible="pluginInstall"
-    @close="handleFetchPlugins"
+    @close="handleFetchPlugins()"
   />
 
   <VPageHeader title="插件">
@@ -320,7 +325,7 @@ function handleClearFilters() {
         >
           <template #actions>
             <VSpace>
-              <VButton @click="handleFetchPlugins">刷新</VButton>
+              <VButton @click="handleFetchPlugins()">刷新</VButton>
               <VButton
                 v-permission="['system:plugins:manage']"
                 type="secondary"
@@ -342,7 +347,7 @@ function handleClearFilters() {
           role="list"
         >
           <li v-for="(plugin, index) in plugins.items" :key="index">
-            <PluginListItem :plugin="plugin" @reload="handleFetchPlugins" />
+            <PluginListItem :plugin="plugin" @reload="handleFetchPlugins()" />
           </li>
         </ul>
       </Transition>

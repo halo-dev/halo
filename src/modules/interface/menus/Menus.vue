@@ -38,11 +38,13 @@ const menuListRef = ref();
 const menuItemEditingModal = ref();
 const refreshInterval = ref();
 
-const handleFetchMenuItems = async () => {
+const handleFetchMenuItems = async (options?: { mute?: boolean }) => {
   try {
     clearInterval(refreshInterval.value);
 
-    loading.value = true;
+    if (!options?.mute) {
+      loading.value = true;
+    }
 
     if (!selectedMenu.value?.spec.menuItems) {
       return;
@@ -65,7 +67,7 @@ const handleFetchMenuItems = async () => {
 
     if (deletedMenuItems.length) {
       refreshInterval.value = setInterval(() => {
-        handleFetchMenuItems();
+        handleFetchMenuItems({ mute: true });
       }, 3000);
     }
   } catch (e) {
@@ -113,7 +115,7 @@ const onMenuItemSaved = async (menuItem: MenuItem) => {
   }
 
   await menuListRef.value.handleFetchMenus();
-  await handleFetchMenuItems();
+  await handleFetchMenuItems({ mute: true });
 };
 
 const handleUpdateInBatch = useDebounceFn(async () => {
@@ -131,7 +133,7 @@ const handleUpdateInBatch = useDebounceFn(async () => {
     console.log("Failed to update menu items", e);
   } finally {
     await menuListRef.value.handleFetchMenus();
-    await handleFetchMenuItems();
+    await handleFetchMenuItems({ mute: true });
   }
 }, 500);
 
@@ -191,7 +193,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
         <MenuList
           ref="menuListRef"
           v-model:selected-menu="selectedMenu"
-          @select="handleFetchMenuItems"
+          @select="handleFetchMenuItems()"
         />
       </div>
       <div class="flex-1">
@@ -229,7 +231,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
             >
               <template #actions>
                 <VSpace>
-                  <VButton @click="handleFetchMenuItems"> 刷新</VButton>
+                  <VButton @click="handleFetchMenuItems()"> 刷新</VButton>
                   <VButton
                     v-permission="['system:menus:manage']"
                     type="primary"

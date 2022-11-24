@@ -11,7 +11,7 @@ interface usePostCategoryReturn {
   categories: Ref<Category[]>;
   categoriesTree: Ref<CategoryTree[]>;
   loading: Ref<boolean>;
-  handleFetchCategories: () => void;
+  handleFetchCategories: (fetchOptions?: { mute?: boolean }) => void;
   handleDelete: (category: CategoryTree) => void;
 }
 
@@ -25,11 +25,13 @@ export function usePostCategory(options?: {
   const loading = ref(false);
   const refreshInterval = ref();
 
-  const handleFetchCategories = async () => {
+  const handleFetchCategories = async (fetchOptions?: { mute?: boolean }) => {
     try {
       clearInterval(refreshInterval.value);
 
-      loading.value = true;
+      if (!fetchOptions?.mute) {
+        loading.value = true;
+      }
       const { data } =
         await apiClient.extension.category.listcontentHaloRunV1alpha1Category({
           page: 0,
@@ -44,7 +46,7 @@ export function usePostCategory(options?: {
 
       if (deletedCategories.length) {
         refreshInterval.value = setInterval(() => {
-          handleFetchCategories();
+          handleFetchCategories({ mute: true });
         }, 3000);
       }
     } catch (e) {

@@ -58,11 +58,16 @@ const selectedPageNames = ref<string[]>([]);
 const checkedAll = ref(false);
 const refreshInterval = ref();
 
-const handleFetchSinglePages = async (page?: number) => {
+const handleFetchSinglePages = async (options?: {
+  mute?: boolean;
+  page?: number;
+}) => {
   try {
     clearInterval(refreshInterval.value);
 
-    loading.value = true;
+    if (!options?.mute) {
+      loading.value = true;
+    }
 
     let contributors: string[] | undefined;
     const labelSelector: string[] = ["content.halo.run/deleted=false"];
@@ -77,8 +82,8 @@ const handleFetchSinglePages = async (page?: number) => {
       );
     }
 
-    if (page) {
-      singlePages.value.page = page;
+    if (options?.page) {
+      singlePages.value.page = options.page;
     }
 
     const { data } = await apiClient.singlePage.listSinglePages({
@@ -105,8 +110,8 @@ const handleFetchSinglePages = async (page?: number) => {
 
     if (abnormalSinglePages.length) {
       refreshInterval.value = setInterval(() => {
-        handleFetchSinglePages();
-      }, 1000);
+        handleFetchSinglePages({ mute: true });
+      }, 3000);
     }
   } catch (error) {
     console.error("Failed to fetch single pages", error);
@@ -142,7 +147,7 @@ const handleOpenSettingModal = async (singlePage: SinglePage) => {
 
 const onSettingModalClose = () => {
   selectedSinglePage.value = undefined;
-  handleFetchSinglePages();
+  handleFetchSinglePages({ mute: true });
 };
 
 const handleSelectPrevious = async () => {
@@ -361,22 +366,22 @@ const keyword = ref("");
 
 function handleVisibleItemChange(visibleItem: VisibleItem) {
   selectedVisibleItem.value = visibleItem;
-  handleFetchSinglePages(1);
+  handleFetchSinglePages({ page: 1 });
 }
 
 const handleSelectUser = (user?: User) => {
   selectedContributor.value = user;
-  handleFetchSinglePages(1);
+  handleFetchSinglePages({ page: 1 });
 };
 
 function handlePublishStatusItemChange(publishStatusItem: PublishStatusItem) {
   selectedPublishStatusItem.value = publishStatusItem;
-  handleFetchSinglePages(1);
+  handleFetchSinglePages({ page: 1 });
 }
 
 function handleSortItemChange(sortItem?: SortItem) {
   selectedSortItem.value = sortItem;
-  handleFetchSinglePages(1);
+  handleFetchSinglePages({ page: 1 });
 }
 
 function handleKeywordChange() {
@@ -384,12 +389,12 @@ function handleKeywordChange() {
   if (keywordNode) {
     keyword.value = keywordNode._value as string;
   }
-  handleFetchSinglePages(1);
+  handleFetchSinglePages({ page: 1 });
 }
 
 function handleClearKeyword() {
   keyword.value = "";
-  handleFetchSinglePages(1);
+  handleFetchSinglePages({ page: 1 });
 }
 
 const hasFilters = computed(() => {
@@ -408,7 +413,7 @@ function handleClearFilters() {
   selectedPublishStatusItem.value = PublishStatusItems[0];
   selectedSortItem.value = undefined;
   keyword.value = "";
-  handleFetchSinglePages(1);
+  handleFetchSinglePages({ page: 1 });
 }
 </script>
 

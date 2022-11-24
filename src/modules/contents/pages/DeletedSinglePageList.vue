@@ -45,14 +45,19 @@ const checkedAll = ref(false);
 const refreshInterval = ref();
 const keyword = ref("");
 
-const handleFetchSinglePages = async (page?: number) => {
+const handleFetchSinglePages = async (options?: {
+  mute?: boolean;
+  page?: number;
+}) => {
   try {
     clearInterval(refreshInterval.value);
 
-    loading.value = true;
+    if (!options?.mute) {
+      loading.value = true;
+    }
 
-    if (page) {
-      singlePages.value.page = page;
+    if (options?.page) {
+      singlePages.value.page = options.page;
     }
 
     const { data } = await apiClient.singlePage.listSinglePages({
@@ -72,7 +77,7 @@ const handleFetchSinglePages = async (page?: number) => {
 
     if (deletedSinglePages.length) {
       refreshInterval.value = setInterval(() => {
-        handleFetchSinglePages();
+        handleFetchSinglePages({ mute: true });
       }, 3000);
     }
   } catch (error) {
@@ -212,12 +217,12 @@ function handleKeywordChange() {
   if (keywordNode) {
     keyword.value = keywordNode._value as string;
   }
-  handleFetchSinglePages(1);
+  handleFetchSinglePages({ page: 1 });
 }
 
 function handleClearKeyword() {
   keyword.value = "";
-  handleFetchSinglePages(1);
+  handleFetchSinglePages({ page: 1 });
 }
 </script>
 

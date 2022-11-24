@@ -41,12 +41,14 @@ const selectedMenuToUpdate = ref<Menu>();
 const menuEditingModal = ref<boolean>(false);
 const refreshInterval = ref();
 
-const handleFetchMenus = async () => {
+const handleFetchMenus = async (options?: { mute?: boolean }) => {
   selectedMenuToUpdate.value = undefined;
   try {
     clearInterval(refreshInterval.value);
 
-    loading.value = true;
+    if (!options?.mute) {
+      loading.value = true;
+    }
 
     const { data } = await apiClient.extension.menu.listv1alpha1Menu();
     menus.value = data.items;
@@ -67,7 +69,7 @@ const handleFetchMenus = async () => {
 
     if (deletedMenus.length) {
       refreshInterval.value = setInterval(() => {
-        handleFetchMenus();
+        handleFetchMenus({ mute: true });
       }, 3000);
     }
   } catch (e) {
@@ -187,7 +189,7 @@ onMounted(handleFetchPrimaryMenuName);
   <MenuEditingModal
     v-model:visible="menuEditingModal"
     :menu="selectedMenuToUpdate"
-    @close="handleFetchMenus"
+    @close="handleFetchMenus()"
     @created="handleSelect"
   />
   <VCard :body-class="['!p-0']" title="菜单">
@@ -196,7 +198,7 @@ onMounted(handleFetchPrimaryMenuName);
       <VEmpty message="你可以尝试刷新或者新建菜单" title="当前没有菜单">
         <template #actions>
           <VSpace>
-            <VButton size="sm" @click="handleFetchMenus"> 刷新</VButton>
+            <VButton size="sm" @click="handleFetchMenus()"> 刷新</VButton>
           </VSpace>
         </template>
       </VEmpty>

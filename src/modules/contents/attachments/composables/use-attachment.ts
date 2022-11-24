@@ -19,7 +19,7 @@ interface useAttachmentControlReturn {
   selectedAttachment: Ref<Attachment | undefined>;
   selectedAttachments: Ref<Set<Attachment>>;
   checkedAll: Ref<boolean>;
-  handleFetchAttachments: (page?: number) => void;
+  handleFetchAttachments: (options?: { mute?: boolean; page?: number }) => void;
   handlePaginationChange: ({
     page,
     size,
@@ -68,14 +68,19 @@ export function useAttachmentControl(filterOptions?: {
   const checkedAll = ref(false);
   const refreshInterval = ref();
 
-  const handleFetchAttachments = async (page?: number) => {
+  const handleFetchAttachments = async (options?: {
+    mute?: boolean;
+    page?: number;
+  }) => {
     try {
       clearInterval(refreshInterval.value);
 
-      loading.value = true;
+      if (!options?.mute) {
+        loading.value = true;
+      }
 
-      if (page) {
-        attachments.value.page = page;
+      if (options?.page) {
+        attachments.value.page = options.page;
       }
 
       const { data } = await apiClient.attachment.searchAttachments({
@@ -96,7 +101,7 @@ export function useAttachmentControl(filterOptions?: {
 
       if (deletedAttachments.length) {
         refreshInterval.value = setInterval(() => {
-          handleFetchAttachments();
+          handleFetchAttachments({ mute: true });
         }, 3000);
       }
     } catch (e) {

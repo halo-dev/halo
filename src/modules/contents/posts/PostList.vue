@@ -64,11 +64,16 @@ const checkedAll = ref(false);
 const selectedPostNames = ref<string[]>([]);
 const refreshInterval = ref();
 
-const handleFetchPosts = async (page?: number) => {
+const handleFetchPosts = async (options?: {
+  mute?: boolean;
+  page?: number;
+}) => {
   try {
     clearInterval(refreshInterval.value);
 
-    loading.value = true;
+    if (!options?.mute) {
+      loading.value = true;
+    }
 
     let categories: string[] | undefined;
     let tags: string[] | undefined;
@@ -96,8 +101,8 @@ const handleFetchPosts = async (page?: number) => {
       );
     }
 
-    if (page) {
-      posts.value.page = page;
+    if (options?.page) {
+      posts.value.page = options.page;
     }
 
     const { data } = await apiClient.post.listPosts({
@@ -126,8 +131,8 @@ const handleFetchPosts = async (page?: number) => {
 
     if (abnormalPosts.length) {
       refreshInterval.value = setInterval(() => {
-        handleFetchPosts();
-      }, 1000);
+        handleFetchPosts({ mute: true });
+      }, 3000);
     }
   } catch (e) {
     console.error("Failed to fetch posts", e);
@@ -164,7 +169,7 @@ const handleOpenSettingModal = async (post: Post) => {
 
 const onSettingModalClose = () => {
   selectedPost.value = undefined;
-  handleFetchPosts();
+  handleFetchPosts({ mute: true });
 };
 
 const handleSelectPrevious = async () => {
@@ -376,32 +381,32 @@ const keyword = ref("");
 
 function handleVisibleItemChange(visibleItem: VisibleItem) {
   selectedVisibleItem.value = visibleItem;
-  handleFetchPosts(1);
+  handleFetchPosts({ page: 1 });
 }
 
 function handlePublishStatusItemChange(publishStatusItem: PublishStatuItem) {
   selectedPublishStatusItem.value = publishStatusItem;
-  handleFetchPosts(1);
+  handleFetchPosts({ page: 1 });
 }
 
 function handleSortItemChange(sortItem?: SortItem) {
   selectedSortItem.value = sortItem;
-  handleFetchPosts(1);
+  handleFetchPosts({ page: 1 });
 }
 
 function handleCategoryChange(category?: Category) {
   selectedCategory.value = category;
-  handleFetchPosts(1);
+  handleFetchPosts({ page: 1 });
 }
 
 function handleTagChange(tag?: Tag) {
   selectedTag.value = tag;
-  handleFetchPosts(1);
+  handleFetchPosts({ page: 1 });
 }
 
 function handleContributorChange(user?: User) {
   selectedContributor.value = user;
-  handleFetchPosts(1);
+  handleFetchPosts({ page: 1 });
 }
 
 function handleKeywordChange() {
@@ -409,12 +414,12 @@ function handleKeywordChange() {
   if (keywordNode) {
     keyword.value = keywordNode._value as string;
   }
-  handleFetchPosts(1);
+  handleFetchPosts({ page: 1 });
 }
 
 function handleClearKeyword() {
   keyword.value = "";
-  handleFetchPosts(1);
+  handleFetchPosts({ page: 1 });
 }
 
 function handleClearFilters() {
@@ -425,7 +430,7 @@ function handleClearFilters() {
   selectedTag.value = undefined;
   selectedContributor.value = undefined;
   keyword.value = "";
-  handleFetchPosts(1);
+  handleFetchPosts({ page: 1 });
 }
 
 const hasFilters = computed(() => {

@@ -8,7 +8,7 @@ import { onBeforeRouteLeave } from "vue-router";
 interface usePostTagReturn {
   tags: Ref<Tag[]>;
   loading: Ref<boolean>;
-  handleFetchTags: () => void;
+  handleFetchTags: (fetchOptions?: { mute?: boolean }) => void;
   handleDelete: (tag: Tag) => void;
 }
 
@@ -21,11 +21,13 @@ export function usePostTag(options?: {
   const loading = ref(false);
   const refreshInterval = ref();
 
-  const handleFetchTags = async () => {
+  const handleFetchTags = async (fetchOptions?: { mute?: boolean }) => {
     try {
       clearInterval(refreshInterval.value);
 
-      loading.value = true;
+      if (!fetchOptions?.mute) {
+        loading.value = true;
+      }
       const { data } =
         await apiClient.extension.tag.listcontentHaloRunV1alpha1Tag({
           page: 0,
@@ -40,7 +42,7 @@ export function usePostTag(options?: {
 
       if (deletedTags.length) {
         refreshInterval.value = setInterval(() => {
-          handleFetchTags();
+          handleFetchTags({ mute: true });
         }, 3000);
       }
     } catch (e) {

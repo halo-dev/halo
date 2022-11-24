@@ -44,14 +44,19 @@ const selectedCommentNames = ref<string[]>([]);
 const keyword = ref("");
 const refreshInterval = ref();
 
-const handleFetchComments = async (page?: number) => {
+const handleFetchComments = async (options?: {
+  mute?: boolean;
+  page?: number;
+}) => {
   try {
     clearInterval(refreshInterval.value);
 
-    loading.value = true;
+    if (!options?.mute) {
+      loading.value = true;
+    }
 
-    if (page) {
-      comments.value.page = page;
+    if (options?.page) {
+      comments.value.page = options.page;
     }
 
     const { data } = await apiClient.comment.listComments({
@@ -70,7 +75,7 @@ const handleFetchComments = async (page?: number) => {
 
     if (deletedComments.length) {
       refreshInterval.value = setInterval(() => {
-        handleFetchComments();
+        handleFetchComments({ mute: true });
       }, 3000);
     }
   } catch (error) {
@@ -238,7 +243,7 @@ const handleApprovedFilterItemChange = (filterItem: {
 }) => {
   selectedApprovedFilterItem.value = filterItem;
   selectedCommentNames.value = [];
-  handleFetchComments(1);
+  handleFetchComments({ page: 1 });
 };
 
 const handleSortFilterItemChange = (filterItem: {
@@ -247,12 +252,12 @@ const handleSortFilterItemChange = (filterItem: {
 }) => {
   selectedSortFilterItem.value = filterItem;
   selectedCommentNames.value = [];
-  handleFetchComments(1);
+  handleFetchComments({ page: 1 });
 };
 
 function handleSelectUser(user: User | undefined) {
   selectedUser.value = user;
-  handleFetchComments(1);
+  handleFetchComments({ page: 1 });
 }
 
 function handleKeywordChange() {
@@ -260,12 +265,12 @@ function handleKeywordChange() {
   if (keywordNode) {
     keyword.value = keywordNode._value as string;
   }
-  handleFetchComments(1);
+  handleFetchComments({ page: 1 });
 }
 
 function handleClearKeyword() {
   keyword.value = "";
-  handleFetchComments(1);
+  handleFetchComments({ page: 1 });
 }
 
 const hasFilters = computed(() => {
@@ -282,7 +287,7 @@ function handleClearFilters() {
   selectedSortFilterItem.value = SortFilterItems[0];
   selectedUser.value = undefined;
   keyword.value = "";
-  handleFetchComments(1);
+  handleFetchComments({ page: 1 });
 }
 </script>
 <template>
@@ -479,7 +484,7 @@ function handleClearFilters() {
             <CommentListItem
               :comment="comment"
               :is-selected="checkSelection(comment)"
-              @reload="handleFetchComments"
+              @reload="handleFetchComments({ mute: true })"
             >
               <template #checkbox>
                 <input
