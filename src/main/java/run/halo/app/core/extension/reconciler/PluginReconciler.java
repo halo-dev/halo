@@ -253,8 +253,7 @@ public class PluginReconciler implements Reconciler<Request> {
         client.fetch(ReverseProxy.class, reverseProxyName)
             .ifPresentOrElse(persisted -> {
                 if (isDevelopmentMode(pluginName)) {
-                    reverseProxy.getMetadata()
-                        .setVersion(persisted.getMetadata().getVersion());
+                    reverseProxy.setMetadata(persisted.getMetadata());
                     client.update(reverseProxy);
                 }
             }, () -> client.create(reverseProxy));

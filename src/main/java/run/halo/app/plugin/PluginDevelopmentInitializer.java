@@ -47,7 +47,7 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
             Plugin plugin = new YamlPluginFinder().find(pluginWrapper.getPluginPath());
             extensionClient.fetch(Plugin.class, plugin.getMetadata().getName())
                 .ifPresentOrElse(persistent -> {
-                    plugin.getMetadata().setVersion(persistent.getMetadata().getVersion());
+                    plugin.setMetadata(persistent.getMetadata());
                     extensionClient.update(plugin);
                 }, () -> extensionClient.create(plugin));
         }

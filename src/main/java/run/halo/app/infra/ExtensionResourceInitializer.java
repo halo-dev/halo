@@ -88,7 +88,7 @@ public class ExtensionResourceInitializer {
             .flatMap(ext -> extensionClient.fetch(extension.groupVersionKind(),
                 extension.getMetadata().getName()))
             .flatMap(existingExt -> {
-                extension.getMetadata().setVersion(existingExt.getMetadata().getVersion());
+                extension.setMetadata(existingExt.getMetadata());
                 return extensionClient.update(extension);
             })
             .switchIfEmpty(Mono.defer(() -> extensionClient.create(extension)))

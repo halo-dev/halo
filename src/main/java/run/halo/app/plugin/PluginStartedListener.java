@@ -77,8 +77,7 @@ public class PluginStartedListener {
 
                         return client.fetch(unstructured.groupVersionKind(), metadata.getName())
                             .flatMap(extension -> {
-                                unstructured.getMetadata()
-                                    .setVersion(extension.getMetadata().getVersion());
+                                unstructured.setMetadata(extension.getMetadata());
                                 return client.update(unstructured);
                             })
                             .switchIfEmpty(Mono.defer(() -> client.create(unstructured)));
