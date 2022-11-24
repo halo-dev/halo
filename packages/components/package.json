@@ -44,11 +44,11 @@
   "homepage": "https://github.com/halo-dev/console/tree/main/packages/components#readme",
   "license": "MIT",
   "devDependencies": {
-    "@histoire/plugin-vue": "^0.11.6",
-    "@iconify-json/ri": "^1.1.3",
-    "histoire": "^0.11.6",
-    "unplugin-icons": "^0.14.13",
-    "vite-plugin-dts": "^1.7.0"
+    "@histoire/plugin-vue": "^0.11.7",
+    "@iconify-json/ri": "^1.1.4",
+    "histoire": "^0.11.7",
+    "unplugin-icons": "^0.14.14",
+    "vite-plugin-dts": "^1.7.1"
   },
   "peerDependencies": {
     "vue": "^3.2.37",
@@ -64,13 +64,13 @@
   "dependencies": {
     "@codemirror/commands": "^6.1.2",
     "@codemirror/lang-css": "^6.0.1",
-    "@codemirror/lang-html": "^6.1.3",
+    "@codemirror/lang-html": "^6.2.0",
     "@codemirror/lang-javascript": "^6.1.1",
     "@codemirror/lang-json": "^6.0.1",
-    "@codemirror/language": "^6.3.0",
-    "@codemirror/legacy-modes": "^6.2.0",
-    "@codemirror/state": "^6.1.3",
-    "@codemirror/view": "^6.4.2",
+    "@codemirror/language": "^6.3.1",
+    "@codemirror/legacy-modes": "^6.3.0",
+    "@codemirror/state": "^6.1.4",
+    "@codemirror/view": "^6.5.1",
     "codemirror": "^6.0.1"
   }
 }
