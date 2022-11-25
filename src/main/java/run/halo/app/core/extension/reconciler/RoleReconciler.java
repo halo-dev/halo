@@ -9,9 +9,12 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.controller.Controller;
+import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.utils.JsonUtils;
@@ -23,6 +26,7 @@ import run.halo.app.infra.utils.JsonUtils;
  * @since 2.0.0
  */
 @Slf4j
+@Component
 public class RoleReconciler implements Reconciler<Request> {
 
     private final ExtensionClient client;
@@ -63,6 +67,13 @@ public class RoleReconciler implements Reconciler<Request> {
             }
         });
         return new Result(false, null);
+    }
+
+    @Override
+    public Controller setupWith(ControllerBuilder builder) {
+        return builder
+            .extension(new Role())
+            .build();
     }
 
     private List<String> aggregateUiPermissions(List<Role> dependencyRoles) {

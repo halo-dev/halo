@@ -4,8 +4,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.controller.Controller;
+import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.resources.ReverseProxyRouterFunctionRegistry;
@@ -16,6 +19,7 @@ import run.halo.app.plugin.resources.ReverseProxyRouterFunctionRegistry;
  * @author guqing
  * @since 2.0.0
  */
+@Component
 public class ReverseProxyReconciler implements Reconciler<Reconciler.Request> {
     private static final String FINALIZER_NAME = "reverse-proxy-protection";
     private final ExtensionClient client;
@@ -40,6 +44,13 @@ public class ReverseProxyReconciler implements Reconciler<Reconciler.Request> {
                 return new Result(false, null);
             })
             .orElse(new Result(false, null));
+    }
+
+    @Override
+    public Controller setupWith(ControllerBuilder builder) {
+        return builder
+            .extension(new ReverseProxy())
+            .build();
     }
 
     private void registerReverseProxy(ReverseProxy reverseProxy) {

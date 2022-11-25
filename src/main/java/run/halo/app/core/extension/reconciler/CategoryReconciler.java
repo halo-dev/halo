@@ -12,10 +12,13 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 import run.halo.app.content.permalinks.CategoryPermalinkPolicy;
 import run.halo.app.core.extension.Category;
 import run.halo.app.core.extension.Post;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.controller.Controller;
+import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -25,6 +28,7 @@ import run.halo.app.infra.utils.JsonUtils;
  * @author guqing
  * @since 2.0.0
  */
+@Component
 public class CategoryReconciler implements Reconciler<Reconciler.Request> {
     private static final String FINALIZER_NAME = "category-protection";
     private final ExtensionClient client;
@@ -52,6 +56,13 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
                 return new Result(true, Duration.ofMinutes(1));
             })
             .orElseGet(() -> new Result(false, null));
+    }
+
+    @Override
+    public Controller setupWith(ControllerBuilder builder) {
+        return builder
+            .extension(new Category())
+            .build();
     }
 
     private void addFinalizerIfNecessary(Category oldCategory) {

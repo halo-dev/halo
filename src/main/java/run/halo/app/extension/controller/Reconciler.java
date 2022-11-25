@@ -6,6 +6,8 @@ public interface Reconciler<R> {
 
     Result reconcile(R request);
 
+    Controller setupWith(ControllerBuilder builder);
+
     record Request(String name) {
     }
 
