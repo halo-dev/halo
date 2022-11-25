@@ -14,4 +14,8 @@ public class NotFoundException extends HaloException {
     public NotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public NotFoundException(Throwable cause) {
+        super(cause);
+    }
 }

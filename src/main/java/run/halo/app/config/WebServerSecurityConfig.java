@@ -1,6 +1,7 @@
 package run.halo.app.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
+import static org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter.Mode.SAMEORIGIN;
 
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -59,6 +60,9 @@ public class WebServerSecurityConfig {
             .pathMatchers("/api/**", "/apis/**", "/login", "/logout")
             .access(new RequestInfoAuthorizationManager(roleService))
             .pathMatchers("/**").permitAll()
+            .and()
+            .headers()
+            .frameOptions().mode(SAMEORIGIN)
             .and()
             .anonymous(anonymousSpec -> {
                 anonymousSpec.authorities(AnonymousUserConst.Role);
