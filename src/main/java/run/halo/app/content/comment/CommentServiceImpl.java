@@ -2,10 +2,12 @@ package run.halo.app.content.comment;
 
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -81,6 +83,10 @@ public class CommentServiceImpl implements CommentService {
                 }
                 comment.getSpec()
                     .setApproved(Boolean.FALSE.equals(commentSetting.getRequireReviewForNew()));
+                if (BooleanUtils.isTrue(comment.getSpec().getApproved())
+                    && comment.getSpec().getApprovedTime() == null) {
+                    comment.getSpec().setApprovedTime(Instant.now());
+                }
                 comment.getSpec().setHidden(false);
                 if (comment.getSpec().getOwner() != null) {
                     return Mono.just(comment);
