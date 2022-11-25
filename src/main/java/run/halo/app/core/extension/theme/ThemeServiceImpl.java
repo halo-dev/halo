@@ -169,15 +169,14 @@ public class ThemeServiceImpl implements ThemeService {
         return client.fetch(Theme.class, name)
             .flatMap(theme -> {
                 String settingName = theme.getSpec().getSettingName();
-                return ThemeUtils.loadThemeSetting(getThemePath(theme))
-                    .stream()
-                    .findFirst()
+                return Flux.fromIterable(ThemeUtils.loadThemeSetting(getThemePath(theme)))
+                    .next()
                     .map(setting -> Unstructured.OBJECT_MAPPER.convertValue(setting, Setting.class))
-                    .map(newSetting -> client.fetch(Setting.class, settingName)
-                        .flatMap(client::delete)
-                        .then(client.create(newSetting))
-                    )
-                    .orElse(Mono.empty());
+                    .flatMap(newSetting -> client.fetch(Setting.class, settingName)
+                        .flatMap(oldSetting -> client.delete(oldSetting)
+                            .then(client.create(newSetting))
+                        )
+                    );
             })
             .then(Mono.defer(() -> {
                 Path themePath = themeRoot.get().resolve(name);
