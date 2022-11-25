@@ -37,7 +37,7 @@ bootJar {
 ext {
     commonsLang3 = "3.12.0"
     base62 = "0.1.3"
-    pf4j = '3.7.0'
+    pf4j = '3.8.0'
     javaDiffUtils = "4.12"
     guava = "31.1-jre"
     jsoup = '1.15.3'
