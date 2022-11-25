@@ -89,7 +89,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                             .schema(schemaBuilder().implementation(UpgradeRequest.class))))
                     .build())
             .PUT("themes/{name}/reload", this::reloadTheme,
-                builder -> builder.operationId("ReloadThemeSetting")
+                builder -> builder.operationId("Reload")
                     .description("Reload theme setting.")
                     .tag(tag)
                     .parameter(parameterBuilder()
