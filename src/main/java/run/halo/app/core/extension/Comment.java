@@ -65,6 +65,8 @@ public class Comment extends AbstractExtension {
 
         private String ipAddress;
 
+        private Instant approvedTime;
+
         @Schema(required = true, defaultValue = "0")
         private Integer priority;
 
