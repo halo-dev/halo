@@ -17,6 +17,7 @@ import java.util.function.Predicate;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -33,6 +34,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.infra.exception.AsyncRequestTimeoutException;
 import run.halo.app.infra.exception.ThemeInstallationException;
 
 @Slf4j
@@ -167,16 +169,14 @@ public class ThemeServiceImpl implements ThemeService {
     @Override
     public Mono<Theme> reloadTheme(String name) {
         return client.fetch(Theme.class, name)
-            .flatMap(theme -> {
-                String settingName = theme.getSpec().getSettingName();
-                return Flux.fromIterable(ThemeUtils.loadThemeSetting(getThemePath(theme)))
-                    .next()
-                    .map(setting -> Unstructured.OBJECT_MAPPER.convertValue(setting, Setting.class))
-                    .flatMap(newSetting -> client.fetch(Setting.class, settingName)
-                        .flatMap(oldSetting -> client.delete(oldSetting)
-                            .then(client.create(newSetting))
-                        )
-                    );
+            .flatMap(oldTheme -> {
+                String settingName = oldTheme.getSpec().getSettingName();
+                return waitForSettingDeleted(settingName)
+                    .doOnError(error -> {
+                        log.error("Failed to delete setting: {}", settingName,
+                            ExceptionUtils.getRootCause(error));
+                        throw new AsyncRequestTimeoutException("Reload theme timeout.");
+                    });
             })
             .then(Mono.defer(() -> {
                 Path themePath = themeRoot.get().resolve(name);
@@ -194,7 +194,30 @@ public class ThemeServiceImpl implements ThemeService {
                         return newTheme;
                     })
                     .flatMap(client::update);
-            }));
+            }))
+            .flatMap(theme -> {
+                String settingName = theme.getSpec().getSettingName();
+                return Flux.fromIterable(ThemeUtils.loadThemeSetting(getThemePath(theme)))
+                    .map(setting -> Unstructured.OBJECT_MAPPER.convertValue(setting, Setting.class))
+                    .filter(setting -> setting.getMetadata().getName().equals(settingName))
+                    .next()
+                    .flatMap(client::create)
+                    .thenReturn(theme);
+            });
+    }
+
+    private Mono<Void> waitForSettingDeleted(String settingName) {
+        return client.fetch(Setting.class, settingName)
+            .flatMap(setting -> client.delete(setting)
+                .flatMap(deleted -> client.fetch(Setting.class, settingName)
+                    .doOnNext(latest -> {
+                        throw new RetryException("Setting is not deleted yet.");
+                    })
+                    .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
+                        .filter(t -> t instanceof RetryException))
+                )
+            )
+            .then();
     }
 
     private Path getThemePath(Theme theme) {
