@@ -37,10 +37,11 @@ public class ControllerBuilder {
 
     private int workerCount = 1;
 
-    public ControllerBuilder(String name, ExtensionClient client) {
-        Assert.hasText(name, "Extension name is required");
+    public ControllerBuilder(Reconciler<Request> reconciler, ExtensionClient client) {
+        Assert.notNull(reconciler, "Reconciler must not be null");
         Assert.notNull(client, "Extension client must not be null");
-        this.name = name;
+        this.name = reconciler.getClass().getName();
+        this.reconciler = reconciler;
         this.client = client;
     }
 
@@ -51,11 +52,6 @@ public class ControllerBuilder {
 
     public ControllerBuilder maxDelay(Duration maxDelay) {
         this.maxDelay = maxDelay;
-        return this;
-    }
-
-    public ControllerBuilder reconciler(Reconciler<Request> reconciler) {
-        this.reconciler = reconciler;
         return this;
     }
 

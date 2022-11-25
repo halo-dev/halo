@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,6 +18,8 @@ import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler;
 import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler.DeleteOption;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.controller.Controller;
+import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.ExternalUrlSupplier;
@@ -24,6 +27,7 @@ import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.plugin.ExtensionComponentsFinder;
 
 @Slf4j
+@Component
 public class AttachmentReconciler implements Reconciler<Request> {
 
     private final ExtensionClient client;
@@ -90,6 +94,13 @@ public class AttachmentReconciler implements Reconciler<Request> {
             updateStatus(request.name(), attachment.getStatus());
         });
         return null;
+    }
+
+    @Override
+    public Controller setupWith(ControllerBuilder builder) {
+        return builder
+            .extension(new Attachment())
+            .build();
     }
 
     void updateStatus(String attachmentName, AttachmentStatus status) {

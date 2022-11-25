@@ -5,10 +5,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import org.springframework.stereotype.Component;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
 import run.halo.app.core.extension.Post;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.controller.Controller;
+import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -18,6 +21,7 @@ import run.halo.app.infra.utils.JsonUtils;
  * @author guqing
  * @since 2.0.0
  */
+@Component
 public class TagReconciler implements Reconciler<Reconciler.Request> {
     private static final String FINALIZER_NAME = "tag-protection";
     private final ExtensionClient client;
@@ -44,6 +48,13 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
                 return new Result(true, Duration.ofMinutes(1));
             })
             .orElseGet(() -> new Result(false, null));
+    }
+
+    @Override
+    public Controller setupWith(ControllerBuilder builder) {
+        return builder
+            .extension(new Tag())
+            .build();
     }
 
     private void cleanUpResources(Tag tag) {
