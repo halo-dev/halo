@@ -39,6 +39,10 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
 
     private void createFixedPluginIfNecessary(HaloPluginManager pluginManager) {
         for (Path path : pluginProperties.getFixedPluginPath()) {
+            // already loaded
+            if (idForPath(path) != null) {
+                continue;
+            }
             String pluginId = pluginManager.loadPlugin(path);
             PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
             if (pluginWrapper == null) {
@@ -51,5 +55,14 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
                     extensionClient.update(plugin);
                 }, () -> extensionClient.create(plugin));
         }
+    }
+
+    protected String idForPath(Path pluginPath) {
+        for (PluginWrapper plugin : haloPluginManager.getPlugins()) {
+            if (plugin.getPluginPath().equals(pluginPath)) {
+                return plugin.getPluginId();
+            }
+        }
+        return null;
     }
 }

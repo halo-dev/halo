@@ -108,8 +108,9 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
                 if (StringUtils.isBlank(releaseSnapshot)) {
                     return;
                 }
-                // do nothing if release snapshot is not changed
-                if (StringUtils.equals(lastReleasedSnapshot, releaseSnapshot)) {
+                // do nothing if release snapshot is not changed and page is published
+                if (page.isPublished()
+                    && StringUtils.equals(lastReleasedSnapshot, releaseSnapshot)) {
                     return;
                 }
                 SinglePage.SinglePageStatus status = page.getStatusOrDefault();
