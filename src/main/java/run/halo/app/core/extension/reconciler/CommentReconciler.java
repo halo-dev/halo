@@ -13,12 +13,15 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.Reply;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.SchemeManager;
+import run.halo.app.extension.controller.Controller;
+import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.MeterUtils;
@@ -29,6 +32,7 @@ import run.halo.app.metrics.MeterUtils;
  * @author guqing
  * @since 2.0.0
  */
+@Component
 public class CommentReconciler implements Reconciler<Reconciler.Request> {
     public static final String FINALIZER_NAME = "comment-protection";
     private final ExtensionClient client;
@@ -56,6 +60,13 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
                 return new Result(true, Duration.ofMinutes(1));
             })
             .orElseGet(() -> new Result(false, null));
+    }
+
+    @Override
+    public Controller setupWith(ControllerBuilder builder) {
+        return builder
+            .extension(new Comment())
+            .build();
     }
 
     private boolean isDeleted(Comment comment) {
