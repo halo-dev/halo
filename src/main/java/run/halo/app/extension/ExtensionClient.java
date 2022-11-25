@@ -10,9 +10,9 @@ import java.util.function.Predicate;
  * ExtensionStore.
  *
  * @author johnniang
- * @deprecated Use {@link ReactiveExtensionClient} instead.
+ * @apiNote Please note that this client can only use in non-reactive environment. If you want to
+ * use Extension client in reactive environment, please use {@link ReactiveExtensionClient} instead.
  */
-@Deprecated(forRemoval = true, since = "2.0")
 public interface ExtensionClient {
 
     /**
