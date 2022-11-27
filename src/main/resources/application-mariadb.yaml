@@ -1,0 +1,10 @@
+spring:
+  r2dbc:
+    url: r2dbc:pool:mariadb://127.0.0.1:3306/halo
+    username: root
+    password: openmysql
+  sql:
+    init:
+      mode: always
+      platform: mysql
+      continue-on-error: true
