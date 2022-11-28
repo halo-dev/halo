@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.permalinks.ExtensionLocator;
@@ -26,6 +27,8 @@ import run.halo.app.extension.ExtensionOperator;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Ref;
+import run.halo.app.extension.controller.Controller;
+import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionList;
@@ -51,6 +54,7 @@ import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
  */
 @Slf4j
 @AllArgsConstructor
+@Component
 public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private static final String FINALIZER_NAME = "single-page-protection";
     private static final GroupVersionKind GVK = GroupVersionKind.fromExtension(SinglePage.class);
@@ -81,6 +85,13 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         return new Result(false, null);
     }
 
+    @Override
+    public Controller setupWith(ControllerBuilder builder) {
+        return builder
+            .extension(new SinglePage())
+            .build();
+    }
+
     private void reconcileSpec(String name) {
         client.fetch(SinglePage.class, name).ifPresent(page -> {
             // un-publish if necessary
@@ -108,8 +119,9 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
                 if (StringUtils.isBlank(releaseSnapshot)) {
                     return;
                 }
-                // do nothing if release snapshot is not changed
-                if (StringUtils.equals(lastReleasedSnapshot, releaseSnapshot)) {
+                // do nothing if release snapshot is not changed and page is published
+                if (page.isPublished()
+                    && StringUtils.equals(lastReleasedSnapshot, releaseSnapshot)) {
                     return;
                 }
                 SinglePage.SinglePageStatus status = page.getStatusOrDefault();

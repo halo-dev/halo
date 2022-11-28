@@ -2,6 +2,7 @@ package run.halo.app.core.extension.theme;
 
 import static java.nio.file.Files.createTempDirectory;
 import static org.springframework.util.FileSystemUtils.copyRecursively;
+import static run.halo.app.core.extension.theme.ThemeUtils.loadThemeManifest;
 import static run.halo.app.core.extension.theme.ThemeUtils.locateThemeManifest;
 import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
 import static run.halo.app.infra.utils.FileUtils.unzip;
@@ -16,6 +17,7 @@ import java.util.function.Predicate;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -32,6 +34,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.infra.exception.AsyncRequestTimeoutException;
 import run.halo.app.infra.exception.ThemeInstallationException;
 
 @Slf4j
@@ -161,6 +164,60 @@ public class ThemeServiceImpl implements ThemeService {
                     })
                     .then(Mono.just(theme));
             });
+    }
+
+    @Override
+    public Mono<Theme> reloadTheme(String name) {
+        return client.fetch(Theme.class, name)
+            .flatMap(oldTheme -> {
+                String settingName = oldTheme.getSpec().getSettingName();
+                return waitForSettingDeleted(settingName)
+                    .doOnError(error -> {
+                        log.error("Failed to delete setting: {}", settingName,
+                            ExceptionUtils.getRootCause(error));
+                        throw new AsyncRequestTimeoutException("Reload theme timeout.");
+                    });
+            })
+            .then(Mono.defer(() -> {
+                Path themePath = themeRoot.get().resolve(name);
+                Path themeManifestPath = ThemeUtils.resolveThemeManifest(themePath);
+                if (themeManifestPath == null) {
+                    throw new IllegalArgumentException(
+                        "The manifest file [theme.yaml] is required.");
+                }
+                Unstructured unstructured = loadThemeManifest(themeManifestPath);
+                Theme newTheme = Unstructured.OBJECT_MAPPER.convertValue(unstructured,
+                    Theme.class);
+                return client.fetch(Theme.class, name)
+                    .map(oldTheme -> {
+                        newTheme.getMetadata().setVersion(oldTheme.getMetadata().getVersion());
+                        return newTheme;
+                    })
+                    .flatMap(client::update);
+            }))
+            .flatMap(theme -> {
+                String settingName = theme.getSpec().getSettingName();
+                return Flux.fromIterable(ThemeUtils.loadThemeSetting(getThemePath(theme)))
+                    .map(setting -> Unstructured.OBJECT_MAPPER.convertValue(setting, Setting.class))
+                    .filter(setting -> setting.getMetadata().getName().equals(settingName))
+                    .next()
+                    .flatMap(client::create)
+                    .thenReturn(theme);
+            });
+    }
+
+    private Mono<Void> waitForSettingDeleted(String settingName) {
+        return client.fetch(Setting.class, settingName)
+            .flatMap(setting -> client.delete(setting)
+                .flatMap(deleted -> client.fetch(Setting.class, settingName)
+                    .doOnNext(latest -> {
+                        throw new RetryException("Setting is not deleted yet.");
+                    })
+                    .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
+                        .filter(t -> t instanceof RetryException))
+                )
+            )
+            .then();
     }
 
     private Path getThemePath(Theme theme) {

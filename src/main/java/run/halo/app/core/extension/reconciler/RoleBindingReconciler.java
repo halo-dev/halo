@@ -9,16 +9,20 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Lazy;
+import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.RoleBinding.Subject;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.controller.Controller;
+import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.utils.JsonUtils;
 
 @Slf4j
+@Component
 public class RoleBindingReconciler implements Reconciler<Request> {
 
     private final ExtensionClient client;
@@ -66,6 +70,13 @@ public class RoleBindingReconciler implements Reconciler<Request> {
             });
         });
         return new Result(false, null);
+    }
+
+    @Override
+    public Controller setupWith(ControllerBuilder builder) {
+        return builder
+            .extension(new RoleBinding())
+            .build();
     }
 
 }

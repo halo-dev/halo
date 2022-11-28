@@ -2,6 +2,7 @@ package run.halo.app.core.extension.reconciler;
 
 import java.time.Duration;
 import java.util.Objects;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import run.halo.app.core.extension.Category;
 import run.halo.app.core.extension.MenuItem;
@@ -12,9 +13,12 @@ import run.halo.app.core.extension.SinglePage;
 import run.halo.app.core.extension.Tag;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Ref;
+import run.halo.app.extension.controller.Controller;
+import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
 
+@Component
 public class MenuItemReconciler implements Reconciler<Request> {
 
     private final ExtensionClient client;
@@ -44,6 +48,13 @@ public class MenuItemReconciler implements Reconciler<Request> {
                 return handleMenuSpec(request.name(), status, spec);
             }
         }).orElseGet(() -> new Result(false, null));
+    }
+
+    @Override
+    public Controller setupWith(ControllerBuilder builder) {
+        return builder
+            .extension(new MenuItem())
+            .build();
     }
 
     private Result handleCategoryRef(String menuItemName, MenuItemStatus status, Ref categoryRef) {
