@@ -20,6 +20,13 @@ const props = withDefaults(
   }
 );
 
+const groupName = computed(() => {
+  if (props.group?.metadata.name === "ungrouped") {
+    return "";
+  }
+  return props.group?.metadata.name;
+});
+
 const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
@@ -37,10 +44,13 @@ const uploadVisible = ref(false);
 const policyEditingModal = ref(false);
 
 const modalTitle = computed(() => {
-  if (props.group && props.group.metadata.name) {
+  if (
+    props.group?.metadata.name &&
+    props.group?.metadata.name !== "ungrouped"
+  ) {
     return `上传附件到分组：${props.group.spec.displayName}`;
   }
-  return "上传附件";
+  return "上传附件到未分组";
 });
 
 watchEffect(() => {
@@ -173,7 +183,7 @@ watch(
         :disabled="!selectedPolicy"
         :meta="{ 
           policyName: selectedPolicy?.metadata.name as string,
-          groupName: props.group?.metadata.name as string
+          groupName: groupName
         }"
         :allowed-meta-fields="['policyName', 'groupName']"
         :note="selectedPolicy ? '' : '请先选择存储策略'"
