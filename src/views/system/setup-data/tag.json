@@ -2,7 +2,7 @@
   "spec": {
     "displayName": "Halo",
     "slug": "halo",
-    "color": "#ad95b2",
+    "color": "#ffffff",
     "cover": ""
   },
   "apiVersion": "content.halo.run/v1alpha1",

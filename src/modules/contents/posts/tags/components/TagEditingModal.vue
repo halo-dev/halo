@@ -43,7 +43,7 @@ const initialFormState: Tag = {
   spec: {
     displayName: "",
     slug: "",
-    color: "#b16cBe",
+    color: "#ffffff",
     cover: "",
   },
   apiVersion: "content.halo.run/v1alpha1",

@@ -3,6 +3,7 @@ import { VTag } from "@halo-dev/components";
 import type { Tag } from "@halo-dev/api-client";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
+import Color from "colorjs.io";
 
 const props = withDefaults(
   defineProps<{
@@ -19,8 +20,9 @@ const labelColor = computed(() => {
   if (!color) {
     return "inherit";
   }
-  // TODO computed label color
-  return "#333";
+  const onWhite = Math.abs(Color.contrast(color, "white", "APCA"));
+  const onBlack = Math.abs(Color.contrast(color, "black", "APCA"));
+  return onWhite > onBlack ? "white" : "#333";
 });
 
 const router = useRouter();
@@ -40,7 +42,6 @@ const handleRouteToDetail = () => {
     :styles="{
       background: tag.spec.color,
       color: labelColor,
-      borderColor: tag.spec.color,
     }"
     @click="handleRouteToDetail"
   >
