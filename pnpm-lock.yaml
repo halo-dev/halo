@@ -15,7 +15,7 @@ importers:
       '@halo-dev/api-client': ^0.0.53
       '@halo-dev/components': workspace:*
       '@halo-dev/console-shared': workspace:*
-      '@halo-dev/richtext-editor': ^0.0.0-alpha.14
+      '@halo-dev/richtext-editor': ^0.0.0-alpha.16
       '@iconify-json/mdi': ^1.1.36
       '@iconify-json/vscode-icons': ^1.1.16
       '@rushstack/eslint-patch': ^1.2.0
@@ -107,7 +107,7 @@ importers:
       '@halo-dev/api-client': 0.0.53
       '@halo-dev/components': link:packages/components
       '@halo-dev/console-shared': link:packages/shared
-      '@halo-dev/richtext-editor': 0.0.0-alpha.14_vue@3.2.45
+      '@halo-dev/richtext-editor': 0.0.0-alpha.16_vue@3.2.45
       '@tiptap/extension-character-count': 2.0.0-beta.202
       '@uppy/core': 3.0.4
       '@uppy/dashboard': 3.2.0_@uppy+core@3.0.4
@@ -1966,8 +1966,8 @@ packages:
     resolution: {integrity: sha512-B3njjXFqTi28FfDhZ9VAVlv6mMQxLgIsBUqTPmMQF/IxWWtfN6cxYi7is+zmw+chFFe38UVaEAPSHORLMxnJ6A==}
     dev: false
 
-  /@halo-dev/richtext-editor/0.0.0-alpha.14_vue@3.2.45:
-    resolution: {integrity: sha512-PiFN/sS1LEO2Vx9c5C147/gg8HXdcGnf9jRFEU3vLZPEtg4WdjApoYLl8ReOz+7sRxjeqeIEG3UzL0Yu4tdB/A==}
+  /@halo-dev/richtext-editor/0.0.0-alpha.16_vue@3.2.45:
+    resolution: {integrity: sha512-MW0KCYT6UGg2zOh0kryGEz+IKLzo/onUTbAYCkiMX4YaQ1mIOoBU+ILaa0YOL2FmDyCxXst/UoSKdUvZu+Qieg==}
     peerDependencies:
       vue: ^3.2.37
     dependencies:
@@ -1983,6 +1983,7 @@ packages:
       '@tiptap/extension-gapcursor': 2.0.0-beta.204_fosglmwb3u6jhi6bbjmnlbdsbu
       '@tiptap/extension-hard-break': 2.0.0-beta.204_fosglmwb3u6jhi6bbjmnlbdsbu
       '@tiptap/extension-heading': 2.0.0-beta.204_fosglmwb3u6jhi6bbjmnlbdsbu
+      '@tiptap/extension-highlight': 2.0.0-beta.204_fosglmwb3u6jhi6bbjmnlbdsbu
       '@tiptap/extension-history': 2.0.0-beta.204_fosglmwb3u6jhi6bbjmnlbdsbu
       '@tiptap/extension-horizontal-rule': 2.0.0-beta.204_fosglmwb3u6jhi6bbjmnlbdsbu
       '@tiptap/extension-image': 2.0.0-beta.202_fosglmwb3u6jhi6bbjmnlbdsbu
@@ -2806,6 +2807,14 @@ packages:
 
   /@tiptap/extension-heading/2.0.0-beta.204_fosglmwb3u6jhi6bbjmnlbdsbu:
     resolution: {integrity: sha512-myb3O/IvdZ3E6aQhFUI4NkO8no4jXZGRFqjtPYwX6Vw72iHcy2ubY7EMR4k5hHxAvRbjbccpq8yAkvRHVmh/BQ==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0-beta.193
+    dependencies:
+      '@tiptap/core': 2.0.0-beta.202
+    dev: false
+
+  /@tiptap/extension-highlight/2.0.0-beta.204_fosglmwb3u6jhi6bbjmnlbdsbu:
+    resolution: {integrity: sha512-uAExkndb7lkREyQxiaknDWjGU8NvA4DT1b6hi4HaXz8doeEfVh71JFHkxFYV/I5qRnob8fhHv0ZxN7Q5CqC8fQ==}
     peerDependencies:
       '@tiptap/core': ^2.0.0-beta.193
     dependencies:

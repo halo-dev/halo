@@ -35,7 +35,7 @@
     "@halo-dev/api-client": "^0.0.53",
     "@halo-dev/components": "workspace:*",
     "@halo-dev/console-shared": "workspace:*",
-    "@halo-dev/richtext-editor": "^0.0.0-alpha.14",
+    "@halo-dev/richtext-editor": "^0.0.0-alpha.16",
     "@tiptap/extension-character-count": "^2.0.0-beta.202",
     "@uppy/core": "^3.0.4",
     "@uppy/dashboard": "^3.2.0",

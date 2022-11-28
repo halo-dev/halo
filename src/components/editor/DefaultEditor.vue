@@ -30,9 +30,11 @@ import {
   ExtensionSubscript,
   ExtensionSuperscript,
   ExtensionPlaceholder,
+  ExtensionHighlight,
   ExtensionCommands,
   ExtensionIframe,
   CommandsSuggestion,
+  CommentParagraph,
   CommandHeader1,
   CommandHeader2,
   CommandHeader3,
@@ -41,6 +43,10 @@ import {
   CommandHeader6,
   CommandCodeBlock,
   CommandIframe,
+  CommandTable,
+  CommandBulletList,
+  CommandOrderedList,
+  CommandTaskList,
   ExtensionCodeBlock,
   lowlight,
   UndoMenuItem,
@@ -60,6 +66,11 @@ import {
   AlignRightMenuItem,
   AlignJustifyMenuItem,
   TableMenuItem,
+  BulletListMenuItem,
+  OrderedListMenuItem,
+  TaskListMenuItem,
+  HighlightMenuItem,
+  Separator,
 } from "@halo-dev/richtext-editor";
 import {
   IconCalendar,
@@ -166,11 +177,13 @@ const editor = useEditor({
     ExtensionPlaceholder.configure({
       placeholder: "输入 / 以选择输入类型",
     }),
+    ExtensionHighlight,
     ExtensionCommands.configure({
       suggestion: {
         ...CommandsSuggestion,
         items: ({ query }: { query: string }) => {
           return [
+            CommentParagraph,
             CommandHeader1,
             CommandHeader2,
             CommandHeader3,
@@ -178,6 +191,10 @@ const editor = useEditor({
             CommandHeader5,
             CommandHeader6,
             CommandCodeBlock,
+            CommandTable,
+            CommandBulletList,
+            CommandOrderedList,
+            CommandTaskList,
             CommandIframe,
           ].filter((item) =>
             [...item.keywords, item.title].some((keyword) =>
@@ -222,17 +239,26 @@ const toolbarMenuItems = computed(() => {
   return [
     UndoMenuItem(editor.value),
     RedoMenuItem(editor.value),
+    Separator(),
     HeadingMenuItem(editor.value),
     BoldMenuItem(editor.value),
     ItalicMenuItem(editor.value),
     UnderlineMenuItem(editor.value),
     StrikeMenuItem(editor.value),
+    HighlightMenuItem(editor.value),
+    Separator(),
     QuoteMenuItem(editor.value),
     CodeMenuItem(editor.value),
     SuperScriptMenuItem(editor.value),
     SubScriptMenuItem(editor.value),
+    Separator(),
+    BulletListMenuItem(editor.value),
+    OrderedListMenuItem(editor.value),
+    TaskListMenuItem(editor.value),
+    Separator(),
     CodeBlockMenuItem(editor.value),
     TableMenuItem(editor.value),
+    Separator(),
     AlignLeftMenuItem(editor.value),
     AlignCenterMenuItem(editor.value),
     AlignRightMenuItem(editor.value),
@@ -254,6 +280,7 @@ const bubbleMenuItems = computed(() => {
     ItalicMenuItem(editor.value),
     UnderlineMenuItem(editor.value),
     StrikeMenuItem(editor.value),
+    HighlightMenuItem(editor.value),
     QuoteMenuItem(editor.value),
     CodeMenuItem(editor.value),
     CodeBlockMenuItem(editor.value),
@@ -335,6 +362,9 @@ watch(
     :editor="editor"
     :toolbar-menu-items="toolbarMenuItems"
     :bubble-menu-items="bubbleMenuItems"
+    :content-styles="{
+      width: 'calc(100% - 18rem)',
+    }"
   >
     <template #extra>
       <div class="h-full w-72 overflow-y-auto border-l bg-white">
