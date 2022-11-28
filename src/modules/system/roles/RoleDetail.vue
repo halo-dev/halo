@@ -29,7 +29,7 @@ const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
 
 const { formState, saving, handleCreateOrUpdate } = useRoleForm();
 
-const { users } = useUserFetch({ fetchOnMounted: true });
+const { users } = useUserFetch({ fetchOnMounted: false });
 
 watch(
   () => selectedRoleTemplates.value,
@@ -156,7 +156,9 @@ onMounted(() => {
                 {{ formState.metadata?.creationTimestamp }}
               </dd>
             </div>
+            <!-- TODO: 支持通过当前角色查询用户 -->
             <div
+              v-if="false"
               class="bg-gray-50 px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">用户</dt>

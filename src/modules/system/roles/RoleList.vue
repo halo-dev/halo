@@ -265,7 +265,8 @@ const handleDelete = async (role: Role) => {
                     <VStatusDot v-tooltip="`删除中`" state="warning" animate />
                   </template>
                 </VEntityField>
-                <VEntityField description="0 个用户" />
+                <!-- TODO: 支持显示用户数量 -->
+                <VEntityField v-if="false" description="0 个用户" />
                 <VEntityField>
                   <template #description>
                     <VTag> 系统保留</VTag>
