@@ -66,6 +66,8 @@ const handleApprove = async () => {
   try {
     const replyToUpdate = cloneDeep(props.reply.reply);
     replyToUpdate.spec.approved = true;
+    // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
+    replyToUpdate.spec.approvedTime = new Date().toISOString();
     await apiClient.extension.reply.updatecontentHaloRunV1alpha1Reply({
       name: replyToUpdate.metadata.name,
       reply: replyToUpdate,
@@ -164,10 +166,10 @@ const isHoveredReply = computed(() => {
           <VStatusDot v-tooltip="`删除中`" state="warning" animate />
         </template>
       </VEntityField>
-      <VEntityField>
+      <VEntityField v-if="reply?.reply?.spec.approvedTime">
         <template #description>
           <span class="truncate text-xs tabular-nums text-gray-500">
-            {{ formatDatetime(reply?.reply?.metadata.creationTimestamp) }}
+            {{ formatDatetime(reply?.reply?.spec.approvedTime) }}
           </span>
         </template>
       </VEntityField>

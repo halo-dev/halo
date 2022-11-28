@@ -12,7 +12,7 @@ importers:
       '@formkit/themes': ^1.0.0-beta.12
       '@formkit/utils': ^1.0.0-beta.12
       '@formkit/vue': ^1.0.0-beta.12
-      '@halo-dev/api-client': ^0.0.53
+      '@halo-dev/api-client': ^0.0.55
       '@halo-dev/components': workspace:*
       '@halo-dev/console-shared': workspace:*
       '@halo-dev/richtext-editor': ^0.0.0-alpha.16
@@ -104,7 +104,7 @@ importers:
       '@formkit/themes': 1.0.0-beta.12-e579559_tailwindcss@3.2.4
       '@formkit/utils': 1.0.0-beta.12-e579559
       '@formkit/vue': 1.0.0-beta.12-e579559_ior6jr3fpijijuwpr34w2i25va
-      '@halo-dev/api-client': 0.0.53
+      '@halo-dev/api-client': 0.0.55
       '@halo-dev/components': link:packages/components
       '@halo-dev/console-shared': link:packages/shared
       '@halo-dev/richtext-editor': 0.0.0-alpha.16_vue@3.2.45
@@ -1962,8 +1962,8 @@ packages:
       - windicss
     dev: false
 
-  /@halo-dev/api-client/0.0.53:
-    resolution: {integrity: sha512-B3njjXFqTi28FfDhZ9VAVlv6mMQxLgIsBUqTPmMQF/IxWWtfN6cxYi7is+zmw+chFFe38UVaEAPSHORLMxnJ6A==}
+  /@halo-dev/api-client/0.0.55:
+    resolution: {integrity: sha512-n/XjFhCgUYYo3mrVsuCa11iyXkbBgcRGIT8fDfdkuLjzfXamxt0eJMFbz8lpH85pTh7O7xTQzCxvi5YIi7zBLw==}
     dev: false
 
   /@halo-dev/richtext-editor/0.0.0-alpha.16_vue@3.2.45:

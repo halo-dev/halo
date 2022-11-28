@@ -85,6 +85,8 @@ const handleApproveReplyInBatch = async () => {
         const promises = repliesToUpdate.map((reply) => {
           const replyToUpdate = reply.reply;
           replyToUpdate.spec.approved = true;
+          // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
+          replyToUpdate.spec.approvedTime = new Date().toISOString();
           return apiClient.extension.reply.updatecontentHaloRunV1alpha1Reply({
             name: replyToUpdate.metadata.name,
             reply: replyToUpdate,
@@ -104,6 +106,8 @@ const handleApprove = async () => {
   try {
     const commentToUpdate = cloneDeep(props.comment.comment);
     commentToUpdate.spec.approved = true;
+    // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
+    commentToUpdate.spec.approvedTime = new Date().toISOString();
     await apiClient.extension.comment.updatecontentHaloRunV1alpha1Comment({
       name: commentToUpdate.metadata.name,
       comment: commentToUpdate,
@@ -358,10 +362,10 @@ const subjectRefResult = computed(() => {
           <VStatusDot v-tooltip="`删除中`" state="warning" animate />
         </template>
       </VEntityField>
-      <VEntityField>
+      <VEntityField v-if="comment?.comment?.spec.approvedTime">
         <template #description>
           <span class="truncate text-xs tabular-nums text-gray-500">
-            {{ formatDatetime(comment?.comment?.metadata.creationTimestamp) }}
+            {{ formatDatetime(comment?.comment?.spec.approvedTime) }}
           </span>
         </template>
       </VEntityField>

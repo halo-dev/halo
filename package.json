@@ -32,7 +32,7 @@
     "@formkit/themes": "^1.0.0-beta.12",
     "@formkit/utils": "^1.0.0-beta.12",
     "@formkit/vue": "^1.0.0-beta.12",
-    "@halo-dev/api-client": "^0.0.53",
+    "@halo-dev/api-client": "^0.0.55",
     "@halo-dev/components": "workspace:*",
     "@halo-dev/console-shared": "workspace:*",
     "@halo-dev/richtext-editor": "^0.0.0-alpha.16",
