@@ -8,6 +8,7 @@ import {
   IconTeam,
   IconAddCircle,
   IconRefreshLine,
+  IconExternalLinkLine,
   VButton,
   VCard,
   VPagination,
@@ -663,17 +664,28 @@ function handleClearFilters() {
                 }"
               >
                 <template #extra>
-                  <RouterLink
-                    v-if="singlePage.page.status?.inProgress"
-                    v-tooltip="`当前有内容已保存，但还未发布。`"
-                    :to="{
-                      name: 'SinglePageEditor',
-                      query: { name: singlePage.page.metadata.name },
-                    }"
-                    class="flex items-center"
-                  >
-                    <VStatusDot state="success" animate />
-                  </RouterLink>
+                  <VSpace>
+                    <RouterLink
+                      v-if="singlePage.page.status?.inProgress"
+                      v-tooltip="`当前有内容已保存，但还未发布。`"
+                      :to="{
+                        name: 'SinglePageEditor',
+                        query: { name: singlePage.page.metadata.name },
+                      }"
+                      class="flex items-center"
+                    >
+                      <VStatusDot state="success" animate />
+                    </RouterLink>
+                    <a
+                      v-if="singlePage.page.status?.permalink"
+                      target="_blank"
+                      :href="singlePage.page.status?.permalink"
+                      :title="singlePage.page.status?.permalink"
+                      class="hidden text-gray-600 transition-all hover:text-gray-900 group-hover:inline-block"
+                    >
+                      <IconExternalLinkLine class="h-3.5 w-3.5" />
+                    </a>
+                  </VSpace>
                 </template>
                 <template #description>
                   <div class="flex w-full flex-col gap-1">
@@ -683,11 +695,6 @@ function handleClearFilters() {
                       </span>
                       <span class="text-xs text-gray-500">
                         评论 {{ singlePage.stats.totalComment || 0 }}
-                      </span>
-                    </VSpace>
-                    <VSpace class="w-full">
-                      <span class="truncate text-xs text-gray-500">
-                        {{ singlePage.page.status?.permalink }}
                       </span>
                     </VSpace>
                   </div>

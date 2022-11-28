@@ -134,7 +134,11 @@ const onUpgradeModalClose = () => {
           >
             <dt class="text-sm font-medium text-gray-900">网站</dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-              <a :href="selectedTheme?.spec.website" target="_blank">
+              <a
+                :href="selectedTheme?.spec.website"
+                class="hover:text-gray-600"
+                target="_blank"
+              >
                 {{ selectedTheme?.spec.website }}
               </a>
             </dd>
@@ -144,7 +148,11 @@ const onUpgradeModalClose = () => {
           >
             <dt class="text-sm font-medium text-gray-900">源码仓库</dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-              <a :href="selectedTheme?.spec.repo" target="_blank">
+              <a
+                :href="selectedTheme?.spec.repo"
+                class="hover:text-gray-600"
+                target="_blank"
+              >
                 {{ selectedTheme?.spec.repo }}
               </a>
             </dd>

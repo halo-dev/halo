@@ -9,6 +9,7 @@ import {
   IconEyeOff,
   IconTeam,
   IconRefreshLine,
+  IconExternalLinkLine,
   Dialog,
   VButton,
   VCard,
@@ -779,6 +780,15 @@ const hasFilters = computed(() => {
                         :tag="tag"
                         route
                       ></PostTag>
+                      <a
+                        v-if="post.post.status?.permalink"
+                        target="_blank"
+                        :href="post.post.status?.permalink"
+                        :title="post.post.status?.permalink"
+                        class="hidden text-gray-600 transition-all hover:text-gray-900 group-hover:inline-block"
+                      >
+                        <IconExternalLinkLine class="h-3.5 w-3.5" />
+                      </a>
                     </VSpace>
                   </template>
                   <template #description>
@@ -787,13 +797,16 @@ const hasFilters = computed(() => {
                         v-if="post.categories.length"
                         class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
                       >
-                        分类：<span
+                        分类：<a
                           v-for="(category, categoryIndex) in post.categories"
                           :key="categoryIndex"
+                          :href="category.status?.permalink"
+                          :title="category.status?.permalink"
+                          target="_blank"
                           class="cursor-pointer hover:text-gray-900"
                         >
                           {{ category.spec.displayName }}
-                        </span>
+                        </a>
                       </p>
                       <span class="text-xs text-gray-500">
                         访问量 {{ post.stats.visit || 0 }}

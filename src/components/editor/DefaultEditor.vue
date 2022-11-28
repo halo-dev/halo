@@ -501,8 +501,15 @@ watch(
                       />
                     </div>
                   </div>
-                  <div class="text-sm text-gray-900 hover:text-blue-600">
-                    {{ permalink }}
+                  <div>
+                    <a
+                      :href="permalink"
+                      :title="permalink"
+                      target="_blank"
+                      class="text-sm text-gray-900 hover:text-blue-600"
+                    >
+                      {{ permalink }}
+                    </a>
                   </div>
                 </div>
               </div>

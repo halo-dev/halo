@@ -36,7 +36,12 @@ const wrapperStyles = computed(() => {
     <div v-if="title || $slots.title" class="entity-field-title-body">
       <slot name="title">
         <div class="entity-field-title" @click="emit('click')">
-          <RouterLink v-if="route" :to="route" :title="title">
+          <RouterLink
+            v-if="route"
+            class="hover:text-gray-600"
+            :to="route"
+            :title="title"
+          >
             {{ title }}
           </RouterLink>
           <span v-else :title="title">

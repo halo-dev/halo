@@ -68,10 +68,19 @@ function onDelete(category: CategoryTree) {
             </div>
           </template>
           <template #start>
-            <VEntityField
-              :title="category.spec.displayName"
-              :description="category.status.permalink"
-            />
+            <VEntityField :title="category.spec.displayName">
+              <template #description>
+                <a
+                  v-if="category.status.permalink"
+                  :href="category.status.permalink"
+                  :title="category.status.permalink"
+                  target="_blank"
+                  class="truncate text-xs text-gray-500 group-hover:text-gray-900"
+                >
+                  {{ category.status.permalink }}
+                </a>
+              </template>
+            </VEntityField>
           </template>
           <template #end>
             <VEntityField v-if="category.metadata.deletionTimestamp">

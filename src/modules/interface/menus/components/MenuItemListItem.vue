@@ -89,14 +89,22 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
             </div>
           </template>
           <template #start>
-            <VEntityField
-              :title="menuItem.status.displayName"
-              :description="menuItem.status.href"
-            >
+            <VEntityField :title="menuItem.status.displayName">
               <template #extra>
                 <VTag v-if="getMenuItemRefDisplayName(menuItem)">
                   {{ getMenuItemRefDisplayName(menuItem) }}
                 </VTag>
+              </template>
+              <template #description>
+                <a
+                  v-if="menuItem.status?.href"
+                  :href="menuItem.status?.href"
+                  :title="menuItem.status?.href"
+                  target="_blank"
+                  class="truncate text-xs text-gray-500 group-hover:text-gray-900"
+                >
+                  {{ menuItem.status.href }}
+                </a>
               </template>
             </VEntityField>
           </template>

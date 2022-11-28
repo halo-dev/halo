@@ -187,9 +187,20 @@ onMounted(async () => {
                 :is-selected="selectedTag?.metadata.name === tag.metadata.name"
               >
                 <template #start>
-                  <VEntityField :description="tag.status?.permalink">
+                  <VEntityField>
                     <template #title>
                       <PostTag :tag="tag" />
+                    </template>
+                    <template #description>
+                      <a
+                        v-if="tag.status?.permalink"
+                        :href="tag.status?.permalink"
+                        :title="tag.status?.permalink"
+                        target="_blank"
+                        class="truncate text-xs text-gray-500 group-hover:text-gray-900"
+                      >
+                        {{ tag.status.permalink }}
+                      </a>
                     </template>
                   </VEntityField>
                 </template>
