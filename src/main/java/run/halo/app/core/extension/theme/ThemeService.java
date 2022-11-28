@@ -10,6 +10,7 @@ public interface ThemeService {
 
     Mono<Theme> upgrade(String themeName, InputStream is);
 
+    Mono<Theme> reloadTheme(String name);
     // TODO Migrate other useful methods in ThemeEndpoint in the future.
 
 }
