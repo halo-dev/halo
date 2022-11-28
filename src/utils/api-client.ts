@@ -34,7 +34,8 @@ import {
 } from "@halo-dev/api-client";
 import type { AxiosInstance } from "axios";
 import axios from "axios";
-import router from "@/router";
+import { useUserStore } from "@/stores/user";
+import { Toast } from "@halo-dev/components";
 
 const baseURL = import.meta.env.VITE_API_URL;
 
@@ -49,10 +50,10 @@ axiosInstance.interceptors.response.use(
   },
   async (error) => {
     if (error.response.status === 401) {
+      const userStore = useUserStore();
+      userStore.loginModalVisible = true;
+      Toast.warning("登录已过期，请重新登录");
       localStorage.removeItem("logged_in");
-      router.push({
-        name: "Login",
-      });
     }
     return Promise.reject(error);
   }

@@ -21,6 +21,7 @@ import {
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import axios from "axios";
 import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
+import LoginModal from "@/components/login/LoginModal.vue";
 import { coreMenuGroups } from "@/router/routes.config";
 import sortBy from "lodash.sortby";
 import { useRoleStore } from "@/stores/role";
@@ -354,6 +355,7 @@ onMounted(generateMenus);
     </div>
   </div>
   <GlobalSearchModal v-model:visible="globalSearchVisible" />
+  <LoginModal />
 </template>
 
 <style lang="scss">

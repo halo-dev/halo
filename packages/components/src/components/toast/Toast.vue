@@ -134,10 +134,10 @@ defineExpose({ close });
 </template>
 <style lang="scss">
 .toast-container {
-  @apply fixed pointer-events-none flex flex-col box-border transition-all w-full left-0 top-0 items-center justify-center p-4 gap-3;
+  @apply fixed pointer-events-none flex z-[9999] flex-col box-border transition-all w-full left-0 top-0 items-center justify-center p-4 gap-3;
 
   .toast-wrapper {
-    @apply inline-block max-w-xs z-50 pointer-events-auto relative;
+    @apply inline-block max-w-xs pointer-events-auto relative;
   }
 
   .toast-body {
