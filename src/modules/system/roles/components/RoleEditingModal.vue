@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { VButton, VModal, VSpace, VTabItem, VTabs } from "@halo-dev/components";
+import { VButton, VModal, VSpace, VTabbar } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { computed, ref, watch } from "vue";
 import { rbacAnnotations } from "@/constants/annotations";
@@ -110,8 +110,22 @@ const handleResetForm = () => {
     :width="700"
     @update:visible="onVisibleChange"
   >
-    <VTabs v-model:active-id="tabActiveId" type="outline">
-      <VTabItem id="general" label="基础信息">
+    <VTabbar
+      v-model:active-id="tabActiveId"
+      :items="[
+        {
+          id: 'general',
+          label: '基本信息',
+        },
+        {
+          id: 'permissions',
+          label: '权限',
+        },
+      ]"
+      type="outline"
+    />
+    <div class="mt-2">
+      <div v-show="tabActiveId === 'general'">
         <FormKit
           v-if="formState.metadata.annotations"
           id="role-form"
@@ -131,66 +145,65 @@ const handleResetForm = () => {
             validation="required|length:0,50"
           ></FormKit>
         </FormKit>
-      </VTabItem>
-      <VTabItem id="permissions" label="权限">
-        <div>
-          <dl class="divide-y divide-gray-100">
-            <div
-              v-for="(group, groupIndex) in roleTemplateGroups"
-              :key="groupIndex"
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                {{ group.module }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                <ul class="space-y-2">
-                  <li v-for="(roleTemplate, index) in group.roles" :key="index">
-                    <label
-                      class="inline-flex w-full cursor-pointer flex-row items-center gap-4 rounded-base border p-5 hover:border-primary"
-                    >
-                      <input
-                        v-model="selectedRoleTemplates"
-                        :value="roleTemplate.metadata.name"
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                        type="checkbox"
-                        @change="handleRoleTemplateSelect"
-                      />
-                      <div class="flex flex-1 flex-col gap-y-3">
-                        <span class="font-medium text-gray-900">
-                          {{
-                            roleTemplate.metadata.annotations?.[
-                              rbacAnnotations.DISPLAY_NAME
-                            ]
-                          }}
-                        </span>
-                        <span
-                          v-if="
+      </div>
+
+      <div v-show="tabActiveId === 'permissions'">
+        <dl class="divide-y divide-gray-100">
+          <div
+            v-for="(group, groupIndex) in roleTemplateGroups"
+            :key="groupIndex"
+            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+          >
+            <dt class="text-sm font-medium text-gray-900">
+              {{ group.module }}
+            </dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+              <ul class="space-y-2">
+                <li v-for="(roleTemplate, index) in group.roles" :key="index">
+                  <label
+                    class="inline-flex w-full cursor-pointer flex-row items-center gap-4 rounded-base border p-5 hover:border-primary"
+                  >
+                    <input
+                      v-model="selectedRoleTemplates"
+                      :value="roleTemplate.metadata.name"
+                      class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                      type="checkbox"
+                      @change="handleRoleTemplateSelect"
+                    />
+                    <div class="flex flex-1 flex-col gap-y-3">
+                      <span class="font-medium text-gray-900">
+                        {{
+                          roleTemplate.metadata.annotations?.[
+                            rbacAnnotations.DISPLAY_NAME
+                          ]
+                        }}
+                      </span>
+                      <span
+                        v-if="
+                          roleTemplate.metadata.annotations?.[
+                            rbacAnnotations.DEPENDENCIES
+                          ]
+                        "
+                        class="text-xs text-gray-400"
+                      >
+                        依赖于
+                        {{
+                          JSON.parse(
                             roleTemplate.metadata.annotations?.[
                               rbacAnnotations.DEPENDENCIES
                             ]
-                          "
-                          class="text-xs text-gray-400"
-                        >
-                          依赖于
-                          {{
-                            JSON.parse(
-                              roleTemplate.metadata.annotations?.[
-                                rbacAnnotations.DEPENDENCIES
-                              ]
-                            ).join(", ")
-                          }}
-                        </span>
-                      </div>
-                    </label>
-                  </li>
-                </ul>
-              </dd>
-            </div>
-          </dl>
-        </div>
-      </VTabItem>
-    </VTabs>
+                          ).join(", ")
+                        }}
+                      </span>
+                    </div>
+                  </label>
+                </li>
+              </ul>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
     <template #footer>
       <VSpace>
         <SubmitButton
