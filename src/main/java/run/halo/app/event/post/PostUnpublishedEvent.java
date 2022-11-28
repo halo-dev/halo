@@ -2,7 +2,7 @@ package run.halo.app.event.post;
 
 import org.springframework.context.ApplicationEvent;
 
-public class PostUnpublishedEvent extends ApplicationEvent {
+public class PostUnpublishedEvent extends ApplicationEvent implements PostEvent {
 
     private final String postName;
 
@@ -11,7 +11,8 @@ public class PostUnpublishedEvent extends ApplicationEvent {
         this.postName = postName;
     }
 
-    public String getPostName() {
+    @Override
+    public String getName() {
         return postName;
     }
 
