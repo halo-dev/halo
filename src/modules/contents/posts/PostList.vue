@@ -801,6 +801,12 @@ const hasFilters = computed(() => {
                       <span class="text-xs text-gray-500">
                         评论 {{ post.stats.totalComment || 0 }}
                       </span>
+                      <span
+                        v-if="post.post.spec.pinned"
+                        class="text-xs text-gray-500"
+                      >
+                        已置顶
+                      </span>
                     </VSpace>
                   </template>
                 </VEntityField>
