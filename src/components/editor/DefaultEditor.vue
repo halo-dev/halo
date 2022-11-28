@@ -27,13 +27,11 @@ import {
   ExtensionTextAlign,
   ExtensionUnderline,
   ExtensionTable,
-  ExtensionTableHeader,
-  ExtensionTableCell,
-  ExtensionTableRow,
   ExtensionSubscript,
   ExtensionSuperscript,
   ExtensionPlaceholder,
   ExtensionCommands,
+  ExtensionIframe,
   CommandsSuggestion,
   CommandHeader1,
   CommandHeader2,
@@ -42,6 +40,7 @@ import {
   CommandHeader5,
   CommandHeader6,
   CommandCodeBlock,
+  CommandIframe,
   ExtensionCodeBlock,
   lowlight,
   UndoMenuItem,
@@ -60,6 +59,7 @@ import {
   AlignCenterMenuItem,
   AlignRightMenuItem,
   AlignJustifyMenuItem,
+  TableMenuItem,
 } from "@halo-dev/richtext-editor";
 import {
   IconCalendar,
@@ -161,9 +161,6 @@ const editor = useEditor({
     ExtensionTable.configure({
       resizable: true,
     }),
-    ExtensionTableHeader,
-    ExtensionTableCell,
-    ExtensionTableRow,
     ExtensionSubscript,
     ExtensionSuperscript,
     ExtensionPlaceholder.configure({
@@ -181,6 +178,7 @@ const editor = useEditor({
             CommandHeader5,
             CommandHeader6,
             CommandCodeBlock,
+            CommandIframe,
           ].filter((item) =>
             [...item.keywords, item.title].some((keyword) =>
               keyword.includes(query)
@@ -192,6 +190,7 @@ const editor = useEditor({
     ExtensionCodeBlock.configure({
       lowlight,
     }),
+    ExtensionIframe,
     ExtensionCharacterCount,
     Extension.create({
       addGlobalAttributes() {
@@ -223,6 +222,7 @@ const toolbarMenuItems = computed(() => {
   return [
     UndoMenuItem(editor.value),
     RedoMenuItem(editor.value),
+    HeadingMenuItem(editor.value),
     BoldMenuItem(editor.value),
     ItalicMenuItem(editor.value),
     UnderlineMenuItem(editor.value),
@@ -232,7 +232,7 @@ const toolbarMenuItems = computed(() => {
     SuperScriptMenuItem(editor.value),
     SubScriptMenuItem(editor.value),
     CodeBlockMenuItem(editor.value),
-    HeadingMenuItem(editor.value),
+    TableMenuItem(editor.value),
     AlignLeftMenuItem(editor.value),
     AlignCenterMenuItem(editor.value),
     AlignRightMenuItem(editor.value),
