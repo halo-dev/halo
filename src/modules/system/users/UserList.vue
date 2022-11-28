@@ -121,7 +121,8 @@ const handleDelete = async (user: User) => {
 
 const handleDeleteInBatch = async () => {
   Dialog.warning({
-    title: "是否确认删除选中的用户？",
+    title: "确定要删除选中的用户吗？",
+    description: "该操作不可恢复。",
     confirmType: "danger",
     onConfirm: async () => {
       const userNamesToDelete = selectedUserNames.value.filter(

@@ -27,8 +27,8 @@ const upgradeModal = ref(false);
 
 const handleReloadTheme = async () => {
   Dialog.warning({
-    title: "是否确认重载主题的所有配置？",
-    description: "此操作仅会重载主题配置和设置表单定义，不会删除已保存的配置。",
+    title: "确定要重载主题的所有配置吗？",
+    description: "该操作仅会重载主题配置和设置表单定义，不会删除已保存的配置。",
     onConfirm: async () => {
       try {
         if (!selectedTheme?.value) {

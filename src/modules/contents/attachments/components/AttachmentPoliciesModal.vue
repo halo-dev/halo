@@ -91,7 +91,7 @@ const handleDelete = async (policy: Policy) => {
   }
 
   Dialog.warning({
-    title: "确定删除该策略吗？",
+    title: "确定要删除该策略吗？",
     description: "当前策略下没有已上传的附件。",
     onConfirm: async () => {
       await apiClient.extension.storage.policy.deletestorageHaloRunV1alpha1Policy(

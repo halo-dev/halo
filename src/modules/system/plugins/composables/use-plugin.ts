@@ -51,8 +51,8 @@ export function usePluginLifeCycle(
     Dialog.warning({
       title: `${
         deleteExtensions
-          ? "是否确认卸载该插件以及对应的配置？"
-          : "是否确认卸载该插件？"
+          ? "确定要卸载该插件以及对应的配置吗？"
+          : "确定要卸载该插件吗？"
       }`,
       description: `${
         enabled ? "当前插件还在启用状态，将在停止运行后卸载。" : ""

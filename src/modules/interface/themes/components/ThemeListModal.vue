@@ -108,10 +108,10 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
   Dialog.warning({
     title: `${
       deleteExtensions
-        ? "是否确认删除该主题以及对应的配置？"
-        : "是否确认删除该主题？"
+        ? "确定要删除该主题以及对应的配置吗？"
+        : "确定要删除该主题吗？"
     }`,
-    description: "删除后将无法恢复。",
+    description: "该操作不可恢复。",
     onConfirm: async () => {
       try {
         await apiClient.extension.theme.deletethemeHaloRunV1alpha1Theme({

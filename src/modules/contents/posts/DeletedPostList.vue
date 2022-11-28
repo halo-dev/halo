@@ -116,7 +116,7 @@ const handleCheckAllChange = (e: Event) => {
 
 const handleDeletePermanently = async (post: Post) => {
   Dialog.warning({
-    title: "是否确认永久删除该文章？",
+    title: "确定要永久删除该文章吗？",
     description: "删除之后将无法恢复",
     confirmType: "danger",
     onConfirm: async () => {
@@ -130,7 +130,7 @@ const handleDeletePermanently = async (post: Post) => {
 
 const handleDeletePermanentlyInBatch = async () => {
   Dialog.warning({
-    title: "是否确认永久删除选中的文章？",
+    title: "确定要永久删除选中的文章吗？",
     description: "删除之后将无法恢复",
     confirmType: "danger",
     onConfirm: async () => {
@@ -149,8 +149,8 @@ const handleDeletePermanentlyInBatch = async () => {
 
 const handleRecovery = async (post: Post) => {
   Dialog.warning({
-    title: "是否确认恢复该文章？",
-    description: "此操作会将文章恢复到被删除之前的状态",
+    title: "确定要恢复该文章吗？",
+    description: "该操作会将文章恢复到被删除之前的状态",
     onConfirm: async () => {
       const postToUpdate = cloneDeep(post);
       postToUpdate.spec.deleted = false;
@@ -165,8 +165,8 @@ const handleRecovery = async (post: Post) => {
 
 const handleRecoveryInBatch = async () => {
   Dialog.warning({
-    title: "是否确认恢复选中的文章？",
-    description: "此操作会将文章恢复到被删除之前的状态",
+    title: "确定要恢复选中的文章吗？",
+    description: "该操作会将文章恢复到被删除之前的状态",
     onConfirm: async () => {
       await Promise.all(
         selectedPostNames.value.map((name) => {

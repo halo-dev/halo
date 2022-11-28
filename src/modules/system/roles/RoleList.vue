@@ -83,8 +83,8 @@ const handleCloneRole = (role: Role) => {
 
 const handleDelete = async (role: Role) => {
   Dialog.warning({
-    title: "是否确定删除该权限？",
-    description: "此权限删除之后，相关联的用户将被删除角色绑定，此操作不可恢复",
+    title: "确定要删除该角色吗？",
+    description: "该角色删除后，相关联的用户将被删除角色绑定，该操作不可恢复",
     confirmType: "danger",
     onConfirm: async () => {
       try {

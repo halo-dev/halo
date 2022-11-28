@@ -122,7 +122,7 @@ const handleCheckAllChange = (e: Event) => {
 
 const handleDeletePermanently = async (singlePage: SinglePage) => {
   Dialog.warning({
-    title: "是否确认永久删除该自定义页面？",
+    title: "确认要永久删除该自定义页面吗？",
     description: "删除之后将无法恢复",
     confirmType: "danger",
     onConfirm: async () => {
@@ -138,7 +138,7 @@ const handleDeletePermanently = async (singlePage: SinglePage) => {
 
 const handleDeletePermanentlyInBatch = async () => {
   Dialog.warning({
-    title: "是否确认永久删除选中的自定义页面？",
+    title: "确定要确认永久删除选中的自定义页面吗？",
     description: "删除之后将无法恢复",
     confirmType: "danger",
     onConfirm: async () => {
@@ -159,8 +159,8 @@ const handleDeletePermanentlyInBatch = async () => {
 
 const handleRecovery = async (singlePage: SinglePage) => {
   Dialog.warning({
-    title: "是否确认恢复该自定义页面？",
-    description: "此操作会将自定义页面恢复到被删除之前的状态",
+    title: "确认要恢复该自定义页面吗？",
+    description: "该操作会将自定义页面恢复到被删除之前的状态",
     onConfirm: async () => {
       const singlePageToUpdate = cloneDeep(singlePage);
       singlePageToUpdate.spec.deleted = false;
@@ -177,8 +177,8 @@ const handleRecovery = async (singlePage: SinglePage) => {
 
 const handleRecoveryInBatch = async () => {
   Dialog.warning({
-    title: "是否确认恢复选中的自定义页面？",
-    description: "此操作会将自定义页面恢复到被删除之前的状态",
+    title: "确认要恢复选中的自定义页面吗？",
+    description: "该操作会将自定义页面恢复到被删除之前的状态",
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {

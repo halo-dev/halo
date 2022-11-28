@@ -37,7 +37,7 @@ const userStore = useUserStore();
 
 const handleLogout = () => {
   Dialog.warning({
-    title: "是否确认退出登录？",
+    title: "确定要退出登录吗？",
     onConfirm: async () => {
       try {
         await axios.post(`${import.meta.env.VITE_API_URL}/logout`, undefined, {

@@ -45,7 +45,7 @@ const quoteReply = computed(() => {
 
 const handleDelete = async () => {
   Dialog.warning({
-    title: "是否确认删除该回复？",
+    title: "确认要删除该回复吗？",
     description: "该操作不可恢复。",
     confirmType: "danger",
     onConfirm: async () => {

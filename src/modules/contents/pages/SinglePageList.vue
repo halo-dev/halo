@@ -215,8 +215,8 @@ const handleCheckAllChange = (e: Event) => {
 
 const handleDelete = async (singlePage: SinglePage) => {
   Dialog.warning({
-    title: "是否确认删除该自定义页面？",
-    description: "此操作会将自定义页面放入回收站，后续可以从回收站恢复",
+    title: "确定要删除该自定义页面吗？",
+    description: "该操作会将自定义页面放入回收站，后续可以从回收站恢复",
     confirmType: "danger",
     onConfirm: async () => {
       const singlePageToUpdate = cloneDeep(singlePage);
@@ -234,8 +234,8 @@ const handleDelete = async (singlePage: SinglePage) => {
 
 const handleDeleteInBatch = async () => {
   Dialog.warning({
-    title: "是否确认删除选中的自定义页面？",
-    description: "此操作会将自定义页面放入回收站，后续可以从回收站恢复",
+    title: "确定要删除选中的自定义页面吗？",
+    description: "该操作会将自定义页面放入回收站，后续可以从回收站恢复",
     confirmType: "danger",
     onConfirm: async () => {
       await Promise.all(

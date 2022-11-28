@@ -157,7 +157,7 @@ const handleDeleteInBatch = async () => {
 
 const handleApproveInBatch = async () => {
   Dialog.warning({
-    title: "确定要审核通过所选评论吗？",
+    title: "确定要审核通过所选的评论吗？",
     onConfirm: async () => {
       try {
         const commentsToUpdate = comments.value.items.filter((comment) => {

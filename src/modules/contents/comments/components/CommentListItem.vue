@@ -57,7 +57,7 @@ provide<Ref<ListedReply | undefined>>("hoveredReply", hoveredReply);
 
 const handleDelete = async () => {
   Dialog.warning({
-    title: "是否确认删除该评论？",
+    title: "确认要删除该评论吗？",
     description: "删除评论的同时会删除该评论下的所有回复，该操作不可恢复。",
     confirmType: "danger",
     onConfirm: async () => {
