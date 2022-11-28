@@ -77,6 +77,7 @@ const handleSaveMenuItem = async () => {
           name: formState.value.metadata.name,
           menuItem: formState.value,
         });
+
       onVisibleChange(false);
       emit("saved", data);
     } else {
@@ -242,7 +243,7 @@ const onMenuItemSourceChange = () => {
       @submit="handleSaveMenuItem"
     >
       <FormKit
-        v-if="!isUpdateMode && menu"
+        v-if="!isUpdateMode && menu && visible"
         v-model="selectedParentMenuItem"
         label="上级菜单项"
         placeholder="选择上级菜单项"
@@ -317,6 +318,7 @@ const onMenuItemSourceChange = () => {
       <VSpace>
         <SubmitButton
           v-if="visible"
+          :loading="saving"
           type="secondary"
           @submit="$formkit.submit('menuitem-form')"
         >

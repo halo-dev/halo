@@ -128,6 +128,7 @@ watch(
       <VSpace>
         <SubmitButton
           v-if="visible"
+          :loading="saving"
           type="secondary"
           @submit="$formkit.submit('menu-form')"
         >
