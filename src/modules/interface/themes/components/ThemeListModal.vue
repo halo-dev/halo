@@ -155,7 +155,7 @@ const handleCreateTheme = async (theme: Theme) => {
       });
 
     // create theme settings
-    apiClient.theme.reloadThemeSetting({ name: data.metadata.name });
+    apiClient.theme.reload({ name: data.metadata.name });
 
     activeTab.value = "installed";
   } catch (error) {

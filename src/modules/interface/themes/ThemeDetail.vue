@@ -25,17 +25,17 @@ const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme");
 const isActivated = inject<ComputedRef<boolean>>("isActivated");
 const upgradeModal = ref(false);
 
-const handleReloadThemeSetting = async () => {
+const handleReloadTheme = async () => {
   Dialog.warning({
-    title: "是否确认刷新主题的设置表单？",
-    description: "此操作仅会刷新主题的设置表单，不会删除已有的配置。",
+    title: "是否确认重载主题的所有配置？",
+    description: "此操作仅会重载主题配置和设置表单定义，不会删除已保存的配置。",
     onConfirm: async () => {
       try {
         if (!selectedTheme?.value) {
           return;
         }
 
-        await apiClient.theme.reloadThemeSetting({
+        await apiClient.theme.reload({
           name: selectedTheme.value.metadata.name as string,
         });
 
@@ -101,9 +101,9 @@ const onUpgradeModalClose = () => {
                     v-close-popper
                     block
                     type="default"
-                    @click="handleReloadThemeSetting"
+                    @click="handleReloadTheme"
                   >
-                    刷新设置表单
+                    重载主题配置
                   </VButton>
                 </VSpace>
               </div>
