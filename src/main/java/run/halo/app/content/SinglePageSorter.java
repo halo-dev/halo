@@ -5,7 +5,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.function.Function;
 import org.springframework.util.comparator.Comparators;
-import run.halo.app.core.extension.SinglePage;
+import run.halo.app.core.extension.content.SinglePage;
 
 /**
  * A sorter for {@link SinglePage}.

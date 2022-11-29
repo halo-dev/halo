@@ -3,7 +3,7 @@ package run.halo.app.theme.finders.vo;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
-import run.halo.app.core.extension.Category;
+import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.MetadataOperator;
 
 /**

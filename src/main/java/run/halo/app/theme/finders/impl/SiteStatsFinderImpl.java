@@ -2,9 +2,9 @@ package run.halo.app.theme.finders.impl;
 
 import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.Category;
 import run.halo.app.core.extension.Counter;
-import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.content.Category;
+import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.SiteStatsFinder;

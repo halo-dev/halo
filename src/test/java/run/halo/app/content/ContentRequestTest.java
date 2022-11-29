@@ -4,8 +4,8 @@ import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
-import run.halo.app.core.extension.Post;
-import run.halo.app.core.extension.Snapshot;
+import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.utils.JsonUtils;
 

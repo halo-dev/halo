@@ -26,7 +26,7 @@ import run.halo.app.content.ListedPost;
 import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
-import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.content.Post;
 import run.halo.app.event.post.PostRecycledEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.extension.ExtensionUtil;

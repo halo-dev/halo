@@ -1,4 +1,4 @@
-package run.halo.app.core.extension;
+package run.halo.app.core.extension.content;
 
 import static java.lang.Boolean.parseBoolean;
 
@@ -14,6 +14,7 @@ import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GVK;
+import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.infra.ConditionList;
 
@@ -26,11 +27,15 @@ import run.halo.app.infra.ConditionList;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = "content.halo.run", version = "v1alpha1", kind = Post.KIND,
+@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Post.KIND,
     plural = "posts", singular = "post")
 @EqualsAndHashCode(callSuper = true)
 public class Post extends AbstractExtension {
+
     public static final String KIND = "Post";
+
+    public static final GroupVersionKind GVK = GroupVersionKind.fromExtension(Post.class);
+
     public static final String CATEGORIES_ANNO = "content.halo.run/categories";
     public static final String LAST_RELEASED_SNAPSHOT_ANNO =
         "content.halo.run/last-released-snapshot";

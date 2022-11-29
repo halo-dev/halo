@@ -4,7 +4,7 @@ import java.util.List;
 import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.Tag;
+import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ListResult;
 import run.halo.app.theme.finders.vo.TagVo;
 

@@ -2,15 +2,16 @@ package run.halo.app.core.extension.reconciler;
 
 import java.time.Duration;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import run.halo.app.core.extension.Category;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.MenuItem.MenuItemSpec;
 import run.halo.app.core.extension.MenuItem.MenuItemStatus;
-import run.halo.app.core.extension.Post;
-import run.halo.app.core.extension.SinglePage;
-import run.halo.app.core.extension.Tag;
+import run.halo.app.core.extension.content.Category;
+import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.content.SinglePage;
+import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Controller;
@@ -18,6 +19,7 @@ import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
 
+@Slf4j
 @Component
 public class MenuItemReconciler implements Reconciler<Request> {
 
@@ -29,25 +31,35 @@ public class MenuItemReconciler implements Reconciler<Request> {
 
     @Override
     public Result reconcile(Request request) {
-        return client.fetch(MenuItem.class, request.name()).map(menuItem -> {
-            final var spec = menuItem.getSpec();
+        return client.fetch(MenuItem.class, request.name())
+            .map(menuItem -> {
+                final var spec = menuItem.getSpec();
 
-            if (menuItem.getStatus() == null) {
-                menuItem.setStatus(new MenuItemStatus());
-            }
-            var status = menuItem.getStatus();
-            if (spec.getCategoryRef() != null) {
-                return handleCategoryRef(request.name(), status, spec.getCategoryRef());
-            } else if (spec.getTagRef() != null) {
-                return handleTagRef(request.name(), status, spec.getTagRef());
-            } else if (spec.getSinglePageRef() != null) {
-                return handleSinglePageSpec(request.name(), status, spec.getSinglePageRef());
-            } else if (spec.getPostRef() != null) {
-                return handlePostRef(request.name(), status, spec.getPostRef());
-            } else {
-                return handleMenuSpec(request.name(), status, spec);
-            }
-        }).orElseGet(() -> new Result(false, null));
+                if (menuItem.getStatus() == null) {
+                    menuItem.setStatus(new MenuItemStatus());
+                }
+                var status = menuItem.getStatus();
+                var targetRef = spec.getTargetRef();
+                if (targetRef != null) {
+                    if (Ref.groupKindEquals(targetRef, Category.GVK)) {
+                        return handleCategoryRef(request.name(), status, targetRef);
+                    }
+                    if (Ref.groupKindEquals(targetRef, Tag.GVK)) {
+                        return handleTagRef(request.name(), status, targetRef);
+                    }
+                    if (Ref.groupKindEquals(targetRef, SinglePage.GVK)) {
+                        return handleSinglePageSpec(request.name(), status, targetRef);
+                    }
+                    if (Ref.groupKindEquals(targetRef, Post.GVK)) {
+                        return handlePostRef(request.name(), status, targetRef);
+                    }
+                    // unsupported ref
+                    log.error("Unsupported MenuItem targetRef " + targetRef);
+                    return Result.doNotRetry();
+                } else {
+                    return handleMenuSpec(request.name(), status, spec);
+                }
+            }).orElseGet(() -> new Result(false, null));
     }
 
     @Override
