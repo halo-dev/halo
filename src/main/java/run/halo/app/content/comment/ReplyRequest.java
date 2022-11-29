@@ -3,7 +3,7 @@ package run.halo.app.content.comment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.UUID;
 import lombok.Data;
-import run.halo.app.core.extension.Reply;
+import run.halo.app.core.extension.content.Reply;
 import run.halo.app.extension.Metadata;
 
 /**

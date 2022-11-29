@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.permalinks.ExtensionLocator;
-import run.halo.app.core.extension.Comment;
+import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.content.Snapshot;

@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.content.comment.ListedReply;
 import run.halo.app.content.comment.ReplyQuery;
 import run.halo.app.content.comment.ReplyService;
-import run.halo.app.core.extension.Reply;
+import run.halo.app.core.extension.content.Reply;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.router.QueryParamBuildUtil;
 
