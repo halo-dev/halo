@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.attachment;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static run.halo.app.core.extension.attachment.Policy.KIND;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -8,31 +9,30 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
-import run.halo.app.extension.Ref;
 
 @Data
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = KIND, plural = "policies",
-    singular = "policy")
+@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = KIND,
+    plural = "policies", singular = "policy")
 public class Policy extends AbstractExtension {
 
     public static final String KIND = "Policy";
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private PolicySpec spec;
 
     @Data
     public static class PolicySpec {
 
-        @Schema(required = true, description = "Display name of policy")
+        @Schema(requiredMode = REQUIRED, description = "Display name of policy")
         private String displayName;
 
-        @Schema(description = "Reference name of Setting extension")
-        private Ref templateRef;
+        @Schema(requiredMode = REQUIRED, description = "Reference name of PolicyTemplate")
+        private String templateName;
 
         @Schema(description = "Reference name of ConfigMap extension")
-        private Ref configMapRef;
+        private String configMapName;
 
     }
 

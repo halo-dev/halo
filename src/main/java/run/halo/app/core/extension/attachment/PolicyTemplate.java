@@ -1,13 +1,14 @@
 package run.halo.app.core.extension.attachment;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static run.halo.app.core.extension.attachment.PolicyTemplate.KIND;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
-import run.halo.app.extension.Ref;
 
 @Data
 @ToString(callSuper = true)
@@ -25,7 +26,8 @@ public class PolicyTemplate extends AbstractExtension {
 
         private String displayName;
 
-        private Ref settingRef;
+        @Schema(requiredMode = REQUIRED)
+        private String settingName;
 
     }
 
