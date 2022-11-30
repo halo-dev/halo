@@ -25,9 +25,6 @@ halo:
       - pathPattern: /upload/**
         locations:
           - migrate-from-1.x
-      - pathPattern: /wp-content/uploads/**
-        locations:
-          - migrate-from-wp
 
 springdoc:
   api-docs:
