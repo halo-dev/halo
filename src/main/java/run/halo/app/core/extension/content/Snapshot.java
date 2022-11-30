@@ -1,4 +1,4 @@
-package run.halo.app.core.extension;
+package run.halo.app.core.extension.content;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,8 +23,8 @@ import run.halo.app.extension.Ref;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = "content.halo.run", version = "v1alpha1",
-    kind = Snapshot.KIND, plural = "snapshots", singular = "snapshot")
+@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Snapshot.KIND,
+    plural = "snapshots", singular = "snapshot")
 @EqualsAndHashCode(callSuper = true)
 public class Snapshot extends AbstractExtension {
     public static final String KIND = "Snapshot";

@@ -24,8 +24,8 @@ import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PostService;
 import run.halo.app.content.TestPost;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
-import run.halo.app.core.extension.Post;
-import run.halo.app.core.extension.Snapshot;
+import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
 

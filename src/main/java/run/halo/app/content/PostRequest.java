@@ -1,7 +1,7 @@
 package run.halo.app.content;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.Ref;
 
 /**

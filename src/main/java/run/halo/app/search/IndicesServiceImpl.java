@@ -3,7 +3,7 @@ package run.halo.app.search;
 import org.springframework.stereotype.Service;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.content.Post;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.search.post.PostDoc;
 import run.halo.app.search.post.PostSearchService;

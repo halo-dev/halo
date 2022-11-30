@@ -49,12 +49,10 @@ public class AttachmentReconciler implements Reconciler<Request> {
         client.fetch(Attachment.class, request.name()).ifPresent(attachment -> {
             // TODO Handle the finalizer
             if (attachment.getMetadata().getDeletionTimestamp() != null) {
-                Policy policy =
-                    client.fetch(Policy.class, attachment.getSpec().getPolicyRef().getName())
-                        .orElseThrow();
-                var configMap =
-                    client.fetch(ConfigMap.class, policy.getSpec().getConfigMapRef().getName())
-                        .orElseThrow();
+                Policy policy = client.fetch(Policy.class, attachment.getSpec().getPolicyName())
+                    .orElseThrow();
+                var configMap = client.fetch(ConfigMap.class, policy.getSpec().getConfigMapName())
+                    .orElseThrow();
                 var deleteOption = new DeleteOption(attachment, policy, configMap);
                 Flux.fromIterable(extensionComponentsFinder.getExtensions(AttachmentHandler.class))
                     .concatMap(handler -> handler.delete(deleteOption)).next().switchIfEmpty(

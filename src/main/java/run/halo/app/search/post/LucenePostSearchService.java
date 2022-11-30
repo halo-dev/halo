@@ -100,10 +100,10 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
                 var doc = this.convert(post);
                 try {
                     var seqNum =
-                        writer.updateDocument(new Term(PostDoc.ID_FIELD, post.getName()), doc);
+                        writer.updateDocument(new Term(PostDoc.ID_FIELD, post.name()), doc);
                     if (log.isDebugEnabled()) {
                         log.debug("Updated document({}) with sequence number {} returned",
-                            post.getName(), seqNum);
+                            post.name(), seqNum);
                     }
                 } catch (IOException e) {
                     throw Exceptions.propagate(e);
@@ -142,19 +142,19 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
 
     private Document convert(PostDoc post) {
         var doc = new Document();
-        doc.add(new StringField("name", post.getName(), YES));
-        doc.add(new StoredField("title", post.getTitle()));
+        doc.add(new StringField("name", post.name(), YES));
+        doc.add(new StoredField("title", post.title()));
 
-        var content = Jsoup.clean(stripToEmpty(post.getExcerpt()) + stripToEmpty(post.getContent()),
+        var content = Jsoup.clean(stripToEmpty(post.excerpt()) + stripToEmpty(post.content()),
             Safelist.none());
 
         doc.add(new StoredField("content", content));
-        doc.add(new TextField("searchable", post.getTitle() + content, NO));
+        doc.add(new TextField("searchable", post.title() + content, NO));
 
-        long publishTimestamp = post.getPublishTimestamp().toEpochMilli();
+        long publishTimestamp = post.publishTimestamp().toEpochMilli();
         doc.add(new LongPoint("publishTimestamp", publishTimestamp));
         doc.add(new StoredField("publishTimestamp", publishTimestamp));
-        doc.add(new StoredField("permalink", post.getPermalink()));
+        doc.add(new StoredField("permalink", post.permalink()));
         return doc;
     }
 

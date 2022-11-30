@@ -3,7 +3,7 @@ package run.halo.app.content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.HashMap;
 import org.apache.commons.lang3.StringUtils;
-import run.halo.app.core.extension.Snapshot;
+import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Ref;
 

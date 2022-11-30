@@ -4,8 +4,7 @@ metadata:
   name: local
 spec:
   displayName: Local Storage
-  settingRef:
-    name: local-policy-template-setting
+  settingName: local-policy-template-setting
 ---
 apiVersion: v1alpha1
 kind: Setting

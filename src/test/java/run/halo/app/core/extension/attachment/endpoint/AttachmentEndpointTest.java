@@ -37,7 +37,6 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.Ref;
 import run.halo.app.plugin.ExtensionComponentsFinder;
 
 @ExtendWith(MockitoExtension.class)
@@ -104,7 +103,7 @@ class AttachmentEndpointTest {
         @Test
         void shouldUploadSuccessfully() {
             var policySpec = new PolicySpec();
-            policySpec.setConfigMapRef(Ref.of("fake-configmap"));
+            policySpec.setConfigMapName("fake-configmap");
             var policyMetadata = new Metadata();
             policyMetadata.setName("fake-policy");
             var policy = new Policy();
@@ -146,9 +145,9 @@ class AttachmentEndpointTest {
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.metadata.name").isEqualTo("fake-attachment")
-                .jsonPath("$.spec.uploadedBy.name").isEqualTo("fake-user")
-                .jsonPath("$.spec.policyRef.name").isEqualTo("fake-policy")
-                .jsonPath("$.spec.groupRef.name").isEqualTo("fake-group")
+                .jsonPath("$.spec.ownerName").isEqualTo("fake-user")
+                .jsonPath("$.spec.policyName").isEqualTo("fake-policy")
+                .jsonPath("$.spec.groupName").isEqualTo("fake-group")
             ;
 
             verify(client).get(Policy.class, "fake-policy");
@@ -195,7 +194,7 @@ class AttachmentEndpointTest {
 
             assertTrue(pred.test(attachment));
 
-            spec.setGroupRef(Ref.of("halo"));
+            spec.setGroupName("halo");
             assertFalse(pred.test(attachment));
         }
     }
