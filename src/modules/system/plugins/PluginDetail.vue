@@ -116,9 +116,14 @@ watchEffect(() => {
           >
             <dt class="text-sm font-medium text-gray-900">提供方</dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              <a :href="plugin?.spec.homepage" target="_blank">
-                {{ plugin?.spec.author }}
+              <a
+                v-if="plugin?.spec.author"
+                :href="plugin?.spec.author.website"
+                target="_blank"
+              >
+                {{ plugin?.spec.author.name }}
               </a>
+              <span v-else>无</span>
             </dd>
           </div>
           <div
