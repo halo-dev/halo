@@ -13,12 +13,13 @@ import DefaultEditor from "@/components/editor/DefaultEditor.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import PostPreviewModal from "./components/PostPreviewModal.vue";
 import type { Post, PostRequest } from "@halo-dev/api-client";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, toRef } from "vue";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { useRouter } from "vue-router";
 import { randomUUID } from "@/utils/id";
+import { useContentCache } from "@/composables/use-content-cache";
 
 const router = useRouter();
 
@@ -99,7 +100,7 @@ const handleSave = async () => {
     }
 
     Toast.success("保存成功");
-
+    handleClearCache(name.value as string);
     await handleFetchContent();
   } catch (e) {
     console.error("Failed to save post", e);
@@ -149,6 +150,7 @@ const handlePublish = async () => {
     }
 
     Toast.success("发布成功", { duration: 2000 });
+    handleClearCache(name.value as string);
   } catch (error) {
     console.error("Failed to publish post", error);
     Toast.error("发布失败，请重试");
@@ -174,7 +176,7 @@ const handleFetchContent = async () => {
     snapshotName: formState.value.post.spec.headSnapshot,
   });
 
-  formState.value.content = data;
+  formState.value.content = Object.assign(formState.value.content, data);
 };
 
 const handleOpenSettingModal = async () => {
@@ -220,7 +222,15 @@ onMounted(async () => {
     // fetch post content
     await handleFetchContent();
   }
+  handleResetCache();
 });
+
+const { handleSetContentCache, handleResetCache, handleClearCache } =
+  useContentCache(
+    "post-content-cache",
+    name.value as string,
+    toRef(formState.value.content, "raw")
+  );
 </script>
 
 <template>
@@ -284,6 +294,7 @@ onMounted(async () => {
       :owner="formState.post.spec.owner"
       :permalink="formState.post.status?.permalink"
       :publish-time="formState.post.spec.publishTime"
+      @update="handleSetContentCache"
     />
   </div>
 </template>

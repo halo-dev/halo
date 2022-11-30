@@ -23,6 +23,7 @@ importers:
       '@tiptap/extension-character-count': ^2.0.0-beta.202
       '@types/jsdom': ^20.0.1
       '@types/lodash.clonedeep': 4.5.7
+      '@types/lodash.debounce': ^4.0.7
       '@types/lodash.isequal': ^4.5.6
       '@types/lodash.merge': ^4.6.7
       '@types/node': ^18.11.9
@@ -64,6 +65,7 @@ importers:
       husky: ^8.0.2
       jsdom: ^20.0.3
       lodash.clonedeep: ^4.5.0
+      lodash.debounce: ^4.0.8
       lodash.isequal: ^4.5.0
       lodash.merge: ^4.6.2
       lodash.sortby: ^4.7.0
@@ -129,6 +131,7 @@ importers:
       floating-vue: 2.0.0-beta.20_vue@3.2.45
       fuse.js: 6.6.2
       lodash.clonedeep: 4.5.0
+      lodash.debounce: 4.0.8
       lodash.isequal: 4.5.0
       lodash.merge: 4.6.2
       lodash.sortby: 4.7.0
@@ -149,6 +152,7 @@ importers:
       '@tailwindcss/aspect-ratio': 0.4.2_tailwindcss@3.2.4
       '@types/jsdom': 20.0.1
       '@types/lodash.clonedeep': 4.5.7
+      '@types/lodash.debounce': 4.0.7
       '@types/lodash.isequal': 4.5.6
       '@types/lodash.merge': 4.6.7
       '@types/node': 18.11.9
@@ -176,7 +180,7 @@ importers:
       randomstring: 1.2.3
       sass: 1.56.1
       start-server-and-test: 1.14.0
-      tailwindcss: 3.2.4_postcss@8.4.19
+      tailwindcss: 3.2.4
       tailwindcss-safe-area: 0.2.2
       tailwindcss-themer: 2.0.2_tailwindcss@3.2.4
       typescript: 4.7.4
@@ -1927,7 +1931,7 @@ packages:
         optional: true
     dependencies:
       '@formkit/core': 1.0.0-beta.12-e579559
-      tailwindcss: 3.2.4_postcss@8.4.19
+      tailwindcss: 3.2.4
     dev: false
 
   /@formkit/utils/1.0.0-beta.12-e579559:
@@ -2671,7 +2675,7 @@ packages:
     peerDependencies:
       tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
     dependencies:
-      tailwindcss: 3.2.4_postcss@8.4.19
+      tailwindcss: 3.2.4
     dev: true
 
   /@tiptap/core/2.0.0-beta.202:
@@ -3127,6 +3131,12 @@ packages:
 
   /@types/lodash.clonedeep/4.5.7:
     resolution: {integrity: sha512-ccNqkPptFIXrpVqUECi60/DFxjNKsfoQxSQsgcBJCX/fuX1wgyQieojkcWH/KpE3xzLoWN/2k+ZeGqIN3paSvw==}
+    dependencies:
+      '@types/lodash': 4.14.186
+    dev: true
+
+  /@types/lodash.debounce/4.0.7:
+    resolution: {integrity: sha512-X1T4wMZ+gT000M2/91SYj0d/7JfeNZ9PeeOldSNoE/lunLeQXKvkmIumI29IaKMotU/ln/McOIvgzZcQ/3TrSA==}
     dependencies:
       '@types/lodash': 4.14.186
     dev: true
@@ -8522,15 +8532,13 @@ packages:
       just-unique: 4.1.1
       lodash.merge: 4.6.2
       lodash.mergewith: 4.6.2
-      tailwindcss: 3.2.4_postcss@8.4.19
+      tailwindcss: 3.2.4
     dev: true
 
-  /tailwindcss/3.2.4_postcss@8.4.19:
+  /tailwindcss/3.2.4:
     resolution: {integrity: sha512-AhwtHCKMtR71JgeYDaswmZXhPcW9iuI9Sp2LvZPo9upDZ7231ZJ7eA9RaURbhpXGVlrjX4cFNlB4ieTetEb7hQ==}
     engines: {node: '>=12.13.0'}
     hasBin: true
-    peerDependencies:
-      postcss: ^8.0.9
     dependencies:
       arg: 5.0.2
       chokidar: 3.5.3

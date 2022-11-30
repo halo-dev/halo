@@ -13,12 +13,13 @@ import DefaultEditor from "@/components/editor/DefaultEditor.vue";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import PostPreviewModal from "../posts/components/PostPreviewModal.vue";
 import type { SinglePage, SinglePageRequest } from "@halo-dev/api-client";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, toRef } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import cloneDeep from "lodash.clonedeep";
 import { useRouter } from "vue-router";
 import { randomUUID } from "@/utils/id";
+import { useContentCache } from "@/composables/use-content-cache";
 
 const router = useRouter();
 
@@ -99,6 +100,7 @@ const handleSave = async () => {
 
     Toast.success("保存成功");
 
+    handleClearCache(routeQueryName.value as string);
     await handleFetchContent();
   } catch (error) {
     console.error("Failed to save single page", error);
@@ -144,6 +146,7 @@ const handlePublish = async () => {
     }
 
     Toast.success("发布成功");
+    handleClearCache(routeQueryName.value as string);
   } catch (error) {
     console.error("Failed to publish single page", error);
     Toast.error("发布失败，请重试");
@@ -168,7 +171,7 @@ const handleFetchContent = async () => {
     snapshotName: formState.value.page.spec.headSnapshot,
   });
 
-  formState.value.content = data;
+  formState.value.content = Object.assign(formState.value.content, data);
 };
 
 const handleOpenSettingModal = async () => {
@@ -211,7 +214,15 @@ onMounted(async () => {
     // fetch single page content
     await handleFetchContent();
   }
+  handleResetCache();
 });
+
+const { handleSetContentCache, handleResetCache, handleClearCache } =
+  useContentCache(
+    "singlePage-content-cache",
+    routeQueryName.value as string,
+    toRef(formState.value.content, "raw")
+  );
 </script>
 
 <template>
@@ -275,6 +286,7 @@ onMounted(async () => {
       :owner="formState.page.spec.owner"
       :permalink="formState.page.status?.permalink"
       :publish-time="formState.page.spec.publishTime"
+      @update="handleSetContentCache"
     />
   </div>
 </template>
