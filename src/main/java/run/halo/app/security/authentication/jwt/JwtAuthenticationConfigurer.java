@@ -13,12 +13,13 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.MediaTypeServerWebExchangeMatcher;
-import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.infra.properties.JwtProperties;
 import run.halo.app.security.authentication.SecurityConfigurer;
 
-@Component
+/**
+ * TODO: Use It after 2.0.0.
+ */
 public class JwtAuthenticationConfigurer implements SecurityConfigurer {
 
     private final ReactiveUserDetailsService userDetailsService;
