@@ -266,7 +266,7 @@ const toolbarMenuItems = computed(() => {
     {
       type: "button",
       icon: markRaw(MdiFileImageBox),
-      title: "SuperScript",
+      title: "插入附件",
       action: () => (attachmentSelectorModal.value = true),
       isActive: () => false,
     },
