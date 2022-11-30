@@ -2,7 +2,7 @@
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { computed, ref, watch } from "vue";
-import type { Menu, MenuItem } from "@halo-dev/api-client";
+import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
@@ -56,19 +56,15 @@ const handleSaveMenuItem = async () => {
   try {
     saving.value = true;
 
-    const menuItemSource = menuItemSources.find(
-      (source) => source.value === selectedMenuItemSource.value
+    const menuItemRef = menuItemRefs.find(
+      (ref) => ref.ref?.kind === selectedRefKind.value
     );
 
-    if (menuItemSource) {
-      const { ref } = menuItemSource;
-      if (ref) {
-        formState.value.spec[ref] = {
-          version: "content.halo.run/v1alpha1",
-          kind: menuItemSource.kind,
-          name: selectedRef.value as string,
-        };
-      }
+    if (menuItemRef) {
+      formState.value.spec.targetRef = {
+        ...menuItemRef.ref,
+        name: selectedRefName.value,
+      };
     }
 
     if (isUpdateMode.value) {
@@ -123,8 +119,8 @@ const onVisibleChange = (visible: boolean) => {
 
 const handleResetForm = () => {
   formState.value = cloneDeep(initialFormState);
-  selectedMenuItemSource.value = menuItemSources[0].value;
-  selectedRef.value = "";
+  selectedRefKind.value = "";
+  selectedRefName.value = "";
   selectedParentMenuItem.value = "";
   reset("menuitem-form");
 };
@@ -137,7 +133,7 @@ watch(
       setFocus("displayNameInput");
 
       if (!props.menuItem) {
-        selectedRef.value = "";
+        selectedRefName.value = "";
       }
     } else {
       handleResetForm();
@@ -152,79 +148,88 @@ watch(
       formState.value = cloneDeep(menuItem);
 
       // Set Ref related
-      const { postRef, categoryRef, tagRef, singlePageRef } =
-        formState.value.spec;
+      const { targetRef } = formState.value.spec;
 
-      if (postRef) {
-        selectedMenuItemSource.value = "post";
-        selectedRef.value = postRef.name;
+      if (!targetRef) {
+        return;
       }
 
-      if (categoryRef) {
-        selectedMenuItemSource.value = "category";
-        selectedRef.value = categoryRef.name;
-      }
-
-      if (tagRef) {
-        selectedMenuItemSource.value = "tag";
-        selectedRef.value = tagRef.name;
-      }
-
-      if (singlePageRef) {
-        selectedMenuItemSource.value = "singlePage";
-        selectedRef.value = singlePageRef.name;
-      }
+      selectedRefName.value = targetRef.name;
+      selectedRefKind.value = targetRef.kind as string;
     } else {
       handleResetForm();
     }
   }
 );
 
-// MenuItem Ref
-interface MenuItemSource {
+interface MenuItemRef {
   label: string;
-  value: string;
-  ref?: "postRef" | "categoryRef" | "tagRef" | "singlePageRef";
-  kind?: "Post" | "Category" | "Tag" | "SinglePage";
+  inputType?: string;
+  ref?: Ref;
 }
 
-const menuItemSources: MenuItemSource[] = [
+const baseRef: Ref = {
+  group: "content.halo.run",
+  version: "v1alpha1",
+  name: "",
+};
+
+const menuItemRefs: MenuItemRef[] = [
   {
     label: "自定义链接",
-    value: "custom",
   },
   {
     label: "文章",
-    value: "post",
-    ref: "postRef",
-    kind: "Post",
+    inputType: "postSelect",
+    ref: {
+      ...baseRef,
+      kind: "Post",
+    },
   },
   {
     label: "自定义页面",
-    value: "singlePage",
-    ref: "singlePageRef",
-    kind: "SinglePage",
+    inputType: "singlePageSelect",
+    ref: {
+      ...baseRef,
+      kind: "SinglePage",
+    },
   },
   {
     label: "分类",
-    value: "category",
-    ref: "categoryRef",
-    kind: "Post",
+    inputType: "categorySelect",
+    ref: {
+      ...baseRef,
+      kind: "Category",
+    },
   },
   {
     label: "标签",
-    value: "tag",
-    ref: "tagRef",
-    kind: "Tag",
+    inputType: "tagSelect",
+    ref: {
+      ...baseRef,
+      kind: "Tag",
+    },
   },
 ];
 
-const selectedMenuItemSource = ref<string>(menuItemSources[0].value);
+const menuItemRefsMap = menuItemRefs.map((menuItemRef) => {
+  return {
+    label: menuItemRef.label,
+    value: menuItemRef.ref?.kind,
+  };
+});
 
-const selectedRef = ref<string>("");
+const selectedRef = computed(() => {
+  return menuItemRefs.find(
+    (menuItemRef) => menuItemRef.ref?.kind === selectedRefKind.value
+  );
+});
+
+const selectedRefKind = ref<string>("");
+const selectedRefName = ref<string>("");
 
 const onMenuItemSourceChange = () => {
-  selectedRef.value = "";
+  selectedRefName.value = "";
 };
 </script>
 <template>
@@ -252,8 +257,8 @@ const onMenuItemSourceChange = () => {
       />
 
       <FormKit
-        v-model="selectedMenuItemSource"
-        :options="menuItemSources"
+        v-model="selectedRefKind"
+        :options="menuItemRefsMap"
         :disabled="isUpdateMode"
         label="类型"
         type="select"
@@ -261,7 +266,7 @@ const onMenuItemSourceChange = () => {
       />
 
       <FormKit
-        v-if="selectedMenuItemSource === 'custom'"
+        v-if="!selectedRefKind"
         id="displayNameInput"
         v-model="formState.spec.displayName"
         label="名称"
@@ -271,7 +276,7 @@ const onMenuItemSourceChange = () => {
       />
 
       <FormKit
-        v-if="selectedMenuItemSource === 'custom'"
+        v-if="!selectedRefKind"
         v-model="formState.spec.href"
         label="链接地址"
         type="text"
@@ -280,37 +285,13 @@ const onMenuItemSourceChange = () => {
       />
 
       <FormKit
-        v-if="selectedMenuItemSource === 'post'"
-        v-model="selectedRef"
-        placeholder="请选择文章"
-        label="文章"
-        type="postSelect"
-        validation="required"
-      />
-
-      <FormKit
-        v-if="selectedMenuItemSource === 'singlePage'"
-        v-model="selectedRef"
-        label="自定义页面"
-        type="singlePageSelect"
-        validation="required"
-      />
-
-      <FormKit
-        v-if="selectedMenuItemSource === 'tag'"
-        v-model="selectedRef"
-        placeholder="请选择标签"
-        label="标签"
-        type="tagSelect"
-        validation="required"
-      />
-
-      <FormKit
-        v-if="selectedMenuItemSource === 'category'"
-        v-model="selectedRef"
-        placeholder="请选择分类"
-        label="分类"
-        type="categorySelect"
+        v-if="selectedRef?.ref"
+        :id="selectedRef.inputType"
+        :key="selectedRef.inputType"
+        v-model="selectedRefName"
+        :placeholder="`请选择${selectedRef.label}`"
+        :label="selectedRef.label"
+        :type="selectedRef.inputType"
         validation="required"
       />
     </FormKit>

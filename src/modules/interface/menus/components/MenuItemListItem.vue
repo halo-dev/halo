@@ -48,19 +48,20 @@ function onDelete(menuItem: MenuTreeItem) {
   emit("delete", menuItem);
 }
 
+const TargetRef = {
+  Post: "文章",
+  SinglePage: "页面",
+  Category: "分类",
+  Tag: "标签",
+};
+
 function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
-  if (menuItem.spec.postRef) {
-    return "文章";
+  const { kind } = menuItem.spec.targetRef || {};
+
+  if (kind && TargetRef[kind]) {
+    return TargetRef[kind];
   }
-  if (menuItem.spec.singlePageRef) {
-    return "自定义页面";
-  }
-  if (menuItem.spec.categoryRef) {
-    return "分类";
-  }
-  if (menuItem.spec.tagRef) {
-    return "标签";
-  }
+
   return undefined;
 }
 </script>
@@ -89,7 +90,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
             </div>
           </template>
           <template #start>
-            <VEntityField :title="menuItem.status.displayName">
+            <VEntityField :title="menuItem.status?.displayName">
               <template #extra>
                 <VTag v-if="getMenuItemRefDisplayName(menuItem)">
                   {{ getMenuItemRefDisplayName(menuItem) }}
