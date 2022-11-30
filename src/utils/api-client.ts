@@ -32,7 +32,7 @@ import {
   V1alpha1SettingApi,
   V1alpha1UserApi,
 } from "@halo-dev/api-client";
-import type { AxiosInstance } from "axios";
+import type { AxiosError, AxiosInstance } from "axios";
 import axios from "axios";
 import { useUserStore } from "@/stores/user";
 import { Toast } from "@halo-dev/components";
@@ -44,17 +44,52 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
+interface ProblemDetail {
+  detail: string;
+  instance: string;
+  status: number;
+  title: string;
+  type?: string;
+}
+
 axiosInstance.interceptors.response.use(
   (response) => {
     return response;
   },
-  async (error) => {
-    if (error.response.status === 401) {
+  async (error: AxiosError<ProblemDetail>) => {
+    if (/Network Error/.test(error.message)) {
+      Toast.error("网络错误，请检查网络连接");
+      return Promise.reject(error);
+    }
+
+    const errorResponse = error.response;
+
+    if (!errorResponse) {
+      Toast.error("网络错误，请检查网络连接");
+      return Promise.reject(error);
+    }
+
+    const { status } = errorResponse;
+
+    const { title } = errorResponse.data;
+
+    if (status === 400) {
+      Toast.error(`请求参数错误：${title}`);
+    } else if (status === 401) {
       const userStore = useUserStore();
       userStore.loginModalVisible = true;
       Toast.warning("登录已过期，请重新登录");
       localStorage.removeItem("logged_in");
+    } else if (status === 403) {
+      Toast.error("无权限访问");
+    } else if (status === 404) {
+      Toast.error("资源不存在");
+    } else if (status === 500) {
+      Toast.error(`服务器内部错误：${title}`);
+    } else {
+      Toast.error(`未知错误：${title}`);
     }
+
     return Promise.reject(error);
   }
 );
