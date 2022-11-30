@@ -9,6 +9,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -25,6 +26,7 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.security.LoginUtils;
 
+@Disabled
 @SpringBootTest
 @AutoConfigureWebTestClient
 class JwtAuthenticationTest {
