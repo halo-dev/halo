@@ -1,0 +1,13 @@
+apiVersion: plugin.halo.run/v1alpha1
+kind: ReverseProxy
+metadata:
+  name: reverse-proxy-template
+  labels:
+    plugin.halo.run/pluginName: io.github.guqing.apples
+rules:
+  - path: /static/**
+    file:
+      directory: static
+  - path: /admin/**
+    file:
+      directory: admin
