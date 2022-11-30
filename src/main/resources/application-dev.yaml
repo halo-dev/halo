@@ -17,11 +17,6 @@ halo:
     initializer:
       super-admin-username: admin
       super-admin-password: admin
-    oauth2:
-      jwt:
-        jwsAlgorithm: rs512
-        public-key-location: classpath:app.pub
-        private-key-location: classpath:app.key
   plugin:
     runtime-mode: development # development, deployment
     classes-directories:
