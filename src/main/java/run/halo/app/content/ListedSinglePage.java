@@ -3,7 +3,7 @@ package run.halo.app.content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
-import run.halo.app.core.extension.SinglePage;
+import run.halo.app.core.extension.content.SinglePage;
 
 
 /**

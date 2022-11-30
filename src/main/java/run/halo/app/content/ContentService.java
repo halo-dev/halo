@@ -2,7 +2,7 @@ package run.halo.app.content;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.Snapshot;
+import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.extension.Ref;
 
 /**

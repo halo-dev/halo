@@ -12,5 +12,9 @@ public interface Reconciler<R> {
     }
 
     record Result(boolean reEnqueue, Duration retryAfter) {
+
+        public static Result doNotRetry() {
+            return new Result(false, null);
+        }
     }
 }

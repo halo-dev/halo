@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 import run.halo.app.content.permalinks.CategoryPermalinkPolicy;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
-import run.halo.app.core.extension.Category;
-import run.halo.app.core.extension.Post;
-import run.halo.app.core.extension.Tag;
+import run.halo.app.core.extension.content.Category;
+import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.theme.DefaultTemplateEnum;
 

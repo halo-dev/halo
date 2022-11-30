@@ -1,7 +1,7 @@
 package run.halo.app.content.comment;
 
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.Reply;
+import run.halo.app.core.extension.content.Reply;
 import run.halo.app.extension.ListResult;
 
 /**

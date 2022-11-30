@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.Properties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.PathUtils;

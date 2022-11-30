@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentRequest;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.ContentWrapper;
-import run.halo.app.core.extension.Snapshot;
+import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
