@@ -1,13 +1,11 @@
 package run.halo.app.core.extension.reconciler.attachment;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.UriUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.attachment.Attachment;
@@ -67,15 +65,16 @@ public class AttachmentReconciler implements Reconciler<Request> {
             var annotations = attachment.getMetadata().getAnnotations();
             if (annotations != null) {
                 String permalink = null;
-                var localRelativePath = annotations.get(Constant.LOCAL_REL_PATH_ANNO_KEY);
-                if (localRelativePath != null) {
-                    // TODO Add router function here.
-                    var encodedPath = UriUtils.encodePath("/upload/" + localRelativePath, UTF_8);
-                    permalink = externalUrl.get().resolve(encodedPath).normalize().toString();
+                var uri = annotations.get(Constant.URI_ANNO_KEY);
+                if (uri != null) {
+                    permalink = UriComponentsBuilder.fromUri(externalUrl.get())
+                        // The URI has been encoded before, so there is no need to encode it again.
+                        .path(uri)
+                        .build()
+                        .toString();
                 } else {
                     var externalLink = annotations.get(Constant.EXTERNAL_LINK_ANNO_KEY);
                     if (externalLink != null) {
-                        // TODO Set the external link into status
                         permalink = externalLink;
                     }
                 }
