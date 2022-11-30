@@ -33,6 +33,7 @@ import run.halo.app.infra.SystemSetting;
 import run.halo.app.plugin.ExtensionComponentsFinder;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
+import run.halo.app.theme.finders.SinglePageFinder;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.router.strategy.ModelConst;
 
@@ -42,7 +43,7 @@ import run.halo.app.theme.router.strategy.ModelConst;
  * @author guqing
  * @see HaloProcessorDialect
  * @see GlobalHeadInjectionProcessor
- * @see PostTemplateHeadProcessor
+ * @see ContentTemplateHeadProcessor
  * @see TemplateHeadProcessor
  * @see TemplateGlobalHeadProcessor
  * @see TemplateFooterElementTagProcessor
@@ -55,6 +56,9 @@ class HaloProcessorDialectTest {
 
     @Mock
     private PostFinder postFinder;
+
+    @Mock
+    private SinglePageFinder singlePageFinder;
 
     @Mock
     private SystemConfigurableEnvironmentFetcher fetcher;
@@ -72,9 +76,11 @@ class HaloProcessorDialectTest {
         templateEngine.addTemplateResolver(new TestTemplateResolver());
 
         Map<String, TemplateHeadProcessor> map = new HashMap<>();
-        map.put("postTemplateHeadProcessor", new PostTemplateHeadProcessor(postFinder));
+        map.put("postTemplateHeadProcessor",
+            new ContentTemplateHeadProcessor(postFinder, singlePageFinder));
         map.put("templateGlobalHeadProcessor", new TemplateGlobalHeadProcessor(fetcher));
         map.put("faviconHeadProcessor", new DefaultFaviconHeadProcessor(fetcher));
+        map.put("globalSeoProcessor", new GlobalSeoProcessor(fetcher));
         lenient().when(applicationContext.getBeansOfType(eq(TemplateHeadProcessor.class)))
             .thenReturn(map);
 
@@ -85,8 +91,10 @@ class HaloProcessorDialectTest {
         when(fetcher.fetch(eq(SystemSetting.CodeInjection.GROUP),
             eq(SystemSetting.CodeInjection.class))).thenReturn(Mono.just(codeInjection));
 
-        when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
+        lenient().when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
             .thenReturn(fetcher);
+        lenient().when(fetcher.fetch(eq(SystemSetting.Seo.GROUP),
+            eq(SystemSetting.Seo.class))).thenReturn(Mono.empty());
 
         when(applicationContext.getBean(eq(ExtensionComponentsFinder.class)))
             .thenReturn(extensionComponentsFinder);
@@ -172,6 +180,68 @@ class HaloProcessorDialectTest {
             """);
     }
 
+    @Test
+    void blockSeo() {
+        final Context context = getContext();
+        SystemSetting.Seo seo = new SystemSetting.Seo();
+        seo.setBlockSpiders(true);
+        when(fetcher.fetch(eq(SystemSetting.Seo.GROUP),
+            eq(SystemSetting.Seo.class))).thenReturn(Mono.just(seo));
+        SystemSetting.Basic basic = new SystemSetting.Basic();
+        basic.setFavicon("favicon.ico");
+        when(fetcher.fetch(eq(SystemSetting.Basic.GROUP),
+            eq(SystemSetting.Basic.class))).thenReturn(Mono.just(basic));
+
+        String result = templateEngine.process("seo", context);
+        assertThat(result).isEqualTo("""
+            <!DOCTYPE html>
+            <html lang="en">
+              <head>
+                <meta charset="UTF-8" />
+                <title>Seo Test</title>
+              <meta name="global-head-test" content="test" />
+            <link rel="icon" href="favicon.ico" />
+            <meta name="robots" content="noindex" />
+            </head>
+              <body>
+                seo setting test.
+              </body>
+            </html>
+            """);
+    }
+
+    @Test
+    void seoWithKeywordsAndDescription() {
+        final Context context = getContext();
+        SystemSetting.Seo seo = new SystemSetting.Seo();
+        seo.setKeywords("K1, K2, K3");
+        seo.setDescription("This is a description.");
+        when(fetcher.fetch(eq(SystemSetting.Seo.GROUP),
+            eq(SystemSetting.Seo.class))).thenReturn(Mono.just(seo));
+        SystemSetting.Basic basic = new SystemSetting.Basic();
+        basic.setFavicon("favicon.ico");
+        when(fetcher.fetch(eq(SystemSetting.Basic.GROUP),
+            eq(SystemSetting.Basic.class))).thenReturn(Mono.just(basic));
+
+        String result = templateEngine.process("seo", context);
+        assertThat(result).isEqualTo("""
+            <!DOCTYPE html>
+            <html lang="en">
+              <head>
+                <meta charset="UTF-8" />
+                <title>Seo Test</title>
+              <meta name="global-head-test" content="test" />
+            <link rel="icon" href="favicon.ico" />
+            <meta name="keywords" content="K1, K2, K3" />
+            <meta name="description" content="This is a description." />
+            </head>
+              <body>
+                seo setting test.
+              </body>
+            </html>
+            """);
+    }
+
     private Context getContext() {
         Context context = new Context();
         context.setVariable(
@@ -191,6 +261,10 @@ class HaloProcessorDialectTest {
 
             if (template.equals(DefaultTemplateEnum.POST.getValue())) {
                 return new StringTemplateResource(postTemplate());
+            }
+
+            if (template.equals("seo")) {
+                return new StringTemplateResource(seoTemplate());
             }
             return null;
         }
@@ -223,6 +297,21 @@ class HaloProcessorDialectTest {
                   </head>
                   <body>
                     %s
+                  </body>
+                </html>
+                """;
+        }
+
+        private String seoTemplate() {
+            return """
+                <!DOCTYPE html>
+                <html lang="en" xmlns:th="http://www.thymeleaf.org">
+                  <head>
+                    <meta charset="UTF-8" />
+                    <title>Seo Test</title>
+                  </head>
+                  <body>
+                    seo setting test.
                   </body>
                 </html>
                 """;
