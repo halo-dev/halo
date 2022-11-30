@@ -66,16 +66,18 @@ class YamlPluginFinderTest {
     @Test
     void findFromJar() throws IOException, URISyntaxException {
         Path tempDirectory = Files.createTempDirectory("halo-plugin");
-        var plugin002Uri = requireNonNull(
-            getClass().getClassLoader().getResource("plugin/plugin-0.0.2")).toURI();
+        try {
+            var plugin002Uri = requireNonNull(
+                getClass().getClassLoader().getResource("plugin/plugin-0.0.2")).toURI();
 
-        Path targetJarPath = tempDirectory.resolve("plugin-0.0.2.jar");
-        FileUtils.jar(Paths.get(plugin002Uri), targetJarPath);
-        Plugin plugin = pluginFinder.find(targetJarPath);
-        assertThat(plugin).isNotNull();
-        assertThat(plugin.getMetadata().getName()).isEqualTo("fake-plugin");
-
-        FileSystemUtils.deleteRecursively(tempDirectory);
+            Path targetJarPath = tempDirectory.resolve("plugin-0.0.2.jar");
+            FileUtils.jar(Paths.get(plugin002Uri), targetJarPath);
+            Plugin plugin = pluginFinder.find(targetJarPath);
+            assertThat(plugin).isNotNull();
+            assertThat(plugin.getMetadata().getName()).isEqualTo("fake-plugin");
+        } finally {
+            FileSystemUtils.deleteRecursively(tempDirectory);
+        }
     }
 
     @Test

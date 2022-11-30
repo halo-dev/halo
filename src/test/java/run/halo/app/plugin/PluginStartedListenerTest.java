@@ -43,18 +43,20 @@ class PluginStartedListenerTest {
         @Test
         void lookupFromJar() throws IOException {
             Path tempDirectory = Files.createTempDirectory("halo-plugin");
-            var plugin001Uri = requireNonNull(
-                ResourceUtils.getFile("classpath:plugin/plugin-0.0.1")).toURI();
+            try {
+                var plugin001Uri = requireNonNull(
+                    ResourceUtils.getFile("classpath:plugin/plugin-0.0.1")).toURI();
 
-            Path targetJarPath = tempDirectory.resolve("plugin-0.0.1.jar");
-            FileUtils.jar(Paths.get(plugin001Uri), targetJarPath);
-            Set<String> unstructuredFilePathFromJar =
-                PluginStartedListener.PluginExtensionLoaderUtils.lookupFromJar(targetJarPath);
-            assertThat(unstructuredFilePathFromJar).hasSize(3);
-            assertThat(unstructuredFilePathFromJar).containsAll(Set.of("extensions/roles.yaml",
-                "extensions/reverseProxy.yaml", "extensions/test.yml"));
-
-            FileSystemUtils.deleteRecursively(tempDirectory);
+                Path targetJarPath = tempDirectory.resolve("plugin-0.0.1.jar");
+                FileUtils.jar(Paths.get(plugin001Uri), targetJarPath);
+                Set<String> unstructuredFilePathFromJar =
+                    PluginStartedListener.PluginExtensionLoaderUtils.lookupFromJar(targetJarPath);
+                assertThat(unstructuredFilePathFromJar).hasSize(3);
+                assertThat(unstructuredFilePathFromJar).containsAll(Set.of("extensions/roles.yaml",
+                    "extensions/reverseProxy.yaml", "extensions/test.yml"));
+            } finally {
+                FileSystemUtils.deleteRecursively(tempDirectory);
+            }
         }
     }
 }
