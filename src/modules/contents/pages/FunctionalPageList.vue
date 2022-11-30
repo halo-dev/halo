@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import {
   VEmpty,
   VSpace,
@@ -8,19 +8,37 @@ import {
   VEntity,
   VEntityField,
 } from "@halo-dev/components";
-import type { PagesPublicState } from "@halo-dev/console-shared";
-import { useExtensionPointsState } from "@/composables/usePlugins";
+import type { FunctionalPage, PluginModule } from "@halo-dev/console-shared";
+import { usePluginModuleStore } from "@/stores/plugin";
 
-const pagesPublicState = ref<PagesPublicState>({
-  functionalPages: [],
+const functionalPages = ref<FunctionalPage[]>([] as FunctionalPage[]);
+
+// resolve plugin extension points
+const { pluginModules } = usePluginModuleStore();
+
+onMounted(() => {
+  pluginModules.forEach((pluginModule: PluginModule) => {
+    const { extensionPoints } = pluginModule;
+    if (!extensionPoints?.["page:functional:create"]) {
+      return;
+    }
+
+    const pages = extensionPoints[
+      "page:functional:create"
+    ]() as FunctionalPage[];
+
+    if (pages) {
+      pages.forEach((page) => {
+        functionalPages.value.push(page);
+      });
+    }
+  });
 });
-
-useExtensionPointsState("PAGES", pagesPublicState);
 </script>
 
 <template>
   <VEmpty
-    v-if="!pagesPublicState.functionalPages.length"
+    v-if="!functionalPages.length"
     message="当前没有功能页面，功能页面通常由各个插件提供，你可以尝试安装新插件以获得支持"
     title="当前没有功能页面"
   >
@@ -41,7 +59,7 @@ useExtensionPointsState("PAGES", pagesPublicState);
     role="list"
   >
     <li
-      v-for="(page, index) in pagesPublicState.functionalPages"
+      v-for="(page, index) in functionalPages"
       :key="index"
       v-permission="page.permissions"
     >

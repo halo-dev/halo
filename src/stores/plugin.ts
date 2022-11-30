@@ -1,17 +1,17 @@
 import { defineStore } from "pinia";
-import type { Plugin } from "@halo-dev/api-client";
+import type { PluginModule } from "@halo-dev/console-shared";
 
 interface PluginStoreState {
-  plugins: Plugin[];
+  pluginModules: PluginModule[];
 }
 
-export const usePluginStore = defineStore("plugin", {
+export const usePluginModuleStore = defineStore("plugin", {
   state: (): PluginStoreState => ({
-    plugins: [],
+    pluginModules: [],
   }),
   actions: {
-    registerPlugin(plugin: Plugin) {
-      this.plugins.push(plugin);
+    registerPluginModule(pluginModule: PluginModule) {
+      this.pluginModules.push(pluginModule);
     },
   },
 });

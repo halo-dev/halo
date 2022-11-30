@@ -5,7 +5,6 @@ import { IconListSettings } from "@halo-dev/components";
 import { markRaw } from "vue";
 
 export default definePlugin({
-  name: "menuModule",
   components: {},
   routes: [
     {

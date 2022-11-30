@@ -6,7 +6,6 @@ import CommentStatsWidget from "./widgets/CommentStatsWidget.vue";
 import { markRaw } from "vue";
 
 export default definePlugin({
-  name: "commentModule",
   components: {
     CommentStatsWidget,
   },

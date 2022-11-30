@@ -4,7 +4,6 @@ import RoleList from "./RoleList.vue";
 import RoleDetail from "./RoleDetail.vue";
 
 export default definePlugin({
-  name: "roleModule",
   components: {},
   routes: [
     {

@@ -11,7 +11,6 @@ import { IconUserSettings } from "@halo-dev/components";
 import { markRaw } from "vue";
 
 export default definePlugin({
-  name: "userModule",
   components: {
     UserStatsWidget,
   },

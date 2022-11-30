@@ -6,7 +6,6 @@ import { IconPalette } from "@halo-dev/components";
 import { markRaw } from "vue";
 
 export default definePlugin({
-  name: "themeModule",
   components: {},
   routes: [
     {

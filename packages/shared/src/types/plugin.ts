@@ -1,22 +1,22 @@
-import type { Component, Ref } from "vue";
+import type { Component } from "vue";
 import type { RouteRecordRaw, RouteRecordName } from "vue-router";
-import type { PagesPublicState } from "../states/pages";
-import type { AttachmentSelectorPublicState } from "../states/attachment-selector";
-
-export type ExtensionPointName = "PAGES" | "POSTS" | "ATTACHMENT_SELECTOR";
-
-export type ExtensionPointState =
-  | PagesPublicState
-  | AttachmentSelectorPublicState;
+import type { FunctionalPage } from "../states/pages";
+import type { AttachmentSelectProvider } from "../states/attachment-selector";
 
 export interface RouteRecordAppend {
   parentName: RouteRecordName;
   route: RouteRecordRaw;
 }
 
-export interface Plugin {
-  name: string;
+export interface ExtensionPoint {
+  "page:functional:create"?: () => FunctionalPage[] | Promise<FunctionalPage[]>;
 
+  "attachment:selector:create"?: () =>
+    | AttachmentSelectProvider[]
+    | Promise<AttachmentSelectProvider[]>;
+}
+
+export interface PluginModule {
   /**
    * These components will be registered when plugin is activated.
    */
@@ -34,7 +34,5 @@ export interface Plugin {
 
   routes?: RouteRecordRaw[] | RouteRecordAppend[];
 
-  extensionPoints?: {
-    [key in ExtensionPointName]?: (state: Ref<ExtensionPointState>) => void;
-  };
+  extensionPoints?: ExtensionPoint;
 }

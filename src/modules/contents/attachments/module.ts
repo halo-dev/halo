@@ -6,7 +6,6 @@ import { IconFolder } from "@halo-dev/components";
 import { markRaw } from "vue";
 
 export default definePlugin({
-  name: "attachmentModule",
   components: {
     AttachmentSelectorModal,
   },

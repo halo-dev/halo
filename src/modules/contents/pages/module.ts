@@ -11,7 +11,6 @@ import { IconPages } from "@halo-dev/components";
 import { markRaw } from "vue";
 
 export default definePlugin({
-  name: "pageModule",
   components: {
     SinglePageStatsWidget,
   },

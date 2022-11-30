@@ -1,10 +1,6 @@
 import type { Attachment } from "@halo-dev/api-client";
 import type { Component } from "vue";
 
-export interface AttachmentSelectorPublicState {
-  providers: AttachmentProvider[];
-}
-
 export type AttachmentLike =
   | Attachment
   | string
@@ -13,7 +9,7 @@ export type AttachmentLike =
       type: string;
     };
 
-export interface AttachmentProvider {
+export interface AttachmentSelectProvider {
   id: string;
   label: string;
   component: Component | string;

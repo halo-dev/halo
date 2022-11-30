@@ -3,7 +3,7 @@ import type { DirectiveBinding } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
 import router from "./router";
-import type { Plugin, RouteRecordAppend } from "@halo-dev/console-shared";
+import type { PluginModule, RouteRecordAppend } from "@halo-dev/console-shared";
 import { Toast } from "@halo-dev/components";
 import { apiClient } from "@/utils/api-client";
 // setup
@@ -12,7 +12,7 @@ import { setupComponents } from "./setup/setupComponents";
 // core modules
 import { coreModules } from "./modules";
 import { useScriptTag } from "@vueuse/core";
-import { usePluginStore } from "@/stores/plugin";
+import { usePluginModuleStore } from "@/stores/plugin";
 import { hasPermission } from "@/utils/permission";
 import { useRoleStore } from "@/stores/role";
 import type { RouteRecordRaw } from "vue-router";
@@ -26,7 +26,7 @@ setupComponents(app);
 
 app.use(createPinia());
 
-function registerModule(pluginModule: Plugin, core: boolean) {
+function registerModule(pluginModule: PluginModule, core: boolean) {
   if (pluginModule.components) {
     Object.keys(pluginModule.components).forEach((key) => {
       const component = pluginModule.components?.[key];
@@ -38,7 +38,6 @@ function registerModule(pluginModule: Plugin, core: boolean) {
 
   if (pluginModule.routes) {
     if (!Array.isArray(pluginModule.routes)) {
-      console.error(`${pluginModule.name}: Plugin routes must be an array`);
       return;
     }
 
@@ -86,7 +85,7 @@ function loadCoreModules() {
   });
 }
 
-const pluginStore = usePluginStore();
+const pluginModuleStore = usePluginModuleStore();
 
 function loadStyle(href: string) {
   return new Promise(function (resolve, reject) {
@@ -144,9 +143,8 @@ async function loadPluginModules() {
         const pluginModule = window[plugin.metadata.name];
 
         if (pluginModule) {
-          // @ts-ignore
-          plugin.spec.module = pluginModule;
           registerModule(pluginModule, false);
+          pluginModuleStore.registerPluginModule(pluginModule);
         }
       } catch (e) {
         const message = `${plugin.metadata.name}: 加载插件入口文件失败`;
@@ -164,8 +162,6 @@ async function loadPluginModules() {
         pluginErrorMessages.push(message);
       }
     }
-
-    pluginStore.registerPlugin(plugin);
   }
 
   if (pluginErrorMessages.length > 0) {

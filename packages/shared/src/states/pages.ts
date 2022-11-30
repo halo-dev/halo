@@ -1,8 +1,4 @@
-export interface PagesPublicState {
-  functionalPages: FunctionalPagesState[];
-}
-
-export interface FunctionalPagesState {
+export interface FunctionalPage {
   name: string;
   path: string;
   url?: string;

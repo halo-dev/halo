@@ -8,7 +8,6 @@ import ViewsStatsWidget from "./widgets/ViewsStatsWidget.vue";
 import { markRaw } from "vue";
 
 export default definePlugin({
-  name: "dashboardModule",
   components: {
     QuickLinkWidget,
     ViewsStatsWidget,

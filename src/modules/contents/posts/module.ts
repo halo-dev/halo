@@ -12,7 +12,6 @@ import RecentPublishedWidget from "./widgets/RecentPublishedWidget.vue";
 import { markRaw } from "vue";
 
 export default definePlugin({
-  name: "postModule",
   components: {
     PostStatsWidget,
     RecentPublishedWidget,

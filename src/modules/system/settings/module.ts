@@ -5,7 +5,6 @@ import { IconSettings } from "@halo-dev/components";
 import { markRaw } from "vue";
 
 export default definePlugin({
-  name: "settingModule",
   components: {},
   routes: [
     {

@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { VButton, VModal, VTabbar } from "@halo-dev/components";
-import { ref, markRaw } from "vue";
+import { ref, markRaw, onMounted } from "vue";
 import CoreSelectorProvider from "./selector-providers/CoreSelectorProvider.vue";
 import UploadSelectorProvider from "./selector-providers/UploadSelectorProvider.vue";
 import type {
   AttachmentLike,
-  AttachmentSelectorPublicState,
+  AttachmentSelectProvider,
+  PluginModule,
 } from "@halo-dev/console-shared";
-import { useExtensionPointsState } from "@/composables/usePlugins";
+import { usePluginModuleStore } from "@/stores/plugin";
 
 withDefaults(
   defineProps<{
@@ -26,24 +27,42 @@ const emit = defineEmits<{
 
 const selected = ref<AttachmentLike[]>([] as AttachmentLike[]);
 
-const attachmentSelectorPublicState = ref<AttachmentSelectorPublicState>({
-  providers: [
-    {
-      id: "core",
-      label: "附件库",
-      component: markRaw(CoreSelectorProvider),
-    },
-    {
-      id: "upload",
-      label: "上传",
-      component: markRaw(UploadSelectorProvider),
-    },
-  ],
+const attachmentSelectProviders = ref<AttachmentSelectProvider[]>([
+  {
+    id: "core",
+    label: "附件库",
+    component: markRaw(CoreSelectorProvider),
+  },
+  {
+    id: "upload",
+    label: "上传",
+    component: markRaw(UploadSelectorProvider),
+  },
+]);
+
+// resolve plugin extension points
+const { pluginModules } = usePluginModuleStore();
+
+onMounted(() => {
+  pluginModules.forEach((pluginModule: PluginModule) => {
+    const { extensionPoints } = pluginModule;
+    if (!extensionPoints?.["attachment:selector:create"]) {
+      return;
+    }
+
+    const providers = extensionPoints[
+      "attachment:selector:create"
+    ]() as AttachmentSelectProvider[];
+
+    if (providers) {
+      providers.forEach((provider) => {
+        attachmentSelectProviders.value.push(provider);
+      });
+    }
+  });
 });
 
-useExtensionPointsState("ATTACHMENT_SELECTOR", attachmentSelectorPublicState);
-
-const activeId = ref(attachmentSelectorPublicState.value.providers[0].id);
+const activeId = ref(attachmentSelectProviders.value[0].id);
 
 const onVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
@@ -53,7 +72,7 @@ const onVisibleChange = (visible: boolean) => {
 };
 
 const onChangeProvider = (providerId: string) => {
-  const provider = attachmentSelectorPublicState.value.providers.find(
+  const provider = attachmentSelectProviders.value.find(
     (provider) => provider.id === providerId
   );
 
@@ -80,14 +99,14 @@ const handleConfirm = () => {
   >
     <VTabbar
       v-model:active-id="activeId"
-      :items="attachmentSelectorPublicState.providers"
+      :items="attachmentSelectProviders"
       class="w-full"
       type="outline"
     ></VTabbar>
 
     <div v-if="visible" class="mt-2">
       <template
-        v-for="(provider, index) in attachmentSelectorPublicState.providers"
+        v-for="(provider, index) in attachmentSelectProviders"
         :key="index"
       >
         <Suspense>
