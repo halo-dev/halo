@@ -66,7 +66,7 @@ public class Plugin extends AbstractExtension {
             + ".[0-9a-zA-Z-]+)*))?$")
         private String version;
 
-        private Author author;
+        private PluginAuthor author;
 
         private String logo;
 
@@ -122,7 +122,7 @@ public class Plugin extends AbstractExtension {
 
     @Data
     @ToString
-    public static class Author {
+    public static class PluginAuthor {
 
         @Schema(requiredMode = REQUIRED, minLength = 1)
         private String name;
