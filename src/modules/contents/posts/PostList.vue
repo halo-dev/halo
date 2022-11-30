@@ -324,10 +324,11 @@ const VisibleItems: VisibleItem[] = [
     label: "公开",
     value: "PUBLIC",
   },
-  {
-    label: "内部成员可访问",
-    value: "INTERNAL",
-  },
+  // TODO: 支持内部成员可访问
+  // {
+  //   label: "内部成员可访问",
+  //   value: "INTERNAL",
+  // },
   {
     label: "私有",
     value: "PRIVATE",
@@ -865,8 +866,9 @@ const hasFilters = computed(() => {
                       v-tooltip="`私有访问`"
                       class="cursor-pointer text-sm transition-all hover:text-blue-600"
                     />
+                    <!-- TODO: 支持内部成员可访问 -->
                     <IconTeam
-                      v-if="post.post.spec.visible === 'INTERNAL'"
+                      v-if="false"
                       v-tooltip="`内部成员可访问`"
                       class="cursor-pointer text-sm transition-all hover:text-blue-600"
                     />

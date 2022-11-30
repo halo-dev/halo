@@ -270,7 +270,6 @@ const onPublishTimeChange = (value: string) => {
             v-model="formState.spec.visible"
             :options="[
               { label: '公开', value: 'PUBLIC' },
-              { label: '内部成员可访问', value: 'INTERNAL' },
               { label: '私有', value: 'PRIVATE' },
             ]"
             label="可见性"
