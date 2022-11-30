@@ -1,11 +1,12 @@
 package run.halo.app.core.extension.reconciler;
 
+import static java.util.Objects.deepEquals;
+
 import com.fasterxml.jackson.core.type.TypeReference;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -40,32 +41,29 @@ public class RoleReconciler implements Reconciler<Request> {
 
     @Override
     public Result reconcile(Request request) {
-        client.fetch(Role.class, request.name()).ifPresent(role -> {
-            final Role oldRole = JsonUtils.deepCopy(role);
-            Map<String, String> annotations = role.getMetadata().getAnnotations();
-            if (annotations == null) {
-                annotations = new HashMap<>();
-                role.getMetadata().setAnnotations(annotations);
-            }
+        client.fetch(Role.class, request.name())
+            .ifPresent(role -> {
+                var annotations = role.getMetadata().getAnnotations();
+                if (annotations == null) {
+                    annotations = new LinkedHashMap<>();
+                    role.getMetadata().setAnnotations(annotations);
+                }
+                var roleDependencies = readValue(annotations.get(Role.ROLE_DEPENDENCIES_ANNO));
+                var dependenciesRole = roleService.listDependencies(roleDependencies);
+                var dependencyRules = dependenciesRole.stream()
+                    .map(Role::getRules)
+                    .flatMap(List::stream)
+                    .sorted()
+                    .toList();
+                var uiPermissions = aggregateUiPermissions(dependenciesRole);
+                // override dependency rules to annotations
+                annotations.put(Role.ROLE_DEPENDENCY_RULES,
+                    JsonUtils.objectToJson(dependencyRules));
+                annotations.put(Role.UI_PERMISSIONS_AGGREGATED_ANNO,
+                    JsonUtils.objectToJson(uiPermissions));
 
-            Set<String> roleDependencies = readValue(annotations.get(Role.ROLE_DEPENDENCIES_ANNO));
-
-            List<Role> dependenciesRole = roleService.listDependencies(roleDependencies);
-
-            List<Role.PolicyRule> dependencyRules = dependenciesRole.stream()
-                .map(Role::getRules)
-                .flatMap(List::stream)
-                .sorted()
-                .toList();
-            List<String> uiPermissions = aggregateUiPermissions(dependenciesRole);
-            // override dependency rules to annotations
-            annotations.put(Role.ROLE_DEPENDENCY_RULES, JsonUtils.objectToJson(dependencyRules));
-            annotations.put(Role.UI_PERMISSIONS_AGGREGATED_ANNO,
-                JsonUtils.objectToJson(uiPermissions));
-            if (!Objects.equals(oldRole, role)) {
-                client.update(role);
-            }
-        });
+                updateLabelsAndAnnotations(role);
+            });
         return new Result(false, null);
     }
 
@@ -74,6 +72,19 @@ public class RoleReconciler implements Reconciler<Request> {
         return builder
             .extension(new Role())
             .build();
+    }
+
+    private void updateLabelsAndAnnotations(Role role) {
+        var annotations = role.getMetadata().getAnnotations();
+        var labels = role.getMetadata().getLabels();
+        client.fetch(Role.class, role.getMetadata().getName())
+            .filter(freshRole -> !deepEquals(annotations, freshRole.getMetadata().getAnnotations())
+            || deepEquals(labels, freshRole.getMetadata().getLabels()))
+            .ifPresent(freshRole -> {
+                freshRole.getMetadata().setAnnotations(annotations);
+                freshRole.getMetadata().setLabels(labels);
+                client.update(freshRole);
+            });
     }
 
     private List<String> aggregateUiPermissions(List<Role> dependencyRoles) {
