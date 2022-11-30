@@ -130,10 +130,10 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
     private boolean shouldHandle(Policy policy) {
         if (policy == null
             || policy.getSpec() == null
-            || policy.getSpec().getTemplateRef() == null) {
+            || !StringUtils.hasText(policy.getSpec().getTemplateName())) {
             return false;
         }
-        return "local".equals(policy.getSpec().getTemplateRef().getName());
+        return "local".equals(policy.getSpec().getTemplateName());
     }
 
     @Data
