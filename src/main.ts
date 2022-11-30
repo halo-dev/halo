@@ -228,7 +228,6 @@ async function initApp() {
     }
 
     await loadUserPermissions();
-    await loadActivatedTheme();
 
     try {
       await loadPluginModules();
@@ -239,6 +238,10 @@ async function initApp() {
     // load system setup state
     const systemStateStore = useSystemStatesStore();
     await systemStateStore.fetchSystemStates();
+
+    if (systemStateStore.states.isSetup) {
+      await loadActivatedTheme();
+    }
   } catch (e) {
     console.error(e);
   } finally {
