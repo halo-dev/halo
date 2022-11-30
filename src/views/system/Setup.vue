@@ -48,12 +48,30 @@ const handleSubmit = async () => {
     await apiClient.extension.tag.createcontentHaloRunV1alpha1Tag({
       tag: tag as Tag,
     });
-    await apiClient.post.draftPost({ postRequest: post as PostRequest });
+    const { data: postData } = await apiClient.post.draftPost({
+      postRequest: post as PostRequest,
+    });
+
+    try {
+      await apiClient.post.publishPost({ name: postData.metadata.name });
+    } catch (e) {
+      console.error("Publish post failed", e);
+    }
 
     // Create singlePage
-    await apiClient.singlePage.draftSinglePage({
-      singlePageRequest: singlePage as SinglePageRequest,
-    });
+    const { data: singlePageData } = await apiClient.singlePage.draftSinglePage(
+      {
+        singlePageRequest: singlePage as SinglePageRequest,
+      }
+    );
+
+    try {
+      await apiClient.singlePage.publishSinglePage({
+        name: singlePageData.metadata.name,
+      });
+    } catch (e) {
+      console.error("Publish single page failed", e);
+    }
 
     // Create menu and menu items
     const menuItemPromises = menuItems.map((item) => {

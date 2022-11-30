@@ -14,10 +14,11 @@
     "spec": {
       "children": [],
       "priority": 1,
-      "categoryRef": {
-        "version": "content.halo.run/v1alpha1",
+      "targetRef": {
+        "group": "content.halo.run",
+        "version": "v1alpha1",
         "kind": "Post",
-        "name": "76514a40-6ef1-4ed9-b58a-e26945bde3ca"
+        "name": "5152aea5-c2e8-4717-8bba-2263d46e19d5"
       }
     },
     "apiVersion": "v1alpha1",
@@ -30,8 +31,9 @@
       "href": "",
       "children": [],
       "priority": 2,
-      "tagRef": {
-        "version": "content.halo.run/v1alpha1",
+      "targetRef": {
+        "group": "content.halo.run",
+        "version": "v1alpha1",
         "kind": "Tag",
         "name": "c33ceabb-d8f1-4711-8991-bb8f5c92ad7c"
       }
@@ -46,8 +48,9 @@
       "href": "",
       "children": [],
       "priority": 3,
-      "singlePageRef": {
-        "version": "content.halo.run/v1alpha1",
+      "targetRef": {
+        "group": "content.halo.run",
+        "version": "v1alpha1",
         "kind": "SinglePage",
         "name": "373a5f79-f44f-441a-9df1-85a4f553ece8"
       }
