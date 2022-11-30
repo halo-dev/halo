@@ -6,12 +6,15 @@ import FunctionalPageList from "./FunctionalPageList.vue";
 import SinglePageList from "./SinglePageList.vue";
 import DeletedSinglePageList from "./DeletedSinglePageList.vue";
 import SinglePageEditor from "./SinglePageEditor.vue";
+import SinglePageStatsWidget from "./widgets/SinglePageStatsWidget.vue";
 import { IconPages } from "@halo-dev/components";
 import { markRaw } from "vue";
 
 export default definePlugin({
   name: "pageModule",
-  components: [],
+  components: {
+    SinglePageStatsWidget,
+  },
   routes: [
     {
       path: "/pages",

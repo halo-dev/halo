@@ -6,7 +6,7 @@ import { markRaw } from "vue";
 
 export default definePlugin({
   name: "menuModule",
-  components: [],
+  components: {},
   routes: [
     {
       path: "/menus",

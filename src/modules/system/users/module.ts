@@ -2,6 +2,7 @@ import { definePlugin } from "@halo-dev/console-shared";
 import BasicLayout from "@/layouts/BasicLayout.vue";
 import BlankLayout from "@/layouts/BlankLayout.vue";
 import UserProfileLayout from "./layouts/UserProfileLayout.vue";
+import UserStatsWidget from "./widgets/UserStatsWidget.vue";
 import UserList from "./UserList.vue";
 import UserDetail from "./UserDetail.vue";
 import PersonalAccessTokens from "./PersonalAccessTokens.vue";
@@ -11,7 +12,9 @@ import { markRaw } from "vue";
 
 export default definePlugin({
   name: "userModule",
-  components: [],
+  components: {
+    UserStatsWidget,
+  },
   routes: [
     {
       path: "/login",

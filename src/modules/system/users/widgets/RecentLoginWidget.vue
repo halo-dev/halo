@@ -1,4 +1,4 @@
-<script lang="ts" name="RecentLoginWidget" setup>
+<script lang="ts" setup>
 import { VCard, VAvatar } from "@halo-dev/components";
 import { useUserFetch } from "@/modules/system/users/composables/use-user";
 

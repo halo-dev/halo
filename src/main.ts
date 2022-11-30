@@ -28,14 +28,12 @@ app.use(createPinia());
 
 function registerModule(pluginModule: Plugin, core: boolean) {
   if (pluginModule.components) {
-    if (!Array.isArray(pluginModule.components)) {
-      console.error(`${pluginModule.name}: Plugin components must be an array`);
-      return;
-    }
-
-    for (const component of pluginModule.components) {
-      component.name && app.component(component.name, component);
-    }
+    Object.keys(pluginModule.components).forEach((key) => {
+      const component = pluginModule.components?.[key];
+      if (component) {
+        app.component(key, component);
+      }
+    });
   }
 
   if (pluginModule.routes) {

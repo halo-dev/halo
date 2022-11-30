@@ -6,7 +6,7 @@ import { markRaw } from "vue";
 
 export default definePlugin({
   name: "settingModule",
-  components: [],
+  components: {},
   routes: [
     {
       path: "/settings",

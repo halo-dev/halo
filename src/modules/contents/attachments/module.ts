@@ -7,7 +7,9 @@ import { markRaw } from "vue";
 
 export default definePlugin({
   name: "attachmentModule",
-  components: [AttachmentSelectorModal],
+  components: {
+    AttachmentSelectorModal,
+  },
   routes: [
     {
       path: "/attachments",

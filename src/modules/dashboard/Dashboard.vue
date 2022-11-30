@@ -114,9 +114,11 @@ import {
   VSpace,
   VTabbar,
 } from "@halo-dev/components";
-import { ref } from "vue";
+import { onMounted, provide, ref, type Ref } from "vue";
 import { useStorage } from "@vueuse/core";
 import cloneDeep from "lodash.clonedeep";
+import { apiClient } from "@/utils/api-client";
+import type { DashboardStats } from "@halo-dev/api-client/index";
 
 const widgetsGroup = [
   {
@@ -125,6 +127,13 @@ const widgetsGroup = [
     widgets: [
       { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "PostStatsWidget" },
       { x: 0, y: 0, w: 6, h: 10, i: 1, widget: "RecentPublishedWidget" },
+    ],
+  },
+  {
+    id: "page",
+    label: "页面",
+    widgets: [
+      { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "SinglePageStatsWidget" },
     ],
   },
   {
@@ -137,7 +146,7 @@ const widgetsGroup = [
     label: "用户",
     widgets: [
       { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "UserStatsWidget" },
-      { x: 0, y: 0, w: 6, h: 10, i: 1, widget: "RecentLoginWidget" },
+      { x: 0, y: 0, w: 3, h: 3, i: 1, widget: "UserProfileWidget" },
     ],
   },
   {
@@ -159,14 +168,13 @@ const layout = useStorage("widgets", [
   { x: 3, y: 0, w: 3, h: 3, i: 1, widget: "UserStatsWidget" },
   { x: 6, y: 0, w: 3, h: 3, i: 2, widget: "CommentStatsWidget" },
   { x: 9, y: 0, w: 3, h: 3, i: 3, widget: "ViewsStatsWidget" },
-  { x: 8, y: 3, w: 4, h: 10, i: 4, widget: "RecentLoginWidget" },
-  { x: 0, y: 3, w: 4, h: 10, i: 5, widget: "QuickLinkWidget" },
+  { x: 0, y: 3, w: 4, h: 10, i: 4, widget: "QuickLinkWidget" },
   {
     x: 4,
     y: 3,
     w: 4,
     h: 10,
-    i: 6,
+    i: 5,
     widget: "RecentPublishedWidget",
   },
 ]);
@@ -194,12 +202,32 @@ function handleRemove(item: any) {
     };
   });
 }
+
+// Dashboard basic stats
+
+const dashboardStats = ref<DashboardStats>({
+  posts: 0,
+  comments: 0,
+  approvedComments: 0,
+  users: 0,
+  visits: 0,
+});
+
+provide<Ref<DashboardStats>>("dashboardStats", dashboardStats);
+
+const handleFetchStats = async () => {
+  const { data } = await apiClient.stats.getStats();
+  dashboardStats.value = data;
+};
+
+onMounted(handleFetchStats);
 </script>
 
 <style>
 .vue-grid-layout {
   @apply -m-[10px];
 }
+
 .vue-grid-item {
   transition: none !important;
 }

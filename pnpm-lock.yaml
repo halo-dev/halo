@@ -20,6 +20,7 @@ importers:
       '@iconify-json/vscode-icons': ^1.1.16
       '@rushstack/eslint-patch': ^1.2.0
       '@tailwindcss/aspect-ratio': ^0.4.2
+      '@tailwindcss/container-queries': ^0.1.0
       '@tiptap/extension-character-count': ^2.0.0-beta.202
       '@types/jsdom': ^20.0.1
       '@types/lodash.clonedeep': 4.5.7
@@ -90,7 +91,6 @@ importers:
       vite-plugin-html: ^3.2.0
       vite-plugin-pwa: ^0.13.3
       vite-plugin-static-copy: ^0.11.1
-      vite-plugin-vue-setup-extend: ^0.4.0
       vitest: ^0.25.3
       vue: ^3.2.45
       vue-grid-layout: 3.0.0-beta1
@@ -150,6 +150,7 @@ importers:
       '@iconify-json/vscode-icons': 1.1.16
       '@rushstack/eslint-patch': 1.2.0
       '@tailwindcss/aspect-ratio': 0.4.2_tailwindcss@3.2.4
+      '@tailwindcss/container-queries': 0.1.0_tailwindcss@3.2.4
       '@types/jsdom': 20.0.1
       '@types/lodash.clonedeep': 4.5.7
       '@types/lodash.debounce': 4.0.7
@@ -180,7 +181,7 @@ importers:
       randomstring: 1.2.3
       sass: 1.56.1
       start-server-and-test: 1.14.0
-      tailwindcss: 3.2.4
+      tailwindcss: 3.2.4_postcss@8.4.19
       tailwindcss-safe-area: 0.2.2
       tailwindcss-themer: 2.0.2_tailwindcss@3.2.4
       typescript: 4.7.4
@@ -191,7 +192,6 @@ importers:
       vite-plugin-html: 3.2.0_vite@3.2.4
       vite-plugin-pwa: 0.13.3_vite@3.2.4
       vite-plugin-static-copy: 0.11.1_vite@3.2.4
-      vite-plugin-vue-setup-extend: 0.4.0_vite@3.2.4
       vitest: 0.25.3_wqgykbafw5ps5nhnqfbxcvabhu
       vue-tsc: 1.0.9_typescript@4.7.4
 
@@ -1931,7 +1931,7 @@ packages:
         optional: true
     dependencies:
       '@formkit/core': 1.0.0-beta.12-e579559
-      tailwindcss: 3.2.4
+      tailwindcss: 3.2.4_postcss@8.4.19
     dev: false
 
   /@formkit/utils/1.0.0-beta.12-e579559:
@@ -2675,7 +2675,15 @@ packages:
     peerDependencies:
       tailwindcss: '>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1'
     dependencies:
-      tailwindcss: 3.2.4
+      tailwindcss: 3.2.4_postcss@8.4.19
+    dev: true
+
+  /@tailwindcss/container-queries/0.1.0_tailwindcss@3.2.4:
+    resolution: {integrity: sha512-t1GeJ9P8ual160BvKy6Y1sG7bjChArMaK6iRXm3ZYjZGN2FTzmqb5ztsTDb9AsTSJD4NMHtsnaI2ielrXEk+hw==}
+    peerDependencies:
+      tailwindcss: '>=3.2.0'
+    dependencies:
+      tailwindcss: 3.2.4_postcss@8.4.19
     dev: true
 
   /@tiptap/core/2.0.0-beta.202:
@@ -8532,13 +8540,15 @@ packages:
       just-unique: 4.1.1
       lodash.merge: 4.6.2
       lodash.mergewith: 4.6.2
-      tailwindcss: 3.2.4
+      tailwindcss: 3.2.4_postcss@8.4.19
     dev: true
 
-  /tailwindcss/3.2.4:
+  /tailwindcss/3.2.4_postcss@8.4.19:
     resolution: {integrity: sha512-AhwtHCKMtR71JgeYDaswmZXhPcW9iuI9Sp2LvZPo9upDZ7231ZJ7eA9RaURbhpXGVlrjX4cFNlB4ieTetEb7hQ==}
     engines: {node: '>=12.13.0'}
     hasBin: true
+    peerDependencies:
+      postcss: ^8.0.9
     dependencies:
       arg: 5.0.2
       chokidar: 3.5.3
@@ -9170,16 +9180,6 @@ packages:
       fast-glob: 3.2.12
       fs-extra: 10.1.0
       picocolors: 1.0.0
-      vite: 3.2.4_ajklay5k626t46b6fyghkbup3i
-    dev: true
-
-  /vite-plugin-vue-setup-extend/0.4.0_vite@3.2.4:
-    resolution: {integrity: sha512-WMbjPCui75fboFoUTHhdbXzu4Y/bJMv5N9QT9a7do3wNMNHHqrk+Tn2jrSJU0LS5fGl/EG+FEDBYVUeWIkDqXQ==}
-    peerDependencies:
-      vite: '>=2.0.0'
-    dependencies:
-      '@vue/compiler-sfc': 3.2.45
-      magic-string: 0.25.9
       vite: 3.2.4_ajklay5k626t46b6fyghkbup3i
     dev: true
 

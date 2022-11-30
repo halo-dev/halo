@@ -2,11 +2,14 @@ import { definePlugin } from "@halo-dev/console-shared";
 import BasicLayout from "@/layouts/BasicLayout.vue";
 import { IconMessage } from "@halo-dev/components";
 import CommentList from "./CommentList.vue";
+import CommentStatsWidget from "./widgets/CommentStatsWidget.vue";
 import { markRaw } from "vue";
 
 export default definePlugin({
   name: "commentModule",
-  components: [],
+  components: {
+    CommentStatsWidget,
+  },
   routes: [
     {
       path: "/comments",

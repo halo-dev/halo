@@ -23,6 +23,7 @@ module.exports = {
     require("tailwindcss-safe-area"),
     require("@tailwindcss/aspect-ratio"),
     require("@formkit/themes/tailwindcss"),
+    require("@tailwindcss/container-queries"),
     require("tailwindcss-themer")({
       defaultTheme: {
         extend: {

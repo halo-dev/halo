@@ -77,6 +77,7 @@
     "@iconify-json/vscode-icons": "^1.1.16",
     "@rushstack/eslint-patch": "^1.2.0",
     "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/container-queries": "^0.1.0",
     "@types/jsdom": "^20.0.1",
     "@types/lodash.clonedeep": "4.5.7",
     "@types/lodash.debounce": "^4.0.7",
@@ -118,7 +119,6 @@
     "vite-plugin-html": "^3.2.0",
     "vite-plugin-pwa": "^0.13.3",
     "vite-plugin-static-copy": "^0.11.1",
-    "vite-plugin-vue-setup-extend": "^0.4.0",
     "vitest": "^0.25.3",
     "vue-tsc": "^1.0.9"
   }

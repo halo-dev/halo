@@ -10,7 +10,7 @@ import { markRaw } from "vue";
 
 export default definePlugin({
   name: "pluginModule",
-  components: [],
+  components: {},
   routes: [
     {
       path: "/plugins",

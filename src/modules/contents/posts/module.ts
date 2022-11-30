@@ -7,11 +7,16 @@ import DeletedPostList from "./DeletedPostList.vue";
 import PostEditor from "./PostEditor.vue";
 import CategoryList from "./categories/CategoryList.vue";
 import TagList from "./tags/TagList.vue";
+import PostStatsWidget from "./widgets/PostStatsWidget.vue";
+import RecentPublishedWidget from "./widgets/RecentPublishedWidget.vue";
 import { markRaw } from "vue";
 
 export default definePlugin({
   name: "postModule",
-  components: [],
+  components: {
+    PostStatsWidget,
+    RecentPublishedWidget,
+  },
   routes: [
     {
       path: "/posts",

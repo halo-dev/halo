@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import type { DashboardStats } from "@halo-dev/api-client";
-import { VCard, IconEye } from "@halo-dev/components";
+import { VCard, IconBookRead } from "@halo-dev/components";
 import { inject, type Ref } from "vue";
+import type { DashboardStats } from "@halo-dev/api-client/index";
 
 const dashboardStats = inject<Ref<DashboardStats>>("dashboardStats");
 </script>
@@ -12,13 +12,13 @@ const dashboardStats = inject<Ref<DashboardStats>>("dashboardStats");
         <span
           class="hidden rounded-full bg-gray-100 p-2.5 text-gray-600 sm:block"
         >
-          <IconEye class="h-5 w-5" />
+          <IconBookRead class="h-5 w-5" />
         </span>
 
         <div>
-          <span class="text-sm text-gray-500">浏览量</span>
+          <span class="text-sm text-gray-500">文章</span>
           <p class="text-2xl font-medium text-gray-900">
-            {{ dashboardStats?.visits || 0 }}
+            {{ dashboardStats?.posts || 0 }}
           </p>
         </div>
       </div>

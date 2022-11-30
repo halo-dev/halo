@@ -20,7 +20,7 @@ export interface Plugin {
   /**
    * These components will be registered when plugin is activated.
    */
-  components?: Component[];
+  components?: Record<string, Component>;
 
   /**
    * Activate hook will be called when plugin is activated.

@@ -3,7 +3,6 @@ import fs from "fs";
 import { defineConfig, loadEnv } from "vite";
 import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
-import VueSetupExtend from "vite-plugin-vue-setup-extend";
 import Compression from "vite-compression-plugin";
 import { VitePWA } from "vite-plugin-pwa";
 import Icons from "unplugin-icons/vite";
@@ -12,7 +11,6 @@ import { setupLibraryExternal } from "./src/build/library-external";
 export const sharedPlugins = [
   Vue(),
   VueJsx(),
-  VueSetupExtend(),
   Compression(),
   Icons({
     compiler: "vue3",

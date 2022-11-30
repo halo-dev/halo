@@ -7,7 +7,7 @@ import { markRaw } from "vue";
 
 export default definePlugin({
   name: "themeModule",
-  components: [],
+  components: {},
   routes: [
     {
       path: "/theme",
