@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.Tag;
+import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.Finder;

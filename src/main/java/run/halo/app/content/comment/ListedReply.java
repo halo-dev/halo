@@ -3,7 +3,7 @@ package run.halo.app.content.comment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Value;
-import run.halo.app.core.extension.Reply;
+import run.halo.app.core.extension.content.Reply;
 
 /**
  * Listed reply for {@link Reply}.

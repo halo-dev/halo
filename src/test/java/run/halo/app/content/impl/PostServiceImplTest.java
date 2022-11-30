@@ -15,7 +15,7 @@ import org.springframework.util.MultiValueMap;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.PostQuery;
 import run.halo.app.content.TestPost;
-import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ReactiveExtensionClient;
 
 /**

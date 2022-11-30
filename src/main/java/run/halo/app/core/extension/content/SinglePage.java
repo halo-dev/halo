@@ -1,4 +1,4 @@
-package run.halo.app.core.extension;
+package run.halo.app.core.extension.content;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,6 +11,7 @@ import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GVK;
+import run.halo.app.extension.GroupVersionKind;
 
 /**
  * <p>Single page extension.</p>
@@ -20,11 +21,14 @@ import run.halo.app.extension.GVK;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = "content.halo.run", version = "v1alpha1", kind = SinglePage.KIND,
+@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = SinglePage.KIND,
     plural = "singlepages", singular = "singlepage")
 @EqualsAndHashCode(callSuper = true)
 public class SinglePage extends AbstractExtension {
+
     public static final String KIND = "SinglePage";
+
+    public static final GroupVersionKind GVK = GroupVersionKind.fromExtension(SinglePage.class);
     public static final String DELETED_LABEL = "content.halo.run/deleted";
     public static final String PUBLISHED_LABEL = "content.halo.run/published";
     public static final String LAST_RELEASED_SNAPSHOT_ANNO =

@@ -1,4 +1,6 @@
-package run.halo.app.core.extension;
+package run.halo.app.core.extension.content;
+
+import static run.halo.app.core.extension.content.Category.KIND;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -8,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
+import run.halo.app.extension.GroupVersionKind;
 
 /**
  * @author guqing
@@ -16,10 +19,14 @@ import run.halo.app.extension.GVK;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = "content.halo.run", version = "v1alpha1",
-    kind = "Category", plural = "categories", singular = "category")
+@GVK(group = Constant.GROUP, version = Constant.VERSION,
+    kind = KIND, plural = "categories", singular = "category")
 @EqualsAndHashCode(callSuper = true)
 public class Category extends AbstractExtension {
+
+    public static final String KIND = "Category";
+
+    public static final GroupVersionKind GVK = GroupVersionKind.fromExtension(Category.class);
 
     @Schema(required = true)
     private CategorySpec spec;

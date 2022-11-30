@@ -5,7 +5,7 @@ import java.util.Map;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import run.halo.app.core.extension.SinglePage;
+import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.infra.SystemSetting;

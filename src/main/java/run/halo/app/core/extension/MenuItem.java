@@ -40,17 +40,8 @@ public class MenuItem extends AbstractExtension {
             schema = @Schema(description = "The name of menu item child"))
         private LinkedHashSet<String> children;
 
-        @Schema(description = "Category reference.")
-        private Ref categoryRef;
-
-        @Schema(description = "Tag reference.")
-        private Ref tagRef;
-
-        @Schema(description = "Post reference.")
-        private Ref postRef;
-
-        @Schema(description = "SinglePage reference.")
-        private Ref singlePageRef;
+        @Schema(description = "Target reference. Like Category, Tag, Post or SinglePage")
+        private Ref targetRef;
 
     }
 

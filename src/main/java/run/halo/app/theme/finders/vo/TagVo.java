@@ -2,7 +2,7 @@ package run.halo.app.theme.finders.vo;
 
 import lombok.Builder;
 import lombok.Value;
-import run.halo.app.core.extension.Tag;
+import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.MetadataOperator;
 
 /**

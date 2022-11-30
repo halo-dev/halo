@@ -3,7 +3,7 @@ package run.halo.app.content.comment;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
-import run.halo.app.core.extension.Comment;
+import run.halo.app.core.extension.content.Comment;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
