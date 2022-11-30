@@ -108,7 +108,7 @@ const handleDelete = (group: Group) => {
 
       // move attachments to none group
       const moveToUnGroupRequests = data.items.map((attachment) => {
-        attachment.spec.groupRef = undefined;
+        attachment.spec.groupName = undefined;
         return apiClient.extension.storage.attachment.updatestorageHaloRunV1alpha1Attachment(
           {
             name: attachment.metadata.name,

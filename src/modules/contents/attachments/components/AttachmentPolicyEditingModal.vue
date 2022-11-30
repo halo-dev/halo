@@ -32,12 +32,8 @@ const emit = defineEmits<{
 const initialFormState: Policy = {
   spec: {
     displayName: "",
-    templateRef: {
-      name: "",
-    },
-    configMapRef: {
-      name: "",
-    },
+    templateName: "",
+    configMapName: "",
   },
   apiVersion: "storage.halo.run/v1alpha1",
   kind: "Policy",
@@ -50,18 +46,14 @@ const initialFormState: Policy = {
 const formState = ref<Policy>(cloneDeep(initialFormState));
 const policyTemplate = ref<PolicyTemplate | undefined>();
 
-const settingName = computed(
-  () => policyTemplate.value?.spec?.settingRef?.name
-);
+const settingName = computed(() => policyTemplate.value?.spec?.settingName);
 
 const configMapName = computed({
   get() {
-    return formState.value.spec.configMapRef?.name;
+    return formState.value.spec.configMapName;
   },
   set(value) {
-    formState.value.spec.configMapRef = {
-      name: value as string,
-    };
+    formState.value.spec.configMapName = value;
   },
 });
 
@@ -128,9 +120,7 @@ const handleSave = async () => {
         }
       );
     } else {
-      formState.value.spec.configMapRef = {
-        name: configMap.value.metadata.name,
-      };
+      formState.value.spec.configMapName = configMap.value.metadata.name;
       await apiClient.extension.storage.policy.createstorageHaloRunV1alpha1Policy(
         {
           policy: formState.value,
@@ -173,12 +163,14 @@ watch(
     if (policy) {
       formState.value = cloneDeep(policy);
 
+      const { templateName } = formState.value.spec;
+
       // Get policy template
-      if (formState.value.spec.templateRef?.name) {
+      if (templateName) {
         const { data } =
           await apiClient.extension.storage.policyTemplate.getstorageHaloRunV1alpha1PolicyTemplate(
             {
-              name: formState.value.spec.templateRef.name,
+              name: templateName,
             }
           );
         policyTemplate.value = data;

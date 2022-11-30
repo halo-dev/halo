@@ -60,12 +60,8 @@ const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
   selectedPolicy.value = {
     spec: {
       displayName: "",
-      templateRef: {
-        name: policyTemplate.metadata.name,
-      },
-      configMapRef: {
-        name: "",
-      },
+      templateName: policyTemplate.metadata.name,
+      configMapName: "",
     },
     apiVersion: "storage.halo.run/v1alpha1",
     kind: "Policy",
@@ -195,7 +191,7 @@ watch(
           <template #start>
             <VEntityField
               :title="policy.spec.displayName"
-              :description="policy.spec.templateRef?.name"
+              :description="policy.spec.templateName"
             ></VEntityField>
           </template>
           <template #end>

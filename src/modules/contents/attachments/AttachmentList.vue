@@ -164,9 +164,7 @@ const handleMove = async (group: Group) => {
   try {
     const promises = Array.from(selectedAttachments.value).map((attachment) => {
       const attachmentToUpdate = cloneDeep(attachment);
-      attachmentToUpdate.spec.groupRef = {
-        name: group.metadata.name,
-      };
+      attachmentToUpdate.spec.groupName = group.metadata.name;
       return apiClient.extension.storage.attachment.updatestorageHaloRunV1alpha1Attachment(
         {
           name: attachment.metadata.name,
@@ -727,9 +725,7 @@ onMounted(() => {
                     </template>
                     <template #end>
                       <VEntityField
-                        :description="
-                          getPolicyName(attachment.spec.policyRef?.name)
-                        "
+                        :description="getPolicyName(attachment.spec.policyName)"
                       />
                       <VEntityField>
                         <template #description>
@@ -737,12 +733,12 @@ onMounted(() => {
                             :to="{
                               name: 'UserDetail',
                               params: {
-                                name: attachment.spec.uploadedBy?.name,
+                                name: attachment.spec.ownerName,
                               },
                             }"
                             class="text-xs text-gray-500"
                           >
-                            {{ attachment.spec.uploadedBy?.name }}
+                            {{ attachment.spec.ownerName }}
                           </RouterLink>
                         </template>
                       </VEntityField>

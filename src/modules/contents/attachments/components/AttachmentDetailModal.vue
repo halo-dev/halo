@@ -34,13 +34,13 @@ const onlyPreview = ref(false);
 
 watchEffect(async () => {
   if (props.attachment) {
-    const { policyRef } = props.attachment.spec;
-    if (!policyRef) {
+    const { policyName } = props.attachment.spec;
+    if (!policyName) {
       return;
     }
     const { data } =
       await apiClient.extension.storage.policy.getstorageHaloRunV1alpha1Policy({
-        name: policyRef.name,
+        name: policyName,
       });
     policy.value = data;
   }
@@ -129,7 +129,7 @@ const onVisibleChange = (visible: boolean) => {
         <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-900">所在分组</dt>
           <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-            {{ getGroupName(attachment?.spec.groupRef?.name) || "未分组" }}
+            {{ getGroupName(attachment?.spec.groupName) || "未分组" }}
           </dd>
         </div>
         <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -153,7 +153,7 @@ const onVisibleChange = (visible: boolean) => {
         <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-900">上传者</dt>
           <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-            {{ attachment?.spec.uploadedBy?.name }}
+            {{ attachment?.spec.ownerName }}
           </dd>
         </div>
         <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
