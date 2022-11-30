@@ -1,5 +1,6 @@
 package run.halo.app.plugin;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -7,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,9 +21,11 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.security.util.InMemoryResource;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ResourceUtils;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.Unstructured;
+import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -60,12 +64,18 @@ class YamlPluginFinderTest {
     }
 
     @Test
-    void findFromJar() throws FileNotFoundException {
-        File file =
-            ResourceUtils.getFile("classpath:plugin/test-unstructured-resource-loader.jar");
-        Plugin plugin = pluginFinder.find(file.toPath());
+    void findFromJar() throws IOException, URISyntaxException {
+        Path tempDirectory = Files.createTempDirectory("halo-plugin");
+        var plugin002Uri = requireNonNull(
+            getClass().getClassLoader().getResource("plugin/plugin-0.0.2")).toURI();
+
+        Path targetJarPath = tempDirectory.resolve("plugin-0.0.2.jar");
+        FileUtils.jar(Paths.get(plugin002Uri), targetJarPath);
+        Plugin plugin = pluginFinder.find(targetJarPath);
         assertThat(plugin).isNotNull();
-        assertThat(plugin.getMetadata().getName()).isEqualTo("io.github.guqing.apples");
+        assertThat(plugin.getMetadata().getName()).isEqualTo("fake-plugin");
+
+        FileSystemUtils.deleteRecursively(tempDirectory);
     }
 
     @Test
@@ -77,7 +87,9 @@ class YamlPluginFinderTest {
                     "spec": {
                         "displayName": "a name to show",
                         "version": "0.0.1",
-                        "author": "guqing",
+                        "author": {
+                            "name": "guqing"
+                        },
                         "logo": "https://guqing.xyz/avatar",
                         "pluginDependencies": {
                             "banana": "0.0.1"

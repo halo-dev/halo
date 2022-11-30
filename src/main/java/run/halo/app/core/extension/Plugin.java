@@ -1,5 +1,7 @@
 package run.halo.app.core.extension;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
@@ -29,7 +31,7 @@ import run.halo.app.extension.GVK;
 @EqualsAndHashCode(callSuper = true)
 public class Plugin extends AbstractExtension {
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private PluginSpec spec;
 
     private PluginStatus status;
@@ -54,6 +56,8 @@ public class Plugin extends AbstractExtension {
         private String displayName;
 
         /**
+         * plugin version.
+         *
          * @see <a href="semver.org">semantic version</a>
          */
         @Schema(required = true, pattern = "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-("
@@ -62,7 +66,7 @@ public class Plugin extends AbstractExtension {
             + ".[0-9a-zA-Z-]+)*))?$")
         private String version;
 
-        private String author;
+        private Author author;
 
         private String logo;
 
@@ -114,6 +118,16 @@ public class Plugin extends AbstractExtension {
         private String stylesheet;
 
         private String logo;
+    }
+
+    @Data
+    @ToString
+    public static class Author {
+
+        @Schema(requiredMode = REQUIRED, minLength = 1)
+        private String name;
+
+        private String website;
     }
 
     @JsonIgnore

@@ -46,6 +46,8 @@ public class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
     private DefaultPluginDescriptor convert(Plugin plugin) {
         String pluginId = plugin.getMetadata().getName();
         Plugin.PluginSpec spec = plugin.getSpec();
+        Plugin.Author author = spec.getAuthor();
+        String provider = (author == null ? StringUtils.EMPTY : author.getName());
 
         DefaultPluginDescriptor defaultPluginDescriptor =
             new DefaultPluginDescriptor(pluginId,
@@ -53,7 +55,7 @@ public class YamlPluginDescriptorFinder implements PluginDescriptorFinder {
                 BasePlugin.class.getName(),
                 spec.getVersion(),
                 spec.getRequires(),
-                spec.getAuthor(),
+                provider,
                 joinLicense(spec.getLicense()));
         // add dependencies
         spec.getPluginDependencies().forEach((pluginDepName, versionRequire) -> {
