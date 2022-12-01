@@ -37,6 +37,8 @@ docker run -it -d --name halo-next -p 8090:8090 -v ~/.halo2:/root/.halo2 --resta
 - 用户名：`demo`
 - 密码：`P@ssw0rd123..`
 
+![操作演示](https://docs.halo.run/assets/images/first-post-44a836e8f2855b27b3946ce80f5245f6.gif)
+
 ## 生态
 
 可访问 [awesome-halo](https://github.com/halo-sigs/awesome-halo) 查看已经适用于 Halo 2.0 的主题和插件，以及适用于 Halo
