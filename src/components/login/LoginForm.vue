@@ -86,6 +86,7 @@ onMounted(() => {
       }"
       name="username"
       placeholder="用户名"
+      :autofocus="true"
       type="text"
       validation="required"
     >
