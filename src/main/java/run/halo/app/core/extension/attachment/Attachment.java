@@ -10,7 +10,6 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
-import run.halo.app.extension.Ref;
 
 @Data
 @ToString(callSuper = true)
@@ -32,14 +31,14 @@ public class Attachment extends AbstractExtension {
         @Schema(description = "Display name of attachment")
         private String displayName;
 
-        @Schema(description = "Reference of Group")
-        private Ref groupRef;
+        @Schema(description = "Group name")
+        private String groupName;
 
-        @Schema(description = "Reference of Policy")
-        private Ref policyRef;
+        @Schema(description = "Policy name")
+        private String policyName;
 
-        @Schema(description = "Reference of User who uploads the attachment")
-        private Ref uploadedBy;
+        @Schema(description = "Name of User who uploads the attachment")
+        private String ownerName;
 
         @Schema(description = "Media type of attachment")
         private String mediaType;

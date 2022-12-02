@@ -1,0 +1,5 @@
+spring:
+  r2dbc:
+    url: r2dbc:h2:file:///~/halo2-dev/db/halo-next?MODE=MySQL&DB_CLOSE_ON_EXIT=FALSE
+halo:
+  work-dir: ${user.home}/halo2-dev

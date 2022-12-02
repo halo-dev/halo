@@ -1,7 +1,7 @@
 package run.halo.app.content;
 
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
 
 /**

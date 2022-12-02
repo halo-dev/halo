@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.integration.IntegrationAutoConfigu
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import run.halo.app.infra.properties.HaloProperties;
-import run.halo.app.infra.properties.JwtProperties;
 
 /**
  * Halo main class.
@@ -19,7 +18,7 @@ import run.halo.app.infra.properties.JwtProperties;
 @EnableScheduling
 @SpringBootApplication(scanBasePackages = "run.halo.app", exclude =
     IntegrationAutoConfiguration.class)
-@EnableConfigurationProperties({HaloProperties.class, JwtProperties.class})
+@EnableConfigurationProperties({HaloProperties.class})
 public class Application {
 
     public static void main(String[] args) {

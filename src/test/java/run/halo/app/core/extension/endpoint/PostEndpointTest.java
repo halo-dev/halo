@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.content.TestPost;
-import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ReactiveExtensionClient;
 
 /**

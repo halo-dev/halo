@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
-import run.halo.app.core.extension.Comment;
+import run.halo.app.core.extension.content.Comment;
 import run.halo.app.extension.FakeExtension;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Ref;

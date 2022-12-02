@@ -1,18 +1,22 @@
 package run.halo.app.plugin;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import org.json.JSONException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pf4j.PluginDescriptor;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ResourceUtils;
+import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -26,11 +30,23 @@ class YamlPluginDescriptorFinderTest {
     private YamlPluginDescriptorFinder yamlPluginDescriptorFinder;
 
     private File testFile;
+    private Path tempDirectory;
 
     @BeforeEach
-    void setUp() throws FileNotFoundException {
+    void setUp() throws IOException {
         yamlPluginDescriptorFinder = new YamlPluginDescriptorFinder();
-        testFile = ResourceUtils.getFile("classpath:plugin/test-unstructured-resource-loader.jar");
+        tempDirectory = Files.createTempDirectory("halo-plugin");
+        var plugin002Uri = requireNonNull(
+            ResourceUtils.getFile("classpath:plugin/plugin-0.0.2")).toURI();
+
+        Path targetJarPath = tempDirectory.resolve("plugin-0.0.2.jar");
+        FileUtils.jar(Paths.get(plugin002Uri), targetJarPath);
+        testFile = targetJarPath.toFile();
+    }
+
+    @AfterEach
+    void tearDown() throws IOException {
+        FileSystemUtils.deleteRecursively(tempDirectory);
     }
 
     @Test
@@ -64,14 +80,14 @@ class YamlPluginDescriptorFinderTest {
         String actual = JsonUtils.objectToJson(pluginDescriptor);
         JSONAssert.assertEquals("""
                 {
-                     "pluginId": "io.github.guqing.apples",
-                     "pluginDescription": "这是一个用来测试的插件",
+                     "pluginId": "fake-plugin",
+                     "pluginDescription": "Fake description",
                      "pluginClass": "run.halo.app.plugin.BasePlugin",
-                     "version": "0.0.1",
-                     "requires": "*",
-                     "provider": "guqing",
+                     "version": "0.0.2",
+                     "requires": ">=2.0.0",
+                     "provider": "johnniang",
                      "dependencies": [],
-                     "license": "MIT"
+                     "license": "GPLv3"
                  }
                 """,
             actual,

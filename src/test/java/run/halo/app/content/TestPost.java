@@ -1,8 +1,8 @@
 package run.halo.app.content;
 
 import java.time.Instant;
-import run.halo.app.core.extension.Post;
-import run.halo.app.core.extension.Snapshot;
+import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GVK;

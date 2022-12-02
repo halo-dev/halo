@@ -5,7 +5,7 @@ import static org.springframework.web.util.UriUtils.encode;
 import java.nio.charset.StandardCharsets;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
-import run.halo.app.core.extension.Category;
+import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.PathUtils;

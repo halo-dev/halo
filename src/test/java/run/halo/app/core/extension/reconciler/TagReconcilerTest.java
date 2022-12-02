@@ -18,8 +18,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.content.TestPost;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
-import run.halo.app.core.extension.Post;
-import run.halo.app.core.extension.Tag;
+import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 

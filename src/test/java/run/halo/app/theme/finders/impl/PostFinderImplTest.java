@@ -23,7 +23,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.core.extension.Counter;
-import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;

@@ -3,10 +3,11 @@ package run.halo.app.content.comment;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.MultiValueMap;
+import run.halo.app.core.extension.content.Reply;
 import run.halo.app.extension.router.IListRequest;
 
 /**
- * Query criteria for {@link run.halo.app.core.extension.Reply} list.
+ * Query criteria for {@link Reply} list.
  *
  * @author guqing
  * @since 2.0.0

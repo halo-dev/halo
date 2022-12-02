@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.core.extension.SinglePage;
+import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.FakeExtension;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;

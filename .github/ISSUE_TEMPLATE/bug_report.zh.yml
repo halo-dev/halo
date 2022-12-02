@@ -17,18 +17,18 @@ body:
       required: true
     attributes:
       label: "是什么版本出现了此问题？"
-      description: "可以在管理后台的关于页面中找到。"
   - type: dropdown
     id: database
     validations:
       required: true
     attributes:
       label: "使用的什么数据库？"
-      description: "可以在管理后台的关于页面中找到。"
       options:
         - H2
+        - PostgreSQL
         - MySQL 5.7
         - MySQL 8.x
+        - MariaDB
         - Other
   - type: dropdown
     id: deployment-method
@@ -37,8 +37,9 @@ body:
     attributes:
       label: "使用的哪种方式部署？"
       options:
-        - Fat Jar
         - Docker
+        - Docker Compose
+        - Fat Jar
   - type: input
     id: site-url
     attributes:

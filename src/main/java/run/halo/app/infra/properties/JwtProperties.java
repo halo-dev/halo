@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.source.InvalidConfigurationPropertyValueException;
 import org.springframework.core.io.Resource;
 import org.springframework.security.converter.RsaKeyConverters;
@@ -21,7 +20,6 @@ import org.springframework.validation.annotation.Validated;
  * @author johnniang
  * @date 2022-04-12
  */
-@ConfigurationProperties(prefix = "halo.security.oauth2.jwt")
 @Validated
 public class JwtProperties {
 

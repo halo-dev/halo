@@ -3,8 +3,8 @@ package run.halo.app.content.comment;
 import lombok.Builder;
 import lombok.Value;
 import org.apache.commons.lang3.StringUtils;
-import run.halo.app.core.extension.Comment;
 import run.halo.app.core.extension.User;
+import run.halo.app.core.extension.content.Comment;
 
 /**
  * Comment owner info.
