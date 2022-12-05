@@ -1,7 +1,7 @@
 create table if not exists extensions
 (
     name    varchar(255) not null,
-    data    blob,
+    data    longblob,
     version bigint,
     primary key (name)
 );
