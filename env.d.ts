@@ -6,6 +6,8 @@ import type { CoreMenuGroupId } from "@halo-dev/console-shared";
 
 import "vue-router";
 
+import "axios";
+
 declare module "*.vue" {
   import type { DefineComponent } from "vue";
   // eslint-disable-next-line
@@ -26,5 +28,11 @@ declare module "vue-router" {
       priority: number;
       mobile?: boolean;
     };
+  }
+}
+
+declare module "axios" {
+  export interface AxiosRequestConfig {
+    mute?: boolean;
   }
 }

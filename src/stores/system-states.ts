@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
-import axios from "axios";
-import type { ConfigMap } from "@halo-dev/api-client";
+import { apiClient } from "@/utils/api-client";
 
 interface SystemState {
   isSetup: boolean;
@@ -20,14 +19,13 @@ export const useSystemStatesStore = defineStore({
   actions: {
     async fetchSystemStates() {
       try {
-        const { data } = await axios.get<ConfigMap>(
-          `${
-            import.meta.env.VITE_API_URL
-          }/api/v1alpha1/configmaps/system-states`,
-          {
-            withCredentials: true,
-          }
-        );
+        const { data } =
+          await apiClient.extension.configMap.getv1alpha1ConfigMap(
+            {
+              name: "system-states",
+            },
+            { mute: true }
+          );
 
         if (data.data) {
           this.states = JSON.parse(data.data["states"]);

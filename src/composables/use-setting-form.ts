@@ -91,6 +91,9 @@ export function useSettingForm(
       const response = await apiClient.extension.configMap.getv1alpha1ConfigMap(
         {
           name: configMapName.value,
+        },
+        {
+          mute: true,
         }
       );
 

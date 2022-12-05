@@ -14,21 +14,28 @@ export const useThemeStore = defineStore("theme", {
     async fetchActivatedTheme() {
       try {
         const { data } =
-          await apiClient.extension.configMap.getv1alpha1ConfigMap({
-            name: "system",
-          });
+          await apiClient.extension.configMap.getv1alpha1ConfigMap(
+            {
+              name: "system",
+            },
+            { mute: true }
+          );
 
         if (!data.data?.theme) {
-          // Todo: show error
           return;
         }
 
         const themeConfig = JSON.parse(data.data.theme);
 
         const { data: themeData } =
-          await apiClient.extension.theme.getthemeHaloRunV1alpha1Theme({
-            name: themeConfig.active,
-          });
+          await apiClient.extension.theme.getthemeHaloRunV1alpha1Theme(
+            {
+              name: themeConfig.active,
+            },
+            {
+              mute: true,
+            }
+          );
 
         this.activatedTheme = themeData;
       } catch (e) {

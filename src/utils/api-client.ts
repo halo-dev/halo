@@ -73,6 +73,12 @@ axiosInstance.interceptors.response.use(
 
     const { title } = errorResponse.data;
 
+    // Don't show error toast
+    // see https://github.com/halo-dev/halo/issues/2836
+    if (errorResponse.config.mute) {
+      return Promise.reject(error);
+    }
+
     if (status === 400) {
       Toast.error(`请求参数错误：${title}`);
     } else if (status === 401) {

@@ -84,15 +84,25 @@ export function usePluginLifeCycle(
           const { settingName, configMapName } = plugin.value.spec;
 
           if (settingName) {
-            await apiClient.extension.setting.deletev1alpha1Setting({
-              name: settingName,
-            });
+            await apiClient.extension.setting.deletev1alpha1Setting(
+              {
+                name: settingName,
+              },
+              {
+                mute: true,
+              }
+            );
           }
 
           if (configMapName) {
-            await apiClient.extension.configMap.deletev1alpha1ConfigMap({
-              name: configMapName,
-            });
+            await apiClient.extension.configMap.deletev1alpha1ConfigMap(
+              {
+                name: configMapName,
+              },
+              {
+                mute: true,
+              }
+            );
           }
         } catch (e) {
           console.error("Failed to uninstall plugin", e);
