@@ -60,11 +60,13 @@ const handleSaveMenuItem = async () => {
       (ref) => ref.ref?.kind === selectedRefKind.value
     );
 
-    if (menuItemRef) {
+    if (menuItemRef?.ref) {
       formState.value.spec.targetRef = {
         ...menuItemRef.ref,
         name: selectedRefName.value,
       };
+      formState.value.spec.displayName = undefined;
+      formState.value.spec.href = undefined;
     }
 
     if (isUpdateMode.value) {
