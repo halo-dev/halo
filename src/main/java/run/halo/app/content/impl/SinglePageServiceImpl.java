@@ -255,7 +255,8 @@ public class SinglePageServiceImpl implements SinglePageService {
                 .totalComment(counter.getTotalComment())
                 .approvedComment(counter.getApprovedComment())
                 .build()
-            );
+            )
+            .defaultIfEmpty(Stats.empty());
     }
 
     private Flux<Contributor> listContributors(List<String> usernames) {

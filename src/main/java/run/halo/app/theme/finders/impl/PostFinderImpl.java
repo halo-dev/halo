@@ -312,7 +312,8 @@ public class PostFinderImpl implements PostFinder {
                 .upvote(counter.getUpvote())
                 .comment(counter.getApprovedComment())
                 .build()
-            );
+            )
+            .defaultIfEmpty(StatsVo.empty());
     }
 
     private Mono<ListedPostVo> getListedPostVo(@NonNull Post post) {

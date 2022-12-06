@@ -6,17 +6,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
-import run.halo.app.event.post.ReplyCreatedEvent;
-import run.halo.app.event.post.ReplyDeletedEvent;
 import run.halo.app.event.post.ReplyEvent;
-import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.Watcher;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.DefaultController;
@@ -32,32 +28,34 @@ import run.halo.app.extension.controller.RequestQueue;
  */
 @Slf4j
 @Component
-public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecycle, Watcher {
+public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecycle {
     private volatile boolean running = false;
 
     private final ExtensionClient client;
-    private final ApplicationEventPublisher eventPublisher;
     private final RequestQueue<ReplyEvent> replyEventQueue;
     private final Controller replyEventController;
 
-    public ReplyEventReconciler(ExtensionClient client, ApplicationEventPublisher eventPublisher) {
+    public ReplyEventReconciler(ExtensionClient client) {
         this.client = client;
-        this.eventPublisher = eventPublisher;
         replyEventQueue = new DefaultDelayQueue<>(Instant::now);
         replyEventController = this.setupWith(null);
     }
 
     @Override
     public Result reconcile(ReplyEvent request) {
-        Reply reply = request.getReply();
-        String commentName = reply.getSpec().getCommentName();
+        Reply requestReply = request.getReply();
+        String commentName = requestReply.getSpec().getCommentName();
 
-        List<Reply> replies = client.list(Reply.class,
-            record -> commentName.equals(reply.getSpec().getCommentName()),
-            defaultReplyComparator());
-
-        client.fetch(Comment.class, reply.getSpec().getCommentName())
+        client.fetch(Comment.class, commentName)
+            // if the comment has been deleted, then do nothing.
+            .filter(comment -> comment.getMetadata().getDeletionTimestamp() == null)
             .ifPresent(comment -> {
+
+                List<Reply> replies = client.list(Reply.class,
+                    record -> commentName.equals(record.getSpec().getCommentName())
+                        && record.getMetadata().getDeletionTimestamp() == null,
+                    defaultReplyComparator());
+
                 Comment.CommentStatus status = comment.getStatusOrDefault();
                 // total reply count
                 status.setReplyCount(replies.size());
@@ -68,18 +66,9 @@ public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecy
                     status.setLastReplyTime(lastReplyTime);
                 }
 
-                // calculate unread reply count
                 Instant lastReadTime = comment.getSpec().getLastReadTime();
-                long unreadReplyCount = replies.stream()
-                    .filter(existingReply -> {
-                        if (lastReadTime == null) {
-                            return true;
-                        }
-                        return existingReply.getMetadata().getCreationTimestamp()
-                            .isAfter(lastReadTime);
-                    })
-                    .count();
-                status.setUnreadReplyCount((int) unreadReplyCount);
+                status.setUnreadReplyCount(Comment.getUnreadReplyCount(replies, lastReadTime));
+
                 client.update(comment);
             });
         return new Result(false, null);
@@ -99,8 +88,8 @@ public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecy
             this,
             replyEventQueue,
             null,
-            Duration.ofMillis(100),
-            Duration.ofMinutes(10));
+            Duration.ofMillis(300),
+            Duration.ofMinutes(5));
     }
 
     @Override
@@ -120,27 +109,8 @@ public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecy
         return this.running;
     }
 
-    @Override
-    public void dispose() {
-
-    }
-
-    @Override
-    public boolean isDisposed() {
-        return !isRunning();
-    }
-
-    @Override
-    public void onAdd(Extension extension) {
-        ReplyCreatedEvent replyCreatedEvent = new ReplyCreatedEvent(this, (Reply) extension);
-        eventPublisher.publishEvent(replyCreatedEvent);
-        replyEventQueue.addImmediately(replyCreatedEvent);
-    }
-
-    @Override
-    public void onDelete(Extension extension) {
-        ReplyDeletedEvent replyDeletedEvent = new ReplyDeletedEvent(this, (Reply) extension);
-        eventPublisher.publishEvent(replyDeletedEvent);
-        replyEventQueue.addImmediately(replyDeletedEvent);
+    @EventListener(ReplyEvent.class)
+    public void onReplyAdded(ReplyEvent replyEvent) {
+        replyEventQueue.addImmediately(replyEvent);
     }
 }

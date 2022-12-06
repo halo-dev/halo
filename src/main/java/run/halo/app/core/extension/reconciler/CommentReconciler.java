@@ -1,23 +1,30 @@
 package run.halo.app.core.extension.reconciler;
 
+import java.time.Instant;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.content.Comment;
+import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.MeterUtils;
 
 /**
@@ -46,6 +53,7 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
                     return;
                 }
                 addFinalizerIfNecessary(comment);
+                reconcileStatus(request.name());
                 updateCommentCounter();
             });
         return new Result(false, null);
@@ -77,6 +85,41 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
                 newFinalizers.add(FINALIZER_NAME);
                 client.update(comment);
             });
+    }
+
+    private void reconcileStatus(String name) {
+        client.fetch(Comment.class, name).ifPresent(comment -> {
+            Comment oldComment = JsonUtils.deepCopy(comment);
+            Comment.CommentStatus status = comment.getStatusOrDefault();
+            status.setHasNewReply(ObjectUtils.defaultIfNull(status.getUnreadReplyCount(), 0) > 0);
+            updateUnReplyCountIfNecessary(comment);
+            if (!oldComment.equals(comment)) {
+                client.update(comment);
+            }
+        });
+    }
+
+    private void updateUnReplyCountIfNecessary(Comment comment) {
+        Instant lastReadTime = comment.getSpec().getLastReadTime();
+        Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(comment);
+        String lastReadTimeAnno = annotations.get(Constant.LAST_READ_TIME_ANNO);
+        if (lastReadTime != null && lastReadTime.toString().equals(lastReadTimeAnno)) {
+            return;
+        }
+        // spec.lastReadTime is null or not equal to annotation.lastReadTime
+        String commentName = comment.getMetadata().getName();
+        List<Reply> replies = client.list(Reply.class,
+            reply -> commentName.equals(reply.getSpec().getCommentName())
+                && reply.getMetadata().getDeletionTimestamp() == null,
+            defaultReplyComparator());
+
+        // calculate unread reply count
+        comment.getStatusOrDefault()
+            .setUnreadReplyCount(Comment.getUnreadReplyCount(replies, lastReadTime));
+        // handled flag
+        if (lastReadTime != null) {
+            annotations.put(Constant.LAST_READ_TIME_ANNO, lastReadTime.toString());
+        }
     }
 
     private void updateCommentCounter() {
@@ -148,5 +191,12 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
             return null;
         }
         return new GroupVersionKind(ref.getGroup(), ref.getVersion(), ref.getKind());
+    }
+
+    Comparator<Reply> defaultReplyComparator() {
+        Function<Reply, Instant> createTime = reply -> reply.getMetadata().getCreationTimestamp();
+        return Comparator.comparing(createTime)
+            .thenComparing(reply -> reply.getMetadata().getName())
+            .reversed();
     }
 }

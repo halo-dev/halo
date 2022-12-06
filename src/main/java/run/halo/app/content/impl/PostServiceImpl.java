@@ -85,7 +85,8 @@ public class PostServiceImpl implements PostService {
                 .totalComment(counter.getTotalComment())
                 .approvedComment(counter.getApprovedComment())
                 .build()
-            );
+            )
+            .defaultIfEmpty(Stats.empty());
     }
 
     Predicate<Post> postListPredicate(PostQuery query) {

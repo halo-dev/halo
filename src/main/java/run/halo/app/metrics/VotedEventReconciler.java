@@ -73,7 +73,7 @@ public class VotedEventReconciler implements Reconciler<VotedEvent>, SmartLifecy
             this,
             votedEventQueue,
             null,
-            Duration.ofSeconds(30),
+            Duration.ofMillis(300),
             Duration.ofMinutes(5));
     }
 

@@ -84,7 +84,7 @@ public class VisitedEventReconciler
             this,
             visitedEventQueue,
             null,
-            Duration.ofSeconds(30),
+            Duration.ofMillis(300),
             Duration.ofMinutes(5));
     }
 

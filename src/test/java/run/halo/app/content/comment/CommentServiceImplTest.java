@@ -241,151 +241,145 @@ class CommentServiceImplTest {
     private String expectListResultJson() {
         return """
             {
-                "page": 1,
-                "size": 10,
-                "total": 3,
-                "totalPages": 1,
-                "items": [
-                    {
-                        "comment": {
-                            "spec": {
-                                "owner": {
-                                    "kind": "Email",
-                                    "name": "A-owner",
-                                    "displayName": "displayName",
-                                    "annotations": {
-                                        "website": "website",
-                                        "avatar": "avatar"
-                                    }
-                                },
-                                "subjectRef": {
-                                    "group": "content.halo.run",
-                                    "version": "v1alpha1",
-                                    "kind": "Post",
-                                    "name": "fake-post"
-                                }
-                            },
-                            "status": {
-                                "hasNewReply": false
-                            },
-                            "apiVersion": "content.halo.run/v1alpha1",
-                            "kind": "Comment",
-                            "metadata": {
-                                "name": "A"
-                            }
-                        },
-                        "owner": {
-                            "kind": "Email",
-                            "name": "A-owner",
-                            "displayName": "displayName",
-                            "avatar": "avatar",
-                            "email": "A-owner"
-                        },
-                        "subject": {
-                            "spec": {
-                                "title": "post-A",
-                                "headSnapshot": "base-snapshot",
-                                "baseSnapshot": "snapshot-A"
-                            },
-                            "apiVersion": "content.halo.run/v1alpha1",
-                            "kind": "Post",
-                            "metadata": {
-                                "name": "fake-post"
-                            }
-                        }
-                    },
-                    {
-                        "comment": {
-                            "spec": {
-                                "owner": {
-                                    "kind": "User",
-                                    "name": "B-owner",
-                                    "displayName": "displayName"
-                                },
-                                "subjectRef": {
-                                    "group": "content.halo.run",
-                                    "version": "v1alpha1",
-                                    "kind": "Post",
-                                    "name": "fake-post"
-                                }
-                            },
-                            "status": {
-                                "hasNewReply": false
-                            },
-                            "apiVersion": "content.halo.run/v1alpha1",
-                            "kind": "Comment",
-                            "metadata": {
-                                "name": "B"
-                            }
-                        },
-                        "owner": {
-                            "kind": "User",
-                            "name": "B-owner",
-                            "displayName": "B-displayName",
-                            "avatar": "B-avatar",
-                            "email": "B-email"
-                        },
-                        "subject": {
-                            "spec": {
-                                "title": "post-A",
-                                "headSnapshot": "base-snapshot",
-                                "baseSnapshot": "snapshot-A"
-                            },
-                            "apiVersion": "content.halo.run/v1alpha1",
-                            "kind": "Post",
-                            "metadata": {
-                                "name": "fake-post"
-                            }
-                        }
-                    },
-                    {
-                        "comment": {
-                            "spec": {
-                                "owner": {
-                                    "kind": "User",
-                                    "name": "C-owner",
-                                    "displayName": "displayName"
-                                },
-                                "subjectRef": {
-                                    "group": "content.halo.run",
-                                    "version": "v1alpha1",
-                                    "kind": "Post",
-                                    "name": "fake-post"
-                                }
-                            },
-                            "status": {
-                                "hasNewReply": false
-                            },
-                            "apiVersion": "content.halo.run/v1alpha1",
-                            "kind": "Comment",
-                            "metadata": {
-                                "name": "C"
-                            }
-                        },
-                        "owner": {
-                            "kind": "User",
-                            "name": "ghost",
-                            "displayName": "Ghost",
-                            "email": ""
-                        },
-                        "subject": {
-                            "spec": {
-                                "title": "post-A",
-                                "headSnapshot": "base-snapshot",
-                                "baseSnapshot": "snapshot-A"
-                            },
-                            "apiVersion": "content.halo.run/v1alpha1",
-                            "kind": "Post",
-                            "metadata": {
-                                "name": "fake-post"
-                            }
-                        }
-                    }
-                ],
-                "first": true,
-                "last": true,
-                "hasNext": false,
-                "hasPrevious": false
+                 "page": 1,
+                 "size": 10,
+                 "total": 3,
+                 "items": [
+                     {
+                         "comment": {
+                             "spec": {
+                                 "owner": {
+                                     "kind": "Email",
+                                     "name": "A-owner",
+                                     "displayName": "displayName",
+                                     "annotations": {
+                                         "website": "website",
+                                         "avatar": "avatar"
+                                     }
+                                 },
+                                 "subjectRef": {
+                                     "group": "content.halo.run",
+                                     "version": "v1alpha1",
+                                     "kind": "Post",
+                                     "name": "fake-post"
+                                 }
+                             },
+                             "status": {},
+                             "apiVersion": "content.halo.run/v1alpha1",
+                             "kind": "Comment",
+                             "metadata": {
+                                 "name": "A"
+                             }
+                         },
+                         "owner": {
+                             "kind": "Email",
+                             "name": "A-owner",
+                             "displayName": "displayName",
+                             "avatar": "avatar",
+                             "email": "A-owner"
+                         },
+                         "subject": {
+                             "spec": {
+                                 "title": "post-A",
+                                 "headSnapshot": "base-snapshot",
+                                 "baseSnapshot": "snapshot-A"
+                             },
+                             "apiVersion": "content.halo.run/v1alpha1",
+                             "kind": "Post",
+                             "metadata": {
+                                 "name": "fake-post"
+                             }
+                         }
+                     },
+                     {
+                         "comment": {
+                             "spec": {
+                                 "owner": {
+                                     "kind": "User",
+                                     "name": "B-owner",
+                                     "displayName": "displayName"
+                                 },
+                                 "subjectRef": {
+                                     "group": "content.halo.run",
+                                     "version": "v1alpha1",
+                                     "kind": "Post",
+                                     "name": "fake-post"
+                                 }
+                             },
+                             "status": {},
+                             "apiVersion": "content.halo.run/v1alpha1",
+                             "kind": "Comment",
+                             "metadata": {
+                                 "name": "B"
+                             }
+                         },
+                         "owner": {
+                             "kind": "User",
+                             "name": "B-owner",
+                             "displayName": "B-displayName",
+                             "avatar": "B-avatar",
+                             "email": "B-email"
+                         },
+                         "subject": {
+                             "spec": {
+                                 "title": "post-A",
+                                 "headSnapshot": "base-snapshot",
+                                 "baseSnapshot": "snapshot-A"
+                             },
+                             "apiVersion": "content.halo.run/v1alpha1",
+                             "kind": "Post",
+                             "metadata": {
+                                 "name": "fake-post"
+                             }
+                         }
+                     },
+                     {
+                         "comment": {
+                             "spec": {
+                                 "owner": {
+                                     "kind": "User",
+                                     "name": "C-owner",
+                                     "displayName": "displayName"
+                                 },
+                                 "subjectRef": {
+                                     "group": "content.halo.run",
+                                     "version": "v1alpha1",
+                                     "kind": "Post",
+                                     "name": "fake-post"
+                                 }
+                             },
+                             "status": {},
+                             "apiVersion": "content.halo.run/v1alpha1",
+                             "kind": "Comment",
+                             "metadata": {
+                                 "name": "C"
+                             }
+                         },
+                         "owner": {
+                             "kind": "User",
+                             "name": "ghost",
+                             "displayName": "Ghost",
+                             "email": ""
+                         },
+                         "subject": {
+                             "spec": {
+                                 "title": "post-A",
+                                 "headSnapshot": "base-snapshot",
+                                 "baseSnapshot": "snapshot-A"
+                             },
+                             "apiVersion": "content.halo.run/v1alpha1",
+                             "kind": "Post",
+                             "metadata": {
+                                 "name": "fake-post"
+                             }
+                         }
+                     }
+                 ],
+                 "first": true,
+                 "last": true,
+                 "hasNext": false,
+                 "hasPrevious": false,
+                 "totalPages": 1
             }
             """;
     }

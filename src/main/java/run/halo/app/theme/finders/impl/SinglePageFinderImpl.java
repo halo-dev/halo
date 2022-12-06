@@ -112,7 +112,8 @@ public class SinglePageFinderImpl implements SinglePageFinder {
                 .upvote(counter.getUpvote())
                 .comment(counter.getApprovedComment())
                 .build()
-            );
+            )
+            .defaultIfEmpty(StatsVo.empty());
     }
 
     <T extends ListedSinglePageVo> Mono<T> populateContributors(T pageVo) {
