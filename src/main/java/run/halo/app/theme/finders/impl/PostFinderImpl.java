@@ -21,7 +21,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import run.halo.app.content.ContentService;
-import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -293,10 +292,9 @@ public class PostFinderImpl implements PostFinder {
                 comparator, pageNullSafe(page), sizeNullSafe(size))
             .flatMap(list -> Flux.fromStream(list.get())
                 .concatMap(post -> getListedPostVo(post)
-                    .map(postVo -> {
-                        populateStats(postVo);
-                        return postVo;
-                    })
+                    .flatMap(postVo -> populateStats(postVo)
+                        .doOnNext(postVo::setStats).thenReturn(postVo)
+                    )
                 )
                 .collectList()
                 .map(postVos -> new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
@@ -306,16 +304,15 @@ public class PostFinderImpl implements PostFinder {
             .defaultIfEmpty(new ListResult<>(page, size, 0L, List.of()));
     }
 
-    private <T extends ListedPostVo> void populateStats(T postVo) {
-        Counter counter =
-            counterService.getByName(MeterUtils.nameOf(Post.class, postVo.getMetadata()
-                .getName()));
-        StatsVo statsVo = StatsVo.builder()
-            .visit(counter.getVisit())
-            .upvote(counter.getUpvote())
-            .comment(counter.getApprovedComment())
-            .build();
-        postVo.setStats(statsVo);
+    private <T extends ListedPostVo> Mono<StatsVo> populateStats(T postVo) {
+        return counterService.getByName(MeterUtils.nameOf(Post.class, postVo.getMetadata()
+                .getName()))
+            .map(counter -> StatsVo.builder()
+                .visit(counter.getVisit())
+                .upvote(counter.getUpvote())
+                .comment(counter.getApprovedComment())
+                .build()
+            );
     }
 
     private Mono<ListedPostVo> getListedPostVo(@NonNull Post post) {
@@ -323,8 +320,12 @@ public class PostFinderImpl implements PostFinder {
         postVo.setCategories(List.of());
         postVo.setTags(List.of());
         postVo.setContributors(List.of());
-        populateStats(postVo);
+
         return Mono.just(postVo)
+            .flatMap(lp -> populateStats(postVo)
+                .doOnNext(lp::setStats)
+                .thenReturn(lp)
+            )
             .flatMap(p -> {
                 String owner = p.getSpec().getOwner();
                 return contributorFinder.getContributor(owner)

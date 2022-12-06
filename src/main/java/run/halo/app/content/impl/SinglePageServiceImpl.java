@@ -33,7 +33,6 @@ import run.halo.app.content.SinglePageRequest;
 import run.halo.app.content.SinglePageService;
 import run.halo.app.content.SinglePageSorter;
 import run.halo.app.content.Stats;
-import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
@@ -213,9 +212,12 @@ public class SinglePageServiceImpl implements SinglePageService {
             .map(sp -> {
                 ListedSinglePage listedSinglePage = new ListedSinglePage();
                 listedSinglePage.setPage(singlePage);
-                listedSinglePage.setStats(fetchStats(singlePage));
                 return listedSinglePage;
             })
+            .flatMap(sp -> fetchStats(singlePage)
+                .doOnNext(sp::setStats)
+                .thenReturn(sp)
+            )
             .flatMap(lsp ->
                 setContributors(singlePage.getStatusOrDefault().getContributors(), lsp))
             .flatMap(lsp -> setOwner(singlePage.getSpec().getOwner(), lsp));
@@ -243,17 +245,17 @@ public class SinglePageServiceImpl implements SinglePageService {
             .thenReturn(page);
     }
 
-    Stats fetchStats(SinglePage singlePage) {
+    Mono<Stats> fetchStats(SinglePage singlePage) {
         Assert.notNull(singlePage, "The singlePage must not be null.");
         String name = singlePage.getMetadata().getName();
-        Counter counter =
-            counterService.getByName(MeterUtils.nameOf(SinglePage.class, name));
-        return Stats.builder()
-            .visit(counter.getVisit())
-            .upvote(counter.getUpvote())
-            .totalComment(counter.getTotalComment())
-            .approvedComment(counter.getApprovedComment())
-            .build();
+        return counterService.getByName(MeterUtils.nameOf(SinglePage.class, name))
+            .map(counter -> Stats.builder()
+                .visit(counter.getVisit())
+                .upvote(counter.getUpvote())
+                .totalComment(counter.getTotalComment())
+                .approvedComment(counter.getApprovedComment())
+                .build()
+            );
     }
 
     private Flux<Contributor> listContributors(List<String> usernames) {

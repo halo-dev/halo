@@ -1,19 +1,14 @@
 package run.halo.app.core.extension.reconciler;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.extension.ExtensionClient;
@@ -23,7 +18,6 @@ import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.MeterUtils;
 
 /**
@@ -36,30 +30,25 @@ import run.halo.app.metrics.MeterUtils;
 public class CommentReconciler implements Reconciler<Reconciler.Request> {
     public static final String FINALIZER_NAME = "comment-protection";
     private final ExtensionClient client;
-    private final MeterRegistry meterRegistry;
     private final SchemeManager schemeManager;
 
-    public CommentReconciler(ExtensionClient client, MeterRegistry meterRegistry,
-        SchemeManager schemeManager) {
+    public CommentReconciler(ExtensionClient client, SchemeManager schemeManager) {
         this.client = client;
-        this.meterRegistry = meterRegistry;
         this.schemeManager = schemeManager;
     }
 
     @Override
     public Result reconcile(Request request) {
-        return client.fetch(Comment.class, request.name())
-            .map(comment -> {
+        client.fetch(Comment.class, request.name())
+            .ifPresent(comment -> {
                 if (isDeleted(comment)) {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
-                    return new Result(false, null);
+                    return;
                 }
                 addFinalizerIfNecessary(comment);
-                reconcileStatus(request.name());
-                reconcileCommentCount();
-                return new Result(true, Duration.ofMinutes(1));
-            })
-            .orElseGet(() -> new Result(false, null));
+                updateCommentCounter();
+            });
+        return new Result(false, null);
     }
 
     @Override
@@ -71,38 +60,6 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
 
     private boolean isDeleted(Comment comment) {
         return comment.getMetadata().getDeletionTimestamp() != null;
-    }
-
-    private void reconcileStatus(String name) {
-        client.fetch(Comment.class, name).ifPresent(comment -> {
-            final Comment oldComment = JsonUtils.deepCopy(comment);
-
-            List<Reply> replies = client.list(Reply.class,
-                reply -> name.equals(reply.getSpec().getCommentName()),
-                defaultReplyComparator());
-            // calculate reply count
-            comment.getStatusOrDefault().setReplyCount(replies.size());
-            // calculate last reply time
-            if (!replies.isEmpty()) {
-                Instant lastReplyTime = replies.get(0).getMetadata().getCreationTimestamp();
-                comment.getStatusOrDefault().setLastReplyTime(lastReplyTime);
-            }
-            // calculate unread reply count
-            Instant lastReadTime = comment.getSpec().getLastReadTime();
-            long unreadReplyCount = replies.stream()
-                .filter(reply -> {
-                    if (lastReadTime == null) {
-                        return true;
-                    }
-                    return reply.getMetadata().getCreationTimestamp().isAfter(lastReadTime);
-                })
-                .count();
-            comment.getStatusOrDefault().setUnreadReplyCount((int) unreadReplyCount);
-
-            if (!oldComment.equals(comment)) {
-                client.update(comment);
-            }
-        });
     }
 
     private void addFinalizerIfNecessary(Comment oldComment) {
@@ -122,7 +79,7 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
             });
     }
 
-    private void reconcileCommentCount() {
+    private void updateCommentCounter() {
         Map<Ref, List<RefCommentTuple>> map = client.list(Comment.class, null, null)
             .stream()
             .map(comment -> {
@@ -148,36 +105,18 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
             schemeManager.fetch(groupVersionKind).ifPresent(scheme -> {
                 String counterName = MeterUtils.nameOf(ref.getGroup(), scheme.plural(),
                     ref.getName());
-                // meter for total comment count
-                calcTotalComments(totalCount, counterName);
-                // meter for approved comment count
-                calcApprovedComments(approvedTotalCount, counterName);
+                client.fetch(Counter.class, counterName).ifPresentOrElse(counter -> {
+                    counter.setTotalComment(totalCount);
+                    counter.setApprovedComment((int) approvedTotalCount);
+                    client.update(counter);
+                }, () -> {
+                    Counter counter = Counter.emptyCounter(counterName);
+                    counter.setTotalComment(totalCount);
+                    counter.setApprovedComment((int) approvedTotalCount);
+                    client.create(counter);
+                });
             });
         });
-    }
-
-    private void calcTotalComments(int totalCount, String counterName) {
-        Counter totalCommentCounter =
-            MeterUtils.totalCommentCounter(meterRegistry, counterName);
-        double totalCountMeter = totalCommentCounter.count();
-        double totalIncrement = totalCount - totalCountMeter;
-        if (totalCountMeter + totalIncrement >= 0) {
-            totalCommentCounter.increment(totalIncrement);
-        } else {
-            totalCommentCounter.increment(totalCountMeter * -1);
-        }
-    }
-
-    private void calcApprovedComments(long approvedTotalCount, String counterName) {
-        Counter approvedCommentCounter =
-            MeterUtils.approvedCommentCounter(meterRegistry, counterName);
-        double approvedComments = approvedCommentCounter.count();
-        double increment = approvedTotalCount - approvedCommentCounter.count();
-        if (approvedComments + increment >= 0) {
-            approvedCommentCounter.increment(increment);
-        } else {
-            approvedCommentCounter.increment(approvedComments * -1);
-        }
     }
 
     record RefCommentTuple(Ref ref, String name, boolean approved) {
@@ -200,18 +139,7 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
                 null)
             .forEach(client::delete);
         // decrement total comment count
-        Ref subjectRef = comment.getSpec().getSubjectRef();
-        GroupVersionKind groupVersionKind = groupVersionKind(subjectRef);
-        if (groupVersionKind == null) {
-            return;
-        }
-        schemeManager.fetch(groupVersionKind)
-            .ifPresent(scheme -> {
-                String counterName = MeterUtils.nameOf(subjectRef.getGroup(), scheme.plural(),
-                    subjectRef.getName());
-                MeterUtils.totalCommentCounter(meterRegistry, counterName)
-                    .increment(-1);
-            });
+        updateCommentCounter();
     }
 
     @Nullable
@@ -220,12 +148,5 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
             return null;
         }
         return new GroupVersionKind(ref.getGroup(), ref.getVersion(), ref.getKind());
-    }
-
-    Comparator<Reply> defaultReplyComparator() {
-        Function<Reply, Instant> createTime = reply -> reply.getMetadata().getCreationTimestamp();
-        return Comparator.comparing(createTime)
-            .thenComparing(reply -> reply.getMetadata().getName())
-            .reversed();
     }
 }

@@ -33,7 +33,6 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
-import run.halo.app.metrics.CounterMeterHandler;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
@@ -51,9 +50,6 @@ class UserEndpointTest {
 
     @MockBean
     UserService userService;
-
-    @MockBean
-    CounterMeterHandler counterMeterHandler;
 
     @BeforeEach
     void setUp() {

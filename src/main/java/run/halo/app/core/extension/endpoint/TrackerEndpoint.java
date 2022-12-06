@@ -4,11 +4,11 @@ import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.MeterRegistry;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -16,6 +16,9 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import run.halo.app.event.post.DownvotedEvent;
+import run.halo.app.event.post.UpvotedEvent;
+import run.halo.app.event.post.VisitedEvent;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.IpAddressUtils;
@@ -28,16 +31,12 @@ import run.halo.app.metrics.VisitLogWriter;
  * @author guqing
  * @since 2.0.0
  */
+@AllArgsConstructor
 @Component
 public class TrackerEndpoint implements CustomEndpoint {
 
-    private final MeterRegistry meterRegistry;
+    private final ApplicationEventPublisher eventPublisher;
     private final VisitLogWriter visitLogWriter;
-
-    public TrackerEndpoint(MeterRegistry meterRegistry, VisitLogWriter visitLogWriter) {
-        this.meterRegistry = meterRegistry;
-        this.visitLogWriter = visitLogWriter;
-    }
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -93,15 +92,12 @@ public class TrackerEndpoint implements CustomEndpoint {
             .switchIfEmpty(
                 Mono.error(new IllegalArgumentException("Counter request body must not be empty")))
             .map(counterRequest -> {
-                String counterName =
-                    MeterUtils.nameOf(counterRequest.group(), counterRequest.plural(),
-                        counterRequest.name());
+                eventPublisher.publishEvent(new VisitedEvent(this, counterRequest.group(),
+                    counterRequest.name(), counterRequest.plural()));
 
-                Counter counter = MeterUtils.visitCounter(meterRegistry, counterName);
-                counter.increment();
                 // async write visit log
                 writeVisitLog(request, counterRequest);
-                return (int) counter.count();
+                return 0;
             })
             .flatMap(count -> ServerResponse.ok().bodyValue(count));
     }
@@ -111,13 +107,9 @@ public class TrackerEndpoint implements CustomEndpoint {
             .switchIfEmpty(
                 Mono.error(new IllegalArgumentException("Upvote request body must not be empty")))
             .map(voteRequest -> {
-                String counterName =
-                    MeterUtils.nameOf(voteRequest.group(), voteRequest.plural(),
-                        voteRequest.name());
-
-                Counter counter = MeterUtils.upvoteCounter(meterRegistry, counterName);
-                counter.increment();
-                return (int) counter.count();
+                eventPublisher.publishEvent(new UpvotedEvent(this, voteRequest.group(),
+                    voteRequest.name(), voteRequest.plural()));
+                return 0;
             })
             .flatMap(count -> ServerResponse.ok().bodyValue(count));
     }
@@ -127,13 +119,9 @@ public class TrackerEndpoint implements CustomEndpoint {
             .switchIfEmpty(
                 Mono.error(new IllegalArgumentException("Downvote request body must not be empty")))
             .map(voteRequest -> {
-                String counterName =
-                    MeterUtils.nameOf(voteRequest.group(), voteRequest.plural(),
-                        voteRequest.name());
-
-                Counter counter = MeterUtils.downvoteCounter(meterRegistry, counterName);
-                counter.increment();
-                return (int) counter.count();
+                eventPublisher.publishEvent(new DownvotedEvent(this, voteRequest.group(),
+                    voteRequest.name(), voteRequest.plural()));
+                return 0;
             })
             .flatMap(count -> ServerResponse.ok().bodyValue(count));
     }

@@ -22,7 +22,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentService;
 import run.halo.app.content.ContentWrapper;
-import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
@@ -103,9 +102,7 @@ class PostFinderImplTest {
 
     @Test
     void archives() {
-        Counter counter = new Counter();
-        counter.setMetadata(new Metadata());
-        when(counterService.getByName(any())).thenReturn(counter);
+        when(counterService.getByName(any())).thenReturn(Mono.empty());
         ListResult<Post> listResult = new ListResult<>(1, 10, 3, postsForArchives());
         when(client.list(eq(Post.class), any(), any(), anyInt(), anyInt()))
             .thenReturn(Mono.just(listResult));

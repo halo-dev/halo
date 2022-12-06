@@ -9,7 +9,7 @@ import run.halo.app.core.extension.Counter;
  */
 public interface CounterService {
 
-    Counter getByName(String counterName);
+    Mono<Counter> getByName(String counterName);
 
     Mono<Counter> deleteByName(String counterName);
 }
