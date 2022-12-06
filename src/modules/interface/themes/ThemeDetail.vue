@@ -95,7 +95,7 @@ const onUpgradeModalClose = () => {
                     type="secondary"
                     @click="upgradeModal = true"
                   >
-                    更新
+                    升级
                   </VButton>
                   <VButton
                     v-close-popper
