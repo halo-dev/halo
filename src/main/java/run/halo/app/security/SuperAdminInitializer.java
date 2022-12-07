@@ -1,9 +1,7 @@
 package run.halo.app.security;
 
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -12,7 +10,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
-import run.halo.app.core.extension.Role.PolicyRule;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.RoleBinding.RoleRef;
 import run.halo.app.core.extension.RoleBinding.Subject;
@@ -42,28 +39,21 @@ public class SuperAdminInitializer {
     @EventListener
     public Mono<Void> initialize(ApplicationReadyEvent readyEvent) {
         return client.fetch(User.class, initializer.getSuperAdminUsername())
-            .switchIfEmpty(Mono.defer(() -> client.create(createAdmin()))
-                .flatMap(admin -> {
-                    var superRole = createSuperRole();
-                    return client.create(superRole)
-                        .flatMap(role -> {
-                            var binding = bindAdminAndSuperRole(admin, superRole);
-                            return client.create(binding).thenReturn(role);
-                        })
-                        .thenReturn(admin);
-                }))
-            .then();
+            .switchIfEmpty(Mono.defer(() -> client.create(createAdmin())).flatMap(admin -> {
+                var binding = bindAdminAndSuperRole(admin);
+                return client.create(binding).thenReturn(admin);
+            })).then();
     }
 
-    RoleBinding bindAdminAndSuperRole(User admin, Role superRole) {
+    RoleBinding bindAdminAndSuperRole(User admin) {
         var metadata = new Metadata();
         String name =
             String.join("-", initializer.getSuperAdminUsername(), SUPER_ROLE_NAME, "binding");
         metadata.setName(name);
         var roleRef = new RoleRef();
-        roleRef.setName(superRole.getMetadata().getName());
-        roleRef.setApiGroup(superRole.groupVersionKind().group());
-        roleRef.setKind(superRole.getKind());
+        roleRef.setName(SUPER_ROLE_NAME);
+        roleRef.setApiGroup(Role.GROUP);
+        roleRef.setKind(Role.KIND);
 
         var subject = new Subject();
         subject.setName(admin.getMetadata().getName());
@@ -76,26 +66,6 @@ public class SuperAdminInitializer {
         roleBinding.setSubjects(List.of(subject));
 
         return roleBinding;
-    }
-
-    Role createSuperRole() {
-        var metadata = new Metadata();
-        metadata.setName(SUPER_ROLE_NAME);
-        Map<String, String> annotations = new HashMap<>();
-        annotations.put(Role.UI_PERMISSIONS_ANNO, "[\"*\"]");
-        metadata.setAnnotations(annotations);
-
-        var superRule = new PolicyRule.Builder()
-            .apiGroups("*")
-            .resources("*")
-            .nonResourceURLs("*")
-            .verbs("*")
-            .build();
-
-        var role = new Role();
-        role.setMetadata(metadata);
-        role.setRules(List.of(superRule));
-        return role;
     }
 
     User createAdmin() {

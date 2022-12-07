@@ -168,7 +168,7 @@ public class PostServiceImpl implements PostService {
 
     private Mono<ListedPost> setTags(List<String> tagNames, ListedPost post) {
         return listTags(tagNames)
-            .collectSortedList()
+            .collectList()
             .doOnNext(post::setTags)
             .map(tags -> post)
             .switchIfEmpty(Mono.defer(() -> Mono.just(post)));
@@ -176,7 +176,7 @@ public class PostServiceImpl implements PostService {
 
     private Mono<ListedPost> setCategories(List<String> categoryNames, ListedPost post) {
         return listCategories(categoryNames)
-            .collectSortedList()
+            .collectList()
             .doOnNext(post::setCategories)
             .map(categories -> post)
             .switchIfEmpty(Mono.defer(() -> Mono.just(post)));
@@ -184,7 +184,7 @@ public class PostServiceImpl implements PostService {
 
     private Mono<ListedPost> setContributors(List<String> contributorNames, ListedPost post) {
         return listContributors(contributorNames)
-            .collectSortedList()
+            .collectList()
             .doOnNext(post::setContributors)
             .map(contributors -> post)
             .switchIfEmpty(Mono.defer(() -> Mono.just(post)));
