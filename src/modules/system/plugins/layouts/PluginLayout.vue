@@ -25,6 +25,7 @@ import BasicLayout from "@/layouts/BasicLayout.vue";
 import type { Ref } from "vue";
 import type { Plugin, SettingForm } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
+import { usePluginLifeCycle } from "../composables/use-plugin";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -59,6 +60,8 @@ provide<Ref<string | undefined>>("activeTab", activeTab);
 
 const settingName = computed(() => plugin.value?.spec.settingName);
 const configMapName = computed(() => plugin.value?.spec.configMapName);
+
+const { isStarted } = usePluginLifeCycle(plugin);
 
 const { setting, handleFetchSettings } = useSettingForm(
   settingName,
@@ -112,7 +115,9 @@ onMounted(async () => {
     return;
   }
 
-  await handleFetchSettings();
+  if (isStarted.value) {
+    await handleFetchSettings();
+  }
 
   tabs.value = cloneDeep(initialTabs);
 
