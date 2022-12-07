@@ -55,7 +55,7 @@ const onUpgradeModalClose = () => {
 </script>
 
 <template>
-  <Transition appear mode="out-in" name="fade">
+  <Transition mode="out-in" name="fade">
     <div>
       <div class="bg-white px-4 py-4 sm:px-6">
         <div class="group flex items-center justify-between">

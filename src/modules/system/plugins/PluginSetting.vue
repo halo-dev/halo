@@ -62,7 +62,7 @@ const handleFetchPlugin = async () => {
 await handleFetchPlugin();
 </script>
 <template>
-  <Transition appear mode="out-in" name="fade">
+  <Transition mode="out-in" name="fade">
     <div class="bg-white p-4">
       <div>
         <FormKit
