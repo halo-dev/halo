@@ -18,14 +18,7 @@
 
 ------------------------------
 
-## 注意
-
-当前分支为 Halo 2.0 的 Console 端开发分支，目前 Halo 2.0 处于 Alpha 测试阶段，不建议从 1.5 直接升级，也不建议在生产环境使用。Console 端稳定版本（Halo 1.5）请查阅以下地址：
-
-- 1.5 分支：<https://github.com/halo-dev/console/tree/release-1.5>
-- 1.6 分支：<https://github.com/halo-dev/console/tree/release-1.6>
-
-> 当前仓库已经将 `halo-admin` 改为了 `console`。但对于 Halo 1.x 版本，依旧保持 halo-admin 的概念。
+当前仓库已经将 `halo-admin` 改为了 `console`。但对于 Halo 1.x 版本，依旧保持 halo-admin 的概念。
 
 ## 开发环境运行
 
