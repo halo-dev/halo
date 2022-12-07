@@ -8,17 +8,19 @@ import {
   VTabbar,
   VTag,
   VAvatar,
+  VAlert,
 } from "@halo-dev/components";
 import { useRoute } from "vue-router";
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
-import { pluginLabels } from "@/constants/labels";
+import { pluginLabels, roleLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
 import {
   useRoleForm,
   useRoleTemplateSelection,
 } from "@/modules/system/roles/composables/use-role";
 import { useUserFetch } from "@/modules/system/users/composables/use-user";
+import { SUPER_ROLE_NAME } from "@/constants/constants";
 
 const route = useRoute();
 
@@ -30,6 +32,28 @@ const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
 const { formState, saving, handleCreateOrUpdate } = useRoleForm();
 
 const { users } = useUserFetch({ fetchOnMounted: false });
+
+const isSystemReserved = computed(() => {
+  return (
+    formState.value.metadata.labels?.[roleLabels.SYSTEM_RESERVED] === "true"
+  );
+});
+
+const isSuperRole = computed(() => {
+  return formState.value.metadata.name === SUPER_ROLE_NAME;
+});
+
+const getRoleCountText = computed(() => {
+  if (formState.value.metadata.name === SUPER_ROLE_NAME) {
+    return `包含所有权限`;
+  }
+
+  const dependenciesCount = JSON.parse(
+    formState.value.metadata.annotations?.[rbacAnnotations.DEPENDENCIES] || "[]"
+  ).length;
+
+  return `包含 ${dependenciesCount} 个权限`;
+});
 
 watch(
   () => selectedRoleTemplates.value,
@@ -97,17 +121,7 @@ onMounted(() => {
           <p
             class="mt-1 flex max-w-2xl items-center gap-2 text-sm text-gray-500"
           >
-            <span
-              >包含
-              {{
-                JSON.parse(
-                  formState.metadata.annotations?.[
-                    rbacAnnotations.DEPENDENCIES
-                  ] || "[]"
-                ).length
-              }}
-              个权限</span
-            >
+            <span>{{ getRoleCountText }}</span>
           </p>
         </div>
         <div class="border-t border-gray-200">
@@ -137,10 +151,11 @@ onMounted(() => {
             >
               <dt class="text-sm font-medium text-gray-900">类型</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                <VTag>系统保留</VTag>
+                <VTag> {{ isSystemReserved ? "系统保留" : "自定义" }} </VTag>
               </dd>
             </div>
             <div
+              v-if="false"
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
             >
               <dt class="text-sm font-medium text-gray-900">描述</dt>
@@ -217,6 +232,14 @@ onMounted(() => {
       </div>
 
       <div v-if="tabActiveId === 'permissions'">
+        <div v-if="isSystemReserved" class="px-4 py-5">
+          <VAlert
+            title="提示"
+            description="系统保留的角色不支持修改，推荐基于此角色创建一个新的角色。"
+            class="w-full sm:w-1/4"
+          />
+        </div>
+
         <div>
           <dl class="divide-y divide-gray-100">
             <div
@@ -259,11 +282,20 @@ onMounted(() => {
                       class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded-base border p-5 hover:border-primary"
                     >
                       <input
+                        v-if="!isSuperRole"
                         v-model="selectedRoleTemplates"
                         :value="role.metadata.name"
                         class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                         type="checkbox"
+                        :disabled="isSystemReserved"
                         @change="handleRoleTemplateSelect"
+                      />
+                      <input
+                        v-else
+                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                        type="checkbox"
+                        checked
+                        disabled
                       />
                       <div class="flex flex-1 flex-col gap-y-3">
                         <span class="font-medium text-gray-900">
@@ -301,8 +333,10 @@ onMounted(() => {
             <VButton
               :loading="saving"
               type="secondary"
+              :disabled="isSystemReserved"
               @click="handleUpdateRole"
-              >保存
+            >
+              保存
             </VButton>
           </div>
         </div>

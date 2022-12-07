@@ -97,14 +97,18 @@ export function useRoleForm(): useRoleFormReturn {
     try {
       saving.value = true;
       if (isUpdateMode.value) {
-        await apiClient.extension.role.updatev1alpha1Role({
+        const { data } = await apiClient.extension.role.updatev1alpha1Role({
           name: formState.value.metadata.name,
           role: formState.value,
         });
+
+        formState.value = data;
       } else {
-        await apiClient.extension.role.createv1alpha1Role({
+        const { data } = await apiClient.extension.role.createv1alpha1Role({
           role: formState.value,
         });
+
+        formState.value = data;
       }
     } catch (e) {
       console.error(e);

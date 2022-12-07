@@ -33,6 +33,8 @@ import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import Fuse from "fuse.js";
 import { usePermission } from "@/utils/permission";
+import { roleLabels } from "@/constants/labels";
+import { SUPER_ROLE_NAME } from "@/constants/constants";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -63,6 +65,22 @@ const searchResults = computed(() => {
   return fuse?.search(keyword.value).map((item) => item.item);
 });
 
+const isSystemReserved = (role: Role) => {
+  return role.metadata.labels?.[roleLabels.SYSTEM_RESERVED] === "true";
+};
+
+const getRoleCountText = (role: Role) => {
+  if (role.metadata.name === SUPER_ROLE_NAME) {
+    return `包含所有权限`;
+  }
+
+  const dependenciesCount = JSON.parse(
+    role.metadata.annotations?.[rbacAnnotations.DEPENDENCIES] || "[]"
+  ).length;
+
+  return `包含 ${dependenciesCount} 个权限`;
+};
+
 const handleOpenEditingModal = (role: Role) => {
   selectedRole.value = role;
   editingModal.value = true;
@@ -73,10 +91,33 @@ const onEditingModalClose = () => {
   handleFetchRoles();
 };
 
-const handleCloneRole = (role: Role) => {
+const handleCloneRole = async (role: Role) => {
   const roleToCreate = cloneDeep<Role>(role);
   roleToCreate.metadata.name = "";
+  roleToCreate.metadata.generateName = "role-";
   roleToCreate.metadata.creationTimestamp = undefined;
+
+  // 移除系统保留标识
+  delete roleToCreate.metadata.labels?.[roleLabels.SYSTEM_RESERVED];
+
+  // 如果是超级管理员角色，那么需要获取到所有角色模板并填充到表单
+  if (role.metadata.name === SUPER_ROLE_NAME) {
+    const { data } = await apiClient.extension.role.listv1alpha1Role({
+      page: 0,
+      size: 0,
+      labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
+    });
+    const roleTemplateNames = data.items.map((item) => item.metadata.name);
+    if (roleToCreate.metadata.annotations) {
+      roleToCreate.metadata.annotations[rbacAnnotations.DEPENDENCIES] =
+        JSON.stringify(roleTemplateNames);
+    } else {
+      roleToCreate.metadata.annotations = {
+        [rbacAnnotations.DEPENDENCIES]: JSON.stringify(roleTemplateNames),
+      };
+    }
+  }
+
   selectedRole.value = roleToCreate;
   editingModal.value = true;
 };
@@ -242,15 +283,7 @@ const handleDelete = async (role: Role) => {
                     role.metadata.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
                     role.metadata.name
                   "
-                  :description="`包含
-                    ${
-                      JSON.parse(
-                        role.metadata.annotations?.[
-                          rbacAnnotations.DEPENDENCIES
-                        ] || '[]'
-                      ).length
-                    }
-                    个权限`"
+                  :description="getRoleCountText(role)"
                   :route="{
                     name: 'RoleDetail',
                     params: {
@@ -269,7 +302,9 @@ const handleDelete = async (role: Role) => {
                 <VEntityField v-if="false" description="0 个用户" />
                 <VEntityField>
                   <template #description>
-                    <VTag> 系统保留</VTag>
+                    <VTag>
+                      {{ isSystemReserved(role) ? "系统保留" : "自定义" }}
+                    </VTag>
                   </template>
                 </VEntityField>
                 <VEntityField>
@@ -285,6 +320,7 @@ const handleDelete = async (role: Role) => {
                 #dropdownItems
               >
                 <VButton
+                  v-if="!isSystemReserved(role)"
                   v-close-popper
                   block
                   type="secondary"
@@ -293,6 +329,7 @@ const handleDelete = async (role: Role) => {
                   编辑
                 </VButton>
                 <VButton
+                  v-if="!isSystemReserved(role)"
                   v-close-popper
                   block
                   type="danger"
