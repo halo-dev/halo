@@ -24,7 +24,7 @@
 ## 快速开始
 
 ```bash
-docker run -it -d --name halo-next -p 8090:8090 -v ~/.halo2:/root/.halo2 --restart=unless-stopped halohub/halo:2.0.0
+docker run -it -d --name halo-next -p 8090:8090 -v ~/.halo2:/root/.halo2 --restart=unless-stopped halohub/halo:2.0.1
 ```
 
 详细部署文档请查阅：<https://docs.halo.run/getting-started/install/docker-compose>
