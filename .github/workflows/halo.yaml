@@ -3,15 +3,15 @@ name: Halo CI
 on:
   pull_request:
     branches:
-      - next
       - main
+      - release-*
     paths:
       - "**"
       - "!**.md"
   push:
     branches:
-      - next
       - main
+      - release-*
     paths:
       - "**"
       - "!**.md"
@@ -56,7 +56,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: halo-sigs/actions/halo-next-docker-build@main # change the version to specific ref or release tag while the action is stable.
         with:
-          image-name: halo-dev
+          image-name: ${{ github.event_name == 'release' && 'halo' || 'halo-dev' }}
           ghcr-token: ${{ secrets.GHCR_TOKEN }}
           dockerhub-user: ${{ secrets.DOCKER_USERNAME }}
           dockerhub-token: ${{ secrets.DOCKER_TOKEN }}
