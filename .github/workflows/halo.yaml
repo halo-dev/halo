@@ -3,15 +3,15 @@ name: Halo CI
 on:
   pull_request:
     branches:
-      - next
       - main
+      - release-*
     paths:
       - "**"
       - "!**.md"
   push:
     branches:
-      - next
       - main
+      - release-*
     paths:
       - "**"
       - "!**.md"
