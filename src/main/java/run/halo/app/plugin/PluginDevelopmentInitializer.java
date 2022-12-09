@@ -1,6 +1,8 @@
 package run.halo.app.plugin;
 
 import java.nio.file.Path;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.pf4j.PluginWrapper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
