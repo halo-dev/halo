@@ -43,7 +43,21 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
             if (idForPath(path) != null) {
                 continue;
             }
-            String pluginId = pluginManager.loadPlugin(path);
+            // for issue #2901
+            // String pluginId=  pluginManager.loadPlugin(path);
+
+            String pluginId =null;
+
+            try {
+                pluginId=  pluginManager.loadPlugin(path);
+            }catch (Exception e) {
+                log.warn("Exception when load plugin from path:{}", path);
+            }
+
+            if(StringUtils.isEmpty(pluginId)) {
+                break;
+            }
+            
             PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
             if (pluginWrapper == null) {
                 continue;
