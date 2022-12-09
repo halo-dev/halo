@@ -54,7 +54,6 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
             try {
                 pluginId=  pluginManager.loadPlugin(path);
             }catch (Exception e) {
-                log.warn("Exception when load plugin from path:{}", path);
             }
 
             if(StringUtils.isEmpty(pluginId)) {
