@@ -32,6 +32,9 @@ public class Role extends AbstractExtension {
         "rbac.authorization.halo.run/dependency-rules";
     public static final String ROLE_DEPENDENCIES_ANNO = "rbac.authorization.halo.run/dependencies";
     public static final String UI_PERMISSIONS_ANNO = "rbac.authorization.halo.run/ui-permissions";
+
+    public static final String SYSTEM_RESERVED_LABELS =
+        "rbac.authorization.halo.run/system-reserved";
     public static final String UI_PERMISSIONS_AGGREGATED_ANNO =
         "rbac.authorization.halo.run/ui-permissions-aggregated";
 

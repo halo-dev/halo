@@ -8,7 +8,6 @@
 
 <p align="center">
 <a href="https://github.com/halo-dev/halo/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/halo-dev/halo.svg?style=flat-square&include_prereleases" /></a>
-<a href="https://github.com/halo-dev/halo/releases"><img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/halo-dev/halo/total.svg?style=flat-square" /></a>
 <a href="https://hub.docker.com/r/halohub/halo"><img alt="Docker pulls" src="https://img.shields.io/docker/pulls/halohub/halo?style=flat-square" /></a>
 <a href="https://github.com/halo-dev/halo/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/halo-dev/halo.svg?style=flat-square" /></a>
 <a href="https://github.com/halo-dev/halo/actions"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/halo-dev/halo/Halo%20CI?style=flat-square" /></a>
@@ -25,7 +24,7 @@
 ## 快速开始
 
 ```bash
-docker run -it -d --name halo-next -p 8090:8090 -v ~/.halo2:/root/.halo2 --restart=unless-stopped halohub/halo:2.0.0
+docker run -it -d --name halo-next -p 8090:8090 -v ~/.halo2:/root/.halo2 --restart=unless-stopped halohub/halo:2.0.1
 ```
 
 详细部署文档请查阅：<https://docs.halo.run/getting-started/install/docker-compose>
