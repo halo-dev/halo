@@ -15,6 +15,7 @@ import run.halo.app.extension.ExtensionClient;
  * @author guqing
  * @since 2.0.0
  */
+@Slf4j
 @Component
 public class PluginDevelopmentInitializer implements ApplicationListener<ApplicationReadyEvent> {
 
