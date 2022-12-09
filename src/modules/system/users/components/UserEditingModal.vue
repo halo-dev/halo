@@ -149,8 +149,8 @@ const handleRawModeChange = () => {
   >
     <template #actions>
       <span @click="handleRawModeChange">
-        <IconCodeBoxLine v-if="!rawMode" />
-        <IconEye v-else />
+        <IconCodeBoxLine v-if="!rawMode" v-tooltip="`查看编码`" />
+        <IconEye v-else v-tooltip="`查看表单`" />
       </span>
     </template>
 

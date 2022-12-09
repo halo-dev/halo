@@ -305,6 +305,7 @@ function handleClearFilters() {
                     @click="handleFetchPlugins()"
                   >
                     <IconRefreshLine
+                      v-tooltip="`刷新`"
                       :class="{ 'animate-spin text-gray-900': loading }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />

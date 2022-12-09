@@ -228,10 +228,12 @@ const getPolicyName = (name: string | undefined) => {
 const viewTypes = [
   {
     name: "list",
+    tooltip: "列表模式",
     icon: IconList,
   },
   {
     name: "grid",
+    tooltip: "网格模式",
     icon: IconGrid,
   },
 ];
@@ -526,6 +528,7 @@ onMounted(() => {
                       <div
                         v-for="(item, index) in viewTypes"
                         :key="index"
+                        v-tooltip="`${item.tooltip}`"
                         :class="{
                           'bg-gray-200 font-bold text-black':
                             viewType === item.name,
@@ -542,6 +545,7 @@ onMounted(() => {
                         @click="handleFetchAttachments()"
                       >
                         <IconRefreshLine
+                          v-tooltip="`刷新`"
                           :class="{ 'animate-spin text-gray-900': loading }"
                           class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                         />
