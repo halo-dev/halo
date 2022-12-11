@@ -1,8 +1,6 @@
 package run.halo.app.plugin;
 
-import java.nio.file.Path;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.pf4j.PluginWrapper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -10,6 +8,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ExtensionClient;
+
+import java.nio.file.Path;
 
 /**
  * @author guqing
@@ -26,7 +26,7 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
     private final ExtensionClient extensionClient;
 
     public PluginDevelopmentInitializer(HaloPluginManager haloPluginManager,
-        PluginProperties pluginProperties, ExtensionClient extensionClient) {
+                                        PluginProperties pluginProperties, ExtensionClient extensionClient) {
         this.haloPluginManager = haloPluginManager;
         this.pluginProperties = pluginProperties;
         this.extensionClient = extensionClient;
@@ -46,30 +46,27 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
             if (idForPath(path) != null) {
                 continue;
             }
-            // for issue #2901
-            // String pluginId=  pluginManager.loadPlugin(path);
 
-            String pluginId =null;
+            // for issue #2901
+            String pluginId;
 
             try {
-                pluginId=  pluginManager.loadPlugin(path);
-            }catch (Exception e) {
+                pluginId = pluginManager.loadPlugin(path);
+            } catch (Exception e) {
+                log.warn(e.getMessage(), e);
+                continue;
             }
 
-            if(StringUtils.isEmpty(pluginId)) {
-                break;
-            }
-            
             PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
             if (pluginWrapper == null) {
                 continue;
             }
             Plugin plugin = new YamlPluginFinder().find(pluginWrapper.getPluginPath());
             extensionClient.fetch(Plugin.class, plugin.getMetadata().getName())
-                .ifPresentOrElse(persistent -> {
-                    plugin.getMetadata().setVersion(persistent.getMetadata().getVersion());
-                    extensionClient.update(plugin);
-                }, () -> extensionClient.create(plugin));
+                    .ifPresentOrElse(persistent -> {
+                        plugin.getMetadata().setVersion(persistent.getMetadata().getVersion());
+                        extensionClient.update(plugin);
+                    }, () -> extensionClient.create(plugin));
         }
     }
 
