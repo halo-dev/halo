@@ -1,5 +1,6 @@
 package run.halo.app.plugin;
 
+import java.nio.file.Path;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginWrapper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -8,8 +9,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ExtensionClient;
-
-import java.nio.file.Path;
 
 /**
  * @author guqing
@@ -26,7 +25,7 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
     private final ExtensionClient extensionClient;
 
     public PluginDevelopmentInitializer(HaloPluginManager haloPluginManager,
-                                        PluginProperties pluginProperties, ExtensionClient extensionClient) {
+        PluginProperties pluginProperties, ExtensionClient extensionClient) {
         this.haloPluginManager = haloPluginManager;
         this.pluginProperties = pluginProperties;
         this.extensionClient = extensionClient;
@@ -63,10 +62,10 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
             }
             Plugin plugin = new YamlPluginFinder().find(pluginWrapper.getPluginPath());
             extensionClient.fetch(Plugin.class, plugin.getMetadata().getName())
-                    .ifPresentOrElse(persistent -> {
-                        plugin.getMetadata().setVersion(persistent.getMetadata().getVersion());
-                        extensionClient.update(plugin);
-                    }, () -> extensionClient.create(plugin));
+                .ifPresentOrElse(persistent -> {
+                    plugin.getMetadata().setVersion(persistent.getMetadata().getVersion());
+                    extensionClient.update(plugin);
+                }, () -> extensionClient.create(plugin));
         }
     }
 
