@@ -58,7 +58,6 @@ public class HaloPluginManager extends DefaultPluginManager
         super(pluginsRoot);
     }
 
-
     @Override
     protected ExtensionFactory createExtensionFactory() {
         return new SpringExtensionFactory(this);
