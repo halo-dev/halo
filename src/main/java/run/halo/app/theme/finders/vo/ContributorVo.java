@@ -14,7 +14,7 @@ import run.halo.app.core.extension.User;
 @Value
 @ToString
 @Builder
-public class Contributor {
+public class ContributorVo {
     String name;
 
     String displayName;
@@ -23,17 +23,22 @@ public class Contributor {
 
     String bio;
 
+    String permalink;
+
     /**
-     * Convert {@link User} to {@link Contributor}.
+     * Convert {@link User} to {@link ContributorVo}.
      *
      * @param user user extension
      * @return contributor value object
      */
-    public static Contributor from(User user) {
+    public static ContributorVo from(User user) {
+        User.UserStatus status = user.getStatus();
+        String permalink = (status == null ? "" : status.getPermalink());
         return builder().name(user.getMetadata().getName())
             .displayName(user.getSpec().getDisplayName())
             .avatar(user.getSpec().getAvatar())
             .bio(user.getSpec().getBio())
+            .permalink(permalink)
             .build();
     }
 }
