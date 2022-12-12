@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, mergeProps } from "vue";
+import { computed } from "vue";
 import type { RouteLocationRaw } from "vue-router";
 
 const props = withDefaults(

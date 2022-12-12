@@ -1,30 +1,6 @@
 <template>
   <Story :init-state="initState" title="Space">
     <template #default="{ state }">
-      <VRadio
-        v-for="(option, index) in ['row', 'column']"
-        :key="index"
-        v-model="state.direction"
-        :label="option"
-        :value="option"
-        name="direction"
-      ></VRadio>
-      <VRadio
-        v-for="(option, index) in ['start', 'center', 'end', 'stretch']"
-        :key="index"
-        v-model="state.align"
-        :label="option"
-        :value="option"
-        name="align"
-      ></VRadio>
-      <VRadio
-        v-for="(option, index) in ['xs', 'sm', 'md', 'lg']"
-        :key="index"
-        v-model="state.spacing"
-        :label="option"
-        :value="option"
-        name="spacing"
-      ></VRadio>
       <VSpace
         :align="state.align"
         :direction="state.direction"
@@ -40,7 +16,6 @@
 <script lang="ts" setup>
 import { VSpace } from "../../components/space";
 import { VButton } from "../../components/button";
-import { VRadio } from "../../components/radio";
 
 function initState() {
   return {

@@ -1,8 +1,0 @@
-// Vitest Snapshot v1
-
-exports[`Radio > should render 1`] = `
-"<div class=\\"radio-wrapper-checked radio-wrapper\\">
-  <div class=\\"radio-inner\\"><input id=\\"radio\\" type=\\"radio\\" value=\\"false\\"></div>
-  <!--v-if-->
-</div>"
-`;

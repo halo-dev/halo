@@ -1,35 +1,10 @@
 <script lang="ts" setup>
 import { VCard } from "./index";
-import { VInput } from "../../components/input";
-import { VSpace } from "../../components/space";
-import { VButton } from "../../components/button";
-import { IconSettings } from "../../icons/icons";
 </script>
 
 <template>
   <Story title="Card">
     <template #default>
-      <div class="p-3">
-        <VCard title="登录">
-          <VSpace class="w-full" direction="column">
-            <VInput placeholder="用户名"></VInput>
-            <VInput placeholder="密码"></VInput>
-          </VSpace>
-
-          <template #actions>
-            <div style="padding: 12px 16px">
-              <IconSettings />
-            </div>
-          </template>
-
-          <template #footer>
-            <VSpace>
-              <VButton type="secondary">登录</VButton>
-              <VButton type="default">取消</VButton>
-            </VSpace>
-          </template>
-        </VCard>
-      </div>
       <!--      https://lofiui.co/-->
       <div class="p-3">
         <VCard title="Page Views">
