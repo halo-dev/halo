@@ -177,7 +177,7 @@ const publishTime = computed(() => {
 });
 
 const onPublishTimeChange = (value: string) => {
-  formState.value.spec.publishTime = toISOString(value);
+  formState.value.spec.publishTime = value ? toISOString(value) : undefined;
 };
 </script>
 
