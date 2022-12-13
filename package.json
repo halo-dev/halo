@@ -21,6 +21,14 @@
     "prettier:packages": "pnpm --parallel --filter \"./packages/**\" prettier",
     "test:unit:packages": "pnpm --parallel --filter \"./packages/**\" run test:unit"
   },
+  "lint-staged": {
+    "*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}": [
+      "prettier --write"
+    ],
+    "*.{js,ts,vue,tsx,jsx}": [
+      "eslint --fix"
+    ]
+  },
   "workspaces": [
     "packages/*"
   ],
@@ -102,6 +110,7 @@
     "eslint-plugin-vue": "^9.8.0",
     "husky": "^8.0.2",
     "jsdom": "^20.0.3",
+    "lint-staged": "^13.1.0",
     "postcss": "^8.4.19",
     "prettier": "^2.8.0",
     "prettier-plugin-tailwindcss": "^0.1.13",

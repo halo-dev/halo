@@ -1,0 +1,2 @@
+# 排除 pnpm-lock.yaml，防止被 prettier 影响导致不必要的 diff
+pnpm-lock.yaml
