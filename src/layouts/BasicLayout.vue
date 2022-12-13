@@ -81,7 +81,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  document.addEventListener("keydown", handleGlobalSearchKeybinding);
+  document.removeEventListener("keydown", handleGlobalSearchKeybinding);
 });
 
 // Generate menus by routes
