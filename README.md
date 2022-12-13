@@ -24,10 +24,18 @@
 ## 快速开始
 
 ```bash
-docker run -it -d --name halo-next -p 8090:8090 -v ~/.halo2:/root/.halo2 --restart=unless-stopped halohub/halo:2.0.0
+docker run \
+  -it -d \
+  --name halo \
+  -p 8090:8090 \
+  -v ~/.halo2:/root/.halo2 \
+  -e HALO_EXTERNAL_URL=http://localhost:8090/ \
+  -e HALO_SECURITY_INITIALIZER_SUPERADMINUSERNAME=admin \
+  -e HALO_SECURITY_INITIALIZER_SUPERADMINPASSWORD=P@88w0rd \
+  halohub/halo:2.0
 ```
 
-详细部署文档请查阅：<https://docs.halo.run/getting-started/install/docker-compose>
+以上仅作为体验使用，详细部署文档请查阅：<https://docs.halo.run/getting-started/install/docker-compose>
 
 ## 在线体验
 

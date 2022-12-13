@@ -381,15 +381,9 @@ public class HaloPluginManager extends DefaultPluginManager
 
     @Override
     protected PluginWrapper loadPluginFromPath(Path pluginPath) {
-        try {
-            PluginWrapper pluginWrapper = super.loadPluginFromPath(pluginPath);
-            rootApplicationContext.publishEvent(new HaloPluginLoadedEvent(this, pluginWrapper));
-            return pluginWrapper;
-        } catch (PluginRuntimeException e) {
-            // ignore this
-            log.warn(e.getMessage(), e);
-        }
-        return null;
+        PluginWrapper pluginWrapper = super.loadPluginFromPath(pluginPath);
+        rootApplicationContext.publishEvent(new HaloPluginLoadedEvent(this, pluginWrapper));
+        return pluginWrapper;
     }
 
     private void removePluginComponentsCache(String pluginId) {
