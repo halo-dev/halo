@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
+import run.halo.app.extension.Metadata;
 import run.halo.app.metrics.MeterUtils;
 
 /**
@@ -60,5 +61,16 @@ public class Counter extends AbstractExtension {
         this.downvote = 0;
         this.totalComment = 0;
         this.approvedComment = 0;
+    }
+
+    public static Counter emptyCounter(String name) {
+        Counter counter = new Counter();
+        counter.setMetadata(new Metadata());
+        counter.getMetadata().setName(name);
+        counter.setUpvote(0);
+        counter.setTotalComment(0);
+        counter.setApprovedComment(0);
+        counter.setVisit(0);
+        return counter;
     }
 }
