@@ -18,4 +18,12 @@ public class StatsVo {
     Integer upvote;
 
     Integer comment;
+
+    public static StatsVo empty() {
+        return StatsVo.builder()
+            .visit(0)
+            .upvote(0)
+            .comment(0)
+            .build();
+    }
 }

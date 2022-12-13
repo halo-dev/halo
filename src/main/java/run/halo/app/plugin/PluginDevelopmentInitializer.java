@@ -1,6 +1,7 @@
 package run.halo.app.plugin;
 
 import java.nio.file.Path;
+import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginWrapper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -13,6 +14,7 @@ import run.halo.app.extension.ExtensionClient;
  * @author guqing
  * @since 2.0.0
  */
+@Slf4j
 @Component
 public class PluginDevelopmentInitializer implements ApplicationListener<ApplicationReadyEvent> {
 
@@ -43,7 +45,17 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
             if (idForPath(path) != null) {
                 continue;
             }
-            String pluginId = pluginManager.loadPlugin(path);
+
+            // for issue #2901
+            String pluginId;
+
+            try {
+                pluginId = pluginManager.loadPlugin(path);
+            } catch (Exception e) {
+                log.warn(e.getMessage(), e);
+                continue;
+            }
+
             PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
             if (pluginWrapper == null) {
                 continue;
