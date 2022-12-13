@@ -54,7 +54,7 @@ public class TrackerEndpoint implements CustomEndpoint {
                                 .implementation(CounterRequest.class))
                         ))
                     .response(responseBuilder()
-                        .implementation(Integer.class))
+                        .implementation(Void.class))
             )
             .POST("trackers/upvote", this::upvote,
                 builder -> builder.operationId("upvote")
@@ -68,7 +68,7 @@ public class TrackerEndpoint implements CustomEndpoint {
                                 .implementation(VoteRequest.class))
                         ))
                     .response(responseBuilder()
-                        .implementation(Integer.class))
+                        .implementation(Void.class))
             )
             .POST("trackers/downvote", this::downvote,
                 builder -> builder.operationId("downvote")
@@ -82,7 +82,7 @@ public class TrackerEndpoint implements CustomEndpoint {
                                 .implementation(VoteRequest.class))
                         ))
                     .response(responseBuilder()
-                        .implementation(Integer.class))
+                        .implementation(Void.class))
             )
             .build();
     }
@@ -91,39 +91,36 @@ public class TrackerEndpoint implements CustomEndpoint {
         return request.bodyToMono(CounterRequest.class)
             .switchIfEmpty(
                 Mono.error(new IllegalArgumentException("Counter request body must not be empty")))
-            .map(counterRequest -> {
+            .doOnNext(counterRequest -> {
                 eventPublisher.publishEvent(new VisitedEvent(this, counterRequest.group(),
                     counterRequest.name(), counterRequest.plural()));
 
                 // async write visit log
                 writeVisitLog(request, counterRequest);
-                return 0;
             })
-            .flatMap(count -> ServerResponse.ok().bodyValue(count));
+            .then(ServerResponse.ok().build());
     }
 
     private Mono<ServerResponse> upvote(ServerRequest request) {
         return request.bodyToMono(VoteRequest.class)
             .switchIfEmpty(
                 Mono.error(new IllegalArgumentException("Upvote request body must not be empty")))
-            .map(voteRequest -> {
+            .doOnNext(voteRequest -> {
                 eventPublisher.publishEvent(new UpvotedEvent(this, voteRequest.group(),
                     voteRequest.name(), voteRequest.plural()));
-                return 0;
             })
-            .flatMap(count -> ServerResponse.ok().bodyValue(count));
+            .then(ServerResponse.ok().build());
     }
 
     private Mono<ServerResponse> downvote(ServerRequest request) {
         return request.bodyToMono(VoteRequest.class)
             .switchIfEmpty(
                 Mono.error(new IllegalArgumentException("Downvote request body must not be empty")))
-            .map(voteRequest -> {
+            .doOnNext(voteRequest -> {
                 eventPublisher.publishEvent(new DownvotedEvent(this, voteRequest.group(),
                     voteRequest.name(), voteRequest.plural()));
-                return 0;
             })
-            .flatMap(count -> ServerResponse.ok().bodyValue(count));
+            .then(ServerResponse.ok().build());
     }
 
     public record VoteRequest(String group, String plural, String name) {
