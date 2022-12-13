@@ -14,7 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import run.halo.app.content.TestPost;
-import run.halo.app.core.extension.Snapshot;
+import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;

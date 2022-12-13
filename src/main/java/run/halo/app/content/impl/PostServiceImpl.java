@@ -32,11 +32,11 @@ import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.content.PostSorter;
 import run.halo.app.content.Stats;
-import run.halo.app.core.extension.Category;
 import run.halo.app.core.extension.Counter;
-import run.halo.app.core.extension.Post;
-import run.halo.app.core.extension.Tag;
 import run.halo.app.core.extension.User;
+import run.halo.app.core.extension.content.Category;
+import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
@@ -165,7 +165,7 @@ public class PostServiceImpl implements PostService {
 
     private Mono<ListedPost> setTags(List<String> tagNames, ListedPost post) {
         return listTags(tagNames)
-            .collectSortedList()
+            .collectList()
             .doOnNext(post::setTags)
             .map(tags -> post)
             .switchIfEmpty(Mono.defer(() -> Mono.just(post)));
@@ -173,7 +173,7 @@ public class PostServiceImpl implements PostService {
 
     private Mono<ListedPost> setCategories(List<String> categoryNames, ListedPost post) {
         return listCategories(categoryNames)
-            .collectSortedList()
+            .collectList()
             .doOnNext(post::setCategories)
             .map(categories -> post)
             .switchIfEmpty(Mono.defer(() -> Mono.just(post)));
@@ -181,7 +181,7 @@ public class PostServiceImpl implements PostService {
 
     private Mono<ListedPost> setContributors(List<String> contributorNames, ListedPost post) {
         return listContributors(contributorNames)
-            .collectSortedList()
+            .collectList()
             .doOnNext(post::setContributors)
             .map(contributors -> post)
             .switchIfEmpty(Mono.defer(() -> Mono.just(post)));

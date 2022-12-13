@@ -1,4 +1,4 @@
-package run.halo.app.core.extension;
+package run.halo.app.core.extension.content;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,10 +19,11 @@ import run.halo.app.extension.Ref;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = "content.halo.run", version = "v1alpha1",
-    kind = Comment.KIND, plural = "comments", singular = "comment")
+@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Comment.KIND,
+    plural = "comments", singular = "comment")
 @EqualsAndHashCode(callSuper = true)
 public class Comment extends AbstractExtension {
+
     public static final String KIND = "Comment";
 
     @Schema(required = true)

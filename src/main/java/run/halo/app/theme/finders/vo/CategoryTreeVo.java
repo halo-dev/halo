@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.util.Assert;
-import run.halo.app.core.extension.Category;
+import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.MetadataOperator;
 
 /**

@@ -4,8 +4,10 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,6 +17,7 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -49,15 +52,17 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                 var settingJson = configMap.getData().getOrDefault("default", "{}");
                 var setting = JsonUtils.jsonToObject(settingJson, PolicySetting.class);
 
-                var attachmentsRoot = getAttachmentsRoot();
-                var attachmentRoot = attachmentsRoot;
+                final var attachmentsRoot = getAttachmentsRoot();
+                final var uploadRoot = attachmentsRoot.resolve("upload");
+                final var file = option.file();
+                final Path attachmentPath;
                 if (StringUtils.hasText(setting.getLocation())) {
-                    attachmentRoot = attachmentsRoot.resolve(setting.getLocation());
+                    attachmentPath =
+                        uploadRoot.resolve(setting.getLocation()).resolve(file.filename());
+                } else {
+                    attachmentPath = uploadRoot.resolve(file.filename());
                 }
-                var file = option.file();
-                var attachmentPath = attachmentRoot.resolve(file.filename());
-                // check the directory traversal before saving
-                checkDirectoryTraversal(attachmentsRoot, attachmentPath);
+                checkDirectoryTraversal(uploadRoot, attachmentPath);
 
                 return Mono.fromRunnable(
                         () -> {
@@ -76,8 +81,22 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                         // TODO check the file extension
                         var metadata = new Metadata();
                         metadata.setName(UUID.randomUUID().toString());
-                        metadata.setAnnotations(Map.of(Constant.LOCAL_REL_PATH_ANNO_KEY,
-                            attachmentsRoot.relativize(attachmentPath).toString()));
+                        var relativePath = attachmentsRoot.relativize(attachmentPath).toString();
+
+                        var pathSegments = new ArrayList<String>();
+                        pathSegments.add("upload");
+                        for (Path p : uploadRoot.relativize(attachmentPath)) {
+                            pathSegments.add(p.toString());
+                        }
+
+                        var uri = UriComponentsBuilder.newInstance()
+                            .pathSegment(pathSegments.toArray(String[]::new))
+                            .encode(StandardCharsets.UTF_8)
+                            .build()
+                            .toString();
+                        metadata.setAnnotations(Map.of(
+                            Constant.LOCAL_REL_PATH_ANNO_KEY, relativePath,
+                            Constant.URI_ANNO_KEY, uri));
                         var spec = new AttachmentSpec();
                         spec.setSize(attachmentPath.toFile().length());
                         file.headers().getContentType();
@@ -130,10 +149,10 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
     private boolean shouldHandle(Policy policy) {
         if (policy == null
             || policy.getSpec() == null
-            || policy.getSpec().getTemplateRef() == null) {
+            || !StringUtils.hasText(policy.getSpec().getTemplateName())) {
             return false;
         }
-        return "local".equals(policy.getSpec().getTemplateRef().getName());
+        return "local".equals(policy.getSpec().getTemplateName());
     }
 
     @Data

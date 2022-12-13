@@ -45,4 +45,7 @@ public class HaloProperties {
 
     @Valid
     private final ThemeProperties theme = new ThemeProperties();
+
+    @Valid
+    private final AttachmentProperties attachment = new AttachmentProperties();
 }

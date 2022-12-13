@@ -1,16 +1,18 @@
 package run.halo.app.plugin;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ResourceUtils;
+import run.halo.app.infra.utils.FileUtils;
 
 /**
  * Tests for {@link PluginStartedListener}.
@@ -39,14 +41,22 @@ class PluginStartedListenerTest {
         }
 
         @Test
-        void lookupFromJar() throws FileNotFoundException {
-            File file =
-                ResourceUtils.getFile("classpath:plugin/test-unstructured-resource-loader.jar");
-            Set<String> unstructuredFilePathFromJar =
-                PluginStartedListener.PluginExtensionLoaderUtils.lookupFromJar(file.toPath());
-            assertThat(unstructuredFilePathFromJar).hasSize(3);
-            assertThat(unstructuredFilePathFromJar).containsAll(Set.of("extensions/roles.yaml",
-                "extensions/reverseProxy.yaml", "extensions/test.yml"));
+        void lookupFromJar() throws IOException {
+            Path tempDirectory = Files.createTempDirectory("halo-plugin");
+            try {
+                var plugin001Uri = requireNonNull(
+                    ResourceUtils.getFile("classpath:plugin/plugin-0.0.1")).toURI();
+
+                Path targetJarPath = tempDirectory.resolve("plugin-0.0.1.jar");
+                FileUtils.jar(Paths.get(plugin001Uri), targetJarPath);
+                Set<String> unstructuredFilePathFromJar =
+                    PluginStartedListener.PluginExtensionLoaderUtils.lookupFromJar(targetJarPath);
+                assertThat(unstructuredFilePathFromJar).hasSize(3);
+                assertThat(unstructuredFilePathFromJar).containsAll(Set.of("extensions/roles.yaml",
+                    "extensions/reverseProxy.yaml", "extensions/test.yml"));
+            } finally {
+                FileSystemUtils.deleteRecursively(tempDirectory);
+            }
         }
     }
 }

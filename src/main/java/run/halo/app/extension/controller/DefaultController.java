@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StopWatch;
 import run.halo.app.extension.controller.RequestQueue.DelayedEntry;
@@ -32,6 +33,7 @@ public class DefaultController<R> implements Controller {
 
     private final ExecutorService executor;
 
+    @Nullable
     private final Synchronizer<R> synchronizer;
 
     private final Duration minDelay;
@@ -144,7 +146,9 @@ public class DefaultController<R> implements Controller {
         @Override
         public void run() {
             log.info("Controller worker {} started", this.name);
-            synchronizer.start();
+            if (synchronizer != null) {
+                synchronizer.start();
+            }
             while (!isDisposed() && !Thread.currentThread().isInterrupted()) {
                 try {
                     var entry = queue.take();
@@ -213,7 +217,9 @@ public class DefaultController<R> implements Controller {
         disposed = true;
         log.info("Disposing controller {}", name);
 
-        synchronizer.dispose();
+        if (synchronizer != null) {
+            synchronizer.dispose();
+        }
 
         executor.shutdownNow();
         try {

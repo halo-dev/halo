@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.MetadataOperator;
 
 class PostTest {

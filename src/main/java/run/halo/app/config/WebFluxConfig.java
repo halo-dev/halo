@@ -3,21 +3,26 @@ package run.halo.app.config;
 import static org.springframework.util.ResourceUtils.FILE_URL_PREFIX;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
+import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.CacheControl;
 import org.springframework.http.codec.CodecConfigurer;
 import org.springframework.http.codec.HttpMessageWriter;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
 import org.springframework.lang.NonNull;
+import org.springframework.web.reactive.config.ResourceHandlerRegistration;
 import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -114,8 +119,12 @@ public class WebFluxConfig implements WebFluxConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         var attachmentsRoot = haloProp.getWorkDir().resolve("attachments");
-        registry.addResourceHandler("/upload/**")
-            .addResourceLocations(FILE_URL_PREFIX + attachmentsRoot + "/");
+
+        // Mandatory resource mapping
+        var uploadRegistration = registry.addResourceHandler("/upload/**")
+            .addResourceLocations(FILE_URL_PREFIX + attachmentsRoot.resolve("upload") + "/")
+            .setUseLastModified(true)
+            .setCacheControl(CacheControl.maxAge(Duration.ofDays(365)));
 
         // For console project
         registry.addResourceHandler("/console/**")
@@ -123,6 +132,23 @@ public class WebFluxConfig implements WebFluxConfigurer {
             .resourceChain(true)
             .addResolver(new EncodedResourceResolver())
             .addResolver(new PathResourceResolver());
+
+        // Additional resource mappings
+        var staticResources = haloProp.getAttachment().getResourceMappings();
+        staticResources.forEach(staticResource -> {
+            ResourceHandlerRegistration registration;
+            if (Objects.equals(staticResource.getPathPattern(), "/upload/**")) {
+                registration = uploadRegistration;
+            } else {
+                registration = registry.addResourceHandler(staticResource.getPathPattern());
+            }
+            staticResource.getLocations().forEach(location -> {
+                var path = attachmentsRoot.resolve(location);
+                checkDirectoryTraversal(attachmentsRoot, path);
+                registration.addResourceLocations(FILE_URL_PREFIX + path + "/");
+            });
+        });
+
     }
 
 

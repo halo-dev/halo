@@ -8,13 +8,12 @@
 
 <p align="center">
 <a href="https://github.com/halo-dev/halo/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/halo-dev/halo.svg?style=flat-square&include_prereleases" /></a>
-<a href="https://github.com/halo-dev/halo/releases"><img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/halo-dev/halo/total.svg?style=flat-square" /></a>
 <a href="https://hub.docker.com/r/halohub/halo"><img alt="Docker pulls" src="https://img.shields.io/docker/pulls/halohub/halo?style=flat-square" /></a>
 <a href="https://github.com/halo-dev/halo/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/halo-dev/halo.svg?style=flat-square" /></a>
 <a href="https://github.com/halo-dev/halo/actions"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/halo-dev/halo/Halo%20CI?style=flat-square" /></a>
 <br />
 <a href="https://halo.run">官网</a>
-<a href="https://docs.halo.run/2.0.0-SNAPSHOT">文档（2.0 RC）</a>
+<a href="https://docs.halo.run">文档</a>
 <a href="https://bbs.halo.run">社区</a>
 <a href="https://gitee.com/halo-dev">Gitee</a>
 <a href="https://t.me/halo_dev">Telegram 频道</a>
@@ -22,23 +21,13 @@
 
 ------------------------------
 
-## 注意
-
-当前分支为 Halo 2.0 的开发分支，目前 Halo 2.0 处于 RC 阶段，暂时无法从 1.5 直接升级，不建议在生产环境使用。稳定版本（Halo 1.x）请查阅以下地址：
-
-- 1.5 分支：<https://github.com/halo-dev/halo/tree/release-1.5>
-- 1.6 分支：<https://github.com/halo-dev/halo/tree/release-1.6>
-- 1.6 文档：<https://docs.halo.run>
-
 ## 快速开始
 
-### Docker
-
 ```bash
-docker run -it -d --name halo-next -p 8090:8090 -v ~/.halo2:/root/.halo2 --restart=unless-stopped halohub/halo-dev:2.0.0-rc.1
+docker run -it -d --name halo-next -p 8090:8090 -v ~/.halo2:/root/.halo2 --restart=unless-stopped halohub/halo:2.0.0
 ```
 
-详细部署文档请查阅：<https://docs.halo.run/2.0.0-SNAPSHOT/getting-started/install/docker>
+详细部署文档请查阅：<https://docs.halo.run/getting-started/install/docker-compose>
 
 ## 在线体验
 
@@ -49,7 +38,8 @@ docker run -it -d --name halo-next -p 8090:8090 -v ~/.halo2:/root/.halo2 --resta
 
 ## 生态
 
-可访问 [awesome-halo](https://github.com/halo-sigs/awesome-halo) 查看已经适用于 Halo 2.0 的主题和插件，以及适用于 Halo 1.x 的相关仓库。
+可访问 [awesome-halo](https://github.com/halo-sigs/awesome-halo) 查看已经适用于 Halo 2.0 的主题和插件，以及适用于 Halo
+1.x 的相关仓库。
 
 ## 许可证
 

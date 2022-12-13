@@ -1,4 +1,4 @@
-package run.halo.app.core.extension;
+package run.halo.app.core.extension.content;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -14,8 +14,8 @@ import run.halo.app.extension.GVK;
  */
 @Data
 @ToString(callSuper = true)
-@GVK(group = "content.halo.run", version = "v1alpha1",
-    kind = Reply.KIND, plural = "replies", singular = "reply")
+@GVK(group = Constant.GROUP, version = Constant.VERSION, kind = Reply.KIND,
+    plural = "replies", singular = "reply")
 @EqualsAndHashCode(callSuper = true)
 public class Reply extends AbstractExtension {
 

@@ -3,7 +3,7 @@ package run.halo.app.theme.finders.vo;
 import lombok.Builder;
 import lombok.ToString;
 import lombok.Value;
-import run.halo.app.core.extension.Snapshot;
+import run.halo.app.core.extension.content.Snapshot;
 
 /**
  * A value object for Content from {@link Snapshot}.

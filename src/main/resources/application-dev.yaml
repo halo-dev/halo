@@ -9,12 +9,14 @@ spring:
     cache: false
 
 halo:
+  console:
+    proxy:
+      endpoint: http://localhost:3000/
+      enabled: true
   security:
-    oauth2:
-      jwt:
-        jwsAlgorithm: rs512
-        public-key-location: classpath:app.pub
-        private-key-location: classpath:app.key
+    initializer:
+      super-admin-username: admin
+      super-admin-password: admin
   plugin:
     runtime-mode: development # development, deployment
     classes-directories:

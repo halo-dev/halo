@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +50,6 @@ import run.halo.app.core.extension.endpoint.SortResolver;
 import run.halo.app.extension.Comparators;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.Ref;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
 import run.halo.app.plugin.ExtensionComponentsFinder;
@@ -108,11 +108,11 @@ public class AttachmentEndpoint implements CustomEndpoint {
                 .map(UploadRequest::new)
                 // prepare the upload option
                 .flatMap(uploadRequest -> client.get(Policy.class, uploadRequest.getPolicyName())
-                    .filter(policy -> policy.getSpec().getConfigMapRef() != null)
+                    .filter(policy -> StringUtils.hasText(policy.getSpec().getConfigMapName()))
                     .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
                         "Please configure the attachment policy before uploading")))
                     .flatMap(policy -> {
-                        var configMapName = policy.getSpec().getConfigMapRef().getName();
+                        var configMapName = policy.getSpec().getConfigMapName();
                         return client.get(ConfigMap.class, configMapName)
                             .map(configMap -> new UploadOption(uploadRequest.getFile(), policy,
                                 configMap));
@@ -127,12 +127,12 @@ public class AttachmentEndpoint implements CustomEndpoint {
                                     spec = new Attachment.AttachmentSpec();
                                     attachment.setSpec(spec);
                                 }
-                                spec.setUploadedBy(Ref.of(username));
-                                spec.setPolicyRef(Ref.of(uploadOption.policy()));
+                                spec.setOwnerName(username);
+                                spec.setPolicyName(uploadOption.policy().getMetadata().getName());
                                 var groupName = uploadRequest.getGroupName();
                                 if (groupName != null) {
                                     // validate the group name
-                                    spec.setGroupRef(Ref.of(groupName));
+                                    spec.setGroupName(groupName);
                                 }
                             }))
                         .next()
@@ -239,31 +239,20 @@ public class AttachmentEndpoint implements CustomEndpoint {
                 }).orElse(true);
 
             Predicate<Attachment> policyPred = attachment -> getPolicy()
-                .map(policy -> {
-                    var policyRef = attachment.getSpec().getPolicyRef();
-                    return policyRef != null && policy.equals(policyRef.getName());
-                }).orElse(true);
+                .map(policy -> Objects.equals(policy, attachment.getSpec().getPolicyName()))
+                .orElse(true);
 
             Predicate<Attachment> groupPred = attachment -> getGroup()
-                .map(group -> {
-                    var groupRef = attachment.getSpec().getGroupRef();
-                    return groupRef != null && group.equals(groupRef.getName());
-                })
+                .map(group -> Objects.equals(group, attachment.getSpec().getGroupName()))
                 .orElse(true);
 
             Predicate<Attachment> ungroupedPred = attachment -> getUngrouped()
                 .filter(Boolean::booleanValue)
-                .map(ungrouped -> {
-                    var groupRef = attachment.getSpec().getGroupRef();
-                    return groupRef == null || !StringUtils.hasText(groupRef.getName());
-                })
+                .map(ungrouped -> !StringUtils.hasText(attachment.getSpec().getGroupName()))
                 .orElseGet(() -> groupPred.test(attachment));
 
             Predicate<Attachment> uploadedByPred = attachment -> getUploadedBy()
-                .map(uploadedBy -> {
-                    var uploadedByRef = attachment.getSpec().getUploadedBy();
-                    return uploadedByRef != null && uploadedBy.equals(uploadedByRef.getName());
-                })
+                .map(uploadedBy -> Objects.equals(uploadedBy, attachment.getSpec().getOwnerName()))
                 .orElse(true);
 
 

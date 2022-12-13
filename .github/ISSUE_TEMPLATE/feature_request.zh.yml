@@ -13,7 +13,6 @@ body:
     id: version
     attributes:
       label: "你当前使用的版本"
-      description: "可以在管理后台的关于页面中找到。"
   - type: markdown
     id: details
     attributes:

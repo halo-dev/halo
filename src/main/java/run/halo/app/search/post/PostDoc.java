@@ -1,36 +1,34 @@
 package run.halo.app.search.post;
 
 import java.time.Instant;
-import lombok.Data;
+import org.springframework.util.Assert;
 import run.halo.app.theme.finders.vo.PostVo;
 
-@Data
-public class PostDoc {
+public record PostDoc(String name,
+                      String title,
+                      String excerpt,
+                      String content,
+                      Instant publishTimestamp,
+                      String permalink) {
 
     public static final String ID_FIELD = "name";
 
-    private String name;
-
-    private String title;
-
-    private String excerpt;
-
-    private String content;
-
-    private Instant publishTimestamp;
-
-    private String permalink;
+    public PostDoc {
+        Assert.hasText(name, "Name must not be blank");
+        Assert.hasText(title, "Title must not be blank");
+        Assert.hasText(permalink, "Permalink must not be blank");
+        Assert.notNull(publishTimestamp, "PublishTimestamp must not be null");
+    }
 
     // TODO Move this static method to other place.
     public static PostDoc from(PostVo postVo) {
-        var post = new PostDoc();
-        post.setName(postVo.getMetadata().getName());
-        post.setTitle(postVo.getSpec().getTitle());
-        post.setExcerpt(postVo.getStatus().getExcerpt());
-        post.setPublishTimestamp(postVo.getSpec().getPublishTime());
-        post.setContent(postVo.getContent().getContent());
-        post.setPermalink(postVo.getStatus().getPermalink());
-        return post;
+        return new PostDoc(
+            postVo.getMetadata().getName(),
+            postVo.getSpec().getTitle(),
+            postVo.getStatus().getExcerpt(),
+            postVo.getContent().getContent(),
+            postVo.getSpec().getPublishTime(),
+            postVo.getStatus().getPermalink()
+        );
     }
-
 }

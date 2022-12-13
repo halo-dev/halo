@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import run.halo.app.core.extension.Comment;
+import run.halo.app.core.extension.content.Comment;
 import run.halo.app.extension.Metadata;
 
 /**

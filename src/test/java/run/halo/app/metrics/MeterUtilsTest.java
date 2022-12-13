@@ -8,7 +8,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.search.RequiredSearch;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.Test;
-import run.halo.app.core.extension.Post;
+import run.halo.app.core.extension.content.Post;
 
 /**
  * Tests for {@link MeterUtils}.

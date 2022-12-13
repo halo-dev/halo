@@ -20,10 +20,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import run.halo.app.core.extension.Category;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.MenuItem.MenuItemSpec;
-import run.halo.app.core.extension.SinglePage;
+import run.halo.app.core.extension.content.Category;
+import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Ref;
@@ -44,7 +44,7 @@ class MenuItemReconcilerTest {
         @Test
         void shouldNotUpdateMenuItemIfCategoryNotFound() {
             Supplier<MenuItem> menuItemSupplier = () -> createMenuItem("fake-name", spec -> {
-                spec.setCategoryRef(Ref.of("fake-category"));
+                spec.setTargetRef(Ref.of("fake-category", Category.GVK));
             });
 
             when(client.fetch(MenuItem.class, "fake-name"))
@@ -63,7 +63,7 @@ class MenuItemReconcilerTest {
         @Test
         void shouldUpdateMenuItemIfCategoryFound() {
             Supplier<MenuItem> menuItemSupplier = () -> createMenuItem("fake-name", spec -> {
-                spec.setCategoryRef(Ref.of("fake-category"));
+                spec.setTargetRef(Ref.of("fake-category", Category.GVK));
             });
 
             when(client.fetch(MenuItem.class, "fake-name"))
@@ -107,9 +107,8 @@ class MenuItemReconcilerTest {
 
         @Test
         void shouldUpdateMenuItemIfPageFound() {
-            Supplier<MenuItem> menuItemSupplier = () -> createMenuItem("fake-name", spec -> {
-                spec.setSinglePageRef(Ref.of("fake-page"));
-            });
+            Supplier<MenuItem> menuItemSupplier = () -> createMenuItem("fake-name",
+                spec -> spec.setTargetRef(Ref.of("fake-page", SinglePage.GVK)));
 
             when(client.fetch(MenuItem.class, "fake-name"))
                 .thenReturn(Optional.of(menuItemSupplier.get()))
