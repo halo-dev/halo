@@ -145,8 +145,12 @@ public class GlobalErrorWebExceptionHandler extends DefaultErrorWebExceptionHand
         ServerResponse.BodyBuilder responseBody,
         Map<String, Object> error) {
         return themeResolver.isTemplateAvailable(request.exchange().getRequest(), viewName)
-            .filter(isAvailable -> isAvailable)
-            .flatMap(isAvailable -> responseBody.render(viewName, error));
+            .flatMap(isAvailable -> {
+                if (isAvailable) {
+                    return responseBody.render(viewName, error);
+                }
+                return super.renderErrorView(viewName, responseBody, error);
+            });
     }
 
     private List<String> getData(int errorStatus) {
