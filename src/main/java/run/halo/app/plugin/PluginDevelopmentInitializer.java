@@ -1,14 +1,18 @@
 package run.halo.app.plugin;
 
 import java.nio.file.Path;
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginWrapper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Plugin;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
  * @author guqing
@@ -22,10 +26,10 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
 
     private final PluginProperties pluginProperties;
 
-    private final ExtensionClient extensionClient;
+    private final ReactiveExtensionClient extensionClient;
 
     public PluginDevelopmentInitializer(HaloPluginManager haloPluginManager,
-        PluginProperties pluginProperties, ExtensionClient extensionClient) {
+        PluginProperties pluginProperties, ReactiveExtensionClient extensionClient) {
         this.haloPluginManager = haloPluginManager;
         this.pluginProperties = pluginProperties;
         this.extensionClient = extensionClient;
@@ -41,19 +45,18 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
 
     private void createFixedPluginIfNecessary(HaloPluginManager pluginManager) {
         for (Path path : pluginProperties.getFixedPluginPath()) {
-            // already loaded
-            if (idForPath(path) != null) {
-                continue;
-            }
+
+            // Already loaded do not load again
+            String pluginId = idForPath(path);
 
             // for issue #2901
-            String pluginId;
-
-            try {
-                pluginId = pluginManager.loadPlugin(path);
-            } catch (Exception e) {
-                log.warn(e.getMessage(), e);
-                continue;
+            if (pluginId == null) {
+                try {
+                    pluginId = pluginManager.loadPlugin(path);
+                } catch (Exception e) {
+                    log.warn(e.getMessage(), e);
+                    continue;
+                }
             }
 
             PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
@@ -62,10 +65,14 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
             }
             Plugin plugin = new YamlPluginFinder().find(pluginWrapper.getPluginPath());
             extensionClient.fetch(Plugin.class, plugin.getMetadata().getName())
-                .ifPresentOrElse(persistent -> {
+                .flatMap(persistent -> {
                     plugin.getMetadata().setVersion(persistent.getMetadata().getVersion());
-                    extensionClient.update(plugin);
-                }, () -> extensionClient.create(plugin));
+                    return extensionClient.update(plugin);
+                })
+                .switchIfEmpty(Mono.defer(() -> extensionClient.create(plugin)))
+                .retryWhen(Retry.backoff(10, Duration.ofMillis(100))
+                    .filter(t -> t instanceof OptimisticLockingFailureException))
+                .block();
         }
     }
 
