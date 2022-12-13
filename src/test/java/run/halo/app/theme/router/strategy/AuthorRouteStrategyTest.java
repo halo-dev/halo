@@ -53,6 +53,7 @@ class AuthorRouteStrategyTest extends RouterStrategyTestSuite {
                     assertThat(model.get("_templateId"))
                         .isEqualTo(DefaultTemplateEnum.AUTHOR.getValue());
                     assertThat(model.get("author")).isNotNull();
+                    assertThat(model.get("posts")).isNotNull();
                     return Mono.empty();
                 }
             }));
