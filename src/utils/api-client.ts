@@ -44,7 +44,7 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-interface ProblemDetail {
+export interface ProblemDetail {
   detail: string;
   instance: string;
   status: number;

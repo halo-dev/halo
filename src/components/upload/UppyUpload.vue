@@ -7,6 +7,8 @@ import type { Restrictions } from "@uppy/core";
 import XHRUpload from "@uppy/xhr-upload";
 import zh_CN from "@uppy/locales/lib/zh_CN";
 import { computed, onUnmounted } from "vue";
+import { Toast } from "@halo-dev/components";
+import type { ProblemDetail } from "@/utils/api-client";
 
 const props = withDefaults(
   defineProps<{
@@ -50,6 +52,18 @@ const uppy = computed(() => {
     fieldName: props.name,
     method: props.method,
     limit: 5,
+    getResponseError: (responseText) => {
+      const response = JSON.parse(responseText);
+      const { title, detail } = (response || {}) as ProblemDetail;
+      const message = [title, detail].filter(Boolean).join(": ");
+
+      if (message) {
+        Toast.error(message, { duration: 5000 });
+
+        return new Error(message);
+      }
+      return new Error("Internal Server Error");
+    },
   });
 });
 
