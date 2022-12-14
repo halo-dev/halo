@@ -1,6 +1,9 @@
 package run.halo.app.infra.exception.handlers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +17,7 @@ import org.springframework.boot.autoconfigure.web.reactive.error.DefaultErrorWeb
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.util.StringUtils;
@@ -54,6 +58,8 @@ public class GlobalErrorWebExceptionHandler extends DefaultErrorWebExceptionHand
 
     private final ThemeResolver themeResolver;
 
+    private final ObjectMapper objectMapper;
+
     static {
         Map<HttpStatus.Series, String> views = new EnumMap<>(HttpStatus.Series.class);
         views.put(HttpStatus.Series.CLIENT_ERROR, "4xx");
@@ -77,6 +83,7 @@ public class GlobalErrorWebExceptionHandler extends DefaultErrorWebExceptionHand
         super(errorAttributes, resources, errorProperties, applicationContext);
         this.errorProperties = errorProperties;
         this.themeResolver = applicationContext.getBean(ThemeResolver.class);
+        this.objectMapper = applicationContext.getBean(ObjectMapper.class);
     }
 
     @Override
@@ -106,9 +113,16 @@ public class GlobalErrorWebExceptionHandler extends DefaultErrorWebExceptionHand
     }
 
     protected Mono<ServerResponse> renderErrorView(ServerRequest request) {
-        Map<String, Object> error =
+        Map<String, Object> errorAttributes =
             getErrorAttributes(request, getErrorAttributeOptions(request, MediaType.TEXT_HTML));
-        int errorStatus = getHttpStatus(error);
+        int errorStatus = getHttpStatus(errorAttributes);
+
+        ProblemDetail problemDetail =
+            ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(errorStatus),
+                (String) errorAttributes.get("message"));
+        problemDetail.setInstance(URI.create(request.path()));
+        Map<String, Object> error = problemDetailMap(problemDetail);
+
         ServerResponse.BodyBuilder responseBody =
             ServerResponse.status(errorStatus).contentType(TEXT_HTML_UTF8);
         return Flux.just(getData(errorStatus).toArray(new String[] {}))
@@ -128,6 +142,11 @@ public class GlobalErrorWebExceptionHandler extends DefaultErrorWebExceptionHand
             log.error("{} 500 Server Error for {}",
                 request.exchange().getLogPrefix(), formatRequest(request), throwable);
         }
+    }
+
+    private Map<String, Object> problemDetailMap(ProblemDetail problemDetail) {
+        return objectMapper.convertValue(problemDetail, new TypeReference<>() {
+        });
     }
 
     private String formatRequest(ServerRequest request) {
