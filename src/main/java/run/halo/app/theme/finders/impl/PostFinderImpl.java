@@ -221,6 +221,12 @@ public class PostFinderImpl implements PostFinder {
     }
 
     @Override
+    public Mono<ListResult<ListedPostVo>> listByOwner(Integer page, Integer size, String owner) {
+        return listPost(page, size,
+            post -> post.getSpec().getOwner().equals(owner), defaultComparator());
+    }
+
+    @Override
     public Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size) {
         return archives(page, size, null, null);
     }
