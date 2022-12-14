@@ -15,6 +15,8 @@ COPY --from=builder application/snapshot-dependencies/ ./
 COPY --from=builder application/application/ ./
 
 ENV JVM_OPTS="-Xmx256m -Xms256m" \
+    HALO_WORK_DIR="/root/.halo2" \
+    SPRING_CONFIG_LOCATION="optional:classpath:/;optional:file:/root/.halo2/" \
     TZ=Asia/Shanghai
 
 RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime \

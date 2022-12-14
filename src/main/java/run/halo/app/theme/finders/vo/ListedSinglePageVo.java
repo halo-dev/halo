@@ -29,9 +29,9 @@ public class ListedSinglePageVo {
 
     private StatsVo stats;
 
-    private List<Contributor> contributors;
+    private List<ContributorVo> contributors;
 
-    private Contributor owner;
+    private ContributorVo owner;
 
     /**
      * Convert {@link SinglePage} to {@link ListedSinglePageVo}.
