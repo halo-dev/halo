@@ -60,7 +60,7 @@ public class ReverseProxyReconciler implements Reconciler<Reconciler.Request> {
 
     private void cleanUpResources(ReverseProxy reverseProxy) {
         String pluginId = getPluginId(reverseProxy);
-        routerFunctionRegistry.remove(pluginId).block();
+        routerFunctionRegistry.remove(pluginId, reverseProxy.getMetadata().getName()).block();
     }
 
     private void addFinalizerIfNecessary(ReverseProxy oldReverseProxy) {
