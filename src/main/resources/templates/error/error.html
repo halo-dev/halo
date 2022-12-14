@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title th:text="${status} + ' | ' + ${#strings.defaultString(title, 'Internal server error')}"></title>
+    <title th:text="${error.status} + ' | ' + ${#strings.defaultString(error.title, 'Internal server error')}"></title>
     <style>
         body {
             padding: 30px 20px;
@@ -117,9 +117,9 @@
 <body>
 
 <div class="container">
-    <h2 th:text="${status}"></h2>
-    <h1 class="title" th:text="${#strings.defaultString(title, 'Internal server error')}"></h1>
-    <p th:text="${#strings.defaultString(detail, '未知错误！可能存在的原因：未正确设置主题或主题文件缺失。')}"></p>
+    <h2 th:text="${error.status}"></h2>
+    <h1 class="title" th:text="${#strings.defaultString(error.title, 'Internal server error')}"></h1>
+    <p th:text="${#strings.defaultString(error.detail, '未知错误！可能存在的原因：未正确设置主题或主题文件缺失。')}"></p>
     <div class="back-home">
         <button th:onclick="window.location.href='[(${site.url})]'"
                 th:text="首页">
