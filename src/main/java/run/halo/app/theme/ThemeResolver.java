@@ -1,6 +1,9 @@
 package run.halo.app.theme;
 
+import java.nio.file.Files;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -14,17 +17,14 @@ import run.halo.app.infra.utils.FilePathUtils;
  * @since 2.0.0
  */
 @Component
+@AllArgsConstructor
 public class ThemeResolver {
     private static final String THEME_WORK_DIR = "themes";
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     private final HaloProperties haloProperties;
 
-    public ThemeResolver(SystemConfigurableEnvironmentFetcher environmentFetcher,
-        HaloProperties haloProperties) {
-        this.environmentFetcher = environmentFetcher;
-        this.haloProperties = haloProperties;
-    }
+    private final ThymeleafProperties thymeleafProperties;
 
     public Mono<ThemeContext> getTheme(ServerHttpRequest request) {
         return environmentFetcher.fetch(Theme.GROUP, Theme.class)
@@ -37,10 +37,7 @@ public class ThemeResolver {
                 if (StringUtils.isBlank(themeName)) {
                     themeName = activatedTheme;
                 }
-                boolean active = false;
-                if (StringUtils.equals(activatedTheme, themeName)) {
-                    active = true;
-                }
+                boolean active = StringUtils.equals(activatedTheme, themeName);
                 var path = FilePathUtils.combinePath(haloProperties.getWorkDir().toString(),
                     THEME_WORK_DIR, themeName);
                 return builder.name(themeName)
@@ -50,4 +47,22 @@ public class ThemeResolver {
             });
     }
 
+    /**
+     * Check whether the template file exists.
+     *
+     * @param viewName view name must not be blank
+     * @return if exists return true, otherwise return false
+     */
+    public Mono<Boolean> isTemplateAvailable(ServerHttpRequest request, String viewName) {
+        return getTheme(request)
+            .map(themeContext -> {
+                String prefix = themeContext.getPath() + "/templates/";
+                String viewNameToUse = viewName;
+                if (!viewNameToUse.endsWith(thymeleafProperties.getSuffix())) {
+                    viewNameToUse = viewNameToUse + thymeleafProperties.getSuffix();
+                }
+                return Files.exists(FilePathUtils.combinePath(prefix, viewNameToUse));
+            })
+            .onErrorResume(e -> Mono.just(false));
+    }
 }
