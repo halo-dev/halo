@@ -68,17 +68,13 @@ public class HaloPluginManager extends DefaultPluginManager
         return new SpringComponentsFinder(this);
     }
 
-    public ApplicationContext getRootApplicationContext() {
-        return this.rootApplicationContext;
-    }
-
     @Override
-    public void setApplicationContext(@NonNull ApplicationContext rootApplicationContext)
+    public final void setApplicationContext(@NonNull ApplicationContext rootApplicationContext)
         throws BeansException {
         this.rootApplicationContext = rootApplicationContext;
     }
 
-    public PluginApplicationContext getPluginApplicationContext(String pluginId) {
+    final PluginApplicationContext getPluginApplicationContext(String pluginId) {
         return pluginApplicationInitializer.getPluginApplicationContext(pluginId);
     }
 
@@ -88,8 +84,9 @@ public class HaloPluginManager extends DefaultPluginManager
     }
 
     @Override
-    public void afterPropertiesSet() {
-        this.pluginApplicationInitializer = new PluginApplicationInitializer(this);
+    public final void afterPropertiesSet() {
+        this.pluginApplicationInitializer =
+            new PluginApplicationInitializer(this, rootApplicationContext);
 
         this.requestMappingManager =
             rootApplicationContext.getBean(PluginRequestMappingManager.class);
