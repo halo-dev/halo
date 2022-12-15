@@ -32,6 +32,7 @@ import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
+import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
@@ -100,6 +101,19 @@ public class ThemeEndpoint implements CustomEndpoint {
                     )
                     .response(responseBuilder()
                         .implementation(Theme.class))
+            )
+            .PUT("themes/{name}/resetconfig", this::resetSettingConfig,
+                builder -> builder.operationId("ResetSettingConfig")
+                    .description("Reset theme setting configMap.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .response(responseBuilder()
+                        .implementation(ConfigMap.class))
             )
             .GET("themes", this::listThemes,
                 builder -> {
@@ -210,6 +224,14 @@ public class ThemeEndpoint implements CustomEndpoint {
     Mono<ServerResponse> reloadTheme(ServerRequest request) {
         String name = request.pathVariable("name");
         return themeService.reloadTheme(name)
+            .flatMap(theme -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(theme));
+    }
+
+    Mono<ServerResponse> resetSettingConfig(ServerRequest request) {
+        String name = request.pathVariable("name");
+        return themeService.resetSettingConfig(name)
             .flatMap(theme -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(theme));

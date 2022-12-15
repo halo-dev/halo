@@ -1,6 +1,7 @@
 package run.halo.app.core.extension.theme;
 
 import static java.nio.file.Files.createTempDirectory;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -17,6 +18,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import org.json.JSONException;
 import org.junit.jupiter.api.AfterEach;
@@ -35,6 +37,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
+import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
@@ -374,5 +377,70 @@ class ThemeServiceImplTest {
                 }
             })
             .verifyComplete();
+    }
+
+    @Test
+    void resetSettingConfig() {
+        Theme theme = new Theme();
+        theme.setMetadata(new Metadata());
+        theme.getMetadata().setName("fake-theme");
+        theme.setSpec(new Theme.ThemeSpec());
+        theme.getSpec().setSettingName("fake-setting");
+        theme.getSpec().setConfigMapName("fake-config");
+        theme.getSpec().setDisplayName("Hello");
+        when(client.fetch(Theme.class, "fake-theme"))
+            .thenReturn(Mono.just(theme));
+
+        Setting setting = new Setting();
+        setting.setMetadata(new Metadata());
+        setting.getMetadata().setName("fake-setting");
+        setting.setSpec(new Setting.SettingSpec());
+        var formSchemaItem = Map.of("name", "email", "value", "example@exmple.com");
+        Setting.SettingForm settingForm = new Setting.SettingForm();
+        settingForm.setGroup("basic");
+        settingForm.setFormSchema(List.of(formSchemaItem));
+        setting.getSpec().setForms(List.of(settingForm));
+        when(client.fetch(eq(Setting.class), eq("fake-setting")))
+            .thenReturn(Mono.just(setting));
+
+        ConfigMap configMap = new ConfigMap();
+        configMap.setMetadata(new Metadata());
+        configMap.getMetadata().setName("fake-config");
+        when(client.fetch(eq(ConfigMap.class), eq("fake-config")))
+            .thenReturn(Mono.just(configMap));
+
+        when(client.update(any(ConfigMap.class)))
+            .thenAnswer((Answer<Mono<ConfigMap>>) invocation -> {
+                ConfigMap argument = invocation.getArgument(0);
+                JSONAssert.assertEquals("""
+                        {
+                            "data": {
+                                "basic": "{\\"email\\":\\"example@exmple.com\\"}"
+                            },
+                            "apiVersion": "v1alpha1",
+                            "kind": "ConfigMap",
+                            "metadata": {
+                                "name": "fake-config"
+                            }
+                        }
+                        """,
+                    JsonUtils.objectToJson(argument),
+                    true);
+                return Mono.just(invocation.getArgument(0));
+            });
+
+        themeService.resetSettingConfig("fake-theme")
+            .as(StepVerifier::create)
+            .consumeNextWith(next -> {
+                assertThat(next).isNotNull();
+            })
+            .verifyComplete();
+
+        verify(client, times(1))
+            .fetch(eq(Setting.class), eq(setting.getMetadata().getName()));
+
+        verify(client, times(1)).fetch(eq(ConfigMap.class), eq("fake-config"));
+
+        verify(client, times(1)).update(any(ConfigMap.class));
     }
 }

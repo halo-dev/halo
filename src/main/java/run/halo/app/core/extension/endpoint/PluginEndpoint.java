@@ -25,11 +25,13 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
@@ -49,7 +51,10 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Plugin;
+import run.halo.app.core.extension.Setting;
+import run.halo.app.core.extension.theme.SettingUtils;
 import run.halo.app.extension.Comparators;
+import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
 import run.halo.app.infra.utils.FileUtils;
@@ -95,6 +100,19 @@ public class PluginEndpoint implements CustomEndpoint {
                         .content(contentBuilder().mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .schema(schemaBuilder().implementation(InstallRequest.class))))
             )
+            .PUT("plugins/{name}/resetconfig", this::resetSettingConfig,
+                builder -> builder.operationId("ResetSettingConfig")
+                    .description("Reset plugin setting configMap.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .response(responseBuilder()
+                        .implementation(ConfigMap.class))
+            )
             .GET("plugins", this::list, builder -> {
                 builder.operationId("ListPlugins")
                     .tag(tag)
@@ -103,6 +121,32 @@ public class PluginEndpoint implements CustomEndpoint {
                 buildParametersFromType(builder, ListRequest.class);
             })
             .build();
+    }
+
+    private Mono<ServerResponse> resetSettingConfig(ServerRequest request) {
+        String name = request.pathVariable("name");
+        return client.fetch(Plugin.class, name)
+            .filter(plugin -> StringUtils.hasText(plugin.getSpec().getSettingName()))
+            .flatMap(plugin -> {
+                String configMapName = plugin.getSpec().getConfigMapName();
+                String settingName = plugin.getSpec().getSettingName();
+                return client.fetch(Setting.class, settingName)
+                    .map(SettingUtils::settingDefinedDefaultValueMap)
+                    .flatMap(data -> updateConfigMapData(configMapName, data));
+            })
+            .flatMap(configMap -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(configMap));
+    }
+
+    private Mono<ConfigMap> updateConfigMapData(String configMapName, Map<String, String> data) {
+        return client.fetch(ConfigMap.class, configMapName)
+            .flatMap(configMap -> {
+                configMap.setData(data);
+                return client.update(configMap);
+            })
+            .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
+                .filter(t -> t instanceof OptimisticLockingFailureException));
     }
 
     private Mono<ServerResponse> upgrade(ServerRequest request) {

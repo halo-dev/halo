@@ -160,4 +160,13 @@ class ThemeEndpointTest {
             .exchange()
             .expectStatus().isOk();
     }
+
+    @Test
+    void resetSettingConfig() {
+        when(themeService.resetSettingConfig(any())).thenReturn(Mono.empty());
+        webTestClient.put()
+            .uri("/themes/fake/resetconfig")
+            .exchange()
+            .expectStatus().isOk();
+    }
 }
