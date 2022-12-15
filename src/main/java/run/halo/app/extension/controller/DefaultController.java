@@ -169,7 +169,7 @@ public class DefaultController<R> implements Controller {
                         }
                     } catch (Throwable t) {
                         if (t instanceof OptimisticLockingFailureException) {
-                            log.debug(
+                            log.warn(
                                 "Optimistic locking failure when reconciling request: {}",
                                 t.getMessage());
                         } else {
