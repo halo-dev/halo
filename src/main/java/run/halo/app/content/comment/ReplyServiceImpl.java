@@ -62,7 +62,8 @@ public class ReplyServiceImpl implements ReplyService {
                         }
                         reply.getSpec().setApproved(
                             Boolean.FALSE.equals(commentSetting.getRequireReviewForNew()));
-                        reply.getSpec().setHidden(!reply.getSpec().getApproved());
+                        //updated for issue 2951 121522
+                        reply.getSpec().setHidden(false);
 
                         if (BooleanUtils.isTrue(reply.getSpec().getApproved())
                             && reply.getSpec().getApprovedTime() == null) {
