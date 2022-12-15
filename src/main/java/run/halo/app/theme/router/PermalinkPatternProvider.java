@@ -50,7 +50,7 @@ public class PermalinkPatternProvider {
     public String getPattern(DefaultTemplateEnum defaultTemplateEnum) {
         SystemSetting.ThemeRouteRules permalinkRules = getPermalinkRules();
         return switch (defaultTemplateEnum) {
-            case INDEX, SINGLE_PAGE -> null;
+            case INDEX, SINGLE_PAGE, AUTHOR -> null;
             case POST -> permalinkRules.getPost();
             case ARCHIVES -> permalinkRules.getArchives();
             case CATEGORY, CATEGORIES -> permalinkRules.getCategories();

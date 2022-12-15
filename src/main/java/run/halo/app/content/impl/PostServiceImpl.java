@@ -32,7 +32,6 @@ import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.content.PostSorter;
 import run.halo.app.content.Stats;
-import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
@@ -76,17 +75,18 @@ public class PostServiceImpl implements PostService {
             );
     }
 
-    Stats fetchStats(Post post) {
+    Mono<Stats> fetchStats(Post post) {
         Assert.notNull(post, "The post must not be null.");
         String name = post.getMetadata().getName();
-        Counter counter =
-            counterService.getByName(MeterUtils.nameOf(Post.class, name));
-        return Stats.builder()
-            .visit(counter.getVisit())
-            .upvote(counter.getUpvote())
-            .totalComment(counter.getTotalComment())
-            .approvedComment(counter.getApprovedComment())
-            .build();
+        return counterService.getByName(MeterUtils.nameOf(Post.class, name))
+            .map(counter -> Stats.builder()
+                .visit(counter.getVisit())
+                .upvote(counter.getUpvote())
+                .totalComment(counter.getTotalComment())
+                .approvedComment(counter.getApprovedComment())
+                .build()
+            )
+            .defaultIfEmpty(Stats.empty());
     }
 
     Predicate<Post> postListPredicate(PostQuery query) {
@@ -154,9 +154,12 @@ public class PostServiceImpl implements PostService {
             .map(p -> {
                 ListedPost listedPost = new ListedPost();
                 listedPost.setPost(p);
-                listedPost.setStats(fetchStats(post));
                 return listedPost;
             })
+            .flatMap(lp -> fetchStats(post)
+                .doOnNext(lp::setStats)
+                .thenReturn(lp)
+            )
             .flatMap(lp -> setTags(post.getSpec().getTags(), lp))
             .flatMap(lp -> setCategories(post.getSpec().getCategories(), lp))
             .flatMap(lp -> setContributors(post.getStatus().getContributors(), lp))

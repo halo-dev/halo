@@ -3,11 +3,13 @@ package run.halo.app.core.extension.content;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.springframework.lang.Nullable;
+import org.springframework.util.CollectionUtils;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.Ref;
@@ -116,8 +118,22 @@ public class Comment extends AbstractExtension {
 
         private Integer unreadReplyCount;
 
-        public boolean getHasNewReply() {
-            return unreadReplyCount != null && unreadReplyCount > 0;
+        private Boolean hasNewReply;
+    }
+
+    public static int getUnreadReplyCount(List<Reply> replies, Instant lastReadTime) {
+        if (CollectionUtils.isEmpty(replies)) {
+            return 0;
         }
+        long unreadReplyCount = replies.stream()
+            .filter(existingReply -> {
+                if (lastReadTime == null) {
+                    return true;
+                }
+                return existingReply.getMetadata().getCreationTimestamp()
+                    .isAfter(lastReadTime);
+            })
+            .count();
+        return (int) unreadReplyCount;
     }
 }

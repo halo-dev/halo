@@ -71,6 +71,8 @@ public class User extends AbstractExtension {
 
         private Instant lastLoginAt;
 
+        private String permalink;
+
         private List<LoginHistory> loginHistories;
 
     }
