@@ -264,7 +264,8 @@ public class PostFinderImpl implements PostFinder {
                                 .month(monthEntry.getKey())
                                 .build()
                             )
-                            .sorted(Comparator.comparing(PostArchiveYearMonthVo::getMonth).reversed())
+                            .sorted(
+                                Comparator.comparing(PostArchiveYearMonthVo::getMonth).reversed())
                             .toList();
                         return PostArchiveVo.builder()
                             .year(String.valueOf(key))
