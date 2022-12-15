@@ -26,15 +26,16 @@ public class PluginApplicationInitializer {
 
     private final ExtensionContextRegistry contextRegistry = ExtensionContextRegistry.getInstance();
     private final SharedApplicationContextHolder sharedApplicationContextHolder;
+    private final ApplicationContext rootApplicationContext;
 
-    public PluginApplicationInitializer(HaloPluginManager springPluginManager) {
-        this.haloPluginManager = springPluginManager;
-        sharedApplicationContextHolder = springPluginManager.getRootApplicationContext()
+    public PluginApplicationInitializer(HaloPluginManager haloPluginManager,
+        ApplicationContext rootApplicationContext) {
+        Assert.notNull(haloPluginManager, "The haloPluginManager must not be null");
+        Assert.notNull(rootApplicationContext, "The rootApplicationContext must not be null");
+        this.haloPluginManager = haloPluginManager;
+        this.rootApplicationContext = rootApplicationContext;
+        sharedApplicationContextHolder = rootApplicationContext
             .getBean(SharedApplicationContextHolder.class);
-    }
-
-    public ApplicationContext getRootApplicationContext() {
-        return this.haloPluginManager.getRootApplicationContext();
     }
 
     private PluginApplicationContext createPluginApplicationContext(String pluginId) {
@@ -111,7 +112,7 @@ public class PluginApplicationInitializer {
     private void populateSettingFetcher(String pluginName,
         DefaultListableBeanFactory listableBeanFactory) {
         ExtensionClient extensionClient =
-            getRootApplicationContext().getBean(ExtensionClient.class);
+            rootApplicationContext.getBean(ExtensionClient.class);
         SettingFetcher settingFetcher = new SettingFetcher(pluginName, extensionClient);
         listableBeanFactory.registerSingleton("settingFetcher", settingFetcher);
     }
