@@ -62,7 +62,7 @@ public class ReplyServiceImpl implements ReplyService {
                         }
                         reply.getSpec().setApproved(
                             Boolean.FALSE.equals(commentSetting.getRequireReviewForNew()));
-                        //updated for issue 2951 121522
+                        // fix https://github.com/halo-dev/halo/issues/2951
                         reply.getSpec().setHidden(false);
 
                         if (BooleanUtils.isTrue(reply.getSpec().getApproved())
