@@ -259,12 +259,12 @@ public class PostFinderImpl implements PostFinder {
                         // convert to archive year month value objects
                         List<PostArchiveYearMonthVo> monthArchives = monthPosts.entrySet()
                             .stream()
-                            .sorted(Map.Entry.comparingByKey())
                             .map(monthEntry -> PostArchiveYearMonthVo.builder()
                                 .posts(monthEntry.getValue())
                                 .month(monthEntry.getKey())
                                 .build()
                             )
+                            .sorted(Comparator.comparing(PostArchiveYearMonthVo::getMonth).reversed())
                             .toList();
                         return PostArchiveVo.builder()
                             .year(String.valueOf(key))
