@@ -12,7 +12,7 @@
 <a href="https://github.com/halo-dev/console/releases"><img alt="GitHub release" src="https://img.shields.io/github/release/halo-dev/console.svg?style=flat-square" /></a>
 <a href="https://github.com/halo-dev/console/blob/master/LICENSE"><img alt="GitHub" src="https://img.shields.io/github/license/halo-dev/console?style=flat-square"></a>
 <a href="https://github.com/halo-dev/console/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/halo-dev/console.svg?style=flat-square"></a>
-<a href="https://github.com/halo-dev/console/actions"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/halo-dev/console/Halo%20Admin%20CI?style=flat-square"/></a>
+<a href="https://github.com/halo-dev/console/actions"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/halo-dev/console/main.yml?branch=main&style=flat-square"/></a>
 <a href="https://gitpod.io/#https://github.com/halo-dev/console"><img alt="Gitpod ready-to-code" src="https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod&style=flat-square"/></a>
 </p>
 
