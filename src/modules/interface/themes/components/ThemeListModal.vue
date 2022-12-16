@@ -2,15 +2,12 @@
 import {
   IconAddCircle,
   IconGitHub,
-  Dialog,
   VButton,
   VEmpty,
   VModal,
   VSpace,
-  VTag,
   VEntity,
   VEntityField,
-  VStatusDot,
   VTabItem,
   VTabs,
   VLoading,
@@ -18,15 +15,11 @@ import {
 import LazyImage from "@/components/image/LazyImage.vue";
 import ThemePreviewModal from "./preview/ThemePreviewModal.vue";
 import ThemeUploadModal from "./ThemeUploadModal.vue";
+import ThemeListItem from "./components/ThemeListItem.vue";
 import { computed, ref, watch } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
-import { usePermission } from "@/utils/permission";
 import { onBeforeRouteLeave } from "vue-router";
-import { useThemeStore } from "@/stores/theme";
-import { storeToRefs } from "pinia";
-
-const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
@@ -49,15 +42,13 @@ const emit = defineEmits<{
 const activeTab = ref("installed");
 const themes = ref<Theme[]>([] as Theme[]);
 const loading = ref(false);
-const themeInstall = ref(false);
+const themeUploadVisible = ref(false);
 const creating = ref(false);
 const refreshInterval = ref();
 
 const modalTitle = computed(() => {
   return activeTab.value === "installed" ? "已安装的主题" : "未安装的主题";
 });
-
-const { activatedTheme } = storeToRefs(useThemeStore());
 
 const handleFetchThemes = async (options?: { mute?: boolean }) => {
   try {
@@ -103,57 +94,6 @@ watch(
     handleFetchThemes();
   }
 );
-
-const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
-  Dialog.warning({
-    title: `${
-      deleteExtensions
-        ? "确定要删除该主题以及对应的配置吗？"
-        : "确定要删除该主题吗？"
-    }`,
-    description: "该操作不可恢复。",
-    onConfirm: async () => {
-      try {
-        await apiClient.extension.theme.deletethemeHaloRunV1alpha1Theme({
-          name: theme.metadata.name,
-        });
-
-        // delete theme setting and configMap
-        if (!deleteExtensions) {
-          return;
-        }
-
-        const { settingName, configMapName } = theme.spec;
-
-        if (settingName) {
-          await apiClient.extension.setting.deletev1alpha1Setting(
-            {
-              name: settingName,
-            },
-            {
-              mute: true,
-            }
-          );
-        }
-
-        if (configMapName) {
-          await apiClient.extension.configMap.deletev1alpha1ConfigMap(
-            {
-              name: configMapName,
-            },
-            {
-              mute: true,
-            }
-          );
-        }
-      } catch (e) {
-        console.error("Failed to uninstall theme", e);
-      } finally {
-        await handleFetchThemes();
-      }
-    },
-  });
-};
 
 const handleCreateTheme = async (theme: Theme) => {
   try {
@@ -204,12 +144,26 @@ defineExpose({
   handleFetchThemes,
 });
 
+// preview
 const previewVisible = ref(false);
 const selectedPreviewTheme = ref<Theme>();
 
 const handleOpenPreview = (theme: Theme) => {
   selectedPreviewTheme.value = theme;
   previewVisible.value = true;
+};
+
+// upgrade
+const themeToUpgrade = ref<Theme>();
+
+const handleOpenUpgradeModal = (theme: Theme) => {
+  themeToUpgrade.value = theme;
+  themeUploadVisible.value = true;
+};
+
+const handleOpenInstallModal = () => {
+  themeToUpgrade.value = undefined;
+  themeUploadVisible.value = true;
 };
 </script>
 <template>
@@ -241,7 +195,7 @@ const handleOpenPreview = (theme: Theme) => {
                 <VButton
                   v-permission="['system:themes:manage']"
                   type="primary"
-                  @click="themeInstall = true"
+                  @click="handleOpenInstallModal()"
                 >
                   <template #icon>
                     <IconAddCircle class="h-full w-full" />
@@ -262,129 +216,15 @@ const handleOpenPreview = (theme: Theme) => {
               :key="index"
               @click="handleSelectTheme(theme)"
             >
-              <VEntity
+              <ThemeListItem
+                :theme="theme"
                 :is-selected="
                   theme.metadata.name === selectedTheme?.metadata?.name
                 "
-              >
-                <template #start>
-                  <VEntityField>
-                    <template #description>
-                      <div class="w-32">
-                        <div
-                          class="group aspect-w-4 aspect-h-3 block w-full overflow-hidden rounded border bg-gray-100"
-                        >
-                          <LazyImage
-                            :key="theme.metadata.name"
-                            :src="theme.spec.logo"
-                            :alt="theme.spec.displayName"
-                            classes="pointer-events-none object-cover group-hover:opacity-75"
-                          >
-                            <template #loading>
-                              <div
-                                class="flex h-full items-center justify-center object-cover"
-                              >
-                                <span class="text-xs text-gray-400"
-                                  >加载中...</span
-                                >
-                              </div>
-                            </template>
-                            <template #error>
-                              <div
-                                class="flex h-full items-center justify-center object-cover"
-                              >
-                                <span class="text-xs text-red-400"
-                                  >加载异常</span
-                                >
-                              </div>
-                            </template>
-                          </LazyImage>
-                        </div>
-                      </div>
-                    </template>
-                  </VEntityField>
-                  <VEntityField
-                    :title="theme.spec.displayName"
-                    :description="theme.spec.version"
-                  >
-                    <template #extra>
-                      <VTag
-                        v-if="
-                          theme.metadata.name === activatedTheme?.metadata?.name
-                        "
-                      >
-                        当前启用
-                      </VTag>
-                    </template>
-                  </VEntityField>
-                </template>
-                <template #end>
-                  <VEntityField v-if="theme.metadata.deletionTimestamp">
-                    <template #description>
-                      <VStatusDot
-                        v-tooltip="`删除中`"
-                        state="warning"
-                        animate
-                      />
-                    </template>
-                  </VEntityField>
-                  <VEntityField>
-                    <template #description>
-                      <a
-                        class="text-sm text-gray-400 hover:text-blue-600"
-                        :href="theme.spec.author.website"
-                        target="_blank"
-                        @click.stop
-                      >
-                        {{ theme.spec.author.name }}
-                      </a>
-                    </template>
-                  </VEntityField>
-                  <VEntityField>
-                    <template #description>
-                      <a
-                        :href="theme.spec.repo"
-                        class="text-gray-900 hover:text-blue-600"
-                        target="_blank"
-                      >
-                        <IconGitHub />
-                      </a>
-                    </template>
-                  </VEntityField>
-                </template>
-                <template
-                  v-if="currentUserHasPermission(['system:themes:manage'])"
-                  #dropdownItems
-                >
-                  <VButton
-                    v-close-popper
-                    block
-                    type="secondary"
-                    @click="handleOpenPreview(theme)"
-                  >
-                    预览
-                  </VButton>
-                  <VButton
-                    v-close-popper
-                    block
-                    type="danger"
-                    @click="handleUninstall(theme)"
-                  >
-                    卸载
-                  </VButton>
-                  <VButton
-                    v-close-popper
-                    :disabled="
-                      theme.metadata.name === activatedTheme?.metadata?.name
-                    "
-                    block
-                    type="danger"
-                    @click="handleUninstall(theme, true)"
-                  >
-                    卸载并删除配置
-                  </VButton>
-                </template>
-              </VEntity>
+                @reload="handleFetchThemes({ mute: true })"
+                @preview="handleOpenPreview(theme)"
+                @upgrade="handleOpenUpgradeModal(theme)"
+              />
             </li>
           </ul>
         </Transition>
@@ -499,7 +339,7 @@ const handleOpenPreview = (theme: Theme) => {
         <VButton
           v-permission="['system:themes:manage']"
           type="secondary"
-          @click="themeInstall = true"
+          @click="handleOpenInstallModal()"
         >
           安装主题
         </VButton>
@@ -510,7 +350,8 @@ const handleOpenPreview = (theme: Theme) => {
 
   <ThemeUploadModal
     v-if="visible"
-    v-model:visible="themeInstall"
+    v-model:visible="themeUploadVisible"
+    :upgrade-theme="themeToUpgrade"
     @close="handleFetchThemes"
   />
 

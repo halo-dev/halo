@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import ThemeListItem from "./ThemeListItem.vue";
+import ThemePreviewListItem from "./ThemePreviewListItem.vue";
 import { useSettingForm } from "@/composables/use-setting-form";
 import { useThemeStore } from "@/stores/theme";
 import { apiClient } from "@/utils/api-client";
@@ -339,7 +339,7 @@ const iframeClasses = computed(() => {
                 :key="index"
                 @click="handleSelect(item)"
               >
-                <ThemeListItem
+                <ThemePreviewListItem
                   :theme="item"
                   :is-selected="
                     selectedTheme?.metadata.name === item.metadata.name

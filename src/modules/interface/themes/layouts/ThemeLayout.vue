@@ -169,12 +169,6 @@ onMounted(() => {
       </template>
       <template #actions>
         <VSpace>
-          <VButton size="sm" type="default" @click="themesModal = true">
-            <template #icon>
-              <IconExchange class="h-full w-full" />
-            </template>
-            切换主题
-          </VButton>
           <VButton
             v-if="!isActivated"
             v-permission="['system:themes:manage']"
@@ -189,6 +183,12 @@ onMounted(() => {
               <IconEye class="h-full w-full" />
             </template>
             预览
+          </VButton>
+          <VButton size="sm" type="default" @click="themesModal = true">
+            <template #icon>
+              <IconExchange class="h-full w-full" />
+            </template>
+            主题管理
           </VButton>
         </VSpace>
       </template>
