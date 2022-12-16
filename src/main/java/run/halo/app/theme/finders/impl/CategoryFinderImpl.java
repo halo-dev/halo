@@ -10,6 +10,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Category;
@@ -115,6 +116,52 @@ public class CategoryFinderImpl implements CategoryFinder {
             .sorted(defaultTreeNodeComparator())
             .collect(Collectors.toList());
     }
+    @Override
+    public Flux<CategoryTreeVo> listSubTreeByName(String nodeName) {
+        return listAll()
+            .collectList()
+            .flatMapIterable(categoryVos -> {
+                Map<String, CategoryTreeVo> nameIdentityMap = categoryVos.stream()
+                    .map(CategoryTreeVo::from)
+                    .collect(Collectors.toMap(categoryVo -> categoryVo.getMetadata().getName(),
+                        Function.identity()));
+
+                nameIdentityMap.forEach((name, value) -> {
+                    List<String> children = value.getSpec().getChildren();
+                    if (children == null) {
+                        return;
+                    }
+                    for (String child : children) {
+                        CategoryTreeVo childNode = nameIdentityMap.get(child);
+                        if (childNode != null) {
+                            childNode.setParentName(name);
+                        }
+                    }
+                });
+                return listToTree(nameIdentityMap.values(), nodeName);
+            });
+    }
+
+    static List<CategoryTreeVo> listToTree(Collection<CategoryTreeVo> list, String nodeName) {
+        Map<String, List<CategoryTreeVo>> parentNameIdentityMap = list.stream()
+            .filter(categoryTreeVo -> categoryTreeVo.getParentName() != null)
+            .collect(Collectors.groupingBy(CategoryTreeVo::getParentName));
+
+        list.forEach(node -> {
+            // sort children
+            List<CategoryTreeVo> children =
+                parentNameIdentityMap.getOrDefault(node.getMetadata().getName(), List.of())
+                    .stream()
+                    .sorted(defaultTreeNodeComparator())
+                    .toList();
+            node.setChildren(children);
+        });
+        return list.stream()
+            .filter(v -> StringUtils.equalsIgnoreCase(v.getMetadata().getName(),nodeName))
+            .sorted(defaultTreeNodeComparator())
+            .collect(Collectors.toList());
+    }
+
 
     static Comparator<CategoryTreeVo> defaultTreeNodeComparator() {
         Function<CategoryTreeVo, Integer> priority =
