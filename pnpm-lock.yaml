@@ -15,7 +15,7 @@ importers:
       '@halo-dev/api-client': ^0.0.60
       '@halo-dev/components': workspace:*
       '@halo-dev/console-shared': workspace:*
-      '@halo-dev/richtext-editor': ^0.0.0-alpha.16
+      '@halo-dev/richtext-editor': ^0.0.0-alpha.17
       '@iconify-json/mdi': ^1.1.36
       '@iconify-json/vscode-icons': ^1.1.16
       '@rushstack/eslint-patch': ^1.2.0
@@ -110,7 +110,7 @@ importers:
       '@halo-dev/api-client': 0.0.60
       '@halo-dev/components': link:packages/components
       '@halo-dev/console-shared': link:packages/shared
-      '@halo-dev/richtext-editor': 0.0.0-alpha.16_vue@3.2.45
+      '@halo-dev/richtext-editor': 0.0.0-alpha.17_vue@3.2.45
       '@tiptap/extension-character-count': 2.0.0-beta.202
       '@uppy/core': 3.0.4
       '@uppy/dashboard': 3.2.0_@uppy+core@3.0.4
@@ -1972,8 +1972,8 @@ packages:
     resolution: {integrity: sha512-HAmJ1BDZxHj2Xp41oNOqZG/1vaR6r4EbBAUQ7ayvUY8SGJMHtJD9dyhCn7k23q6G7FmzFKFNGxajovsjBEM+yg==}
     dev: false
 
-  /@halo-dev/richtext-editor/0.0.0-alpha.16_vue@3.2.45:
-    resolution: {integrity: sha512-MW0KCYT6UGg2zOh0kryGEz+IKLzo/onUTbAYCkiMX4YaQ1mIOoBU+ILaa0YOL2FmDyCxXst/UoSKdUvZu+Qieg==}
+  /@halo-dev/richtext-editor/0.0.0-alpha.17_vue@3.2.45:
+    resolution: {integrity: sha512-q9xVHdUdgsXFT6nj31DKNyhR/Flh/jHcepOC/FUlWf58yoZ7i2+6YeTcrcxeVV/DBKlvVXVvQ1As6zPrCY7+Bg==}
     peerDependencies:
       vue: ^3.2.37
     dependencies:
@@ -2015,6 +2015,7 @@ packages:
       '@tiptap/vue-3': 2.0.0-beta.202_jtnhdqyx7clarsezcvtuxgjsq4
       '@vueuse/core': 9.6.0_vue@3.2.45
       floating-vue: 2.0.0-beta.20_vue@3.2.45
+      highlight.js: 11.6.0
       katex: 0.16.3
       lowlight: 2.7.0
       tippy.js: 6.3.7
