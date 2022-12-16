@@ -42,6 +42,7 @@ public class SinglePageRouteStrategy implements DetailsPageRouteHandlerStrategy 
         String name) {
         return request -> {
             Map<String, Object> model = new HashMap<>();
+            model.put("name", name);
             model.put("groupVersionKind", gvk);
             model.put("plural", getPlural());
             model.put(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.SINGLE_PAGE.getValue());

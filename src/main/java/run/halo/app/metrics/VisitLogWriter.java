@@ -96,7 +96,7 @@ public class VisitLogWriter implements InitializingBean, DisposableBean {
         this.started = false;
         interruptThread = true;
         asyncLogWriter.dispose();
-        executorService.shutdown();
+        executorService.shutdownNow();
     }
 
     static class AsyncLogWriter implements Disposable {

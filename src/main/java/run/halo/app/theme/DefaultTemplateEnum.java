@@ -19,7 +19,9 @@ public enum DefaultTemplateEnum {
 
     TAGS("tags"),
 
-    SINGLE_PAGE("page");
+    SINGLE_PAGE("page"),
+
+    AUTHOR("author");
 
     private final String value;
 

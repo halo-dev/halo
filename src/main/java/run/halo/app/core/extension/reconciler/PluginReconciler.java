@@ -231,6 +231,9 @@ public class PluginReconciler implements Reconciler<Request> {
         // stop and unload plugin, see also PluginBeforeStopSyncListener
         haloPluginManager.stopPlugin(pluginWrapper.getPluginId());
         haloPluginManager.unloadPlugin(pluginWrapper.getPluginId());
+        // delete initial reverse proxy
+        client.fetch(ReverseProxy.class, initialReverseProxyName(pluginWrapper.getPluginId()))
+            .ifPresent(client::delete);
         // delete plugin resources
         if (RuntimeMode.DEPLOYMENT.equals(pluginWrapper.getRuntimeMode())) {
             // delete plugin file

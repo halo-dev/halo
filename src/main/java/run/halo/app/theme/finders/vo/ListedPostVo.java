@@ -31,9 +31,9 @@ public class ListedPostVo {
 
     private List<TagVo> tags;
 
-    private List<Contributor> contributors;
+    private List<ContributorVo> contributors;
 
-    private Contributor owner;
+    private ContributorVo owner;
 
     private StatsVo stats;
 
