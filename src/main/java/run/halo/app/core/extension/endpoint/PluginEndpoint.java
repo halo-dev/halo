@@ -101,7 +101,7 @@ public class PluginEndpoint implements CustomEndpoint {
                             .schema(schemaBuilder().implementation(InstallRequest.class))))
             )
             .PUT("plugins/{name}/resetconfig", this::resetSettingConfig,
-                builder -> builder.operationId("ResetSettingConfig")
+                builder -> builder.operationId("ResetPluginSettingConfig")
                     .description("Reset plugin setting configMap.")
                     .tag(tag)
                     .parameter(parameterBuilder()
