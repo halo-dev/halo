@@ -7,12 +7,14 @@ import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ConcurrentLruCache;
 import org.springframework.util.ResourceUtils;
+import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.dialect.IDialect;
 import org.thymeleaf.spring6.ISpringWebFluxTemplateEngine;
 import org.thymeleaf.spring6.dialect.SpringStandardDialect;
 import org.thymeleaf.standard.expression.IStandardVariableExpressionEvaluator;
 import org.thymeleaf.templateresolver.FileTemplateResolver;
 import org.thymeleaf.templateresolver.ITemplateResolver;
+import reactor.core.publisher.Mono;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.dialect.HaloProcessorDialect;
@@ -47,14 +49,17 @@ public class TemplateEngineManager {
 
     private final ObjectProvider<IDialect> dialects;
 
+    private final ThemeResolver themeResolver;
+
     public TemplateEngineManager(ThymeleafProperties thymeleafProperties,
         ExternalUrlSupplier externalUrlSupplier,
         ObjectProvider<ITemplateResolver> templateResolvers,
-        ObjectProvider<IDialect> dialects) {
+        ObjectProvider<IDialect> dialects, ThemeResolver themeResolver) {
         this.thymeleafProperties = thymeleafProperties;
         this.externalUrlSupplier = externalUrlSupplier;
         this.templateResolvers = templateResolvers;
         this.dialects = dialects;
+        this.themeResolver = themeResolver;
         engineCache = new ConcurrentLruCache<>(CACHE_SIZE_LIMIT, this::templateEngineGenerator);
     }
 
@@ -75,6 +80,16 @@ public class TemplateEngineManager {
         } catch (FileNotFoundException e) {
             return false;
         }
+    }
+
+    public Mono<Void> clearCache(String themeName) {
+        return themeResolver.getThemeContext(themeName)
+            .doOnNext(themeContext -> {
+                TemplateEngine templateEngine =
+                    (TemplateEngine) engineCache.get(themeContext);
+                templateEngine.clearTemplateCache();
+            })
+            .then();
     }
 
     private ISpringWebFluxTemplateEngine templateEngineGenerator(ThemeContext theme) {
