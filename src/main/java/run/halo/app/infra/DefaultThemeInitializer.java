@@ -43,6 +43,7 @@ public class DefaultThemeInitializer implements ApplicationListener<SchemeInitia
                     + "inside theme root");
                 return;
             }
+            log.info("Initializing default theme from {}", location);
             PathMatchingResourcePatternResolver resolver =
                 new PathMatchingResourcePatternResolver();
             var latch = new CountDownLatch(1);
