@@ -36,7 +36,8 @@ const emit = defineEmits<{
 
 const { theme } = toRefs(props);
 
-const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
+const { isActivated, handleActiveTheme, handleResetSettingConfig } =
+  useThemeLifeCycle(theme);
 
 const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
   Dialog.warning({
@@ -201,6 +202,14 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
           </div>
         </template>
       </FloatingDropdown>
+      <VButton
+        v-close-popper
+        block
+        type="danger"
+        @click="handleResetSettingConfig"
+      >
+        重置
+      </VButton>
     </template>
   </VEntity>
 </template>

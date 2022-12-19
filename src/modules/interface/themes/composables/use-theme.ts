@@ -2,7 +2,7 @@ import type { ComputedRef, Ref } from "vue";
 import { computed, ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
-import { Dialog } from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import { useThemeStore } from "@/stores/theme";
 import { storeToRefs } from "pinia";
 
@@ -10,6 +10,7 @@ interface useThemeLifeCycleReturn {
   loading: Ref<boolean>;
   isActivated: ComputedRef<boolean>;
   handleActiveTheme: () => void;
+  handleResetSettingConfig: () => void;
 }
 
 export function useThemeLifeCycle(
@@ -57,10 +58,34 @@ export function useThemeLifeCycle(
     });
   };
 
+  const handleResetSettingConfig = async () => {
+    Dialog.warning({
+      title: "确定要重置主题的所有配置吗？",
+      description: "该操作会删除已保存的配置，重置为默认配置。",
+      confirmType: "danger",
+      onConfirm: async () => {
+        try {
+          if (!theme?.value) {
+            return;
+          }
+
+          await apiClient.theme.resetThemeConfig({
+            name: theme.value.metadata.name as string,
+          });
+
+          Toast.success("重置配置成功");
+        } catch (e) {
+          console.error("Failed to reset theme setting config", e);
+        }
+      },
+    });
+  };
+
   return {
     loading,
     isActivated,
     handleActiveTheme,
+    handleResetSettingConfig,
   };
 }
 

@@ -8,6 +8,8 @@ import {
   VEntity,
   VEntityField,
   VAvatar,
+  Dialog,
+  Toast,
 } from "@halo-dev/components";
 import PluginUploadModal from "./PluginUploadModal.vue";
 import { ref, toRefs } from "vue";
@@ -15,6 +17,7 @@ import { usePluginLifeCycle } from "../composables/use-plugin";
 import type { Plugin } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
+import { apiClient } from "@/utils/api-client";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -39,6 +42,29 @@ const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
 
 const onUpgradeModalClose = () => {
   emit("reload");
+};
+
+const handleResetSettingConfig = async () => {
+  Dialog.warning({
+    title: "确定要重置插件的所有配置吗？",
+    description: "该操作会删除已保存的配置，重置为默认配置。",
+    confirmType: "danger",
+    onConfirm: async () => {
+      try {
+        if (!plugin?.value) {
+          return;
+        }
+
+        await apiClient.plugin.resetPluginConfig({
+          name: plugin.value.metadata.name as string,
+        });
+
+        Toast.success("重置配置成功");
+      } catch (e) {
+        console.error("Failed to reset plugin setting config", e);
+      }
+    },
+  });
 };
 </script>
 <template>
@@ -157,6 +183,14 @@ const onUpgradeModalClose = () => {
           </div>
         </template>
       </FloatingDropdown>
+      <VButton
+        v-close-popper
+        block
+        type="danger"
+        @click="handleResetSettingConfig"
+      >
+        重置
+      </VButton>
     </template>
   </VEntity>
 </template>

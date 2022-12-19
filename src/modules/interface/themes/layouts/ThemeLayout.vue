@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { nextTick, onMounted, type ComputedRef, type Ref } from "vue";
+import { nextTick, onMounted, type Ref } from "vue";
 import { computed, provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -72,7 +72,6 @@ const { setting, handleFetchSettings } = useSettingForm(
 );
 
 provide<Ref<Theme | undefined>>("selectedTheme", selectedTheme);
-provide<ComputedRef<boolean>>("isActivated", isActivated);
 
 const route = useRoute();
 const router = useRouter();
