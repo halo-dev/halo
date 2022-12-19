@@ -174,21 +174,6 @@ class ThemeReconcilerTest {
             true);
     }
 
-    @Test
-    void settingDefinedDefaultValueMap() throws JSONException {
-        Setting setting = getFakeSetting();
-        when(haloProperties.getWorkDir()).thenReturn(tempDirectory);
-        Map<String, String> map = new ThemeReconciler(extensionClient, haloProperties)
-            .settingDefinedDefaultValueMap(setting);
-        JSONAssert.assertEquals("""
-            {
-                "sns": "{\\"email\\":\\"example@exmple.com\\"}"
-            }
-            """,
-            JsonUtils.objectToJson(map),
-            true);
-    }
-
     private static Setting getFakeSetting() {
         String settingJson = """
             {
