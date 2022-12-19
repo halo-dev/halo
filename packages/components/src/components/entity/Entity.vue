@@ -37,7 +37,8 @@ const classes = computed(() => {
       <div v-if="$slots.dropdownItems" class="entity-dropdown">
         <FloatingDropdown>
           <div
-            class="entity-dropdown-trigger group-hover:bg-gray-100"
+            class="entity-dropdown-trigger group-hover:bg-gray-200/60"
+            :class="{ '!bg-gray-300/60': isSelected }"
             @click.stop
           >
             <IconMore />
