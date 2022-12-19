@@ -51,6 +51,7 @@ class ThemeReconcilerTest {
     @Mock
     private HaloProperties haloProperties;
 
+    @Mock
     private File defaultTheme;
 
     private Path tempDirectory;

@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.web.reactive.function.BodyInserters.fromMultipartData;
@@ -32,6 +33,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.theme.TemplateEngineManager;
 
 /**
  * Tests for {@link ThemeEndpoint}.
@@ -47,6 +49,9 @@ class ThemeEndpointTest {
 
     @Mock
     ThemeService themeService;
+
+    @Mock
+    TemplateEngineManager templateEngineManager;
 
     @InjectMocks
     ThemeEndpoint themeEndpoint;
@@ -108,6 +113,9 @@ class ThemeEndpointTest {
             when(themeService.upgrade(eq("default"), isA(InputStream.class)))
                 .thenReturn(Mono.just(newTheme));
 
+            when(templateEngineManager.clearCache(eq("default")))
+                .thenReturn(Mono.empty());
+
             webTestClient.post()
                 .uri("/themes/default/upgrade")
                 .body(fromMultipartData(bodyBuilder.build()))
@@ -115,6 +123,8 @@ class ThemeEndpointTest {
                 .expectStatus().isOk();
 
             verify(themeService).upgrade(eq("default"), isA(InputStream.class));
+
+            verify(templateEngineManager, times(1)).clearCache(eq("default"));
         }
 
     }

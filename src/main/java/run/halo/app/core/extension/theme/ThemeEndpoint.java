@@ -37,6 +37,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.theme.TemplateEngineManager;
 
 /**
  * Endpoint for managing themes.
@@ -54,11 +55,14 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     private final ThemeService themeService;
 
+    private final TemplateEngineManager templateEngineManager;
+
     public ThemeEndpoint(ReactiveExtensionClient client, ThemeRootGetter themeRoot,
-        ThemeService themeService) {
+        ThemeService themeService, TemplateEngineManager templateEngineManager) {
         this.client = client;
         this.themeRoot = themeRoot;
         this.themeService = themeService;
+        this.templateEngineManager = templateEngineManager;
     }
 
     @Override
@@ -180,6 +184,9 @@ public class ThemeEndpoint implements CustomEndpoint {
                     return Mono.error(e);
                 }
             })
+            .flatMap((updatedTheme) -> templateEngineManager.clearCache(
+                    updatedTheme.getMetadata().getName())
+                .thenReturn(updatedTheme))
             .flatMap(updatedTheme -> ServerResponse.ok()
                 .bodyValue(updatedTheme));
     }
