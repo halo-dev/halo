@@ -100,9 +100,9 @@ public class PluginEndpoint implements CustomEndpoint {
                         .content(contentBuilder().mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .schema(schemaBuilder().implementation(InstallRequest.class))))
             )
-            .PUT("plugins/{name}/resetconfig", this::resetSettingConfig,
-                builder -> builder.operationId("ResetPluginSettingConfig")
-                    .description("Reset plugin setting configMap.")
+            .PUT("plugins/{name}/reset-config", this::resetSettingConfig,
+                builder -> builder.operationId("ResetPluginConfig")
+                    .description("Reset the configMap of plugin setting.")
                     .tag(tag)
                     .parameter(parameterBuilder()
                         .name("name")

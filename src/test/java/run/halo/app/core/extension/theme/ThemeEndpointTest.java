@@ -165,7 +165,7 @@ class ThemeEndpointTest {
     void resetSettingConfig() {
         when(themeService.resetSettingConfig(any())).thenReturn(Mono.empty());
         webTestClient.put()
-            .uri("/themes/fake/resetconfig")
+            .uri("/themes/fake/reset-config")
             .exchange()
             .expectStatus().isOk();
     }

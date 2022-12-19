@@ -102,9 +102,9 @@ public class ThemeEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(Theme.class))
             )
-            .PUT("themes/{name}/resetconfig", this::resetSettingConfig,
-                builder -> builder.operationId("ResetThemeSettingConfig")
-                    .description("Reset theme setting configMap.")
+            .PUT("themes/{name}/reset-config", this::resetSettingConfig,
+                builder -> builder.operationId("ResetThemeConfig")
+                    .description("Reset the configMap of theme setting.")
                     .tag(tag)
                     .parameter(parameterBuilder()
                         .name("name")
