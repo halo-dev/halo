@@ -132,12 +132,31 @@ const onUpgradeModalClose = () => {
       >
         升级
       </VButton>
-      <VButton v-close-popper block type="danger" @click="uninstall">
-        卸载
-      </VButton>
-      <VButton v-close-popper block type="danger" @click="uninstall(true)">
-        卸载并删除配置
-      </VButton>
+      <FloatingDropdown class="w-full" placement="left" :triggers="['click']">
+        <VButton block type="danger"> 卸载 </VButton>
+        <template #popper>
+          <div class="w-52 p-2">
+            <VSpace class="w-full" direction="column">
+              <VButton
+                v-close-popper.all
+                block
+                type="danger"
+                @click="uninstall"
+              >
+                卸载
+              </VButton>
+              <VButton
+                v-close-popper.all
+                block
+                type="danger"
+                @click="uninstall(true)"
+              >
+                卸载并删除配置
+              </VButton>
+            </VSpace>
+          </div>
+        </template>
+      </FloatingDropdown>
     </template>
   </VEntity>
 </template>

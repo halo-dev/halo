@@ -55,7 +55,9 @@ export function usePluginLifeCycle(
           : "确定要卸载该插件吗？"
       }`,
       description: `${
-        enabled ? "当前插件还在启用状态，将在停止运行后卸载。" : ""
+        enabled
+          ? "当前插件还在启用状态，将在停止运行后卸载，该操作不可恢复。"
+          : "该操作不可恢复。"
       }`,
       confirmType: "danger",
       confirmText: `${enabled ? "停止运行并卸载" : "卸载"}`,
