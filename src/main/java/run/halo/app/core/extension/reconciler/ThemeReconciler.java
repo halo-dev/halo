@@ -1,19 +1,15 @@
 package run.halo.app.core.extension.reconciler;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.FileSystemUtils;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
+import run.halo.app.core.extension.theme.SettingUtils;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
@@ -106,7 +102,7 @@ public class ThemeReconciler implements Reconciler<Request> {
 
         client.fetch(Setting.class, theme.getSpec().getSettingName())
             .ifPresent(setting -> {
-                Map<String, String> data = settingDefinedDefaultValueMap(setting);
+                var data = SettingUtils.settingDefinedDefaultValueMap(setting);
                 if (CollectionUtils.isEmpty(data)) {
                     return;
                 }
@@ -116,31 +112,6 @@ public class ThemeReconciler implements Reconciler<Request> {
                 configMap.setData(data);
                 client.create(configMap);
             });
-    }
-
-    Map<String, String> settingDefinedDefaultValueMap(Setting setting) {
-        final String defaultValueField = "value";
-        final String nameField = "name";
-        List<Setting.SettingForm> forms = setting.getSpec().getForms();
-        if (CollectionUtils.isEmpty(forms)) {
-            return null;
-        }
-        Map<String, String> data = new LinkedHashMap<>();
-        for (Setting.SettingForm form : forms) {
-            String group = form.getGroup();
-            Map<String, JsonNode> groupValue = form.getFormSchema().stream()
-                .map(o -> JsonUtils.DEFAULT_JSON_MAPPER.convertValue(o, JsonNode.class))
-                .filter(jsonNode -> jsonNode.isObject() && jsonNode.has(nameField)
-                    && jsonNode.has(defaultValueField))
-                .map(jsonNode -> {
-                    String name = jsonNode.findValue(nameField).asText();
-                    JsonNode value = jsonNode.findValue(defaultValueField);
-                    return Map.entry(name, value);
-                })
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-            data.put(group, JsonUtils.objectToJson(groupValue));
-        }
-        return data;
     }
 
     private void reconcileThemeDeletion(Theme theme) {

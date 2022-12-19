@@ -15,6 +15,9 @@ rules:
   - apiGroups: [ "plugin.halo.run" ]
     resources: [ "plugins" ]
     verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "plugins/upgrade", "plugins/resetconfig" ]
+    verbs: [ "*" ]
   - nonResourceURLs: [ "/apis/api.console.halo.run/v1alpha1/plugins/*" ]
     verbs: [ "create" ]
 ---
