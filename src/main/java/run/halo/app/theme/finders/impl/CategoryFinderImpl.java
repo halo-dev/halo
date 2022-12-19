@@ -122,7 +122,7 @@ public class CategoryFinderImpl implements CategoryFinder {
         });
         return list.stream()
             .filter(v -> StringUtils.isEmpty(nodeName) ? v.getParentName() == null
-                : StringUtils.equalsIgnoreCase(v.getMetadata().getName(), nodeName))
+                : StringUtils.equals(v.getMetadata().getName(), nodeName))
             .sorted(defaultTreeNodeComparator())
             .collect(Collectors.toList());
     }

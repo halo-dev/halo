@@ -101,6 +101,14 @@ class CategoryFinderImplTest {
         assertThat(treeVos).hasSize(1);
     }
 
+    @Test
+    void listSubTreeByName() {
+        when(client.list(eq(Category.class), eq(null), any()))
+            .thenReturn(Flux.fromIterable(categoriesForTree()));
+        List<CategoryTreeVo> treeVos = categoryFinder.listSubTreeByName("E").collectList().block();
+        assertThat(treeVos).hasSize(1);
+    }
+
     /**
      * Test for {@link CategoryFinderImpl#listAsTree()}.
      *
