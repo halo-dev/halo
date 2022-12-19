@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 import run.halo.app.core.extension.theme.ThemeService;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.properties.ThemeProperties;
@@ -47,7 +48,7 @@ public class DefaultThemeInitializer implements ApplicationListener<SchemeInitia
             PathMatchingResourcePatternResolver resolver =
                 new PathMatchingResourcePatternResolver();
             var latch = new CountDownLatch(1);
-            themeService.install(resolver.getResource(location).getInputStream())
+            themeService.install(ResourceUtils.getURL(location).openStream())
                 .doFinally(signalType -> latch.countDown())
                 .subscribe(theme -> log.info("Initialized default theme: {}",
                     theme.getMetadata().getName()));
