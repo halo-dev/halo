@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
@@ -18,6 +19,7 @@ import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -204,6 +206,29 @@ public class ThemeServiceImpl implements ThemeService {
                     .flatMap(client::create)
                     .thenReturn(theme);
             });
+    }
+
+    @Override
+    public Mono<ConfigMap> resetSettingConfig(String name) {
+        return client.fetch(Theme.class, name)
+            .filter(theme -> StringUtils.isNotBlank(theme.getSpec().getSettingName()))
+            .flatMap(theme -> {
+                String configMapName = theme.getSpec().getConfigMapName();
+                String settingName = theme.getSpec().getSettingName();
+                return client.fetch(Setting.class, settingName)
+                    .map(SettingUtils::settingDefinedDefaultValueMap)
+                    .flatMap(data -> updateConfigMapData(configMapName, data));
+            });
+    }
+
+    private Mono<ConfigMap> updateConfigMapData(String configMapName, Map<String, String> data) {
+        return client.fetch(ConfigMap.class, configMapName)
+            .flatMap(configMap -> {
+                configMap.setData(data);
+                return client.update(configMap);
+            })
+            .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
+                .filter(t -> t instanceof OptimisticLockingFailureException));
     }
 
     private Mono<Void> waitForSettingDeleted(String settingName) {

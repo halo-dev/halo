@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.StopWatch;
@@ -167,9 +168,14 @@ public class DefaultController<R> implements Controller {
                             log.trace(watch.toString());
                         }
                     } catch (Throwable t) {
-                        log.error("Reconciler in " + this.name
-                                + " aborted with an error, re-enqueuing...",
-                            t);
+                        if (t instanceof OptimisticLockingFailureException) {
+                            log.warn("Optimistic locking failure when reconciling request: {}/{}",
+                                this.name, entry.getEntry());
+                        } else {
+                            log.error("Reconciler in " + this.name
+                                    + " aborted with an error, re-enqueuing...",
+                                t);
+                        }
                         result = new Reconciler.Result(true, null);
                     } finally {
                         queue.done(entry.getEntry());
