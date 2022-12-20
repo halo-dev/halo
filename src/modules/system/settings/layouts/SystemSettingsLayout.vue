@@ -113,14 +113,12 @@ watch([() => route.name, () => route.params], async () => {
       <div class="bg-white">
         <RouterView :key="activeTab" v-slot="{ Component }">
           <template v-if="Component">
-            <Transition appear mode="out-in" name="fade">
-              <Suspense>
-                <component :is="Component"></component>
-                <template #fallback>
-                  <VLoading />
-                </template>
-              </Suspense>
-            </Transition>
+            <Suspense>
+              <component :is="Component"></component>
+              <template #fallback>
+                <VLoading />
+              </template>
+            </Suspense>
           </template>
         </RouterView>
       </div>
