@@ -63,4 +63,8 @@ body {
 .v-popper__popper {
   outline: none;
 }
+
+.v-popper--theme-tooltip {
+  pointer-events: none;
+}
 </style>
