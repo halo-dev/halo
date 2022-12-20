@@ -16,6 +16,7 @@ import {
   Dialog,
   VStatusDot,
   VLoading,
+  Toast,
 } from "@halo-dev/components";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
@@ -110,6 +111,8 @@ const handleDelete = async (user: User) => {
         await apiClient.extension.user.deletev1alpha1User({
           name: user.metadata.name,
         });
+
+        Toast.success("删除成功");
       } catch (e) {
         console.error("Failed to delete user", e);
       } finally {
@@ -137,6 +140,7 @@ const handleDeleteInBatch = async () => {
       );
       await handleFetchUsers();
       selectedUserNames.value.length = 0;
+      Toast.success("删除成功");
     },
   });
 };

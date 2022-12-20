@@ -10,6 +10,7 @@ import {
   VEntityField,
   VTag,
   VLoading,
+  Toast,
 } from "@halo-dev/components";
 import MenuEditingModal from "./MenuEditingModal.vue";
 import { onMounted, onUnmounted, ref } from "vue";
@@ -113,6 +114,8 @@ const handleDeleteMenu = async (menu: Menu) => {
         );
 
         await Promise.all(deleteItemsPromises);
+
+        Toast.success("删除成功");
       } catch (e) {
         console.error("Failed to delete menu", e);
       } finally {
@@ -181,6 +184,8 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
     });
   }
   await handleFetchPrimaryMenuName();
+
+  Toast.success("设置成功");
 };
 
 onMounted(handleFetchPrimaryMenuName);

@@ -20,6 +20,7 @@ import {
   VEntity,
   VEntityField,
   VLoading,
+  Toast,
 } from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
@@ -175,6 +176,8 @@ const handleMove = async (group: Group) => {
 
     await Promise.all(promises);
     selectedAttachments.value.clear();
+
+    Toast.success("移动成功");
   } catch (e) {
     console.error(e);
   } finally {

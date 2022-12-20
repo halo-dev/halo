@@ -1,5 +1,11 @@
 <script lang="ts" setup>
-import { VModal, VSpace, VButton, IconMotionLine } from "@halo-dev/components";
+import {
+  VModal,
+  VSpace,
+  VButton,
+  IconMotionLine,
+  Toast,
+} from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import type {
   ListedComment,
@@ -100,6 +106,8 @@ const handleCreateReply = async () => {
       replyRequest: formState.value,
     });
     onVisibleChange(false);
+
+    Toast.success("回复成功");
   } catch (error) {
     console.error("Failed to create comment reply", error);
   } finally {

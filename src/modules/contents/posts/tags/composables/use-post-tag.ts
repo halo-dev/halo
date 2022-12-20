@@ -2,7 +2,7 @@ import { apiClient } from "@/utils/api-client";
 import type { Tag } from "@halo-dev/api-client";
 import { onUnmounted, type Ref } from "vue";
 import { onMounted, ref } from "vue";
-import { Dialog } from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import { onBeforeRouteLeave } from "vue-router";
 
 interface usePostTagReturn {
@@ -70,6 +70,8 @@ export function usePostTag(options?: {
           await apiClient.extension.tag.deletecontentHaloRunV1alpha1Tag({
             name: tag.metadata.name,
           });
+
+          Toast.success("删除成功");
         } catch (e) {
           console.error("Failed to delete tag", e);
         } finally {

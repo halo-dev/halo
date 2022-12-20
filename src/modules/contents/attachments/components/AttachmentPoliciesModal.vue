@@ -9,6 +9,7 @@ import {
   VEntity,
   VEntityField,
   VStatusDot,
+  Toast,
 } from "@halo-dev/components";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
 import { ref, watch } from "vue";
@@ -93,6 +94,8 @@ const handleDelete = async (policy: Policy) => {
       await apiClient.extension.storage.policy.deletestorageHaloRunV1alpha1Policy(
         { name: policy.metadata.name }
       );
+
+      Toast.success("删除成功");
       handleFetchPolicies();
     },
   });

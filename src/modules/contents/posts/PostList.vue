@@ -22,6 +22,7 @@ import {
   VEntity,
   VEntityField,
   VLoading,
+  Toast,
 } from "@halo-dev/components";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import CategoryDropdownSelector from "@/components/dropdown-selector/CategoryDropdownSelector.vue";
@@ -256,6 +257,8 @@ const handleDelete = async (post: Post) => {
         name: post.metadata.name,
       });
       await handleFetchPosts();
+
+      Toast.success("删除成功");
     },
   });
 };
@@ -285,6 +288,8 @@ const handleDeleteInBatch = async () => {
       );
       await handleFetchPosts();
       selectedPostNames.value = [];
+
+      Toast.success("删除成功");
     },
   });
 };

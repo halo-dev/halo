@@ -4,7 +4,7 @@ import { onUnmounted, type Ref } from "vue";
 import { onMounted, ref } from "vue";
 import type { CategoryTree } from "@/modules/contents/posts/categories/utils";
 import { buildCategoriesTree } from "@/modules/contents/posts/categories/utils";
-import { Dialog } from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import { onBeforeRouteLeave } from "vue-router";
 
 interface usePostCategoryReturn {
@@ -76,6 +76,8 @@ export function usePostCategory(options?: {
               name: category.metadata.name,
             }
           );
+
+          Toast.success("删除成功");
         } catch (e) {
           console.error("Failed to delete tag", e);
         } finally {

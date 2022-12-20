@@ -5,6 +5,7 @@ import {
   VCard,
   IconDeleteBin,
   Dialog,
+  Toast,
 } from "@halo-dev/components";
 
 import type { AttachmentLike } from "@halo-dev/console-shared";
@@ -104,6 +105,8 @@ const handleDelete = async (attachment: Attachment) => {
         );
         attachments.value.delete(attachment);
         selectedAttachments.value.delete(attachment);
+
+        Toast.success("删除成功");
       } catch (e) {
         console.error("Failed to delete attachment", e);
       }

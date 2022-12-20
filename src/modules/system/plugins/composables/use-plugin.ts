@@ -3,7 +3,7 @@ import { computed } from "vue";
 import type { Plugin } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
-import { Dialog } from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 
 interface usePluginLifeCycleReturn {
   isStarted: ComputedRef<boolean | undefined>;
@@ -34,6 +34,8 @@ export function usePluginLifeCycle(
             name: pluginToUpdate.metadata.name,
             plugin: pluginToUpdate,
           });
+
+          Toast.success(`${pluginToUpdate.spec.enabled ? "启动" : "停止"}成功`);
         } catch (e) {
           console.error(e);
         } finally {
@@ -79,33 +81,33 @@ export function usePluginLifeCycle(
           });
 
           // delete plugin setting and configMap
-          if (!deleteExtensions) {
-            return;
+          if (deleteExtensions) {
+            const { settingName, configMapName } = plugin.value.spec;
+
+            if (settingName) {
+              await apiClient.extension.setting.deletev1alpha1Setting(
+                {
+                  name: settingName,
+                },
+                {
+                  mute: true,
+                }
+              );
+            }
+
+            if (configMapName) {
+              await apiClient.extension.configMap.deletev1alpha1ConfigMap(
+                {
+                  name: configMapName,
+                },
+                {
+                  mute: true,
+                }
+              );
+            }
           }
 
-          const { settingName, configMapName } = plugin.value.spec;
-
-          if (settingName) {
-            await apiClient.extension.setting.deletev1alpha1Setting(
-              {
-                name: settingName,
-              },
-              {
-                mute: true,
-              }
-            );
-          }
-
-          if (configMapName) {
-            await apiClient.extension.configMap.deletev1alpha1ConfigMap(
-              {
-                name: configMapName,
-              },
-              {
-                mute: true,
-              }
-            );
-          }
+          Toast.success("卸载成功");
         } catch (e) {
           console.error("Failed to uninstall plugin", e);
         } finally {

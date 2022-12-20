@@ -9,6 +9,7 @@ import cloneDeep from "lodash.clonedeep";
 import merge from "lodash.merge";
 import type { ConfigMap, Setting, SettingForm } from "@halo-dev/api-client";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
+import { Toast } from "@halo-dev/components";
 
 const initialConfigMap: ConfigMap = {
   apiVersion: "v1alpha1",
@@ -150,6 +151,8 @@ export function useSettingForm(
           });
         configMapName.value = data.metadata.name;
       }
+
+      Toast.success("保存成功");
     } catch (e) {
       console.error("Failed to save configMap", e);
     } finally {

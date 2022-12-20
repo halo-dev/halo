@@ -15,6 +15,7 @@ import {
   VPageHeader,
   VStatusDot,
   VLoading,
+  Toast,
 } from "@halo-dev/components";
 import { onMounted, ref, watch } from "vue";
 import type { ListedSinglePageList, SinglePage } from "@halo-dev/api-client";
@@ -132,6 +133,8 @@ const handleDeletePermanently = async (singlePage: SinglePage) => {
         }
       );
       await handleFetchSinglePages();
+
+      Toast.success("删除成功");
     },
   });
 };
@@ -153,6 +156,8 @@ const handleDeletePermanentlyInBatch = async () => {
       );
       await handleFetchSinglePages();
       selectedPageNames.value = [];
+
+      Toast.success("删除成功");
     },
   });
 };
@@ -171,6 +176,8 @@ const handleRecovery = async (singlePage: SinglePage) => {
         }
       );
       await handleFetchSinglePages();
+
+      Toast.success("恢复成功");
     },
   });
 };
@@ -201,6 +208,8 @@ const handleRecoveryInBatch = async () => {
       );
       await handleFetchSinglePages();
       selectedPageNames.value = [];
+
+      Toast.success("恢复成功");
     },
   });
 };

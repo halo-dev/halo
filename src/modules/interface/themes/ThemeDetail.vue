@@ -13,6 +13,7 @@ import {
   VButton,
   Dialog,
   VAvatar,
+  Toast,
 } from "@halo-dev/components";
 import ThemeUploadModal from "./components/ThemeUploadModal.vue";
 
@@ -41,6 +42,8 @@ const handleReloadTheme = async () => {
         await apiClient.theme.reload({
           name: selectedTheme.value.metadata.name as string,
         });
+
+        Toast.success("重载配置成功");
 
         window.location.reload();
       } catch (e) {

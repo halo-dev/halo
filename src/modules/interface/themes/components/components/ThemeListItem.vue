@@ -8,6 +8,7 @@ import {
   VEntityField,
   VStatusDot,
   Dialog,
+  Toast,
 } from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
 import type { Theme } from "@halo-dev/api-client";
@@ -43,8 +44,8 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
   Dialog.warning({
     title: `${
       deleteExtensions
-        ? "确定要删除该主题以及对应的配置吗？"
-        : "确定要删除该主题吗？"
+        ? "确定要卸载该主题以及对应的配置吗？"
+        : "确定要卸载该主题吗？"
     }`,
     description: "该操作不可恢复。",
     onConfirm: async () => {
@@ -54,33 +55,33 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
         });
 
         // delete theme setting and configMap
-        if (!deleteExtensions) {
-          return;
+        if (deleteExtensions) {
+          const { settingName, configMapName } = theme.spec;
+
+          if (settingName) {
+            await apiClient.extension.setting.deletev1alpha1Setting(
+              {
+                name: settingName,
+              },
+              {
+                mute: true,
+              }
+            );
+          }
+
+          if (configMapName) {
+            await apiClient.extension.configMap.deletev1alpha1ConfigMap(
+              {
+                name: configMapName,
+              },
+              {
+                mute: true,
+              }
+            );
+          }
         }
 
-        const { settingName, configMapName } = theme.spec;
-
-        if (settingName) {
-          await apiClient.extension.setting.deletev1alpha1Setting(
-            {
-              name: settingName,
-            },
-            {
-              mute: true,
-            }
-          );
-        }
-
-        if (configMapName) {
-          await apiClient.extension.configMap.deletev1alpha1ConfigMap(
-            {
-              name: configMapName,
-            },
-            {
-              mute: true,
-            }
-          );
-        }
+        Toast.success("卸载成功");
       } catch (e) {
         console.error("Failed to uninstall theme", e);
       } finally {

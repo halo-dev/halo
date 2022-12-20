@@ -1,5 +1,12 @@
 <script lang="ts" setup>
-import { VButton, VModal, VSpace, VTabItem, VTabs } from "@halo-dev/components";
+import {
+  Toast,
+  VButton,
+  VModal,
+  VSpace,
+  VTabItem,
+  VTabs,
+} from "@halo-dev/components";
 import { computed, ref, watchEffect } from "vue";
 import type { Post } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
@@ -101,6 +108,8 @@ const handleSave = async () => {
     emit("saved", data);
 
     handleVisibleChange(false);
+
+    Toast.success("保存成功");
   } catch (e) {
     console.error("Failed to save post", e);
   } finally {
@@ -126,6 +135,8 @@ const handlePublish = async () => {
     emit("published", data);
 
     handleVisibleChange(false);
+
+    Toast.success("发布成功");
   } catch (e) {
     console.error("Failed to publish post", e);
   } finally {
@@ -142,6 +153,8 @@ const handleUnpublish = async () => {
     });
 
     handleVisibleChange(false);
+
+    Toast.success("取消发布成功");
   } catch (e) {
     console.error("Failed to publish post", e);
   } finally {

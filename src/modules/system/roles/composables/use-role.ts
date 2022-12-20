@@ -4,6 +4,7 @@ import { computed, onMounted, ref } from "vue";
 import { roleLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
 import { apiClient } from "@/utils/api-client";
+import { Toast } from "@halo-dev/components";
 
 interface RoleTemplateGroup {
   module: string | null | undefined;
@@ -110,6 +111,8 @@ export function useRoleForm(): useRoleFormReturn {
 
         formState.value = data;
       }
+
+      Toast.success("保存成功");
     } catch (e) {
       console.error(e);
     } finally {

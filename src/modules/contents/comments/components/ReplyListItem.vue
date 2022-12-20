@@ -8,6 +8,7 @@ import {
   Dialog,
   VStatusDot,
   IconReplyLine,
+  Toast,
 } from "@halo-dev/components";
 import type { ListedReply } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
@@ -53,6 +54,8 @@ const handleDelete = async () => {
         await apiClient.extension.reply.deletecontentHaloRunV1alpha1Reply({
           name: props.reply?.reply.metadata.name as string,
         });
+
+        Toast.success("删除成功");
       } catch (error) {
         console.log("Failed to delete comment reply", error);
       } finally {
@@ -72,6 +75,8 @@ const handleApprove = async () => {
       name: replyToUpdate.metadata.name,
       reply: replyToUpdate,
     });
+
+    Toast.success("操作成功");
   } catch (error) {
     console.error("Failed to approve comment reply", error);
   } finally {

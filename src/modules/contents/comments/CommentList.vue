@@ -11,6 +11,7 @@ import {
   VEmpty,
   Dialog,
   VLoading,
+  Toast,
 } from "@halo-dev/components";
 import CommentListItem from "./components/CommentListItem.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
@@ -146,6 +147,8 @@ const handleDeleteInBatch = async () => {
         });
         await Promise.all(promises);
         selectedCommentNames.value = [];
+
+        Toast.success("删除成功");
       } catch (e) {
         console.error("Failed to delete comments", e);
       } finally {
@@ -181,6 +184,8 @@ const handleApproveInBatch = async () => {
         });
         await Promise.all(promises);
         selectedCommentNames.value = [];
+
+        Toast.success("操作成功");
       } catch (e) {
         console.error("Failed to approve comments in batch", e);
       } finally {

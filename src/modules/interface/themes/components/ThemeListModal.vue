@@ -11,6 +11,7 @@ import {
   VTabItem,
   VTabs,
   VLoading,
+  Toast,
 } from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
 import ThemePreviewModal from "./preview/ThemePreviewModal.vue";
@@ -108,6 +109,8 @@ const handleCreateTheme = async (theme: Theme) => {
     apiClient.theme.reload({ name: data.metadata.name });
 
     activeTab.value = "installed";
+
+    Toast.success("安装成功");
   } catch (error) {
     console.error("Failed to create theme", error);
   } finally {

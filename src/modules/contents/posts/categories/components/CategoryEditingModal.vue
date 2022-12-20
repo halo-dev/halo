@@ -4,7 +4,7 @@ import { computed, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 
 // components
-import { VButton, VModal, VSpace } from "@halo-dev/components";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 
 // types
@@ -76,6 +76,8 @@ const handleSaveCategory = async () => {
       });
     }
     onVisibleChange(false);
+
+    Toast.success("保存成功");
   } catch (e) {
     console.error("Failed to create category", e);
   } finally {

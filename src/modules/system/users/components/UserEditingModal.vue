@@ -8,6 +8,7 @@ import type { User } from "@halo-dev/api-client";
 import {
   IconCodeBoxLine,
   IconEye,
+  Toast,
   VButton,
   VCodemirror,
   VModal,
@@ -123,6 +124,8 @@ const handleCreateUser = async () => {
     }
 
     onVisibleChange(false);
+
+    Toast.success("保存成功");
   } catch (e) {
     console.error("Failed to create or update user", e);
   } finally {

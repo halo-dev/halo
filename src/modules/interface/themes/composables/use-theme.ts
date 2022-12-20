@@ -49,6 +49,8 @@ export function useThemeLifeCycle(
               configMap: systemConfigMap,
             });
           }
+
+          Toast.success("启用成功");
         } catch (e) {
           console.error("Failed to active theme", e);
         } finally {

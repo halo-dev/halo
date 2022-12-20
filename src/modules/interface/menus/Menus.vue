@@ -9,6 +9,7 @@ import {
   VPageHeader,
   VSpace,
   VLoading,
+  Toast,
 } from "@halo-dev/components";
 import MenuItemEditingModal from "./components/MenuItemEditingModal.vue";
 import MenuItemListItem from "./components/MenuItemListItem.vue";
@@ -173,6 +174,8 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
       }
 
       await handleFetchMenuItems();
+
+      Toast.success("删除成功");
     },
   });
 };

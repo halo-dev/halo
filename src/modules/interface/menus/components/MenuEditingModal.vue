@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { VButton, VModal, VSpace } from "@halo-dev/components";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import type { Menu } from "@halo-dev/api-client";
 import { computed, ref, watch } from "vue";
@@ -60,6 +60,8 @@ const handleCreateMenu = async () => {
       emit("created", data);
     }
     onVisibleChange(false);
+
+    Toast.success("保存成功");
   } catch (e) {
     console.error("Failed to create menu", e);
   } finally {

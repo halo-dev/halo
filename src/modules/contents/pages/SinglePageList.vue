@@ -20,6 +20,7 @@ import {
   VEntity,
   VEntityField,
   VLoading,
+  Toast,
 } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
@@ -229,6 +230,8 @@ const handleDelete = async (singlePage: SinglePage) => {
         }
       );
       await handleFetchSinglePages();
+
+      Toast.success("删除成功");
     },
   });
 };
@@ -260,6 +263,8 @@ const handleDeleteInBatch = async () => {
       );
       await handleFetchSinglePages();
       selectedPageNames.value = [];
+
+      Toast.success("删除成功");
     },
   });
 };

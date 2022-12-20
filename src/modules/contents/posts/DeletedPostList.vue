@@ -15,6 +15,7 @@ import {
   VEntity,
   VEntityField,
   VLoading,
+  Toast,
 } from "@halo-dev/components";
 import PostTag from "./tags/components/PostTag.vue";
 import { onMounted, ref, watch } from "vue";
@@ -124,6 +125,8 @@ const handleDeletePermanently = async (post: Post) => {
         name: post.metadata.name,
       });
       await handleFetchPosts();
+
+      Toast.success("删除成功");
     },
   });
 };
@@ -143,6 +146,8 @@ const handleDeletePermanentlyInBatch = async () => {
       );
       await handleFetchPosts();
       selectedPostNames.value = [];
+
+      Toast.success("删除成功");
     },
   });
 };
@@ -159,6 +164,8 @@ const handleRecovery = async (post: Post) => {
         post: postToUpdate,
       });
       await handleFetchPosts();
+
+      Toast.success("恢复成功");
     },
   });
 };
@@ -187,6 +194,8 @@ const handleRecoveryInBatch = async () => {
       );
       await handleFetchPosts();
       selectedPostNames.value = [];
+
+      Toast.success("恢复成功");
     },
   });
 };

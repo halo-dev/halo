@@ -18,6 +18,7 @@ import {
   VEntity,
   VEntityField,
   VLoading,
+  Toast,
 } from "@halo-dev/components";
 import RoleEditingModal from "./components/RoleEditingModal.vue";
 
@@ -132,6 +133,8 @@ const handleDelete = async (role: Role) => {
         await apiClient.extension.role.deletev1alpha1Role({
           name: role.metadata.name,
         });
+
+        Toast.success("删除成功");
       } catch (e) {
         console.error("Failed to delete role", e);
       }

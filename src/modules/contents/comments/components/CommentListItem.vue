@@ -11,6 +11,7 @@ import {
   IconAddCircle,
   IconExternalLinkLine,
   VLoading,
+  Toast,
 } from "@halo-dev/components";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import type {
@@ -65,6 +66,8 @@ const handleDelete = async () => {
         await apiClient.extension.comment.deletecontentHaloRunV1alpha1Comment({
           name: props.comment?.comment?.metadata.name as string,
         });
+
+        Toast.success("删除成功");
       } catch (error) {
         console.log("Failed to delete comment", error);
       } finally {
@@ -93,6 +96,8 @@ const handleApproveReplyInBatch = async () => {
           });
         });
         await Promise.all(promises);
+
+        Toast.success("操作成功");
       } catch (e) {
         console.error("Failed to approve comment replies in batch", e);
       } finally {
@@ -112,6 +117,8 @@ const handleApprove = async () => {
       name: commentToUpdate.metadata.name,
       comment: commentToUpdate,
     });
+
+    Toast.success("操作成功");
   } catch (error) {
     console.error("Failed to approve comment", error);
   } finally {

@@ -1,5 +1,12 @@
 <script lang="ts" setup>
-import { VButton, VModal, VSpace, VTabItem, VTabs } from "@halo-dev/components";
+import {
+  Toast,
+  VButton,
+  VModal,
+  VSpace,
+  VTabItem,
+  VTabs,
+} from "@halo-dev/components";
 import { computed, ref, watchEffect } from "vue";
 import type { SinglePage } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
@@ -105,6 +112,8 @@ const handleSave = async () => {
     emit("saved", data);
 
     onVisibleChange(false);
+
+    Toast.success("保存成功");
   } catch (error) {
     console.error("Failed to save single page", error);
   } finally {
@@ -150,6 +159,8 @@ const handleSwitchPublish = async (publish: boolean) => {
     }
 
     onVisibleChange(false);
+
+    Toast.success(`${publish ? "发布" : "取消发布"}成功`);
   } catch (error) {
     console.error("Failed to publish single page", error);
   } finally {

@@ -9,7 +9,7 @@ import type { Ref } from "vue";
 import { ref, watch } from "vue";
 import type { AttachmentLike } from "@halo-dev/console-shared";
 import { apiClient } from "@/utils/api-client";
-import { Dialog } from "@halo-dev/components";
+import { Dialog, Toast } from "@halo-dev/components";
 import type { Content, Editor } from "@halo-dev/richtext-editor";
 import { onBeforeRouteLeave } from "vue-router";
 
@@ -180,6 +180,8 @@ export function useAttachmentControl(filterOptions?: {
             selectedAttachment.value = undefined;
           }
           selectedAttachments.value.delete(attachment);
+
+          Toast.success("删除成功");
         } catch (e) {
           console.error("Failed to delete attachment", e);
         } finally {
@@ -207,6 +209,8 @@ export function useAttachmentControl(filterOptions?: {
           );
           await Promise.all(promises);
           selectedAttachments.value.clear();
+
+          Toast.success("删除成功");
         } catch (e) {
           console.error("Failed to delete attachments", e);
         } finally {

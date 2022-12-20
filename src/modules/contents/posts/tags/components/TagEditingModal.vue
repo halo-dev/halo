@@ -7,6 +7,7 @@ import { apiClient } from "@/utils/api-client";
 import {
   IconArrowLeft,
   IconArrowRight,
+  Toast,
   VButton,
   VModal,
   VSpace,
@@ -79,6 +80,8 @@ const handleSaveTag = async () => {
       });
     }
     onVisibleChange(false);
+
+    Toast.success("保存成功");
   } catch (e) {
     console.error("Failed to create tag", e);
   } finally {
