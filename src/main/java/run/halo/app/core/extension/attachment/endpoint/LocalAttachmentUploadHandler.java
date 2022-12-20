@@ -5,6 +5,7 @@ import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -17,6 +18,7 @@ import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.server.ServerWebInputException;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
@@ -108,7 +110,13 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                         attachment.setMetadata(metadata);
                         attachment.setSpec(spec);
                         return attachment;
-                    }));
+                    }))
+                    .onErrorMap(FileAlreadyExistsException.class, e -> {
+                        log.error("attachment upload error occurred because file already existed: "
+                            + e.getMessage());
+                        return new ServerWebInputException(
+                            "文件名 " + file.filename() + " 已存在，请更名后重试");
+                    });
             });
     }
 
