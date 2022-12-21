@@ -77,7 +77,7 @@ public class CategoryFinderImpl implements CategoryFinder {
     }
 
     @Override
-    public Flux<CategoryTreeVo> listSubTreeByName(String nodeName) {
+    public Flux<CategoryTreeVo> listAsTree(String nodeName) {
         return this.toCategoryTreeVoFlux(nodeName);
     }
 
