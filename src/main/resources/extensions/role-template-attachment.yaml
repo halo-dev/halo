@@ -12,13 +12,13 @@ metadata:
       ["system:attachments:manage"]
 rules:
   - apiGroups: [ "storage.halo.run" ]
-    resources: [ "attachments" ]
+    resources: [ "attachments", "policies", "policytemplates", "groups" ]
     verbs: [ "*" ]
   - apiGroups: [ "api.console.halo.run" ]
     resources: [ "attachments" ]
     verbs: [ "*" ]
-  - nonResourceURLs: [ "/apis/api.console.halo.run/attachments/upload" ]
-    verbs: [ "post" ]
+  - nonResourceURLs: [ "/apis/api.console.halo.run/v1alpha1/attachments/upload" ]
+    verbs: [ "create" ]
 ---
 apiVersion: v1alpha1
 kind: "Role"
@@ -33,7 +33,7 @@ metadata:
       ["system:attachments:view"]
 rules:
   - apiGroups: [ "storage.halo.run" ]
-    resources: [ "attachments" ]
+    resources: [ "attachments", "policies", "policytemplates", "groups" ]
     verbs: [ "get", "list" ]
   - apiGroups: [ "api.console.halo.run" ]
     resources: [ "attachments" ]
