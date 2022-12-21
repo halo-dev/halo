@@ -106,7 +106,7 @@ class CategoryFinderImplTest {
         when(client.list(eq(Category.class), eq(null), any()))
             .thenReturn(Flux.fromIterable(categoriesForTree()));
         List<CategoryTreeVo> treeVos = categoryFinder.listAsTree("E").collectList().block();
-        assertThat(treeVos).hasSize(1);
+        assertThat(treeVos.get(0).getMetadata().getName()).isEqualTo("E");
     }
 
     /**

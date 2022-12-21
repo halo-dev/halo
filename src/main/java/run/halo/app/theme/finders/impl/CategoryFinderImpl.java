@@ -54,7 +54,7 @@ public class CategoryFinderImpl implements CategoryFinder {
     @Override
     public Mono<ListResult<CategoryVo>> list(Integer page, Integer size) {
         return client.list(Category.class, null,
-            defaultComparator(), pageNullSafe(page), sizeNullSafe(size))
+                defaultComparator(), pageNullSafe(page), sizeNullSafe(size))
             .map(list -> {
                 List<CategoryVo> categoryVos = list.stream()
                     .map(CategoryVo::from)
