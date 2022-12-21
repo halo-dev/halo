@@ -31,3 +31,12 @@ halo:
 springdoc:
   api-docs:
     enabled: false
+
+logging:
+  file:
+    name: ${halo.work-dir}/logs/halo.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      total-size-cap: 1GB
+      max-history: 0
