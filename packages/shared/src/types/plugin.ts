@@ -2,6 +2,7 @@ import type { Component } from "vue";
 import type { RouteRecordRaw, RouteRecordName } from "vue-router";
 import type { FunctionalPage } from "../states/pages";
 import type { AttachmentSelectProvider } from "../states/attachment-selector";
+import type { EditorProvider } from "..";
 
 export interface RouteRecordAppend {
   parentName: RouteRecordName;
@@ -14,6 +15,8 @@ export interface ExtensionPoint {
   "attachment:selector:create"?: () =>
     | AttachmentSelectProvider[]
     | Promise<AttachmentSelectProvider[]>;
+
+  "editor:create"?: () => EditorProvider[] | Promise<EditorProvider[]>;
 }
 
 export interface PluginModule {

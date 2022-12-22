@@ -8,20 +8,33 @@ import {
   VPageHeader,
   VSpace,
   Toast,
+  Dialog,
 } from "@halo-dev/components";
-import DefaultEditor from "@/components/editor/DefaultEditor.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import PostPreviewModal from "./components/PostPreviewModal.vue";
 import type { Post, PostRequest } from "@halo-dev/api-client";
-import { computed, onMounted, ref, toRef } from "vue";
+import {
+  computed,
+  nextTick,
+  onMounted,
+  provide,
+  ref,
+  toRef,
+  type ComputedRef,
+} from "vue";
+import type { EditorProvider } from "@halo-dev/console-shared";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { useRouter } from "vue-router";
 import { randomUUID } from "@/utils/id";
 import { useContentCache } from "@/composables/use-content-cache";
+import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
 
 const router = useRouter();
+
+const { editorProviders } = useEditorExtensionPoints();
+const currentEditorProvider = ref<EditorProvider>();
 
 const initialFormState: PostRequest = {
   post: {
@@ -49,6 +62,7 @@ const initialFormState: PostRequest = {
     kind: "Post",
     metadata: {
       name: randomUUID(),
+      annotations: {},
     },
   },
   content: {
@@ -68,12 +82,23 @@ const isUpdateMode = computed(() => {
   return !!formState.value.post.metadata.creationTimestamp;
 });
 
+// provide some data to editor
+provide<ComputedRef<string | undefined>>(
+  "owner",
+  computed(() => formState.value.post.spec.owner)
+);
+provide<ComputedRef<string | undefined>>(
+  "publishTime",
+  computed(() => formState.value.post.spec.publishTime)
+);
+provide<ComputedRef<string | undefined>>(
+  "permalink",
+  computed(() => formState.value.post.status?.permalink)
+);
+
 const handleSave = async () => {
   try {
     saving.value = true;
-
-    // Set rendered content
-    formState.value.content.content = formState.value.content.raw;
 
     // Set default title and slug
     if (!formState.value.post.spec.title) {
@@ -115,9 +140,6 @@ const returnToView = useRouteQuery<string>("returnToView");
 const handlePublish = async () => {
   try {
     publishing.value = true;
-
-    // Set rendered content
-    formState.value.content.content = formState.value.content.raw;
 
     if (isUpdateMode.value) {
       const { name: postName } = formState.value.post.metadata;
@@ -176,6 +198,42 @@ const handleFetchContent = async () => {
     snapshotName: formState.value.post.spec.headSnapshot,
   });
 
+  // get editor provider
+  if (!currentEditorProvider.value) {
+    const preferredEditor = editorProviders.value.find(
+      (provider) =>
+        provider.name ===
+        formState.value.post.metadata.annotations?.[
+          "content.halo.run/preferred-editor"
+        ]
+    );
+
+    const provider =
+      preferredEditor ||
+      editorProviders.value.find(
+        (provider) => provider.rawType === data.rawType
+      );
+
+    if (provider) {
+      currentEditorProvider.value = provider;
+
+      formState.value.post.metadata.annotations = {
+        ...formState.value.post.metadata.annotations,
+        "content.halo.run/preferred-editor": provider.name,
+      };
+    } else {
+      Dialog.warning({
+        title: "警告",
+        description: `未找到符合 ${data.rawType} 格式的编辑器，请检查是否已安装编辑器插件`,
+        onConfirm: () => {
+          router.back();
+        },
+      });
+    }
+
+    await nextTick();
+  }
+
   formState.value.content = Object.assign(formState.value.content, data);
 };
 
@@ -210,6 +268,7 @@ const onSettingPublished = (post: Post) => {
 
 // Get post data when the route contains the name parameter
 const name = useRouteQuery("name");
+const editor = useRouteQuery("editor");
 onMounted(async () => {
   if (name.value) {
     // fetch post
@@ -221,6 +280,21 @@ onMounted(async () => {
 
     // fetch post content
     await handleFetchContent();
+  } else {
+    // Set default editor
+    const provider =
+      editorProviders.value.find(
+        (provider) => provider.name === editor.value
+      ) || editorProviders.value[0];
+
+    if (provider) {
+      currentEditorProvider.value = provider;
+      formState.value.content.rawType = provider.rawType;
+    }
+
+    formState.value.post.metadata.annotations = {
+      "content.halo.run/preferred-editor": provider.name,
+    };
   }
   handleResetCache();
 });
@@ -289,11 +363,12 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     </template>
   </VPageHeader>
   <div class="editor border-t" style="height: calc(100vh - 3.5rem)">
-    <DefaultEditor
-      v-model="formState.content.raw"
-      :owner="formState.post.spec.owner"
-      :permalink="formState.post.status?.permalink"
-      :publish-time="formState.post.spec.publishTime"
+    <component
+      :is="currentEditorProvider.component"
+      v-if="currentEditorProvider"
+      v-model:raw="formState.content.raw"
+      v-model:content="formState.content.content"
+      class="h-full"
       @update="handleSetContentCache"
     />
   </div>

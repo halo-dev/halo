@@ -89,29 +89,38 @@ import MdiFormatHeader3 from "~icons/mdi/format-header-3";
 import MdiFormatHeader4 from "~icons/mdi/format-header-4";
 import MdiFormatHeader5 from "~icons/mdi/format-header-5";
 import MdiFormatHeader6 from "~icons/mdi/format-header-6";
-import { computed, markRaw, nextTick, ref, watch } from "vue";
+import {
+  computed,
+  inject,
+  markRaw,
+  nextTick,
+  ref,
+  watch,
+  type ComputedRef,
+} from "vue";
 import { formatDatetime } from "@/utils/date";
 import { useAttachmentSelect } from "@/modules/contents/attachments/composables/use-attachment";
 
 const props = withDefaults(
   defineProps<{
-    modelValue?: string;
-    owner?: string;
-    permalink?: string;
-    publishTime?: string | null;
+    raw?: string;
+    content: string;
   }>(),
   {
-    modelValue: "",
-    owner: undefined,
-    permalink: undefined,
-    publishTime: undefined,
+    raw: "",
+    content: "",
   }
 );
 
 const emit = defineEmits<{
-  (event: "update:modelValue", value: string): void;
+  (event: "update:raw", value: string): void;
+  (event: "update:content", value: string): void;
   (event: "update", value: string): void;
 }>();
+
+const owner = inject<ComputedRef<string | undefined>>("owner");
+const publishTime = inject<ComputedRef<string | undefined>>("publishTime");
+const permalink = inject<ComputedRef<string | undefined>>("permalink");
 
 interface HeadingNode {
   id: string;
@@ -134,7 +143,7 @@ const extraActiveId = ref("toc");
 const attachmentSelectorModal = ref(false);
 
 const editor = useEditor({
-  content: props.modelValue,
+  content: props.raw,
   extensions: [
     ExtensionBlockquote,
     ExtensionBold,
@@ -226,7 +235,8 @@ const editor = useEditor({
   ],
   autofocus: "start",
   onUpdate: () => {
-    emit("update:modelValue", editor.value?.getHTML() + "");
+    emit("update:raw", editor.value?.getHTML() + "");
+    emit("update:content", editor.value?.getHTML() + "");
     emit("update", editor.value?.getHTML() + "");
     nextTick(() => {
       handleGenerateTableOfContent();
@@ -340,10 +350,10 @@ const handleSelectHeadingNode = (node: HeadingNode) => {
 const { onAttachmentSelect } = useAttachmentSelect(editor);
 
 watch(
-  () => props.modelValue,
+  () => props.raw,
   () => {
-    if (props.modelValue !== editor.value?.getHTML()) {
-      editor.value?.commands.setContent(props.modelValue);
+    if (props.raw !== editor.value?.getHTML()) {
+      editor.value?.commands.setContent(props.raw);
       nextTick(() => {
         handleGenerateTableOfContent();
       });

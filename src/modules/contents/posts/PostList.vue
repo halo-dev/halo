@@ -45,8 +45,11 @@ import FilterTag from "@/components/filter/FilterTag.vue";
 import FilteCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 import TagDropdownSelector from "@/components/dropdown-selector/TagDropdownSelector.vue";
+import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
 
 const { currentUserHasPermission } = usePermission();
+
+const { editorProviders } = useEditorExtensionPoints();
 
 const posts = ref<ListedPostList>({
   page: 1,
@@ -476,7 +479,40 @@ const hasFilters = computed(() => {
         <VButton :route="{ name: 'Categories' }" size="sm">分类</VButton>
         <VButton :route="{ name: 'Tags' }" size="sm">标签</VButton>
         <VButton :route="{ name: 'DeletedPosts' }" size="sm">回收站</VButton>
+
+        <FloatingDropdown
+          v-if="editorProviders.length > 1"
+          v-permission="['system:posts:manage']"
+        >
+          <VButton type="secondary">
+            <template #icon>
+              <IconAddCircle class="h-full w-full" />
+            </template>
+            新建
+          </VButton>
+          <template #popper>
+            <div class="w-48 p-2">
+              <VSpace class="w-full" direction="column">
+                <VButton
+                  v-for="(editorProvider, index) in editorProviders"
+                  :key="index"
+                  v-close-popper
+                  block
+                  type="default"
+                  :route="{
+                    name: 'PostEditor',
+                    query: { editor: editorProvider.name },
+                  }"
+                >
+                  {{ editorProvider.displayName }}
+                </VButton>
+              </VSpace>
+            </div>
+          </template>
+        </FloatingDropdown>
+
         <VButton
+          v-else
           v-permission="['system:posts:manage']"
           :route="{ name: 'PostEditor' }"
           type="secondary"
