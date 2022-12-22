@@ -363,9 +363,6 @@ function handleClearKeyword() {
                   <template #description>
                     <VSpace>
                       <span class="text-xs text-gray-500">
-                        {{ singlePage.page.status?.permalink }}
-                      </span>
-                      <span class="text-xs text-gray-500">
                         访问量 {{ singlePage.stats.visit || 0 }}
                       </span>
                       <span class="text-xs text-gray-500">
