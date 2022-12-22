@@ -52,6 +52,10 @@ const isUpdateMode = computed(() => {
   return !!formState.value.metadata.creationTimestamp;
 });
 
+const modalTitle = computed(() => {
+  return isUpdateMode.value ? "编辑菜单项" : "新增菜单项";
+});
+
 const handleSaveMenuItem = async () => {
   try {
     saving.value = true;
@@ -240,7 +244,7 @@ const onMenuItemSourceChange = () => {
   <VModal
     :visible="visible"
     :width="500"
-    title="编辑菜单项"
+    :title="modalTitle"
     @update:visible="onVisibleChange"
   >
     <FormKit
