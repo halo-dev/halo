@@ -107,6 +107,7 @@ class CategoryFinderImplTest {
             .thenReturn(Flux.fromIterable(categoriesForTree()));
         List<CategoryTreeVo> treeVos = categoryFinder.listAsTree("E").collectList().block();
         assertThat(treeVos.get(0).getMetadata().getName()).isEqualTo("E");
+        assertThat(treeVos.get(0).getChildren().get(0).getMetadata().getName()).isEqualTo("A");
     }
 
     /**

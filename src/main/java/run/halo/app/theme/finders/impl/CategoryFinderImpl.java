@@ -77,11 +77,11 @@ public class CategoryFinderImpl implements CategoryFinder {
     }
 
     @Override
-    public Flux<CategoryTreeVo> listAsTree(String nodeName) {
-        return this.toCategoryTreeVoFlux(nodeName);
+    public Flux<CategoryTreeVo> listAsTree(String name) {
+        return this.toCategoryTreeVoFlux(name);
     }
 
-    Flux<CategoryTreeVo> toCategoryTreeVoFlux(String nodeName) {
+    Flux<CategoryTreeVo> toCategoryTreeVoFlux(String name) {
         return listAll()
             .collectList()
             .flatMapIterable(categoryVos -> {
@@ -90,7 +90,7 @@ public class CategoryFinderImpl implements CategoryFinder {
                     .collect(Collectors.toMap(categoryVo -> categoryVo.getMetadata().getName(),
                         Function.identity()));
 
-                nameIdentityMap.forEach((name, value) -> {
+                nameIdentityMap.forEach((nameKey, value) -> {
                     List<String> children = value.getSpec().getChildren();
                     if (children == null) {
                         return;
@@ -98,15 +98,15 @@ public class CategoryFinderImpl implements CategoryFinder {
                     for (String child : children) {
                         CategoryTreeVo childNode = nameIdentityMap.get(child);
                         if (childNode != null) {
-                            childNode.setParentName(name);
+                            childNode.setParentName(nameKey);
                         }
                     }
                 });
-                return listToTree(nameIdentityMap.values(), nodeName);
+                return listToTree(nameIdentityMap.values(), name);
             });
     }
 
-    static List<CategoryTreeVo> listToTree(Collection<CategoryTreeVo> list, String nodeName) {
+    static List<CategoryTreeVo> listToTree(Collection<CategoryTreeVo> list, String name) {
         Map<String, List<CategoryTreeVo>> parentNameIdentityMap = list.stream()
             .filter(categoryTreeVo -> categoryTreeVo.getParentName() != null)
             .collect(Collectors.groupingBy(CategoryTreeVo::getParentName));
@@ -121,8 +121,8 @@ public class CategoryFinderImpl implements CategoryFinder {
             node.setChildren(children);
         });
         return list.stream()
-            .filter(v -> StringUtils.isEmpty(nodeName) ? v.getParentName() == null
-                : StringUtils.equals(v.getMetadata().getName(), nodeName))
+            .filter(v -> StringUtils.isEmpty(name) ? v.getParentName() == null
+                : StringUtils.equals(v.getMetadata().getName(), name))
             .sorted(defaultTreeNodeComparator())
             .collect(Collectors.toList());
     }
