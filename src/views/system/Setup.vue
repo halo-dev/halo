@@ -18,6 +18,7 @@ import type {
   SinglePageRequest,
   Tag,
 } from "@halo-dev/api-client";
+import { useThemeStore } from "@/stores/theme";
 
 const router = useRouter();
 
@@ -98,6 +99,8 @@ const handleSubmit = async () => {
 
     const systemStateStore = useSystemStatesStore();
     await systemStateStore.fetchSystemStates();
+    const themeStore = useThemeStore();
+    await themeStore.fetchActivatedTheme();
 
     router.push({ name: "Dashboard" });
 
