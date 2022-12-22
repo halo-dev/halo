@@ -1,12 +1,10 @@
 package run.halo.app.infra;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.concurrent.CountDownLatch;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import run.halo.app.core.extension.theme.ThemeService;
@@ -47,15 +45,16 @@ public class DefaultThemeInitializer implements ApplicationListener<SchemeInitia
                 return;
             }
             log.info("Initializing default theme from {}", location);
-            var defaultThemeUri = ResourceUtils.getURL(location).toURI();
+            PathMatchingResourcePatternResolver resolver =
+                new PathMatchingResourcePatternResolver();
             var latch = new CountDownLatch(1);
-            themeService.install(Files.newInputStream(Path.of(defaultThemeUri)))
+            themeService.install(ResourceUtils.getURL(location).openStream())
                 .doFinally(signalType -> latch.countDown())
                 .subscribe(theme -> log.info("Initialized default theme: {}",
                     theme.getMetadata().getName()));
             latch.await();
             // Because default active theme is default, we don't need to enabled it manually.
-        } catch (IOException | URISyntaxException | InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             // we should skip the initialization error at here
             log.warn("Failed to initialize theme from " + location, e);
         }

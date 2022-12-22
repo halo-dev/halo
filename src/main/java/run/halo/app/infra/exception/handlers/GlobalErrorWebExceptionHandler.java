@@ -18,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
-import org.springframework.util.StringUtils;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.method.annotation.ExceptionHandlerMethodResolver;
 import org.springframework.web.reactive.BindingContext;
@@ -125,29 +124,6 @@ public class GlobalErrorWebExceptionHandler extends DefaultErrorWebExceptionHand
             .switchIfEmpty(this.errorProperties.getWhitelabel().isEnabled()
                 ? renderDefaultErrorView(responseBody, error) : Mono.error(getError(request)))
             .next();
-    }
-
-    protected void logError(ServerRequest request, ServerResponse response, Throwable throwable) {
-        if (log.isDebugEnabled()) {
-            log.debug(request.exchange().getLogPrefix() + formatError(throwable, request),
-                throwable);
-        }
-        if (HttpStatus.resolve(response.statusCode().value()) != null
-            && response.statusCode().equals(HttpStatus.INTERNAL_SERVER_ERROR)) {
-            log.error("{} 500 Server Error for {}",
-                request.exchange().getLogPrefix(), formatRequest(request), throwable);
-        }
-    }
-
-    private String formatRequest(ServerRequest request) {
-        String rawQuery = request.uri().getRawQuery();
-        String query = StringUtils.hasText(rawQuery) ? "?" + rawQuery : "";
-        return "HTTP " + request.method() + " \"" + request.path() + query + "\"";
-    }
-
-    private String formatError(Throwable ex, ServerRequest request) {
-        String reason = ex.getClass().getSimpleName() + ": " + ex.getMessage();
-        return "Resolved [" + reason + "] for HTTP " + request.method() + " " + request.path();
     }
 
     private Mono<ServerResponse> renderErrorViewBy(ServerRequest request, String viewName,
