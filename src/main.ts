@@ -19,6 +19,7 @@ import type { RouteRecordRaw } from "vue-router";
 import { useThemeStore } from "./stores/theme";
 import { useSystemStatesStore } from "./stores/system-states";
 import { useUserStore } from "./stores/user";
+import { useSystemConfigMapStore } from "./stores/system-configmap";
 
 const app = createApp(App);
 
@@ -234,6 +235,10 @@ async function initApp() {
     // load system setup state
     const systemStateStore = useSystemStatesStore();
     await systemStateStore.fetchSystemStates();
+
+    // load system configMap
+    const systemConfigMapStore = useSystemConfigMapStore();
+    await systemConfigMapStore.fetchSystemConfigMap();
 
     if (systemStateStore.states.isSetup) {
       await loadActivatedTheme();

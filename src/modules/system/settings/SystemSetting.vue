@@ -9,6 +9,7 @@ import { VButton } from "@halo-dev/components";
 import { useSettingForm } from "@/composables/use-setting-form";
 import { useRouteParams } from "@vueuse/router";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
+import { useSystemConfigMapStore } from "@/stores/system-configmap";
 
 const group = useRouteParams<string>("group");
 
@@ -29,6 +30,13 @@ const formSchema = computed(() => {
     ?.formSchema as (FormKitSchemaCondition | FormKitSchemaNode)[];
 });
 
+const systemConfigMapStore = useSystemConfigMapStore();
+
+const handleSave = async () => {
+  await handleSaveConfigMap();
+  await systemConfigMapStore.fetchSystemConfigMap();
+};
+
 await handleFetchSettings();
 await handleFetchConfigMap();
 </script>
@@ -44,7 +52,7 @@ await handleFetchConfigMap();
           :actions="false"
           :preserve="true"
           type="form"
-          @submit="handleSaveConfigMap"
+          @submit="handleSave"
         >
           <FormKitSchema
             :schema="formSchema"

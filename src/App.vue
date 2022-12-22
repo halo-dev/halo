@@ -1,7 +1,12 @@
 <script lang="ts" setup>
 import { RouterView, useRoute } from "vue-router";
-import { watch } from "vue";
+import { computed, watch } from "vue";
 import { useTitle } from "@vueuse/core";
+import { useFavicon } from "@vueuse/core";
+import { useSystemConfigMapStore } from "./stores/system-configmap";
+import { storeToRefs } from "pinia";
+
+const { configMap } = storeToRefs(useSystemConfigMapStore());
 
 const AppName = "Halo";
 const route = useRoute();
@@ -18,6 +23,25 @@ watch(
     title.value = AppName;
   }
 );
+
+// Favicon
+const defaultFavicon = "/console/favicon.ico";
+
+const favicon = computed(() => {
+  if (!configMap?.value?.data?.["basic"]) {
+    return defaultFavicon;
+  }
+
+  const basic = JSON.parse(configMap.value.data["basic"]);
+
+  if (basic.favicon) {
+    return basic.favicon;
+  }
+
+  return defaultFavicon;
+});
+
+useFavicon(favicon);
 </script>
 
 <template>
