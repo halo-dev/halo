@@ -23,8 +23,11 @@ const emit = defineEmits<{
 
 const wrapperStyles = computed(() => {
   if (props.width) {
+    const width =
+      typeof props.width === "string" ? props.width : `${props.width}px`;
     return {
-      width: typeof props.width === "string" ? props.width : `${props.width}px`,
+      width,
+      maxWidth: width,
     };
   }
   return {};

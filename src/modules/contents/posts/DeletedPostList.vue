@@ -346,7 +346,7 @@ function handleClearKeyword() {
                 />
               </template>
               <template #start>
-                <VEntityField :title="post.post.spec.title">
+                <VEntityField :title="post.post.spec.title" width="27rem">
                   <template #extra>
                     <VSpace class="mt-1 sm:mt-0">
                       <PostTag
@@ -358,7 +358,7 @@ function handleClearKeyword() {
                     </VSpace>
                   </template>
                   <template #description>
-                    <VSpace>
+                    <VSpace class="flex-wrap !gap-y-1">
                       <p
                         v-if="post.categories.length"
                         class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
