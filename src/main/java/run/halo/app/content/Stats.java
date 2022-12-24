@@ -20,4 +20,13 @@ public class Stats {
     Integer totalComment;
 
     Integer approvedComment;
+
+    public static Stats empty() {
+        return Stats.builder()
+            .visit(0)
+            .upvote(0)
+            .totalComment(0)
+            .approvedComment(0)
+            .build();
+    }
 }

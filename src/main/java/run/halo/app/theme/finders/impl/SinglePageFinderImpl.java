@@ -11,7 +11,6 @@ import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentService;
-import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.ListResult;
@@ -62,9 +61,12 @@ public class SinglePageFinderImpl implements SinglePageFinder {
                 SinglePageVo pageVo = SinglePageVo.from(page);
                 pageVo.setContributors(List.of());
                 pageVo.setContent(ContentVo.empty());
-                populateStats(pageVo);
                 return pageVo;
             })
+            .flatMap(singlePageVo -> fetchStats(singlePageVo)
+                .doOnNext(singlePageVo::setStats)
+                .thenReturn(singlePageVo)
+            )
             .flatMap(this::populateContributors)
             .flatMap(page -> content(pageName)
                 .doOnNext(page::setContent)
@@ -93,9 +95,9 @@ public class SinglePageFinderImpl implements SinglePageFinder {
                 .map(singlePage -> {
                     ListedSinglePageVo pageVo = ListedSinglePageVo.from(singlePage);
                     pageVo.setContributors(List.of());
-                    populateStats(pageVo);
                     return pageVo;
                 })
+                .flatMap(lp -> fetchStats(lp).doOnNext(lp::setStats).thenReturn(lp))
                 .concatMap(this::populateContributors)
                 .collectList()
                 .map(pageVos -> new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
@@ -105,16 +107,16 @@ public class SinglePageFinderImpl implements SinglePageFinder {
             .defaultIfEmpty(new ListResult<>(0, 0, 0, List.of()));
     }
 
-    <T extends ListedSinglePageVo> void populateStats(T pageVo) {
+    <T extends ListedSinglePageVo> Mono<StatsVo> fetchStats(T pageVo) {
         String name = pageVo.getMetadata().getName();
-        Counter counter =
-            counterService.getByName(MeterUtils.nameOf(SinglePage.class, name));
-        StatsVo statsVo = StatsVo.builder()
-            .visit(counter.getVisit())
-            .upvote(counter.getUpvote())
-            .comment(counter.getApprovedComment())
-            .build();
-        pageVo.setStats(statsVo);
+        return counterService.getByName(MeterUtils.nameOf(SinglePage.class, name))
+            .map(counter -> StatsVo.builder()
+                .visit(counter.getVisit())
+                .upvote(counter.getUpvote())
+                .comment(counter.getApprovedComment())
+                .build()
+            )
+            .defaultIfEmpty(StatsVo.empty());
     }
 
     <T extends ListedSinglePageVo> Mono<T> populateContributors(T pageVo) {

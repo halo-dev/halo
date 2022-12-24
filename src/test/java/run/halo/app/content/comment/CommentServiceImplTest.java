@@ -265,9 +265,7 @@ class CommentServiceImplTest {
                                     "name": "fake-post"
                                 }
                             },
-                            "status": {
-                                "hasNewReply": false
-                            },
+                            "status": {},
                             "apiVersion": "content.halo.run/v1alpha1",
                             "kind": "Comment",
                             "metadata": {
@@ -309,9 +307,7 @@ class CommentServiceImplTest {
                                     "name": "fake-post"
                                 }
                             },
-                            "status": {
-                                "hasNewReply": false
-                            },
+                            "status": {},
                             "apiVersion": "content.halo.run/v1alpha1",
                             "kind": "Comment",
                             "metadata": {
@@ -353,9 +349,7 @@ class CommentServiceImplTest {
                                     "name": "fake-post"
                                 }
                             },
-                            "status": {
-                                "hasNewReply": false
-                            },
+                            "status": {},
                             "apiVersion": "content.halo.run/v1alpha1",
                             "kind": "Comment",
                             "metadata": {
