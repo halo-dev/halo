@@ -1,13 +1,6 @@
 <script lang="ts" setup>
-import {
-  Toast,
-  VButton,
-  VModal,
-  VSpace,
-  VTabItem,
-  VTabs,
-} from "@halo-dev/components";
-import { computed, ref, watchEffect } from "vue";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
+import { computed, nextTick, ref, watchEffect } from "vue";
 import type { SinglePage } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
@@ -15,6 +8,7 @@ import { useThemeCustomTemplates } from "@/modules/interface/themes/composables/
 import { singlePageLabels } from "@/constants/labels";
 import { randomUUID } from "@/utils/id";
 import { toDatetimeLocal, toISOString } from "@/utils/date";
+import { submitForm } from "@formkit/core";
 
 const initialFormState: SinglePage = {
   spec: {
@@ -64,11 +58,11 @@ const emit = defineEmits<{
   (event: "published", singlePage: SinglePage): void;
 }>();
 
-const activeTab = ref("general");
 const formState = ref<SinglePage>(cloneDeep(initialFormState));
 const saving = ref(false);
 const publishing = ref(false);
 const publishCanceling = ref(false);
+const submitType = ref<"publish" | "save">();
 
 const isUpdateMode = computed(() => {
   return !!formState.value.metadata.creationTimestamp;
@@ -77,11 +71,33 @@ const isUpdateMode = computed(() => {
 const onVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
-    setTimeout(() => {
-      activeTab.value = "general";
-    }, 200);
     emit("close");
   }
+};
+
+const handleSubmit = () => {
+  if (submitType.value === "publish") {
+    handlePublish();
+  }
+  if (submitType.value === "save") {
+    handleSave();
+  }
+};
+
+const handleSaveClick = () => {
+  submitType.value = "save";
+
+  nextTick(() => {
+    submitForm("singlePage-setting-form");
+  });
+};
+
+const handlePublishClick = () => {
+  submitType.value = "publish";
+
+  nextTick(() => {
+    submitForm("singlePage-setting-form");
+  });
 };
 
 const handleSave = async () => {
@@ -121,50 +137,71 @@ const handleSave = async () => {
   }
 };
 
-const handleSwitchPublish = async (publish: boolean) => {
+const handlePublish = async () => {
   if (props.onlyEmit) {
     emit("published", formState.value);
     return;
   }
 
   try {
-    if (publish) {
-      publishing.value = true;
-    } else {
-      publishCanceling.value = true;
-    }
+    publishing.value = true;
 
-    if (publish) {
-      formState.value.spec.releaseSnapshot = formState.value.spec.headSnapshot;
-    }
+    const singlePageToUpdate = cloneDeep(formState.value);
+
+    singlePageToUpdate.spec.releaseSnapshot =
+      singlePageToUpdate.spec.headSnapshot;
+    singlePageToUpdate.spec.publish = true;
 
     const { data } =
       await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
         {
           name: formState.value.metadata.name,
-          singlePage: {
-            ...formState.value,
-            spec: {
-              ...formState.value.spec,
-              publish: publish,
-            },
-          },
+          singlePage: singlePageToUpdate,
         }
       );
 
     formState.value = data;
 
-    if (publish) {
-      emit("published", data);
-    }
+    emit("published", data);
 
     onVisibleChange(false);
 
-    Toast.success(`${publish ? "发布" : "取消发布"}成功`);
+    Toast.success("发布成功");
   } catch (error) {
     console.error("Failed to publish single page", error);
   } finally {
     publishing.value = false;
+  }
+};
+
+const handleUnpublish = async () => {
+  try {
+    publishCanceling.value = true;
+
+    const { data: singlePage } =
+      await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
+        name: formState.value.metadata.name,
+      });
+
+    const singlePageToUpdate = cloneDeep(singlePage);
+    singlePageToUpdate.spec.publish = false;
+
+    const { data } =
+      await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+        {
+          name: formState.value.metadata.name,
+          singlePage: singlePageToUpdate,
+        }
+      );
+
+    formState.value = data;
+
+    onVisibleChange(false);
+
+    Toast.success("取消发布成功");
+  } catch (error) {
+    console.error("Failed to unpublish single page", error);
+  } finally {
     publishCanceling.value = false;
   }
 };
@@ -204,114 +241,128 @@ const onPublishTimeChange = (value: string) => {
       <slot name="actions"></slot>
     </template>
 
-    <VTabs v-model:active-id="activeTab" type="outline">
-      <VTabItem id="general" label="常规">
-        <FormKit
-          id="basic"
-          name="basic"
-          :actions="false"
-          :preserve="true"
-          type="form"
-        >
-          <FormKit
-            v-model="formState.spec.title"
-            label="标题"
-            type="text"
-            name="title"
-            validation="required|length:0,100"
-          ></FormKit>
-          <FormKit
-            v-model="formState.spec.slug"
-            label="别名"
-            name="slug"
-            type="text"
-            validation="required|length:0,100"
-          ></FormKit>
-          <FormKit
-            v-model="formState.spec.excerpt.autoGenerate"
-            :options="[
-              { label: '是', value: true },
-              { label: '否', value: false },
-            ]"
-            name="autoGenerate"
-            label="自动生成摘要"
-            type="radio"
-          >
-          </FormKit>
-          <FormKit
-            v-if="!formState.spec.excerpt.autoGenerate"
-            v-model="formState.spec.excerpt.raw"
-            name="raw"
-            label="自定义摘要"
-            type="textarea"
-            validation="length:0,1024"
-            :rows="5"
-          ></FormKit>
-        </FormKit>
-      </VTabItem>
-      <VTabItem id="advanced" label="高级">
-        <FormKit
-          id="advanced"
-          name="advanced"
-          :actions="false"
-          :preserve="true"
-          type="form"
-        >
-          <FormKit
-            v-model="formState.spec.allowComment"
-            :options="[
-              { label: '是', value: true },
-              { label: '否', value: false },
-            ]"
-            name="allowComment"
-            label="允许评论"
-            type="radio"
-          ></FormKit>
-          <FormKit
-            v-model="formState.spec.pinned"
-            :options="[
-              { label: '是', value: true },
-              { label: '否', value: false },
-            ]"
-            label="是否置顶"
-            name="pinned"
-            type="radio"
-          ></FormKit>
-          <FormKit
-            v-model="formState.spec.visible"
-            :options="[
-              { label: '公开', value: 'PUBLIC' },
-              { label: '私有', value: 'PRIVATE' },
-            ]"
-            label="可见性"
-            name="visible"
-            type="select"
-          ></FormKit>
-          <FormKit
-            :value="publishTime"
-            label="发表时间"
-            type="datetime-local"
-            name="publishTime"
-            @input="onPublishTimeChange"
-          ></FormKit>
-          <FormKit
-            v-model="formState.spec.template"
-            :options="templates"
-            label="自定义模板"
-            type="select"
-            name="template"
-          ></FormKit>
-          <FormKit
-            v-model="formState.spec.cover"
-            label="封面图"
-            type="attachment"
-            name="cover"
-            validation="length:0,1024"
-          ></FormKit>
-        </FormKit>
-        <!--TODO: add SEO/Metas/Inject Code form-->
-      </VTabItem>
-    </VTabs>
+    <FormKit
+      id="singlePage-setting-form"
+      type="form"
+      name="singlePage-setting-form"
+      :config="{ validationVisibility: 'submit' }"
+      @submit="handleSubmit"
+    >
+      <div>
+        <div class="md:grid md:grid-cols-4 md:gap-6">
+          <div class="md:col-span-1">
+            <div class="sticky top-0">
+              <span class="text-base font-medium text-gray-900">
+                常规设置
+              </span>
+            </div>
+          </div>
+          <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+            <FormKit
+              v-model="formState.spec.title"
+              label="标题"
+              type="text"
+              name="title"
+              validation="required|length:0,100"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.slug"
+              label="别名"
+              name="slug"
+              type="text"
+              validation="required|length:0,100"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.excerpt.autoGenerate"
+              :options="[
+                { label: '是', value: true },
+                { label: '否', value: false },
+              ]"
+              name="autoGenerate"
+              label="自动生成摘要"
+              type="radio"
+            >
+            </FormKit>
+            <FormKit
+              v-if="!formState.spec.excerpt.autoGenerate"
+              v-model="formState.spec.excerpt.raw"
+              name="raw"
+              label="自定义摘要"
+              type="textarea"
+              validation="length:0,1024"
+              :rows="5"
+            ></FormKit>
+          </div>
+        </div>
+
+        <div class="py-5">
+          <div class="border-t border-gray-200"></div>
+        </div>
+
+        <div class="md:grid md:grid-cols-4 md:gap-6">
+          <div class="md:col-span-1">
+            <div class="sticky top-0">
+              <span class="text-base font-medium text-gray-900">
+                高级设置
+              </span>
+            </div>
+          </div>
+          <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+            <FormKit
+              v-model="formState.spec.allowComment"
+              :options="[
+                { label: '是', value: true },
+                { label: '否', value: false },
+              ]"
+              name="allowComment"
+              label="允许评论"
+              type="radio"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.pinned"
+              :options="[
+                { label: '是', value: true },
+                { label: '否', value: false },
+              ]"
+              label="是否置顶"
+              name="pinned"
+              type="radio"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.visible"
+              :options="[
+                { label: '公开', value: 'PUBLIC' },
+                { label: '私有', value: 'PRIVATE' },
+              ]"
+              label="可见性"
+              name="visible"
+              type="select"
+            ></FormKit>
+            <FormKit
+              :value="publishTime"
+              label="发表时间"
+              type="datetime-local"
+              name="publishTime"
+              @input="onPublishTimeChange"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.template"
+              :options="templates"
+              label="自定义模板"
+              type="select"
+              name="template"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.cover"
+              label="封面图"
+              type="attachment"
+              name="cover"
+              validation="length:0,1024"
+            ></FormKit>
+          </div>
+        </div>
+      </div>
+    </FormKit>
 
     <template #footer>
       <VSpace>
@@ -322,7 +373,7 @@ const onPublishTimeChange = (value: string) => {
             "
             :loading="publishing"
             type="secondary"
-            @click="handleSwitchPublish(true)"
+            @click="handlePublishClick()"
           >
             发布
           </VButton>
@@ -330,17 +381,15 @@ const onPublishTimeChange = (value: string) => {
             v-else
             :loading="publishCanceling"
             type="danger"
-            @click="handleSwitchPublish(false)"
+            @click="handleUnpublish()"
           >
             取消发布
           </VButton>
         </template>
-        <VButton :loading="saving" type="secondary" @click="handleSave">
+        <VButton :loading="saving" type="secondary" @click="handleSaveClick">
           保存
         </VButton>
-        <VButton size="sm" type="default" @click="onVisibleChange(false)">
-          关闭
-        </VButton>
+        <VButton type="default" @click="onVisibleChange(false)"> 关闭 </VButton>
       </VSpace>
     </template>
   </VModal>

@@ -1,13 +1,6 @@
 <script lang="ts" setup>
-import {
-  Toast,
-  VButton,
-  VModal,
-  VSpace,
-  VTabItem,
-  VTabs,
-} from "@halo-dev/components";
-import { computed, ref, watchEffect } from "vue";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
+import { computed, nextTick, ref, watchEffect } from "vue";
 import type { Post } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
@@ -15,6 +8,7 @@ import { useThemeCustomTemplates } from "@/modules/interface/themes/composables/
 import { postLabels } from "@/constants/labels";
 import { randomUUID } from "@/utils/id";
 import { toDatetimeLocal, toISOString } from "@/utils/date";
+import { submitForm } from "@formkit/core";
 
 const initialFormState: Post = {
   spec: {
@@ -66,11 +60,11 @@ const emit = defineEmits<{
   (event: "published", post: Post): void;
 }>();
 
-const activeTab = ref("general");
 const formState = ref<Post>(cloneDeep(initialFormState));
 const saving = ref(false);
 const publishing = ref(false);
 const publishCanceling = ref(false);
+const submitType = ref<"publish" | "save">();
 
 const isUpdateMode = computed(() => {
   return !!formState.value.metadata.creationTimestamp;
@@ -79,11 +73,37 @@ const isUpdateMode = computed(() => {
 const handleVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
-    setTimeout(() => {
-      activeTab.value = "general";
-    }, 200);
     emit("close");
   }
+};
+
+const handleSubmit = () => {
+  if (submitType.value === "publish") {
+    handlePublish();
+  }
+  if (submitType.value === "save") {
+    handleSave();
+  }
+};
+
+const handleSaveClick = () => {
+  submitType.value = "save";
+
+  nextTick(() => {
+    submitForm("post-setting-form");
+  });
+};
+
+const handlePublishClick = () => {
+  if (!props.onlyEmit) {
+    handlePublish();
+  }
+
+  submitType.value = "publish";
+
+  nextTick(() => {
+    submitForm("post-setting-form");
+  });
 };
 
 const handleSave = async () => {
@@ -197,124 +217,138 @@ const onPublishTimeChange = (value: string) => {
       <slot name="actions"></slot>
     </template>
 
-    <VTabs v-model:active-id="activeTab" type="outline">
-      <VTabItem id="general" label="常规">
-        <FormKit
-          id="basic"
-          name="basic"
-          :actions="false"
-          :preserve="true"
-          type="form"
-        >
-          <FormKit
-            v-model="formState.spec.title"
-            label="标题"
-            type="text"
-            name="title"
-            validation="required|length:0,100"
-          ></FormKit>
-          <FormKit
-            v-model="formState.spec.slug"
-            label="别名"
-            name="slug"
-            type="text"
-            validation="required|length:0,100"
-          ></FormKit>
-          <FormKit
-            v-model="formState.spec.categories"
-            label="分类目录"
-            name="categories"
-            type="categoryCheckbox"
-          />
-          <FormKit
-            v-model="formState.spec.tags"
-            label="标签"
-            name="tags"
-            type="tagCheckbox"
-          />
-          <FormKit
-            v-model="formState.spec.excerpt.autoGenerate"
-            :options="[
-              { label: '是', value: true },
-              { label: '否', value: false },
-            ]"
-            name="autoGenerate"
-            label="自动生成摘要"
-            type="radio"
-          >
-          </FormKit>
-          <FormKit
-            v-if="!formState.spec.excerpt.autoGenerate"
-            v-model="formState.spec.excerpt.raw"
-            label="自定义摘要"
-            name="raw"
-            type="textarea"
-            :rows="5"
-            validation="length:0,1024"
-          ></FormKit>
-        </FormKit>
-      </VTabItem>
-      <VTabItem id="advanced" label="高级">
-        <FormKit
-          id="advanced"
-          name="advanced"
-          :actions="false"
-          :preserve="true"
-          type="form"
-        >
-          <FormKit
-            v-model="formState.spec.allowComment"
-            :options="[
-              { label: '是', value: true },
-              { label: '否', value: false },
-            ]"
-            label="允许评论"
-            type="radio"
-          ></FormKit>
-          <FormKit
-            v-model="formState.spec.pinned"
-            :options="[
-              { label: '是', value: true },
-              { label: '否', value: false },
-            ]"
-            label="是否置顶"
-            name="pinned"
-            type="radio"
-          ></FormKit>
-          <FormKit
-            v-model="formState.spec.visible"
-            :options="[
-              { label: '公开', value: 'PUBLIC' },
-              { label: '私有', value: 'PRIVATE' },
-            ]"
-            label="可见性"
-            name="visible"
-            type="select"
-          ></FormKit>
-          <FormKit
-            :value="publishTime"
-            label="发表时间"
-            type="datetime-local"
-            @input="onPublishTimeChange"
-          ></FormKit>
-          <FormKit
-            v-model="formState.spec.template"
-            :options="templates"
-            label="自定义模板"
-            name="template"
-            type="select"
-          ></FormKit>
-          <FormKit
-            v-model="formState.spec.cover"
-            name="cover"
-            label="封面图"
-            type="attachment"
-            validation="length:0,1024"
-          ></FormKit>
-        </FormKit>
-        <!--TODO: add SEO/Metas/Inject Code form-->
-      </VTabItem>
-    </VTabs>
+    <FormKit
+      id="post-setting-form"
+      type="form"
+      name="post-setting-form"
+      :config="{ validationVisibility: 'submit' }"
+      @submit="handleSubmit"
+    >
+      <div>
+        <div class="md:grid md:grid-cols-4 md:gap-6">
+          <div class="md:col-span-1">
+            <div class="sticky top-0">
+              <span class="text-base font-medium text-gray-900">
+                常规设置
+              </span>
+            </div>
+          </div>
+          <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+            <FormKit
+              v-model="formState.spec.title"
+              label="标题"
+              type="text"
+              name="title"
+              validation="required|length:0,100"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.slug"
+              label="别名"
+              name="slug"
+              type="text"
+              validation="required|length:0,100"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.categories"
+              label="分类目录"
+              name="categories"
+              type="categoryCheckbox"
+            />
+            <FormKit
+              v-model="formState.spec.tags"
+              label="标签"
+              name="tags"
+              type="tagCheckbox"
+            />
+            <FormKit
+              v-model="formState.spec.excerpt.autoGenerate"
+              :options="[
+                { label: '是', value: true },
+                { label: '否', value: false },
+              ]"
+              name="autoGenerate"
+              label="自动生成摘要"
+              type="radio"
+            >
+            </FormKit>
+            <FormKit
+              v-if="!formState.spec.excerpt.autoGenerate"
+              v-model="formState.spec.excerpt.raw"
+              label="自定义摘要"
+              name="raw"
+              type="textarea"
+              :rows="5"
+              validation="length:0,1024"
+            ></FormKit>
+          </div>
+        </div>
+
+        <div class="py-5">
+          <div class="border-t border-gray-200"></div>
+        </div>
+
+        <div class="md:grid md:grid-cols-4 md:gap-6">
+          <div class="md:col-span-1">
+            <div class="sticky top-0">
+              <span class="text-base font-medium text-gray-900">
+                高级设置
+              </span>
+            </div>
+          </div>
+          <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+            <FormKit
+              v-model="formState.spec.allowComment"
+              :options="[
+                { label: '是', value: true },
+                { label: '否', value: false },
+              ]"
+              label="允许评论"
+              type="radio"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.pinned"
+              :options="[
+                { label: '是', value: true },
+                { label: '否', value: false },
+              ]"
+              label="是否置顶"
+              name="pinned"
+              type="radio"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.visible"
+              :options="[
+                { label: '公开', value: 'PUBLIC' },
+                { label: '私有', value: 'PRIVATE' },
+              ]"
+              label="可见性"
+              name="visible"
+              type="select"
+            ></FormKit>
+            <FormKit
+              :value="publishTime"
+              label="发表时间"
+              type="datetime-local"
+              @input="onPublishTimeChange"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.template"
+              :options="templates"
+              label="自定义模板"
+              name="template"
+              type="select"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.cover"
+              name="cover"
+              label="封面图"
+              type="attachment"
+              validation="length:0,1024"
+            ></FormKit>
+          </div>
+        </div>
+      </div>
+    </FormKit>
 
     <template #footer>
       <VSpace>
@@ -323,7 +357,7 @@ const onPublishTimeChange = (value: string) => {
             v-if="formState.metadata.labels?.[postLabels.PUBLISHED] !== 'true'"
             :loading="publishing"
             type="secondary"
-            @click="handlePublish()"
+            @click="handlePublishClick()"
           >
             发布
           </VButton>
@@ -336,7 +370,7 @@ const onPublishTimeChange = (value: string) => {
             取消发布
           </VButton>
         </template>
-        <VButton :loading="saving" type="secondary" @click="handleSave">
+        <VButton :loading="saving" type="secondary" @click="handleSaveClick()">
           保存
         </VButton>
         <VButton type="default" @click="handleVisibleChange(false)">
