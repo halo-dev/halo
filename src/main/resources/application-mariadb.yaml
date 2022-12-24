@@ -1,13 +1,12 @@
 spring:
   r2dbc:
-    url: r2dbc:pool:mariadb://10.0.0.52:3306/halodb
+    url: r2dbc:pool:mariadb://localhost:3306/halo
     username: root
-    password: 226217@Nbs
+    password: mariadb
   sql:
     init:
       mode: always
       platform: mysql
-      continue-on-error: true
 halo:
   console:
     proxy:
