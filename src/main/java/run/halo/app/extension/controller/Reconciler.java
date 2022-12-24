@@ -1,6 +1,5 @@
 package run.halo.app.extension.controller;
 
-import javax.xml.transform.Result;
 import java.time.Duration;
 
 public interface Reconciler<R> {
