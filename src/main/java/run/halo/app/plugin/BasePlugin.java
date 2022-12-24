@@ -2,6 +2,7 @@ package run.halo.app.plugin;
 
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.Plugin;
+import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 
 /**
@@ -18,7 +19,7 @@ public class BasePlugin extends Plugin {
         super(wrapper);
     }
 
-    private HaloPluginManager getPluginManager() {
-        return (HaloPluginManager) getWrapper().getPluginManager();
+    private PluginManager getPluginManager() {
+        return getWrapper().getPluginManager();
     }
 }

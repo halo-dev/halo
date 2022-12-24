@@ -51,6 +51,7 @@ class ThemeReconcilerTest {
     @Mock
     private HaloProperties haloProperties;
 
+    @Mock
     private File defaultTheme;
 
     private Path tempDirectory;
@@ -170,21 +171,6 @@ class ThemeReconcilerTest {
             }
             """,
             JsonUtils.objectToJson(data),
-            true);
-    }
-
-    @Test
-    void settingDefinedDefaultValueMap() throws JSONException {
-        Setting setting = getFakeSetting();
-        when(haloProperties.getWorkDir()).thenReturn(tempDirectory);
-        Map<String, String> map = new ThemeReconciler(extensionClient, haloProperties)
-            .settingDefinedDefaultValueMap(setting);
-        JSONAssert.assertEquals("""
-            {
-                "sns": "{\\"email\\":\\"example@exmple.com\\"}"
-            }
-            """,
-            JsonUtils.objectToJson(map),
             true);
     }
 

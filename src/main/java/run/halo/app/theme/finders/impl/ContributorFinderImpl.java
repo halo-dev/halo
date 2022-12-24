@@ -7,7 +7,7 @@ import run.halo.app.core.extension.User;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.Finder;
-import run.halo.app.theme.finders.vo.Contributor;
+import run.halo.app.theme.finders.vo.ContributorVo;
 
 /**
  * A default implementation of {@link ContributorFinder}.
@@ -25,13 +25,13 @@ public class ContributorFinderImpl implements ContributorFinder {
     }
 
     @Override
-    public Mono<Contributor> getContributor(String name) {
+    public Mono<ContributorVo> getContributor(String name) {
         return client.fetch(User.class, name)
-            .map(Contributor::from);
+            .map(ContributorVo::from);
     }
 
     @Override
-    public Flux<Contributor> getContributors(List<String> names) {
+    public Flux<ContributorVo> getContributors(List<String> names) {
         if (names == null) {
             return Flux.empty();
         }

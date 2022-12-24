@@ -35,6 +35,9 @@ public interface PostFinder {
     Mono<ListResult<ListedPostVo>> listByTag(@Nullable Integer page, @Nullable Integer size,
         String tag);
 
+    Mono<ListResult<ListedPostVo>> listByOwner(@Nullable Integer page, @Nullable Integer size,
+        String owner);
+
     Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size);
 
     Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size, String year);

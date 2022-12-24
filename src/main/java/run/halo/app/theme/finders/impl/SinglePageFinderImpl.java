@@ -61,9 +61,12 @@ public class SinglePageFinderImpl implements SinglePageFinder {
                 SinglePageVo pageVo = SinglePageVo.from(page);
                 pageVo.setContributors(List.of());
                 pageVo.setContent(ContentVo.empty());
-                populateStats(pageVo);
                 return pageVo;
             })
+            .flatMap(singlePageVo -> fetchStats(singlePageVo)
+                .doOnNext(singlePageVo::setStats)
+                .thenReturn(singlePageVo)
+            )
             .flatMap(this::populateContributors)
             .flatMap(page -> content(pageName)
                 .doOnNext(page::setContent)
@@ -94,7 +97,7 @@ public class SinglePageFinderImpl implements SinglePageFinder {
                     pageVo.setContributors(List.of());
                     return pageVo;
                 })
-                .flatMap(lp -> populateStats(lp).doOnNext(lp::setStats).thenReturn(lp))
+                .flatMap(lp -> fetchStats(lp).doOnNext(lp::setStats).thenReturn(lp))
                 .concatMap(this::populateContributors)
                 .collectList()
                 .map(pageVos -> new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
@@ -104,7 +107,7 @@ public class SinglePageFinderImpl implements SinglePageFinder {
             .defaultIfEmpty(new ListResult<>(0, 0, 0, List.of()));
     }
 
-    <T extends ListedSinglePageVo> Mono<StatsVo> populateStats(T pageVo) {
+    <T extends ListedSinglePageVo> Mono<StatsVo> fetchStats(T pageVo) {
         String name = pageVo.getMetadata().getName();
         return counterService.getByName(MeterUtils.nameOf(SinglePage.class, name))
             .map(counter -> StatsVo.builder()

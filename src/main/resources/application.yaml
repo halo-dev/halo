@@ -14,6 +14,8 @@ spring:
     init:
       mode: always
       platform: h2
+  codec:
+    max-in-memory-size: 10MB
 
 halo:
   external-url: "http://${server.address:localhost}:${server.port}"
@@ -29,3 +31,12 @@ halo:
 springdoc:
   api-docs:
     enabled: false
+
+logging:
+  file:
+    name: ${halo.work-dir}/logs/halo.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      total-size-cap: 1GB
+      max-history: 0

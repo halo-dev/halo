@@ -221,6 +221,12 @@ public class PostFinderImpl implements PostFinder {
     }
 
     @Override
+    public Mono<ListResult<ListedPostVo>> listByOwner(Integer page, Integer size, String owner) {
+        return listPost(page, size,
+            post -> post.getSpec().getOwner().equals(owner), defaultComparator());
+    }
+
+    @Override
     public Mono<ListResult<PostArchiveVo>> archives(Integer page, Integer size) {
         return archives(page, size, null, null);
     }
@@ -258,12 +264,13 @@ public class PostFinderImpl implements PostFinder {
                         // convert to archive year month value objects
                         List<PostArchiveYearMonthVo> monthArchives = monthPosts.entrySet()
                             .stream()
-                            .sorted(Map.Entry.comparingByKey())
                             .map(monthEntry -> PostArchiveYearMonthVo.builder()
                                 .posts(monthEntry.getValue())
                                 .month(monthEntry.getKey())
                                 .build()
                             )
+                            .sorted(
+                                Comparator.comparing(PostArchiveYearMonthVo::getMonth).reversed())
                             .toList();
                         return PostArchiveVo.builder()
                             .year(String.valueOf(key))
