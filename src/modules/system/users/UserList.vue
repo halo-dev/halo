@@ -21,7 +21,7 @@ import {
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import GrantPermissionModal from "./components/GrantPermissionModal.vue";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { User, UserList } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
@@ -52,14 +52,19 @@ const users = ref<UserList>({
 const loading = ref(false);
 const selectedUserNames = ref<string[]>([]);
 const selectedUser = ref<User>();
+const refreshInterval = ref();
 
 const userStore = useUserStore();
 
 let fuse: Fuse<User> | undefined = undefined;
 
-const handleFetchUsers = async () => {
+const handleFetchUsers = async (options?: { mute?: boolean }) => {
   try {
-    loading.value = true;
+    clearInterval(refreshInterval.value);
+
+    if (!options?.mute) {
+      loading.value = true;
+    }
 
     const { data } = await apiClient.extension.user.listv1alpha1User({
       page: users.value.page,
@@ -71,6 +76,16 @@ const handleFetchUsers = async () => {
       keys: ["spec.displayName", "metadata.name", "spec.email"],
       useExtendedSearch: true,
     });
+
+    const deletedUsers = users.value.items.filter(
+      (user) => !!user.metadata.deletionTimestamp
+    );
+
+    if (deletedUsers.length) {
+      refreshInterval.value = setInterval(() => {
+        handleFetchUsers({ mute: true });
+      }, 3000);
+    }
   } catch (e) {
     console.error("Failed to fetch users", e);
   } finally {
@@ -197,6 +212,10 @@ const getRoles = (user: User) => {
 
 onMounted(() => {
   handleFetchUsers();
+});
+
+onUnmounted(() => {
+  clearInterval(refreshInterval.value);
 });
 
 // Route query action

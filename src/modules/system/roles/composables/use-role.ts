@@ -1,5 +1,5 @@
 import type { Role } from "@halo-dev/api-client";
-import type { ComputedRef, Ref } from "vue";
+import { onUnmounted, type ComputedRef, type Ref } from "vue";
 import { computed, onMounted, ref } from "vue";
 import { roleLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
@@ -55,16 +55,32 @@ interface useRoleTemplateSelectionReturn {
 export function useFetchRole(): useFetchRoleReturn {
   const roles = ref<Role[]>([]);
   const loading = ref(false);
+  const refreshInterval = ref();
 
-  const handleFetchRoles = async () => {
+  const handleFetchRoles = async (options?: { mute?: boolean }) => {
     try {
-      loading.value = true;
+      clearInterval(refreshInterval.value);
+
+      if (!options?.mute) {
+        loading.value = true;
+      }
+
       const { data } = await apiClient.extension.role.listv1alpha1Role({
         page: 0,
         size: 0,
         labelSelector: [`!${roleLabels.TEMPLATE}`],
       });
       roles.value = data.items;
+
+      const deletedRoles = roles.value.filter(
+        (role) => !!role.metadata.deletionTimestamp
+      );
+
+      if (deletedRoles.length) {
+        refreshInterval.value = setInterval(() => {
+          handleFetchRoles({ mute: true });
+        }, 3000);
+      }
     } catch (e) {
       console.error("Failed to fetch roles", e);
     } finally {
@@ -73,6 +89,10 @@ export function useFetchRole(): useFetchRoleReturn {
   };
 
   onMounted(handleFetchRoles);
+
+  onUnmounted(() => {
+    clearInterval(refreshInterval.value);
+  });
 
   return {
     roles,

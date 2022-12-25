@@ -137,6 +137,8 @@ const handleDelete = async (role: Role) => {
         Toast.success("删除成功");
       } catch (e) {
         console.error("Failed to delete role", e);
+      } finally {
+        handleFetchRoles();
       }
     },
   });
@@ -296,11 +298,6 @@ const handleDelete = async (role: Role) => {
                 ></VEntityField>
               </template>
               <template #end>
-                <VEntityField v-if="role.metadata.deletionTimestamp">
-                  <template #description>
-                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
-                  </template>
-                </VEntityField>
                 <!-- TODO: 支持显示用户数量 -->
                 <VEntityField v-if="false" description="0 个用户" />
                 <VEntityField>
@@ -308,6 +305,11 @@ const handleDelete = async (role: Role) => {
                     <VTag>
                       {{ isSystemReserved(role) ? "系统保留" : "自定义" }}
                     </VTag>
+                  </template>
+                </VEntityField>
+                <VEntityField v-if="role.metadata.deletionTimestamp">
+                  <template #description>
+                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
                   </template>
                 </VEntityField>
                 <VEntityField>
