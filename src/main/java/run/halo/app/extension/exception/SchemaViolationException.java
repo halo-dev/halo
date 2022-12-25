@@ -1,6 +1,8 @@
 package run.halo.app.extension.exception;
 
 import org.openapi4j.core.validation.ValidationResults;
+import org.springframework.http.HttpStatus;
+import run.halo.app.extension.GroupVersionKind;
 
 /**
  * This exception is thrown when Schema is violation.
@@ -14,28 +16,9 @@ public class SchemaViolationException extends ExtensionException {
      */
     private final ValidationResults errors;
 
-    public SchemaViolationException(ValidationResults errors) {
-        this.errors = errors;
-    }
-
-    public SchemaViolationException(String message, ValidationResults errors) {
-        super(message);
-        this.errors = errors;
-    }
-
-    public SchemaViolationException(String message, Throwable cause, ValidationResults errors) {
-        super(message, cause);
-        this.errors = errors;
-    }
-
-    public SchemaViolationException(Throwable cause, ValidationResults errors) {
-        super(cause);
-        this.errors = errors;
-    }
-
-    public SchemaViolationException(String message, Throwable cause, boolean enableSuppression,
-        boolean writableStackTrace, ValidationResults errors) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public SchemaViolationException(GroupVersionKind gvk, ValidationResults errors) {
+        super(HttpStatus.BAD_REQUEST, "Failed to validate " + gvk, null, null,
+            new Object[] {gvk, errors});
         this.errors = errors;
     }
 

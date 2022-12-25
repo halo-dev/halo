@@ -40,7 +40,7 @@ public interface SchemeManager {
     @NonNull
     default Scheme get(@NonNull GroupVersionKind gvk) {
         return fetch(gvk).orElseThrow(
-            () -> new SchemeNotFoundException("Scheme was not found for " + gvk));
+            () -> new SchemeNotFoundException(gvk));
     }
 
     @NonNull

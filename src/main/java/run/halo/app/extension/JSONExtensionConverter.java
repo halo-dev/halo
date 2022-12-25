@@ -62,8 +62,8 @@ public class JSONExtensionConverter implements ExtensionConverter {
             if (!validation.isValid()) {
                 log.debug("Failed to validate Extension: {}, and errors were: {}",
                     extension.getClass(), validation.results());
-                throw new SchemaViolationException("Failed to validate Extension "
-                    + extension.getClass(), validation.results());
+                throw new SchemaViolationException(extension.groupVersionKind(),
+                    validation.results());
             }
 
             var version = extension.getMetadata().getVersion();

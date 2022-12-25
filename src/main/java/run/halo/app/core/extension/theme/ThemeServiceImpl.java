@@ -18,7 +18,6 @@ import java.util.function.Predicate;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Service;
@@ -36,8 +35,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.ThemeRootGetter;
-import run.halo.app.infra.exception.AsyncRequestTimeoutException;
-import run.halo.app.infra.exception.ThemeInstallationException;
+import run.halo.app.infra.exception.ThemeUpgradeException;
 
 @Slf4j
 @Service
@@ -77,9 +75,10 @@ public class ThemeServiceImpl implements ThemeService {
             .flatMap(oldTheme -> {
                 try (var zis = new ZipInputStream(is)) {
                     unzip(zis, tempDir.get());
-                    return locateThemeManifest(tempDir.get())
-                        .switchIfEmpty(Mono.error(() -> new ThemeInstallationException(
-                            "Missing theme manifest file: theme.yaml or theme.yml")));
+                    return locateThemeManifest(tempDir.get()).switchIfEmpty(Mono.error(
+                        () -> new ThemeUpgradeException(
+                            "Missing theme manifest file: theme.yaml or theme.yml",
+                            "problemDetail.theme.upgrade.missingManifest", null)));
                 } catch (IOException e) {
                     return Mono.error(e);
                 }
@@ -97,7 +96,9 @@ public class ThemeServiceImpl implements ThemeService {
                         log.error("Want theme name: {}, but provided: {}", themeName,
                             newTheme.getMetadata().getName());
                     }
-                    throw new ServerWebInputException("please make sure the theme name is correct");
+                    throw new ThemeUpgradeException("Please make sure the theme name is correct",
+                        "problemDetail.theme.upgrade.nameMismatch",
+                        new Object[] {newTheme.getMetadata().getName(), themeName});
                 }
             })
             .flatMap(newTheme -> {
@@ -173,12 +174,7 @@ public class ThemeServiceImpl implements ThemeService {
         return client.fetch(Theme.class, name)
             .flatMap(oldTheme -> {
                 String settingName = oldTheme.getSpec().getSettingName();
-                return waitForSettingDeleted(settingName)
-                    .doOnError(error -> {
-                        log.error("Failed to delete setting: {}", settingName,
-                            ExceptionUtils.getRootCause(error));
-                        throw new AsyncRequestTimeoutException("Reload theme timeout.");
-                    });
+                return waitForSettingDeleted(settingName);
             })
             .then(Mono.defer(() -> {
                 Path themePath = themeRoot.get().resolve(name);
@@ -235,9 +231,8 @@ public class ThemeServiceImpl implements ThemeService {
         return client.fetch(Setting.class, settingName)
             .flatMap(setting -> client.delete(setting)
                 .flatMap(deleted -> client.fetch(Setting.class, settingName)
-                    .doOnNext(latest -> {
-                        throw new RetryException("Setting is not deleted yet.");
-                    })
+                    .flatMap(s -> Mono.error(
+                        () -> new RetryException("Re-check if the setting is deleted.")))
                     .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
                         .filter(t -> t instanceof RetryException))
                 )
@@ -272,9 +267,9 @@ public class ThemeServiceImpl implements ThemeService {
                 throw new RetryException("Re-check if the theme is deleted successfully");
             })
             .retryWhen(Retry.fixedDelay(20, Duration.ofMillis(100))
-                .filter(t -> t instanceof RetryException))
-            .onErrorMap(Exceptions::isRetryExhausted,
-                throwable -> new ServerErrorException("Wait timeout for theme deleted", throwable))
+                .filter(t -> t instanceof RetryException)
+                .onRetryExhaustedThrow((spec, signal) ->
+                    new ServerErrorException("Wait timeout for theme deleted", null)))
             .then();
     }
 }

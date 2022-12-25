@@ -111,14 +111,16 @@ class ThemeUtils {
             })
             .flatMap(is -> ThemeUtils.locateThemeManifest(tempDir.get()))
             .switchIfEmpty(
-                Mono.error(() -> new ThemeInstallationException("Missing theme manifest")))
+                Mono.error(() -> new ThemeInstallationException("Missing theme manifest",
+                    "problemDetail.theme.install.missingManifest", null)))
             .map(themeManifestPath -> {
                 var theme = loadThemeManifest(themeManifestPath);
                 var themeName = theme.getMetadata().getName();
                 var themeTargetPath = themeWorkDir.resolve(themeName);
                 try {
                     if (!override && !FileUtils.isEmpty(themeTargetPath)) {
-                        throw new ThemeInstallationException("Theme already exists.");
+                        throw new ThemeInstallationException("Theme already exists.",
+                            "problemDetail.theme.install.alreadyExists", new Object[] {themeName});
                     }
                     // install theme to theme work dir
                     copyRecursively(themeManifestPath.getParent(), themeTargetPath);

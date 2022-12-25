@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static run.halo.app.extension.GroupVersionKind.fromExtension;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -92,7 +93,8 @@ class ExtensionDeleteHandlerTest {
             .pathVariable("name", "my-fake")
             .build();
         when(client.get(FakeExtension.class, "my-fake")).thenReturn(
-            Mono.error(new ExtensionNotFoundException()));
+            Mono.error(
+                new ExtensionNotFoundException(fromExtension(FakeExtension.class), "my-fake")));
 
         var scheme = Scheme.buildFromType(FakeExtension.class);
         var deleteHandler = new ExtensionDeleteHandler(scheme, client);
