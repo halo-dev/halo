@@ -82,4 +82,4 @@ metadata:
 rules:
   - apiGroups: [ "" ]
     resources: [ "annotationsettings" ]
-    verbs: [ "*" ]
+    verbs: [ "get", "list" ]
