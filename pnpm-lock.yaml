@@ -11,8 +11,9 @@ importers:
       '@formkit/inputs': ^1.0.0-beta.12
       '@formkit/themes': ^1.0.0-beta.12
       '@formkit/utils': ^1.0.0-beta.12
+      '@formkit/validation': 1.0.0-beta.12
       '@formkit/vue': ^1.0.0-beta.12
-      '@halo-dev/api-client': ^0.0.62
+      '@halo-dev/api-client': 0.0.64
       '@halo-dev/components': workspace:*
       '@halo-dev/console-shared': workspace:*
       '@halo-dev/richtext-editor': ^0.0.0-alpha.17
@@ -105,8 +106,9 @@ importers:
       '@formkit/inputs': 1.0.0-beta.12-e579559
       '@formkit/themes': 1.0.0-beta.12-e579559_tailwindcss@3.2.4
       '@formkit/utils': 1.0.0-beta.12-e579559
+      '@formkit/validation': 1.0.0-beta.12
       '@formkit/vue': 1.0.0-beta.12-e579559_ior6jr3fpijijuwpr34w2i25va
-      '@halo-dev/api-client': 0.0.62
+      '@halo-dev/api-client': 0.0.64
       '@halo-dev/components': link:packages/components
       '@halo-dev/console-shared': link:packages/shared
       '@halo-dev/richtext-editor': 0.0.0-alpha.17_vue@3.2.45
@@ -1874,6 +1876,12 @@ packages:
       '@floating-ui/core': 0.3.1
     dev: false
 
+  /@formkit/core/1.0.0-beta.12:
+    resolution: {integrity: sha512-/Pod7k4N58eDOG+0LE0ccV7BOYD5sEA4RqaRNJn9m6Jg9nF/JATmSNL46kVCH3mV6sSoV045L3Zir8//rya0Lw==}
+    dependencies:
+      '@formkit/utils': 1.0.0-beta.12
+    dev: false
+
   /@formkit/core/1.0.0-beta.12-e579559:
     resolution: {integrity: sha512-y90ubMcFr6WtAjZqUOLgA3p4jm024f6R7iDRVKHsmdwSKm1/GZl4D+Yo2k8DL40xM7NbZhIvK40MiEC0pNZ3ig==}
     dependencies:
@@ -1899,6 +1907,13 @@ packages:
     resolution: {integrity: sha512-igRXzW9edZ4wMHkX7XFricPsVNU99BoMWKwDOzg+erjLKwPw+h4tVKWmZFe2xTUUDSCBoxkLS5TgdsUZ84vMng==}
     dependencies:
       '@formkit/core': 1.0.0-beta.12-e579559
+    dev: false
+
+  /@formkit/observer/1.0.0-beta.12:
+    resolution: {integrity: sha512-kXVWUkjbNsymwv50QuI5thjlCknGy8azPlzepTDj3fsuZANuHG8qaj3W5h9mY6cCgvil4d4WeBz5f54iJsaEXA==}
+    dependencies:
+      '@formkit/core': 1.0.0-beta.12
+      '@formkit/utils': 1.0.0-beta.12
     dev: false
 
   /@formkit/observer/1.0.0-beta.12-e579559:
@@ -1934,8 +1949,19 @@ packages:
       tailwindcss: 3.2.4_postcss@8.4.19
     dev: false
 
+  /@formkit/utils/1.0.0-beta.12:
+    resolution: {integrity: sha512-L2P221teC+58Y1A4TZpJsLt/Y+WErLxbBt4hH6XhokssVX7mYR56YWienY9StN5jmiGVWtcK1+riXCb0n1aMOA==}
+    dev: false
+
   /@formkit/utils/1.0.0-beta.12-e579559:
     resolution: {integrity: sha512-4yTz4IRzPX3G08aAO+ZfEuBYfy6OSgk3csx3TBhOcL6NzyIbJkTc2ZsxaUYXgY6FOVclazLGMKM5+jBitMOL5Q==}
+    dev: false
+
+  /@formkit/validation/1.0.0-beta.12:
+    resolution: {integrity: sha512-ZSD5llsfSqXfIYMtSeeDwx7h421JCKobi00RxpGJkuHgpnAi3oxTJB7J6u+3pMrO9BqcidGtk5G/rk9F4fCNEw==}
+    dependencies:
+      '@formkit/core': 1.0.0-beta.12
+      '@formkit/observer': 1.0.0-beta.12
     dev: false
 
   /@formkit/validation/1.0.0-beta.12-e579559:
@@ -1966,8 +1992,8 @@ packages:
       - windicss
     dev: false
 
-  /@halo-dev/api-client/0.0.62:
-    resolution: {integrity: sha512-LVoAH4/+8iHxqHf7X6Ax3wy+IRSB2Tm9IC3zhfGdnbrdgyn/NnnpRIhTCKo6cK0Sr2j/3W4Pvmc0xCWNVzNAyw==}
+  /@halo-dev/api-client/0.0.64:
+    resolution: {integrity: sha512-zzhTdRi4p7nRsWG7u85YCkoHZLHsbpuWeBCwLl5FSXxY8ruKuiOo0FypkS7Ll7505XASk4MJL6rsyeX+l7rLmQ==}
     dev: false
 
   /@halo-dev/richtext-editor/0.0.0-alpha.17_vue@3.2.45:

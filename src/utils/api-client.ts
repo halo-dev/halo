@@ -31,6 +31,7 @@ import {
   V1alpha1RoleBindingApi,
   V1alpha1SettingApi,
   V1alpha1UserApi,
+  V1alpha1AnnotationSettingApi,
 } from "@halo-dev/api-client";
 import type { AxiosError, AxiosInstance } from "axios";
 import axios from "axios";
@@ -157,6 +158,11 @@ function setupApiClient(axios: AxiosInstance) {
           axios
         ),
       },
+      annotationSetting: new V1alpha1AnnotationSettingApi(
+        undefined,
+        baseURL,
+        axios
+      ),
     },
     // custom endpoints
     user: new ApiConsoleHaloRunV1alpha1UserApi(undefined, baseURL, axios),
