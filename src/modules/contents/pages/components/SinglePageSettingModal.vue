@@ -9,6 +9,7 @@ import { singlePageLabels } from "@/constants/labels";
 import { randomUUID } from "@/utils/id";
 import { toDatetimeLocal, toISOString } from "@/utils/date";
 import { submitForm } from "@formkit/core";
+import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 
 const initialFormState: SinglePage = {
   spec: {
@@ -75,6 +76,8 @@ const onVisibleChange = (visible: boolean) => {
   }
 };
 
+const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
+
 const handleSubmit = () => {
   if (submitType.value === "publish") {
     handlePublish();
@@ -101,6 +104,20 @@ const handlePublishClick = () => {
 };
 
 const handleSave = async () => {
+  annotationsFormRef.value?.handleSubmit();
+  await nextTick();
+
+  const { customAnnotations, annotations, customFormInvalid, specFormInvalid } =
+    annotationsFormRef.value || {};
+  if (customFormInvalid || specFormInvalid) {
+    return;
+  }
+
+  formState.value.metadata.annotations = {
+    ...annotations,
+    ...customAnnotations,
+  };
+
   if (props.onlyEmit) {
     emit("saved", formState.value);
     return;
@@ -138,6 +155,20 @@ const handleSave = async () => {
 };
 
 const handlePublish = async () => {
+  annotationsFormRef.value?.handleSubmit();
+  await nextTick();
+
+  const { customAnnotations, annotations, customFormInvalid, specFormInvalid } =
+    annotationsFormRef.value || {};
+  if (customFormInvalid || specFormInvalid) {
+    return;
+  }
+
+  formState.value.metadata.annotations = {
+    ...annotations,
+    ...customAnnotations,
+  };
+
   if (props.onlyEmit) {
     emit("published", formState.value);
     return;
@@ -363,6 +394,27 @@ const onPublishTimeChange = (value: string) => {
         </div>
       </div>
     </FormKit>
+
+    <div class="py-5">
+      <div class="border-t border-gray-200"></div>
+    </div>
+
+    <div class="md:grid md:grid-cols-4 md:gap-6">
+      <div class="md:col-span-1">
+        <div class="sticky top-0">
+          <span class="text-base font-medium text-gray-900"> 元数据 </span>
+        </div>
+      </div>
+      <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+        <AnnotationsForm
+          :key="formState.metadata.name"
+          ref="annotationsFormRef"
+          :value="formState.metadata.annotations"
+          kind="SinglePage"
+          group="content.halo.run"
+        />
+      </div>
+    </div>
 
     <template #footer>
       <VSpace>

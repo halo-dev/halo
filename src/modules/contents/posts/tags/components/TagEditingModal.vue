@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 
 // components
@@ -21,6 +21,7 @@ import type { Tag } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
+import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -66,7 +67,23 @@ const modalTitle = computed(() => {
   return isUpdateMode.value ? "编辑文章标签" : "新增文章标签";
 });
 
+const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
+
 const handleSaveTag = async () => {
+  annotationsFormRef.value?.handleSubmit();
+  await nextTick();
+
+  const { customAnnotations, annotations, customFormInvalid, specFormInvalid } =
+    annotationsFormRef.value || {};
+  if (customFormInvalid || specFormInvalid) {
+    return;
+  }
+
+  formState.value.metadata.annotations = {
+    ...annotations,
+    ...customAnnotations,
+  };
+
   try {
     saving.value = true;
     if (isUpdateMode.value) {
@@ -127,7 +144,7 @@ watch(
   <VModal
     :title="modalTitle"
     :visible="visible"
-    :width="600"
+    :width="700"
     @update:visible="onVisibleChange"
   >
     <template #actions>
@@ -138,46 +155,80 @@ watch(
         <IconArrowRight />
       </span>
     </template>
+
     <FormKit
       id="tag-form"
+      type="form"
       name="tag-form"
       :config="{ validationVisibility: 'submit' }"
-      type="form"
       @submit="handleSaveTag"
     >
-      <FormKit
-        id="displayNameInput"
-        v-model="formState.spec.displayName"
-        name="displayName"
-        label="名称"
-        type="text"
-        validation="required|length:0,50"
-      ></FormKit>
-      <FormKit
-        v-model="formState.spec.slug"
-        help="通常作为标签访问地址标识"
-        label="别名"
-        name="slug"
-        type="text"
-        validation="required|length:0,50"
-      ></FormKit>
-      <FormKit
-        v-model="formState.spec.color"
-        name="color"
-        help="需要主题适配以支持"
-        label="颜色"
-        type="color"
-        validation="length:0,50"
-      ></FormKit>
-      <FormKit
-        v-model="formState.spec.cover"
-        name="cover"
-        help="需要主题适配以支持"
-        label="封面图"
-        type="attachment"
-        validation="length:0,1024"
-      ></FormKit>
+      <div>
+        <div class="md:grid md:grid-cols-4 md:gap-6">
+          <div class="md:col-span-1">
+            <div class="sticky top-0">
+              <span class="text-base font-medium text-gray-900"> 常规 </span>
+            </div>
+          </div>
+          <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+            <FormKit
+              id="displayNameInput"
+              v-model="formState.spec.displayName"
+              name="displayName"
+              label="名称"
+              type="text"
+              validation="required|length:0,50"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.slug"
+              help="通常作为标签访问地址标识"
+              label="别名"
+              name="slug"
+              type="text"
+              validation="required|length:0,50"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.color"
+              name="color"
+              help="需要主题适配以支持"
+              label="颜色"
+              type="color"
+              validation="length:0,50"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.cover"
+              name="cover"
+              help="需要主题适配以支持"
+              label="封面图"
+              type="attachment"
+              validation="length:0,1024"
+            ></FormKit>
+          </div>
+        </div>
+      </div>
     </FormKit>
+
+    <div class="py-5">
+      <div class="border-t border-gray-200"></div>
+    </div>
+
+    <div class="md:grid md:grid-cols-4 md:gap-6">
+      <div class="md:col-span-1">
+        <div class="sticky top-0">
+          <span class="text-base font-medium text-gray-900"> 元数据 </span>
+        </div>
+      </div>
+      <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+        <AnnotationsForm
+          :key="formState.metadata.name"
+          ref="annotationsFormRef"
+          :value="formState.metadata.annotations"
+          kind="Tag"
+          group="content.halo.run"
+        />
+      </div>
+    </div>
+
     <template #footer>
       <VSpace>
         <SubmitButton

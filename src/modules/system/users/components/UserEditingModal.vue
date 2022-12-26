@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { User } from "@halo-dev/api-client";
 
@@ -14,6 +14,7 @@ import { reset } from "@formkit/core";
 
 // hooks
 import { setFocus } from "@/formkit/utils/focus";
+import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -94,7 +95,23 @@ const handleResetForm = () => {
   reset("user-form");
 };
 
+const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
+
 const handleCreateUser = async () => {
+  annotationsFormRef.value?.handleSubmit();
+  await nextTick();
+
+  const { customAnnotations, annotations, customFormInvalid, specFormInvalid } =
+    annotationsFormRef.value || {};
+  if (customFormInvalid || specFormInvalid) {
+    return;
+  }
+
+  formState.value.metadata.annotations = {
+    ...annotations,
+    ...customAnnotations,
+  };
+
   try {
     saving.value = true;
     if (isUpdateMode.value) {
@@ -132,52 +149,84 @@ const handleCreateUser = async () => {
       type="form"
       @submit="handleCreateUser"
     >
-      <FormKit
-        id="userNameInput"
-        v-model="formState.metadata.name"
-        :disabled="isUpdateMode"
-        label="用户名"
-        type="text"
-        name="name"
-        validation="required|alphanumeric|length:0,50"
-      ></FormKit>
-      <FormKit
-        id="displayNameInput"
-        v-model="formState.spec.displayName"
-        label="显示名称"
-        type="text"
-        name="displayName"
-        validation="required|length:0,50"
-      ></FormKit>
-      <FormKit
-        v-model="formState.spec.email"
-        label="电子邮箱"
-        type="email"
-        name="email"
-        validation="required|email|length:0,100"
-      ></FormKit>
-      <FormKit
-        v-model="formState.spec.phone"
-        label="手机号"
-        type="text"
-        name="phone"
-        validation="length:0,20"
-      ></FormKit>
-      <FormKit
-        v-model="formState.spec.avatar"
-        label="头像"
-        type="attachment"
-        name="avatar"
-        validation="url|length:0,1024"
-      ></FormKit>
-      <FormKit
-        v-model="formState.spec.bio"
-        label="描述"
-        type="textarea"
-        name="bio"
-        validation="length:0,2048"
-      ></FormKit>
+      <div>
+        <div class="md:grid md:grid-cols-4 md:gap-6">
+          <div class="md:col-span-1">
+            <div class="sticky top-0">
+              <span class="text-base font-medium text-gray-900"> 常规 </span>
+            </div>
+          </div>
+          <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+            <FormKit
+              id="userNameInput"
+              v-model="formState.metadata.name"
+              :disabled="isUpdateMode"
+              label="用户名"
+              type="text"
+              name="name"
+              validation="required|alphanumeric|length:0,50"
+            ></FormKit>
+            <FormKit
+              id="displayNameInput"
+              v-model="formState.spec.displayName"
+              label="显示名称"
+              type="text"
+              name="displayName"
+              validation="required|length:0,50"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.email"
+              label="电子邮箱"
+              type="email"
+              name="email"
+              validation="required|email|length:0,100"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.phone"
+              label="手机号"
+              type="text"
+              name="phone"
+              validation="length:0,20"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.avatar"
+              label="头像"
+              type="attachment"
+              name="avatar"
+              validation="url|length:0,1024"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.bio"
+              label="描述"
+              type="textarea"
+              name="bio"
+              validation="length:0,2048"
+            ></FormKit>
+          </div>
+        </div>
+      </div>
     </FormKit>
+
+    <div class="py-5">
+      <div class="border-t border-gray-200"></div>
+    </div>
+
+    <div class="md:grid md:grid-cols-4 md:gap-6">
+      <div class="md:col-span-1">
+        <div class="sticky top-0">
+          <span class="text-base font-medium text-gray-900"> 元数据 </span>
+        </div>
+      </div>
+      <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+        <AnnotationsForm
+          :key="formState.metadata.name"
+          ref="annotationsFormRef"
+          :value="formState.metadata.annotations"
+          kind="User"
+          group=""
+        />
+      </div>
+    </div>
     <template #footer>
       <VSpace>
         <SubmitButton

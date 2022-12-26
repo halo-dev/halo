@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 
 // components
@@ -15,6 +15,7 @@ import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 import { useThemeCustomTemplates } from "@/modules/interface/themes/composables/use-theme";
+import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -62,7 +63,23 @@ const modalTitle = computed(() => {
   return isUpdateMode.value ? "编辑文章分类" : "新增文章分类";
 });
 
+const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
+
 const handleSaveCategory = async () => {
+  annotationsFormRef.value?.handleSubmit();
+  await nextTick();
+
+  const { customAnnotations, annotations, customFormInvalid, specFormInvalid } =
+    annotationsFormRef.value || {};
+  if (customFormInvalid || specFormInvalid) {
+    return;
+  }
+
+  formState.value.metadata.annotations = {
+    ...annotations,
+    ...customAnnotations,
+  };
+
   try {
     saving.value = true;
     if (isUpdateMode.value) {
@@ -126,56 +143,89 @@ const { templates } = useThemeCustomTemplates("category");
   <VModal
     :title="modalTitle"
     :visible="visible"
-    :width="600"
+    :width="700"
     @update:visible="onVisibleChange"
   >
     <FormKit
       id="category-form"
-      name="category-form"
       type="form"
+      name="category-form"
       :config="{ validationVisibility: 'submit' }"
       @submit="handleSaveCategory"
     >
-      <FormKit
-        id="displayNameInput"
-        v-model="formState.spec.displayName"
-        name="displayName"
-        label="名称"
-        type="text"
-        validation="required|length:0,50"
-      ></FormKit>
-      <FormKit
-        v-model="formState.spec.slug"
-        help="通常作为分类访问地址标识"
-        name="slug"
-        label="别名"
-        type="text"
-        validation="required|length:0,50"
-      ></FormKit>
-      <FormKit
-        v-model="formState.spec.template"
-        :options="templates"
-        label="自定义模板"
-        type="select"
-        name="template"
-      ></FormKit>
-      <FormKit
-        v-model="formState.spec.cover"
-        help="需要主题适配以支持"
-        name="cover"
-        label="封面图"
-        type="attachment"
-        validation="length:0,1024"
-      ></FormKit>
-      <FormKit
-        v-model="formState.spec.description"
-        name="description"
-        help="需要主题适配以支持"
-        label="描述"
-        type="textarea"
-        validation="length:0,200"
-      ></FormKit>
+      <div>
+        <div class="md:grid md:grid-cols-4 md:gap-6">
+          <div class="md:col-span-1">
+            <div class="sticky top-0">
+              <span class="text-base font-medium text-gray-900"> 常规 </span>
+            </div>
+          </div>
+          <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+            <FormKit
+              id="displayNameInput"
+              v-model="formState.spec.displayName"
+              name="displayName"
+              label="名称"
+              type="text"
+              validation="required|length:0,50"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.slug"
+              help="通常作为分类访问地址标识"
+              name="slug"
+              label="别名"
+              type="text"
+              validation="required|length:0,50"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.template"
+              :options="templates"
+              label="自定义模板"
+              type="select"
+              name="template"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.cover"
+              help="需要主题适配以支持"
+              name="cover"
+              label="封面图"
+              type="attachment"
+              validation="length:0,1024"
+            ></FormKit>
+            <FormKit
+              v-model="formState.spec.description"
+              name="description"
+              help="需要主题适配以支持"
+              label="描述"
+              type="textarea"
+              validation="length:0,200"
+            ></FormKit>
+          </div>
+        </div>
+      </div>
     </FormKit>
+
+    <div class="py-5">
+      <div class="border-t border-gray-200"></div>
+    </div>
+
+    <div class="md:grid md:grid-cols-4 md:gap-6">
+      <div class="md:col-span-1">
+        <div class="sticky top-0">
+          <span class="text-base font-medium text-gray-900"> 元数据 </span>
+        </div>
+      </div>
+      <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+        <AnnotationsForm
+          :key="formState.metadata.name"
+          ref="annotationsFormRef"
+          :value="formState.metadata.annotations"
+          kind="Category"
+          group="content.halo.run"
+        />
+      </div>
+    </div>
+
     <template #footer>
       <VSpace>
         <SubmitButton

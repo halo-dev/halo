@@ -1,12 +1,13 @@
 <script lang="ts" setup>
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import { computed, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
 import { setFocus } from "@/formkit/utils/focus";
+import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -56,7 +57,23 @@ const modalTitle = computed(() => {
   return isUpdateMode.value ? "编辑菜单项" : "新增菜单项";
 });
 
+const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
+
 const handleSaveMenuItem = async () => {
+  annotationsFormRef.value?.handleSubmit();
+  await nextTick();
+
+  const { customAnnotations, annotations, customFormInvalid, specFormInvalid } =
+    annotationsFormRef.value || {};
+  if (customFormInvalid || specFormInvalid) {
+    return;
+  }
+
+  formState.value.metadata.annotations = {
+    ...annotations,
+    ...customAnnotations,
+  };
+
   try {
     saving.value = true;
 
@@ -243,7 +260,7 @@ const onMenuItemSourceChange = () => {
 <template>
   <VModal
     :visible="visible"
-    :width="500"
+    :width="700"
     :title="modalTitle"
     @update:visible="onVisibleChange"
   >
@@ -255,54 +272,87 @@ const onMenuItemSourceChange = () => {
       :config="{ validationVisibility: 'submit' }"
       @submit="handleSaveMenuItem"
     >
-      <FormKit
-        v-if="!isUpdateMode && menu && visible"
-        v-model="selectedParentMenuItem"
-        label="上级菜单项"
-        placeholder="选择上级菜单项"
-        type="menuItemSelect"
-        :menu-items="menu?.spec.menuItems || []"
-      />
+      <div>
+        <div class="md:grid md:grid-cols-4 md:gap-6">
+          <div class="md:col-span-1">
+            <div class="sticky top-0">
+              <span class="text-base font-medium text-gray-900"> 常规 </span>
+            </div>
+          </div>
+          <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+            <FormKit
+              v-if="!isUpdateMode && menu && visible"
+              v-model="selectedParentMenuItem"
+              label="上级菜单项"
+              placeholder="选择上级菜单项"
+              type="menuItemSelect"
+              :menu-items="menu?.spec.menuItems || []"
+            />
 
-      <FormKit
-        v-model="selectedRefKind"
-        :options="menuItemRefsMap"
-        :disabled="isUpdateMode"
-        label="类型"
-        type="select"
-        @change="onMenuItemSourceChange"
-      />
+            <FormKit
+              v-model="selectedRefKind"
+              :options="menuItemRefsMap"
+              :disabled="isUpdateMode"
+              label="类型"
+              type="select"
+              @change="onMenuItemSourceChange"
+            />
 
-      <FormKit
-        v-if="!selectedRefKind"
-        id="displayNameInput"
-        v-model="formState.spec.displayName"
-        label="名称"
-        type="text"
-        name="displayName"
-        validation="required|length:0,100"
-      />
+            <FormKit
+              v-if="!selectedRefKind"
+              id="displayNameInput"
+              v-model="formState.spec.displayName"
+              label="名称"
+              type="text"
+              name="displayName"
+              validation="required|length:0,100"
+            />
 
-      <FormKit
-        v-if="!selectedRefKind"
-        v-model="formState.spec.href"
-        label="链接地址"
-        type="text"
-        name="href"
-        validation="required|length:0,1024"
-      />
+            <FormKit
+              v-if="!selectedRefKind"
+              v-model="formState.spec.href"
+              label="链接地址"
+              type="text"
+              name="href"
+              validation="required|length:0,1024"
+            />
 
-      <FormKit
-        v-if="selectedRef?.ref"
-        :id="selectedRef.inputType"
-        :key="selectedRef.inputType"
-        v-model="selectedRefName"
-        :placeholder="`请选择${selectedRef.label}`"
-        :label="selectedRef.label"
-        :type="selectedRef.inputType"
-        validation="required"
-      />
+            <FormKit
+              v-if="selectedRef?.ref"
+              :id="selectedRef.inputType"
+              :key="selectedRef.inputType"
+              v-model="selectedRefName"
+              :placeholder="`请选择${selectedRef.label}`"
+              :label="selectedRef.label"
+              :type="selectedRef.inputType"
+              validation="required"
+            />
+          </div>
+        </div>
+      </div>
     </FormKit>
+
+    <div class="py-5">
+      <div class="border-t border-gray-200"></div>
+    </div>
+
+    <div class="md:grid md:grid-cols-4 md:gap-6">
+      <div class="md:col-span-1">
+        <div class="sticky top-0">
+          <span class="text-base font-medium text-gray-900"> 元数据 </span>
+        </div>
+      </div>
+      <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+        <AnnotationsForm
+          :key="formState.metadata.name"
+          ref="annotationsFormRef"
+          :value="formState.metadata.annotations"
+          kind="MenuItem"
+          group=""
+        />
+      </div>
+    </div>
+
     <template #footer>
       <VSpace>
         <SubmitButton

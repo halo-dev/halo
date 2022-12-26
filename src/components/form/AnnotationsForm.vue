@@ -148,7 +148,11 @@ const specFormInvalid = ref(true);
 const customFormInvalid = ref(true);
 
 const handleSubmit = async () => {
-  submitForm("specForm");
+  if (avaliableAnnotationSettings.value.length) {
+    submitForm("specForm");
+  } else {
+    specFormInvalid.value = false;
+  }
   submitForm("customForm");
   await nextTick();
 };
