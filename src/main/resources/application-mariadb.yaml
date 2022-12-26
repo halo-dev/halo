@@ -7,12 +7,3 @@ spring:
     init:
       mode: always
       platform: mysql
-halo:
-  console:
-    proxy:
-      endpoint: http://localhost:3000/
-      enabled: true
-  security:
-    initializer:
-      super-admin-username: admin
-      super-admin-password: admin
