@@ -1,7 +1,7 @@
-import DefaultEditor from "@/components/editor/DefaultEditor.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
 import type { EditorProvider, PluginModule } from "@halo-dev/console-shared";
-import { markRaw, onMounted, ref, type Ref } from "vue";
+import { onMounted, ref, type Ref, defineAsyncComponent } from "vue";
+import { VLoading } from "@halo-dev/components";
 
 interface useEditorExtensionPointsReturn {
   editorProviders: Ref<EditorProvider[]>;
@@ -15,7 +15,11 @@ export function useEditorExtensionPoints(): useEditorExtensionPointsReturn {
     {
       name: "default",
       displayName: "默认编辑器",
-      component: markRaw(DefaultEditor),
+      component: defineAsyncComponent({
+        loader: () => import("@/components/editor/DefaultEditor.vue"),
+        loadingComponent: VLoading,
+        delay: 200,
+      }),
       rawType: "HTML",
     },
   ]);
