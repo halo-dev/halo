@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -29,9 +30,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
+import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.ThemeRootGetter;
@@ -150,21 +153,26 @@ public class ThemeServiceImpl implements ThemeService {
                     return Mono.error(new IllegalStateException(
                         "Theme must only have one config.yaml or config.yml."));
                 }
+                var spec = theme.getSpec();
                 return Flux.fromIterable(unstructureds)
-                    .flatMap(unstructured -> {
-                        var spec = theme.getSpec();
+                    .filter(unstructured -> {
                         String name = unstructured.getMetadata().getName();
-
                         boolean isThemeSetting = unstructured.getKind().equals(Setting.KIND)
                             && StringUtils.equals(spec.getSettingName(), name);
 
                         boolean isThemeConfig = unstructured.getKind().equals(ConfigMap.KIND)
                             && StringUtils.equals(spec.getConfigMapName(), name);
-                        if (isThemeSetting || isThemeConfig) {
-                            return client.create(unstructured);
-                        }
-                        return Mono.empty();
+
+                        boolean isAnnotationSetting = unstructured.getKind()
+                            .equals(AnnotationSetting.KIND);
+                        return isThemeSetting || isThemeConfig || isAnnotationSetting;
                     })
+                    .doOnNext(unstructured ->
+                        populateThemeNameLabel(unstructured, theme.getMetadata().getName()))
+                    .flatMap(unstructured -> client.create(unstructured)
+                        .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                            .filter(OptimisticLockingFailureException.class::isInstance))
+                    )
                     .then(Mono.just(theme));
             });
     }
@@ -174,7 +182,8 @@ public class ThemeServiceImpl implements ThemeService {
         return client.fetch(Theme.class, name)
             .flatMap(oldTheme -> {
                 String settingName = oldTheme.getSpec().getSettingName();
-                return waitForSettingDeleted(settingName);
+                return waitForSettingDeleted(settingName)
+                    .then(waitForAnnotationSettingsDeleted(name));
             })
             .then(Mono.defer(() -> {
                 Path themePath = themeRoot.get().resolve(name);
@@ -195,13 +204,24 @@ public class ThemeServiceImpl implements ThemeService {
             }))
             .flatMap(theme -> {
                 String settingName = theme.getSpec().getSettingName();
-                return Flux.fromIterable(ThemeUtils.loadThemeSetting(getThemePath(theme)))
-                    .map(setting -> Unstructured.OBJECT_MAPPER.convertValue(setting, Setting.class))
-                    .filter(setting -> setting.getMetadata().getName().equals(settingName))
-                    .next()
+                return Flux.fromIterable(ThemeUtils.loadThemeResources(getThemePath(theme)))
+                    .filter(unstructured -> (Setting.KIND.equals(unstructured.getKind())
+                        && unstructured.getMetadata().getName().equals(settingName))
+                        || AnnotationSetting.KIND.equals(unstructured.getKind())
+                    )
+                    .doOnNext(unstructured -> populateThemeNameLabel(unstructured, name))
                     .flatMap(client::create)
-                    .thenReturn(theme);
+                    .then(Mono.just(theme));
             });
+    }
+
+    private static void populateThemeNameLabel(Unstructured unstructured, String themeName) {
+        Map<String, String> labels = unstructured.getMetadata().getLabels();
+        if (labels == null) {
+            labels = new HashMap<>();
+            unstructured.getMetadata().setLabels(labels);
+        }
+        labels.put(Theme.THEME_NAME_LABEL, themeName);
     }
 
     @Override
@@ -233,6 +253,25 @@ public class ThemeServiceImpl implements ThemeService {
                 .flatMap(deleted -> client.fetch(Setting.class, settingName)
                     .flatMap(s -> Mono.error(
                         () -> new RetryException("Re-check if the setting is deleted.")))
+                    .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
+                        .filter(t -> t instanceof RetryException))
+                )
+            )
+            .then();
+    }
+
+    private Mono<Void> waitForAnnotationSettingsDeleted(String themeName) {
+        return client.list(AnnotationSetting.class,
+                annotationSetting -> {
+                    Map<String, String> labels = ExtensionUtil.nullSafeLabels(annotationSetting);
+                    return StringUtils.equals(themeName, labels.get(Theme.THEME_NAME_LABEL));
+                }, null)
+            .flatMap(annotationSetting -> client.delete(annotationSetting)
+                .flatMap(deleted -> client.fetch(AnnotationSetting.class,
+                        annotationSetting.getMetadata().getName())
+                    .doOnNext(latest -> {
+                        throw new RetryException("AnnotationSetting is not deleted yet.");
+                    })
                     .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
                         .filter(t -> t instanceof RetryException))
                 )
