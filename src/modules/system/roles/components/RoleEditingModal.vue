@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { VButton, VModal, VSpace, VTabbar } from "@halo-dev/components";
+import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import { computed, ref, watch } from "vue";
+import { computed, watch } from "vue";
 import { rbacAnnotations } from "@/constants/annotations";
 import type { Role } from "@halo-dev/api-client";
 import {
@@ -11,6 +11,7 @@ import {
 import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
+import { pluginLabels } from "@/constants/labels";
 
 const props = withDefaults(
   defineProps<{
@@ -76,8 +77,6 @@ watch(
   }
 );
 
-const tabActiveId = ref("general");
-
 const editingModalTitle = computed(() => {
   return isUpdateMode.value ? "编辑角色" : "创建角色";
 });
@@ -100,6 +99,7 @@ const onVisibleChange = (visible: boolean) => {
 
 const handleResetForm = () => {
   formState.value = cloneDeep(initialFormState);
+  selectedRoleTemplates.value.clear();
   reset("role-form");
 };
 </script>
@@ -110,98 +110,123 @@ const handleResetForm = () => {
     :width="700"
     @update:visible="onVisibleChange"
   >
-    <VTabbar
-      v-model:active-id="tabActiveId"
-      :items="[
-        {
-          id: 'general',
-          label: '基本信息',
-        },
-        {
-          id: 'permissions',
-          label: '权限',
-        },
-      ]"
-      type="outline"
-    />
-    <div class="mt-2">
-      <div v-show="tabActiveId === 'general'">
-        <FormKit
-          v-if="formState.metadata.annotations"
-          id="role-form"
-          name="role-form"
-          :actions="false"
-          type="form"
-          :config="{ validationVisibility: 'submit' }"
-          @submit="handleCreateOrUpdateRole"
-        >
+    <div>
+      <div class="md:grid md:grid-cols-4 md:gap-6">
+        <div class="md:col-span-1">
+          <div class="sticky top-0">
+            <span class="text-base font-medium text-gray-900"> 基本信息 </span>
+          </div>
+        </div>
+        <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
           <FormKit
-            id="displayNameInput"
-            v-model="
-              formState.metadata.annotations[rbacAnnotations.DISPLAY_NAME]
-            "
-            label="名称"
-            type="text"
-            validation="required|length:0,50"
-          ></FormKit>
-        </FormKit>
-      </div>
-
-      <div v-show="tabActiveId === 'permissions'">
-        <dl class="divide-y divide-gray-100">
-          <div
-            v-for="(group, groupIndex) in roleTemplateGroups"
-            :key="groupIndex"
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+            v-if="formState.metadata.annotations"
+            id="role-form"
+            name="role-form"
+            :actions="false"
+            type="form"
+            :config="{ validationVisibility: 'submit' }"
+            @submit="handleCreateOrUpdateRole"
           >
-            <dt class="text-sm font-medium text-gray-900">
-              {{ group.module }}
-            </dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              <ul class="space-y-2">
-                <li v-for="(roleTemplate, index) in group.roles" :key="index">
-                  <label
-                    class="inline-flex w-full cursor-pointer flex-row items-center gap-4 rounded-base border p-5 hover:border-primary"
+            <FormKit
+              id="displayNameInput"
+              v-model="
+                formState.metadata.annotations[rbacAnnotations.DISPLAY_NAME]
+              "
+              label="名称"
+              type="text"
+              validation="required|length:0,50"
+            ></FormKit>
+          </FormKit>
+        </div>
+      </div>
+      <div class="py-5">
+        <div class="border-t border-gray-200"></div>
+      </div>
+      <div class="md:grid md:grid-cols-4 md:gap-6">
+        <div class="md:col-span-1">
+          <div class="sticky top-0">
+            <span class="text-base font-medium text-gray-900"> 权限 </span>
+          </div>
+        </div>
+        <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+          <dl class="divide-y divide-gray-100">
+            <div
+              v-for="(group, groupIndex) in roleTemplateGroups"
+              :key="groupIndex"
+              class="flex flex-col gap-3 bg-white py-5 first:pt-0"
+            >
+              <dt class="text-sm font-medium text-gray-900">
+                <div>{{ group.module }}</div>
+                <div
+                  v-if="
+                    group.roles.length &&
+                    group.roles[0].metadata.labels?.[pluginLabels.NAME]
+                  "
+                  class="mt-3 text-xs text-gray-500"
+                >
+                  由
+                  <RouterLink
+                    :to="{
+                      name: 'PluginDetail',
+                      params: {
+                        name: group.roles[0].metadata.labels?.[
+                          pluginLabels.NAME
+                        ],
+                      },
+                    }"
+                    class="hover:text-blue-600"
                   >
-                    <input
-                      v-model="selectedRoleTemplates"
-                      :value="roleTemplate.metadata.name"
-                      class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                      type="checkbox"
-                      @change="handleRoleTemplateSelect"
-                    />
-                    <div class="flex flex-1 flex-col gap-y-3">
-                      <span class="font-medium text-gray-900">
-                        {{
-                          roleTemplate.metadata.annotations?.[
-                            rbacAnnotations.DISPLAY_NAME
-                          ]
-                        }}
-                      </span>
-                      <span
-                        v-if="
-                          roleTemplate.metadata.annotations?.[
-                            rbacAnnotations.DEPENDENCIES
-                          ]
-                        "
-                        class="text-xs text-gray-400"
-                      >
-                        依赖于
-                        {{
-                          JSON.parse(
+                    {{ group.roles[0].metadata.labels?.[pluginLabels.NAME] }}
+                  </RouterLink>
+                  插件提供
+                </div>
+              </dt>
+              <dd class="text-sm text-gray-900">
+                <ul class="space-y-2">
+                  <li v-for="(roleTemplate, index) in group.roles" :key="index">
+                    <label
+                      class="inline-flex w-full cursor-pointer flex-row items-center gap-4 rounded-base border p-5 hover:border-primary"
+                    >
+                      <input
+                        v-model="selectedRoleTemplates"
+                        :value="roleTemplate.metadata.name"
+                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                        type="checkbox"
+                        @change="handleRoleTemplateSelect"
+                      />
+                      <div class="flex flex-1 flex-col gap-y-3">
+                        <span class="font-medium text-gray-900">
+                          {{
+                            roleTemplate.metadata.annotations?.[
+                              rbacAnnotations.DISPLAY_NAME
+                            ]
+                          }}
+                        </span>
+                        <span
+                          v-if="
                             roleTemplate.metadata.annotations?.[
                               rbacAnnotations.DEPENDENCIES
                             ]
-                          ).join(", ")
-                        }}
-                      </span>
-                    </div>
-                  </label>
-                </li>
-              </ul>
-            </dd>
-          </div>
-        </dl>
+                          "
+                          class="text-xs text-gray-400"
+                        >
+                          依赖于
+                          {{
+                            JSON.parse(
+                              roleTemplate.metadata.annotations?.[
+                                rbacAnnotations.DEPENDENCIES
+                              ]
+                            ).join(", ")
+                          }}
+                        </span>
+                      </div>
+                    </label>
+                  </li>
+                </ul>
+              </dd>
+            </div>
+          </dl>
+        </div>
       </div>
     </div>
     <template #footer>
