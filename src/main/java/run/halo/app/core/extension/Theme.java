@@ -25,6 +25,8 @@ public class Theme extends AbstractExtension {
 
     public static final String KIND = "Theme";
 
+    public static final String THEME_NAME_LABEL = "theme.halo.run/theme-name";
+
     @Schema(required = true)
     private ThemeSpec spec;
 

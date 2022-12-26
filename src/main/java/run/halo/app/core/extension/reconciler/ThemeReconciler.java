@@ -2,16 +2,22 @@ package run.halo.app.core.extension.reconciler;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.FileSystemUtils;
+import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.theme.SettingUtils;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
@@ -30,6 +36,7 @@ import run.halo.app.theme.ThemePathPolicy;
  */
 @Component
 public class ThemeReconciler implements Reconciler<Request> {
+    private static final String FINALIZER_NAME = "theme-protection";
 
     private final ExtensionClient client;
     private final ThemePathPolicy themePathPolicy;
@@ -44,8 +51,10 @@ public class ThemeReconciler implements Reconciler<Request> {
         client.fetch(Theme.class, request.name())
             .ifPresent(theme -> {
                 if (isDeleted(theme)) {
-                    reconcileThemeDeletion(theme);
+                    cleanUpResourcesAndRemoveFinalizer(request.name());
+                    return;
                 }
+                addFinalizerIfNecessary(theme);
                 themeSettingDefaultConfig(theme);
                 reconcileStatus(request.name());
             });
@@ -114,6 +123,33 @@ public class ThemeReconciler implements Reconciler<Request> {
             });
     }
 
+    private void addFinalizerIfNecessary(Theme oldTheme) {
+        Set<String> finalizers = oldTheme.getMetadata().getFinalizers();
+        if (finalizers != null && finalizers.contains(FINALIZER_NAME)) {
+            return;
+        }
+        client.fetch(Theme.class, oldTheme.getMetadata().getName())
+            .ifPresent(theme -> {
+                Set<String> newFinalizers = theme.getMetadata().getFinalizers();
+                if (newFinalizers == null) {
+                    newFinalizers = new HashSet<>();
+                    theme.getMetadata().setFinalizers(newFinalizers);
+                }
+                newFinalizers.add(FINALIZER_NAME);
+                client.update(theme);
+            });
+    }
+
+    private void cleanUpResourcesAndRemoveFinalizer(String themeName) {
+        client.fetch(Theme.class, themeName).ifPresent(theme -> {
+            reconcileThemeDeletion(theme);
+            if (theme.getMetadata().getFinalizers() != null) {
+                theme.getMetadata().getFinalizers().remove(FINALIZER_NAME);
+            }
+            client.update(theme);
+        });
+    }
+
     private void reconcileThemeDeletion(Theme theme) {
         deleteThemeFiles(theme);
         // delete theme setting form
@@ -121,6 +157,19 @@ public class ThemeReconciler implements Reconciler<Request> {
         if (StringUtils.isNotBlank(settingName)) {
             client.fetch(Setting.class, settingName)
                 .ifPresent(client::delete);
+        }
+        // delete annotation setting
+        deleteAnnotationSettings(theme.getMetadata().getName());
+    }
+
+    private void deleteAnnotationSettings(String themeName) {
+        List<AnnotationSetting> result = client.list(AnnotationSetting.class, annotationSetting -> {
+            Map<String, String> labels = ExtensionUtil.nullSafeLabels(annotationSetting);
+            return themeName.equals(labels.get(Theme.THEME_NAME_LABEL));
+        }, null);
+
+        for (AnnotationSetting annotationSetting : result) {
+            client.delete(annotationSetting);
         }
     }
 
