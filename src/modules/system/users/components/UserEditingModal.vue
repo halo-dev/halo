@@ -5,19 +5,10 @@ import { apiClient } from "@/utils/api-client";
 import type { User } from "@halo-dev/api-client";
 
 // components
-import {
-  IconCodeBoxLine,
-  IconEye,
-  Toast,
-  VButton,
-  VCodemirror,
-  VModal,
-  VSpace,
-} from "@halo-dev/components";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 
 // libs
-import YAML from "yaml";
 import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
 
@@ -60,8 +51,6 @@ const initialFormState: User = {
 
 const formState = ref<User>(cloneDeep(initialFormState));
 const saving = ref(false);
-const rawMode = ref(false);
-const raw = ref("");
 
 const isUpdateMode = computed(() => {
   return !!formState.value.metadata.creationTimestamp;
@@ -69,10 +58,6 @@ const isUpdateMode = computed(() => {
 
 const creationModalTitle = computed(() => {
   return isUpdateMode.value ? "编辑用户" : "新增用户";
-});
-
-const modalWidth = computed(() => {
-  return rawMode.value ? 800 : 700;
 });
 
 watch(
@@ -132,88 +117,67 @@ const handleCreateUser = async () => {
     saving.value = false;
   }
 };
-
-const handleRawModeChange = () => {
-  rawMode.value = !rawMode.value;
-
-  if (rawMode.value) {
-    raw.value = YAML.stringify(formState.value);
-  } else {
-    formState.value = YAML.parse(raw.value);
-  }
-};
 </script>
 <template>
   <VModal
     :title="creationModalTitle"
     :visible="visible"
-    :width="modalWidth"
+    :width="700"
     @update:visible="onVisibleChange"
   >
-    <template #actions>
-      <span @click="handleRawModeChange">
-        <IconCodeBoxLine v-if="!rawMode" v-tooltip="`查看编码`" />
-        <IconEye v-else v-tooltip="`查看表单`" />
-      </span>
-    </template>
-
-    <VCodemirror v-show="rawMode" v-model="raw" height="50vh" language="yaml" />
-
-    <div v-show="!rawMode">
+    <FormKit
+      id="user-form"
+      name="user-form"
+      :config="{ validationVisibility: 'submit' }"
+      type="form"
+      @submit="handleCreateUser"
+    >
       <FormKit
-        id="user-form"
-        name="user-form"
-        :config="{ validationVisibility: 'submit' }"
-        type="form"
-        @submit="handleCreateUser"
-      >
-        <FormKit
-          id="userNameInput"
-          v-model="formState.metadata.name"
-          :disabled="isUpdateMode"
-          label="用户名"
-          type="text"
-          name="name"
-          validation="required|alphanumeric|length:0,50"
-        ></FormKit>
-        <FormKit
-          id="displayNameInput"
-          v-model="formState.spec.displayName"
-          label="显示名称"
-          type="text"
-          name="displayName"
-          validation="required|length:0,50"
-        ></FormKit>
-        <FormKit
-          v-model="formState.spec.email"
-          label="电子邮箱"
-          type="email"
-          name="email"
-          validation="required|email|length:0,100"
-        ></FormKit>
-        <FormKit
-          v-model="formState.spec.phone"
-          label="手机号"
-          type="text"
-          name="phone"
-          validation="length:0,20"
-        ></FormKit>
-        <FormKit
-          v-model="formState.spec.avatar"
-          label="头像"
-          type="attachment"
-          name="avatar"
-          validation="url|length:0,1024"
-        ></FormKit>
-        <FormKit
-          v-model="formState.spec.bio"
-          label="描述"
-          type="textarea"
-          name="bio"
-          validation="length:0,2048"
-        ></FormKit>
-      </FormKit>
-    </div>
+        id="userNameInput"
+        v-model="formState.metadata.name"
+        :disabled="isUpdateMode"
+        label="用户名"
+        type="text"
+        name="name"
+        validation="required|alphanumeric|length:0,50"
+      ></FormKit>
+      <FormKit
+        id="displayNameInput"
+        v-model="formState.spec.displayName"
+        label="显示名称"
+        type="text"
+        name="displayName"
+        validation="required|length:0,50"
+      ></FormKit>
+      <FormKit
+        v-model="formState.spec.email"
+        label="电子邮箱"
+        type="email"
+        name="email"
+        validation="required|email|length:0,100"
+      ></FormKit>
+      <FormKit
+        v-model="formState.spec.phone"
+        label="手机号"
+        type="text"
+        name="phone"
+        validation="length:0,20"
+      ></FormKit>
+      <FormKit
+        v-model="formState.spec.avatar"
+        label="头像"
+        type="attachment"
+        name="avatar"
+        validation="url|length:0,1024"
+      ></FormKit>
+      <FormKit
+        v-model="formState.spec.bio"
+        label="描述"
+        type="textarea"
+        name="bio"
+        validation="length:0,2048"
+      ></FormKit>
+    </FormKit>
     <template #footer>
       <VSpace>
         <SubmitButton
