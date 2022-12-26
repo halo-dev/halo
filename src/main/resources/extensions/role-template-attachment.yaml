@@ -17,6 +17,9 @@ rules:
   - apiGroups: [ "api.console.halo.run" ]
     resources: [ "attachments" ]
     verbs: [ "*" ]
+  - apiGroups: [ "" ]
+    resources: [ "settings" ]
+    verbs: [ "get" ]
   - nonResourceURLs: [ "/apis/api.console.halo.run/v1alpha1/attachments/upload" ]
     verbs: [ "create" ]
 ---
