@@ -19,7 +19,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.BaseStream;
 import java.util.stream.Stream;
 import java.util.zip.ZipInputStream;
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
@@ -38,19 +37,12 @@ class ThemeUtils {
     private static final String THEME_TMP_PREFIX = "halo-theme-";
     private static final String[] THEME_MANIFESTS = {"theme.yaml", "theme.yml"};
 
-    private static final String[] THEME_CONFIG = {"config.yaml", "config.yml"};
-
-    private static final String[] THEME_SETTING = {"settings.yaml", "settings.yml"};
-
-    static List<Unstructured> loadThemeSetting(Path themePath) {
-        return loadUnstructured(themePath, THEME_SETTING);
-    }
-
     static Flux<Theme> listAllThemesFromThemeDir(Path themesDir) {
         return walkThemesFromPath(themesDir)
             .filter(Files::isDirectory)
-            .map(themePath -> loadUnstructured(themePath, THEME_MANIFESTS))
+            .map(ThemeUtils::findThemeManifest)
             .flatMap(Flux::fromIterable)
+            .filter(unstructured -> unstructured.getKind().equals(Theme.KIND))
             .map(unstructured -> Unstructured.OBJECT_MAPPER.convertValue(unstructured,
                 Theme.class))
             .sort(Comparator.comparing(theme -> theme.getMetadata().getName()));
@@ -64,10 +56,9 @@ class ThemeUtils {
             .subscribeOn(Schedulers.boundedElastic());
     }
 
-    private static List<Unstructured> loadUnstructured(Path themePath,
-        String[] themeSetting) {
+    private static List<Unstructured> findThemeManifest(Path themePath) {
         List<Resource> resources = new ArrayList<>(4);
-        for (String themeResource : themeSetting) {
+        for (String themeResource : THEME_MANIFESTS) {
             Path resourcePath = themePath.resolve(themeResource);
             if (Files.exists(resourcePath)) {
                 resources.add(new FileSystemResource(resourcePath));
@@ -81,8 +72,28 @@ class ThemeUtils {
     }
 
     static List<Unstructured> loadThemeResources(Path themePath) {
-        String[] resourceNames = ArrayUtils.addAll(THEME_SETTING, THEME_CONFIG);
-        return loadUnstructured(themePath, resourceNames);
+        try (Stream<Path> paths = Files.list(themePath)) {
+            List<FileSystemResource> resources = paths
+                .filter(path -> {
+                    String pathString = path.toString();
+                    return pathString.endsWith(".yaml") || pathString.endsWith(".yml");
+                })
+                .filter(path -> {
+                    String pathString = path.toString();
+                    for (String themeManifest : THEME_MANIFESTS) {
+                        if (pathString.endsWith(themeManifest)) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+                .map(FileSystemResource::new)
+                .toList();
+            return new YamlUnstructuredLoader(resources.toArray(new Resource[0]))
+                .load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     static Mono<Unstructured> unzipThemeTo(InputStream inputStream, Path themeWorkDir) {
@@ -111,14 +122,16 @@ class ThemeUtils {
             })
             .flatMap(is -> ThemeUtils.locateThemeManifest(tempDir.get()))
             .switchIfEmpty(
-                Mono.error(() -> new ThemeInstallationException("Missing theme manifest")))
+                Mono.error(() -> new ThemeInstallationException("Missing theme manifest",
+                    "problemDetail.theme.install.missingManifest", null)))
             .map(themeManifestPath -> {
                 var theme = loadThemeManifest(themeManifestPath);
                 var themeName = theme.getMetadata().getName();
                 var themeTargetPath = themeWorkDir.resolve(themeName);
                 try {
                     if (!override && !FileUtils.isEmpty(themeTargetPath)) {
-                        throw new ThemeInstallationException("Theme already exists.");
+                        throw new ThemeInstallationException("Theme already exists.",
+                            "problemDetail.theme.install.alreadyExists", new Object[] {themeName});
                     }
                     // install theme to theme work dir
                     copyRecursively(themeManifestPath.getParent(), themeTargetPath);

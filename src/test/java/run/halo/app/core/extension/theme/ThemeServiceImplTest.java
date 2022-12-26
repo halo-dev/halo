@@ -33,8 +33,10 @@ import org.mockito.stubbing.Answer;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.server.ServerWebInputException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
@@ -240,6 +242,8 @@ class ThemeServiceImplTest {
                 return Mono.just(argument);
             });
 
+        when(client.list(eq(AnnotationSetting.class), any(), eq(null))).thenReturn(Flux.empty());
+
         themeService.reloadTheme("fake-theme")
             .as(StepVerifier::create)
             .consumeNextWith(themeUpdated -> {
@@ -320,9 +324,9 @@ class ThemeServiceImplTest {
                 return Mono.just(argument);
             });
 
-        when(client.create(any(Setting.class)))
-            .thenAnswer((Answer<Mono<Setting>>) invocation -> {
-                Setting argument = invocation.getArgument(0);
+        when(client.create(any(Unstructured.class)))
+            .thenAnswer((Answer<Mono<Unstructured>>) invocation -> {
+                Unstructured argument = invocation.getArgument(0);
                 JSONAssert.assertEquals("""
                         {
                            "spec": {
@@ -342,7 +346,10 @@ class ThemeServiceImplTest {
                            "apiVersion": "v1alpha1",
                            "kind": "Setting",
                            "metadata": {
-                              "name": "fake-setting"
+                              "name": "fake-setting",
+                              "labels": {
+                                  "theme.halo.run/theme-name": "fake-theme"
+                              }
                             }
                          }
                         """,
@@ -350,6 +357,8 @@ class ThemeServiceImplTest {
                     true);
                 return Mono.just(invocation.getArgument(0));
             });
+
+        when(client.list(eq(AnnotationSetting.class), any(), eq(null))).thenReturn(Flux.empty());
 
         themeService.reloadTheme("fake-theme")
             .as(StepVerifier::create)

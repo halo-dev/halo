@@ -5,6 +5,7 @@ import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import run.halo.app.core.extension.attachment.Attachment.AttachmentSpec;
 import run.halo.app.core.extension.attachment.Constant;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.extension.Metadata;
+import run.halo.app.infra.exception.AttachmentAlreadyExistsException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -108,7 +110,9 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                         attachment.setMetadata(metadata);
                         attachment.setSpec(spec);
                         return attachment;
-                    }));
+                    }))
+                    .onErrorMap(FileAlreadyExistsException.class,
+                        e -> new AttachmentAlreadyExistsException(e.getFile()));
             });
     }
 

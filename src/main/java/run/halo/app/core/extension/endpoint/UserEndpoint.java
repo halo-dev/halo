@@ -28,6 +28,8 @@ import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.infra.exception.UserNotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
 
 @Component
@@ -115,7 +117,9 @@ public class UserEndpoint implements CustomEndpoint {
         return ReactiveSecurityContextHolder.getContext()
             .flatMap(ctx -> {
                 var name = ctx.getAuthentication().getName();
-                return client.get(User.class, name);
+                return client.get(User.class, name)
+                    .onErrorMap(ExtensionNotFoundException.class,
+                        e -> new UserNotFoundException(name));
             })
             .flatMap(user -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)

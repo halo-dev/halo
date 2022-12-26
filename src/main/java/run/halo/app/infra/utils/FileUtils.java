@@ -194,7 +194,8 @@ public abstract class FileUtils {
             return;
         }
 
-        throw new AccessDeniedException(pathToCheck.toString());
+        throw new AccessDeniedException("Directory traversal detected: " + pathToCheck,
+            "problemDetail.directoryTraversal", new Object[] {parentPath, pathToCheck});
     }
 
     /**

@@ -1,24 +1,24 @@
 package run.halo.app.infra.exception;
 
-public class AccessDeniedException extends HaloException {
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+/**
+ * AccessDeniedException will resolve i18n message and response 403 status.
+ *
+ * @author johnniang
+ */
+public class AccessDeniedException extends ResponseStatusException {
 
     public AccessDeniedException() {
+        this("Access to the resource is forbidden");
     }
 
-    public AccessDeniedException(String message) {
-        super(message);
+    public AccessDeniedException(String reason) {
+        this(reason, null, null);
     }
 
-    public AccessDeniedException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public AccessDeniedException(Throwable cause) {
-        super(cause);
-    }
-
-    public AccessDeniedException(String message, Throwable cause, boolean enableSuppression,
-        boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public AccessDeniedException(String reason, String detailCode, Object[] detailArgs) {
+        super(HttpStatus.FORBIDDEN, reason, null, detailCode, detailArgs);
     }
 }

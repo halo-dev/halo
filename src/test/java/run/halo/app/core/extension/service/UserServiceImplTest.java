@@ -14,6 +14,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static run.halo.app.extension.GroupVersionKind.fromExtension;
 
 import java.util.List;
 import java.util.Set;
@@ -51,7 +52,7 @@ class UserServiceImplTest {
     @Test
     void shouldThrowExceptionIfUserNotFoundInExtension() {
         when(client.get(User.class, "faker")).thenReturn(
-            Mono.error(new ExtensionNotFoundException()));
+            Mono.error(new ExtensionNotFoundException(fromExtension(User.class), "faker")));
 
         StepVerifier.create(userService.getUser("faker"))
             .verifyError(ExtensionNotFoundException.class);
@@ -275,7 +276,8 @@ class UserServiceImplTest {
         @Test
         void shouldThrowExceptionIfUserNotFound() {
             when(client.get(User.class, "fake-user"))
-                .thenReturn(Mono.error(new ExtensionNotFoundException()));
+                .thenReturn(Mono.error(
+                    new ExtensionNotFoundException(fromExtension(User.class), "fake-user")));
 
             StepVerifier.create(userService.updateWithRawPassword("fake-user", "new-password"))
                 .verifyError(ExtensionNotFoundException.class);
@@ -301,7 +303,8 @@ class UserServiceImplTest {
         @Test
         void shouldGetNotFoundIfUserNotFound() {
             when(client.get(User.class, "invalid-user"))
-                .thenReturn(Mono.error(new ExtensionNotFoundException()));
+                .thenReturn(Mono.error(
+                    new ExtensionNotFoundException(fromExtension(User.class), "invalid-user")));
 
             var grantRolesMono = userService.grantRoles("invalid-user", Set.of("fake-role"));
             StepVerifier.create(grantRolesMono)

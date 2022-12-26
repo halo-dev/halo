@@ -1,5 +1,8 @@
 package run.halo.app.extension.exception;
 
+import org.springframework.http.HttpStatus;
+import run.halo.app.extension.GroupVersionKind;
+
 /**
  * SchemeNotFoundException is thrown while we try to get a scheme but not found.
  *
@@ -7,23 +10,9 @@ package run.halo.app.extension.exception;
  */
 public class SchemeNotFoundException extends ExtensionException {
 
-    public SchemeNotFoundException() {
+    public SchemeNotFoundException(GroupVersionKind gvk) {
+        super(HttpStatus.INTERNAL_SERVER_ERROR, "Scheme not found for " + gvk, null, null,
+            new Object[] {gvk});
     }
 
-    public SchemeNotFoundException(String message) {
-        super(message);
-    }
-
-    public SchemeNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public SchemeNotFoundException(Throwable cause) {
-        super(cause);
-    }
-
-    public SchemeNotFoundException(String message, Throwable cause, boolean enableSuppression,
-        boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }
