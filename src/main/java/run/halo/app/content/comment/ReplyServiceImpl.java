@@ -55,10 +55,12 @@ public class ReplyServiceImpl implements ReplyService {
                     .map(commentSetting -> {
                         if (Boolean.FALSE.equals(commentSetting.getEnable())) {
                             throw new AccessDeniedException(
-                                "The comment function has been turned off.");
+                                "The comment function has been turned off.",
+                                "problemDetail.comment.turnedOff", null);
                         }
                         if (checkReplyOwner(reply, commentSetting.getSystemUserOnly())) {
-                            throw new AccessDeniedException("Allow system user reply only.");
+                            throw new AccessDeniedException("Allow only system users to comment.",
+                                "problemDetail.comment.systemUsersOnly", null);
                         }
                         reply.getSpec().setApproved(
                             Boolean.FALSE.equals(commentSetting.getRequireReviewForNew()));

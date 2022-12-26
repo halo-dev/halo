@@ -68,11 +68,8 @@ public record Scheme(Class<? extends Extension> type,
     @NonNull
     public static GVK getGvkFromType(@NonNull Class<? extends Extension> type) {
         var gvk = type.getAnnotation(GVK.class);
-        if (gvk == null) {
-            throw new ExtensionException(
-                String.format("Annotation %s needs to be on Extension %s", GVK.class.getName(),
-                    type.getName()));
-        }
+        Assert.notNull(gvk,
+            "Missing annotation " + GVK.class.getName() + " on type " + type.getName());
         return gvk;
     }
 }

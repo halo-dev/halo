@@ -10,6 +10,7 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RequestPredicates.PUT;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
+import static run.halo.app.extension.GroupVersionKind.fromExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,7 +93,8 @@ class AuthorizationTest {
 
         when(roleService.getMonoRole("post.read")).thenReturn(Mono.just(role));
         when(roleService.getMonoRole("authenticated")).thenReturn(
-            Mono.error(ExtensionNotFoundException::new));
+            Mono.error(
+                () -> new ExtensionNotFoundException(fromExtension(Role.class), "authenticated")));
 
         var token = LoginUtils.login(webClient, "user", "password").block();
         webClient.get().uri("/apis/fake.halo.run/v1/posts")

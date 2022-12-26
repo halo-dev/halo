@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.Test;
-import run.halo.app.extension.exception.ExtensionException;
 
 class SchemeTest {
 
@@ -40,9 +39,9 @@ class SchemeTest {
         class NoGvkExtension extends AbstractExtension {
         }
 
-        assertThrows(ExtensionException.class,
+        assertThrows(IllegalArgumentException.class,
             () -> Scheme.getGvkFromType(NoGvkExtension.class));
-        assertThrows(ExtensionException.class,
+        assertThrows(IllegalArgumentException.class,
             () -> Scheme.buildFromType(NoGvkExtension.class));
     }
 

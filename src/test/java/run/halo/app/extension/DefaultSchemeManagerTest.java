@@ -20,7 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.extension.SchemeWatcherManager.SchemeRegistered;
 import run.halo.app.extension.SchemeWatcherManager.SchemeUnregistered;
 import run.halo.app.extension.SchemeWatcherManager.SchemeWatcher;
-import run.halo.app.extension.exception.ExtensionException;
 import run.halo.app.extension.exception.SchemeNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
@@ -37,7 +36,7 @@ class DefaultSchemeManagerTest {
         class WithoutGvkExtension extends AbstractExtension {
         }
 
-        assertThrows(ExtensionException.class,
+        assertThrows(IllegalArgumentException.class,
             () -> schemeManager.register(WithoutGvkExtension.class));
     }
 

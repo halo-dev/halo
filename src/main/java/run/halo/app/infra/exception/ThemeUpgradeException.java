@@ -4,13 +4,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * @author guqing
+ * ThemeUpgradeException will response bad request status if failed to upgrade theme.
+ *
  * @author johnniang
- * @since 2.0.0
  */
-public class ThemeInstallationException extends ResponseStatusException {
+public class ThemeUpgradeException extends ResponseStatusException {
 
-    public ThemeInstallationException(String reason, String detailCode, Object[] detailArgs) {
+    public ThemeUpgradeException(String reason, String detailCode, Object[] detailArgs) {
         super(HttpStatus.BAD_REQUEST, reason, null, detailCode, detailArgs);
     }
 
