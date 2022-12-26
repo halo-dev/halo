@@ -14,7 +14,6 @@ import type {
 } from "@halo-dev/api-client";
 // @ts-ignore
 import { Picker } from "emoji-mart";
-import data from "@emoji-mart/data";
 import i18n from "@emoji-mart/data/i18n/zh.json";
 import { computed, nextTick, ref, watch, watchEffect } from "vue";
 import { reset } from "@formkit/core";
@@ -120,7 +119,10 @@ const emojiPickerRef = ref<HTMLElement | null>(null);
 
 const handleCreateEmojiPicker = () => {
   const emojiPicker = new Picker({
-    data: data,
+    data: async () => {
+      const data = await import("@emoji-mart/data");
+      return Object.assign({}, data);
+    },
     theme: "light",
     autoFocus: true,
     i18n: i18n,
