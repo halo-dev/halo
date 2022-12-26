@@ -16,6 +16,8 @@ import run.halo.app.extension.GroupKind;
 @GVK(group = "", version = "v1alpha1", kind = KIND,
     plural = "annotationsettings", singular = "annotationsetting")
 public class AnnotationSetting extends AbstractExtension {
+    public static final String TARGET_REF_LABEL = "halo.run/target-ref";
+
     public static final String KIND = "AnnotationSetting";
 
     private AnnotationSettingSpec spec;
