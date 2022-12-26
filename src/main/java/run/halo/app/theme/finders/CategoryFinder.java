@@ -26,4 +26,6 @@ public interface CategoryFinder {
     Flux<CategoryVo> listAll();
 
     Flux<CategoryTreeVo> listAsTree();
+
+    Flux<CategoryTreeVo> listAsTree(String name);
 }
