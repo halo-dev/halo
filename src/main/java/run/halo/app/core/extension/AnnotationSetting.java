@@ -1,7 +1,9 @@
 package run.halo.app.core.extension;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static run.halo.app.core.extension.AnnotationSetting.KIND;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,11 +22,15 @@ public class AnnotationSetting extends AbstractExtension {
 
     public static final String KIND = "AnnotationSetting";
 
+    @Schema(requiredMode = REQUIRED)
     private AnnotationSettingSpec spec;
 
     @Data
     public static class AnnotationSettingSpec {
+        @Schema(requiredMode = REQUIRED)
         private GroupKind targetRef;
+
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private List<Object> formSchema;
     }
 }
