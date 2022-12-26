@@ -26,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ResourceUtils;
+import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
@@ -103,8 +104,10 @@ class ThemeReconcilerTest {
 
         themeReconciler.reconcile(new Reconciler.Request(metadata.getName()));
 
-        verify(extensionClient, times(3)).fetch(eq(Theme.class), eq(metadata.getName()));
-        verify(extensionClient, times(2)).fetch(eq(Setting.class), eq(themeSpec.getSettingName()));
+        verify(extensionClient, times(2)).fetch(eq(Theme.class), eq(metadata.getName()));
+        verify(extensionClient, times(1)).fetch(eq(Setting.class), eq(themeSpec.getSettingName()));
+
+        verify(extensionClient, times(1)).list(eq(AnnotationSetting.class), any(), any());
 
         assertThat(Files.exists(testWorkDir)).isTrue();
         assertThat(Files.exists(defaultThemePath)).isFalse();
@@ -134,7 +137,7 @@ class ThemeReconcilerTest {
         Reconciler.Result reconcile =
             themeReconciler.reconcile(new Reconciler.Request(metadata.getName()));
         assertThat(reconcile.reEnqueue()).isFalse();
-        verify(extensionClient, times(2)).fetch(eq(Theme.class), eq(metadata.getName()));
+        verify(extensionClient, times(3)).fetch(eq(Theme.class), eq(metadata.getName()));
 
         // setting exists
         themeSpec.setSettingName("theme-test-setting");
@@ -143,9 +146,9 @@ class ThemeReconcilerTest {
         assertThat(theme.getSpec().getConfigMapName()).isNull();
         ArgumentCaptor<Theme> captor = ArgumentCaptor.forClass(Theme.class);
         themeReconciler.reconcile(new Reconciler.Request(metadata.getName()));
-        verify(extensionClient, times(5))
+        verify(extensionClient, times(6))
             .fetch(eq(Theme.class), eq(metadata.getName()));
-        verify(extensionClient, times(2))
+        verify(extensionClient, times(3))
             .update(captor.capture());
         Theme value = captor.getValue();
         assertThat(value.getSpec().getConfigMapName()).isNotNull();

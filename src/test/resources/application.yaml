@@ -11,6 +11,8 @@ spring:
     init:
       mode: always
       platform: h2
+  messages:
+      basename: config.i18n.messages
 
 halo:
   work-dir: ${user.home}/halo-next-test

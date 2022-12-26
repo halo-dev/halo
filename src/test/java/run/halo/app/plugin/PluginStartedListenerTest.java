@@ -52,8 +52,10 @@ class PluginStartedListenerTest {
                 Set<String> unstructuredFilePathFromJar =
                     PluginStartedListener.PluginExtensionLoaderUtils.lookupFromJar(targetJarPath);
                 assertThat(unstructuredFilePathFromJar).hasSize(3);
-                assertThat(unstructuredFilePathFromJar).containsAll(Set.of("extensions/roles.yaml",
-                    "extensions/reverseProxy.yaml", "extensions/test.yml"));
+                assertThat(unstructuredFilePathFromJar).containsAll(Set.of(
+                    Path.of("extensions/roles.yaml").toString(),
+                    Path.of("extensions/reverseProxy.yaml").toString(),
+                    Path.of("extensions/test.yml").toString()));
             } finally {
                 FileSystemUtils.deleteRecursively(tempDirectory);
             }

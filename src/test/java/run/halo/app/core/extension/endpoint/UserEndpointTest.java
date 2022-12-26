@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+import static run.halo.app.extension.GroupVersionKind.fromExtension;
 
 import java.util.List;
 import java.util.Set;
@@ -72,7 +73,8 @@ class UserEndpointTest {
         @Test
         void shouldResponseErrorIfUserNotFound() {
             when(client.get(User.class, "fake-user"))
-                .thenReturn(Mono.error(new ExtensionNotFoundException()));
+                .thenReturn(Mono.error(
+                    new ExtensionNotFoundException(fromExtension(User.class), "fake-user")));
             webClient.get().uri("/apis/api.console.halo.run/v1alpha1/users/-")
                 .exchange()
                 .expectStatus().isNotFound();
@@ -142,7 +144,8 @@ class UserEndpointTest {
         void setUp() {
             when(client.list(same(RoleBinding.class), any(), any())).thenReturn(Flux.empty());
             when(client.get(User.class, "fake-user"))
-                .thenReturn(Mono.error(new ExtensionNotFoundException()));
+                .thenReturn(Mono.error(
+                    new ExtensionNotFoundException(fromExtension(User.class), "fake-user")));
         }
 
         @Test

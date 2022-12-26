@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static run.halo.app.extension.GroupVersionKind.fromExtension;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -163,7 +164,8 @@ class DefaultUserDetailServiceTest {
     @Test
     void shouldNotFindUserDetailsByNonExistingUsername() {
         when(userService.getUser("non-existing-user")).thenReturn(
-            Mono.error(() -> new ExtensionNotFoundException("The user was not found")));
+            Mono.error(() -> new ExtensionNotFoundException(
+                fromExtension(run.halo.app.core.extension.User.class), "non-existing-user")));
 
         var userDetailsMono = userDetailService.findByUsername("non-existing-user");
 

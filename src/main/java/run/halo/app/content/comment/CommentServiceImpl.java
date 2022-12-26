@@ -68,11 +68,13 @@ public class CommentServiceImpl implements CommentService {
             .flatMap(commentSetting -> {
                 if (Boolean.FALSE.equals(commentSetting.getEnable())) {
                     return Mono.error(
-                        new AccessDeniedException("The comment function has been turned off."));
+                        new AccessDeniedException("The comment function has been turned off.",
+                            "problemDetail.comment.turnedOff", null));
                 }
                 if (checkCommentOwner(comment, commentSetting.getSystemUserOnly())) {
                     return Mono.error(
-                        new AccessDeniedException("Allow system user comments only."));
+                        new AccessDeniedException("Allow only system users to comment.",
+                            "problemDetail.comment.systemUsersOnly", null));
                 }
 
                 if (comment.getSpec().getTop() == null) {

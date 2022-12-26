@@ -84,14 +84,15 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     @Override
     public <E extends Extension> Mono<E> get(Class<E> type, String name) {
         return fetch(type, name)
-            .switchIfEmpty(Mono.error(() -> new ExtensionNotFoundException(
-                "Extension " + type.getName() + " with name " + name + " not found")));
+            .switchIfEmpty(Mono.error(() -> {
+                var gvk = GroupVersionKind.fromExtension(type);
+                return new ExtensionNotFoundException(gvk, name);
+            }));
     }
 
     private Mono<Unstructured> get(GroupVersionKind gvk, String name) {
         return fetch(gvk, name)
-            .switchIfEmpty(Mono.error(() -> new ExtensionNotFoundException(
-                "Extension " + gvk + " with name " + name + " not found")));
+            .switchIfEmpty(Mono.error(() -> new ExtensionNotFoundException(gvk, name)));
     }
 
     @Override

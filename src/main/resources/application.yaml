@@ -2,6 +2,9 @@ server:
   port: 8090
   compression:
     enabled: true
+  error:
+    whitelabel:
+        enabled: false
 spring:
   output:
     ansi:
@@ -16,6 +19,8 @@ spring:
       platform: h2
   codec:
     max-in-memory-size: 10MB
+  messages:
+    basename: config.i18n.messages
 
 halo:
   external-url: "http://${server.address:localhost}:${server.port}"

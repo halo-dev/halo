@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static run.halo.app.extension.GroupVersionKind.fromExtension;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,8 +65,8 @@ class ExtensionGetHandlerTest {
         var serverRequest = MockServerRequest.builder()
             .pathVariable("name", "my-fake")
             .build();
-        when(client.get(eq(FakeExtension.class), eq("my-fake"))).thenReturn(
-            Mono.error(new ExtensionNotFoundException()));
+        when(client.get(eq(FakeExtension.class), eq("my-fake"))).thenReturn(Mono.error(
+            new ExtensionNotFoundException(fromExtension(FakeExtension.class), "my-fake")));
 
         Mono<ServerResponse> responseMono = getHandler.handle(serverRequest);
         StepVerifier.create(responseMono)
