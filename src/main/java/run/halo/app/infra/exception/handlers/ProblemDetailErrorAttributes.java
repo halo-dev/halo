@@ -50,7 +50,9 @@ public class ProblemDetailErrorAttributes implements ErrorAttributes {
         if (error instanceof ErrorResponse er) {
             errorResponse = er;
         } else {
-            errorResponse = ErrorResponse.create(error, status, error.getMessage());
+            var reason = responseStatusAnno.getValue("reason", String.class)
+                .orElse(error.getMessage());
+            errorResponse = ErrorResponse.create(error, status, reason);
         }
         var problemDetail =
             errorResponse.updateAndGetBody(messageSource, getLocale(request.exchange()));

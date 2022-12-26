@@ -11,11 +11,9 @@ spring:
     init:
       mode: always
       platform: h2
-  webflux:
-    problemdetails:
-      enabled: true
   messages:
       basename: config.i18n.messages
+
 halo:
   work-dir: ${user.home}/halo-next-test
   external-url: "http://${server.address:localhost}:${server.port}"

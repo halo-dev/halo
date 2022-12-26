@@ -21,9 +21,6 @@ spring:
     max-in-memory-size: 10MB
   messages:
     basename: config.i18n.messages
-  webflux:
-    problemdetails:
-      enabled: true
 
 halo:
   external-url: "http://${server.address:localhost}:${server.port}"
