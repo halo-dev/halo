@@ -1,0 +1,9 @@
+spring:
+  r2dbc:
+    url: r2dbc:pool:mariadb://localhost:3306/halo
+    username: root
+    password: mariadb
+  sql:
+    init:
+      mode: always
+      platform: mysql
