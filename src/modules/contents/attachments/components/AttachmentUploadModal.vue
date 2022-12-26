@@ -1,63 +1,72 @@
 <script lang="ts" setup>
 import { VModal, IconAddCircle, VAlert } from "@halo-dev/components";
 import UppyUpload from "@/components/upload/UppyUpload.vue";
-import { computed, ref, watch, watchEffect } from "vue";
-import type { Policy, Group, PolicyTemplate } from "@halo-dev/api-client";
+import { ref, watch } from "vue";
+import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
 import {
   useFetchAttachmentPolicy,
   useFetchAttachmentPolicyTemplate,
 } from "../composables/use-attachment-policy";
+import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
+import { useLocalStorage } from "@vueuse/core";
 
 const props = withDefaults(
   defineProps<{
     visible: boolean;
-    group?: Group;
   }>(),
   {
     visible: false,
-    group: undefined,
   }
 );
-
-const groupName = computed(() => {
-  if (props.group?.metadata.name === "ungrouped") {
-    return "";
-  }
-  return props.group?.metadata.name;
-});
 
 const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
 
+const { groups, handleFetchGroups } = useFetchAttachmentGroup({
+  fetchOnMounted: false,
+});
 const { policies, handleFetchPolicies } = useFetchAttachmentPolicy({
   fetchOnMounted: false,
 });
 const { policyTemplates, handleFetchPolicyTemplates } =
   useFetchAttachmentPolicyTemplate();
 
-const selectedPolicy = ref<Policy>();
+const selectedGroupName = useLocalStorage("attachment-upload-group", "");
+const selectedPolicyName = useLocalStorage("attachment-upload-policy", "");
 const policyToCreate = ref<Policy>();
 const uploadVisible = ref(false);
 const policyEditingModal = ref(false);
 
-const modalTitle = computed(() => {
-  if (
-    props.group?.metadata.name &&
-    props.group?.metadata.name !== "ungrouped"
-  ) {
-    return `上传附件到分组：${props.group.spec.displayName}`;
-  }
-  return "上传附件到未分组";
-});
+watch(
+  () => groups.value,
+  () => {
+    if (selectedGroupName.value === "") return;
 
-watchEffect(() => {
-  if (policies.value.length) {
-    selectedPolicy.value = policies.value[0];
+    const group = groups.value.find(
+      (group) => group.metadata.name === selectedGroupName.value
+    );
+    if (!group) {
+      selectedGroupName.value =
+        groups.value.length > 0 ? groups.value[0].metadata.name : "";
+    }
   }
-});
+);
+
+watch(
+  () => policies.value,
+  () => {
+    const policy = policies.value.find(
+      (policy) => policy.metadata.name === selectedPolicyName.value
+    );
+    if (!policy) {
+      selectedPolicyName.value =
+        policies.value.length > 0 ? policies.value[0].metadata.name : "";
+    }
+  }
+);
 
 const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
   policyToCreate.value = {
@@ -93,6 +102,7 @@ watch(
   () => props.visible,
   (newValue) => {
     if (newValue) {
+      handleFetchGroups();
       handleFetchPolicies();
       handleFetchPolicyTemplates();
       uploadVisible.value = true;
@@ -110,12 +120,36 @@ watch(
     :body-class="['!p-0']"
     :visible="visible"
     :width="650"
-    :title="modalTitle"
+    title="上传附件"
     @update:visible="onVisibleChange"
   >
     <div class="w-full p-4">
       <div class="mb-2">
-        <span class="text-sm text-gray-900">选择存储策略：</span>
+        <span class="text-sm text-gray-800">选择分组：</span>
+      </div>
+      <div class="mb-3 grid grid-cols-2 gap-x-2 gap-y-3 sm:grid-cols-4">
+        <div
+          v-for="(group, index) in [
+            { metadata: { name: '' }, spec: { displayName: '未分组' } },
+            ...groups,
+          ]"
+          :key="index"
+          :class="{
+            '!bg-gray-200 !text-gray-900':
+              group.metadata.name === selectedGroupName,
+          }"
+          class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
+          @click="selectedGroupName = group.metadata.name"
+        >
+          <div class="flex flex-1 items-center gap-2 truncate">
+            <span class="truncate text-sm">
+              {{ group.spec.displayName }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="mb-2">
+        <span class="text-sm text-gray-800">选择存储策略：</span>
       </div>
       <div class="mb-3 grid grid-cols-2 gap-x-2 gap-y-3 sm:grid-cols-4">
         <div
@@ -123,10 +157,10 @@ watch(
           :key="index"
           :class="{
             '!bg-gray-200 !text-gray-900':
-              selectedPolicy?.metadata.name === policy.metadata.name,
+              selectedPolicyName === policy.metadata.name,
           }"
           class="flex cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
-          @click="selectedPolicy = policy"
+          @click="selectedPolicyName = policy.metadata.name"
         >
           <div class="flex flex-1 flex-col items-start truncate">
             <span class="truncate text-sm">
@@ -176,13 +210,13 @@ watch(
       <UppyUpload
         v-if="uploadVisible"
         endpoint="/apis/api.console.halo.run/v1alpha1/attachments/upload"
-        :disabled="!selectedPolicy"
-        :meta="{ 
-          policyName: selectedPolicy?.metadata.name as string,
-          groupName: groupName
+        :disabled="!selectedPolicyName"
+        :meta="{
+          policyName: selectedPolicyName,
+          groupName: selectedGroupName,
         }"
         :allowed-meta-fields="['policyName', 'groupName']"
-        :note="selectedPolicy ? '' : '请先选择存储策略'"
+        :note="selectedPolicyName ? '' : '请先选择存储策略'"
       />
     </div>
   </VModal>

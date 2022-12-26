@@ -298,7 +298,6 @@ onMounted(() => {
   </AttachmentDetailModal>
   <AttachmentUploadModal
     v-model:visible="uploadVisible"
-    :group="selectedGroup"
     @close="onUploadModalClose"
   />
   <AttachmentPoliciesModal v-model:visible="policyVisible" />
