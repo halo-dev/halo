@@ -23,8 +23,6 @@ interface Action {
   permissions?: string[];
 }
 
-const userStore = useUserStore();
-
 const router = useRouter();
 
 const themePreviewVisible = ref(false);
@@ -36,7 +34,7 @@ const actions: Action[] = [
     action: () => {
       router.push({
         name: "UserDetail",
-        params: { name: userStore.currentUser?.metadata.name },
+        params: { name: "-" },
       });
     },
   },

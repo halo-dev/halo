@@ -15,6 +15,9 @@ import { reset } from "@formkit/core";
 // hooks
 import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import { useUserStore } from "@/stores/user";
+
+const userStore = useUserStore();
 
 const props = withDefaults(
   defineProps<{
@@ -115,10 +118,16 @@ const handleCreateUser = async () => {
   try {
     saving.value = true;
     if (isUpdateMode.value) {
-      await apiClient.extension.user.updatev1alpha1User({
-        name: formState.value.metadata.name,
-        user: formState.value,
-      });
+      if (props.user?.metadata.name === userStore.currentUser?.metadata.name) {
+        await apiClient.user.updateCurrentUser({
+          user: formState.value,
+        });
+      } else {
+        await apiClient.extension.user.updatev1alpha1User({
+          name: formState.value.metadata.name,
+          user: formState.value,
+        });
+      }
     } else {
       await apiClient.extension.user.createv1alpha1User({
         user: formState.value,

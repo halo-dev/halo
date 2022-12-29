@@ -241,7 +241,7 @@ onMounted(generateMenus);
                   type="secondary"
                   :route="{
                     name: 'UserDetail',
-                    params: { name: userStore.currentUser?.metadata.name },
+                    params: { name: '-' },
                   }"
                 >
                   个人资料

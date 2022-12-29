@@ -8,11 +8,16 @@ import {
   VTabbar,
   VAvatar,
 } from "@halo-dev/components";
-import { onMounted, provide, ref, watch } from "vue";
+import { computed, onMounted, provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import type { User } from "@halo-dev/api-client";
 import UserEditingModal from "../components/UserEditingModal.vue";
 import UserPasswordChangeModal from "../components/UserPasswordChangeModal.vue";
+import { usePermission } from "@/utils/permission";
+import { useUserStore } from "@/stores/user";
+
+const { currentUserHasPermission } = usePermission();
+const userStore = useUserStore();
 
 const tabs = [
   {
@@ -35,14 +40,26 @@ const { params } = useRoute();
 
 const handleFetchUser = async () => {
   try {
-    const { data } = await apiClient.extension.user.getv1alpha1User({
-      name: params.name as string,
-    });
-    user.value = data;
+    if (params.name === "-") {
+      const { data } = await apiClient.user.getCurrentUserDetail();
+      user.value = data;
+    } else {
+      const { data } = await apiClient.extension.user.getv1alpha1User({
+        name: params.name as string,
+      });
+      user.value = data;
+    }
   } catch (e) {
     console.error(e);
   }
 };
+
+const isCurrentUser = computed(() => {
+  if (params.name === "-") {
+    return true;
+  }
+  return user.value?.metadata.name === userStore.currentUser?.metadata.name;
+});
 
 provide("user", user);
 
@@ -112,6 +129,10 @@ const handleTabChange = (id: string) => {
               <h2 class="text-gray-600">@{{ user?.metadata.name }}</h2>
             </div>
             <div
+              v-if="
+                currentUserHasPermission(['system:users:manage']) ||
+                isCurrentUser
+              "
               class="justify-stretch mt-6 hidden flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4 md:flex"
             >
               <FloatingDropdown>
