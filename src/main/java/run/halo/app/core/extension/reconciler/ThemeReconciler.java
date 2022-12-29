@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.FileSystemUtils;
@@ -40,6 +41,12 @@ public class ThemeReconciler implements Reconciler<Request> {
 
     private final ExtensionClient client;
     private final ThemePathPolicy themePathPolicy;
+
+    private final RetryTemplate retryTemplate = RetryTemplate.builder()
+        .maxAttempts(20)
+        .fixedBackoff(300)
+        .retryOn(IllegalStateException.class)
+        .build();
 
     public ThemeReconciler(ExtensionClient client, HaloProperties haloProperties) {
         this.client = client;
@@ -157,20 +164,39 @@ public class ThemeReconciler implements Reconciler<Request> {
         if (StringUtils.isNotBlank(settingName)) {
             client.fetch(Setting.class, settingName)
                 .ifPresent(client::delete);
+            retryTemplate.execute(callback -> {
+                client.fetch(Setting.class, settingName).ifPresent(setting -> {
+                    throw new IllegalStateException("Waiting for setting to be deleted.");
+                });
+                return null;
+            });
         }
         // delete annotation setting
         deleteAnnotationSettings(theme.getMetadata().getName());
     }
 
     private void deleteAnnotationSettings(String themeName) {
-        List<AnnotationSetting> result = client.list(AnnotationSetting.class, annotationSetting -> {
-            Map<String, String> labels = ExtensionUtil.nullSafeLabels(annotationSetting);
-            return themeName.equals(labels.get(Theme.THEME_NAME_LABEL));
-        }, null);
+        List<AnnotationSetting> result = listAnnotationSettingsByThemeName(themeName);
 
         for (AnnotationSetting annotationSetting : result) {
             client.delete(annotationSetting);
         }
+
+        retryTemplate.execute(callback -> {
+            List<AnnotationSetting> annotationSettings =
+                listAnnotationSettingsByThemeName(themeName);
+            if (annotationSettings.isEmpty()) {
+                return null;
+            }
+            throw new IllegalStateException("Waiting for annotation settings to be deleted.");
+        });
+    }
+
+    private List<AnnotationSetting> listAnnotationSettingsByThemeName(String themeName) {
+        return client.list(AnnotationSetting.class, annotationSetting -> {
+            Map<String, String> labels = ExtensionUtil.nullSafeLabels(annotationSetting);
+            return themeName.equals(labels.get(Theme.THEME_NAME_LABEL));
+        }, null);
     }
 
     private void deleteThemeFiles(Theme theme) {

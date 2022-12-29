@@ -1,5 +1,7 @@
 package run.halo.app.core.extension;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.LinkedHashSet;
@@ -23,6 +25,25 @@ public class MenuItem extends AbstractExtension {
     @Schema(description = "The status of menu item.")
     private MenuItemStatus status;
 
+    public enum Target {
+        BLANK("_blank"),
+        SELF("_self"),
+        PARENT("_parent"),
+        TOP("_top");
+
+        private final String value;
+
+        @JsonCreator
+        Target(String value) {
+            this.value = value;
+        }
+
+        @JsonValue
+        public String getValue() {
+            return value;
+        }
+    }
+
     @Data
     public static class MenuItemSpec {
 
@@ -31,6 +52,9 @@ public class MenuItem extends AbstractExtension {
 
         @Schema(description = "The href of this menu item.")
         private String href;
+
+        @Schema(description = "The <a> target attribute of this menu item.")
+        private Target target;
 
         @Schema(description = "The priority is for ordering.")
         private Integer priority;
