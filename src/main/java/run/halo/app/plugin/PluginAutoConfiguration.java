@@ -1,8 +1,13 @@
 package run.halo.app.plugin;
 
+import static run.halo.app.plugin.resources.BundleResourceUtils.getJsBundleResource;
+
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.ClassLoadingStrategy;
 import org.pf4j.CompoundPluginLoader;
@@ -22,13 +27,14 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
+import org.springframework.http.CacheControl;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import run.halo.app.plugin.resources.BundleResourceUtils;
+import reactor.core.publisher.Mono;
 
 /**
  * Plugin autoconfiguration for Spring Boot.
@@ -163,13 +169,20 @@ public class PluginAutoConfiguration {
                 String pluginName = request.pathVariable("name");
                 String fileName = request.pathVariable("resource");
 
-                Resource jsBundleResource =
-                    BundleResourceUtils.getJsBundleResource(haloPluginManager, pluginName,
-                        fileName);
-                if (jsBundleResource == null) {
+                var jsBundle = getJsBundleResource(haloPluginManager, pluginName, fileName);
+                if (jsBundle == null || !jsBundle.exists()) {
                     return ServerResponse.notFound().build();
                 }
-                return ServerResponse.ok().bodyValue(jsBundleResource);
+                try {
+                    var lastModified = Instant.ofEpochMilli(jsBundle.lastModified());
+                    return request.checkNotModified(lastModified)
+                        .switchIfEmpty(Mono.defer(() -> ServerResponse.ok()
+                                .cacheControl(CacheControl.maxAge(Duration.ofDays(365 / 2)))
+                                .lastModified(lastModified)
+                                .body(BodyInserters.fromResource(jsBundle))));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             })
             .build();
     }
