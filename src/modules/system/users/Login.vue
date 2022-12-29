@@ -12,12 +12,16 @@ onBeforeMount(() => {
     router.push({ name: "Dashboard" });
   }
 });
+
+function onLoginSucceed() {
+  window.location.reload();
+}
 </script>
 <template>
   <div class="flex h-screen flex-col items-center justify-center">
     <IconLogo class="mb-8" />
     <div class="login-form flex w-72 flex-col">
-      <LoginForm @succeed="router.go(0)" />
+      <LoginForm @succeed="onLoginSucceed" />
     </div>
   </div>
 </template>
