@@ -93,7 +93,7 @@ public class PostServiceImpl implements PostService {
         Predicate<Post> paramPredicate = post ->
             contains(query.getCategories(), post.getSpec().getCategories())
                 && contains(query.getTags(), post.getSpec().getTags())
-                && contains(query.getContributors(), post.getStatus().getContributors());
+                && contains(query.getContributors(), post.getStatusOrDefault().getContributors());
 
         String keyword = query.getKeyword();
         if (keyword != null) {
@@ -159,7 +159,7 @@ public class PostServiceImpl implements PostService {
             })
             .flatMap(lp -> setTags(post.getSpec().getTags(), lp))
             .flatMap(lp -> setCategories(post.getSpec().getCategories(), lp))
-            .flatMap(lp -> setContributors(post.getStatus().getContributors(), lp))
+            .flatMap(lp -> setContributors(post.getStatusOrDefault().getContributors(), lp))
             .flatMap(lp -> setOwner(post.getSpec().getOwner(), lp));
     }
 

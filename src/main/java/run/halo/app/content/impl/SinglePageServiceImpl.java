@@ -14,7 +14,6 @@ import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationContext;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -60,8 +59,6 @@ public class SinglePageServiceImpl implements SinglePageService {
     private final ReactiveExtensionClient client;
 
     private final CounterService counterService;
-
-    private final ApplicationContext applicationContext;
 
     @Override
     public Mono<ListResult<ListedSinglePage>> list(SinglePageQuery query) {
