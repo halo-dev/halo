@@ -11,12 +11,9 @@ import {
 } from "@halo-dev/components";
 import BasicLayout from "@/layouts/BasicLayout.vue";
 import { useRoute, useRouter } from "vue-router";
-import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
 
 const route = useRoute();
 const router = useRouter();
-
-const { editorProviders } = useEditorExtensionPoints();
 
 interface PageTab {
   id: string;
@@ -78,38 +75,7 @@ watchEffect(() => {
           <VButton :route="{ name: 'DeletedSinglePages' }" size="sm">
             回收站
           </VButton>
-          <FloatingDropdown
-            v-if="editorProviders.length > 1"
-            v-permission="['system:singlepages:manage']"
-          >
-            <VButton type="secondary">
-              <template #icon>
-                <IconAddCircle class="h-full w-full" />
-              </template>
-              新建
-            </VButton>
-            <template #popper>
-              <div class="w-48 p-2">
-                <VSpace class="w-full" direction="column">
-                  <VButton
-                    v-for="(editorProvider, index) in editorProviders"
-                    :key="index"
-                    v-close-popper
-                    block
-                    type="default"
-                    :route="{
-                      name: 'SinglePageEditor',
-                      query: { editor: editorProvider.name },
-                    }"
-                  >
-                    {{ editorProvider.displayName }}
-                  </VButton>
-                </VSpace>
-              </div>
-            </template>
-          </FloatingDropdown>
           <VButton
-            v-else
             v-permission="['system:singlepages:manage']"
             :route="{ name: 'SinglePageEditor' }"
             type="secondary"

@@ -22,20 +22,35 @@ import {
   toRef,
   type ComputedRef,
 } from "vue";
-import type { EditorProvider } from "@halo-dev/console-shared";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { useRouter } from "vue-router";
 import { randomUUID } from "@/utils/id";
 import { useContentCache } from "@/composables/use-content-cache";
-import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
+import {
+  useEditorExtensionPoints,
+  type EditorProvider,
+} from "@/composables/use-editor-extension-points";
+import { useLocalStorage } from "@vueuse/core";
+import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
 
 const router = useRouter();
 
+// Editor providers
 const { editorProviders } = useEditorExtensionPoints();
 const currentEditorProvider = ref<EditorProvider>();
+const storedEditorProviderName = useLocalStorage("editor-provider-name", "");
 
+const handleChangeEditorProvider = (provider: EditorProvider) => {
+  currentEditorProvider.value = provider;
+  storedEditorProviderName.value = provider.name;
+  formState.value.post.metadata.annotations = {
+    "content.halo.run/preferred-editor": provider.name,
+  };
+};
+
+// Post form
 const initialFormState: PostRequest = {
   post: {
     spec: {
@@ -254,6 +269,7 @@ const handleOpenSettingModal = async () => {
   settingModal.value = true;
 };
 
+// Post settings
 const onSettingSaved = (post: Post) => {
   // Set route query parameter
   if (!isUpdateMode.value) {
@@ -276,7 +292,6 @@ const onSettingPublished = (post: Post) => {
 
 // Get post data when the route contains the name parameter
 const name = useRouteQuery("name");
-const editor = useRouteQuery("editor");
 onMounted(async () => {
   if (name.value) {
     // fetch post
@@ -292,7 +307,7 @@ onMounted(async () => {
     // Set default editor
     const provider =
       editorProviders.value.find(
-        (provider) => provider.name === editor.value
+        (provider) => provider.name === storedEditorProviderName.value
       ) || editorProviders.value[0];
 
     if (provider) {
@@ -307,6 +322,7 @@ onMounted(async () => {
   handleResetCache();
 });
 
+// Post content cache
 const { handleSetContentCache, handleResetCache, handleClearCache } =
   useContentCache(
     "post-content-cache",
@@ -331,6 +347,12 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     </template>
     <template #actions>
       <VSpace>
+        <EditorProviderSelector
+          v-if="editorProviders.length > 1 && !isUpdateMode"
+          :provider="currentEditorProvider"
+          @select="handleChangeEditorProvider"
+        />
+
         <!-- TODO: add preview post support -->
         <VButton
           v-if="false"

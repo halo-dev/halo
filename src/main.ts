@@ -145,7 +145,10 @@ async function loadPluginModules() {
 
         if (pluginModule) {
           registerModule(pluginModule, false);
-          pluginModuleStore.registerPluginModule(pluginModule);
+          pluginModuleStore.registerPluginModule({
+            ...pluginModule,
+            extension: plugin,
+          });
         }
       } catch (e) {
         const message = `${plugin.metadata.name}: 加载插件入口文件失败`;

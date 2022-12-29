@@ -1,5 +1,10 @@
 import { defineStore } from "pinia";
-import type { PluginModule } from "@halo-dev/console-shared";
+import type { PluginModule as PluginModuleRaw } from "@halo-dev/console-shared";
+import type { Plugin } from "@halo-dev/api-client";
+
+export interface PluginModule extends PluginModuleRaw {
+  extension: Plugin;
+}
 
 interface PluginStoreState {
   pluginModules: PluginModule[];

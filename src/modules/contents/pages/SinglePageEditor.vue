@@ -28,14 +28,29 @@ import cloneDeep from "lodash.clonedeep";
 import { useRouter } from "vue-router";
 import { randomUUID } from "@/utils/id";
 import { useContentCache } from "@/composables/use-content-cache";
-import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
-import type { EditorProvider } from "@halo-dev/console-shared";
+import {
+  useEditorExtensionPoints,
+  type EditorProvider,
+} from "@/composables/use-editor-extension-points";
+import { useLocalStorage } from "@vueuse/core";
+import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
 
 const router = useRouter();
 
+// Editor providers
 const { editorProviders } = useEditorExtensionPoints();
 const currentEditorProvider = ref<EditorProvider>();
+const storedEditorProviderName = useLocalStorage("editor-provider-name", "");
 
+const handleChangeEditorProvider = (provider: EditorProvider) => {
+  currentEditorProvider.value = provider;
+  storedEditorProviderName.value = provider.name;
+  formState.value.page.metadata.annotations = {
+    "content.halo.run/preferred-editor": provider.name,
+  };
+};
+
+// SinglePage form
 const initialFormState: SinglePageRequest = {
   page: {
     spec: {
@@ -238,6 +253,7 @@ const handleFetchContent = async () => {
   formState.value.content = Object.assign(formState.value.content, data);
 };
 
+// SinglePage settings
 const handleOpenSettingModal = async () => {
   const { data: latestSinglePage } =
     await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
@@ -267,7 +283,6 @@ const onSettingPublished = (singlePage: SinglePage) => {
   handlePublish();
 };
 
-const editor = useRouteQuery("editor");
 onMounted(async () => {
   if (routeQueryName.value) {
     const { data: singlePage } =
@@ -282,7 +297,7 @@ onMounted(async () => {
     // Set default editor
     const provider =
       editorProviders.value.find(
-        (provider) => provider.name === editor.value
+        (provider) => provider.name === storedEditorProviderName.value
       ) || editorProviders.value[0];
     if (provider) {
       currentEditorProvider.value = provider;
@@ -296,6 +311,7 @@ onMounted(async () => {
   handleResetCache();
 });
 
+// SinglePage content cache
 const { handleSetContentCache, handleResetCache, handleClearCache } =
   useContentCache(
     "singlePage-content-cache",
@@ -320,6 +336,12 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     </template>
     <template #actions>
       <VSpace>
+        <EditorProviderSelector
+          v-if="editorProviders.length > 1 && !isUpdateMode"
+          :provider="currentEditorProvider"
+          @select="handleChangeEditorProvider"
+        />
+
         <!-- TODO: add preview single page support -->
         <VButton
           v-if="false"
