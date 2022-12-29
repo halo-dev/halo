@@ -31,7 +31,7 @@ rules:
   - apiGroups: [ "api.console.halo.run" ]
     resources: [ "users" ]
     resourceNames: [ "-" ]
-    verbs: [ "list", "get" ]
+    verbs: [ "get", "update" ]
 ---
 apiVersion: v1alpha1
 kind: "Role"
