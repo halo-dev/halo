@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -26,6 +27,7 @@ import org.thymeleaf.templateresolver.StringTemplateResolver;
 import org.thymeleaf.templateresource.ITemplateResource;
 import org.thymeleaf.templateresource.StringTemplateResource;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
@@ -35,6 +37,7 @@ import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.SinglePageFinder;
 import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.finders.vo.UserVo;
 import run.halo.app.theme.router.strategy.ModelConst;
 
 /**
@@ -88,7 +91,7 @@ class HaloProcessorDialectTest {
         codeInjection.setContentHead("<meta name=\"content-head-test\" content=\"test\" />");
         codeInjection.setGlobalHead("<meta name=\"global-head-test\" content=\"test\" />");
         codeInjection.setFooter("<footer>hello this is global footer.</footer>");
-        when(fetcher.fetch(eq(SystemSetting.CodeInjection.GROUP),
+        lenient().when(fetcher.fetch(eq(SystemSetting.CodeInjection.GROUP),
             eq(SystemSetting.CodeInjection.class))).thenReturn(Mono.just(codeInjection));
 
         lenient().when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
@@ -96,10 +99,10 @@ class HaloProcessorDialectTest {
         lenient().when(fetcher.fetch(eq(SystemSetting.Seo.GROUP),
             eq(SystemSetting.Seo.class))).thenReturn(Mono.empty());
 
-        when(applicationContext.getBean(eq(ExtensionComponentsFinder.class)))
+        lenient().when(applicationContext.getBean(eq(ExtensionComponentsFinder.class)))
             .thenReturn(extensionComponentsFinder);
 
-        when(extensionComponentsFinder.getExtensions(eq(TemplateHeadProcessor.class)))
+        lenient().when(extensionComponentsFinder.getExtensions(eq(TemplateHeadProcessor.class)))
             .thenReturn(new ArrayList<>(map.values()));
     }
 
@@ -242,6 +245,78 @@ class HaloProcessorDialectTest {
             """);
     }
 
+    @Nested
+    class AnnotationExpressionObjectFactoryTest {
+
+        @Test
+        void getWhenAnnotationsIsNull() {
+            Context context = getContext();
+            context.setVariable("user", createUser());
+
+            String result = templateEngine.process("annotationsGetExpression", context);
+            assertThat(result).isEqualTo("<p></p>\n");
+        }
+
+        @Test
+        void getWhenAnnotationsExists() {
+            Context context = getContext();
+            UserVo user = createUser();
+            user.getMetadata().setAnnotations(Map.of("background", "fake-background"));
+            context.setVariable("user", user);
+
+            String result = templateEngine.process("annotationsGetExpression", context);
+            assertThat(result).isEqualTo("<p>fake-background</p>\n");
+        }
+
+        @Test
+        void getOrDefaultWhenAnnotationsIsNull() {
+            Context context = getContext();
+            UserVo user = createUser();
+            user.getMetadata().setAnnotations(Map.of("background", "red"));
+            context.setVariable("user", user);
+
+            String result = templateEngine.process("annotationsGetOrDefaultExpression", context);
+            assertThat(result).isEqualTo("<p>red</p>\n");
+        }
+
+        @Test
+        void getOrDefaultWhenAnnotationsExists() {
+            Context context = getContext();
+            context.setVariable("user", createUser());
+
+            String result = templateEngine.process("annotationsGetOrDefaultExpression", context);
+            assertThat(result).isEqualTo("<p>default-value</p>\n");
+        }
+
+        @Test
+        void containsWhenAnnotationsIsNull() {
+            Context context = getContext();
+            context.setVariable("user", createUser());
+
+            String result = templateEngine.process("annotationsContainsExpression", context);
+            assertThat(result).isEqualTo("<p>false</p>\n");
+        }
+
+        @Test
+        void containsWhenAnnotationsIsNotNull() {
+            Context context = getContext();
+            UserVo user = createUser();
+            user.getMetadata().setAnnotations(Map.of("background", ""));
+            context.setVariable("user", user);
+
+            String result = templateEngine.process("annotationsContainsExpression", context);
+            assertThat(result).isEqualTo("<p>true</p>\n");
+        }
+
+        UserVo createUser() {
+            User user = new User();
+            user.setMetadata(new Metadata());
+            user.getMetadata().setName("fake-user");
+            user.setSpec(new User.UserSpec());
+            return UserVo.from(user);
+        }
+    }
+
     private Context getContext() {
         Context context = new Context();
         context.setVariable(
@@ -265,6 +340,16 @@ class HaloProcessorDialectTest {
 
             if (template.equals("seo")) {
                 return new StringTemplateResource(seoTemplate());
+            }
+
+            if (template.equals("annotationsGetExpression")) {
+                return new StringTemplateResource(annotationsGetExpression());
+            }
+            if (template.equals("annotationsGetOrDefaultExpression")) {
+                return new StringTemplateResource(annotationsGetOrDefaultExpression());
+            }
+            if (template.equals("annotationsContainsExpression")) {
+                return new StringTemplateResource(annotationsContainsExpression());
             }
             return null;
         }
@@ -314,6 +399,24 @@ class HaloProcessorDialectTest {
                     seo setting test.
                   </body>
                 </html>
+                """;
+        }
+
+        private String annotationsGetExpression() {
+            return """
+                <p th:text="${#annotations.get(user, 'background')}"></p>
+                """;
+        }
+
+        private String annotationsGetOrDefaultExpression() {
+            return """
+                <p th:text="${#annotations.getOrDefault(user, 'background', 'default-value')}"></p>
+                """;
+        }
+
+        private String annotationsContainsExpression() {
+            return """
+                <p th:text="${#annotations.contains(user, 'background')}"></p>
                 """;
         }
     }

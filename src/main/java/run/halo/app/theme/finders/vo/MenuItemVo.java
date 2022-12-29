@@ -17,7 +17,7 @@ import run.halo.app.extension.MetadataOperator;
 @Data
 @ToString
 @Builder
-public class MenuItemVo implements VisualizableTreeNode<MenuItemVo> {
+public class MenuItemVo implements VisualizableTreeNode<MenuItemVo>, ExtensionVoOperator {
 
     MetadataOperator metadata;
 

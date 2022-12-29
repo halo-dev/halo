@@ -15,7 +15,7 @@ import run.halo.app.extension.MetadataOperator;
 @Value
 @Builder
 @EqualsAndHashCode
-public class CategoryVo {
+public class CategoryVo implements ExtensionVoOperator {
 
     MetadataOperator metadata;
 

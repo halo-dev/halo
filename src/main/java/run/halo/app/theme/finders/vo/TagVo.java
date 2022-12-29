@@ -10,7 +10,7 @@ import run.halo.app.extension.MetadataOperator;
  */
 @Value
 @Builder
-public class TagVo {
+public class TagVo implements ExtensionVoOperator {
 
     MetadataOperator metadata;
 
