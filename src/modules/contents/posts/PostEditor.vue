@@ -221,6 +221,14 @@ const handleFetchContent = async () => {
         ...formState.value.post.metadata.annotations,
         "content.halo.run/preferred-editor": provider.name,
       };
+
+      const { data } =
+        await apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
+          name: formState.value.post.metadata.name,
+          post: formState.value.post,
+        });
+
+      formState.value.post = data;
     } else {
       Dialog.warning({
         title: "警告",

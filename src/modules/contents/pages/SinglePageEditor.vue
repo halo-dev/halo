@@ -213,6 +213,16 @@ const handleFetchContent = async () => {
         ...formState.value.page.metadata.annotations,
         "content.halo.run/preferred-editor": provider.name,
       };
+
+      const { data } =
+        await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+          {
+            name: formState.value.page.metadata.name,
+            singlePage: formState.value.page,
+          }
+        );
+
+      formState.value.page = data;
     } else {
       Dialog.warning({
         title: "警告",
