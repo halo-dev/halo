@@ -34,6 +34,7 @@ const initialFormState: MenuItem = {
   spec: {
     displayName: "",
     href: "",
+    target: "_self",
     children: [],
     priority: 0,
   },
@@ -326,6 +327,31 @@ const onMenuItemSourceChange = () => {
               :label="selectedRef.label"
               :type="selectedRef.inputType"
               validation="required"
+            />
+
+            <FormKit
+              v-model="formState.spec.target"
+              label="打开方式"
+              type="select"
+              name="target"
+              :options="[
+                {
+                  label: '当前窗口',
+                  value: '_self',
+                },
+                {
+                  label: '新窗口',
+                  value: '_blank',
+                },
+                {
+                  label: '父窗口',
+                  value: '_parent',
+                },
+                {
+                  label: '顶级窗口',
+                  value: '_top',
+                },
+              ]"
             />
           </div>
         </div>
