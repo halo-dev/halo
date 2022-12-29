@@ -99,6 +99,65 @@ class UserEndpointTest {
     }
 
     @Nested
+    @DisplayName("UpdateProfile")
+    class UpdateProfileTest {
+
+        @Test
+        void shouldUpdateProfileCorrectly() {
+            var currentUser = createUser("fake-user");
+            var updatedUser = createUser("fake-user");
+            var requestUser = createUser("fake-user");
+
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
+            when(client.update(currentUser)).thenReturn(Mono.just(updatedUser));
+
+            webClient.put().uri("/apis/api.console.halo.run/v1alpha1/users/-")
+                .bodyValue(requestUser)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(User.class)
+                .isEqualTo(updatedUser);
+
+            verify(client).get(User.class, "fake-user");
+            verify(client).update(currentUser);
+        }
+
+        @Test
+        void shouldGetErrorIfUsernameMismatch() {
+            var currentUser = createUser("fake-user");
+            var updatedUser = createUser("fake-user");
+            var requestUser = createUser("another-fake-user");
+
+            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
+            when(client.update(currentUser)).thenReturn(Mono.just(updatedUser));
+
+            webClient.put().uri("/apis/api.console.halo.run/v1alpha1/users/-")
+                .bodyValue(requestUser)
+                .exchange()
+                .expectStatus().isBadRequest();
+
+            verify(client).get(User.class, "fake-user");
+            verify(client, never()).update(currentUser);
+        }
+
+        User createUser(String name) {
+            var spec = new User.UserSpec();
+            spec.setEmail("hi@halo.run");
+            spec.setBio("Fake bio");
+            spec.setDisplayName("Faker");
+            spec.setPassword("fake-password");
+
+            var metadata = new Metadata();
+            metadata.setName(name);
+
+            var user = new User();
+            user.setSpec(spec);
+            user.setMetadata(metadata);
+            return user;
+        }
+    }
+
+    @Nested
     @DisplayName("ChangePassword")
     class ChangePasswordTest {
 

@@ -16,7 +16,9 @@ import java.util.stream.Collectors;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -52,6 +54,12 @@ public class UserEndpoint implements CustomEndpoint {
                 .description("Get current user detail")
                 .tag(tag)
                 .response(responseBuilder().implementation(User.class)))
+            .PUT("/users/-", this::updateProfile,
+                builder -> builder.operationId("UpdateCurrentUser")
+                    .description("Update current user profile, but password.")
+                    .tag(tag)
+                    .requestBody(requestBodyBuilder().required(true).implementation(User.class))
+                    .response(responseBuilder().implementation(User.class)))
             .POST("/users/{name}/permissions", this::grantPermission,
                 builder -> builder.operationId("GrantPermission")
                     .description("Grant permissions to user")
@@ -87,6 +95,32 @@ public class UserEndpoint implements CustomEndpoint {
                         .implementation(User.class))
             )
             .build();
+    }
+
+    private Mono<ServerResponse> updateProfile(ServerRequest request) {
+        return ReactiveSecurityContextHolder.getContext()
+            .map(SecurityContext::getAuthentication)
+            .map(Authentication::getName)
+            .flatMap(currentUserName -> client.get(User.class, currentUserName))
+            .flatMap(currentUser -> request.bodyToMono(User.class)
+                .filter(user ->
+                    Objects.equals(user.getMetadata().getName(),
+                        currentUser.getMetadata().getName()))
+                .switchIfEmpty(
+                    Mono.error(() -> new ServerWebInputException("Username didn't match.")))
+                .map(user -> {
+                    var spec = currentUser.getSpec();
+                    var newSpec = user.getSpec();
+                    spec.setAvatar(newSpec.getAvatar());
+                    spec.setBio(newSpec.getBio());
+                    spec.setDisplayName(newSpec.getDisplayName());
+                    spec.setTwoFactorAuthEnabled(newSpec.getTwoFactorAuthEnabled());
+                    spec.setEmail(newSpec.getEmail());
+                    spec.setPhone(newSpec.getPhone());
+                    return currentUser;
+                }))
+            .flatMap(client::update)
+            .flatMap(updatedUser -> ServerResponse.ok().bodyValue(updatedUser));
     }
 
     Mono<ServerResponse> changePassword(ServerRequest request) {
