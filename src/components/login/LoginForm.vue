@@ -90,9 +90,6 @@ onMounted(() => {
       type="text"
       validation="required"
     >
-      <template #prefixIcon>
-        <IconUserLine />
-      </template>
     </FormKit>
     <FormKit
       id="passwordInput"
@@ -104,9 +101,6 @@ onMounted(() => {
       type="password"
       validation="required"
     >
-      <template #prefixIcon>
-        <IconShieldUser />
-      </template>
     </FormKit>
   </FormKit>
   <VButton
