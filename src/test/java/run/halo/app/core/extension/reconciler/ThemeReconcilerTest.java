@@ -1,6 +1,7 @@
 package run.halo.app.core.extension.reconciler;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.json.JSONException;
@@ -23,7 +25,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.retry.RetryException;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ResourceUtils;
 import run.halo.app.core.extension.AnnotationSetting;
@@ -32,6 +36,7 @@ import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.JsonUtils;
@@ -105,12 +110,98 @@ class ThemeReconcilerTest {
         themeReconciler.reconcile(new Reconciler.Request(metadata.getName()));
 
         verify(extensionClient, times(2)).fetch(eq(Theme.class), eq(metadata.getName()));
-        verify(extensionClient, times(1)).fetch(eq(Setting.class), eq(themeSpec.getSettingName()));
+        verify(extensionClient, times(2)).fetch(eq(Setting.class), eq(themeSpec.getSettingName()));
 
-        verify(extensionClient, times(1)).list(eq(AnnotationSetting.class), any(), any());
+        verify(extensionClient, times(2)).list(eq(AnnotationSetting.class), any(), any());
 
         assertThat(Files.exists(testWorkDir)).isTrue();
         assertThat(Files.exists(defaultThemePath)).isFalse();
+    }
+
+    @Test
+    void reconcileDeleteRetry() {
+        Theme theme = fakeTheme();
+        final MetadataOperator metadata = theme.getMetadata();
+
+        Path testWorkDir = tempDirectory.resolve("reconcile-delete");
+        when(haloProperties.getWorkDir()).thenReturn(testWorkDir);
+
+        final ThemeReconciler themeReconciler =
+            new ThemeReconciler(extensionClient, haloProperties);
+
+        final int[] retryFlags = {0, 0};
+        when(extensionClient.fetch(eq(Setting.class), eq("theme-test-setting")))
+            .thenAnswer((Answer<Optional<Setting>>) invocation -> {
+                retryFlags[0]++;
+                // retry 2 times
+                if (retryFlags[0] < 3) {
+                    return Optional.of(new Setting());
+                }
+                return Optional.empty();
+            });
+
+        when(extensionClient.list(eq(AnnotationSetting.class), any(), eq(null)))
+            .thenAnswer((Answer<List<AnnotationSetting>>) invocation -> {
+                retryFlags[1]++;
+                // retry 2 times
+                if (retryFlags[1] < 3) {
+                    return List.of(new AnnotationSetting());
+                }
+                return List.of();
+            });
+
+        themeReconciler.reconcile(new Reconciler.Request(metadata.getName()));
+
+        String settingName = theme.getSpec().getSettingName();
+        verify(extensionClient, times(2)).fetch(eq(Theme.class), eq(metadata.getName()));
+        verify(extensionClient, times(3)).fetch(eq(Setting.class), eq(settingName));
+        verify(extensionClient, times(3)).list(eq(AnnotationSetting.class), any(), eq(null));
+    }
+
+    @Test
+    void reconcileDeleteRetryWhenThrowException() {
+        Theme theme = fakeTheme();
+
+        Path testWorkDir = tempDirectory.resolve("reconcile-delete");
+        when(haloProperties.getWorkDir()).thenReturn(testWorkDir);
+
+        final ThemeReconciler themeReconciler =
+            new ThemeReconciler(extensionClient, haloProperties);
+
+        final int[] retryFlags = {0};
+        when(extensionClient.fetch(eq(Setting.class), eq("theme-test-setting")))
+            .thenAnswer((Answer<Optional<Setting>>) invocation -> {
+                retryFlags[0]++;
+                // retry 2 times
+                if (retryFlags[0] < 2) {
+                    return Optional.of(new Setting());
+                }
+                throw new RetryException("retry exception.");
+            });
+
+        String settingName = theme.getSpec().getSettingName();
+        assertThatThrownBy(
+            () -> themeReconciler.reconcile(new Reconciler.Request(theme.getMetadata().getName())))
+            .isInstanceOf(RetryException.class)
+            .hasMessage("retry exception.");
+
+        verify(extensionClient, times(2)).fetch(eq(Setting.class), eq(settingName));
+    }
+
+    private Theme fakeTheme() {
+        Theme theme = new Theme();
+        Metadata metadata = new Metadata();
+        metadata.setName("theme-test");
+        metadata.setDeletionTimestamp(Instant.now());
+        theme.setMetadata(metadata);
+        theme.setKind(Theme.KIND);
+        theme.setApiVersion("theme.halo.run/v1alpha1");
+        Theme.ThemeSpec themeSpec = new Theme.ThemeSpec();
+        themeSpec.setSettingName("theme-test-setting");
+        theme.setSpec(themeSpec);
+        when(extensionClient.fetch(eq(Theme.class), eq(metadata.getName())))
+            .thenReturn(Optional.of(theme));
+        return theme;
     }
 
     @Test
@@ -169,10 +260,10 @@ class ThemeReconcilerTest {
         ConfigMap defaultValueConfigMap = configMapCaptor.getValue();
         Map<String, String> data = defaultValueConfigMap.getData();
         JSONAssert.assertEquals("""
-            {
-                "sns": "{\\"email\\":\\"example@exmple.com\\"}"
-            }
-            """,
+                {
+                    "sns": "{\\"email\\":\\"example@exmple.com\\"}"
+                }
+                """,
             JsonUtils.objectToJson(data),
             true);
     }

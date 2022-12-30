@@ -20,7 +20,7 @@ import run.halo.app.extension.MetadataOperator;
 @Builder
 @ToString
 @EqualsAndHashCode
-public class CategoryTreeVo implements VisualizableTreeNode<CategoryTreeVo> {
+public class CategoryTreeVo implements VisualizableTreeNode<CategoryTreeVo>, ExtensionVoOperator {
 
     private MetadataOperator metadata;
 

@@ -19,7 +19,7 @@ import run.halo.app.extension.MetadataOperator;
 @SuperBuilder
 @ToString
 @EqualsAndHashCode
-public class ListedSinglePageVo {
+public class ListedSinglePageVo implements ExtensionVoOperator {
 
     private MetadataOperator metadata;
 
