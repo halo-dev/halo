@@ -20,7 +20,7 @@ import run.halo.app.extension.MetadataOperator;
 @Builder
 @ToString
 @EqualsAndHashCode
-public class ReplyVo {
+public class ReplyVo implements ExtensionVoOperator {
 
     @Schema(required = true)
     MetadataOperator metadata;

@@ -19,7 +19,7 @@ import run.halo.app.extension.MetadataOperator;
 @SuperBuilder
 @ToString
 @EqualsAndHashCode
-public class ListedPostVo {
+public class ListedPostVo implements ExtensionVoOperator {
 
     private MetadataOperator metadata;
 

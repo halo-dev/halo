@@ -18,7 +18,7 @@ import run.halo.app.extension.MetadataOperator;
 @Value
 @Builder
 @EqualsAndHashCode
-public class CommentVo {
+public class CommentVo implements ExtensionVoOperator {
 
     @Schema(required = true)
     MetadataOperator metadata;

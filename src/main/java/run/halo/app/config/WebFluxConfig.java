@@ -8,7 +8,6 @@ import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -105,7 +104,7 @@ public class WebFluxConfig implements WebFluxConfigurer {
         var indexResource = applicationContext.getResource(indexLocation);
         try {
             return ServerResponse.ok()
-                .lastModified(Instant.ofEpochMilli(indexResource.lastModified()))
+                .cacheControl(CacheControl.noStore())
                 .body(BodyInserters.fromResource(indexResource));
         } catch (Throwable e) {
             return Mono.error(e);
@@ -119,16 +118,19 @@ public class WebFluxConfig implements WebFluxConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         var attachmentsRoot = haloProp.getWorkDir().resolve("attachments");
+        var cacheControl = CacheControl.maxAge(Duration.ofDays(365 / 2));
 
         // Mandatory resource mapping
         var uploadRegistration = registry.addResourceHandler("/upload/**")
             .addResourceLocations(FILE_URL_PREFIX + attachmentsRoot.resolve("upload") + "/")
             .setUseLastModified(true)
-            .setCacheControl(CacheControl.maxAge(Duration.ofDays(365)));
+            .setCacheControl(cacheControl);
 
         // For console project
         registry.addResourceHandler("/console/**")
             .addResourceLocations(haloProp.getConsole().getLocation())
+            .setCacheControl(cacheControl)
+            .setUseLastModified(true)
             .resourceChain(true)
             .addResolver(new EncodedResourceResolver())
             .addResolver(new PathResourceResolver());
@@ -145,7 +147,9 @@ public class WebFluxConfig implements WebFluxConfigurer {
             staticResource.getLocations().forEach(location -> {
                 var path = attachmentsRoot.resolve(location);
                 checkDirectoryTraversal(attachmentsRoot, path);
-                registration.addResourceLocations(FILE_URL_PREFIX + path + "/");
+                registration.addResourceLocations(FILE_URL_PREFIX + path + "/")
+                    .setCacheControl(cacheControl)
+                    .setUseLastModified(true);
             });
         });
 

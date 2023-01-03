@@ -10,7 +10,7 @@ import run.halo.app.infra.utils.JsonUtils;
 
 @Value
 @Builder
-public class UserVo {
+public class UserVo implements ExtensionVoOperator {
     MetadataOperator metadata;
 
     User.UserSpec spec;

@@ -18,7 +18,7 @@ import run.halo.app.extension.MetadataOperator;
 @Value
 @ToString
 @Builder
-public class MenuVo {
+public class MenuVo implements ExtensionVoOperator {
 
     MetadataOperator metadata;
 
