@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -127,9 +128,9 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
                 SinglePage.SinglePageStatus status = page.getStatusOrDefault();
 
                 // validate release snapshot
-                boolean present = client.fetch(Snapshot.class, releaseSnapshot)
-                    .isPresent();
-                if (!present) {
+                Optional<Snapshot> releasedSnapshotOpt =
+                    client.fetch(Snapshot.class, releaseSnapshot);
+                if (releasedSnapshotOpt.isEmpty()) {
                     Condition condition = Condition.builder()
                         .type(Post.PostPhase.FAILED.name())
                         .reason("SnapshotNotFound")
@@ -160,6 +161,9 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
                 if (page.getSpec().getPublishTime() == null) {
                     page.getSpec().setPublishTime(Instant.now());
                 }
+
+                // populate lastModifyTime
+                status.setLastModifyTime(releasedSnapshotOpt.get().getSpec().getLastModifyTime());
 
                 client.update(page);
             });

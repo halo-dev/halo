@@ -7,16 +7,19 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationContext;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentService;
@@ -26,6 +29,7 @@ import run.halo.app.content.TestPost;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Snapshot;
+import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
 
@@ -47,6 +51,9 @@ class PostReconcilerTest {
 
     @Mock
     private PostService postService;
+
+    @Mock
+    private ApplicationContext applicationContext;
 
     @InjectMocks
     private PostReconciler postReconciler;
@@ -118,5 +125,69 @@ class PostReconcilerTest {
         verify(client, times(4)).update(captor.capture());
         Post value = captor.getValue();
         assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");
+    }
+
+    @Nested
+    class LastModifyTimeTest {
+        @Test
+        void reconcileLastModifyTimeWhenPostIsPublished() {
+            String name = "post-A";
+            Post post = TestPost.postV1();
+            post.getSpec().setPublish(true);
+            post.getSpec().setHeadSnapshot("post-A-head-snapshot");
+            post.getSpec().setReleaseSnapshot("post-fake-released-snapshot");
+            when(client.fetch(eq(Post.class), eq(name)))
+                .thenReturn(Optional.of(post));
+            when(contentService.getContent(eq(post.getSpec().getReleaseSnapshot())))
+                .thenReturn(Mono.just(ContentWrapper.builder()
+                    .snapshotName(post.getSpec().getHeadSnapshot())
+                    .raw("hello world")
+                    .content("<p>hello world</p>")
+                    .rawType("markdown")
+                    .build()));
+            Instant lastModifyTime = Instant.now();
+            Snapshot snapshotV2 = TestPost.snapshotV2();
+            snapshotV2.getSpec().setLastModifyTime(lastModifyTime);
+            when(client.fetch(eq(Snapshot.class), eq(post.getSpec().getReleaseSnapshot())))
+                .thenReturn(Optional.of(snapshotV2));
+
+            when(contentService.listSnapshots(any()))
+                .thenReturn(Flux.empty());
+
+            ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
+            postReconciler.reconcile(new Reconciler.Request(name));
+
+            verify(client, times(4)).update(captor.capture());
+            Post value = captor.getValue();
+            assertThat(value.getStatus().getLastModifyTime()).isEqualTo(lastModifyTime);
+            verify(applicationContext).publishEvent(any(PostPublishedEvent.class));
+        }
+
+        @Test
+        void reconcileLastModifyTimeWhenPostIsNotPublished() {
+            String name = "post-A";
+            Post post = TestPost.postV1();
+            post.getSpec().setPublish(false);
+            post.getSpec().setHeadSnapshot("post-A-head-snapshot");
+            when(client.fetch(eq(Post.class), eq(name)))
+                .thenReturn(Optional.of(post));
+            when(contentService.getContent(eq(post.getSpec().getReleaseSnapshot())))
+                .thenReturn(Mono.just(ContentWrapper.builder()
+                    .snapshotName(post.getSpec().getHeadSnapshot())
+                    .raw("hello world")
+                    .content("<p>hello world</p>")
+                    .rawType("markdown")
+                    .build()));
+
+            when(contentService.listSnapshots(any()))
+                .thenReturn(Flux.empty());
+
+            ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
+            postReconciler.reconcile(new Reconciler.Request(name));
+
+            verify(client, times(3)).update(captor.capture());
+            Post value = captor.getValue();
+            assertThat(value.getStatus().getLastModifyTime()).isNull();
+        }
     }
 }
