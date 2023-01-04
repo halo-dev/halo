@@ -369,6 +369,12 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
                     status.setInProgress(!StringUtils.equals(releaseSnapshot, headSnapshot));
                 });
 
+            if (singlePage.isPublished() && status.getLastModifyTime() == null) {
+                client.fetch(Snapshot.class, singlePage.getSpec().getReleaseSnapshot())
+                    .ifPresent(releasedSnapshot ->
+                        status.setLastModifyTime(releasedSnapshot.getSpec().getLastModifyTime()));
+            }
+
             if (!oldPage.equals(singlePage)) {
                 client.update(singlePage);
             }

@@ -303,6 +303,12 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                         !StringUtils.equals(headSnapshot, post.getSpec().getReleaseSnapshot()));
                 });
 
+            if (post.isPublished() && status.getLastModifyTime() == null) {
+                client.fetch(Snapshot.class, post.getSpec().getReleaseSnapshot())
+                    .ifPresent(releasedSnapshot ->
+                        status.setLastModifyTime(releasedSnapshot.getSpec().getLastModifyTime()));
+            }
+
             if (!oldPost.equals(post)) {
                 client.update(post);
             }
