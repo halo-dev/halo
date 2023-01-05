@@ -10,9 +10,11 @@ import static org.mockito.Mockito.when;
 import static run.halo.app.content.TestPost.snapshotV1;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -121,6 +123,74 @@ class SinglePageReconcilerTest {
         page.getSpec().setSlug("中文 slug");
         permalink = singlePageReconciler.createPermalink(page);
         assertThat(permalink).isEqualTo("http://example.com/%E4%B8%AD%E6%96%87%20slug");
+    }
+
+    @Nested
+    class LastModifyTimeTest {
+        @Test
+        void reconcileLastModifyTimeWhenPageIsPublished() {
+            String name = "page-A";
+            when(externalUrlSupplier.get()).thenReturn(URI.create(""));
+
+            SinglePage page = pageV1();
+            page.getSpec().setPublish(true);
+            page.getSpec().setHeadSnapshot("page-A-head-snapshot");
+            page.getSpec().setReleaseSnapshot("page-fake-released-snapshot");
+            when(client.fetch(eq(SinglePage.class), eq(name)))
+                .thenReturn(Optional.of(page));
+            when(contentService.getContent(eq(page.getSpec().getHeadSnapshot())))
+                .thenReturn(Mono.just(ContentWrapper.builder()
+                    .snapshotName(page.getSpec().getHeadSnapshot())
+                    .raw("hello world")
+                    .content("<p>hello world</p>")
+                    .rawType("markdown")
+                    .build())
+                );
+            Instant lastModifyTime = Instant.now();
+            Snapshot snapshotV2 = TestPost.snapshotV2();
+            snapshotV2.getSpec().setLastModifyTime(lastModifyTime);
+            when(client.fetch(eq(Snapshot.class), eq(page.getSpec().getReleaseSnapshot())))
+                .thenReturn(Optional.of(snapshotV2));
+
+            when(contentService.listSnapshots(any()))
+                .thenReturn(Flux.empty());
+
+            ArgumentCaptor<SinglePage> captor = ArgumentCaptor.forClass(SinglePage.class);
+            singlePageReconciler.reconcile(new Reconciler.Request(name));
+
+            verify(client, times(4)).update(captor.capture());
+            SinglePage value = captor.getValue();
+            assertThat(value.getStatus().getLastModifyTime()).isEqualTo(lastModifyTime);
+        }
+
+        @Test
+        void reconcileLastModifyTimeWhenPageIsNotPublished() {
+            String name = "page-A";
+            when(externalUrlSupplier.get()).thenReturn(URI.create(""));
+
+            SinglePage page = pageV1();
+            page.getSpec().setPublish(false);
+            when(client.fetch(eq(SinglePage.class), eq(name)))
+                .thenReturn(Optional.of(page));
+            when(contentService.getContent(eq(page.getSpec().getHeadSnapshot())))
+                .thenReturn(Mono.just(ContentWrapper.builder()
+                    .snapshotName(page.getSpec().getHeadSnapshot())
+                    .raw("hello world")
+                    .content("<p>hello world</p>")
+                    .rawType("markdown")
+                    .build())
+                );
+
+            when(contentService.listSnapshots(any()))
+                .thenReturn(Flux.empty());
+
+            ArgumentCaptor<SinglePage> captor = ArgumentCaptor.forClass(SinglePage.class);
+            singlePageReconciler.reconcile(new Reconciler.Request(name));
+
+            verify(client, times(3)).update(captor.capture());
+            SinglePage value = captor.getValue();
+            assertThat(value.getStatus().getLastModifyTime()).isNull();
+        }
     }
 
     public static SinglePage pageV1() {

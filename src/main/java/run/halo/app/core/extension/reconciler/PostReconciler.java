@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +14,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import run.halo.app.content.ContentService;
-import run.halo.app.content.PostService;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
@@ -53,7 +53,6 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     private static final String FINALIZER_NAME = "post-protection";
     private final ExtensionClient client;
     private final ContentService contentService;
-    private final PostService postService;
     private final PostPermalinkPolicy postPermalinkPolicy;
     private final CounterService counterService;
 
@@ -126,9 +125,9 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 Post.PostStatus status = post.getStatusOrDefault();
 
                 // validate release snapshot
-                boolean present = client.fetch(Snapshot.class, releaseSnapshot)
-                    .isPresent();
-                if (!present) {
+                Optional<Snapshot> releasedSnapshotOpt =
+                    client.fetch(Snapshot.class, releaseSnapshot);
+                if (releasedSnapshotOpt.isEmpty()) {
                     Condition condition = Condition.builder()
                         .type(Post.PostPhase.FAILED.name())
                         .reason("SnapshotNotFound")
@@ -158,6 +157,9 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 if (post.getSpec().getPublishTime() == null) {
                     post.getSpec().setPublishTime(Instant.now());
                 }
+
+                // populate lastModifyTime
+                status.setLastModifyTime(releasedSnapshotOpt.get().getSpec().getLastModifyTime());
 
                 client.update(post);
                 applicationContext.publishEvent(new PostPublishedEvent(this, name));
@@ -300,6 +302,12 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                     status.setInProgress(
                         !StringUtils.equals(headSnapshot, post.getSpec().getReleaseSnapshot()));
                 });
+
+            if (post.isPublished() && status.getLastModifyTime() == null) {
+                client.fetch(Snapshot.class, post.getSpec().getReleaseSnapshot())
+                    .ifPresent(releasedSnapshot ->
+                        status.setLastModifyTime(releasedSnapshot.getSpec().getLastModifyTime()));
+            }
 
             if (!oldPost.equals(post)) {
                 client.update(post);

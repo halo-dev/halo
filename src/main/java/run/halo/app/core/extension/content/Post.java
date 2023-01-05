@@ -150,6 +150,8 @@ public class Post extends AbstractExtension {
 
         private List<String> contributors;
 
+        private Instant lastModifyTime;
+
         @JsonIgnore
         public ConditionList getConditionsOrDefault() {
             if (this.conditions == null) {
