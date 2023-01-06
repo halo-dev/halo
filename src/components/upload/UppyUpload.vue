@@ -52,6 +52,7 @@ const uppy = computed(() => {
     fieldName: props.name,
     method: props.method,
     limit: 5,
+    timeout: 0,
     getResponseError: (responseText) => {
       const response = JSON.parse(responseText);
       const { title, detail } = (response || {}) as ProblemDetail;
