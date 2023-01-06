@@ -25,6 +25,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
 import run.halo.app.plugin.event.HaloPluginBeforeStopEvent;
 import run.halo.app.plugin.event.HaloPluginLoadedEvent;
 import run.halo.app.plugin.event.HaloPluginStartedEvent;
@@ -214,6 +215,11 @@ public class HaloPluginManager extends DefaultPluginManager
     @Override
     public void stopPlugins() {
         doStopPlugins();
+    }
+
+    public boolean validatePluginVersion(PluginWrapper pluginWrapper) {
+        Assert.notNull(pluginWrapper, "The pluginWrapper must not be null.");
+        return isPluginValid(pluginWrapper);
     }
 
     private PluginState doStartPlugin(String pluginId) {
