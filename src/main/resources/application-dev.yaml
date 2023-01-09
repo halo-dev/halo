@@ -19,11 +19,7 @@ halo:
       super-admin-password: admin
   plugin:
     runtime-mode: development # development, deployment
-    classes-directories:
-      - "build/classes"
-      - "build/resources"
-    lib-directories:
-      - "libs"
+    plugins-root: ${halo.work-dir}/plugins
   work-dir: ${user.home}/halo2-dev
 logging:
   level:
