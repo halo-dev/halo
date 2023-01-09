@@ -117,17 +117,30 @@ public class PluginAutoConfiguration {
                     } else {
                         return new CompoundPluginLoader()
                             .add(new DevelopmentPluginLoader(this) {
+
+                                @Override
+                                protected PluginClassLoader createPluginClassLoader(Path pluginPath,
+                                    PluginDescriptor pluginDescriptor) {
+                                    return new PluginClassLoader(pluginManager, pluginDescriptor,
+                                        getClass().getClassLoader(), ClassLoadingStrategy.APD);
+                                }
+
                                 @Override
                                 public ClassLoader loadPlugin(Path pluginPath,
                                     PluginDescriptor pluginDescriptor) {
-                                    PluginClassLoader pluginClassLoader =
-                                        new PluginClassLoader(pluginManager, pluginDescriptor,
-                                            getClass().getClassLoader(), ClassLoadingStrategy.APD);
-
-                                    loadClasses(pluginPath, pluginClassLoader);
-                                    loadJars(pluginPath, pluginClassLoader);
-
-                                    return pluginClassLoader;
+                                    if (pluginProperties.getClassesDirectories() != null) {
+                                        for (String classesDirectory :
+                                            pluginProperties.getClassesDirectories()) {
+                                            pluginClasspath.addClassesDirectories(classesDirectory);
+                                        }
+                                    }
+                                    if (pluginProperties.getLibDirectories() != null) {
+                                        for (String libDirectory :
+                                            pluginProperties.getLibDirectories()) {
+                                            pluginClasspath.addJarsDirectories(libDirectory);
+                                        }
+                                    }
+                                    return super.loadPlugin(pluginPath, pluginDescriptor);
                                 }
                             }, this::isDevelopment)
                             .add(new JarPluginLoader(this) {

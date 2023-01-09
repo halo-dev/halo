@@ -17,6 +17,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties(prefix = "halo.plugin")
 public class PluginProperties {
+    public static final String GRADLE_LIBS_DIR = "build/libs";
 
     /**
      * Auto start plugin when main app is ready.
@@ -53,7 +54,7 @@ public class PluginProperties {
     /**
      * Extended Plugin Jar Directory.
      */
-    private List<String> libDirectories = new ArrayList<>();
+    private List<String> libDirectories = new ArrayList<>(List.of(GRADLE_LIBS_DIR));
 
     /**
      * Runtime Mode：development/deployment.
