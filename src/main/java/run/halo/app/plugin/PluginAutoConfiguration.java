@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.ClassLoadingStrategy;
@@ -24,10 +23,10 @@ import org.pf4j.PluginRepository;
 import org.pf4j.PluginStatusProvider;
 import org.pf4j.RuntimeMode;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.CacheControl;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -176,7 +175,9 @@ public class PluginAutoConfiguration {
     }
 
     @Bean
-    public RouterFunction<ServerResponse> pluginJsBundleRoute(HaloPluginManager haloPluginManager) {
+    public RouterFunction<ServerResponse> pluginJsBundleRoute(HaloPluginManager haloPluginManager,
+        WebProperties webProperties) {
+        var cacheProperties = webProperties.getResources().getCache();
         return RouterFunctions.route()
             .GET("/plugins/{name}/assets/console/{*resource}", request -> {
                 String pluginName = request.pathVariable("name");
@@ -186,13 +187,17 @@ public class PluginAutoConfiguration {
                 if (jsBundle == null || !jsBundle.exists()) {
                     return ServerResponse.notFound().build();
                 }
+                var useLastModified = cacheProperties.isUseLastModified();
+                var bodyBuilder = ServerResponse.ok()
+                    .cacheControl(cacheProperties.getCachecontrol().toHttpCacheControl());
                 try {
-                    var lastModified = Instant.ofEpochMilli(jsBundle.lastModified());
-                    return request.checkNotModified(lastModified)
-                        .switchIfEmpty(Mono.defer(() -> ServerResponse.ok()
-                                .cacheControl(CacheControl.maxAge(Duration.ofDays(365 / 2)))
-                                .lastModified(lastModified)
+                    if (useLastModified) {
+                        var lastModified = Instant.ofEpochMilli(jsBundle.lastModified());
+                        return request.checkNotModified(lastModified)
+                            .switchIfEmpty(Mono.defer(() -> bodyBuilder.lastModified(lastModified)
                                 .body(BodyInserters.fromResource(jsBundle))));
+                    }
+                    return bodyBuilder.body(BodyInserters.fromResource(jsBundle));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
