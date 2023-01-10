@@ -10,6 +10,7 @@ export interface RouteRecordAppend {
 }
 
 export interface ExtensionPoint {
+  // @deprecated
   "page:functional:create"?: () => FunctionalPage[] | Promise<FunctionalPage[]>;
 
   "attachment:selector:create"?: () =>

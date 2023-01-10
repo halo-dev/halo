@@ -1,3 +1,4 @@
+// @deprecated
 export interface FunctionalPage {
   name: string;
   path: string;
