@@ -14,6 +14,7 @@ import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersF
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
 
+import com.github.zafarkhaja.semver.Version;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,14 +33,11 @@ import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.info.BuildProperties;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
-import org.springframework.lang.Nullable;
 import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -62,6 +60,7 @@ import run.halo.app.extension.Comparators;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
+import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.VersionUtils;
 import run.halo.app.plugin.PluginProperties;
@@ -76,13 +75,7 @@ public class PluginEndpoint implements CustomEndpoint {
 
     private final ReactiveExtensionClient client;
 
-    @Nullable
-    private BuildProperties buildProperties;
-
-    @Autowired(required = false)
-    public void setBuildProperties(@Nullable BuildProperties buildProperties) {
-        this.buildProperties = buildProperties;
-    }
+    private final SystemVersionSupplier systemVersionSupplier;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -211,11 +204,10 @@ public class PluginEndpoint implements CustomEndpoint {
 
     private void satisfiesRequiresVersion(Plugin newPlugin) {
         Assert.notNull(newPlugin, "The plugin must not be null.");
-        if (buildProperties == null) {
-            return;
-        }
+        Version version = systemVersionSupplier.get();
         // validate the plugin version
-        String systemVersion = buildProperties.getVersion();
+        // only use the nominal system version to compare, the format is like MAJOR.MINOR.PATCH
+        String systemVersion = version.getNormalVersion();
         String requires = newPlugin.getSpec().getRequires();
         if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
             throw new ServerWebInputException(String.format(

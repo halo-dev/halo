@@ -24,20 +24,18 @@ import org.pf4j.PluginManager;
 import org.pf4j.PluginRepository;
 import org.pf4j.PluginStatusProvider;
 import org.pf4j.RuntimeMode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
-import org.springframework.lang.Nullable;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.SystemVersionSupplier;
 
 /**
  * Plugin autoconfiguration for Spring Boot.
@@ -52,21 +50,17 @@ public class PluginAutoConfiguration {
 
     private final PluginProperties pluginProperties;
 
-    @Nullable
-    private BuildProperties buildProperties;
+    private final SystemVersionSupplier systemVersionSupplier;
 
     @Qualifier("webFluxContentTypeResolver")
     private final RequestedContentTypeResolver requestedContentTypeResolver;
 
     public PluginAutoConfiguration(PluginProperties pluginProperties,
+        SystemVersionSupplier systemVersionSupplier,
         RequestedContentTypeResolver requestedContentTypeResolver) {
         this.pluginProperties = pluginProperties;
+        this.systemVersionSupplier = systemVersionSupplier;
         this.requestedContentTypeResolver = requestedContentTypeResolver;
-    }
-
-    @Autowired(required = false)
-    public void setBuildProperties(@Nullable BuildProperties buildProperties) {
-        this.buildProperties = buildProperties;
     }
 
     @Bean
@@ -189,11 +183,7 @@ public class PluginAutoConfiguration {
     }
 
     String getSystemVersion() {
-        String defaultVersion = "0.0.0";
-        if (buildProperties == null) {
-            return defaultVersion;
-        }
-        return StringUtils.defaultString(buildProperties.getVersion(), defaultVersion);
+        return systemVersionSupplier.get().getNormalVersion();
     }
 
     @Bean
