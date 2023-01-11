@@ -21,6 +21,11 @@ spring:
     max-in-memory-size: 10MB
   messages:
     basename: config.i18n.messages
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          max-age: 365d
 
 halo:
   external-url: "http://${server.address:localhost}:${server.port}"
