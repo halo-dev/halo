@@ -26,6 +26,7 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -219,8 +220,8 @@ public class ThemeEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> fetchThemeConfig(ServerRequest request) {
-        final var themeName = request.pathVariable("name");
-        return client.fetch(Theme.class, themeName)
+        return themeNameInPathVariableOrActivated(request)
+            .flatMap(themeName -> client.fetch(Theme.class, themeName))
             .mapNotNull(theme -> theme.getSpec().getConfigMapName())
             .flatMap(configMapName -> client.fetch(ConfigMap.class, configMapName))
             .flatMap(configMap -> ServerResponse.ok().bodyValue(configMap));
@@ -234,11 +235,25 @@ public class ThemeEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> fetchThemeSetting(ServerRequest request) {
-        String name = request.pathVariable("name");
-        return client.fetch(Theme.class, name)
+        return themeNameInPathVariableOrActivated(request)
+            .flatMap(name -> client.fetch(Theme.class, name))
             .mapNotNull(theme -> theme.getSpec().getSettingName())
             .flatMap(settingName -> client.fetch(Setting.class, settingName))
             .flatMap(setting -> ServerResponse.ok().bodyValue(setting));
+    }
+
+    private Mono<String> themeNameInPathVariableOrActivated(ServerRequest request) {
+        Assert.notNull(request, "request must not be null.");
+        return Mono.fromSupplier(() -> request.pathVariable("name"))
+            .flatMap(name -> {
+                if ("-".equals(name)) {
+                    return systemEnvironmentFetcher.fetch(SystemSetting.Theme.GROUP,
+                            SystemSetting.Theme.class)
+                        .mapNotNull(SystemSetting.Theme::getActive)
+                        .defaultIfEmpty(name);
+                }
+                return Mono.just(name);
+            });
     }
 
     public static class ThemeQuery extends IListRequest.QueryListRequest {
