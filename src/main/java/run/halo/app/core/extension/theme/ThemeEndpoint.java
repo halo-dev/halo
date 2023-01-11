@@ -14,9 +14,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
@@ -30,6 +34,8 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
+import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.ConfigMap;
@@ -37,6 +43,8 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.theme.TemplateEngineManager;
 
@@ -48,6 +56,7 @@ import run.halo.app.theme.TemplateEngineManager;
  */
 @Slf4j
 @Component
+@AllArgsConstructor
 public class ThemeEndpoint implements CustomEndpoint {
 
     private final ReactiveExtensionClient client;
@@ -58,13 +67,7 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     private final TemplateEngineManager templateEngineManager;
 
-    public ThemeEndpoint(ReactiveExtensionClient client, ThemeRootGetter themeRoot,
-        ThemeService themeService, TemplateEngineManager templateEngineManager) {
-        this.client = client;
-        this.themeRoot = themeRoot;
-        this.themeService = themeService;
-        this.templateEngineManager = templateEngineManager;
-    }
+    private final SystemConfigurableEnvironmentFetcher systemEnvironmentFetcher;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -119,6 +122,19 @@ public class ThemeEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(ConfigMap.class))
             )
+            .PUT("themes/{name}/config", this::updateThemeConfig,
+                builder -> builder.operationId("updateThemeConfig")
+                    .description("Update the configMap of theme setting.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .response(responseBuilder()
+                        .implementation(ConfigMap.class))
+            )
             .GET("themes", this::listThemes,
                 builder -> {
                     builder.operationId("ListThemes")
@@ -129,7 +145,100 @@ public class ThemeEndpoint implements CustomEndpoint {
                     QueryParamBuildUtil.buildParametersFromType(builder, ThemeQuery.class);
                 }
             )
+            .GET("themes/-/activation", this::fetchActivatedTheme,
+                builder -> builder.operationId("fetchActivatedTheme")
+                    .description("Fetch the activated theme.")
+                    .tag(tag)
+                    .response(responseBuilder()
+                        .implementation(Theme.class))
+            )
+            .GET("themes/{name}/setting", this::fetchThemeSetting,
+                builder -> builder.operationId("fetchThemeSetting")
+                    .description("Fetch setting of theme.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .response(responseBuilder()
+                        .implementation(Setting.class))
+            )
+            .GET("themes/{name}/config", this::fetchThemeConfig,
+                builder -> builder.operationId("fetchThemeConfig")
+                    .description("Fetch configMap of theme by configured configMapName.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .response(responseBuilder()
+                        .implementation(ConfigMap.class))
+            )
             .build();
+    }
+
+    private Mono<ServerResponse> updateThemeConfig(ServerRequest request) {
+        final var themeName = request.pathVariable("name");
+        return client.fetch(Theme.class, themeName)
+            .doOnNext(theme -> {
+                String configMapName = theme.getSpec().getConfigMapName();
+                if (StringUtils.isBlank(configMapName)) {
+                    throw new ServerWebInputException(
+                        "Unable to complete the request because the theme configMapName is blank.");
+                }
+            })
+            .flatMap(theme -> {
+                final var configMapName = theme.getSpec().getConfigMapName();
+                return request.bodyToMono(ConfigMap.class)
+                    .doOnNext(configMapToUpdate -> {
+                        var configMapNameToUpdate = configMapToUpdate.getMetadata().getName();
+                        if (!configMapName.equals(configMapNameToUpdate)) {
+                            throw new ServerWebInputException(
+                                "The name from the request body does not match the theme "
+                                    + "configMapName name.");
+                        }
+                    })
+                    .flatMap(configMapToUpdate -> client.fetch(ConfigMap.class, configMapName)
+                        .map(persisted -> {
+                            configMapToUpdate.getMetadata()
+                                .setVersion(persisted.getMetadata().getVersion());
+                            return configMapToUpdate;
+                        })
+                        .switchIfEmpty(client.create(configMapToUpdate))
+                    )
+                    .flatMap(client::update)
+                    .retryWhen(Retry.backoff(5, Duration.ofMillis(300))
+                        .filter(OptimisticLockingFailureException.class::isInstance)
+                    );
+            })
+            .flatMap(theme -> ServerResponse.ok().bodyValue(theme));
+    }
+
+    private Mono<ServerResponse> fetchThemeConfig(ServerRequest request) {
+        final var themeName = request.pathVariable("name");
+        return client.fetch(Theme.class, themeName)
+            .mapNotNull(theme -> theme.getSpec().getConfigMapName())
+            .flatMap(configMapName -> client.fetch(ConfigMap.class, configMapName))
+            .flatMap(configMap -> ServerResponse.ok().bodyValue(configMap));
+    }
+
+    private Mono<ServerResponse> fetchActivatedTheme(ServerRequest request) {
+        return systemEnvironmentFetcher.fetch(SystemSetting.Theme.GROUP, SystemSetting.Theme.class)
+            .map(SystemSetting.Theme::getActive)
+            .flatMap(activatedName -> client.fetch(Theme.class, activatedName))
+            .flatMap(theme -> ServerResponse.ok().bodyValue(theme));
+    }
+
+    private Mono<ServerResponse> fetchThemeSetting(ServerRequest request) {
+        String name = request.pathVariable("name");
+        return client.fetch(Theme.class, name)
+            .mapNotNull(theme -> theme.getSpec().getSettingName())
+            .flatMap(settingName -> client.fetch(Setting.class, settingName))
+            .flatMap(setting -> ServerResponse.ok().bodyValue(setting));
     }
 
     public static class ThemeQuery extends IListRequest.QueryListRequest {
