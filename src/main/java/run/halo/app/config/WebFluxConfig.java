@@ -7,10 +7,10 @@ import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
-import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,12 +45,18 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     private final HaloProperties haloProp;
 
+
+    private final WebProperties.Resources resourceProperties;
+
     private final ApplicationContext applicationContext;
 
-    public WebFluxConfig(ObjectMapper objectMapper, HaloProperties haloProp,
+    public WebFluxConfig(ObjectMapper objectMapper,
+        HaloProperties haloProp,
+        WebProperties webProperties,
         ApplicationContext applicationContext) {
         this.objectMapper = objectMapper;
         this.haloProp = haloProp;
+        this.resourceProperties = webProperties.getResources();
         this.applicationContext = applicationContext;
     }
 
@@ -118,19 +124,22 @@ public class WebFluxConfig implements WebFluxConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         var attachmentsRoot = haloProp.getWorkDir().resolve("attachments");
-        var cacheControl = CacheControl.maxAge(Duration.ofDays(365 / 2));
+        final var cacheControl = resourceProperties.getCache()
+            .getCachecontrol()
+            .toHttpCacheControl();
+        final var useLastModified = resourceProperties.getCache().isUseLastModified();
 
         // Mandatory resource mapping
         var uploadRegistration = registry.addResourceHandler("/upload/**")
             .addResourceLocations(FILE_URL_PREFIX + attachmentsRoot.resolve("upload") + "/")
-            .setUseLastModified(true)
+            .setUseLastModified(useLastModified)
             .setCacheControl(cacheControl);
 
         // For console project
         registry.addResourceHandler("/console/**")
             .addResourceLocations(haloProp.getConsole().getLocation())
             .setCacheControl(cacheControl)
-            .setUseLastModified(true)
+            .setUseLastModified(useLastModified)
             .resourceChain(true)
             .addResolver(new EncodedResourceResolver())
             .addResolver(new PathResourceResolver());
@@ -149,7 +158,7 @@ public class WebFluxConfig implements WebFluxConfigurer {
                 checkDirectoryTraversal(attachmentsRoot, path);
                 registration.addResourceLocations(FILE_URL_PREFIX + path + "/")
                     .setCacheControl(cacheControl)
-                    .setUseLastModified(true);
+                    .setUseLastModified(useLastModified);
             });
         });
 
