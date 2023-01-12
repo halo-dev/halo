@@ -61,6 +61,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
 import run.halo.app.infra.SystemVersionSupplier;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.VersionUtils;
 import run.halo.app.plugin.PluginProperties;
@@ -210,9 +211,12 @@ public class PluginEndpoint implements CustomEndpoint {
         String systemVersion = version.getNormalVersion();
         String requires = newPlugin.getSpec().getRequires();
         if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
-            throw new ServerWebInputException(String.format(
-                "Plugin requires a minimum system version of [%s], and you have [%s].",
-                systemVersion, requires));
+            throw new UnsatisfiedAttributeValueException(String.format(
+                "Plugin requires a minimum system version of [%s], but the current version is "
+                    + "[%s].",
+                requires, systemVersion),
+                "problemDetail.plugin.version.unsatisfied.requires",
+                new String[] {requires, systemVersion});
         }
     }
 
