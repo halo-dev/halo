@@ -216,7 +216,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                         .filter(OptimisticLockingFailureException.class::isInstance)
                     );
             })
-            .flatMap(theme -> ServerResponse.ok().bodyValue(theme));
+            .flatMap(configMap -> ServerResponse.ok().bodyValue(configMap));
     }
 
     private Mono<ServerResponse> fetchThemeConfig(ServerRequest request) {
