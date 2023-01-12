@@ -47,6 +47,8 @@ import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.TemplateEngineManager;
 
 /**
@@ -136,6 +138,13 @@ public class ThemeEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(ConfigMap.class))
             )
+            .PUT("themes/{name}/activation", this::activateTheme,
+                builder -> builder.operationId("activateTheme")
+                    .description("Activate a theme by name.")
+                    .tag(tag)
+                    .response(responseBuilder()
+                        .implementation(Theme.class))
+            )
             .GET("themes", this::listThemes,
                 builder -> {
                     builder.operationId("ListThemes")
@@ -180,6 +189,33 @@ public class ThemeEndpoint implements CustomEndpoint {
                         .implementation(ConfigMap.class))
             )
             .build();
+    }
+
+    private Mono<ServerResponse> activateTheme(ServerRequest request) {
+        final var activatedThemeName = request.pathVariable("name");
+        return client.fetch(Theme.class, activatedThemeName)
+            .switchIfEmpty(Mono.error(new NotFoundException("Theme not found.")))
+            .flatMap(theme -> systemEnvironmentFetcher.fetch(SystemSetting.Theme.GROUP,
+                    SystemSetting.Theme.class)
+                .flatMap(themeSetting -> {
+                    // update active theme config
+                    themeSetting.setActive(activatedThemeName);
+                    return systemEnvironmentFetcher.getConfigMap()
+                        .filter(configMap -> configMap.getData() != null)
+                        .map(configMap -> {
+                            var themeConfigJson = JsonUtils.objectToJson(themeSetting);
+                            configMap.getData()
+                                .put(SystemSetting.Theme.GROUP, themeConfigJson);
+                            return configMap;
+                        });
+                })
+                .flatMap(client::update)
+                .retryWhen(Retry.backoff(5, Duration.ofMillis(300))
+                    .filter(OptimisticLockingFailureException.class::isInstance)
+                )
+                .thenReturn(theme)
+            )
+            .flatMap(activatedTheme -> ServerResponse.ok().bodyValue(activatedTheme));
     }
 
     private Mono<ServerResponse> updateThemeConfig(ServerRequest request) {
