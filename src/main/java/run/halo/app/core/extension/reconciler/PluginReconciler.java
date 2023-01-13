@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.pf4j.PluginRuntimeException;
@@ -41,16 +42,11 @@ import run.halo.app.plugin.resources.BundleResourceUtils;
  */
 @Slf4j
 @Component
+@AllArgsConstructor
 public class PluginReconciler implements Reconciler<Request> {
     private static final String FINALIZER_NAME = "plugin-protection";
     private final ExtensionClient client;
     private final HaloPluginManager haloPluginManager;
-
-    public PluginReconciler(ExtensionClient client,
-        HaloPluginManager haloPluginManager) {
-        this.client = client;
-        this.haloPluginManager = haloPluginManager;
-    }
 
     @Override
     public Result reconcile(Request request) {
@@ -138,6 +134,12 @@ public class PluginReconciler implements Reconciler<Request> {
     private void startPlugin(String pluginName) {
         client.fetch(Plugin.class, pluginName).ifPresent(plugin -> {
             final Plugin oldPlugin = JsonUtils.deepCopy(plugin);
+
+            // verify plugin meets the preconditions for startup
+            if (!verifyStartCondition(pluginName)) {
+                return;
+            }
+
             if (shouldReconcileStartState(plugin)) {
                 PluginState currentState = haloPluginManager.startPlugin(pluginName);
                 handleStatus(plugin, currentState, PluginState.STARTED);
@@ -157,6 +159,47 @@ public class PluginReconciler implements Reconciler<Request> {
                 client.update(plugin);
             }
         });
+    }
+
+    private boolean verifyStartCondition(String pluginName) {
+        PluginWrapper pluginWrapper = haloPluginManager.getPlugin(pluginName);
+        return client.fetch(Plugin.class, pluginName).map(plugin -> {
+            Plugin.PluginStatus oldStatus = JsonUtils.deepCopy(plugin.statusNonNull());
+
+            Plugin.PluginStatus status = plugin.statusNonNull();
+            status.setLastTransitionTime(Instant.now());
+            if (pluginWrapper == null) {
+                status.setPhase(PluginState.FAILED);
+                status.setReason("PluginNotFound");
+                status.setMessage("Plugin [" + pluginName + "] not found in plugin manager");
+                if (!oldStatus.equals(status)) {
+                    client.update(plugin);
+                }
+                return false;
+            }
+
+            // Check if this plugin version is match requires param.
+            if (!haloPluginManager.validatePluginVersion(pluginWrapper)) {
+                status.setPhase(PluginState.FAILED);
+                status.setReason("PluginVersionNotMatch");
+                String message = String.format(
+                    "Plugin requires a minimum system version of [%s], and you have [%s].",
+                    plugin.getSpec().getRequires(), haloPluginManager.getSystemVersion());
+                status.setMessage(message);
+                if (!oldStatus.equals(status)) {
+                    client.update(plugin);
+                }
+                return false;
+            }
+
+            PluginState pluginState = pluginWrapper.getPluginState();
+            if (PluginState.DISABLED.equals(pluginState)) {
+                status.setPhase(pluginState);
+                status.setReason("PluginDisabled");
+                status.setMessage("The plugin is disabled for some reason and cannot be started.");
+            }
+            return true;
+        }).orElse(false);
     }
 
     private boolean shouldReconcileStopState(Plugin plugin) {
@@ -187,11 +230,15 @@ public class PluginReconciler implements Reconciler<Request> {
         if (desiredState.equals(currentState)) {
             plugin.getSpec().setEnabled(PluginState.STARTED.equals(currentState));
         } else {
+            String pluginName = plugin.getMetadata().getName();
             PluginStartingError startingError =
                 haloPluginManager.getPluginStartingError(plugin.getMetadata().getName());
+            if (startingError == null) {
+                startingError = PluginStartingError.of(pluginName, "Unknown error", "");
+            }
             status.setReason(startingError.getMessage());
             status.setMessage(startingError.getDevMessage());
-            // requeue the plugin for reconciliation
+            client.fetch(Plugin.class, pluginName).ifPresent(client::update);
             throw new PluginRuntimeException(startingError.getMessage());
         }
     }
