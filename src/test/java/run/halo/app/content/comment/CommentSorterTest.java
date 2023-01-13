@@ -155,9 +155,7 @@ class CommentSorterTest {
         return List.of(commentA, commentB, commentC);
     }
 
-    List<Comment> commentsIncludeNoReply(){
-
-        List<Comment> comments = new ArrayList<>(comments());
+    List<Comment> commentsIncludeNoReply() {
 
         final Instant now = Instant.now();
         Comment commentD = new Comment();
@@ -178,7 +176,7 @@ class CommentSorterTest {
         commentE.setSpec(new Comment.CommentSpec());
         commentE.setStatus(new Comment.CommentStatus());
 
-
+        List<Comment> comments = new ArrayList<>(comments());
         comments.add(commentD);
         comments.add(commentE);
 
