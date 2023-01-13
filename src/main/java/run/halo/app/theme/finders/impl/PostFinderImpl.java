@@ -373,12 +373,12 @@ public class PostFinderImpl implements PostFinder {
             post -> Objects.requireNonNullElse(post.getSpec().getPinned(), false);
         Function<Post, Integer> priority =
             post -> Objects.requireNonNullElse(post.getSpec().getPriority(), 0);
-        Function<Post, Instant> creationTimestamp =
-            post -> post.getMetadata().getCreationTimestamp();
+        Function<Post, Instant> publishTime =
+            post -> post.getSpec().getPublishTime();
         Function<Post, String> name = post -> post.getMetadata().getName();
         return Comparator.comparing(pinned)
             .thenComparing(priority)
-            .thenComparing(creationTimestamp)
+            .thenComparing(publishTime, Comparators.nullsLow())
             .thenComparing(name)
             .reversed();
     }
