@@ -16,10 +16,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.context.ServerSecurityContextRepository;
+import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.MediaTypeServerWebExchangeMatcher;
 import run.halo.app.core.extension.service.RoleService;
@@ -45,7 +48,8 @@ public class WebServerSecurityConfig {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     SecurityWebFilterChain apiFilterChain(ServerHttpSecurity http,
         RoleService roleService,
-        ObjectProvider<SecurityConfigurer> securityConfigurers) {
+        ObjectProvider<SecurityConfigurer> securityConfigurers,
+        ServerSecurityContextRepository securityContextRepository) {
 
         http.securityMatcher(pathMatchers("/api/**", "/apis/**", "/login", "/logout"))
             .authorizeExchange().anyExchange()
@@ -54,6 +58,7 @@ public class WebServerSecurityConfig {
                 spec.authorities(AnonymousUserConst.Role);
                 spec.principal(AnonymousUserConst.PRINCIPAL);
             })
+            .securityContextRepository(securityContextRepository)
             .formLogin(withDefaults())
             .logout(withDefaults())
             .httpBasic(withDefaults());
@@ -67,21 +72,27 @@ public class WebServerSecurityConfig {
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 1)
-    SecurityWebFilterChain portalFilterChain(ServerHttpSecurity http) {
+    SecurityWebFilterChain portalFilterChain(ServerHttpSecurity http, ServerSecurityContextRepository securityContextRepository) {
         var pathMatcher = pathMatchers(HttpMethod.GET, "/**");
         var mediaTypeMatcher = new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML);
         mediaTypeMatcher.setIgnoredMediaTypes(Set.of(MediaType.ALL));
         http.securityMatcher(new AndServerWebExchangeMatcher(pathMatcher, mediaTypeMatcher))
             .authorizeExchange().anyExchange().permitAll().and()
+            .securityContextRepository(securityContextRepository)
             .headers()
             .frameOptions().mode(SAMEORIGIN)
             .referrerPolicy().policy(STRICT_ORIGIN_WHEN_CROSS_ORIGIN).and()
             .cache().disable().and()
-            .anonymous(spec -> {
-                spec.authorities(AnonymousUserConst.Role);
-                spec.principal(AnonymousUserConst.PRINCIPAL);
-            });
+            .anonymous(spec -> spec.authenticationFilter(
+                new HaloAnonymousAuthenticationWebFilter("portal", AnonymousUserConst.PRINCIPAL,
+                    AuthorityUtils.createAuthorityList(AnonymousUserConst.Role),
+                    securityContextRepository)));
         return http.build();
+    }
+
+    @Bean
+    ServerSecurityContextRepository securityContextRepository() {
+        return new WebSessionServerSecurityContextRepository();
     }
 
     @Bean

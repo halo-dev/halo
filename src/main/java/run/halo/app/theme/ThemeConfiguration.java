@@ -12,12 +12,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
+import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FilePathUtils;
+import run.halo.app.theme.dialect.HaloSpringSecurityDialect;
 import run.halo.app.theme.dialect.LinkExpressionObjectDialect;
 
 /**
@@ -65,5 +68,11 @@ public class ThemeConfiguration {
     @Bean
     LinkExpressionObjectDialect linkExpressionObjectDialect() {
         return new LinkExpressionObjectDialect();
+    }
+
+    @Bean
+    SpringSecurityDialect springSecurityDialect(
+        ServerSecurityContextRepository securityContextRepository) {
+        return new HaloSpringSecurityDialect(securityContextRepository);
     }
 }
