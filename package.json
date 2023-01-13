@@ -94,8 +94,8 @@
     "@types/node": "^18.11.9",
     "@types/qs": "^6.9.7",
     "@types/randomstring": "^1.1.8",
-    "@vitejs/plugin-vue": "^3.2.0",
-    "@vitejs/plugin-vue-jsx": "^2.1.1",
+    "@vitejs/plugin-vue": "^4.0.0",
+    "@vitejs/plugin-vue-jsx": "^3.0.0",
     "@vitest/ui": "^0.25.3",
     "@vue/compiler-sfc": "^3.2.45",
     "@vue/eslint-config-prettier": "^7.0.0",
@@ -122,13 +122,13 @@
     "tailwindcss-themer": "^2.0.2",
     "typescript": "~4.7.4",
     "unplugin-icons": "^0.14.14",
-    "vite": "^3.2.4",
+    "vite": "^4.0.4",
     "vite-compression-plugin": "^0.0.4",
     "vite-plugin-externals": "^0.5.1",
     "vite-plugin-html": "^3.2.0",
     "vite-plugin-pwa": "^0.13.3",
     "vite-plugin-static-copy": "^0.11.1",
     "vitest": "^0.25.3",
-    "vue-tsc": "^1.0.9"
+    "vue-tsc": "^1.0.24"
   }
 }
