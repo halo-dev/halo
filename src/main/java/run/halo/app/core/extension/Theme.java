@@ -5,10 +5,13 @@ import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
+import run.halo.app.infra.ConditionList;
 
 /**
  * <p>Theme extension.</p>
@@ -53,7 +56,10 @@ public class Theme extends AbstractExtension {
 
         private String version;
 
+        @Deprecated(forRemoval = true)
         private String require;
+
+        private String requires;
 
         private String settingName;
 
@@ -64,24 +70,43 @@ public class Theme extends AbstractExtension {
 
         @NonNull
         public String getVersion() {
-            if (StringUtils.isBlank(this.version)) {
-                return WILDCARD;
-            }
-            return version;
+            return StringUtils.defaultString(this.version, WILDCARD);
         }
 
         @NonNull
-        public String getRequire() {
-            if (StringUtils.isBlank(this.require)) {
-                return WILDCARD;
-            }
-            return require;
+        public String getRequires() {
+            return StringUtils.defaultString(requires, WILDCARD);
         }
     }
 
     @Data
     public static class ThemeStatus {
+        private ThemePhase phase;
+        private ConditionList conditions;
         private String location;
+    }
+
+    /**
+     * Null-safe get {@link ConditionList} from theme status.
+     *
+     * @param theme theme must not be null
+     * @return condition list
+     */
+    public static ConditionList nullSafeConditionList(Theme theme) {
+        Assert.notNull(theme, "The theme must not be null");
+        ThemeStatus status = ObjectUtils.defaultIfNull(theme.getStatus(), new ThemeStatus());
+        theme.setStatus(status);
+
+        ConditionList conditions =
+            ObjectUtils.defaultIfNull(status.getConditions(), new ConditionList());
+        status.setConditions(conditions);
+        return conditions;
+    }
+
+    public enum ThemePhase {
+        READY,
+        FAILED,
+        UNKNOWN,
     }
 
     @Data
