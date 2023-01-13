@@ -8,6 +8,7 @@ import java.lang.reflect.Constructor;
 import java.nio.file.Path;
 import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.pf4j.ClassLoadingStrategy;
 import org.pf4j.CompoundPluginLoader;
 import org.pf4j.CompoundPluginRepository;
@@ -27,13 +28,13 @@ import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.accept.RequestedContentTypeResolver;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.SystemVersionSupplier;
 
 /**
  * Plugin autoconfiguration for Spring Boot.
@@ -48,12 +49,16 @@ public class PluginAutoConfiguration {
 
     private final PluginProperties pluginProperties;
 
+    private final SystemVersionSupplier systemVersionSupplier;
+
     @Qualifier("webFluxContentTypeResolver")
     private final RequestedContentTypeResolver requestedContentTypeResolver;
 
     public PluginAutoConfiguration(PluginProperties pluginProperties,
+        SystemVersionSupplier systemVersionSupplier,
         RequestedContentTypeResolver requestedContentTypeResolver) {
         this.pluginProperties = pluginProperties;
+        this.systemVersionSupplier = systemVersionSupplier;
         this.requestedContentTypeResolver = requestedContentTypeResolver;
     }
 
@@ -77,13 +82,12 @@ public class PluginAutoConfiguration {
 
         // Setup Plugin folder
         String pluginsRoot =
-            StringUtils.hasText(pluginProperties.getPluginsRoot())
-                ? pluginProperties.getPluginsRoot()
-                : "plugins";
+            StringUtils.defaultString(pluginProperties.getPluginsRoot(), "plugins");
+
         System.setProperty("pf4j.pluginsDir", pluginsRoot);
         String appHome = System.getProperty("app.home");
         if (RuntimeMode.DEPLOYMENT == pluginProperties.getRuntimeMode()
-            && StringUtils.hasText(appHome)) {
+            && StringUtils.isNotBlank(appHome)) {
             System.setProperty("pf4j.pluginsDir", appHome + File.separator + pluginsRoot);
         }
 
@@ -170,8 +174,15 @@ public class PluginAutoConfiguration {
             };
 
         pluginManager.setExactVersionAllowed(pluginProperties.isExactVersionAllowed());
-        pluginManager.setSystemVersion(pluginProperties.getSystemVersion());
+        // only for development mode
+        if (RuntimeMode.DEPLOYMENT.equals(pluginManager.getRuntimeMode())) {
+            pluginManager.setSystemVersion(getSystemVersion());
+        }
         return pluginManager;
+    }
+
+    String getSystemVersion() {
+        return systemVersionSupplier.get().getNormalVersion();
     }
 
     @Bean

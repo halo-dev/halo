@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.reactive.server.WebTestClient.bindToRouterFunction;
 import static org.springframework.web.reactive.function.BodyInserters.fromMultipartData;
 
+import com.github.zafarkhaja.semver.Version;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -43,6 +44,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.plugin.PluginProperties;
 
@@ -55,6 +57,9 @@ class PluginEndpointTest {
 
     @Mock
     private ReactiveExtensionClient client;
+
+    @Mock
+    SystemVersionSupplier systemVersionSupplier;
 
     @InjectMocks
     PluginEndpoint endpoint;
@@ -203,7 +208,7 @@ class PluginEndpointTest {
             webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
                 .build();
 
-
+            lenient().when(systemVersionSupplier.get()).thenReturn(Version.valueOf("0.0.0"));
             tempDirectory = Files.createTempDirectory("halo-test-plugin-upgrade-");
             lenient().when(pluginProperties.getPluginsRoot())
                 .thenReturn(tempDirectory.resolve("plugins").toString());
