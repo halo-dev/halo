@@ -14,6 +14,7 @@ import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersF
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
 
+import com.github.zafarkhaja.semver.Version;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -38,6 +40,7 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.Part;
 import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -57,22 +60,23 @@ import run.halo.app.extension.Comparators;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
+import run.halo.app.infra.SystemVersionSupplier;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.FileUtils;
+import run.halo.app.infra.utils.VersionUtils;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.YamlPluginFinder;
 
 @Slf4j
 @Component
+@AllArgsConstructor
 public class PluginEndpoint implements CustomEndpoint {
 
     private final PluginProperties pluginProperties;
 
     private final ReactiveExtensionClient client;
 
-    public PluginEndpoint(PluginProperties pluginProperties, ReactiveExtensionClient client) {
-        this.pluginProperties = pluginProperties;
-        this.client = client;
-    }
+    private final SystemVersionSupplier systemVersionSupplier;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -172,6 +176,8 @@ public class PluginEndpoint implements CustomEndpoint {
                     throw new ServerWebInputException(
                         "The uploaded plugin doesn't match the given plugin name");
                 }
+
+                satisfiesRequiresVersion(newPlugin);
             })
             .flatMap(newPlugin -> deletePluginAndWaitForComplete(newPlugin.getMetadata().getName())
                 .map(oldPlugin -> {
@@ -187,7 +193,6 @@ public class PluginEndpoint implements CustomEndpoint {
                     var pluginRoot = Paths.get(pluginProperties.getPluginsRoot());
                     createDirectoriesIfNotExists(pluginRoot);
                     var tempPluginPath = tempPluginPathRef.get();
-                    var filename = tempPluginPath.getFileName().toString();
                     copy(tempPluginPath, pluginRoot.resolve(newPlugin.generateFileName()));
                 } catch (IOException e) {
                     throw Exceptions.propagate(e);
@@ -196,6 +201,23 @@ public class PluginEndpoint implements CustomEndpoint {
             .flatMap(client::create)
             .flatMap(newPlugin -> ServerResponse.ok().bodyValue(newPlugin))
             .doFinally(signalType -> deleteRecursivelyAndSilently(tempDirRef.get()));
+    }
+
+    private void satisfiesRequiresVersion(Plugin newPlugin) {
+        Assert.notNull(newPlugin, "The plugin must not be null.");
+        Version version = systemVersionSupplier.get();
+        // validate the plugin version
+        // only use the nominal system version to compare, the format is like MAJOR.MINOR.PATCH
+        String systemVersion = version.getNormalVersion();
+        String requires = newPlugin.getSpec().getRequires();
+        if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
+            throw new UnsatisfiedAttributeValueException(String.format(
+                "Plugin requires a minimum system version of [%s], but the current version is "
+                    + "[%s].",
+                requires, systemVersion),
+                "problemDetail.plugin.version.unsatisfied.requires",
+                new String[] {requires, systemVersion});
+        }
     }
 
     private Mono<Plugin> deletePluginAndWaitForComplete(String pluginName) {
@@ -332,6 +354,8 @@ public class PluginEndpoint implements CustomEndpoint {
             .flatMap(this::transferToTemp)
             .flatMap(tempJarFilePath -> {
                 var plugin = new YamlPluginFinder().find(tempJarFilePath);
+                // validate the plugin version
+                satisfiesRequiresVersion(plugin);
                 // Disable auto enable during installation
                 plugin.getSpec().setEnabled(false);
                 return client.fetch(Plugin.class, plugin.getMetadata().getName())

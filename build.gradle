@@ -27,6 +27,10 @@ configurations {
     }
 }
 
+springBoot {
+    buildInfo()
+}
+
 bootJar {
     manifest {
         attributes "Implementation-Title": "Halo Application",
