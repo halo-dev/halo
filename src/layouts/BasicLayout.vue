@@ -189,7 +189,11 @@ onMounted(generateMenus);
   <div class="flex h-full">
     <aside class="navbar fixed hidden h-full overflow-y-auto md:block">
       <div class="logo flex justify-center pt-5 pb-7">
-        <IconLogo />
+        <a href="/" target="_blank" title="访问首页">
+          <IconLogo
+            class="cursor-pointer select-none transition-all hover:brightness-125"
+          />
+        </a>
       </div>
       <div class="px-3">
         <div
