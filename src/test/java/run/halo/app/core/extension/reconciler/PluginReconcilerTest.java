@@ -60,7 +60,8 @@ class PluginReconcilerTest {
     @BeforeEach
     void setUp() {
         pluginReconciler = new PluginReconciler(extensionClient, haloPluginManager);
-
+        lenient().when(haloPluginManager.validatePluginVersion(any())).thenReturn(true);
+        lenient().when(haloPluginManager.getSystemVersion()).thenReturn("0.0.0");
         lenient().when(haloPluginManager.getPlugin(any())).thenReturn(pluginWrapper);
         lenient().when(haloPluginManager.getUnresolvedPlugins()).thenReturn(List.of());
     }
@@ -127,7 +128,7 @@ class PluginReconcilerTest {
         when(pluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
 
         ArgumentCaptor<Plugin> pluginCaptor = doReconcileWithoutRequeue();
-        verify(extensionClient, times(3)).update(any(Plugin.class));
+        verify(extensionClient, times(4)).update(any(Plugin.class));
 
         Plugin updateArgs = pluginCaptor.getValue();
         assertThat(updateArgs).isNotNull();
@@ -162,7 +163,7 @@ class PluginReconcilerTest {
         when(pluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
 
         ArgumentCaptor<Plugin> pluginCaptor = doReconcileWithoutRequeue();
-        verify(extensionClient, times(3)).update(any(Plugin.class));
+        verify(extensionClient, times(4)).update(any(Plugin.class));
 
         Plugin updateArgs = pluginCaptor.getValue();
         assertThat(updateArgs).isNotNull();
