@@ -276,9 +276,9 @@ public class PostFinderImpl implements PostFinder {
                             .year(String.valueOf(key))
                             .months(monthArchives)
                             .build();
-                        })
-                        .sorted(Comparator.comparing(PostArchiveVo::getYear).reversed())
-                        .toList();
+                    })
+                    .sorted(Comparator.comparing(PostArchiveVo::getYear).reversed())
+                    .toList();
                 return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
                     postArchives);
             })
