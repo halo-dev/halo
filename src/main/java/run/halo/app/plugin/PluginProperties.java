@@ -71,9 +71,4 @@ public class PluginProperties {
      * Allows providing custom plugin loaders.
      */
     private Class<PluginLoader> customPluginLoader;
-
-    /**
-     * The system version used for comparisons to the plugin requires attribute.
-     */
-    private String systemVersion = "0.0.0";
 }

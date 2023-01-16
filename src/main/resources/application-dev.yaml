@@ -7,6 +7,12 @@ spring:
       enabled: always
   thymeleaf:
     cache: false
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          no-cache: true
+        use-last-modified: false
 
 halo:
   console:
