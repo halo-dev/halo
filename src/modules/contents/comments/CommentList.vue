@@ -221,6 +221,10 @@ const SortFilterItems: {
 }[] = [
   {
     label: "默认",
+    value: undefined,
+  },
+  {
+    label: "最后回复时间",
     value: "LAST_REPLY_TIME",
   },
   {
@@ -283,7 +287,7 @@ function handleClearKeyword() {
 const hasFilters = computed(() => {
   return (
     selectedApprovedFilterItem.value.value !== undefined ||
-    selectedSortFilterItem.value.value !== "LAST_REPLY_TIME" ||
+    selectedSortFilterItem.value.value !== undefined ||
     selectedUser.value ||
     keyword.value
   );
@@ -358,7 +362,7 @@ function handleClearFilters() {
                 </FilterTag>
 
                 <FilterTag
-                  v-if="selectedSortFilterItem.value != 'LAST_REPLY_TIME'"
+                  v-if="selectedSortFilterItem.value != undefined"
                   @close="handleSortFilterItemChange(SortFilterItems[0])"
                 >
                   排序：{{ selectedSortFilterItem.label }}
