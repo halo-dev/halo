@@ -119,13 +119,20 @@ function loadStyle(href: string) {
 const pluginErrorMessages: Array<string> = [];
 
 async function loadPluginModules() {
-  const { data } =
-    await apiClient.extension.plugin.listpluginHaloRunV1alpha1Plugin();
+  const { data } = await apiClient.plugin.listPlugins(
+    {
+      enabled: true,
+      page: 0,
+      size: 0,
+    },
+    { mute: true }
+  );
 
   // Get all started plugins
-  const plugins = data.items.filter(
-    (plugin) => plugin.status?.phase === "STARTED" && plugin.spec.enabled
-  );
+  const plugins = data.items.filter((plugin) => {
+    const { entry, stylesheet } = plugin.status || {};
+    return plugin.status?.phase === "STARTED" && (!!entry || !!stylesheet);
+  });
 
   for (const plugin of plugins) {
     const { entry, stylesheet } = plugin.status || {
