@@ -8,9 +8,11 @@ import Color from "colorjs.io";
 const props = withDefaults(
   defineProps<{
     tag: Tag;
+    rounded?: boolean;
     route?: boolean;
   }>(),
   {
+    rounded: false,
     route: false,
   }
 );
@@ -43,8 +45,13 @@ const handleRouteToDetail = () => {
       background: tag.spec.color,
       color: labelColor,
     }"
+    :rounded="rounded"
     @click="handleRouteToDetail"
   >
     {{ tag.spec.displayName }}
+
+    <template #rightIcon>
+      <slot name="rightIcon" />
+    </template>
   </VTag>
 </template>

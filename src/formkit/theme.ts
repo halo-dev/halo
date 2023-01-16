@@ -91,6 +91,19 @@ const theme: Record<string, Record<string, string>> = {
     content: "flex-1 p-2 col-span-11",
     controls: "bg-gray-200 col-span-1 flex items-center justify-center",
   },
+  tagSelect: {
+    ...textClassification,
+    inner: `${textClassification.inner} !overflow-visible !h-auto min-h-[2.25rem]`,
+    input: `w-0 flex-grow outline-0 bg-transparent py-1 px-3 block transition-all appearance-none text-sm antialiased`,
+    "post-tags-wrapper": "flex w-full items-center",
+    "post-tags": "flex w-full flex-wrap items-center",
+    "post-tag-wrapper": "inline-flex items-center p-1",
+    "post-tag-close":
+      "h-4 w-4 cursor-pointer text-gray-600 hover:text-gray-900",
+    "post-tags-button": "inline-flex h-full cursor-pointer items-center px-1",
+    "dropdown-wrapper":
+      "absolute ring-1 ring-white top-full bottom-auto right-0 z-10 mt-1 max-h-96 w-full overflow-auto rounded bg-white shadow-lg",
+  },
 };
 
 export default theme;
