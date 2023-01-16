@@ -72,7 +72,8 @@ public class WebServerSecurityConfig {
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 1)
-    SecurityWebFilterChain portalFilterChain(ServerHttpSecurity http, ServerSecurityContextRepository securityContextRepository) {
+    SecurityWebFilterChain portalFilterChain(ServerHttpSecurity http,
+        ServerSecurityContextRepository securityContextRepository) {
         var pathMatcher = pathMatchers(HttpMethod.GET, "/**");
         var mediaTypeMatcher = new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML);
         mediaTypeMatcher.setIgnoredMediaTypes(Set.of(MediaType.ALL));
