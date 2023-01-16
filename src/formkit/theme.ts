@@ -104,6 +104,17 @@ const theme: Record<string, Record<string, string>> = {
     "dropdown-wrapper":
       "absolute ring-1 ring-white top-full bottom-auto right-0 z-10 mt-1 max-h-96 w-full overflow-auto rounded bg-white shadow-lg",
   },
+  categorySelect: {
+    ...textClassification,
+    inner: `${textClassification.inner} !overflow-visible !h-auto min-h-[2.25rem]`,
+    input: `w-0 flex-grow outline-0 bg-transparent py-1 px-3 block transition-all appearance-none text-sm antialiased`,
+    "post-categories-wrapper": "flex w-full items-center",
+    "post-categories": "flex w-full flex-wrap items-center",
+    "post-categories-button":
+      "inline-flex h-full cursor-pointer items-center px-1",
+    "dropdown-wrapper":
+      "absolute ring-1 ring-white top-full bottom-auto right-0 z-10 mt-1 max-h-96 w-full overflow-auto rounded bg-white shadow-lg",
+  },
 };
 
 export default theme;

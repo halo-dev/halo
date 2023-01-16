@@ -121,3 +121,26 @@ export function convertCategoryTreeToCategory(
     },
   };
 }
+
+export const getCategoryPath = (
+  categories: CategoryTree[],
+  name: string,
+  path: CategoryTree[] = []
+) => {
+  for (const category of categories) {
+    if (category.metadata && category.metadata.name === name) {
+      return path.concat([category]);
+    }
+
+    if (category.spec && category.spec.children) {
+      const found = getCategoryPath(
+        category.spec.children,
+        name,
+        path.concat([category])
+      );
+      if (found) {
+        return found;
+      }
+    }
+  }
+};
