@@ -56,7 +56,8 @@ public class Theme extends AbstractExtension {
 
         private String version;
 
-        @Deprecated(forRemoval = true)
+        @Deprecated(forRemoval = true, since = "2.2.0")
+        @Schema(description = "Deprecated, use `requires` instead.")
         private String require;
 
         private String requires;
@@ -73,9 +74,17 @@ public class Theme extends AbstractExtension {
             return StringUtils.defaultString(this.version, WILDCARD);
         }
 
+        /**
+         * if requires is not empty, then return requires, else return require or {@code WILDCARD}.
+         *
+         * @return requires to satisfies system version
+         */
         @NonNull
         public String getRequires() {
-            return StringUtils.defaultString(requires, WILDCARD);
+            if (StringUtils.isNotBlank(this.requires)) {
+                return this.requires;
+            }
+            return StringUtils.defaultString(this.require, WILDCARD);
         }
     }
 
