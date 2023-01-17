@@ -21,7 +21,6 @@ import org.pf4j.RuntimeMode;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.core.extension.Setting;
@@ -354,9 +353,7 @@ public class PluginReconciler implements Reconciler<Request> {
         client.fetch(Setting.class, plugin.getSpec().getSettingName())
             .ifPresent(setting -> {
                 var data = SettingUtils.settingDefinedDefaultValueMap(setting);
-                if (CollectionUtils.isEmpty(data)) {
-                    return;
-                }
+                // Create with or without default value
                 ConfigMap configMap = new ConfigMap();
                 configMap.setMetadata(new Metadata());
                 configMap.getMetadata().setName(configMapNameToUse);
