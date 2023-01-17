@@ -16,7 +16,7 @@ rules:
     resources: [ "posts" ]
     verbs: [ "*" ]
   - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "posts", "posts/publish", "posts/unpublish", "posts/recycle", "posts/content", "contents", "contents/publish" ]
+    resources: [ "posts", "posts/publish", "posts/unpublish", "posts/recycle", "posts/content" ]
     verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
 ---
 apiVersion: v1alpha1
@@ -37,5 +37,5 @@ rules:
     resources: [ "posts" ]
     verbs: [ "get", "list" ]
   - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "posts", "contents" ]
+    resources: [ "posts", "posts/head-content", "posts/release-content" ]
     verbs: [ "get", "list" ]

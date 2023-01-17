@@ -12,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import run.halo.app.content.ContentService;
 import run.halo.app.content.PostQuery;
 import run.halo.app.content.TestPost;
 import run.halo.app.core.extension.content.Post;
@@ -28,9 +27,6 @@ import run.halo.app.extension.ReactiveExtensionClient;
 class PostServiceImplTest {
     @Mock
     private ReactiveExtensionClient client;
-
-    @Mock
-    private ContentService contentService;
 
     @InjectMocks
     private PostServiceImpl postService;

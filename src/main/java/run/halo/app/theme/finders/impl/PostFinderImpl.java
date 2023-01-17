@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -20,7 +21,7 @@ import org.springframework.util.comparator.Comparators;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
-import run.halo.app.content.ContentService;
+import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -47,6 +48,7 @@ import run.halo.app.theme.finders.vo.StatsVo;
  * @since 2.0.0
  */
 @Finder("postFinder")
+@AllArgsConstructor
 public class PostFinderImpl implements PostFinder {
 
     public static final Predicate<Post> FIXED_PREDICATE = post -> post.isPublished()
@@ -54,7 +56,7 @@ public class PostFinderImpl implements PostFinder {
         && Post.VisibleEnum.PUBLIC.equals(post.getSpec().getVisible());
     private final ReactiveExtensionClient client;
 
-    private final ContentService contentService;
+    private final PostService postService;
 
     private final TagFinder tagFinder;
 
@@ -63,19 +65,6 @@ public class PostFinderImpl implements PostFinder {
     private final ContributorFinder contributorFinder;
 
     private final CounterService counterService;
-
-    public PostFinderImpl(ReactiveExtensionClient client,
-        ContentService contentService,
-        TagFinder tagFinder,
-        CategoryFinder categoryFinder,
-        ContributorFinder contributorFinder, CounterService counterService) {
-        this.client = client;
-        this.contentService = contentService;
-        this.tagFinder = tagFinder;
-        this.categoryFinder = categoryFinder;
-        this.contributorFinder = contributorFinder;
-        this.counterService = counterService;
-    }
 
     @Override
     public Mono<PostVo> getByName(String postName) {
@@ -90,9 +79,7 @@ public class PostFinderImpl implements PostFinder {
 
     @Override
     public Mono<ContentVo> content(String postName) {
-        return client.fetch(Post.class, postName)
-            .map(post -> post.getSpec().getReleaseSnapshot())
-            .flatMap(contentService::getContent)
+        return postService.getReleaseContent(postName)
             .map(wrapper -> ContentVo.builder().content(wrapper.getContent())
                 .raw(wrapper.getRaw()).build());
     }

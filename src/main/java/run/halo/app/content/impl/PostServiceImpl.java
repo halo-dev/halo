@@ -2,7 +2,6 @@ package run.halo.app.content.impl;
 
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
-import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
@@ -11,19 +10,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.content.AbstractContentService;
 import run.halo.app.content.ContentRequest;
-import run.halo.app.content.ContentService;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.Contributor;
 import run.halo.app.content.ListedPost;
@@ -52,11 +48,15 @@ import run.halo.app.metrics.MeterUtils;
  */
 @Slf4j
 @Component
-@AllArgsConstructor
-public class PostServiceImpl implements PostService {
-    private final ContentService contentService;
+public class PostServiceImpl extends AbstractContentService implements PostService {
     private final ReactiveExtensionClient client;
     private final CounterService counterService;
+
+    public PostServiceImpl(ReactiveExtensionClient client, CounterService counterService) {
+        super(client);
+        this.client = client;
+        this.counterService = counterService;
+    }
 
     @Override
     public Mono<ListResult<ListedPost>> listPost(PostQuery query) {
@@ -253,7 +253,7 @@ public class PostServiceImpl implements PostService {
                     new ContentRequest(Ref.of(post), post.getSpec().getHeadSnapshot(),
                         postRequest.content().raw(), postRequest.content().content(),
                         postRequest.content().rawType());
-                return contentService.draftContent(contentRequest)
+                return draftContent(post.getSpec().getBaseSnapshot(), contentRequest)
                     .flatMap(contentWrapper -> waitForPostToDraftConcludingWork(
                         post.getMetadata().getName(),
                         contentWrapper)
@@ -293,16 +293,17 @@ public class PostServiceImpl implements PostService {
         Post post = postRequest.post();
         String headSnapshot = post.getSpec().getHeadSnapshot();
         String releaseSnapshot = post.getSpec().getReleaseSnapshot();
+        String baseSnapshot = post.getSpec().getBaseSnapshot();
 
         if (StringUtils.equals(releaseSnapshot, headSnapshot)) {
             // create new snapshot to update first
-            return contentService.draftContent(postRequest.contentRequest(), headSnapshot)
+            return draftContent(baseSnapshot, postRequest.contentRequest(), headSnapshot)
                 .flatMap(contentWrapper -> {
                     post.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
                     return client.update(post);
                 });
         }
-        return contentService.updateContent(postRequest.contentRequest())
+        return updateContent(baseSnapshot, postRequest.contentRequest())
             .flatMap(contentWrapper -> {
                 post.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
                 return client.update(post);
@@ -311,9 +312,21 @@ public class PostServiceImpl implements PostService {
                 .filter(throwable -> throwable instanceof OptimisticLockingFailureException));
     }
 
-    private Mono<String> getContextUsername() {
-        return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
-            .map(Principal::getName);
+    @Override
+    public Mono<ContentWrapper> getHeadContent(String postName) {
+        return client.get(Post.class, postName)
+            .flatMap(post -> {
+                String headSnapshot = post.getSpec().getHeadSnapshot();
+                return getContent(headSnapshot, post.getSpec().getBaseSnapshot());
+            });
+    }
+
+    @Override
+    public Mono<ContentWrapper> getReleaseContent(String postName) {
+        return client.get(Post.class, postName)
+            .flatMap(post -> {
+                String releaseSnapshot = post.getSpec().getReleaseSnapshot();
+                return getContent(releaseSnapshot, post.getSpec().getBaseSnapshot());
+            });
     }
 }
