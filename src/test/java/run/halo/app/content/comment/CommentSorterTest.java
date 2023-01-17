@@ -3,6 +3,7 @@ package run.halo.app.content.comment;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -99,6 +100,23 @@ class CommentSorterTest {
         assertThat(commentNames).isEqualTo(List.of("B", "A", "C"));
     }
 
+    @Test
+    void sortByDefaultDesc() {
+        Comparator<Comment> defaultComparator = CommentSorter.defaultCommentComparator().reversed();
+        List<String> commentNames = comments().stream()
+            .sorted(defaultComparator)
+            .map(comment -> comment.getMetadata().getName())
+            .toList();
+        assertThat(commentNames).isEqualTo(List.of("B", "A", "C"));
+
+
+        List<String> commentList = commentsIncludeNoReply().stream()
+            .sorted(defaultComparator)
+            .map(comment -> comment.getMetadata().getName())
+            .toList();
+        assertThat(commentList).isEqualTo(List.of("D", "E", "B", "A", "C"));
+    }
+
     List<Comment> comments() {
         final Instant now = Instant.now();
         Comment commentA = new Comment();
@@ -135,5 +153,34 @@ class CommentSorterTest {
         commentC.getStatus().setReplyCount(10);
 
         return List.of(commentA, commentB, commentC);
+    }
+
+    List<Comment> commentsIncludeNoReply() {
+
+        final Instant now = Instant.now();
+        Comment commentD = new Comment();
+        commentD.setMetadata(new Metadata());
+        commentD.getMetadata().setName("D");
+
+        commentD.getMetadata().setCreationTimestamp(now.plusSeconds(50));
+
+        commentD.setSpec(new Comment.CommentSpec());
+        commentD.setStatus(new Comment.CommentStatus());
+
+        Comment commentE = new Comment();
+        commentE.setMetadata(new Metadata());
+        commentE.getMetadata().setName("E");
+
+        commentE.getMetadata().setCreationTimestamp(now.plusSeconds(20));
+
+        commentE.setSpec(new Comment.CommentSpec());
+        commentE.setStatus(new Comment.CommentStatus());
+
+        List<Comment> comments = new ArrayList<>(comments());
+        comments.add(commentD);
+        comments.add(commentE);
+
+        return comments;
+
     }
 }

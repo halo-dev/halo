@@ -191,35 +191,35 @@ class PostFinderImplTest {
 
     List<Post> posts() {
         // 置顶的排前面按 priority 排序
-        // 再根据创建时间排序
+        // 再根据发布时间排序
         // 相同再根据名称排序
         // 6, 2, 1, 5, 4, 3
         Post post1 = post(1);
         post1.getSpec().setPinned(false);
-        post1.getMetadata().setCreationTimestamp(Instant.now().plusSeconds(20));
+        post1.getSpec().setPublishTime(Instant.now().plusSeconds(20));
 
         Post post2 = post(2);
         post2.getSpec().setPinned(true);
         post2.getSpec().setPriority(2);
-        post2.getMetadata().setCreationTimestamp(Instant.now());
+        post2.getSpec().setPublishTime(Instant.now());
 
         Post post3 = post(3);
         post3.getSpec().setDeleted(true);
-        post3.getMetadata().setCreationTimestamp(Instant.now());
+        post3.getSpec().setPublishTime(Instant.now());
 
         Post post4 = post(4);
         post4.getSpec().setVisible(Post.VisibleEnum.PRIVATE);
-        post4.getMetadata().setCreationTimestamp(Instant.now());
+        post4.getSpec().setPublishTime(Instant.now());
 
         Post post5 = post(5);
         post5.getSpec().setPublish(false);
         post5.getMetadata().getLabels().clear();
-        post5.getMetadata().setCreationTimestamp(Instant.now());
+        post5.getSpec().setPublishTime(Instant.now());
 
         Post post6 = post(6);
         post6.getSpec().setPinned(true);
         post6.getSpec().setPriority(3);
-        post6.getMetadata().setCreationTimestamp(Instant.now());
+        post6.getSpec().setPublishTime(Instant.now());
 
         return List.of(post1, post2, post3, post4, post5, post6);
     }

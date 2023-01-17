@@ -352,6 +352,10 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
             List<String> contributors = client.list(Snapshot.class,
                     snapshot -> Ref.of(singlePage).equals(snapshot.getSpec().getSubjectRef()), null)
                 .stream()
+                .peek(snapshot -> {
+                    snapshot.getSpec().setContentPatch(StringUtils.EMPTY);
+                    snapshot.getSpec().setRawPatch(StringUtils.EMPTY);
+                })
                 .map(snapshot -> {
                     Set<String> usernames = snapshot.getSpec().getContributors();
                     return Objects.requireNonNullElseGet(usernames,
