@@ -148,8 +148,7 @@ public class CategoryFinderImpl implements CategoryFinder {
             category -> category.getMetadata().getName();
         return Comparator.comparing(priority)
             .thenComparing(creationTimestamp)
-            .thenComparing(name)
-            .reversed();
+            .thenComparing(name);
     }
 
     int pageNullSafe(Integer page) {
