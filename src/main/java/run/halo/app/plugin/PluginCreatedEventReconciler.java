@@ -4,7 +4,6 @@ import io.micrometer.common.util.StringUtils;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.EventListener;
@@ -77,8 +76,7 @@ public class PluginCreatedEventReconciler
 
     void ensureConfigMapNameNotEmptyIfSettingIsNotBlank(String pluginName)
         throws InterruptedException {
-        var latch = new CountDownLatch(1);
-        var disposable = client.fetch(Plugin.class, pluginName)
+        client.fetch(Plugin.class, pluginName)
             .switchIfEmpty(Mono.error(new IllegalStateException("Plugin not found: " + pluginName)))
             .filter(plugin -> StringUtils.isNotBlank(plugin.getSpec().getSettingName()))
             .filter(plugin -> StringUtils.isBlank(plugin.getSpec().getConfigMapName()))
@@ -87,16 +85,7 @@ public class PluginCreatedEventReconciler
                 plugin.getSpec().setConfigMapName(UUID.randomUUID().toString());
             })
             .flatMap(client::update)
-            .doFinally(signalType -> latch.countDown())
-            .subscribe(service -> {
-            }, throwable -> {
-                throw Exceptions.propagate(throwable);
-            });
-        try {
-            latch.await();
-        } finally {
-            disposable.dispose();
-        }
+            .block();
     }
 
     @Override
