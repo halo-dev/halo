@@ -241,7 +241,7 @@ const viewTypes = [
   },
 ];
 
-const viewType = useRouteQuery<string>("view", "grid");
+const viewType = useRouteQuery<string>("view", "list");
 
 // Route query action
 const routeQueryAction = useRouteQuery<string | undefined>("action");
