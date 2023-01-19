@@ -7,6 +7,7 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +19,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.properties.HaloProperties;
-import run.halo.app.infra.utils.FilePathUtils;
+import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.theme.dialect.HaloSpringSecurityDialect;
 import run.halo.app.theme.dialect.LinkExpressionObjectDialect;
 
@@ -29,10 +29,11 @@ import run.halo.app.theme.dialect.LinkExpressionObjectDialect;
  */
 @Configuration
 public class ThemeConfiguration {
-    private final HaloProperties haloProperties;
 
-    public ThemeConfiguration(HaloProperties haloProperties) {
-        this.haloProperties = haloProperties;
+    private final ThemeRootGetter themeRoot;
+
+    public ThemeConfiguration(ThemeRootGetter themeRoot) {
+        this.themeRoot = themeRoot;
     }
 
     @Bean
@@ -43,6 +44,7 @@ public class ThemeConfiguration {
             request -> {
                 var themeName = request.pathVariable("themeName");
                 var resource = request.pathVariable("resource");
+                resource = StringUtils.removeStart(resource, "/");
                 var fsRes = new FileSystemResource(getThemeAssetsPath(themeName, resource));
                 var bodyBuilder = ServerResponse.ok()
                     .cacheControl(cacheProperties.getCachecontrol().toHttpCacheControl());
@@ -61,8 +63,11 @@ public class ThemeConfiguration {
     }
 
     private Path getThemeAssetsPath(String themeName, String resource) {
-        return FilePathUtils.combinePath(haloProperties.getWorkDir().toString(),
-            "themes", themeName, "templates", "assets", resource);
+        return themeRoot.get()
+            .resolve(themeName)
+            .resolve("templates")
+            .resolve("assets")
+            .resolve(resource);
     }
 
     @Bean
