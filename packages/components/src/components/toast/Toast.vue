@@ -141,7 +141,7 @@ defineExpose({ close });
   }
 
   .toast-body {
-    @apply cursor-pointer flex items-center px-2.5 py-2 overflow-hidden bg-white shadow hover:shadow-md transition-all rounded gap-2;
+    @apply cursor-pointer flex items-center px-2.5 py-2 overflow-hidden break-all bg-white shadow hover:shadow-md transition-all rounded gap-2;
   }
 
   .toast-content {
