@@ -17,6 +17,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.zip.ZipInputStream;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -37,21 +38,22 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
+import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.ThemeUpgradeException;
+import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
+import run.halo.app.infra.utils.VersionUtils;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class ThemeServiceImpl implements ThemeService {
 
     private final ReactiveExtensionClient client;
 
     private final ThemeRootGetter themeRoot;
 
-    public ThemeServiceImpl(ReactiveExtensionClient client, ThemeRootGetter themeRoot) {
-        this.client = client;
-        this.themeRoot = themeRoot;
-    }
+    private final SystemVersionSupplier systemVersionSupplier;
 
     @Override
     public Mono<Theme> install(InputStream is) {
@@ -139,6 +141,18 @@ public class ThemeServiceImpl implements ThemeService {
             "Theme manifest kind must be Theme.");
         return client.create(themeManifest)
             .map(theme -> Unstructured.OBJECT_MAPPER.convertValue(theme, Theme.class))
+            .doOnNext(theme -> {
+                String systemVersion = systemVersionSupplier.get().getNormalVersion();
+                String requires = theme.getSpec().getRequires();
+                if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
+                    throw new UnsatisfiedAttributeValueException(
+                        String.format("The theme requires a minimum system version of %s, "
+                                + "but the current version is %s.",
+                            requires, systemVersion),
+                        "problemDetail.theme.version.unsatisfied.requires",
+                        new String[] {requires, systemVersion});
+                }
+            })
             .flatMap(theme -> {
                 var unstructureds = ThemeUtils.loadThemeResources(getThemePath(theme));
                 if (unstructureds.stream()
