@@ -492,7 +492,10 @@ function handleClearFilters() {
           class="box-border h-full w-full divide-y divide-gray-100"
           role="list"
         >
-          <li v-for="(comment, index) in comments.items" :key="index">
+          <li
+            v-for="comment in comments.items"
+            :key="comment.comment.metadata.name"
+          >
             <CommentListItem
               :comment="comment"
               :is-selected="checkSelection(comment)"
