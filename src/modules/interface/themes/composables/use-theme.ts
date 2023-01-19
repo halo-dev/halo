@@ -9,6 +9,7 @@ import { storeToRefs } from "pinia";
 interface useThemeLifeCycleReturn {
   loading: Ref<boolean>;
   isActivated: ComputedRef<boolean>;
+  getFailedMessage: () => string | undefined;
   handleActiveTheme: () => void;
   handleResetSettingConfig: () => void;
 }
@@ -25,6 +26,18 @@ export function useThemeLifeCycle(
   const isActivated = computed(() => {
     return activatedTheme?.value?.metadata.name === theme.value?.metadata.name;
   });
+
+  const getFailedMessage = (): string | undefined => {
+    if (!(theme.value?.status?.phase === "FAILED")) {
+      return;
+    }
+
+    const condition = theme.value.status.conditions?.[0];
+
+    if (condition) {
+      return [condition.type, condition.message].join("：");
+    }
+  };
 
   const handleActiveTheme = async () => {
     Dialog.info({
@@ -86,6 +99,7 @@ export function useThemeLifeCycle(
   return {
     loading,
     isActivated,
+    getFailedMessage,
     handleActiveTheme,
     handleResetSettingConfig,
   };

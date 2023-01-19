@@ -14,6 +14,7 @@ import {
   Dialog,
   VAvatar,
   Toast,
+  VStatusDot,
 } from "@halo-dev/components";
 import ThemeUploadModal from "./components/ThemeUploadModal.vue";
 
@@ -26,7 +27,7 @@ import { apiClient } from "@/utils/api-client";
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme", ref());
 const upgradeModal = ref(false);
 
-const { isActivated, handleResetSettingConfig } =
+const { isActivated, getFailedMessage, handleResetSettingConfig } =
   useThemeLifeCycle(selectedTheme);
 
 const handleReloadTheme = async () => {
@@ -83,6 +84,12 @@ const onUpgradeModalClose = () => {
                 <VTag>
                   {{ isActivated ? "当前启用" : "未启用" }}
                 </VTag>
+                <VStatusDot
+                  v-if="getFailedMessage()"
+                  v-tooltip="getFailedMessage()"
+                  state="warning"
+                  animate
+                />
               </p>
             </div>
           </div>
@@ -184,7 +191,7 @@ const onUpgradeModalClose = () => {
           >
             <dt class="text-sm font-medium text-gray-900">Halo 版本要求</dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-              {{ selectedTheme?.spec.require }}
+              {{ selectedTheme?.spec.requires }}
             </dd>
           </div>
           <div
