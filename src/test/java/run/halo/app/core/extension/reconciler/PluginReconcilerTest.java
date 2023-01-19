@@ -28,6 +28,7 @@ import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.context.ApplicationEventPublisher;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.extension.ExtensionClient;
@@ -55,11 +56,14 @@ class PluginReconcilerTest {
     @Mock
     PluginWrapper pluginWrapper;
 
+    @Mock
+    ApplicationEventPublisher eventPublisher;
+
     PluginReconciler pluginReconciler;
 
     @BeforeEach
     void setUp() {
-        pluginReconciler = new PluginReconciler(extensionClient, haloPluginManager);
+        pluginReconciler = new PluginReconciler(extensionClient, haloPluginManager, eventPublisher);
         lenient().when(haloPluginManager.validatePluginVersion(any())).thenReturn(true);
         lenient().when(haloPluginManager.getSystemVersion()).thenReturn("0.0.0");
         lenient().when(haloPluginManager.getPlugin(any())).thenReturn(pluginWrapper);
