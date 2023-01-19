@@ -3,6 +3,7 @@ package run.halo.app.content.comment;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import org.springframework.util.comparator.Comparators;
 import run.halo.app.core.extension.content.Comment;
@@ -65,9 +66,13 @@ public enum CommentSorter {
     }
 
     static Comparator<Comment> defaultCommentComparator() {
-        Function<Comment, Instant> lastReplyTime =
-            comment -> comment.getStatusOrDefault().getLastReplyTime();
-        return Comparator.comparing(lastReplyTime, Comparators.nullsLow())
+        Function<Comment, Instant> comparatorFunc =
+            comment -> {
+                Instant lastReplyTime = comment.getStatusOrDefault().getLastReplyTime();
+                return Optional.ofNullable(
+                    lastReplyTime).orElse(comment.getMetadata().getCreationTimestamp());
+            };
+        return Comparator.comparing(comparatorFunc, Comparators.nullsLow())
             .thenComparing(name);
     }
 }

@@ -2,6 +2,7 @@ package run.halo.app.core.extension.reconciler;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +25,13 @@ import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
+import run.halo.app.infra.Condition;
+import run.halo.app.infra.ConditionStatus;
+import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.exception.ThemeUninstallException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.VersionUtils;
 import run.halo.app.theme.ThemePathPolicy;
 
 /**
@@ -41,6 +46,7 @@ public class ThemeReconciler implements Reconciler<Request> {
 
     private final ExtensionClient client;
     private final ThemePathPolicy themePathPolicy;
+    private final SystemVersionSupplier systemVersionSupplier;
 
     private final RetryTemplate retryTemplate = RetryTemplate.builder()
         .maxAttempts(20)
@@ -48,9 +54,11 @@ public class ThemeReconciler implements Reconciler<Request> {
         .retryOn(IllegalStateException.class)
         .build();
 
-    public ThemeReconciler(ExtensionClient client, HaloProperties haloProperties) {
+    public ThemeReconciler(ExtensionClient client, HaloProperties haloProperties,
+        SystemVersionSupplier systemVersionSupplier) {
         this.client = client;
         themePathPolicy = new ThemePathPolicy(haloProperties.getWorkDir());
+        this.systemVersionSupplier = systemVersionSupplier;
     }
 
     @Override
@@ -77,12 +85,35 @@ public class ThemeReconciler implements Reconciler<Request> {
 
     private void reconcileStatus(String name) {
         client.fetch(Theme.class, name).ifPresent(theme -> {
-            Theme oldTheme = JsonUtils.deepCopy(theme);
+            final Theme oldTheme = JsonUtils.deepCopy(theme);
             if (theme.getStatus() == null) {
                 theme.setStatus(new Theme.ThemeStatus());
             }
+            Theme.ThemeStatus status = theme.getStatus();
+
             Path themePath = themePathPolicy.generate(theme);
-            theme.getStatus().setLocation(themePath.toAbsolutePath().toString());
+            status.setLocation(themePath.toAbsolutePath().toString());
+            if (status.getPhase() == null) {
+                status.setPhase(Theme.ThemePhase.READY);
+            }
+
+            // Check if this theme version is match requires param.
+            String normalVersion = systemVersionSupplier.get().getNormalVersion();
+            String requires = theme.getSpec().getRequires();
+            if (!VersionUtils.satisfiesRequires(normalVersion, requires)) {
+                status.setPhase(Theme.ThemePhase.FAILED);
+                Condition condition = Condition.builder()
+                    .type(Theme.ThemePhase.FAILED.name())
+                    .status(ConditionStatus.FALSE)
+                    .reason("UnsatisfiedRequiresVersion")
+                    .message(String.format(
+                        "Theme requires a minimum system version of [%s], and you have [%s].",
+                        requires, normalVersion))
+                    .lastTransitionTime(Instant.now())
+                    .build();
+                Theme.nullSafeConditionList(theme).add(condition);
+            }
+
             if (!oldTheme.equals(theme)) {
                 client.update(theme);
             }
