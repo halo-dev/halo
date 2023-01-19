@@ -100,7 +100,7 @@ public class TemplateEngineManager {
             thymeleafProperties.isRenderHiddenMarkersBeforeCheckboxes());
 
         var mainResolver = haloTemplateResolver();
-        mainResolver.setPrefix(theme.getPath() + "/templates/");
+        mainResolver.setPrefix(theme.getPath().resolve("templates") + "/");
         engine.addTemplateResolver(mainResolver);
         // replace StandardDialect with SpringStandardDialect
         engine.setDialect(new SpringStandardDialect() {
