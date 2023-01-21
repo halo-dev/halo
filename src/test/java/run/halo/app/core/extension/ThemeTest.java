@@ -45,7 +45,7 @@ class ThemeTest {
         themeSpec.setSettingName("test-setting");
 
         themeSpec.setVersion(null);
-        themeSpec.setRequire(null);
+        themeSpec.setRequires(null);
         JSONAssert.assertEquals("""
                 {
                     "spec": {
@@ -59,7 +59,7 @@ class ThemeTest {
                         "website": "https://test.com",
                         "repo": "https://test.com",
                         "version": "*",
-                        "require": "*",
+                        "requires": "*",
                         "settingName": "test-setting",
                         "configMapName": "test-config-map"
                     },
@@ -74,9 +74,9 @@ class ThemeTest {
             true);
 
         themeSpec.setVersion("1.0.0");
-        themeSpec.setRequire("2.0.0");
+        themeSpec.setRequires("2.0.0");
         assertThat(themeSpec.getVersion()).isEqualTo("1.0.0");
-        assertThat(themeSpec.getRequire()).isEqualTo("2.0.0");
+        assertThat(themeSpec.getRequires()).isEqualTo("2.0.0");
     }
 
     @Test

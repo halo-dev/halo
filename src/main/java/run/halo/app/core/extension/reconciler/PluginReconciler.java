@@ -18,9 +18,14 @@ import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.ReverseProxy;
+import run.halo.app.core.extension.Setting;
+import run.halo.app.core.extension.theme.SettingUtils;
+import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Controller;
@@ -32,6 +37,7 @@ import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginStartingError;
+import run.halo.app.plugin.event.PluginCreatedEvent;
 import run.halo.app.plugin.resources.BundleResourceUtils;
 
 /**
@@ -47,6 +53,7 @@ public class PluginReconciler implements Reconciler<Request> {
     private static final String FINALIZER_NAME = "plugin-protection";
     private final ExtensionClient client;
     private final HaloPluginManager haloPluginManager;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public Result reconcile(Request request) {
@@ -145,6 +152,8 @@ public class PluginReconciler implements Reconciler<Request> {
                 handleStatus(plugin, currentState, PluginState.STARTED);
                 plugin.statusNonNull().setLastStartTime(Instant.now());
             }
+
+            settingDefaultConfig(plugin);
 
             Plugin.PluginStatus status = plugin.statusNonNull();
             String jsBundlePath =
@@ -257,6 +266,9 @@ public class PluginReconciler implements Reconciler<Request> {
                 }
                 newFinalizers.add(FINALIZER_NAME);
                 client.update(plugin);
+
+                eventPublisher.publishEvent(
+                    new PluginCreatedEvent(this, plugin.getMetadata().getName()));
             });
     }
 
@@ -319,6 +331,35 @@ public class PluginReconciler implements Reconciler<Request> {
                     client.update(reverseProxy);
                 }
             }, () -> client.create(reverseProxy));
+    }
+
+    private void settingDefaultConfig(Plugin plugin) {
+        Assert.notNull(plugin, "The plugin must not be null.");
+        if (StringUtils.isBlank(plugin.getSpec().getSettingName())) {
+            return;
+        }
+
+        final String configMapNameToUse = plugin.getSpec().getConfigMapName();
+        if (StringUtils.isBlank(configMapNameToUse)) {
+            return;
+        }
+
+        boolean existConfigMap = client.fetch(ConfigMap.class, configMapNameToUse)
+            .isPresent();
+        if (existConfigMap) {
+            return;
+        }
+
+        client.fetch(Setting.class, plugin.getSpec().getSettingName())
+            .ifPresent(setting -> {
+                var data = SettingUtils.settingDefinedDefaultValueMap(setting);
+                // Create with or without default value
+                ConfigMap configMap = new ConfigMap();
+                configMap.setMetadata(new Metadata());
+                configMap.getMetadata().setName(configMapNameToUse);
+                configMap.setData(data);
+                client.create(configMap);
+            });
     }
 
     static String initialReverseProxyName(String pluginName) {
