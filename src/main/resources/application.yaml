@@ -50,3 +50,18 @@ logging:
       max-file-size: 10MB
       total-size-cap: 1GB
       max-history: 0
+
+management:
+  endpoints:
+    web:
+      exposure:
+          include: ["health", "info", "startup"]
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  info:
+    java:
+      enabled: true
+    os:
+      enabled: true

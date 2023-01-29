@@ -3,6 +3,9 @@ package run.halo.app.infra;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import lombok.Data;
+import org.springframework.boot.convert.ApplicationConversionService;
+import run.halo.app.extension.ConfigMap;
+import run.halo.app.infra.utils.JsonUtils;
 
 /**
  * TODO Optimization value acquisition.
@@ -102,4 +105,16 @@ public class SystemSetting {
 
     }
 
+    public static <T> T get(ConfigMap configMap, String key, Class<T> type) {
+        var data = configMap.getData();
+        var valueString = data.get(key);
+        if (valueString == null) {
+            return null;
+        }
+        var conversionService = ApplicationConversionService.getSharedInstance();
+        if (conversionService.canConvert(String.class, type)) {
+            return conversionService.convert(valueString, type);
+        }
+        return JsonUtils.jsonToObject(valueString, type);
+    }
 }
