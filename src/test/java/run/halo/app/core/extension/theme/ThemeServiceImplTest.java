@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
 import static run.halo.app.infra.utils.FileUtils.zip;
 
+import com.github.zafarkhaja.semver.Version;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -44,6 +45,7 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.extension.exception.ExtensionException;
+import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.ThemeInstallationException;
 import run.halo.app.infra.utils.JsonUtils;
@@ -57,6 +59,9 @@ class ThemeServiceImplTest {
     @Mock
     ThemeRootGetter themeRoot;
 
+    @Mock
+    private SystemVersionSupplier systemVersionSupplier;
+
     @InjectMocks
     ThemeServiceImpl themeService;
 
@@ -68,6 +73,8 @@ class ThemeServiceImplTest {
         lenient().when(themeRoot.get()).thenReturn(tmpDir.resolve("themes"));
         // init the folder
         Files.createDirectory(themeRoot.get());
+
+        lenient().when(systemVersionSupplier.get()).thenReturn(Version.valueOf("0.0.0"));
     }
 
     @AfterEach
@@ -253,7 +260,7 @@ class ThemeServiceImplTest {
                                 "spec": {
                                     "displayName": "Fake Theme",
                                     "version": "*",
-                                    "require": "*"
+                                    "requires": "*"
                                 },
                                 "apiVersion": "theme.halo.run/v1alpha1",
                                 "kind": "Theme",
@@ -370,7 +377,7 @@ class ThemeServiceImplTest {
                                     "settingName": "fake-setting",
                                     "displayName": "Fake Theme",
                                     "version": "*",
-                                    "require": "*"
+                                    "requires": "*"
                                 },
                                 "apiVersion": "theme.halo.run/v1alpha1",
                                 "kind": "Theme",

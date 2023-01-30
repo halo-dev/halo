@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.dialect.HaloProcessorDialect;
-import run.halo.app.theme.engine.SpringWebFluxTemplateEngine;
+import run.halo.app.theme.engine.HaloTemplateEngine;
 import run.halo.app.theme.message.ThemeMessageResolver;
 
 /**
@@ -93,15 +93,14 @@ public class TemplateEngineManager {
     }
 
     private ISpringWebFluxTemplateEngine templateEngineGenerator(ThemeContext theme) {
-        var engine = new SpringWebFluxTemplateEngine();
+        var engine = new HaloTemplateEngine(new ThemeMessageResolver(theme));
         engine.setEnableSpringELCompiler(thymeleafProperties.isEnableSpringElCompiler());
-        engine.setMessageResolver(new ThemeMessageResolver(theme));
         engine.setLinkBuilder(new ThemeLinkBuilder(theme, externalUrlSupplier));
         engine.setRenderHiddenMarkersBeforeCheckboxes(
             thymeleafProperties.isRenderHiddenMarkersBeforeCheckboxes());
 
         var mainResolver = haloTemplateResolver();
-        mainResolver.setPrefix(theme.getPath() + "/templates/");
+        mainResolver.setPrefix(theme.getPath().resolve("templates") + "/");
         engine.addTemplateResolver(mainResolver);
         // replace StandardDialect with SpringStandardDialect
         engine.setDialect(new SpringStandardDialect() {

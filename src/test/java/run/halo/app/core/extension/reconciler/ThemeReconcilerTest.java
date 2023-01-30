@@ -4,10 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.github.zafarkhaja.semver.Version;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -38,6 +40,7 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.ThemePathPolicy;
@@ -58,6 +61,9 @@ class ThemeReconcilerTest {
     private HaloProperties haloProperties;
 
     @Mock
+    private SystemVersionSupplier systemVersionSupplier;
+
+    @Mock
     private File defaultTheme;
 
     private Path tempDirectory;
@@ -66,6 +72,7 @@ class ThemeReconcilerTest {
     void setUp() throws IOException {
         tempDirectory = Files.createTempDirectory("halo-theme-");
         defaultTheme = ResourceUtils.getFile("classpath:themes/default");
+        lenient().when(systemVersionSupplier.get()).thenReturn(Version.valueOf("0.0.0"));
     }
 
     @AfterEach
@@ -80,7 +87,7 @@ class ThemeReconcilerTest {
         when(haloProperties.getWorkDir()).thenReturn(testWorkDir);
 
         final ThemeReconciler themeReconciler =
-            new ThemeReconciler(extensionClient, haloProperties);
+            new ThemeReconciler(extensionClient, haloProperties, systemVersionSupplier);
         final ThemePathPolicy themePathPolicy = new ThemePathPolicy(testWorkDir);
 
         Theme theme = new Theme();
@@ -127,7 +134,7 @@ class ThemeReconcilerTest {
         when(haloProperties.getWorkDir()).thenReturn(testWorkDir);
 
         final ThemeReconciler themeReconciler =
-            new ThemeReconciler(extensionClient, haloProperties);
+            new ThemeReconciler(extensionClient, haloProperties, systemVersionSupplier);
 
         final int[] retryFlags = {0, 0};
         when(extensionClient.fetch(eq(Setting.class), eq("theme-test-setting")))
@@ -166,7 +173,7 @@ class ThemeReconcilerTest {
         when(haloProperties.getWorkDir()).thenReturn(testWorkDir);
 
         final ThemeReconciler themeReconciler =
-            new ThemeReconciler(extensionClient, haloProperties);
+            new ThemeReconciler(extensionClient, haloProperties, systemVersionSupplier);
 
         final int[] retryFlags = {0};
         when(extensionClient.fetch(eq(Setting.class), eq("theme-test-setting")))
@@ -211,7 +218,7 @@ class ThemeReconcilerTest {
         when(haloProperties.getWorkDir()).thenReturn(testWorkDir);
 
         final ThemeReconciler themeReconciler =
-            new ThemeReconciler(extensionClient, haloProperties);
+            new ThemeReconciler(extensionClient, haloProperties, systemVersionSupplier);
 
         Theme theme = new Theme();
         Metadata metadata = new Metadata();
