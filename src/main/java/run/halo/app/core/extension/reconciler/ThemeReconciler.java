@@ -11,7 +11,6 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.FileSystemUtils;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
@@ -150,9 +149,7 @@ public class ThemeReconciler implements Reconciler<Request> {
         client.fetch(Setting.class, theme.getSpec().getSettingName())
             .ifPresent(setting -> {
                 var data = SettingUtils.settingDefinedDefaultValueMap(setting);
-                if (CollectionUtils.isEmpty(data)) {
-                    return;
-                }
+                // Whether there is a default value or not
                 ConfigMap configMap = new ConfigMap();
                 configMap.setMetadata(new Metadata());
                 configMap.getMetadata().setName(configMapNameToUse);
