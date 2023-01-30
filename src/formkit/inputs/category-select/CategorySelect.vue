@@ -13,6 +13,7 @@ import CategoryTag from "./components/CategoryTag.vue";
 import SearchResultListItem from "./components/SearchResultListItem.vue";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
+import { slugify } from "transliteration";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -212,7 +213,7 @@ const handleCreateCategory = async () => {
       category: {
         spec: {
           displayName: text.value,
-          slug: text.value,
+          slug: slugify(text.value, { trim: true }),
           description: "",
           cover: "",
           template: "",

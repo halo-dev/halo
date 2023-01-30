@@ -12,6 +12,7 @@ import {
 import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
 import { usePermission } from "@/utils/permission";
+import { slugify } from "transliteration";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -196,7 +197,7 @@ const handleCreateTag = async () => {
       tag: {
         spec: {
           displayName: text.value,
-          slug: text.value,
+          slug: slugify(text.value, { trim: true }),
           color: "#ffffff",
           cover: "",
         },

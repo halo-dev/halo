@@ -1,5 +1,11 @@
 <script lang="ts" setup>
-import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
+import {
+  IconRefreshLine,
+  Toast,
+  VButton,
+  VModal,
+  VSpace,
+} from "@halo-dev/components";
 import { computed, nextTick, ref, watchEffect } from "vue";
 import type { Post } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
@@ -10,6 +16,7 @@ import { randomUUID } from "@/utils/id";
 import { toDatetimeLocal, toISOString } from "@/utils/date";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { submitForm } from "@formkit/core";
+import useSlugify from "@/composables/use-slugify";
 
 const initialFormState: Post = {
   spec: {
@@ -222,6 +229,20 @@ const onPublishTimeChange = (value: string) => {
 };
 
 const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
+
+// slug
+const { handleGenerateSlug } = useSlugify(
+  computed(() => formState.value.spec.title),
+  computed({
+    get() {
+      return formState.value.spec.slug;
+    },
+    set(value) {
+      formState.value.spec.slug = value;
+    },
+  }),
+  computed(() => !isUpdateMode.value)
+);
 </script>
 <template>
   <VModal
@@ -265,7 +286,20 @@ const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
               name="slug"
               type="text"
               validation="required|length:0,100"
-            ></FormKit>
+              help="通常用于生成文章的固定链接"
+            >
+              <template #suffix>
+                <div
+                  v-tooltip="'根据标题重新生成别名'"
+                  class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
+                  @click="handleGenerateSlug"
+                >
+                  <IconRefreshLine
+                    class="h-4 w-4 text-gray-500 group-hover:text-gray-700"
+                  />
+                </div>
+              </template>
+            </FormKit>
             <FormKit
               v-model="formState.spec.categories"
               label="分类目录"

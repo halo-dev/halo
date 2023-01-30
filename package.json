@@ -74,6 +74,7 @@
     "pinia": "^2.0.26",
     "pretty-bytes": "^6.0.0",
     "qs": "^6.11.0",
+    "transliteration": "^2.3.5",
     "vue": "^3.2.45",
     "vue-grid-layout": "3.0.0-beta1",
     "vue-router": "^4.1.6",
