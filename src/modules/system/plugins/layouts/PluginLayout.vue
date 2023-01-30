@@ -1,18 +1,14 @@
 <script lang="ts" setup>
 // core libs
-import { computed, nextTick, onMounted, provide, ref, watch } from "vue";
+import { nextTick, onMounted, provide, ref, watch } from "vue";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { apiClient } from "@/utils/api-client";
 
 // libs
 import cloneDeep from "lodash.clonedeep";
 
-// hooks
-import { useSettingForm } from "@/composables/use-setting-form";
-
 // components
 import {
-  VButton,
   VCard,
   VPageHeader,
   VTabbar,
@@ -23,7 +19,7 @@ import BasicLayout from "@/layouts/BasicLayout.vue";
 
 // types
 import type { Ref } from "vue";
-import type { Plugin, SettingForm } from "@halo-dev/api-client";
+import type { Plugin, Setting, SettingForm } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 
@@ -52,21 +48,14 @@ const route = useRoute();
 const router = useRouter();
 
 const plugin = ref<Plugin>();
+const setting = ref<Setting>();
 const tabs = ref<PluginTab[]>(cloneDeep(initialTabs));
 const activeTab = ref<string>();
 
 provide<Ref<Plugin | undefined>>("plugin", plugin);
 provide<Ref<string | undefined>>("activeTab", activeTab);
 
-const settingName = computed(() => plugin.value?.spec.settingName);
-const configMapName = computed(() => plugin.value?.spec.configMapName);
-
 const { isStarted } = usePluginLifeCycle(plugin);
-
-const { setting, handleFetchSettings } = useSettingForm(
-  settingName,
-  configMapName
-);
 
 const handleFetchPlugin = async () => {
   try {
@@ -78,6 +67,14 @@ const handleFetchPlugin = async () => {
   } catch (e) {
     console.error(e);
   }
+};
+
+const handleFetchSettings = async () => {
+  if (!plugin.value) return;
+  const { data } = await apiClient.plugin.fetchPluginSetting({
+    name: plugin.value?.metadata.name,
+  });
+  setting.value = data;
 };
 
 const handleTabChange = (id: string) => {
@@ -110,7 +107,7 @@ const handleTriggerTabChange = () => {
 onMounted(async () => {
   await handleFetchPlugin();
 
-  if (!currentUserHasPermission(["system:settings:view"])) {
+  if (!currentUserHasPermission(["system:plugins:manage"])) {
     handleTriggerTabChange();
     return;
   }
@@ -160,9 +157,6 @@ watch([() => route.name, () => route.params], () => {
           class="mr-2"
           size="sm"
         />
-      </template>
-      <template #actions>
-        <VButton class="opacity-0" type="secondary">安装</VButton>
       </template>
     </VPageHeader>
 

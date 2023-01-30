@@ -1,65 +1,67 @@
 <script lang="ts" setup>
 // core libs
-import { computed, ref } from "vue";
+import { inject, ref, type Ref } from "vue";
 
 // hooks
-import { useSettingForm } from "@/composables/use-setting-form";
+import { useSettingFormConvert } from "@/composables/use-setting-form";
 import { apiClient } from "@/utils/api-client";
 
 // components
 import { VButton } from "@halo-dev/components";
 
 // types
-import type { Plugin } from "@halo-dev/api-client";
+import type { ConfigMap, Plugin, Setting } from "@halo-dev/api-client";
 import { useRouteParams } from "@vueuse/router";
-import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 
-const name = useRouteParams<string>("name");
 const group = useRouteParams<string>("group");
 
-const plugin = ref<Plugin | undefined>();
+const plugin = inject<Ref<Plugin | undefined>>("plugin");
+const saving = ref(false);
+const setting = ref<Setting>();
+const configMap = ref<ConfigMap>();
 
-const settingName = computed(() => plugin?.value?.spec.settingName);
-const configMapName = computed(() => plugin?.value?.spec.configMapName);
-
-const {
+const { configMapFormData, formSchema, convertToSave } = useSettingFormConvert(
   setting,
-  configMapFormData,
-  saving,
-  handleFetchSettings,
-  handleFetchConfigMap,
-  handleSaveConfigMap,
-} = useSettingForm(settingName, configMapName);
+  configMap,
+  group
+);
 
-const formSchema = computed(() => {
-  if (!setting.value) {
-    return;
-  }
-  const { forms } = setting.value.spec;
-  return forms.find((item) => item.group === group.value)?.formSchema as (
-    | FormKitSchemaCondition
-    | FormKitSchemaNode
-  )[];
-});
-
-const handleFetchPlugin = async () => {
-  try {
-    const { data } =
-      await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin({
-        name: name.value,
-      });
-    plugin.value = data;
-
-    if (settingName.value && configMapName.value) {
-      await handleFetchSettings();
-      await handleFetchConfigMap();
-    }
-  } catch (e) {
-    console.error("Failed to fetch plugin and settings", e);
-  }
+const handleFetchSettings = async () => {
+  if (!plugin?.value) return;
+  const { data } = await apiClient.plugin.fetchPluginSetting({
+    name: plugin.value.metadata.name,
+  });
+  setting.value = data;
 };
 
-await handleFetchPlugin();
+const handleFetchConfigMap = async () => {
+  if (!plugin?.value) return;
+  const { data } = await apiClient.plugin.fetchPluginConfig({
+    name: plugin.value.metadata.name,
+  });
+  configMap.value = data;
+};
+
+const handleSaveConfigMap = async () => {
+  saving.value = true;
+  const configMapToUpdate = convertToSave();
+  if (!configMapToUpdate || !plugin?.value) {
+    saving.value = false;
+    return;
+  }
+
+  const { data: newConfigMap } = await apiClient.plugin.updatePluginConfig({
+    name: plugin.value.metadata.name,
+    configMap: configMapToUpdate,
+  });
+
+  await handleFetchSettings();
+  configMap.value = newConfigMap;
+  saving.value = false;
+};
+
+await handleFetchSettings();
+await handleFetchConfigMap();
 </script>
 <template>
   <Transition mode="out-in" name="fade">
@@ -81,7 +83,7 @@ await handleFetchPlugin();
           />
         </FormKit>
       </div>
-      <div v-permission="['system:configmaps:manage']" class="pt-5">
+      <div v-permission="['system:plugins:manage']" class="pt-5">
         <div class="flex justify-start">
           <VButton
             :loading="saving"

@@ -56,7 +56,7 @@ export default definePlugin({
               component: PluginSetting,
               meta: {
                 title: "插件设置",
-                permissions: ["system:settings:view"],
+                permissions: ["system:plugins:manage"],
               },
             },
           ],
