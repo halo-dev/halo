@@ -51,7 +51,8 @@ public class WebServerSecurityConfig {
         ObjectProvider<SecurityConfigurer> securityConfigurers,
         ServerSecurityContextRepository securityContextRepository) {
 
-        http.securityMatcher(pathMatchers("/api/**", "/apis/**", "/login", "/logout"))
+        http.securityMatcher(
+                pathMatchers("/api/**", "/apis/**", "/login", "/logout", "/actuator/**"))
             .authorizeExchange().anyExchange()
             .access(new RequestInfoAuthorizationManager(roleService)).and()
             .anonymous(spec -> {
