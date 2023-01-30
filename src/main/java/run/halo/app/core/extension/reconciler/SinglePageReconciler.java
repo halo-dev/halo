@@ -17,7 +17,7 @@ import org.jsoup.Jsoup;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import run.halo.app.content.ContentService;
+import run.halo.app.content.SinglePageService;
 import run.halo.app.content.permalinks.ExtensionLocator;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
@@ -60,7 +60,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
     private static final String FINALIZER_NAME = "single-page-protection";
     private static final GroupVersionKind GVK = GroupVersionKind.fromExtension(SinglePage.class);
     private final ExtensionClient client;
-    private final ContentService contentService;
+    private final SinglePageService singlePageService;
     private final ApplicationContext applicationContext;
     private final CounterService counterService;
 
@@ -337,7 +337,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
             }
 
             if (excerpt.getAutoGenerate()) {
-                contentService.getContent(spec.getHeadSnapshot())
+                singlePageService.getContent(spec.getHeadSnapshot(), spec.getBaseSnapshot())
                     .blockOptional()
                     .ifPresent(content -> {
                         String contentRevised = content.getContent();
@@ -349,25 +349,27 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
             // handle contributors
             String headSnapshot = singlePage.getSpec().getHeadSnapshot();
-            contentService.listSnapshots(Ref.of(singlePage))
-                .collectList()
-                .blockOptional().ifPresent(snapshots -> {
-                    List<String> contributors = snapshots.stream()
-                        .map(snapshot -> {
-                            Set<String> usernames = snapshot.getSpec().getContributors();
-                            return Objects.requireNonNullElseGet(usernames,
-                                () -> new HashSet<String>());
-                        })
-                        .flatMap(Set::stream)
-                        .distinct()
-                        .sorted()
-                        .toList();
-                    status.setContributors(contributors);
+            List<String> contributors = client.list(Snapshot.class,
+                    snapshot -> Ref.of(singlePage).equals(snapshot.getSpec().getSubjectRef()), null)
+                .stream()
+                .peek(snapshot -> {
+                    snapshot.getSpec().setContentPatch(StringUtils.EMPTY);
+                    snapshot.getSpec().setRawPatch(StringUtils.EMPTY);
+                })
+                .map(snapshot -> {
+                    Set<String> usernames = snapshot.getSpec().getContributors();
+                    return Objects.requireNonNullElseGet(usernames,
+                        () -> new HashSet<String>());
+                })
+                .flatMap(Set::stream)
+                .distinct()
+                .sorted()
+                .toList();
+            status.setContributors(contributors);
 
-                    // update in progress status
-                    String releaseSnapshot = singlePage.getSpec().getReleaseSnapshot();
-                    status.setInProgress(!StringUtils.equals(releaseSnapshot, headSnapshot));
-                });
+            // update in progress status
+            String releaseSnapshot = singlePage.getSpec().getReleaseSnapshot();
+            status.setInProgress(!StringUtils.equals(releaseSnapshot, headSnapshot));
 
             if (singlePage.isPublished() && status.getLastModifyTime() == null) {
                 client.fetch(Snapshot.class, singlePage.getSpec().getReleaseSnapshot())

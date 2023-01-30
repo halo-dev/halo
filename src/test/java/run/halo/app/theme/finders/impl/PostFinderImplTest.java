@@ -20,8 +20,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.content.ContentService;
 import run.halo.app.content.ContentWrapper;
+import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
@@ -47,10 +47,10 @@ class PostFinderImplTest {
     private ReactiveExtensionClient client;
 
     @Mock
-    private ContentService contentService;
+    private CounterService counterService;
 
     @Mock
-    private CounterService counterService;
+    private PostService postService;
 
     @Mock
     private CategoryFinder categoryFinder;
@@ -74,9 +74,7 @@ class PostFinderImplTest {
             .content("content")
             .rawType("rawType")
             .build();
-        when(client.fetch(eq(Post.class), eq("post-1")))
-            .thenReturn(Mono.just(post));
-        when(contentService.getContent(post.getSpec().getReleaseSnapshot()))
+        when(postService.getReleaseContent(eq(post.getMetadata().getName())))
             .thenReturn(Mono.just(contentWrapper));
         ContentVo content = postFinder.content("post-1").block();
         assertThat(content.getContent()).isEqualTo(contentWrapper.getContent());

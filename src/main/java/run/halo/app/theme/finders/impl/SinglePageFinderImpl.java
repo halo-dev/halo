@@ -6,11 +6,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.content.ContentService;
+import run.halo.app.content.SinglePageService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.ListResult;
@@ -32,6 +33,7 @@ import run.halo.app.theme.finders.vo.StatsVo;
  * @since 2.0.0
  */
 @Finder("singlePageFinder")
+@AllArgsConstructor
 public class SinglePageFinderImpl implements SinglePageFinder {
 
     public static final Predicate<SinglePage> FIXED_PREDICATE = page -> page.isPublished()
@@ -40,19 +42,11 @@ public class SinglePageFinderImpl implements SinglePageFinder {
 
     private final ReactiveExtensionClient client;
 
-    private final ContentService contentService;
+    private final SinglePageService singlePageService;
 
     private final ContributorFinder contributorFinder;
 
     private final CounterService counterService;
-
-    public SinglePageFinderImpl(ReactiveExtensionClient client, ContentService contentService,
-        ContributorFinder contributorFinder, CounterService counterService) {
-        this.client = client;
-        this.contentService = contentService;
-        this.contributorFinder = contributorFinder;
-        this.counterService = counterService;
-    }
 
     @Override
     public Mono<SinglePageVo> getByName(String pageName) {
@@ -80,9 +74,7 @@ public class SinglePageFinderImpl implements SinglePageFinder {
 
     @Override
     public Mono<ContentVo> content(String pageName) {
-        return client.fetch(SinglePage.class, pageName)
-            .map(page -> page.getSpec().getReleaseSnapshot())
-            .flatMap(contentService::getContent)
+        return singlePageService.getReleaseContent(pageName)
             .map(wrapper -> ContentVo.builder().content(wrapper.getContent())
                 .raw(wrapper.getRaw()).build());
     }

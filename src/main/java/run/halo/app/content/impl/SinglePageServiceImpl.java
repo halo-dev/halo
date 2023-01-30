@@ -2,7 +2,6 @@ package run.halo.app.content.impl;
 
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
-import java.security.Principal;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
@@ -11,19 +10,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.content.AbstractContentService;
 import run.halo.app.content.ContentRequest;
-import run.halo.app.content.ContentService;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.Contributor;
 import run.halo.app.content.ListedSinglePage;
@@ -51,13 +47,34 @@ import run.halo.app.metrics.MeterUtils;
  */
 @Slf4j
 @Service
-@AllArgsConstructor
-public class SinglePageServiceImpl implements SinglePageService {
-    private final ContentService contentService;
+public class SinglePageServiceImpl extends AbstractContentService implements SinglePageService {
 
     private final ReactiveExtensionClient client;
-
     private final CounterService counterService;
+
+    public SinglePageServiceImpl(ReactiveExtensionClient client, CounterService counterService) {
+        super(client);
+        this.client = client;
+        this.counterService = counterService;
+    }
+
+    @Override
+    public Mono<ContentWrapper> getHeadContent(String singlePageName) {
+        return client.get(SinglePage.class, singlePageName)
+            .flatMap(singlePage -> {
+                String headSnapshot = singlePage.getSpec().getHeadSnapshot();
+                return getContent(headSnapshot, singlePage.getSpec().getBaseSnapshot());
+            });
+    }
+
+    @Override
+    public Mono<ContentWrapper> getReleaseContent(String singlePageName) {
+        return client.get(SinglePage.class, singlePageName)
+            .flatMap(singlePage -> {
+                String releaseSnapshot = singlePage.getSpec().getReleaseSnapshot();
+                return getContent(releaseSnapshot, singlePage.getSpec().getBaseSnapshot());
+            });
+    }
 
     @Override
     public Mono<ListResult<ListedSinglePage>> list(SinglePageQuery query) {
@@ -96,7 +113,7 @@ public class SinglePageServiceImpl implements SinglePageService {
                     new ContentRequest(Ref.of(page), page.getSpec().getHeadSnapshot(),
                         pageRequest.content().raw(), pageRequest.content().content(),
                         pageRequest.content().rawType());
-                return contentService.draftContent(contentRequest)
+                return draftContent(page.getSpec().getBaseSnapshot(), contentRequest)
                     .flatMap(
                         contentWrapper -> waitForPageToDraftConcludingWork(
                             page.getMetadata().getName(),
@@ -137,28 +154,23 @@ public class SinglePageServiceImpl implements SinglePageService {
         SinglePage page = pageRequest.page();
         String headSnapshot = page.getSpec().getHeadSnapshot();
         String releaseSnapshot = page.getSpec().getReleaseSnapshot();
+        String baseSnapshot = page.getSpec().getBaseSnapshot();
 
         // create new snapshot to update first
         if (StringUtils.equals(headSnapshot, releaseSnapshot)) {
-            return contentService.draftContent(pageRequest.contentRequest(), headSnapshot)
+            return draftContent(baseSnapshot, pageRequest.contentRequest(), headSnapshot)
                 .flatMap(contentWrapper -> {
                     page.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
                     return client.update(page);
                 });
         }
-        return contentService.updateContent(pageRequest.contentRequest())
+        return updateContent(baseSnapshot, pageRequest.contentRequest())
             .flatMap(contentWrapper -> {
                 page.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
                 return client.update(page);
             })
             .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
                 .filter(throwable -> throwable instanceof OptimisticLockingFailureException));
-    }
-
-    private Mono<String> getContextUsername() {
-        return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
-            .map(Principal::getName);
     }
 
     Predicate<SinglePage> pageListPredicate(SinglePageQuery query) {

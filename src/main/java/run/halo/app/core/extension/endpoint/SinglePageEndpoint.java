@@ -20,6 +20,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.thymeleaf.util.StringUtils;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.ListedSinglePage;
 import run.halo.app.content.SinglePageQuery;
 import run.halo.app.content.SinglePageRequest;
@@ -58,6 +59,30 @@ public class SinglePageEndpoint implements CustomEndpoint {
                         );
                     QueryParamBuildUtil.buildParametersFromType(builder, SinglePageQuery.class);
                 }
+            )
+            .GET("singlepages/{name}/head-content", this::fetchHeadContent,
+                builder -> builder.operationId("fetchSinglePageHeadContent")
+                    .description("Fetch head content of single page.")
+                    .tag(tag)
+                    .parameter(parameterBuilder().name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .response(responseBuilder()
+                        .implementation(ContentWrapper.class))
+            )
+            .GET("singlepages/{name}/release-content", this::fetchReleaseContent,
+                builder -> builder.operationId("fetchSinglePageReleaseContent")
+                    .description("Fetch release content of single page.")
+                    .tag(tag)
+                    .parameter(parameterBuilder().name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .response(responseBuilder()
+                        .implementation(ContentWrapper.class))
             )
             .POST("singlepages", this::draftSinglePage,
                 builder -> builder.operationId("DraftSinglePage")
@@ -121,6 +146,18 @@ public class SinglePageEndpoint implements CustomEndpoint {
                         .implementation(SinglePage.class))
             )
             .build();
+    }
+
+    private Mono<ServerResponse> fetchReleaseContent(ServerRequest request) {
+        final var name = request.pathVariable("name");
+        return singlePageService.getReleaseContent(name)
+            .flatMap(content -> ServerResponse.ok().bodyValue(content));
+    }
+
+    private Mono<ServerResponse> fetchHeadContent(ServerRequest request) {
+        String name = request.pathVariable("name");
+        return singlePageService.getHeadContent(name)
+            .flatMap(content -> ServerResponse.ok().bodyValue(content));
     }
 
     Mono<ServerResponse> draftSinglePage(ServerRequest request) {

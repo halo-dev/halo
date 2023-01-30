@@ -17,4 +17,10 @@ public interface PostService {
     Mono<Post> draftPost(PostRequest postRequest);
 
     Mono<Post> updatePost(PostRequest postRequest);
+
+    Mono<ContentWrapper> getHeadContent(String postName);
+
+    Mono<ContentWrapper> getReleaseContent(String postName);
+
+    Mono<ContentWrapper> getContent(String snapshotName, String baseSnapshotName);
 }
