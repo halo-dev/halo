@@ -13,7 +13,7 @@ import org.jsoup.Jsoup;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import run.halo.app.content.ContentService;
+import run.halo.app.content.PostService;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
@@ -52,7 +52,7 @@ import run.halo.app.metrics.MeterUtils;
 public class PostReconciler implements Reconciler<Reconciler.Request> {
     private static final String FINALIZER_NAME = "post-protection";
     private final ExtensionClient client;
-    private final ContentService contentService;
+    private final PostService postService;
     private final PostPermalinkPolicy postPermalinkPolicy;
     private final CounterService counterService;
 
@@ -269,7 +269,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 spec.setExcerpt(excerpt);
             }
             if (excerpt.getAutoGenerate()) {
-                contentService.getContent(spec.getReleaseSnapshot())
+                postService.getContent(spec.getReleaseSnapshot(), spec.getBaseSnapshot())
                     .blockOptional()
                     .ifPresent(content -> {
                         String contentRevised = content.getContent();
@@ -282,26 +282,27 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             Ref ref = Ref.of(post);
             // handle contributors
             String headSnapshot = post.getSpec().getHeadSnapshot();
-            contentService.listSnapshots(ref)
-                .collectList()
-                .blockOptional()
-                .ifPresent(snapshots -> {
-                    List<String> contributors = snapshots.stream()
-                        .map(snapshot -> {
-                            Set<String> usernames = snapshot.getSpec().getContributors();
-                            return Objects.requireNonNullElseGet(usernames,
-                                () -> new HashSet<String>());
-                        })
-                        .flatMap(Set::stream)
-                        .distinct()
-                        .sorted()
-                        .toList();
-                    status.setContributors(contributors);
+            List<String> contributors = client.list(Snapshot.class,
+                    snapshot -> ref.equals(snapshot.getSpec().getSubjectRef()), null)
+                .stream()
+                .peek(snapshot -> {
+                    snapshot.getSpec().setContentPatch(StringUtils.EMPTY);
+                    snapshot.getSpec().setRawPatch(StringUtils.EMPTY);
+                })
+                .map(snapshot -> {
+                    Set<String> usernames = snapshot.getSpec().getContributors();
+                    return Objects.requireNonNullElseGet(usernames,
+                        () -> new HashSet<String>());
+                })
+                .flatMap(Set::stream)
+                .distinct()
+                .sorted()
+                .toList();
+            status.setContributors(contributors);
 
-                    // update in progress status
-                    status.setInProgress(
-                        !StringUtils.equals(headSnapshot, post.getSpec().getReleaseSnapshot()));
-                });
+            // update in progress status
+            status.setInProgress(
+                !StringUtils.equals(headSnapshot, post.getSpec().getReleaseSnapshot()));
 
             if (post.isPublished() && status.getLastModifyTime() == null) {
                 client.fetch(Snapshot.class, post.getSpec().getReleaseSnapshot())

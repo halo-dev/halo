@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.reactive.function.server.MockServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 
 /**
  * Tests for {@link RadixRouterTree}.
@@ -40,5 +41,11 @@ class RadixRouterTreeTest {
             .queryParam("p", "fake-post")
             .method(HttpMethod.GET).build();
         assertThat(RadixRouterTree.pathToFind(request)).isEqualTo("/?p=fake-post");
+    }
+
+    @Test
+    void shouldInsertKeyWithPercentSign() {
+        var tree = new RadixRouterTree();
+        tree.insert("/1%1", request -> ServerResponse.ok().build());
     }
 }

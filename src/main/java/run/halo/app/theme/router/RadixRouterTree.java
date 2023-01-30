@@ -31,9 +31,7 @@ public class RadixRouterTree extends RadixTree<HandlerFunction<ServerResponse>> 
     @Override
     public void insert(String key, HandlerFunction<ServerResponse> value)
         throws IllegalArgumentException {
-        // uri decode key to insert
-        String decodedKey = UriUtils.decode(key, StandardCharsets.UTF_8);
-        super.insert(decodedKey, value);
+        super.insert(key, value);
         if (log.isDebugEnabled()) {
             checkIndices();
         }

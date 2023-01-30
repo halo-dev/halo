@@ -12,6 +12,12 @@ import run.halo.app.extension.ListResult;
  */
 public interface SinglePageService {
 
+    Mono<ContentWrapper> getHeadContent(String singlePageName);
+
+    Mono<ContentWrapper> getReleaseContent(String singlePageName);
+
+    Mono<ContentWrapper> getContent(String snapshotName, String baseSnapshotName);
+
     Mono<ListResult<ListedSinglePage>> list(SinglePageQuery listRequest);
 
     Mono<SinglePage> draft(SinglePageRequest pageRequest);

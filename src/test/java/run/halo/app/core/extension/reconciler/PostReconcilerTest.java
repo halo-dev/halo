@@ -20,9 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.content.ContentService;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PostService;
 import run.halo.app.content.TestPost;
@@ -44,8 +42,7 @@ class PostReconcilerTest {
 
     @Mock
     private ExtensionClient client;
-    @Mock
-    private ContentService contentService;
+
     @Mock
     private PostPermalinkPolicy postPermalinkPolicy;
 
@@ -66,15 +63,16 @@ class PostReconcilerTest {
         post.getSpec().setHeadSnapshot("post-A-head-snapshot");
         when(client.fetch(eq(Post.class), eq(name)))
             .thenReturn(Optional.of(post));
-        when(contentService.getContent(eq(post.getSpec().getReleaseSnapshot())))
+        when(postService.getContent(eq(post.getSpec().getReleaseSnapshot()),
+            eq(post.getSpec().getBaseSnapshot())))
             .thenReturn(Mono.empty());
 
         Snapshot snapshotV1 = TestPost.snapshotV1();
         Snapshot snapshotV2 = TestPost.snapshotV2();
         snapshotV1.getSpec().setContributors(Set.of("guqing"));
         snapshotV2.getSpec().setContributors(Set.of("guqing", "zhangsan"));
-        when(contentService.listSnapshots(any()))
-            .thenReturn(Flux.just(snapshotV1, snapshotV2));
+        when(client.list(eq(Snapshot.class), any(), any()))
+            .thenReturn(List.of(snapshotV1, snapshotV2));
 
         ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
         postReconciler.reconcile(new Reconciler.Request(name));
@@ -101,7 +99,8 @@ class PostReconcilerTest {
         post.getSpec().setReleaseSnapshot("post-fake-released-snapshot");
         when(client.fetch(eq(Post.class), eq(name)))
             .thenReturn(Optional.of(post));
-        when(contentService.getContent(eq(post.getSpec().getReleaseSnapshot())))
+        when(postService.getContent(eq(post.getSpec().getReleaseSnapshot()),
+            eq(post.getSpec().getBaseSnapshot())))
             .thenReturn(Mono.just(ContentWrapper.builder()
                 .snapshotName(post.getSpec().getHeadSnapshot())
                 .raw("hello world")
@@ -116,8 +115,8 @@ class PostReconcilerTest {
         Snapshot snapshotV1 = TestPost.snapshotV1();
         snapshotV1.getSpec().setContributors(Set.of("guqing"));
 
-        when(contentService.listSnapshots(any()))
-            .thenReturn(Flux.just(snapshotV1, snapshotV2));
+        when(client.list(eq(Snapshot.class), any(), any()))
+            .thenReturn(List.of(snapshotV1, snapshotV2));
 
         ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
         postReconciler.reconcile(new Reconciler.Request(name));
@@ -138,7 +137,8 @@ class PostReconcilerTest {
             post.getSpec().setReleaseSnapshot("post-fake-released-snapshot");
             when(client.fetch(eq(Post.class), eq(name)))
                 .thenReturn(Optional.of(post));
-            when(contentService.getContent(eq(post.getSpec().getReleaseSnapshot())))
+            when(postService.getContent(eq(post.getSpec().getReleaseSnapshot()),
+                    eq(post.getSpec().getBaseSnapshot())))
                 .thenReturn(Mono.just(ContentWrapper.builder()
                     .snapshotName(post.getSpec().getHeadSnapshot())
                     .raw("hello world")
@@ -151,8 +151,8 @@ class PostReconcilerTest {
             when(client.fetch(eq(Snapshot.class), eq(post.getSpec().getReleaseSnapshot())))
                 .thenReturn(Optional.of(snapshotV2));
 
-            when(contentService.listSnapshots(any()))
-                .thenReturn(Flux.empty());
+            when(client.list(eq(Snapshot.class), any(), any()))
+                .thenReturn(List.of());
 
             ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
             postReconciler.reconcile(new Reconciler.Request(name));
@@ -171,7 +171,8 @@ class PostReconcilerTest {
             post.getSpec().setHeadSnapshot("post-A-head-snapshot");
             when(client.fetch(eq(Post.class), eq(name)))
                 .thenReturn(Optional.of(post));
-            when(contentService.getContent(eq(post.getSpec().getReleaseSnapshot())))
+            when(postService.getContent(eq(post.getSpec().getReleaseSnapshot()),
+                eq(post.getSpec().getBaseSnapshot())))
                 .thenReturn(Mono.just(ContentWrapper.builder()
                     .snapshotName(post.getSpec().getHeadSnapshot())
                     .raw("hello world")
@@ -179,8 +180,8 @@ class PostReconcilerTest {
                     .rawType("markdown")
                     .build()));
 
-            when(contentService.listSnapshots(any()))
-                .thenReturn(Flux.empty());
+            when(client.list(eq(Snapshot.class), any(), any()))
+                .thenReturn(List.of());
 
             ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
             postReconciler.reconcile(new Reconciler.Request(name));

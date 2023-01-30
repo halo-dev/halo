@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.content.ContentService;
+import run.halo.app.content.SinglePageService;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -34,7 +34,7 @@ class SinglePageFinderImplTest {
     private ReactiveExtensionClient client;
 
     @Mock
-    private ContentService contentService;
+    private SinglePageService singlePageService;
 
     @Mock
     private ContributorFinder contributorFinder;
@@ -61,7 +61,7 @@ class SinglePageFinderImplTest {
 
         when(counterService.getByName(anyString())).thenReturn(Mono.empty());
         when(contributorFinder.getContributor(anyString())).thenReturn(Mono.empty());
-        when(contentService.getContent(anyString())).thenReturn(Mono.empty());
+        when(singlePageService.getReleaseContent(anyString())).thenReturn(Mono.empty());
 
         singlePageFinder.getByName(fakePageName)
             .as(StepVerifier::create)
@@ -71,9 +71,9 @@ class SinglePageFinderImplTest {
             })
             .verifyComplete();
 
-        verify(client, times(2)).fetch(SinglePage.class, fakePageName);
+        verify(client, times(1)).fetch(SinglePage.class, fakePageName);
         verify(counterService).getByName(anyString());
-        verify(contentService).getContent(anyString());
+        verify(singlePageService).getReleaseContent(anyString());
         verify(contributorFinder).getContributor(anyString());
     }
 }

@@ -22,9 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.content.ContentService;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.SinglePageService;
 import run.halo.app.content.TestPost;
@@ -50,8 +48,6 @@ import run.halo.app.theme.router.PermalinkIndexUpdateCommand;
 class SinglePageReconcilerTest {
     @Mock
     private ExtensionClient client;
-    @Mock
-    private ContentService contentService;
 
     @Mock
     private ApplicationContext applicationContext;
@@ -75,7 +71,8 @@ class SinglePageReconcilerTest {
         page.getSpec().setHeadSnapshot("page-A-head-snapshot");
         when(client.fetch(eq(SinglePage.class), eq(name)))
             .thenReturn(Optional.of(page));
-        when(contentService.getContent(eq(page.getSpec().getHeadSnapshot())))
+        when(singlePageService.getContent(eq(page.getSpec().getHeadSnapshot()),
+            eq(page.getSpec().getBaseSnapshot())))
             .thenReturn(Mono.just(ContentWrapper.builder()
                 .snapshotName(page.getSpec().getHeadSnapshot())
                 .raw("hello world")
@@ -88,8 +85,8 @@ class SinglePageReconcilerTest {
         Snapshot snapshotV2 = TestPost.snapshotV2();
         snapshotV1.getSpec().setContributors(Set.of("guqing"));
         snapshotV2.getSpec().setContributors(Set.of("guqing", "zhangsan"));
-        when(contentService.listSnapshots(any()))
-            .thenReturn(Flux.just(snapshotV1, snapshotV2));
+        when(client.list(eq(Snapshot.class), any(), any()))
+            .thenReturn(List.of(snapshotV1, snapshotV2));
         when(externalUrlSupplier.get()).thenReturn(URI.create(""));
 
         ArgumentCaptor<SinglePage> captor = ArgumentCaptor.forClass(SinglePage.class);
@@ -138,7 +135,8 @@ class SinglePageReconcilerTest {
             page.getSpec().setReleaseSnapshot("page-fake-released-snapshot");
             when(client.fetch(eq(SinglePage.class), eq(name)))
                 .thenReturn(Optional.of(page));
-            when(contentService.getContent(eq(page.getSpec().getHeadSnapshot())))
+            when(singlePageService.getContent(eq(page.getSpec().getHeadSnapshot()),
+                eq(page.getSpec().getBaseSnapshot())))
                 .thenReturn(Mono.just(ContentWrapper.builder()
                     .snapshotName(page.getSpec().getHeadSnapshot())
                     .raw("hello world")
@@ -152,8 +150,8 @@ class SinglePageReconcilerTest {
             when(client.fetch(eq(Snapshot.class), eq(page.getSpec().getReleaseSnapshot())))
                 .thenReturn(Optional.of(snapshotV2));
 
-            when(contentService.listSnapshots(any()))
-                .thenReturn(Flux.empty());
+            when(client.list(eq(Snapshot.class), any(), any()))
+                .thenReturn(List.of());
 
             ArgumentCaptor<SinglePage> captor = ArgumentCaptor.forClass(SinglePage.class);
             singlePageReconciler.reconcile(new Reconciler.Request(name));
@@ -172,7 +170,8 @@ class SinglePageReconcilerTest {
             page.getSpec().setPublish(false);
             when(client.fetch(eq(SinglePage.class), eq(name)))
                 .thenReturn(Optional.of(page));
-            when(contentService.getContent(eq(page.getSpec().getHeadSnapshot())))
+            when(singlePageService.getContent(eq(page.getSpec().getHeadSnapshot()),
+                eq(page.getSpec().getBaseSnapshot())))
                 .thenReturn(Mono.just(ContentWrapper.builder()
                     .snapshotName(page.getSpec().getHeadSnapshot())
                     .raw("hello world")
@@ -181,8 +180,8 @@ class SinglePageReconcilerTest {
                     .build())
                 );
 
-            when(contentService.listSnapshots(any()))
-                .thenReturn(Flux.empty());
+            when(client.list(eq(Snapshot.class), any(), any()))
+                .thenReturn(List.of());
 
             ArgumentCaptor<SinglePage> captor = ArgumentCaptor.forClass(SinglePage.class);
             singlePageReconciler.reconcile(new Reconciler.Request(name));
