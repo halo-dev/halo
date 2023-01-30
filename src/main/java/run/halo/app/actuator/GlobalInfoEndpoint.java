@@ -36,12 +36,11 @@ public class GlobalInfoEndpoint {
         info.setExternalUrl(externalUrl.get());
         info.setLocale(Locale.getDefault());
         info.setTimeZone(TimeZone.getDefault());
-        systemConfigFetcher.getIfAvailable()
-            .getConfigMapBlocking()
+        systemConfigFetcher.ifAvailable(fetcher -> fetcher.getConfigMapBlocking()
             .ifPresent(configMap -> {
-                info.setAllowComments(allowComments(configMap));
-                info.setAllowRegistration(allowRegistration(configMap));
-            });
+                handleCommentSetting(info, configMap);
+                handleUserSetting(info, configMap);
+            }));
 
         return info;
     }
@@ -57,23 +56,32 @@ public class GlobalInfoEndpoint {
 
         private boolean allowComments;
 
+        private boolean allowAnonymousComments;
+
         private boolean allowRegistration;
 
     }
 
-    private boolean allowComments(ConfigMap configMap) {
+    private void handleCommentSetting(GlobalInfo info, ConfigMap configMap) {
         var comment = SystemSetting.get(configMap, Comment.GROUP, Comment.class);
-        if (comment == null || comment.getEnable() == null) {
-            return false;
+        if (comment == null) {
+            info.setAllowComments(true);
+            info.setAllowAnonymousComments(true);
+        } else {
+            info.setAllowComments(comment.getEnable() != null && comment.getEnable());
+            info.setAllowAnonymousComments(
+                comment.getSystemUserOnly() == null || !comment.getSystemUserOnly());
         }
-        return comment.getEnable();
     }
 
-    private boolean allowRegistration(ConfigMap configMap) {
+    private void handleUserSetting(GlobalInfo info, ConfigMap configMap) {
         var user = SystemSetting.get(configMap, User.GROUP, User.class);
-        if (user == null || user.getAllowRegistration() == null) {
-            return false;
+        if (user == null) {
+            info.setAllowRegistration(false);
+        } else {
+            info.setAllowRegistration(
+                user.getAllowRegistration() != null && user.getAllowRegistration());
         }
-        return user.getAllowRegistration();
     }
+
 }
