@@ -104,6 +104,23 @@ public class PluginEndpoint implements CustomEndpoint {
                         .content(contentBuilder().mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .schema(schemaBuilder().implementation(InstallRequest.class))))
             )
+            .PUT("plugins/{name}/config", this::updatePluginConfig,
+                builder -> builder.operationId("updatePluginConfig")
+                    .description("Update the configMap of plugin setting.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder().mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(schemaBuilder().implementation(ConfigMap.class))))
+                    .response(responseBuilder()
+                        .implementation(ConfigMap.class))
+            )
             .PUT("plugins/{name}/reset-config", this::resetSettingConfig,
                 builder -> builder.operationId("ResetPluginConfig")
                     .description("Reset the configMap of plugin setting.")
@@ -124,7 +141,86 @@ public class PluginEndpoint implements CustomEndpoint {
                     .response(responseBuilder().implementation(generateGenericClass(Plugin.class)));
                 buildParametersFromType(builder, ListRequest.class);
             })
+            .GET("plugins/{name}/setting", this::fetchPluginSetting,
+                builder -> builder.operationId("fetchPluginSetting")
+                    .description("Fetch setting of plugin.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .response(responseBuilder()
+                        .implementation(Setting.class))
+            )
+            .GET("plugins/{name}/config", this::fetchPluginConfig,
+                builder -> builder.operationId("fetchPluginConfig")
+                    .description("Fetch configMap of plugin by configured configMapName.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .response(responseBuilder()
+                        .implementation(ConfigMap.class))
+            )
             .build();
+    }
+
+    private Mono<ServerResponse> fetchPluginConfig(ServerRequest request) {
+        final var name = request.pathVariable("name");
+        return client.fetch(Plugin.class, name)
+            .mapNotNull(plugin -> plugin.getSpec().getConfigMapName())
+            .flatMap(configMapName -> client.fetch(ConfigMap.class, configMapName))
+            .flatMap(configMap -> ServerResponse.ok().bodyValue(configMap));
+    }
+
+    private Mono<ServerResponse> fetchPluginSetting(ServerRequest request) {
+        final var name = request.pathVariable("name");
+        return client.fetch(Plugin.class, name)
+            .mapNotNull(plugin -> plugin.getSpec().getSettingName())
+            .flatMap(settingName -> client.fetch(Setting.class, settingName))
+            .flatMap(setting -> ServerResponse.ok().bodyValue(setting));
+    }
+
+    private Mono<ServerResponse> updatePluginConfig(ServerRequest request) {
+        final var pluginName = request.pathVariable("name");
+        return client.fetch(Plugin.class, pluginName)
+            .doOnNext(plugin -> {
+                String configMapName = plugin.getSpec().getConfigMapName();
+                if (!StringUtils.hasText(configMapName)) {
+                    throw new ServerWebInputException(
+                        "Unable to complete the request because the plugin configMapName is blank");
+                }
+            })
+            .flatMap(plugin -> {
+                final String configMapName = plugin.getSpec().getConfigMapName();
+                return request.bodyToMono(ConfigMap.class)
+                    .doOnNext(configMapToUpdate -> {
+                        var configMapNameToUpdate = configMapToUpdate.getMetadata().getName();
+                        if (!configMapName.equals(configMapNameToUpdate)) {
+                            throw new ServerWebInputException(
+                                "The name from the request body does not match the plugin "
+                                    + "configMapName name.");
+                        }
+                    })
+                    .flatMap(configMapToUpdate -> client.fetch(ConfigMap.class, configMapName)
+                        .map(persisted -> {
+                            configMapToUpdate.getMetadata()
+                                .setVersion(persisted.getMetadata().getVersion());
+                            return configMapToUpdate;
+                        })
+                        .switchIfEmpty(client.create(configMapToUpdate))
+                    )
+                    .flatMap(client::update)
+                    .retryWhen(Retry.backoff(5, Duration.ofMillis(300))
+                        .filter(OptimisticLockingFailureException.class::isInstance)
+                    );
+            })
+            .flatMap(configMap -> ServerResponse.ok().bodyValue(configMap));
     }
 
     private Mono<ServerResponse> resetSettingConfig(ServerRequest request) {
