@@ -1,10 +1,14 @@
 <script lang="ts" setup>
 import ThemePreviewListItem from "./ThemePreviewListItem.vue";
-import { useSettingForm } from "@/composables/use-setting-form";
+import { useSettingFormConvert } from "@/composables/use-setting-form";
 import { useThemeStore } from "@/stores/theme";
 import { apiClient } from "@/utils/api-client";
-import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
-import type { SettingForm, Theme } from "@halo-dev/api-client";
+import type {
+  ConfigMap,
+  Setting,
+  SettingForm,
+  Theme,
+} from "@halo-dev/api-client";
 import {
   VModal,
   IconLink,
@@ -111,21 +115,61 @@ const modalTitle = computed(() => {
 });
 
 // theme settings
+const setting = ref<Setting>();
+const configMap = ref<ConfigMap>();
+const saving = ref(false);
 const settingTabs = ref<SettingTab[]>([] as SettingTab[]);
 const activeSettingTab = ref("");
 const settingsVisible = ref(false);
 
-const settingName = computed(() => selectedTheme.value?.spec.settingName);
-const configMapName = computed(() => selectedTheme.value?.spec.configMapName);
-
-const {
+const { formSchema, configMapFormData, convertToSave } = useSettingFormConvert(
   setting,
-  configMapFormData,
-  saving,
-  handleFetchConfigMap,
-  handleFetchSettings,
-  handleSaveConfigMap,
-} = useSettingForm(settingName, configMapName);
+  configMap,
+  activeSettingTab
+);
+
+const handleFetchSettings = async () => {
+  if (!selectedTheme?.value) return;
+
+  const { data } = await apiClient.theme.fetchThemeSetting({
+    name: selectedTheme?.value?.metadata.name,
+  });
+
+  setting.value = data;
+};
+
+const handleFetchConfigMap = async () => {
+  if (!selectedTheme?.value) return;
+
+  const { data } = await apiClient.theme.fetchThemeConfig({
+    name: selectedTheme?.value?.metadata.name,
+  });
+
+  configMap.value = data;
+};
+
+const handleSaveConfigMap = async () => {
+  saving.value = true;
+
+  const configMapToUpdate = convertToSave();
+
+  if (!configMapToUpdate || !selectedTheme?.value) {
+    saving.value = false;
+    return;
+  }
+
+  const { data: newConfigMap } = await apiClient.theme.updateThemeConfig({
+    name: selectedTheme?.value?.metadata.name,
+    configMap: configMapToUpdate,
+  });
+
+  await handleFetchSettings();
+  configMap.value = newConfigMap;
+
+  saving.value = false;
+
+  handleRefresh();
+};
 
 watch(
   () => selectedTheme.value,
@@ -155,20 +199,6 @@ const handleOpenSettings = (theme?: Theme) => {
   }
   themesVisible.value = false;
   settingsVisible.value = !settingsVisible.value;
-};
-
-const formSchema = computed(() => {
-  if (!setting.value) {
-    return;
-  }
-  const { forms } = setting.value.spec;
-  return forms.find((item) => item.group === activeSettingTab.value)
-    ?.formSchema as (FormKitSchemaCondition | FormKitSchemaNode)[];
-});
-
-const handleSaveThemeConfigMap = async () => {
-  await handleSaveConfigMap();
-  handleRefresh();
 };
 
 const handleRefresh = () => {
@@ -288,14 +318,14 @@ const iframeClasses = computed(() => {
                       configMapFormData &&
                       formSchema
                     "
-                    :id="tab.id"
+                    :id="`preview-setting-${tab.id}`"
                     :key="tab.id"
                     v-model="configMapFormData[tab.id]"
                     :name="tab.id"
                     :actions="false"
                     :preserve="true"
                     type="form"
-                    @submit="handleSaveThemeConfigMap"
+                    @submit="handleSaveConfigMap"
                   >
                     <FormKitSchema
                       :schema="formSchema"
@@ -303,12 +333,16 @@ const iframeClasses = computed(() => {
                     />
                   </FormKit>
                 </div>
-                <div v-permission="['system:configmaps:manage']" class="pt-5">
+                <div v-permission="['system:themes:manage']" class="pt-5">
                   <div class="flex justify-start">
                     <VButton
                       :loading="saving"
                       type="secondary"
-                      @click="$formkit.submit(activeSettingTab || '')"
+                      @click="
+                        $formkit.submit(
+                          `preview-setting-${activeSettingTab}` || ''
+                        )
+                      "
                     >
                       保存
                     </VButton>

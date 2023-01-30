@@ -34,7 +34,7 @@ export default definePlugin({
           component: ThemeSetting,
           meta: {
             title: "主题设置",
-            permissions: ["system:settings:view"],
+            permissions: ["system:themes:view"],
           },
         },
       ],

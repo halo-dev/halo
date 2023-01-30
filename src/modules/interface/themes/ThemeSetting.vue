@@ -1,45 +1,73 @@
 <script lang="ts" setup>
 // core libs
-import { computed, inject, watch } from "vue";
+import { inject, ref, watch } from "vue";
 
 // components
 import { VButton } from "@halo-dev/components";
 
 // types
 import type { Ref } from "vue";
-import type { Theme } from "@halo-dev/api-client";
+import type { ConfigMap, Setting, Theme } from "@halo-dev/api-client";
 
 // hooks
-import { useSettingForm } from "@/composables/use-setting-form";
 import { useRouteParams } from "@vueuse/router";
-import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
+import { apiClient } from "@/utils/api-client";
+import { useSettingFormConvert } from "@/composables/use-setting-form";
 
 const group = useRouteParams<string>("group");
 
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme");
 
-const settingName = computed(() => selectedTheme?.value?.spec.settingName);
-const configMapName = computed(() => selectedTheme?.value?.spec.configMapName);
+const saving = ref(false);
+const setting = ref<Setting>();
+const configMap = ref<ConfigMap>();
 
-const {
+const { configMapFormData, formSchema, convertToSave } = useSettingFormConvert(
   setting,
-  configMapFormData,
-  saving,
-  handleFetchConfigMap,
-  handleFetchSettings,
-  handleSaveConfigMap,
-} = useSettingForm(settingName, configMapName);
+  configMap,
+  group
+);
 
-const formSchema = computed(() => {
-  if (!setting.value) {
+const handleFetchSettings = async () => {
+  if (!selectedTheme?.value) return;
+
+  const { data } = await apiClient.theme.fetchThemeSetting({
+    name: selectedTheme?.value?.metadata.name,
+  });
+
+  setting.value = data;
+};
+
+const handleFetchConfigMap = async () => {
+  if (!selectedTheme?.value) return;
+
+  const { data } = await apiClient.theme.fetchThemeConfig({
+    name: selectedTheme?.value?.metadata.name,
+  });
+
+  configMap.value = data;
+};
+
+const handleSaveConfigMap = async () => {
+  saving.value = true;
+
+  const configMapToUpdate = convertToSave();
+
+  if (!configMapToUpdate || !selectedTheme?.value) {
+    saving.value = false;
     return;
   }
-  const { forms } = setting.value.spec;
-  return forms.find((item) => item.group === group?.value)?.formSchema as (
-    | FormKitSchemaCondition
-    | FormKitSchemaNode
-  )[];
-});
+
+  const { data: newConfigMap } = await apiClient.theme.updateThemeConfig({
+    name: selectedTheme?.value?.metadata.name,
+    configMap: configMapToUpdate,
+  });
+
+  await handleFetchSettings();
+  configMap.value = newConfigMap;
+
+  saving.value = false;
+};
 
 await handleFetchSettings();
 await handleFetchConfigMap();
@@ -57,7 +85,7 @@ watch(
     <div class="bg-white p-4">
       <div>
         <FormKit
-          v-if="group && formSchema && configMapFormData"
+          v-if="group && formSchema && configMapFormData?.[group]"
           :id="group"
           v-model="configMapFormData[group]"
           :name="group"
@@ -72,7 +100,7 @@ watch(
           />
         </FormKit>
       </div>
-      <div v-permission="['system:configmaps:manage']" class="pt-5">
+      <div v-permission="['system:themes:manage']" class="pt-5">
         <div class="flex justify-start">
           <VButton
             :loading="saving"

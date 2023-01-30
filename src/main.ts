@@ -203,7 +203,11 @@ async function loadUserPermissions() {
         return;
       }
 
-      enable ? (el.style.backgroundColor = "red") : el.remove();
+      if (enable) {
+        //TODO
+        return;
+      }
+      el?.remove?.();
     }
   );
 }

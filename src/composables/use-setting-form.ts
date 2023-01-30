@@ -1,6 +1,6 @@
 // core libs
 // types
-import type { Ref } from "vue";
+import { computed, watch, type ComputedRef, type Ref } from "vue";
 import { ref } from "vue";
 import { apiClient } from "../utils/api-client";
 
@@ -177,5 +177,70 @@ export function useSettingForm(
     handleFetchConfigMap,
     handleSaveConfigMap,
     handleReset,
+  };
+}
+
+interface useSettingFormConvertReturn {
+  formSchema: ComputedRef<
+    (FormKitSchemaCondition | FormKitSchemaNode)[] | undefined
+  >;
+  configMapFormData: Ref<Record<string, Record<string, string>>>;
+  convertToSave: () => ConfigMap | undefined;
+}
+
+export function useSettingFormConvert(
+  setting: Ref<Setting | undefined>,
+  configMap: Ref<ConfigMap | undefined>,
+  group: Ref<string>
+): useSettingFormConvertReturn {
+  const configMapFormData = ref<Record<string, Record<string, string>>>({});
+
+  const formSchema = computed(() => {
+    if (!setting.value) {
+      return;
+    }
+    const { forms } = setting.value.spec;
+    return forms.find((item) => item.group === group?.value)?.formSchema as (
+      | FormKitSchemaCondition
+      | FormKitSchemaNode
+    )[];
+  });
+
+  watch(
+    () => configMap.value,
+    () => {
+      const { forms } = setting.value?.spec || {};
+
+      forms?.forEach((form) => {
+        configMapFormData.value[form.group] = JSON.parse(
+          configMap.value?.data?.[form.group] || "{}"
+        );
+      });
+    }
+  );
+
+  function convertToSave() {
+    const configMapToUpdate = cloneDeep(configMap.value);
+
+    if (!configMapToUpdate) {
+      return;
+    }
+
+    const data: {
+      [key: string]: string;
+    } = {};
+
+    setting.value?.spec.forms.forEach((item: SettingForm) => {
+      data[item.group] = JSON.stringify(configMapFormData?.value?.[item.group]);
+    });
+
+    configMapToUpdate.data = data;
+    return configMapToUpdate;
+  }
+
+  return {
+    formSchema,
+    configMapFormData,
+    convertToSave,
   };
 }

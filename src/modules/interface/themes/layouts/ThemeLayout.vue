@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
 import { nextTick, onMounted, type Ref } from "vue";
-import { computed, provide, ref, watch } from "vue";
+import { provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 // libs
@@ -11,7 +11,6 @@ import cloneDeep from "lodash.clonedeep";
 import { useThemeLifeCycle } from "../composables/use-theme";
 // types
 import BasicLayout from "@/layouts/BasicLayout.vue";
-import { useSettingForm } from "@/composables/use-setting-form";
 
 // components
 import {
@@ -28,10 +27,11 @@ import {
 } from "@halo-dev/components";
 import ThemeListModal from "../components/ThemeListModal.vue";
 import ThemePreviewModal from "../components/preview/ThemePreviewModal.vue";
-import type { SettingForm, Theme } from "@halo-dev/api-client";
+import type { Setting, SettingForm, Theme } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import { useThemeStore } from "@/stores/theme";
 import { storeToRefs } from "pinia";
+import { apiClient } from "@/utils/api-client";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -63,18 +63,22 @@ const activeTab = ref("");
 const { loading, isActivated, handleActiveTheme } =
   useThemeLifeCycle(selectedTheme);
 
-const settingName = computed(() => selectedTheme.value?.spec.settingName);
-const configMapName = computed(() => selectedTheme.value?.spec.configMapName);
-
-const { setting, handleFetchSettings } = useSettingForm(
-  settingName,
-  configMapName
-);
-
 provide<Ref<Theme | undefined>>("selectedTheme", selectedTheme);
 
 const route = useRoute();
 const router = useRouter();
+
+const setting = ref<Setting>();
+
+const handleFetchSettings = async () => {
+  if (!selectedTheme.value) return;
+
+  const { data } = await apiClient.theme.fetchThemeSetting({
+    name: selectedTheme.value?.metadata.name,
+  });
+
+  setting.value = data;
+};
 
 const handleTabChange = (id: string) => {
   const tab = tabs.value.find((item) => item.id === id);
@@ -91,7 +95,7 @@ watch(
       // reset tabs
       tabs.value = cloneDeep(initialTabs);
 
-      if (!currentUserHasPermission(["system:settings:view"])) {
+      if (!currentUserHasPermission(["system:themes:view"])) {
         handleTriggerTabChange();
         return;
       }
