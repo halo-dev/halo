@@ -209,8 +209,8 @@ const handleFetchContent = async () => {
     return;
   }
 
-  const { data } = await apiClient.content.obtainSnapshotContent({
-    snapshotName: formState.value.post.spec.headSnapshot,
+  const { data } = await apiClient.post.fetchPostHeadContent({
+    name: formState.value.post.metadata.name,
   });
 
   // get editor provider

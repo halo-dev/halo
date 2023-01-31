@@ -204,8 +204,8 @@ const handleFetchContent = async () => {
   if (!formState.value.page.spec.headSnapshot) {
     return;
   }
-  const { data } = await apiClient.content.obtainSnapshotContent({
-    snapshotName: formState.value.page.spec.headSnapshot,
+  const { data } = await apiClient.singlePage.fetchSinglePageHeadContent({
+    name: formState.value.page.metadata.name,
   });
 
   // get editor provider
