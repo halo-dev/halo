@@ -1,5 +1,7 @@
 package run.halo.app.core.extension;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
@@ -60,6 +62,7 @@ public class Theme extends AbstractExtension {
         @Schema(description = "Deprecated, use `requires` instead.")
         private String require;
 
+        @Schema(requiredMode = NOT_REQUIRED)
         private String requires;
 
         private String settingName;
