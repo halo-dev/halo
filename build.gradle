@@ -73,6 +73,7 @@ dependencies {
     implementation "org.apache.lucene:lucene-core:$lucene"
     implementation "org.apache.lucene:lucene-queryparser:$lucene"
     implementation "org.apache.lucene:lucene-highlighter:$lucene"
+    implementation "org.apache.lucene:lucene-backward-codecs:$lucene"
     implementation 'cn.shenyanchao.ik-analyzer:ik-analyzer:9.0.0'
 
     implementation "org.apache.commons:commons-lang3:$commonsLang3"
