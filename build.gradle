@@ -48,6 +48,7 @@ ext {
     jsoup = '1.15.3'
     jsonPatch = "1.13"
     springDocOpenAPI = "2.0.2"
+    lucene = "9.5.0"
 }
 
 dependencies {
@@ -69,9 +70,9 @@ dependencies {
     implementation "net.bytebuddy:byte-buddy"
 
     // Apache Lucene
-    implementation 'org.apache.lucene:lucene-core:9.4.1'
-    implementation 'org.apache.lucene:lucene-queryparser:9.4.1'
-    implementation 'org.apache.lucene:lucene-highlighter:9.4.1'
+    implementation "org.apache.lucene:lucene-core:$lucene"
+    implementation "org.apache.lucene:lucene-queryparser:$lucene"
+    implementation "org.apache.lucene:lucene-highlighter:$lucene"
     implementation 'cn.shenyanchao.ik-analyzer:ik-analyzer:9.0.0'
 
     implementation "org.apache.commons:commons-lang3:$commonsLang3"
