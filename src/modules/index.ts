@@ -9,6 +9,7 @@ import pluginModule from "./system/plugins/module";
 import userModule from "./system/users/module";
 import roleModule from "./system/roles/module";
 import settingModule from "./system/settings/module";
+import actuatorModule from "./system/actuator/module";
 
 // const coreModules = [
 //   dashboardModule,
@@ -28,6 +29,7 @@ const coreModules = [
   postModule,
   pluginModule,
   settingModule,
+  actuatorModule,
   dashboardModule,
   menuModule,
   commentModule,
