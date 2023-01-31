@@ -33,6 +33,8 @@ import {
   ExtensionHighlight,
   ExtensionCommands,
   ExtensionIframe,
+  ExtensionVideo,
+  ExtensionAudio,
   CommandsSuggestion,
   CommentParagraph,
   CommandHeader1,
@@ -43,6 +45,8 @@ import {
   CommandHeader6,
   CommandCodeBlock,
   CommandIframe,
+  CommandVideo,
+  CommandAudio,
   CommandTable,
   CommandBulletList,
   CommandOrderedList,
@@ -205,6 +209,8 @@ const editor = useEditor({
             CommandOrderedList,
             CommandTaskList,
             CommandIframe,
+            CommandVideo,
+            CommandAudio,
           ].filter((item) =>
             [...item.keywords, item.title].some((keyword) =>
               keyword.includes(query)
@@ -217,6 +223,8 @@ const editor = useEditor({
       lowlight,
     }),
     ExtensionIframe,
+    ExtensionVideo,
+    ExtensionAudio,
     ExtensionCharacterCount,
     Extension.create({
       addGlobalAttributes() {

@@ -285,32 +285,63 @@ export function useAttachmentSelect(
   editor: Ref<Editor | undefined>
 ): useAttachmentSelectReturn {
   const onAttachmentSelect = (attachments: AttachmentLike[]) => {
-    const images: Content[] = attachments.map((attachment) => {
-      const attrs: { src?: string; alt?: string } = {};
-      if (typeof attachment === "string") {
-        attrs.src = attachment;
-        return {
-          type: "image",
-          attrs,
-        };
-      }
-      if ("url" in attachment) {
-        attrs.src = attachment.url;
-        attrs.alt = attachment.type;
-      }
-      if ("spec" in attachment) {
-        attrs.src = attachment.status?.permalink;
-        attrs.alt = attachment.spec.displayName;
-      }
-      return {
-        type: "image",
-        attrs,
-      };
-    });
+    const contents: Content[] = attachments
+      .map((attachment) => {
+        if (typeof attachment === "string") {
+          return {
+            type: "image",
+            attrs: {
+              src: attachment,
+            },
+          };
+        }
+        if ("url" in attachment) {
+          return {
+            type: "image",
+            attrs: {
+              src: attachment.url,
+              alt: attachment.type,
+            },
+          };
+        }
+        if ("spec" in attachment) {
+          const { mediaType, displayName } = attachment.spec;
+          const { permalink } = attachment.status || {};
+          if (mediaType?.startsWith("image/")) {
+            return {
+              type: "image",
+              attrs: {
+                src: permalink,
+                alt: displayName,
+              },
+            };
+          }
+
+          if (mediaType?.startsWith("video/")) {
+            return {
+              type: "video",
+              attrs: {
+                src: permalink,
+              },
+            };
+          }
+
+          if (mediaType?.startsWith("audio/")) {
+            return {
+              type: "audio",
+              attrs: {
+                src: permalink,
+              },
+            };
+          }
+        }
+      })
+      .filter(Boolean) as Content[];
+    console.log(contents);
     editor.value
       ?.chain()
       .focus()
-      .insertContent([...images, { type: "paragraph", content: "" }])
+      .insertContent([...contents, { type: "paragraph", content: "" }])
       .run();
   };
 
