@@ -19,7 +19,9 @@ export const useThemeStore = defineStore("theme", () => {
         mute: true,
       });
 
-      activatedTheme.value = data;
+      if (data) {
+        activatedTheme.value = data;
+      }
     } catch (e) {
       console.error("Failed to fetch active theme", e);
     }
