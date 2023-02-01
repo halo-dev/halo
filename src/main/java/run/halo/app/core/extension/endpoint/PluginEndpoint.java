@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -61,6 +62,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
 import run.halo.app.infra.SystemVersionSupplier;
+import run.halo.app.infra.exception.PluginInstallationException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.VersionUtils;
@@ -455,25 +457,25 @@ public class PluginEndpoint implements CustomEndpoint {
                 // Disable auto enable during installation
                 plugin.getSpec().setEnabled(false);
                 return client.fetch(Plugin.class, plugin.getMetadata().getName())
-                    .switchIfEmpty(Mono.defer(() -> client.create(plugin)))
+                    .doOnNext(oldPlugin -> {
+                        String pluginName = oldPlugin.getMetadata().getName();
+                        throw new PluginInstallationException(
+                            "Plugin [" + pluginName + "] already installed",
+                            "problemDetail.plugin.install.alreadyInstalled",
+                            new Object[] {pluginName});
+                    })
+                    .then(client.create(plugin))
                     .publishOn(Schedulers.boundedElastic())
-                    .map(created -> {
+                    .doOnNext(created -> {
                         String fileName = created.generateFileName();
                         var pluginRoot = Paths.get(pluginProperties.getPluginsRoot());
                         createDirectoriesIfNotExists(pluginRoot);
                         Path pluginFilePath = pluginRoot.resolve(fileName);
-                        if (Files.exists(pluginFilePath)) {
-                            throw new IllegalArgumentException(
-                                "Plugin already installed : " + pluginFilePath);
-                        }
-                        FileUtils.copy(tempJarFilePath, pluginFilePath);
-                        return created;
+                        // move the plugin jar file to the plugin root
+                        // replace the old plugin jar file if exists
+                        FileUtils.copy(tempJarFilePath, pluginFilePath,
+                            StandardCopyOption.REPLACE_EXISTING);
                     })
-                    .onErrorResume(
-                        error -> client.fetch(Plugin.class, plugin.getMetadata().getName())
-                            .flatMap(client::delete)
-                            .then(Mono.error(error))
-                    )
                     .doFinally(signalType -> {
                         try {
                             Files.deleteIfExists(tempJarFilePath);
