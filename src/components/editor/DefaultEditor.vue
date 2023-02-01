@@ -81,6 +81,7 @@ import {
   IconCharacterRecognition,
   IconLink,
   IconUserFollow,
+  Toast,
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
@@ -104,6 +105,11 @@ import {
 } from "vue";
 import { formatDatetime } from "@/utils/date";
 import { useAttachmentSelect } from "@/modules/contents/attachments/composables/use-attachment";
+import { apiClient } from "@/utils/api-client";
+import * as fastq from "fastq";
+import type { queueAsPromised } from "fastq";
+import type { Attachment } from "@halo-dev/api-client";
+import { useFetchAttachmentPolicy } from "@/modules/contents/attachments/composables/use-attachment-policy";
 
 const props = withDefaults(
   defineProps<{
@@ -168,6 +174,7 @@ const editor = useEditor({
     ExtensionText,
     ExtensionImage.configure({
       inline: true,
+      allowBase64: false,
       HTMLAttributes: {
         loading: "lazy",
       },
@@ -250,7 +257,143 @@ const editor = useEditor({
       handleGenerateTableOfContent();
     });
   },
+  editorProps: {
+    handleDrop: (view, event: DragEvent, _, moved) => {
+      if (!moved && event.dataTransfer && event.dataTransfer.files) {
+        const images = Array.from(event.dataTransfer.files).filter((file) =>
+          file.type.startsWith("image/")
+        ) as File[];
+
+        if (images.length === 0) {
+          return;
+        }
+
+        event.preventDefault();
+
+        images.forEach((file, index) => {
+          uploadQueue.push({
+            file,
+            process: (url: string) => {
+              const { schema } = view.state;
+              const coordinates = view.posAtCoords({
+                left: event.clientX,
+                top: event.clientY,
+              });
+
+              if (!coordinates) return;
+
+              const node = schema.nodes.image.create({
+                src: url,
+              });
+
+              const transaction = view.state.tr.insert(
+                coordinates.pos + index,
+                node
+              );
+
+              editor.value?.view.dispatch(transaction);
+            },
+          });
+        });
+
+        return true;
+      }
+      return false;
+    },
+    handlePaste: (view, event: ClipboardEvent, slice) => {
+      const images = Array.from(event.clipboardData?.items || [])
+        .map((item) => {
+          return item.getAsFile();
+        })
+        .filter((file) => {
+          return file && file.type.startsWith("image/");
+        }) as File[];
+
+      if (images.length === 0) {
+        return;
+      }
+
+      event.preventDefault();
+
+      images.forEach((file) => {
+        uploadQueue.push({
+          file,
+          process: (url: string) => {
+            editor.value
+              ?.chain()
+              .focus()
+              .insertContent([
+                {
+                  type: "image",
+                  attrs: {
+                    src: url,
+                  },
+                },
+              ])
+              .run();
+          },
+        });
+      });
+    },
+  },
 });
+
+// image drag and paste upload
+const { policies } = useFetchAttachmentPolicy({ fetchOnMounted: true });
+
+type Task = {
+  file: File;
+  process: (permalink: string) => void;
+};
+
+const uploadQueue: queueAsPromised<Task> = fastq.promise(asyncWorker, 1);
+
+async function asyncWorker(arg: Task): Promise<void> {
+  if (!policies.value.length) {
+    Toast.warning("目前没有可用的存储策略");
+    return;
+  }
+
+  const { data: attachmentData } = await apiClient.attachment.uploadAttachment({
+    file: arg.file,
+    policyName: policies.value[0].metadata.name,
+  });
+
+  const permalink = await handleFetchPermalink(attachmentData, 3);
+
+  if (permalink) {
+    arg.process(permalink);
+  }
+}
+
+const handleFetchPermalink = async (
+  attachment: Attachment,
+  maxRetry: number
+): Promise<string | undefined> => {
+  if (maxRetry === 0) {
+    Toast.error(`获取附件永久链接失败：${attachment.spec.displayName}`);
+    return undefined;
+  }
+
+  const { data } =
+    await apiClient.extension.storage.attachment.getstorageHaloRunV1alpha1Attachment(
+      {
+        name: attachment.metadata.name,
+      }
+    );
+
+  if (data.status?.permalink) {
+    return data.status.permalink;
+  }
+
+  return await new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      const permalink = handleFetchPermalink(attachment, maxRetry - 1);
+      clearTimeout(timer);
+      resolve(permalink);
+    }, 300);
+  });
+};
 
 const toolbarMenuItems = computed(() => {
   if (!editor.value) return [];

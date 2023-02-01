@@ -62,6 +62,7 @@ importers:
       eslint: ^8.28.0
       eslint-plugin-cypress: ^2.12.1
       eslint-plugin-vue: ^9.8.0
+      fastq: ^1.15.0
       floating-vue: 2.0.0-beta.20
       fuse.js: ^6.6.2
       husky: ^8.0.2
@@ -131,6 +132,7 @@ importers:
       colorjs.io: 0.4.2
       dayjs: 1.11.6
       emoji-mart: 5.3.3
+      fastq: 1.15.0
       floating-vue: 2.0.0-beta.20_vue@3.2.45
       fuse.js: 6.6.2
       lodash.clonedeep: 4.5.0
@@ -2728,7 +2730,7 @@ packages:
     engines: {node: '>= 8'}
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
-      fastq: 1.13.0
+      fastq: 1.15.0
 
   /@polka/url/1.0.0-next.21:
     resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
@@ -5977,8 +5979,8 @@ packages:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
     dev: true
 
-  /fastq/1.13.0:
-    resolution: {integrity: sha512-YpkpUnK8od0o1hmeSc7UUs/eB/vIPWJYjKck2QKIzAf71Vm1AAQ3EbuZB3g2JIy+pg+ERD0vqI79KyZiB2e2Nw==}
+  /fastq/1.15.0:
+    resolution: {integrity: sha512-wBrocU2LCXXa+lWBt8RoIRD89Fi8OdABODa/kEnyeyjS5aZO5/GNvI5sEINADqP/h8M29UHTHUb53sUu5Ihqdw==}
     dependencies:
       reusify: 1.0.4
 
