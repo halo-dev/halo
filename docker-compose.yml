@@ -1,0 +1,51 @@
+version: "3"
+
+services:
+  halo:
+    image: halohub/halo:2.0.1
+    container_name: halo
+    restart: on-failure:3
+    depends_on:
+      halodb:
+        condition: service_healthy
+    networks:
+      halo_network:
+    volumes:
+      - halodata:/root/.halo2
+    ports:
+      - "8090:8090"
+    environment:
+      - SPRING_R2DBC_URL=r2dbc:pool:postgresql://halodb/halo
+      - SPRING_R2DBC_USERNAME=halo
+      - SPRING_R2DBC_PASSWORD=openpostgresql
+      - SPRING_SQL_INIT_PLATFORM=postgresql
+      - HALO_EXTERNAL_URL=http://blog.yourdomainname.com/
+      - HALO_SECURITY_INITIALIZER_SUPERADMINUSERNAME=admin
+      - HALO_SECURITY_INITIALIZER_SUPERADMINPASSWORD=P@ssw0rd
+
+  halodb:
+    image: postgres:latest
+    container_name: halodb
+    restart: on-failure: 3
+    networks:
+      halo_network:
+    volumes:
+      - halodb:/var/lib/postgresql/data
+    ports:          # could remove ports to public
+      - "5433:5432"
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      - POSTGRES_PASSWORD=openpostgresql
+      - POSTGRES_USER=halo
+      - POSTGRES_DB=halo
+
+networks:
+  halo_network:
+volumes:
+  halodb:
+  halodata:
+  
