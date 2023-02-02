@@ -154,7 +154,8 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                 extensionStore.getVersion(),
                 extensionStore.getData()))
             .map(updated -> converter.convertFrom((Class<E>) extension.getClass(), updated))
-            .doOnNext(updated -> watchers.onUpdate(extension, updated));
+            .doOnNext(updated -> watchers.onUpdate(extension, updated))
+            .switchIfEmpty(Mono.defer(() -> Mono.just(extension)));
     }
 
     @Override
