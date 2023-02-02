@@ -1,9 +1,9 @@
 package run.halo.app.infra;
 
 import java.util.AbstractCollection;
-import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.springframework.lang.NonNull;
@@ -20,7 +20,7 @@ import org.springframework.lang.NonNull;
  */
 public class ConditionList extends AbstractCollection<Condition> {
     private static final int EVICT_THRESHOLD = 20;
-    private final Deque<Condition> conditions = new ArrayDeque<>();
+    private final Deque<Condition> conditions = new LinkedList<>();
 
     @Override
     public boolean add(@NonNull Condition condition) {
@@ -112,5 +112,22 @@ public class ConditionList extends AbstractCollection<Condition> {
     @Override
     public void forEach(Consumer<? super Condition> action) {
         conditions.forEach(action);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ConditionList that = (ConditionList) o;
+        return Objects.equals(conditions, that.conditions);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(conditions);
     }
 }
