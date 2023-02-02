@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 import org.pf4j.PluginState;
 import org.springframework.lang.NonNull;
@@ -93,8 +91,7 @@ public class Plugin extends AbstractExtension {
         private String configMapName;
     }
 
-    @Getter
-    @Setter
+    @Data
     public static class License {
         private String name;
         private String url;

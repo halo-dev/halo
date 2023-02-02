@@ -4,9 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -20,13 +17,13 @@ class DefaultDelayQueueTest {
 
     Instant now = Instant.now();
 
-    DefaultDelayQueue<Request> queue;
+    DefaultQueue<Request> queue;
 
     final Duration minDelay = Duration.ofMillis(1);
 
     @BeforeEach
     void setUp() {
-        queue = new DefaultDelayQueue<>(() -> now, minDelay);
+        queue = new DefaultQueue<>(() -> now, minDelay);
     }
 
     @Test
@@ -82,23 +79,23 @@ class DefaultDelayQueueTest {
 
     @Test
     void shouldNotAddRepeatedlyIfNotDone() throws InterruptedException {
-        var entrySpy = spy(new DelayedEntry<>(newRequest("fake-name"), minDelay, () -> now));
+        queue = new DefaultQueue<>(() -> now, Duration.ZERO);
+        var fakeEntry = new DelayedEntry<>(newRequest("fake-name"), Duration.ZERO,
+            () -> this.now);
 
-        doReturn(0L).when(entrySpy).getDelay(any());
-
-        queue.add(entrySpy);
+        queue.add(fakeEntry);
         assertEquals(1, queue.size());
-        assertEquals(entrySpy, queue.peek());
+        assertEquals(fakeEntry, queue.peek());
         queue.take();
         assertEquals(0, queue.size());
 
-        queue.add(entrySpy);
+        queue.add(fakeEntry);
         assertEquals(0, queue.size());
 
         queue.done(newRequest("fake-name"));
-        queue.add(entrySpy);
+        queue.add(fakeEntry);
         assertEquals(1, queue.size());
-        assertEquals(entrySpy, queue.peek());
+        assertEquals(fakeEntry, queue.peek());
     }
 
     Request newRequest(String name) {

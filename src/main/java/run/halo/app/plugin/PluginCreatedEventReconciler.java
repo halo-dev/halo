@@ -15,7 +15,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.DefaultController;
-import run.halo.app.extension.controller.DefaultDelayQueue;
+import run.halo.app.extension.controller.DefaultQueue;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.RequestQueue;
 import run.halo.app.plugin.event.PluginCreatedEvent;
@@ -42,7 +42,7 @@ public class PluginCreatedEventReconciler
 
     public PluginCreatedEventReconciler(ReactiveExtensionClient client) {
         this.client = client;
-        pluginEventQueue = new DefaultDelayQueue<>(Instant::now);
+        pluginEventQueue = new DefaultQueue<>(Instant::now);
         pluginEventController = this.setupWith(null);
     }
 
