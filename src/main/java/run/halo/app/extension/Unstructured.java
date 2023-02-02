@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import lombok.EqualsAndHashCode;
 
 /**
  * Unstructured is a generic Extension, which wraps ObjectNode to maintain the Extension data, like
@@ -65,6 +66,7 @@ public class Unstructured implements Extension {
         return new UnstructuredMetadata();
     }
 
+    @EqualsAndHashCode(exclude = "version")
     class UnstructuredMetadata implements MetadataOperator {
 
         @Override
