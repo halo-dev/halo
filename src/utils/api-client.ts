@@ -100,6 +100,8 @@ axiosInstance.interceptors.response.use(
   }
 );
 
+axiosInstance.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
+
 const apiClient = setupApiClient(axiosInstance);
 
 function setupApiClient(axios: AxiosInstance) {
