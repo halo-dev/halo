@@ -28,6 +28,8 @@ public class CorsConfigurer implements SecurityConfigurer {
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/**", configuration);
         source.registerCorsConfiguration("/apis/**", configuration);
+        // source.registerCorsConfiguration("/login/**", configuration);
+        // source.registerCorsConfiguration("/logout/**", configuration);
         return source;
     }
 }

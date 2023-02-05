@@ -19,6 +19,7 @@ import run.halo.app.security.authentication.SecurityConfigurer;
 
 /**
  * TODO: Use It after 2.0.0.
+ * 采用Jwt鉴权方式
  */
 public class JwtAuthenticationConfigurer implements SecurityConfigurer {
 

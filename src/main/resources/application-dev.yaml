@@ -17,7 +17,7 @@ spring:
 halo:
   console:
     proxy:
-      endpoint: http://localhost:3000/
+      endpoint: http://127.0.0.1:3000/
       enabled: true
   security:
     initializer:

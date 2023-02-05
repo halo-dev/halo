@@ -164,7 +164,7 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     }
 
-
+    // 当name的配置value == havingValue时， 该配置才生效
     @ConditionalOnProperty(name = "halo.console.proxy.enabled", havingValue = "true")
     @Bean
     ConsoleProxyFilter consoleProxyFilter() {
