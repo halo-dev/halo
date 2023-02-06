@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -335,7 +336,8 @@ public class PluginReconciler implements Reconciler<Request> {
 
     private void settingDefaultConfig(Plugin plugin) {
         Assert.notNull(plugin, "The plugin must not be null.");
-        if (StringUtils.isBlank(plugin.getSpec().getSettingName())) {
+        final String settingName = plugin.getSpec().getSettingName();
+        if (StringUtils.isBlank(settingName)) {
             return;
         }
 
@@ -350,16 +352,34 @@ public class PluginReconciler implements Reconciler<Request> {
             return;
         }
 
-        client.fetch(Setting.class, plugin.getSpec().getSettingName())
-            .ifPresent(setting -> {
-                var data = SettingUtils.settingDefinedDefaultValueMap(setting);
-                // Create with or without default value
-                ConfigMap configMap = new ConfigMap();
-                configMap.setMetadata(new Metadata());
-                configMap.getMetadata().setName(configMapNameToUse);
-                configMap.setData(data);
-                client.create(configMap);
-            });
+        Optional<Setting> settingOption = client.fetch(Setting.class, settingName);
+        // Fix gh-3224
+        // Maybe Setting is being created and cannot be queried. so try again.
+        if (settingOption.isEmpty()) {
+            client.fetch(Plugin.class, plugin.getMetadata().getName())
+                .ifPresent(newPlugin -> {
+                    final Plugin.PluginStatus oldStatus =
+                        JsonUtils.deepCopy(newPlugin.statusNonNull());
+                    Plugin.PluginStatus status = newPlugin.statusNonNull();
+                    status.setPhase(PluginState.FAILED);
+                    status.setReason("ResourceNotReady");
+                    status.setMessage("Setting for " + settingName + " is not ready, retrying...");
+                    status.setLastTransitionTime(Instant.now());
+                    if (!oldStatus.equals(status)) {
+                        client.update(newPlugin);
+                    }
+                    throw new IllegalStateException(status.getMessage());
+                });
+            return;
+        }
+
+        var data = SettingUtils.settingDefinedDefaultValueMap(settingOption.get());
+        // Create with or without default value
+        ConfigMap configMap = new ConfigMap();
+        configMap.setMetadata(new Metadata());
+        configMap.getMetadata().setName(configMapNameToUse);
+        configMap.setData(data);
+        client.create(configMap);
     }
 
     static String initialReverseProxyName(String pluginName) {
