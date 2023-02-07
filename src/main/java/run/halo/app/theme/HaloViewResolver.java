@@ -50,7 +50,7 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver {
         @Override
         public Mono<Void> render(Map<String, ?> model, MediaType contentType,
             ServerWebExchange exchange) {
-            return themeResolver.getTheme(exchange.getRequest()).flatMap(theme -> {
+            return themeResolver.getTheme(exchange).flatMap(theme -> {
                 // calculate the engine before rendering
                 setTemplateEngine(engineManager.getTemplateEngine(theme));
                 return super.render(model, contentType, exchange)

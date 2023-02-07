@@ -25,7 +25,7 @@ public class ThemeContextBasedVariablesAcquirer implements ViewContextBasedVaria
 
     @Override
     public Mono<Map<String, Object>> acquire(ServerWebExchange exchange) {
-        return themeResolver.getTheme(exchange.getRequest())
+        return themeResolver.getTheme(exchange)
             .flatMap(themeContext -> {
                 String name = themeContext.getName();
                 return themeFinder.getByName(name);

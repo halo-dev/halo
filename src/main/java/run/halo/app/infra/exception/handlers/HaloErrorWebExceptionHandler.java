@@ -12,6 +12,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import reactor.util.context.Context;
 import run.halo.app.theme.ThemeContext;
 import run.halo.app.theme.ThemeResolver;
 import run.halo.app.theme.engine.ThemeTemplateAvailabilityProvider;
@@ -59,9 +60,9 @@ public class HaloErrorWebExceptionHandler extends DefaultErrorWebExceptionHandle
 
     @Override
     protected Mono<ServerResponse> renderErrorView(ServerRequest request) {
-        return themeResolver.getTheme(request.exchange().getRequest())
+        return themeResolver.getTheme(request.exchange())
             .flatMap(themeContext -> super.renderErrorView(request)
-                .contextWrite(context -> context.put(ThemeContext.class, themeContext)));
+                .contextWrite(Context.of(ThemeContext.class, themeContext)));
     }
 
     @Override
