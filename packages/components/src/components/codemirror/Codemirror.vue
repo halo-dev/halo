@@ -45,6 +45,7 @@ const emit = defineEmits<{
 const customTheme = EditorView.theme({
   "&": {
     height: props.height,
+    width: "100%",
   },
 });
 
