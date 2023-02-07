@@ -50,7 +50,7 @@ const handleFetchActuatorStartup = async () => {
 
 const isExternalUrlValid = computed(() => {
   if (!globalInfo.value?.externalUrl) {
-    return false;
+    return true;
   }
   const url = new URL(globalInfo.value.externalUrl);
   const { host: currentHost, protocol: currentProtocol } = window.location;
