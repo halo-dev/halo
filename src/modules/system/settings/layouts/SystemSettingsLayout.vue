@@ -109,19 +109,19 @@ watch([() => route.name, () => route.params], async () => {
             @change="handleTabChange"
           ></VTabbar>
         </template>
+        <div class="bg-white">
+          <RouterView :key="activeTab" v-slot="{ Component }">
+            <template v-if="Component">
+              <Suspense>
+                <component :is="Component"></component>
+                <template #fallback>
+                  <VLoading />
+                </template>
+              </Suspense>
+            </template>
+          </RouterView>
+        </div>
       </VCard>
-      <div class="bg-white">
-        <RouterView :key="activeTab" v-slot="{ Component }">
-          <template v-if="Component">
-            <Suspense>
-              <component :is="Component"></component>
-              <template #fallback>
-                <VLoading />
-              </template>
-            </Suspense>
-          </template>
-        </RouterView>
-      </div>
     </div>
   </BasicLayout>
 </template>
