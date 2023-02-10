@@ -1,9 +1,11 @@
 package run.halo.app.extension.store;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.exception.DuplicateNameException;
 
 @Component
 public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreClient {
@@ -26,7 +28,9 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
 
     @Override
     public Mono<ExtensionStore> create(String name, byte[] data) {
-        return repository.save(new ExtensionStore(name, data));
+        return repository.save(new ExtensionStore(name, data))
+            .onErrorMap(DuplicateKeyException.class,
+                t -> new DuplicateNameException("Duplicate name detected.", t));
     }
 
     @Override
