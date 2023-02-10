@@ -237,6 +237,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             if (publishTime != null) {
                 labels.put(Post.ARCHIVE_YEAR_LABEL, HaloUtils.getYearText(publishTime));
                 labels.put(Post.ARCHIVE_MONTH_LABEL, HaloUtils.getMonthText(publishTime));
+                labels.put(Post.ARCHIVE_DAY_LABEL, HaloUtils.getDayText(publishTime));
             }
             if (!labels.containsKey(Post.PUBLISHED_LABEL)) {
                 labels.put(Post.PUBLISHED_LABEL, Boolean.FALSE.toString());

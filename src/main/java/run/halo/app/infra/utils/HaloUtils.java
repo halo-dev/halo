@@ -54,6 +54,12 @@ public class HaloUtils {
         return StringUtils.defaultString(userAgent, "unknown");
     }
 
+    public static String getDayText(Instant instant) {
+        Assert.notNull(instant, "Instant must not be null");
+        int dayValue = instant.atZone(ZoneId.systemDefault()).getDayOfMonth();
+        return StringUtils.leftPad(String.valueOf(dayValue), 2, '0');
+    }
+
     public static String getMonthText(Instant instant) {
         Assert.notNull(instant, "Instant must not be null");
         int monthValue = instant.atZone(ZoneId.systemDefault()).getMonthValue();
