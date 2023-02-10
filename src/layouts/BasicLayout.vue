@@ -187,7 +187,9 @@ onMounted(generateMenus);
 
 <template>
   <div class="flex h-full">
-    <aside class="navbar fixed hidden h-full overflow-y-auto md:block">
+    <aside
+      class="navbar fixed hidden h-full overflow-y-auto md:flex md:flex-col"
+    >
       <div class="logo flex justify-center pt-5 pb-7">
         <a href="/" target="_blank" title="访问首页">
           <IconLogo
@@ -195,73 +197,77 @@ onMounted(generateMenus);
           />
         </a>
       </div>
-      <div class="px-3">
-        <div
-          class="flex cursor-pointer items-center rounded bg-gray-100 p-2 text-gray-400 transition-all hover:text-gray-900"
-          @click="globalSearchVisible = true"
-        >
-          <span class="mr-3">
-            <IconSearch />
-          </span>
-          <span class="flex-1 select-none text-base font-normal">搜索</span>
-          <div class="text-sm">
-            {{ `${isMac ? "⌘" : "Ctrl"}+K` }}
-          </div>
-        </div>
-      </div>
-      <RoutesMenu :menus="menus" />
-      <div class="current-profile">
-        <div v-if="userStore.currentUser?.spec.avatar" class="profile-avatar">
-          <VAvatar
-            :src="userStore.currentUser?.spec.avatar"
-            :alt="userStore.currentUser?.spec.displayName"
-            size="md"
-            circle
-          ></VAvatar>
-        </div>
-        <div class="profile-name">
-          <div class="flex text-sm font-medium">
-            {{ userStore.currentUser?.spec.displayName }}
-          </div>
-          <div class="flex">
-            <VTag>
-              <template #leftIcon>
-                <IconUserSettings />
-              </template>
-              {{ currentRole }}
-            </VTag>
-          </div>
-        </div>
-        <FloatingDropdown
-          class="profile-control cursor-pointer rounded p-1 transition-all hover:bg-gray-100"
-        >
-          <IconMore />
-          <template #popper>
-            <div class="w-48 p-2">
-              <VSpace class="w-full" direction="column">
-                <VButton
-                  v-close-popper
-                  block
-                  type="secondary"
-                  :route="{
-                    name: 'UserDetail',
-                    params: { name: '-' },
-                  }"
-                >
-                  个人资料
-                </VButton>
-                <VButton
-                  v-close-popper
-                  block
-                  type="default"
-                  @click="handleLogout"
-                >
-                  退出登录
-                </VButton>
-              </VSpace>
+      <div class="flex-1 overflow-y-auto">
+        <div class="px-3">
+          <div
+            class="flex cursor-pointer items-center rounded bg-gray-100 p-2 text-gray-400 transition-all hover:text-gray-900"
+            @click="globalSearchVisible = true"
+          >
+            <span class="mr-3">
+              <IconSearch />
+            </span>
+            <span class="flex-1 select-none text-base font-normal">搜索</span>
+            <div class="text-sm">
+              {{ `${isMac ? "⌘" : "Ctrl"}+K` }}
             </div>
-          </template>
-        </FloatingDropdown>
+          </div>
+        </div>
+        <RoutesMenu :menus="menus" />
+      </div>
+      <div class="profile-placeholder">
+        <div class="current-profile">
+          <div v-if="userStore.currentUser?.spec.avatar" class="profile-avatar">
+            <VAvatar
+              :src="userStore.currentUser?.spec.avatar"
+              :alt="userStore.currentUser?.spec.displayName"
+              size="md"
+              circle
+            ></VAvatar>
+          </div>
+          <div class="profile-name">
+            <div class="flex text-sm font-medium">
+              {{ userStore.currentUser?.spec.displayName }}
+            </div>
+            <div class="flex">
+              <VTag>
+                <template #leftIcon>
+                  <IconUserSettings />
+                </template>
+                {{ currentRole }}
+              </VTag>
+            </div>
+          </div>
+          <FloatingDropdown
+            class="profile-control cursor-pointer rounded p-1 transition-all hover:bg-gray-100"
+          >
+            <IconMore />
+            <template #popper>
+              <div class="w-48 p-2">
+                <VSpace class="w-full" direction="column">
+                  <VButton
+                    v-close-popper
+                    block
+                    type="secondary"
+                    :route="{
+                      name: 'UserDetail',
+                      params: { name: '-' },
+                    }"
+                  >
+                    个人资料
+                  </VButton>
+                  <VButton
+                    v-close-popper
+                    block
+                    type="default"
+                    @click="handleLogout"
+                  >
+                    退出登录
+                  </VButton>
+                </VSpace>
+              </div>
+            </template>
+          </FloatingDropdown>
+        </div>
       </div>
     </aside>
 
@@ -368,32 +374,35 @@ onMounted(generateMenus);
   @apply bg-white;
   z-index: 999;
   box-shadow: 0 4px 4px #f6c6ce;
-  padding-bottom: 70px;
 
-  .current-profile {
+  .profile-placeholder {
     height: 70px;
-    @apply fixed
-    left-0
-    bottom-0
-    flex
-    w-64
-    gap-3
-    bg-white
-    p-3;
 
-    .profile-avatar {
-      @apply flex
-      items-center 
-      self-center;
-    }
+    .current-profile {
+      height: 70px;
+      @apply fixed
+      left-0
+      bottom-0
+      flex
+      w-64
+      gap-3
+      bg-white
+      p-3;
 
-    .profile-name {
-      @apply flex-1
-      self-center;
-    }
+      .profile-avatar {
+        @apply flex
+        items-center 
+        self-center;
+      }
 
-    .profile-control {
-      @apply self-center;
+      .profile-name {
+        @apply flex-1
+        self-center;
+      }
+
+      .profile-control {
+        @apply self-center;
+      }
     }
   }
 }
