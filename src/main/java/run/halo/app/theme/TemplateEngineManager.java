@@ -39,7 +39,7 @@ import run.halo.app.theme.message.ThemeMessageResolver;
 @Component
 public class TemplateEngineManager {
     private static final int CACHE_SIZE_LIMIT = 5;
-    private final ConcurrentLruCache<ThemeContext, ISpringWebFluxTemplateEngine> engineCache;
+    private final ConcurrentLruCache<CacheKey, ISpringWebFluxTemplateEngine> engineCache;
 
     private final ThymeleafProperties thymeleafProperties;
 
@@ -64,14 +64,15 @@ public class TemplateEngineManager {
     }
 
     public ISpringWebFluxTemplateEngine getTemplateEngine(ThemeContext theme) {
+        CacheKey cacheKey = buildCacheKey(theme);
         // cache not exists, will create new engine
-        if (!engineCache.contains(theme)) {
+        if (!engineCache.contains(cacheKey)) {
             // before this, check if theme exists
             if (!fileExists(theme.getPath())) {
                 throw new NotFoundException("Theme not found.");
             }
         }
-        return engineCache.get(theme);
+        return engineCache.get(cacheKey);
     }
 
     private boolean fileExists(Path path) {
@@ -85,22 +86,38 @@ public class TemplateEngineManager {
     public Mono<Void> clearCache(String themeName) {
         return themeResolver.getThemeContext(themeName)
             .doOnNext(themeContext -> {
+                CacheKey cacheKey = buildCacheKey(themeContext);
                 TemplateEngine templateEngine =
-                    (TemplateEngine) engineCache.get(themeContext);
+                    (TemplateEngine) engineCache.get(cacheKey);
                 templateEngine.clearTemplateCache();
             })
             .then();
     }
 
-    private ISpringWebFluxTemplateEngine templateEngineGenerator(ThemeContext theme) {
-        var engine = new HaloTemplateEngine(new ThemeMessageResolver(theme));
+    /**
+     * TemplateEngine LRU cache key.
+     *
+     * @param name from {@link #context}
+     * @param active from {@link #context}
+     * @param context must not be null
+     */
+    private record CacheKey(String name, boolean active, ThemeContext context) {
+    }
+
+    CacheKey buildCacheKey(ThemeContext context) {
+        return new CacheKey(context.getName(), context.isActive(), context);
+    }
+
+    private ISpringWebFluxTemplateEngine templateEngineGenerator(CacheKey cacheKey) {
+
+        var engine = new HaloTemplateEngine(new ThemeMessageResolver(cacheKey.context()));
         engine.setEnableSpringELCompiler(thymeleafProperties.isEnableSpringElCompiler());
-        engine.setLinkBuilder(new ThemeLinkBuilder(theme, externalUrlSupplier));
+        engine.setLinkBuilder(new ThemeLinkBuilder(cacheKey.context(), externalUrlSupplier));
         engine.setRenderHiddenMarkersBeforeCheckboxes(
             thymeleafProperties.isRenderHiddenMarkersBeforeCheckboxes());
 
         var mainResolver = haloTemplateResolver();
-        mainResolver.setPrefix(theme.getPath().resolve("templates") + "/");
+        mainResolver.setPrefix(cacheKey.context().getPath().resolve("templates") + "/");
         engine.addTemplateResolver(mainResolver);
         // replace StandardDialect with SpringStandardDialect
         engine.setDialect(new SpringStandardDialect() {
