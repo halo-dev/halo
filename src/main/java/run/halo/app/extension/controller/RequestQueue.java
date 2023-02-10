@@ -18,6 +18,10 @@ public interface RequestQueue<E> extends Disposable {
 
     void done(E request);
 
+    long size();
+
+    DelayedEntry<E> peek();
+
     class DelayedEntry<E> implements Delayed {
 
         private final E entry;

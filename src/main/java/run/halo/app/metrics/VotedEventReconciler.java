@@ -15,7 +15,7 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.DefaultController;
-import run.halo.app.extension.controller.DefaultDelayQueue;
+import run.halo.app.extension.controller.DefaultQueue;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.RequestQueue;
 
@@ -36,7 +36,7 @@ public class VotedEventReconciler implements Reconciler<VotedEvent>, SmartLifecy
 
     public VotedEventReconciler(ExtensionClient client) {
         this.client = client;
-        votedEventQueue = new DefaultDelayQueue<>(Instant::now);
+        votedEventQueue = new DefaultQueue<>(Instant::now);
         votedEventController = this.setupWith(null);
     }
 

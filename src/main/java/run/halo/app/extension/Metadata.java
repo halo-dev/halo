@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
  * @author johnniang
  */
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "version")
 public class Metadata implements MetadataOperator {
 
     /**

@@ -17,7 +17,7 @@ import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.DefaultController;
-import run.halo.app.extension.controller.DefaultDelayQueue;
+import run.halo.app.extension.controller.DefaultQueue;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.RequestQueue;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
@@ -43,7 +43,7 @@ public class PostEventReconciler implements Reconciler<PostEvent>, SmartLifecycl
         this.extensionGetter = extensionGetter;
         this.postFinder = postFinder;
 
-        postEventQueue = new DefaultDelayQueue<>(Instant::now);
+        postEventQueue = new DefaultQueue<>(Instant::now);
         postEventController = this.setupWith(null);
     }
 

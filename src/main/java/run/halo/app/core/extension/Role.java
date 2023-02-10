@@ -53,6 +53,7 @@ public class Role extends AbstractExtension {
      * @since 2.0.0
      */
     @Getter
+    @EqualsAndHashCode
     public static class PolicyRule implements Comparable<PolicyRule> {
         /**
          * APIGroups is the name of the APIGroup that contains the resources.
