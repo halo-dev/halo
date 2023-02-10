@@ -1,12 +1,14 @@
 package run.halo.app.theme.message;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
 import java.io.FileNotFoundException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,13 +16,13 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.theme.ThemeContext;
 import run.halo.app.theme.ThemeResolver;
@@ -50,7 +52,7 @@ public class ThemeMessageResolverIntegrationTest {
         defaultThemeUrl = ResourceUtils.getURL("classpath:themes/default");
         otherThemeUrl = ResourceUtils.getURL("classpath:themes/other");
 
-        Mockito.when(themeResolver.getTheme(Mockito.any(ServerHttpRequest.class)))
+        when(themeResolver.getTheme(any(ServerWebExchange.class)))
             .thenReturn(Mono.just(createDefaultContext()));
     }
 
@@ -150,7 +152,7 @@ public class ThemeMessageResolverIntegrationTest {
                 """);
 
         // For other theme
-        Mockito.when(themeResolver.getTheme(Mockito.any(ServerHttpRequest.class)))
+        when(themeResolver.getTheme(any(ServerWebExchange.class)))
             .thenReturn(Mono.just(createOtherContext()));
         webTestClient.get()
             .uri("/index?language=zh")

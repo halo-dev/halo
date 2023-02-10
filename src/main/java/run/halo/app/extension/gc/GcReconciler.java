@@ -13,7 +13,7 @@ import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.DefaultController;
-import run.halo.app.extension.controller.DefaultDelayQueue;
+import run.halo.app.extension.controller.DefaultQueue;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.store.ExtensionStoreClient;
 
@@ -55,7 +55,7 @@ class GcReconciler implements Reconciler<GcRequest> {
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
-        var queue = new DefaultDelayQueue<GcRequest>(Instant::now, Duration.ofMillis(500));
+        var queue = new DefaultQueue<GcRequest>(Instant::now, Duration.ofMillis(500));
         var synchronizer = new GcSynchronizer(client, queue, schemeManager);
         return new DefaultController<>(
             "garbage-collector-controller",

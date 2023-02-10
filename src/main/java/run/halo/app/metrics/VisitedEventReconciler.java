@@ -17,7 +17,7 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.DefaultController;
-import run.halo.app.extension.controller.DefaultDelayQueue;
+import run.halo.app.extension.controller.DefaultQueue;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.RequestQueue;
 
@@ -41,7 +41,7 @@ public class VisitedEventReconciler
 
     public VisitedEventReconciler(ExtensionClient client) {
         this.client = client;
-        visitedEventQueue = new DefaultDelayQueue<>(Instant::now);
+        visitedEventQueue = new DefaultQueue<>(Instant::now);
         visitedEventController = this.setupWith(null);
     }
 

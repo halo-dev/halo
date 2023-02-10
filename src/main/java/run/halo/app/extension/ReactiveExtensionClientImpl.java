@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.util.Predicates;
@@ -136,20 +137,25 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             mono = get(extension.getClass(), extension.getMetadata().getName());
         }
         return mono
-            .map(old -> {
+            .flatMap(old -> {
                 // reset some fields
                 var oldMetadata = old.getMetadata();
                 var newMetadata = extension.getMetadata();
                 newMetadata.setCreationTimestamp(oldMetadata.getCreationTimestamp());
                 newMetadata.setDeletionTimestamp(oldMetadata.getDeletionTimestamp());
                 extension.setMetadata(newMetadata);
-                return converter.convertTo(extension);
+                if (Objects.equals(old, extension)) {
+                    return Mono.empty();
+                }
+                return Mono.just(extension);
             })
+            .map(converter::convertTo)
             .flatMap(extensionStore -> client.update(extensionStore.getName(),
                 extensionStore.getVersion(),
                 extensionStore.getData()))
             .map(updated -> converter.convertFrom((Class<E>) extension.getClass(), updated))
-            .doOnNext(updated -> watchers.onUpdate(extension, updated));
+            .doOnNext(updated -> watchers.onUpdate(extension, updated))
+            .switchIfEmpty(Mono.defer(() -> Mono.just(extension)));
     }
 
     @Override

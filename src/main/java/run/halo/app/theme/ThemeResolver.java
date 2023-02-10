@@ -2,9 +2,9 @@ package run.halo.app.theme;
 
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting.Theme;
@@ -37,24 +37,37 @@ public class ThemeResolver {
             .map(ThemeContext.ThemeContextBuilder::build);
     }
 
-    public Mono<ThemeContext> getTheme(ServerHttpRequest request) {
-        return environmentFetcher.fetch(Theme.GROUP, Theme.class)
-            .map(Theme::getActive)
-            .switchIfEmpty(Mono.error(() -> new IllegalArgumentException("No theme activated")))
-            .map(activatedTheme -> {
-                var builder = ThemeContext.builder();
-                var themeName =
-                    request.getQueryParams().getFirst(ThemeContext.THEME_PREVIEW_PARAM_NAME);
-                if (StringUtils.isBlank(themeName)) {
-                    themeName = activatedTheme;
-                }
-                boolean active = StringUtils.equals(activatedTheme, themeName);
-                var path = themeRoot.get().resolve(themeName);
-                return builder.name(themeName)
-                    .path(path)
-                    .active(active)
-                    .build();
-            });
+    public Mono<ThemeContext> getTheme(ServerWebExchange exchange) {
+        return fetchThemeFromExchange(exchange)
+            .switchIfEmpty(Mono.defer(() -> environmentFetcher.fetch(Theme.GROUP, Theme.class)
+                .map(Theme::getActive)
+                .switchIfEmpty(
+                    Mono.error(() -> new IllegalArgumentException("No theme activated")))
+                .map(activatedTheme -> {
+                    var builder = ThemeContext.builder();
+                    var themeName = exchange.getRequest().getQueryParams()
+                        .getFirst(ThemeContext.THEME_PREVIEW_PARAM_NAME);
+                    if (StringUtils.isBlank(themeName)) {
+                        themeName = activatedTheme;
+                    }
+                    boolean active = StringUtils.equals(activatedTheme, themeName);
+                    var path = themeRoot.get().resolve(themeName);
+                    return builder.name(themeName)
+                        .path(path)
+                        .active(active)
+                        .build();
+                })
+                .doOnNext(themeContext ->
+                    exchange.getAttributes().put(ThemeContext.class.getName(), themeContext))
+            ));
+    }
+
+    public Mono<ThemeContext> fetchThemeFromExchange(ServerWebExchange exchange) {
+        return Mono.justOrEmpty(exchange)
+            .map(ServerWebExchange::getAttributes)
+            .filter(attrs -> attrs.containsKey(ThemeContext.class.getName()))
+            .map(attrs -> attrs.get(ThemeContext.class.getName()))
+            .cast(ThemeContext.class);
     }
 
 }

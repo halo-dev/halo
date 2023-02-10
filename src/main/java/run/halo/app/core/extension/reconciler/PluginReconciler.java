@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -36,6 +37,7 @@ import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginConst;
+import run.halo.app.plugin.PluginNotFoundException;
 import run.halo.app.plugin.PluginStartingError;
 import run.halo.app.plugin.event.PluginCreatedEvent;
 import run.halo.app.plugin.resources.BundleResourceUtils;
@@ -82,24 +84,13 @@ public class PluginReconciler implements Reconciler<Request> {
             ensurePluginLoaded();
         }
 
+        if (!checkPluginState(name)) {
+            return;
+        }
+
         client.fetch(Plugin.class, name).ifPresent(plugin -> {
             Plugin oldPlugin = JsonUtils.deepCopy(plugin);
             Plugin.PluginStatus pluginStatus = plugin.statusNonNull();
-            PluginWrapper pluginWrapper = haloPluginManager.getPlugin(name);
-            if (pluginWrapper == null) {
-                pluginStatus.setPhase(PluginState.FAILED);
-                pluginStatus.setReason("PluginNotFound");
-                pluginStatus.setMessage("Plugin " + name + " not found in plugin manager");
-            } else {
-                // Set to the correct state
-                pluginStatus.setPhase(pluginWrapper.getPluginState());
-
-                if (haloPluginManager.getUnresolvedPlugins().contains(pluginWrapper)) {
-                    // load and resolve plugin
-                    haloPluginManager.loadPlugin(pluginWrapper.getPluginPath());
-                }
-            }
-
             String logo = plugin.getSpec().getLogo();
             if (PathUtils.isAbsoluteUri(logo)) {
                 pluginStatus.setLogo(logo);
@@ -117,6 +108,36 @@ public class PluginReconciler implements Reconciler<Request> {
         startPlugin(name);
 
         stopPlugin(name);
+    }
+
+    private boolean checkPluginState(String name) {
+        // check plugin state
+        return client.fetch(Plugin.class, name)
+            .map(plugin -> {
+                Plugin oldPlugin = JsonUtils.deepCopy(plugin);
+                Plugin.PluginStatus pluginStatus = plugin.statusNonNull();
+                PluginWrapper pluginWrapper = haloPluginManager.getPlugin(name);
+                if (pluginWrapper == null) {
+                    pluginStatus.setPhase(PluginState.FAILED);
+                    pluginStatus.setReason("PluginNotFound");
+                    pluginStatus.setMessage(
+                        "Plugin " + plugin.getMetadata().getName()
+                            + " not found in plugin manager.");
+                    if (!plugin.equals(oldPlugin)) {
+                        client.update(plugin);
+                    }
+                    return false;
+                }
+                // Set to the correct state
+                pluginStatus.setPhase(pluginWrapper.getPluginState());
+
+                if (haloPluginManager.getUnresolvedPlugins().contains(pluginWrapper)) {
+                    // load and resolve plugin
+                    haloPluginManager.loadPlugin(pluginWrapper.getPluginPath());
+                }
+                return true;
+            })
+            .orElse(false);
     }
 
     private void ensurePluginLoaded() {
@@ -172,20 +193,15 @@ public class PluginReconciler implements Reconciler<Request> {
 
     private boolean verifyStartCondition(String pluginName) {
         PluginWrapper pluginWrapper = haloPluginManager.getPlugin(pluginName);
+        if (pluginWrapper == null) {
+            throw new PluginNotFoundException(
+                "Plugin " + pluginName + " not found in plugin manager.");
+        }
         return client.fetch(Plugin.class, pluginName).map(plugin -> {
             Plugin.PluginStatus oldStatus = JsonUtils.deepCopy(plugin.statusNonNull());
 
             Plugin.PluginStatus status = plugin.statusNonNull();
             status.setLastTransitionTime(Instant.now());
-            if (pluginWrapper == null) {
-                status.setPhase(PluginState.FAILED);
-                status.setReason("PluginNotFound");
-                status.setMessage("Plugin [" + pluginName + "] not found in plugin manager");
-                if (!oldStatus.equals(status)) {
-                    client.update(plugin);
-                }
-                return false;
-            }
 
             // Check if this plugin version is match requires param.
             if (!haloPluginManager.validatePluginVersion(pluginWrapper)) {
@@ -206,6 +222,9 @@ public class PluginReconciler implements Reconciler<Request> {
                 status.setPhase(pluginState);
                 status.setReason("PluginDisabled");
                 status.setMessage("The plugin is disabled for some reason and cannot be started.");
+                if (!oldStatus.equals(status)) {
+                    client.update(plugin);
+                }
             }
             return true;
         }).orElse(false);
@@ -335,7 +354,8 @@ public class PluginReconciler implements Reconciler<Request> {
 
     private void settingDefaultConfig(Plugin plugin) {
         Assert.notNull(plugin, "The plugin must not be null.");
-        if (StringUtils.isBlank(plugin.getSpec().getSettingName())) {
+        final String settingName = plugin.getSpec().getSettingName();
+        if (StringUtils.isBlank(settingName)) {
             return;
         }
 
@@ -350,16 +370,34 @@ public class PluginReconciler implements Reconciler<Request> {
             return;
         }
 
-        client.fetch(Setting.class, plugin.getSpec().getSettingName())
-            .ifPresent(setting -> {
-                var data = SettingUtils.settingDefinedDefaultValueMap(setting);
-                // Create with or without default value
-                ConfigMap configMap = new ConfigMap();
-                configMap.setMetadata(new Metadata());
-                configMap.getMetadata().setName(configMapNameToUse);
-                configMap.setData(data);
-                client.create(configMap);
-            });
+        Optional<Setting> settingOption = client.fetch(Setting.class, settingName);
+        // Fix gh-3224
+        // Maybe Setting is being created and cannot be queried. so try again.
+        if (settingOption.isEmpty()) {
+            client.fetch(Plugin.class, plugin.getMetadata().getName())
+                .ifPresent(newPlugin -> {
+                    final Plugin.PluginStatus oldStatus =
+                        JsonUtils.deepCopy(newPlugin.statusNonNull());
+                    Plugin.PluginStatus status = newPlugin.statusNonNull();
+                    status.setPhase(PluginState.FAILED);
+                    status.setReason("ResourceNotReady");
+                    status.setMessage("Setting for " + settingName + " is not ready, retrying...");
+                    status.setLastTransitionTime(Instant.now());
+                    if (!oldStatus.equals(status)) {
+                        client.update(newPlugin);
+                    }
+                    throw new IllegalStateException(status.getMessage());
+                });
+            return;
+        }
+
+        var data = SettingUtils.settingDefinedDefaultValueMap(settingOption.get());
+        // Create with or without default value
+        ConfigMap configMap = new ConfigMap();
+        configMap.setMetadata(new Metadata());
+        configMap.getMetadata().setName(configMapNameToUse);
+        configMap.setData(data);
+        client.create(configMap);
     }
 
     static String initialReverseProxyName(String pluginName) {

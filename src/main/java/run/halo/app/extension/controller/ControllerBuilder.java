@@ -106,7 +106,7 @@ public class ControllerBuilder {
         Assert.notNull(extension, "Extension must not be null");
         Assert.notNull(reconciler, "Reconciler must not be null");
 
-        var queue = new DefaultDelayQueue<Request>(nowSupplier, minDelay);
+        var queue = new DefaultQueue<Request>(nowSupplier, minDelay);
         var predicates = new WatcherPredicates.Builder()
             .withGroupVersionKind(extension.groupVersionKind())
             .onAddPredicate(onAddPredicate)

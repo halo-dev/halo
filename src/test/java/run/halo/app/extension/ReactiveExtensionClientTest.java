@@ -21,6 +21,7 @@ import static run.halo.app.extension.GroupVersionKind.fromAPIVersionAndKind;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -395,6 +396,7 @@ class ReactiveExtensionClientTest {
     @Test
     void shouldUpdateSuccessfully() {
         var fake = createFakeExtension("fake", 2L);
+        fake.getMetadata().setLabels(Map.of("new", "true"));
         var storeName = "/registry/fake.halo.run/fakes/fake";
         when(converter.convertTo(any())).thenReturn(
             createExtensionStore(storeName, 2L));
@@ -402,15 +404,45 @@ class ReactiveExtensionClientTest {
             Mono.just(createExtensionStore(storeName, 2L)));
         when(storeClient.fetchByName(storeName)).thenReturn(
             Mono.just(createExtensionStore(storeName, 1L)));
-        when(converter.convertFrom(same(FakeExtension.class), any())).thenReturn(fake);
+
+        var oldFake = createFakeExtension("fake", 2L);
+        oldFake.getMetadata().setLabels(Map.of("old", "true"));
+
+        var updatedFake = createFakeExtension("fake", 3L);
+        updatedFake.getMetadata().setLabels(Map.of("updated", "true"));
+        when(converter.convertFrom(same(FakeExtension.class), any()))
+            .thenReturn(oldFake)
+            .thenReturn(updatedFake);
+
+        StepVerifier.create(client.update(fake))
+            .expectNext(updatedFake)
+            .verifyComplete();
+
+        verify(storeClient).fetchByName(storeName);
+        verify(converter).convertTo(eq(fake));
+        verify(converter, times(2)).convertFrom(same(FakeExtension.class), any());
+        verify(storeClient)
+            .update(eq("/registry/fake.halo.run/fakes/fake"), eq(2L), any());
+    }
+
+    @Test
+    void shouldNotUpdateIfExtensionNotChange() {
+        var fake = createFakeExtension("fake", 2L);
+        var storeName = "/registry/fake.halo.run/fakes/fake";
+        when(storeClient.fetchByName(storeName)).thenReturn(
+            Mono.just(createExtensionStore(storeName, 1L)));
+
+        var oldFake = createFakeExtension("fake", 2L);
+        when(converter.convertFrom(same(FakeExtension.class), any())).thenReturn(oldFake);
 
         StepVerifier.create(client.update(fake))
             .expectNext(fake)
             .verifyComplete();
 
-        verify(converter, times(1)).convertTo(eq(fake));
-        verify(storeClient, times(1))
-            .update(eq("/registry/fake.halo.run/fakes/fake"), eq(2L), any());
+        verify(storeClient).fetchByName(storeName);
+        verify(converter).convertFrom(same(FakeExtension.class), any());
+        verify(converter, never()).convertTo(any());
+        verify(storeClient, never()).update(any(), any(), any());
     }
 
     @Test
@@ -423,14 +455,24 @@ class ReactiveExtensionClientTest {
             .thenReturn(Mono.just(createExtensionStore(name, 12345L)));
         when(storeClient.fetchByName(name))
             .thenReturn(Mono.just(createExtensionStore(name, 12346L)));
-        when(converter.convertFrom(same(Unstructured.class), any())).thenReturn(fake);
+
+        var oldFake = createUnstructured();
+        oldFake.getMetadata().setLabels(Map.of("old", "true"));
+
+        var updatedFake = createUnstructured();
+        updatedFake.getMetadata().setLabels(Map.of("updated", "true"));
+        when(converter.convertFrom(same(Unstructured.class), any()))
+            .thenReturn(oldFake)
+            .thenReturn(updatedFake);
 
         StepVerifier.create(client.update(fake))
-            .expectNext(fake)
+            .expectNext(updatedFake)
             .verifyComplete();
 
-        verify(converter, times(1)).convertTo(eq(fake));
-        verify(storeClient, times(1))
+        verify(storeClient).fetchByName(name);
+        verify(converter).convertTo(eq(fake));
+        verify(converter, times(2)).convertFrom(same(Unstructured.class), any());
+        verify(storeClient)
             .update(eq("/registry/fake.halo.run/fakes/fake"), eq(12345L), any());
     }
 
@@ -478,6 +520,13 @@ class ReactiveExtensionClientTest {
             shouldUpdateSuccessfully();
 
             verify(watcher, times(1)).onUpdate(any(), any());
+        }
+
+        @Test
+        void shouldNotWatchOnUpdateIfExtensionNotChange() {
+            shouldNotUpdateIfExtensionNotChange();
+
+            verify(watcher, never()).onUpdate(any(), any());
         }
 
         @Test
