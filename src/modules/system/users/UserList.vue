@@ -58,6 +58,8 @@ const userStore = useUserStore();
 
 let fuse: Fuse<User> | undefined = undefined;
 
+const ANONYMOUSUSER_NAME = "anonymousUser";
+
 const handleFetchUsers = async (options?: { mute?: boolean }) => {
   try {
     clearInterval(refreshInterval.value);
@@ -69,6 +71,7 @@ const handleFetchUsers = async (options?: { mute?: boolean }) => {
     const { data } = await apiClient.extension.user.listv1alpha1User({
       page: users.value.page,
       size: users.value.size,
+      fieldSelector: [`name!=${ANONYMOUSUSER_NAME}`],
     });
     users.value = data;
 
