@@ -54,7 +54,7 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
                 }
                 addFinalizerIfNecessary(comment);
                 reconcileStatus(request.name());
-                updateCommentCounter();
+                updateCommentCounter(comment.getSpec().getSubjectRef());
             });
         return new Result(false, null);
     }
@@ -122,9 +122,10 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
         }
     }
 
-    private void updateCommentCounter() {
+    private void updateCommentCounter(Ref commentSubjectRef) {
         Map<Ref, List<RefCommentTuple>> map = client.list(Comment.class, null, null)
             .stream()
+            .filter(comment -> !isDeleted(comment))
             .map(comment -> {
                 boolean approved =
                     Objects.equals(true, comment.getSpec().getApproved())
@@ -133,6 +134,10 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
                     comment.getMetadata().getName(), approved);
             })
             .collect(Collectors.groupingBy(RefCommentTuple::ref));
+        // Help reduce counter to zero when all comments are deleted
+        if (!map.containsKey(commentSubjectRef)){
+            map.put(commentSubjectRef, List.of());
+        }
         map.forEach((ref, pairs) -> {
             GroupVersionKind groupVersionKind = groupVersionKind(ref);
             if (groupVersionKind == null) {
@@ -182,7 +187,7 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
                 null)
             .forEach(client::delete);
         // decrement total comment count
-        updateCommentCounter();
+        updateCommentCounter(comment.getSpec().getSubjectRef());
     }
 
     @Nullable
