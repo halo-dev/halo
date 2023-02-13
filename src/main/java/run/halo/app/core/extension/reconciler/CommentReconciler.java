@@ -135,7 +135,7 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
             })
             .collect(Collectors.groupingBy(RefCommentTuple::ref));
         // Help reduce counter to zero when all comments are deleted
-        if (!map.containsKey(commentSubjectRef)){
+        if (!map.containsKey(commentSubjectRef)) {
             map.put(commentSubjectRef, List.of());
         }
         map.forEach((ref, pairs) -> {
