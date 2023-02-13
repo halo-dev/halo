@@ -308,10 +308,10 @@ const subjectRefResult = computed(() => {
         :title="comment?.owner?.displayName"
         :description="comment?.owner?.email"
       ></VEntityField>
-      <VEntityField>
+      <VEntityField width="60%">
         <template #description>
           <div class="flex flex-col gap-2">
-            <div class="text-sm text-gray-900">
+            <div class="break-all text-sm text-gray-900">
               {{ comment?.comment?.spec.content }}
             </div>
             <div class="flex items-center gap-3 text-xs">
