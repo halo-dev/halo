@@ -54,6 +54,7 @@ const selectedIndex = ref(0);
 const fuse = new Fuse(searchableItem, {
   keys: ["title", "group", "route.path", "route.name"],
   useExtendedSearch: true,
+  threshold: 0.2,
 });
 
 const searchResults = computed((): SearchableItem[] => {

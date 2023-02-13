@@ -78,6 +78,7 @@ const handleFetchUsers = async (options?: { mute?: boolean }) => {
     fuse = new Fuse(data.items, {
       keys: ["spec.displayName", "metadata.name", "spec.email"],
       useExtendedSearch: true,
+      threshold: 0.2,
     });
 
     const deletedUsers = users.value.items.filter(

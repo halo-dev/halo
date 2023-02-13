@@ -52,6 +52,7 @@ watch(
     fuse = new Fuse(tags.value, {
       keys: ["spec.displayName", "metadata.name", "spec.email"],
       useExtendedSearch: true,
+      threshold: 0.2,
     });
   }
 );

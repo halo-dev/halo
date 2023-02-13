@@ -56,6 +56,7 @@ watch(
     fuse = new Fuse(categories.value, {
       keys: ["spec.displayName", "metadata.name"],
       useExtendedSearch: true,
+      threshold: 0.2,
     });
   }
 );
