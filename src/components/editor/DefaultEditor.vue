@@ -300,7 +300,7 @@ const editor = useEditor({
       }
       return false;
     },
-    handlePaste: (view, event: ClipboardEvent, slice) => {
+    handlePaste: (view, event: ClipboardEvent) => {
       const images = Array.from(event.clipboardData?.items || [])
         .map((item) => {
           return item.getAsFile();

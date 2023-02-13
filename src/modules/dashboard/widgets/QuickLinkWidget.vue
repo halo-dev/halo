@@ -14,7 +14,6 @@ import {
 import { markRaw, ref, type Component } from "vue";
 import { useRouter } from "vue-router";
 import ThemePreviewModal from "@/modules/interface/themes/components/preview/ThemePreviewModal.vue";
-import { useUserStore } from "@/stores/user";
 
 interface Action {
   icon: Component;
