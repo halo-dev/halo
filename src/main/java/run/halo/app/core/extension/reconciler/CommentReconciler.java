@@ -123,9 +123,9 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void updateCommentCounter(Ref commentSubjectRef) {
-        Map<Ref, List<RefCommentTuple>> map = client.list(Comment.class, null, null)
+        Map<Ref, List<RefCommentTuple>> map = client.list(Comment.class,
+                comment -> !isDeleted(comment), null)
             .stream()
-            .filter(comment -> !isDeleted(comment))
             .map(comment -> {
                 boolean approved =
                     Objects.equals(true, comment.getSpec().getApproved())
