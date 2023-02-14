@@ -232,12 +232,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
                 contributor.setAvatar(user.getSpec().getAvatar());
                 return contributor;
             })
-            .switchIfEmpty(Mono.fromCallable(() -> {
-                var contributor = new Contributor();
-                contributor.setName("ghost");
-                contributor.setDisplayName("Ghost");
-                return contributor;
-            }));
+            .defaultIfEmpty(Contributor.getGhost());
     }
 
     @Override
