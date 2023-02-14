@@ -59,6 +59,10 @@ public class SystemConfigurableEnvironmentFetcher {
             .switchIfEmpty(Mono.just(new SystemSetting.Post()));
     }
 
+    public Mono<SystemSetting.ThemeRouteRules> fetchRouteRules() {
+        return fetch(SystemSetting.ThemeRouteRules.GROUP, SystemSetting.ThemeRouteRules.class);
+    }
+
     @NonNull
     private Mono<Map<String, String>> getValuesInternal() {
         return getConfigMap()

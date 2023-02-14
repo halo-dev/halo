@@ -3,7 +3,6 @@ package run.halo.app.core.extension.reconciler;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,9 +33,6 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.metrics.CounterService;
-import run.halo.app.theme.router.PermalinkIndexAddCommand;
-import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
-import run.halo.app.theme.router.PermalinkIndexUpdateCommand;
 
 /**
  * Tests for {@link SinglePageReconciler}.
@@ -97,10 +93,6 @@ class SinglePageReconcilerTest {
         SinglePage value = captor.getValue();
         assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");
         assertThat(value.getStatus().getContributors()).isEqualTo(List.of("guqing", "zhangsan"));
-
-        verify(applicationContext, times(0)).publishEvent(isA(PermalinkIndexAddCommand.class));
-        verify(applicationContext, times(1)).publishEvent(isA(PermalinkIndexDeleteCommand.class));
-        verify(applicationContext, times(0)).publishEvent(isA(PermalinkIndexUpdateCommand.class));
     }
 
     @Test

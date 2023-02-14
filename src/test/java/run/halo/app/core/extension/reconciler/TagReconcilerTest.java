@@ -52,17 +52,13 @@ class TagReconcilerTest {
         tagReconciler.reconcile(new TagReconciler.Request("fake-tag"));
 
         verify(client, times(3)).update(captor.capture());
-        verify(tagPermalinkPolicy, times(1)).onPermalinkAdd(any());
-        verify(tagPermalinkPolicy, times(1)).onPermalinkDelete(any());
         Tag capture = captor.getValue();
         assertThat(capture.getStatus().getPermalink()).isEqualTo("/tags/fake-slug");
 
         // change slug
         tag.getSpec().setSlug("new-slug");
         tagReconciler.reconcile(new TagReconciler.Request("fake-tag"));
-        verify(client, times(4)).update(captor.capture());
-        verify(tagPermalinkPolicy, times(2)).onPermalinkAdd(any());
-        verify(tagPermalinkPolicy, times(2)).onPermalinkDelete(any());
+        verify(client, times(5)).update(captor.capture());
         assertThat(capture.getStatus().getPermalink()).isEqualTo("/tags/new-slug");
     }
 
@@ -76,8 +72,6 @@ class TagReconcilerTest {
 
         tagReconciler.reconcile(new TagReconciler.Request("fake-tag"));
         verify(client, times(1)).update(captor.capture());
-        verify(tagPermalinkPolicy, times(0)).onPermalinkAdd(any());
-        verify(tagPermalinkPolicy, times(1)).onPermalinkDelete(any());
         verify(tagPermalinkPolicy, times(0)).permalink(any());
     }
 
@@ -90,7 +84,7 @@ class TagReconcilerTest {
 
         ArgumentCaptor<Tag> captor = ArgumentCaptor.forClass(Tag.class);
         tagReconciler.reconcile(new TagReconciler.Request("fake-tag"));
-        verify(client, times(2)).update(captor.capture());
+        verify(client, times(3)).update(captor.capture());
         List<Tag> allValues = captor.getAllValues();
         assertThat(allValues.get(1).getStatusOrDefault().getPostCount()).isEqualTo(2);
         assertThat(allValues.get(1).getStatusOrDefault().getVisiblePostCount()).isEqualTo(0);

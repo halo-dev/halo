@@ -22,7 +22,6 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.theme.HaloViewResolver;
-import run.halo.app.theme.router.strategy.EmptyView;
 
 /**
  * Tests for {@link ViewNameResolver}.
