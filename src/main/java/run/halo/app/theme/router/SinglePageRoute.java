@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.http.MediaType;
@@ -85,10 +86,14 @@ public class SinglePageRoute
     public Result reconcile(Request request) {
         client.fetch(SinglePage.class, request.name())
             .ifPresent(page -> {
-                if (ExtensionOperator.isDeleted(page)) {
+                if (ExtensionOperator.isDeleted(page)
+                    || BooleanUtils.isTrue(page.getSpec().getDeleted())) {
                     quickRouteMap.remove(NameSlugPair.from(page));
                     return;
                 }
+                // put new one
+                quickRouteMap.entrySet()
+                    .removeIf(entry -> entry.getKey().name().equals(request.name()));
                 quickRouteMap.put(NameSlugPair.from(page), handlerFunction(request.name()));
             });
         return new Result(false, null);
