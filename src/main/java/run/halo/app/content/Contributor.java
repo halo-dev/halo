@@ -17,7 +17,7 @@ public class Contributor {
     public static Contributor getGhost() {
         Contributor contributor = new Contributor();
         contributor.setName("ghost");
-        contributor.setDisplayName("Ghost");
+        contributor.setDisplayName("已删除用户");
         return contributor;
     }
 }
