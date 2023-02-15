@@ -5,10 +5,9 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -54,7 +53,7 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
                 }
                 addFinalizerIfNecessary(comment);
                 reconcileStatus(request.name());
-                updateCommentCounter();
+                updateSameSubjectRefCommentCounter(comment.getSpec().getSubjectRef());
             });
         return new Result(false, null);
     }
@@ -122,47 +121,37 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
         }
     }
 
-    private void updateCommentCounter() {
-        Map<Ref, List<RefCommentTuple>> map = client.list(Comment.class, null, null)
-            .stream()
-            .map(comment -> {
-                boolean approved =
-                    Objects.equals(true, comment.getSpec().getApproved())
-                        && !isDeleted(comment);
-                return new RefCommentTuple(comment.getSpec().getSubjectRef(),
-                    comment.getMetadata().getName(), approved);
-            })
-            .collect(Collectors.groupingBy(RefCommentTuple::ref));
-        map.forEach((ref, pairs) -> {
-            GroupVersionKind groupVersionKind = groupVersionKind(ref);
-            if (groupVersionKind == null) {
-                return;
-            }
-            // approved total count
-            long approvedTotalCount = pairs.stream()
-                .filter(refCommentPair -> refCommentPair.approved)
-                .count();
-            // total count
-            int totalCount = pairs.size();
+    private void updateSameSubjectRefCommentCounter(Ref commentSubjectRef) {
+        List<Comment> comments = client.list(Comment.class,
+            comment -> !isDeleted(comment)
+                && commentSubjectRef.equals(comment.getSpec().getSubjectRef()),
+            null);
 
-            schemeManager.fetch(groupVersionKind).ifPresent(scheme -> {
-                String counterName = MeterUtils.nameOf(ref.getGroup(), scheme.plural(),
-                    ref.getName());
-                client.fetch(Counter.class, counterName).ifPresentOrElse(counter -> {
-                    counter.setTotalComment(totalCount);
-                    counter.setApprovedComment((int) approvedTotalCount);
-                    client.update(counter);
-                }, () -> {
-                    Counter counter = Counter.emptyCounter(counterName);
-                    counter.setTotalComment(totalCount);
-                    counter.setApprovedComment((int) approvedTotalCount);
-                    client.create(counter);
-                });
+        GroupVersionKind groupVersionKind = groupVersionKind(commentSubjectRef);
+        if (groupVersionKind == null) {
+            return;
+        }
+        // approved total count
+        long approvedTotalCount = comments.stream()
+            .filter(comment -> BooleanUtils.isTrue(comment.getSpec().getApproved()))
+            .count();
+        // total count
+        int totalCount = comments.size();
+
+        schemeManager.fetch(groupVersionKind).ifPresent(scheme -> {
+            String counterName = MeterUtils.nameOf(commentSubjectRef.getGroup(), scheme.plural(),
+                commentSubjectRef.getName());
+            client.fetch(Counter.class, counterName).ifPresentOrElse(counter -> {
+                counter.setTotalComment(totalCount);
+                counter.setApprovedComment((int) approvedTotalCount);
+                client.update(counter);
+            }, () -> {
+                Counter counter = Counter.emptyCounter(counterName);
+                counter.setTotalComment(totalCount);
+                counter.setApprovedComment((int) approvedTotalCount);
+                client.create(counter);
             });
         });
-    }
-
-    record RefCommentTuple(Ref ref, String name, boolean approved) {
     }
 
     private void cleanUpResourcesAndRemoveFinalizer(String commentName) {
@@ -182,7 +171,7 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
                 null)
             .forEach(client::delete);
         // decrement total comment count
-        updateCommentCounter();
+        updateSameSubjectRefCommentCounter(comment.getSpec().getSubjectRef());
     }
 
     @Nullable

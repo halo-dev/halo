@@ -208,7 +208,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
             return Flux.empty();
         }
         return Flux.fromIterable(tagNames)
-            .flatMap(tagName -> client.fetch(Tag.class, tagName));
+            .flatMapSequential(tagName -> client.fetch(Tag.class, tagName));
     }
 
     private Flux<Category> listCategories(List<String> categoryNames) {
@@ -216,7 +216,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
             return Flux.empty();
         }
         return Flux.fromIterable(categoryNames)
-            .flatMap(categoryName -> client.fetch(Category.class, categoryName));
+            .flatMapSequential(categoryName -> client.fetch(Category.class, categoryName));
     }
 
     private Flux<Contributor> listContributors(List<String> usernames) {
@@ -231,7 +231,8 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
                 contributor.setDisplayName(user.getSpec().getDisplayName());
                 contributor.setAvatar(user.getSpec().getAvatar());
                 return contributor;
-            });
+            })
+            .defaultIfEmpty(Contributor.getGhost());
     }
 
     @Override
