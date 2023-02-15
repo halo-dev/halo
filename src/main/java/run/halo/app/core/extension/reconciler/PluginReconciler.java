@@ -363,9 +363,11 @@ public class PluginReconciler implements Reconciler<Request> {
                     Plugin.PluginStatus status = newPlugin.statusNonNull();
                     status.setPhase(PluginState.FAILED);
                     status.setReason("ResourceNotReady");
-                    status.setMessage("Setting for " + settingName + " is not ready, retrying...");
+                    status.setMessage(
+                        "Setting named " + settingName + " is not ready, retrying...");
                     status.setLastTransitionTime(Instant.now());
-                    if (!oldStatus.equals(status)) {
+                    if (!oldStatus.equals(status)
+                        && !StringUtils.equals(oldStatus.getReason(), status.getReason())) {
                         client.update(newPlugin);
                     }
                     throw new IllegalStateException(status.getMessage());
