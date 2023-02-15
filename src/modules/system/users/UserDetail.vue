@@ -6,13 +6,20 @@ import { useRouter } from "vue-router";
 import type { User } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
+import { useRoleStore } from "@/stores/role";
 
 const user = inject<Ref<User>>("user");
 
+const roleStore = useRoleStore();
+
 const roles = computed(() => {
-  return JSON.parse(
+  const names = JSON.parse(
     user?.value?.metadata?.annotations?.[rbacAnnotations.ROLE_NAMES] || "[]"
   );
+
+  return names.map((name: string) => {
+    return roleStore.getRoleDisplayName(name);
+  });
 });
 
 const router = useRouter();

@@ -27,6 +27,7 @@ import sortBy from "lodash.sortby";
 import { useRoleStore } from "@/stores/role";
 import { hasPermission } from "@/utils/permission";
 import { useUserStore } from "@/stores/user";
+import { rbacAnnotations } from "@/constants/annotations";
 
 const route = useRoute();
 const router = useRouter();
@@ -56,11 +57,16 @@ const handleLogout = () => {
 };
 
 const currentRole = computed(() => {
-  return JSON.parse(
-    userStore.currentUser?.metadata.annotations?.[
-      "rbac.authorization.halo.run/role-names"
-    ] || "[]"
-  )[0];
+  const names = JSON.parse(
+    userStore.currentUser?.metadata.annotations?.[rbacAnnotations.ROLE_NAMES] ||
+      "[]"
+  );
+
+  if (names.length === 0) {
+    return;
+  }
+
+  return roleStore.getRoleDisplayName(names[0]);
 });
 
 // Global Search
@@ -228,7 +234,7 @@ onMounted(generateMenus);
             <div class="flex text-sm font-medium">
               {{ userStore.currentUser?.spec.displayName }}
             </div>
-            <div class="flex">
+            <div v-if="currentRole" class="flex">
               <VTag>
                 <template #leftIcon>
                   <IconUserSettings />

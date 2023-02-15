@@ -30,6 +30,7 @@ import { useRouteQuery } from "@vueuse/router";
 import Fuse from "fuse.js";
 import { usePermission } from "@/utils/permission";
 import { useUserStore } from "@/stores/user";
+import { useRoleStore } from "@/stores/role";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -55,6 +56,7 @@ const selectedUser = ref<User>();
 const refreshInterval = ref();
 
 const userStore = useUserStore();
+const roleStore = useRoleStore();
 
 let fuse: Fuse<User> | undefined = undefined;
 
@@ -209,9 +211,13 @@ const handleOpenGrantPermissionModal = (user: User) => {
 };
 
 const getRoles = (user: User) => {
-  return JSON.parse(
+  const names = JSON.parse(
     user.metadata.annotations?.[rbacAnnotations.ROLE_NAMES] || "[]"
   );
+
+  return names.map((name: string) => {
+    return roleStore.getRoleDisplayName(name);
+  });
 };
 
 onMounted(() => {

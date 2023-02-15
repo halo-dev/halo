@@ -240,6 +240,9 @@ async function initApp() {
 
     await loadUserPermissions();
 
+    const roleStore = useRoleStore();
+    await roleStore.fetchRoles();
+
     try {
       await loadPluginModules();
     } catch (e) {
