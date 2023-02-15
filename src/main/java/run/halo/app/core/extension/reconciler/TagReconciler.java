@@ -53,6 +53,7 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         return builder
+            .syncAllOnStart(false)
             .extension(new Tag())
             .build();
     }
