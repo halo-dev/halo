@@ -14,11 +14,14 @@ export const useRoleStore = defineStore("role", () => {
 
   async function fetchRoles() {
     try {
-      const { data } = await apiClient.extension.role.listv1alpha1Role({
-        page: 0,
-        size: 0,
-        labelSelector: [`!${roleLabels.TEMPLATE}`],
-      });
+      const { data } = await apiClient.extension.role.listv1alpha1Role(
+        {
+          page: 0,
+          size: 0,
+          labelSelector: [`!${roleLabels.TEMPLATE}`],
+        },
+        { mute: true }
+      );
       roles.value = data.items;
     } catch (error) {
       console.error("Failed to fetch roles", error);
