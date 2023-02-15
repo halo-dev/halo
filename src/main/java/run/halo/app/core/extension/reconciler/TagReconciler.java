@@ -41,8 +41,6 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
                 }
                 addFinalizerIfNecessary(tag);
 
-                this.reconcileStatusPermalink(request.name());
-
                 reconcileStatusPosts(request.name());
             });
         return new Result(false, null);
@@ -86,22 +84,6 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
             }
             client.update(tag);
         });
-    }
-
-    private void reconcileStatusPermalink(String tagName) {
-        client.fetch(Tag.class, tagName)
-            .ifPresent(tag -> {
-                Tag oldTag = JsonUtils.deepCopy(tag);
-                tagPermalinkPolicy.onPermalinkDelete(oldTag);
-
-                tag.getStatusOrDefault()
-                    .setPermalink(tagPermalinkPolicy.permalink(tag));
-                tagPermalinkPolicy.onPermalinkAdd(tag);
-
-                if (!oldTag.equals(tag)) {
-                    client.update(tag);
-                }
-            });
     }
 
     private void reconcileStatusPosts(String tagName) {

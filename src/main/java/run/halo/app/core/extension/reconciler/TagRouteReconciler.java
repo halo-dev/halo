@@ -21,7 +21,7 @@ public class TagRouteReconciler implements Reconciler<Reconciler.Request> {
         client.fetch(Tag.class, request.name())
             .ifPresent(tag -> {
                 if (tag.getMetadata().getDeletionTimestamp() != null) {
-                    tagPermalinkPolicy.onPermalinkDelete(tag);
+                    // TagReconciler already did it, so there is no need to remove permalink
                     return;
                 }
 
