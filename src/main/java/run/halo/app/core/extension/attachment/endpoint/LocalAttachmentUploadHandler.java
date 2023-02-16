@@ -1,6 +1,7 @@
 package run.halo.app.core.extension.attachment.endpoint;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
+import static run.halo.app.infra.utils.FileNameUtils.randomFileName;
 import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
 
 import java.io.IOException;
@@ -12,16 +13,20 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.Exceptions;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.retry.Retry;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Attachment.AttachmentSpec;
 import run.halo.app.core.extension.attachment.Constant;
@@ -76,18 +81,17 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                             }
                         })
                     .subscribeOn(Schedulers.boundedElastic())
-                    // save the attachment
-                    .then(DataBufferUtils.write(file.content(), attachmentPath, CREATE_NEW))
-                    .then(Mono.fromCallable(() -> {
-                        log.info("Wrote attachment {} into {}", file.filename(), attachmentPath);
+                    .then(writeContent(file.content(), attachmentPath, true))
+                    .map(path -> {
+                        log.info("Wrote attachment {} into {}", file.filename(), path);
                         // TODO check the file extension
                         var metadata = new Metadata();
                         metadata.setName(UUID.randomUUID().toString());
-                        var relativePath = attachmentsRoot.relativize(attachmentPath).toString();
+                        var relativePath = attachmentsRoot.relativize(path).toString();
 
                         var pathSegments = new ArrayList<String>();
                         pathSegments.add("upload");
-                        for (Path p : uploadRoot.relativize(attachmentPath)) {
+                        for (Path p : uploadRoot.relativize(path)) {
                             pathSegments.add(p.toString());
                         }
 
@@ -100,17 +104,16 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                             Constant.LOCAL_REL_PATH_ANNO_KEY, relativePath,
                             Constant.URI_ANNO_KEY, uri));
                         var spec = new AttachmentSpec();
-                        spec.setSize(attachmentPath.toFile().length());
-                        file.headers().getContentType();
+                        spec.setSize(path.toFile().length());
                         spec.setMediaType(Optional.ofNullable(file.headers().getContentType())
                             .map(MediaType::toString)
                             .orElse(null));
-                        spec.setDisplayName(file.filename());
+                        spec.setDisplayName(path.getFileName().toString());
                         var attachment = new Attachment();
                         attachment.setMetadata(metadata);
                         attachment.setSpec(spec);
                         return attachment;
-                    }))
+                    })
                     .onErrorMap(FileAlreadyExistsException.class,
                         e -> new AttachmentAlreadyExistsException(e.getFile()));
             });
@@ -164,5 +167,38 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
 
         private String location;
 
+    }
+
+    /**
+     * Write content into file. We will detect duplicate filename and auto-rename it with 3 times
+     * retry.
+     *
+     * @param content is file content
+     * @param targetPath is target path
+     * @return file path
+     */
+    private Mono<Path> writeContent(Flux<DataBuffer> content,
+        Path targetPath,
+        boolean renameIfExists) {
+        return Mono.defer(() -> {
+            final var pathRef = new AtomicReference<>(targetPath);
+            return Mono.defer(
+                    // we have to use defer method to obtain a fresh path
+                    () -> DataBufferUtils.write(content, pathRef.get(), CREATE_NEW))
+                .retryWhen(Retry.max(3)
+                    .filter(t -> {
+                        if (renameIfExists) {
+                            return t instanceof FileAlreadyExistsException;
+                        }
+                        return false;
+                    })
+                    .doAfterRetry(signal -> {
+                        // rename the path
+                        var oldPath = pathRef.get();
+                        var fileName = randomFileName(oldPath.toString(), 4);
+                        pathRef.set(oldPath.resolveSibling(fileName));
+                    }))
+                .then(Mono.fromSupplier(pathRef::get));
+        });
     }
 }
