@@ -7,6 +7,7 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import static run.halo.app.extension.ListResult.generateGenericClass;
 import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.micrometer.common.util.StringUtils;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -294,13 +295,13 @@ public class UserEndpoint implements CustomEndpoint {
                     return true;
                 }
                 var annotations = user.getMetadata().getAnnotations();
-                if (annotations == null) {
+                if (annotations == null || !annotations.containsKey(User.ROLE_NAMES_ANNO)) {
                     return false;
                 } else {
                     Pattern pattern = Pattern.compile("\\[\"([^\"]*)\"\\]");
                     Matcher matcher = pattern.matcher(annotations.get(User.ROLE_NAMES_ANNO));
                     if (matcher.find()) {
-                        return matcher.group(1).equals(getRole());
+                        return matcher.group(1).equals(role);
                     } else {
                         return false;
                     }
