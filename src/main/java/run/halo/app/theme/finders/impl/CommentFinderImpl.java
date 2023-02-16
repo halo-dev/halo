@@ -70,12 +70,14 @@ public class CommentFinderImpl implements CommentFinder {
 
     @Override
     public Mono<ListResult<ReplyVo>> listReply(String commentName, Integer page, Integer size) {
-        Comparator<Reply> comparator =
-            Comparator.comparing(reply -> reply.getMetadata().getCreationTimestamp());
+        Function<Reply, Instant> approvedTime = reply -> reply.getSpec().getApprovedTime();
+        Function<Reply, Instant> createTime = reply -> reply.getMetadata().getCreationTimestamp();
+        Comparator<Reply> comparator = Comparator.nullsLast(Comparator.comparing(approvedTime))
+                .thenComparing(createTime);
         return fixedReplyPredicate(commentName)
             .flatMap(fixedPredicate ->
                 client.list(Reply.class, fixedPredicate,
-                        comparator.reversed(), pageNullSafe(page), sizeNullSafe(size))
+                        comparator, pageNullSafe(page), sizeNullSafe(size))
                     .flatMap(list -> Flux.fromStream(list.get().map(this::toReplyVo))
                         .concatMap(Function.identity())
                         .collectList()
@@ -170,12 +172,16 @@ public class CommentFinderImpl implements CommentFinder {
             comment -> Objects.requireNonNullElse(comment.getSpec().getTop(), false);
         Function<Comment, Integer> priority =
             comment -> Objects.requireNonNullElse(comment.getSpec().getPriority(), 0);
+        Function<Comment, Instant> approvedTime =
+            comment -> comment.getSpec().getApprovedTime();
         Function<Comment, Instant> creationTimestamp =
             comment -> comment.getMetadata().getCreationTimestamp();
         Function<Comment, String> name =
             comment -> comment.getMetadata().getName();
+        // comments sorted in descending order
         return Comparator.comparing(top)
             .thenComparing(priority)
+            .thenComparing(Comparator.nullsLast(Comparator.comparing(approvedTime)))
             .thenComparing(creationTimestamp)
             .thenComparing(name)
             .reversed();
