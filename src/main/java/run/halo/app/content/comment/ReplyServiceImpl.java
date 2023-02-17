@@ -3,7 +3,6 @@ package run.halo.app.content.comment;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.BooleanUtils;
@@ -50,6 +49,9 @@ public class ReplyServiceImpl implements ReplyService {
                 }
                 if (reply.getSpec().getPriority() == null) {
                     reply.getSpec().setPriority(0);
+                }
+                if (reply.getSpec().getCreationTime() == null) {
+                    reply.getSpec().setCreationTime(Instant.now());
                 }
                 return environmentFetcher.fetchComment()
                     .map(commentSetting -> {
@@ -104,7 +106,8 @@ public class ReplyServiceImpl implements ReplyService {
 
     @Override
     public Mono<ListResult<ListedReply>> list(ReplyQuery query) {
-        return client.list(Reply.class, getReplyPredicate(query), defaultComparator(),
+        return client.list(Reply.class, getReplyPredicate(query),
+                ReplyService.creationTimeAscComparator(),
                 query.getPage(), query.getSize())
             .flatMap(list -> Flux.fromStream(list.get()
                     .map(this::toListedReply))
@@ -138,12 +141,6 @@ public class ReplyServiceImpl implements ReplyService {
         }
         throw new IllegalStateException(
             "Unsupported owner kind: " + owner.getKind());
-    }
-
-    Comparator<Reply> defaultComparator() {
-        Function<Reply, Instant> createTime = reply -> reply.getMetadata().getCreationTimestamp();
-        return Comparator.comparing(createTime)
-            .thenComparing(reply -> reply.getMetadata().getName());
     }
 
     Predicate<Reply> getReplyPredicate(ReplyQuery query) {

@@ -1,10 +1,8 @@
 package run.halo.app.theme.finders.impl;
 
 import java.security.Principal;
-import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.BooleanUtils;
@@ -13,9 +11,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.util.Assert;
+import org.springframework.util.comparator.Comparators;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.comment.OwnerInfo;
+import run.halo.app.content.comment.ReplyService;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
@@ -70,14 +70,11 @@ public class CommentFinderImpl implements CommentFinder {
 
     @Override
     public Mono<ListResult<ReplyVo>> listReply(String commentName, Integer page, Integer size) {
-        Function<Reply, Instant> approvedTime = reply -> reply.getSpec().getApprovedTime();
-        Function<Reply, Instant> createTime = reply -> reply.getMetadata().getCreationTimestamp();
-        Comparator<Reply> comparator = Comparator.nullsLast(Comparator.comparing(approvedTime))
-                .thenComparing(createTime);
         return fixedReplyPredicate(commentName)
             .flatMap(fixedPredicate ->
                 client.list(Reply.class, fixedPredicate,
-                        comparator, pageNullSafe(page), sizeNullSafe(size))
+                        ReplyService.creationTimeAscComparator(), pageNullSafe(page),
+                        sizeNullSafe(size))
                     .flatMap(list -> Flux.fromStream(list.get().map(this::toReplyVo))
                         .concatMap(Function.identity())
                         .collectList()
@@ -168,23 +165,36 @@ public class CommentFinderImpl implements CommentFinder {
     }
 
     static Comparator<Comment> defaultComparator() {
-        Function<Comment, Boolean> top =
-            comment -> Objects.requireNonNullElse(comment.getSpec().getTop(), false);
-        Function<Comment, Integer> priority =
-            comment -> Objects.requireNonNullElse(comment.getSpec().getPriority(), 0);
-        Function<Comment, Instant> approvedTime =
-            comment -> comment.getSpec().getApprovedTime();
-        Function<Comment, Instant> creationTimestamp =
-            comment -> comment.getMetadata().getCreationTimestamp();
-        Function<Comment, String> name =
-            comment -> comment.getMetadata().getName();
-        // comments sorted in descending order
-        return Comparator.comparing(top)
-            .thenComparing(priority)
-            .thenComparing(Comparator.nullsLast(Comparator.comparing(approvedTime)))
-            .thenComparing(creationTimestamp)
-            .thenComparing(name)
-            .reversed();
+        return new CommentComparator();
+    }
+
+    static class CommentComparator implements Comparator<Comment> {
+        @Override
+        public int compare(Comment c1, Comment c2) {
+            boolean c1Top = BooleanUtils.isTrue(c1.getSpec().getTop());
+            boolean c2Top = BooleanUtils.isTrue(c2.getSpec().getTop());
+            if (c1Top == c2Top) {
+                int c1Priority = ObjectUtils.defaultIfNull(c1.getSpec().getPriority(), 0);
+                int c2Priority = ObjectUtils.defaultIfNull(c2.getSpec().getPriority(), 0);
+                if (c1Top) {
+                    // 都置顶
+                    return Integer.compare(c1Priority, c2Priority);
+                }
+
+                // 两个评论不置顶根据 creationTime 降序排列
+                return Comparator.comparing(
+                        (Comment comment) -> comment.getSpec().getCreationTime(),
+                        Comparators.nullsLow())
+                    .thenComparing((Comment comment) -> comment.getMetadata().getName())
+                    .compare(c2, c1);
+            } else if (c1Top) {
+                // 只有 c1 置顶，c1 排前面
+                return -1;
+            } else {
+                // 只有c2置顶, c2排在前面
+                return 1;
+            }
+        }
     }
 
     int pageNullSafe(Integer page) {
