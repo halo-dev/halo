@@ -27,7 +27,6 @@ function handleConfirm() {
     onConfirm: async () => {
       await new Promise((resolve) =>
         setTimeout(() => {
-          console.log("Timeout");
           resolve("");
         }, 1000)
       );

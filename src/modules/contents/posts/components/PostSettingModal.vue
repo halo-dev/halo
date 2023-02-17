@@ -218,7 +218,6 @@ const { templates } = useThemeCustomTemplates("post");
 const publishTime = computed(() => {
   const { publishTime } = formState.value.spec;
   if (publishTime) {
-    console.log(toDatetimeLocal(publishTime));
     return toDatetimeLocal(publishTime);
   }
   return "";

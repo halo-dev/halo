@@ -57,7 +57,7 @@ const handleDelete = async () => {
 
         Toast.success("删除成功");
       } catch (error) {
-        console.log("Failed to delete comment reply", error);
+        console.error("Failed to delete comment reply", error);
       } finally {
         emit("reload");
       }

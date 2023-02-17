@@ -57,7 +57,7 @@ const handleUpdateInBatch = useDebounceFn(async () => {
     );
     await Promise.all(promises);
   } catch (e) {
-    console.log("Failed to update categories", e);
+    console.error("Failed to update categories", e);
   } finally {
     await handleFetchCategories();
   }

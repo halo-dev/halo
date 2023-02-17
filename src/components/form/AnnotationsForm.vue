@@ -58,7 +58,7 @@ const handleFetchAnnotationSettings = async () => {
       );
     annotationSettings.value = data.items;
   } catch (error) {
-    console.log("Failed to fetch annotation settings", error);
+    console.error("Failed to fetch annotation settings", error);
   }
 };
 

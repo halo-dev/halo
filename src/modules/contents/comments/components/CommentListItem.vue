@@ -69,7 +69,7 @@ const handleDelete = async () => {
 
         Toast.success("删除成功");
       } catch (error) {
-        console.log("Failed to delete comment", error);
+        console.error("Failed to delete comment", error);
       } finally {
         emit("reload");
       }

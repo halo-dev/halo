@@ -145,7 +145,7 @@ const handleUpdateInBatch = useDebounceFn(async () => {
     );
     await Promise.all(promises);
   } catch (e) {
-    console.log("Failed to update menu items", e);
+    console.error("Failed to update menu items", e);
   } finally {
     await menuListRef.value.handleFetchMenus();
     await handleFetchMenuItems({ mute: true });

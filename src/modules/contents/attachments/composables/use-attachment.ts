@@ -337,7 +337,6 @@ export function useAttachmentSelect(
         }
       })
       .filter(Boolean) as Content[];
-    console.log(contents);
     editor.value
       ?.chain()
       .focus()
