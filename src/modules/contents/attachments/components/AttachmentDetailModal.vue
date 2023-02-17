@@ -118,6 +118,20 @@ const onVisibleChange = (visible: boolean) => {
                 </template>
               </LazyImage>
             </div>
+            <div v-else-if="attachment?.spec.mediaType?.startsWith('video/')">
+              <video
+                :src="attachment.status?.permalink"
+                controls
+                class="max-w-full rounded sm:max-w-[50%]"
+              >
+                当前浏览器不支持该视频播放
+              </video>
+            </div>
+            <div v-else-if="attachment?.spec.mediaType?.startsWith('audio/')">
+              <audio :src="attachment.status?.permalink" controls>
+                当前浏览器不支持该音频播放
+              </audio>
+            </div>
             <span v-else> 此文件不支持预览 </span>
           </dd>
         </div>
