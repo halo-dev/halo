@@ -12,6 +12,7 @@ const props = withDefaults(
     bodyClass?: string[];
     mountToBody?: boolean;
     centered?: boolean;
+    layerClosable?: boolean;
   }>(),
   {
     visible: false,
@@ -22,6 +23,7 @@ const props = withDefaults(
     bodyClass: undefined,
     mountToBody: false,
     centered: true,
+    layerClosable: false,
   }
 );
 
@@ -50,6 +52,19 @@ const contentStyles = computed(() => {
 function handleClose() {
   emit("update:visible", false);
   emit("close");
+}
+
+const focus = ref(false);
+
+function handleClickLayer() {
+  if (props.layerClosable) {
+    handleClose();
+    return;
+  }
+  focus.value = true;
+  setTimeout(() => {
+    focus.value = false;
+  }, 300);
 }
 
 watch(
@@ -85,7 +100,11 @@ watch(
         @before-enter="rootVisible = true"
         @after-leave="rootVisible = false"
       >
-        <div v-show="visible" class="modal-layer" @click.stop="handleClose()" />
+        <div
+          v-show="visible"
+          class="modal-layer"
+          @click.stop="handleClickLayer()"
+        />
       </transition>
       <transition
         enter-active-class="ease-out duration-200"
@@ -98,7 +117,8 @@ watch(
         <div
           v-show="visible"
           :style="contentStyles"
-          class="modal-content transform transition-all"
+          class="modal-content transform transition-all duration-300"
+          :class="{ 'modal-focus': focus }"
         >
           <div v-if="$slots.header || title" class="modal-header group">
             <slot name="header">
@@ -162,6 +182,10 @@ watch(
     rounded-base;
     width: calc(100vw - 20px);
     max-height: calc(100vh - 5rem);
+
+    &.modal-focus {
+      @apply scale-[1.02];
+    }
 
     .modal-header {
       @apply flex

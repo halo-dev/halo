@@ -75,6 +75,7 @@ const onVisibleChange = (visible: boolean) => {
     :visible="visible"
     :width="1000"
     :mount-to-body="mountToBody"
+    :layer-closable="true"
     height="calc(100vh - 20px)"
     @update:visible="onVisibleChange"
   >

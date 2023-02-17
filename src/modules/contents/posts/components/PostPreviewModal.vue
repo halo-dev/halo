@@ -29,6 +29,7 @@ const onVisibleChange = (visible: boolean) => {
   <VModal
     :body-class="['!p-0']"
     :visible="visible"
+    :layer-closable="true"
     fullscreen
     title="文章预览"
     @update:visible="onVisibleChange"

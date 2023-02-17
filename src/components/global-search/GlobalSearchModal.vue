@@ -372,6 +372,7 @@ const onVisibleChange = (visible: boolean) => {
     :mount-to-body="true"
     :width="650"
     :centered="false"
+    :layer-closable="true"
     @update:visible="onVisibleChange"
   >
     <div id="search-input" class="border-b border-gray-100 px-4 py-2.5">

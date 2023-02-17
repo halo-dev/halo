@@ -122,6 +122,7 @@ watch(
     :width="750"
     title="存储策略"
     :body-class="['!p-0']"
+    :layer-closable="true"
     @update:visible="onVisibleChange"
   >
     <template #actions>

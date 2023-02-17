@@ -58,6 +58,7 @@
     v-model:visible="widgetsModal"
     height="calc(100vh - 20px)"
     :width="1280"
+    :layer-closable="true"
     title="小组件"
   >
     <VTabbar

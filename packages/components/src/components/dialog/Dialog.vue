@@ -90,7 +90,12 @@ const handleClose = () => {
 };
 </script>
 <template>
-  <VModal :visible="visible" :width="450" @close="handleCancel()">
+  <VModal
+    :visible="visible"
+    :width="450"
+    :layer-closable="true"
+    @close="handleCancel()"
+  >
     <div class="flex justify-between items-start py-2 mb-2">
       <div class="flex flex-row items-center gap-3">
         <component
