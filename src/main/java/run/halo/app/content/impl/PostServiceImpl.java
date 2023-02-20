@@ -225,7 +225,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
         }
         return Flux.fromIterable(usernames)
             .flatMap(username -> client.fetch(User.class, username)
-                .switchIfEmpty(client.fetch(User.class, "ghost")))
+                .switchIfEmpty(Mono.defer(() -> client.fetch(User.class, "ghost"))))
             .map(user -> {
                 Contributor contributor = new Contributor();
                 contributor.setName(user.getMetadata().getName());
