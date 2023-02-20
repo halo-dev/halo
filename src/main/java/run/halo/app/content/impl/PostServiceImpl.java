@@ -224,15 +224,15 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
             return Flux.empty();
         }
         return Flux.fromIterable(usernames)
-            .flatMap(username -> client.fetch(User.class, username))
+            .flatMap(username -> client.fetch(User.class, username)
+                .switchIfEmpty(client.fetch(User.class, "ghost")))
             .map(user -> {
                 Contributor contributor = new Contributor();
                 contributor.setName(user.getMetadata().getName());
                 contributor.setDisplayName(user.getSpec().getDisplayName());
                 contributor.setAvatar(user.getSpec().getAvatar());
                 return contributor;
-            })
-            .defaultIfEmpty(Contributor.getGhost());
+            });
     }
 
     @Override
