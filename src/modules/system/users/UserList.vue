@@ -65,6 +65,7 @@ const userStore = useUserStore();
 const roleStore = useRoleStore();
 
 const ANONYMOUSUSER_NAME = "anonymousUser";
+const DELETEDUSER_NAME = "ghost";
 
 const handleFetchUsers = async (options?: {
   mute?: boolean;
@@ -85,7 +86,10 @@ const handleFetchUsers = async (options?: {
       page: users.value.page,
       size: users.value.size,
       keyword: keyword.value,
-      fieldSelector: [`name!=${ANONYMOUSUSER_NAME}`],
+      fieldSelector: [
+        `name!=${ANONYMOUSUSER_NAME}`,
+        `name!=${DELETEDUSER_NAME}`,
+      ],
       sort: [selectedSortItem.value?.value].filter(
         (item) => !!item
       ) as string[],
