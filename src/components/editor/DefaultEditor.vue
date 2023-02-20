@@ -532,7 +532,7 @@ watch(
         <VTabs v-model:active-id="extraActiveId" type="outline">
           <VTabItem id="toc" label="大纲">
             <div class="p-1 pt-0">
-              <ul class="space-y-1">
+              <ul v-if="headingNodes?.length" class="space-y-1">
                 <li
                   v-for="(node, index) in headingNodes"
                   :key="index"
@@ -559,6 +559,9 @@ watch(
                   </div>
                 </li>
               </ul>
+              <div v-else class="flex flex-col items-center py-10">
+                <span class="text-sm text-gray-600">暂无大纲</span>
+              </div>
             </div>
           </VTabItem>
           <VTabItem id="information" label="详情">
