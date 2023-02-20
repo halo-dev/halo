@@ -17,20 +17,25 @@ import {
   VStatusDot,
   VLoading,
   Toast,
+  IconRefreshLine,
+  VEmpty,
 } from "@halo-dev/components";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import GrantPermissionModal from "./components/GrantPermissionModal.vue";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
-import type { User, UserList } from "@halo-dev/api-client";
+import type { Role, User, UserList } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 import { useRouteQuery } from "@vueuse/router";
-import Fuse from "fuse.js";
 import { usePermission } from "@/utils/permission";
 import { useUserStore } from "@/stores/user";
 import { useRoleStore } from "@/stores/role";
+import { getNode } from "@formkit/core";
+import FilterTag from "@/components/filter/FilterTag.vue";
+import { useFetchRole } from "../roles/composables/use-role";
+import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -53,16 +58,18 @@ const users = ref<UserList>({
 const loading = ref(false);
 const selectedUserNames = ref<string[]>([]);
 const selectedUser = ref<User>();
+const keyword = ref("");
 const refreshInterval = ref();
 
 const userStore = useUserStore();
 const roleStore = useRoleStore();
 
-let fuse: Fuse<User> | undefined = undefined;
-
 const ANONYMOUSUSER_NAME = "anonymousUser";
 
-const handleFetchUsers = async (options?: { mute?: boolean }) => {
+const handleFetchUsers = async (options?: {
+  mute?: boolean;
+  page?: number;
+}) => {
   try {
     clearInterval(refreshInterval.value);
 
@@ -70,18 +77,22 @@ const handleFetchUsers = async (options?: { mute?: boolean }) => {
       loading.value = true;
     }
 
-    const { data } = await apiClient.extension.user.listv1alpha1User({
+    if (options?.page) {
+      users.value.page = options.page;
+    }
+
+    const { data } = await apiClient.user.listUsers({
       page: users.value.page,
       size: users.value.size,
+      keyword: keyword.value,
       fieldSelector: [`name!=${ANONYMOUSUSER_NAME}`],
+      sort: [selectedSortItem.value?.value].filter(
+        (item) => !!item
+      ) as string[],
+      role: selectedRole.value?.metadata.name,
     });
-    users.value = data;
 
-    fuse = new Fuse(data.items, {
-      keys: ["spec.displayName", "metadata.name", "spec.email"],
-      useExtendedSearch: true,
-      threshold: 0.2,
-    });
+    users.value = data;
 
     const deletedUsers = users.value.items.filter(
       (user) => !!user.metadata.deletionTimestamp
@@ -99,16 +110,6 @@ const handleFetchUsers = async (options?: { mute?: boolean }) => {
     loading.value = false;
   }
 };
-
-const keyword = ref("");
-
-const searchResults = computed(() => {
-  if (!fuse || !keyword.value) {
-    return users.value.items;
-  }
-
-  return fuse?.search(keyword.value).map((item) => item.item);
-});
 
 const handlePaginationChange = async ({
   page,
@@ -239,6 +240,62 @@ onMounted(() => {
     editingModal.value = true;
   }
 });
+
+// Filters
+function handleKeywordChange() {
+  const keywordNode = getNode("keywordInput");
+  if (keywordNode) {
+    keyword.value = keywordNode._value as string;
+  }
+  handleFetchUsers({ page: 1 });
+}
+
+function handleClearKeyword() {
+  keyword.value = "";
+  handleFetchUsers({ page: 1 });
+}
+
+interface SortItem {
+  label: string;
+  value: string;
+}
+
+const SortItems: SortItem[] = [
+  {
+    label: "较近创建",
+    value: "creationTimestamp,desc",
+  },
+  {
+    label: "较早创建",
+    value: "creationTimestamp,asc",
+  },
+];
+
+const selectedSortItem = ref<SortItem>();
+
+function handleSortItemChange(sortItem?: SortItem) {
+  selectedSortItem.value = sortItem;
+  handleFetchUsers({ page: 1 });
+}
+
+const { roles } = useFetchRole();
+const selectedRole = ref<Role>();
+
+function handleRoleChange(role?: Role) {
+  selectedRole.value = role;
+  handleFetchUsers({ page: 1 });
+}
+
+function handleClearFilters() {
+  selectedRole.value = undefined;
+  selectedSortItem.value = undefined;
+  keyword.value = "";
+  handleFetchUsers({ page: 1 });
+}
+
+const hasFilters = computed(() => {
+  return selectedRole.value || selectedSortItem.value || keyword.value;
+});
 </script>
 <template>
   <UserEditingModal
@@ -308,49 +365,53 @@ onMounted(() => {
                 @change="handleCheckAllChange"
               />
             </div>
-            <div class="flex w-full flex-1 sm:w-auto">
-              <FormKit
+            <div class="flex w-full flex-1 items-center sm:w-auto">
+              <div
                 v-if="!selectedUserNames.length"
-                v-model="keyword"
-                placeholder="输入关键词搜索"
-                type="text"
-              ></FormKit>
+                class="flex items-center gap-2"
+              >
+                <FormKit
+                  id="keywordInput"
+                  outer-class="!p-0"
+                  :model-value="keyword"
+                  name="keyword"
+                  placeholder="输入关键词搜索"
+                  type="text"
+                  @keyup.enter="handleKeywordChange"
+                ></FormKit>
+
+                <FilterTag v-if="keyword" @close="handleClearKeyword()">
+                  关键词：{{ keyword }}
+                </FilterTag>
+
+                <FilterTag v-if="selectedRole" @close="handleRoleChange()">
+                  角色：{{
+                    selectedRole.metadata.annotations?.[
+                      rbacAnnotations.DISPLAY_NAME
+                    ] || selectedRole.metadata.name
+                  }}
+                </FilterTag>
+
+                <FilterTag
+                  v-if="selectedSortItem"
+                  @close="handleSortItemChange()"
+                >
+                  排序：{{ selectedSortItem.label }}
+                </FilterTag>
+
+                <FilterCleanButton
+                  v-if="hasFilters"
+                  @click="handleClearFilters"
+                />
+              </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeleteInBatch">
                   删除
                 </VButton>
               </VSpace>
             </div>
-            <div v-if="false" class="mt-4 flex sm:mt-0">
+            <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
-                <FloatingDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">状态</span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <div class="w-52 p-4">
-                      <ul class="space-y-1">
-                        <li
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">正常</span>
-                        </li>
-                        <li
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">已禁用</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </template>
-                </FloatingDropdown>
                 <FloatingDropdown>
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
@@ -364,28 +425,19 @@ onMounted(() => {
                     <div class="w-52 p-4">
                       <ul class="space-y-1">
                         <li
+                          v-for="(role, index) in roles"
+                          :key="index"
                           v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                          @click="handleRoleChange(role)"
                         >
-                          <span class="truncate">Super Administrator</span>
-                        </li>
-                        <li
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">Administrator</span>
-                        </li>
-                        <li
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">Editor</span>
-                        </li>
-                        <li
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">Guest</span>
+                          <span class="truncate">
+                            {{
+                              role.metadata.annotations?.[
+                                rbacAnnotations.DISPLAY_NAME
+                              ] || role.metadata.name
+                            }}
+                          </span>
                         </li>
                       </ul>
                     </div>
@@ -404,33 +456,67 @@ onMounted(() => {
                     <div class="w-72 p-4">
                       <ul class="space-y-1">
                         <li
+                          v-for="(sortItem, index) in SortItems"
+                          :key="index"
                           v-close-popper
                           class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                          @click="handleSortItemChange(sortItem)"
                         >
-                          <span class="truncate">较近登录</span>
-                        </li>
-                        <li
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">较晚登录</span>
+                          <span class="truncate">{{ sortItem.label }}</span>
                         </li>
                       </ul>
                     </div>
                   </template>
                 </FloatingDropdown>
+                <div class="flex flex-row gap-2">
+                  <div
+                    class="group cursor-pointer rounded p-1 hover:bg-gray-200"
+                    @click="handleFetchUsers()"
+                  >
+                    <IconRefreshLine
+                      v-tooltip="`刷新`"
+                      :class="{ 'animate-spin text-gray-900': loading }"
+                      class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
+                    />
+                  </div>
+                </div>
               </VSpace>
             </div>
           </div>
         </div>
       </template>
+
       <VLoading v-if="loading" />
+
+      <Transition v-else-if="!users.total" appear name="fade">
+        <VEmpty
+          message="当前没有符合筛选条件的用户，你可以尝试刷新或者创建新用户"
+          title="当前没有符合筛选条件的用户"
+        >
+          <template #actions>
+            <VSpace>
+              <VButton @click="handleFetchUsers()">刷新</VButton>
+              <VButton
+                v-permission="['system:users:manage']"
+                type="secondary"
+                @click="editingModal = true"
+              >
+                <template #icon>
+                  <IconAddCircle class="h-full w-full" />
+                </template>
+                新建用户
+              </VButton>
+            </VSpace>
+          </template>
+        </VEmpty>
+      </Transition>
+
       <Transition v-else appear name="fade">
         <ul
           class="box-border h-full w-full divide-y divide-gray-100"
           role="list"
         >
-          <li v-for="(user, index) in searchResults" :key="index">
+          <li v-for="(user, index) in users.items" :key="index">
             <VEntity :is-selected="checkSelection(user)">
               <template
                 v-if="currentUserHasPermission(['system:users:manage'])"

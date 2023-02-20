@@ -38,6 +38,8 @@ import { GrantRequest } from '../models'
 // @ts-ignore
 import { User } from '../models'
 // @ts-ignore
+import { UserList } from '../models'
+// @ts-ignore
 import { UserPermission } from '../models'
 /**
  * ApiConsoleHaloRunV1alpha1UserApi - axios parameter creator
@@ -224,6 +226,85 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (confi
       }
     },
     /**
+     * List users
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
+     * @param {string} [keyword]
+     * @param {string} [role]
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {number} [page] The page number. Zero indicates no page.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listUsers: async (
+      sort?: Array<string>,
+      keyword?: string,
+      role?: string,
+      size?: number,
+      page?: number,
+      labelSelector?: Array<string>,
+      fieldSelector?: Array<string>,
+      options: AxiosRequestConfig = {},
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/users`
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
+      if (configuration) {
+        baseOptions = configuration.baseOptions
+      }
+
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration)
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+      if (sort) {
+        localVarQueryParameter['sort'] = Array.from(sort)
+      }
+
+      if (keyword !== undefined) {
+        localVarQueryParameter['keyword'] = keyword
+      }
+
+      if (role !== undefined) {
+        localVarQueryParameter['role'] = role
+      }
+
+      if (size !== undefined) {
+        localVarQueryParameter['size'] = size
+      }
+
+      if (page !== undefined) {
+        localVarQueryParameter['page'] = page
+      }
+
+      if (labelSelector) {
+        localVarQueryParameter['labelSelector'] = labelSelector
+      }
+
+      if (fieldSelector) {
+        localVarQueryParameter['fieldSelector'] = fieldSelector
+      }
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      }
+    },
+    /**
      * Update current user profile, but password.
      * @param {User} user
      * @param {*} [options] Override http request option.
@@ -329,6 +410,40 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (configuration?: Conf
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
     },
     /**
+     * List users
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
+     * @param {string} [keyword]
+     * @param {string} [role]
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {number} [page] The page number. Zero indicates no page.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async listUsers(
+      sort?: Array<string>,
+      keyword?: string,
+      role?: string,
+      size?: number,
+      page?: number,
+      labelSelector?: Array<string>,
+      fieldSelector?: Array<string>,
+      options?: AxiosRequestConfig,
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserList>> {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.listUsers(
+        sort,
+        keyword,
+        role,
+        size,
+        page,
+        labelSelector,
+        fieldSelector,
+        options,
+      )
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+    },
+    /**
      * Update current user profile, but password.
      * @param {User} user
      * @param {*} [options] Override http request option.
@@ -404,6 +519,29 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
         .then((request) => request(axios, basePath))
     },
     /**
+     * List users
+     * @param {ApiConsoleHaloRunV1alpha1UserApiListUsersRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listUsers(
+      requestParameters: ApiConsoleHaloRunV1alpha1UserApiListUsersRequest = {},
+      options?: AxiosRequestConfig,
+    ): AxiosPromise<UserList> {
+      return localVarFp
+        .listUsers(
+          requestParameters.sort,
+          requestParameters.keyword,
+          requestParameters.role,
+          requestParameters.size,
+          requestParameters.page,
+          requestParameters.labelSelector,
+          requestParameters.fieldSelector,
+          options,
+        )
+        .then((request) => request(axios, basePath))
+    },
+    /**
      * Update current user profile, but password.
      * @param {ApiConsoleHaloRunV1alpha1UserApiUpdateCurrentUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -472,6 +610,62 @@ export interface ApiConsoleHaloRunV1alpha1UserApiGrantPermissionRequest {
    * @memberof ApiConsoleHaloRunV1alpha1UserApiGrantPermission
    */
   readonly grantRequest: GrantRequest
+}
+
+/**
+ * Request parameters for listUsers operation in ApiConsoleHaloRunV1alpha1UserApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1UserApiListUsersRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1UserApiListUsersRequest {
+  /**
+   * Sort property and direction of the list result. Supported fields: creationTimestamp
+   * @type {Array<string>}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
+   */
+  readonly sort?: Array<string>
+
+  /**
+   *
+   * @type {string}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
+   */
+  readonly keyword?: string
+
+  /**
+   *
+   * @type {string}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
+   */
+  readonly role?: string
+
+  /**
+   * Size of one page. Zero indicates no limit.
+   * @type {number}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
+   */
+  readonly size?: number
+
+  /**
+   * The page number. Zero indicates no page.
+   * @type {number}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
+   */
+  readonly page?: number
+
+  /**
+   * Label selector for filtering.
+   * @type {Array<string>}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
+   */
+  readonly labelSelector?: Array<string>
+
+  /**
+   * Field selector for filtering.
+   * @type {Array<string>}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
+   */
+  readonly fieldSelector?: Array<string>
 }
 
 /**
@@ -552,6 +746,31 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
   ) {
     return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
       .grantPermission(requestParameters.name, requestParameters.grantRequest, options)
+      .then((request) => request(this.axios, this.basePath))
+  }
+
+  /**
+   * List users
+   * @param {ApiConsoleHaloRunV1alpha1UserApiListUsersRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApi
+   */
+  public listUsers(
+    requestParameters: ApiConsoleHaloRunV1alpha1UserApiListUsersRequest = {},
+    options?: AxiosRequestConfig,
+  ) {
+    return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
+      .listUsers(
+        requestParameters.sort,
+        requestParameters.keyword,
+        requestParameters.role,
+        requestParameters.size,
+        requestParameters.page,
+        requestParameters.labelSelector,
+        requestParameters.fieldSelector,
+        options,
+      )
       .then((request) => request(this.axios, this.basePath))
   }
 

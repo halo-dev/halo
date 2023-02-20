@@ -1,6 +1,5 @@
 .gitignore
 .npmignore
-.openapi-generator-ignore
 api.ts
 api/api-console-halo-run-v1alpha1-attachment-api.ts
 api/api-console-halo-run-v1alpha1-comment-api.ts
