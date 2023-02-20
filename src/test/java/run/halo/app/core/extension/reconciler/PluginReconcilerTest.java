@@ -23,6 +23,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.Answer;
 import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
@@ -74,15 +75,18 @@ class PluginReconcilerTest {
     @DisplayName("Reconcile to start successfully")
     void reconcileOkWhenPluginManagerStartSuccessfully() {
         Plugin plugin = need2ReconcileForStartupState();
-        when(extensionClient.fetch(eq(Plugin.class), eq("apples"))).thenReturn(Optional.of(plugin));
-        when(haloPluginManager.startPlugin(any())).thenReturn(PluginState.STARTED);
-        // mock plugin real state is started
         when(pluginWrapper.getPluginState()).thenReturn(PluginState.STOPPED);
+        when(extensionClient.fetch(eq(Plugin.class), eq("apples"))).thenReturn(Optional.of(plugin));
+        when(haloPluginManager.startPlugin(any())).thenAnswer((Answer<PluginState>) invocation -> {
+            // mock plugin real state is started
+            when(pluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
+            return PluginState.STARTED;
+        });
 
         ArgumentCaptor<Plugin> pluginCaptor = doReconcileWithoutRequeue();
         verify(extensionClient, times(3)).update(isA(Plugin.class));
 
-        Plugin updateArgs = pluginCaptor.getValue();
+        Plugin updateArgs = pluginCaptor.getAllValues().get(2);
         assertThat(updateArgs).isNotNull();
         assertThat(updateArgs.getSpec().getEnabled()).isTrue();
         assertThat(updateArgs.getStatus().getPhase()).isEqualTo(PluginState.STARTED);
@@ -114,8 +118,8 @@ class PluginReconcilerTest {
 
             Plugin.PluginStatus status = updateArgs.getStatus();
             assertThat(status.getPhase()).isEqualTo(PluginState.FAILED);
-            assertThat(status.getReason()).isEqualTo("error message");
-            assertThat(status.getMessage()).isEqualTo("dev message");
+            assertThat(status.getConditions().peek().getReason()).isEqualTo("error message");
+            assertThat(status.getConditions().peek().getMessage()).isEqualTo("dev message");
             assertThat(status.getLastStartTime()).isNull();
         }).isInstanceOf(PluginRuntimeException.class)
             .hasMessage("error message");
@@ -200,9 +204,7 @@ class PluginReconcilerTest {
 
             Plugin.PluginStatus status = updateArgs.getStatus();
             assertThat(status.getPhase()).isEqualTo(PluginState.FAILED);
-            assertThat(status.getReason()).isEqualTo("error message");
-            assertThat(status.getMessage()).isEqualTo("dev message");
-        }).isInstanceOf(PluginRuntimeException.class)
+        }).isInstanceOf(IllegalStateException.class)
             .hasMessage("error message");
     }
 
