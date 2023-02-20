@@ -1,6 +1,5 @@
 package run.halo.app.core.extension.reconciler;
 
-import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -34,25 +33,23 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
 
     @Override
     public Result reconcile(Request request) {
-        return client.fetch(Tag.class, request.name())
-            .map(tag -> {
+        client.fetch(Tag.class, request.name())
+            .ifPresent(tag -> {
                 if (isDeleted(tag)) {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
-                    return new Result(false, null);
+                    return;
                 }
                 addFinalizerIfNecessary(tag);
 
-                this.reconcileStatusPermalink(request.name());
-
                 reconcileStatusPosts(request.name());
-                return new Result(true, Duration.ofMinutes(1));
-            })
-            .orElseGet(() -> new Result(false, null));
+            });
+        return new Result(false, null);
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         return builder
+            .syncAllOnStart(false)
             .extension(new Tag())
             .build();
     }
@@ -87,22 +84,6 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
             }
             client.update(tag);
         });
-    }
-
-    private void reconcileStatusPermalink(String tagName) {
-        client.fetch(Tag.class, tagName)
-            .ifPresent(tag -> {
-                Tag oldTag = JsonUtils.deepCopy(tag);
-                tagPermalinkPolicy.onPermalinkDelete(oldTag);
-
-                tag.getStatusOrDefault()
-                    .setPermalink(tagPermalinkPolicy.permalink(tag));
-                tagPermalinkPolicy.onPermalinkAdd(tag);
-
-                if (!oldTag.equals(tag)) {
-                    client.update(tag);
-                }
-            });
     }
 
     private void reconcileStatusPosts(String tagName) {
