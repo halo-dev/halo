@@ -1,19 +1,31 @@
 package run.halo.app.core.extension.endpoint;
 
+import static java.util.Comparator.comparing;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
+import static run.halo.app.extension.ListResult.generateGenericClass;
+import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
+import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.micrometer.common.util.StringUtils;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
@@ -23,14 +35,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.service.UserService;
+import run.halo.app.extension.Comparators;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.extension.router.IListRequest;
 import run.halo.app.infra.exception.UserNotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -94,6 +109,13 @@ public class UserEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(User.class))
             )
+            .GET("users", this::list, builder -> {
+                builder.operationId("ListUsers")
+                    .tag(tag)
+                    .description("List users")
+                    .response(responseBuilder().implementation(generateGenericClass(User.class)));
+                buildParametersFromType(builder, ListRequest.class);
+            })
             .build();
     }
 
@@ -223,5 +245,105 @@ public class UserEndpoint implements CustomEndpoint {
 
     record UserPermission(@Schema(required = true) Set<Role> roles,
                           @Schema(required = true) Set<String> uiPermissions) {
+    }
+
+    public class ListRequest extends IListRequest.QueryListRequest {
+
+        private final ServerWebExchange exchange;
+
+        public ListRequest(ServerRequest request) {
+            super(request.queryParams());
+            this.exchange = request.exchange();
+        }
+
+        @Schema(name = "keyword")
+        public String getKeyword() {
+            return queryParams.getFirst("keyword");
+        }
+
+        @Schema(name = "role")
+        public String getRole() {
+            return queryParams.getFirst("role");
+        }
+
+        @ArraySchema(uniqueItems = true,
+            arraySchema = @Schema(name = "sort",
+                description = "Sort property and direction of the list result. Supported fields: "
+                    + "creationTimestamp"),
+            schema = @Schema(description = "like field,asc or field,desc",
+                implementation = String.class,
+                example = "creationTimestamp,desc"))
+        public Sort getSort() {
+            return SortResolver.defaultInstance.resolve(exchange);
+        }
+
+        public Predicate<User> toPredicate() {
+            Predicate<User> displayNamePredicate = user -> {
+                var keyword = getKeyword();
+                if (!org.springframework.util.StringUtils.hasText(keyword)) {
+                    return true;
+                }
+                var displayName = user.getSpec().getDisplayName();
+                if (!org.springframework.util.StringUtils.hasText(displayName)) {
+                    return false;
+                }
+                return displayName.toLowerCase().contains(keyword.trim().toLowerCase());
+            };
+            Predicate<User> rolePredicate = user -> {
+                var role = getRole();
+                if (role == null) {
+                    return true;
+                }
+                var annotations = user.getMetadata().getAnnotations();
+                if (annotations == null || !annotations.containsKey(User.ROLE_NAMES_ANNO)) {
+                    return false;
+                } else {
+                    Pattern pattern = Pattern.compile("\\[\"([^\"]*)\"\\]");
+                    Matcher matcher = pattern.matcher(annotations.get(User.ROLE_NAMES_ANNO));
+                    if (matcher.find()) {
+                        return matcher.group(1).equals(role);
+                    } else {
+                        return false;
+                    }
+                }
+            };
+            return displayNamePredicate
+                .and(rolePredicate)
+                .and(labelAndFieldSelectorToPredicate(getLabelSelector(), getFieldSelector()));
+        }
+
+        public Comparator<User> toComparator() {
+            var sort = getSort();
+            var ctOrder = sort.getOrderFor("creationTimestamp");
+            List<Comparator<User>> comparators = new ArrayList<>();
+            if (ctOrder != null) {
+                Comparator<User> comparator =
+                    comparing(user -> user.getMetadata().getCreationTimestamp());
+                if (ctOrder.isDescending()) {
+                    comparator = comparator.reversed();
+                }
+                comparators.add(comparator);
+            }
+            comparators.add(Comparators.compareCreationTimestamp(false));
+            comparators.add(Comparators.compareName(true));
+            return comparators.stream()
+                .reduce(Comparator::thenComparing)
+                .orElse(null);
+        }
+    }
+
+    Mono<ServerResponse> list(ServerRequest request) {
+        return Mono.just(request)
+            .map(UserEndpoint.ListRequest::new)
+            .flatMap(listRequest -> {
+                var predicate = listRequest.toPredicate();
+                var comparator = listRequest.toComparator();
+                return client.list(User.class,
+                    predicate,
+                    comparator,
+                    listRequest.getPage(),
+                    listRequest.getSize());
+            })
+            .flatMap(listResult -> ServerResponse.ok().bodyValue(listResult));
     }
 }
