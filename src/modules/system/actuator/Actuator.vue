@@ -85,6 +85,28 @@ const handleCopy = () => {
 
   Toast.success("复制成功");
 };
+
+const handleDownloadLogfile = () => {
+  axios
+    .get(`${import.meta.env.VITE_API_URL}/actuator/logfile`)
+    .then((response) => {
+      const blob = new Blob([response.data]);
+      const downloadElement = document.createElement("a");
+      const href = window.URL.createObjectURL(blob);
+      downloadElement.href = href;
+      downloadElement.download = `halo-log-${formatDatetime(new Date())}.log`;
+      document.body.appendChild(downloadElement);
+      downloadElement.click();
+      document.body.removeChild(downloadElement);
+      window.URL.revokeObjectURL(href);
+
+      Toast.success("下载成功");
+    })
+    .catch((e) => {
+      Toast.error("下载失败");
+      console.log("Failed to download log file.", e);
+    });
+};
 </script>
 
 <template>
@@ -231,6 +253,16 @@ const handleCopy = () => {
               <dt class="text-sm font-medium text-gray-900">操作系统</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 {{ info.os.name }} {{ info.os.version }} / {{ info.os.arch }}
+              </dd>
+            </div>
+            <div
+              class="items-center bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
+            >
+              <dt class="text-sm font-medium text-gray-900">运行日志</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                <VButton size="sm" @click="handleDownloadLogfile()">
+                  下载
+                </VButton>
               </dd>
             </div>
           </dl>
