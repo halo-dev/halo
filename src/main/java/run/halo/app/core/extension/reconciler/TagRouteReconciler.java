@@ -35,11 +35,8 @@ public class TagRouteReconciler implements Reconciler<Reconciler.Request> {
             .ifPresent(tag -> {
                 final String oldPermalink = tag.getStatusOrDefault().getPermalink();
 
-                tagPermalinkPolicy.onPermalinkDelete(tag);
-
                 String permalink = tagPermalinkPolicy.permalink(tag);
                 tag.getStatusOrDefault().setPermalink(permalink);
-                tagPermalinkPolicy.onPermalinkAdd(tag);
 
                 if (!StringUtils.equals(permalink, oldPermalink)) {
                     client.update(tag);
