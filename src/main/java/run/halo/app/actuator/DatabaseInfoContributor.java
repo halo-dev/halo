@@ -2,17 +2,17 @@ package run.halo.app.actuator;
 
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionMetadata;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import org.springframework.boot.actuate.info.Info;
 import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 @Component
 public class DatabaseInfoContributor implements InfoContributor {
-    private final static String DATABASE_INFO_KEY = "database";
+    private static final String DATABASE_INFO_KEY = "database";
 
     private final ConnectionFactory connectionFactory;
 
@@ -26,8 +26,8 @@ public class DatabaseInfoContributor implements InfoContributor {
     }
 
     public Map<String, Object> contributorMap() {
-        Map<String, Object> map = new HashMap<>();
-        ConnectionMetadata connectionMetadata = getConnectionMetadata().block();
+        var map = new HashMap<String, Object>();
+        var connectionMetadata = getConnectionMetadata().block();
         if (Objects.isNull(connectionMetadata)) {
             return map;
         }
