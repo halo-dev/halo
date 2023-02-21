@@ -1,6 +1,8 @@
 package run.halo.app.core.extension.endpoint;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.never;
@@ -8,15 +10,20 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+import static org.springframework.test.web.reactive.server.WebTestClient.bindToRouterFunction;
 import static run.halo.app.extension.GroupVersionKind.fromExtension;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,6 +37,7 @@ import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
+import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
@@ -40,17 +48,19 @@ import run.halo.app.infra.utils.JsonUtils;
 @WithMockUser(username = "fake-user", password = "fake-password", roles = "fake-super-role")
 class UserEndpointTest {
 
-    @Autowired
     WebTestClient webClient;
 
     @MockBean
     RoleService roleService;
 
-    @MockBean
+    @Mock
     ReactiveExtensionClient client;
 
-    @MockBean
+    @Mock
     UserService userService;
+
+    @InjectMocks
+    UserEndpoint endpoint;
 
     @BeforeEach
     void setUp() {
@@ -63,7 +73,197 @@ class UserEndpointTest {
         var role = new Role();
         role.setRules(List.of(rule));
         when(roleService.getMonoRole("authenticated")).thenReturn(Mono.just(role));
+        webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
+            .build();
         webClient = webClient.mutateWith(csrf());
+    }
+
+    @Nested
+    class UserListTest {
+
+        @Test
+        void shouldListEmptyUsersWhenNoUsers() {
+            when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
+                .thenReturn(Mono.just(ListResult.emptyResult()));
+
+            bindToRouterFunction(endpoint.endpoint())
+                .build()
+                .get().uri("/users")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(0)
+                .jsonPath("$.total").isEqualTo(0);
+        }
+
+        @Test
+        void shouldListUsersWhenUserPresent() {
+            var users = List.of(
+                createUser("fake-user-1"),
+                createUser("fake-user-2"),
+                createUser("fake-user-3")
+            );
+            var expectResult = new ListResult<>(users);
+            when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
+                .thenReturn(Mono.just(expectResult));
+
+            bindToRouterFunction(endpoint.endpoint())
+                .build()
+                .get().uri("/users")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(3)
+                .jsonPath("$.total").isEqualTo(3);
+        }
+
+        @Test
+        void shouldFilterUsersWhenKeywordProvided() {
+            var expectUser =
+                createUser("fake-user-2", "expected display name");
+            var unexpectedUser1 =
+                createUser("fake-user-1", "first fake display name");
+            var unexpectedUser2 =
+                createUser("fake-user-3", "second fake display name");
+            var users = List.of(
+                expectUser
+            );
+            var expectResult = new ListResult<>(users);
+            when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
+                .thenReturn(Mono.just(expectResult));
+
+            bindToRouterFunction(endpoint.endpoint())
+                .build()
+                .get().uri("/users?keyword=Expected")
+                .exchange()
+                .expectStatus().isOk();
+
+            verify(client).list(same(User.class), argThat(
+                    predicate -> predicate.test(expectUser)
+                        && !predicate.test(unexpectedUser1)
+                        && !predicate.test(unexpectedUser2)),
+                any(), anyInt(), anyInt());
+        }
+
+        @Test
+        void shouldFilterUsersWhenRoleProvided() {
+            var expectUser =
+                JsonUtils.jsonToObject("""
+                    {
+                        "apiVersion": "v1alpha1",
+                        "kind": "User",
+                        "metadata": {
+                            "name": "alice",
+                            "annotations": {
+                                "rbac.authorization.halo.run/role-names": "[\\"guest\\"]"
+                            }
+                        }
+                    }
+                    """, User.class);
+            var unexpectedUser1 =
+                JsonUtils.jsonToObject("""
+                    {
+                        "apiVersion": "v1alpha1",
+                        "kind": "User",
+                        "metadata": {
+                            "name": "admin",
+                            "annotations": {
+                                "rbac.authorization.halo.run/role-names": "[\\"super-role\\"]"
+                            }
+                        }
+                    }
+                    """, User.class);
+            var unexpectedUser2 =
+                JsonUtils.jsonToObject("""
+                    {
+                        "apiVersion": "v1alpha1",
+                        "kind": "User",
+                        "metadata": {
+                            "name": "joey",
+                            "annotations": {}
+                        }
+                    }
+                    """, User.class);
+            var users = List.of(
+                expectUser
+            );
+            var expectResult = new ListResult<>(users);
+            when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
+                .thenReturn(Mono.just(expectResult));
+
+            bindToRouterFunction(endpoint.endpoint())
+                .build()
+                .get().uri("/users?role=guest")
+                .exchange()
+                .expectStatus().isOk();
+
+            verify(client).list(same(User.class), argThat(
+                    predicate -> predicate.test(expectUser)
+                        && !predicate.test(unexpectedUser1)
+                        && !predicate.test(unexpectedUser2)),
+                any(), anyInt(), anyInt());
+        }
+
+        @Test
+        void shouldSortUsersWhenCreationTimestampSet() {
+            var expectUser =
+                createUser("fake-user-2", "expected display name");
+            var unexpectedUser1 =
+                createUser("fake-user-1", "first fake display name");
+            var unexpectedUser2 =
+                createUser("fake-user-3", "second fake display name");
+            var expectResult = new ListResult<>(List.of(expectUser));
+            when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
+                .thenReturn(Mono.just(expectResult));
+
+            bindToRouterFunction(endpoint.endpoint())
+                .build()
+                .get().uri("/users?sort=creationTimestamp,desc")
+                .exchange()
+                .expectStatus().isOk();
+
+            verify(client).list(same(User.class), any(), argThat(comparator -> {
+                var now = Instant.now();
+                var users = new ArrayList<>(List.of(
+                    createUser("fake-user-a", now),
+                    createUser("fake-user-b", now.plusSeconds(1)),
+                    createUser("fake-user-c", now.plusSeconds(2))
+                ));
+                users.sort(comparator);
+                return Objects.deepEquals(users, List.of(
+                    createUser("fake-user-c", now.plusSeconds(2)),
+                    createUser("fake-user-b", now.plusSeconds(1)),
+                    createUser("fake-user-a", now)
+                ));
+            }), anyInt(), anyInt());
+        }
+
+        User createUser(String name) {
+            return createUser(name, "fake display name");
+        }
+
+        User createUser(String name, String displayName) {
+            var metadata = new Metadata();
+            metadata.setName(name);
+            metadata.setCreationTimestamp(Instant.now());
+            var spec = new User.UserSpec();
+            spec.setDisplayName(displayName);
+            var user = new User();
+            user.setMetadata(metadata);
+            user.setSpec(spec);
+            return user;
+        }
+
+        User createUser(String name, Instant creationTimestamp) {
+            var metadata = new Metadata();
+            metadata.setName(name);
+            metadata.setCreationTimestamp(creationTimestamp);
+            var spec = new User.UserSpec();
+            var user = new User();
+            user.setMetadata(metadata);
+            user.setSpec(spec);
+            return user;
+        }
     }
 
     @Nested
@@ -75,7 +275,7 @@ class UserEndpointTest {
             when(client.get(User.class, "fake-user"))
                 .thenReturn(Mono.error(
                     new ExtensionNotFoundException(fromExtension(User.class), "fake-user")));
-            webClient.get().uri("/apis/api.console.halo.run/v1alpha1/users/-")
+            webClient.get().uri("/users/-")
                 .exchange()
                 .expectStatus().isNotFound();
 
@@ -89,7 +289,7 @@ class UserEndpointTest {
             var user = new User();
             user.setMetadata(metadata);
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(user));
-            webClient.get().uri("/apis/api.console.halo.run/v1alpha1/users/-")
+            webClient.get().uri("/users/-")
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -111,7 +311,7 @@ class UserEndpointTest {
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
             when(client.update(currentUser)).thenReturn(Mono.just(updatedUser));
 
-            webClient.put().uri("/apis/api.console.halo.run/v1alpha1/users/-")
+            webClient.put().uri("/users/-")
                 .bodyValue(requestUser)
                 .exchange()
                 .expectStatus().isOk()
@@ -131,7 +331,7 @@ class UserEndpointTest {
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
             when(client.update(currentUser)).thenReturn(Mono.just(updatedUser));
 
-            webClient.put().uri("/apis/api.console.halo.run/v1alpha1/users/-")
+            webClient.put().uri("/users/-")
                 .bodyValue(requestUser)
                 .exchange()
                 .expectStatus().isBadRequest();
@@ -166,7 +366,7 @@ class UserEndpointTest {
             var user = new User();
             when(userService.updateWithRawPassword("fake-user", "new-password"))
                 .thenReturn(Mono.just(user));
-            webClient.put().uri("/apis/api.console.halo.run/v1alpha1/users/-/password")
+            webClient.put().uri("/users/-/password")
                 .bodyValue(new UserEndpoint.ChangePasswordRequest("new-password"))
                 .exchange()
                 .expectStatus().isOk()
@@ -182,7 +382,7 @@ class UserEndpointTest {
             when(userService.updateWithRawPassword("another-fake-user", "new-password"))
                 .thenReturn(Mono.just(user));
             webClient.put()
-                .uri("/apis/api.console.halo.run/v1alpha1/users/another-fake-user/password")
+                .uri("/users/another-fake-user/password")
                 .bodyValue(new UserEndpoint.ChangePasswordRequest("new-password"))
                 .exchange()
                 .expectStatus().isOk()
@@ -209,7 +409,7 @@ class UserEndpointTest {
 
         @Test
         void shouldGetBadRequestIfRequestBodyIsEmpty() {
-            webClient.post().uri("/apis/api.console.halo.run/v1alpha1/users/fake-user/permissions")
+            webClient.post().uri("/users/fake-user/permissions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .exchange()
                 .expectStatus().isBadRequest();
@@ -223,7 +423,7 @@ class UserEndpointTest {
         void shouldGrantPermission() {
             when(userService.grantRoles("fake-user", Set.of("fake-role"))).thenReturn(Mono.empty());
 
-            webClient.post().uri("/apis/api.console.halo.run/v1alpha1/users/fake-user/permissions")
+            webClient.post().uri("/users/fake-user/permissions")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UserEndpoint.GrantRequest(Set.of("fake-role")))
                 .exchange()
@@ -250,7 +450,7 @@ class UserEndpointTest {
             when(userService.listRoles(eq("fake-user"))).thenReturn(
                 Flux.fromIterable(List.of(roleA)));
 
-            webClient.get().uri("/apis/api.console.halo.run/v1alpha1/users/fake-user/permissions")
+            webClient.get().uri("/users/fake-user/permissions")
                 .exchange()
                 .expectStatus()
                 .isOk()

@@ -55,7 +55,7 @@ management:
   endpoints:
     web:
       exposure:
-          include: ["health", "info", "startup", "globalinfo"]
+          include: ["health", "info", "startup", "globalinfo", "logfile"]
   endpoint:
     health:
       probes:
