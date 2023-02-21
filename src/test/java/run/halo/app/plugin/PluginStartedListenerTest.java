@@ -35,7 +35,7 @@ class PluginStartedListenerTest {
             Files.createFile(extensions.resolve("roles.yaml"));
 
             Set<String> extensionResources =
-                PluginStartedListener.PluginExtensionLoaderUtils.lookupFromClasses(tempPluginPath);
+                PluginExtensionLoaderUtils.lookupFromClasses(tempPluginPath);
             assertThat(extensionResources)
                 .containsAll(Set.of(Path.of("extensions/roles.yaml").toString()));
         }
@@ -50,7 +50,7 @@ class PluginStartedListenerTest {
                 Path targetJarPath = tempDirectory.resolve("plugin-0.0.1.jar");
                 FileUtils.jar(Paths.get(plugin001Uri), targetJarPath);
                 Set<String> unstructuredFilePathFromJar =
-                    PluginStartedListener.PluginExtensionLoaderUtils.lookupFromJar(targetJarPath);
+                    PluginExtensionLoaderUtils.lookupFromJar(targetJarPath);
                 assertThat(unstructuredFilePathFromJar).hasSize(3);
                 assertThat(unstructuredFilePathFromJar).containsAll(Set.of(
                     Path.of("extensions/roles.yaml").toString(),
