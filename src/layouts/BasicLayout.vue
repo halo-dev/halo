@@ -18,7 +18,7 @@ import {
   useRouter,
   type RouteRecordRaw,
 } from "vue-router";
-import { computed, onMounted, onUnmounted, ref } from "vue";
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import axios from "axios";
 import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
 import LoginModal from "@/components/login/LoginModal.vue";
@@ -28,6 +28,8 @@ import { useRoleStore } from "@/stores/role";
 import { hasPermission } from "@/utils/permission";
 import { useUserStore } from "@/stores/user";
 import { rbacAnnotations } from "@/constants/annotations";
+import { useScroll } from "@vueuse/core";
+import { defineStore } from "pinia";
 
 const route = useRoute();
 const router = useRouter();
@@ -189,6 +191,31 @@ const generateMenus = () => {
 };
 
 onMounted(generateMenus);
+
+// store scroll position
+const navbarScroller = ref();
+const { y } = useScroll(navbarScroller);
+
+const useNavbarScrollStore = defineStore("navbar", {
+  state: () => ({
+    y: 0,
+  }),
+});
+
+const navbarScrollStore = useNavbarScrollStore();
+
+watch(
+  () => y.value,
+  () => {
+    navbarScrollStore.y = y.value;
+  }
+);
+
+onMounted(() => {
+  nextTick(() => {
+    y.value = navbarScrollStore.y;
+  });
+});
 </script>
 
 <template>
@@ -203,7 +230,7 @@ onMounted(generateMenus);
           />
         </a>
       </div>
-      <div class="flex-1 overflow-y-auto">
+      <div ref="navbarScroller" class="flex-1 overflow-y-auto">
         <div class="px-3">
           <div
             class="flex cursor-pointer items-center rounded bg-gray-100 p-2 text-gray-400 transition-all hover:text-gray-900"
