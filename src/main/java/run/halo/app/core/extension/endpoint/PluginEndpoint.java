@@ -62,7 +62,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
 import run.halo.app.infra.SystemVersionSupplier;
-import run.halo.app.infra.exception.PluginInstallationException;
+import run.halo.app.infra.exception.PluginAlreadyExistsException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.VersionUtils;
@@ -458,11 +458,7 @@ public class PluginEndpoint implements CustomEndpoint {
                 plugin.getSpec().setEnabled(false);
                 return client.fetch(Plugin.class, plugin.getMetadata().getName())
                     .doOnNext(oldPlugin -> {
-                        String pluginName = oldPlugin.getMetadata().getName();
-                        throw new PluginInstallationException(
-                            "Plugin [" + pluginName + "] already installed",
-                            "problemDetail.plugin.install.alreadyInstalled",
-                            new Object[] {pluginName});
+                        throw new PluginAlreadyExistsException(oldPlugin.getMetadata().getName());
                     })
                     .then(client.create(plugin))
                     .publishOn(Schedulers.boundedElastic())

@@ -1,6 +1,5 @@
 package run.halo.app.core.extension.reconciler;
 
-import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -38,11 +37,11 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
 
     @Override
     public Result reconcile(Request request) {
-        return client.fetch(Tag.class, request.name())
-            .map(tag -> {
+        client.fetch(Tag.class, request.name())
+            .ifPresent(tag -> {
                 if (isDeleted(tag)) {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
-                    return new Result(false, null);
+                    return;
                 }
                 addFinalizerIfNecessary(tag);
 
@@ -51,14 +50,14 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
                 this.reconcileStatusPermalink(request.name());
 
                 reconcileStatusPosts(request.name());
-                return new Result(true, Duration.ofMinutes(1));
-            })
-            .orElseGet(() -> new Result(false, null));
+            });
+        return new Result(false, null);
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         return builder
+            .syncAllOnStart(false)
             .extension(new Tag())
             .build();
     }
