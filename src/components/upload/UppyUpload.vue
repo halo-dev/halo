@@ -36,6 +36,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (event: "uploaded", response: SuccessResponse): void;
+  (event: "error", file, response): void;
 }>();
 
 const uppy = computed(() => {
@@ -70,6 +71,10 @@ const uppy = computed(() => {
 
 uppy.value.on("upload-success", (_, response: SuccessResponse) => {
   emit("uploaded", response);
+});
+
+uppy.value.on("upload-error", (file, _, response) => {
+  emit("error", file, response);
 });
 
 onUnmounted(() => {

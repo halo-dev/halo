@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { VModal, Dialog } from "@halo-dev/components";
+import { VModal, Dialog, Toast } from "@halo-dev/components";
 import UppyUpload from "@/components/upload/UppyUpload.vue";
 import { apiClient } from "@/utils/api-client";
 import type { Plugin } from "@halo-dev/api-client";
 import { computed, ref, watch } from "vue";
-import type { SuccessResponse } from "@uppy/core";
+import type { SuccessResponse, ErrorResponse } from "@uppy/core";
+import type { UppyFile } from "@uppy/utils";
 
 const props = withDefaults(
   defineProps<{
@@ -76,6 +77,40 @@ const onUploaded = async (response: SuccessResponse) => {
   });
 };
 
+interface PluginInstallationErrorResponse {
+  detail: string;
+  instance: string;
+  pluginName: string;
+  requestId: string;
+  status: number;
+  timestamp: string;
+  title: string;
+  type: string;
+}
+
+const PLUGIN_ALREADY_EXISTS_TYPE =
+  "https://halo.run/probs/plugin-alreay-exists";
+
+const onError = (file: UppyFile<unknown>, response: ErrorResponse) => {
+  const body = response.body as PluginInstallationErrorResponse;
+  if (body.type === PLUGIN_ALREADY_EXISTS_TYPE) {
+    Dialog.info({
+      title: "插件已存在",
+      description: "当前安装的插件已存在，是否升级？",
+      onConfirm: async () => {
+        await apiClient.plugin.upgradePlugin({
+          name: body.pluginName,
+          file: file.data as File,
+        });
+
+        Toast.success("升级成功");
+
+        window.location.reload();
+      },
+    });
+  }
+};
+
 watch(
   () => props.visible,
   (newValue) => {
@@ -106,6 +141,7 @@ watch(
       :endpoint="endpoint"
       auto-proceed
       @uploaded="onUploaded"
+      @error="onError"
     />
   </VModal>
 </template>
