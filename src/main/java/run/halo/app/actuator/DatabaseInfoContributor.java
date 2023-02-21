@@ -1,5 +1,6 @@
 package run.halo.app.actuator;
 
+import io.r2dbc.spi.Connection;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionMetadata;
 import java.util.HashMap;
@@ -37,10 +38,11 @@ public class DatabaseInfoContributor implements InfoContributor {
     }
 
     private Mono<ConnectionMetadata> getConnectionMetadata() {
-        return Mono.from(this.connectionFactory.create())
-            .flatMap(connection -> {
-                var metadata = connection.getMetadata();
-                return Mono.from(connection.close()).thenReturn(metadata);
-            });
+        return Mono.usingWhen(this.connectionFactory.create(),
+            conn -> Mono.just(conn.getMetadata()),
+            Connection::close,
+            (conn, t) -> conn.close(),
+            Connection::close
+        );
     }
 }
