@@ -78,6 +78,7 @@
     "transliteration": "^2.3.5",
     "vue": "^3.2.45",
     "vue-grid-layout": "3.0.0-beta1",
+    "vue-i18n": "^9.2.2",
     "vue-router": "^4.1.6",
     "vuedraggable": "^4.1.0"
   },

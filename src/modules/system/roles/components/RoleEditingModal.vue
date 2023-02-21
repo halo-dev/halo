@@ -156,7 +156,9 @@ const handleResetForm = () => {
               class="flex flex-col gap-3 bg-white py-5 first:pt-0"
             >
               <dt class="text-sm font-medium text-gray-900">
-                <div>{{ group.module }}</div>
+                <div>
+                  {{ $t(`rbac.${group.module}`, group.module as string) }}
+                </div>
                 <div
                   v-if="
                     group.roles.length &&
@@ -197,9 +199,16 @@ const handleResetForm = () => {
                       <div class="flex flex-1 flex-col gap-y-3">
                         <span class="font-medium text-gray-900">
                           {{
-                            roleTemplate.metadata.annotations?.[
-                              rbacAnnotations.DISPLAY_NAME
-                            ]
+                            $t(
+                              `rbac.${
+                                roleTemplate.metadata.annotations?.[
+                                  rbacAnnotations.DISPLAY_NAME
+                                ]
+                              }`,
+                              roleTemplate.metadata.annotations?.[
+                                rbacAnnotations.DISPLAY_NAME
+                              ] as string
+                            )
                           }}
                         </span>
                         <span
@@ -216,7 +225,11 @@ const handleResetForm = () => {
                               roleTemplate.metadata.annotations?.[
                                 rbacAnnotations.DEPENDENCIES
                               ]
-                            ).join(", ")
+                            )
+                              .map((item: string) =>
+                                $t(`rbac.${item}`, item as string)
+                              )
+                              .join("，")
                           }}
                         </span>
                       </div>

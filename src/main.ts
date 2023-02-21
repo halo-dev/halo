@@ -20,12 +20,14 @@ import { useThemeStore } from "./stores/theme";
 import { useSystemStatesStore } from "./stores/system-states";
 import { useUserStore } from "./stores/user";
 import { useSystemConfigMapStore } from "./stores/system-configmap";
+import i18n from "./locales";
 
 const app = createApp(App);
 
 setupComponents(app);
 
 app.use(createPinia());
+app.use(i18n);
 
 function registerModule(pluginModule: PluginModule, core: boolean) {
   if (pluginModule.components) {
