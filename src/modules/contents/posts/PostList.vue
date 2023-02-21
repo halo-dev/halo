@@ -783,12 +783,6 @@ const hasFilters = computed(() => {
                       >
                         <VStatusDot state="success" animate />
                       </RouterLink>
-                      <PostTag
-                        v-for="(tag, tagIndex) in post.tags"
-                        :key="tagIndex"
-                        :tag="tag"
-                        route
-                      ></PostTag>
                       <a
                         v-if="post.post.status?.permalink"
                         target="_blank"
@@ -801,35 +795,45 @@ const hasFilters = computed(() => {
                     </VSpace>
                   </template>
                   <template #description>
-                    <VSpace class="flex-wrap !gap-y-1">
-                      <p
-                        v-if="post.categories.length"
-                        class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
-                      >
-                        分类：<a
-                          v-for="(category, categoryIndex) in post.categories"
-                          :key="categoryIndex"
-                          :href="category.status?.permalink"
-                          :title="category.status?.permalink"
-                          target="_blank"
-                          class="cursor-pointer hover:text-gray-900"
+                    <div class="flex flex-col gap-1.5">
+                      <VSpace class="flex-wrap !gap-y-1">
+                        <p
+                          v-if="post.categories.length"
+                          class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
                         >
-                          {{ category.spec.displayName }}
-                        </a>
-                      </p>
-                      <span class="text-xs text-gray-500">
-                        访问量 {{ post.stats.visit || 0 }}
-                      </span>
-                      <span class="text-xs text-gray-500">
-                        评论 {{ post.stats.totalComment || 0 }}
-                      </span>
-                      <span
-                        v-if="post.post.spec.pinned"
-                        class="text-xs text-gray-500"
-                      >
-                        已置顶
-                      </span>
-                    </VSpace>
+                          分类：<a
+                            v-for="(category, categoryIndex) in post.categories"
+                            :key="categoryIndex"
+                            :href="category.status?.permalink"
+                            :title="category.status?.permalink"
+                            target="_blank"
+                            class="cursor-pointer hover:text-gray-900"
+                          >
+                            {{ category.spec.displayName }}
+                          </a>
+                        </p>
+                        <span class="text-xs text-gray-500">
+                          访问量 {{ post.stats.visit || 0 }}
+                        </span>
+                        <span class="text-xs text-gray-500">
+                          评论 {{ post.stats.totalComment || 0 }}
+                        </span>
+                        <span
+                          v-if="post.post.spec.pinned"
+                          class="text-xs text-gray-500"
+                        >
+                          已置顶
+                        </span>
+                      </VSpace>
+                      <VSpace v-if="post.tags.length" class="flex-wrap">
+                        <PostTag
+                          v-for="(tag, tagIndex) in post.tags"
+                          :key="tagIndex"
+                          :tag="tag"
+                          route
+                        ></PostTag>
+                      </VSpace>
+                    </div>
                   </template>
                 </VEntityField>
               </template>

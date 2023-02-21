@@ -347,37 +347,37 @@ function handleClearKeyword() {
               </template>
               <template #start>
                 <VEntityField :title="post.post.spec.title" width="27rem">
-                  <template #extra>
-                    <VSpace class="mt-1 sm:mt-0">
-                      <PostTag
-                        v-for="(tag, tagIndex) in post.tags"
-                        :key="tagIndex"
-                        :tag="tag"
-                        route
-                      ></PostTag>
-                    </VSpace>
-                  </template>
                   <template #description>
-                    <VSpace class="flex-wrap !gap-y-1">
-                      <p
-                        v-if="post.categories.length"
-                        class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
-                      >
-                        分类：<span
-                          v-for="(category, categoryIndex) in post.categories"
-                          :key="categoryIndex"
-                          class="cursor-pointer hover:text-gray-900"
+                    <div class="flex flex-col gap-1.5">
+                      <VSpace class="flex-wrap !gap-y-1">
+                        <p
+                          v-if="post.categories.length"
+                          class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
                         >
-                          {{ category.spec.displayName }}
+                          分类：<span
+                            v-for="(category, categoryIndex) in post.categories"
+                            :key="categoryIndex"
+                            class="cursor-pointer hover:text-gray-900"
+                          >
+                            {{ category.spec.displayName }}
+                          </span>
+                        </p>
+                        <span class="text-xs text-gray-500">
+                          访问量 {{ post.stats.visit || 0 }}
                         </span>
-                      </p>
-                      <span class="text-xs text-gray-500">
-                        访问量 {{ post.stats.visit || 0 }}
-                      </span>
-                      <span class="text-xs text-gray-500">
-                        评论 {{ post.stats.totalComment || 0 }}
-                      </span>
-                    </VSpace>
+                        <span class="text-xs text-gray-500">
+                          评论 {{ post.stats.totalComment || 0 }}
+                        </span>
+                      </VSpace>
+                      <VSpace v-if="post.tags.length" class="flex-wrap">
+                        <PostTag
+                          v-for="(tag, tagIndex) in post.tags"
+                          :key="tagIndex"
+                          :tag="tag"
+                          route
+                        ></PostTag>
+                      </VSpace>
+                    </div>
                   </template>
                 </VEntityField>
               </template>
