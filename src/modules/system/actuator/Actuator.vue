@@ -78,6 +78,7 @@ const handleCopy = () => {
 - 构建时间：${formatDatetime(info.value?.build?.time)}
 - Git Commit：${info.value?.git?.commit.id}
 - Java：${info.value?.java.runtime.name} / ${info.value?.java.runtime.version}
+- 数据库：${info.value?.database.name} / ${info.value?.database.version}
 - 操作系统：${info.value?.os.name} / ${info.value?.os.version}
   `;
 
@@ -245,6 +246,14 @@ const handleDownloadLogfile = () => {
               <dt class="text-sm font-medium text-gray-900">Java</dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 {{ info.java.runtime.name }} / {{ info.java.runtime.version }}
+              </dd>
+            </div>
+            <div
+              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
+            >
+              <dt class="text-sm font-medium text-gray-900">数据库</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                {{ [info.database.name, info.database.version].join(" / ") }}
               </dd>
             </div>
             <div

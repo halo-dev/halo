@@ -12,6 +12,12 @@ export interface Info {
   build?: Build;
   java: Java;
   os: Os;
+  database: Database;
+}
+
+export interface Database {
+  name: string;
+  version: string;
 }
 
 export interface Commit {
