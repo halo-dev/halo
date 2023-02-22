@@ -14,95 +14,15 @@ import {
 } from "@halo-dev/components";
 import PluginListItem from "./components/PluginListItem.vue";
 import PluginUploadModal from "./components/PluginUploadModal.vue";
-import { computed, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
-import type { PluginList } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
-import { onBeforeRouteLeave } from "vue-router";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import FilteCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
+import { useQuery } from "@tanstack/vue-query";
+import type { Plugin } from "@halo-dev/api-client";
 
-const { currentUserHasPermission } = usePermission();
-
-const plugins = ref<PluginList>({
-  page: 1,
-  size: 20,
-  total: 0,
-  items: [],
-  first: true,
-  last: false,
-  hasNext: false,
-  hasPrevious: false,
-  totalPages: 0,
-});
-const loading = ref(false);
-const pluginInstall = ref(false);
-const keyword = ref("");
-const refreshInterval = ref();
-
-const handleFetchPlugins = async (options?: {
-  mute?: boolean;
-  page?: number;
-}) => {
-  try {
-    clearInterval(refreshInterval.value);
-
-    if (!options?.mute) {
-      loading.value = true;
-    }
-
-    if (options?.page) {
-      plugins.value.page = options.page;
-    }
-
-    const { data } = await apiClient.plugin.listPlugins({
-      page: plugins.value.page,
-      size: plugins.value.size,
-      keyword: keyword.value,
-      enabled: selectedEnabledItem.value?.value,
-      sort: [selectedSortItem.value?.value].filter(
-        (item) => !!item
-      ) as string[],
-    });
-
-    plugins.value = data;
-
-    const deletedPlugins = plugins.value.items.filter(
-      (plugin) => !!plugin.metadata.deletionTimestamp
-    );
-
-    if (deletedPlugins.length) {
-      refreshInterval.value = setInterval(() => {
-        handleFetchPlugins({ mute: true });
-      }, 3000);
-    }
-  } catch (e) {
-    console.error("Failed to fetch plugins", e);
-  } finally {
-    loading.value = false;
-  }
-};
-
-onBeforeRouteLeave(() => {
-  clearInterval(refreshInterval.value);
-});
-
-const handlePaginationChange = ({
-  page,
-  size,
-}: {
-  page: number;
-  size: number;
-}) => {
-  plugins.value.page = page;
-  plugins.value.size = size;
-  handleFetchPlugins();
-};
-
-onMounted(handleFetchPlugins);
-
-// Filters
 interface EnabledItem {
   label: string;
   value?: boolean;
@@ -113,6 +33,16 @@ interface SortItem {
   value: string;
 }
 
+const { currentUserHasPermission } = usePermission();
+
+const pluginInstall = ref(false);
+
+const keyword = ref("");
+const page = ref(1);
+const size = ref(20);
+const total = ref(0);
+
+// Filters
 const EnabledItems: EnabledItem[] = [
   {
     label: "全部",
@@ -144,12 +74,12 @@ const selectedSortItem = ref<SortItem>();
 
 function handleEnabledItemChange(enabledItem: EnabledItem) {
   selectedEnabledItem.value = enabledItem;
-  handleFetchPlugins({ page: 1 });
+  page.value = 1;
 }
 
 function handleSortItemChange(sortItem?: SortItem) {
   selectedSortItem.value = sortItem;
-  handleFetchPlugins({ page: 1 });
+  page.value = 1;
 }
 
 function handleKeywordChange() {
@@ -157,12 +87,12 @@ function handleKeywordChange() {
   if (keywordNode) {
     keyword.value = keywordNode._value as string;
   }
-  handleFetchPlugins({ page: 1 });
+  page.value = 1;
 }
 
 function handleClearKeyword() {
   keyword.value = "";
-  handleFetchPlugins({ page: 1 });
+  page.value = 1;
 }
 
 const hasFilters = computed(() => {
@@ -177,14 +107,47 @@ function handleClearFilters() {
   selectedEnabledItem.value = undefined;
   selectedSortItem.value = undefined;
   keyword.value = "";
-  handleFetchPlugins({ page: 1 });
+  page.value = 1;
 }
+
+const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
+  queryKey: [
+    "plugins",
+    page,
+    size,
+    keyword,
+    selectedEnabledItem,
+    selectedSortItem,
+  ],
+  queryFn: async () => {
+    const { data } = await apiClient.plugin.listPlugins({
+      page: page.value,
+      size: size.value,
+      keyword: keyword.value,
+      enabled: selectedEnabledItem.value?.value,
+      sort: [selectedSortItem.value?.value].filter(Boolean) as string[],
+    });
+
+    total.value = data.total;
+
+    return data.items;
+  },
+  refetchOnWindowFocus: false,
+  keepPreviousData: true,
+  refetchInterval: (data) => {
+    const deletingPlugins = data?.filter(
+      (plugin) => !!plugin.metadata.deletionTimestamp
+    );
+
+    return deletingPlugins?.length ? 3000 : false;
+  },
+});
 </script>
 <template>
   <PluginUploadModal
     v-if="currentUserHasPermission(['system:plugins:manage'])"
     v-model:visible="pluginInstall"
-    @close="handleFetchPlugins()"
+    @close="refetch()"
   />
 
   <VPageHeader title="插件">
@@ -302,11 +265,11 @@ function handleClearFilters() {
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                    @click="handleFetchPlugins()"
+                    @click="refetch()"
                   >
                     <IconRefreshLine
                       v-tooltip="`刷新`"
-                      :class="{ 'animate-spin text-gray-900': loading }"
+                      :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
                   </div>
@@ -317,16 +280,16 @@ function handleClearFilters() {
         </div>
       </template>
 
-      <VLoading v-if="loading" />
+      <VLoading v-if="isLoading" />
 
-      <Transition v-else-if="!plugins.total" appear name="fade">
+      <Transition v-else-if="!data?.length" appear name="fade">
         <VEmpty
           message="当前没有已安装的插件，你可以尝试刷新或者安装新插件"
           title="当前没有已安装的插件"
         >
           <template #actions>
             <VSpace>
-              <VButton @click="handleFetchPlugins()">刷新</VButton>
+              <VButton :loading="isFetching" @click="refetch()">刷新</VButton>
               <VButton
                 v-permission="['system:plugins:manage']"
                 type="secondary"
@@ -347,8 +310,8 @@ function handleClearFilters() {
           class="box-border h-full w-full divide-y divide-gray-100"
           role="list"
         >
-          <li v-for="(plugin, index) in plugins.items" :key="index">
-            <PluginListItem :plugin="plugin" @reload="handleFetchPlugins()" />
+          <li v-for="(plugin, index) in data" :key="index">
+            <PluginListItem :plugin="plugin" @reload="refetch()" />
           </li>
         </ul>
       </Transition>
@@ -356,11 +319,10 @@ function handleClearFilters() {
       <template #footer>
         <div class="bg-white sm:flex sm:items-center sm:justify-end">
           <VPagination
-            :page="plugins.page"
-            :size="plugins.size"
-            :total="plugins.total"
-            :size-options="[20, 30, 50, 100]"
-            @change="handlePaginationChange"
+            v-model:page="page"
+            v-model:size="size"
+            :total="total"
+            :size-options="[10, 20, 30, 50, 100]"
           />
         </div>
       </template>

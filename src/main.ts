@@ -21,6 +21,7 @@ import { useSystemStatesStore } from "./stores/system-states";
 import { useUserStore } from "./stores/user";
 import { useSystemConfigMapStore } from "./stores/system-configmap";
 import i18n from "./locales";
+import { VueQueryPlugin } from "@tanstack/vue-query";
 
 const app = createApp(App);
 
@@ -28,6 +29,7 @@ setupComponents(app);
 
 app.use(createPinia());
 app.use(i18n);
+app.use(VueQueryPlugin);
 
 function registerModule(pluginModule: PluginModule, core: boolean) {
   if (pluginModule.components) {
