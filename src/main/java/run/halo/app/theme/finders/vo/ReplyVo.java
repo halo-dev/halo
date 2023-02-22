@@ -2,6 +2,7 @@ package run.halo.app.theme.finders.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.Value;
@@ -16,21 +17,24 @@ import run.halo.app.extension.MetadataOperator;
  * @author guqing
  * @since 2.0.0
  */
-@Value
+@Data
 @Builder
 @ToString
 @EqualsAndHashCode
 public class ReplyVo implements ExtensionVoOperator {
 
     @Schema(required = true)
-    MetadataOperator metadata;
+    private MetadataOperator metadata;
 
     @Schema(required = true)
-    Reply.ReplySpec spec;
+    private Reply.ReplySpec spec;
 
     @With
     @Schema(required = true)
-    OwnerInfo owner;
+    private OwnerInfo owner;
+
+    @Schema(required = true)
+    private CommentStatsVo stats;
 
     /**
      * Convert {@link Reply} to {@link ReplyVo}.
