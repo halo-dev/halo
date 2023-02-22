@@ -6,6 +6,7 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import java.time.Instant;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
@@ -116,8 +117,15 @@ public class CommentEndpoint implements CustomEndpoint {
         return request.bodyToMono(ReplyRequest.class)
             .flatMap(replyRequest -> {
                 Reply reply = replyRequest.toReply();
+                // Create via console without audit
+                reply.getSpec().setApproved(true);
+                reply.getSpec().setApprovedTime(Instant.now());
                 reply.getSpec().setIpAddress(IpAddressUtils.getIpAddress(request));
                 reply.getSpec().setUserAgent(HaloUtils.userAgentFrom(request));
+                // fix gh-2951
+                if (reply.getSpec().getHidden() == null) {
+                    reply.getSpec().setHidden(false);
+                }
                 return replyService.create(commentName, reply);
             })
             .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
