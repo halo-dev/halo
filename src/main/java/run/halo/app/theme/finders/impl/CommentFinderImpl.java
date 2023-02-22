@@ -98,8 +98,8 @@ public class CommentFinderImpl implements CommentFinder {
                 .doOnNext(commentVo::setStats)
                 .thenReturn(commentVo))
             .flatMap(commentVo -> getOwnerInfo(owner)
-                .map(commentVo::withOwner)
-                .defaultIfEmpty(commentVo)
+                .doOnNext(commentVo::setOwner)
+                .thenReturn(commentVo)
             );
     }
 
@@ -120,8 +120,8 @@ public class CommentFinderImpl implements CommentFinder {
                 .doOnNext(replyVo::setStats)
                 .thenReturn(replyVo))
             .flatMap(replyVo -> getOwnerInfo(reply.getSpec().getOwner())
-                .map(replyVo::withOwner)
-                .defaultIfEmpty(replyVo)
+                .doOnNext(replyVo::setOwner)
+                .thenReturn(replyVo)
             );
     }
 

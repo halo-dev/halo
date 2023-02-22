@@ -4,10 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Value;
-import lombok.With;
 import run.halo.app.content.comment.OwnerInfo;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.extension.MetadataOperator;
@@ -31,7 +27,6 @@ public class CommentVo implements ExtensionVoOperator {
 
     private Comment.CommentStatus status;
 
-    @With
     @Schema(required = true)
     private OwnerInfo owner;
 

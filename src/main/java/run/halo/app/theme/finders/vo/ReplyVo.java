@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import lombok.Value;
-import lombok.With;
 import run.halo.app.content.comment.OwnerInfo;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.extension.MetadataOperator;
@@ -29,7 +27,6 @@ public class ReplyVo implements ExtensionVoOperator {
     @Schema(required = true)
     private Reply.ReplySpec spec;
 
-    @With
     @Schema(required = true)
     private OwnerInfo owner;
 
