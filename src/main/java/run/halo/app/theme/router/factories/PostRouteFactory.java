@@ -3,15 +3,20 @@ package run.halo.app.theme.router.factories;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.server.HandlerFunction;
@@ -55,73 +60,100 @@ public class PostRouteFactory implements RouteFactory {
 
     @Override
     public RouterFunction<ServerResponse> create(String pattern) {
-        PostRequestParamPredicate postParamPredicate =
-            new PostRequestParamPredicate(pattern);
+        PatternParser postParamPredicate =
+            new PatternParser(pattern);
         if (postParamPredicate.isQueryParamPattern()) {
-            RequestPredicate requestPredicate = postParamPredicate.requestPredicate();
-            return RouterFunctions.route(GET("/").and(requestPredicate), handlerFunction());
+            RequestPredicate requestPredicate = postParamPredicate.toRequestPredicate();
+            return RouterFunctions.route(GET("/")
+                .and(requestPredicate), queryParamHandlerFunction(postParamPredicate));
         }
         return RouterFunctions
             .route(GET(pattern).and(accept(MediaType.TEXT_HTML)), handlerFunction());
     }
 
+    HandlerFunction<ServerResponse> queryParamHandlerFunction(PatternParser paramPredicate) {
+        return request -> {
+            Map<String, String> variables = mergedVariables(request);
+            PostPatternVariable patternVariable = new PostPatternVariable();
+            Optional.ofNullable(variables.get(paramPredicate.getQueryParamName()))
+                .ifPresent(value -> {
+                    switch (paramPredicate.getPlaceholderName()) {
+                        case "name" -> patternVariable.setName(value);
+                        case "slug" -> patternVariable.setSlug(value);
+                        default ->
+                            throw new IllegalArgumentException("Unsupported query param predicate");
+                    }
+                });
+            return postResponse(request, patternVariable);
+        };
+    }
+
     HandlerFunction<ServerResponse> handlerFunction() {
         return request -> {
             PostPatternVariable patternVariable = PostPatternVariable.from(request);
-            Mono<PostVo> postVoMono = bestMatchPost(patternVariable);
-            return postVoMono
-                .flatMap(postVo -> {
-                    Map<String, Object> model = new HashMap<>();
-                    model.put("groupVersionKind", GroupVersionKind.fromExtension(Post.class));
-                    GVK gvk = Post.class.getAnnotation(GVK.class);
-                    model.put("plural", gvk.plural());
-                    model.put("post", postVo);
-
-                    String template = postVo.getSpec().getTemplate();
-                    return viewNameResolver.resolveViewNameOrDefault(request, template,
-                            DefaultTemplateEnum.POST.getValue())
-                        .flatMap(templateName -> ServerResponse.ok().render(templateName, model));
-                })
-                .switchIfEmpty(Mono.error(new NotFoundException("Post not found")));
+            return postResponse(request, patternVariable);
         };
+    }
+
+    @NonNull
+    private Mono<ServerResponse> postResponse(ServerRequest request,
+        PostPatternVariable patternVariable) {
+        Mono<PostVo> postVoMono = bestMatchPost(patternVariable);
+        return postVoMono
+            .flatMap(postVo -> {
+                Map<String, Object> model = new HashMap<>();
+                model.put("groupVersionKind", GroupVersionKind.fromExtension(Post.class));
+                GVK gvk = Post.class.getAnnotation(GVK.class);
+                model.put("plural", gvk.plural());
+                model.put("post", postVo);
+
+                String template = postVo.getSpec().getTemplate();
+                return viewNameResolver.resolveViewNameOrDefault(request, template,
+                        DefaultTemplateEnum.POST.getValue())
+                    .flatMap(templateName -> ServerResponse.ok().render(templateName, model));
+            });
     }
 
     Mono<PostVo> bestMatchPost(PostPatternVariable variable) {
         return postsByPredicates(variable)
             .filter(post -> {
                 Map<String, String> labels = ExtensionUtil.nullSafeLabels(post);
-                String year = labels.get(Post.ARCHIVE_YEAR_LABEL);
-                String month = labels.get(Post.ARCHIVE_MONTH_LABEL);
-                String day = labels.get(Post.ARCHIVE_DAY_LABEL);
                 return matchIfPresent(variable.getName(), post.getMetadata().getName())
                     && matchIfPresent(variable.getSlug(), post.getSpec().getSlug())
-                    && matchIfPresent(variable.getYear(), year)
-                    && matchIfPresent(variable.getMonth(), month)
-                    && matchIfPresent(variable.getDay(), day);
+                    && matchIfPresent(variable.getYear(), labels.get(Post.ARCHIVE_YEAR_LABEL))
+                    && matchIfPresent(variable.getMonth(), labels.get(Post.ARCHIVE_MONTH_LABEL))
+                    && matchIfPresent(variable.getDay(), labels.get(Post.ARCHIVE_DAY_LABEL));
             })
             .next()
-            .flatMap(post -> postFinder.getByName(post.getMetadata().getName()));
+            .flatMap(post -> postFinder.getByName(post.getMetadata().getName()))
+            .switchIfEmpty(Mono.error(new NotFoundException("Post not found")));
     }
 
     Flux<Post> postsByPredicates(PostPatternVariable patternVariable) {
-        // fetch post by name
         if (StringUtils.isNotBlank(patternVariable.getName())) {
-            return client.fetch(Post.class, patternVariable.getName())
-                .filter(PostFinderImpl.FIXED_PREDICATE)
-                .flux();
+            return fetchPostsByName(patternVariable.getName());
         }
+        if (StringUtils.isNotBlank(patternVariable.getSlug())) {
+            return fetchPostsBySlug(patternVariable.getSlug());
+        }
+        return Flux.empty();
+    }
 
+    private Flux<Post> fetchPostsByName(String name) {
+        return client.fetch(Post.class, name)
+            .filter(PostFinderImpl.FIXED_PREDICATE)
+            .flux();
+    }
+
+    private Flux<Post> fetchPostsBySlug(String slug) {
         return client.list(Post.class,
             post -> PostFinderImpl.FIXED_PREDICATE.test(post)
-                && matchIfPresent(patternVariable.getSlug(), post.getSpec().getSlug()),
+                && matchIfPresent(slug, post.getSpec().getSlug()),
             null);
     }
 
     private boolean matchIfPresent(String variable, String target) {
-        if (StringUtils.isBlank(variable)) {
-            return true;
-        }
-        return variable.equals(target);
+        return StringUtils.isBlank(variable) || StringUtils.equals(target, variable);
     }
 
     @Data
@@ -136,33 +168,35 @@ public class PostRouteFactory implements RouteFactory {
             Map<String, String> variables = mergedVariables(request);
             return JsonUtils.mapToObject(variables, PostPatternVariable.class);
         }
-
-        static Map<String, String> mergedVariables(ServerRequest request) {
-            Map<String, String> pathVariables = request.pathVariables();
-            MultiValueMap<String, String> queryParams = request.queryParams();
-            Map<String, String> mergedVariables = new LinkedHashMap<>();
-            for (String paramKey : queryParams.keySet()) {
-                mergedVariables.put(paramKey, queryParams.getFirst(paramKey));
-            }
-            // path variables higher priority will override query params
-            mergedVariables.putAll(pathVariables);
-            return mergedVariables;
-        }
     }
 
-    static class PostRequestParamPredicate {
-        static final String NAME_PARAM = "name";
-        static final String SLUG_PARAM = "slug";
+    static Map<String, String> mergedVariables(ServerRequest request) {
+        Map<String, String> pathVariables = request.pathVariables();
+        MultiValueMap<String, String> queryParams = request.queryParams();
+        Map<String, String> mergedVariables = new LinkedHashMap<>();
+        for (String paramKey : queryParams.keySet()) {
+            mergedVariables.put(paramKey, queryParams.getFirst(paramKey));
+        }
+        // path variables higher priority will override query params
+        mergedVariables.putAll(pathVariables);
+        return mergedVariables;
+    }
+
+    static class PatternParser {
+        private static final Pattern PATTERN_COMPILE = Pattern.compile("([^&?]*)=\\{(.*?)\\}(&|$)");
+        private static final Cache<String, Matcher> MATCHER_CACHE = CacheBuilder.newBuilder()
+            .maximumSize(5)
+            .build();
+
         private final String pattern;
         private String paramName;
         private String placeholderName;
-
         private final boolean isQueryParamPattern;
 
-        PostRequestParamPredicate(String pattern) {
+        PatternParser(String pattern) {
             this.pattern = pattern;
-            Matcher matcher = matchUrlParam(pattern);
-            if (matcher != null) {
+            Matcher matcher = patternToMatcher(pattern);
+            if (matcher.find()) {
                 this.paramName = matcher.group(1);
                 this.placeholderName = matcher.group(2);
                 this.isQueryParamPattern = true;
@@ -171,32 +205,28 @@ public class PostRouteFactory implements RouteFactory {
             }
         }
 
-        RequestPredicate requestPredicate() {
+        Matcher patternToMatcher(String pattern) {
+            try {
+                return MATCHER_CACHE.get(pattern, () -> PATTERN_COMPILE.matcher(pattern));
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        RequestPredicate toRequestPredicate() {
             if (!this.isQueryParamPattern) {
                 throw new IllegalStateException("Not a query param pattern: " + pattern);
             }
 
-            if (NAME_PARAM.equals(placeholderName)) {
-                return RequestPredicates.queryParam(paramName,
-                    name -> true);
-            }
-
-            if (SLUG_PARAM.equals(placeholderName)) {
-                return RequestPredicates.queryParam(paramName,
-                    slug -> true);
-            }
-            throw new IllegalArgumentException(
-                String.format("Unknown param value placeholder [%s] in pattern [%s]",
-                    placeholderName, pattern));
+            return RequestPredicates.queryParam(paramName, value -> true);
         }
 
-        Matcher matchUrlParam(String patternSequence) {
-            Pattern compile = Pattern.compile("([^&?]*)=\\{(.*?)\\}(&|$)");
-            Matcher matcher = compile.matcher(patternSequence);
-            if (matcher.find()) {
-                return matcher;
-            }
-            return null;
+        public String getPlaceholderName() {
+            return this.placeholderName;
+        }
+
+        public String getQueryParamName() {
+            return this.paramName;
         }
 
         public boolean isQueryParamPattern() {
