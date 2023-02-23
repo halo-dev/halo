@@ -102,7 +102,7 @@ class CommentSorterTest {
 
     @Test
     void sortByDefaultDesc() {
-        Comparator<Comment> defaultComparator = CommentSorter.defaultCommentComparator().reversed();
+        Comparator<Comment> defaultComparator = CommentSorter.lastReplyTimeComparator().reversed();
         List<String> commentNames = comments().stream()
             .sorted(defaultComparator)
             .map(comment -> comment.getMetadata().getName())
@@ -124,8 +124,9 @@ class CommentSorterTest {
         commentA.getMetadata().setName("A");
         // create time
         commentA.getMetadata().setCreationTimestamp(now.plusSeconds(10));
-
         commentA.setSpec(new Comment.CommentSpec());
+        commentA.getSpec().setCreationTime(commentA.getMetadata().getCreationTimestamp());
+
         commentA.setStatus(new Comment.CommentStatus());
         // last reply time
         commentA.getStatus().setLastReplyTime(now.plusSeconds(5));
@@ -140,6 +141,7 @@ class CommentSorterTest {
         commentB.setStatus(new Comment.CommentStatus());
         commentB.getStatus().setLastReplyTime(now.plusSeconds(15));
         commentB.getStatus().setReplyCount(8);
+        commentB.getSpec().setCreationTime(commentB.getMetadata().getCreationTimestamp());
 
         Comment commentC = new Comment();
         commentC.setMetadata(new Metadata());
@@ -151,6 +153,7 @@ class CommentSorterTest {
         commentC.setStatus(new Comment.CommentStatus());
         commentC.getStatus().setLastReplyTime(now.plusSeconds(3));
         commentC.getStatus().setReplyCount(10);
+        commentC.getSpec().setCreationTime(commentC.getMetadata().getCreationTimestamp());
 
         return List.of(commentA, commentB, commentC);
     }
@@ -165,6 +168,7 @@ class CommentSorterTest {
         commentD.getMetadata().setCreationTimestamp(now.plusSeconds(50));
 
         commentD.setSpec(new Comment.CommentSpec());
+        commentD.getSpec().setCreationTime(commentD.getMetadata().getCreationTimestamp());
         commentD.setStatus(new Comment.CommentStatus());
 
         Comment commentE = new Comment();
@@ -172,8 +176,8 @@ class CommentSorterTest {
         commentE.getMetadata().setName("E");
 
         commentE.getMetadata().setCreationTimestamp(now.plusSeconds(20));
-
         commentE.setSpec(new Comment.CommentSpec());
+        commentE.getSpec().setCreationTime(commentE.getMetadata().getCreationTimestamp());
         commentE.setStatus(new Comment.CommentStatus());
 
         List<Comment> comments = new ArrayList<>(comments());

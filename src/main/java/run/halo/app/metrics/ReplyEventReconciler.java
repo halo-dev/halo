@@ -1,14 +1,15 @@
 package run.halo.app.metrics;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.List;
-import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import run.halo.app.content.comment.ReplyService;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.event.post.ReplyEvent;
@@ -51,20 +52,24 @@ public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecy
             .filter(comment -> comment.getMetadata().getDeletionTimestamp() == null)
             .ifPresent(comment -> {
 
+                // order by reply creation time desc to get first as last reply time
                 List<Reply> replies = client.list(Reply.class,
                     record -> commentName.equals(record.getSpec().getCommentName())
                         && record.getMetadata().getDeletionTimestamp() == null,
-                    defaultReplyComparator());
+                    ReplyService.creationTimeAscComparator().reversed());
 
                 Comment.CommentStatus status = comment.getStatusOrDefault();
                 // total reply count
                 status.setReplyCount(replies.size());
 
                 // calculate last reply time
-                if (!replies.isEmpty()) {
-                    Instant lastReplyTime = replies.get(0).getMetadata().getCreationTimestamp();
-                    status.setLastReplyTime(lastReplyTime);
-                }
+                Instant lastReplyTime = replies.stream()
+                    .findFirst()
+                    .map(reply -> defaultIfNull(reply.getSpec().getCreationTime(),
+                        reply.getMetadata().getCreationTimestamp())
+                    )
+                    .orElse(null);
+                status.setLastReplyTime(lastReplyTime);
 
                 Instant lastReadTime = comment.getSpec().getLastReadTime();
                 status.setUnreadReplyCount(Comment.getUnreadReplyCount(replies, lastReadTime));
@@ -72,13 +77,6 @@ public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecy
                 client.update(comment);
             });
         return new Result(false, null);
-    }
-
-    Comparator<Reply> defaultReplyComparator() {
-        Function<Reply, Instant> createTime = reply -> reply.getMetadata().getCreationTimestamp();
-        return Comparator.comparing(createTime)
-            .thenComparing(reply -> reply.getMetadata().getName())
-            .reversed();
     }
 
     @Override
