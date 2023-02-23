@@ -2,6 +2,7 @@ package run.halo.app.core.extension.endpoint;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
@@ -16,6 +17,7 @@ import static run.halo.app.extension.GroupVersionKind.fromExtension;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +28,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -50,7 +51,7 @@ class UserEndpointTest {
 
     WebTestClient webClient;
 
-    @MockBean
+    @Mock
     RoleService roleService;
 
     @Mock
@@ -272,14 +273,14 @@ class UserEndpointTest {
 
         @Test
         void shouldResponseErrorIfUserNotFound() {
-            when(client.get(User.class, "fake-user"))
+            when(userService.getUser("fake-user"))
                 .thenReturn(Mono.error(
                     new ExtensionNotFoundException(fromExtension(User.class), "fake-user")));
             webClient.get().uri("/users/-")
                 .exchange()
                 .expectStatus().isNotFound();
 
-            verify(client).get(User.class, "fake-user");
+            verify(userService).getUser(eq("fake-user"));
         }
 
         @Test
@@ -288,13 +289,22 @@ class UserEndpointTest {
             metadata.setName("fake-user");
             var user = new User();
             user.setMetadata(metadata);
-            when(client.get(User.class, "fake-user")).thenReturn(Mono.just(user));
+            Map<String, String> annotations =
+                Map.of(User.ROLE_NAMES_ANNO, JsonUtils.objectToJson(Set.of("role-A")));
+            user.getMetadata().setAnnotations(annotations);
+            when(userService.getUser("fake-user")).thenReturn(Mono.just(user));
+            Role role = new Role();
+            role.setMetadata(new Metadata());
+            role.getMetadata().setName("role-A");
+            role.setRules(List.of());
+            when(roleService.list(anySet())).thenReturn(Flux.just(role));
             webClient.get().uri("/users/-")
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody(User.class)
-                .isEqualTo(user);
+                .expectBody(UserEndpoint.DetailedUser.class)
+                .isEqualTo(new UserEndpoint.DetailedUser(user, List.of(role)));
+            verify(roleService).list(eq(Set.of("role-A")));
         }
     }
 

@@ -35,6 +35,7 @@ import run.halo.app.core.extension.User;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.infra.exception.UserNotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,11 +52,10 @@ class UserServiceImplTest {
 
     @Test
     void shouldThrowExceptionIfUserNotFoundInExtension() {
-        when(client.get(User.class, "faker")).thenReturn(
+        when(client.get(eq(User.class), eq("faker"))).thenReturn(
             Mono.error(new ExtensionNotFoundException(fromExtension(User.class), "faker")));
-
         StepVerifier.create(userService.getUser("faker"))
-            .verifyError(ExtensionNotFoundException.class);
+            .verifyError(UserNotFoundException.class);
 
         verify(client, times(1)).get(eq(User.class), eq("faker"));
     }
@@ -275,12 +275,12 @@ class UserServiceImplTest {
 
         @Test
         void shouldThrowExceptionIfUserNotFound() {
-            when(client.get(User.class, "fake-user"))
+            when(client.get(eq(User.class), eq("fake-user")))
                 .thenReturn(Mono.error(
                     new ExtensionNotFoundException(fromExtension(User.class), "fake-user")));
 
             StepVerifier.create(userService.updateWithRawPassword("fake-user", "new-password"))
-                .verifyError(ExtensionNotFoundException.class);
+                .verifyError(UserNotFoundException.class);
 
             verify(passwordEncoder, never()).matches(anyString(), anyString());
             verify(passwordEncoder, never()).encode(anyString());

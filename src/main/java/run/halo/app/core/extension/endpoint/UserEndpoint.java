@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.endpoint;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static java.util.Comparator.comparing;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
@@ -9,7 +10,6 @@ import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersF
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import io.micrometer.common.util.StringUtils;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,6 +24,8 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
@@ -32,6 +34,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -41,25 +44,22 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.User;
+import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Comparators;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.extension.router.IListRequest;
-import run.halo.app.infra.exception.UserNotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
 
 @Component
+@RequiredArgsConstructor
 public class UserEndpoint implements CustomEndpoint {
 
     private static final String SELF_USER = "-";
     private final ReactiveExtensionClient client;
     private final UserService userService;
-
-    public UserEndpoint(ReactiveExtensionClient client, UserService userService) {
-        this.client = client;
-        this.userService = userService;
-    }
+    private final RoleService roleService;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -68,7 +68,12 @@ public class UserEndpoint implements CustomEndpoint {
             .GET("/users/-", this::me, builder -> builder.operationId("GetCurrentUserDetail")
                 .description("Get current user detail")
                 .tag(tag)
-                .response(responseBuilder().implementation(User.class)))
+                .response(responseBuilder().implementation(DetailedUser.class)))
+            .GET("/users/{name}", this::getUserByName,
+                builder -> builder.operationId("GetUserDetail")
+                    .description("Get user detail by name")
+                    .tag(tag)
+                    .response(responseBuilder().implementation(DetailedUser.class)))
             .PUT("/users/-", this::updateProfile,
                 builder -> builder.operationId("UpdateCurrentUser")
                     .description("Update current user profile, but password.")
@@ -117,6 +122,15 @@ public class UserEndpoint implements CustomEndpoint {
                 buildParametersFromType(builder, ListRequest.class);
             })
             .build();
+    }
+
+    private Mono<ServerResponse> getUserByName(ServerRequest request) {
+        final var name = request.pathVariable("name");
+        return userService.getUser(name)
+            .flatMap(this::toDetailedUser)
+            .flatMap(user -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(user));
     }
 
     private Mono<ServerResponse> updateProfile(ServerRequest request) {
@@ -173,13 +187,36 @@ public class UserEndpoint implements CustomEndpoint {
         return ReactiveSecurityContextHolder.getContext()
             .flatMap(ctx -> {
                 var name = ctx.getAuthentication().getName();
-                return client.get(User.class, name)
-                    .onErrorMap(ExtensionNotFoundException.class,
-                        e -> new UserNotFoundException(name));
+                return userService.getUser(name);
             })
+            .flatMap(this::toDetailedUser)
             .flatMap(user -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(user));
+    }
+
+    private Mono<DetailedUser> toDetailedUser(User user) {
+        Set<String> roleNames = roleNames(user);
+        return roleService.list(roleNames)
+            .collectList()
+            .map(roles -> new DetailedUser(user, roles))
+            .defaultIfEmpty(new DetailedUser(user, List.of()));
+    }
+
+    Set<String> roleNames(User user) {
+        Assert.notNull(user, "User must not be null");
+        Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(user);
+        String roleNamesJson = annotations.get(User.ROLE_NAMES_ANNO);
+        if (StringUtils.isBlank(roleNamesJson)) {
+            return Set.of();
+        }
+        return JsonUtils.jsonToObject(roleNamesJson, new TypeReference<>() {
+        });
+    }
+
+    record DetailedUser(@Schema(requiredMode = REQUIRED) User user,
+                        @Schema(requiredMode = REQUIRED) List<Role> role) {
+
     }
 
     @NonNull

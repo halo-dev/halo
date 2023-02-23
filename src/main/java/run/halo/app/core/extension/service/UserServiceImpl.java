@@ -16,6 +16,8 @@ import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.infra.exception.UserNotFoundException;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -31,7 +33,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<User> getUser(String username) {
-        return client.get(User.class, username);
+        return client.get(User.class, username)
+            .onErrorMap(ExtensionNotFoundException.class,
+                e -> new UserNotFoundException(username));
     }
 
     @Override
