@@ -1,5 +1,6 @@
 package run.halo.app.plugin;
 
+import java.util.Map;
 import org.springframework.context.event.EventListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -39,6 +40,14 @@ public class PluginBeforeStopSyncListener {
         return Flux.fromIterable(gvkExtensionNames.entrySet())
             .flatMap(entry -> Flux.fromIterable(entry.getValue())
                 .flatMap(extensionName -> client.fetch(entry.getKey(), extensionName))
+                .filter(unstructured -> {
+                    Map<String, String> annotations = unstructured.getMetadata().getAnnotations();
+                    if (annotations == null) {
+                        return true;
+                    }
+                    String stage = PluginConst.DeleteStage.STOP.name();
+                    return stage.equals(annotations.getOrDefault(PluginConst.DELETE_STAGE, stage));
+                })
                 .flatMap(client::delete))
             .then();
     }

@@ -31,6 +31,9 @@ public class ConditionList extends AbstractCollection<Condition> {
     }
 
     public boolean addFirst(@NonNull Condition condition) {
+        if (isSame(conditions.peekFirst(), condition)) {
+            return false;
+        }
         conditions.addFirst(condition);
         return true;
     }
