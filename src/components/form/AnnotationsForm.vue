@@ -100,22 +100,23 @@ const handleProcessCustomAnnotations = () => {
     })
     .filter((item) => item) as { key: string; value: string }[];
 
-  annotations.value = Object.entries(props.value || {})
-    .map(([key, value]) => {
-      const fromThemeSpec = formSchemas.some((item) => {
-        if (typeof item === "object" && "$formkit" in item) {
-          return item.name === key;
+  annotations.value = formSchemas
+    .map((item) => {
+      if (typeof item === "object" && "$formkit" in item) {
+        if (props.value && item.name in props.value) {
+          return {
+            key: item.name,
+            value: props.value[item.name],
+          };
+        } else {
+          return {
+            key: item.name,
+            value: item.value,
+          };
         }
-        return false;
-      });
-      if (fromThemeSpec) {
-        return {
-          key,
-          value,
-        };
       }
     })
-    .filter((item) => item)
+    .filter(Boolean)
     .reduce((acc, cur) => {
       if (cur) {
         acc[cur.key] = cur.value;
