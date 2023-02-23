@@ -5,7 +5,6 @@ import static java.util.Comparator.comparing;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
-import static run.halo.app.extension.ListResult.generateGenericClass;
 import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
@@ -48,6 +47,7 @@ import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Comparators;
 import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.infra.utils.JsonUtils;
@@ -124,7 +124,7 @@ public class UserEndpoint implements CustomEndpoint {
                 builder.operationId("ListUsers")
                     .tag(tag)
                     .description("List users")
-                    .response(responseBuilder().implementation(generateGenericClass(User.class)));
+                    .response(responseBuilder().implementation(ListedUser.class));
                 buildParametersFromType(builder, ListRequest.class);
             })
             .build();
@@ -375,6 +375,10 @@ public class UserEndpoint implements CustomEndpoint {
         }
     }
 
+    record ListedUser(@Schema(requiredMode = REQUIRED) User user,
+                      @Schema(requiredMode = REQUIRED) List<Role> roles) {
+    }
+
     Mono<ServerResponse> list(ServerRequest request) {
         return Mono.just(request)
             .map(UserEndpoint.ListRequest::new)
@@ -387,6 +391,28 @@ public class UserEndpoint implements CustomEndpoint {
                     listRequest.getPage(),
                     listRequest.getSize());
             })
+            .flatMap(this::toListedUser)
             .flatMap(listResult -> ServerResponse.ok().bodyValue(listResult));
+    }
+
+    private Mono<ListResult<ListedUser>> toListedUser(ListResult<User> listResult) {
+        return Flux.fromStream(listResult.get())
+            .flatMap(user -> {
+                Set<String> roleNames = roleNames(user);
+                return roleService.list(roleNames)
+                    .collectList()
+                    .map(roles -> new ListedUser(user, roles))
+                    .defaultIfEmpty(new ListedUser(user, List.of()));
+            })
+            .collectList()
+            .map(items -> convertFrom(listResult, items))
+            .defaultIfEmpty(convertFrom(listResult, List.of()));
+    }
+
+    <T> ListResult<T> convertFrom(ListResult<?> listResult, List<T> items) {
+        Assert.notNull(listResult, "listResult must not be null");
+        Assert.notNull(items, "items must not be null");
+        return new ListResult<>(listResult.getPage(), listResult.getSize(),
+            listResult.getTotal(), items);
     }
 }

@@ -105,6 +105,7 @@ class UserEndpointTest {
                 createUser("fake-user-3")
             );
             var expectResult = new ListResult<>(users);
+            when(roleService.list(anySet())).thenReturn(Flux.empty());
             when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
                 .thenReturn(Mono.just(expectResult));
 
@@ -132,6 +133,7 @@ class UserEndpointTest {
             var expectResult = new ListResult<>(users);
             when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
                 .thenReturn(Mono.just(expectResult));
+            when(roleService.list(anySet())).thenReturn(Flux.empty());
 
             bindToRouterFunction(endpoint.endpoint())
                 .build()
@@ -191,6 +193,7 @@ class UserEndpointTest {
             var expectResult = new ListResult<>(users);
             when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
                 .thenReturn(Mono.just(expectResult));
+            when(roleService.list(anySet())).thenReturn(Flux.empty());
 
             bindToRouterFunction(endpoint.endpoint())
                 .build()
@@ -216,6 +219,7 @@ class UserEndpointTest {
             var expectResult = new ListResult<>(List.of(expectUser));
             when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
                 .thenReturn(Mono.just(expectResult));
+            when(roleService.list(anySet())).thenReturn(Flux.empty());
 
             bindToRouterFunction(endpoint.endpoint())
                 .build()
