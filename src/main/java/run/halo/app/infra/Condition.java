@@ -5,9 +5,13 @@ import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
+ * EqualsAndHashCode 排除了lastTransitionTime否则失败时，lastTransitionTime 会被更新
+ * 导致 equals 为 false，一直被加入队列.
+ *
  * @author guqing
  * @see
  * <a href="https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions">pod-conditions</a>
@@ -17,6 +21,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(exclude = "lastTransitionTime")
 public class Condition {
     /**
      * type of condition in CamelCase or in foo.example.com/CamelCase.
