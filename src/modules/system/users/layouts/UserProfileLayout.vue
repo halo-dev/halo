@@ -1,13 +1,7 @@
 <script lang="ts" setup>
 import BasicLayout from "@/layouts/BasicLayout.vue";
 import { apiClient } from "@/utils/api-client";
-import {
-  IconUpload,
-  VButton,
-  VSpace,
-  VTabbar,
-  VAvatar,
-} from "@halo-dev/components";
+import { VButton, VSpace, VTabbar, VAvatar } from "@halo-dev/components";
 import { computed, onMounted, provide, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import type { User } from "@halo-dev/api-client";
@@ -33,6 +27,7 @@ const tabs = [
 ];
 
 const user = ref<User>();
+const loading = ref();
 const editingModal = ref(false);
 const passwordChangeModal = ref(false);
 
@@ -40,6 +35,7 @@ const { params } = useRoute();
 
 const handleFetchUser = async () => {
   try {
+    loading.value = true;
     if (params.name === "-") {
       const { data } = await apiClient.user.getCurrentUserDetail();
       user.value = data;
@@ -51,6 +47,8 @@ const handleFetchUser = async () => {
     }
   } catch (e) {
     console.error(e);
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -103,70 +101,59 @@ const handleTabChange = (id: string) => {
       @close="handleFetchUser"
     />
     <header class="bg-white">
-      <div class="h-48 bg-gradient-to-r from-gray-800 to-red-500"></div>
-      <div class="px-4">
-        <div class="-mt-12 flex items-end space-x-5 sm:-mt-16">
-          <div v-if="user?.spec?.avatar" class="inline-flex items-center">
-            <div class="h-24 w-24 sm:h-32 sm:w-32">
+      <div class="p-4">
+        <div class="flex items-center justify-between">
+          <div class="flex flex-row items-center gap-5">
+            <div class="h-20 w-20">
               <VAvatar
-                :src="user?.spec?.avatar"
-                :alt="user?.spec?.displayName"
+                v-if="user"
+                :src="user?.spec.avatar"
+                :alt="user?.spec.displayName"
                 circle
                 width="100%"
                 height="100%"
-                class="ring-4 ring-white drop-shadow-lg"
+                class="ring-4 ring-white drop-shadow-md"
               />
+            </div>
+            <div class="block">
+              <h1 class="truncate text-lg font-bold text-gray-900">
+                {{ user?.spec.displayName }}
+              </h1>
+              <span v-if="!loading" class="text-sm text-gray-600">
+                @{{ user?.metadata.name }}
+              </span>
             </div>
           </div>
           <div
-            class="mt-6 sm:flex sm:min-w-0 sm:flex-1 sm:items-center sm:justify-end sm:space-x-6 sm:pb-1"
-            :class="{ '!mt-12': !user?.spec?.avatar }"
+            v-if="
+              currentUserHasPermission(['system:users:manage']) || isCurrentUser
+            "
           >
-            <div class="mt-6 block min-w-0 flex-1">
-              <h1 class="truncate text-xl font-bold text-gray-900">
-                <span class="mr-1">{{ user?.spec?.displayName }}</span>
-              </h1>
-              <h2 class="text-gray-600">@{{ user?.metadata.name }}</h2>
-            </div>
-            <div
-              v-if="
-                currentUserHasPermission(['system:users:manage']) ||
-                isCurrentUser
-              "
-              class="justify-stretch mt-6 hidden flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4 md:flex"
-            >
-              <FloatingDropdown>
-                <VButton type="default">编辑</VButton>
-                <template #popper>
-                  <div class="w-48 p-2">
-                    <VSpace class="w-full" direction="column">
-                      <VButton
-                        v-close-popper
-                        block
-                        type="secondary"
-                        @click="editingModal = true"
-                      >
-                        修改资料
-                      </VButton>
-                      <VButton
-                        v-close-popper
-                        block
-                        @click="passwordChangeModal = true"
-                      >
-                        修改密码
-                      </VButton>
-                    </VSpace>
-                  </div>
-                </template>
-              </FloatingDropdown>
-            </div>
+            <FloatingDropdown>
+              <VButton type="default">编辑</VButton>
+              <template #popper>
+                <div class="w-48 p-2">
+                  <VSpace class="w-full" direction="column">
+                    <VButton
+                      v-close-popper
+                      block
+                      type="secondary"
+                      @click="editingModal = true"
+                    >
+                      修改资料
+                    </VButton>
+                    <VButton
+                      v-close-popper
+                      block
+                      @click="passwordChangeModal = true"
+                    >
+                      修改密码
+                    </VButton>
+                  </VSpace>
+                </div>
+              </template>
+            </FloatingDropdown>
           </div>
-        </div>
-      </div>
-
-      <div class="absolute top-6 right-6">
-        <div class="">
-          <IconUpload v-if="false" class="text-white" />
         </div>
       </div>
     </header>
