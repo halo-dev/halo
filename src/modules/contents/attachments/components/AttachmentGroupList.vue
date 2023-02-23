@@ -163,9 +163,9 @@ const handleDeleteWithAttachments = (group: Group) => {
 };
 
 watch(
-  () => groups.value.length,
+  () => groups.value?.length,
   () => {
-    const allGroups = [...defaultGroups, ...groups.value];
+    const allGroups = [...defaultGroups, ...(groups.value || [])];
     const groupIndex = allGroups.findIndex(
       (group) => group.metadata.name === routeQuery.value
     );
@@ -178,9 +178,8 @@ watch(
 
 onMounted(async () => {
   await handleFetchGroups();
-
   if (routeQuery.value && !props.readonly) {
-    const allGroups = [...defaultGroups, ...groups.value];
+    const allGroups = [...defaultGroups, ...(groups.value || [])];
     const group = allGroups.find(
       (group) => group.metadata.name === routeQuery.value
     );

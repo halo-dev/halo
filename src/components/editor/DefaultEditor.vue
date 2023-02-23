@@ -339,7 +339,7 @@ const editor = useEditor({
 });
 
 // image drag and paste upload
-const { policies } = useFetchAttachmentPolicy({ fetchOnMounted: true });
+const { policies } = useFetchAttachmentPolicy();
 
 type Task = {
   file: File;
@@ -349,7 +349,7 @@ type Task = {
 const uploadQueue: queueAsPromised<Task> = fastq.promise(asyncWorker, 1);
 
 async function asyncWorker(arg: Task): Promise<void> {
-  if (!policies.value.length) {
+  if (!policies.value?.length) {
     Toast.warning("目前没有可用的存储策略");
     return;
   }

@@ -51,10 +51,8 @@ const policyVisible = ref(false);
 const uploadVisible = ref(false);
 const detailVisible = ref(false);
 
-const { policies } = useFetchAttachmentPolicy({ fetchOnMounted: true });
-const { groups, handleFetchGroups } = useFetchAttachmentGroup({
-  fetchOnMounted: true,
-});
+const { policies } = useFetchAttachmentPolicy();
+const { groups, handleFetchGroups } = useFetchAttachmentGroup();
 
 const selectedGroup = ref<Group>();
 
@@ -85,26 +83,24 @@ const SortItems: SortItem[] = [
 
 const selectedPolicy = ref<Policy>();
 const selectedUser = ref<User>();
-const keyword = ref<string>("");
 const selectedSortItem = ref<SortItem>();
-
 const selectedSortItemValue = computed(() => {
   return selectedSortItem.value?.value;
 });
 
 function handleSelectPolicy(policy: Policy | undefined) {
   selectedPolicy.value = policy;
-  handleFetchAttachments({ page: 1 });
+  page.value = 1;
 }
 
 function handleSelectUser(user: User | undefined) {
   selectedUser.value = user;
-  handleFetchAttachments({ page: 1 });
+  page.value = 1;
 }
 
 function handleSortItemChange(sortItem?: SortItem) {
   selectedSortItem.value = sortItem;
-  handleFetchAttachments({ page: 1 });
+  page.value = 1;
 }
 
 function handleKeywordChange() {
@@ -112,12 +108,12 @@ function handleKeywordChange() {
   if (keywordNode) {
     keyword.value = keywordNode._value as string;
   }
-  handleFetchAttachments({ page: 1 });
+  page.value = 1;
 }
 
 function handleClearKeyword() {
   keyword.value = "";
-  handleFetchAttachments({ page: 1 });
+  page.value = 1;
 }
 
 const hasFilters = computed(() => {
@@ -134,19 +130,24 @@ function handleClearFilters() {
   selectedUser.value = undefined;
   selectedSortItem.value = undefined;
   keyword.value = "";
-  handleFetchAttachments({ page: 1 });
+  page.value = 1;
 }
+
+const keyword = ref<string>("");
+const page = ref<number>(1);
+const size = ref<number>(20);
 
 const {
   attachments,
   selectedAttachment,
   selectedAttachments,
   checkedAll,
-  loading,
+  isLoading,
+  isFetching,
+  total,
   handleFetchAttachments,
   handleSelectNext,
   handleSelectPrevious,
-  handlePaginationChange,
   handleDelete,
   handleDeleteInBatch,
   handleCheckAll,
@@ -159,6 +160,8 @@ const {
   user: selectedUser,
   keyword: keyword,
   sort: selectedSortItemValue,
+  page: page,
+  size: size,
 });
 
 const handleMove = async (group: Group) => {
@@ -209,21 +212,16 @@ const onDetailModalClose = () => {
   selectedAttachment.value = undefined;
   nameQuery.value = undefined;
   nameQueryAttachment.value = undefined;
-  handleFetchAttachments({ mute: true });
+  handleFetchAttachments();
 };
 
 const onUploadModalClose = () => {
   routeQueryAction.value = undefined;
-  handleFetchAttachments({ mute: true });
-};
-
-const onGroupChange = () => {
-  handleReset();
   handleFetchAttachments();
 };
 
 const getPolicyName = (name: string | undefined) => {
-  const policy = policies.value.find((p) => p.metadata.name === name);
+  const policy = policies.value?.find((p) => p.metadata.name === name);
   return policy?.spec.displayName;
 };
 
@@ -548,7 +546,7 @@ onMounted(() => {
                       >
                         <IconRefreshLine
                           v-tooltip="`刷新`"
-                          :class="{ 'animate-spin text-gray-900': loading }"
+                          :class="{ 'animate-spin text-gray-900': isFetching }"
                           class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                         />
                       </div>
@@ -562,15 +560,15 @@ onMounted(() => {
           <div :style="`${viewType === 'list' ? 'padding:12px 16px 0' : ''}`">
             <AttachmentGroupList
               v-model:selected-group="selectedGroup"
-              @select="onGroupChange"
+              @select="handleReset"
               @update="handleFetchGroups"
               @reload-attachments="handleFetchAttachments"
             />
           </div>
 
-          <VLoading v-if="loading" />
+          <VLoading v-if="isLoading" />
 
-          <Transition v-else-if="!attachments.total" appear name="fade">
+          <Transition v-else-if="!attachments?.length" appear name="fade">
             <VEmpty
               message="当前分组没有附件，你可以尝试刷新或者上传附件"
               title="当前分组没有附件"
@@ -600,7 +598,7 @@ onMounted(() => {
                 role="list"
               >
                 <VCard
-                  v-for="(attachment, index) in attachments.items"
+                  v-for="(attachment, index) in attachments"
                   :key="index"
                   :body-class="['!p-0']"
                   :class="{
@@ -680,10 +678,7 @@ onMounted(() => {
                 class="box-border h-full w-full divide-y divide-gray-100"
                 role="list"
               >
-                <li
-                  v-for="(attachment, index) in attachments.items"
-                  :key="index"
-                >
+                <li v-for="(attachment, index) in attachments" :key="index">
                   <VEntity :is-selected="isChecked(attachment)">
                     <template
                       v-if="
@@ -797,11 +792,10 @@ onMounted(() => {
           <template #footer>
             <div class="bg-white sm:flex sm:items-center sm:justify-end">
               <VPagination
-                :page="attachments.page"
-                :size="attachments.size"
-                :total="attachments.total"
+                v-model:page="page"
+                v-model:size="size"
+                :total="total"
                 :size-options="[60, 120, 200]"
-                @change="handlePaginationChange"
               />
             </div>
           </template>

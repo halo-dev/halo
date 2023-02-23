@@ -1,32 +1,21 @@
-import type {
-  Attachment,
-  AttachmentList,
-  Group,
-  Policy,
-  User,
-} from "@halo-dev/api-client";
+import type { Attachment, Group, Policy, User } from "@halo-dev/api-client";
 import type { Ref } from "vue";
 import { ref, watch } from "vue";
 import type { AttachmentLike } from "@halo-dev/console-shared";
 import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import type { Content, Editor } from "@halo-dev/richtext-editor";
-import { onBeforeRouteLeave } from "vue-router";
+import { useQuery } from "@tanstack/vue-query";
 
 interface useAttachmentControlReturn {
-  attachments: Ref<AttachmentList>;
-  loading: Ref<boolean>;
+  attachments: Ref<Attachment[] | undefined>;
+  isLoading: Ref<boolean>;
+  isFetching: Ref<boolean>;
   selectedAttachment: Ref<Attachment | undefined>;
   selectedAttachments: Ref<Set<Attachment>>;
   checkedAll: Ref<boolean>;
-  handleFetchAttachments: (options?: { mute?: boolean; page?: number }) => void;
-  handlePaginationChange: ({
-    page,
-    size,
-  }: {
-    page: number;
-    size: number;
-  }) => void;
+  total: Ref<number>;
+  handleFetchAttachments: () => void;
   handleSelectPrevious: () => void;
   handleSelectNext: () => void;
   handleDelete: (attachment: Attachment) => void;
@@ -41,124 +30,95 @@ interface useAttachmentSelectReturn {
   onAttachmentSelect: (attachments: AttachmentLike[]) => void;
 }
 
-export function useAttachmentControl(filterOptions?: {
+export function useAttachmentControl(filterOptions: {
   policy?: Ref<Policy | undefined>;
   group?: Ref<Group | undefined>;
   user?: Ref<User | undefined>;
   keyword?: Ref<string | undefined>;
   sort?: Ref<string | undefined>;
+  page: Ref<number>;
+  size: Ref<number>;
 }): useAttachmentControlReturn {
-  const { user, policy, group, keyword, sort } = filterOptions || {};
-
-  const attachments = ref<AttachmentList>({
-    page: 1,
-    size: 60,
-    total: 0,
-    items: [],
-    first: true,
-    last: false,
-    hasNext: false,
-    hasPrevious: false,
-    totalPages: 0,
-  });
-  const loading = ref<boolean>(false);
+  const { user, policy, group, keyword, sort, page, size } = filterOptions;
 
   const selectedAttachment = ref<Attachment>();
   const selectedAttachments = ref<Set<Attachment>>(new Set<Attachment>());
   const checkedAll = ref(false);
-  const refreshInterval = ref();
 
-  const handleFetchAttachments = async (options?: {
-    mute?: boolean;
-    page?: number;
-  }) => {
-    try {
-      clearInterval(refreshInterval.value);
+  const total = ref(0);
+  const hasPrevious = ref(false);
+  const hasNext = ref(false);
 
-      if (!options?.mute) {
-        loading.value = true;
-      }
-
-      if (options?.page) {
-        attachments.value.page = options.page;
-      }
-
+  const { data, isLoading, isFetching, refetch } = useQuery<Attachment[]>({
+    queryKey: ["attachments", policy, keyword, group, user, page, size, sort],
+    queryFn: async () => {
       const { data } = await apiClient.attachment.searchAttachments({
         policy: policy?.value?.metadata.name,
         displayName: keyword?.value,
         group: group?.value?.metadata.name,
         ungrouped: group?.value?.metadata.name === "ungrouped",
         uploadedBy: user?.value?.metadata.name,
-        page: attachments.value.page,
-        size: attachments.value.size,
+        page: page?.value,
+        size: size?.value,
         sort: [sort?.value as string].filter(Boolean),
       });
-      attachments.value = data;
 
-      const deletedAttachments = attachments.value.items.filter(
+      total.value = data.total;
+      hasPrevious.value = data.hasPrevious;
+      hasNext.value = data.hasNext;
+
+      return data.items;
+    },
+    refetchInterval(data) {
+      const deletingAttachments = data?.filter(
         (attachment) => !!attachment.metadata.deletionTimestamp
       );
-
-      if (deletedAttachments.length) {
-        refreshInterval.value = setInterval(() => {
-          handleFetchAttachments({ mute: true });
-        }, 3000);
-      }
-    } catch (e) {
-      console.error("Failed to fetch attachments", e);
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  onBeforeRouteLeave(() => {
-    clearInterval(refreshInterval.value);
+      return deletingAttachments?.length ? 3000 : false;
+    },
+    refetchOnWindowFocus: false,
   });
 
-  const handlePaginationChange = async ({
-    page,
-    size,
-  }: {
-    page: number;
-    size: number;
-  }) => {
-    attachments.value.page = page;
-    attachments.value.size = size;
-    await handleFetchAttachments();
-  };
-
   const handleSelectPrevious = async () => {
-    const { items, hasPrevious } = attachments.value;
-    const index = items.findIndex(
+    if (!data.value) return;
+
+    const index = data.value?.findIndex(
       (attachment) =>
         attachment.metadata.name === selectedAttachment.value?.metadata.name
     );
+
+    if (index === undefined) return;
+
     if (index > 0) {
-      selectedAttachment.value = items[index - 1];
+      selectedAttachment.value = data.value[index - 1];
       return;
     }
+
     if (index === 0 && hasPrevious) {
-      attachments.value.page--;
-      await handleFetchAttachments();
-      selectedAttachment.value =
-        attachments.value.items[attachments.value.items.length - 1];
+      page.value--;
+      await refetch();
+      selectedAttachment.value = data.value[data.value.length - 1];
     }
   };
 
   const handleSelectNext = async () => {
-    const { items, hasNext } = attachments.value;
-    const index = items.findIndex(
+    if (!data.value) return;
+
+    const index = data.value?.findIndex(
       (attachment) =>
         attachment.metadata.name === selectedAttachment.value?.metadata.name
     );
-    if (index < items.length - 1) {
-      selectedAttachment.value = items[index + 1];
+
+    if (index === undefined) return;
+
+    if (index < data.value?.length - 1) {
+      selectedAttachment.value = data.value[index + 1];
       return;
     }
-    if (index === items.length - 1 && hasNext) {
-      attachments.value.page++;
-      await handleFetchAttachments();
-      selectedAttachment.value = attachments.value.items[0];
+
+    if (index === data.value.length - 1 && hasNext) {
+      page.value++;
+      await refetch();
+      selectedAttachment.value = data.value[0];
     }
   };
 
@@ -185,7 +145,7 @@ export function useAttachmentControl(filterOptions?: {
         } catch (e) {
           console.error("Failed to delete attachment", e);
         } finally {
-          await handleFetchAttachments();
+          await refetch();
         }
       },
     });
@@ -214,7 +174,7 @@ export function useAttachmentControl(filterOptions?: {
         } catch (e) {
           console.error("Failed to delete attachments", e);
         } finally {
-          await handleFetchAttachments();
+          await refetch();
         }
       },
     });
@@ -222,7 +182,7 @@ export function useAttachmentControl(filterOptions?: {
 
   const handleCheckAll = (checkAll: boolean) => {
     if (checkAll) {
-      attachments.value.items.forEach((attachment) => {
+      data.value?.forEach((attachment) => {
         selectedAttachments.value.add(attachment);
       });
     } else {
@@ -242,7 +202,7 @@ export function useAttachmentControl(filterOptions?: {
   watch(
     () => selectedAttachments.value.size,
     (newValue) => {
-      checkedAll.value = newValue === attachments.value.items?.length;
+      checkedAll.value = newValue === data.value?.length;
     }
   );
 
@@ -256,20 +216,21 @@ export function useAttachmentControl(filterOptions?: {
   };
 
   const handleReset = () => {
-    attachments.value.page = 1;
+    page.value = 1;
     selectedAttachment.value = undefined;
     selectedAttachments.value.clear();
     checkedAll.value = false;
   };
 
   return {
-    attachments,
-    loading,
+    attachments: data,
+    isLoading,
+    isFetching,
     selectedAttachment,
     selectedAttachments,
     checkedAll,
-    handleFetchAttachments,
-    handlePaginationChange,
+    total,
+    handleFetchAttachments: refetch,
     handleSelectPrevious,
     handleSelectNext,
     handleDelete,

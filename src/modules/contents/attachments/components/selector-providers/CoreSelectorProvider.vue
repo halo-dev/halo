@@ -38,20 +38,22 @@ const emit = defineEmits<{
 }>();
 
 const selectedGroup = ref<Group>();
+const page = ref(1);
+const size = ref(60);
 
 const {
   attachments,
-  loading,
+  isLoading,
+  total,
   selectedAttachment,
   selectedAttachments,
   handleFetchAttachments,
-  handlePaginationChange,
   handleSelect,
   handleSelectPrevious,
   handleSelectNext,
   handleReset,
   isChecked,
-} = useAttachmentControl({ group: selectedGroup });
+} = useAttachmentControl({ group: selectedGroup, page, size });
 
 const uploadVisible = ref(false);
 const detailVisible = ref(false);
@@ -64,21 +66,14 @@ const handleOpenDetail = (attachment: Attachment) => {
   selectedAttachment.value = attachment;
   detailVisible.value = true;
 };
-
-const onGroupChange = () => {
-  handleReset();
-  handleFetchAttachments();
-};
-
-await handleFetchAttachments();
 </script>
 <template>
   <AttachmentGroupList
     v-model:selected-group="selectedGroup"
     readonly
-    @select="onGroupChange"
+    @select="handleReset"
   />
-  <div v-if="attachments.total > 0" class="mb-5">
+  <div v-if="attachments?.length" class="mb-5">
     <VButton @click="uploadVisible = true">
       <template #icon>
         <IconUpload class="h-full w-full" />
@@ -87,7 +82,7 @@ await handleFetchAttachments();
     </VButton>
   </div>
   <VEmpty
-    v-if="!attachments.total && !loading"
+    v-if="!attachments?.length && !isLoading"
     message="当前没有附件，你可以尝试刷新或者上传附件"
     title="当前没有附件"
   >
@@ -109,7 +104,7 @@ await handleFetchAttachments();
     role="list"
   >
     <VCard
-      v-for="(attachment, index) in attachments.items"
+      v-for="(attachment, index) in attachments"
       :key="index"
       :body-class="['!p-0']"
       :class="{
@@ -171,11 +166,10 @@ await handleFetchAttachments();
   </div>
   <div class="mt-4 bg-white sm:flex sm:items-center sm:justify-end">
     <VPagination
-      :page="attachments.page"
-      :size="attachments.size"
-      :total="attachments.total"
+      v-model:page="page"
+      v-model:size="size"
+      :total="total"
       :size-options="[60, 120, 200]"
-      @change="handlePaginationChange"
     />
   </div>
   <AttachmentUploadModal

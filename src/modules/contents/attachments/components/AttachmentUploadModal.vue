@@ -25,14 +25,9 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const { groups, handleFetchGroups } = useFetchAttachmentGroup({
-  fetchOnMounted: false,
-});
-const { policies, handleFetchPolicies } = useFetchAttachmentPolicy({
-  fetchOnMounted: false,
-});
-const { policyTemplates, handleFetchPolicyTemplates } =
-  useFetchAttachmentPolicyTemplate();
+const { groups } = useFetchAttachmentGroup();
+const { policies, handleFetchPolicies } = useFetchAttachmentPolicy();
+const { policyTemplates } = useFetchAttachmentPolicyTemplate();
 
 const selectedGroupName = useLocalStorage("attachment-upload-group", "");
 const selectedPolicyName = useLocalStorage("attachment-upload-policy", "");
@@ -45,12 +40,13 @@ watch(
   () => {
     if (selectedGroupName.value === "") return;
 
-    const group = groups.value.find(
+    const group = groups.value?.find(
       (group) => group.metadata.name === selectedGroupName.value
     );
     if (!group) {
-      selectedGroupName.value =
-        groups.value.length > 0 ? groups.value[0].metadata.name : "";
+      selectedGroupName.value = groups.value?.length
+        ? groups.value[0].metadata.name
+        : "";
     }
   }
 );
@@ -58,12 +54,13 @@ watch(
 watch(
   () => policies.value,
   () => {
-    const policy = policies.value.find(
+    const policy = policies.value?.find(
       (policy) => policy.metadata.name === selectedPolicyName.value
     );
     if (!policy) {
-      selectedPolicyName.value =
-        policies.value.length > 0 ? policies.value[0].metadata.name : "";
+      selectedPolicyName.value = policies.value?.length
+        ? policies.value[0].metadata.name
+        : "";
     }
   }
 );
@@ -87,7 +84,7 @@ const handleOpenCreateNewPolicyModal = (policyTemplate: PolicyTemplate) => {
 
 const onEditingModalClose = async () => {
   await handleFetchPolicies();
-  policyToCreate.value = policies.value[0];
+  policyToCreate.value = policies.value?.[0];
 };
 
 const onVisibleChange = (visible: boolean) => {
@@ -102,9 +99,6 @@ watch(
   () => props.visible,
   (newValue) => {
     if (newValue) {
-      handleFetchGroups();
-      handleFetchPolicies();
-      handleFetchPolicyTemplates();
       uploadVisible.value = true;
     } else {
       const uploadVisibleTimer = setTimeout(() => {
@@ -131,7 +125,7 @@ watch(
         <div
           v-for="(group, index) in [
             { metadata: { name: '' }, spec: { displayName: '未分组' } },
-            ...groups,
+            ...(groups || []),
           ]"
           :key="index"
           :class="{
@@ -200,7 +194,7 @@ watch(
           </template>
         </FloatingDropdown>
       </div>
-      <div v-if="policies.length <= 0" class="mb-3">
+      <div v-if="!policies?.length" class="mb-3">
         <VAlert
           title="没有存储策略"
           description="在上传之前，需要新建一个存储策略"
