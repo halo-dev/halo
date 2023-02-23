@@ -150,6 +150,7 @@ public class CommentServiceImpl implements CommentService {
 
     private Mono<OwnerInfo> getCommentOwnerInfo(Comment.CommentOwner owner) {
         if (User.KIND.equals(owner.getKind())) {
+
             return client.fetch(User.class, owner.getName())
                 .map(OwnerInfo::from)
                 .switchIfEmpty(Mono.just(OwnerInfo.ghostUser()));

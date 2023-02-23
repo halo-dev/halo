@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -16,9 +17,9 @@ import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.comment.OwnerInfo;
-import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
+import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
@@ -35,13 +36,11 @@ import run.halo.app.theme.finders.vo.ReplyVo;
  * @since 2.0.0
  */
 @Finder("commentFinder")
+@RequiredArgsConstructor
 public class CommentFinderImpl implements CommentFinder {
 
     private final ReactiveExtensionClient client;
-
-    public CommentFinderImpl(ReactiveExtensionClient client) {
-        this.client = client;
-    }
+    private final UserService userService;
 
     @Override
     public Mono<CommentVo> getByName(String name) {
@@ -108,7 +107,7 @@ public class CommentFinderImpl implements CommentFinder {
         if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
             return Mono.just(OwnerInfo.from(owner));
         }
-        return client.fetch(User.class, owner.getName())
+        return userService.userOrGhost(owner.getName())
             .map(OwnerInfo::from)
             .defaultIfEmpty(OwnerInfo.ghostUser());
     }

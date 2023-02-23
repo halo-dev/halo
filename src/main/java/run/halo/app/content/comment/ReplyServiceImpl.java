@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
+import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -27,16 +29,12 @@ import run.halo.app.infra.exception.AccessDeniedException;
  * @since 2.0.0
  */
 @Service
+@RequiredArgsConstructor
 public class ReplyServiceImpl implements ReplyService {
 
     private final ReactiveExtensionClient client;
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
-
-    public ReplyServiceImpl(ReactiveExtensionClient client,
-        SystemConfigurableEnvironmentFetcher environmentFetcher) {
-        this.client = client;
-        this.environmentFetcher = environmentFetcher;
-    }
+    private final UserService userService;
 
     @Override
     public Mono<Reply> create(String commentName, Reply reply) {
@@ -129,7 +127,7 @@ public class ReplyServiceImpl implements ReplyService {
     private Mono<OwnerInfo> getOwnerInfo(Reply reply) {
         Comment.CommentOwner owner = reply.getSpec().getOwner();
         if (User.KIND.equals(owner.getKind())) {
-            return client.fetch(User.class, owner.getName())
+            return userService.userOrGhost(owner.getName())
                 .map(OwnerInfo::from)
                 .switchIfEmpty(Mono.just(OwnerInfo.ghostUser()));
         }
