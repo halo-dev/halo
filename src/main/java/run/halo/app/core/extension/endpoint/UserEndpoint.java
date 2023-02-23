@@ -73,6 +73,12 @@ public class UserEndpoint implements CustomEndpoint {
                 builder -> builder.operationId("GetUserDetail")
                     .description("Get user detail by name")
                     .tag(tag)
+                    .parameter(parameterBuilder()
+                        .in(ParameterIn.PATH)
+                        .name("name")
+                        .description("User name")
+                        .required(true)
+                    )
                     .response(responseBuilder().implementation(DetailedUser.class)))
             .PUT("/users/-", this::updateProfile,
                 builder -> builder.operationId("UpdateCurrentUser")
