@@ -49,6 +49,8 @@ jobs:
           java-version: 17
       - name: Run tests
         run: ./gradlew test
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
   docker-build-and-push:
     runs-on: ubuntu-latest
     needs: test
