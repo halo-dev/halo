@@ -20,7 +20,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.comparator.Comparators;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
@@ -135,7 +134,6 @@ public class PostFinderImpl implements PostFinder {
         }
 
         List<String> elements = window.elements();
-        Tuple2<String, String> previousNext;
         // current post index
         int index = elements.indexOf(currentName);
 
