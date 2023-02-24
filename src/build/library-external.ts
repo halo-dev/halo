@@ -38,6 +38,11 @@ export const setupLibraryExternal = (
       rename: `vue-router.global.${staticSuffix}.js`,
     },
     {
+      src: `./node_modules/vue-demi/lib/index.iife.js`,
+      dest: "assets/vue-demi",
+      rename: `vue-demi.${staticSuffix}.js`,
+    },
+    {
       src: "./node_modules/@vueuse/shared/index.iife.min.js",
       dest: "assets/vueuse",
       rename: `vueuse.shared.iife.${staticSuffix}.js`,
@@ -88,6 +93,7 @@ export const setupLibraryExternal = (
       "@vueuse/core": "VueUse",
       "@vueuse/components": "VueUse",
       "@vueuse/router": "VueUse",
+      "vue-demi": "VueDemi",
     }),
     ViteStaticCopy({
       targets: staticTargets,
