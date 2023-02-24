@@ -131,8 +131,7 @@ public class ReplyServiceImpl implements ReplyService {
         Comment.CommentOwner owner = reply.getSpec().getOwner();
         if (User.KIND.equals(owner.getKind())) {
             return userService.getUserOrGhost(owner.getName())
-                .map(OwnerInfo::from)
-                .switchIfEmpty(Mono.just(OwnerInfo.ghostUser()));
+                .map(OwnerInfo::from);
         }
         if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
             return Mono.just(OwnerInfo.from(owner));

@@ -107,8 +107,7 @@ public class CommentFinderImpl implements CommentFinder {
             return Mono.just(OwnerInfo.from(owner));
         }
         return userService.getUserOrGhost(owner.getName())
-            .map(OwnerInfo::from)
-            .defaultIfEmpty(OwnerInfo.ghostUser());
+            .map(OwnerInfo::from);
     }
 
     private Mono<Predicate<Comment>> fixedCommentPredicate(Ref ref) {
