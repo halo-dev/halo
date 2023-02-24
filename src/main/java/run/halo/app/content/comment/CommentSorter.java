@@ -30,12 +30,12 @@ public enum CommentSorter {
 
     static Comparator<Comment> from(CommentSorter sorter) {
         if (sorter == null) {
-            return defaultCommentComparator();
+            return lastReplyTimeComparator();
         }
         if (CREATE_TIME.equals(sorter)) {
             Function<Comment, Instant> comparatorFunc =
-                comment -> comment.getMetadata().getCreationTimestamp();
-            return Comparator.comparing(comparatorFunc)
+                comment -> comment.getSpec().getCreationTime();
+            return Comparator.comparing(comparatorFunc, Comparators.nullsLow())
                 .thenComparing(name);
         }
 
@@ -65,12 +65,12 @@ public enum CommentSorter {
         return null;
     }
 
-    static Comparator<Comment> defaultCommentComparator() {
+    static Comparator<Comment> lastReplyTimeComparator() {
         Function<Comment, Instant> comparatorFunc =
             comment -> {
                 Instant lastReplyTime = comment.getStatusOrDefault().getLastReplyTime();
-                return Optional.ofNullable(
-                    lastReplyTime).orElse(comment.getMetadata().getCreationTimestamp());
+                return Optional.ofNullable(lastReplyTime)
+                    .orElse(comment.getSpec().getCreationTime());
             };
         return Comparator.comparing(comparatorFunc, Comparators.nullsLow())
             .thenComparing(name);
