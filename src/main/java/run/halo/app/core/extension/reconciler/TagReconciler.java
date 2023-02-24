@@ -105,11 +105,11 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
     private void reconcileStatusPermalink(String tagName) {
         client.fetch(Tag.class, tagName)
             .ifPresent(tag -> {
-                Tag oldTag = JsonUtils.deepCopy(tag);
-                tag.getStatusOrDefault()
-                    .setPermalink(tagPermalinkPolicy.permalink(tag));
+                String oldPermalink = tag.getStatusOrDefault().getPermalink();
+                String permalink = tagPermalinkPolicy.permalink(tag);
+                tag.getStatusOrDefault().setPermalink(permalink);
 
-                if (!oldTag.equals(tag)) {
+                if (!StringUtils.equals(permalink, oldPermalink)) {
                     client.update(tag);
                 }
             });

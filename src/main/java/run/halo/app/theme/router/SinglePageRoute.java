@@ -29,6 +29,7 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.extension.Scheme;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
@@ -141,7 +142,7 @@ public class SinglePageRoute
     }
 
     private String getPlural() {
-        GVK annotation = SinglePage.class.getAnnotation(GVK.class);
-        return annotation.plural();
+        GVK gvk = Scheme.getGvkFromType(SinglePage.class);
+        return gvk.plural();
     }
 }
