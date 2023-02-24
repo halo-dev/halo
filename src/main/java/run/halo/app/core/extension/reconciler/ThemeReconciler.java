@@ -6,8 +6,10 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
@@ -82,40 +84,40 @@ public class ThemeReconciler implements Reconciler<Request> {
             .build();
     }
 
-    private void reconcileStatus(String name) {
+    void reconcileStatus(String name) {
         client.fetch(Theme.class, name).ifPresent(theme -> {
-            final Theme oldTheme = JsonUtils.deepCopy(theme);
-            if (theme.getStatus() == null) {
-                theme.setStatus(new Theme.ThemeStatus());
-            }
-            Theme.ThemeStatus status = theme.getStatus();
+            final Theme.ThemeStatus status =
+                ObjectUtils.defaultIfNull(theme.getStatus(), new Theme.ThemeStatus());
+            final Theme.ThemeStatus oldStatus = JsonUtils.deepCopy(status);
+            theme.setStatus(status);
 
             Path themePath = themePathPolicy.generate(theme);
             status.setLocation(themePath.toAbsolutePath().toString());
-            if (status.getPhase() == null) {
-                status.setPhase(Theme.ThemePhase.READY);
-            }
+
+            status.setPhase(Theme.ThemePhase.READY);
+            Condition.ConditionBuilder conditionBuilder = Condition.builder()
+                .type(Theme.ThemePhase.READY.name())
+                .status(ConditionStatus.TRUE)
+                .reason(Theme.ThemePhase.READY.name())
+                .message(StringUtils.EMPTY)
+                .lastTransitionTime(Instant.now());
 
             // Check if this theme version is match requires param.
             String normalVersion = systemVersionSupplier.get().getNormalVersion();
             String requires = theme.getSpec().getRequires();
             if (!VersionUtils.satisfiesRequires(normalVersion, requires)) {
                 status.setPhase(Theme.ThemePhase.FAILED);
-                Condition condition = Condition.builder()
+                conditionBuilder
                     .type(Theme.ThemePhase.FAILED.name())
                     .status(ConditionStatus.FALSE)
                     .reason("UnsatisfiedRequiresVersion")
                     .message(String.format(
                         "Theme requires a minimum system version of [%s], and you have [%s].",
-                        requires, normalVersion))
-                    .lastTransitionTime(Instant.now())
-                    .build();
-                Theme.nullSafeConditionList(theme).add(condition);
-            } else {
-                status.setPhase(Theme.ThemePhase.READY);
+                        requires, normalVersion));
             }
+            Theme.nullSafeConditionList(theme).addAndEvictFIFO(conditionBuilder.build());
 
-            if (!oldTheme.equals(theme)) {
+            if (!Objects.equals(oldStatus, status)) {
                 client.update(theme);
             }
         });

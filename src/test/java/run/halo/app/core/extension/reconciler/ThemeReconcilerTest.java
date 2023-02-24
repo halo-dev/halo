@@ -195,6 +195,38 @@ class ThemeReconcilerTest {
         verify(extensionClient, times(2)).fetch(eq(Setting.class), eq(settingName));
     }
 
+    @Test
+    void reconcileStatus() {
+        when(systemVersionSupplier.get()).thenReturn(Version.valueOf("2.3.0"));
+        Path testWorkDir = tempDirectory.resolve("reconcile-delete");
+        when(haloProperties.getWorkDir()).thenReturn(testWorkDir);
+
+        final ThemeReconciler themeReconciler =
+            new ThemeReconciler(extensionClient, haloProperties, systemVersionSupplier);
+        Theme theme = fakeTheme();
+        theme.setStatus(null);
+        theme.getSpec().setRequires(">2.3.0");
+        when(extensionClient.fetch(eq(Theme.class), eq("fake-theme")))
+            .thenReturn(Optional.of(theme));
+        themeReconciler.reconcileStatus("fake-theme");
+        ArgumentCaptor<Theme> themeUpdateCaptor = ArgumentCaptor.forClass(Theme.class);
+        verify(extensionClient).update(themeUpdateCaptor.capture());
+        Theme value = themeUpdateCaptor.getValue();
+        assertThat(value.getStatus()).isNotNull();
+        assertThat(value.getStatus().getConditions().peekFirst().getType())
+            .isEqualTo(Theme.ThemePhase.FAILED.name());
+        assertThat(value.getStatus().getPhase())
+            .isEqualTo(Theme.ThemePhase.FAILED);
+
+        theme.getSpec().setRequires(">=2.3.0");
+        when(extensionClient.fetch(eq(Theme.class), eq("fake-theme")))
+            .thenReturn(Optional.of(theme));
+        themeReconciler.reconcileStatus("fake-theme");
+        verify(extensionClient, times(2)).update(themeUpdateCaptor.capture());
+        assertThat(themeUpdateCaptor.getValue().getStatus().getPhase())
+            .isEqualTo(Theme.ThemePhase.READY);
+    }
+
     private Theme fakeTheme() {
         Theme theme = new Theme();
         Metadata metadata = new Metadata();
@@ -206,7 +238,7 @@ class ThemeReconcilerTest {
         Theme.ThemeSpec themeSpec = new Theme.ThemeSpec();
         themeSpec.setSettingName("theme-test-setting");
         theme.setSpec(themeSpec);
-        when(extensionClient.fetch(eq(Theme.class), eq(metadata.getName())))
+        lenient().when(extensionClient.fetch(eq(Theme.class), eq(metadata.getName())))
             .thenReturn(Optional.of(theme));
         return theme;
     }
