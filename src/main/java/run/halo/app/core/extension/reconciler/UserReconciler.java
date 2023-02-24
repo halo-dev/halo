@@ -7,10 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import run.halo.app.content.permalinks.ExtensionLocator;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
@@ -18,8 +16,6 @@ import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.PathUtils;
-import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
-import run.halo.app.theme.router.PermalinkIndexUpdateCommand;
 
 @Slf4j
 @Component
@@ -58,19 +54,10 @@ public class UserReconciler implements Reconciler<Request> {
 
             status.setPermalink(getUserPermalink(user));
 
-            ExtensionLocator extensionLocator = getExtensionLocator(name);
-            eventPublisher.publishEvent(
-                new PermalinkIndexUpdateCommand(this, extensionLocator, status.getPermalink()));
-
             if (!StringUtils.equals(oldPermalink, status.getPermalink())) {
                 client.update(user);
             }
         });
-    }
-
-    private static ExtensionLocator getExtensionLocator(String name) {
-        return new ExtensionLocator(GroupVersionKind.fromExtension(User.class), name,
-            name);
     }
 
     private String getUserPermalink(User user) {
@@ -98,9 +85,6 @@ public class UserReconciler implements Reconciler<Request> {
 
     private void cleanUpResourcesAndRemoveFinalizer(String userName) {
         client.fetch(User.class, userName).ifPresent(user -> {
-            eventPublisher.publishEvent(
-                new PermalinkIndexDeleteCommand(this, getExtensionLocator(userName)));
-
             if (user.getMetadata().getFinalizers() != null) {
                 user.getMetadata().getFinalizers().remove(FINALIZER_NAME);
             }

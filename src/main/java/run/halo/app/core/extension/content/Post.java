@@ -4,6 +4,7 @@ import static java.lang.Boolean.parseBoolean;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -48,8 +49,9 @@ public class Post extends AbstractExtension {
     public static final String ARCHIVE_YEAR_LABEL = "content.halo.run/archive-year";
 
     public static final String ARCHIVE_MONTH_LABEL = "content.halo.run/archive-month";
+    public static final String ARCHIVE_DAY_LABEL = "content.halo.run/archive-day";
 
-    @Schema(required = true)
+    @Schema(requiredMode = RequiredMode.REQUIRED)
     private PostSpec spec;
 
     @Schema
@@ -81,10 +83,10 @@ public class Post extends AbstractExtension {
 
     @Data
     public static class PostSpec {
-        @Schema(required = true, minLength = 1)
+        @Schema(requiredMode = RequiredMode.REQUIRED, minLength = 1)
         private String title;
 
-        @Schema(required = true, minLength = 1)
+        @Schema(requiredMode = RequiredMode.REQUIRED, minLength = 1)
         private String slug;
 
         /**
@@ -102,27 +104,27 @@ public class Post extends AbstractExtension {
 
         private String cover;
 
-        @Schema(required = true, defaultValue = "false")
+        @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "false")
         private Boolean deleted;
 
-        @Schema(required = true, defaultValue = "false")
+        @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "false")
         private Boolean publish;
 
         private Instant publishTime;
 
-        @Schema(required = true, defaultValue = "false")
+        @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "false")
         private Boolean pinned;
 
-        @Schema(required = true, defaultValue = "true")
+        @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "true")
         private Boolean allowComment;
 
-        @Schema(required = true, defaultValue = "PUBLIC")
+        @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "PUBLIC")
         private VisibleEnum visible;
 
-        @Schema(required = true, defaultValue = "0")
+        @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "0")
         private Integer priority;
 
-        @Schema(required = true)
+        @Schema(requiredMode = RequiredMode.REQUIRED)
         private Excerpt excerpt;
 
         private List<String> categories;
@@ -134,7 +136,7 @@ public class Post extends AbstractExtension {
 
     @Data
     public static class PostStatus {
-        @Schema(required = true)
+        @Schema(requiredMode = RequiredMode.REQUIRED)
         private String phase;
 
         @Schema
@@ -164,7 +166,7 @@ public class Post extends AbstractExtension {
     @Data
     public static class Excerpt {
 
-        @Schema(required = true, defaultValue = "true")
+        @Schema(requiredMode = RequiredMode.REQUIRED, defaultValue = "true")
         private Boolean autoGenerate;
 
         private String raw;

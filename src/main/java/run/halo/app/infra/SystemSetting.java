@@ -32,6 +32,15 @@ public class SystemSetting {
         private String archives;
         private String post;
         private String tags;
+
+        public static ThemeRouteRules empty() {
+            ThemeRouteRules rules = new ThemeRouteRules();
+            rules.setPost("/archives/{slug}");
+            rules.setArchives("/archives");
+            rules.setTags("/tags");
+            rules.setCategories("/categories");
+            return rules;
+        }
     }
 
     @Data

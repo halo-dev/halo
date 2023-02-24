@@ -1,4 +1,4 @@
-package run.halo.app.theme.router.strategy;
+package run.halo.app.theme.router.factories;
 
 /**
  * Static variable keys for view model.

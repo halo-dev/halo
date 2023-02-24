@@ -47,7 +47,7 @@ class CategoryReconcilerTest {
         reconcileStatusPostPilling("category-A");
 
         ArgumentCaptor<Category> captor = ArgumentCaptor.forClass(Category.class);
-        verify(client, times(2)).update(captor.capture());
+        verify(client, times(3)).update(captor.capture());
         assertThat(captor.getAllValues().get(1).getStatusOrDefault().getPostCount()).isEqualTo(4);
         assertThat(
             captor.getAllValues().get(1).getStatusOrDefault().getVisiblePostCount()).isEqualTo(0);
@@ -57,7 +57,7 @@ class CategoryReconcilerTest {
     void reconcileStatusPostForCategoryB() throws JSONException {
         reconcileStatusPostPilling("category-B");
         ArgumentCaptor<Category> captor = ArgumentCaptor.forClass(Category.class);
-        verify(client, times(2)).update(captor.capture());
+        verify(client, times(3)).update(captor.capture());
         Category category = captor.getAllValues().get(1);
         assertThat(category.getStatusOrDefault().getPostCount()).isEqualTo(3);
         assertThat(category.getStatusOrDefault().getVisiblePostCount()).isEqualTo(0);
@@ -67,7 +67,7 @@ class CategoryReconcilerTest {
     void reconcileStatusPostForCategoryC() throws JSONException {
         reconcileStatusPostPilling("category-C");
         ArgumentCaptor<Category> captor = ArgumentCaptor.forClass(Category.class);
-        verify(client, times(2)).update(captor.capture());
+        verify(client, times(3)).update(captor.capture());
         assertThat(captor.getAllValues().get(1).getStatusOrDefault().getPostCount()).isEqualTo(2);
         assertThat(
             captor.getAllValues().get(1).getStatusOrDefault().getVisiblePostCount()).isEqualTo(0);
@@ -77,7 +77,7 @@ class CategoryReconcilerTest {
     void reconcileStatusPostForCategoryD() throws JSONException {
         reconcileStatusPostPilling("category-D");
         ArgumentCaptor<Category> captor = ArgumentCaptor.forClass(Category.class);
-        verify(client, times(2)).update(captor.capture());
+        verify(client, times(3)).update(captor.capture());
         assertThat(captor.getAllValues().get(1).getStatusOrDefault().postCount).isEqualTo(1);
         assertThat(captor.getAllValues().get(1).getStatusOrDefault().visiblePostCount).isEqualTo(0);
     }

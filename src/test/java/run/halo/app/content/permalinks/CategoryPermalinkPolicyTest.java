@@ -1,7 +1,6 @@
 package run.halo.app.content.permalinks;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
@@ -10,12 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationContext;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.Metadata;
 import run.halo.app.infra.ExternalUrlSupplier;
-import run.halo.app.theme.DefaultTemplateEnum;
-import run.halo.app.theme.router.PermalinkPatternProvider;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 
 /**
  * Tests for {@link CategoryPermalinkPolicy}.
@@ -27,27 +24,21 @@ import run.halo.app.theme.router.PermalinkPatternProvider;
 class CategoryPermalinkPolicyTest {
 
     @Mock
-    private PermalinkPatternProvider permalinkPatternProvider;
-
-    @Mock
-    private ApplicationContext applicationContext;
-
-    @Mock
     private ExternalUrlSupplier externalUrlSupplier;
+
+    @Mock
+    private SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     private CategoryPermalinkPolicy categoryPermalinkPolicy;
 
     @BeforeEach
     void setUp() {
         categoryPermalinkPolicy =
-            new CategoryPermalinkPolicy(applicationContext, permalinkPatternProvider,
-                externalUrlSupplier);
+            new CategoryPermalinkPolicy(externalUrlSupplier, environmentFetcher);
     }
 
     @Test
     void permalink() {
-        when(permalinkPatternProvider.getPattern(eq(DefaultTemplateEnum.CATEGORY)))
-            .thenReturn("categories");
         Category category = new Category();
         Metadata metadata = new Metadata();
         metadata.setName("category-test");
@@ -69,19 +60,5 @@ class CategoryPermalinkPolicyTest {
         category.getSpec().setSlug("中文 slug");
         permalink = categoryPermalinkPolicy.permalink(category);
         assertThat(permalink).isEqualTo("http://exmaple.com/categories/%E4%B8%AD%E6%96%87%20slug");
-    }
-
-    @Test
-    void templateName() {
-        String s = categoryPermalinkPolicy.templateName();
-        assertThat(s).isEqualTo(DefaultTemplateEnum.CATEGORY.getValue());
-    }
-
-    @Test
-    void pattern() {
-        when(permalinkPatternProvider.getPattern(eq(DefaultTemplateEnum.CATEGORY)))
-            .thenReturn("categories");
-        String pattern = categoryPermalinkPolicy.pattern();
-        assertThat(pattern).isEqualTo("categories");
     }
 }

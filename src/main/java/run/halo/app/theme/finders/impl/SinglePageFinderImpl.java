@@ -51,6 +51,7 @@ public class SinglePageFinderImpl implements SinglePageFinder {
     @Override
     public Mono<SinglePageVo> getByName(String pageName) {
         return client.fetch(SinglePage.class, pageName)
+            .filter(FIXED_PREDICATE)
             .map(page -> {
                 SinglePageVo pageVo = SinglePageVo.from(page);
                 pageVo.setContributors(List.of());

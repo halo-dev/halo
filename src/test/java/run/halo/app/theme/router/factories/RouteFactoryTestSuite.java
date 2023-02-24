@@ -1,17 +1,14 @@
-package run.halo.app.theme.router.strategy;
+package run.halo.app.theme.router.factories;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.HandlerStrategies;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -20,30 +17,20 @@ import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
-import run.halo.app.infra.properties.HaloProperties;
-import run.halo.app.theme.router.PermalinkHttpGetRouter;
+import run.halo.app.theme.router.EmptyView;
 
 /**
- * Abstract test for {@link DetailsPageRouteHandlerStrategy} and
- * {@link ListPageRouteHandlerStrategy}.
+ * Abstract test for {@link RouteFactory}.
  *
  * @author guqing
  * @since 2.0.0
  */
 @ExtendWith(MockitoExtension.class)
-abstract class RouterStrategyTestSuite {
+abstract class RouteFactoryTestSuite {
     @Mock
     protected SystemConfigurableEnvironmentFetcher environmentFetcher;
     @Mock
-    protected ApplicationContext applicationContext;
-    @Mock
-    protected HaloProperties haloProperties;
-
-    @Mock
     protected ViewResolver viewResolver;
-
-    @InjectMocks
-    protected PermalinkHttpGetRouter permalinkHttpGetRouter;
 
     @BeforeEach
     final void setUpParent() throws URISyntaxException {
@@ -51,7 +38,6 @@ abstract class RouterStrategyTestSuite {
             .thenReturn(Mono.just(new SystemSetting.Post()));
         lenient().when(environmentFetcher.fetch(eq(SystemSetting.ThemeRouteRules.GROUP),
             eq(SystemSetting.ThemeRouteRules.class))).thenReturn(Mono.just(getThemeRouteRules()));
-        lenient().when(haloProperties.getExternalUrl()).thenReturn(new URI("http://example.com"));
         lenient().when(viewResolver.resolveViewName(any(), any()))
             .thenReturn(Mono.just(new EmptyView()));
         setUp();
@@ -76,9 +62,5 @@ abstract class RouterStrategyTestSuite {
                 .viewResolver(viewResolver)
                 .build())
             .build();
-    }
-
-    public RouterFunction<ServerResponse> getRouterFunction() {
-        return request -> Mono.justOrEmpty(permalinkHttpGetRouter.route(request));
     }
 }
