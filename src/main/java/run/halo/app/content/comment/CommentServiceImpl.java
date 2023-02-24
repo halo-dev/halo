@@ -93,6 +93,9 @@ public class CommentServiceImpl implements CommentService {
                 if (comment.getSpec().getOwner() != null) {
                     return Mono.just(comment);
                 }
+                if (comment.getSpec().getCreationTime() == null) {
+                    comment.getSpec().setCreationTime(Instant.now());
+                }
                 // populate owner from current user
                 return fetchCurrentUser()
                     .map(this::toCommentOwner)
