@@ -1,5 +1,8 @@
 package run.halo.app.theme.endpoint;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+import static org.apache.commons.lang3.BooleanUtils.isFalse;
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
@@ -9,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
@@ -32,6 +36,8 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.IpAddressUtils;
 import run.halo.app.theme.finders.CommentFinder;
@@ -42,25 +48,13 @@ import run.halo.app.theme.finders.vo.ReplyVo;
  * Endpoint for {@link CommentFinder}.
  */
 @Component
+@RequiredArgsConstructor
 public class CommentFinderEndpoint implements CustomEndpoint {
 
     private final CommentFinder commentFinder;
     private final CommentService commentService;
     private final ReplyService replyService;
-
-    /**
-     * Construct a {@link CommentFinderEndpoint} instance.
-     *
-     * @param commentFinder comment finder
-     * @param commentService comment service to create comment
-     * @param replyService reply service to create reply
-     */
-    public CommentFinderEndpoint(CommentFinder commentFinder, CommentService commentService,
-        ReplyService replyService) {
-        this.commentFinder = commentFinder;
-        this.commentService = commentService;
-        this.replyService = replyService;
-    }
+    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -158,15 +152,41 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                 Reply reply = replyRequest.toReply();
                 reply.getSpec().setIpAddress(IpAddressUtils.getIpAddress(request));
                 reply.getSpec().setUserAgent(HaloUtils.userAgentFrom(request));
-                return replyService.create(commentName, reply);
+                // fix gh-2951
+                reply.getSpec().setHidden(false);
+                return environmentFetcher.fetchComment()
+                    .map(commentSetting -> {
+                        if (isFalse(commentSetting.getEnable())) {
+                            throw new AccessDeniedException(
+                                "The comment function has been turned off.",
+                                "problemDetail.comment.turnedOff", null);
+                        }
+                        if (checkReplyOwner(reply, commentSetting.getSystemUserOnly())) {
+                            throw new AccessDeniedException("Allow only system users to comment.",
+                                "problemDetail.comment.systemUsersOnly", null);
+                        }
+                        reply.getSpec()
+                            .setApproved(isFalse(commentSetting.getRequireReviewForNew()));
+                        return reply;
+                    })
+                    .defaultIfEmpty(reply);
             })
+            .flatMap(reply -> replyService.create(commentName, reply))
             .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
+    }
+
+    private boolean checkReplyOwner(Reply reply, Boolean onlySystemUser) {
+        Comment.CommentOwner owner = reply.getSpec().getOwner();
+        if (isTrue(onlySystemUser)) {
+            return owner != null && Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind());
+        }
+        return false;
     }
 
     Mono<ServerResponse> listComments(ServerRequest request) {
         CommentQuery commentQuery = new CommentQuery(request.queryParams());
         return commentFinder.list(commentQuery.toRef(), commentQuery.getPage(),
-                    commentQuery.getSize())
+                commentQuery.getSize())
             .flatMap(list -> ServerResponse.ok().bodyValue(list));
     }
 
@@ -196,7 +216,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
             return queryParams.getFirst("group");
         }
 
-        @Schema(required = true, description = "The comment subject version.")
+        @Schema(requiredMode = REQUIRED, description = "The comment subject version.")
         public String getVersion() {
             return emptyToNull(queryParams.getFirst("version"));
         }
@@ -206,7 +226,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
          *
          * @return comment subject ref kind
          */
-        @Schema(required = true, description = "The comment subject kind.")
+        @Schema(requiredMode = REQUIRED, description = "The comment subject kind.")
         public String getKind() {
             String kind = emptyToNull(queryParams.getFirst("kind"));
             if (kind == null) {
@@ -220,7 +240,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
          *
          * @return comment subject ref name
          */
-        @Schema(required = true, description = "The comment subject name.")
+        @Schema(requiredMode = REQUIRED, description = "The comment subject name.")
         public String getName() {
             String name = emptyToNull(queryParams.getFirst("name"));
             if (name == null) {
