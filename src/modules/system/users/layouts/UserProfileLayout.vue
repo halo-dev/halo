@@ -2,9 +2,9 @@
 import BasicLayout from "@/layouts/BasicLayout.vue";
 import { apiClient } from "@/utils/api-client";
 import { VButton, VSpace, VTabbar, VAvatar } from "@halo-dev/components";
-import { computed, onMounted, provide, ref, watch } from "vue";
+import { computed, onMounted, provide, ref, watch, type Ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import type { User } from "@halo-dev/api-client";
+import type { DetailedUser } from "@halo-dev/api-client";
 import UserEditingModal from "../components/UserEditingModal.vue";
 import UserPasswordChangeModal from "../components/UserPasswordChangeModal.vue";
 import { usePermission } from "@/utils/permission";
@@ -26,7 +26,7 @@ const tabs = [
   // },
 ];
 
-const user = ref<User>();
+const user = ref<DetailedUser>();
 const loading = ref();
 const editingModal = ref(false);
 const passwordChangeModal = ref(false);
@@ -40,7 +40,7 @@ const handleFetchUser = async () => {
       const { data } = await apiClient.user.getCurrentUserDetail();
       user.value = data;
     } else {
-      const { data } = await apiClient.extension.user.getv1alpha1User({
+      const { data } = await apiClient.user.getUserDetail({
         name: params.name as string,
       });
       user.value = data;
@@ -56,10 +56,12 @@ const isCurrentUser = computed(() => {
   if (params.name === "-") {
     return true;
   }
-  return user.value?.metadata.name === userStore.currentUser?.metadata.name;
+  return (
+    user.value?.user.metadata.name === userStore.currentUser?.metadata.name
+  );
 });
 
-provide("user", user);
+provide<Ref<DetailedUser | undefined>>("user", user);
 
 const activeTab = ref();
 
@@ -92,12 +94,12 @@ const handleTabChange = (id: string) => {
   <BasicLayout>
     <UserEditingModal
       v-model:visible="editingModal"
-      :user="user"
+      :user="user?.user"
       @close="handleFetchUser"
     />
     <UserPasswordChangeModal
       v-model:visible="passwordChangeModal"
-      :user="user"
+      :user="user?.user"
       @close="handleFetchUser"
     />
     <header class="bg-white">
@@ -107,8 +109,8 @@ const handleTabChange = (id: string) => {
             <div class="h-20 w-20">
               <VAvatar
                 v-if="user"
-                :src="user?.spec.avatar"
-                :alt="user?.spec.displayName"
+                :src="user.user.spec.avatar"
+                :alt="user.user.spec.displayName"
                 circle
                 width="100%"
                 height="100%"
@@ -117,10 +119,10 @@ const handleTabChange = (id: string) => {
             </div>
             <div class="block">
               <h1 class="truncate text-lg font-bold text-gray-900">
-                {{ user?.spec.displayName }}
+                {{ user?.user.spec.displayName }}
               </h1>
               <span v-if="!loading" class="text-sm text-gray-600">
-                @{{ user?.metadata.name }}
+                @{{ user?.user.metadata.name }}
               </span>
             </div>
           </div>

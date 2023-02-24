@@ -18,7 +18,7 @@ import {
   useRouter,
   type RouteRecordRaw,
 } from "vue-router";
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
 import axios from "axios";
 import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
 import LoginModal from "@/components/login/LoginModal.vue";
@@ -29,7 +29,7 @@ import { hasPermission } from "@/utils/permission";
 import { useUserStore } from "@/stores/user";
 import { rbacAnnotations } from "@/constants/annotations";
 import { useScroll } from "@vueuse/core";
-import { defineStore } from "pinia";
+import { defineStore, storeToRefs } from "pinia";
 
 const route = useRoute();
 const router = useRouter();
@@ -38,6 +38,8 @@ const moreMenuVisible = ref(false);
 const moreMenuRootVisible = ref(false);
 
 const userStore = useUserStore();
+
+const { currentRoles, currentUser } = storeToRefs(userStore);
 
 const handleLogout = () => {
   Dialog.warning({
@@ -57,19 +59,6 @@ const handleLogout = () => {
     },
   });
 };
-
-const currentRole = computed(() => {
-  const names = JSON.parse(
-    userStore.currentUser?.metadata.annotations?.[rbacAnnotations.ROLE_NAMES] ||
-      "[]"
-  );
-
-  if (names.length === 0) {
-    return;
-  }
-
-  return roleStore.getRoleDisplayName(names[0]);
-});
 
 // Global Search
 const globalSearchVisible = ref(false);
@@ -249,24 +238,28 @@ onMounted(() => {
       </div>
       <div class="profile-placeholder">
         <div class="current-profile">
-          <div v-if="userStore.currentUser?.spec.avatar" class="profile-avatar">
+          <div v-if="currentUser?.spec.avatar" class="profile-avatar">
             <VAvatar
-              :src="userStore.currentUser?.spec.avatar"
-              :alt="userStore.currentUser?.spec.displayName"
+              :src="currentUser?.spec.avatar"
+              :alt="currentUser?.spec.displayName"
               size="md"
               circle
             ></VAvatar>
           </div>
           <div class="profile-name">
             <div class="flex text-sm font-medium">
-              {{ userStore.currentUser?.spec.displayName }}
+              {{ currentUser?.spec.displayName }}
             </div>
-            <div v-if="currentRole" class="flex">
+            <div v-if="currentRoles?.[0]" class="flex">
               <VTag>
                 <template #leftIcon>
                   <IconUserSettings />
                 </template>
-                {{ currentRole }}
+                {{
+                  currentRoles[0].metadata.annotations?.[
+                    rbacAnnotations.DISPLAY_NAME
+                  ] || currentRoles[0].metadata.name
+                }}
               </VTag>
             </div>
           </div>

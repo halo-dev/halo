@@ -34,11 +34,13 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } fr
 // @ts-ignore
 import { ChangePasswordRequest } from '../models'
 // @ts-ignore
+import { DetailedUser } from '../models'
+// @ts-ignore
 import { GrantRequest } from '../models'
 // @ts-ignore
-import { User } from '../models'
+import { ListedUserList } from '../models'
 // @ts-ignore
-import { UserList } from '../models'
+import { User } from '../models'
 // @ts-ignore
 import { UserPermission } from '../models'
 /**
@@ -175,6 +177,47 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (confi
       }
     },
     /**
+     * Get user detail by name
+     * @param {string} name User name
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getUserDetail: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+      // verify required parameter 'name' is not null or undefined
+      assertParamExists('getUserDetail', 'name', name)
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/users/{name}`.replace(
+        `{${'name'}}`,
+        encodeURIComponent(String(name)),
+      )
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
+      let baseOptions
+      if (configuration) {
+        baseOptions = configuration.baseOptions
+      }
+
+      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
+      const localVarHeaderParameter = {} as any
+      const localVarQueryParameter = {} as any
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration)
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter)
+      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
+      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      }
+    },
+    /**
      * Grant permissions to user
      * @param {string} name User name
      * @param {GrantRequest} grantRequest
@@ -231,9 +274,9 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (confi
      * @param {string} [keyword]
      * @param {string} [role]
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -242,9 +285,9 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (confi
       keyword?: string,
       role?: string,
       size?: number,
-      page?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options: AxiosRequestConfig = {},
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/api.console.halo.run/v1alpha1/users`
@@ -283,16 +326,16 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (confi
         localVarQueryParameter['size'] = size
       }
 
-      if (page !== undefined) {
-        localVarQueryParameter['page'] = page
-      }
-
       if (labelSelector) {
         localVarQueryParameter['labelSelector'] = labelSelector
       }
 
       if (fieldSelector) {
         localVarQueryParameter['fieldSelector'] = fieldSelector
+      }
+
+      if (page !== undefined) {
+        localVarQueryParameter['page'] = page
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter)
@@ -377,7 +420,7 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (configuration?: Conf
      */
     async getCurrentUserDetail(
       options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DetailedUser>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.getCurrentUserDetail(options)
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
     },
@@ -392,6 +435,19 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (configuration?: Conf
       options?: AxiosRequestConfig,
     ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserPermission>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.getPermissions(name, options)
+      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+    },
+    /**
+     * Get user detail by name
+     * @param {string} name User name
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async getUserDetail(
+      name: string,
+      options?: AxiosRequestConfig,
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DetailedUser>> {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.getUserDetail(name, options)
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
     },
     /**
@@ -415,9 +471,9 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (configuration?: Conf
      * @param {string} [keyword]
      * @param {string} [role]
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -426,19 +482,19 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (configuration?: Conf
       keyword?: string,
       role?: string,
       size?: number,
-      page?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserList>> {
+    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedUserList>> {
       const localVarAxiosArgs = await localVarAxiosParamCreator.listUsers(
         sort,
         keyword,
         role,
         size,
-        page,
         labelSelector,
         fieldSelector,
+        page,
         options,
       )
       return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
@@ -489,7 +545,7 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getCurrentUserDetail(options?: AxiosRequestConfig): AxiosPromise<User> {
+    getCurrentUserDetail(options?: AxiosRequestConfig): AxiosPromise<DetailedUser> {
       return localVarFp.getCurrentUserDetail(options).then((request) => request(axios, basePath))
     },
     /**
@@ -503,6 +559,18 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
       options?: AxiosRequestConfig,
     ): AxiosPromise<UserPermission> {
       return localVarFp.getPermissions(requestParameters.name, options).then((request) => request(axios, basePath))
+    },
+    /**
+     * Get user detail by name
+     * @param {ApiConsoleHaloRunV1alpha1UserApiGetUserDetailRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    getUserDetail(
+      requestParameters: ApiConsoleHaloRunV1alpha1UserApiGetUserDetailRequest,
+      options?: AxiosRequestConfig,
+    ): AxiosPromise<DetailedUser> {
+      return localVarFp.getUserDetail(requestParameters.name, options).then((request) => request(axios, basePath))
     },
     /**
      * Grant permissions to user
@@ -527,16 +595,16 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
     listUsers(
       requestParameters: ApiConsoleHaloRunV1alpha1UserApiListUsersRequest = {},
       options?: AxiosRequestConfig,
-    ): AxiosPromise<UserList> {
+    ): AxiosPromise<ListedUserList> {
       return localVarFp
         .listUsers(
           requestParameters.sort,
           requestParameters.keyword,
           requestParameters.role,
           requestParameters.size,
-          requestParameters.page,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.page,
           options,
         )
         .then((request) => request(axios, basePath))
@@ -587,6 +655,20 @@ export interface ApiConsoleHaloRunV1alpha1UserApiGetPermissionsRequest {
    * User name
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiGetPermissions
+   */
+  readonly name: string
+}
+
+/**
+ * Request parameters for getUserDetail operation in ApiConsoleHaloRunV1alpha1UserApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1UserApiGetUserDetailRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1UserApiGetUserDetailRequest {
+  /**
+   * User name
+   * @type {string}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiGetUserDetail
    */
   readonly name: string
 }
@@ -647,13 +729,6 @@ export interface ApiConsoleHaloRunV1alpha1UserApiListUsersRequest {
   readonly size?: number
 
   /**
-   * The page number. Zero indicates no page.
-   * @type {number}
-   * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
-   */
-  readonly page?: number
-
-  /**
    * Label selector for filtering.
    * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
@@ -666,6 +741,13 @@ export interface ApiConsoleHaloRunV1alpha1UserApiListUsersRequest {
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
   readonly fieldSelector?: Array<string>
+
+  /**
+   * The page number. Zero indicates no page.
+   * @type {number}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
+   */
+  readonly page?: number
 }
 
 /**
@@ -734,6 +816,22 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
   }
 
   /**
+   * Get user detail by name
+   * @param {ApiConsoleHaloRunV1alpha1UserApiGetUserDetailRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApi
+   */
+  public getUserDetail(
+    requestParameters: ApiConsoleHaloRunV1alpha1UserApiGetUserDetailRequest,
+    options?: AxiosRequestConfig,
+  ) {
+    return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
+      .getUserDetail(requestParameters.name, options)
+      .then((request) => request(this.axios, this.basePath))
+  }
+
+  /**
    * Grant permissions to user
    * @param {ApiConsoleHaloRunV1alpha1UserApiGrantPermissionRequest} requestParameters Request parameters.
    * @param {*} [options] Override http request option.
@@ -766,9 +864,9 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
         requestParameters.keyword,
         requestParameters.role,
         requestParameters.size,
-        requestParameters.page,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.page,
         options,
       )
       .then((request) => request(this.axios, this.basePath))

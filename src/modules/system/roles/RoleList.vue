@@ -36,9 +36,7 @@ import Fuse from "fuse.js";
 import { usePermission } from "@/utils/permission";
 import { roleLabels } from "@/constants/labels";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
-import { useRoleStore } from "@/stores/role";
 
-const roleStore = useRoleStore();
 const { currentUserHasPermission } = usePermission();
 
 const editingModal = ref<boolean>(false);
@@ -93,7 +91,6 @@ const handleOpenEditingModal = (role: Role) => {
 const onEditingModalClose = () => {
   selectedRole.value = undefined;
   handleFetchRoles();
-  roleStore.fetchRoles();
 };
 
 const handleCloneRole = async (role: Role) => {
@@ -143,7 +140,6 @@ const handleDelete = async (role: Role) => {
         console.error("Failed to delete role", e);
       } finally {
         handleFetchRoles();
-        roleStore.fetchRoles();
       }
     },
   });

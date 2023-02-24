@@ -77,6 +77,7 @@ models/counter-request.ts
 models/counter.ts
 models/custom-templates.ts
 models/dashboard-stats.ts
+models/detailed-user.ts
 models/excerpt.ts
 models/extension.ts
 models/file-reverse-proxy-provider.ts
@@ -96,6 +97,8 @@ models/listed-reply-list.ts
 models/listed-reply.ts
 models/listed-single-page-list.ts
 models/listed-single-page.ts
+models/listed-user-list.ts
+models/listed-user.ts
 models/login-history.ts
 models/menu-item-list.ts
 models/menu-item-spec.ts

@@ -25,13 +25,12 @@ import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import GrantPermissionModal from "./components/GrantPermissionModal.vue";
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
-import type { Role, User, UserList } from "@halo-dev/api-client";
+import type { Role, User, ListedUserList } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 import { useRouteQuery } from "@vueuse/router";
 import { usePermission } from "@/utils/permission";
 import { useUserStore } from "@/stores/user";
-import { useRoleStore } from "@/stores/role";
 import { getNode } from "@formkit/core";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import { useFetchRole } from "../roles/composables/use-role";
@@ -44,7 +43,7 @@ const editingModal = ref<boolean>(false);
 const passwordChangeModal = ref<boolean>(false);
 const grantPermissionModal = ref<boolean>(false);
 
-const users = ref<UserList>({
+const users = ref<ListedUserList>({
   page: 1,
   size: 20,
   total: 0,
@@ -62,7 +61,6 @@ const keyword = ref("");
 const refreshInterval = ref();
 
 const userStore = useUserStore();
-const roleStore = useRoleStore();
 
 const ANONYMOUSUSER_NAME = "anonymousUser";
 const DELETEDUSER_NAME = "ghost";
@@ -99,7 +97,7 @@ const handleFetchUsers = async (options?: {
     users.value = data;
 
     const deletedUsers = users.value.items.filter(
-      (user) => !!user.metadata.deletionTimestamp
+      (user) => !!user.user.metadata.deletionTimestamp
     );
 
     if (deletedUsers.length) {
@@ -188,7 +186,7 @@ const handleCheckAllChange = (e: Event) => {
   if (checked) {
     selectedUserNames.value =
       users.value.items.map((user) => {
-        return user.metadata.name;
+        return user.user.metadata.name;
       }) || [];
   } else {
     selectedUserNames.value.length = 0;
@@ -213,16 +211,6 @@ const handleOpenPasswordChangeModal = (user: User) => {
 const handleOpenGrantPermissionModal = (user: User) => {
   selectedUser.value = user;
   grantPermissionModal.value = true;
-};
-
-const getRoles = (user: User) => {
-  const names = JSON.parse(
-    user.metadata.annotations?.[rbacAnnotations.ROLE_NAMES] || "[]"
-  );
-
-  return names.map((name: string) => {
-    return roleStore.getRoleDisplayName(name);
-  });
 };
 
 onMounted(() => {
@@ -521,14 +509,14 @@ const hasFilters = computed(() => {
           role="list"
         >
           <li v-for="(user, index) in users.items" :key="index">
-            <VEntity :is-selected="checkSelection(user)">
+            <VEntity :is-selected="checkSelection(user.user)">
               <template
                 v-if="currentUserHasPermission(['system:users:manage'])"
                 #checkbox
               >
                 <input
                   v-model="selectedUserNames"
-                  :value="user.metadata.name"
+                  :value="user.user.metadata.name"
                   class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                   name="post-checkbox"
                   type="checkbox"
@@ -538,18 +526,18 @@ const hasFilters = computed(() => {
                 <VEntityField>
                   <template #description>
                     <VAvatar
-                      :alt="user.spec.displayName"
-                      :src="user.spec.avatar"
+                      :alt="user.user.spec.displayName"
+                      :src="user.user.spec.avatar"
                       size="md"
                     ></VAvatar>
                   </template>
                 </VEntityField>
                 <VEntityField
-                  :title="user.spec.displayName"
-                  :description="user.metadata.name"
+                  :title="user.user.spec.displayName"
+                  :description="user.user.metadata.name"
                   :route="{
                     name: 'UserDetail',
-                    params: { name: user.metadata.name },
+                    params: { name: user.user.metadata.name },
                   }"
                 />
               </template>
@@ -557,17 +545,21 @@ const hasFilters = computed(() => {
                 <VEntityField>
                   <template #description>
                     <div
-                      v-for="(role, roleIndex) in getRoles(user)"
+                      v-for="(role, roleIndex) in user.roles"
                       :key="roleIndex"
                       class="flex items-center"
                     >
                       <VTag>
-                        {{ role }}
+                        {{
+                          role.metadata.annotations?.[
+                            rbacAnnotations.DISPLAY_NAME
+                          ] || role.metadata.name
+                        }}
                       </VTag>
                     </div>
                   </template>
                 </VEntityField>
-                <VEntityField v-if="user.metadata.deletionTimestamp">
+                <VEntityField v-if="user.user.metadata.deletionTimestamp">
                   <template #description>
                     <VStatusDot v-tooltip="`删除中`" state="warning" animate />
                   </template>
@@ -575,7 +567,7 @@ const hasFilters = computed(() => {
                 <VEntityField>
                   <template #description>
                     <span class="truncate text-xs tabular-nums text-gray-500">
-                      {{ formatDatetime(user.metadata.creationTimestamp) }}
+                      {{ formatDatetime(user.user.metadata.creationTimestamp) }}
                     </span>
                   </template>
                 </VEntityField>
@@ -588,35 +580,37 @@ const hasFilters = computed(() => {
                   v-close-popper
                   block
                   type="secondary"
-                  @click="handleOpenCreateModal(user)"
+                  @click="handleOpenCreateModal(user.user)"
                 >
                   修改资料
                 </VButton>
                 <VButton
                   v-close-popper
                   block
-                  @click="handleOpenPasswordChangeModal(user)"
+                  @click="handleOpenPasswordChangeModal(user.user)"
                 >
                   修改密码
                 </VButton>
                 <VButton
                   v-if="
-                    userStore.currentUser?.metadata.name !== user.metadata.name
+                    userStore.currentUser?.metadata.name !==
+                    user.user.metadata.name
                   "
                   v-close-popper
                   block
-                  @click="handleOpenGrantPermissionModal(user)"
+                  @click="handleOpenGrantPermissionModal(user.user)"
                 >
                   分配角色
                 </VButton>
                 <VButton
                   v-if="
-                    userStore.currentUser?.metadata.name !== user.metadata.name
+                    userStore.currentUser?.metadata.name !==
+                    user.user.metadata.name
                   "
                   v-close-popper
                   block
                   type="danger"
-                  @click="handleDelete(user)"
+                  @click="handleDelete(user.user)"
                 >
                   删除
                 </VButton>

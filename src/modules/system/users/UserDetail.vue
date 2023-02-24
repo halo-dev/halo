@@ -1,26 +1,13 @@
 <script lang="ts" setup>
 import { IconUserSettings, VTag } from "@halo-dev/components";
 import type { Ref } from "vue";
-import { computed, inject } from "vue";
+import { inject } from "vue";
 import { useRouter } from "vue-router";
-import type { User } from "@halo-dev/api-client";
+import type { DetailedUser } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
-import { useRoleStore } from "@/stores/role";
 
-const user = inject<Ref<User>>("user");
-
-const roleStore = useRoleStore();
-
-const roles = computed(() => {
-  const names = JSON.parse(
-    user?.value?.metadata?.annotations?.[rbacAnnotations.ROLE_NAMES] || "[]"
-  );
-
-  return names.map((name: string) => {
-    return roleStore.getRoleDisplayName(name);
-  });
-});
+const user = inject<Ref<DetailedUser | undefined>>("user");
 
 const router = useRouter();
 </script>
@@ -32,7 +19,7 @@ const router = useRouter();
       >
         <dt class="text-sm font-medium text-gray-900">显示名称</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-          {{ user?.spec?.displayName }}
+          {{ user?.user.spec?.displayName }}
         </dd>
       </div>
       <div
@@ -40,7 +27,7 @@ const router = useRouter();
       >
         <dt class="text-sm font-medium text-gray-900">用户名</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-          {{ user?.metadata?.name }}
+          {{ user?.user.metadata?.name }}
         </dd>
       </div>
       <div
@@ -48,7 +35,7 @@ const router = useRouter();
       >
         <dt class="text-sm font-medium text-gray-900">电子邮箱</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-          {{ user?.spec?.email || "未设置" }}
+          {{ user?.user.spec?.email || "未设置" }}
         </dd>
       </div>
       <div
@@ -57,14 +44,22 @@ const router = useRouter();
         <dt class="text-sm font-medium text-gray-900">角色</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
           <VTag
-            v-for="(role, index) in roles"
+            v-for="(role, index) in user?.roles"
             :key="index"
-            @click="router.push({ name: 'RoleDetail', params: { name: role } })"
+            @click="
+              router.push({
+                name: 'RoleDetail',
+                params: { name: role.metadata.name },
+              })
+            "
           >
             <template #leftIcon>
               <IconUserSettings />
             </template>
-            {{ role }}
+            {{
+              role.metadata.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
+              role.metadata.name
+            }}
           </VTag>
         </dd>
       </div>
@@ -73,7 +68,7 @@ const router = useRouter();
       >
         <dt class="text-sm font-medium text-gray-900">描述</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-          {{ user?.spec?.bio || "无" }}
+          {{ user?.user.spec?.bio || "无" }}
         </dd>
       </div>
       <div
@@ -83,7 +78,7 @@ const router = useRouter();
         <dd
           class="mt-1 text-sm tabular-nums text-gray-900 sm:col-span-3 sm:mt-0"
         >
-          {{ formatDatetime(user?.metadata?.creationTimestamp) }}
+          {{ formatDatetime(user?.user.metadata?.creationTimestamp) }}
         </dd>
       </div>
       <!-- TODO: add display last login time support -->
@@ -93,7 +88,7 @@ const router = useRouter();
       >
         <dt class="text-sm font-medium text-gray-900">最近登录时间</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-          {{ user?.metadata?.creationTimestamp }}
+          {{ user?.user.metadata?.creationTimestamp }}
         </dd>
       </div>
     </dl>
