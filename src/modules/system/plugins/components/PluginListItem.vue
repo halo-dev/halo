@@ -66,6 +66,13 @@ const handleResetSettingConfig = async () => {
     },
   });
 };
+
+const getFailedMessage = (plugin: Plugin) => {
+  if (plugin.status?.conditions?.length) {
+    const lastCondition = plugin.status.conditions[0];
+    return [lastCondition.reason, lastCondition.message].join(":");
+  }
+};
 </script>
 <template>
   <PluginUploadModal
@@ -105,7 +112,7 @@ const handleResetSettingConfig = async () => {
       <VEntityField v-if="plugin?.status?.phase === 'FAILED'">
         <template #description>
           <VStatusDot
-            v-tooltip="`${plugin?.status?.reason}:${plugin?.status?.message}`"
+            v-tooltip="getFailedMessage(plugin)"
             state="error"
             animate
           />

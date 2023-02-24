@@ -12,6 +12,10 @@
  * Do not edit the class manually.
  */
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { Condition } from './condition'
+
 /**
  *
  * @export
@@ -26,28 +30,16 @@ export interface PluginStatus {
   phase?: PluginStatusPhaseEnum
   /**
    *
-   * @type {string}
+   * @type {Array<Condition>}
    * @memberof PluginStatus
    */
-  reason?: string
-  /**
-   *
-   * @type {string}
-   * @memberof PluginStatus
-   */
-  message?: string
+  conditions?: Array<Condition>
   /**
    *
    * @type {string}
    * @memberof PluginStatus
    */
   lastStartTime?: string
-  /**
-   *
-   * @type {string}
-   * @memberof PluginStatus
-   */
-  lastTransitionTime?: string
   /**
    *
    * @type {string}

@@ -70,7 +70,7 @@ const handleFetchPlugin = async () => {
 };
 
 const handleFetchSettings = async () => {
-  if (!plugin.value) return;
+  if (!plugin.value || !plugin.value.spec.settingName) return;
   const { data } = await apiClient.plugin.fetchPluginSetting({
     name: plugin.value?.metadata.name,
   });
@@ -112,9 +112,7 @@ onMounted(async () => {
     return;
   }
 
-  if (isStarted.value) {
-    await handleFetchSettings();
-  }
+  await handleFetchSettings();
 
   tabs.value = cloneDeep(initialTabs);
 
