@@ -84,7 +84,7 @@ class TagReconcilerTest {
 
         ArgumentCaptor<Tag> captor = ArgumentCaptor.forClass(Tag.class);
         tagReconciler.reconcile(new TagReconciler.Request("fake-tag"));
-        verify(client, times(3)).update(captor.capture());
+        verify(client, times(2)).update(captor.capture());
         List<Tag> allValues = captor.getAllValues();
         assertThat(allValues.get(1).getStatusOrDefault().getPostCount()).isEqualTo(2);
         assertThat(allValues.get(1).getStatusOrDefault().getVisiblePostCount()).isEqualTo(0);
