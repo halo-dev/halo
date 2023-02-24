@@ -24,7 +24,6 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.ExternalUrlSupplier;
-import run.halo.app.theme.router.PermalinkIndexUpdateCommand;
 
 /**
  * Tests for {@link UserReconciler}.
@@ -54,7 +53,6 @@ class UserReconcilerTest {
             .thenReturn(Optional.of(user("fake-user")));
         userReconciler.reconcile(new Reconciler.Request("fake-user"));
         verify(client, times(1)).update(any(User.class));
-        verify(eventPublisher, times(1)).publishEvent(any(PermalinkIndexUpdateCommand.class));
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         verify(client, times(1)).update(captor.capture());
@@ -68,7 +66,6 @@ class UserReconcilerTest {
             .thenReturn(Optional.of(user(AnonymousUserConst.PRINCIPAL)));
         userReconciler.reconcile(new Reconciler.Request(AnonymousUserConst.PRINCIPAL));
         verify(client, times(0)).update(any(User.class));
-        verify(eventPublisher, times(0)).publishEvent(any(PermalinkIndexUpdateCommand.class));
     }
 
     User user(String name) {

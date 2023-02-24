@@ -1,4 +1,4 @@
-package run.halo.app.theme.router.strategy;
+package run.halo.app.theme.router;
 
 import java.util.Map;
 import org.springframework.http.MediaType;

@@ -11,12 +11,16 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.permalinks.CategoryPermalinkPolicy;
 import run.halo.app.core.extension.content.Category;
+import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
@@ -29,16 +33,11 @@ import run.halo.app.infra.utils.JsonUtils;
  * @since 2.0.0
  */
 @Component
+@AllArgsConstructor
 public class CategoryReconciler implements Reconciler<Reconciler.Request> {
     private static final String FINALIZER_NAME = "category-protection";
     private final ExtensionClient client;
     private final CategoryPermalinkPolicy categoryPermalinkPolicy;
-
-    public CategoryReconciler(ExtensionClient client,
-        CategoryPermalinkPolicy categoryPermalinkPolicy) {
-        this.client = client;
-        this.categoryPermalinkPolicy = categoryPermalinkPolicy;
-    }
 
     @Override
     public Result reconcile(Request request) {
@@ -49,6 +48,8 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
                     return new Result(false, null);
                 }
                 addFinalizerIfNecessary(category);
+
+                reconcileMetadata(request.name());
 
                 reconcileStatusPermalink(request.name());
 
@@ -63,6 +64,20 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
         return builder
             .extension(new Category())
             .build();
+    }
+
+    void reconcileMetadata(String name) {
+        client.fetch(Category.class, name).ifPresent(category -> {
+            Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(category);
+            String oldPermalinkPattern = annotations.get(Constant.PERMALINK_PATTERN_ANNO);
+
+            String newPattern = categoryPermalinkPolicy.pattern();
+            annotations.put(Constant.PERMALINK_PATTERN_ANNO, newPattern);
+
+            if (!StringUtils.equals(oldPermalinkPattern, newPattern)) {
+                client.update(category);
+            }
+        });
     }
 
     private void addFinalizerIfNecessary(Category oldCategory) {
@@ -82,14 +97,8 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
             });
     }
 
-    private void cleanUpResources(Category category) {
-        // remove permalink from permalink indexer
-        categoryPermalinkPolicy.onPermalinkDelete(category);
-    }
-
     private void cleanUpResourcesAndRemoveFinalizer(String categoryName) {
         client.fetch(Category.class, categoryName).ifPresent(category -> {
-            cleanUpResources(category);
             if (category.getMetadata().getFinalizers() != null) {
                 category.getMetadata().getFinalizers().remove(FINALIZER_NAME);
             }
@@ -101,11 +110,8 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
         client.fetch(Category.class, name)
             .ifPresent(category -> {
                 Category oldCategory = JsonUtils.deepCopy(category);
-                categoryPermalinkPolicy.onPermalinkDelete(oldCategory);
-
                 category.getStatusOrDefault()
                     .setPermalink(categoryPermalinkPolicy.permalink(category));
-                categoryPermalinkPolicy.onPermalinkAdd(category);
 
                 if (!oldCategory.equals(category)) {
                     client.update(category);

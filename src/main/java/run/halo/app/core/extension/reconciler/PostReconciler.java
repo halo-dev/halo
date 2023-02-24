@@ -16,6 +16,7 @@ import org.springframework.util.Assert;
 import run.halo.app.content.PostService;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.core.extension.content.Comment;
+import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.event.post.PostPublishedEvent;
@@ -237,10 +238,16 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             if (publishTime != null) {
                 labels.put(Post.ARCHIVE_YEAR_LABEL, HaloUtils.getYearText(publishTime));
                 labels.put(Post.ARCHIVE_MONTH_LABEL, HaloUtils.getMonthText(publishTime));
+                labels.put(Post.ARCHIVE_DAY_LABEL, HaloUtils.getDayText(publishTime));
             }
             if (!labels.containsKey(Post.PUBLISHED_LABEL)) {
                 labels.put(Post.PUBLISHED_LABEL, Boolean.FALSE.toString());
             }
+
+            Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(post);
+            String newPattern = postPermalinkPolicy.pattern();
+            annotations.put(Constant.PERMALINK_PATTERN_ANNO, newPattern);
+
             if (!oldPost.equals(post)) {
                 client.update(post);
             }
@@ -250,11 +257,9 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     private void reconcileStatus(String name) {
         client.fetch(Post.class, name).ifPresent(post -> {
             final Post oldPost = JsonUtils.deepCopy(post);
-            postPermalinkPolicy.onPermalinkDelete(oldPost);
 
             post.getStatusOrDefault()
                 .setPermalink(postPermalinkPolicy.permalink(post));
-            postPermalinkPolicy.onPermalinkAdd(post);
 
             Post.PostStatus status = post.getStatusOrDefault();
             if (status.getPhase() == null) {
@@ -344,9 +349,6 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void cleanUpResources(Post post) {
-        // remove permalink from permalink indexer
-        postPermalinkPolicy.onPermalinkDelete(post);
-
         // clean up snapshots
         final Ref ref = Ref.of(post);
         client.list(Snapshot.class,
