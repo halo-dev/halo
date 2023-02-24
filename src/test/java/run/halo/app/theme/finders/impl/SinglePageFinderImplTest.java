@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.content.SinglePageService;
+import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -52,9 +54,13 @@ class SinglePageFinderImplTest {
         SinglePage singlePage = new SinglePage();
         singlePage.setMetadata(new Metadata());
         singlePage.getMetadata().setName(fakePageName);
+        singlePage.getMetadata().setLabels(Map.of(SinglePage.PUBLISHED_LABEL, "true"));
         singlePage.setSpec(new SinglePage.SinglePageSpec());
         singlePage.getSpec().setOwner("fake-owner");
         singlePage.getSpec().setReleaseSnapshot("fake-release");
+        singlePage.getSpec().setPublish(true);
+        singlePage.getSpec().setDeleted(false);
+        singlePage.getSpec().setVisible(Post.VisibleEnum.PUBLIC);
         singlePage.setStatus(new SinglePage.SinglePageStatus());
         when(client.fetch(eq(SinglePage.class), eq(fakePageName)))
             .thenReturn(Mono.just(singlePage));

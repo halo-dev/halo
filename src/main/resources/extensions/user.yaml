@@ -2,6 +2,8 @@ apiVersion: v1alpha1
 kind: User
 metadata:
   name: anonymousUser
+  finalizers:
+    - system-protection
 spec:
   displayName: Anonymous User
   email: anonymous@example.com
@@ -12,6 +14,8 @@ apiVersion: v1alpha1
 kind: User
 metadata:
   name: ghost
+  finalizers:
+    - system-protection
 spec:
   displayName: 已删除用户
   email: ghost@example.com

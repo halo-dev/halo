@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +25,7 @@ import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Reply;
+import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
@@ -43,9 +45,19 @@ class CommentFinderImplTest {
 
     @Mock
     private ReactiveExtensionClient client;
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     private CommentFinderImpl commentFinder;
+
+    @BeforeEach
+    void setUp() {
+        User ghost = createUser();
+        ghost.getMetadata().setName("ghost");
+        when(userService.getUserOrGhost(eq("ghost"))).thenReturn(Mono.just(ghost));
+        when(userService.getUserOrGhost(eq("fake-user"))).thenReturn(Mono.just(createUser()));
+    }
 
     @Nested
     class ListCommentTest {
@@ -211,6 +223,7 @@ class CommentFinderImplTest {
                 return Mono.just(new ListResult<>(1, 10, comments.size(), comments));
             });
 
+            extractedUser();
             when(client.fetch(eq(User.class), any())).thenReturn(Mono.just(createUser()));
         }
 
@@ -340,6 +353,7 @@ class CommentFinderImplTest {
                 return Mono.just(new ListResult<>(1, 10, replies.size(), replies));
             });
 
+            extractedUser();
             when(client.fetch(eq(User.class), any())).thenReturn(Mono.just(createUser()));
         }
 
@@ -360,6 +374,18 @@ class CommentFinderImplTest {
             reply.getSpec().setOwner(commentOwner);
             return reply;
         }
+    }
+
+    private void extractedUser() {
+        User another = createUser();
+        another.getMetadata().setName("another");
+        when(userService.getUserOrGhost(eq("another"))).thenReturn(Mono.just(another));
+
+        User ghost = createUser();
+        ghost.getMetadata().setName("ghost");
+        when(userService.getUserOrGhost(eq("ghost"))).thenReturn(Mono.just(ghost));
+        when(userService.getUserOrGhost(eq("fake-user"))).thenReturn(Mono.just(createUser()));
+        when(userService.getUserOrGhost(any())).thenReturn(Mono.just(ghost));
     }
 
     User createUser() {

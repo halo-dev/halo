@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,6 +27,7 @@ import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Ref;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.theme.finders.CommentFinder;
 
 /**
@@ -43,6 +45,9 @@ class CommentFinderEndpointTest {
     private CommentService commentService;
 
     @Mock
+    private SystemConfigurableEnvironmentFetcher environmentFetcher;
+
+    @Mock
     private ReplyService replyService;
 
     @InjectMocks
@@ -52,6 +57,7 @@ class CommentFinderEndpointTest {
 
     @BeforeEach
     void setUp() {
+        lenient().when(environmentFetcher.fetchComment()).thenReturn(Mono.empty());
         webTestClient = WebTestClient
             .bindToRouterFunction(commentFinderEndpoint.endpoint())
             .build();

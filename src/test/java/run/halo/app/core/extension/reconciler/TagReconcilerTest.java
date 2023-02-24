@@ -41,6 +41,28 @@ class TagReconcilerTest {
     private TagReconciler tagReconciler;
 
     @Test
+    void reconcile() {
+        Tag tag = tag();
+        when(client.fetch(eq(Tag.class), eq("fake-tag")))
+            .thenReturn(Optional.of(tag));
+        when(tagPermalinkPolicy.permalink(any()))
+            .thenAnswer(arg -> "/tags/" + tag.getSpec().getSlug());
+        ArgumentCaptor<Tag> captor = ArgumentCaptor.forClass(Tag.class);
+
+        tagReconciler.reconcile(new TagReconciler.Request("fake-tag"));
+
+        verify(client, times(3)).update(captor.capture());
+        Tag capture = captor.getValue();
+        assertThat(capture.getStatus().getPermalink()).isEqualTo("/tags/fake-slug");
+
+        // change slug
+        tag.getSpec().setSlug("new-slug");
+        tagReconciler.reconcile(new TagReconciler.Request("fake-tag"));
+        verify(client, times(5)).update(captor.capture());
+        assertThat(capture.getStatus().getPermalink()).isEqualTo("/tags/new-slug");
+    }
+
+    @Test
     void reconcileDelete() {
         Tag tag = tag();
         tag.getMetadata().setDeletionTimestamp(Instant.now());
@@ -50,8 +72,6 @@ class TagReconcilerTest {
 
         tagReconciler.reconcile(new TagReconciler.Request("fake-tag"));
         verify(client, times(1)).update(captor.capture());
-        verify(tagPermalinkPolicy, times(0)).onPermalinkAdd(any());
-        verify(tagPermalinkPolicy, times(1)).onPermalinkDelete(any());
         verify(tagPermalinkPolicy, times(0)).permalink(any());
     }
 
