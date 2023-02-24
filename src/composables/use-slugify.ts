@@ -15,6 +15,9 @@ export default function useSlugify(
   );
 
   const handleGenerateSlug = () => {
+    if (!source.value) {
+      return;
+    }
     target.value = slugify(source.value, {
       trim: true,
     });
