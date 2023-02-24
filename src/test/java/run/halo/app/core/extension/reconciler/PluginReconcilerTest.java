@@ -18,6 +18,7 @@ import java.util.Optional;
 import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -29,13 +30,17 @@ import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.web.util.UrlUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.plugin.HaloPluginManager;
+import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginStartingError;
 
 /**
@@ -285,6 +290,78 @@ class PluginReconcilerTest {
         when(pluginWrapper.getRuntimeMode()).thenReturn(RuntimeMode.DEVELOPMENT);
         pluginReconciler.createInitialReverseProxyIfNotPresent(plugin);
         verify(extensionClient, times(1)).update(any());
+    }
+
+    @Nested
+    class PluginLogoTest {
+
+        @Test
+        void absoluteUri() {
+            Plugin plugin = new Plugin();
+            plugin.setSpec(new Plugin.PluginSpec());
+            plugin.getSpec().setLogo("https://example.com/logo.png");
+            plugin.getSpec().setVersion("1.0.0");
+            pluginReconciler.handleLogoPath(plugin);
+            assertThat(plugin.statusNonNull().getLogo())
+                .isEqualTo("https://example.com/logo.png?version=1.0.0");
+        }
+
+        @Test
+        void absoluteUriWithQueryParam() {
+            Plugin plugin = new Plugin();
+            plugin.setSpec(new Plugin.PluginSpec());
+            plugin.getSpec().setLogo("https://example.com/logo.png?hello=world");
+            plugin.getSpec().setVersion("1.0.0");
+            pluginReconciler.handleLogoPath(plugin);
+            assertThat(plugin.statusNonNull().getLogo())
+                .isEqualTo("https://example.com/logo.png?hello=world&version=1.0.0");
+        }
+
+        @Test
+        void logoIsNull() {
+            Plugin plugin = new Plugin();
+            plugin.setSpec(new Plugin.PluginSpec());
+            plugin.getSpec().setLogo(null);
+            plugin.getSpec().setVersion("1.0.0");
+            pluginReconciler.handleLogoPath(plugin);
+            assertThat(plugin.statusNonNull().getLogo()).isNull();
+        }
+
+        @Test
+        void logoIsEmpty() {
+            Plugin plugin = new Plugin();
+            plugin.setSpec(new Plugin.PluginSpec());
+            plugin.getSpec().setLogo("");
+            plugin.getSpec().setVersion("1.0.0");
+            pluginReconciler.handleLogoPath(plugin);
+            assertThat(plugin.statusNonNull().getLogo()).isNull();
+        }
+
+        @Test
+        void relativePath() {
+            Plugin plugin = new Plugin();
+            plugin.setSpec(new Plugin.PluginSpec());
+            plugin.setMetadata(new Metadata());
+            plugin.getMetadata().setName("fake-plugin");
+            plugin.getSpec().setLogo("/static/logo.jpg");
+            plugin.getSpec().setVersion("1.0.0");
+            pluginReconciler.handleLogoPath(plugin);
+            assertThat(plugin.statusNonNull().getLogo())
+                .isEqualTo("/plugins/fake-plugin/assets/static/logo.jpg?version=1.0.0");
+        }
+
+        @Test
+        void dataBlob() {
+            Plugin plugin = new Plugin();
+            plugin.setSpec(new Plugin.PluginSpec());
+            plugin.setMetadata(new Metadata());
+            plugin.getMetadata().setName("fake-plugin");
+            plugin.getSpec().setLogo("data:image/gif;base64,R0lGODfake");
+            plugin.getSpec().setVersion("2.0.0");
+            pluginReconciler.handleLogoPath(plugin);
+            assertThat(plugin.statusNonNull().getLogo())
+                .isEqualTo("data:image/gif;base64,R0lGODfake");
+        }
     }
 
     private ArgumentCaptor<Plugin> doReconcileNeedRequeue() {

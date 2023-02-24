@@ -29,9 +29,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import org.springframework.retry.support.RetryTemplate;
+import org.springframework.security.web.util.UrlUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.web.util.UriComponentsBuilder;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.core.extension.Setting;
@@ -108,25 +111,37 @@ public class PluginReconciler implements Reconciler<Request> {
                 }
                 createInitialReverseProxyIfNotPresent(plugin);
 
-                Plugin.PluginStatus status = plugin.statusNonNull();
-
                 // filled logo path
-                String logo = plugin.getSpec().getLogo();
-                if (PathUtils.isAbsoluteUri(logo)) {
-                    status.setLogo(logo);
-                } else {
-                    String assetsPrefix =
-                        PluginConst.assertsRoutePrefix(plugin.getMetadata().getName());
-                    status.setLogo(PathUtils.combinePath(assetsPrefix, logo));
-                }
+                handleLogoPath(plugin);
 
                 // update phase
                 PluginWrapper pluginWrapper = getPluginWrapper(name);
+                Plugin.PluginStatus status = plugin.statusNonNull();
                 status.setPhase(pluginWrapper.getPluginState());
                 updateStatus(plugin.getMetadata().getName(), status);
                 return false;
             })
             .orElse(false);
+    }
+
+    void handleLogoPath(Plugin plugin) {
+        String logo = plugin.getSpec().getLogo();
+        if (StringUtils.isBlank(logo)) {
+            return;
+        }
+        Plugin.PluginStatus status = plugin.statusNonNull();
+        String cacheableLogoPath = cacheableLogoPath(logo, plugin.getSpec().getVersion());
+        if (PathUtils.isAbsoluteUri(logo)) {
+            if (UrlUtils.isAbsoluteUrl(logo)) {
+                status.setLogo(cacheableLogoPath);
+            } else {
+                status.setLogo(logo);
+            }
+        } else {
+            String assetsPrefix =
+                PluginConst.assertsRoutePrefix(plugin.getMetadata().getName());
+            status.setLogo(PathUtils.combinePath(assetsPrefix, cacheableLogoPath));
+        }
     }
 
     Optional<Setting> lookupPluginSetting(String name, String settingName) {
@@ -374,12 +389,15 @@ public class PluginReconciler implements Reconciler<Request> {
 
             plugin.statusNonNull().setLastStartTime(Instant.now());
 
+            final String pluginVersion = plugin.getSpec().getVersion();
             String jsBundlePath =
                 BundleResourceUtils.getJsBundlePath(haloPluginManager, name);
+            jsBundlePath = cacheableLogoPath(jsBundlePath, pluginVersion);
             status.setEntry(jsBundlePath);
 
             String cssBundlePath =
                 BundleResourceUtils.getCssBundlePath(haloPluginManager, name);
+            cssBundlePath = cacheableLogoPath(cssBundlePath, pluginVersion);
             status.setStylesheet(cssBundlePath);
 
             status.setPhase(currentState);
@@ -396,6 +414,15 @@ public class PluginReconciler implements Reconciler<Request> {
                 client.update(plugin);
             }
         });
+    }
+
+    private String cacheableLogoPath(@Nullable String path, String pluginVersion) {
+        if (StringUtils.isNotBlank(path)) {
+            return UriComponentsBuilder.fromUriString(path)
+                .queryParam("version", pluginVersion)
+                .build().toString();
+        }
+        return path;
     }
 
     PluginStartingError getStaringErrorInfo(String name) {
