@@ -301,6 +301,12 @@ const editor = useEditor({
       return false;
     },
     handlePaste: (view, event: ClipboardEvent) => {
+      const types = Array.from(event.clipboardData?.types || []);
+
+      if (["text/plain", "text/html"].includes(types[0])) {
+        return;
+      }
+
       const images = Array.from(event.clipboardData?.items || [])
         .map((item) => {
           return item.getAsFile();
