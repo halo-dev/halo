@@ -25,9 +25,6 @@ import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
-import run.halo.app.metrics.CounterService;
-import run.halo.app.metrics.CounterService;
-import run.halo.app.metrics.MeterUtils;
 import run.halo.app.plugin.ExtensionComponentsFinder;
 
 /**
