@@ -69,7 +69,13 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
     </template>
 
     <template #dropdownItems>
-      <VButton v-close-popper block type="secondary" @click="handleActiveTheme">
+      <VButton
+        v-if="!isActivated"
+        v-close-popper
+        block
+        type="secondary"
+        @click="handleActiveTheme"
+      >
         启用
       </VButton>
       <VButton

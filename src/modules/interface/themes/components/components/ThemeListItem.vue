@@ -178,7 +178,13 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
       v-if="currentUserHasPermission(['system:themes:manage'])"
       #dropdownItems
     >
-      <VButton v-close-popper block type="secondary" @click="handleActiveTheme">
+      <VButton
+        v-if="!isActivated"
+        v-close-popper
+        block
+        type="secondary"
+        @click="handleActiveTheme"
+      >
         启用
       </VButton>
       <VButton v-close-popper block type="default" @click="emit('upgrade')">
