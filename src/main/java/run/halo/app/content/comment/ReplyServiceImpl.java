@@ -19,7 +19,6 @@ import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
 
