@@ -6,16 +6,15 @@ import {
   VEntityField,
   IconExternalLinkLine,
 } from "@halo-dev/components";
-import { onMounted, ref } from "vue";
 import type { ListedPost } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { postLabels } from "@/constants/labels";
+import { useQuery } from "@tanstack/vue-query";
 
-const posts = ref<ListedPost[]>([] as ListedPost[]);
-
-const handleFetchPosts = async () => {
-  try {
+const { data } = useQuery<ListedPost[]>({
+  queryKey: ["widget-recent-posts"],
+  queryFn: async () => {
     const { data } = await apiClient.post.listPosts({
       labelSelector: [
         `${postLabels.DELETED}=false`,
@@ -26,13 +25,10 @@ const handleFetchPosts = async () => {
       page: 1,
       size: 10,
     });
-    posts.value = data.items;
-  } catch (e) {
-    console.error("Failed to fetch posts", e);
-  }
-};
-
-onMounted(handleFetchPosts);
+    return data.items;
+  },
+  refetchOnWindowFocus: false,
+});
 </script>
 <template>
   <VCard
@@ -41,7 +37,7 @@ onMounted(handleFetchPosts);
     title="最近文章"
   >
     <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
-      <li v-for="(post, index) in posts" :key="index">
+      <li v-for="(post, index) in data" :key="index">
         <VEntity>
           <template #start>
             <VEntityField

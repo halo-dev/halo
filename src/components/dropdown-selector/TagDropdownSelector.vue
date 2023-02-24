@@ -21,7 +21,7 @@ const emit = defineEmits<{
   (event: "select", tag?: Tag): void;
 }>();
 
-const { tags, handleFetchTags } = usePostTag({ fetchOnMounted: false });
+const { tags } = usePostTag();
 
 const handleSelect = (tag: Tag) => {
   if (props.selected && tag.metadata.name === props.selected.metadata.name) {
@@ -35,7 +35,6 @@ const handleSelect = (tag: Tag) => {
 };
 
 function onDropdownShow() {
-  handleFetchTags();
   setTimeout(() => {
     setFocus("tagDropdownSelectorInput");
   }, 200);
@@ -49,11 +48,14 @@ let fuse: Fuse<Tag> | undefined = undefined;
 watch(
   () => tags.value,
   () => {
-    fuse = new Fuse(tags.value, {
+    fuse = new Fuse(tags.value || [], {
       keys: ["spec.displayName", "metadata.name", "spec.email"],
       useExtendedSearch: true,
       threshold: 0.2,
     });
+  },
+  {
+    immediate: true,
   }
 );
 

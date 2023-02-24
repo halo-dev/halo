@@ -126,7 +126,7 @@ export const getCategoryPath = (
   categories: CategoryTree[],
   name: string,
   path: CategoryTree[] = []
-) => {
+): CategoryTree[] | undefined => {
   for (const category of categories) {
     if (category.metadata && category.metadata.name === name) {
       return path.concat([category]);

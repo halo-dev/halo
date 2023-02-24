@@ -1,63 +1,39 @@
 import { apiClient } from "@/utils/api-client";
 import type { Tag } from "@halo-dev/api-client";
-import { onUnmounted, type Ref } from "vue";
-import { onMounted, ref } from "vue";
+import type { Ref } from "vue";
 import { Dialog, Toast } from "@halo-dev/components";
-import { onBeforeRouteLeave } from "vue-router";
+import { useQuery } from "@tanstack/vue-query";
 
 interface usePostTagReturn {
-  tags: Ref<Tag[]>;
-  loading: Ref<boolean>;
-  handleFetchTags: (fetchOptions?: { mute?: boolean }) => void;
+  tags: Ref<Tag[] | undefined>;
+  isLoading: Ref<boolean>;
+  handleFetchTags: () => void;
   handleDelete: (tag: Tag) => void;
 }
 
-export function usePostTag(options?: {
-  fetchOnMounted: boolean;
-}): usePostTagReturn {
-  const { fetchOnMounted } = options || {};
-
-  const tags = ref<Tag[]>([] as Tag[]);
-  const loading = ref(false);
-  const refreshInterval = ref();
-
-  const handleFetchTags = async (fetchOptions?: { mute?: boolean }) => {
-    try {
-      clearInterval(refreshInterval.value);
-
-      if (!fetchOptions?.mute) {
-        loading.value = true;
-      }
+export function usePostTag(): usePostTagReturn {
+  const {
+    data: tags,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["post-tags"],
+    queryFn: async () => {
       const { data } =
         await apiClient.extension.tag.listcontentHaloRunV1alpha1Tag({
           page: 0,
           size: 0,
         });
 
-      tags.value = data.items;
-
-      const deletedTags = tags.value.filter(
+      return data.items;
+    },
+    refetchInterval(data) {
+      const deletingTags = data?.filter(
         (tag) => !!tag.metadata.deletionTimestamp
       );
-
-      if (deletedTags.length) {
-        refreshInterval.value = setInterval(() => {
-          handleFetchTags({ mute: true });
-        }, 3000);
-      }
-    } catch (e) {
-      console.error("Failed to fetch tags", e);
-    } finally {
-      loading.value = false;
-    }
-  };
-
-  onUnmounted(() => {
-    clearInterval(refreshInterval.value);
-  });
-
-  onBeforeRouteLeave(() => {
-    clearInterval(refreshInterval.value);
+      return deletingTags?.length ? 3000 : false;
+    },
+    refetchOnWindowFocus: false,
   });
 
   const handleDelete = async (tag: Tag) => {
@@ -75,20 +51,16 @@ export function usePostTag(options?: {
         } catch (e) {
           console.error("Failed to delete tag", e);
         } finally {
-          await handleFetchTags();
+          await refetch();
         }
       },
     });
   };
 
-  onMounted(() => {
-    fetchOnMounted && handleFetchTags();
-  });
-
   return {
     tags,
-    loading,
-    handleFetchTags,
+    isLoading,
+    handleFetchTags: refetch,
     handleDelete,
   };
 }

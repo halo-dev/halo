@@ -38,10 +38,10 @@ const selectedCategory = ref<Category | null>(null);
 const {
   categories,
   categoriesTree,
-  loading,
+  isLoading,
   handleFetchCategories,
   handleDelete,
-} = usePostCategory({ fetchOnMounted: true });
+} = usePostCategory();
 
 const handleUpdateInBatch = useDebounceFn(async () => {
   const categoriesTreeToUpdate = resetCategoriesTreePriority(
@@ -106,14 +106,14 @@ const onEditingModalClose = () => {
           >
             <div class="flex w-full flex-1 sm:w-auto">
               <span class="text-base font-medium">
-                {{ categories.length }} 个分类
+                {{ categories?.length || 0 }} 个分类
               </span>
             </div>
           </div>
         </div>
       </template>
-      <VLoading v-if="loading" />
-      <Transition v-else-if="!categories.length" appear name="fade">
+      <VLoading v-if="isLoading" />
+      <Transition v-else-if="!categories?.length" appear name="fade">
         <VEmpty message="你可以尝试刷新或者新建分类" title="当前没有分类">
           <template #actions>
             <VSpace>

@@ -33,7 +33,7 @@ const label = computed(() => {
     props.category.metadata.name
   );
   return categories
-    .map((category: CategoryTree) => category.spec.displayName)
+    ?.map((category: CategoryTree) => category.spec.displayName)
     .join(" / ");
 });
 </script>

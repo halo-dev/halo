@@ -35,9 +35,7 @@ const multiple = computed(() => {
   return multiple === "true";
 });
 
-const { categories, categoriesTree, handleFetchCategories } = usePostCategory({
-  fetchOnMounted: true,
-});
+const { categories, categoriesTree, handleFetchCategories } = usePostCategory();
 
 provide<Ref<CategoryTree[]>>("categoriesTree", categoriesTree);
 
@@ -69,7 +67,7 @@ const searchResults = computed(() => {
 watch(
   () => searchResults.value,
   (value) => {
-    if (value?.length > 0 && text.value) {
+    if (value?.length && text.value) {
       selectedCategory.value = value[0];
       scrollToSelected();
     } else {
@@ -81,11 +79,14 @@ watch(
 watch(
   () => categories.value,
   () => {
-    fuse = new Fuse(categories.value, {
+    fuse = new Fuse(categories.value || [], {
       keys: ["spec.displayName", "spec.slug"],
       useExtendedSearch: true,
       threshold: 0.2,
     });
+  },
+  {
+    immediate: true,
   }
 );
 
@@ -94,14 +95,14 @@ const selectedCategories = computed(() => {
     const currentValue = props.context._value || [];
     return currentValue
       .map((categoryName): Category | undefined => {
-        return categories.value.find(
+        return categories.value?.find(
           (category) => category.metadata.name === categoryName
         );
       })
       .filter(Boolean) as Category[];
   }
 
-  const category = categories.value.find(
+  const category = categories.value?.find(
     (category) => category.metadata.name === props.context._value
   );
   return [category].filter(Boolean) as Category[];
@@ -140,6 +141,8 @@ const handleSelect = (category: CategoryTree | Category) => {
 };
 
 const handleKeydown = (e: KeyboardEvent) => {
+  if (!searchResults.value) return;
+
   if (e.key === "ArrowDown") {
     e.preventDefault();
 
@@ -217,7 +220,7 @@ const handleCreateCategory = async () => {
           description: "",
           cover: "",
           template: "",
-          priority: categories.value.length + 1,
+          priority: categories.value?.length || 0 + 1,
           children: [],
         },
         apiVersion: "content.halo.run/v1alpha1",
@@ -286,7 +289,7 @@ const handleDelete = () => {
     <div v-if="dropdownVisible" :class="context.classes['dropdown-wrapper']">
       <ul class="p-1">
         <li
-          v-if="text.trim() && searchResults.length <= 0"
+          v-if="text.trim() && !searchResults?.length"
           v-permission="['system:posts:manage']"
           class="group flex cursor-pointer items-center justify-between rounded bg-gray-100 p-2"
         >

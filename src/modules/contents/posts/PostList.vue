@@ -28,282 +28,32 @@ import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSel
 import CategoryDropdownSelector from "@/components/dropdown-selector/CategoryDropdownSelector.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import PostTag from "../posts/tags/components/PostTag.vue";
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import type {
   User,
   Category,
-  ListedPostList,
   Post,
   Tag,
+  ListedPost,
 } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
-import { onBeforeRouteLeave } from "vue-router";
 import { postLabels } from "@/constants/labels";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import FilteCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 import TagDropdownSelector from "@/components/dropdown-selector/TagDropdownSelector.vue";
+import { useQuery } from "@tanstack/vue-query";
 
 const { currentUserHasPermission } = usePermission();
 
-const posts = ref<ListedPostList>({
-  page: 1,
-  size: 20,
-  total: 0,
-  items: [],
-  first: true,
-  last: false,
-  hasNext: false,
-  hasPrevious: false,
-  totalPages: 0,
-});
-const loading = ref(false);
 const settingModal = ref(false);
 const selectedPost = ref<Post>();
 const checkedAll = ref(false);
 const selectedPostNames = ref<string[]>([]);
-const refreshInterval = ref();
-
-const handleFetchPosts = async (options?: {
-  mute?: boolean;
-  page?: number;
-}) => {
-  try {
-    clearInterval(refreshInterval.value);
-
-    if (!options?.mute) {
-      loading.value = true;
-    }
-
-    let categories: string[] | undefined;
-    let tags: string[] | undefined;
-    let contributors: string[] | undefined;
-    const labelSelector: string[] = ["content.halo.run/deleted=false"];
-
-    if (selectedCategory.value) {
-      categories = [
-        selectedCategory.value.metadata.name,
-        selectedCategory.value.metadata.name,
-      ];
-    }
-
-    if (selectedTag.value) {
-      tags = [selectedTag.value.metadata.name];
-    }
-
-    if (selectedContributor.value) {
-      contributors = [selectedContributor.value.metadata.name];
-    }
-
-    if (selectedPublishStatusItem.value.value !== undefined) {
-      labelSelector.push(
-        `${postLabels.PUBLISHED}=${selectedPublishStatusItem.value.value}`
-      );
-    }
-
-    if (options?.page) {
-      posts.value.page = options.page;
-    }
-
-    const { data } = await apiClient.post.listPosts({
-      labelSelector,
-      page: posts.value.page,
-      size: posts.value.size,
-      visible: selectedVisibleItem.value?.value,
-      sort: selectedSortItem.value?.sort,
-      sortOrder: selectedSortItem.value?.sortOrder,
-      keyword: keyword.value,
-      category: categories,
-      tag: tags,
-      contributor: contributors,
-    });
-    posts.value = data;
-
-    // When an post is in the process of deleting or publishing, the list needs to be refreshed regularly
-    const abnormalPosts = posts.value.items.filter((post) => {
-      const { spec, metadata, status } = post.post;
-      return (
-        spec.deleted ||
-        (spec.publish && metadata.labels?.[postLabels.PUBLISHED] !== "true") ||
-        (spec.releaseSnapshot === spec.headSnapshot && status?.inProgress)
-      );
-    });
-
-    if (abnormalPosts.length) {
-      refreshInterval.value = setInterval(() => {
-        handleFetchPosts({ mute: true });
-      }, 3000);
-    }
-  } catch (e) {
-    console.error("Failed to fetch posts", e);
-  } finally {
-    loading.value = false;
-  }
-};
-
-onBeforeRouteLeave(() => {
-  clearInterval(refreshInterval.value);
-});
-
-const handlePaginationChange = ({
-  page,
-  size,
-}: {
-  page: number;
-  size: number;
-}) => {
-  posts.value.page = page;
-  posts.value.size = size;
-  handleFetchPosts();
-};
-
-const handleOpenSettingModal = async (post: Post) => {
-  const { data } = await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
-    {
-      name: post.metadata.name,
-    }
-  );
-  selectedPost.value = data;
-  settingModal.value = true;
-};
-
-const onSettingModalClose = () => {
-  selectedPost.value = undefined;
-  handleFetchPosts({ mute: true });
-};
-
-const handleSelectPrevious = async () => {
-  const { items, hasPrevious } = posts.value;
-  const index = items.findIndex(
-    (post) => post.post.metadata.name === selectedPost.value?.metadata.name
-  );
-  if (index > 0) {
-    const { data } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
-        name: items[index - 1].post.metadata.name,
-      });
-    selectedPost.value = data;
-    return;
-  }
-  if (index === 0 && hasPrevious) {
-    posts.value.page--;
-    await handleFetchPosts();
-    selectedPost.value = posts.value.items[posts.value.items.length - 1].post;
-  }
-};
-
-const handleSelectNext = async () => {
-  const { items, hasNext } = posts.value;
-  const index = items.findIndex(
-    (post) => post.post.metadata.name === selectedPost.value?.metadata.name
-  );
-  if (index < items.length - 1) {
-    const { data } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
-        name: items[index + 1].post.metadata.name,
-      });
-    selectedPost.value = data;
-    return;
-  }
-  if (index === items.length - 1 && hasNext) {
-    posts.value.page++;
-    await handleFetchPosts();
-    selectedPost.value = posts.value.items[0].post;
-  }
-};
-
-const checkSelection = (post: Post) => {
-  return (
-    post.metadata.name === selectedPost.value?.metadata.name ||
-    selectedPostNames.value.includes(post.metadata.name)
-  );
-};
-
-const getPublishStatus = (post: Post) => {
-  const { labels } = post.metadata;
-  return labels?.[postLabels.PUBLISHED] === "true" ? "已发布" : "未发布";
-};
-
-const isPublishing = (post: Post) => {
-  const { spec, status, metadata } = post;
-  return (
-    (spec.publish && metadata.labels?.[postLabels.PUBLISHED] !== "true") ||
-    (spec.releaseSnapshot === spec.headSnapshot && status?.inProgress)
-  );
-};
-
-const handleCheckAllChange = (e: Event) => {
-  const { checked } = e.target as HTMLInputElement;
-
-  if (checked) {
-    selectedPostNames.value =
-      posts.value.items.map((post) => {
-        return post.post.metadata.name;
-      }) || [];
-  } else {
-    selectedPostNames.value = [];
-  }
-};
-
-const handleDelete = async (post: Post) => {
-  Dialog.warning({
-    title: "确定要删除该文章吗？",
-    description: "该操作会将文章放入回收站，后续可以从回收站恢复",
-    confirmType: "danger",
-    onConfirm: async () => {
-      await apiClient.post.recyclePost({
-        name: post.metadata.name,
-      });
-      await handleFetchPosts();
-
-      Toast.success("删除成功");
-    },
-  });
-};
-
-const handleDeleteInBatch = async () => {
-  Dialog.warning({
-    title: "确定要删除选中的文章吗？",
-    description: "该操作会将文章放入回收站，后续可以从回收站恢复",
-    confirmType: "danger",
-    onConfirm: async () => {
-      await Promise.all(
-        selectedPostNames.value.map((name) => {
-          const post = posts.value.items.find(
-            (item) => item.post.metadata.name === name
-          )?.post;
-
-          if (!post) {
-            return Promise.resolve();
-          }
-
-          post.spec.deleted = true;
-          return apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
-            name: post.metadata.name,
-            post: post,
-          });
-        })
-      );
-      await handleFetchPosts();
-      selectedPostNames.value = [];
-
-      Toast.success("删除成功");
-    },
-  });
-};
-
-watch(selectedPostNames, (newValue) => {
-  checkedAll.value = newValue.length === posts.value.items?.length;
-});
-
-onMounted(() => {
-  handleFetchPosts();
-});
 
 // Filters
-
 interface VisibleItem {
   label: string;
   value?: "PUBLIC" | "INTERNAL" | "PRIVATE";
@@ -388,32 +138,32 @@ const keyword = ref("");
 
 function handleVisibleItemChange(visibleItem: VisibleItem) {
   selectedVisibleItem.value = visibleItem;
-  handleFetchPosts({ page: 1 });
+  page.value = 1;
 }
 
 function handlePublishStatusItemChange(publishStatusItem: PublishStatuItem) {
   selectedPublishStatusItem.value = publishStatusItem;
-  handleFetchPosts({ page: 1 });
+  page.value = 1;
 }
 
 function handleSortItemChange(sortItem?: SortItem) {
   selectedSortItem.value = sortItem;
-  handleFetchPosts({ page: 1 });
+  page.value = 1;
 }
 
 function handleCategoryChange(category?: Category) {
   selectedCategory.value = category;
-  handleFetchPosts({ page: 1 });
+  page.value = 1;
 }
 
 function handleTagChange(tag?: Tag) {
   selectedTag.value = tag;
-  handleFetchPosts({ page: 1 });
+  page.value = 1;
 }
 
 function handleContributorChange(user?: User) {
   selectedContributor.value = user;
-  handleFetchPosts({ page: 1 });
+  page.value = 1;
 }
 
 function handleKeywordChange() {
@@ -421,12 +171,12 @@ function handleKeywordChange() {
   if (keywordNode) {
     keyword.value = keywordNode._value as string;
   }
-  handleFetchPosts({ page: 1 });
+  page.value = 1;
 }
 
 function handleClearKeyword() {
   keyword.value = "";
-  handleFetchPosts({ page: 1 });
+  page.value = 1;
 }
 
 function handleClearFilters() {
@@ -437,7 +187,7 @@ function handleClearFilters() {
   selectedTag.value = undefined;
   selectedContributor.value = undefined;
   keyword.value = "";
-  handleFetchPosts({ page: 1 });
+  page.value = 1;
 }
 
 const hasFilters = computed(() => {
@@ -450,6 +200,220 @@ const hasFilters = computed(() => {
     selectedContributor.value ||
     keyword.value
   );
+});
+
+const page = ref(1);
+const size = ref(20);
+const total = ref(0);
+const hasPrevious = ref(false);
+const hasNext = ref(false);
+
+const {
+  data: posts,
+  isLoading,
+  isFetching,
+  refetch,
+} = useQuery<ListedPost[]>({
+  queryKey: [
+    "posts",
+    page,
+    size,
+    selectedCategory,
+    selectedTag,
+    selectedContributor,
+    selectedPublishStatusItem,
+    selectedVisibleItem,
+    selectedSortItem,
+    keyword,
+  ],
+  queryFn: async () => {
+    let categories: string[] | undefined;
+    let tags: string[] | undefined;
+    let contributors: string[] | undefined;
+    const labelSelector: string[] = ["content.halo.run/deleted=false"];
+
+    if (selectedCategory.value) {
+      categories = [selectedCategory.value.metadata.name];
+    }
+
+    if (selectedTag.value) {
+      tags = [selectedTag.value.metadata.name];
+    }
+
+    if (selectedContributor.value) {
+      contributors = [selectedContributor.value.metadata.name];
+    }
+
+    if (selectedPublishStatusItem.value.value !== undefined) {
+      labelSelector.push(
+        `${postLabels.PUBLISHED}=${selectedPublishStatusItem.value.value}`
+      );
+    }
+
+    const { data } = await apiClient.post.listPosts({
+      labelSelector,
+      page: page.value,
+      size: size.value,
+      visible: selectedVisibleItem.value?.value,
+      sort: selectedSortItem.value?.sort,
+      sortOrder: selectedSortItem.value?.sortOrder,
+      keyword: keyword.value,
+      category: categories,
+      tag: tags,
+      contributor: contributors,
+    });
+
+    total.value = data.total;
+    hasNext.value = data.hasNext;
+    hasPrevious.value = data.hasPrevious;
+
+    return data.items;
+  },
+  refetchInterval: (data) => {
+    const abnormalPosts = data?.filter((post) => {
+      const { spec, metadata, status } = post.post;
+      return (
+        spec.deleted ||
+        (spec.publish && metadata.labels?.[postLabels.PUBLISHED] !== "true") ||
+        (spec.releaseSnapshot === spec.headSnapshot && status?.inProgress)
+      );
+    });
+
+    return abnormalPosts?.length ? 3000 : false;
+  },
+  refetchOnWindowFocus: false,
+});
+
+const handleOpenSettingModal = async (post: Post) => {
+  const { data } = await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
+    {
+      name: post.metadata.name,
+    }
+  );
+  selectedPost.value = data;
+  settingModal.value = true;
+};
+
+const onSettingModalClose = () => {
+  selectedPost.value = undefined;
+  refetch();
+};
+
+const handleSelectPrevious = async () => {
+  if (!posts.value) return;
+
+  const index = posts.value.findIndex(
+    (post) => post.post.metadata.name === selectedPost.value?.metadata.name
+  );
+
+  if (index > 0) {
+    const { data: previousPost } =
+      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+        name: posts.value[index - 1].post.metadata.name,
+      });
+    selectedPost.value = previousPost;
+    return;
+  }
+  if (index === 0 && hasPrevious) {
+    page.value--;
+    await refetch();
+    selectedPost.value = posts.value[posts.value.length - 1].post;
+  }
+};
+
+const handleSelectNext = async () => {
+  if (!posts.value) return;
+
+  const index = posts.value.findIndex(
+    (post) => post.post.metadata.name === selectedPost.value?.metadata.name
+  );
+  if (index < posts.value.length - 1) {
+    const { data: nextPost } =
+      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+        name: posts.value[index + 1].post.metadata.name,
+      });
+    selectedPost.value = nextPost;
+    return;
+  }
+  if (index === posts.value.length - 1 && hasNext) {
+    page.value++;
+    await refetch();
+    selectedPost.value = posts.value[0].post;
+  }
+};
+
+const checkSelection = (post: Post) => {
+  return (
+    post.metadata.name === selectedPost.value?.metadata.name ||
+    selectedPostNames.value.includes(post.metadata.name)
+  );
+};
+
+const getPublishStatus = (post: Post) => {
+  const { labels } = post.metadata;
+  return labels?.[postLabels.PUBLISHED] === "true" ? "已发布" : "未发布";
+};
+
+const isPublishing = (post: Post) => {
+  const { spec, status, metadata } = post;
+  return (
+    (spec.publish && metadata.labels?.[postLabels.PUBLISHED] !== "true") ||
+    (spec.releaseSnapshot === spec.headSnapshot && status?.inProgress)
+  );
+};
+
+const handleCheckAllChange = (e: Event) => {
+  const { checked } = e.target as HTMLInputElement;
+
+  if (checked) {
+    selectedPostNames.value =
+      posts.value?.map((post) => {
+        return post.post.metadata.name;
+      }) || [];
+  } else {
+    selectedPostNames.value = [];
+  }
+};
+
+const handleDelete = async (post: Post) => {
+  Dialog.warning({
+    title: "确定要删除该文章吗？",
+    description: "该操作会将文章放入回收站，后续可以从回收站恢复",
+    confirmType: "danger",
+    onConfirm: async () => {
+      await apiClient.post.recyclePost({
+        name: post.metadata.name,
+      });
+      await refetch();
+
+      Toast.success("删除成功");
+    },
+  });
+};
+
+const handleDeleteInBatch = async () => {
+  Dialog.warning({
+    title: "确定要删除选中的文章吗？",
+    description: "该操作会将文章放入回收站，后续可以从回收站恢复",
+    confirmType: "danger",
+    onConfirm: async () => {
+      await Promise.all(
+        selectedPostNames.value.map((name) => {
+          return apiClient.post.recyclePost({
+            name,
+          });
+        })
+      );
+      await refetch();
+      selectedPostNames.value = [];
+
+      Toast.success("删除成功");
+    },
+  });
+};
+
+watch(selectedPostNames, (newValue) => {
+  checkedAll.value = newValue.length === posts.value?.length;
 });
 </script>
 <template>
@@ -708,11 +672,11 @@ const hasFilters = computed(() => {
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                    @click="handleFetchPosts()"
+                    @click="refetch()"
                   >
                     <IconRefreshLine
                       v-tooltip="`刷新`"
-                      :class="{ 'animate-spin text-gray-900': loading }"
+                      :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
                   </div>
@@ -722,12 +686,12 @@ const hasFilters = computed(() => {
           </div>
         </div>
       </template>
-      <VLoading v-if="loading" />
-      <Transition v-else-if="!posts.items.length" appear name="fade">
+      <VLoading v-if="isLoading" />
+      <Transition v-else-if="!posts?.length" appear name="fade">
         <VEmpty message="你可以尝试刷新或者新建文章" title="当前没有文章">
           <template #actions>
             <VSpace>
-              <VButton @click="handleFetchPosts">刷新</VButton>
+              <VButton @click="refetch">刷新</VButton>
               <VButton
                 v-permission="['system:posts:manage']"
                 :route="{ name: 'PostEditor' }"
@@ -747,7 +711,7 @@ const hasFilters = computed(() => {
           class="box-border h-full w-full divide-y divide-gray-100"
           role="list"
         >
-          <li v-for="(post, index) in posts.items" :key="index">
+          <li v-for="(post, index) in posts" :key="index">
             <VEntity :is-selected="checkSelection(post.post)">
               <template
                 v-if="currentUserHasPermission(['system:posts:manage'])"
@@ -928,11 +892,10 @@ const hasFilters = computed(() => {
       <template #footer>
         <div class="bg-white sm:flex sm:items-center sm:justify-end">
           <VPagination
-            :page="posts.page"
-            :size="posts.size"
-            :total="posts.total"
+            v-model:page="page"
+            v-model:size="size"
+            :total="total"
             :size-options="[20, 30, 50, 100]"
-            @change="handlePaginationChange"
           />
         </div>
       </template>

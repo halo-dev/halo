@@ -46,9 +46,7 @@ const viewTypes = [
 
 const viewType = ref("list");
 
-const { tags, loading, handleFetchTags, handleDelete } = usePostTag({
-  fetchOnMounted: true,
-});
+const { tags, isLoading, handleFetchTags, handleDelete } = usePostTag();
 
 const editingModal = ref(false);
 const selectedTag = ref<Tag | null>(null);
@@ -59,6 +57,8 @@ const handleOpenEditingModal = (tag: Tag | null) => {
 };
 
 const handleSelectPrevious = () => {
+  if (!tags.value) return;
+
   const currentIndex = tags.value.findIndex(
     (tag) => tag.metadata.name === selectedTag.value?.metadata.name
   );
@@ -74,6 +74,8 @@ const handleSelectPrevious = () => {
 };
 
 const handleSelectNext = () => {
+  if (!tags.value) return;
+
   if (!selectedTag.value) {
     selectedTag.value = tags.value[0];
     return;
@@ -140,7 +142,7 @@ onMounted(async () => {
           >
             <div class="flex w-full flex-1 sm:w-auto">
               <span class="text-base font-medium">
-                {{ tags.length }} 个标签
+                {{ tags?.length || 0 }} 个标签
               </span>
             </div>
             <div class="flex flex-row gap-2">
@@ -159,8 +161,8 @@ onMounted(async () => {
           </div>
         </div>
       </template>
-      <VLoading v-if="loading" />
-      <Transition v-else-if="!tags.length" appear name="fade">
+      <VLoading v-if="isLoading" />
+      <Transition v-else-if="!tags?.length" appear name="fade">
         <VEmpty message="你可以尝试刷新或者新建标签" title="当前没有标签">
           <template #actions>
             <VSpace>

@@ -2,7 +2,7 @@
 import { apiClient } from "@/utils/api-client";
 import type { FormKitFrameworkContext } from "@formkit/core";
 import type { Tag } from "@halo-dev/api-client";
-import { computed, onMounted, ref, watch, type PropType } from "vue";
+import { computed, ref, watch, type PropType } from "vue";
 import PostTag from "@/modules/contents/posts/tags/components/PostTag.vue";
 import {
   IconCheckboxCircle,
@@ -13,6 +13,7 @@ import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
 import { usePermission } from "@/utils/permission";
 import { slugify } from "transliteration";
+import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -36,7 +37,6 @@ const multiple = computed(() => {
   return multiple === "true";
 });
 
-const postTags = ref<Tag[]>([] as Tag[]);
 const selectedTag = ref<Tag>();
 const dropdownVisible = ref(false);
 const text = ref("");
@@ -46,8 +46,9 @@ onClickOutside(wrapperRef, () => {
   dropdownVisible.value = false;
 });
 
-// search
+const { tags: postTags, handleFetchTags } = usePostTag();
 
+// search
 let fuse: Fuse<Tag> | undefined = undefined;
 
 const searchResults = computed(() => {
@@ -61,7 +62,7 @@ const searchResults = computed(() => {
 watch(
   () => searchResults.value,
   (value) => {
-    if (value?.length > 0 && text.value) {
+    if (value?.length && text.value) {
       selectedTag.value = value[0];
       scrollToSelected();
     } else {
@@ -70,32 +71,31 @@ watch(
   }
 );
 
-const handleFetchTags = async () => {
-  const { data } = await apiClient.extension.tag.listcontentHaloRunV1alpha1Tag({
-    page: 0,
-    size: 0,
-  });
-
-  postTags.value = data.items;
-
-  fuse = new Fuse(data.items, {
-    keys: ["spec.displayName", "spec.slug"],
-    useExtendedSearch: true,
-    threshold: 0.2,
-  });
-};
+watch(
+  () => postTags.value,
+  () => {
+    fuse = new Fuse(postTags.value || [], {
+      keys: ["spec.displayName", "metadata.name", "spec.email"],
+      useExtendedSearch: true,
+      threshold: 0.2,
+    });
+  },
+  {
+    immediate: true,
+  }
+);
 
 const selectedTags = computed(() => {
   if (multiple.value) {
     const selectedTagNames = (props.context._value as string[]) || [];
     return selectedTagNames
       .map((tagName): Tag | undefined => {
-        return postTags.value.find((tag) => tag.metadata.name === tagName);
+        return postTags.value?.find((tag) => tag.metadata.name === tagName);
       })
       .filter(Boolean) as Tag[];
   }
 
-  const tag = postTags.value.find(
+  const tag = postTags.value?.find(
     (tag) => tag.metadata.name === props.context._value
   );
 
@@ -129,6 +129,8 @@ const handleSelect = (tag: Tag) => {
 };
 
 const handleKeydown = (e: KeyboardEvent) => {
+  if (!searchResults.value) return;
+
   if (e.key === "ArrowDown") {
     e.preventDefault();
 
@@ -234,8 +236,6 @@ const handleDelete = () => {
     props.context.node.input("");
   }
 };
-
-onMounted(handleFetchTags);
 </script>
 
 <template>
@@ -279,7 +279,7 @@ onMounted(handleFetchTags);
     <div v-if="dropdownVisible" :class="context.classes['dropdown-wrapper']">
       <ul class="p-1">
         <li
-          v-if="text.trim() && searchResults.length <= 0"
+          v-if="text.trim() && !searchResults?.length"
           v-permission="['system:posts:manage']"
           class="group flex cursor-pointer items-center justify-between rounded bg-gray-100 p-2"
           @click="handleCreateTag"
