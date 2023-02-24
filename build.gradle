@@ -4,6 +4,7 @@ plugins {
     id "com.gorylenko.gradle-git-properties" version "2.3.2"
     id "checkstyle"
     id 'java'
+    id 'jacoco'
 }
 
 group = "run.halo.app"
@@ -114,4 +115,15 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+test {
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled false
+    }
 }
