@@ -111,6 +111,8 @@ public class ThemeReconciler implements Reconciler<Request> {
                     .lastTransitionTime(Instant.now())
                     .build();
                 Theme.nullSafeConditionList(theme).add(condition);
+            } else {
+                status.setPhase(Theme.ThemePhase.READY);
             }
 
             if (!oldTheme.equals(theme)) {
