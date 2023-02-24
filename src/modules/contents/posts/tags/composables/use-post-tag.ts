@@ -28,10 +28,10 @@ export function usePostTag(): usePostTagReturn {
       return data.items;
     },
     refetchInterval(data) {
-      const deletingTags = data?.filter(
-        (tag) => !!tag.metadata.deletionTimestamp
+      const abnormalTags = data?.filter(
+        (tag) => !!tag.metadata.deletionTimestamp || !tag.status?.permalink
       );
-      return deletingTags?.length ? 3000 : false;
+      return abnormalTags?.length ? 3000 : false;
     },
     refetchOnWindowFocus: false,
   });

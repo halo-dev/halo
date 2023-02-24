@@ -34,10 +34,11 @@ export function usePostCategory(): usePostCategoryReturn {
       return data.items;
     },
     refetchInterval(data) {
-      const deletingCategories = data?.filter(
-        (category) => !!category.metadata.deletionTimestamp
+      const abnormalCategories = data?.filter(
+        (category) =>
+          !!category.metadata.deletionTimestamp || !category.status?.permalink
       );
-      return deletingCategories?.length ? 3000 : false;
+      return abnormalCategories?.length ? 3000 : false;
     },
     refetchOnWindowFocus: false,
     onSuccess(data) {
