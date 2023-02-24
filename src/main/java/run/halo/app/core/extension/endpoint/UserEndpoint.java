@@ -5,6 +5,7 @@ import static java.util.Comparator.comparing;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
+import static run.halo.app.extension.ListResult.generateGenericClass;
 import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
@@ -124,7 +125,8 @@ public class UserEndpoint implements CustomEndpoint {
                 builder.operationId("ListUsers")
                     .tag(tag)
                     .description("List users")
-                    .response(responseBuilder().implementation(ListedUser.class));
+                    .response(responseBuilder()
+                        .implementation(generateGenericClass(ListedUser.class)));
                 buildParametersFromType(builder, ListRequest.class);
             })
             .build();
@@ -221,7 +223,7 @@ public class UserEndpoint implements CustomEndpoint {
     }
 
     record DetailedUser(@Schema(requiredMode = REQUIRED) User user,
-                        @Schema(requiredMode = REQUIRED) List<Role> role) {
+                        @Schema(requiredMode = REQUIRED) List<Role> roles) {
 
     }
 
