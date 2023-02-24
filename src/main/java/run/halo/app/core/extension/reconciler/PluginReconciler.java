@@ -31,7 +31,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.retry.support.RetryTemplate;
-import org.springframework.security.web.util.UrlUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -130,17 +129,14 @@ public class PluginReconciler implements Reconciler<Request> {
             return;
         }
         Plugin.PluginStatus status = plugin.statusNonNull();
-        String cacheableLogoPath = cacheableLogoPath(logo, plugin.getSpec().getVersion());
         if (PathUtils.isAbsoluteUri(logo)) {
-            if (UrlUtils.isAbsoluteUrl(logo)) {
-                status.setLogo(cacheableLogoPath);
-            } else {
-                status.setLogo(logo);
-            }
+            status.setLogo(logo);
         } else {
             String assetsPrefix =
                 PluginConst.assertsRoutePrefix(plugin.getMetadata().getName());
-            status.setLogo(PathUtils.combinePath(assetsPrefix, cacheableLogoPath));
+            String versionedLogo =
+                applyVersioningToStaticResource(logo, plugin.getSpec().getVersion());
+            status.setLogo(PathUtils.combinePath(assetsPrefix, versionedLogo));
         }
     }
 
@@ -392,12 +388,12 @@ public class PluginReconciler implements Reconciler<Request> {
             final String pluginVersion = plugin.getSpec().getVersion();
             String jsBundlePath =
                 BundleResourceUtils.getJsBundlePath(haloPluginManager, name);
-            jsBundlePath = cacheableLogoPath(jsBundlePath, pluginVersion);
+            jsBundlePath = applyVersioningToStaticResource(jsBundlePath, pluginVersion);
             status.setEntry(jsBundlePath);
 
             String cssBundlePath =
                 BundleResourceUtils.getCssBundlePath(haloPluginManager, name);
-            cssBundlePath = cacheableLogoPath(cssBundlePath, pluginVersion);
+            cssBundlePath = applyVersioningToStaticResource(cssBundlePath, pluginVersion);
             status.setStylesheet(cssBundlePath);
 
             status.setPhase(currentState);
@@ -416,7 +412,7 @@ public class PluginReconciler implements Reconciler<Request> {
         });
     }
 
-    private String cacheableLogoPath(@Nullable String path, String pluginVersion) {
+    private String applyVersioningToStaticResource(@Nullable String path, String pluginVersion) {
         if (StringUtils.isNotBlank(path)) {
             return UriComponentsBuilder.fromUriString(path)
                 .queryParam("version", pluginVersion)

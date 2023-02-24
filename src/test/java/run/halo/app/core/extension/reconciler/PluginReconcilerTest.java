@@ -299,7 +299,7 @@ class PluginReconcilerTest {
             plugin.getSpec().setVersion("1.0.0");
             pluginReconciler.handleLogoPath(plugin);
             assertThat(plugin.statusNonNull().getLogo())
-                .isEqualTo("https://example.com/logo.png?version=1.0.0");
+                .isEqualTo("https://example.com/logo.png");
         }
 
         @Test
@@ -310,7 +310,7 @@ class PluginReconcilerTest {
             plugin.getSpec().setVersion("1.0.0");
             pluginReconciler.handleLogoPath(plugin);
             assertThat(plugin.statusNonNull().getLogo())
-                .isEqualTo("https://example.com/logo.png?hello=world&version=1.0.0");
+                .isEqualTo("https://example.com/logo.png?hello=world");
         }
 
         @Test
