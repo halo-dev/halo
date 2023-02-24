@@ -96,6 +96,7 @@ const searchResults = computed(() => {
                   <VEntityField>
                     <template #description>
                       <VAvatar
+                        :key="user.metadata.name"
                         :alt="user.spec.displayName"
                         :src="user.spec.avatar"
                         size="md"
