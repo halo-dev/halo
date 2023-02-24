@@ -28,9 +28,9 @@ import run.halo.app.content.SinglePageRequest;
 import run.halo.app.content.SinglePageService;
 import run.halo.app.content.SinglePageSorter;
 import run.halo.app.content.Stats;
-import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
+import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
@@ -51,11 +51,14 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
 
     private final ReactiveExtensionClient client;
     private final CounterService counterService;
+    private final UserService userService;
 
-    public SinglePageServiceImpl(ReactiveExtensionClient client, CounterService counterService) {
+    public SinglePageServiceImpl(ReactiveExtensionClient client, CounterService counterService,
+        UserService userService) {
         super(client);
         this.client = client;
         this.counterService = counterService;
+        this.userService = userService;
     }
 
     @Override
@@ -242,7 +245,7 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
     }
 
     private Mono<ListedSinglePage> setOwner(String ownerName, ListedSinglePage page) {
-        return client.fetch(User.class, ownerName)
+        return userService.getUserOrGhost(ownerName)
             .map(user -> {
                 Contributor contributor = new Contributor();
                 contributor.setName(user.getMetadata().getName());
@@ -273,7 +276,7 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
             return Flux.empty();
         }
         return Flux.fromIterable(usernames)
-            .flatMap(username -> client.fetch(User.class, username))
+            .flatMap(userService::getUserOrGhost)
             .map(user -> {
                 Contributor contributor = new Contributor();
                 contributor.setName(user.getMetadata().getName());

@@ -15,6 +15,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
+import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -33,14 +34,16 @@ import run.halo.app.plugin.ExtensionComponentsFinder;
 public class CommentServiceImpl implements CommentService {
 
     private final ReactiveExtensionClient client;
+    private final UserService userService;
     private final ExtensionComponentsFinder extensionComponentsFinder;
 
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     public CommentServiceImpl(ReactiveExtensionClient client,
-        ExtensionComponentsFinder extensionComponentsFinder,
+        UserService userService, ExtensionComponentsFinder extensionComponentsFinder,
         SystemConfigurableEnvironmentFetcher environmentFetcher) {
         this.client = client;
+        this.userService = userService;
         this.extensionComponentsFinder = extensionComponentsFinder;
         this.environmentFetcher = environmentFetcher;
     }
@@ -153,9 +156,8 @@ public class CommentServiceImpl implements CommentService {
 
     private Mono<OwnerInfo> getCommentOwnerInfo(Comment.CommentOwner owner) {
         if (User.KIND.equals(owner.getKind())) {
-            return client.fetch(User.class, owner.getName())
-                .map(OwnerInfo::from)
-                .switchIfEmpty(Mono.just(OwnerInfo.ghostUser()));
+            return userService.getUserOrGhost(owner.getName())
+                .map(OwnerInfo::from);
         }
         if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
             return Mono.just(OwnerInfo.from(owner));
