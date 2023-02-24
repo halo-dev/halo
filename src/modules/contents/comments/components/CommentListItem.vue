@@ -369,10 +369,15 @@ const subjectRefResult = computed(() => {
           <VStatusDot v-tooltip="`删除中`" state="warning" animate />
         </template>
       </VEntityField>
-      <VEntityField v-if="comment?.comment?.spec.approvedTime">
+      <VEntityField>
         <template #description>
           <span class="truncate text-xs tabular-nums text-gray-500">
-            {{ formatDatetime(comment?.comment?.spec.approvedTime) }}
+            {{
+              formatDatetime(
+                comment?.comment.spec.creationTime ||
+                  comment?.comment.metadata.creationTimestamp
+              )
+            }}
           </span>
         </template>
       </VEntityField>

@@ -63,6 +63,12 @@ export interface CommentSpec {
   approvedTime?: string
   /**
    *
+   * @type {string}
+   * @memberof CommentSpec
+   */
+  creationTime?: string
+  /**
+   *
    * @type {number}
    * @memberof CommentSpec
    */

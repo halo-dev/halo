@@ -60,6 +60,12 @@ export interface ReplySpec {
   approvedTime?: string
   /**
    *
+   * @type {string}
+   * @memberof ReplySpec
+   */
+  creationTime?: string
+  /**
+   *
    * @type {number}
    * @memberof ReplySpec
    */

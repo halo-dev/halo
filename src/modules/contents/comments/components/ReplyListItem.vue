@@ -171,10 +171,15 @@ const isHoveredReply = computed(() => {
           <VStatusDot v-tooltip="`删除中`" state="warning" animate />
         </template>
       </VEntityField>
-      <VEntityField v-if="reply?.reply?.spec.approvedTime">
+      <VEntityField>
         <template #description>
           <span class="truncate text-xs tabular-nums text-gray-500">
-            {{ formatDatetime(reply?.reply?.spec.approvedTime) }}
+            {{
+              formatDatetime(
+                reply?.reply?.spec.creationTime ||
+                  reply?.reply.metadata.creationTimestamp
+              )
+            }}
           </span>
         </template>
       </VEntityField>
