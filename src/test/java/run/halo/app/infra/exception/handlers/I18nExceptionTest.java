@@ -2,6 +2,9 @@ package run.halo.app.infra.exception.handlers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Locale;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
@@ -25,6 +28,18 @@ class I18nExceptionTest {
     @Autowired
     WebTestClient webClient;
 
+    Locale currentLocale;
+
+    @BeforeEach
+    void setUp() {
+        currentLocale = Locale.getDefault();
+        Locale.setDefault(Locale.ENGLISH);
+    }
+
+    @AfterEach
+    void tearDown() {
+        Locale.setDefault(currentLocale);
+    }
 
     @Test
     void shouldBeOkForGreetingEndpoint() {
