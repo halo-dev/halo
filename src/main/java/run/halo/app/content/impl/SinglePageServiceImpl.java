@@ -245,7 +245,7 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
     }
 
     private Mono<ListedSinglePage> setOwner(String ownerName, ListedSinglePage page) {
-        return userService.userOrGhost(ownerName)
+        return userService.getUserOrGhost(ownerName)
             .map(user -> {
                 Contributor contributor = new Contributor();
                 contributor.setName(user.getMetadata().getName());
@@ -276,7 +276,7 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
             return Flux.empty();
         }
         return Flux.fromIterable(usernames)
-            .flatMap(userService::userOrGhost)
+            .flatMap(userService::getUserOrGhost)
             .map(user -> {
                 Contributor contributor = new Contributor();
                 contributor.setName(user.getMetadata().getName());

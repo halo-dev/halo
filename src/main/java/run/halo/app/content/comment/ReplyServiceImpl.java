@@ -130,7 +130,7 @@ public class ReplyServiceImpl implements ReplyService {
     private Mono<OwnerInfo> getOwnerInfo(Reply reply) {
         Comment.CommentOwner owner = reply.getSpec().getOwner();
         if (User.KIND.equals(owner.getKind())) {
-            return userService.userOrGhost(owner.getName())
+            return userService.getUserOrGhost(owner.getName())
                 .map(OwnerInfo::from)
                 .switchIfEmpty(Mono.just(OwnerInfo.ghostUser()));
         }

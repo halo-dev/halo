@@ -55,8 +55,8 @@ class CommentFinderImplTest {
     void setUp() {
         User ghost = createUser();
         ghost.getMetadata().setName("ghost");
-        when(userService.userOrGhost(eq("ghost"))).thenReturn(Mono.just(ghost));
-        when(userService.userOrGhost(eq("fake-user"))).thenReturn(Mono.just(createUser()));
+        when(userService.getUserOrGhost(eq("ghost"))).thenReturn(Mono.just(ghost));
+        when(userService.getUserOrGhost(eq("fake-user"))).thenReturn(Mono.just(createUser()));
     }
 
     @Nested
@@ -379,13 +379,13 @@ class CommentFinderImplTest {
     private void extractedUser() {
         User another = createUser();
         another.getMetadata().setName("another");
-        when(userService.userOrGhost(eq("another"))).thenReturn(Mono.just(another));
+        when(userService.getUserOrGhost(eq("another"))).thenReturn(Mono.just(another));
 
         User ghost = createUser();
         ghost.getMetadata().setName("ghost");
-        when(userService.userOrGhost(eq("ghost"))).thenReturn(Mono.just(ghost));
-        when(userService.userOrGhost(eq("fake-user"))).thenReturn(Mono.just(createUser()));
-        when(userService.userOrGhost(any())).thenReturn(Mono.just(ghost));
+        when(userService.getUserOrGhost(eq("ghost"))).thenReturn(Mono.just(ghost));
+        when(userService.getUserOrGhost(eq("fake-user"))).thenReturn(Mono.just(createUser()));
+        when(userService.getUserOrGhost(any())).thenReturn(Mono.just(ghost));
     }
 
     User createUser() {

@@ -194,7 +194,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
     }
 
     private Mono<ListedPost> setOwner(String ownerName, ListedPost post) {
-        return userService.userOrGhost(ownerName)
+        return userService.getUserOrGhost(ownerName)
             .map(user -> {
                 Contributor contributor = new Contributor();
                 contributor.setName(user.getMetadata().getName());
@@ -227,7 +227,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
             return Flux.empty();
         }
         return Flux.fromIterable(usernames)
-            .flatMap(userService::userOrGhost)
+            .flatMap(userService::getUserOrGhost)
             .map(user -> {
                 Contributor contributor = new Contributor();
                 contributor.setName(user.getMetadata().getName());

@@ -17,7 +17,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.comment.OwnerInfo;
 import run.halo.app.content.comment.ReplyService;
-import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.extension.service.UserService;
@@ -107,7 +106,7 @@ public class CommentFinderImpl implements CommentFinder {
         if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
             return Mono.just(OwnerInfo.from(owner));
         }
-        return userService.userOrGhost(owner.getName())
+        return userService.getUserOrGhost(owner.getName())
             .map(OwnerInfo::from)
             .defaultIfEmpty(OwnerInfo.ghostUser());
     }

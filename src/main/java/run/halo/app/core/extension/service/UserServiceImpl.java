@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Mono<User> userOrGhost(String username) {
+    public Mono<User> getUserOrGhost(String username) {
         return client.fetch(User.class, username)
             .switchIfEmpty(Mono.defer(() -> client.fetch(User.class, GHOST_USER_NAME)));
     }
