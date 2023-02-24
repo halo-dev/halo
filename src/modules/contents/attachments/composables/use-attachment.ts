@@ -256,6 +256,7 @@ export function useAttachmentSelect(
             },
           };
         }
+
         if ("url" in attachment) {
           return {
             type: "image",
@@ -265,6 +266,7 @@ export function useAttachmentSelect(
             },
           };
         }
+
         if ("spec" in attachment) {
           const { mediaType, displayName } = attachment.spec;
           const { permalink } = attachment.status || {};
@@ -295,9 +297,23 @@ export function useAttachmentSelect(
               },
             };
           }
+
+          return {
+            type: "text",
+            marks: [
+              {
+                type: "link",
+                attrs: {
+                  href: permalink,
+                },
+              },
+            ],
+            text: displayName,
+          };
         }
       })
       .filter(Boolean) as Content[];
+
     editor.value
       ?.chain()
       .focus()
