@@ -28,10 +28,10 @@ import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.content.PostSorter;
 import run.halo.app.content.Stats;
-import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Tag;
+import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
@@ -51,11 +51,14 @@ import run.halo.app.metrics.MeterUtils;
 public class PostServiceImpl extends AbstractContentService implements PostService {
     private final ReactiveExtensionClient client;
     private final CounterService counterService;
+    private final UserService userService;
 
-    public PostServiceImpl(ReactiveExtensionClient client, CounterService counterService) {
+    public PostServiceImpl(ReactiveExtensionClient client, CounterService counterService,
+        UserService userService) {
         super(client);
         this.client = client;
         this.counterService = counterService;
+        this.userService = userService;
     }
 
     @Override
@@ -191,7 +194,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
     }
 
     private Mono<ListedPost> setOwner(String ownerName, ListedPost post) {
-        return client.fetch(User.class, ownerName)
+        return userService.getUserOrGhost(ownerName)
             .map(user -> {
                 Contributor contributor = new Contributor();
                 contributor.setName(user.getMetadata().getName());
@@ -224,8 +227,7 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
             return Flux.empty();
         }
         return Flux.fromIterable(usernames)
-            .flatMap(username -> client.fetch(User.class, username)
-                .switchIfEmpty(Mono.defer(() -> client.fetch(User.class, "ghost"))))
+            .flatMap(userService::getUserOrGhost)
             .map(user -> {
                 Contributor contributor = new Contributor();
                 contributor.setName(user.getMetadata().getName());
