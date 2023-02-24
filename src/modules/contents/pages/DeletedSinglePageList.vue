@@ -17,92 +17,56 @@ import {
   VLoading,
   Toast,
 } from "@halo-dev/components";
-import { onMounted, ref, watch } from "vue";
-import type { ListedSinglePageList, SinglePage } from "@halo-dev/api-client";
+import { ref, watch } from "vue";
+import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
-import { onBeforeRouteLeave, RouterLink } from "vue-router";
+import { RouterLink } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
 import { getNode } from "@formkit/core";
 import FilterTag from "@/components/filter/FilterTag.vue";
+import { useQuery } from "@tanstack/vue-query";
 
 const { currentUserHasPermission } = usePermission();
 
-const singlePages = ref<ListedSinglePageList>({
-  page: 1,
-  size: 50,
-  total: 0,
-  items: [],
-  first: true,
-  last: false,
-  hasNext: false,
-  hasPrevious: false,
-  totalPages: 0,
-});
-const loading = ref(false);
 const selectedPageNames = ref<string[]>([]);
 const checkedAll = ref(false);
-const refreshInterval = ref();
 const keyword = ref("");
 
-const handleFetchSinglePages = async (options?: {
-  mute?: boolean;
-  page?: number;
-}) => {
-  try {
-    clearInterval(refreshInterval.value);
+const page = ref(1);
+const size = ref(20);
+const total = ref(0);
 
-    if (!options?.mute) {
-      loading.value = true;
-    }
-
-    if (options?.page) {
-      singlePages.value.page = options.page;
-    }
-
+const {
+  data: singlePages,
+  isLoading,
+  isFetching,
+  refetch,
+} = useQuery<ListedSinglePage[]>({
+  queryKey: ["deleted-singlePages", page, size, keyword],
+  queryFn: async () => {
     const { data } = await apiClient.singlePage.listSinglePages({
       labelSelector: [`content.halo.run/deleted=true`],
-      page: singlePages.value.page,
-      size: singlePages.value.size,
+      page: page.value,
+      size: size.value,
       keyword: keyword.value,
     });
 
-    singlePages.value = data;
+    total.value = data.total;
 
-    const deletedSinglePages = singlePages.value.items.filter(
+    return data.items;
+  },
+  refetchOnWindowFocus: false,
+  refetchInterval(data) {
+    const deletedSinglePages = data?.filter(
       (singlePage) =>
         !!singlePage.page.metadata.deletionTimestamp ||
         !singlePage.page.spec.deleted
     );
-
-    if (deletedSinglePages.length) {
-      refreshInterval.value = setInterval(() => {
-        handleFetchSinglePages({ mute: true });
-      }, 3000);
-    }
-  } catch (error) {
-    console.error("Failed to fetch deleted single pages", error);
-  } finally {
-    loading.value = false;
-  }
-};
-
-onBeforeRouteLeave(() => {
-  clearInterval(refreshInterval.value);
+    return deletedSinglePages?.length ? 3000 : false;
+  },
 });
-
-const handlePaginationChange = ({
-  page,
-  size,
-}: {
-  page: number;
-  size: number;
-}) => {
-  singlePages.value.page = page;
-  singlePages.value.size = size;
-  handleFetchSinglePages();
-};
 
 const checkSelection = (singlePage: SinglePage) => {
   return selectedPageNames.value.includes(singlePage.metadata.name);
@@ -113,7 +77,7 @@ const handleCheckAllChange = (e: Event) => {
 
   if (checked) {
     selectedPageNames.value =
-      singlePages.value.items.map((singlePage) => {
+      singlePages.value?.map((singlePage) => {
         return singlePage.page.metadata.name;
       }) || [];
   } else {
@@ -132,7 +96,7 @@ const handleDeletePermanently = async (singlePage: SinglePage) => {
           name: singlePage.metadata.name,
         }
       );
-      await handleFetchSinglePages();
+      await refetch();
 
       Toast.success("删除成功");
     },
@@ -154,7 +118,7 @@ const handleDeletePermanentlyInBatch = async () => {
           );
         })
       );
-      await handleFetchSinglePages();
+      await refetch();
       selectedPageNames.value = [];
 
       Toast.success("删除成功");
@@ -175,7 +139,7 @@ const handleRecovery = async (singlePage: SinglePage) => {
           singlePage: singlePageToUpdate,
         }
       );
-      await handleFetchSinglePages();
+      await refetch();
 
       Toast.success("恢复成功");
     },
@@ -189,7 +153,7 @@ const handleRecoveryInBatch = async () => {
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {
-          const singlePage = singlePages.value.items.find(
+          const singlePage = singlePages.value?.find(
             (item) => item.page.metadata.name === name
           )?.page;
 
@@ -197,16 +161,21 @@ const handleRecoveryInBatch = async () => {
             return Promise.resolve();
           }
 
-          singlePage.spec.deleted = false;
           return apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
             {
               name: singlePage.metadata.name,
-              singlePage: singlePage,
+              singlePage: {
+                ...singlePage,
+                spec: {
+                  ...singlePage.spec,
+                  deleted: false,
+                },
+              },
             }
           );
         })
       );
-      await handleFetchSinglePages();
+      await refetch();
       selectedPageNames.value = [];
 
       Toast.success("恢复成功");
@@ -215,10 +184,8 @@ const handleRecoveryInBatch = async () => {
 };
 
 watch(selectedPageNames, (newValue) => {
-  checkedAll.value = newValue.length === singlePages.value.items?.length;
+  checkedAll.value = newValue.length === singlePages.value?.length;
 });
-
-onMounted(handleFetchSinglePages);
 
 // Filters
 function handleKeywordChange() {
@@ -226,12 +193,12 @@ function handleKeywordChange() {
   if (keywordNode) {
     keyword.value = keywordNode._value as string;
   }
-  handleFetchSinglePages({ page: 1 });
+  page.value = 1;
 }
 
 function handleClearKeyword() {
   keyword.value = "";
-  handleFetchSinglePages({ page: 1 });
+  page.value = 1;
 }
 </script>
 
@@ -307,10 +274,10 @@ function handleClearKeyword() {
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                    @click="handleFetchSinglePages()"
+                    @click="refetch()"
                   >
                     <IconRefreshLine
-                      :class="{ 'animate-spin text-gray-900': loading }"
+                      :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
                   </div>
@@ -320,15 +287,15 @@ function handleClearKeyword() {
           </div>
         </div>
       </template>
-      <VLoading v-if="loading" />
-      <Transition v-else-if="!singlePages.items.length" appear name="fade">
+      <VLoading v-if="isLoading" />
+      <Transition v-else-if="!singlePages?.length" appear name="fade">
         <VEmpty
           message="你可以尝试刷新或者返回自定义页面管理"
           title="没有自定义页面被放入回收站"
         >
           <template #actions>
             <VSpace>
-              <VButton @click="handleFetchSinglePages">刷新</VButton>
+              <VButton @click="refetch">刷新</VButton>
               <VButton
                 v-permission="['system:singlepages:view']"
                 :route="{ name: 'SinglePages' }"
@@ -345,7 +312,7 @@ function handleClearKeyword() {
           class="box-border h-full w-full divide-y divide-gray-100"
           role="list"
         >
-          <li v-for="(singlePage, index) in singlePages.items" :key="index">
+          <li v-for="(singlePage, index) in singlePages" :key="index">
             <VEntity :is-selected="checkSelection(singlePage.page)">
               <template
                 v-if="currentUserHasPermission(['system:singlepages:manage'])"
@@ -445,11 +412,10 @@ function handleClearKeyword() {
       <template #footer>
         <div class="bg-white sm:flex sm:items-center sm:justify-end">
           <VPagination
-            :page="singlePages.page"
-            :size="singlePages.size"
-            :total="singlePages.total"
+            v-model:page="page"
+            v-model:size="size"
+            :total="total"
             :size-options="[20, 30, 50, 100]"
-            @change="handlePaginationChange"
           />
         </div>
       </template>

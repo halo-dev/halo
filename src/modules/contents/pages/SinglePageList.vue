@@ -26,273 +26,27 @@ import {
 } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
-import { computed, onMounted, ref, watch } from "vue";
-import type {
-  ListedSinglePageList,
-  SinglePage,
-  User,
-} from "@halo-dev/api-client";
+import { computed, ref, watch } from "vue";
+import type { ListedSinglePage, SinglePage, User } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
-import { onBeforeRouteLeave, RouterLink } from "vue-router";
+import { RouterLink } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
 import { singlePageLabels } from "@/constants/labels";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
+import { useQuery } from "@tanstack/vue-query";
 
 const { currentUserHasPermission } = usePermission();
 
-const singlePages = ref<ListedSinglePageList>({
-  page: 1,
-  size: 20,
-  total: 0,
-  items: [],
-  first: true,
-  last: false,
-  hasNext: false,
-  hasPrevious: false,
-  totalPages: 0,
-});
-const loading = ref(false);
 const settingModal = ref(false);
 const selectedSinglePage = ref<SinglePage>();
 const selectedPageNames = ref<string[]>([]);
 const checkedAll = ref(false);
-const refreshInterval = ref();
-
-const handleFetchSinglePages = async (options?: {
-  mute?: boolean;
-  page?: number;
-}) => {
-  try {
-    clearInterval(refreshInterval.value);
-
-    if (!options?.mute) {
-      loading.value = true;
-    }
-
-    let contributors: string[] | undefined;
-    const labelSelector: string[] = ["content.halo.run/deleted=false"];
-
-    if (selectedContributor.value) {
-      contributors = [selectedContributor.value.metadata.name];
-    }
-
-    if (selectedPublishStatusItem.value.value !== undefined) {
-      labelSelector.push(
-        `${singlePageLabels.PUBLISHED}=${selectedPublishStatusItem.value.value}`
-      );
-    }
-
-    if (options?.page) {
-      singlePages.value.page = options.page;
-    }
-
-    const { data } = await apiClient.singlePage.listSinglePages({
-      labelSelector,
-      page: singlePages.value.page,
-      size: singlePages.value.size,
-      visible: selectedVisibleItem.value.value,
-      sort: selectedSortItem.value?.sort,
-      sortOrder: selectedSortItem.value?.sortOrder,
-      keyword: keyword.value,
-      contributor: contributors,
-    });
-    singlePages.value = data;
-
-    const abnormalSinglePages = singlePages.value.items.filter((singlePage) => {
-      const { spec, metadata, status } = singlePage.page;
-      return (
-        spec.deleted ||
-        (spec.publish &&
-          metadata.labels?.[singlePageLabels.PUBLISHED] !== "true") ||
-        (spec.releaseSnapshot === spec.headSnapshot && status?.inProgress)
-      );
-    });
-
-    if (abnormalSinglePages.length) {
-      refreshInterval.value = setInterval(() => {
-        handleFetchSinglePages({ mute: true });
-      }, 3000);
-    }
-  } catch (error) {
-    console.error("Failed to fetch single pages", error);
-  } finally {
-    loading.value = false;
-  }
-};
-
-onBeforeRouteLeave(() => {
-  clearInterval(refreshInterval.value);
-});
-
-const handlePaginationChange = ({
-  page,
-  size,
-}: {
-  page: number;
-  size: number;
-}) => {
-  singlePages.value.page = page;
-  singlePages.value.size = size;
-  handleFetchSinglePages();
-};
-
-const handleOpenSettingModal = async (singlePage: SinglePage) => {
-  const { data } =
-    await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
-      name: singlePage.metadata.name,
-    });
-  selectedSinglePage.value = data;
-  settingModal.value = true;
-};
-
-const onSettingModalClose = () => {
-  selectedSinglePage.value = undefined;
-  handleFetchSinglePages({ mute: true });
-};
-
-const handleSelectPrevious = async () => {
-  const { items, hasPrevious } = singlePages.value;
-  const index = items.findIndex(
-    (singlePage) =>
-      singlePage.page.metadata.name === selectedSinglePage.value?.metadata.name
-  );
-  if (index > 0) {
-    const { data } =
-      await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
-        name: items[index - 1].page.metadata.name,
-      });
-    selectedSinglePage.value = data;
-    return;
-  }
-  if (index === 0 && hasPrevious) {
-    singlePages.value.page--;
-    await handleFetchSinglePages();
-    selectedSinglePage.value =
-      singlePages.value.items[singlePages.value.items.length - 1].page;
-  }
-};
-
-const handleSelectNext = async () => {
-  const { items, hasNext } = singlePages.value;
-  const index = items.findIndex(
-    (singlePage) =>
-      singlePage.page.metadata.name === selectedSinglePage.value?.metadata.name
-  );
-  if (index < items.length - 1) {
-    const { data } =
-      await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
-        name: items[index + 1].page.metadata.name,
-      });
-    selectedSinglePage.value = data;
-    return;
-  }
-  if (index === items.length - 1 && hasNext) {
-    singlePages.value.page++;
-    await handleFetchSinglePages();
-    selectedSinglePage.value = singlePages.value.items[0].page;
-  }
-};
-
-const checkSelection = (singlePage: SinglePage) => {
-  return (
-    singlePage.metadata.name === selectedSinglePage.value?.metadata.name ||
-    selectedPageNames.value.includes(singlePage.metadata.name)
-  );
-};
-
-const handleCheckAllChange = (e: Event) => {
-  const { checked } = e.target as HTMLInputElement;
-
-  if (checked) {
-    selectedPageNames.value =
-      singlePages.value.items.map((singlePage) => {
-        return singlePage.page.metadata.name;
-      }) || [];
-  } else {
-    selectedPageNames.value = [];
-  }
-};
-
-const handleDelete = async (singlePage: SinglePage) => {
-  Dialog.warning({
-    title: "确定要删除该自定义页面吗？",
-    description: "该操作会将自定义页面放入回收站，后续可以从回收站恢复",
-    confirmType: "danger",
-    onConfirm: async () => {
-      const singlePageToUpdate = cloneDeep(singlePage);
-      singlePageToUpdate.spec.deleted = true;
-      await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
-        {
-          name: singlePage.metadata.name,
-          singlePage: singlePageToUpdate,
-        }
-      );
-      await handleFetchSinglePages();
-
-      Toast.success("删除成功");
-    },
-  });
-};
-
-const handleDeleteInBatch = async () => {
-  Dialog.warning({
-    title: "确定要删除选中的自定义页面吗？",
-    description: "该操作会将自定义页面放入回收站，后续可以从回收站恢复",
-    confirmType: "danger",
-    onConfirm: async () => {
-      await Promise.all(
-        selectedPageNames.value.map((name) => {
-          const page = singlePages.value.items.find(
-            (item) => item.page.metadata.name === name
-          )?.page;
-
-          if (!page) {
-            return Promise.resolve();
-          }
-
-          page.spec.deleted = true;
-          return apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
-            {
-              name: page.metadata.name,
-              singlePage: page,
-            }
-          );
-        })
-      );
-      await handleFetchSinglePages();
-      selectedPageNames.value = [];
-
-      Toast.success("删除成功");
-    },
-  });
-};
-
-const getPublishStatus = (singlePage: SinglePage) => {
-  const { labels } = singlePage.metadata;
-  return labels?.[singlePageLabels.PUBLISHED] === "true" ? "已发布" : "未发布";
-};
-
-const isPublishing = (singlePage: SinglePage) => {
-  const { spec, status, metadata } = singlePage;
-  return (
-    (spec.publish &&
-      metadata.labels?.[singlePageLabels.PUBLISHED] !== "true") ||
-    (spec.releaseSnapshot === spec.headSnapshot && status?.inProgress)
-  );
-};
-
-watch(selectedPageNames, (newValue) => {
-  checkedAll.value = newValue.length === singlePages.value.items?.length;
-});
-
-onMounted(handleFetchSinglePages);
 
 // Filters
-
 interface VisibleItem {
   label: string;
   value?: "PUBLIC" | "INTERNAL" | "PRIVATE";
@@ -375,22 +129,22 @@ const keyword = ref("");
 
 function handleVisibleItemChange(visibleItem: VisibleItem) {
   selectedVisibleItem.value = visibleItem;
-  handleFetchSinglePages({ page: 1 });
+  page.value = 1;
 }
 
 const handleSelectUser = (user?: User) => {
   selectedContributor.value = user;
-  handleFetchSinglePages({ page: 1 });
+  page.value = 1;
 };
 
 function handlePublishStatusItemChange(publishStatusItem: PublishStatusItem) {
   selectedPublishStatusItem.value = publishStatusItem;
-  handleFetchSinglePages({ page: 1 });
+  page.value = 1;
 }
 
 function handleSortItemChange(sortItem?: SortItem) {
   selectedSortItem.value = sortItem;
-  handleFetchSinglePages({ page: 1 });
+  page.value = 1;
 }
 
 function handleKeywordChange() {
@@ -398,12 +152,12 @@ function handleKeywordChange() {
   if (keywordNode) {
     keyword.value = keywordNode._value as string;
   }
-  handleFetchSinglePages({ page: 1 });
+  page.value = 1;
 }
 
 function handleClearKeyword() {
   keyword.value = "";
-  handleFetchSinglePages({ page: 1 });
+  page.value = 1;
 }
 
 const hasFilters = computed(() => {
@@ -422,8 +176,232 @@ function handleClearFilters() {
   selectedPublishStatusItem.value = PublishStatusItems[0];
   selectedSortItem.value = undefined;
   keyword.value = "";
-  handleFetchSinglePages({ page: 1 });
+  page.value = 1;
 }
+
+const page = ref(1);
+const size = ref(20);
+const total = ref(0);
+const hasNext = ref(false);
+const hasPrevious = ref(false);
+
+const {
+  data: singlePages,
+  isLoading,
+  isFetching,
+  refetch,
+} = useQuery<ListedSinglePage[]>({
+  queryKey: [
+    "singlePages",
+    selectedContributor,
+    selectedPublishStatusItem,
+    page,
+    size,
+    selectedVisibleItem,
+    selectedSortItem,
+    keyword,
+  ],
+  queryFn: async () => {
+    let contributors: string[] | undefined;
+    const labelSelector: string[] = ["content.halo.run/deleted=false"];
+
+    if (selectedContributor.value) {
+      contributors = [selectedContributor.value.metadata.name];
+    }
+
+    if (selectedPublishStatusItem.value.value !== undefined) {
+      labelSelector.push(
+        `${singlePageLabels.PUBLISHED}=${selectedPublishStatusItem.value.value}`
+      );
+    }
+
+    const { data } = await apiClient.singlePage.listSinglePages({
+      labelSelector,
+      page: page.value,
+      size: size.value,
+      visible: selectedVisibleItem.value.value,
+      sort: selectedSortItem.value?.sort,
+      sortOrder: selectedSortItem.value?.sortOrder,
+      keyword: keyword.value,
+      contributor: contributors,
+    });
+
+    total.value = data.total;
+    hasNext.value = data.hasNext;
+    hasPrevious.value = data.hasPrevious;
+
+    return data.items;
+  },
+  refetchOnWindowFocus: false,
+  refetchInterval(data) {
+    const abnormalSinglePages = data?.filter((singlePage) => {
+      const { spec, metadata, status } = singlePage.page;
+      return (
+        spec.deleted ||
+        (spec.publish &&
+          metadata.labels?.[singlePageLabels.PUBLISHED] !== "true") ||
+        (spec.releaseSnapshot === spec.headSnapshot && status?.inProgress)
+      );
+    });
+    return abnormalSinglePages?.length ? 3000 : false;
+  },
+});
+
+const handleOpenSettingModal = async (singlePage: SinglePage) => {
+  const { data } =
+    await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
+      name: singlePage.metadata.name,
+    });
+  selectedSinglePage.value = data;
+  settingModal.value = true;
+};
+
+const onSettingModalClose = () => {
+  selectedSinglePage.value = undefined;
+  refetch();
+};
+
+const handleSelectPrevious = async () => {
+  if (!singlePages.value) return;
+
+  const index = singlePages.value.findIndex(
+    (singlePage) =>
+      singlePage.page.metadata.name === selectedSinglePage.value?.metadata.name
+  );
+  if (index > 0) {
+    const { data } =
+      await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
+        name: singlePages.value[index - 1].page.metadata.name,
+      });
+    selectedSinglePage.value = data;
+    return;
+  }
+  if (index === 0 && hasPrevious.value) {
+    page.value--;
+    await refetch();
+    selectedSinglePage.value =
+      singlePages.value[singlePages.value.length - 1].page;
+  }
+};
+
+const handleSelectNext = async () => {
+  if (!singlePages.value) return;
+
+  const index = singlePages.value.findIndex(
+    (singlePage) =>
+      singlePage.page.metadata.name === selectedSinglePage.value?.metadata.name
+  );
+  if (index < singlePages.value.length - 1) {
+    const { data } =
+      await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
+        name: singlePages.value[index + 1].page.metadata.name,
+      });
+    selectedSinglePage.value = data;
+    return;
+  }
+  if (index === singlePages.value.length - 1 && hasNext.value) {
+    page.value++;
+    await refetch();
+    selectedSinglePage.value = singlePages.value[0].page;
+  }
+};
+
+const checkSelection = (singlePage: SinglePage) => {
+  return (
+    singlePage.metadata.name === selectedSinglePage.value?.metadata.name ||
+    selectedPageNames.value.includes(singlePage.metadata.name)
+  );
+};
+
+const handleCheckAllChange = (e: Event) => {
+  const { checked } = e.target as HTMLInputElement;
+
+  if (checked) {
+    selectedPageNames.value =
+      singlePages.value?.map((singlePage) => {
+        return singlePage.page.metadata.name;
+      }) || [];
+  } else {
+    selectedPageNames.value = [];
+  }
+};
+
+const handleDelete = async (singlePage: SinglePage) => {
+  Dialog.warning({
+    title: "确定要删除该自定义页面吗？",
+    description: "该操作会将自定义页面放入回收站，后续可以从回收站恢复",
+    confirmType: "danger",
+    onConfirm: async () => {
+      const singlePageToUpdate = cloneDeep(singlePage);
+      singlePageToUpdate.spec.deleted = true;
+      await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+        {
+          name: singlePage.metadata.name,
+          singlePage: singlePageToUpdate,
+        }
+      );
+      await refetch();
+
+      Toast.success("删除成功");
+    },
+  });
+};
+
+const handleDeleteInBatch = async () => {
+  Dialog.warning({
+    title: "确定要删除选中的自定义页面吗？",
+    description: "该操作会将自定义页面放入回收站，后续可以从回收站恢复",
+    confirmType: "danger",
+    onConfirm: async () => {
+      await Promise.all(
+        selectedPageNames.value.map((name) => {
+          const page = singlePages.value?.find(
+            (item) => item.page.metadata.name === name
+          )?.page;
+
+          if (!page) {
+            return Promise.resolve();
+          }
+
+          return apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+            {
+              name: page.metadata.name,
+              singlePage: {
+                ...page,
+                spec: {
+                  ...page.spec,
+                  deleted: true,
+                },
+              },
+            }
+          );
+        })
+      );
+      await refetch();
+      selectedPageNames.value = [];
+
+      Toast.success("删除成功");
+    },
+  });
+};
+
+const getPublishStatus = (singlePage: SinglePage) => {
+  const { labels } = singlePage.metadata;
+  return labels?.[singlePageLabels.PUBLISHED] === "true" ? "已发布" : "未发布";
+};
+
+const isPublishing = (singlePage: SinglePage) => {
+  const { spec, status, metadata } = singlePage;
+  return (
+    (spec.publish &&
+      metadata.labels?.[singlePageLabels.PUBLISHED] !== "true") ||
+    (spec.releaseSnapshot === spec.headSnapshot && status?.inProgress)
+  );
+};
+
+watch(selectedPageNames, (newValue) => {
+  checkedAll.value = newValue.length === singlePages.value?.length;
+});
 </script>
 
 <template>
@@ -649,11 +627,11 @@ function handleClearFilters() {
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                    @click="handleFetchSinglePages()"
+                    @click="refetch()"
                   >
                     <IconRefreshLine
                       v-tooltip="`刷新`"
-                      :class="{ 'animate-spin text-gray-900': loading }"
+                      :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
                   </div>
@@ -663,12 +641,12 @@ function handleClearFilters() {
           </div>
         </div>
       </template>
-      <VLoading v-if="loading" />
-      <Transition v-else-if="!singlePages.items.length" appear name="fade">
+      <VLoading v-if="isLoading" />
+      <Transition v-else-if="!singlePages?.length" appear name="fade">
         <VEmpty message="你可以尝试刷新或者新建页面" title="当前没有页面">
           <template #actions>
             <VSpace>
-              <VButton @click="handleFetchSinglePages">刷新</VButton>
+              <VButton @click="refetch">刷新</VButton>
               <VButton
                 v-permission="['system:singlepages:manage']"
                 :route="{ name: 'SinglePageEditor' }"
@@ -688,7 +666,7 @@ function handleClearFilters() {
           class="box-border h-full w-full divide-y divide-gray-100"
           role="list"
         >
-          <li v-for="(singlePage, index) in singlePages.items" :key="index">
+          <li v-for="(singlePage, index) in singlePages" :key="index">
             <VEntity :is-selected="checkSelection(singlePage.page)">
               <template
                 v-if="currentUserHasPermission(['system:singlepages:manage'])"
@@ -838,11 +816,10 @@ function handleClearFilters() {
       <template #footer>
         <div class="bg-white sm:flex sm:items-center sm:justify-end">
           <VPagination
-            :page="singlePages.page"
-            :size="singlePages.size"
-            :total="singlePages.total"
+            v-model:page="page"
+            v-model:size="size"
+            :total="total"
             :size-options="[20, 30, 50, 100]"
-            @change="handlePaginationChange"
           />
         </div>
       </template>
