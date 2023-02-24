@@ -111,7 +111,7 @@ public class PluginReconciler implements Reconciler<Request> {
                 createInitialReverseProxyIfNotPresent(plugin);
 
                 // filled logo path
-                handleLogoPath(plugin);
+                generateAccessibleLogoUrl(plugin);
 
                 // update phase
                 PluginWrapper pluginWrapper = getPluginWrapper(name);
@@ -123,7 +123,7 @@ public class PluginReconciler implements Reconciler<Request> {
             .orElse(false);
     }
 
-    void handleLogoPath(Plugin plugin) {
+    void generateAccessibleLogoUrl(Plugin plugin) {
         String logo = plugin.getSpec().getLogo();
         if (StringUtils.isBlank(logo)) {
             return;

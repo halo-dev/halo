@@ -297,7 +297,7 @@ class PluginReconcilerTest {
             plugin.setSpec(new Plugin.PluginSpec());
             plugin.getSpec().setLogo("https://example.com/logo.png");
             plugin.getSpec().setVersion("1.0.0");
-            pluginReconciler.handleLogoPath(plugin);
+            pluginReconciler.generateAccessibleLogoUrl(plugin);
             assertThat(plugin.statusNonNull().getLogo())
                 .isEqualTo("https://example.com/logo.png");
         }
@@ -308,7 +308,7 @@ class PluginReconcilerTest {
             plugin.setSpec(new Plugin.PluginSpec());
             plugin.getSpec().setLogo("https://example.com/logo.png?hello=world");
             plugin.getSpec().setVersion("1.0.0");
-            pluginReconciler.handleLogoPath(plugin);
+            pluginReconciler.generateAccessibleLogoUrl(plugin);
             assertThat(plugin.statusNonNull().getLogo())
                 .isEqualTo("https://example.com/logo.png?hello=world");
         }
@@ -319,7 +319,7 @@ class PluginReconcilerTest {
             plugin.setSpec(new Plugin.PluginSpec());
             plugin.getSpec().setLogo(null);
             plugin.getSpec().setVersion("1.0.0");
-            pluginReconciler.handleLogoPath(plugin);
+            pluginReconciler.generateAccessibleLogoUrl(plugin);
             assertThat(plugin.statusNonNull().getLogo()).isNull();
         }
 
@@ -329,7 +329,7 @@ class PluginReconcilerTest {
             plugin.setSpec(new Plugin.PluginSpec());
             plugin.getSpec().setLogo("");
             plugin.getSpec().setVersion("1.0.0");
-            pluginReconciler.handleLogoPath(plugin);
+            pluginReconciler.generateAccessibleLogoUrl(plugin);
             assertThat(plugin.statusNonNull().getLogo()).isNull();
         }
 
@@ -341,7 +341,7 @@ class PluginReconcilerTest {
             plugin.getMetadata().setName("fake-plugin");
             plugin.getSpec().setLogo("/static/logo.jpg");
             plugin.getSpec().setVersion("1.0.0");
-            pluginReconciler.handleLogoPath(plugin);
+            pluginReconciler.generateAccessibleLogoUrl(plugin);
             assertThat(plugin.statusNonNull().getLogo())
                 .isEqualTo("/plugins/fake-plugin/assets/static/logo.jpg?version=1.0.0");
         }
@@ -354,7 +354,7 @@ class PluginReconcilerTest {
             plugin.getMetadata().setName("fake-plugin");
             plugin.getSpec().setLogo("data:image/gif;base64,R0lGODfake");
             plugin.getSpec().setVersion("2.0.0");
-            pluginReconciler.handleLogoPath(plugin);
+            pluginReconciler.generateAccessibleLogoUrl(plugin);
             assertThat(plugin.statusNonNull().getLogo())
                 .isEqualTo("data:image/gif;base64,R0lGODfake");
         }
