@@ -13,8 +13,10 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.pf4j.PluginState;
 import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.GVK;
+import run.halo.app.infra.ConditionList;
 
 /**
  * A custom resource for Plugin.
@@ -102,19 +104,23 @@ public class Plugin extends AbstractExtension {
 
         private PluginState phase;
 
-        private String reason;
-
-        private String message;
+        private ConditionList conditions;
 
         private Instant lastStartTime;
-
-        private Instant lastTransitionTime;
 
         private String entry;
 
         private String stylesheet;
 
         private String logo;
+
+        public static ConditionList nullSafeConditions(@NonNull PluginStatus status) {
+            Assert.notNull(status, "The status must not be null.");
+            if (status.getConditions() == null) {
+                status.setConditions(new ConditionList());
+            }
+            return status.getConditions();
+        }
     }
 
     @Data

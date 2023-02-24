@@ -20,6 +20,9 @@ import static org.mockito.Mockito.when;
 import static run.halo.app.extension.GroupVersionKind.fromAPIVersionAndKind;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 import reactor.core.Exceptions;
@@ -52,6 +56,11 @@ class ReactiveExtensionClientTest {
 
     @Mock
     SchemeManager schemeManager;
+
+    @Spy
+    ObjectMapper objectMapper = JsonMapper.builder()
+        .addModule(new JavaTimeModule())
+        .build();
 
     @InjectMocks
     ReactiveExtensionClientImpl client;
@@ -419,7 +428,7 @@ class ReactiveExtensionClientTest {
             .verifyComplete();
 
         verify(storeClient).fetchByName(storeName);
-        verify(converter).convertTo(eq(fake));
+        verify(converter).convertTo(isA(JsonExtension.class));
         verify(converter, times(2)).convertFrom(same(FakeExtension.class), any());
         verify(storeClient)
             .update(eq("/registry/fake.halo.run/fakes/fake"), eq(2L), any());
@@ -433,6 +442,7 @@ class ReactiveExtensionClientTest {
             Mono.just(createExtensionStore(storeName, 1L)));
 
         var oldFake = createFakeExtension("fake", 2L);
+
         when(converter.convertFrom(same(FakeExtension.class), any())).thenReturn(oldFake);
 
         StepVerifier.create(client.update(fake))
@@ -470,7 +480,7 @@ class ReactiveExtensionClientTest {
             .verifyComplete();
 
         verify(storeClient).fetchByName(name);
-        verify(converter).convertTo(eq(fake));
+        verify(converter).convertTo(isA(JsonExtension.class));
         verify(converter, times(2)).convertFrom(same(Unstructured.class), any());
         verify(storeClient)
             .update(eq("/registry/fake.halo.run/fakes/fake"), eq(12345L), any());

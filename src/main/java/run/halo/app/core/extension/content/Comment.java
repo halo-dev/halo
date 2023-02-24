@@ -1,5 +1,7 @@
 package run.halo.app.core.extension.content;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
@@ -70,6 +72,11 @@ public class Comment extends AbstractExtension {
 
         private Instant approvedTime;
 
+        /**
+         * The user-defined creation time default is <code>metadata.creationTimestamp</code>.
+         */
+        private Instant creationTime;
+
         @Schema(required = true, defaultValue = "0")
         private Integer priority;
 
@@ -84,6 +91,15 @@ public class Comment extends AbstractExtension {
 
         @Schema(required = true, defaultValue = "false")
         private Boolean hidden;
+
+        /**
+         * If the creation time is null, use approvedTime.
+         *
+         * @return if creationTime is null returned approved time, otherwise creationTime.
+         */
+        public Instant getCreationTime() {
+            return defaultIfNull(creationTime, approvedTime);
+        }
     }
 
     @Data
@@ -130,8 +146,9 @@ public class Comment extends AbstractExtension {
                 if (lastReadTime == null) {
                     return true;
                 }
-                return existingReply.getMetadata().getCreationTimestamp()
-                    .isAfter(lastReadTime);
+                Instant creationTime = defaultIfNull(existingReply.getSpec().getCreationTime(),
+                    existingReply.getMetadata().getCreationTimestamp());
+                return creationTime.isAfter(lastReadTime);
             })
             .count();
         return (int) unreadReplyCount;

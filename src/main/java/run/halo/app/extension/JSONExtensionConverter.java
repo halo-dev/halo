@@ -53,8 +53,6 @@ public class JSONExtensionConverter implements ExtensionConverter {
         var scheme = schemeManager.get(gvk);
 
         try {
-            var data = objectMapper.writeValueAsBytes(extension);
-
             var validation = new ValidationData<>(extension);
             var extensionJsonNode = objectMapper.valueToTree(extension);
             var validator = getValidator(scheme);
@@ -68,6 +66,7 @@ public class JSONExtensionConverter implements ExtensionConverter {
 
             var version = extension.getMetadata().getVersion();
             var storeName = ExtensionUtil.buildStoreName(scheme, extension.getMetadata().getName());
+            var data = objectMapper.writeValueAsBytes(extensionJsonNode);
             return new ExtensionStore(storeName, data, version);
         } catch (IOException e) {
             throw new ExtensionConvertException("Failed write Extension as bytes", e);
