@@ -1,16 +1,15 @@
 package run.halo.app.core.extension.reconciler;
 
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import run.halo.app.content.comment.ReplyService;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Constant;
@@ -110,7 +109,7 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
         List<Reply> replies = client.list(Reply.class,
             reply -> commentName.equals(reply.getSpec().getCommentName())
                 && reply.getMetadata().getDeletionTimestamp() == null,
-            defaultReplyComparator());
+            ReplyService.creationTimeAscComparator());
 
         // calculate unread reply count
         comment.getStatusOrDefault()
@@ -180,12 +179,5 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
             return null;
         }
         return new GroupVersionKind(ref.getGroup(), ref.getVersion(), ref.getKind());
-    }
-
-    Comparator<Reply> defaultReplyComparator() {
-        Function<Reply, Instant> createTime = reply -> reply.getMetadata().getCreationTimestamp();
-        return Comparator.comparing(createTime)
-            .thenComparing(reply -> reply.getMetadata().getName())
-            .reversed();
     }
 }

@@ -127,6 +127,7 @@ class CommentServiceImplTest {
 
         verify(client, times(1)).create(captor.capture());
         Comment comment = captor.getValue();
+        comment.getSpec().setCreationTime(null);
         JSONAssert.assertEquals("""
                 {
                     "spec": {

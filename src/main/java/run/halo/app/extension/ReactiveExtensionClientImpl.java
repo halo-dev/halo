@@ -3,11 +3,13 @@ package run.halo.app.extension;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.springframework.util.StringUtils.hasText;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.util.Predicates;
@@ -29,11 +31,14 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     private final Watcher.WatcherComposite watchers;
 
+    private final ObjectMapper objectMapper;
+
     public ReactiveExtensionClientImpl(ReactiveExtensionStoreClient client,
-        ExtensionConverter converter, SchemeManager schemeManager) {
+        ExtensionConverter converter, SchemeManager schemeManager, ObjectMapper objectMapper) {
         this.client = client;
         this.converter = converter;
         this.schemeManager = schemeManager;
+        this.objectMapper = objectMapper;
         this.watchers = new Watcher.WatcherComposite();
     }
 
@@ -110,7 +115,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
                     if (!hasText(metadata.getGenerateName())) {
                         throw new IllegalArgumentException(
                             "The metadata.generateName must not be blank when metadata.name is "
-                                + "blank");
+                            + "blank");
                     }
                     // generate name with random text
                     metadata.setName(metadata.getGenerateName() + randomAlphabetic(5));
@@ -124,38 +129,55 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 // retry when generateName is set
                 .filter(t -> t instanceof DataIntegrityViolationException
-                    && hasText(extension.getMetadata().getGenerateName())));
+                             && hasText(extension.getMetadata().getGenerateName())));
     }
 
     @Override
     public <E extends Extension> Mono<E> update(E extension) {
-        // overwrite some fields
-        Mono<? extends Extension> mono;
-        if (extension instanceof Unstructured unstructured) {
-            mono = get(unstructured.groupVersionKind(), extension.getMetadata().getName());
-        } else {
-            mono = get(extension.getClass(), extension.getMetadata().getName());
-        }
-        return mono
-            .flatMap(old -> {
-                // reset some fields
-                var oldMetadata = old.getMetadata();
-                var newMetadata = extension.getMetadata();
+        // Refactor the atomic reference if we have a better solution.
+        final var statusChangeOnly = new AtomicBoolean(false);
+        return getLatest(extension)
+            .map(old -> new JsonExtension(objectMapper, old))
+            .flatMap(oldJsonExt -> {
+                var newJsonExt = new JsonExtension(objectMapper, extension);
+                // reset some mandatory fields
+                var oldMetadata = oldJsonExt.getMetadata();
+                var newMetadata = newJsonExt.getMetadata();
                 newMetadata.setCreationTimestamp(oldMetadata.getCreationTimestamp());
-                newMetadata.setDeletionTimestamp(oldMetadata.getDeletionTimestamp());
-                extension.setMetadata(newMetadata);
-                if (Objects.equals(old, extension)) {
+                newMetadata.setGenerateName(oldMetadata.getGenerateName());
+
+                var oldObjectNode = oldJsonExt.getInternal().deepCopy();
+                var newObjectNode = newJsonExt.getInternal().deepCopy();
+                if (Objects.equals(oldObjectNode, newObjectNode)) {
+                    // if no data were changed, just skip updating.
                     return Mono.empty();
                 }
-                return Mono.just(extension);
+                // check status is changed
+                oldObjectNode.remove("status");
+                newObjectNode.remove("status");
+                if (Objects.equals(oldObjectNode, newObjectNode)) {
+                    statusChangeOnly.set(true);
+                }
+                return Mono.just(newJsonExt);
             })
             .map(converter::convertTo)
             .flatMap(extensionStore -> client.update(extensionStore.getName(),
                 extensionStore.getVersion(),
                 extensionStore.getData()))
             .map(updated -> converter.convertFrom((Class<E>) extension.getClass(), updated))
-            .doOnNext(updated -> watchers.onUpdate(extension, updated))
+            .doOnNext(updated -> {
+                if (!statusChangeOnly.get()) {
+                    watchers.onUpdate(extension, updated);
+                }
+            })
             .switchIfEmpty(Mono.defer(() -> Mono.just(extension)));
+    }
+
+    private Mono<? extends Extension> getLatest(Extension extension) {
+        if (extension instanceof Unstructured unstructured) {
+            return get(unstructured.groupVersionKind(), unstructured.getMetadata().getName());
+        }
+        return get(extension.getClass(), extension.getMetadata().getName());
     }
 
     @Override
