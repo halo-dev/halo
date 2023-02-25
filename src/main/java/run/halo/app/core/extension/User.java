@@ -34,6 +34,8 @@ public class User extends AbstractExtension {
 
     public static final String ROLE_NAMES_ANNO = "rbac.authorization.halo.run/role-names";
 
+    public static final String HIDDEN_USER_LABEL = "halo.run/hidden-user";
+
     @Schema(required = true)
     private UserSpec spec;
 
