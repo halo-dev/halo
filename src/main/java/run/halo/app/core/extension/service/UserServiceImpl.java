@@ -16,9 +16,12 @@ import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.infra.exception.UserNotFoundException;
 
 @Service
 public class UserServiceImpl implements UserService {
+    public static final String GHOST_USER_NAME = "ghost";
 
     private final ReactiveExtensionClient client;
 
@@ -31,7 +34,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<User> getUser(String username) {
-        return client.get(User.class, username);
+        return client.get(User.class, username)
+            .onErrorMap(ExtensionNotFoundException.class,
+                e -> new UserNotFoundException(username));
+    }
+
+    @Override
+    public Mono<User> getUserOrGhost(String username) {
+        return client.fetch(User.class, username)
+            .switchIfEmpty(Mono.defer(() -> client.get(User.class, GHOST_USER_NAME)));
     }
 
     @Override

@@ -5,6 +5,7 @@ import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldS
 import java.time.Instant;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -13,11 +14,10 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
+import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
-import run.halo.app.infra.exception.AccessDeniedException;
 
 /**
  * A default implementation of {@link ReplyService}.
@@ -26,21 +26,16 @@ import run.halo.app.infra.exception.AccessDeniedException;
  * @since 2.0.0
  */
 @Service
+@RequiredArgsConstructor
 public class ReplyServiceImpl implements ReplyService {
 
     private final ReactiveExtensionClient client;
-    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
-
-    public ReplyServiceImpl(ReactiveExtensionClient client,
-        SystemConfigurableEnvironmentFetcher environmentFetcher) {
-        this.client = client;
-        this.environmentFetcher = environmentFetcher;
-    }
+    private final UserService userService;
 
     @Override
     public Mono<Reply> create(String commentName, Reply reply) {
-        return client.fetch(Comment.class, commentName)
-            .flatMap(comment -> {
+        return client.get(Comment.class, commentName)
+            .map(comment -> {
                 // Boolean allowNotification = reply.getSpec().getAllowNotification();
                 // TODO send notification if allowNotification is true
                 reply.getSpec().setCommentName(commentName);
@@ -53,28 +48,14 @@ public class ReplyServiceImpl implements ReplyService {
                 if (reply.getSpec().getCreationTime() == null) {
                     reply.getSpec().setCreationTime(Instant.now());
                 }
-                return environmentFetcher.fetchComment()
-                    .map(commentSetting -> {
-                        if (Boolean.FALSE.equals(commentSetting.getEnable())) {
-                            throw new AccessDeniedException(
-                                "The comment function has been turned off.",
-                                "problemDetail.comment.turnedOff", null);
-                        }
-                        if (checkReplyOwner(reply, commentSetting.getSystemUserOnly())) {
-                            throw new AccessDeniedException("Allow only system users to comment.",
-                                "problemDetail.comment.systemUsersOnly", null);
-                        }
-                        reply.getSpec().setApproved(
-                            Boolean.FALSE.equals(commentSetting.getRequireReviewForNew()));
-                        // fix https://github.com/halo-dev/halo/issues/2951
-                        reply.getSpec().setHidden(false);
-
-                        if (BooleanUtils.isTrue(reply.getSpec().getApproved())
-                            && reply.getSpec().getApprovedTime() == null) {
-                            reply.getSpec().setApprovedTime(Instant.now());
-                        }
-                        return reply;
-                    });
+                if (reply.getSpec().getApproved() == null) {
+                    reply.getSpec().setApproved(false);
+                }
+                if (BooleanUtils.isTrue(reply.getSpec().getApproved())
+                    && reply.getSpec().getApprovedTime() == null) {
+                    reply.getSpec().setApprovedTime(Instant.now());
+                }
+                return reply;
             })
             .flatMap(replyToUse -> {
                 if (replyToUse.getSpec().getOwner() != null) {
@@ -87,21 +68,9 @@ public class ReplyServiceImpl implements ReplyService {
                         return replyToUse;
                     })
                     .switchIfEmpty(
-                        Mono.error(new IllegalStateException("Reply owner must not be null.")));
+                        Mono.error(new IllegalArgumentException("Reply owner must not be null.")));
             })
-            .flatMap(client::create)
-            .switchIfEmpty(Mono.error(
-                new IllegalArgumentException(
-                    String.format("Comment not found for name [%s].", commentName)))
-            );
-    }
-
-    private boolean checkReplyOwner(Reply reply, Boolean onlySystemUser) {
-        Comment.CommentOwner owner = reply.getSpec().getOwner();
-        if (Boolean.TRUE.equals(onlySystemUser)) {
-            return owner != null && Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind());
-        }
-        return false;
+            .flatMap(client::create);
     }
 
     @Override
@@ -132,9 +101,8 @@ public class ReplyServiceImpl implements ReplyService {
     private Mono<OwnerInfo> getOwnerInfo(Reply reply) {
         Comment.CommentOwner owner = reply.getSpec().getOwner();
         if (User.KIND.equals(owner.getKind())) {
-            return client.fetch(User.class, owner.getName())
-                .map(OwnerInfo::from)
-                .switchIfEmpty(Mono.just(OwnerInfo.ghostUser()));
+            return userService.getUserOrGhost(owner.getName())
+                .map(OwnerInfo::from);
         }
         if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
             return Mono.just(OwnerInfo.from(owner));

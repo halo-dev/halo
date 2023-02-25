@@ -8,79 +8,45 @@ import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Properties;
-import org.springframework.context.ApplicationContext;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
-import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.infra.ExternalUrlSupplier;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.PathUtils;
-import run.halo.app.theme.DefaultTemplateEnum;
-import run.halo.app.theme.router.PermalinkIndexAddCommand;
-import run.halo.app.theme.router.PermalinkIndexDeleteCommand;
-import run.halo.app.theme.router.PermalinkIndexUpdateCommand;
-import run.halo.app.theme.router.PermalinkPatternProvider;
-import run.halo.app.theme.router.PermalinkWatch;
 
 /**
  * @author guqing
  * @since 2.0.0
  */
 @Component
-public class PostPermalinkPolicy implements PermalinkPolicy<Post>, PermalinkWatch<Post> {
-    private final GroupVersionKind gvk = GroupVersionKind.fromExtension(Post.class);
+@RequiredArgsConstructor
+public class PostPermalinkPolicy implements PermalinkPolicy<Post> {
+    public static final String DEFAULT_PERMALINK_PATTERN =
+        SystemSetting.ThemeRouteRules.empty().getPost();
     private static final NumberFormat NUMBER_FORMAT = new DecimalFormat("00");
 
-    private final PermalinkPatternProvider permalinkPatternProvider;
-    private final ApplicationContext applicationContext;
+    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
     private final ExternalUrlSupplier externalUrlSupplier;
-
-    public PostPermalinkPolicy(PermalinkPatternProvider permalinkPatternProvider,
-        ApplicationContext applicationContext, ExternalUrlSupplier externalUrlSupplier) {
-        this.permalinkPatternProvider = permalinkPatternProvider;
-        this.applicationContext = applicationContext;
-        this.externalUrlSupplier = externalUrlSupplier;
-    }
 
     @Override
     public String permalink(Post post) {
-        return createPermalink(post, pattern());
+        Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(post);
+        String permalinkPattern =
+            annotations.getOrDefault(Constant.PERMALINK_PATTERN_ANNO, DEFAULT_PERMALINK_PATTERN);
+        return createPermalink(post, permalinkPattern);
     }
 
-    @Override
-    public String templateName() {
-        return DefaultTemplateEnum.POST.getValue();
-    }
-
-    @Override
     public String pattern() {
-        return permalinkPatternProvider.getPattern(DefaultTemplateEnum.POST);
-    }
-
-    @Override
-    public void onPermalinkAdd(Post post) {
-        if (!post.isPublished() || Objects.equals(true, post.getSpec().getDeleted())) {
-            return;
-        }
-        // publish when post is published and not deleted
-        applicationContext.publishEvent(new PermalinkIndexAddCommand(this, getLocator(post),
-            post.getStatusOrDefault().getPermalink()));
-    }
-
-    @Override
-    public void onPermalinkUpdate(Post post) {
-        applicationContext.publishEvent(new PermalinkIndexUpdateCommand(this, getLocator(post),
-            post.getStatusOrDefault().getPermalink()));
-    }
-
-    @Override
-    public void onPermalinkDelete(Post post) {
-        applicationContext.publishEvent(new PermalinkIndexDeleteCommand(this, getLocator(post)));
-    }
-
-    private ExtensionLocator getLocator(Post post) {
-        return new ExtensionLocator(gvk, post.getMetadata().getName(), post.getSpec().getSlug());
+        return environmentFetcher.fetchRouteRules()
+            .map(SystemSetting.ThemeRouteRules::getPost)
+            .blockOptional()
+            .orElse(DEFAULT_PERMALINK_PATTERN);
     }
 
     private String createPermalink(Post post, String pattern) {

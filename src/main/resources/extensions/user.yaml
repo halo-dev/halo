@@ -4,6 +4,8 @@ metadata:
   name: anonymousUser
   labels:
     halo.run/hidden-user: "true"
+  finalizers:
+    - system-protection
 spec:
   displayName: Anonymous User
   email: anonymous@example.com
@@ -16,6 +18,8 @@ metadata:
   name: ghost
   labels:
     halo.run/hidden-user: "true"
+  finalizers:
+    - system-protection
 spec:
   displayName: 已删除用户
   email: ghost@example.com

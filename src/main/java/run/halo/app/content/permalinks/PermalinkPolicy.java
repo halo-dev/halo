@@ -13,8 +13,4 @@ public interface PermalinkPolicy<T extends AbstractExtension> {
         new PropertyPlaceholderHelper("{", "}");
 
     String permalink(T extension);
-
-    String templateName();
-
-    String pattern();
 }

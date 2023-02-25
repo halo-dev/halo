@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -86,6 +87,12 @@ public class DefaultRoleService implements RoleService {
                 });
         }
         return result;
+    }
+
+    @Override
+    public Flux<Role> list(Set<String> roleNames) {
+        return Flux.fromIterable(ObjectUtils.defaultIfNull(roleNames, Set.of()))
+            .flatMap(roleName -> extensionClient.fetch(Role.class, roleName));
     }
 
     @NonNull

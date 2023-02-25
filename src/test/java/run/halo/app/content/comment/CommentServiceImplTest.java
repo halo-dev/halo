@@ -31,6 +31,7 @@ import run.halo.app.content.TestPost;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -56,6 +57,9 @@ class CommentServiceImplTest {
     private ReactiveExtensionClient client;
 
     @Mock
+    private UserService userService;
+
+    @Mock
     private ExtensionComponentsFinder extensionComponentsFinder;
 
     @InjectMocks
@@ -70,15 +74,10 @@ class CommentServiceImplTest {
         when(client.list(eq(Comment.class), any(), any(), anyInt(), anyInt()))
             .thenReturn(Mono.just(comments));
 
-        User user = new User();
-        user.setMetadata(new Metadata());
-        user.getMetadata().setName("B-owner");
-        user.setSpec(new User.UserSpec());
-        user.getSpec().setAvatar("B-avatar");
-        user.getSpec().setDisplayName("B-displayName");
-        user.getSpec().setEmail("B-email");
-        when(client.fetch(eq(User.class), eq("B-owner")))
-            .thenReturn(Mono.just(user));
+        when(userService.getUserOrGhost(eq("A-owner")))
+                .thenReturn(Mono.just(createUser("A-owner")));
+        when(userService.getUserOrGhost(eq("B-owner")))
+                .thenReturn(Mono.just(createUser("B-owner")));
         when(client.fetch(eq(User.class), eq("C-owner")))
             .thenReturn(Mono.empty());
 
@@ -90,8 +89,26 @@ class CommentServiceImplTest {
         when(postCommentSubject.get(eq("fake-post"))).thenReturn(Mono.just(post()));
     }
 
+    private static User createUser(String name) {
+        User user = new User();
+        user.setMetadata(new Metadata());
+        user.getMetadata().setName(name);
+        user.setSpec(new User.UserSpec());
+        user.getSpec().setAvatar(name + "-avatar");
+        user.getSpec().setDisplayName(name + "-displayName");
+        user.getSpec().setEmail(name + "-email");
+        return user;
+    }
+
     @Test
     void listComment() {
+        when(userService.getUserOrGhost(any()))
+            .thenReturn(Mono.just(ghostUser()));
+        when(userService.getUserOrGhost("A-owner"))
+            .thenReturn(Mono.just(createUser("A-owner")));
+        when(userService.getUserOrGhost("B-owner"))
+            .thenReturn(Mono.just(createUser("B-owner")));
+
         Mono<ListResult<ListedComment>> listResultMono =
             commentService.listComment(new CommentQuery(new LinkedMultiValueMap<>()));
         StepVerifier.create(listResultMono)
@@ -118,6 +135,8 @@ class CommentServiceImplTest {
 
         ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
 
+        when(client.fetch(eq(User.class), eq("B-owner")))
+                .thenReturn(Mono.just(createUser("B-owner")));
         Comment commentToCreate = commentRequest.toComment();
         commentToCreate.getMetadata().setName("fake");
         Mono<Comment> commentMono = commentService.create(commentToCreate);
@@ -136,7 +155,7 @@ class CommentServiceImplTest {
                         "owner": {
                             "kind": "User",
                             "name": "B-owner",
-                            "displayName": "B-displayName"
+                            "displayName": "B-owner-displayName"
                         },
                         "priority": 0,
                         "top": false,
@@ -239,6 +258,16 @@ class CommentServiceImplTest {
         return commentSetting;
     }
 
+    User ghostUser() {
+        User user = new User();
+        user.setMetadata(new Metadata());
+        user.getMetadata().setName("ghost");
+        user.setSpec(new User.UserSpec());
+        user.getSpec().setDisplayName("Ghost");
+        user.getSpec().setEmail("");
+        return user;
+    }
+
     private String expectListResultJson() {
         return """
             {
@@ -318,9 +347,9 @@ class CommentServiceImplTest {
                         "owner": {
                             "kind": "User",
                             "name": "B-owner",
-                            "displayName": "B-displayName",
-                            "avatar": "B-avatar",
-                            "email": "B-email"
+                            "displayName": "B-owner-displayName",
+                            "avatar": "B-owner-avatar",
+                            "email": "B-owner-email"
                         },
                         "subject": {
                             "spec": {

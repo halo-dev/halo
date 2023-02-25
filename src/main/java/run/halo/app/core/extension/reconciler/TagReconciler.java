@@ -2,13 +2,17 @@ package run.halo.app.core.extension.reconciler;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
+import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
@@ -41,6 +45,10 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
                 }
                 addFinalizerIfNecessary(tag);
 
+                reconcileMetadata(request.name());
+
+                this.reconcileStatusPermalink(request.name());
+
                 reconcileStatusPosts(request.name());
             });
         return new Result(false, null);
@@ -54,9 +62,18 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
             .build();
     }
 
-    private void cleanUpResources(Tag tag) {
-        // remove permalink from permalink indexer
-        tagPermalinkPolicy.onPermalinkDelete(tag);
+    void reconcileMetadata(String name) {
+        client.fetch(Tag.class, name).ifPresent(tag -> {
+            Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(tag);
+            String oldPermalinkPattern = annotations.get(Constant.PERMALINK_PATTERN_ANNO);
+
+            String newPattern = tagPermalinkPolicy.pattern();
+            annotations.put(Constant.PERMALINK_PATTERN_ANNO, newPattern);
+
+            if (!StringUtils.equals(oldPermalinkPattern, newPattern)) {
+                client.update(tag);
+            }
+        });
     }
 
     private void addFinalizerIfNecessary(Tag oldTag) {
@@ -78,12 +95,24 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
 
     private void cleanUpResourcesAndRemoveFinalizer(String tagName) {
         client.fetch(Tag.class, tagName).ifPresent(tag -> {
-            cleanUpResources(tag);
             if (tag.getMetadata().getFinalizers() != null) {
                 tag.getMetadata().getFinalizers().remove(FINALIZER_NAME);
             }
             client.update(tag);
         });
+    }
+
+    private void reconcileStatusPermalink(String tagName) {
+        client.fetch(Tag.class, tagName)
+            .ifPresent(tag -> {
+                String oldPermalink = tag.getStatusOrDefault().getPermalink();
+                String permalink = tagPermalinkPolicy.permalink(tag);
+                tag.getStatusOrDefault().setPermalink(permalink);
+
+                if (!StringUtils.equals(permalink, oldPermalink)) {
+                    client.update(tag);
+                }
+            });
     }
 
     private void reconcileStatusPosts(String tagName) {
