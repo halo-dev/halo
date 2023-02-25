@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.endpoint;
 
+import static java.lang.Boolean.parseBoolean;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 
 import lombok.Data;
@@ -12,6 +13,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
@@ -54,7 +56,11 @@ public class StatsEndpoint implements CustomEndpoint {
                 return stats;
             })
             .flatMap(stats -> client.list(User.class,
-                    user -> user.getMetadata().getDeletionTimestamp() == null,
+                    user -> {
+                        var labels = ExtensionUtil.nullSafeLabels(user);
+                        return user.getMetadata().getDeletionTimestamp() == null
+                            && !parseBoolean(labels.getOrDefault(User.HIDDEN_USER_LABEL, "false"));
+                    },
                     null)
                 .count()
                 .map(count -> {
