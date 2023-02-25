@@ -56,6 +56,7 @@ import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Setting;
+import run.halo.app.core.extension.service.PluginService;
 import run.halo.app.core.extension.theme.SettingUtils;
 import run.halo.app.extension.Comparators;
 import run.halo.app.extension.ConfigMap;
@@ -79,6 +80,8 @@ public class PluginEndpoint implements CustomEndpoint {
     private final ReactiveExtensionClient client;
 
     private final SystemVersionSupplier systemVersionSupplier;
+
+    private final PluginService pluginService;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -169,7 +172,17 @@ public class PluginEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(ConfigMap.class))
             )
+            .GET("plugin-presets", this::listPresets, builder -> {
+                builder.operationId("ListPluginPresets")
+                    .description("List all plugin presets in the system.")
+                    .tag(tag)
+                    .response(responseBuilder().implementationArray(Plugin.class));
+            })
             .build();
+    }
+
+    private Mono<ServerResponse> listPresets(ServerRequest request) {
+        return ServerResponse.ok().body(pluginService.getPresets(), Plugin.class);
     }
 
     private Mono<ServerResponse> fetchPluginConfig(ServerRequest request) {
