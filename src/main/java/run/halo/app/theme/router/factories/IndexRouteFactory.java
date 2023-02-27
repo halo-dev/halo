@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.ListedPostVo;
@@ -52,7 +53,7 @@ public class IndexRouteFactory implements RouteFactory {
 
     private Mono<UrlContextListResult<ListedPostVo>> postList(ServerRequest request) {
         String path = request.path();
-        return configuredPageSize(environmentFetcher)
+        return configuredPageSize(environmentFetcher, SystemSetting.Post::getPostPageSize)
             .flatMap(pageSize -> postFinder.list(pageNumInPathVariable(request), pageSize))
             .map(list -> new UrlContextListResult.Builder<ListedPostVo>()
                 .listResult(list)
