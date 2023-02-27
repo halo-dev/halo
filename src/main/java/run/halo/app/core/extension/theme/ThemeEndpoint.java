@@ -11,7 +11,6 @@ import static run.halo.app.infra.utils.DataBufferUtils.toInputStream;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -414,6 +413,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                 .bodyValue(theme));
     }
 
+    @Schema(name = "ThemeInstallRequest")
     public record InstallRequest(
         @Schema(required = true, description = "Theme zip file.") FilePart file) {
     }
@@ -431,23 +431,6 @@ public class ThemeEndpoint implements CustomEndpoint {
             .flatMap(theme -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(theme));
-    }
-
-    private Path getThemePath(Theme theme) {
-        return getThemeWorkDir().resolve(theme.getMetadata().getName());
-    }
-
-    private Path getThemeWorkDir() {
-        Path themePath = themeRoot.get();
-        if (Files.notExists(themePath)) {
-            try {
-                Files.createDirectories(themePath);
-            } catch (IOException e) {
-                throw new UnsupportedOperationException(
-                    "Failed to create directory " + themePath, e);
-            }
-        }
-        return themePath;
     }
 
     Mono<FilePart> getZipFilePart(MultiValueMap<String, Part> formData) {
