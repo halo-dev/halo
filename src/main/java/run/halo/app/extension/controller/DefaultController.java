@@ -162,11 +162,8 @@ public class DefaultController<R> implements Controller {
                         watch.start("reconciliation");
                         result = reconciler.reconcile(entry.getEntry());
                         watch.stop();
-                        log.debug("{} >>> Reconciled request: {} with result: {}", this.name,
-                            entry.getEntry(), result);
-                        if (log.isTraceEnabled()) {
-                            log.trace(watch.toString());
-                        }
+                        log.debug("{} >>> Reconciled request: {} with result: {}, usage: {}",
+                            this.name, entry.getEntry(), result, watch.getTotalTimeMillis());
                     } catch (Throwable t) {
                         if (t instanceof OptimisticLockingFailureException) {
                             log.warn("Optimistic locking failure when reconciling request: {}/{}",
