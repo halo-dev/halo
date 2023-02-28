@@ -314,11 +314,7 @@ export function useAttachmentSelect(
       })
       .filter(Boolean) as Content[];
 
-    editor.value
-      ?.chain()
-      .focus()
-      .insertContent([...contents, { type: "paragraph", content: "" }])
-      .run();
+    editor.value?.chain().focus().insertContent(contents).run();
   };
 
   return {
