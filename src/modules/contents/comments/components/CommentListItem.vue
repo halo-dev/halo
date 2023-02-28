@@ -22,12 +22,13 @@ import type {
   SinglePage,
 } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
-import { computed, onMounted, provide, ref, watch, type Ref } from "vue";
+import { computed, provide, ref, watch, type Ref } from "vue";
 import ReplyListItem from "./ReplyListItem.vue";
 import { apiClient } from "@/utils/api-client";
-import { onBeforeRouteLeave, type RouteLocationRaw } from "vue-router";
+import type { RouteLocationRaw } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
+import { useQuery } from "@tanstack/vue-query";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -46,13 +47,10 @@ const emit = defineEmits<{
   (event: "reload"): void;
 }>();
 
-const replies = ref<ListedReply[]>([] as ListedReply[]);
 const selectedReply = ref<ListedReply>();
 const hoveredReply = ref<ListedReply>();
-const loading = ref(false);
 const showReplies = ref(false);
 const replyModal = ref(false);
-const refreshInterval = ref();
 
 provide<Ref<ListedReply | undefined>>("hoveredReply", hoveredReply);
 
@@ -82,26 +80,30 @@ const handleApproveReplyInBatch = async () => {
     title: "确定要审核通过该评论的所有回复吗？",
     onConfirm: async () => {
       try {
-        const repliesToUpdate = replies.value.filter((reply) => {
+        const repliesToUpdate = replies.value?.filter((reply) => {
           return !reply.reply.spec.approved;
         });
-        const promises = repliesToUpdate.map((reply) => {
-          const replyToUpdate = reply.reply;
-          replyToUpdate.spec.approved = true;
-          // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
-          replyToUpdate.spec.approvedTime = new Date().toISOString();
+        const promises = repliesToUpdate?.map((reply) => {
           return apiClient.extension.reply.updatecontentHaloRunV1alpha1Reply({
-            name: replyToUpdate.metadata.name,
-            reply: replyToUpdate,
+            name: reply.reply.metadata.name,
+            reply: {
+              ...reply.reply,
+              spec: {
+                ...reply.reply.spec,
+                approved: true,
+                // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
+                approvedTime: new Date().toISOString(),
+              },
+            },
           });
         });
-        await Promise.all(promises);
+        await Promise.all(promises || []);
 
         Toast.success("操作成功");
       } catch (e) {
         console.error("Failed to approve comment replies in batch", e);
       } finally {
-        await handleFetchReplies();
+        await refetch();
       }
     },
   });
@@ -126,66 +128,46 @@ const handleApprove = async () => {
   }
 };
 
-const handleFetchReplies = async (options?: { mute?: boolean }) => {
-  try {
-    clearInterval(refreshInterval.value);
-
-    if (!options?.mute) {
-      loading.value = true;
-    }
-
+const {
+  data: replies,
+  isLoading,
+  refetch,
+} = useQuery<ListedReply[]>({
+  queryKey: [
+    "comment-replies",
+    props.comment.comment.metadata.name,
+    showReplies,
+  ],
+  queryFn: async () => {
     const { data } = await apiClient.reply.listReplies({
       commentName: props.comment.comment.metadata.name,
       page: 0,
       size: 0,
     });
-    replies.value = data.items;
-
-    const deletedReplies = replies.value.filter(
+    return data.items;
+  },
+  refetchOnWindowFocus: false,
+  refetchInterval(data) {
+    const deletingReplies = data?.filter(
       (reply) => !!reply.reply.metadata.deletionTimestamp
     );
-
-    if (deletedReplies.length) {
-      refreshInterval.value = setInterval(() => {
-        handleFetchReplies({ mute: true });
-      }, 3000);
-    }
-  } catch (error) {
-    console.error("Failed to fetch comment replies", error);
-  } finally {
-    loading.value = false;
-  }
-};
-
-onMounted(() => {
-  clearInterval(refreshInterval.value);
+    return deletingReplies?.length ? 3000 : false;
+  },
+  enabled: computed(() => showReplies.value),
 });
-
-onBeforeRouteLeave(() => {
-  clearInterval(refreshInterval.value);
-});
-
-watch(
-  () => showReplies.value,
-  (newValue) => {
-    if (newValue) {
-      handleFetchReplies();
-    } else {
-      replies.value = [];
-    }
-  }
-);
 
 const handleToggleShowReplies = async () => {
   showReplies.value = !showReplies.value;
   if (showReplies.value) {
     // update last read time
-    const commentToUpdate = cloneDeep(props.comment.comment);
-    commentToUpdate.spec.lastReadTime = new Date().toISOString();
-    await apiClient.extension.comment.updatecontentHaloRunV1alpha1Comment({
-      name: commentToUpdate.metadata.name,
-      comment: commentToUpdate,
-    });
+    if (props.comment.comment.status?.unreadReplyCount) {
+      const commentToUpdate = cloneDeep(props.comment.comment);
+      commentToUpdate.spec.lastReadTime = new Date().toISOString();
+      await apiClient.extension.comment.updatecontentHaloRunV1alpha1Comment({
+        name: commentToUpdate.metadata.name,
+        comment: commentToUpdate,
+      });
+    }
   } else {
     emit("reload");
   }
@@ -202,7 +184,7 @@ const onTriggerReply = (reply: ListedReply) => {
 
 const onReplyCreationModalClose = () => {
   selectedReply.value = undefined;
-  handleFetchReplies({ mute: true });
+  refetch();
 };
 
 // Subject ref processing
@@ -413,12 +395,12 @@ const subjectRefResult = computed(() => {
       <div
         class="ml-8 mt-3 divide-y divide-gray-100 rounded-base border-t border-gray-100 pt-3"
       >
-        <VLoading v-if="loading" />
-        <Transition v-else-if="!replies.length" appear name="fade">
+        <VLoading v-if="isLoading" />
+        <Transition v-else-if="!replies?.length" appear name="fade">
           <VEmpty message="你可以尝试刷新或者创建新回复" title="当前没有回复">
             <template #actions>
               <VSpace>
-                <VButton @click="handleFetchReplies">刷新</VButton>
+                <VButton @click="refetch()">刷新</VButton>
                 <VButton type="secondary" @click="replyModal = true">
                   <template #icon>
                     <IconAddCircle class="h-full w-full" />
@@ -437,7 +419,7 @@ const subjectRefResult = computed(() => {
               :class="{ 'hover:bg-white': showReplies }"
               :reply="reply"
               :replies="replies"
-              @reload="handleFetchReplies({ mute: true })"
+              @reload="refetch()"
               @reply="onTriggerReply"
             ></ReplyListItem>
           </div>

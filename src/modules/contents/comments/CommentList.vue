@@ -15,187 +15,18 @@ import {
 } from "@halo-dev/components";
 import CommentListItem from "./components/CommentListItem.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
-import type {
-  ListedComment,
-  ListedCommentList,
-  User,
-} from "@halo-dev/api-client";
-import { computed, onMounted, ref, watch } from "vue";
+import type { ListedComment, User } from "@halo-dev/api-client";
+import { computed, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
-import { onBeforeRouteLeave } from "vue-router";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
+import { useQuery } from "@tanstack/vue-query";
 
-const comments = ref<ListedCommentList>({
-  page: 1,
-  size: 20,
-  total: 0,
-  items: [],
-  first: true,
-  last: false,
-  hasNext: false,
-  hasPrevious: false,
-  totalPages: 0,
-});
-const loading = ref(false);
 const checkAll = ref(false);
 const selectedComment = ref<ListedComment>();
 const selectedCommentNames = ref<string[]>([]);
 const keyword = ref("");
-const refreshInterval = ref();
-
-const handleFetchComments = async (options?: {
-  mute?: boolean;
-  page?: number;
-}) => {
-  try {
-    clearInterval(refreshInterval.value);
-
-    if (!options?.mute) {
-      loading.value = true;
-    }
-
-    if (options?.page) {
-      comments.value.page = options.page;
-    }
-
-    const { data } = await apiClient.comment.listComments({
-      page: comments.value.page,
-      size: comments.value.size,
-      approved: selectedApprovedFilterItem.value.value,
-      sort: selectedSortFilterItem.value.value,
-      keyword: keyword.value,
-      ownerName: selectedUser.value?.metadata.name,
-    });
-    comments.value = data;
-
-    const deletedComments = comments.value.items.filter(
-      (comment) => !!comment.comment.metadata.deletionTimestamp
-    );
-
-    if (deletedComments.length) {
-      refreshInterval.value = setInterval(() => {
-        handleFetchComments({ mute: true });
-      }, 3000);
-    }
-  } catch (error) {
-    console.error("Failed to fetch comments", error);
-  } finally {
-    loading.value = false;
-  }
-};
-
-onBeforeRouteLeave(() => {
-  clearInterval(refreshInterval.value);
-});
-
-const handlePaginationChange = ({
-  page,
-  size,
-}: {
-  page: number;
-  size: number;
-}) => {
-  comments.value.page = page;
-  comments.value.size = size;
-  handleFetchComments();
-};
-
-// Selection
-const handleCheckAllChange = (e: Event) => {
-  const { checked } = e.target as HTMLInputElement;
-
-  if (checked) {
-    selectedCommentNames.value =
-      comments.value.items.map((comment) => {
-        return comment.comment.metadata.name;
-      }) || [];
-  } else {
-    selectedCommentNames.value = [];
-  }
-};
-
-const checkSelection = (comment: ListedComment) => {
-  return (
-    comment.comment.metadata.name ===
-      selectedComment.value?.comment.metadata.name ||
-    selectedCommentNames.value.includes(comment.comment.metadata.name)
-  );
-};
-
-watch(
-  () => selectedCommentNames.value,
-  (newValue) => {
-    checkAll.value = newValue.length === comments.value.items?.length;
-  }
-);
-
-const handleDeleteInBatch = async () => {
-  Dialog.warning({
-    title: "确定要删除所选的评论吗？",
-    description: "将同时删除所有评论下的回复，该操作不可恢复。",
-    confirmType: "danger",
-    onConfirm: async () => {
-      try {
-        const promises = selectedCommentNames.value.map((name) => {
-          return apiClient.extension.comment.deletecontentHaloRunV1alpha1Comment(
-            {
-              name,
-            }
-          );
-        });
-        await Promise.all(promises);
-        selectedCommentNames.value = [];
-
-        Toast.success("删除成功");
-      } catch (e) {
-        console.error("Failed to delete comments", e);
-      } finally {
-        await handleFetchComments();
-      }
-    },
-  });
-};
-
-const handleApproveInBatch = async () => {
-  Dialog.warning({
-    title: "确定要审核通过所选的评论吗？",
-    onConfirm: async () => {
-      try {
-        const commentsToUpdate = comments.value.items.filter((comment) => {
-          return (
-            selectedCommentNames.value.includes(
-              comment.comment.metadata.name
-            ) && !comment.comment.spec.approved
-          );
-        });
-        const promises = commentsToUpdate.map((comment) => {
-          const commentToUpdate = comment.comment;
-          commentToUpdate.spec.approved = true;
-          // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
-          commentToUpdate.spec.approvedTime = new Date().toISOString();
-          return apiClient.extension.comment.updatecontentHaloRunV1alpha1Comment(
-            {
-              name: commentToUpdate.metadata.name,
-              comment: commentToUpdate,
-            }
-          );
-        });
-        await Promise.all(promises);
-        selectedCommentNames.value = [];
-
-        Toast.success("操作成功");
-      } catch (e) {
-        console.error("Failed to approve comments in batch", e);
-      } finally {
-        await handleFetchComments();
-      }
-    },
-  });
-};
-
-onMounted(handleFetchComments);
 
 // Filters
 const ApprovedFilterItems: { label: string; value?: boolean }[] = [
@@ -254,7 +85,7 @@ const handleApprovedFilterItemChange = (filterItem: {
 }) => {
   selectedApprovedFilterItem.value = filterItem;
   selectedCommentNames.value = [];
-  handleFetchComments({ page: 1 });
+  page.value = 1;
 };
 
 const handleSortFilterItemChange = (filterItem: {
@@ -263,12 +94,12 @@ const handleSortFilterItemChange = (filterItem: {
 }) => {
   selectedSortFilterItem.value = filterItem;
   selectedCommentNames.value = [];
-  handleFetchComments({ page: 1 });
+  page.value = 1;
 };
 
 function handleSelectUser(user: User | undefined) {
   selectedUser.value = user;
-  handleFetchComments({ page: 1 });
+  page.value = 1;
 }
 
 function handleKeywordChange() {
@@ -276,12 +107,12 @@ function handleKeywordChange() {
   if (keywordNode) {
     keyword.value = keywordNode._value as string;
   }
-  handleFetchComments({ page: 1 });
+  page.value = 1;
 }
 
 function handleClearKeyword() {
   keyword.value = "";
-  handleFetchComments({ page: 1 });
+  page.value = 1;
 }
 
 const hasFilters = computed(() => {
@@ -298,8 +129,148 @@ function handleClearFilters() {
   selectedSortFilterItem.value = SortFilterItems[0];
   selectedUser.value = undefined;
   keyword.value = "";
-  handleFetchComments({ page: 1 });
+  page.value = 1;
 }
+
+const page = ref(1);
+const size = ref(20);
+const total = ref(0);
+
+const {
+  data: comments,
+  isLoading,
+  isFetching,
+  refetch,
+} = useQuery<ListedComment[]>({
+  queryKey: [
+    "comments",
+    page,
+    size,
+    selectedApprovedFilterItem,
+    selectedSortFilterItem,
+    selectedUser,
+    keyword,
+  ],
+  queryFn: async () => {
+    const { data } = await apiClient.comment.listComments({
+      page: page.value,
+      size: size.value,
+      approved: selectedApprovedFilterItem.value.value,
+      sort: selectedSortFilterItem.value.value,
+      keyword: keyword.value,
+      ownerName: selectedUser.value?.metadata.name,
+    });
+
+    total.value = data.total;
+
+    return data.items;
+  },
+  refetchOnWindowFocus: false,
+  refetchInterval(data) {
+    const deletingComments = data?.filter(
+      (comment) => !!comment.comment.metadata.deletionTimestamp
+    );
+    return deletingComments?.length ? 3000 : false;
+  },
+});
+
+// Selection
+const handleCheckAllChange = (e: Event) => {
+  const { checked } = e.target as HTMLInputElement;
+
+  if (checked) {
+    selectedCommentNames.value =
+      comments.value?.map((comment) => {
+        return comment.comment.metadata.name;
+      }) || [];
+  } else {
+    selectedCommentNames.value = [];
+  }
+};
+
+const checkSelection = (comment: ListedComment) => {
+  return (
+    comment.comment.metadata.name ===
+      selectedComment.value?.comment.metadata.name ||
+    selectedCommentNames.value.includes(comment.comment.metadata.name)
+  );
+};
+
+watch(
+  () => selectedCommentNames.value,
+  (newValue) => {
+    checkAll.value = newValue.length === comments.value?.length;
+  }
+);
+
+const handleDeleteInBatch = async () => {
+  Dialog.warning({
+    title: "确定要删除所选的评论吗？",
+    description: "将同时删除所有评论下的回复，该操作不可恢复。",
+    confirmType: "danger",
+    onConfirm: async () => {
+      try {
+        const promises = selectedCommentNames.value.map((name) => {
+          return apiClient.extension.comment.deletecontentHaloRunV1alpha1Comment(
+            {
+              name,
+            }
+          );
+        });
+        await Promise.all(promises);
+        selectedCommentNames.value = [];
+
+        Toast.success("删除成功");
+      } catch (e) {
+        console.error("Failed to delete comments", e);
+      } finally {
+        refetch();
+      }
+    },
+  });
+};
+
+const handleApproveInBatch = async () => {
+  Dialog.warning({
+    title: "确定要审核通过所选的评论吗？",
+    onConfirm: async () => {
+      try {
+        const commentsToUpdate = comments.value?.filter((comment) => {
+          return (
+            selectedCommentNames.value.includes(
+              comment.comment.metadata.name
+            ) && !comment.comment.spec.approved
+          );
+        });
+
+        const promises = commentsToUpdate?.map((comment) => {
+          return apiClient.extension.comment.updatecontentHaloRunV1alpha1Comment(
+            {
+              name: comment.comment.metadata.name,
+              comment: {
+                ...comment.comment,
+                spec: {
+                  ...comment.comment.spec,
+                  approved: true,
+                  // TODO: 暂时由前端设置发布时间。see https://github.com/halo-dev/halo/pull/2746
+                  approvedTime: new Date().toISOString(),
+                },
+              },
+            }
+          );
+        });
+        await Promise.all(promises || []);
+        selectedCommentNames.value = [];
+
+        Toast.success("操作成功");
+      } catch (e) {
+        console.error("Failed to approve comments in batch", e);
+      } finally {
+        refetch();
+      }
+    },
+  });
+};
 </script>
 <template>
   <VPageHeader title="评论">
@@ -463,11 +434,11 @@ function handleClearFilters() {
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                    @click="handleFetchComments()"
+                    @click="refetch()"
                   >
                     <IconRefreshLine
                       v-tooltip="`刷新`"
-                      :class="{ 'animate-spin text-gray-900': loading }"
+                      :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
                   </div>
@@ -477,12 +448,12 @@ function handleClearFilters() {
           </div>
         </div>
       </template>
-      <VLoading v-if="loading" />
-      <Transition v-else-if="!comments.items.length" appear name="fade">
+      <VLoading v-if="isLoading" />
+      <Transition v-else-if="!comments?.length" appear name="fade">
         <VEmpty message="你可以尝试刷新或者修改筛选条件" title="当前没有评论">
           <template #actions>
             <VSpace>
-              <VButton @click="handleFetchComments">刷新</VButton>
+              <VButton @click="refetch">刷新</VButton>
             </VSpace>
           </template>
         </VEmpty>
@@ -492,14 +463,11 @@ function handleClearFilters() {
           class="box-border h-full w-full divide-y divide-gray-100"
           role="list"
         >
-          <li
-            v-for="comment in comments.items"
-            :key="comment.comment.metadata.name"
-          >
+          <li v-for="comment in comments" :key="comment.comment.metadata.name">
             <CommentListItem
               :comment="comment"
               :is-selected="checkSelection(comment)"
-              @reload="handleFetchComments({ mute: true })"
+              @reload="refetch()"
             >
               <template #checkbox>
                 <input
@@ -518,11 +486,10 @@ function handleClearFilters() {
       <template #footer>
         <div class="bg-white sm:flex sm:items-center sm:justify-end">
           <VPagination
-            :page="comments.page"
-            :size="comments.size"
-            :total="comments.total"
+            v-model:page="page"
+            v-model:size="size"
+            :total="total"
             :size-options="[20, 30, 50, 100]"
-            @change="handlePaginationChange"
           />
         </div>
       </template>
