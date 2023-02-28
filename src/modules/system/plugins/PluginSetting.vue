@@ -7,7 +7,7 @@ import { useSettingFormConvert } from "@/composables/use-setting-form";
 import { apiClient } from "@/utils/api-client";
 
 // components
-import { VButton } from "@halo-dev/components";
+import { Toast, VButton } from "@halo-dev/components";
 
 // types
 import type { ConfigMap, Plugin, Setting } from "@halo-dev/api-client";
@@ -54,6 +54,8 @@ const handleSaveConfigMap = async () => {
     name: plugin.value.metadata.name,
     configMap: configMapToUpdate,
   });
+
+  Toast.success("保存成功");
 
   await handleFetchSettings();
   configMap.value = newConfigMap;

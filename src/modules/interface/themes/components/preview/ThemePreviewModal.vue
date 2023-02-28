@@ -21,6 +21,7 @@ import {
   IconPhone,
   IconTablet,
   IconRefreshLine,
+  Toast,
 } from "@halo-dev/components";
 import { storeToRefs } from "pinia";
 import { computed, markRaw, ref, watch } from "vue";
@@ -162,6 +163,8 @@ const handleSaveConfigMap = async () => {
     name: selectedTheme?.value?.metadata.name,
     configMap: configMapToUpdate,
   });
+
+  Toast.success("保存成功");
 
   await handleFetchSettings();
   configMap.value = newConfigMap;

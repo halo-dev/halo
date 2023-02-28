@@ -3,7 +3,7 @@
 import { inject, ref, watch } from "vue";
 
 // components
-import { VButton } from "@halo-dev/components";
+import { Toast, VButton } from "@halo-dev/components";
 
 // types
 import type { Ref } from "vue";
@@ -62,6 +62,8 @@ const handleSaveConfigMap = async () => {
     name: selectedTheme?.value?.metadata.name,
     configMap: configMapToUpdate,
   });
+
+  Toast.success("保存成功");
 
   await handleFetchSettings();
   configMap.value = newConfigMap;
