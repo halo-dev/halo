@@ -14,11 +14,13 @@ import menu from "./setup-data/menu.json";
 import menuItems from "./setup-data/menu-items.json";
 import type {
   Category,
+  Plugin,
   PostRequest,
   SinglePageRequest,
   Tag,
 } from "@halo-dev/api-client";
 import { useThemeStore } from "@/stores/theme";
+import { useMutation } from "@tanstack/vue-query";
 
 const router = useRouter();
 
@@ -31,6 +33,24 @@ const {
 
 const siteTitle = ref("");
 const loading = ref(false);
+
+const { mutate: pluginStartMutate } = useMutation({
+  mutationKey: ["plugin-start"],
+  mutationFn: async (plugin: Plugin) => {
+    const { data: pluginToUpdate } =
+      await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin({
+        name: plugin.metadata.name,
+      });
+
+    pluginToUpdate.spec.enabled = true;
+
+    return apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin({
+      name: plugin.metadata.name,
+      plugin: pluginToUpdate,
+    });
+  },
+  retry: 3,
+});
 
 const handleSubmit = async () => {
   try {
@@ -52,12 +72,7 @@ const handleSubmit = async () => {
     const { data: postData } = await apiClient.post.draftPost({
       postRequest: post as PostRequest,
     });
-
-    try {
-      await apiClient.post.publishPost({ name: postData.metadata.name });
-    } catch (e) {
-      console.error("Publish post failed", e);
-    }
+    await apiClient.post.publishPost({ name: postData.metadata.name });
 
     // Create singlePage
     const { data: singlePageData } = await apiClient.singlePage.draftSinglePage(
@@ -66,13 +81,9 @@ const handleSubmit = async () => {
       }
     );
 
-    try {
-      await apiClient.singlePage.publishSinglePage({
-        name: singlePageData.metadata.name,
-      });
-    } catch (e) {
-      console.error("Publish single page failed", e);
-    }
+    await apiClient.singlePage.publishSinglePage({
+      name: singlePageData.metadata.name,
+    });
 
     // Create menu and menu items
     const menuItemPromises = menuItems.map((item) => {
@@ -83,33 +94,50 @@ const handleSubmit = async () => {
     await Promise.all(menuItemPromises);
     await apiClient.extension.menu.createv1alpha1Menu({ menu: menu });
 
-    // Create system-states ConfigMap
-    await apiClient.extension.configMap.createv1alpha1ConfigMap({
-      configMap: {
-        metadata: {
-          name: "system-states",
-        },
-        kind: "ConfigMap",
-        apiVersion: "v1alpha1",
-        data: {
-          states: JSON.stringify({ isSetup: true }),
-        },
-      },
-    });
+    // Install preset plugins
+    const { data: presetPlugins } = await apiClient.plugin.listPluginPresets();
 
-    const systemStateStore = useSystemStatesStore();
-    await systemStateStore.fetchSystemStates();
-    const themeStore = useThemeStore();
-    await themeStore.fetchActivatedTheme();
+    const installPluginResponses = await Promise.all(
+      presetPlugins.map((plugin) => {
+        return apiClient.plugin.installPlugin({
+          source: "PRESET",
+          presetName: plugin.metadata.name as string,
+        });
+      })
+    );
 
-    router.push({ name: "Dashboard" });
-
-    Toast.success("初始化成功");
+    for (let i = 0; i < installPluginResponses.length; i++) {
+      const response = installPluginResponses[i];
+      pluginStartMutate(response.data);
+    }
   } catch (error) {
-    console.error("Failed to setup", error);
-  } finally {
-    loading.value = false;
+    console.error("Failed to initialize preset data", error);
   }
+
+  // Create system-states ConfigMap
+  await apiClient.extension.configMap.createv1alpha1ConfigMap({
+    configMap: {
+      metadata: {
+        name: "system-states",
+      },
+      kind: "ConfigMap",
+      apiVersion: "v1alpha1",
+      data: {
+        states: JSON.stringify({ isSetup: true }),
+      },
+    },
+  });
+
+  const systemStateStore = useSystemStatesStore();
+  await systemStateStore.fetchSystemStates();
+  const themeStore = useThemeStore();
+  await themeStore.fetchActivatedTheme();
+
+  loading.value = false;
+
+  router.push({ name: "Dashboard" });
+
+  Toast.success("初始化成功");
 };
 
 onMounted(async () => {

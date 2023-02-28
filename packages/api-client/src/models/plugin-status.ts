@@ -58,6 +58,12 @@ export interface PluginStatus {
    * @memberof PluginStatus
    */
   logo?: string
+  /**
+   * Load location of the plugin, often a path.
+   * @type {string}
+   * @memberof PluginStatus
+   */
+  loadLocation?: string
 }
 
 export const PluginStatusPhaseEnum = {
