@@ -21,7 +21,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.skyscreamer.jsonassert.JSONAssert;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.TestRole;
 import run.halo.app.core.extension.service.RoleService;
@@ -71,22 +70,10 @@ class RoleReconcilerTest {
 
         Reconciler.Request request = new Reconciler.Request("role-template-apple-manage");
         roleReconciler.reconcile(request);
-        String expected = """
-            [
-                {
-                    "resources": ["apples"],
-                    "verbs": ["list"]
-                },
-                {
-                    "resources": ["apples"],
-                    "verbs": ["update"]
-                }
-            ]
-            """;
         Role updateArgs = roleCaptor.getValue();
         assertThat(updateArgs).isNotNull();
-        JSONAssert.assertEquals(expected, updateArgs.getMetadata().getAnnotations()
-            .get(Role.ROLE_DEPENDENCY_RULES), false);
+        assertThat(updateArgs.getMetadata().getAnnotations())
+            .containsKey(Role.UI_PERMISSIONS_AGGREGATED_ANNO);
     }
 
     @Test

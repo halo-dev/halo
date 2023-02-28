@@ -50,15 +50,9 @@ public class RoleReconciler implements Reconciler<Request> {
                 }
                 var roleDependencies = readValue(annotations.get(Role.ROLE_DEPENDENCIES_ANNO));
                 var dependenciesRole = roleService.listDependencies(roleDependencies);
-                var dependencyRules = dependenciesRole.stream()
-                    .map(Role::getRules)
-                    .flatMap(List::stream)
-                    .sorted()
-                    .toList();
                 var uiPermissions = aggregateUiPermissions(dependenciesRole);
                 // override dependency rules to annotations
-                annotations.put(Role.ROLE_DEPENDENCY_RULES,
-                    JsonUtils.objectToJson(dependencyRules));
+                annotations.put(Role.ROLE_DEPENDENCY_RULES, "[]");
                 annotations.put(Role.UI_PERMISSIONS_AGGREGATED_ANNO,
                     JsonUtils.objectToJson(uiPermissions));
 

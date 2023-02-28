@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -16,10 +17,12 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.SynchronousSink;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.RoleBinding.RoleRef;
 import run.halo.app.core.extension.RoleBinding.Subject;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -87,6 +90,40 @@ public class DefaultRoleService implements RoleService {
                 });
         }
         return result;
+    }
+
+    @Override
+    public Flux<Role> listDependenciesFlux(Set<String> names) {
+        if (names == null) {
+            return Flux.empty();
+        }
+        Set<String> visited = new HashSet<>();
+        Deque<String> queue = new ArrayDeque<>(names);
+
+        return Flux.generate((Consumer<SynchronousSink<String>>)
+                sink -> {
+                    if (queue.isEmpty()) {
+                        sink.complete();
+                        return;
+                    }
+                    sink.next(queue.poll());
+                })
+            .concatMap(roleName -> {
+                if (visited.contains(roleName)) {
+                    return Mono.empty();
+                }
+                visited.add(roleName);
+                return extensionClient.fetch(Role.class, roleName)
+                    .map(role -> {
+                        Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(role);
+                        String roleNameDependencies =
+                            annotations.get(Role.ROLE_DEPENDENCIES_ANNO);
+                        List<String> roleDependencies = stringToList(roleNameDependencies);
+                        queue.addAll(roleDependencies);
+                        return role;
+                    });
+            })
+            .doFinally(s -> visited.clear());
     }
 
     @Override
