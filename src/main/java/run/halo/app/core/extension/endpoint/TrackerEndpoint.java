@@ -20,10 +20,6 @@ import run.halo.app.event.post.DownvotedEvent;
 import run.halo.app.event.post.UpvotedEvent;
 import run.halo.app.event.post.VisitedEvent;
 import run.halo.app.extension.GroupVersion;
-import run.halo.app.infra.utils.HaloUtils;
-import run.halo.app.infra.utils.IpAddressUtils;
-import run.halo.app.metrics.MeterUtils;
-import run.halo.app.metrics.VisitLogWriter;
 
 /**
  * Metrics counter endpoint.
@@ -36,7 +32,6 @@ import run.halo.app.metrics.VisitLogWriter;
 public class TrackerEndpoint implements CustomEndpoint {
 
     private final ApplicationEventPublisher eventPublisher;
-    private final VisitLogWriter visitLogWriter;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -94,9 +89,6 @@ public class TrackerEndpoint implements CustomEndpoint {
             .doOnNext(counterRequest -> {
                 eventPublisher.publishEvent(new VisitedEvent(this, counterRequest.group(),
                     counterRequest.name(), counterRequest.plural()));
-
-                // async write visit log
-                writeVisitLog(request, counterRequest);
             })
             .then(ServerResponse.ok().build());
     }
@@ -137,27 +129,6 @@ public class TrackerEndpoint implements CustomEndpoint {
             Assert.notNull(name, "The name must not be null.");
             group = StringUtils.defaultString(group);
         }
-    }
-
-    private void writeVisitLog(ServerRequest request, CounterRequest counterRequest) {
-        String logMessage = logMessage(request, counterRequest);
-        visitLogWriter.log(logMessage);
-    }
-
-    private String logMessage(ServerRequest request, CounterRequest counterRequest) {
-        String ipAddress = IpAddressUtils.getIpAddress(request);
-        String hostname = counterRequest.hostname();
-        String screen = counterRequest.screen();
-        String language = counterRequest.language();
-        String referrer = counterRequest.referrer();
-        String userAgent = HaloUtils.userAgentFrom(request);
-        String counterName =
-            MeterUtils.nameOf(counterRequest.group(), counterRequest.plural(),
-                counterRequest.name());
-        return String.format(
-            "subject=[%s], ipAddress=[%s], hostname=[%s], screen=[%s], language=[%s], "
-                + "referrer=[%s], userAgent=[%s]", counterName, ipAddress, hostname, screen,
-            language, referrer, userAgent);
     }
 
     @Override
