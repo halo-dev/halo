@@ -17,6 +17,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.ListedPostVo;
@@ -62,7 +63,7 @@ public class AuthorPostsRouteFactory implements RouteFactory {
     private Mono<UrlContextListResult<ListedPostVo>> postList(ServerRequest request, String name) {
         String path = request.path();
         int pageNum = pageNumInPathVariable(request);
-        return configuredPageSize(environmentFetcher)
+        return configuredPageSize(environmentFetcher, SystemSetting.Post::getPostPageSize)
             .flatMap(pageSize -> postFinder.listByOwner(pageNum, pageSize, name))
             .map(list -> new UrlContextListResult.Builder<ListedPostVo>()
                 .listResult(list)
