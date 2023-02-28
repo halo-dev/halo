@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Component;
@@ -199,6 +200,8 @@ public class SinglePageEndpoint implements CustomEndpoint {
                 spec.setReleaseSnapshot(spec.getHeadSnapshot());
                 return client.update(singlePage);
             })
+            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                .filter(t -> t instanceof OptimisticLockingFailureException))
             .flatMap(post -> {
                 if (asyncPublish) {
                     return Mono.just(post);
