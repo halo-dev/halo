@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
@@ -18,6 +19,8 @@ import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.metrics.CounterService;
+import run.halo.app.metrics.MeterUtils;
 
 /**
  * A default implementation of {@link ReplyService}.
@@ -31,6 +34,7 @@ public class ReplyServiceImpl implements ReplyService {
 
     private final ReactiveExtensionClient client;
     private final UserService userService;
+    private final CounterService counterService;
 
     @Override
     public Mono<Reply> create(String commentName, Reply reply) {
@@ -95,7 +99,21 @@ public class ReplyServiceImpl implements ReplyService {
                 builder.owner(ownerInfo);
                 return builder;
             })
-            .map(ListedReply.ListedReplyBuilder::build);
+            .map(ListedReply.ListedReplyBuilder::build)
+            .flatMap(listedReply -> fetchStats(reply)
+                .doOnNext(listedReply::setStats)
+                .thenReturn(listedReply));
+    }
+
+    Mono<CommentStats> fetchStats(Reply reply) {
+        Assert.notNull(reply, "The reply must not be null.");
+        String name = reply.getMetadata().getName();
+        return counterService.getByName(MeterUtils.nameOf(Reply.class, name))
+            .map(counter -> CommentStats.builder()
+                .upvote(counter.getUpvote())
+                .build()
+            )
+            .defaultIfEmpty(CommentStats.empty());
     }
 
     private Mono<OwnerInfo> getOwnerInfo(Reply reply) {

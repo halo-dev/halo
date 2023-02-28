@@ -21,6 +21,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
@@ -33,6 +34,7 @@ import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.AnonymousUserConst;
+import run.halo.app.metrics.CounterService;
 
 /**
  * Tests for {@link CommentFinderImpl}.
@@ -47,6 +49,9 @@ class CommentFinderImplTest {
     private ReactiveExtensionClient client;
     @Mock
     private UserService userService;
+
+    @Mock
+    private CounterService counterService;
 
     @InjectMocks
     private CommentFinderImpl commentFinder;
@@ -92,6 +97,7 @@ class CommentFinderImplTest {
                     assertThat(listResult.getItems().size()).isEqualTo(2);
                     assertThat(listResult.getItems().get(0).getMetadata().getName())
                         .isEqualTo("comment-approved");
+                    assertThat(listResult.getItems().get(0).getStats().getUpvote()).isEqualTo(9);
                 })
                 .verifyComplete();
         }
@@ -225,6 +231,10 @@ class CommentFinderImplTest {
 
             extractedUser();
             when(client.fetch(eq(User.class), any())).thenReturn(Mono.just(createUser()));
+
+            Counter counter = new Counter();
+            counter.setUpvote(9);
+            when(counterService.getByName(any())).thenReturn(Mono.just(counter));
         }
 
         Comment createComment() {
@@ -262,6 +272,7 @@ class CommentFinderImplTest {
                     assertThat(listResult.getItems().size()).isEqualTo(2);
                     assertThat(listResult.getItems().get(0).getMetadata().getName())
                         .isEqualTo("reply-approved");
+                    assertThat(listResult.getItems().get(0).getStats().getUpvote()).isEqualTo(9);
                 })
                 .verifyComplete();
         }
@@ -355,6 +366,10 @@ class CommentFinderImplTest {
 
             extractedUser();
             when(client.fetch(eq(User.class), any())).thenReturn(Mono.just(createUser()));
+
+            Counter counter = new Counter();
+            counter.setUpvote(9);
+            when(counterService.getByName(any())).thenReturn(Mono.just(counter));
         }
 
         Reply createReply() {

@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Component;
@@ -189,16 +190,19 @@ public class SinglePageEndpoint implements CustomEndpoint {
         boolean asyncPublish = request.queryParam("async")
             .map(Boolean::parseBoolean)
             .orElse(false);
-        return client.fetch(SinglePage.class, name)
-            .flatMap(singlePage -> {
-                SinglePage.SinglePageSpec spec = singlePage.getSpec();
-                spec.setPublish(true);
-                if (spec.getHeadSnapshot() == null) {
-                    spec.setHeadSnapshot(spec.getBaseSnapshot());
-                }
-                spec.setReleaseSnapshot(spec.getHeadSnapshot());
-                return client.update(singlePage);
-            })
+        return Mono.defer(() -> client.get(SinglePage.class, name)
+                .flatMap(singlePage -> {
+                    SinglePage.SinglePageSpec spec = singlePage.getSpec();
+                    spec.setPublish(true);
+                    if (spec.getHeadSnapshot() == null) {
+                        spec.setHeadSnapshot(spec.getBaseSnapshot());
+                    }
+                    spec.setReleaseSnapshot(spec.getHeadSnapshot());
+                    return client.update(singlePage);
+                })
+            )
+            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                .filter(t -> t instanceof OptimisticLockingFailureException))
             .flatMap(post -> {
                 if (asyncPublish) {
                     return Mono.just(post);
