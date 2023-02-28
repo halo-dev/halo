@@ -2,6 +2,9 @@ package run.halo.app.core.extension.endpoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -11,12 +14,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.content.TestPost;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
@@ -73,6 +78,53 @@ class PostEndpointTest {
             .isOk()
             .expectBody(Post.class)
             .value(post -> assertThat(post).isEqualTo(TestPost.postV1()));
+    }
+
+    @Test
+    void publishRetryOnOptimisticLockingFailure() {
+        var post = new Post();
+        post.setMetadata(new Metadata());
+        post.getMetadata().setName("post-1");
+        post.setSpec(new Post.PostSpec());
+        when(client.get(eq(Post.class), eq("post-1"))).thenReturn(Mono.just(post));
+
+        when(client.update(any(Post.class)))
+            .thenReturn(Mono.error(new OptimisticLockingFailureException("fake-error")));
+
+        // Send request
+        webTestClient.put()
+            .uri("/posts/{name}/publish?async=false", "post-1")
+            .exchange()
+            .expectStatus()
+            .is5xxServerError();
+
+        // Verify WebClient retry behavior
+        verify(client, times(6)).get(eq(Post.class), eq("post-1"));
+        verify(client, times(6)).update(any(Post.class));
+    }
+
+    @Test
+    void publishSuccess() {
+        var post = new Post();
+        post.setMetadata(new Metadata());
+        post.getMetadata().setName("post-1");
+        post.setSpec(new Post.PostSpec());
+        when(client.get(eq(Post.class), eq("post-1"))).thenReturn(Mono.just(post));
+        when(client.fetch(eq(Post.class), eq("post-1"))).thenReturn(Mono.empty());
+
+        when(client.update(any(Post.class)))
+            .thenReturn(Mono.just(post));
+
+        // Send request
+        webTestClient.put()
+            .uri("/posts/{name}/publish?async=false", "post-1")
+            .exchange()
+            .expectStatus()
+            .is2xxSuccessful();
+
+        // Verify WebClient retry behavior
+        verify(client, times(1)).get(eq(Post.class), eq("post-1"));
+        verify(client, times(1)).update(any(Post.class));
     }
 
     PostRequest postRequest(Post post) {
