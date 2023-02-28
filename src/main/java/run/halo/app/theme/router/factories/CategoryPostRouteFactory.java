@@ -18,6 +18,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
@@ -83,7 +84,7 @@ public class CategoryPostRouteFactory implements RouteFactory {
         ServerRequest request) {
         String path = request.path();
         int pageNum = pageNumInPathVariable(request);
-        return configuredPageSize(environmentFetcher)
+        return configuredPageSize(environmentFetcher, SystemSetting.Post::getCategoryPageSize)
             .flatMap(pageSize -> postFinder.listByCategory(pageNum, pageSize, name))
             .map(list -> new UrlContextListResult.Builder<ListedPostVo>()
                 .listResult(list)

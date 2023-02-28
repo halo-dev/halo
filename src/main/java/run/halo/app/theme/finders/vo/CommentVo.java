@@ -2,9 +2,8 @@ package run.halo.app.theme.finders.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Value;
-import lombok.With;
 import run.halo.app.content.comment.OwnerInfo;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.extension.MetadataOperator;
@@ -15,22 +14,24 @@ import run.halo.app.extension.MetadataOperator;
  * @author guqing
  * @since 2.0.0
  */
-@Value
+@Data
 @Builder
 @EqualsAndHashCode
 public class CommentVo implements ExtensionVoOperator {
 
     @Schema(required = true)
-    MetadataOperator metadata;
+    private MetadataOperator metadata;
 
     @Schema(required = true)
-    Comment.CommentSpec spec;
+    private Comment.CommentSpec spec;
 
-    Comment.CommentStatus status;
+    private Comment.CommentStatus status;
 
-    @With
     @Schema(required = true)
-    OwnerInfo owner;
+    private OwnerInfo owner;
+
+    @Schema(required = true)
+    private CommentStatsVo stats;
 
     /**
      * Convert {@link Comment} to {@link CommentVo}.

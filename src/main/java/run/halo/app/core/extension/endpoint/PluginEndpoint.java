@@ -1,6 +1,6 @@
 package run.halo.app.core.extension.endpoint;
 
-import static java.nio.file.Files.copy;
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 import static java.util.Comparator.comparing;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
@@ -12,9 +12,7 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static run.halo.app.extension.ListResult.generateGenericClass;
 import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
-import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
 
-import com.github.zafarkhaja.semver.Version;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,14 +20,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,47 +35,37 @@ import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.http.codec.multipart.FormFieldPart;
 import org.springframework.http.codec.multipart.Part;
-import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Component;
-import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Setting;
+import run.halo.app.core.extension.service.PluginService;
 import run.halo.app.core.extension.theme.SettingUtils;
 import run.halo.app.extension.Comparators;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
-import run.halo.app.infra.SystemVersionSupplier;
-import run.halo.app.infra.exception.PluginAlreadyExistsException;
-import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
-import run.halo.app.infra.utils.FileUtils;
-import run.halo.app.infra.utils.VersionUtils;
-import run.halo.app.plugin.PluginProperties;
-import run.halo.app.plugin.YamlPluginFinder;
+import run.halo.app.plugin.PluginNotFoundException;
 
 @Slf4j
 @Component
 @AllArgsConstructor
 public class PluginEndpoint implements CustomEndpoint {
 
-    private final PluginProperties pluginProperties;
-
     private final ReactiveExtensionClient client;
 
-    private final SystemVersionSupplier systemVersionSupplier;
+    private final PluginService pluginService;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -169,7 +156,16 @@ public class PluginEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(ConfigMap.class))
             )
+            .GET("plugin-presets", this::listPresets,
+                builder -> builder.operationId("ListPluginPresets")
+                    .description("List all plugin presets in the system.")
+                    .tag(tag)
+                    .response(responseBuilder().implementationArray(Plugin.class)))
             .build();
+    }
+
+    private Mono<ServerResponse> listPresets(ServerRequest request) {
+        return ServerResponse.ok().body(pluginService.getPresets(), Plugin.class);
     }
 
     private Mono<ServerResponse> fetchPluginConfig(ServerRequest request) {
@@ -206,7 +202,7 @@ public class PluginEndpoint implements CustomEndpoint {
                         if (!configMapName.equals(configMapNameToUpdate)) {
                             throw new ServerWebInputException(
                                 "The name from the request body does not match the plugin "
-                                    + "configMapName name.");
+                                + "configMapName name.");
                         }
                     })
                     .flatMap(configMapToUpdate -> client.fetch(ConfigMap.class, configMapName)
@@ -251,94 +247,63 @@ public class PluginEndpoint implements CustomEndpoint {
                 .filter(t -> t instanceof OptimisticLockingFailureException));
     }
 
-    private Mono<ServerResponse> upgrade(ServerRequest request) {
-        var pluginNameInPath = request.pathVariable("name");
-        var tempDirRef = new AtomicReference<Path>();
-        var tempPluginPathRef = new AtomicReference<Path>();
-        return client.fetch(Plugin.class, pluginNameInPath)
-            .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
-                "The given plugin with name " + pluginNameInPath + " does not exit")))
-            .then(request.multipartData())
-            .flatMap(this::getJarFilePart)
-            .flatMap(jarFilePart -> createTempDirectory()
-                .doOnNext(tempDirRef::set)
-                .flatMap(tempDirectory -> {
-                    var pluginPath = tempDirectory.resolve(jarFilePart.filename());
-                    return jarFilePart.transferTo(pluginPath).thenReturn(pluginPath);
+
+    private Mono<ServerResponse> install(ServerRequest request) {
+        return request.multipartData()
+            .map(InstallRequest::new)
+            .flatMap(installRequest -> installRequest.getSource()
+                .flatMap(source -> {
+                    if (InstallSource.FILE.equals(source)) {
+                        return installFromFile(installRequest.getFile(), pluginService::install);
+                    }
+                    if (InstallSource.PRESET.equals(source)) {
+                        return installFromPreset(installRequest.getPresetName(),
+                            pluginService::install);
+                    }
+                    return Mono.error(
+                        new UnsupportedOperationException("Unsupported install source " + source));
                 }))
-            .doOnNext(tempPluginPathRef::set)
-            .map(pluginPath -> new YamlPluginFinder().find(pluginPath))
-            .doOnNext(newPlugin -> {
-                // validate the plugin name
-                if (!Objects.equals(pluginNameInPath, newPlugin.getMetadata().getName())) {
-                    throw new ServerWebInputException(
-                        "The uploaded plugin doesn't match the given plugin name");
-                }
-
-                satisfiesRequiresVersion(newPlugin);
-            })
-            .flatMap(newPlugin -> deletePluginAndWaitForComplete(newPlugin.getMetadata().getName())
-                .map(oldPlugin -> {
-                    var enabled = oldPlugin.getSpec().getEnabled();
-                    newPlugin.getSpec().setEnabled(enabled);
-                    return newPlugin;
-                })
-            )
-            .publishOn(Schedulers.boundedElastic())
-            .doOnNext(newPlugin -> {
-                // copy the Jar file into plugin root
-                try {
-                    var pluginRoot = Paths.get(pluginProperties.getPluginsRoot());
-                    createDirectoriesIfNotExists(pluginRoot);
-                    var tempPluginPath = tempPluginPathRef.get();
-                    copy(tempPluginPath, pluginRoot.resolve(newPlugin.generateFileName()));
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
-                }
-            })
-            .flatMap(client::create)
-            .flatMap(newPlugin -> ServerResponse.ok().bodyValue(newPlugin))
-            .doFinally(signalType -> deleteRecursivelyAndSilently(tempDirRef.get()));
+            .flatMap(plugin -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(plugin));
     }
 
-    private void satisfiesRequiresVersion(Plugin newPlugin) {
-        Assert.notNull(newPlugin, "The plugin must not be null.");
-        Version version = systemVersionSupplier.get();
-        // validate the plugin version
-        // only use the nominal system version to compare, the format is like MAJOR.MINOR.PATCH
-        String systemVersion = version.getNormalVersion();
-        String requires = newPlugin.getSpec().getRequires();
-        if (!VersionUtils.satisfiesRequires(systemVersion, requires)) {
-            throw new UnsatisfiedAttributeValueException(String.format(
-                "Plugin requires a minimum system version of [%s], but the current version is "
-                    + "[%s].",
-                requires, systemVersion),
-                "problemDetail.plugin.version.unsatisfied.requires",
-                new String[] {requires, systemVersion});
-        }
+    private Mono<ServerResponse> upgrade(ServerRequest request) {
+        var pluginName = request.pathVariable("name");
+        return request.multipartData()
+            .map(InstallRequest::new)
+            .flatMap(installRequest -> installRequest.getSource()
+                .flatMap(source -> {
+                    if (InstallSource.FILE.equals(source)) {
+                        return installFromFile(installRequest.getFile(),
+                            path -> pluginService.upgrade(pluginName, path));
+                    }
+                    if (InstallSource.PRESET.equals(source)) {
+                        return installFromPreset(installRequest.getPresetName(),
+                            path -> pluginService.upgrade(pluginName, path));
+                    }
+                    return Mono.error(
+                        new UnsupportedOperationException("Unsupported install source " + source));
+                }))
+            .flatMap(upgradedPlugin -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(upgradedPlugin));
     }
 
-    private Mono<Plugin> deletePluginAndWaitForComplete(String pluginName) {
-        return client.fetch(Plugin.class, pluginName)
-            .flatMap(client::delete)
-            .flatMap(plugin -> waitForDeleted(plugin.getMetadata().getName()).thenReturn(plugin));
+    private Mono<Plugin> installFromFile(Mono<FilePart> filePartMono,
+        Function<Path, Mono<Plugin>> resourceClosure) {
+        var pathMono = filePartMono.flatMap(this::transferToTemp);
+        return Mono.usingWhen(pathMono, resourceClosure, this::deleteFileIfExists);
     }
 
-    private Mono<Void> waitForDeleted(String pluginName) {
-        return client.fetch(Plugin.class, pluginName)
-            .flatMap(plugin -> Mono.error(
-                new RetryException("Re-check if the plugin is deleted successfully")))
-            .retryWhen(Retry.fixedDelay(20, Duration.ofMillis(100))
-                .filter(t -> t instanceof RetryException)
-            )
-            .onErrorMap(Exceptions::isRetryExhausted,
-                t -> new ServerErrorException("Wait timeout for plugin deleted", t))
-            .then();
-    }
-
-    private Mono<Path> createTempDirectory() {
-        return Mono.fromCallable(() -> Files.createTempDirectory("halo-plugin-"))
-            .subscribeOn(Schedulers.boundedElastic());
+    private Mono<Plugin> installFromPreset(Mono<String> presetNameMono,
+        Function<Path, Mono<Plugin>> resourceClosure) {
+        return presetNameMono.flatMap(pluginService::getPreset)
+            .switchIfEmpty(
+                Mono.error(() -> new PluginNotFoundException("Plugin preset was not found.")))
+            .map(pluginPreset -> pluginPreset.getStatus().getLoadLocation())
+            .map(Path::of)
+            .flatMap(resourceClosure);
     }
 
     public static class ListRequest extends QueryListRequest {
@@ -364,7 +329,7 @@ public class PluginEndpoint implements CustomEndpoint {
         @ArraySchema(uniqueItems = true,
             arraySchema = @Schema(name = "sort",
                 description = "Sort property and direction of the list result. Supported fields: "
-                    + "creationTimestamp"),
+                              + "creationTimestamp"),
             schema = @Schema(description = "like field,asc or field,desc",
                 implementation = String.class,
                 example = "creationTimestamp,desc"))
@@ -442,47 +407,79 @@ public class PluginEndpoint implements CustomEndpoint {
             .flatMap(listResult -> ServerResponse.ok().bodyValue(listResult));
     }
 
-    public record InstallRequest(
-        @Schema(required = true, description = "Plugin Jar file.") FilePart file) {
+    @Schema(name = "PluginInstallRequest")
+    public static class InstallRequest {
+
+        private final MultiValueMap<String, Part> multipartData;
+
+        public InstallRequest(MultiValueMap<String, Part> multipartData) {
+            this.multipartData = multipartData;
+        }
+
+        @Schema(requiredMode = NOT_REQUIRED, description = "Plugin Jar file.")
+        public Mono<FilePart> getFile() {
+            var part = multipartData.getFirst("file");
+            if (part == null) {
+                return Mono.error(new ServerWebInputException("Form field file is required"));
+            }
+            if (!(part instanceof FilePart file)) {
+                return Mono.error(new ServerWebInputException("Invalid parameter of file"));
+            }
+            if (!Paths.get(file.filename()).toString().endsWith(".jar")) {
+                return Mono.error(
+                    new ServerWebInputException("Invalid file type, only jar is supported"));
+            }
+            return Mono.just(file);
+        }
+
+        @Schema(requiredMode = NOT_REQUIRED,
+            description = "Plugin preset name. We will find the plugin from plugin presets")
+        public Mono<String> getPresetName() {
+            var part = multipartData.getFirst("presetName");
+            if (part == null) {
+                return Mono.error(new ServerWebInputException(
+                    "Form field presetName is required."));
+            }
+            if (!(part instanceof FormFieldPart presetName)) {
+                return Mono.error(new ServerWebInputException(
+                    "Invalid format of presetName field, string required"));
+            }
+            if (!StringUtils.hasText(presetName.value())) {
+                return Mono.error(new ServerWebInputException("presetName must not be blank"));
+            }
+            return Mono.just(presetName.value());
+        }
+
+        @Schema(requiredMode = NOT_REQUIRED, description = "Install source. Default is file.")
+        public Mono<InstallSource> getSource() {
+            var part = multipartData.getFirst("source");
+            if (part == null) {
+                return Mono.just(InstallSource.FILE);
+            }
+            if (!(part instanceof FormFieldPart sourcePart)) {
+                return Mono.error(new ServerWebInputException(
+                    "Invalid format of source field, string required."));
+            }
+            var installSource = InstallSource.valueOf(sourcePart.value().toUpperCase());
+            return Mono.just(installSource);
+        }
     }
 
-    Mono<ServerResponse> install(ServerRequest request) {
-        return request.multipartData()
-            .flatMap(this::getJarFilePart)
-            .flatMap(this::transferToTemp)
-            .flatMap(tempJarFilePath -> {
-                var plugin = new YamlPluginFinder().find(tempJarFilePath);
-                // validate the plugin version
-                satisfiesRequiresVersion(plugin);
-                // Disable auto enable during installation
-                plugin.getSpec().setEnabled(false);
-                return client.fetch(Plugin.class, plugin.getMetadata().getName())
-                    .doOnNext(oldPlugin -> {
-                        throw new PluginAlreadyExistsException(oldPlugin.getMetadata().getName());
-                    })
-                    .then(client.create(plugin))
-                    .publishOn(Schedulers.boundedElastic())
-                    .doOnNext(created -> {
-                        String fileName = created.generateFileName();
-                        var pluginRoot = Paths.get(pluginProperties.getPluginsRoot());
-                        createDirectoriesIfNotExists(pluginRoot);
-                        Path pluginFilePath = pluginRoot.resolve(fileName);
-                        // move the plugin jar file to the plugin root
-                        // replace the old plugin jar file if exists
-                        FileUtils.copy(tempJarFilePath, pluginFilePath,
-                            StandardCopyOption.REPLACE_EXISTING);
-                    })
-                    .doFinally(signalType -> {
-                        try {
-                            Files.deleteIfExists(tempJarFilePath);
-                        } catch (IOException e) {
-                            log.error("Failed to delete temp file: {}", tempJarFilePath, e);
-                        }
-                    });
-            })
-            .flatMap(plugin -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(plugin));
+    public enum InstallSource {
+        FILE,
+        PRESET,
+        URL
+    }
+
+    Mono<Void> deleteFileIfExists(Path path) {
+        return Mono.fromRunnable(() -> {
+            try {
+                Files.deleteIfExists(path);
+            } catch (IOException e) {
+                // ignore this error
+                log.warn("Failed to delete temporary jar file: {}", path, e);
+            }
+        }).subscribeOn(Schedulers.boundedElastic()).then();
     }
 
     private Mono<Path> transferToTemp(FilePart filePart) {
@@ -493,27 +490,4 @@ public class PluginEndpoint implements CustomEndpoint {
             );
     }
 
-    void createDirectoriesIfNotExists(Path directory) {
-        if (Files.exists(directory)) {
-            return;
-        }
-        try {
-            Files.createDirectories(directory);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to create directory " + directory, e);
-        }
-    }
-
-    Mono<FilePart> getJarFilePart(MultiValueMap<String, Part> formData) {
-        Part part = formData.getFirst("file");
-        if (!(part instanceof FilePart file)) {
-            return Mono.error(new ServerWebInputException(
-                "Invalid parameter of file, binary data is required"));
-        }
-        if (!Paths.get(file.filename()).toString().endsWith(".jar")) {
-            return Mono.error(new ServerWebInputException(
-                "Invalid file type, only jar is supported"));
-        }
-        return Mono.just(file);
-    }
 }

@@ -11,6 +11,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
@@ -22,6 +23,8 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.exception.AccessDeniedException;
+import run.halo.app.metrics.CounterService;
+import run.halo.app.metrics.MeterUtils;
 import run.halo.app.plugin.ExtensionComponentsFinder;
 
 /**
@@ -38,14 +41,17 @@ public class CommentServiceImpl implements CommentService {
     private final ExtensionComponentsFinder extensionComponentsFinder;
 
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final CounterService counterService;
 
     public CommentServiceImpl(ReactiveExtensionClient client,
         UserService userService, ExtensionComponentsFinder extensionComponentsFinder,
-        SystemConfigurableEnvironmentFetcher environmentFetcher) {
+        SystemConfigurableEnvironmentFetcher environmentFetcher,
+        CounterService counterService) {
         this.client = client;
         this.userService = userService;
         this.extensionComponentsFinder = extensionComponentsFinder;
         this.environmentFetcher = environmentFetcher;
+        this.counterService = counterService;
     }
 
     @Override
@@ -151,7 +157,21 @@ public class CommentServiceImpl implements CommentService {
                 })
                 .switchIfEmpty(Mono.just(builder))
             )
-            .map(ListedComment.ListedCommentBuilder::build);
+            .map(ListedComment.ListedCommentBuilder::build)
+            .flatMap(lc -> fetchStats(comment)
+                .doOnNext(lc::setStats)
+                .thenReturn(lc));
+    }
+
+    Mono<CommentStats> fetchStats(Comment comment) {
+        Assert.notNull(comment, "The comment must not be null.");
+        String name = comment.getMetadata().getName();
+        return counterService.getByName(MeterUtils.nameOf(Comment.class, name))
+            .map(counter -> CommentStats.builder()
+                .upvote(counter.getUpvote())
+                .build()
+            )
+            .defaultIfEmpty(CommentStats.empty());
     }
 
     private Mono<OwnerInfo> getCommentOwnerInfo(Comment.CommentOwner owner) {

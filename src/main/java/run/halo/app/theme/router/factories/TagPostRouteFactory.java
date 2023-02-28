@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
@@ -67,7 +68,7 @@ public class TagPostRouteFactory implements RouteFactory {
 
     private Mono<UrlContextListResult<ListedPostVo>> postList(String name, Integer page,
         String requestPath) {
-        return configuredPageSize(environmentFetcher)
+        return configuredPageSize(environmentFetcher, SystemSetting.Post::getTagPageSize)
             .flatMap(pageSize -> postFinder.listByTag(page, pageSize, name))
             .map(list -> new UrlContextListResult.Builder<ListedPostVo>()
                 .listResult(list)

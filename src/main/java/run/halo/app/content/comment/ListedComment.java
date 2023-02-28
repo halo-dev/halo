@@ -2,7 +2,7 @@ package run.halo.app.content.comment;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.extension.Extension;
 
@@ -12,15 +12,18 @@ import run.halo.app.extension.Extension;
  * @author guqing
  * @since 2.0.0
  */
-@Value
+@Data
 @Builder
 public class ListedComment {
 
     @Schema(required = true)
-    Comment comment;
+    private Comment comment;
 
     @Schema(required = true)
-    OwnerInfo owner;
+    private OwnerInfo owner;
 
-    Extension subject;
+    private Extension subject;
+
+    @Schema(required = true)
+    private CommentStats stats;
 }
