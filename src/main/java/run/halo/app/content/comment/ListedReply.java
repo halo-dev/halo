@@ -2,7 +2,7 @@ package run.halo.app.content.comment;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
 import run.halo.app.core.extension.content.Reply;
 
 /**
@@ -11,13 +11,16 @@ import run.halo.app.core.extension.content.Reply;
  * @author guqing
  * @since 2.0.0
  */
-@Value
+@Data
 @Builder
 public class ListedReply {
 
     @Schema(required = true)
-    Reply reply;
+    private Reply reply;
 
     @Schema(required = true)
-    OwnerInfo owner;
+    private OwnerInfo owner;
+
+    @Schema(required = true)
+    private CommentStats stats;
 }

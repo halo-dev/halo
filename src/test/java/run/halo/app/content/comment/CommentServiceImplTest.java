@@ -28,6 +28,7 @@ import org.springframework.util.MultiValueMap;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.content.TestPost;
+import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
@@ -39,6 +40,8 @@ import run.halo.app.extension.Ref;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.metrics.CounterService;
+import run.halo.app.metrics.MeterUtils;
 import run.halo.app.plugin.ExtensionComponentsFinder;
 
 /**
@@ -64,6 +67,9 @@ class CommentServiceImplTest {
 
     @InjectMocks
     private CommentServiceImpl commentService;
+
+    @Mock
+    private CounterService counterService;
 
     @BeforeEach
     void setUp() {
@@ -111,6 +117,21 @@ class CommentServiceImplTest {
 
         Mono<ListResult<ListedComment>> listResultMono =
             commentService.listComment(new CommentQuery(new LinkedMultiValueMap<>()));
+        Counter counterA = new Counter();
+        counterA.setUpvote(3);
+        String commentACounter = MeterUtils.nameOf(Comment.class, "A");
+        when(counterService.getByName(eq(commentACounter))).thenReturn(Mono.just(counterA));
+
+        Counter counterB = new Counter();
+        counterB.setUpvote(9);
+        String commentBCounter = MeterUtils.nameOf(Comment.class, "B");
+        when(counterService.getByName(eq(commentBCounter))).thenReturn(Mono.just(counterB));
+
+        Counter counterC = new Counter();
+        counterC.setUpvote(0);
+        String commentCCounter = MeterUtils.nameOf(Comment.class, "C");
+        when(counterService.getByName(eq(commentCCounter))).thenReturn(Mono.just(counterC));
+
         StepVerifier.create(listResultMono)
             .consumeNextWith(result -> {
                 try {
@@ -320,6 +341,9 @@ class CommentServiceImplTest {
                             "metadata": {
                                 "name": "fake-post"
                             }
+                        },
+                        "stats": {
+                            "upvote": 3
                         }
                     },
                     {
@@ -362,6 +386,9 @@ class CommentServiceImplTest {
                             "metadata": {
                                 "name": "fake-post"
                             }
+                        },
+                        "stats": {
+                           "upvote": 9
                         }
                     },
                     {
@@ -403,6 +430,9 @@ class CommentServiceImplTest {
                             "metadata": {
                                 "name": "fake-post"
                             }
+                        },
+                        "stats": {
+                            "upvote": 0
                         }
                     }
                 ],

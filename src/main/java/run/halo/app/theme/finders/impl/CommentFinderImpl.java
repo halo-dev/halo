@@ -20,13 +20,18 @@ import run.halo.app.content.comment.ReplyService;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.extension.service.UserService;
+import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.AnonymousUserConst;
+import run.halo.app.metrics.CounterService;
+import run.halo.app.metrics.MeterUtils;
 import run.halo.app.theme.finders.CommentFinder;
 import run.halo.app.theme.finders.Finder;
+import run.halo.app.theme.finders.vo.CommentStatsVo;
 import run.halo.app.theme.finders.vo.CommentVo;
+import run.halo.app.theme.finders.vo.ExtensionVoOperator;
 import run.halo.app.theme.finders.vo.ReplyVo;
 
 /**
@@ -41,6 +46,7 @@ public class CommentFinderImpl implements CommentFinder {
 
     private final ReactiveExtensionClient client;
     private final UserService userService;
+    private final CounterService counterService;
 
     @Override
     public Mono<CommentVo> getByName(String name) {
@@ -88,17 +94,34 @@ public class CommentFinderImpl implements CommentFinder {
     private Mono<CommentVo> toCommentVo(Comment comment) {
         Comment.CommentOwner owner = comment.getSpec().getOwner();
         return Mono.just(CommentVo.from(comment))
+            .flatMap(commentVo -> populateStats(Comment.class, commentVo)
+                .doOnNext(commentVo::setStats)
+                .thenReturn(commentVo))
             .flatMap(commentVo -> getOwnerInfo(owner)
-                .map(commentVo::withOwner)
-                .defaultIfEmpty(commentVo)
+                .doOnNext(commentVo::setOwner)
+                .thenReturn(commentVo)
             );
+    }
+
+    private <E extends AbstractExtension, T extends ExtensionVoOperator> Mono<CommentStatsVo>
+        populateStats(Class<E> clazz, T vo) {
+        return counterService.getByName(MeterUtils.nameOf(clazz, vo.getMetadata()
+                .getName()))
+            .map(counter -> CommentStatsVo.builder()
+                .upvote(counter.getUpvote())
+                .build()
+            )
+            .defaultIfEmpty(CommentStatsVo.empty());
     }
 
     private Mono<ReplyVo> toReplyVo(Reply reply) {
         return Mono.just(ReplyVo.from(reply))
+            .flatMap(replyVo -> populateStats(Reply.class, replyVo)
+                .doOnNext(replyVo::setStats)
+                .thenReturn(replyVo))
             .flatMap(replyVo -> getOwnerInfo(reply.getSpec().getOwner())
-                .map(replyVo::withOwner)
-                .defaultIfEmpty(replyVo)
+                .doOnNext(replyVo::setOwner)
+                .thenReturn(replyVo)
             );
     }
 

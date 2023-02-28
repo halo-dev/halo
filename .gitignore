@@ -74,3 +74,4 @@ application-local.properties
 !src/test/resources/themes/*.zip
 !src/main/resources/themes/*.zip
 src/main/resources/console/
+src/main/resources/presets/

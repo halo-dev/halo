@@ -4,6 +4,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.net.URI;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -113,6 +114,9 @@ public class Plugin extends AbstractExtension {
         private String stylesheet;
 
         private String logo;
+
+        @Schema(description = "Load location of the plugin, often a path.")
+        private URI loadLocation;
 
         public static ConditionList nullSafeConditions(@NonNull PluginStatus status) {
             Assert.notNull(status, "The status must not be null.");
