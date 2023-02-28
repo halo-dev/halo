@@ -30,7 +30,6 @@ import run.halo.app.infra.exception.PluginAlreadyExistsException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.VersionUtils;
-import run.halo.app.plugin.PluginNotFoundException;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.YamlPluginFinder;
 
@@ -71,52 +70,57 @@ public class PluginServiceImpl implements PluginService {
 
     @Override
     public Mono<Plugin> install(Path path) {
-        final var pluginFinder = new YamlPluginFinder();
-        final var pluginInPath = pluginFinder.find(path);
-        // validate the plugin version
-        satisfiesRequiresVersion(pluginInPath);
+        return Mono.defer(() -> {
+            final var pluginFinder = new YamlPluginFinder();
+            final var pluginInPath = pluginFinder.find(path);
+            // validate the plugin version
+            satisfiesRequiresVersion(pluginInPath);
 
-        return client.fetch(Plugin.class, pluginInPath.getMetadata().getName())
-            .flatMap(oldPlugin -> Mono.<Plugin>error(
-                new PluginAlreadyExistsException(oldPlugin.getMetadata().getName())))
-            .switchIfEmpty(Mono.defer(
-                () -> copyToPluginHome(pluginInPath)
-                    .map(pluginFinder::find)
-                    .doOnNext(p -> {
-                        // Disable auto enable after installation
-                        p.getSpec().setEnabled(false);
-                    })
-                    .flatMap(client::create)));
+            return client.fetch(Plugin.class, pluginInPath.getMetadata().getName())
+                .flatMap(oldPlugin -> Mono.<Plugin>error(
+                    new PluginAlreadyExistsException(oldPlugin.getMetadata().getName())))
+                .switchIfEmpty(Mono.defer(
+                    () -> copyToPluginHome(pluginInPath)
+                        .map(pluginFinder::find)
+                        .doOnNext(p -> {
+                            // Disable auto enable after installation
+                            p.getSpec().setEnabled(false);
+                        })
+                        .flatMap(client::create)));
+
+        });
     }
 
     @Override
     public Mono<Plugin> upgrade(String name, Path path) {
-        // pre-check the plugin in the path
-        final var pluginFinder = new YamlPluginFinder();
-        final var pluginInPath = pluginFinder.find(path);
-        satisfiesRequiresVersion(pluginInPath);
-        if (!Objects.equals(name, pluginInPath.getMetadata().getName())) {
-            return Mono.error(new ServerWebInputException(
-                "The provided plugin " + pluginInPath.getMetadata().getName()
-                + " didn't match the given plugin " + name));
-        }
+        return Mono.defer(() -> {
+            // pre-check the plugin in the path
+            final var pluginFinder = new YamlPluginFinder();
+            final var pluginInPath = pluginFinder.find(path);
+            satisfiesRequiresVersion(pluginInPath);
+            if (!Objects.equals(name, pluginInPath.getMetadata().getName())) {
+                return Mono.error(new ServerWebInputException(
+                    "The provided plugin " + pluginInPath.getMetadata().getName()
+                    + " didn't match the given plugin " + name));
+            }
 
-        // check if the plugin exists
-        return client.fetch(Plugin.class, name)
-            .switchIfEmpty(Mono.error(() -> new PluginNotFoundException(
-                "The given plugin with name " + name + " was not found.")))
-            // delete the plugin and wait for the deletion
-            .then(deletePluginAndWaitForComplete(name))
-            // copy plugin into plugin home
-            .flatMap(prevPlugin -> copyToPluginHome(pluginInPath)
-                .map(pluginFinder::find)
-                // reset enabled spec
-                .doOnNext(pluginToCreate -> {
-                    var enabled = prevPlugin.getSpec().getEnabled();
-                    pluginToCreate.getSpec().setEnabled(enabled);
-                }))
-            // create the plugin
-            .flatMap(client::create);
+            // check if the plugin exists
+            return client.fetch(Plugin.class, name)
+                .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
+                    "The given plugin with name " + name + " was not found.")))
+                // delete the plugin and wait for the deletion
+                .then(Mono.defer(() -> deletePluginAndWaitForComplete(name)))
+                // copy plugin into plugin home
+                .flatMap(prevPlugin -> copyToPluginHome(pluginInPath)
+                    .map(pluginFinder::find)
+                    // reset enabled spec
+                    .doOnNext(pluginToCreate -> {
+                        var enabled = prevPlugin.getSpec().getEnabled();
+                        pluginToCreate.getSpec().setEnabled(enabled);
+                    }))
+                // create the plugin
+                .flatMap(client::create);
+        });
     }
 
     /**
@@ -149,13 +153,13 @@ public class PluginServiceImpl implements PluginService {
     private Mono<Plugin> deletePluginAndWaitForComplete(String pluginName) {
         return client.fetch(Plugin.class, pluginName)
             .flatMap(client::delete)
-            .flatMap(plugin -> waitForDeleted(plugin.getMetadata().getName()).thenReturn(plugin));
+            .flatMap(plugin -> waitForDeleted(pluginName).thenReturn(plugin));
     }
 
     private Mono<Void> waitForDeleted(String pluginName) {
-        return client.fetch(Plugin.class, pluginName)
-            .flatMap(plugin -> Mono.error(
-                new RetryException("Re-check if the plugin is deleted successfully")))
+        return Mono.defer(() -> client.fetch(Plugin.class, pluginName)
+                .flatMap(plugin -> Mono.error(
+                    new RetryException("Re-check if the plugin is deleted successfully"))))
             .retryWhen(Retry.fixedDelay(20, Duration.ofMillis(100))
                 .filter(t -> t instanceof RetryException)
             )

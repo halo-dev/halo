@@ -58,20 +58,24 @@ class YamlPluginDescriptorFinderTest {
 
         // jar file is applicable
         Path tempJarFile = Files.createTempFile("test", ".jar");
-        applicable =
-            yamlPluginDescriptorFinder.isApplicable(tempJarFile);
-        assertThat(applicable).isTrue();
-
-        // zip file is not applicable
         Path tempZipFile = Files.createTempFile("test", ".zip");
-        applicable =
-            yamlPluginDescriptorFinder.isApplicable(tempZipFile);
-        assertThat(applicable).isFalse();
+        try {
+            applicable =
+                yamlPluginDescriptorFinder.isApplicable(tempJarFile);
+            assertThat(applicable).isTrue();
+            // zip file is not applicable
+            applicable =
+                yamlPluginDescriptorFinder.isApplicable(tempZipFile);
+            assertThat(applicable).isFalse();
 
-        // directory is applicable
-        applicable =
-            yamlPluginDescriptorFinder.isApplicable(tempJarFile.getParent());
-        assertThat(applicable).isTrue();
+            // directory is applicable
+            applicable =
+                yamlPluginDescriptorFinder.isApplicable(tempJarFile.getParent());
+            assertThat(applicable).isTrue();
+        } finally {
+            FileUtils.deleteRecursivelyAndSilently(tempJarFile);
+            FileUtils.deleteRecursivelyAndSilently(tempZipFile);
+        }
     }
 
     @Test
