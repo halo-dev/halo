@@ -9,7 +9,7 @@ import run.halo.app.extension.Extension;
  * <pre>
  *     Indexer&lt;Post&gt; indexer = new Indexer&lt;&gt;();
  *     indexer.addIndexFunc("category", post -&gt; {
- *       List<String> tags = post.getSpec().getTags();
+ *       List&lt;String&gt; tags = post.getSpec().getTags();
  *       return tags == null ? Set.of() : Set.copyOf(tags);
  *     });
  *     indexer.add("category", post);
@@ -44,7 +44,7 @@ public interface Indexer<T extends Extension> {
      * following:</p>
      * <pre>
      * // Create an Indexer that indexes Person objects by name and age
-     * Indexer<Person> indexer = new Indexer<>();
+     * Indexer&lt;Person&gt; indexer = new Indexer<>();
      * indexer.addIndexFunc("name", person -> Collections.singleton(person.getName()));
      * indexer.addIndexFunc("age", person -> Collections.singleton(String.valueOf(person
      *  .getAge())));
