@@ -190,16 +190,17 @@ public class SinglePageEndpoint implements CustomEndpoint {
         boolean asyncPublish = request.queryParam("async")
             .map(Boolean::parseBoolean)
             .orElse(false);
-        return client.fetch(SinglePage.class, name)
-            .flatMap(singlePage -> {
-                SinglePage.SinglePageSpec spec = singlePage.getSpec();
-                spec.setPublish(true);
-                if (spec.getHeadSnapshot() == null) {
-                    spec.setHeadSnapshot(spec.getBaseSnapshot());
-                }
-                spec.setReleaseSnapshot(spec.getHeadSnapshot());
-                return client.update(singlePage);
-            })
+        return Mono.defer(() -> client.get(SinglePage.class, name)
+                .flatMap(singlePage -> {
+                    SinglePage.SinglePageSpec spec = singlePage.getSpec();
+                    spec.setPublish(true);
+                    if (spec.getHeadSnapshot() == null) {
+                        spec.setHeadSnapshot(spec.getBaseSnapshot());
+                    }
+                    spec.setReleaseSnapshot(spec.getHeadSnapshot());
+                    return client.update(singlePage);
+                })
+            )
             .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
                 .filter(t -> t instanceof OptimisticLockingFailureException))
             .flatMap(post -> {

@@ -214,18 +214,19 @@ public class PostEndpoint implements CustomEndpoint {
         boolean asyncPublish = request.queryParam("async")
             .map(Boolean::parseBoolean)
             .orElse(false);
-        return client.get(Post.class, name)
-            .doOnNext(post -> {
-                var spec = post.getSpec();
-                request.queryParam("headSnapshot").ifPresent(spec::setHeadSnapshot);
-                spec.setPublish(true);
-                if (spec.getHeadSnapshot() == null) {
-                    spec.setHeadSnapshot(spec.getBaseSnapshot());
-                }
-                // TODO Provide release snapshot query param to control
-                spec.setReleaseSnapshot(spec.getHeadSnapshot());
-            })
-            .flatMap(client::update)
+        return Mono.defer(() -> client.get(Post.class, name)
+                .doOnNext(post -> {
+                    var spec = post.getSpec();
+                    request.queryParam("headSnapshot").ifPresent(spec::setHeadSnapshot);
+                    spec.setPublish(true);
+                    if (spec.getHeadSnapshot() == null) {
+                        spec.setHeadSnapshot(spec.getBaseSnapshot());
+                    }
+                    // TODO Provide release snapshot query param to control
+                    spec.setReleaseSnapshot(spec.getHeadSnapshot());
+                })
+                .flatMap(client::update)
+            )
             .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
                 .filter(t -> t instanceof OptimisticLockingFailureException))
             .flatMap(post -> {
