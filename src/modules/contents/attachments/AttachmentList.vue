@@ -135,7 +135,7 @@ function handleClearFilters() {
 
 const keyword = ref<string>("");
 const page = ref<number>(1);
-const size = ref<number>(20);
+const size = ref<number>(60);
 
 const {
   attachments,
