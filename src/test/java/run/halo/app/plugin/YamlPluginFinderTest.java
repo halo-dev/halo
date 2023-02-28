@@ -3,6 +3,7 @@ package run.halo.app.plugin;
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.File;
@@ -16,6 +17,7 @@ import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pf4j.PluginRuntimeException;
+import org.pf4j.PluginState;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -47,20 +49,20 @@ class YamlPluginFinderTest {
 
     @Test
     void find() throws IOException, JSONException {
-        Path tempDirectory = Files.createTempDirectory("halo-test-plugin");
+        var tempDirectory = Files.createTempDirectory("halo-test-plugin");
+        try {
+            var directories =
+                Files.createDirectories(tempDirectory.resolve("build/resources/main"));
+            FileCopyUtils.copy(testFile, directories.resolve("plugin.yaml").toFile());
 
-        Path directories = Files.createDirectories(tempDirectory.resolve("build/resources/main"));
-        FileCopyUtils.copy(testFile, directories.resolve("plugin.yaml").toFile());
-
-        Plugin plugin = pluginFinder.find(tempDirectory);
-        assertThat(plugin).isNotNull();
-        JSONAssert.assertEquals("""
-                {
-                    "phase": "RESOLVED"
-                }
-                """,
-            JsonUtils.objectToJson(plugin.getStatus()),
-            true);
+            var plugin = pluginFinder.find(tempDirectory);
+            assertThat(plugin).isNotNull();
+            var status = plugin.getStatus();
+            assertEquals(PluginState.RESOLVED, status.getPhase());
+            assertEquals(tempDirectory.toUri(), status.getLoadLocation());
+        } finally {
+            FileUtils.deleteRecursivelyAndSilently(tempDirectory);
+        }
     }
 
     @Test

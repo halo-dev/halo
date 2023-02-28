@@ -19,6 +19,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
@@ -78,7 +79,7 @@ public class ArchiveRouteFactory implements RouteFactory {
         ArchivePathVariables variables = ArchivePathVariables.from(request);
         int pageNum = pageNumInPathVariable(request);
         String requestPath = request.path();
-        return configuredPageSize(environmentFetcher)
+        return configuredPageSize(environmentFetcher, SystemSetting.Post::getArchivePageSize)
             .flatMap(pageSize -> postFinder.archives(pageNum, pageSize, variables.getYear(),
                 variables.getMonth()))
             .map(list -> new UrlContextListResult.Builder<PostArchiveVo>()
