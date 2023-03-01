@@ -3,7 +3,7 @@ ports:
     onOpen: open-browser
 
 tasks:
-  - init: npm install -g pnpm && pnpm install && pnpm build:packages
+  - init: npm install -g pnpm && pnpm install && pnpm build-packages
     command: pnpm dev
 
 vscode:

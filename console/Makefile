@@ -9,7 +9,7 @@ install: ## install dependencies
 
 .PHONY: build
 build: install ## build console
-	pnpm build:packages
+	pnpm build-packages
 	pnpm build
 
 .PHONY: lint
@@ -19,7 +19,7 @@ lint: install ## lint code
 
 .PHONY: test
 test: install ## run tests
-	pnpm test:unit
+	pnpm test-unit
 
 .PHONY: help
 help: ## print this help

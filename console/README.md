@@ -32,7 +32,7 @@ pnpm install
 ```
 
 ```bash
-pnpm build:packages
+pnpm build-packages
 ```
 
 ```bash
