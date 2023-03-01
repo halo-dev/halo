@@ -1,0 +1,31 @@
+{
+  "page": {
+    "spec": {
+      "title": "关于",
+      "slug": "about",
+      "template": "",
+      "cover": "",
+      "deleted": false,
+      "publish": false,
+      "publishTime": "",
+      "pinned": false,
+      "allowComment": true,
+      "visible": "PUBLIC",
+      "version": 1,
+      "priority": 0,
+      "excerpt": {
+        "autoGenerate": false,
+        "raw": "这是一个自定义页面，你可以在后台的 页面 -> 自定义页面 找到它，你可以用于新建关于页面、联系我们页面等等。"
+      },
+      "htmlMetas": []
+    },
+    "apiVersion": "content.halo.run/v1alpha1",
+    "kind": "SinglePage",
+    "metadata": { "name": "373a5f79-f44f-441a-9df1-85a4f553ece8" }
+  },
+  "content": {
+    "raw": "<h2><strong>关于页面</strong></h2><p>这是一个自定义页面，你可以在后台的 <code>页面</code> -&gt; <code>自定义页面</code> 找到它，你可以用于新建关于页面、联系我们页面等等。</p><blockquote><p>这是一篇自动生成的页面，你可以在后台删除它。</p></blockquote>",
+    "content": "<h2><strong>关于页面</strong></h2><p>这是一个自定义页面，你可以在后台的 <code>页面</code> -&gt; <code>自定义页面</code> 找到它，你可以用于新建关于页面、联系我们页面等等。</p><blockquote><p>这是一篇自动生成的页面，你可以在后台删除它。</p></blockquote>",
+    "rawType": "HTML"
+  }
+}

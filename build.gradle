@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '3.0.3'
     id 'io.spring.dependency-management' version '1.1.0'
     id "com.gorylenko.gradle-git-properties" version "2.3.2"
+    id "com.github.node-gradle.node" version "3.5.1"
     id "checkstyle"
     id 'java'
     id 'jacoco'
@@ -140,4 +141,8 @@ tasks.register('downloadPluginPresets', Download) {
             'https://github.com/halo-sigs/plugin-feed/releases/download/v1.1.0-beta.1/plugin-feed-1.1.0-beta.1.jar'
     ])
     dest 'src/main/resources/presets/plugins'
+}
+
+node {
+    nodeProjectDir = file("${project.projectDir}/console")
 }

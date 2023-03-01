@@ -1,0 +1,61 @@
+// Vitest Snapshot v1
+
+exports[`Button > should render 1`] = `
+"<button class=\\"btn-md btn-default btn\\" type=\\"button\\">
+  <!--v-if--><span class=\\"btn-content\\"></span>
+</button>"
+`;
+
+exports[`Button > should work with block prop 1`] = `
+"<button class=\\"btn-md btn-default btn-block btn\\" type=\\"button\\">
+  <!--v-if--><span class=\\"btn-content\\"></span>
+</button>"
+`;
+
+exports[`Button > should work with circle prop 1`] = `
+"<button class=\\"btn-md btn-default btn-circle btn\\" type=\\"button\\">
+  <!--v-if--><span class=\\"btn-content\\"></span>
+</button>"
+`;
+
+exports[`Button > should work with disabled prop 1`] = `
+"<button class=\\"btn-md btn-default btn\\" type=\\"button\\" disabled=\\"\\">
+  <!--v-if--><span class=\\"btn-content\\"></span>
+</button>"
+`;
+
+exports[`Button > should work with size prop 1`] = `
+"<button class=\\"btn-lg btn-default btn\\" type=\\"button\\">
+  <!--v-if--><span class=\\"btn-content\\"></span>
+</button>"
+`;
+
+exports[`Button > should work with size prop 2`] = `
+"<button class=\\"btn-sm btn-default btn\\" type=\\"button\\">
+  <!--v-if--><span class=\\"btn-content\\"></span>
+</button>"
+`;
+
+exports[`Button > should work with size prop 3`] = `
+"<button class=\\"btn-xs btn-default btn\\" type=\\"button\\">
+  <!--v-if--><span class=\\"btn-content\\"></span>
+</button>"
+`;
+
+exports[`Button > should work with type prop 1`] = `
+"<button class=\\"btn-md btn-primary btn\\" type=\\"button\\">
+  <!--v-if--><span class=\\"btn-content\\"></span>
+</button>"
+`;
+
+exports[`Button > should work with type prop 2`] = `
+"<button class=\\"btn-md btn-secondary btn\\" type=\\"button\\">
+  <!--v-if--><span class=\\"btn-content\\"></span>
+</button>"
+`;
+
+exports[`Button > should work with type prop 3`] = `
+"<button class=\\"btn-md btn-danger btn\\" type=\\"button\\">
+  <!--v-if--><span class=\\"btn-content\\"></span>
+</button>"
+`;

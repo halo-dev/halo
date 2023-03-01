@@ -1,0 +1,105 @@
+// Vitest Snapshot v1
+
+exports[`Menu > should render 1`] = `
+"<div class=\\"menu-container w-full p-3\\">
+  <ul></ul>
+</div>"
+`;
+
+exports[`Menu > should render 2`] = `
+"<li class=\\"menu-item\\">
+  <div class=\\"menu-item-title\\">
+    <!--v-if--><span class=\\"menu-title flex-1 self-center\\"></span>
+    <!--v-if-->
+  </div>
+  <transition-stub name=\\"submenus-show\\" appear=\\"false\\" persisted=\\"true\\" css=\\"true\\">
+    <ul class=\\"sub-menu-items transition-all\\" style=\\"display: none;\\"></ul>
+  </transition-stub>
+</li>"
+`;
+
+exports[`Menu > should work with openIds prop 1`] = `
+"<div class=\\"menu-container w-full p-3\\">
+  <ul>
+    <li class=\\"menu-item\\">
+      <div class=\\"menu-item-title\\">
+        <!--v-if--><span class=\\"menu-title flex-1 self-center\\">Menu Item 1</span>
+        <!--v-if-->
+      </div>
+      <transition-stub name=\\"submenus-show\\" appear=\\"false\\" persisted=\\"true\\" css=\\"true\\">
+        <ul class=\\"sub-menu-items transition-all\\" style=\\"display: none;\\"></ul>
+      </transition-stub>
+    </li>
+    <li class=\\"menu-item\\">
+      <div class=\\"menu-item-title\\">
+        <!--v-if--><span class=\\"menu-title flex-1 self-center\\">Menu Item 2</span>
+        <!--v-if-->
+      </div>
+      <transition-stub name=\\"submenus-show\\" appear=\\"false\\" persisted=\\"true\\" css=\\"true\\">
+        <ul class=\\"sub-menu-items transition-all\\" style=\\"display: none;\\"></ul>
+      </transition-stub>
+    </li>
+    <li class=\\"has-submenus menu-item\\">
+      <div class=\\"menu-item-title\\">
+        <!--v-if--><span class=\\"menu-title flex-1 self-center\\">Menu Item 3</span><span class=\\"open menu-icon-collapse self-center transition-all\\"><svg viewBox=\\"0 0 24 24\\" width=\\"1.2em\\" height=\\"1.2em\\"><path fill=\\"currentColor\\" d=\\"m13.172 12l-4.95-4.95l1.414-1.414L16 12l-6.364 6.364l-1.414-1.414z\\"></path></svg></span>
+      </div>
+      <transition-stub name=\\"submenus-show\\" appear=\\"false\\" persisted=\\"true\\" css=\\"true\\">
+        <ul class=\\"sub-menu-items transition-all\\">
+          <li class=\\"menu-item\\">
+            <div class=\\"menu-item-title\\">
+              <!--v-if--><span class=\\"menu-title flex-1 self-center\\">Menu Item 4</span>
+              <!--v-if-->
+            </div>
+            <transition-stub name=\\"submenus-show\\" appear=\\"false\\" persisted=\\"true\\" css=\\"true\\">
+              <ul class=\\"sub-menu-items transition-all\\" style=\\"display: none;\\"></ul>
+            </transition-stub>
+          </li>
+        </ul>
+      </transition-stub>
+    </li>
+  </ul>
+</div>"
+`;
+
+exports[`Menu > should work with sub menus 1`] = `
+"<div class=\\"menu-container w-full p-3\\">
+  <ul>
+    <li class=\\"menu-item\\">
+      <div class=\\"menu-item-title\\">
+        <!--v-if--><span class=\\"menu-title flex-1 self-center\\">Menu Item 1</span>
+        <!--v-if-->
+      </div>
+      <transition-stub name=\\"submenus-show\\" appear=\\"false\\" persisted=\\"true\\" css=\\"true\\">
+        <ul class=\\"sub-menu-items transition-all\\" style=\\"display: none;\\"></ul>
+      </transition-stub>
+    </li>
+    <li class=\\"menu-item\\">
+      <div class=\\"menu-item-title\\">
+        <!--v-if--><span class=\\"menu-title flex-1 self-center\\">Menu Item 2</span>
+        <!--v-if-->
+      </div>
+      <transition-stub name=\\"submenus-show\\" appear=\\"false\\" persisted=\\"true\\" css=\\"true\\">
+        <ul class=\\"sub-menu-items transition-all\\" style=\\"display: none;\\"></ul>
+      </transition-stub>
+    </li>
+    <li class=\\"has-submenus menu-item\\">
+      <div class=\\"menu-item-title\\">
+        <!--v-if--><span class=\\"menu-title flex-1 self-center\\">Menu Item 3</span><span class=\\"open menu-icon-collapse self-center transition-all\\"><svg viewBox=\\"0 0 24 24\\" width=\\"1.2em\\" height=\\"1.2em\\"><path fill=\\"currentColor\\" d=\\"m13.172 12l-4.95-4.95l1.414-1.414L16 12l-6.364 6.364l-1.414-1.414z\\"></path></svg></span>
+      </div>
+      <transition-stub name=\\"submenus-show\\" appear=\\"false\\" persisted=\\"true\\" css=\\"true\\">
+        <ul class=\\"sub-menu-items transition-all\\">
+          <li class=\\"menu-item\\">
+            <div class=\\"menu-item-title\\">
+              <!--v-if--><span class=\\"menu-title flex-1 self-center\\">Menu Item 4</span>
+              <!--v-if-->
+            </div>
+            <transition-stub name=\\"submenus-show\\" appear=\\"false\\" persisted=\\"true\\" css=\\"true\\">
+              <ul class=\\"sub-menu-items transition-all\\" style=\\"display: none;\\"></ul>
+            </transition-stub>
+          </li>
+        </ul>
+      </transition-stub>
+    </li>
+  </ul>
+</div>"
+`;
