@@ -1,5 +1,6 @@
 package run.halo.app.content;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -126,7 +127,7 @@ class DefaultIndexerTest {
     }
 
     @Test
-    public void testLabelIndexer() {
+    public void testLabelIndexer() throws JSONException {
         // Create a new Indexer.
         DefaultIndexer<Post> indexer = new DefaultIndexer<>();
 
@@ -172,40 +173,78 @@ class DefaultIndexerTest {
         indexer.delete(labelsIndexName, post2);
 
         // Verify that the Indexer has the correct indices.
-        assertEquals(
-            Map.of(
-                "app=myapp", Set.of("post-1"),
-                "env=prod", Set.of("post-1", "post-3"),
-                "app=otherapp", Set.of("post-3")),
-            indexer.getIndices("labels"));
+        JSONAssert.assertEquals("""
+                {
+                    "app=myapp": [
+                        "post-1"
+                    ],
+                    "env=prod": [
+                        "post-1",
+                        "post-3"
+                    ],
+                    "app=otherapp": [
+                        "post-3"
+                    ]
+                }
+                """,
+            JsonUtils.objectToJson(indexer.getIndices("labels")),
+            true);
 
         // Update post2 in the Indexer.
         post2.getMetadata().setLabels(Map.of("l1", "v1", "l2", "v2"));
         indexer.update(labelsIndexName, post2);
 
         // Verify that the Indexer has the correct indices.
-        assertEquals(
-            Map.of(
-                "app=myapp", Set.of("post-1"),
-                "env=prod", Set.of("post-1", "post-3"),
-                "app=otherapp", Set.of("post-3"),
-                "l1=v1", Set.of("post-2"),
-                "l2=v2", Set.of("post-2")),
-            indexer.getIndices("labels"));
+        JSONAssert.assertEquals("""
+                {
+                    "app=myapp": [
+                        "post-1"
+                    ],
+                    "env=prod": [
+                        "post-1",
+                        "post-3"
+                    ],
+                    "app=otherapp": [
+                        "post-3"
+                    ],
+                    "l1=v1": [
+                        "post-2"
+                    ],
+                    "l2=v2": [
+                        "post-2"
+                    ]
+                }
+                """,
+            JsonUtils.objectToJson(indexer.getIndices("labels")),
+            true);
 
         // Update post1 in the Indexer.
         post1.getMetadata().setLabels(Map.of("l2", "v2", "l3", "v3"));
         indexer.update(labelsIndexName, post1);
 
         // Verify that the Indexer has the correct indices.
-        assertEquals(
-            Map.of(
-                "env=prod", Set.of("post-3"),
-                "app=otherapp", Set.of("post-3"),
-                "l1=v1", Set.of("post-2"),
-                "l2=v2", Set.of("post-1", "post-2"),
-                "l3=v3", Set.of("post-1")),
-            indexer.getIndices("labels"));
+        JSONAssert.assertEquals("""
+                {
+                    "env=prod": [
+                        "post-3"
+                    ],
+                    "app=otherapp": [
+                        "post-3"
+                    ],
+                    "l1=v1": [
+                        "post-2"
+                    ],
+                    "l2=v2": [
+                        "post-1",
+                        "post-2"
+                    ],
+                    "l3=v3": [
+                        "post-1"
+                    ]
+                }
+                """,
+            JsonUtils.objectToJson(indexer.getIndices("labels")),
+            true);
     }
 
     @Test
@@ -244,18 +283,25 @@ class DefaultIndexerTest {
         indexer.add(labelsIndexName, post2);
         indexer.add(tagsIndexName, post2);
 
-        assertEquals(Set.of("post-1", "post-2"), indexer.getByIndex(labelsIndexName, "app=myapp"));
-        assertEquals(Set.of("post-1"), indexer.getByIndex(tagsIndexName, "t1"));
+        assertThat(indexer.getByIndex(labelsIndexName, "app=myapp"))
+            .containsExactlyInAnyOrder("post-1", "post-2");
+        assertThat(indexer.getByIndex(tagsIndexName, "t1"))
+            .containsExactlyInAnyOrder("post-1");
 
-        assertEquals(Set.of("post-2"), indexer.getByIndex(labelsIndexName, "env=test"));
-        assertEquals(Set.of("post-1", "post-2"), indexer.getByIndex(tagsIndexName, "t2"));
+        assertThat(indexer.getByIndex(labelsIndexName, "env=test"))
+            .containsExactlyInAnyOrder("post-2");
+        assertThat(indexer.getByIndex(tagsIndexName, "t2"))
+            .containsExactlyInAnyOrder("post-1", "post-2");
 
         post2.getSpec().setTags(List.of("t1", "t4"));
         indexer.update(tagsIndexName, post2);
 
-        assertEquals(Set.of("post-1", "post-2"), indexer.getByIndex(tagsIndexName, "t1"));
-        assertEquals(Set.of("post-1"), indexer.getByIndex(tagsIndexName, "t2"));
-        assertEquals(Set.of("post-2"), indexer.getByIndex(tagsIndexName, "t4"));
+        assertThat(indexer.getByIndex(tagsIndexName, "t1"))
+            .containsExactlyInAnyOrder("post-1", "post-2");
+        assertThat(indexer.getByIndex(tagsIndexName, "t2"))
+            .containsExactlyInAnyOrder("post-1");
+        assertThat(indexer.getByIndex(tagsIndexName, "t4"))
+            .containsExactlyInAnyOrder("post-2");
     }
 
     private static DefaultIndexer.IndexFunc<Post> labelIndexFunc() {
@@ -296,14 +342,12 @@ class DefaultIndexerTest {
         indexer.add(tagsIndexName, post1);
         indexer.add(tagsIndexName, post2);
 
-        Set<String> t1PostNames = indexer.getByIndex(tagsIndexName, "t1");
-        assertEquals("[post-1]", t1PostNames.toString());
-
-        Set<String> t2PostNames = indexer.getByIndex(tagsIndexName, "t2");
-        assertEquals("[post-1, post-2]", t2PostNames.toString());
-
-        Set<String> t3PostNames = indexer.getByIndex(tagsIndexName, "t3");
-        assertEquals("[post-2]", t3PostNames.toString());
+        assertThat(indexer.getByIndex(tagsIndexName, "t1"))
+            .containsExactlyInAnyOrder("post-1");
+        assertThat(indexer.getByIndex(tagsIndexName, "t2"))
+            .containsExactlyInAnyOrder("post-1", "post-2");
+        assertThat(indexer.getByIndex(tagsIndexName, "t3"))
+            .containsExactlyInAnyOrder("post-2");
     }
 
     @Test
