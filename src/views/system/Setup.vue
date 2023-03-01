@@ -44,10 +44,15 @@ const { mutate: pluginStartMutate } = useMutation({
 
     pluginToUpdate.spec.enabled = true;
 
-    return apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin({
-      name: plugin.metadata.name,
-      plugin: pluginToUpdate,
-    });
+    return apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin(
+      {
+        name: plugin.metadata.name,
+        plugin: pluginToUpdate,
+      },
+      {
+        mute: true,
+      }
+    );
   },
   retry: 3,
 });
