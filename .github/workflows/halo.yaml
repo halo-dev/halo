@@ -54,7 +54,7 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v2
-      - uses: halo-sigs/actions/halo-next-docker-build@main # change the version to specific ref or release tag while the action is stable.
+      - uses: halo-sigs/actions/halo-next-docker-build@release-2.1 # change the version to specific ref or release tag while the action is stable.
         with:
           image-name: ${{ github.event_name == 'release' && 'halo' || 'halo-dev' }}
           ghcr-token: ${{ secrets.GHCR_TOKEN }}
