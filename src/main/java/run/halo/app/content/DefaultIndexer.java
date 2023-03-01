@@ -18,6 +18,9 @@ import run.halo.app.extension.Extension;
  *
  * @param <T> the type of object to be indexed
  * @author guqing
+ * @see
+ * <a href="https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/client-go/tools/cache/index.go">kubernetes index</a>
+ * @see <a href="https://juejin.cn/post/7132767272841510926">informer机制之cache.indexer机制</a>
  * @since 2.0.0
  */
 public class DefaultIndexer<T extends Extension> implements Indexer<T> {
