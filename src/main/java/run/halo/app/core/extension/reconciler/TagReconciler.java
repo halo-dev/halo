@@ -1,12 +1,14 @@
 package run.halo.app.core.extension.reconciler;
 
+import java.time.Duration;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import run.halo.app.content.PostIndexInformer;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
@@ -25,23 +27,20 @@ import run.halo.app.infra.utils.JsonUtils;
  * @since 2.0.0
  */
 @Component
+@RequiredArgsConstructor
 public class TagReconciler implements Reconciler<Reconciler.Request> {
     private static final String FINALIZER_NAME = "tag-protection";
     private final ExtensionClient client;
     private final TagPermalinkPolicy tagPermalinkPolicy;
-
-    public TagReconciler(ExtensionClient client, TagPermalinkPolicy tagPermalinkPolicy) {
-        this.client = client;
-        this.tagPermalinkPolicy = tagPermalinkPolicy;
-    }
+    private final PostIndexInformer postIndexInformer;
 
     @Override
     public Result reconcile(Request request) {
-        client.fetch(Tag.class, request.name())
-            .ifPresent(tag -> {
+        return client.fetch(Tag.class, request.name())
+            .map(tag -> {
                 if (isDeleted(tag)) {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
-                    return;
+                    return Result.doNotRetry();
                 }
                 addFinalizerIfNecessary(tag);
 
@@ -50,14 +49,15 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
                 this.reconcileStatusPermalink(request.name());
 
                 reconcileStatusPosts(request.name());
-            });
-        return new Result(false, null);
+                return new Result(true, Duration.ofMinutes(1));
+            })
+            .orElse(Result.doNotRetry());
     }
 
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         return builder
-            .syncAllOnStart(false)
+            .syncAllOnStart(true)
             .extension(new Tag())
             .build();
     }
@@ -128,29 +128,20 @@ public class TagReconciler implements Reconciler<Reconciler.Request> {
     }
 
     private void populatePosts(Tag tag) {
-        List<Post.CompactPost> compactPosts = client.list(Post.class, null, null)
-            .stream()
-            .filter(post -> includes(post.getSpec().getTags(), tag.getMetadata().getName()))
-            .map(post -> Post.CompactPost.builder()
-                .name(post.getMetadata().getName())
-                .published(post.isPublished())
-                .visible(post.getSpec().getVisible())
-                .build())
-            .toList();
-        tag.getStatusOrDefault().setPostCount(compactPosts.size());
+        // populate post count
+        Set<String> postNames = postIndexInformer.getByTagName(tag.getMetadata().getName());
+        tag.getStatusOrDefault().setPostCount(postNames.size());
 
-        long visiblePostCount = compactPosts.stream()
-            .filter(post -> Objects.equals(true, post.getPublished())
-                && Post.VisibleEnum.PUBLIC.equals(post.getVisible()))
-            .count();
-        tag.getStatusOrDefault().setVisiblePostCount((int) visiblePostCount);
-    }
+        // populate visible post count
+        Map<String, String> labelToQuery = Map.of(Post.PUBLISHED_LABEL, BooleanUtils.TRUE,
+            Post.VISIBLE_LABEL, Post.VisibleEnum.PUBLIC.name(),
+            Post.DELETED_LABEL, BooleanUtils.FALSE);
+        Set<String> hasAllLabelPosts = postIndexInformer.getByLabels(labelToQuery);
 
-    private boolean includes(List<String> tags, String tagName) {
-        if (tags == null) {
-            return false;
-        }
-        return tags.contains(tagName);
+        // retain all posts that has all labels
+        Set<String> postNamesWithTag = new HashSet<>(postNames);
+        postNamesWithTag.retainAll(hasAllLabelPosts);
+        tag.getStatusOrDefault().setVisiblePostCount(postNamesWithTag.size());
     }
 
     private boolean isDeleted(Tag tag) {

@@ -214,19 +214,20 @@ public class PostEndpoint implements CustomEndpoint {
         boolean asyncPublish = request.queryParam("async")
             .map(Boolean::parseBoolean)
             .orElse(false);
-        return client.get(Post.class, name)
-            .doOnNext(post -> {
-                var spec = post.getSpec();
-                request.queryParam("headSnapshot").ifPresent(spec::setHeadSnapshot);
-                spec.setPublish(true);
-                if (spec.getHeadSnapshot() == null) {
-                    spec.setHeadSnapshot(spec.getBaseSnapshot());
-                }
-                // TODO Provide release snapshot query param to control
-                spec.setReleaseSnapshot(spec.getHeadSnapshot());
-            })
-            .flatMap(client::update)
-            .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
+        return Mono.defer(() -> client.get(Post.class, name)
+                .doOnNext(post -> {
+                    var spec = post.getSpec();
+                    request.queryParam("headSnapshot").ifPresent(spec::setHeadSnapshot);
+                    spec.setPublish(true);
+                    if (spec.getHeadSnapshot() == null) {
+                        spec.setHeadSnapshot(spec.getBaseSnapshot());
+                    }
+                    // TODO Provide release snapshot query param to control
+                    spec.setReleaseSnapshot(spec.getHeadSnapshot());
+                })
+                .flatMap(client::update)
+            )
+            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
                 .filter(t -> t instanceof OptimisticLockingFailureException))
             .flatMap(post -> {
                 if (asyncPublish) {
@@ -243,7 +244,7 @@ public class PostEndpoint implements CustomEndpoint {
                         }
                         throw new RetryException("Post publishing status is not as expected");
                     })
-                    .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(100))
+                    .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(200))
                         .filter(t -> t instanceof RetryException))
                     .doOnError(IllegalStateException.class, err -> {
                         log.error("Failed to publish post [{}]", name, err);

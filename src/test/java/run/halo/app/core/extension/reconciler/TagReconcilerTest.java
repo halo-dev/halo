@@ -10,15 +10,15 @@ import static org.mockito.Mockito.when;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import run.halo.app.content.TestPost;
+import run.halo.app.content.PostIndexInformer;
 import run.halo.app.content.permalinks.TagPermalinkPolicy;
-import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
@@ -37,6 +37,9 @@ class TagReconcilerTest {
     @Mock
     private TagPermalinkPolicy tagPermalinkPolicy;
 
+    @Mock
+    private PostIndexInformer postIndexInformer;
+
     @InjectMocks
     private TagReconciler tagReconciler;
 
@@ -45,6 +48,8 @@ class TagReconcilerTest {
         Tag tag = tag();
         when(client.fetch(eq(Tag.class), eq("fake-tag")))
             .thenReturn(Optional.of(tag));
+        when(postIndexInformer.getByTagName(eq("fake-tag")))
+            .thenReturn(Set.of());
         when(tagPermalinkPolicy.permalink(any()))
             .thenAnswer(arg -> "/tags/" + tag.getSpec().getSlug());
         ArgumentCaptor<Tag> captor = ArgumentCaptor.forClass(Tag.class);
@@ -80,7 +85,8 @@ class TagReconcilerTest {
         Tag tag = tag();
         when(client.fetch(eq(Tag.class), eq("fake-tag")))
             .thenReturn(Optional.of(tag));
-        when(client.list(eq(Post.class), any(), any())).thenReturn(posts());
+        when(postIndexInformer.getByTagName(eq("fake-tag")))
+            .thenReturn(Set.of("fake-post-1", "fake-post-3"));
 
         ArgumentCaptor<Tag> captor = ArgumentCaptor.forClass(Tag.class);
         tagReconciler.reconcile(new TagReconciler.Request("fake-tag"));
@@ -101,23 +107,4 @@ class TagReconcilerTest {
         tag.setStatus(new Tag.TagStatus());
         return tag;
     }
-
-    private List<Post> posts() {
-        Post post1 = TestPost.postV1();
-        post1.getMetadata().setName("fake-post-1");
-        post1.getSpec().setVisible(Post.VisibleEnum.PUBLIC);
-        post1.getSpec().setTags(List.of("fake-tag", "tag-A", "tag-B"));
-
-        Post post2 = TestPost.postV1();
-        post2.getMetadata().setName("fake-post-2");
-        post2.getSpec().setVisible(Post.VisibleEnum.INTERNAL);
-        post2.getSpec().setTags(List.of("tag-A", "tag-C"));
-
-        Post post3 = TestPost.postV1();
-        post3.getMetadata().setName("fake-post-3");
-        post3.getSpec().setVisible(Post.VisibleEnum.PRIVATE);
-        post3.getSpec().setTags(List.of("tag-A", "fake-tag"));
-        return List.of(post1, post2, post3);
-    }
-
 }

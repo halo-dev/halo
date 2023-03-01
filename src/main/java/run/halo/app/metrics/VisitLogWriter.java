@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Component;
 import reactor.core.Disposable;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
@@ -29,7 +28,7 @@ import run.halo.app.infra.utils.FileUtils;
  * @since 2.0.0
  */
 @Slf4j
-@Component
+@Deprecated
 public class VisitLogWriter implements InitializingBean, DisposableBean {
     private static final String LOG_FILE_NAME = "visits.log";
     private static final String LOG_FILE_LOCATION = "logs";
