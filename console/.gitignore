@@ -27,3 +27,5 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+
+!src/build

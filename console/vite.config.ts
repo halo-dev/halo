@@ -50,6 +50,10 @@ export default ({ mode }: { mode: string }) => {
       port: 3000,
     },
     build: {
+      outDir: fileURLToPath(
+        new URL("../src/main/resources/console", import.meta.url)
+      ),
+      emptyOutDir: true,
       chunkSizeWarningLimit: 2048,
     },
   });
