@@ -35,6 +35,19 @@ jobs:
           java-version: 17
       - name: Check code style
         run: ./gradlew check -x test
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            console:
+              - 'console/**'
+      - name: Setup console environment
+        if: steps.changes.outputs.console == 'true'
+        uses: halo-sigs/actions/admin-env-setup@main
+      - name: Check console
+        if: steps.changes.outputs.console == 'true'
+        run: make clint
+
   test:
     runs-on: ubuntu-latest
     steps:
@@ -51,12 +64,26 @@ jobs:
         run: ./gradlew test
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            console:
+              - 'console/**'
+      - name: Setup console environment
+        if: steps.changes.outputs.console == 'true'
+        uses: halo-sigs/actions/admin-env-setup@main
+      - name: Test console
+        if: steps.changes.outputs.console == 'true'
+        run: make ctest
+
   docker-build-and-push:
     runs-on: ubuntu-latest
     needs: test
     steps:
       - uses: actions/checkout@v3
-      - uses: halo-sigs/actions/halo-next-docker-build@main # change the version to specific ref or release tag while the action is stable.
+        # This action is only for test, we should revert it before merging.
+      - uses: JohnNiang/actions/halo-next-docker-build@refactor/halo-build # change the version to specific ref or release tag while the action is stable.
         with:
           image-name: ${{ github.event_name == 'release' && 'halo' || 'halo-dev' }}
           ghcr-token: ${{ secrets.GHCR_TOKEN }}
