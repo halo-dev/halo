@@ -9,11 +9,11 @@ cbuild-packages: cinstall ## Build packages of console
 cbuild: cbuild-packages ## Build console
 	./gradlew pnpm_build
 
-clint: ## Lint console
+clint: cinstall## Lint console
 	./gradlew pnpm_lint
 	./gradlew pnpm_typecheck
 
-ctest: ## Test console
+ctest: cinstall ## Test console
 	./gradlew pnpm_test-unit
 
 help: ## print this help
