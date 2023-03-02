@@ -33,8 +33,21 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
           java-version: 17
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            console:
+              - 'console/**'
       - name: Check code style
         run: ./gradlew check -x test
+      - name: Setup console environment
+        if: steps.changes.outputs.console == 'true'
+        uses: halo-sigs/actions/admin-env-setup@main
+      - name: Check console
+        if: steps.changes.outputs.console == 'true'
+        run: make -C console lint
+
   test:
     runs-on: ubuntu-latest
     steps:
@@ -47,10 +60,23 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
           java-version: 17
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            console:
+              - 'console/**'
       - name: Run tests
         run: ./gradlew test
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
+      - name: Setup console environment
+        if: steps.changes.outputs.console == 'true'
+        uses: halo-sigs/actions/admin-env-setup@main
+      - name: Test console
+        if: steps.changes.outputs.console == 'true'
+        run: make -C console test
+
   docker-build-and-push:
     runs-on: ubuntu-latest
     needs: test

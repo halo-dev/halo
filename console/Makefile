@@ -1,26 +1,23 @@
 SHELL := /usr/bin/env bash -o errexit -o pipefail -o nounset
 
-.PHONY: all
-all: lint test ## lint and test code
-
-.PHONY: install
-install: ## install dependencies
+install: ## Install console
 	pnpm install
 
-.PHONY: build
-build: install ## build console
+build-packages: install ## Build packages of console
 	pnpm build:packages
+
+build: build-packages ## Build console
 	pnpm build
 
-.PHONY: lint
-lint: install ## lint code
+lint: build-packages ## Lint console
 	pnpm lint
 	pnpm typecheck
 
-.PHONY: test
-test: install ## run tests
+test: build-packages ## Test console
 	pnpm test:unit
 
-.PHONY: help
+dev: build-packages ## Run console with development environment
+	pnpm dev
+
 help: ## print this help
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {gsub("\\\\n",sprintf("\n%22c",""), $$2);printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
