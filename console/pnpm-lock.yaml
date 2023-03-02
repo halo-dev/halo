@@ -66,7 +66,7 @@ importers:
       fastq: ^1.15.0
       floating-vue: 2.0.0-beta.20
       fuse.js: ^6.6.2
-      husky: ^8.0.2
+      husky: ^8.0.3
       jsdom: ^20.0.3
       lint-staged: ^13.1.0
       lodash.clonedeep: ^4.5.0
@@ -184,7 +184,7 @@ importers:
       eslint: 8.28.0
       eslint-plugin-cypress: 2.12.1_eslint@8.28.0
       eslint-plugin-vue: 9.8.0_eslint@8.28.0
-      husky: 8.0.2
+      husky: 8.0.3
       jsdom: 20.0.3
       lint-staged: 13.1.0
       postcss: 8.4.19
@@ -4757,7 +4757,7 @@ packages:
   /axios/0.21.4_debug@4.3.2:
     resolution: {integrity: sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==}
     dependencies:
-      follow-redirects: 1.15.2
+      follow-redirects: 1.15.2_debug@4.3.2
     transitivePeerDependencies:
       - debug
     dev: true
@@ -4765,7 +4765,7 @@ packages:
   /axios/0.26.1:
     resolution: {integrity: sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA==}
     dependencies:
-      follow-redirects: 1.15.2_debug@4.3.2
+      follow-redirects: 1.15.2
     transitivePeerDependencies:
       - debug
     dev: true
@@ -7440,8 +7440,8 @@ packages:
     engines: {node: '>=12.20.0'}
     dev: true
 
-  /husky/8.0.2:
-    resolution: {integrity: sha512-Tkv80jtvbnkK3mYWxPZePGFpQ/tT3HNSs/sasF9P2YfkMezDl3ON37YN6jUUI4eTg5LcyVynlb6r4eyvOmspvg==}
+  /husky/8.0.3:
+    resolution: {integrity: sha512-+dQSyqPh4x1hlO1swXBiNb2HzTDN1I2IGLQx1GrBuiqFJfoMrnZWwVmatvSiO+Iz8fBUnf+lekwNo4c2LlXItg==}
     engines: {node: '>=14'}
     hasBin: true
     dev: true
