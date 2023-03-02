@@ -1,0 +1,16 @@
+{
+  "spec": {
+    "displayName": "默认分类",
+    "slug": "default",
+    "description": "这是你的默认分类，如不需要，删除即可。",
+    "cover": "",
+    "template": "",
+    "priority": 0,
+    "children": []
+  },
+  "apiVersion": "content.halo.run/v1alpha1",
+  "kind": "Category",
+  "metadata": {
+    "name": "76514a40-6ef1-4ed9-b58a-e26945bde3ca"
+  }
+}

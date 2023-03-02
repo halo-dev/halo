@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+    <meta content="webkit" name="renderer" />
+    <meta
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+      name="viewport"
+    />
+    <meta content="noindex,nofollow" name="robots" />
+    <title>Halo</title>
+    <link rel="icon" href="/favicon.ico" type="image/png" />
+    <link rel="icon" href="/favicon.ico" type="image/svg+xml" />
+    <meta name="msapplication-TileColor" content="#da532c" />
+    <meta name="theme-color" content="#ffffff" />
+    <%- injectScript %>
+    <style>
+      body {
+        height: 100%;
+        background-color: #f5f5f5;
+      }
+
+      #loader {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: auto;
+        border: solid 3px #e5e5e5;
+        border-top-color: #333;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 0.6s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>
+      <strong>
+        We're sorry but halo console client doesn't work properly without
+        JavaScript enabled. Please enable it to continue.
+      </strong>
+    </noscript>
+    <div id="app">
+      <div id="loader"></div>
+    </div>
+    <script src="/src/main.ts" type="module"></script>
+  </body>
+</html>
