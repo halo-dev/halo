@@ -1,0 +1,8 @@
+// Vitest Snapshot v1
+
+exports[`StatusDot > should match snapshot 1`] = `
+"<div class=\\"status-dot-wrapper status-dot-success\\">
+  <div class=\\"status-dot-body\\"><span class=\\"status-dot-inner\\"></span></div>
+  <!--v-if-->
+</div>"
+`;

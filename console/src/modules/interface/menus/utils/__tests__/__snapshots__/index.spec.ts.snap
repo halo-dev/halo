@@ -1,0 +1,378 @@
+// Vitest Snapshot v1
+
+exports[`buildMenuItemsTree > should match snapshot 1`] = `
+[
+  {
+    "apiVersion": "v1alpha1",
+    "kind": "MenuItem",
+    "metadata": {
+      "creationTimestamp": "2022-08-05T04:22:03.377364Z",
+      "name": "411a3639-bf0d-4266-9cfb-14184259dab5",
+      "version": 1,
+    },
+    "spec": {
+      "children": [],
+      "displayName": "首页",
+      "href": "https://ryanc.cc/",
+      "priority": 0,
+    },
+  },
+  {
+    "apiVersion": "v1alpha1",
+    "kind": "MenuItem",
+    "metadata": {
+      "creationTimestamp": "2022-08-05T04:19:37.252228Z",
+      "name": "40e4ba86-5c7e-43c2-b4c0-cee376d26564",
+      "version": 12,
+    },
+    "spec": {
+      "children": [
+        {
+          "apiVersion": "v1alpha1",
+          "kind": "MenuItem",
+          "metadata": {
+            "creationTimestamp": "2022-07-28T06:50:32.777556Z",
+            "name": "caeef383-3828-4039-9114-6f9ad3b4a37e",
+            "version": 4,
+          },
+          "spec": {
+            "children": [],
+            "displayName": "Halo",
+            "href": "https://ryanc.cc/categories/halo",
+            "priority": 0,
+          },
+        },
+        {
+          "apiVersion": "v1alpha1",
+          "kind": "MenuItem",
+          "metadata": {
+            "creationTimestamp": "2022-08-05T04:22:03.377364Z",
+            "name": "ded1943d-9fdb-4563-83ee-2f04364872e0",
+            "version": 1,
+          },
+          "spec": {
+            "children": [
+              {
+                "apiVersion": "v1alpha1",
+                "kind": "MenuItem",
+                "metadata": {
+                  "creationTimestamp": "2022-08-05T04:22:03.377364Z",
+                  "name": "96b636bb-3e4a-44d1-8ea7-f9da9e876f45",
+                  "version": 1,
+                },
+                "spec": {
+                  "children": [],
+                  "displayName": "Spring Boot",
+                  "href": "https://ryanc.cc/categories/spring-boot",
+                  "priority": 0,
+                },
+              },
+            ],
+            "displayName": "Java",
+            "href": "https://ryanc.cc/categories/java",
+            "priority": 1,
+          },
+        },
+      ],
+      "displayName": "文章分类",
+      "href": "https://ryanc.cc/categories",
+      "priority": 1,
+    },
+  },
+]
+`;
+
+exports[`convertMenuTreeItemToMenuItem > should match snapshot 1`] = `
+{
+  "apiVersion": "v1alpha1",
+  "kind": "MenuItem",
+  "metadata": {
+    "creationTimestamp": "2022-08-05T04:19:37.252228Z",
+    "name": "40e4ba86-5c7e-43c2-b4c0-cee376d26564",
+    "version": 12,
+  },
+  "spec": {
+    "children": [
+      "caeef383-3828-4039-9114-6f9ad3b4a37e",
+      "ded1943d-9fdb-4563-83ee-2f04364872e0",
+    ],
+    "displayName": "文章分类",
+    "href": "https://ryanc.cc/categories",
+    "priority": 1,
+  },
+}
+`;
+
+exports[`convertMenuTreeItemToMenuItem > should match snapshot 2`] = `
+{
+  "apiVersion": "v1alpha1",
+  "kind": "MenuItem",
+  "metadata": {
+    "creationTimestamp": "2022-08-05T04:22:03.377364Z",
+    "name": "ded1943d-9fdb-4563-83ee-2f04364872e0",
+    "version": 1,
+  },
+  "spec": {
+    "children": [
+      "96b636bb-3e4a-44d1-8ea7-f9da9e876f45",
+    ],
+    "displayName": "Java",
+    "href": "https://ryanc.cc/categories/java",
+    "priority": 1,
+  },
+}
+`;
+
+exports[`convertTreeToMenuItems > will match snapshot 1`] = `
+[
+  {
+    "apiVersion": "v1alpha1",
+    "kind": "MenuItem",
+    "metadata": {
+      "creationTimestamp": "2022-08-05T04:22:03.377364Z",
+      "name": "411a3639-bf0d-4266-9cfb-14184259dab5",
+      "version": 1,
+    },
+    "spec": {
+      "children": [],
+      "displayName": "首页",
+      "href": "https://ryanc.cc/",
+      "priority": 0,
+    },
+  },
+  {
+    "apiVersion": "v1alpha1",
+    "kind": "MenuItem",
+    "metadata": {
+      "creationTimestamp": "2022-08-05T04:19:37.252228Z",
+      "name": "40e4ba86-5c7e-43c2-b4c0-cee376d26564",
+      "version": 12,
+    },
+    "spec": {
+      "children": [
+        "caeef383-3828-4039-9114-6f9ad3b4a37e",
+        "ded1943d-9fdb-4563-83ee-2f04364872e0",
+      ],
+      "displayName": "文章分类",
+      "href": "https://ryanc.cc/categories",
+      "priority": 1,
+    },
+  },
+  {
+    "apiVersion": "v1alpha1",
+    "kind": "MenuItem",
+    "metadata": {
+      "creationTimestamp": "2022-07-28T06:50:32.777556Z",
+      "name": "caeef383-3828-4039-9114-6f9ad3b4a37e",
+      "version": 4,
+    },
+    "spec": {
+      "children": [],
+      "displayName": "Halo",
+      "href": "https://ryanc.cc/categories/halo",
+      "priority": 0,
+    },
+  },
+  {
+    "apiVersion": "v1alpha1",
+    "kind": "MenuItem",
+    "metadata": {
+      "creationTimestamp": "2022-08-05T04:22:03.377364Z",
+      "name": "ded1943d-9fdb-4563-83ee-2f04364872e0",
+      "version": 1,
+    },
+    "spec": {
+      "children": [
+        "96b636bb-3e4a-44d1-8ea7-f9da9e876f45",
+      ],
+      "displayName": "Java",
+      "href": "https://ryanc.cc/categories/java",
+      "priority": 1,
+    },
+  },
+  {
+    "apiVersion": "v1alpha1",
+    "kind": "MenuItem",
+    "metadata": {
+      "creationTimestamp": "2022-08-05T04:22:03.377364Z",
+      "name": "96b636bb-3e4a-44d1-8ea7-f9da9e876f45",
+      "version": 1,
+    },
+    "spec": {
+      "children": [],
+      "displayName": "Spring Boot",
+      "href": "https://ryanc.cc/categories/spring-boot",
+      "priority": 0,
+    },
+  },
+]
+`;
+
+exports[`resetMenuItemsTreePriority > should match snapshot 1`] = `
+[
+  {
+    "apiVersion": "v1alpha1",
+    "kind": "MenuItem",
+    "metadata": {
+      "creationTimestamp": "2022-08-05T04:22:03.377364Z",
+      "name": "411a3639-bf0d-4266-9cfb-14184259dab5",
+      "version": 1,
+    },
+    "spec": {
+      "children": [],
+      "displayName": "首页",
+      "href": "https://ryanc.cc/",
+      "priority": 0,
+    },
+  },
+  {
+    "apiVersion": "v1alpha1",
+    "kind": "MenuItem",
+    "metadata": {
+      "creationTimestamp": "2022-08-05T04:19:37.252228Z",
+      "name": "40e4ba86-5c7e-43c2-b4c0-cee376d26564",
+      "version": 12,
+    },
+    "spec": {
+      "children": [
+        {
+          "apiVersion": "v1alpha1",
+          "kind": "MenuItem",
+          "metadata": {
+            "creationTimestamp": "2022-07-28T06:50:32.777556Z",
+            "name": "caeef383-3828-4039-9114-6f9ad3b4a37e",
+            "version": 4,
+          },
+          "spec": {
+            "children": [],
+            "displayName": "Halo",
+            "href": "https://ryanc.cc/categories/halo",
+            "priority": 0,
+          },
+        },
+        {
+          "apiVersion": "v1alpha1",
+          "kind": "MenuItem",
+          "metadata": {
+            "creationTimestamp": "2022-08-05T04:22:03.377364Z",
+            "name": "ded1943d-9fdb-4563-83ee-2f04364872e0",
+            "version": 1,
+          },
+          "spec": {
+            "children": [
+              {
+                "apiVersion": "v1alpha1",
+                "kind": "MenuItem",
+                "metadata": {
+                  "creationTimestamp": "2022-08-05T04:22:03.377364Z",
+                  "name": "96b636bb-3e4a-44d1-8ea7-f9da9e876f45",
+                  "version": 1,
+                },
+                "spec": {
+                  "children": [],
+                  "displayName": "Spring Boot",
+                  "href": "https://ryanc.cc/categories/spring-boot",
+                  "priority": 0,
+                },
+              },
+            ],
+            "displayName": "Java",
+            "href": "https://ryanc.cc/categories/java",
+            "priority": 1,
+          },
+        },
+      ],
+      "displayName": "文章分类",
+      "href": "https://ryanc.cc/categories",
+      "priority": 1,
+    },
+  },
+]
+`;
+
+exports[`sortMenuItemsTree > will match snapshot 1`] = `
+[
+  {
+    "apiVersion": "v1alpha1",
+    "kind": "MenuItem",
+    "metadata": {
+      "creationTimestamp": "2022-08-05T04:19:37.252228Z",
+      "name": "40e4ba86-5c7e-43c2-b4c0-cee376d26564",
+      "version": 12,
+    },
+    "spec": {
+      "categoryRef": {
+        "name": "",
+      },
+      "children": [
+        {
+          "apiVersion": "v1alpha1",
+          "kind": "MenuItem",
+          "metadata": {
+            "creationTimestamp": "2022-08-05T04:22:03.377364Z",
+            "name": "ded1943d-9fdb-4563-83ee-2f04364872e0",
+            "version": 0,
+          },
+          "spec": {
+            "categoryRef": {
+              "name": "",
+            },
+            "children": [],
+            "displayName": "Java",
+            "href": "https://ryanc.cc/categories/java",
+            "pageRef": {
+              "name": "",
+            },
+            "postRef": {
+              "name": "",
+            },
+            "priority": 0,
+            "tagRef": {
+              "name": "",
+            },
+          },
+        },
+        {
+          "apiVersion": "v1alpha1",
+          "kind": "MenuItem",
+          "metadata": {
+            "creationTimestamp": "2022-07-28T06:50:32.777556Z",
+            "name": "caeef383-3828-4039-9114-6f9ad3b4a37e",
+            "version": 4,
+          },
+          "spec": {
+            "categoryRef": {
+              "name": "",
+            },
+            "children": [],
+            "displayName": "Halo",
+            "href": "https://ryanc.cc/categories/halo",
+            "pageRef": {
+              "name": "",
+            },
+            "postRef": {
+              "name": "",
+            },
+            "priority": 1,
+            "tagRef": {
+              "name": "",
+            },
+          },
+        },
+      ],
+      "displayName": "文章分类",
+      "href": "https://ryanc.cc/categories",
+      "pageRef": {
+        "name": "",
+      },
+      "postRef": {
+        "name": "",
+      },
+      "priority": 0,
+      "tagRef": {
+        "name": "",
+      },
+    },
+  },
+]
+`;

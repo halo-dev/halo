@@ -1,0 +1,38 @@
+name: Halo Console CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - release-*
+    paths:
+      - "**"
+      - "!**.md"
+  push:
+    branches:
+      - main
+      - release-*
+    paths:
+      - "**"
+      - "!**.md"
+  release:
+    types:
+      - created
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Environment Set Up
+        uses: halo-sigs/actions/admin-env-setup@main
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build packages
+        run: pnpm build:packages
+      - name: Run code lint check
+        run: pnpm lint
+      - name: Run typescript type check
+        run: pnpm typecheck
+      - name: Run unit test
+        run: pnpm test:unit
