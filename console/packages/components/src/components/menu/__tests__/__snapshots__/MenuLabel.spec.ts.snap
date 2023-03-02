@@ -1,3 +1,0 @@
-// Vitest Snapshot v1
-
-exports[`MenuLabel > should render 1`] = `"<li class=\\"menu-label flex flex-col\\">Hello Halo</li>"`;

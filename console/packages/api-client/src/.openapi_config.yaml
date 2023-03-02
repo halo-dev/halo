@@ -1,5 +1,0 @@
-supportsES6: true
-useSingleRequestParameter: true
-withSeparateModelsAndApi: true
-apiPackage: api
-modelPackage: models
