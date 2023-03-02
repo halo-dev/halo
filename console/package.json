@@ -2,7 +2,7 @@
   "name": "@halo-dev/console",
   "version": "2.3.0",
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "cd .. && husky install console/.husky",
     "dev": "vite --host",
     "build": "vue-tsc --noEmit && vite build",
     "build:packages": "pnpm --filter \"./packages/**\" build",
