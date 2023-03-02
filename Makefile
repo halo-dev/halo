@@ -1,6 +1,7 @@
 SHELL := /usr/bin/env bash -o errexit -o pipefail -o nounset
 
 cinstall: ## Install console
+	./gradlew pnpmSetup
 	./gradlew pnpm_install
 
 cbuild-packages: cinstall ## Build packages of console
