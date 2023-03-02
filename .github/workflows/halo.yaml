@@ -82,8 +82,7 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v3
-        # This action is only for test, we should revert it before merging.
-      - uses: JohnNiang/actions/halo-next-docker-build@refactor/halo-build # change the version to specific ref or release tag while the action is stable.
+      - uses: halo-sigs/actions/halo-next-docker-build@main # change the version to specific ref or release tag while the action is stable.
         with:
           image-name: ${{ github.event_name == 'release' && 'halo' || 'halo-dev' }}
           ghcr-token: ${{ secrets.GHCR_TOKEN }}
