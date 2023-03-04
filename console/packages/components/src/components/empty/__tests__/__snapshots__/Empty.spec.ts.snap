@@ -1,0 +1,12 @@
+// Vitest Snapshot v1
+
+exports[`Empty > should match snapshot 1`] = `
+"<div class=\\"empty-wrapper\\">
+  <div class=\\"empty-image h-32 w-32\\"><img src=\\"./Empty.svg\\" alt=\\"Empty\\"></div>
+  <div class=\\"empty-title\\">Not found</div>
+  <div class=\\"empty-message\\">No posts found</div>
+  <div class=\\"empty-actions\\"><button class=\\"btn-md btn-primary btn\\" type=\\"button\\">
+      <!--v-if--><span class=\\"btn-content\\">New Post</span>
+    </button></div>
+</div>"
+`;

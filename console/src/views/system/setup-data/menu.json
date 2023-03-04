@@ -1,0 +1,14 @@
+{
+  "spec": {
+    "displayName": "主菜单",
+    "menuItems": [
+      "88c3f10b-321c-4092-86a8-70db00251b74",
+      "c4c814d1-0c2c-456b-8c96-4864965fee94",
+      "35869bd3-33b5-448b-91ee-cf6517a59644",
+      "b0d041fa-dc99-48f6-a193-8604003379cf"
+    ]
+  },
+  "apiVersion": "v1alpha1",
+  "kind": "Menu",
+  "metadata": { "name": "primary" }
+}
