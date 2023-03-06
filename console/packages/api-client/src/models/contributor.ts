@@ -23,17 +23,17 @@ export interface Contributor {
    * @type {string}
    * @memberof Contributor
    */
-  displayName?: string
+  avatar?: string;
   /**
    *
    * @type {string}
    * @memberof Contributor
    */
-  avatar?: string
+  displayName?: string;
   /**
    *
    * @type {string}
    * @memberof Contributor
    */
-  name?: string
+  name?: string;
 }

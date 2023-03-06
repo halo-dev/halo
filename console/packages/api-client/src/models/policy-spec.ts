@@ -19,21 +19,21 @@
  */
 export interface PolicySpec {
   /**
+   * Reference name of ConfigMap extension
+   * @type {string}
+   * @memberof PolicySpec
+   */
+  configMapName?: string;
+  /**
    * Display name of policy
    * @type {string}
    * @memberof PolicySpec
    */
-  displayName: string
+  displayName: string;
   /**
    * Reference name of PolicyTemplate
    * @type {string}
    * @memberof PolicySpec
    */
-  templateName: string
-  /**
-   * Reference name of ConfigMap extension
-   * @type {string}
-   * @memberof PolicySpec
-   */
-  configMapName?: string
+  templateName: string;
 }

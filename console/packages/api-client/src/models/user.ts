@@ -14,13 +14,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 // May contain unused imports in some cases
 // @ts-ignore
-import { UserSpec } from './user-spec'
+import { UserSpec } from "./user-spec";
 // May contain unused imports in some cases
 // @ts-ignore
-import { UserStatus } from './user-status'
+import { UserStatus } from "./user-status";
 
 /**
  *
@@ -30,32 +30,32 @@ import { UserStatus } from './user-status'
 export interface User {
   /**
    *
-   * @type {UserSpec}
+   * @type {string}
    * @memberof User
    */
-  spec: UserSpec
-  /**
-   *
-   * @type {UserStatus}
-   * @memberof User
-   */
-  status?: UserStatus
+  apiVersion: string;
   /**
    *
    * @type {string}
    * @memberof User
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof User
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof User
    */
-  metadata: Metadata
+  metadata: Metadata;
+  /**
+   *
+   * @type {UserSpec}
+   * @memberof User
+   */
+  spec: UserSpec;
+  /**
+   *
+   * @type {UserStatus}
+   * @memberof User
+   */
+  status?: UserStatus;
 }

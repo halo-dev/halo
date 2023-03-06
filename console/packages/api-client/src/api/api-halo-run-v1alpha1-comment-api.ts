@@ -12,9 +12,9 @@
  * Do not edit the class manually.
  */
 
-import type { Configuration } from '../configuration'
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios'
-import globalAxios from 'axios'
+import type { Configuration } from "../configuration";
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from "axios";
+import globalAxios from "axios";
 // Some imports not used depending on template conditions
 // @ts-ignore
 import {
@@ -28,26 +28,34 @@ import {
   serializeDataIfNeeded,
   toPathString,
   createRequestFunction,
-} from '../common'
+} from "../common";
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base'
+import {
+  BASE_PATH,
+  COLLECTION_FORMATS,
+  RequestArgs,
+  BaseAPI,
+  RequiredError,
+} from "../base";
 // @ts-ignore
-import { Comment } from '../models'
+import { Comment } from "../models";
 // @ts-ignore
-import { CommentRequest } from '../models'
+import { CommentRequest } from "../models";
 // @ts-ignore
-import { CommentVoList } from '../models'
+import { CommentVoList } from "../models";
 // @ts-ignore
-import { Reply } from '../models'
+import { Reply } from "../models";
 // @ts-ignore
-import { ReplyRequest } from '../models'
+import { ReplyRequest } from "../models";
 // @ts-ignore
-import { ReplyVoList } from '../models'
+import { ReplyVoList } from "../models";
 /**
  * ApiHaloRunV1alpha1CommentApi - axios parameter creator
  * @export
  */
-export const ApiHaloRunV1alpha1CommentApiAxiosParamCreator = function (configuration?: Configuration) {
+export const ApiHaloRunV1alpha1CommentApiAxiosParamCreator = function (
+  configuration?: Configuration
+) {
   return {
     /**
      * Create a comment.
@@ -55,40 +63,56 @@ export const ApiHaloRunV1alpha1CommentApiAxiosParamCreator = function (configura
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    createComment1: async (commentRequest: CommentRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    createComment1: async (
+      commentRequest: CommentRequest,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'commentRequest' is not null or undefined
-      assertParamExists('createComment1', 'commentRequest', commentRequest)
-      const localVarPath = `/apis/api.halo.run/v1alpha1/comments`
+      assertParamExists("createComment1", "commentRequest", commentRequest);
+      const localVarPath = `/apis/api.halo.run/v1alpha1/comments`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(commentRequest, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        commentRequest,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Create a reply.
@@ -100,46 +124,60 @@ export const ApiHaloRunV1alpha1CommentApiAxiosParamCreator = function (configura
     createReply1: async (
       name: string,
       replyRequest: ReplyRequest,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('createReply1', 'name', name)
+      assertParamExists("createReply1", "name", name);
       // verify required parameter 'replyRequest' is not null or undefined
-      assertParamExists('createReply1', 'replyRequest', replyRequest)
-      const localVarPath = `/apis/api.halo.run/v1alpha1/comments/{name}/reply`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("createReply1", "replyRequest", replyRequest);
+      const localVarPath =
+        `/apis/api.halo.run/v1alpha1/comments/{name}/reply`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(replyRequest, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        replyRequest,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Get a comment.
@@ -147,40 +185,53 @@ export const ApiHaloRunV1alpha1CommentApiAxiosParamCreator = function (configura
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getComment: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    getComment: async (
+      name: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('getComment', 'name', name)
-      const localVarPath = `/apis/api.halo.run/v1alpha1/comments/{name}`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("getComment", "name", name);
+      const localVarPath =
+        `/apis/api.halo.run/v1alpha1/comments/{name}`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * List comment replies.
@@ -194,49 +245,59 @@ export const ApiHaloRunV1alpha1CommentApiAxiosParamCreator = function (configura
       name: string,
       size?: number,
       page?: number,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('listCommentReplies', 'name', name)
-      const localVarPath = `/apis/api.halo.run/v1alpha1/comments/{name}/reply`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("listCommentReplies", "name", name);
+      const localVarPath =
+        `/apis/api.halo.run/v1alpha1/comments/{name}/reply`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
       if (size !== undefined) {
-        localVarQueryParameter['size'] = size
+        localVarQueryParameter["size"] = size;
       }
 
       if (page !== undefined) {
-        localVarQueryParameter['page'] = page
+        localVarQueryParameter["page"] = page;
       }
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * List comments.
@@ -256,76 +317,88 @@ export const ApiHaloRunV1alpha1CommentApiAxiosParamCreator = function (configura
       group?: string,
       size?: number,
       page?: number,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('listComments1', 'name', name)
+      assertParamExists("listComments1", "name", name);
       // verify required parameter 'version' is not null or undefined
-      assertParamExists('listComments1', 'version', version)
+      assertParamExists("listComments1", "version", version);
       // verify required parameter 'kind' is not null or undefined
-      assertParamExists('listComments1', 'kind', kind)
-      const localVarPath = `/apis/api.halo.run/v1alpha1/comments`
+      assertParamExists("listComments1", "kind", kind);
+      const localVarPath = `/apis/api.halo.run/v1alpha1/comments`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
       if (name !== undefined) {
-        localVarQueryParameter['name'] = name
+        localVarQueryParameter["name"] = name;
       }
 
       if (version !== undefined) {
-        localVarQueryParameter['version'] = version
+        localVarQueryParameter["version"] = version;
       }
 
       if (group !== undefined) {
-        localVarQueryParameter['group'] = group
+        localVarQueryParameter["group"] = group;
       }
 
       if (kind !== undefined) {
-        localVarQueryParameter['kind'] = kind
+        localVarQueryParameter["kind"] = kind;
       }
 
       if (size !== undefined) {
-        localVarQueryParameter['size'] = size
+        localVarQueryParameter["size"] = size;
       }
 
       if (page !== undefined) {
-        localVarQueryParameter['page'] = page
+        localVarQueryParameter["page"] = page;
       }
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
-  }
-}
+  };
+};
 
 /**
  * ApiHaloRunV1alpha1CommentApi - functional programming interface
  * @export
  */
-export const ApiHaloRunV1alpha1CommentApiFp = function (configuration?: Configuration) {
-  const localVarAxiosParamCreator = ApiHaloRunV1alpha1CommentApiAxiosParamCreator(configuration)
+export const ApiHaloRunV1alpha1CommentApiFp = function (
+  configuration?: Configuration
+) {
+  const localVarAxiosParamCreator =
+    ApiHaloRunV1alpha1CommentApiAxiosParamCreator(configuration);
   return {
     /**
      * Create a comment.
@@ -335,10 +408,20 @@ export const ApiHaloRunV1alpha1CommentApiFp = function (configuration?: Configur
      */
     async createComment1(
       commentRequest: CommentRequest,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Comment>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.createComment1(commentRequest, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Comment>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.createComment1(
+        commentRequest,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Create a reply.
@@ -350,10 +433,21 @@ export const ApiHaloRunV1alpha1CommentApiFp = function (configuration?: Configur
     async createReply1(
       name: string,
       replyRequest: ReplyRequest,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Reply>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.createReply1(name, replyRequest, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Reply>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.createReply1(
+        name,
+        replyRequest,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Get a comment.
@@ -363,10 +457,20 @@ export const ApiHaloRunV1alpha1CommentApiFp = function (configuration?: Configur
      */
     async getComment(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentVoList>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.getComment(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentVoList>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.getComment(
+        name,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * List comment replies.
@@ -380,10 +484,23 @@ export const ApiHaloRunV1alpha1CommentApiFp = function (configuration?: Configur
       name: string,
       size?: number,
       page?: number,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ReplyVoList>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.listCommentReplies(name, size, page, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ReplyVoList>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.listCommentReplies(
+          name,
+          size,
+          page,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * List comments.
@@ -403,8 +520,10 @@ export const ApiHaloRunV1alpha1CommentApiFp = function (configuration?: Configur
       group?: string,
       size?: number,
       page?: number,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentVoList>> {
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentVoList>
+    > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.listComments1(
         name,
         version,
@@ -412,12 +531,17 @@ export const ApiHaloRunV1alpha1CommentApiFp = function (configuration?: Configur
         group,
         size,
         page,
-        options,
-      )
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
-  }
-}
+  };
+};
 
 /**
  * ApiHaloRunV1alpha1CommentApi - factory interface
@@ -426,9 +550,9 @@ export const ApiHaloRunV1alpha1CommentApiFp = function (configuration?: Configur
 export const ApiHaloRunV1alpha1CommentApiFactory = function (
   configuration?: Configuration,
   basePath?: string,
-  axios?: AxiosInstance,
+  axios?: AxiosInstance
 ) {
-  const localVarFp = ApiHaloRunV1alpha1CommentApiFp(configuration)
+  const localVarFp = ApiHaloRunV1alpha1CommentApiFp(configuration);
   return {
     /**
      * Create a comment.
@@ -438,11 +562,11 @@ export const ApiHaloRunV1alpha1CommentApiFactory = function (
      */
     createComment1(
       requestParameters: ApiHaloRunV1alpha1CommentApiCreateComment1Request,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<Comment> {
       return localVarFp
         .createComment1(requestParameters.commentRequest, options)
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * Create a reply.
@@ -452,11 +576,15 @@ export const ApiHaloRunV1alpha1CommentApiFactory = function (
      */
     createReply1(
       requestParameters: ApiHaloRunV1alpha1CommentApiCreateReply1Request,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<Reply> {
       return localVarFp
-        .createReply1(requestParameters.name, requestParameters.replyRequest, options)
-        .then((request) => request(axios, basePath))
+        .createReply1(
+          requestParameters.name,
+          requestParameters.replyRequest,
+          options
+        )
+        .then((request) => request(axios, basePath));
     },
     /**
      * Get a comment.
@@ -466,9 +594,11 @@ export const ApiHaloRunV1alpha1CommentApiFactory = function (
      */
     getComment(
       requestParameters: ApiHaloRunV1alpha1CommentApiGetCommentRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<CommentVoList> {
-      return localVarFp.getComment(requestParameters.name, options).then((request) => request(axios, basePath))
+      return localVarFp
+        .getComment(requestParameters.name, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      * List comment replies.
@@ -478,11 +608,16 @@ export const ApiHaloRunV1alpha1CommentApiFactory = function (
      */
     listCommentReplies(
       requestParameters: ApiHaloRunV1alpha1CommentApiListCommentRepliesRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<ReplyVoList> {
       return localVarFp
-        .listCommentReplies(requestParameters.name, requestParameters.size, requestParameters.page, options)
-        .then((request) => request(axios, basePath))
+        .listCommentReplies(
+          requestParameters.name,
+          requestParameters.size,
+          requestParameters.page,
+          options
+        )
+        .then((request) => request(axios, basePath));
     },
     /**
      * List comments.
@@ -492,7 +627,7 @@ export const ApiHaloRunV1alpha1CommentApiFactory = function (
      */
     listComments1(
       requestParameters: ApiHaloRunV1alpha1CommentApiListComments1Request,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<CommentVoList> {
       return localVarFp
         .listComments1(
@@ -502,12 +637,12 @@ export const ApiHaloRunV1alpha1CommentApiFactory = function (
           requestParameters.group,
           requestParameters.size,
           requestParameters.page,
-          options,
+          options
         )
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
-  }
-}
+  };
+};
 
 /**
  * Request parameters for createComment1 operation in ApiHaloRunV1alpha1CommentApi.
@@ -520,7 +655,7 @@ export interface ApiHaloRunV1alpha1CommentApiCreateComment1Request {
    * @type {CommentRequest}
    * @memberof ApiHaloRunV1alpha1CommentApiCreateComment1
    */
-  readonly commentRequest: CommentRequest
+  readonly commentRequest: CommentRequest;
 }
 
 /**
@@ -534,14 +669,14 @@ export interface ApiHaloRunV1alpha1CommentApiCreateReply1Request {
    * @type {string}
    * @memberof ApiHaloRunV1alpha1CommentApiCreateReply1
    */
-  readonly name: string
+  readonly name: string;
 
   /**
    *
    * @type {ReplyRequest}
    * @memberof ApiHaloRunV1alpha1CommentApiCreateReply1
    */
-  readonly replyRequest: ReplyRequest
+  readonly replyRequest: ReplyRequest;
 }
 
 /**
@@ -555,7 +690,7 @@ export interface ApiHaloRunV1alpha1CommentApiGetCommentRequest {
    * @type {string}
    * @memberof ApiHaloRunV1alpha1CommentApiGetComment
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -569,21 +704,21 @@ export interface ApiHaloRunV1alpha1CommentApiListCommentRepliesRequest {
    * @type {string}
    * @memberof ApiHaloRunV1alpha1CommentApiListCommentReplies
    */
-  readonly name: string
+  readonly name: string;
 
   /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof ApiHaloRunV1alpha1CommentApiListCommentReplies
    */
-  readonly size?: number
+  readonly size?: number;
 
   /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof ApiHaloRunV1alpha1CommentApiListCommentReplies
    */
-  readonly page?: number
+  readonly page?: number;
 }
 
 /**
@@ -597,42 +732,42 @@ export interface ApiHaloRunV1alpha1CommentApiListComments1Request {
    * @type {string}
    * @memberof ApiHaloRunV1alpha1CommentApiListComments1
    */
-  readonly name: string
+  readonly name: string;
 
   /**
    * The comment subject version.
    * @type {string}
    * @memberof ApiHaloRunV1alpha1CommentApiListComments1
    */
-  readonly version: string
+  readonly version: string;
 
   /**
    * The comment subject kind.
    * @type {string}
    * @memberof ApiHaloRunV1alpha1CommentApiListComments1
    */
-  readonly kind: string
+  readonly kind: string;
 
   /**
    * The comment subject group.
    * @type {string}
    * @memberof ApiHaloRunV1alpha1CommentApiListComments1
    */
-  readonly group?: string
+  readonly group?: string;
 
   /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof ApiHaloRunV1alpha1CommentApiListComments1
    */
-  readonly size?: number
+  readonly size?: number;
 
   /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof ApiHaloRunV1alpha1CommentApiListComments1
    */
-  readonly page?: number
+  readonly page?: number;
 }
 
 /**
@@ -651,11 +786,11 @@ export class ApiHaloRunV1alpha1CommentApi extends BaseAPI {
    */
   public createComment1(
     requestParameters: ApiHaloRunV1alpha1CommentApiCreateComment1Request,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiHaloRunV1alpha1CommentApiFp(this.configuration)
       .createComment1(requestParameters.commentRequest, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -667,11 +802,15 @@ export class ApiHaloRunV1alpha1CommentApi extends BaseAPI {
    */
   public createReply1(
     requestParameters: ApiHaloRunV1alpha1CommentApiCreateReply1Request,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiHaloRunV1alpha1CommentApiFp(this.configuration)
-      .createReply1(requestParameters.name, requestParameters.replyRequest, options)
-      .then((request) => request(this.axios, this.basePath))
+      .createReply1(
+        requestParameters.name,
+        requestParameters.replyRequest,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -681,10 +820,13 @@ export class ApiHaloRunV1alpha1CommentApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof ApiHaloRunV1alpha1CommentApi
    */
-  public getComment(requestParameters: ApiHaloRunV1alpha1CommentApiGetCommentRequest, options?: AxiosRequestConfig) {
+  public getComment(
+    requestParameters: ApiHaloRunV1alpha1CommentApiGetCommentRequest,
+    options?: AxiosRequestConfig
+  ) {
     return ApiHaloRunV1alpha1CommentApiFp(this.configuration)
       .getComment(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -696,11 +838,16 @@ export class ApiHaloRunV1alpha1CommentApi extends BaseAPI {
    */
   public listCommentReplies(
     requestParameters: ApiHaloRunV1alpha1CommentApiListCommentRepliesRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiHaloRunV1alpha1CommentApiFp(this.configuration)
-      .listCommentReplies(requestParameters.name, requestParameters.size, requestParameters.page, options)
-      .then((request) => request(this.axios, this.basePath))
+      .listCommentReplies(
+        requestParameters.name,
+        requestParameters.size,
+        requestParameters.page,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -712,7 +859,7 @@ export class ApiHaloRunV1alpha1CommentApi extends BaseAPI {
    */
   public listComments1(
     requestParameters: ApiHaloRunV1alpha1CommentApiListComments1Request,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiHaloRunV1alpha1CommentApiFp(this.configuration)
       .listComments1(
@@ -722,8 +869,8 @@ export class ApiHaloRunV1alpha1CommentApi extends BaseAPI {
         requestParameters.group,
         requestParameters.size,
         requestParameters.page,
-        options,
+        options
       )
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 }

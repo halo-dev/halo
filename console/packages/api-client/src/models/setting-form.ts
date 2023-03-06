@@ -20,20 +20,20 @@
 export interface SettingForm {
   /**
    *
-   * @type {string}
-   * @memberof SettingForm
-   */
-  group: string
-  /**
-   *
-   * @type {string}
-   * @memberof SettingForm
-   */
-  label?: string
-  /**
-   *
    * @type {Array<object>}
    * @memberof SettingForm
    */
-  formSchema: Array<object>
+  formSchema: Array<object>;
+  /**
+   *
+   * @type {string}
+   * @memberof SettingForm
+   */
+  group: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SettingForm
+   */
+  label?: string;
 }

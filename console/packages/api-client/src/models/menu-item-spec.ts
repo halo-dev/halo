@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Ref } from './ref'
+import { Ref } from "./ref";
 
 /**
  * The spec of menu item.
@@ -23,48 +23,49 @@ import { Ref } from './ref'
  */
 export interface MenuItemSpec {
   /**
+   * Children of this menu item
+   * @type {Array<string>}
+   * @memberof MenuItemSpec
+   */
+  children?: Array<string>;
+  /**
    * The display name of menu item.
    * @type {string}
    * @memberof MenuItemSpec
    */
-  displayName?: string
+  displayName?: string;
   /**
    * The href of this menu item.
    * @type {string}
    * @memberof MenuItemSpec
    */
-  href?: string
-  /**
-   * The <a> target attribute of this menu item.
-   * @type {string}
-   * @memberof MenuItemSpec
-   */
-  target?: MenuItemSpecTargetEnum
+  href?: string;
   /**
    * The priority is for ordering.
    * @type {number}
    * @memberof MenuItemSpec
    */
-  priority?: number
+  priority?: number;
   /**
-   * Children of this menu item
-   * @type {Array<string>}
+   * The <a> target attribute of this menu item.
+   * @type {string}
    * @memberof MenuItemSpec
    */
-  children?: Array<string>
+  target?: MenuItemSpecTargetEnum;
   /**
    *
    * @type {Ref}
    * @memberof MenuItemSpec
    */
-  targetRef?: Ref
+  targetRef?: Ref;
 }
 
 export const MenuItemSpecTargetEnum = {
-  Blank: '_blank',
-  Self: '_self',
-  Parent: '_parent',
-  Top: '_top',
-} as const
+  Blank: "_blank",
+  Self: "_self",
+  Parent: "_parent",
+  Top: "_top",
+} as const;
 
-export type MenuItemSpecTargetEnum = typeof MenuItemSpecTargetEnum[keyof typeof MenuItemSpecTargetEnum]
+export type MenuItemSpecTargetEnum =
+  typeof MenuItemSpecTargetEnum[keyof typeof MenuItemSpecTargetEnum];

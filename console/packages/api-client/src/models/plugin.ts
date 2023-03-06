@@ -14,13 +14,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 // May contain unused imports in some cases
 // @ts-ignore
-import { PluginSpec } from './plugin-spec'
+import { PluginSpec } from "./plugin-spec";
 // May contain unused imports in some cases
 // @ts-ignore
-import { PluginStatus } from './plugin-status'
+import { PluginStatus } from "./plugin-status";
 
 /**
  *
@@ -30,32 +30,32 @@ import { PluginStatus } from './plugin-status'
 export interface Plugin {
   /**
    *
-   * @type {PluginSpec}
+   * @type {string}
    * @memberof Plugin
    */
-  spec: PluginSpec
-  /**
-   *
-   * @type {PluginStatus}
-   * @memberof Plugin
-   */
-  status?: PluginStatus
+  apiVersion: string;
   /**
    *
    * @type {string}
    * @memberof Plugin
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof Plugin
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof Plugin
    */
-  metadata: Metadata
+  metadata: Metadata;
+  /**
+   *
+   * @type {PluginSpec}
+   * @memberof Plugin
+   */
+  spec: PluginSpec;
+  /**
+   *
+   * @type {PluginStatus}
+   * @memberof Plugin
+   */
+  status?: PluginStatus;
 }

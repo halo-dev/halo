@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Policy } from './policy'
+import { Policy } from "./policy";
 
 /**
  *
@@ -23,57 +23,57 @@ import { Policy } from './policy'
  */
 export interface PolicyList {
   /**
-   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page is the first page.
+   * @type {boolean}
    * @memberof PolicyList
    */
-  page: number
+  first: boolean;
   /**
-   * Size of each page. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof PolicyList
    */
-  size: number
+  hasNext: boolean;
   /**
-   * Total elements.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof PolicyList
    */
-  total: number
+  hasPrevious: boolean;
   /**
    * A chunk of items.
    * @type {Array<Policy>}
    * @memberof PolicyList
    */
-  items: Array<Policy>
-  /**
-   * Indicates whether current page is the first page.
-   * @type {boolean}
-   * @memberof PolicyList
-   */
-  first: boolean
+  items: Array<Policy>;
   /**
    * Indicates whether current page is the last page.
    * @type {boolean}
    * @memberof PolicyList
    */
-  last: boolean
+  last: boolean;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof PolicyList
    */
-  hasNext: boolean
+  page: number;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Size of each page. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof PolicyList
    */
-  hasPrevious: boolean
+  size: number;
+  /**
+   * Total elements.
+   * @type {number}
+   * @memberof PolicyList
+   */
+  total: number;
   /**
    * Indicates total pages.
    * @type {number}
    * @memberof PolicyList
    */
-  totalPages: number
+  totalPages: number;
 }

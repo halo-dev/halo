@@ -23,37 +23,38 @@ export interface Condition {
    * @type {string}
    * @memberof Condition
    */
-  type: string
+  lastTransitionTime: string;
   /**
    *
    * @type {string}
    * @memberof Condition
    */
-  status: ConditionStatusEnum
+  message: string;
   /**
    *
    * @type {string}
    * @memberof Condition
    */
-  lastTransitionTime: string
+  reason: string;
   /**
    *
    * @type {string}
    * @memberof Condition
    */
-  message: string
+  status: ConditionStatusEnum;
   /**
    *
    * @type {string}
    * @memberof Condition
    */
-  reason: string
+  type: string;
 }
 
 export const ConditionStatusEnum = {
-  True: 'TRUE',
-  False: 'FALSE',
-  Unknown: 'UNKNOWN',
-} as const
+  True: "TRUE",
+  False: "FALSE",
+  Unknown: "UNKNOWN",
+} as const;
 
-export type ConditionStatusEnum = typeof ConditionStatusEnum[keyof typeof ConditionStatusEnum]
+export type ConditionStatusEnum =
+  typeof ConditionStatusEnum[keyof typeof ConditionStatusEnum];

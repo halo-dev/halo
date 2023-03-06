@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Role } from './role'
+import { Role } from "./role";
 
 /**
  *
@@ -27,11 +27,11 @@ export interface UserPermission {
    * @type {Array<Role>}
    * @memberof UserPermission
    */
-  roles: Array<Role>
+  roles: Array<Role>;
   /**
    *
    * @type {Array<string>}
    * @memberof UserPermission
    */
-  uiPermissions: Array<string>
+  uiPermissions: Array<string>;
 }

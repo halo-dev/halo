@@ -12,9 +12,9 @@
  * Do not edit the class manually.
  */
 
-import type { Configuration } from '../configuration'
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios'
-import globalAxios from 'axios'
+import type { Configuration } from "../configuration";
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from "axios";
+import globalAxios from "axios";
 // Some imports not used depending on template conditions
 // @ts-ignore
 import {
@@ -28,18 +28,26 @@ import {
   serializeDataIfNeeded,
   toPathString,
   createRequestFunction,
-} from '../common'
+} from "../common";
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base'
+import {
+  BASE_PATH,
+  COLLECTION_FORMATS,
+  RequestArgs,
+  BaseAPI,
+  RequiredError,
+} from "../base";
 // @ts-ignore
-import { Category } from '../models'
+import { Category } from "../models";
 // @ts-ignore
-import { CategoryList } from '../models'
+import { CategoryList } from "../models";
 /**
  * ContentHaloRunV1alpha1CategoryApi - axios parameter creator
  * @export
  */
-export const ContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (configuration?: Configuration) {
+export const ContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (
+  configuration?: Configuration
+) {
   return {
     /**
      * Create content.halo.run/v1alpha1/Category
@@ -49,39 +57,52 @@ export const ContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (conf
      */
     createcontentHaloRunV1alpha1Category: async (
       category?: Category,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
-      const localVarPath = `/apis/content.halo.run/v1alpha1/categories`
+      const localVarPath = `/apis/content.halo.run/v1alpha1/categories`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(category, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        category,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Delete content.halo.run/v1alpha1/Category
@@ -91,41 +112,51 @@ export const ContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (conf
      */
     deletecontentHaloRunV1alpha1Category: async (
       name: string,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('deletecontentHaloRunV1alpha1Category', 'name', name)
-      const localVarPath = `/apis/content.halo.run/v1alpha1/categories/{name}`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("deletecontentHaloRunV1alpha1Category", "name", name);
+      const localVarPath =
+        `/apis/content.halo.run/v1alpha1/categories/{name}`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "DELETE",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Get content.halo.run/v1alpha1/Category
@@ -133,40 +164,53 @@ export const ContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (conf
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getcontentHaloRunV1alpha1Category: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    getcontentHaloRunV1alpha1Category: async (
+      name: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('getcontentHaloRunV1alpha1Category', 'name', name)
-      const localVarPath = `/apis/content.halo.run/v1alpha1/categories/{name}`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("getcontentHaloRunV1alpha1Category", "name", name);
+      const localVarPath =
+        `/apis/content.halo.run/v1alpha1/categories/{name}`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * List content.halo.run/v1alpha1/Category
@@ -182,52 +226,61 @@ export const ContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (conf
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
-      const localVarPath = `/apis/content.halo.run/v1alpha1/categories`
+      const localVarPath = `/apis/content.halo.run/v1alpha1/categories`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
       if (page !== undefined) {
-        localVarQueryParameter['page'] = page
+        localVarQueryParameter["page"] = page;
       }
 
       if (size !== undefined) {
-        localVarQueryParameter['size'] = size
+        localVarQueryParameter["size"] = size;
       }
 
       if (labelSelector) {
-        localVarQueryParameter['labelSelector'] = labelSelector
+        localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
       if (fieldSelector) {
-        localVarQueryParameter['fieldSelector'] = fieldSelector
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Update content.halo.run/v1alpha1/Category
@@ -239,54 +292,71 @@ export const ContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (conf
     updatecontentHaloRunV1alpha1Category: async (
       name: string,
       category?: Category,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('updatecontentHaloRunV1alpha1Category', 'name', name)
-      const localVarPath = `/apis/content.halo.run/v1alpha1/categories/{name}`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("updatecontentHaloRunV1alpha1Category", "name", name);
+      const localVarPath =
+        `/apis/content.halo.run/v1alpha1/categories/{name}`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "PUT",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(category, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        category,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
-  }
-}
+  };
+};
 
 /**
  * ContentHaloRunV1alpha1CategoryApi - functional programming interface
  * @export
  */
-export const ContentHaloRunV1alpha1CategoryApiFp = function (configuration?: Configuration) {
-  const localVarAxiosParamCreator = ContentHaloRunV1alpha1CategoryApiAxiosParamCreator(configuration)
+export const ContentHaloRunV1alpha1CategoryApiFp = function (
+  configuration?: Configuration
+) {
+  const localVarAxiosParamCreator =
+    ContentHaloRunV1alpha1CategoryApiAxiosParamCreator(configuration);
   return {
     /**
      * Create content.halo.run/v1alpha1/Category
@@ -296,10 +366,21 @@ export const ContentHaloRunV1alpha1CategoryApiFp = function (configuration?: Con
      */
     async createcontentHaloRunV1alpha1Category(
       category?: Category,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Category>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.createcontentHaloRunV1alpha1Category(category, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Category>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.createcontentHaloRunV1alpha1Category(
+          category,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Delete content.halo.run/v1alpha1/Category
@@ -309,10 +390,21 @@ export const ContentHaloRunV1alpha1CategoryApiFp = function (configuration?: Con
      */
     async deletecontentHaloRunV1alpha1Category(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.deletecontentHaloRunV1alpha1Category(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.deletecontentHaloRunV1alpha1Category(
+          name,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Get content.halo.run/v1alpha1/Category
@@ -322,10 +414,21 @@ export const ContentHaloRunV1alpha1CategoryApiFp = function (configuration?: Con
      */
     async getcontentHaloRunV1alpha1Category(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Category>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.getcontentHaloRunV1alpha1Category(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Category>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.getcontentHaloRunV1alpha1Category(
+          name,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * List content.halo.run/v1alpha1/Category
@@ -341,16 +444,24 @@ export const ContentHaloRunV1alpha1CategoryApiFp = function (configuration?: Con
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CategoryList>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.listcontentHaloRunV1alpha1Category(
-        page,
-        size,
-        labelSelector,
-        fieldSelector,
-        options,
-      )
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<CategoryList>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.listcontentHaloRunV1alpha1Category(
+          page,
+          size,
+          labelSelector,
+          fieldSelector,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Update content.halo.run/v1alpha1/Category
@@ -362,17 +473,25 @@ export const ContentHaloRunV1alpha1CategoryApiFp = function (configuration?: Con
     async updatecontentHaloRunV1alpha1Category(
       name: string,
       category?: Category,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Category>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.updatecontentHaloRunV1alpha1Category(
-        name,
-        category,
-        options,
-      )
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Category>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.updatecontentHaloRunV1alpha1Category(
+          name,
+          category,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
-  }
-}
+  };
+};
 
 /**
  * ContentHaloRunV1alpha1CategoryApi - factory interface
@@ -381,9 +500,9 @@ export const ContentHaloRunV1alpha1CategoryApiFp = function (configuration?: Con
 export const ContentHaloRunV1alpha1CategoryApiFactory = function (
   configuration?: Configuration,
   basePath?: string,
-  axios?: AxiosInstance,
+  axios?: AxiosInstance
 ) {
-  const localVarFp = ContentHaloRunV1alpha1CategoryApiFp(configuration)
+  const localVarFp = ContentHaloRunV1alpha1CategoryApiFp(configuration);
   return {
     /**
      * Create content.halo.run/v1alpha1/Category
@@ -393,11 +512,14 @@ export const ContentHaloRunV1alpha1CategoryApiFactory = function (
      */
     createcontentHaloRunV1alpha1Category(
       requestParameters: ContentHaloRunV1alpha1CategoryApiCreatecontentHaloRunV1alpha1CategoryRequest = {},
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<Category> {
       return localVarFp
-        .createcontentHaloRunV1alpha1Category(requestParameters.category, options)
-        .then((request) => request(axios, basePath))
+        .createcontentHaloRunV1alpha1Category(
+          requestParameters.category,
+          options
+        )
+        .then((request) => request(axios, basePath));
     },
     /**
      * Delete content.halo.run/v1alpha1/Category
@@ -407,11 +529,11 @@ export const ContentHaloRunV1alpha1CategoryApiFactory = function (
      */
     deletecontentHaloRunV1alpha1Category(
       requestParameters: ContentHaloRunV1alpha1CategoryApiDeletecontentHaloRunV1alpha1CategoryRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<void> {
       return localVarFp
         .deletecontentHaloRunV1alpha1Category(requestParameters.name, options)
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * Get content.halo.run/v1alpha1/Category
@@ -421,11 +543,11 @@ export const ContentHaloRunV1alpha1CategoryApiFactory = function (
      */
     getcontentHaloRunV1alpha1Category(
       requestParameters: ContentHaloRunV1alpha1CategoryApiGetcontentHaloRunV1alpha1CategoryRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<Category> {
       return localVarFp
         .getcontentHaloRunV1alpha1Category(requestParameters.name, options)
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * List content.halo.run/v1alpha1/Category
@@ -435,7 +557,7 @@ export const ContentHaloRunV1alpha1CategoryApiFactory = function (
      */
     listcontentHaloRunV1alpha1Category(
       requestParameters: ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1CategoryRequest = {},
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<CategoryList> {
       return localVarFp
         .listcontentHaloRunV1alpha1Category(
@@ -443,9 +565,9 @@ export const ContentHaloRunV1alpha1CategoryApiFactory = function (
           requestParameters.size,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
-          options,
+          options
         )
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * Update content.halo.run/v1alpha1/Category
@@ -455,14 +577,18 @@ export const ContentHaloRunV1alpha1CategoryApiFactory = function (
      */
     updatecontentHaloRunV1alpha1Category(
       requestParameters: ContentHaloRunV1alpha1CategoryApiUpdatecontentHaloRunV1alpha1CategoryRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<Category> {
       return localVarFp
-        .updatecontentHaloRunV1alpha1Category(requestParameters.name, requestParameters.category, options)
-        .then((request) => request(axios, basePath))
+        .updatecontentHaloRunV1alpha1Category(
+          requestParameters.name,
+          requestParameters.category,
+          options
+        )
+        .then((request) => request(axios, basePath));
     },
-  }
-}
+  };
+};
 
 /**
  * Request parameters for createcontentHaloRunV1alpha1Category operation in ContentHaloRunV1alpha1CategoryApi.
@@ -475,7 +601,7 @@ export interface ContentHaloRunV1alpha1CategoryApiCreatecontentHaloRunV1alpha1Ca
    * @type {Category}
    * @memberof ContentHaloRunV1alpha1CategoryApiCreatecontentHaloRunV1alpha1Category
    */
-  readonly category?: Category
+  readonly category?: Category;
 }
 
 /**
@@ -489,7 +615,7 @@ export interface ContentHaloRunV1alpha1CategoryApiDeletecontentHaloRunV1alpha1Ca
    * @type {string}
    * @memberof ContentHaloRunV1alpha1CategoryApiDeletecontentHaloRunV1alpha1Category
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -503,7 +629,7 @@ export interface ContentHaloRunV1alpha1CategoryApiGetcontentHaloRunV1alpha1Categ
    * @type {string}
    * @memberof ContentHaloRunV1alpha1CategoryApiGetcontentHaloRunV1alpha1Category
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -517,28 +643,28 @@ export interface ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1Cate
    * @type {number}
    * @memberof ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1Category
    */
-  readonly page?: number
+  readonly page?: number;
 
   /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1Category
    */
-  readonly size?: number
+  readonly size?: number;
 
   /**
    * Label selector for filtering.
    * @type {Array<string>}
    * @memberof ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1Category
    */
-  readonly labelSelector?: Array<string>
+  readonly labelSelector?: Array<string>;
 
   /**
    * Field selector for filtering.
    * @type {Array<string>}
    * @memberof ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1Category
    */
-  readonly fieldSelector?: Array<string>
+  readonly fieldSelector?: Array<string>;
 }
 
 /**
@@ -552,14 +678,14 @@ export interface ContentHaloRunV1alpha1CategoryApiUpdatecontentHaloRunV1alpha1Ca
    * @type {string}
    * @memberof ContentHaloRunV1alpha1CategoryApiUpdatecontentHaloRunV1alpha1Category
    */
-  readonly name: string
+  readonly name: string;
 
   /**
    * Updated category
    * @type {Category}
    * @memberof ContentHaloRunV1alpha1CategoryApiUpdatecontentHaloRunV1alpha1Category
    */
-  readonly category?: Category
+  readonly category?: Category;
 }
 
 /**
@@ -578,11 +704,11 @@ export class ContentHaloRunV1alpha1CategoryApi extends BaseAPI {
    */
   public createcontentHaloRunV1alpha1Category(
     requestParameters: ContentHaloRunV1alpha1CategoryApiCreatecontentHaloRunV1alpha1CategoryRequest = {},
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ContentHaloRunV1alpha1CategoryApiFp(this.configuration)
       .createcontentHaloRunV1alpha1Category(requestParameters.category, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -594,11 +720,11 @@ export class ContentHaloRunV1alpha1CategoryApi extends BaseAPI {
    */
   public deletecontentHaloRunV1alpha1Category(
     requestParameters: ContentHaloRunV1alpha1CategoryApiDeletecontentHaloRunV1alpha1CategoryRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ContentHaloRunV1alpha1CategoryApiFp(this.configuration)
       .deletecontentHaloRunV1alpha1Category(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -610,11 +736,11 @@ export class ContentHaloRunV1alpha1CategoryApi extends BaseAPI {
    */
   public getcontentHaloRunV1alpha1Category(
     requestParameters: ContentHaloRunV1alpha1CategoryApiGetcontentHaloRunV1alpha1CategoryRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ContentHaloRunV1alpha1CategoryApiFp(this.configuration)
       .getcontentHaloRunV1alpha1Category(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -626,7 +752,7 @@ export class ContentHaloRunV1alpha1CategoryApi extends BaseAPI {
    */
   public listcontentHaloRunV1alpha1Category(
     requestParameters: ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1CategoryRequest = {},
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ContentHaloRunV1alpha1CategoryApiFp(this.configuration)
       .listcontentHaloRunV1alpha1Category(
@@ -634,9 +760,9 @@ export class ContentHaloRunV1alpha1CategoryApi extends BaseAPI {
         requestParameters.size,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
-        options,
+        options
       )
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -648,10 +774,14 @@ export class ContentHaloRunV1alpha1CategoryApi extends BaseAPI {
    */
   public updatecontentHaloRunV1alpha1Category(
     requestParameters: ContentHaloRunV1alpha1CategoryApiUpdatecontentHaloRunV1alpha1CategoryRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ContentHaloRunV1alpha1CategoryApiFp(this.configuration)
-      .updatecontentHaloRunV1alpha1Category(requestParameters.name, requestParameters.category, options)
-      .then((request) => request(this.axios, this.basePath))
+      .updatecontentHaloRunV1alpha1Category(
+        requestParameters.name,
+        requestParameters.category,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
   }
 }

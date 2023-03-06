@@ -23,11 +23,11 @@ export interface PolicyTemplateSpec {
    * @type {string}
    * @memberof PolicyTemplateSpec
    */
-  displayName?: string
+  displayName?: string;
   /**
    *
    * @type {string}
    * @memberof PolicyTemplateSpec
    */
-  settingName: string
+  settingName: string;
 }

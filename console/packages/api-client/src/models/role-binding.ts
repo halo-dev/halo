@@ -14,13 +14,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 // May contain unused imports in some cases
 // @ts-ignore
-import { RoleRef } from './role-ref'
+import { RoleRef } from "./role-ref";
 // May contain unused imports in some cases
 // @ts-ignore
-import { Subject } from './subject'
+import { Subject } from "./subject";
 
 /**
  *
@@ -30,32 +30,32 @@ import { Subject } from './subject'
 export interface RoleBinding {
   /**
    *
-   * @type {Array<Subject>}
+   * @type {string}
    * @memberof RoleBinding
    */
-  subjects?: Array<Subject>
-  /**
-   *
-   * @type {RoleRef}
-   * @memberof RoleBinding
-   */
-  roleRef?: RoleRef
+  apiVersion: string;
   /**
    *
    * @type {string}
    * @memberof RoleBinding
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof RoleBinding
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof RoleBinding
    */
-  metadata: Metadata
+  metadata: Metadata;
+  /**
+   *
+   * @type {RoleRef}
+   * @memberof RoleBinding
+   */
+  roleRef?: RoleRef;
+  /**
+   *
+   * @type {Array<Subject>}
+   * @memberof RoleBinding
+   */
+  subjects?: Array<Subject>;
 }

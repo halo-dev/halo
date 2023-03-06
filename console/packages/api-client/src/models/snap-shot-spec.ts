@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Ref } from './ref'
+import { Ref } from "./ref";
 
 /**
  *
@@ -24,50 +24,50 @@ import { Ref } from './ref'
 export interface SnapShotSpec {
   /**
    *
-   * @type {Ref}
-   * @memberof SnapShotSpec
-   */
-  subjectRef: Ref
-  /**
-   *
    * @type {string}
    * @memberof SnapShotSpec
    */
-  rawType: string
-  /**
-   *
-   * @type {string}
-   * @memberof SnapShotSpec
-   */
-  rawPatch?: string
-  /**
-   *
-   * @type {string}
-   * @memberof SnapShotSpec
-   */
-  contentPatch?: string
-  /**
-   *
-   * @type {string}
-   * @memberof SnapShotSpec
-   */
-  parentSnapshotName?: string
-  /**
-   *
-   * @type {string}
-   * @memberof SnapShotSpec
-   */
-  lastModifyTime?: string
-  /**
-   *
-   * @type {string}
-   * @memberof SnapShotSpec
-   */
-  owner: string
+  contentPatch?: string;
   /**
    *
    * @type {Array<string>}
    * @memberof SnapShotSpec
    */
-  contributors?: Array<string>
+  contributors?: Array<string>;
+  /**
+   *
+   * @type {string}
+   * @memberof SnapShotSpec
+   */
+  lastModifyTime?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SnapShotSpec
+   */
+  owner: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SnapShotSpec
+   */
+  parentSnapshotName?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SnapShotSpec
+   */
+  rawPatch?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SnapShotSpec
+   */
+  rawType: string;
+  /**
+   *
+   * @type {Ref}
+   * @memberof SnapShotSpec
+   */
+  subjectRef: Ref;
 }

@@ -14,10 +14,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CommentEmailOwner } from './comment-email-owner'
+import { CommentEmailOwner } from "./comment-email-owner";
 // May contain unused imports in some cases
 // @ts-ignore
-import { Ref } from './ref'
+import { Ref } from "./ref";
 
 /**
  *
@@ -27,32 +27,32 @@ import { Ref } from './ref'
 export interface CommentRequest {
   /**
    *
-   * @type {Ref}
+   * @type {boolean}
    * @memberof CommentRequest
    */
-  subjectRef: Ref
+  allowNotification?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CommentRequest
+   */
+  content: string;
   /**
    *
    * @type {CommentEmailOwner}
    * @memberof CommentRequest
    */
-  owner?: CommentEmailOwner
+  owner?: CommentEmailOwner;
   /**
    *
    * @type {string}
    * @memberof CommentRequest
    */
-  raw: string
+  raw: string;
   /**
    *
-   * @type {string}
+   * @type {Ref}
    * @memberof CommentRequest
    */
-  content: string
-  /**
-   *
-   * @type {boolean}
-   * @memberof CommentRequest
-   */
-  allowNotification?: boolean
+  subjectRef: Ref;
 }

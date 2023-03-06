@@ -20,26 +20,26 @@
 export interface CommentStatus {
   /**
    *
-   * @type {string}
-   * @memberof CommentStatus
-   */
-  lastReplyTime?: string
-  /**
-   *
-   * @type {number}
-   * @memberof CommentStatus
-   */
-  replyCount?: number
-  /**
-   *
-   * @type {number}
-   * @memberof CommentStatus
-   */
-  unreadReplyCount?: number
-  /**
-   *
    * @type {boolean}
    * @memberof CommentStatus
    */
-  hasNewReply?: boolean
+  hasNewReply?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CommentStatus
+   */
+  lastReplyTime?: string;
+  /**
+   *
+   * @type {number}
+   * @memberof CommentStatus
+   */
+  replyCount?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof CommentStatus
+   */
+  unreadReplyCount?: number;
 }

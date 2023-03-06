@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { SearchEngine } from './search-engine'
+import { SearchEngine } from "./search-engine";
 
 /**
  *
@@ -23,57 +23,57 @@ import { SearchEngine } from './search-engine'
  */
 export interface SearchEngineList {
   /**
-   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page is the first page.
+   * @type {boolean}
    * @memberof SearchEngineList
    */
-  page: number
+  first: boolean;
   /**
-   * Size of each page. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof SearchEngineList
    */
-  size: number
+  hasNext: boolean;
   /**
-   * Total elements.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof SearchEngineList
    */
-  total: number
+  hasPrevious: boolean;
   /**
    * A chunk of items.
    * @type {Array<SearchEngine>}
    * @memberof SearchEngineList
    */
-  items: Array<SearchEngine>
-  /**
-   * Indicates whether current page is the first page.
-   * @type {boolean}
-   * @memberof SearchEngineList
-   */
-  first: boolean
+  items: Array<SearchEngine>;
   /**
    * Indicates whether current page is the last page.
    * @type {boolean}
    * @memberof SearchEngineList
    */
-  last: boolean
+  last: boolean;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof SearchEngineList
    */
-  hasNext: boolean
+  page: number;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Size of each page. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof SearchEngineList
    */
-  hasPrevious: boolean
+  size: number;
+  /**
+   * Total elements.
+   * @type {number}
+   * @memberof SearchEngineList
+   */
+  total: number;
   /**
    * Indicates total pages.
    * @type {number}
    * @memberof SearchEngineList
    */
-  totalPages: number
+  totalPages: number;
 }

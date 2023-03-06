@@ -14,13 +14,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { AttachmentSpec } from './attachment-spec'
+import { AttachmentSpec } from "./attachment-spec";
 // May contain unused imports in some cases
 // @ts-ignore
-import { AttachmentStatus } from './attachment-status'
+import { AttachmentStatus } from "./attachment-status";
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 
 /**
  *
@@ -30,32 +30,32 @@ import { Metadata } from './metadata'
 export interface Attachment {
   /**
    *
-   * @type {AttachmentSpec}
+   * @type {string}
    * @memberof Attachment
    */
-  spec: AttachmentSpec
-  /**
-   *
-   * @type {AttachmentStatus}
-   * @memberof Attachment
-   */
-  status?: AttachmentStatus
+  apiVersion: string;
   /**
    *
    * @type {string}
    * @memberof Attachment
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof Attachment
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof Attachment
    */
-  metadata: Metadata
+  metadata: Metadata;
+  /**
+   *
+   * @type {AttachmentSpec}
+   * @memberof Attachment
+   */
+  spec: AttachmentSpec;
+  /**
+   *
+   * @type {AttachmentStatus}
+   * @memberof Attachment
+   */
+  status?: AttachmentStatus;
 }

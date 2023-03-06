@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { PolicyTemplate } from './policy-template'
+import { PolicyTemplate } from "./policy-template";
 
 /**
  *
@@ -23,57 +23,57 @@ import { PolicyTemplate } from './policy-template'
  */
 export interface PolicyTemplateList {
   /**
-   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page is the first page.
+   * @type {boolean}
    * @memberof PolicyTemplateList
    */
-  page: number
+  first: boolean;
   /**
-   * Size of each page. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof PolicyTemplateList
    */
-  size: number
+  hasNext: boolean;
   /**
-   * Total elements.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof PolicyTemplateList
    */
-  total: number
+  hasPrevious: boolean;
   /**
    * A chunk of items.
    * @type {Array<PolicyTemplate>}
    * @memberof PolicyTemplateList
    */
-  items: Array<PolicyTemplate>
-  /**
-   * Indicates whether current page is the first page.
-   * @type {boolean}
-   * @memberof PolicyTemplateList
-   */
-  first: boolean
+  items: Array<PolicyTemplate>;
   /**
    * Indicates whether current page is the last page.
    * @type {boolean}
    * @memberof PolicyTemplateList
    */
-  last: boolean
+  last: boolean;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof PolicyTemplateList
    */
-  hasNext: boolean
+  page: number;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Size of each page. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof PolicyTemplateList
    */
-  hasPrevious: boolean
+  size: number;
+  /**
+   * Total elements.
+   * @type {number}
+   * @memberof PolicyTemplateList
+   */
+  total: number;
   /**
    * Indicates total pages.
    * @type {number}
    * @memberof PolicyTemplateList
    */
-  totalPages: number
+  totalPages: number;
 }

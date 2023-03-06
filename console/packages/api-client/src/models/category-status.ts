@@ -23,17 +23,17 @@ export interface CategoryStatus {
    * @type {string}
    * @memberof CategoryStatus
    */
-  permalink?: string
+  permalink?: string;
   /**
    *
    * @type {number}
    * @memberof CategoryStatus
    */
-  postCount?: number
+  postCount?: number;
   /**
    *
    * @type {number}
    * @memberof CategoryStatus
    */
-  visiblePostCount?: number
+  visiblePostCount?: number;
 }

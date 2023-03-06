@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { GroupKind } from './group-kind'
+import { GroupKind } from "./group-kind";
 
 /**
  *
@@ -24,14 +24,14 @@ import { GroupKind } from './group-kind'
 export interface AnnotationSettingSpec {
   /**
    *
-   * @type {GroupKind}
-   * @memberof AnnotationSettingSpec
-   */
-  targetRef: GroupKind
-  /**
-   *
    * @type {Array<object>}
    * @memberof AnnotationSettingSpec
    */
-  formSchema: Array<object>
+  formSchema: Array<object>;
+  /**
+   *
+   * @type {GroupKind}
+   * @memberof AnnotationSettingSpec
+   */
+  targetRef: GroupKind;
 }
