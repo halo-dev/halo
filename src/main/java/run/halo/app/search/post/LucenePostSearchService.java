@@ -23,7 +23,8 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.FuzzyQuery;
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -57,7 +58,7 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
 
     public LucenePostSearchService(HaloProperties haloProperties)
         throws IOException {
-        analyzer = new IKAnalyzer();
+        analyzer = new IKAnalyzer(true);
         var postIdxPath = haloProperties.getWorkDir().resolve("indices/posts");
         postIndexDir = FSDirectory.open(postIdxPath);
     }
@@ -79,7 +80,7 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
 
         var hits = new ArrayList<PostHit>(topDocs.scoreDocs.length);
         for (var scoreDoc : topDocs.scoreDocs) {
-            hits.add(convert(searcher.doc(scoreDoc.doc), highlighter));
+            hits.add(convert(searcher.storedFields().document(scoreDoc.doc), highlighter));
         }
 
         var result = new SearchResult<PostHit>();
@@ -132,12 +133,11 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
     }
 
 
-    private Query buildQuery(String keyword) {
-        keyword = stripToEmpty(keyword).toLowerCase();
+    private Query buildQuery(String keyword) throws ParseException {
         if (log.isDebugEnabled()) {
             log.debug("Trying to search for keyword: {}", keyword);
         }
-        return new FuzzyQuery(new Term("searchable", keyword));
+        return new QueryParser("searchable", analyzer).parse(keyword);
     }
 
     private Document convert(PostDoc post) {
