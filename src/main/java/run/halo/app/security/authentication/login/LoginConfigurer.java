@@ -1,51 +1,102 @@
-package run.halo.app.security.authentication.formlogin;
+package run.halo.app.security.authentication.login;
 
 import static run.halo.app.security.authentication.WebExchangeMatchers.ignoringMediaTypeAll;
 
+import io.micrometer.observation.ObservationRegistry;
 import java.util.Map;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.ObservationReactiveAuthenticationManager;
+import org.springframework.security.authentication.ReactiveAuthenticationManager;
+import org.springframework.security.authentication.UserDetailsRepositoryReactiveAuthenticationManager;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.CredentialsContainer;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.WebFilterExchange;
+import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationFailureHandler;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.ServerAuthenticationFailureHandler;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
+import org.springframework.security.web.server.context.ServerSecurityContextRepository;
+import org.springframework.security.web.server.ui.LogoutPageGeneratingWebFilter;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.security.authentication.SecurityConfigurer;
 
 @Component
-public class FormLoginConfigurer implements SecurityConfigurer {
+public class LoginConfigurer implements SecurityConfigurer {
 
     private final ServerResponse.Context context;
 
-    public FormLoginConfigurer(ServerResponse.Context context) {
+    private final ObservationRegistry observationRegistry;
+
+    private final ReactiveUserDetailsService userDetailsService;
+
+    private final ReactiveUserDetailsPasswordService passwordService;
+
+    private final PasswordEncoder passwordEncoder;
+
+    private final ServerSecurityContextRepository securityContextRepository;
+
+    private final CryptoService cryptoService;
+
+    public LoginConfigurer(ServerResponse.Context context,
+        ObservationRegistry observationRegistry,
+        ReactiveUserDetailsService userDetailsService,
+        ReactiveUserDetailsPasswordService passwordService,
+        PasswordEncoder passwordEncoder,
+        ServerSecurityContextRepository securityContextRepository,
+        CryptoService cryptoService) {
         this.context = context;
+        this.observationRegistry = observationRegistry;
+        this.userDetailsService = userDetailsService;
+        this.passwordService = passwordService;
+        this.passwordEncoder = passwordEncoder;
+        this.securityContextRepository = securityContextRepository;
+        this.cryptoService = cryptoService;
     }
 
     @Override
     public void configure(ServerHttpSecurity http) {
+        // See https://github.com/spring-projects/spring-security/issues/5361 for more.
+        // We disable the form login because we will customize the login by ourselves.
         http.formLogin()
-            .authenticationSuccessHandler(new FormLoginSuccessHandler(context))
-            .authenticationFailureHandler(new FormLoginFailureHandler(context))
-        ;
+            .disable();
+
+        var requiresMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, "/login");
+
+        var filter = new AuthenticationWebFilter(authenticationManager());
+        filter.setRequiresAuthenticationMatcher(requiresMatcher);
+        filter.setAuthenticationFailureHandler(new LoginFailureHandler());
+        filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
+        filter.setServerAuthenticationConverter(new LoginAuthenticationConverter(cryptoService));
+        filter.setSecurityContextRepository(securityContextRepository);
+
+        http.addFilterAt(filter, SecurityWebFiltersOrder.FORM_LOGIN);
+        http.addFilterAt(new LogoutPageGeneratingWebFilter(),
+            SecurityWebFiltersOrder.LOGOUT_PAGE_GENERATING);
     }
 
-    public static class FormLoginSuccessHandler implements ServerAuthenticationSuccessHandler {
+    ReactiveAuthenticationManager authenticationManager() {
+        var manager = new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
+        manager.setPasswordEncoder(passwordEncoder);
+        manager.setUserDetailsPasswordService(passwordService);
+        return new ObservationReactiveAuthenticationManager(observationRegistry, manager);
+    }
 
-        private final ServerResponse.Context context;
+    public class LoginSuccessHandler implements ServerAuthenticationSuccessHandler {
 
         private final ServerAuthenticationSuccessHandler defaultHandler =
             new RedirectServerAuthenticationSuccessHandler("/console/");
-
-        public FormLoginSuccessHandler(ServerResponse.Context context) {
-            this.context = context;
-        }
 
         @Override
         public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange,
@@ -70,15 +121,10 @@ public class FormLoginConfigurer implements SecurityConfigurer {
         }
     }
 
-    public static class FormLoginFailureHandler implements ServerAuthenticationFailureHandler {
+    public class LoginFailureHandler implements ServerAuthenticationFailureHandler {
 
         private final ServerAuthenticationFailureHandler defaultHandler =
             new RedirectServerAuthenticationFailureHandler("/console?error#/login");
-        private final ServerResponse.Context context;
-
-        public FormLoginFailureHandler(ServerResponse.Context context) {
-            this.context = context;
-        }
 
         @Override
         public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange,
