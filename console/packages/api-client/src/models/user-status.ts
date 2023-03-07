@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { LoginHistory } from './login-history'
+import { LoginHistory } from "./login-history";
 
 /**
  *
@@ -27,17 +27,17 @@ export interface UserStatus {
    * @type {string}
    * @memberof UserStatus
    */
-  lastLoginAt?: string
-  /**
-   *
-   * @type {string}
-   * @memberof UserStatus
-   */
-  permalink?: string
+  lastLoginAt?: string;
   /**
    *
    * @type {Array<LoginHistory>}
    * @memberof UserStatus
    */
-  loginHistories?: Array<LoginHistory>
+  loginHistories?: Array<LoginHistory>;
+  /**
+   *
+   * @type {string}
+   * @memberof UserStatus
+   */
+  permalink?: string;
 }

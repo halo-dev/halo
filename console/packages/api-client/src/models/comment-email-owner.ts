@@ -23,23 +23,23 @@ export interface CommentEmailOwner {
    * @type {string}
    * @memberof CommentEmailOwner
    */
-  email?: string
+  avatar?: string;
   /**
    *
    * @type {string}
    * @memberof CommentEmailOwner
    */
-  avatar?: string
+  displayName?: string;
   /**
    *
    * @type {string}
    * @memberof CommentEmailOwner
    */
-  displayName?: string
+  email?: string;
   /**
    *
    * @type {string}
    * @memberof CommentEmailOwner
    */
-  website?: string
+  website?: string;
 }

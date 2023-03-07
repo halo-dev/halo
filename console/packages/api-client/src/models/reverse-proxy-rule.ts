@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { FileReverseProxyProvider } from './file-reverse-proxy-provider'
+import { FileReverseProxyProvider } from "./file-reverse-proxy-provider";
 
 /**
  *
@@ -24,14 +24,14 @@ import { FileReverseProxyProvider } from './file-reverse-proxy-provider'
 export interface ReverseProxyRule {
   /**
    *
-   * @type {string}
-   * @memberof ReverseProxyRule
-   */
-  path?: string
-  /**
-   *
    * @type {FileReverseProxyProvider}
    * @memberof ReverseProxyRule
    */
-  file?: FileReverseProxyProvider
+  file?: FileReverseProxyProvider;
+  /**
+   *
+   * @type {string}
+   * @memberof ReverseProxyRule
+   */
+  path?: string;
 }

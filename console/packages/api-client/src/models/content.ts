@@ -23,17 +23,17 @@ export interface Content {
    * @type {string}
    * @memberof Content
    */
-  raw?: string
+  content?: string;
   /**
    *
    * @type {string}
    * @memberof Content
    */
-  content?: string
+  raw?: string;
   /**
    *
    * @type {string}
    * @memberof Content
    */
-  rawType?: string
+  rawType?: string;
 }

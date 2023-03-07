@@ -23,23 +23,23 @@ export interface TagSpec {
    * @type {string}
    * @memberof TagSpec
    */
-  displayName: string
+  color?: string;
   /**
    *
    * @type {string}
    * @memberof TagSpec
    */
-  slug: string
+  cover?: string;
   /**
    *
    * @type {string}
    * @memberof TagSpec
    */
-  color?: string
+  displayName: string;
   /**
    *
    * @type {string}
    * @memberof TagSpec
    */
-  cover?: string
+  slug: string;
 }

@@ -23,41 +23,41 @@ export interface CounterRequest {
    * @type {string}
    * @memberof CounterRequest
    */
-  group?: string
+  group?: string;
   /**
    *
    * @type {string}
    * @memberof CounterRequest
    */
-  plural?: string
+  hostname?: string;
   /**
    *
    * @type {string}
    * @memberof CounterRequest
    */
-  name?: string
+  language?: string;
   /**
    *
    * @type {string}
    * @memberof CounterRequest
    */
-  hostname?: string
+  name?: string;
   /**
    *
    * @type {string}
    * @memberof CounterRequest
    */
-  screen?: string
+  plural?: string;
   /**
    *
    * @type {string}
    * @memberof CounterRequest
    */
-  language?: string
+  referrer?: string;
   /**
    *
    * @type {string}
    * @memberof CounterRequest
    */
-  referrer?: string
+  screen?: string;
 }

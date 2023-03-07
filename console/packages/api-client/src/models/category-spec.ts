@@ -20,44 +20,44 @@
 export interface CategorySpec {
   /**
    *
-   * @type {string}
+   * @type {Array<string>}
    * @memberof CategorySpec
    */
-  displayName: string
+  children?: Array<string>;
   /**
    *
    * @type {string}
    * @memberof CategorySpec
    */
-  slug: string
+  cover?: string;
   /**
    *
    * @type {string}
    * @memberof CategorySpec
    */
-  description?: string
+  description?: string;
   /**
    *
    * @type {string}
    * @memberof CategorySpec
    */
-  cover?: string
-  /**
-   *
-   * @type {string}
-   * @memberof CategorySpec
-   */
-  template?: string
+  displayName: string;
   /**
    *
    * @type {number}
    * @memberof CategorySpec
    */
-  priority: number
+  priority: number;
   /**
    *
-   * @type {Array<string>}
+   * @type {string}
    * @memberof CategorySpec
    */
-  children?: Array<string>
+  slug: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CategorySpec
+   */
+  template?: string;
 }

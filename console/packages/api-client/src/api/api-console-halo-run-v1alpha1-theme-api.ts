@@ -12,9 +12,9 @@
  * Do not edit the class manually.
  */
 
-import type { Configuration } from '../configuration'
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios'
-import globalAxios from 'axios'
+import type { Configuration } from "../configuration";
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from "axios";
+import globalAxios from "axios";
 // Some imports not used depending on template conditions
 // @ts-ignore
 import {
@@ -28,22 +28,30 @@ import {
   serializeDataIfNeeded,
   toPathString,
   createRequestFunction,
-} from '../common'
+} from "../common";
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base'
+import {
+  BASE_PATH,
+  COLLECTION_FORMATS,
+  RequestArgs,
+  BaseAPI,
+  RequiredError,
+} from "../base";
 // @ts-ignore
-import { ConfigMap } from '../models'
+import { ConfigMap } from "../models";
 // @ts-ignore
-import { Setting } from '../models'
+import { Setting } from "../models";
 // @ts-ignore
-import { Theme } from '../models'
+import { Theme } from "../models";
 // @ts-ignore
-import { ThemeList } from '../models'
+import { ThemeList } from "../models";
 /**
  * ApiConsoleHaloRunV1alpha1ThemeApi - axios parameter creator
  * @export
  */
-export const ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator = function (configuration?: Configuration) {
+export const ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator = function (
+  configuration?: Configuration
+) {
   return {
     /**
      * Activate a theme by name.
@@ -51,75 +59,99 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator = function (conf
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    activateTheme: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    activateTheme: async (
+      name: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('activateTheme', 'name', name)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/activation`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("activateTheme", "name", name);
+      const localVarPath =
+        `/apis/api.console.halo.run/v1alpha1/themes/{name}/activation`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "PUT",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Fetch the activated theme.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    fetchActivatedTheme: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/-/activation`
+    fetchActivatedTheme: async (
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/-/activation`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Fetch configMap of theme by configured configMapName.
@@ -127,40 +159,53 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator = function (conf
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    fetchThemeConfig: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    fetchThemeConfig: async (
+      name: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('fetchThemeConfig', 'name', name)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/config`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("fetchThemeConfig", "name", name);
+      const localVarPath =
+        `/apis/api.console.halo.run/v1alpha1/themes/{name}/config`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Fetch setting of theme.
@@ -168,40 +213,53 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator = function (conf
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    fetchThemeSetting: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    fetchThemeSetting: async (
+      name: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('fetchThemeSetting', 'name', name)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/setting`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("fetchThemeSetting", "name", name);
+      const localVarPath =
+        `/apis/api.console.halo.run/v1alpha1/themes/{name}/setting`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Install a theme by uploading a zip file.
@@ -209,114 +267,137 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator = function (conf
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    installTheme: async (file: File, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    installTheme: async (
+      file: File,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'file' is not null or undefined
-      assertParamExists('installTheme', 'file', file)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/install`
+      assertParamExists("installTheme", "file", file);
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/install`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
-      const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)()
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+      const localVarFormParams = new ((configuration &&
+        configuration.formDataCtor) ||
+        FormData)();
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
       if (file !== undefined) {
-        localVarFormParams.append('file', file as any)
+        localVarFormParams.append("file", file as any);
       }
 
-      localVarHeaderParameter['Content-Type'] = 'multipart/form-data'
+      localVarHeaderParameter["Content-Type"] = "multipart/form-data";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = localVarFormParams
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = localVarFormParams;
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * List themes.
      * @param {boolean} uninstalled
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listThemes: async (
       uninstalled: boolean,
       size?: number,
-      page?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
-      options: AxiosRequestConfig = {},
+      page?: number,
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'uninstalled' is not null or undefined
-      assertParamExists('listThemes', 'uninstalled', uninstalled)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes`
+      assertParamExists("listThemes", "uninstalled", uninstalled);
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
       if (uninstalled !== undefined) {
-        localVarQueryParameter['uninstalled'] = uninstalled
+        localVarQueryParameter["uninstalled"] = uninstalled;
       }
 
       if (size !== undefined) {
-        localVarQueryParameter['size'] = size
-      }
-
-      if (page !== undefined) {
-        localVarQueryParameter['page'] = page
+        localVarQueryParameter["size"] = size;
       }
 
       if (labelSelector) {
-        localVarQueryParameter['labelSelector'] = labelSelector
+        localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
       if (fieldSelector) {
-        localVarQueryParameter['fieldSelector'] = fieldSelector
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      if (page !== undefined) {
+        localVarQueryParameter["page"] = page;
+      }
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Reload theme setting.
@@ -324,40 +405,53 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator = function (conf
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    reload: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    reload: async (
+      name: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('reload', 'name', name)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/reload`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("reload", "name", name);
+      const localVarPath =
+        `/apis/api.console.halo.run/v1alpha1/themes/{name}/reload`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "PUT",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Reset the configMap of theme setting.
@@ -365,40 +459,53 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator = function (conf
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    resetThemeConfig: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    resetThemeConfig: async (
+      name: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('resetThemeConfig', 'name', name)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/reset-config`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("resetThemeConfig", "name", name);
+      const localVarPath =
+        `/apis/api.console.halo.run/v1alpha1/themes/{name}/reset-config`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "PUT",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Update the configMap of theme setting.
@@ -410,46 +517,60 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator = function (conf
     updateThemeConfig: async (
       name: string,
       configMap: ConfigMap,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('updateThemeConfig', 'name', name)
+      assertParamExists("updateThemeConfig", "name", name);
       // verify required parameter 'configMap' is not null or undefined
-      assertParamExists('updateThemeConfig', 'configMap', configMap)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/config`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("updateThemeConfig", "configMap", configMap);
+      const localVarPath =
+        `/apis/api.console.halo.run/v1alpha1/themes/{name}/config`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "PUT",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(configMap, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        configMap,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Upgrade theme
@@ -458,60 +579,79 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator = function (conf
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    upgradeTheme: async (name: string, file: File, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    upgradeTheme: async (
+      name: string,
+      file: File,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('upgradeTheme', 'name', name)
+      assertParamExists("upgradeTheme", "name", name);
       // verify required parameter 'file' is not null or undefined
-      assertParamExists('upgradeTheme', 'file', file)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/{name}/upgrade`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("upgradeTheme", "file", file);
+      const localVarPath =
+        `/apis/api.console.halo.run/v1alpha1/themes/{name}/upgrade`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
-      const localVarFormParams = new ((configuration && configuration.formDataCtor) || FormData)()
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+      const localVarFormParams = new ((configuration &&
+        configuration.formDataCtor) ||
+        FormData)();
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
       if (file !== undefined) {
-        localVarFormParams.append('file', file as any)
+        localVarFormParams.append("file", file as any);
       }
 
-      localVarHeaderParameter['Content-Type'] = 'multipart/form-data'
+      localVarHeaderParameter["Content-Type"] = "multipart/form-data";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = localVarFormParams
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = localVarFormParams;
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
-  }
-}
+  };
+};
 
 /**
  * ApiConsoleHaloRunV1alpha1ThemeApi - functional programming interface
  * @export
  */
-export const ApiConsoleHaloRunV1alpha1ThemeApiFp = function (configuration?: Configuration) {
-  const localVarAxiosParamCreator = ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator(configuration)
+export const ApiConsoleHaloRunV1alpha1ThemeApiFp = function (
+  configuration?: Configuration
+) {
+  const localVarAxiosParamCreator =
+    ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator(configuration);
   return {
     /**
      * Activate a theme by name.
@@ -521,10 +661,20 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFp = function (configuration?: Con
      */
     async activateTheme(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.activateTheme(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.activateTheme(
+        name,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Fetch the activated theme.
@@ -532,10 +682,18 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFp = function (configuration?: Con
      * @throws {RequiredError}
      */
     async fetchActivatedTheme(
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.fetchActivatedTheme(options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.fetchActivatedTheme(options);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Fetch configMap of theme by configured configMapName.
@@ -545,10 +703,18 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFp = function (configuration?: Con
      */
     async fetchThemeConfig(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConfigMap>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.fetchThemeConfig(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConfigMap>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.fetchThemeConfig(name, options);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Fetch setting of theme.
@@ -558,10 +724,18 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFp = function (configuration?: Con
      */
     async fetchThemeSetting(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.fetchThemeSetting(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.fetchThemeSetting(name, options);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Install a theme by uploading a zip file.
@@ -571,38 +745,55 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFp = function (configuration?: Con
      */
     async installTheme(
       file: File,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.installTheme(file, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.installTheme(
+        file,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * List themes.
      * @param {boolean} uninstalled
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listThemes(
       uninstalled: boolean,
       size?: number,
-      page?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ThemeList>> {
+      page?: number,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ThemeList>
+    > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.listThemes(
         uninstalled,
         size,
-        page,
         labelSelector,
         fieldSelector,
-        options,
-      )
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+        page,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Reload theme setting.
@@ -612,10 +803,20 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFp = function (configuration?: Con
      */
     async reload(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.reload(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.reload(
+        name,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Reset the configMap of theme setting.
@@ -625,10 +826,18 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFp = function (configuration?: Con
      */
     async resetThemeConfig(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConfigMap>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.resetThemeConfig(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConfigMap>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.resetThemeConfig(name, options);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Update the configMap of theme setting.
@@ -640,10 +849,22 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFp = function (configuration?: Con
     async updateThemeConfig(
       name: string,
       configMap: ConfigMap,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConfigMap>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.updateThemeConfig(name, configMap, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConfigMap>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.updateThemeConfig(
+          name,
+          configMap,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Upgrade theme
@@ -655,13 +876,24 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFp = function (configuration?: Con
     async upgradeTheme(
       name: string,
       file: File,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.upgradeTheme(name, file, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.upgradeTheme(
+        name,
+        file,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
-  }
-}
+  };
+};
 
 /**
  * ApiConsoleHaloRunV1alpha1ThemeApi - factory interface
@@ -670,9 +902,9 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFp = function (configuration?: Con
 export const ApiConsoleHaloRunV1alpha1ThemeApiFactory = function (
   configuration?: Configuration,
   basePath?: string,
-  axios?: AxiosInstance,
+  axios?: AxiosInstance
 ) {
-  const localVarFp = ApiConsoleHaloRunV1alpha1ThemeApiFp(configuration)
+  const localVarFp = ApiConsoleHaloRunV1alpha1ThemeApiFp(configuration);
   return {
     /**
      * Activate a theme by name.
@@ -682,9 +914,11 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFactory = function (
      */
     activateTheme(
       requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiActivateThemeRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<Theme> {
-      return localVarFp.activateTheme(requestParameters.name, options).then((request) => request(axios, basePath))
+      return localVarFp
+        .activateTheme(requestParameters.name, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      * Fetch the activated theme.
@@ -692,7 +926,9 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFactory = function (
      * @throws {RequiredError}
      */
     fetchActivatedTheme(options?: AxiosRequestConfig): AxiosPromise<Theme> {
-      return localVarFp.fetchActivatedTheme(options).then((request) => request(axios, basePath))
+      return localVarFp
+        .fetchActivatedTheme(options)
+        .then((request) => request(axios, basePath));
     },
     /**
      * Fetch configMap of theme by configured configMapName.
@@ -702,9 +938,11 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFactory = function (
      */
     fetchThemeConfig(
       requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiFetchThemeConfigRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<ConfigMap> {
-      return localVarFp.fetchThemeConfig(requestParameters.name, options).then((request) => request(axios, basePath))
+      return localVarFp
+        .fetchThemeConfig(requestParameters.name, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      * Fetch setting of theme.
@@ -714,9 +952,11 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFactory = function (
      */
     fetchThemeSetting(
       requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiFetchThemeSettingRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<Setting> {
-      return localVarFp.fetchThemeSetting(requestParameters.name, options).then((request) => request(axios, basePath))
+      return localVarFp
+        .fetchThemeSetting(requestParameters.name, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      * Install a theme by uploading a zip file.
@@ -726,9 +966,11 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFactory = function (
      */
     installTheme(
       requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiInstallThemeRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<Theme> {
-      return localVarFp.installTheme(requestParameters.file, options).then((request) => request(axios, basePath))
+      return localVarFp
+        .installTheme(requestParameters.file, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      * List themes.
@@ -738,18 +980,18 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFactory = function (
      */
     listThemes(
       requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiListThemesRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<ThemeList> {
       return localVarFp
         .listThemes(
           requestParameters.uninstalled,
           requestParameters.size,
-          requestParameters.page,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
-          options,
+          requestParameters.page,
+          options
         )
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * Reload theme setting.
@@ -759,9 +1001,11 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFactory = function (
      */
     reload(
       requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiReloadRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<Theme> {
-      return localVarFp.reload(requestParameters.name, options).then((request) => request(axios, basePath))
+      return localVarFp
+        .reload(requestParameters.name, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      * Reset the configMap of theme setting.
@@ -771,9 +1015,11 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFactory = function (
      */
     resetThemeConfig(
       requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiResetThemeConfigRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<ConfigMap> {
-      return localVarFp.resetThemeConfig(requestParameters.name, options).then((request) => request(axios, basePath))
+      return localVarFp
+        .resetThemeConfig(requestParameters.name, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      * Update the configMap of theme setting.
@@ -783,11 +1029,15 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFactory = function (
      */
     updateThemeConfig(
       requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiUpdateThemeConfigRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<ConfigMap> {
       return localVarFp
-        .updateThemeConfig(requestParameters.name, requestParameters.configMap, options)
-        .then((request) => request(axios, basePath))
+        .updateThemeConfig(
+          requestParameters.name,
+          requestParameters.configMap,
+          options
+        )
+        .then((request) => request(axios, basePath));
     },
     /**
      * Upgrade theme
@@ -797,14 +1047,14 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFactory = function (
      */
     upgradeTheme(
       requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiUpgradeThemeRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<void> {
       return localVarFp
         .upgradeTheme(requestParameters.name, requestParameters.file, options)
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
-  }
-}
+  };
+};
 
 /**
  * Request parameters for activateTheme operation in ApiConsoleHaloRunV1alpha1ThemeApi.
@@ -817,7 +1067,7 @@ export interface ApiConsoleHaloRunV1alpha1ThemeApiActivateThemeRequest {
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApiActivateTheme
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -831,7 +1081,7 @@ export interface ApiConsoleHaloRunV1alpha1ThemeApiFetchThemeConfigRequest {
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApiFetchThemeConfig
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -845,7 +1095,7 @@ export interface ApiConsoleHaloRunV1alpha1ThemeApiFetchThemeSettingRequest {
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApiFetchThemeSetting
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -859,7 +1109,7 @@ export interface ApiConsoleHaloRunV1alpha1ThemeApiInstallThemeRequest {
    * @type {File}
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApiInstallTheme
    */
-  readonly file: File
+  readonly file: File;
 }
 
 /**
@@ -873,35 +1123,35 @@ export interface ApiConsoleHaloRunV1alpha1ThemeApiListThemesRequest {
    * @type {boolean}
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApiListThemes
    */
-  readonly uninstalled: boolean
+  readonly uninstalled: boolean;
 
   /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApiListThemes
    */
-  readonly size?: number
-
-  /**
-   * The page number. Zero indicates no page.
-   * @type {number}
-   * @memberof ApiConsoleHaloRunV1alpha1ThemeApiListThemes
-   */
-  readonly page?: number
+  readonly size?: number;
 
   /**
    * Label selector for filtering.
    * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApiListThemes
    */
-  readonly labelSelector?: Array<string>
+  readonly labelSelector?: Array<string>;
 
   /**
    * Field selector for filtering.
    * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApiListThemes
    */
-  readonly fieldSelector?: Array<string>
+  readonly fieldSelector?: Array<string>;
+
+  /**
+   * The page number. Zero indicates no page.
+   * @type {number}
+   * @memberof ApiConsoleHaloRunV1alpha1ThemeApiListThemes
+   */
+  readonly page?: number;
 }
 
 /**
@@ -915,7 +1165,7 @@ export interface ApiConsoleHaloRunV1alpha1ThemeApiReloadRequest {
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApiReload
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -929,7 +1179,7 @@ export interface ApiConsoleHaloRunV1alpha1ThemeApiResetThemeConfigRequest {
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApiResetThemeConfig
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -943,14 +1193,14 @@ export interface ApiConsoleHaloRunV1alpha1ThemeApiUpdateThemeConfigRequest {
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApiUpdateThemeConfig
    */
-  readonly name: string
+  readonly name: string;
 
   /**
    *
    * @type {ConfigMap}
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApiUpdateThemeConfig
    */
-  readonly configMap: ConfigMap
+  readonly configMap: ConfigMap;
 }
 
 /**
@@ -964,14 +1214,14 @@ export interface ApiConsoleHaloRunV1alpha1ThemeApiUpgradeThemeRequest {
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApiUpgradeTheme
    */
-  readonly name: string
+  readonly name: string;
 
   /**
    *
    * @type {File}
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApiUpgradeTheme
    */
-  readonly file: File
+  readonly file: File;
 }
 
 /**
@@ -990,11 +1240,11 @@ export class ApiConsoleHaloRunV1alpha1ThemeApi extends BaseAPI {
    */
   public activateTheme(
     requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiActivateThemeRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1ThemeApiFp(this.configuration)
       .activateTheme(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -1006,7 +1256,7 @@ export class ApiConsoleHaloRunV1alpha1ThemeApi extends BaseAPI {
   public fetchActivatedTheme(options?: AxiosRequestConfig) {
     return ApiConsoleHaloRunV1alpha1ThemeApiFp(this.configuration)
       .fetchActivatedTheme(options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -1018,11 +1268,11 @@ export class ApiConsoleHaloRunV1alpha1ThemeApi extends BaseAPI {
    */
   public fetchThemeConfig(
     requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiFetchThemeConfigRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1ThemeApiFp(this.configuration)
       .fetchThemeConfig(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -1034,11 +1284,11 @@ export class ApiConsoleHaloRunV1alpha1ThemeApi extends BaseAPI {
    */
   public fetchThemeSetting(
     requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiFetchThemeSettingRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1ThemeApiFp(this.configuration)
       .fetchThemeSetting(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -1050,11 +1300,11 @@ export class ApiConsoleHaloRunV1alpha1ThemeApi extends BaseAPI {
    */
   public installTheme(
     requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiInstallThemeRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1ThemeApiFp(this.configuration)
       .installTheme(requestParameters.file, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -1066,18 +1316,18 @@ export class ApiConsoleHaloRunV1alpha1ThemeApi extends BaseAPI {
    */
   public listThemes(
     requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiListThemesRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1ThemeApiFp(this.configuration)
       .listThemes(
         requestParameters.uninstalled,
         requestParameters.size,
-        requestParameters.page,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
-        options,
+        requestParameters.page,
+        options
       )
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -1087,10 +1337,13 @@ export class ApiConsoleHaloRunV1alpha1ThemeApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApi
    */
-  public reload(requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiReloadRequest, options?: AxiosRequestConfig) {
+  public reload(
+    requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiReloadRequest,
+    options?: AxiosRequestConfig
+  ) {
     return ApiConsoleHaloRunV1alpha1ThemeApiFp(this.configuration)
       .reload(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -1102,11 +1355,11 @@ export class ApiConsoleHaloRunV1alpha1ThemeApi extends BaseAPI {
    */
   public resetThemeConfig(
     requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiResetThemeConfigRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1ThemeApiFp(this.configuration)
       .resetThemeConfig(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -1118,11 +1371,15 @@ export class ApiConsoleHaloRunV1alpha1ThemeApi extends BaseAPI {
    */
   public updateThemeConfig(
     requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiUpdateThemeConfigRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1ThemeApiFp(this.configuration)
-      .updateThemeConfig(requestParameters.name, requestParameters.configMap, options)
-      .then((request) => request(this.axios, this.basePath))
+      .updateThemeConfig(
+        requestParameters.name,
+        requestParameters.configMap,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -1134,10 +1391,10 @@ export class ApiConsoleHaloRunV1alpha1ThemeApi extends BaseAPI {
    */
   public upgradeTheme(
     requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiUpgradeThemeRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1ThemeApiFp(this.configuration)
       .upgradeTheme(requestParameters.name, requestParameters.file, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 }

@@ -23,5 +23,5 @@ export interface GroupSpec {
    * @type {string}
    * @memberof GroupSpec
    */
-  displayName: string
+  displayName: string;
 }

@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ConfigMap } from './config-map'
+import { ConfigMap } from "./config-map";
 
 /**
  *
@@ -23,57 +23,57 @@ import { ConfigMap } from './config-map'
  */
 export interface ConfigMapList {
   /**
-   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page is the first page.
+   * @type {boolean}
    * @memberof ConfigMapList
    */
-  page: number
+  first: boolean;
   /**
-   * Size of each page. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof ConfigMapList
    */
-  size: number
+  hasNext: boolean;
   /**
-   * Total elements.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof ConfigMapList
    */
-  total: number
+  hasPrevious: boolean;
   /**
    * A chunk of items.
    * @type {Array<ConfigMap>}
    * @memberof ConfigMapList
    */
-  items: Array<ConfigMap>
-  /**
-   * Indicates whether current page is the first page.
-   * @type {boolean}
-   * @memberof ConfigMapList
-   */
-  first: boolean
+  items: Array<ConfigMap>;
   /**
    * Indicates whether current page is the last page.
    * @type {boolean}
    * @memberof ConfigMapList
    */
-  last: boolean
+  last: boolean;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof ConfigMapList
    */
-  hasNext: boolean
+  page: number;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Size of each page. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof ConfigMapList
    */
-  hasPrevious: boolean
+  size: number;
+  /**
+   * Total elements.
+   * @type {number}
+   * @memberof ConfigMapList
+   */
+  total: number;
   /**
    * Indicates total pages.
    * @type {number}
    * @memberof ConfigMapList
    */
-  totalPages: number
+  totalPages: number;
 }
