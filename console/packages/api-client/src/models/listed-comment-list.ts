@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ListedComment } from './listed-comment'
+import { ListedComment } from "./listed-comment";
 
 /**
  *
@@ -23,57 +23,57 @@ import { ListedComment } from './listed-comment'
  */
 export interface ListedCommentList {
   /**
-   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page is the first page.
+   * @type {boolean}
    * @memberof ListedCommentList
    */
-  page: number
+  first: boolean;
   /**
-   * Size of each page. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof ListedCommentList
    */
-  size: number
+  hasNext: boolean;
   /**
-   * Total elements.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof ListedCommentList
    */
-  total: number
+  hasPrevious: boolean;
   /**
    * A chunk of items.
    * @type {Array<ListedComment>}
    * @memberof ListedCommentList
    */
-  items: Array<ListedComment>
-  /**
-   * Indicates whether current page is the first page.
-   * @type {boolean}
-   * @memberof ListedCommentList
-   */
-  first: boolean
+  items: Array<ListedComment>;
   /**
    * Indicates whether current page is the last page.
    * @type {boolean}
    * @memberof ListedCommentList
    */
-  last: boolean
+  last: boolean;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof ListedCommentList
    */
-  hasNext: boolean
+  page: number;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Size of each page. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof ListedCommentList
    */
-  hasPrevious: boolean
+  size: number;
+  /**
+   * Total elements.
+   * @type {number}
+   * @memberof ListedCommentList
+   */
+  total: number;
   /**
    * Indicates total pages.
    * @type {number}
    * @memberof ListedCommentList
    */
-  totalPages: number
+  totalPages: number;
 }

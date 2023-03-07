@@ -23,17 +23,17 @@ export interface Subject {
    * @type {string}
    * @memberof Subject
    */
-  kind?: string
+  apiGroup?: string;
   /**
    *
    * @type {string}
    * @memberof Subject
    */
-  name?: string
+  kind?: string;
   /**
    *
    * @type {string}
    * @memberof Subject
    */
-  apiGroup?: string
+  name?: string;
 }

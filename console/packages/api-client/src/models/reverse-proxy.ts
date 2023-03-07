@@ -14,10 +14,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 // May contain unused imports in some cases
 // @ts-ignore
-import { ReverseProxyRule } from './reverse-proxy-rule'
+import { ReverseProxyRule } from "./reverse-proxy-rule";
 
 /**
  *
@@ -27,26 +27,26 @@ import { ReverseProxyRule } from './reverse-proxy-rule'
 export interface ReverseProxy {
   /**
    *
-   * @type {Array<ReverseProxyRule>}
+   * @type {string}
    * @memberof ReverseProxy
    */
-  rules?: Array<ReverseProxyRule>
+  apiVersion: string;
   /**
    *
    * @type {string}
    * @memberof ReverseProxy
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof ReverseProxy
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof ReverseProxy
    */
-  metadata: Metadata
+  metadata: Metadata;
+  /**
+   *
+   * @type {Array<ReverseProxyRule>}
+   * @memberof ReverseProxy
+   */
+  rules?: Array<ReverseProxyRule>;
 }

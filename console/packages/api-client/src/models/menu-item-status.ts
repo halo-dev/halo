@@ -23,11 +23,11 @@ export interface MenuItemStatus {
    * @type {string}
    * @memberof MenuItemStatus
    */
-  displayName?: string
+  displayName?: string;
   /**
    * Calculated href of manu item.
    * @type {string}
    * @memberof MenuItemStatus
    */
-  href?: string
+  href?: string;
 }

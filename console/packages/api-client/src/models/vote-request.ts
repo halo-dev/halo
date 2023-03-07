@@ -23,17 +23,17 @@ export interface VoteRequest {
    * @type {string}
    * @memberof VoteRequest
    */
-  group?: string
+  group?: string;
   /**
    *
    * @type {string}
    * @memberof VoteRequest
    */
-  plural?: string
+  name?: string;
   /**
    *
    * @type {string}
    * @memberof VoteRequest
    */
-  name?: string
+  plural?: string;
 }

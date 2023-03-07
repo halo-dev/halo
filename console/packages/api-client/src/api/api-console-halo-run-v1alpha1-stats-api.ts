@@ -12,9 +12,9 @@
  * Do not edit the class manually.
  */
 
-import type { Configuration } from '../configuration'
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios'
-import globalAxios from 'axios'
+import type { Configuration } from "../configuration";
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from "axios";
+import globalAxios from "axios";
 // Some imports not used depending on template conditions
 // @ts-ignore
 import {
@@ -28,61 +28,83 @@ import {
   serializeDataIfNeeded,
   toPathString,
   createRequestFunction,
-} from '../common'
+} from "../common";
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base'
+import {
+  BASE_PATH,
+  COLLECTION_FORMATS,
+  RequestArgs,
+  BaseAPI,
+  RequiredError,
+} from "../base";
 // @ts-ignore
-import { DashboardStats } from '../models'
+import { DashboardStats } from "../models";
 /**
  * ApiConsoleHaloRunV1alpha1StatsApi - axios parameter creator
  * @export
  */
-export const ApiConsoleHaloRunV1alpha1StatsApiAxiosParamCreator = function (configuration?: Configuration) {
+export const ApiConsoleHaloRunV1alpha1StatsApiAxiosParamCreator = function (
+  configuration?: Configuration
+) {
   return {
     /**
      * Get stats.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getStats: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/stats`
+    getStats: async (
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/stats`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
-  }
-}
+  };
+};
 
 /**
  * ApiConsoleHaloRunV1alpha1StatsApi - functional programming interface
  * @export
  */
-export const ApiConsoleHaloRunV1alpha1StatsApiFp = function (configuration?: Configuration) {
-  const localVarAxiosParamCreator = ApiConsoleHaloRunV1alpha1StatsApiAxiosParamCreator(configuration)
+export const ApiConsoleHaloRunV1alpha1StatsApiFp = function (
+  configuration?: Configuration
+) {
+  const localVarAxiosParamCreator =
+    ApiConsoleHaloRunV1alpha1StatsApiAxiosParamCreator(configuration);
   return {
     /**
      * Get stats.
@@ -90,13 +112,22 @@ export const ApiConsoleHaloRunV1alpha1StatsApiFp = function (configuration?: Con
      * @throws {RequiredError}
      */
     async getStats(
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DashboardStats>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.getStats(options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<DashboardStats>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.getStats(
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
-  }
-}
+  };
+};
 
 /**
  * ApiConsoleHaloRunV1alpha1StatsApi - factory interface
@@ -105,9 +136,9 @@ export const ApiConsoleHaloRunV1alpha1StatsApiFp = function (configuration?: Con
 export const ApiConsoleHaloRunV1alpha1StatsApiFactory = function (
   configuration?: Configuration,
   basePath?: string,
-  axios?: AxiosInstance,
+  axios?: AxiosInstance
 ) {
-  const localVarFp = ApiConsoleHaloRunV1alpha1StatsApiFp(configuration)
+  const localVarFp = ApiConsoleHaloRunV1alpha1StatsApiFp(configuration);
   return {
     /**
      * Get stats.
@@ -115,10 +146,12 @@ export const ApiConsoleHaloRunV1alpha1StatsApiFactory = function (
      * @throws {RequiredError}
      */
     getStats(options?: AxiosRequestConfig): AxiosPromise<DashboardStats> {
-      return localVarFp.getStats(options).then((request) => request(axios, basePath))
+      return localVarFp
+        .getStats(options)
+        .then((request) => request(axios, basePath));
     },
-  }
-}
+  };
+};
 
 /**
  * ApiConsoleHaloRunV1alpha1StatsApi - object-oriented interface
@@ -136,6 +169,6 @@ export class ApiConsoleHaloRunV1alpha1StatsApi extends BaseAPI {
   public getStats(options?: AxiosRequestConfig) {
     return ApiConsoleHaloRunV1alpha1StatsApiFp(this.configuration)
       .getStats(options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 }

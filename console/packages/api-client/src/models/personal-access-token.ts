@@ -14,10 +14,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 // May contain unused imports in some cases
 // @ts-ignore
-import { PersonalAccessTokenSpec } from './personal-access-token-spec'
+import { PersonalAccessTokenSpec } from "./personal-access-token-spec";
 
 /**
  *
@@ -27,26 +27,26 @@ import { PersonalAccessTokenSpec } from './personal-access-token-spec'
 export interface PersonalAccessToken {
   /**
    *
-   * @type {PersonalAccessTokenSpec}
+   * @type {string}
    * @memberof PersonalAccessToken
    */
-  spec?: PersonalAccessTokenSpec
+  apiVersion: string;
   /**
    *
    * @type {string}
    * @memberof PersonalAccessToken
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof PersonalAccessToken
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof PersonalAccessToken
    */
-  metadata: Metadata
+  metadata: Metadata;
+  /**
+   *
+   * @type {PersonalAccessTokenSpec}
+   * @memberof PersonalAccessToken
+   */
+  spec?: PersonalAccessTokenSpec;
 }

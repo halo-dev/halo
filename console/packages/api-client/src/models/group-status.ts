@@ -19,15 +19,15 @@
  */
 export interface GroupStatus {
   /**
-   * Update timestamp of the group
-   * @type {string}
-   * @memberof GroupStatus
-   */
-  updateTimestamp?: string
-  /**
    * Total of attachments under the current group
    * @type {number}
    * @memberof GroupStatus
    */
-  totalAttachments?: number
+  totalAttachments?: number;
+  /**
+   * Update timestamp of the group
+   * @type {string}
+   * @memberof GroupStatus
+   */
+  updateTimestamp?: string;
 }
