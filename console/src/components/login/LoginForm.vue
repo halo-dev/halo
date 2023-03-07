@@ -8,6 +8,7 @@ import { Toast, VButton } from "@halo-dev/components";
 import { onMounted, ref } from "vue";
 import qs from "qs";
 import { submitForm } from "@formkit/core";
+import { JSEncrypt } from "jsencrypt";
 
 const emit = defineEmits<{
   (event: "succeed"): void;
@@ -38,17 +39,35 @@ const handleGenerateToken = async () => {
 const handleLogin = async () => {
   try {
     loading.value = true;
-
-    await axios.post(
-      `${import.meta.env.VITE_API_URL}/login`,
-      qs.stringify(loginForm.value),
-      {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
+    await axios
+      .get(`${import.meta.env.VITE_API_URL}/login/public-key`)
+      .then((response) => {
+        return response.data.base64Format;
+      })
+      .then((publicKey) => {
+        const encrypt = new JSEncrypt();
+        encrypt.setPublicKey(publicKey);
+        return encrypt.encrypt(loginForm.value.password);
+      })
+      .then((encryptedPassword) => {
+        return axios.post(
+          `${import.meta.env.VITE_API_URL}/login`,
+          qs.stringify({
+            username: loginForm.value.username,
+            password: encryptedPassword,
+            _csrf: loginForm.value._csrf,
+          }),
+          {
+            withCredentials: true,
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+            },
+          }
+        );
+      })
+      .catch((error) => {
+        console.error(error);
+      });
 
     await userStore.fetchCurrentUser();
 
@@ -66,7 +85,7 @@ const handleLogin = async () => {
 
       if (e.response?.status === 403) {
         Toast.warning("CSRF Token 失效，请重新尝试", { duration: 5000 });
-        handleGenerateToken();
+        await handleGenerateToken();
         return;
       }
 
