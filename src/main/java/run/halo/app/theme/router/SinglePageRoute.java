@@ -127,6 +127,7 @@ public class SinglePageRoute
         return request -> singlePageFinder.getByName(name)
             .flatMap(singlePageVo -> {
                 Map<String, Object> model = new HashMap<>();
+                model.put("name", singlePageVo.getMetadata().getName());
                 model.put("groupVersionKind", gvk);
                 model.put("plural", getPlural());
                 model.put(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.SINGLE_PAGE.getValue());
