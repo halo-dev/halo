@@ -8,6 +8,7 @@ import {
   ApiConsoleHaloRunV1alpha1ReplyApi,
   ApiConsoleHaloRunV1alpha1StatsApi,
   ApiConsoleHaloRunV1alpha1AttachmentApi,
+  ApiConsoleHaloRunV1alpha1IndicesApi,
   ContentHaloRunV1alpha1CategoryApi,
   ContentHaloRunV1alpha1CommentApi,
   ContentHaloRunV1alpha1PostApi,
@@ -185,6 +186,7 @@ function setupApiClient(axios: AxiosInstance) {
       axios
     ),
     login: new LoginApi(undefined, baseURL, axios),
+    indices: new ApiConsoleHaloRunV1alpha1IndicesApi(undefined, baseURL, axios),
   };
 }
 

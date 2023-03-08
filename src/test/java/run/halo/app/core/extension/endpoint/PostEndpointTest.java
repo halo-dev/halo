@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +22,7 @@ import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.content.TestPost;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.core.extension.content.Post.PostSpec;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 
@@ -85,7 +87,7 @@ class PostEndpointTest {
         var post = new Post();
         post.setMetadata(new Metadata());
         post.getMetadata().setName("post-1");
-        post.setSpec(new Post.PostSpec());
+        post.setSpec(new PostSpec());
         when(client.get(eq(Post.class), eq("post-1"))).thenReturn(Mono.just(post));
 
         when(client.update(any(Post.class)))
@@ -108,9 +110,19 @@ class PostEndpointTest {
         var post = new Post();
         post.setMetadata(new Metadata());
         post.getMetadata().setName("post-1");
-        post.setSpec(new Post.PostSpec());
-        when(client.get(eq(Post.class), eq("post-1"))).thenReturn(Mono.just(post));
-        when(client.fetch(eq(Post.class), eq("post-1"))).thenReturn(Mono.empty());
+        post.setSpec(new PostSpec());
+
+        var publishedPost = new Post();
+        var publishedMetadata = new Metadata();
+        publishedMetadata.setAnnotations(Map.of(Post.LAST_RELEASED_SNAPSHOT_ANNO, "my-release"));
+        publishedPost.setMetadata(publishedMetadata);
+        var publishedPostSpec = new PostSpec();
+        publishedPostSpec.setReleaseSnapshot("my-release");
+        publishedPost.setSpec(publishedPostSpec);
+
+        when(client.get(eq(Post.class), eq("post-1")))
+            .thenReturn(Mono.just(post))
+            .thenReturn(Mono.just(publishedPost));
 
         when(client.update(any(Post.class)))
             .thenReturn(Mono.just(post));
@@ -123,8 +135,43 @@ class PostEndpointTest {
             .is2xxSuccessful();
 
         // Verify WebClient retry behavior
-        verify(client, times(1)).get(eq(Post.class), eq("post-1"));
-        verify(client, times(1)).update(any(Post.class));
+        verify(client, times(2)).get(eq(Post.class), eq("post-1"));
+        verify(client).update(any(Post.class));
+    }
+
+    @Test
+    void shouldFailIfWaitTimeoutForPublishedStatus() {
+        var post = new Post();
+        post.setMetadata(new Metadata());
+        post.getMetadata().setName("post-1");
+        post.setSpec(new PostSpec());
+
+        var publishedPost = new Post();
+        var publishedMetadata = new Metadata();
+        publishedMetadata.setAnnotations(
+            Map.of(Post.LAST_RELEASED_SNAPSHOT_ANNO, "old-my-release"));
+        publishedPost.setMetadata(publishedMetadata);
+        var publishedPostSpec = new PostSpec();
+        publishedPostSpec.setReleaseSnapshot("my-release");
+        publishedPost.setSpec(publishedPostSpec);
+
+        when(client.get(eq(Post.class), eq("post-1")))
+            .thenReturn(Mono.just(post))
+            .thenReturn(Mono.just(publishedPost));
+
+        when(client.update(any(Post.class)))
+            .thenReturn(Mono.just(post));
+
+        // Send request
+        webTestClient.put()
+            .uri("/posts/{name}/publish?async=false", "post-1")
+            .exchange()
+            .expectStatus()
+            .is5xxServerError();
+
+        // Verify WebClient retry behavior
+        verify(client, times(12)).get(eq(Post.class), eq("post-1"));
+        verify(client).update(any(Post.class));
     }
 
     PostRequest postRequest(Post post) {
