@@ -91,15 +91,6 @@ public class Comment extends AbstractExtension {
 
         @Schema(required = true, defaultValue = "false")
         private Boolean hidden;
-
-        /**
-         * If the creation time is null, use approvedTime.
-         *
-         * @return if creationTime is null returned approved time, otherwise creationTime.
-         */
-        public Instant getCreationTime() {
-            return defaultIfNull(creationTime, approvedTime);
-        }
     }
 
     @Data
