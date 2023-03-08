@@ -102,6 +102,7 @@ public class PostRouteFactory implements RouteFactory {
         return postVoMono
             .flatMap(postVo -> {
                 Map<String, Object> model = new HashMap<>();
+                model.put("name", postVo.getMetadata().getName());
                 model.put(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.POST.getValue());
                 model.put("groupVersionKind", GroupVersionKind.fromExtension(Post.class));
                 GVK gvk = Post.class.getAnnotation(GVK.class);
