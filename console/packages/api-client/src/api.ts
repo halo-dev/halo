@@ -32,6 +32,7 @@ export * from "./api/content-halo-run-v1alpha1-reply-api";
 export * from "./api/content-halo-run-v1alpha1-single-page-api";
 export * from "./api/content-halo-run-v1alpha1-snapshot-api";
 export * from "./api/content-halo-run-v1alpha1-tag-api";
+export * from "./api/login-api";
 export * from "./api/metrics-halo-run-v1alpha1-counter-api";
 export * from "./api/plugin-halo-run-v1alpha1-plugin-api";
 export * from "./api/plugin-halo-run-v1alpha1-reverse-proxy-api";

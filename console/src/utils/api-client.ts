@@ -31,6 +31,7 @@ import {
   V1alpha1SettingApi,
   V1alpha1UserApi,
   V1alpha1AnnotationSettingApi,
+  LoginApi,
 } from "@halo-dev/api-client";
 import type { AxiosError, AxiosInstance } from "axios";
 import axios from "axios";
@@ -183,6 +184,7 @@ function setupApiClient(axios: AxiosInstance) {
       baseURL,
       axios
     ),
+    login: new LoginApi(undefined, baseURL, axios),
   };
 }
 

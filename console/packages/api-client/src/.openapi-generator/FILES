@@ -21,6 +21,7 @@ api/content-halo-run-v1alpha1-reply-api.ts
 api/content-halo-run-v1alpha1-single-page-api.ts
 api/content-halo-run-v1alpha1-snapshot-api.ts
 api/content-halo-run-v1alpha1-tag-api.ts
+api/login-api.ts
 api/metrics-halo-run-v1alpha1-counter-api.ts
 api/plugin-halo-run-v1alpha1-plugin-api.ts
 api/plugin-halo-run-v1alpha1-reverse-proxy-api.ts
@@ -133,6 +134,7 @@ models/post-request.ts
 models/post-spec.ts
 models/post-status.ts
 models/post.ts
+models/public-key-response.ts
 models/ref.ts
 models/reply-list.ts
 models/reply-request.ts
