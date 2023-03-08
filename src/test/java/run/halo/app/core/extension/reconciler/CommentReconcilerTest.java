@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -83,6 +84,29 @@ class CommentReconcilerTest {
         Comment value = captor.getValue();
         assertThat(value.getMetadata().getFinalizers()
             .contains(CommentReconciler.FINALIZER_NAME)).isFalse();
+    }
+
+    @Test
+    void compatibleCreationTime() {
+        Comment comment = new Comment();
+        comment.setMetadata(new Metadata());
+        comment.getMetadata().setName("fake-comment");
+        comment.setSpec(new Comment.CommentSpec());
+        comment.getSpec().setApprovedTime(Instant.now());
+        comment.getSpec().setCreationTime(null);
+        when(client.fetch(eq(Comment.class), eq("fake-comment")))
+            .thenReturn(Optional.of(comment));
+
+        commentReconciler.compatibleCreationTime("fake-comment");
+
+        verify(client, times(1)).fetch(eq(Comment.class), eq("fake-comment"));
+
+        ArgumentCaptor<Comment> captor = ArgumentCaptor.forClass(Comment.class);
+        verify(client, times(1)).update(captor.capture());
+        Comment updated = captor.getValue();
+        assertThat(updated.getSpec().getCreationTime()).isNotNull();
+        assertThat(updated.getSpec().getCreationTime())
+            .isEqualTo(updated.getSpec().getApprovedTime());
     }
 
     private static Ref getRef() {

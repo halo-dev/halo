@@ -8,12 +8,16 @@ import {
   IconUserSettings,
   IconPalette,
   IconWindowLine,
+  IconSearch,
   VCard,
   IconUserLine,
+  Dialog,
+  Toast,
 } from "@halo-dev/components";
 import { markRaw, ref, type Component } from "vue";
 import { useRouter } from "vue-router";
 import ThemePreviewModal from "@/modules/interface/themes/components/preview/ThemePreviewModal.vue";
+import { apiClient } from "@/utils/api-client";
 
 interface Action {
   icon: Component;
@@ -110,6 +114,21 @@ const actions: Action[] = [
       });
     },
     permissions: ["system:users:manage"],
+  },
+  {
+    icon: markRaw(IconSearch),
+    title: "刷新搜索引擎",
+    action: () => {
+      Dialog.warning({
+        title: "确定要刷新搜索引擎索引吗？",
+        description: "此操作会对所有已发布的文章重新创建搜索引擎索引。",
+        onConfirm: async () => {
+          await apiClient.indices.buildPostIndices();
+          Toast.success("刷新成功");
+        },
+      });
+    },
+    permissions: ["system:posts:manage"],
   },
 ];
 </script>
