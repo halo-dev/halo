@@ -94,16 +94,21 @@ public class CommentServiceImpl implements CommentService {
                 }
                 comment.getSpec()
                     .setApproved(Boolean.FALSE.equals(commentSetting.getRequireReviewForNew()));
+
                 if (BooleanUtils.isTrue(comment.getSpec().getApproved())
                     && comment.getSpec().getApprovedTime() == null) {
                     comment.getSpec().setApprovedTime(Instant.now());
                 }
-                comment.getSpec().setHidden(false);
-                if (comment.getSpec().getOwner() != null) {
-                    return Mono.just(comment);
-                }
+
                 if (comment.getSpec().getCreationTime() == null) {
                     comment.getSpec().setCreationTime(Instant.now());
+                }
+
+                comment.getSpec().setHidden(false);
+
+                // return if the comment owner is not null
+                if (comment.getSpec().getOwner() != null) {
+                    return Mono.just(comment);
                 }
                 // populate owner from current user
                 return fetchCurrentUser()

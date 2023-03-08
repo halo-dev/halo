@@ -32,15 +32,15 @@ importers:
       '@types/node': ^18.11.9
       '@types/qs': ^6.9.7
       '@types/randomstring': ^1.1.8
-      '@uppy/core': ^3.0.4
-      '@uppy/dashboard': ^3.2.0
+      '@uppy/core': ^3.1.1
+      '@uppy/dashboard': ^3.3.1
       '@uppy/drag-drop': ^3.0.1
       '@uppy/file-input': ^3.0.1
-      '@uppy/locales': ^3.0.4
+      '@uppy/locales': ^3.0.7
       '@uppy/progress-bar': ^3.0.1
       '@uppy/status-bar': ^3.0.1
       '@uppy/vue': ^1.0.1
-      '@uppy/xhr-upload': ^3.0.4
+      '@uppy/xhr-upload': ^3.1.0
       '@vitejs/plugin-vue': ^4.0.0
       '@vitejs/plugin-vue-jsx': ^3.0.0
       '@vitest/ui': ^0.25.3
@@ -68,6 +68,7 @@ importers:
       fuse.js: ^6.6.2
       husky: ^8.0.2
       jsdom: ^20.0.3
+      jsencrypt: ^3.3.2
       lint-staged: ^13.1.0
       lodash.clonedeep: ^4.5.0
       lodash.debounce: ^4.0.8
@@ -119,15 +120,15 @@ importers:
       '@halo-dev/richtext-editor': 0.0.0-alpha.19_oau5uimcdfyintci7kxkcutjea
       '@tanstack/vue-query': 4.24.10_vue@3.2.45
       '@tiptap/extension-character-count': 2.0.0-beta.202_f4ffqkgz5d3wev7su7t7l2rrua
-      '@uppy/core': 3.0.4
-      '@uppy/dashboard': 3.2.0_@uppy+core@3.0.4
-      '@uppy/drag-drop': 3.0.1_@uppy+core@3.0.4
-      '@uppy/file-input': 3.0.1_@uppy+core@3.0.4
-      '@uppy/locales': 3.0.4
-      '@uppy/progress-bar': 3.0.1_@uppy+core@3.0.4
-      '@uppy/status-bar': 3.0.1_@uppy+core@3.0.4
-      '@uppy/vue': 1.0.1_awk5c2uglsd654jjqxzzrstvoi
-      '@uppy/xhr-upload': 3.0.4_@uppy+core@3.0.4
+      '@uppy/core': 3.1.1
+      '@uppy/dashboard': 3.3.1_@uppy+core@3.1.1
+      '@uppy/drag-drop': 3.0.1_@uppy+core@3.1.1
+      '@uppy/file-input': 3.0.1_@uppy+core@3.1.1
+      '@uppy/locales': 3.0.7
+      '@uppy/progress-bar': 3.0.1_@uppy+core@3.1.1
+      '@uppy/status-bar': 3.0.1_@uppy+core@3.1.1
+      '@uppy/vue': 1.0.1_7kuifiuf4n7iuvilaqu6jhnnxu
+      '@uppy/xhr-upload': 3.1.0_@uppy+core@3.1.1
       '@vueuse/components': 9.6.0_vue@3.2.45
       '@vueuse/core': 9.6.0_vue@3.2.45
       '@vueuse/router': 9.6.0_xsxatmlnmmg5bcuv3xdnj6fj7y
@@ -139,6 +140,7 @@ importers:
       fastq: 1.15.0
       floating-vue: 2.0.0-beta.20_vue@3.2.45
       fuse.js: 6.6.2
+      jsencrypt: 3.3.2
       lodash.clonedeep: 4.5.0
       lodash.debounce: 4.0.8
       lodash.isequal: 4.5.0
@@ -3922,19 +3924,19 @@ packages:
       eslint-visitor-keys: 3.3.0
     dev: true
 
-  /@uppy/companion-client/3.0.2:
-    resolution: {integrity: sha512-Dv4RQQpuJ+4e6kRp6+KF5q2tjrFuShqXzrTFjk4EgwdX72Yz9QOgWwxhAH4/83vRdGrL/46mCcmvT52ODUJgBQ==}
+  /@uppy/companion-client/3.1.1:
+    resolution: {integrity: sha512-S1M37vjWu8gdOgdI3Hh/1fVZ9GaLdyPQjVyUujZDTsr79b4VG7v/zjdqJ0FiOTjfGbpnj8s9kr1uyYi0Zf5VFw==}
     dependencies:
-      '@uppy/utils': 5.0.2
+      '@uppy/utils': 5.1.3
       namespace-emitter: 2.0.1
     dev: false
 
-  /@uppy/core/3.0.4:
-    resolution: {integrity: sha512-vFofKmmVVsQE9bnOXozAPy94kLQMUdMH/l8m4ncXmxyyGRc2e9VfvY9wiy2EEsoj11O7YVzHOP70FYdRReUpVw==}
+  /@uppy/core/3.1.1:
+    resolution: {integrity: sha512-cVH2R+snO4zexw5P1jujY+am4gndI/deWRxrvJ8RKGz6P5g/c89buIEX+5I2aYRT9yPjqstLe7Oob61yspVMpQ==}
     dependencies:
       '@transloadit/prettier-bytes': 0.0.9
       '@uppy/store-default': 3.0.2
-      '@uppy/utils': 5.0.2
+      '@uppy/utils': 5.1.3
       lodash.throttle: 4.1.1
       mime-match: 1.0.2
       namespace-emitter: 2.0.1
@@ -3942,18 +3944,18 @@ packages:
       preact: 10.11.2
     dev: false
 
-  /@uppy/dashboard/3.2.0_@uppy+core@3.0.4:
-    resolution: {integrity: sha512-Lb7qx4AKrq66cQnmoNdGIbhwYEZKnmdufasFWctrY1g2qN7Mv+1hor+QLhN9F51qHU1VJmxgEgEWmfZREWiXXw==}
+  /@uppy/dashboard/3.3.1_@uppy+core@3.1.1:
+    resolution: {integrity: sha512-KzOElKUbZajwp+OVXM3/4bSAJq59o1yWNOlzDEvA4Uu/DMDQbd+jmorjyE8zuJwWyhEAWnuIoMrz+ng0FKvCnA==}
     peerDependencies:
-      '@uppy/core': ^3.0.4
+      '@uppy/core': ^3.1.1
     dependencies:
       '@transloadit/prettier-bytes': 0.0.7
-      '@uppy/core': 3.0.4
-      '@uppy/informer': 3.0.1_@uppy+core@3.0.4
-      '@uppy/provider-views': 3.0.2_@uppy+core@3.0.4
-      '@uppy/status-bar': 3.0.1_@uppy+core@3.0.4
-      '@uppy/thumbnail-generator': 3.0.2_@uppy+core@3.0.4
-      '@uppy/utils': 5.1.1
+      '@uppy/core': 3.1.1
+      '@uppy/informer': 3.0.1_@uppy+core@3.1.1
+      '@uppy/provider-views': 3.1.0_@uppy+core@3.1.1
+      '@uppy/status-bar': 3.0.1_@uppy+core@3.1.1
+      '@uppy/thumbnail-generator': 3.0.2_@uppy+core@3.1.1
+      '@uppy/utils': 5.1.3
       classnames: 2.3.2
       is-shallow-equal: 1.0.1
       lodash.debounce: 4.0.8
@@ -3962,68 +3964,68 @@ packages:
       preact: 10.11.2
     dev: false
 
-  /@uppy/drag-drop/3.0.1_@uppy+core@3.0.4:
+  /@uppy/drag-drop/3.0.1_@uppy+core@3.1.1:
     resolution: {integrity: sha512-1jMlF2V5AFfvSYtbIR1N2M8WbjhQPW14FcEElpeWjzwlF3OnbUARwk4jBlGfcAsDcV4dYf6hG192xPPdnuBc6A==}
     peerDependencies:
       '@uppy/core': ^3.0.2
     dependencies:
-      '@uppy/core': 3.0.4
+      '@uppy/core': 3.1.1
       '@uppy/utils': 5.0.2
       preact: 10.11.2
     dev: false
 
-  /@uppy/file-input/3.0.1_@uppy+core@3.0.4:
+  /@uppy/file-input/3.0.1_@uppy+core@3.1.1:
     resolution: {integrity: sha512-RTOm09Z1JjfSnvULY41u3VXm5nMkORmOCwo68oI4Kd1UL/h3V64bqqd34IN5vDDhJ2O58qDAKohPdReqhcNJAQ==}
     peerDependencies:
       '@uppy/core': ^3.0.2
     dependencies:
-      '@uppy/core': 3.0.4
+      '@uppy/core': 3.1.1
       '@uppy/utils': 5.0.2
       preact: 10.11.2
     dev: false
 
-  /@uppy/informer/3.0.1_@uppy+core@3.0.4:
+  /@uppy/informer/3.0.1_@uppy+core@3.1.1:
     resolution: {integrity: sha512-Mip+l2CYsTVYa0fSwD0okHRS5/UhAqCfQO2CRwwR5/vC6DpR1VAALDqx6RpssOaFiOACAx12VCcZiP5J8+2BJw==}
     peerDependencies:
       '@uppy/core': ^3.0.2
     dependencies:
-      '@uppy/core': 3.0.4
-      '@uppy/utils': 5.1.1
+      '@uppy/core': 3.1.1
+      '@uppy/utils': 5.1.3
       preact: 10.11.2
     dev: false
 
-  /@uppy/locales/3.0.4:
-    resolution: {integrity: sha512-KOey5lGxaCRufWE95n3muiJsx1BHx9braHixDukeH89SDETMMGANT+wwSSPOUjIOnNzJKBin0oqoGULQV5lPaA==}
+  /@uppy/locales/3.0.7:
+    resolution: {integrity: sha512-wDLVznIM3olp5qSNULKaWjemxyVpCSicWDnKVB5LZssjPRw+xAm5C10HYBhDlOygq4k3IJF/gBSO2hl5WZ1RfQ==}
     dev: false
 
-  /@uppy/progress-bar/3.0.1_@uppy+core@3.0.4:
+  /@uppy/progress-bar/3.0.1_@uppy+core@3.1.1:
     resolution: {integrity: sha512-cjBLOst0sPV1yF6YzkQIx/mHpytMXN7MRF7H/6Yc8ahDzm8XkbwMQCf2zksaanGfHUNCHlQFgCkfjfizK6VJIw==}
     peerDependencies:
       '@uppy/core': ^3.0.2
     dependencies:
-      '@uppy/core': 3.0.4
+      '@uppy/core': 3.1.1
       '@uppy/utils': 5.0.2
       preact: 10.11.2
     dev: false
 
-  /@uppy/provider-views/3.0.2_@uppy+core@3.0.4:
-    resolution: {integrity: sha512-z4v6UAiNSM2h8BB+/svBU1R/6QsssoLYKd4O8g6L7iAD1S2NPtU7U0busIyTvh3CA1Q6tfvfwF1JOFGTfNPQaA==}
+  /@uppy/provider-views/3.1.0_@uppy+core@3.1.1:
+    resolution: {integrity: sha512-98XoOP+MECgBR3Dj17D/5JH51DeGtyqcVvrsHZIzjPg7bgpI+tOHUzXEYLAMC0conDlzOVI8V1d5a9tr1V7MMA==}
     peerDependencies:
-      '@uppy/core': ^3.0.4
+      '@uppy/core': ^3.1.0
     dependencies:
-      '@uppy/core': 3.0.4
-      '@uppy/utils': 5.1.1
+      '@uppy/core': 3.1.1
+      '@uppy/utils': 5.1.3
       classnames: 2.3.2
       preact: 10.11.2
     dev: false
 
-  /@uppy/status-bar/3.0.1_@uppy+core@3.0.4:
+  /@uppy/status-bar/3.0.1_@uppy+core@3.1.1:
     resolution: {integrity: sha512-QQqIjiHBsNjZFR6xEc5SAT5UYbKnRcgNWwyLmJR0BYVINfx/aeIueXIm0jkBuJ4XFkebH7nDjKGW89JE9WKkgg==}
     peerDependencies:
       '@uppy/core': ^3.0.2
     dependencies:
       '@transloadit/prettier-bytes': 0.0.9
-      '@uppy/core': 3.0.4
+      '@uppy/core': 3.1.1
       '@uppy/utils': 5.0.2
       classnames: 2.3.2
       lodash.throttle: 4.1.1
@@ -4034,13 +4036,13 @@ packages:
     resolution: {integrity: sha512-kIQMCjXui6tjF1E9xGo4YHkvt71McXkU0FStrcQuBrRXuOhb+NcuWh3sMh3KryivVNgT6w5Odrlw2FUFkl9cqA==}
     dev: false
 
-  /@uppy/thumbnail-generator/3.0.2_@uppy+core@3.0.4:
+  /@uppy/thumbnail-generator/3.0.2_@uppy+core@3.1.1:
     resolution: {integrity: sha512-3qE1giGu1O9BkO8MCYYV78X9p95l5Ptv7JUDpqKlIMN/NGBHblMFCn5mjmt4soyQFUGgnZ7+bxq0DtjXPpWJYA==}
     peerDependencies:
       '@uppy/core': ^3.0.2
     dependencies:
-      '@uppy/core': 3.0.4
-      '@uppy/utils': 5.1.1
+      '@uppy/core': 3.1.1
+      '@uppy/utils': 5.1.3
       exifr: 7.1.3
     dev: false
 
@@ -4050,13 +4052,13 @@ packages:
       lodash.throttle: 4.1.1
     dev: false
 
-  /@uppy/utils/5.1.1:
-    resolution: {integrity: sha512-uoI+PcIVQboky0ZbN4PQeK1seZnnJocomzeK7blId9HKJ6QNgZLf2ibk2CQuQxrOuNsWhgrhs5uLO5Si0oM0Yw==}
+  /@uppy/utils/5.1.3:
+    resolution: {integrity: sha512-ws6eh5JClNe91AYVRMBy7RJzMlhdvQpVtLKJoyIAoJDEf0m4cvdqDJethB3KTq4WtBQkLpMD4I6mvR4eN3talA==}
     dependencies:
       lodash.throttle: 4.1.1
     dev: false
 
-  /@uppy/vue/1.0.1_awk5c2uglsd654jjqxzzrstvoi:
+  /@uppy/vue/1.0.1_7kuifiuf4n7iuvilaqu6jhnnxu:
     resolution: {integrity: sha512-2cAzNz/a3GSscPfBh6WBelK0X6tY0DL5xAcOlSSENzZ0kxuGUq4a6N55ThUWC3THoCwbT0zFbUrjS41UEJDy/g==}
     peerDependencies:
       '@uppy/core': ^3.0.2
@@ -4078,24 +4080,24 @@ packages:
       '@uppy/status-bar':
         optional: true
     dependencies:
-      '@uppy/core': 3.0.4
-      '@uppy/dashboard': 3.2.0_@uppy+core@3.0.4
-      '@uppy/drag-drop': 3.0.1_@uppy+core@3.0.4
-      '@uppy/file-input': 3.0.1_@uppy+core@3.0.4
-      '@uppy/progress-bar': 3.0.1_@uppy+core@3.0.4
-      '@uppy/status-bar': 3.0.1_@uppy+core@3.0.4
+      '@uppy/core': 3.1.1
+      '@uppy/dashboard': 3.3.1_@uppy+core@3.1.1
+      '@uppy/drag-drop': 3.0.1_@uppy+core@3.1.1
+      '@uppy/file-input': 3.0.1_@uppy+core@3.1.1
+      '@uppy/progress-bar': 3.0.1_@uppy+core@3.1.1
+      '@uppy/status-bar': 3.0.1_@uppy+core@3.1.1
       shallow-equal: 1.2.1
       vue: 3.2.45
     dev: false
 
-  /@uppy/xhr-upload/3.0.4_@uppy+core@3.0.4:
-    resolution: {integrity: sha512-uJ1oxcwEaSLnrexvi6Lp57hV3z3DsovgVmYIVwg+z/EnrRcL32wNRE7FcIr8Mk9e1jdMiFYlk6cQmiP2dZep8A==}
+  /@uppy/xhr-upload/3.1.0_@uppy+core@3.1.1:
+    resolution: {integrity: sha512-v0OsrB74w9RcFU8VMFElxMuGaSFHBuAlkbK30zHEY2YEKUsCfkWMdUbpaWNc1KWERH66Fv57IsA3AbK2HTjWdw==}
     peerDependencies:
-      '@uppy/core': ^3.0.4
+      '@uppy/core': ^3.0.6
     dependencies:
-      '@uppy/companion-client': 3.0.2
-      '@uppy/core': 3.0.4
-      '@uppy/utils': 5.0.2
+      '@uppy/companion-client': 3.1.1
+      '@uppy/core': 3.1.1
+      '@uppy/utils': 5.1.3
       nanoid: 4.0.0
     dev: false
 
@@ -4616,7 +4618,7 @@ packages:
   /axios/0.26.1:
     resolution: {integrity: sha512-fPwcX4EvnSHuInCMItEhAGnaSEXRBjtzh9fOtsE6E1G6p7vl7edEeZe11QHf18+6+9gR5PbKV/sGKNaD8YaMeA==}
     dependencies:
-      follow-redirects: 1.15.2
+      follow-redirects: 1.15.2_debug@4.3.2
     transitivePeerDependencies:
       - debug
     dev: true
@@ -4624,7 +4626,7 @@ packages:
   /axios/0.27.2:
     resolution: {integrity: sha512-t+yRIyySRTp/wua5xEr+z1q60QmLq8ABsS5O9Me1AsE5dfKqgnCFzwiCZZ/cGNd1lq4/7akDWMxdhVlucjmnOQ==}
     dependencies:
-      follow-redirects: 1.15.2
+      follow-redirects: 1.15.2_debug@4.3.2
       form-data: 4.0.0
     transitivePeerDependencies:
       - debug
@@ -5431,7 +5433,6 @@ packages:
         optional: true
     dependencies:
       ms: 2.1.2
-    dev: true
 
   /debug/4.3.4:
     resolution: {integrity: sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==}
@@ -6669,15 +6670,6 @@ packages:
       vue-resize: 2.0.0-alpha.1_vue@3.2.45
     dev: false
 
-  /follow-redirects/1.15.2:
-    resolution: {integrity: sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==}
-    engines: {node: '>=4.0'}
-    peerDependencies:
-      debug: '*'
-    peerDependenciesMeta:
-      debug:
-        optional: true
-
   /follow-redirects/1.15.2_debug@4.3.2:
     resolution: {integrity: sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==}
     engines: {node: '>=4.0'}
@@ -6688,7 +6680,6 @@ packages:
         optional: true
     dependencies:
       debug: 4.3.2
-    dev: true
 
   /foreground-child/2.0.0:
     resolution: {integrity: sha512-dCIq9FpEcyQyXKCkyzmlPTFNgrCzPudOe+mhvJU5zAtlBnGVy2yKxtfsxK2tQBThwq225jcvBjpw1Gr40uzZCA==}
@@ -7671,6 +7662,10 @@ packages:
       - utf-8-validate
     dev: true
 
+  /jsencrypt/3.3.2:
+    resolution: {integrity: sha512-arQR1R1ESGdAxY7ZheWr12wCaF2yF47v5qpB76TtV64H1pyGudk9Hvw8Y9tb/FiTIaaTRUyaSnm5T/Y53Ghm/A==}
+    dev: false
+
   /jsesc/0.5.0:
     resolution: {integrity: sha512-uZz5UnB7u4T9LvwmFqXii7pZSouaRPorGs5who1Ip7VO0wxanFvBL7GkM6dTHlgX+jhBApRetaWpnDabOeTcnA==}
     hasBin: true
@@ -8236,7 +8231,6 @@ packages:
 
   /ms/2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
-    dev: true
 
   /ms/2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}

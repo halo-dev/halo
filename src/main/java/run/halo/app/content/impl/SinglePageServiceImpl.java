@@ -128,25 +128,25 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
 
     private Mono<SinglePage> waitForPageToDraftConcludingWork(String pageName,
         ContentWrapper contentWrapper) {
-        return client.fetch(SinglePage.class, pageName)
-            .flatMap(page -> {
-                page.getSpec().setBaseSnapshot(contentWrapper.getSnapshotName());
-                page.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
-                if (Objects.equals(true, page.getSpec().getPublish())) {
-                    page.getSpec().setReleaseSnapshot(page.getSpec().getHeadSnapshot());
-                }
-                Condition condition = Condition.builder()
-                    .type(Post.PostPhase.DRAFT.name())
-                    .reason("DraftedSuccessfully")
-                    .message("Drafted page successfully")
-                    .status(ConditionStatus.TRUE)
-                    .lastTransitionTime(Instant.now())
-                    .build();
-                SinglePage.SinglePageStatus status = page.getStatusOrDefault();
-                status.getConditionsOrDefault().addAndEvictFIFO(condition);
-                status.setPhase(Post.PostPhase.DRAFT.name());
-                return client.update(page);
-            })
+        return Mono.defer(() -> client.fetch(SinglePage.class, pageName)
+                .flatMap(page -> {
+                    page.getSpec().setBaseSnapshot(contentWrapper.getSnapshotName());
+                    page.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
+                    if (Objects.equals(true, page.getSpec().getPublish())) {
+                        page.getSpec().setReleaseSnapshot(page.getSpec().getHeadSnapshot());
+                    }
+                    Condition condition = Condition.builder()
+                        .type(Post.PostPhase.DRAFT.name())
+                        .reason("DraftedSuccessfully")
+                        .message("Drafted page successfully")
+                        .status(ConditionStatus.TRUE)
+                        .lastTransitionTime(Instant.now())
+                        .build();
+                    SinglePage.SinglePageStatus status = page.getStatusOrDefault();
+                    status.getConditionsOrDefault().addAndEvictFIFO(condition);
+                    status.setPhase(Post.PostPhase.DRAFT.name());
+                    return client.update(page);
+                }))
             .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
                 .filter(OptimisticLockingFailureException.class::isInstance)
             );
@@ -167,11 +167,11 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
                     return client.update(page);
                 });
         }
-        return updateContent(baseSnapshot, pageRequest.contentRequest())
-            .flatMap(contentWrapper -> {
-                page.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
-                return client.update(page);
-            })
+        return Mono.defer(() -> updateContent(baseSnapshot, pageRequest.contentRequest())
+                .flatMap(contentWrapper -> {
+                    page.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
+                    return client.update(page);
+                }))
             .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
                 .filter(throwable -> throwable instanceof OptimisticLockingFailureException));
     }

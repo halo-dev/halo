@@ -17,5 +17,5 @@ rules:
     verbs: [ "*" ]
   - nonResourceURLs: [ "/apis/api.halo.run/v1alpha1/trackers/*" ]
     verbs: [ "create" ]
-  - nonResourceURLs: [ "/actuator/globalinfo", "/actuator/health", "/actuator/health/*"]
+  - nonResourceURLs: [ "/actuator/globalinfo", "/actuator/health", "/actuator/health/*", "/login/public-key"]
     verbs: [ "get" ]

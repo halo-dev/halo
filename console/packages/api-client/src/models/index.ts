@@ -86,6 +86,7 @@ export * from "./post-list";
 export * from "./post-request";
 export * from "./post-spec";
 export * from "./post-status";
+export * from "./public-key-response";
 export * from "./ref";
 export * from "./reply";
 export * from "./reply-list";

@@ -80,7 +80,7 @@ public class SwaggerConfig {
         return GroupedOpenApi.builder()
             .group("all-api")
             .displayName("All APIs")
-            .pathsToMatch("/api/**", "/apis/**")
+            .pathsToMatch("/api/**", "/apis/**", "/login/**")
             .build();
     }
 
