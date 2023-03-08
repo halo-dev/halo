@@ -1,12 +1,14 @@
 package run.halo.app.core.extension.reconciler;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.comment.ReplyService;
@@ -51,6 +53,7 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
                     return;
                 }
                 addFinalizerIfNecessary(comment);
+                compatibleCreationTime(request.name());
                 reconcileStatus(request.name());
                 updateSameSubjectRefCommentCounter(comment.getSpec().getSubjectRef());
             });
@@ -62,6 +65,28 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
         return builder
             .extension(new Comment())
             .build();
+    }
+
+    /**
+     * If the comment creation time is null, set it to the approved time or the current time.
+     * TODO remove this method in the future and fill in attributes in hook mode instead.
+     *
+     * @param name comment name
+     */
+    void compatibleCreationTime(String name) {
+        client.fetch(Comment.class, name).ifPresent(comment -> {
+            Instant creationTime = comment.getSpec().getCreationTime();
+            Instant oldCreationTime =
+                creationTime == null ? null : Instant.ofEpochMilli(creationTime.toEpochMilli());
+            if (creationTime == null) {
+                creationTime = defaultIfNull(comment.getSpec().getApprovedTime(), Instant.now());
+                comment.getSpec().setCreationTime(creationTime);
+            }
+
+            if (!Objects.equals(oldCreationTime, comment.getSpec().getCreationTime())) {
+                client.update(comment);
+            }
+        });
     }
 
     private boolean isDeleted(Comment comment) {
@@ -89,7 +114,7 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
         client.fetch(Comment.class, name).ifPresent(comment -> {
             Comment oldComment = JsonUtils.deepCopy(comment);
             Comment.CommentStatus status = comment.getStatusOrDefault();
-            status.setHasNewReply(ObjectUtils.defaultIfNull(status.getUnreadReplyCount(), 0) > 0);
+            status.setHasNewReply(defaultIfNull(status.getUnreadReplyCount(), 0) > 0);
             updateUnReplyCountIfNecessary(comment);
             if (!oldComment.equals(comment)) {
                 client.update(comment);
