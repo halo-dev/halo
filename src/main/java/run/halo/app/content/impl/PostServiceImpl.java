@@ -268,25 +268,25 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
 
     private Mono<Post> waitForPostToDraftConcludingWork(String postName,
         ContentWrapper contentWrapper) {
-        return client.fetch(Post.class, postName)
-            .flatMap(post -> {
-                post.getSpec().setBaseSnapshot(contentWrapper.getSnapshotName());
-                post.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
-                if (Objects.equals(true, post.getSpec().getPublish())) {
-                    post.getSpec().setReleaseSnapshot(post.getSpec().getHeadSnapshot());
-                }
-                Condition condition = Condition.builder()
-                    .type(Post.PostPhase.DRAFT.name())
-                    .reason("DraftedSuccessfully")
-                    .message("Drafted post successfully.")
-                    .status(ConditionStatus.TRUE)
-                    .lastTransitionTime(Instant.now())
-                    .build();
-                Post.PostStatus status = post.getStatusOrDefault();
-                status.setPhase(Post.PostPhase.DRAFT.name());
-                status.getConditionsOrDefault().addAndEvictFIFO(condition);
-                return client.update(post);
-            })
+        return Mono.defer(() -> client.fetch(Post.class, postName)
+                .flatMap(post -> {
+                    post.getSpec().setBaseSnapshot(contentWrapper.getSnapshotName());
+                    post.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
+                    if (Objects.equals(true, post.getSpec().getPublish())) {
+                        post.getSpec().setReleaseSnapshot(post.getSpec().getHeadSnapshot());
+                    }
+                    Condition condition = Condition.builder()
+                        .type(Post.PostPhase.DRAFT.name())
+                        .reason("DraftedSuccessfully")
+                        .message("Drafted post successfully.")
+                        .status(ConditionStatus.TRUE)
+                        .lastTransitionTime(Instant.now())
+                        .build();
+                    Post.PostStatus status = post.getStatusOrDefault();
+                    status.setPhase(Post.PostPhase.DRAFT.name());
+                    status.getConditionsOrDefault().addAndEvictFIFO(condition);
+                    return client.update(post);
+                }))
             .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
                 .filter(OptimisticLockingFailureException.class::isInstance));
     }
@@ -306,11 +306,11 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
                     return client.update(post);
                 });
         }
-        return updateContent(baseSnapshot, postRequest.contentRequest())
-            .flatMap(contentWrapper -> {
-                post.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
-                return client.update(post);
-            })
+        return Mono.defer(() -> updateContent(baseSnapshot, postRequest.contentRequest())
+                .flatMap(contentWrapper -> {
+                    post.getSpec().setHeadSnapshot(contentWrapper.getSnapshotName());
+                    return client.update(post);
+                }))
             .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
                 .filter(throwable -> throwable instanceof OptimisticLockingFailureException));
     }

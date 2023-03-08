@@ -7,6 +7,7 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.time.Duration;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.fn.builders.schema.Builder;
@@ -19,7 +20,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.thymeleaf.util.StringUtils;
+import org.springframework.web.server.ServerErrorException;
+import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.content.ContentWrapper;
@@ -229,39 +231,35 @@ public class PostEndpoint implements CustomEndpoint {
             )
             .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
                 .filter(t -> t instanceof OptimisticLockingFailureException))
-            .flatMap(post -> {
-                if (asyncPublish) {
-                    return Mono.just(post);
-                }
-                return client.fetch(Post.class, name)
-                    .map(latest -> {
-                        String latestReleasedSnapshotName =
-                            ExtensionUtil.nullSafeAnnotations(latest)
-                                .get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
-                        if (StringUtils.equals(latestReleasedSnapshotName,
-                            latest.getSpec().getReleaseSnapshot())) {
-                            return latest;
-                        }
-                        throw new RetryException("Post publishing status is not as expected");
-                    })
-                    .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(200))
-                        .filter(t -> t instanceof RetryException))
-                    .doOnError(IllegalStateException.class, err -> {
-                        log.error("Failed to publish post [{}]", name, err);
-                        throw new IllegalStateException("Publishing wait timeout.");
-                    });
-            })
+            .filter(post -> asyncPublish)
+            .switchIfEmpty(Mono.defer(() -> awaitPostPublished(name)))
+            .onErrorMap(Exceptions::isRetryExhausted, err -> new ServerErrorException(
+                "Post publishing failed, please try again later.", err))
             .flatMap(publishResult -> ServerResponse.ok().bodyValue(publishResult));
+    }
+
+    private Mono<Post> awaitPostPublished(String postName) {
+        return Mono.defer(() -> client.get(Post.class, postName)
+                .filter(post -> {
+                    var releasedSnapshot = ExtensionUtil.nullSafeAnnotations(post)
+                        .get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
+                    var expectReleaseSnapshot = post.getSpec().getReleaseSnapshot();
+                    return Objects.equals(releasedSnapshot, expectReleaseSnapshot);
+                })
+                .switchIfEmpty(Mono.error(
+                    () -> new RetryException("Retry to check post publish status"))))
+            .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(200))
+                .filter(t -> t instanceof RetryException));
     }
 
     private Mono<ServerResponse> unpublishPost(ServerRequest request) {
         var name = request.pathVariable("name");
-        return client.get(Post.class, name)
-            .doOnNext(post -> {
-                var spec = post.getSpec();
-                spec.setPublish(false);
-            })
-            .flatMap(client::update)
+        return Mono.defer(() -> client.get(Post.class, name)
+                .doOnNext(post -> {
+                    var spec = post.getSpec();
+                    spec.setPublish(false);
+                })
+                .flatMap(client::update))
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 .filter(t -> t instanceof OptimisticLockingFailureException))
             // TODO Fire unpublished event in reconciler in the future
@@ -272,12 +270,12 @@ public class PostEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> recyclePost(ServerRequest request) {
         var name = request.pathVariable("name");
-        return client.get(Post.class, name)
-            .doOnNext(post -> {
-                var spec = post.getSpec();
-                spec.setDeleted(true);
-            })
-            .flatMap(client::update)
+        return Mono.defer(() -> client.get(Post.class, name)
+                .doOnNext(post -> {
+                    var spec = post.getSpec();
+                    spec.setDeleted(true);
+                })
+                .flatMap(client::update))
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 .filter(t -> t instanceof OptimisticLockingFailureException))
             // TODO Fire recycled event in reconciler in the future
