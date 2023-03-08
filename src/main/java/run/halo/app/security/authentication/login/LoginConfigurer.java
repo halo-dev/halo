@@ -26,6 +26,7 @@ import org.springframework.security.web.server.authentication.ServerAuthenticati
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.security.web.server.ui.LogoutPageGeneratingWebFilter;
+import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -67,8 +68,8 @@ public class LoginConfigurer implements SecurityConfigurer {
 
     @Override
     public void configure(ServerHttpSecurity http) {
-        // See https://github.com/spring-projects/spring-security/issues/5361 for more.
         // We disable the form login because we will customize the login by ourselves.
+        // See https://github.com/spring-projects/spring-security/issues/5361 for more.
         http.formLogin()
             .disable();
 
@@ -103,21 +104,22 @@ public class LoginConfigurer implements SecurityConfigurer {
             Authentication authentication) {
             return ignoringMediaTypeAll(MediaType.APPLICATION_JSON)
                 .matches(webFilterExchange.getExchange())
+                .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
                 .flatMap(matchResult -> {
-                    if (matchResult.isMatch()) {
-                        var principal = authentication.getPrincipal();
-                        if (principal instanceof CredentialsContainer credentialsContainer) {
-                            credentialsContainer.eraseCredentials();
-                        }
-                        return ServerResponse.ok()
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(principal)
-                            .flatMap(serverResponse ->
-                                serverResponse.writeTo(webFilterExchange.getExchange(), context));
+                    var principal = authentication.getPrincipal();
+                    if (principal instanceof CredentialsContainer credentialsContainer) {
+                        credentialsContainer.eraseCredentials();
                     }
-                    return defaultHandler.onAuthenticationSuccess(webFilterExchange,
-                        authentication);
-                });
+
+                    return ServerResponse.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(principal)
+                        .flatMap(serverResponse ->
+                            serverResponse.writeTo(webFilterExchange.getExchange(), context));
+                })
+                .switchIfEmpty(
+                    defaultHandler.onAuthenticationSuccess(webFilterExchange, authentication)
+                );
         }
     }
 
@@ -131,18 +133,16 @@ public class LoginConfigurer implements SecurityConfigurer {
             AuthenticationException exception) {
             return ignoringMediaTypeAll(MediaType.APPLICATION_JSON).matches(
                     webFilterExchange.getExchange())
-                .flatMap(matchResult -> {
-                    if (matchResult.isMatch()) {
-                        return ServerResponse.status(HttpStatus.UNAUTHORIZED)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(Map.of(
-                                "error", exception.getLocalizedMessage()
-                            ))
-                            .flatMap(serverResponse -> serverResponse.writeTo(
-                                webFilterExchange.getExchange(), context));
-                    }
-                    return defaultHandler.onAuthenticationFailure(webFilterExchange, exception);
-                });
+                .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
+                .flatMap(matchResult -> ServerResponse.status(HttpStatus.UNAUTHORIZED)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(Map.of(
+                        "error", exception.getLocalizedMessage()
+                    ))
+                    .flatMap(serverResponse -> serverResponse.writeTo(
+                        webFilterExchange.getExchange(), context)))
+                .switchIfEmpty(
+                    defaultHandler.onAuthenticationFailure(webFilterExchange, exception));
         }
 
     }

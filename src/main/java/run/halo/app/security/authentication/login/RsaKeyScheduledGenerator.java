@@ -3,7 +3,6 @@ package run.halo.app.security.authentication.login;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
-import reactor.core.Disposable;
 
 /**
  * RsaKeyScheduledGenerator is responsible for periodically generating RSA key pair.
@@ -20,7 +19,7 @@ public class RsaKeyScheduledGenerator {
     }
 
     @Scheduled(fixedDelay = 1, timeUnit = TimeUnit.DAYS)
-    Disposable scheduleGeneration() {
-        return cryptoService.regenerateKeys().subscribe();
+    void scheduleGeneration() {
+        cryptoService.generateKeys().block();
     }
 }

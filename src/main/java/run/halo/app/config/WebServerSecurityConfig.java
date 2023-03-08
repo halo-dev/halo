@@ -130,7 +130,7 @@ public class WebServerSecurityConfig {
 
     @Bean
     CryptoService cryptoService(HaloProperties haloProperties) {
-        return new RsaKeyService(haloProperties);
+        return new RsaKeyService(haloProperties.getWorkDir().resolve("keys"));
     }
 
     @Bean

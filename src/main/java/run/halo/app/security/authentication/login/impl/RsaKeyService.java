@@ -24,12 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.util.StopWatch;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.security.authentication.login.CryptoService;
+import run.halo.app.security.authentication.login.InvalidEncryptedMessageException;
 
 @Slf4j
 public class RsaKeyService implements CryptoService {
@@ -40,13 +39,13 @@ public class RsaKeyService implements CryptoService {
 
     private final Path publicKeyPath;
 
-    public RsaKeyService(HaloProperties haloProperties) {
-        privateKeyPath = haloProperties.getWorkDir().resolve("keys/id_rsa");
-        publicKeyPath = haloProperties.getWorkDir().resolve("keys/id_rsa.pub");
+    public RsaKeyService(Path dir) {
+        privateKeyPath = dir.resolve("id_rsa");
+        publicKeyPath = dir.resolve("id_rsa.pub");
     }
 
     @Override
-    public Mono<Void> regenerateKeys() {
+    public Mono<Void> generateKeys() {
         try {
             log.info("Generating RSA keys...");
             var stopWatch = new StopWatch("GenerateRSAKeys");
@@ -96,7 +95,7 @@ public class RsaKeyService implements CryptoService {
                         e);
                 } catch (IllegalBlockSizeException | BadPaddingException e) {
                     // invalid encrypted message
-                    throw new BadCredentialsException("Invalid credential.", e);
+                    throw new InvalidEncryptedMessageException("Invalid encrypted message.", e);
                 }
             });
     }

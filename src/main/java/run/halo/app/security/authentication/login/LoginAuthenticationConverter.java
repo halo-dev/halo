@@ -24,7 +24,6 @@ public class LoginAuthenticationConverter extends ServerFormLoginAuthenticationC
             // validate the password
             .flatMap(token -> {
                 var credentials = (String) token.getCredentials();
-
                 byte[] credentialsBytes;
                 try {
                     credentialsBytes = Base64.getDecoder().decode(credentials);
@@ -33,6 +32,8 @@ public class LoginAuthenticationConverter extends ServerFormLoginAuthenticationC
                     return Mono.error(new BadCredentialsException("Invalid Base64 scheme."));
                 }
                 return cryptoService.decrypt(credentialsBytes)
+                    .onErrorMap(InvalidEncryptedMessageException.class,
+                        error -> new BadCredentialsException("Invalid credential.", error))
                     .map(decryptedCredentials -> new UsernamePasswordAuthenticationToken(
                         token.getPrincipal(),
                         new String(decryptedCredentials, UTF_8)));
