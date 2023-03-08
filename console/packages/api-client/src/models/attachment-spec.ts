@@ -23,41 +23,41 @@ export interface AttachmentSpec {
    * @type {string}
    * @memberof AttachmentSpec
    */
-  displayName?: string
+  displayName?: string;
   /**
    * Group name
    * @type {string}
    * @memberof AttachmentSpec
    */
-  groupName?: string
-  /**
-   * Policy name
-   * @type {string}
-   * @memberof AttachmentSpec
-   */
-  policyName?: string
-  /**
-   * Name of User who uploads the attachment
-   * @type {string}
-   * @memberof AttachmentSpec
-   */
-  ownerName?: string
+  groupName?: string;
   /**
    * Media type of attachment
    * @type {string}
    * @memberof AttachmentSpec
    */
-  mediaType?: string
+  mediaType?: string;
+  /**
+   * Name of User who uploads the attachment
+   * @type {string}
+   * @memberof AttachmentSpec
+   */
+  ownerName?: string;
+  /**
+   * Policy name
+   * @type {string}
+   * @memberof AttachmentSpec
+   */
+  policyName?: string;
   /**
    * Size of attachment. Unit is Byte
    * @type {number}
    * @memberof AttachmentSpec
    */
-  size?: number
+  size?: number;
   /**
    * Tags of attachment
    * @type {Array<string>}
    * @memberof AttachmentSpec
    */
-  tags?: Array<string>
+  tags?: Array<string>;
 }

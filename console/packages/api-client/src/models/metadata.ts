@@ -19,51 +19,51 @@
  */
 export interface Metadata {
   /**
-   * The name field will be generated automatically according to the given generateName field
+   *
+   * @type {{ [key: string]: string; }}
+   * @memberof Metadata
+   */
+  annotations?: { [key: string]: string } | null;
+  /**
+   *
    * @type {string}
    * @memberof Metadata
    */
-  generateName?: string
+  creationTimestamp?: string | null;
+  /**
+   *
+   * @type {string}
+   * @memberof Metadata
+   */
+  deletionTimestamp?: string | null;
   /**
    *
    * @type {Array<string>}
    * @memberof Metadata
    */
-  finalizers?: Array<string> | null
+  finalizers?: Array<string> | null;
+  /**
+   * The name field will be generated automatically according to the given generateName field
+   * @type {string}
+   * @memberof Metadata
+   */
+  generateName?: string;
+  /**
+   *
+   * @type {{ [key: string]: string; }}
+   * @memberof Metadata
+   */
+  labels?: { [key: string]: string } | null;
   /**
    * Metadata name
    * @type {string}
    * @memberof Metadata
    */
-  name: string
-  /**
-   *
-   * @type {{ [key: string]: string; }}
-   * @memberof Metadata
-   */
-  labels?: { [key: string]: string } | null
-  /**
-   *
-   * @type {{ [key: string]: string; }}
-   * @memberof Metadata
-   */
-  annotations?: { [key: string]: string } | null
+  name: string;
   /**
    *
    * @type {number}
    * @memberof Metadata
    */
-  version?: number | null
-  /**
-   *
-   * @type {string}
-   * @memberof Metadata
-   */
-  creationTimestamp?: string | null
-  /**
-   *
-   * @type {string}
-   * @memberof Metadata
-   */
-  deletionTimestamp?: string | null
+  version?: number | null;
 }

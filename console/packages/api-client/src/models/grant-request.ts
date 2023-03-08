@@ -23,5 +23,5 @@ export interface GrantRequest {
    * @type {Array<string>}
    * @memberof GrantRequest
    */
-  roles?: Array<string>
+  roles?: Array<string>;
 }

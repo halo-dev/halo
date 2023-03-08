@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Excerpt } from './excerpt'
+import { Excerpt } from "./excerpt";
 
 /**
  *
@@ -24,112 +24,113 @@ import { Excerpt } from './excerpt'
 export interface SinglePageSpec {
   /**
    *
-   * @type {string}
+   * @type {boolean}
    * @memberof SinglePageSpec
    */
-  title: string
+  allowComment: boolean;
   /**
    *
    * @type {string}
    * @memberof SinglePageSpec
    */
-  slug: string
+  baseSnapshot?: string;
   /**
    *
    * @type {string}
    * @memberof SinglePageSpec
    */
-  releaseSnapshot?: string
-  /**
-   *
-   * @type {string}
-   * @memberof SinglePageSpec
-   */
-  headSnapshot?: string
-  /**
-   *
-   * @type {string}
-   * @memberof SinglePageSpec
-   */
-  baseSnapshot?: string
-  /**
-   *
-   * @type {string}
-   * @memberof SinglePageSpec
-   */
-  owner?: string
-  /**
-   *
-   * @type {string}
-   * @memberof SinglePageSpec
-   */
-  template?: string
-  /**
-   *
-   * @type {string}
-   * @memberof SinglePageSpec
-   */
-  cover?: string
+  cover?: string;
   /**
    *
    * @type {boolean}
    * @memberof SinglePageSpec
    */
-  deleted: boolean
-  /**
-   *
-   * @type {boolean}
-   * @memberof SinglePageSpec
-   */
-  publish: boolean
-  /**
-   *
-   * @type {string}
-   * @memberof SinglePageSpec
-   */
-  publishTime?: string
-  /**
-   *
-   * @type {boolean}
-   * @memberof SinglePageSpec
-   */
-  pinned: boolean
-  /**
-   *
-   * @type {boolean}
-   * @memberof SinglePageSpec
-   */
-  allowComment: boolean
-  /**
-   *
-   * @type {string}
-   * @memberof SinglePageSpec
-   */
-  visible: SinglePageSpecVisibleEnum
-  /**
-   *
-   * @type {number}
-   * @memberof SinglePageSpec
-   */
-  priority: number
+  deleted: boolean;
   /**
    *
    * @type {Excerpt}
    * @memberof SinglePageSpec
    */
-  excerpt: Excerpt
+  excerpt: Excerpt;
+  /**
+   *
+   * @type {string}
+   * @memberof SinglePageSpec
+   */
+  headSnapshot?: string;
   /**
    *
    * @type {Array<{ [key: string]: string; }>}
    * @memberof SinglePageSpec
    */
-  htmlMetas?: Array<{ [key: string]: string }>
+  htmlMetas?: Array<{ [key: string]: string }>;
+  /**
+   *
+   * @type {string}
+   * @memberof SinglePageSpec
+   */
+  owner?: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SinglePageSpec
+   */
+  pinned: boolean;
+  /**
+   *
+   * @type {number}
+   * @memberof SinglePageSpec
+   */
+  priority: number;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SinglePageSpec
+   */
+  publish: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof SinglePageSpec
+   */
+  publishTime?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SinglePageSpec
+   */
+  releaseSnapshot?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SinglePageSpec
+   */
+  slug: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SinglePageSpec
+   */
+  template?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SinglePageSpec
+   */
+  title: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SinglePageSpec
+   */
+  visible: SinglePageSpecVisibleEnum;
 }
 
 export const SinglePageSpecVisibleEnum = {
-  Public: 'PUBLIC',
-  Internal: 'INTERNAL',
-  Private: 'PRIVATE',
-} as const
+  Public: "PUBLIC",
+  Internal: "INTERNAL",
+  Private: "PRIVATE",
+} as const;
 
-export type SinglePageSpecVisibleEnum = typeof SinglePageSpecVisibleEnum[keyof typeof SinglePageSpecVisibleEnum]
+export type SinglePageSpecVisibleEnum =
+  typeof SinglePageSpecVisibleEnum[keyof typeof SinglePageSpecVisibleEnum];

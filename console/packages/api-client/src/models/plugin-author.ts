@@ -23,11 +23,11 @@ export interface PluginAuthor {
    * @type {string}
    * @memberof PluginAuthor
    */
-  name: string
+  name: string;
   /**
    *
    * @type {string}
    * @memberof PluginAuthor
    */
-  website?: string
+  website?: string;
 }

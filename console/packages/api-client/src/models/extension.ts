@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 
 /**
  *
@@ -27,17 +27,17 @@ export interface Extension {
    * @type {string}
    * @memberof Extension
    */
-  kind: string
+  apiVersion: string;
   /**
    *
    * @type {string}
    * @memberof Extension
    */
-  apiVersion: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof Extension
    */
-  metadata: Metadata
+  metadata: Metadata;
 }

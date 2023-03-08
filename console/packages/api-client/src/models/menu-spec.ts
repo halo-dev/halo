@@ -23,11 +23,11 @@ export interface MenuSpec {
    * @type {string}
    * @memberof MenuSpec
    */
-  displayName: string
+  displayName: string;
   /**
    * Names of menu children below this menu.
    * @type {Array<string>}
    * @memberof MenuSpec
    */
-  menuItems?: Array<string>
+  menuItems?: Array<string>;
 }

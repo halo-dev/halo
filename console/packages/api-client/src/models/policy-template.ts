@@ -14,10 +14,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 // May contain unused imports in some cases
 // @ts-ignore
-import { PolicyTemplateSpec } from './policy-template-spec'
+import { PolicyTemplateSpec } from "./policy-template-spec";
 
 /**
  *
@@ -27,26 +27,26 @@ import { PolicyTemplateSpec } from './policy-template-spec'
 export interface PolicyTemplate {
   /**
    *
-   * @type {PolicyTemplateSpec}
+   * @type {string}
    * @memberof PolicyTemplate
    */
-  spec?: PolicyTemplateSpec
+  apiVersion: string;
   /**
    *
    * @type {string}
    * @memberof PolicyTemplate
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof PolicyTemplate
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof PolicyTemplate
    */
-  metadata: Metadata
+  metadata: Metadata;
+  /**
+   *
+   * @type {PolicyTemplateSpec}
+   * @memberof PolicyTemplate
+   */
+  spec?: PolicyTemplateSpec;
 }

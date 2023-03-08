@@ -12,9 +12,9 @@
  * Do not edit the class manually.
  */
 
-import type { Configuration } from '../configuration'
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios'
-import globalAxios from 'axios'
+import type { Configuration } from "../configuration";
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from "axios";
+import globalAxios from "axios";
 // Some imports not used depending on template conditions
 // @ts-ignore
 import {
@@ -28,124 +28,154 @@ import {
   serializeDataIfNeeded,
   toPathString,
   createRequestFunction,
-} from '../common'
+} from "../common";
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base'
+import {
+  BASE_PATH,
+  COLLECTION_FORMATS,
+  RequestArgs,
+  BaseAPI,
+  RequiredError,
+} from "../base";
 // @ts-ignore
-import { ListedReplyList } from '../models'
+import { ListedReplyList } from "../models";
 /**
  * ApiConsoleHaloRunV1alpha1ReplyApi - axios parameter creator
  * @export
  */
-export const ApiConsoleHaloRunV1alpha1ReplyApiAxiosParamCreator = function (configuration?: Configuration) {
+export const ApiConsoleHaloRunV1alpha1ReplyApiAxiosParamCreator = function (
+  configuration?: Configuration
+) {
   return {
     /**
      * List replies.
      * @param {string} [commentName] Replies filtered by commentName.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listReplies: async (
       commentName?: string,
       size?: number,
-      page?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
-      options: AxiosRequestConfig = {},
+      page?: number,
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/replies`
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/replies`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
       if (commentName !== undefined) {
-        localVarQueryParameter['commentName'] = commentName
+        localVarQueryParameter["commentName"] = commentName;
       }
 
       if (size !== undefined) {
-        localVarQueryParameter['size'] = size
-      }
-
-      if (page !== undefined) {
-        localVarQueryParameter['page'] = page
+        localVarQueryParameter["size"] = size;
       }
 
       if (labelSelector) {
-        localVarQueryParameter['labelSelector'] = labelSelector
+        localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
       if (fieldSelector) {
-        localVarQueryParameter['fieldSelector'] = fieldSelector
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      if (page !== undefined) {
+        localVarQueryParameter["page"] = page;
+      }
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
-  }
-}
+  };
+};
 
 /**
  * ApiConsoleHaloRunV1alpha1ReplyApi - functional programming interface
  * @export
  */
-export const ApiConsoleHaloRunV1alpha1ReplyApiFp = function (configuration?: Configuration) {
-  const localVarAxiosParamCreator = ApiConsoleHaloRunV1alpha1ReplyApiAxiosParamCreator(configuration)
+export const ApiConsoleHaloRunV1alpha1ReplyApiFp = function (
+  configuration?: Configuration
+) {
+  const localVarAxiosParamCreator =
+    ApiConsoleHaloRunV1alpha1ReplyApiAxiosParamCreator(configuration);
   return {
     /**
      * List replies.
      * @param {string} [commentName] Replies filtered by commentName.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listReplies(
       commentName?: string,
       size?: number,
-      page?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedReplyList>> {
+      page?: number,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string
+      ) => AxiosPromise<ListedReplyList>
+    > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.listReplies(
         commentName,
         size,
-        page,
         labelSelector,
         fieldSelector,
-        options,
-      )
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+        page,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
-  }
-}
+  };
+};
 
 /**
  * ApiConsoleHaloRunV1alpha1ReplyApi - factory interface
@@ -154,9 +184,9 @@ export const ApiConsoleHaloRunV1alpha1ReplyApiFp = function (configuration?: Con
 export const ApiConsoleHaloRunV1alpha1ReplyApiFactory = function (
   configuration?: Configuration,
   basePath?: string,
-  axios?: AxiosInstance,
+  axios?: AxiosInstance
 ) {
-  const localVarFp = ApiConsoleHaloRunV1alpha1ReplyApiFp(configuration)
+  const localVarFp = ApiConsoleHaloRunV1alpha1ReplyApiFp(configuration);
   return {
     /**
      * List replies.
@@ -166,21 +196,21 @@ export const ApiConsoleHaloRunV1alpha1ReplyApiFactory = function (
      */
     listReplies(
       requestParameters: ApiConsoleHaloRunV1alpha1ReplyApiListRepliesRequest = {},
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<ListedReplyList> {
       return localVarFp
         .listReplies(
           requestParameters.commentName,
           requestParameters.size,
-          requestParameters.page,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
-          options,
+          requestParameters.page,
+          options
         )
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
-  }
-}
+  };
+};
 
 /**
  * Request parameters for listReplies operation in ApiConsoleHaloRunV1alpha1ReplyApi.
@@ -193,35 +223,35 @@ export interface ApiConsoleHaloRunV1alpha1ReplyApiListRepliesRequest {
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1ReplyApiListReplies
    */
-  readonly commentName?: string
+  readonly commentName?: string;
 
   /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof ApiConsoleHaloRunV1alpha1ReplyApiListReplies
    */
-  readonly size?: number
-
-  /**
-   * The page number. Zero indicates no page.
-   * @type {number}
-   * @memberof ApiConsoleHaloRunV1alpha1ReplyApiListReplies
-   */
-  readonly page?: number
+  readonly size?: number;
 
   /**
    * Label selector for filtering.
    * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1ReplyApiListReplies
    */
-  readonly labelSelector?: Array<string>
+  readonly labelSelector?: Array<string>;
 
   /**
    * Field selector for filtering.
    * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1ReplyApiListReplies
    */
-  readonly fieldSelector?: Array<string>
+  readonly fieldSelector?: Array<string>;
+
+  /**
+   * The page number. Zero indicates no page.
+   * @type {number}
+   * @memberof ApiConsoleHaloRunV1alpha1ReplyApiListReplies
+   */
+  readonly page?: number;
 }
 
 /**
@@ -240,17 +270,17 @@ export class ApiConsoleHaloRunV1alpha1ReplyApi extends BaseAPI {
    */
   public listReplies(
     requestParameters: ApiConsoleHaloRunV1alpha1ReplyApiListRepliesRequest = {},
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1ReplyApiFp(this.configuration)
       .listReplies(
         requestParameters.commentName,
         requestParameters.size,
-        requestParameters.page,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
-        options,
+        requestParameters.page,
+        options
       )
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 }

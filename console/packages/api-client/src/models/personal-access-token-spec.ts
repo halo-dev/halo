@@ -23,35 +23,35 @@ export interface PersonalAccessTokenSpec {
    * @type {string}
    * @memberof PersonalAccessTokenSpec
    */
-  userName?: string
+  displayName?: string;
   /**
    *
    * @type {string}
    * @memberof PersonalAccessTokenSpec
    */
-  displayName?: string
+  expiresAt?: string;
   /**
    *
    * @type {boolean}
    * @memberof PersonalAccessTokenSpec
    */
-  revoked?: boolean
+  revoked?: boolean;
   /**
    *
    * @type {string}
    * @memberof PersonalAccessTokenSpec
    */
-  expiresAt?: string
+  scopes?: string;
   /**
    *
    * @type {string}
    * @memberof PersonalAccessTokenSpec
    */
-  scopes?: string
+  tokenDigest?: string;
   /**
    *
    * @type {string}
    * @memberof PersonalAccessTokenSpec
    */
-  tokenDigest?: string
+  userName?: string;
 }

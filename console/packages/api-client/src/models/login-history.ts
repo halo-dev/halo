@@ -23,29 +23,29 @@ export interface LoginHistory {
    * @type {string}
    * @memberof LoginHistory
    */
-  loginAt: string
+  loginAt: string;
   /**
    *
    * @type {string}
    * @memberof LoginHistory
    */
-  sourceIp: string
+  reason?: string;
   /**
    *
    * @type {string}
    * @memberof LoginHistory
    */
-  userAgent: string
+  sourceIp: string;
   /**
    *
    * @type {boolean}
    * @memberof LoginHistory
    */
-  successful: boolean
+  successful: boolean;
   /**
    *
    * @type {string}
    * @memberof LoginHistory
    */
-  reason?: string
+  userAgent: string;
 }

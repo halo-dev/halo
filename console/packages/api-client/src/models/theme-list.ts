@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Theme } from './theme'
+import { Theme } from "./theme";
 
 /**
  *
@@ -23,57 +23,57 @@ import { Theme } from './theme'
  */
 export interface ThemeList {
   /**
-   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page is the first page.
+   * @type {boolean}
    * @memberof ThemeList
    */
-  page: number
+  first: boolean;
   /**
-   * Size of each page. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof ThemeList
    */
-  size: number
+  hasNext: boolean;
   /**
-   * Total elements.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof ThemeList
    */
-  total: number
+  hasPrevious: boolean;
   /**
    * A chunk of items.
    * @type {Array<Theme>}
    * @memberof ThemeList
    */
-  items: Array<Theme>
-  /**
-   * Indicates whether current page is the first page.
-   * @type {boolean}
-   * @memberof ThemeList
-   */
-  first: boolean
+  items: Array<Theme>;
   /**
    * Indicates whether current page is the last page.
    * @type {boolean}
    * @memberof ThemeList
    */
-  last: boolean
+  last: boolean;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof ThemeList
    */
-  hasNext: boolean
+  page: number;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Size of each page. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof ThemeList
    */
-  hasPrevious: boolean
+  size: number;
+  /**
+   * Total elements.
+   * @type {number}
+   * @memberof ThemeList
+   */
+  total: number;
   /**
    * Indicates total pages.
    * @type {number}
    * @memberof ThemeList
    */
-  totalPages: number
+  totalPages: number;
 }

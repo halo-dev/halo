@@ -23,11 +23,11 @@ export interface FileReverseProxyProvider {
    * @type {string}
    * @memberof FileReverseProxyProvider
    */
-  directory?: string
+  directory?: string;
   /**
    *
    * @type {string}
    * @memberof FileReverseProxyProvider
    */
-  filename?: string
+  filename?: string;
 }

@@ -14,13 +14,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CategorySpec } from './category-spec'
+import { CategorySpec } from "./category-spec";
 // May contain unused imports in some cases
 // @ts-ignore
-import { CategoryStatus } from './category-status'
+import { CategoryStatus } from "./category-status";
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 
 /**
  *
@@ -30,32 +30,32 @@ import { Metadata } from './metadata'
 export interface Category {
   /**
    *
-   * @type {CategorySpec}
+   * @type {string}
    * @memberof Category
    */
-  spec: CategorySpec
-  /**
-   *
-   * @type {CategoryStatus}
-   * @memberof Category
-   */
-  status?: CategoryStatus
+  apiVersion: string;
   /**
    *
    * @type {string}
    * @memberof Category
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof Category
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof Category
    */
-  metadata: Metadata
+  metadata: Metadata;
+  /**
+   *
+   * @type {CategorySpec}
+   * @memberof Category
+   */
+  spec: CategorySpec;
+  /**
+   *
+   * @type {CategoryStatus}
+   * @memberof Category
+   */
+  status?: CategoryStatus;
 }
