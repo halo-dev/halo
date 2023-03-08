@@ -12,9 +12,9 @@
  * Do not edit the class manually.
  */
 
-import type { Configuration } from '../configuration'
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios'
-import globalAxios from 'axios'
+import type { Configuration } from "../configuration";
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from "axios";
+import globalAxios from "axios";
 // Some imports not used depending on template conditions
 // @ts-ignore
 import {
@@ -28,18 +28,26 @@ import {
   serializeDataIfNeeded,
   toPathString,
   createRequestFunction,
-} from '../common'
+} from "../common";
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base'
+import {
+  BASE_PATH,
+  COLLECTION_FORMATS,
+  RequestArgs,
+  BaseAPI,
+  RequiredError,
+} from "../base";
 // @ts-ignore
-import { Attachment } from '../models'
+import { Attachment } from "../models";
 // @ts-ignore
-import { AttachmentList } from '../models'
+import { AttachmentList } from "../models";
 /**
  * StorageHaloRunV1alpha1AttachmentApi - axios parameter creator
  * @export
  */
-export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (configuration?: Configuration) {
+export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (
+  configuration?: Configuration
+) {
   return {
     /**
      * Create storage.halo.run/v1alpha1/Attachment
@@ -49,39 +57,52 @@ export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (co
      */
     createstorageHaloRunV1alpha1Attachment: async (
       attachment?: Attachment,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
-      const localVarPath = `/apis/storage.halo.run/v1alpha1/attachments`
+      const localVarPath = `/apis/storage.halo.run/v1alpha1/attachments`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(attachment, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        attachment,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Delete storage.halo.run/v1alpha1/Attachment
@@ -91,41 +112,51 @@ export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (co
      */
     deletestorageHaloRunV1alpha1Attachment: async (
       name: string,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('deletestorageHaloRunV1alpha1Attachment', 'name', name)
-      const localVarPath = `/apis/storage.halo.run/v1alpha1/attachments/{name}`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("deletestorageHaloRunV1alpha1Attachment", "name", name);
+      const localVarPath =
+        `/apis/storage.halo.run/v1alpha1/attachments/{name}`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "DELETE",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Get storage.halo.run/v1alpha1/Attachment
@@ -135,41 +166,51 @@ export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (co
      */
     getstorageHaloRunV1alpha1Attachment: async (
       name: string,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('getstorageHaloRunV1alpha1Attachment', 'name', name)
-      const localVarPath = `/apis/storage.halo.run/v1alpha1/attachments/{name}`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("getstorageHaloRunV1alpha1Attachment", "name", name);
+      const localVarPath =
+        `/apis/storage.halo.run/v1alpha1/attachments/{name}`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * List storage.halo.run/v1alpha1/Attachment
@@ -185,52 +226,61 @@ export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (co
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
-      const localVarPath = `/apis/storage.halo.run/v1alpha1/attachments`
+      const localVarPath = `/apis/storage.halo.run/v1alpha1/attachments`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
       if (page !== undefined) {
-        localVarQueryParameter['page'] = page
+        localVarQueryParameter["page"] = page;
       }
 
       if (size !== undefined) {
-        localVarQueryParameter['size'] = size
+        localVarQueryParameter["size"] = size;
       }
 
       if (labelSelector) {
-        localVarQueryParameter['labelSelector'] = labelSelector
+        localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
       if (fieldSelector) {
-        localVarQueryParameter['fieldSelector'] = fieldSelector
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Update storage.halo.run/v1alpha1/Attachment
@@ -242,54 +292,71 @@ export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (co
     updatestorageHaloRunV1alpha1Attachment: async (
       name: string,
       attachment?: Attachment,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('updatestorageHaloRunV1alpha1Attachment', 'name', name)
-      const localVarPath = `/apis/storage.halo.run/v1alpha1/attachments/{name}`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("updatestorageHaloRunV1alpha1Attachment", "name", name);
+      const localVarPath =
+        `/apis/storage.halo.run/v1alpha1/attachments/{name}`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "PUT",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(attachment, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        attachment,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
-  }
-}
+  };
+};
 
 /**
  * StorageHaloRunV1alpha1AttachmentApi - functional programming interface
  * @export
  */
-export const StorageHaloRunV1alpha1AttachmentApiFp = function (configuration?: Configuration) {
-  const localVarAxiosParamCreator = StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator(configuration)
+export const StorageHaloRunV1alpha1AttachmentApiFp = function (
+  configuration?: Configuration
+) {
+  const localVarAxiosParamCreator =
+    StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator(configuration);
   return {
     /**
      * Create storage.halo.run/v1alpha1/Attachment
@@ -299,13 +366,21 @@ export const StorageHaloRunV1alpha1AttachmentApiFp = function (configuration?: C
      */
     async createstorageHaloRunV1alpha1Attachment(
       attachment?: Attachment,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.createstorageHaloRunV1alpha1Attachment(
-        attachment,
-        options,
-      )
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.createstorageHaloRunV1alpha1Attachment(
+          attachment,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Delete storage.halo.run/v1alpha1/Attachment
@@ -315,10 +390,21 @@ export const StorageHaloRunV1alpha1AttachmentApiFp = function (configuration?: C
      */
     async deletestorageHaloRunV1alpha1Attachment(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.deletestorageHaloRunV1alpha1Attachment(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.deletestorageHaloRunV1alpha1Attachment(
+          name,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Get storage.halo.run/v1alpha1/Attachment
@@ -328,10 +414,21 @@ export const StorageHaloRunV1alpha1AttachmentApiFp = function (configuration?: C
      */
     async getstorageHaloRunV1alpha1Attachment(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.getstorageHaloRunV1alpha1Attachment(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.getstorageHaloRunV1alpha1Attachment(
+          name,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * List storage.halo.run/v1alpha1/Attachment
@@ -347,16 +444,24 @@ export const StorageHaloRunV1alpha1AttachmentApiFp = function (configuration?: C
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AttachmentList>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.liststorageHaloRunV1alpha1Attachment(
-        page,
-        size,
-        labelSelector,
-        fieldSelector,
-        options,
-      )
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<AttachmentList>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.liststorageHaloRunV1alpha1Attachment(
+          page,
+          size,
+          labelSelector,
+          fieldSelector,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Update storage.halo.run/v1alpha1/Attachment
@@ -368,17 +473,25 @@ export const StorageHaloRunV1alpha1AttachmentApiFp = function (configuration?: C
     async updatestorageHaloRunV1alpha1Attachment(
       name: string,
       attachment?: Attachment,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.updatestorageHaloRunV1alpha1Attachment(
-        name,
-        attachment,
-        options,
-      )
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Attachment>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.updatestorageHaloRunV1alpha1Attachment(
+          name,
+          attachment,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
-  }
-}
+  };
+};
 
 /**
  * StorageHaloRunV1alpha1AttachmentApi - factory interface
@@ -387,9 +500,9 @@ export const StorageHaloRunV1alpha1AttachmentApiFp = function (configuration?: C
 export const StorageHaloRunV1alpha1AttachmentApiFactory = function (
   configuration?: Configuration,
   basePath?: string,
-  axios?: AxiosInstance,
+  axios?: AxiosInstance
 ) {
-  const localVarFp = StorageHaloRunV1alpha1AttachmentApiFp(configuration)
+  const localVarFp = StorageHaloRunV1alpha1AttachmentApiFp(configuration);
   return {
     /**
      * Create storage.halo.run/v1alpha1/Attachment
@@ -399,11 +512,14 @@ export const StorageHaloRunV1alpha1AttachmentApiFactory = function (
      */
     createstorageHaloRunV1alpha1Attachment(
       requestParameters: StorageHaloRunV1alpha1AttachmentApiCreatestorageHaloRunV1alpha1AttachmentRequest = {},
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<Attachment> {
       return localVarFp
-        .createstorageHaloRunV1alpha1Attachment(requestParameters.attachment, options)
-        .then((request) => request(axios, basePath))
+        .createstorageHaloRunV1alpha1Attachment(
+          requestParameters.attachment,
+          options
+        )
+        .then((request) => request(axios, basePath));
     },
     /**
      * Delete storage.halo.run/v1alpha1/Attachment
@@ -413,11 +529,11 @@ export const StorageHaloRunV1alpha1AttachmentApiFactory = function (
      */
     deletestorageHaloRunV1alpha1Attachment(
       requestParameters: StorageHaloRunV1alpha1AttachmentApiDeletestorageHaloRunV1alpha1AttachmentRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<void> {
       return localVarFp
         .deletestorageHaloRunV1alpha1Attachment(requestParameters.name, options)
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * Get storage.halo.run/v1alpha1/Attachment
@@ -427,11 +543,11 @@ export const StorageHaloRunV1alpha1AttachmentApiFactory = function (
      */
     getstorageHaloRunV1alpha1Attachment(
       requestParameters: StorageHaloRunV1alpha1AttachmentApiGetstorageHaloRunV1alpha1AttachmentRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<Attachment> {
       return localVarFp
         .getstorageHaloRunV1alpha1Attachment(requestParameters.name, options)
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * List storage.halo.run/v1alpha1/Attachment
@@ -441,7 +557,7 @@ export const StorageHaloRunV1alpha1AttachmentApiFactory = function (
      */
     liststorageHaloRunV1alpha1Attachment(
       requestParameters: StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1AttachmentRequest = {},
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<AttachmentList> {
       return localVarFp
         .liststorageHaloRunV1alpha1Attachment(
@@ -449,9 +565,9 @@ export const StorageHaloRunV1alpha1AttachmentApiFactory = function (
           requestParameters.size,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
-          options,
+          options
         )
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * Update storage.halo.run/v1alpha1/Attachment
@@ -461,14 +577,18 @@ export const StorageHaloRunV1alpha1AttachmentApiFactory = function (
      */
     updatestorageHaloRunV1alpha1Attachment(
       requestParameters: StorageHaloRunV1alpha1AttachmentApiUpdatestorageHaloRunV1alpha1AttachmentRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<Attachment> {
       return localVarFp
-        .updatestorageHaloRunV1alpha1Attachment(requestParameters.name, requestParameters.attachment, options)
-        .then((request) => request(axios, basePath))
+        .updatestorageHaloRunV1alpha1Attachment(
+          requestParameters.name,
+          requestParameters.attachment,
+          options
+        )
+        .then((request) => request(axios, basePath));
     },
-  }
-}
+  };
+};
 
 /**
  * Request parameters for createstorageHaloRunV1alpha1Attachment operation in StorageHaloRunV1alpha1AttachmentApi.
@@ -481,7 +601,7 @@ export interface StorageHaloRunV1alpha1AttachmentApiCreatestorageHaloRunV1alpha1
    * @type {Attachment}
    * @memberof StorageHaloRunV1alpha1AttachmentApiCreatestorageHaloRunV1alpha1Attachment
    */
-  readonly attachment?: Attachment
+  readonly attachment?: Attachment;
 }
 
 /**
@@ -495,7 +615,7 @@ export interface StorageHaloRunV1alpha1AttachmentApiDeletestorageHaloRunV1alpha1
    * @type {string}
    * @memberof StorageHaloRunV1alpha1AttachmentApiDeletestorageHaloRunV1alpha1Attachment
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -509,7 +629,7 @@ export interface StorageHaloRunV1alpha1AttachmentApiGetstorageHaloRunV1alpha1Att
    * @type {string}
    * @memberof StorageHaloRunV1alpha1AttachmentApiGetstorageHaloRunV1alpha1Attachment
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -523,28 +643,28 @@ export interface StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1At
    * @type {number}
    * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
    */
-  readonly page?: number
+  readonly page?: number;
 
   /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
    */
-  readonly size?: number
+  readonly size?: number;
 
   /**
    * Label selector for filtering.
    * @type {Array<string>}
    * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
    */
-  readonly labelSelector?: Array<string>
+  readonly labelSelector?: Array<string>;
 
   /**
    * Field selector for filtering.
    * @type {Array<string>}
    * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
    */
-  readonly fieldSelector?: Array<string>
+  readonly fieldSelector?: Array<string>;
 }
 
 /**
@@ -558,14 +678,14 @@ export interface StorageHaloRunV1alpha1AttachmentApiUpdatestorageHaloRunV1alpha1
    * @type {string}
    * @memberof StorageHaloRunV1alpha1AttachmentApiUpdatestorageHaloRunV1alpha1Attachment
    */
-  readonly name: string
+  readonly name: string;
 
   /**
    * Updated attachment
    * @type {Attachment}
    * @memberof StorageHaloRunV1alpha1AttachmentApiUpdatestorageHaloRunV1alpha1Attachment
    */
-  readonly attachment?: Attachment
+  readonly attachment?: Attachment;
 }
 
 /**
@@ -584,11 +704,14 @@ export class StorageHaloRunV1alpha1AttachmentApi extends BaseAPI {
    */
   public createstorageHaloRunV1alpha1Attachment(
     requestParameters: StorageHaloRunV1alpha1AttachmentApiCreatestorageHaloRunV1alpha1AttachmentRequest = {},
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration)
-      .createstorageHaloRunV1alpha1Attachment(requestParameters.attachment, options)
-      .then((request) => request(this.axios, this.basePath))
+      .createstorageHaloRunV1alpha1Attachment(
+        requestParameters.attachment,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -600,11 +723,11 @@ export class StorageHaloRunV1alpha1AttachmentApi extends BaseAPI {
    */
   public deletestorageHaloRunV1alpha1Attachment(
     requestParameters: StorageHaloRunV1alpha1AttachmentApiDeletestorageHaloRunV1alpha1AttachmentRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration)
       .deletestorageHaloRunV1alpha1Attachment(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -616,11 +739,11 @@ export class StorageHaloRunV1alpha1AttachmentApi extends BaseAPI {
    */
   public getstorageHaloRunV1alpha1Attachment(
     requestParameters: StorageHaloRunV1alpha1AttachmentApiGetstorageHaloRunV1alpha1AttachmentRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration)
       .getstorageHaloRunV1alpha1Attachment(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -632,7 +755,7 @@ export class StorageHaloRunV1alpha1AttachmentApi extends BaseAPI {
    */
   public liststorageHaloRunV1alpha1Attachment(
     requestParameters: StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1AttachmentRequest = {},
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration)
       .liststorageHaloRunV1alpha1Attachment(
@@ -640,9 +763,9 @@ export class StorageHaloRunV1alpha1AttachmentApi extends BaseAPI {
         requestParameters.size,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
-        options,
+        options
       )
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -654,10 +777,14 @@ export class StorageHaloRunV1alpha1AttachmentApi extends BaseAPI {
    */
   public updatestorageHaloRunV1alpha1Attachment(
     requestParameters: StorageHaloRunV1alpha1AttachmentApiUpdatestorageHaloRunV1alpha1AttachmentRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration)
-      .updatestorageHaloRunV1alpha1Attachment(requestParameters.name, requestParameters.attachment, options)
-      .then((request) => request(this.axios, this.basePath))
+      .updatestorageHaloRunV1alpha1Attachment(
+        requestParameters.name,
+        requestParameters.attachment,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
   }
 }

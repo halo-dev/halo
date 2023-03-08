@@ -12,9 +12,9 @@
  * Do not edit the class manually.
  */
 
-import type { Configuration } from '../configuration'
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios'
-import globalAxios from 'axios'
+import type { Configuration } from "../configuration";
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from "axios";
+import globalAxios from "axios";
 // Some imports not used depending on template conditions
 // @ts-ignore
 import {
@@ -28,402 +28,509 @@ import {
   serializeDataIfNeeded,
   toPathString,
   createRequestFunction,
-} from '../common'
+} from "../common";
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base'
+import {
+  BASE_PATH,
+  COLLECTION_FORMATS,
+  RequestArgs,
+  BaseAPI,
+  RequiredError,
+} from "../base";
 // @ts-ignore
-import { Content } from '../models'
+import { Content } from "../models";
 // @ts-ignore
-import { ContentWrapper } from '../models'
+import { ContentWrapper } from "../models";
 // @ts-ignore
-import { ListedSinglePageList } from '../models'
+import { ListedSinglePageList } from "../models";
 // @ts-ignore
-import { Post } from '../models'
+import { Post } from "../models";
 // @ts-ignore
-import { SinglePage } from '../models'
+import { SinglePage } from "../models";
 // @ts-ignore
-import { SinglePageRequest } from '../models'
+import { SinglePageRequest } from "../models";
 /**
  * ApiConsoleHaloRunV1alpha1SinglePageApi - axios parameter creator
  * @export
  */
-export const ApiConsoleHaloRunV1alpha1SinglePageApiAxiosParamCreator = function (configuration?: Configuration) {
-  return {
-    /**
-     * Draft a single page.
-     * @param {SinglePageRequest} singlePageRequest
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    draftSinglePage: async (
-      singlePageRequest: SinglePageRequest,
-      options: AxiosRequestConfig = {},
-    ): Promise<RequestArgs> => {
-      // verify required parameter 'singlePageRequest' is not null or undefined
-      assertParamExists('draftSinglePage', 'singlePageRequest', singlePageRequest)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/singlepages`
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
-      if (configuration) {
-        baseOptions = configuration.baseOptions
-      }
+export const ApiConsoleHaloRunV1alpha1SinglePageApiAxiosParamCreator =
+  function (configuration?: Configuration) {
+    return {
+      /**
+       * Draft a single page.
+       * @param {SinglePageRequest} singlePageRequest
+       * @param {*} [options] Override http request option.
+       * @throws {RequiredError}
+       */
+      draftSinglePage: async (
+        singlePageRequest: SinglePageRequest,
+        options: AxiosRequestConfig = {}
+      ): Promise<RequestArgs> => {
+        // verify required parameter 'singlePageRequest' is not null or undefined
+        assertParamExists(
+          "draftSinglePage",
+          "singlePageRequest",
+          singlePageRequest
+        );
+        const localVarPath = `/apis/api.console.halo.run/v1alpha1/singlepages`;
+        // use dummy base URL string because the URL constructor only accepts absolute URLs.
+        const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+        let baseOptions;
+        if (configuration) {
+          baseOptions = configuration.baseOptions;
+        }
 
-      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+        const localVarRequestOptions = {
+          method: "POST",
+          ...baseOptions,
+          ...options,
+        };
+        const localVarHeaderParameter = {} as any;
+        const localVarQueryParameter = {} as any;
 
-      // authentication BasicAuth required
-      // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+        // authentication BasicAuth required
+        // http basic authentication required
+        setBasicAuthToObject(localVarRequestOptions, configuration);
 
-      // authentication BearerAuth required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+        // authentication BearerAuth required
+        // http bearer authentication required
+        await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+        localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(singlePageRequest, localVarRequestOptions, configuration)
+        setSearchParams(localVarUrlObj, localVarQueryParameter);
+        let headersFromBaseOptions =
+          baseOptions && baseOptions.headers ? baseOptions.headers : {};
+        localVarRequestOptions.headers = {
+          ...localVarHeaderParameter,
+          ...headersFromBaseOptions,
+          ...options.headers,
+        };
+        localVarRequestOptions.data = serializeDataIfNeeded(
+          singlePageRequest,
+          localVarRequestOptions,
+          configuration
+        );
 
-      return {
-        url: toPathString(localVarUrlObj),
-        options: localVarRequestOptions,
-      }
-    },
-    /**
-     * Fetch head content of single page.
-     * @param {string} name
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    fetchSinglePageHeadContent: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-      // verify required parameter 'name' is not null or undefined
-      assertParamExists('fetchSinglePageHeadContent', 'name', name)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/singlepages/{name}/head-content`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
-      if (configuration) {
-        baseOptions = configuration.baseOptions
-      }
+        return {
+          url: toPathString(localVarUrlObj),
+          options: localVarRequestOptions,
+        };
+      },
+      /**
+       * Fetch head content of single page.
+       * @param {string} name
+       * @param {*} [options] Override http request option.
+       * @throws {RequiredError}
+       */
+      fetchSinglePageHeadContent: async (
+        name: string,
+        options: AxiosRequestConfig = {}
+      ): Promise<RequestArgs> => {
+        // verify required parameter 'name' is not null or undefined
+        assertParamExists("fetchSinglePageHeadContent", "name", name);
+        const localVarPath =
+          `/apis/api.console.halo.run/v1alpha1/singlepages/{name}/head-content`.replace(
+            `{${"name"}}`,
+            encodeURIComponent(String(name))
+          );
+        // use dummy base URL string because the URL constructor only accepts absolute URLs.
+        const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+        let baseOptions;
+        if (configuration) {
+          baseOptions = configuration.baseOptions;
+        }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+        const localVarRequestOptions = {
+          method: "GET",
+          ...baseOptions,
+          ...options,
+        };
+        const localVarHeaderParameter = {} as any;
+        const localVarQueryParameter = {} as any;
 
-      // authentication BasicAuth required
-      // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+        // authentication BasicAuth required
+        // http basic authentication required
+        setBasicAuthToObject(localVarRequestOptions, configuration);
 
-      // authentication BearerAuth required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+        // authentication BearerAuth required
+        // http bearer authentication required
+        await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+        setSearchParams(localVarUrlObj, localVarQueryParameter);
+        let headersFromBaseOptions =
+          baseOptions && baseOptions.headers ? baseOptions.headers : {};
+        localVarRequestOptions.headers = {
+          ...localVarHeaderParameter,
+          ...headersFromBaseOptions,
+          ...options.headers,
+        };
 
-      return {
-        url: toPathString(localVarUrlObj),
-        options: localVarRequestOptions,
-      }
-    },
-    /**
-     * Fetch release content of single page.
-     * @param {string} name
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    fetchSinglePageReleaseContent: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-      // verify required parameter 'name' is not null or undefined
-      assertParamExists('fetchSinglePageReleaseContent', 'name', name)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/singlepages/{name}/release-content`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
-      if (configuration) {
-        baseOptions = configuration.baseOptions
-      }
+        return {
+          url: toPathString(localVarUrlObj),
+          options: localVarRequestOptions,
+        };
+      },
+      /**
+       * Fetch release content of single page.
+       * @param {string} name
+       * @param {*} [options] Override http request option.
+       * @throws {RequiredError}
+       */
+      fetchSinglePageReleaseContent: async (
+        name: string,
+        options: AxiosRequestConfig = {}
+      ): Promise<RequestArgs> => {
+        // verify required parameter 'name' is not null or undefined
+        assertParamExists("fetchSinglePageReleaseContent", "name", name);
+        const localVarPath =
+          `/apis/api.console.halo.run/v1alpha1/singlepages/{name}/release-content`.replace(
+            `{${"name"}}`,
+            encodeURIComponent(String(name))
+          );
+        // use dummy base URL string because the URL constructor only accepts absolute URLs.
+        const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+        let baseOptions;
+        if (configuration) {
+          baseOptions = configuration.baseOptions;
+        }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+        const localVarRequestOptions = {
+          method: "GET",
+          ...baseOptions,
+          ...options,
+        };
+        const localVarHeaderParameter = {} as any;
+        const localVarQueryParameter = {} as any;
 
-      // authentication BasicAuth required
-      // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+        // authentication BasicAuth required
+        // http basic authentication required
+        setBasicAuthToObject(localVarRequestOptions, configuration);
 
-      // authentication BearerAuth required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+        // authentication BearerAuth required
+        // http bearer authentication required
+        await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+        setSearchParams(localVarUrlObj, localVarQueryParameter);
+        let headersFromBaseOptions =
+          baseOptions && baseOptions.headers ? baseOptions.headers : {};
+        localVarRequestOptions.headers = {
+          ...localVarHeaderParameter,
+          ...headersFromBaseOptions,
+          ...options.headers,
+        };
 
-      return {
-        url: toPathString(localVarUrlObj),
-        options: localVarRequestOptions,
-      }
-    },
-    /**
-     * List single pages.
-     * @param {'PUBLISH_TIME' | 'CREATE_TIME'} [sort] SinglePage collation.
-     * @param {string} [keyword] SinglePages filtered by keyword.
-     * @param {'PUBLIC' | 'INTERNAL' | 'PRIVATE'} [visible]
-     * @param {boolean} [sortOrder] ascending order If it is true; otherwise, it is in descending order.
-     * @param {'DRAFT' | 'PENDING_APPROVAL' | 'PUBLISHED' | 'FAILED'} [publishPhase]
-     * @param {Array<string>} [contributor]
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {number} [page] The page number. Zero indicates no page.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    listSinglePages: async (
-      sort?: 'PUBLISH_TIME' | 'CREATE_TIME',
-      keyword?: string,
-      visible?: 'PUBLIC' | 'INTERNAL' | 'PRIVATE',
-      sortOrder?: boolean,
-      publishPhase?: 'DRAFT' | 'PENDING_APPROVAL' | 'PUBLISHED' | 'FAILED',
-      contributor?: Array<string>,
-      size?: number,
-      page?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
-      options: AxiosRequestConfig = {},
-    ): Promise<RequestArgs> => {
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/singlepages`
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
-      if (configuration) {
-        baseOptions = configuration.baseOptions
-      }
+        return {
+          url: toPathString(localVarUrlObj),
+          options: localVarRequestOptions,
+        };
+      },
+      /**
+       * List single pages.
+       * @param {'PUBLISH_TIME' | 'CREATE_TIME'} [sort] SinglePage collation.
+       * @param {boolean} [sortOrder] ascending order If it is true; otherwise, it is in descending order.
+       * @param {'DRAFT' | 'PENDING_APPROVAL' | 'PUBLISHED' | 'FAILED'} [publishPhase]
+       * @param {Array<string>} [contributor]
+       * @param {string} [keyword] SinglePages filtered by keyword.
+       * @param {'PUBLIC' | 'INTERNAL' | 'PRIVATE'} [visible]
+       * @param {number} [size] Size of one page. Zero indicates no limit.
+       * @param {Array<string>} [labelSelector] Label selector for filtering.
+       * @param {Array<string>} [fieldSelector] Field selector for filtering.
+       * @param {number} [page] The page number. Zero indicates no page.
+       * @param {*} [options] Override http request option.
+       * @throws {RequiredError}
+       */
+      listSinglePages: async (
+        sort?: "PUBLISH_TIME" | "CREATE_TIME",
+        sortOrder?: boolean,
+        publishPhase?: "DRAFT" | "PENDING_APPROVAL" | "PUBLISHED" | "FAILED",
+        contributor?: Array<string>,
+        keyword?: string,
+        visible?: "PUBLIC" | "INTERNAL" | "PRIVATE",
+        size?: number,
+        labelSelector?: Array<string>,
+        fieldSelector?: Array<string>,
+        page?: number,
+        options: AxiosRequestConfig = {}
+      ): Promise<RequestArgs> => {
+        const localVarPath = `/apis/api.console.halo.run/v1alpha1/singlepages`;
+        // use dummy base URL string because the URL constructor only accepts absolute URLs.
+        const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+        let baseOptions;
+        if (configuration) {
+          baseOptions = configuration.baseOptions;
+        }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+        const localVarRequestOptions = {
+          method: "GET",
+          ...baseOptions,
+          ...options,
+        };
+        const localVarHeaderParameter = {} as any;
+        const localVarQueryParameter = {} as any;
 
-      // authentication BasicAuth required
-      // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+        // authentication BasicAuth required
+        // http basic authentication required
+        setBasicAuthToObject(localVarRequestOptions, configuration);
 
-      // authentication BearerAuth required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+        // authentication BearerAuth required
+        // http bearer authentication required
+        await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (sort !== undefined) {
-        localVarQueryParameter['sort'] = sort
-      }
+        if (sort !== undefined) {
+          localVarQueryParameter["sort"] = sort;
+        }
 
-      if (keyword !== undefined) {
-        localVarQueryParameter['keyword'] = keyword
-      }
+        if (sortOrder !== undefined) {
+          localVarQueryParameter["sortOrder"] = sortOrder;
+        }
 
-      if (visible !== undefined) {
-        localVarQueryParameter['visible'] = visible
-      }
+        if (publishPhase !== undefined) {
+          localVarQueryParameter["publishPhase"] = publishPhase;
+        }
 
-      if (sortOrder !== undefined) {
-        localVarQueryParameter['sortOrder'] = sortOrder
-      }
+        if (contributor) {
+          localVarQueryParameter["contributor"] = Array.from(contributor);
+        }
 
-      if (publishPhase !== undefined) {
-        localVarQueryParameter['publishPhase'] = publishPhase
-      }
+        if (keyword !== undefined) {
+          localVarQueryParameter["keyword"] = keyword;
+        }
 
-      if (contributor) {
-        localVarQueryParameter['contributor'] = Array.from(contributor)
-      }
+        if (visible !== undefined) {
+          localVarQueryParameter["visible"] = visible;
+        }
 
-      if (size !== undefined) {
-        localVarQueryParameter['size'] = size
-      }
+        if (size !== undefined) {
+          localVarQueryParameter["size"] = size;
+        }
 
-      if (page !== undefined) {
-        localVarQueryParameter['page'] = page
-      }
+        if (labelSelector) {
+          localVarQueryParameter["labelSelector"] = labelSelector;
+        }
 
-      if (labelSelector) {
-        localVarQueryParameter['labelSelector'] = labelSelector
-      }
+        if (fieldSelector) {
+          localVarQueryParameter["fieldSelector"] = fieldSelector;
+        }
 
-      if (fieldSelector) {
-        localVarQueryParameter['fieldSelector'] = fieldSelector
-      }
+        if (page !== undefined) {
+          localVarQueryParameter["page"] = page;
+        }
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+        setSearchParams(localVarUrlObj, localVarQueryParameter);
+        let headersFromBaseOptions =
+          baseOptions && baseOptions.headers ? baseOptions.headers : {};
+        localVarRequestOptions.headers = {
+          ...localVarHeaderParameter,
+          ...headersFromBaseOptions,
+          ...options.headers,
+        };
 
-      return {
-        url: toPathString(localVarUrlObj),
-        options: localVarRequestOptions,
-      }
-    },
-    /**
-     * Publish a single page.
-     * @param {string} name
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    publishSinglePage: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-      // verify required parameter 'name' is not null or undefined
-      assertParamExists('publishSinglePage', 'name', name)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/singlepages/{name}/publish`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
-      if (configuration) {
-        baseOptions = configuration.baseOptions
-      }
+        return {
+          url: toPathString(localVarUrlObj),
+          options: localVarRequestOptions,
+        };
+      },
+      /**
+       * Publish a single page.
+       * @param {string} name
+       * @param {*} [options] Override http request option.
+       * @throws {RequiredError}
+       */
+      publishSinglePage: async (
+        name: string,
+        options: AxiosRequestConfig = {}
+      ): Promise<RequestArgs> => {
+        // verify required parameter 'name' is not null or undefined
+        assertParamExists("publishSinglePage", "name", name);
+        const localVarPath =
+          `/apis/api.console.halo.run/v1alpha1/singlepages/{name}/publish`.replace(
+            `{${"name"}}`,
+            encodeURIComponent(String(name))
+          );
+        // use dummy base URL string because the URL constructor only accepts absolute URLs.
+        const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+        let baseOptions;
+        if (configuration) {
+          baseOptions = configuration.baseOptions;
+        }
 
-      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+        const localVarRequestOptions = {
+          method: "PUT",
+          ...baseOptions,
+          ...options,
+        };
+        const localVarHeaderParameter = {} as any;
+        const localVarQueryParameter = {} as any;
 
-      // authentication BasicAuth required
-      // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+        // authentication BasicAuth required
+        // http basic authentication required
+        setBasicAuthToObject(localVarRequestOptions, configuration);
 
-      // authentication BearerAuth required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+        // authentication BearerAuth required
+        // http bearer authentication required
+        await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+        setSearchParams(localVarUrlObj, localVarQueryParameter);
+        let headersFromBaseOptions =
+          baseOptions && baseOptions.headers ? baseOptions.headers : {};
+        localVarRequestOptions.headers = {
+          ...localVarHeaderParameter,
+          ...headersFromBaseOptions,
+          ...options.headers,
+        };
 
-      return {
-        url: toPathString(localVarUrlObj),
-        options: localVarRequestOptions,
-      }
-    },
-    /**
-     * Update a single page.
-     * @param {string} name
-     * @param {SinglePageRequest} singlePageRequest
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    updateDraftSinglePage: async (
-      name: string,
-      singlePageRequest: SinglePageRequest,
-      options: AxiosRequestConfig = {},
-    ): Promise<RequestArgs> => {
-      // verify required parameter 'name' is not null or undefined
-      assertParamExists('updateDraftSinglePage', 'name', name)
-      // verify required parameter 'singlePageRequest' is not null or undefined
-      assertParamExists('updateDraftSinglePage', 'singlePageRequest', singlePageRequest)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/singlepages/{name}`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
-      if (configuration) {
-        baseOptions = configuration.baseOptions
-      }
+        return {
+          url: toPathString(localVarUrlObj),
+          options: localVarRequestOptions,
+        };
+      },
+      /**
+       * Update a single page.
+       * @param {string} name
+       * @param {SinglePageRequest} singlePageRequest
+       * @param {*} [options] Override http request option.
+       * @throws {RequiredError}
+       */
+      updateDraftSinglePage: async (
+        name: string,
+        singlePageRequest: SinglePageRequest,
+        options: AxiosRequestConfig = {}
+      ): Promise<RequestArgs> => {
+        // verify required parameter 'name' is not null or undefined
+        assertParamExists("updateDraftSinglePage", "name", name);
+        // verify required parameter 'singlePageRequest' is not null or undefined
+        assertParamExists(
+          "updateDraftSinglePage",
+          "singlePageRequest",
+          singlePageRequest
+        );
+        const localVarPath =
+          `/apis/api.console.halo.run/v1alpha1/singlepages/{name}`.replace(
+            `{${"name"}}`,
+            encodeURIComponent(String(name))
+          );
+        // use dummy base URL string because the URL constructor only accepts absolute URLs.
+        const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+        let baseOptions;
+        if (configuration) {
+          baseOptions = configuration.baseOptions;
+        }
 
-      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+        const localVarRequestOptions = {
+          method: "PUT",
+          ...baseOptions,
+          ...options,
+        };
+        const localVarHeaderParameter = {} as any;
+        const localVarQueryParameter = {} as any;
 
-      // authentication BasicAuth required
-      // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+        // authentication BasicAuth required
+        // http basic authentication required
+        setBasicAuthToObject(localVarRequestOptions, configuration);
 
-      // authentication BearerAuth required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+        // authentication BearerAuth required
+        // http bearer authentication required
+        await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+        localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(singlePageRequest, localVarRequestOptions, configuration)
+        setSearchParams(localVarUrlObj, localVarQueryParameter);
+        let headersFromBaseOptions =
+          baseOptions && baseOptions.headers ? baseOptions.headers : {};
+        localVarRequestOptions.headers = {
+          ...localVarHeaderParameter,
+          ...headersFromBaseOptions,
+          ...options.headers,
+        };
+        localVarRequestOptions.data = serializeDataIfNeeded(
+          singlePageRequest,
+          localVarRequestOptions,
+          configuration
+        );
 
-      return {
-        url: toPathString(localVarUrlObj),
-        options: localVarRequestOptions,
-      }
-    },
-    /**
-     * Update a single page\'s content.
-     * @param {string} name
-     * @param {Content} content
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    updateSinglePageContent: async (
-      name: string,
-      content: Content,
-      options: AxiosRequestConfig = {},
-    ): Promise<RequestArgs> => {
-      // verify required parameter 'name' is not null or undefined
-      assertParamExists('updateSinglePageContent', 'name', name)
-      // verify required parameter 'content' is not null or undefined
-      assertParamExists('updateSinglePageContent', 'content', content)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/singlepages/{name}/content`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
-      if (configuration) {
-        baseOptions = configuration.baseOptions
-      }
+        return {
+          url: toPathString(localVarUrlObj),
+          options: localVarRequestOptions,
+        };
+      },
+      /**
+       * Update a single page\'s content.
+       * @param {string} name
+       * @param {Content} content
+       * @param {*} [options] Override http request option.
+       * @throws {RequiredError}
+       */
+      updateSinglePageContent: async (
+        name: string,
+        content: Content,
+        options: AxiosRequestConfig = {}
+      ): Promise<RequestArgs> => {
+        // verify required parameter 'name' is not null or undefined
+        assertParamExists("updateSinglePageContent", "name", name);
+        // verify required parameter 'content' is not null or undefined
+        assertParamExists("updateSinglePageContent", "content", content);
+        const localVarPath =
+          `/apis/api.console.halo.run/v1alpha1/singlepages/{name}/content`.replace(
+            `{${"name"}}`,
+            encodeURIComponent(String(name))
+          );
+        // use dummy base URL string because the URL constructor only accepts absolute URLs.
+        const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+        let baseOptions;
+        if (configuration) {
+          baseOptions = configuration.baseOptions;
+        }
 
-      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+        const localVarRequestOptions = {
+          method: "PUT",
+          ...baseOptions,
+          ...options,
+        };
+        const localVarHeaderParameter = {} as any;
+        const localVarQueryParameter = {} as any;
 
-      // authentication BasicAuth required
-      // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+        // authentication BasicAuth required
+        // http basic authentication required
+        setBasicAuthToObject(localVarRequestOptions, configuration);
 
-      // authentication BearerAuth required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+        // authentication BearerAuth required
+        // http bearer authentication required
+        await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+        localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(content, localVarRequestOptions, configuration)
+        setSearchParams(localVarUrlObj, localVarQueryParameter);
+        let headersFromBaseOptions =
+          baseOptions && baseOptions.headers ? baseOptions.headers : {};
+        localVarRequestOptions.headers = {
+          ...localVarHeaderParameter,
+          ...headersFromBaseOptions,
+          ...options.headers,
+        };
+        localVarRequestOptions.data = serializeDataIfNeeded(
+          content,
+          localVarRequestOptions,
+          configuration
+        );
 
-      return {
-        url: toPathString(localVarUrlObj),
-        options: localVarRequestOptions,
-      }
-    },
-  }
-}
+        return {
+          url: toPathString(localVarUrlObj),
+          options: localVarRequestOptions,
+        };
+      },
+    };
+  };
 
 /**
  * ApiConsoleHaloRunV1alpha1SinglePageApi - functional programming interface
  * @export
  */
-export const ApiConsoleHaloRunV1alpha1SinglePageApiFp = function (configuration?: Configuration) {
-  const localVarAxiosParamCreator = ApiConsoleHaloRunV1alpha1SinglePageApiAxiosParamCreator(configuration)
+export const ApiConsoleHaloRunV1alpha1SinglePageApiFp = function (
+  configuration?: Configuration
+) {
+  const localVarAxiosParamCreator =
+    ApiConsoleHaloRunV1alpha1SinglePageApiAxiosParamCreator(configuration);
   return {
     /**
      * Draft a single page.
@@ -433,10 +540,20 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFp = function (configuration?
      */
     async draftSinglePage(
       singlePageRequest: SinglePageRequest,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.draftSinglePage(singlePageRequest, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.draftSinglePage(
+        singlePageRequest,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Fetch head content of single page.
@@ -446,10 +563,21 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFp = function (configuration?
      */
     async fetchSinglePageHeadContent(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ContentWrapper>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.fetchSinglePageHeadContent(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ContentWrapper>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.fetchSinglePageHeadContent(
+          name,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Fetch release content of single page.
@@ -459,53 +587,74 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFp = function (configuration?
      */
     async fetchSinglePageReleaseContent(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ContentWrapper>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.fetchSinglePageReleaseContent(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ContentWrapper>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.fetchSinglePageReleaseContent(
+          name,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * List single pages.
      * @param {'PUBLISH_TIME' | 'CREATE_TIME'} [sort] SinglePage collation.
-     * @param {string} [keyword] SinglePages filtered by keyword.
-     * @param {'PUBLIC' | 'INTERNAL' | 'PRIVATE'} [visible]
      * @param {boolean} [sortOrder] ascending order If it is true; otherwise, it is in descending order.
      * @param {'DRAFT' | 'PENDING_APPROVAL' | 'PUBLISHED' | 'FAILED'} [publishPhase]
      * @param {Array<string>} [contributor]
+     * @param {string} [keyword] SinglePages filtered by keyword.
+     * @param {'PUBLIC' | 'INTERNAL' | 'PRIVATE'} [visible]
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listSinglePages(
-      sort?: 'PUBLISH_TIME' | 'CREATE_TIME',
-      keyword?: string,
-      visible?: 'PUBLIC' | 'INTERNAL' | 'PRIVATE',
+      sort?: "PUBLISH_TIME" | "CREATE_TIME",
       sortOrder?: boolean,
-      publishPhase?: 'DRAFT' | 'PENDING_APPROVAL' | 'PUBLISHED' | 'FAILED',
+      publishPhase?: "DRAFT" | "PENDING_APPROVAL" | "PUBLISHED" | "FAILED",
       contributor?: Array<string>,
+      keyword?: string,
+      visible?: "PUBLIC" | "INTERNAL" | "PRIVATE",
       size?: number,
-      page?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedSinglePageList>> {
+      page?: number,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string
+      ) => AxiosPromise<ListedSinglePageList>
+    > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.listSinglePages(
         sort,
-        keyword,
-        visible,
         sortOrder,
         publishPhase,
         contributor,
+        keyword,
+        visible,
         size,
-        page,
         labelSelector,
         fieldSelector,
-        options,
-      )
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+        page,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Publish a single page.
@@ -515,10 +664,18 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFp = function (configuration?
      */
     async publishSinglePage(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.publishSinglePage(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.publishSinglePage(name, options);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Update a single page.
@@ -530,10 +687,22 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFp = function (configuration?
     async updateDraftSinglePage(
       name: string,
       singlePageRequest: SinglePageRequest,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.updateDraftSinglePage(name, singlePageRequest, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePage>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.updateDraftSinglePage(
+          name,
+          singlePageRequest,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Update a single page\'s content.
@@ -545,13 +714,25 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFp = function (configuration?
     async updateSinglePageContent(
       name: string,
       content: Content,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.updateSinglePageContent(name, content, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Post>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.updateSinglePageContent(
+          name,
+          content,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
-  }
-}
+  };
+};
 
 /**
  * ApiConsoleHaloRunV1alpha1SinglePageApi - factory interface
@@ -560,9 +741,9 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFp = function (configuration?
 export const ApiConsoleHaloRunV1alpha1SinglePageApiFactory = function (
   configuration?: Configuration,
   basePath?: string,
-  axios?: AxiosInstance,
+  axios?: AxiosInstance
 ) {
-  const localVarFp = ApiConsoleHaloRunV1alpha1SinglePageApiFp(configuration)
+  const localVarFp = ApiConsoleHaloRunV1alpha1SinglePageApiFp(configuration);
   return {
     /**
      * Draft a single page.
@@ -572,11 +753,11 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFactory = function (
      */
     draftSinglePage(
       requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiDraftSinglePageRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<SinglePage> {
       return localVarFp
         .draftSinglePage(requestParameters.singlePageRequest, options)
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * Fetch head content of single page.
@@ -586,11 +767,11 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFactory = function (
      */
     fetchSinglePageHeadContent(
       requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageHeadContentRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<ContentWrapper> {
       return localVarFp
         .fetchSinglePageHeadContent(requestParameters.name, options)
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * Fetch release content of single page.
@@ -600,11 +781,11 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFactory = function (
      */
     fetchSinglePageReleaseContent(
       requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageReleaseContentRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<ContentWrapper> {
       return localVarFp
         .fetchSinglePageReleaseContent(requestParameters.name, options)
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * List single pages.
@@ -614,23 +795,23 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFactory = function (
      */
     listSinglePages(
       requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePagesRequest = {},
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<ListedSinglePageList> {
       return localVarFp
         .listSinglePages(
           requestParameters.sort,
-          requestParameters.keyword,
-          requestParameters.visible,
           requestParameters.sortOrder,
           requestParameters.publishPhase,
           requestParameters.contributor,
+          requestParameters.keyword,
+          requestParameters.visible,
           requestParameters.size,
-          requestParameters.page,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
-          options,
+          requestParameters.page,
+          options
         )
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * Publish a single page.
@@ -640,9 +821,11 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFactory = function (
      */
     publishSinglePage(
       requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiPublishSinglePageRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<SinglePage> {
-      return localVarFp.publishSinglePage(requestParameters.name, options).then((request) => request(axios, basePath))
+      return localVarFp
+        .publishSinglePage(requestParameters.name, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      * Update a single page.
@@ -652,11 +835,15 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFactory = function (
      */
     updateDraftSinglePage(
       requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiUpdateDraftSinglePageRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<SinglePage> {
       return localVarFp
-        .updateDraftSinglePage(requestParameters.name, requestParameters.singlePageRequest, options)
-        .then((request) => request(axios, basePath))
+        .updateDraftSinglePage(
+          requestParameters.name,
+          requestParameters.singlePageRequest,
+          options
+        )
+        .then((request) => request(axios, basePath));
     },
     /**
      * Update a single page\'s content.
@@ -666,14 +853,18 @@ export const ApiConsoleHaloRunV1alpha1SinglePageApiFactory = function (
      */
     updateSinglePageContent(
       requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiUpdateSinglePageContentRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<Post> {
       return localVarFp
-        .updateSinglePageContent(requestParameters.name, requestParameters.content, options)
-        .then((request) => request(axios, basePath))
+        .updateSinglePageContent(
+          requestParameters.name,
+          requestParameters.content,
+          options
+        )
+        .then((request) => request(axios, basePath));
     },
-  }
-}
+  };
+};
 
 /**
  * Request parameters for draftSinglePage operation in ApiConsoleHaloRunV1alpha1SinglePageApi.
@@ -686,7 +877,7 @@ export interface ApiConsoleHaloRunV1alpha1SinglePageApiDraftSinglePageRequest {
    * @type {SinglePageRequest}
    * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiDraftSinglePage
    */
-  readonly singlePageRequest: SinglePageRequest
+  readonly singlePageRequest: SinglePageRequest;
 }
 
 /**
@@ -700,7 +891,7 @@ export interface ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageHeadConten
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageHeadContent
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -714,7 +905,7 @@ export interface ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageReleaseCon
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageReleaseContent
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -728,70 +919,70 @@ export interface ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePagesRequest {
    * @type {'PUBLISH_TIME' | 'CREATE_TIME'}
    * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePages
    */
-  readonly sort?: 'PUBLISH_TIME' | 'CREATE_TIME'
-
-  /**
-   * SinglePages filtered by keyword.
-   * @type {string}
-   * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePages
-   */
-  readonly keyword?: string
-
-  /**
-   *
-   * @type {'PUBLIC' | 'INTERNAL' | 'PRIVATE'}
-   * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePages
-   */
-  readonly visible?: 'PUBLIC' | 'INTERNAL' | 'PRIVATE'
+  readonly sort?: "PUBLISH_TIME" | "CREATE_TIME";
 
   /**
    * ascending order If it is true; otherwise, it is in descending order.
    * @type {boolean}
    * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePages
    */
-  readonly sortOrder?: boolean
+  readonly sortOrder?: boolean;
 
   /**
    *
    * @type {'DRAFT' | 'PENDING_APPROVAL' | 'PUBLISHED' | 'FAILED'}
    * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePages
    */
-  readonly publishPhase?: 'DRAFT' | 'PENDING_APPROVAL' | 'PUBLISHED' | 'FAILED'
+  readonly publishPhase?: "DRAFT" | "PENDING_APPROVAL" | "PUBLISHED" | "FAILED";
 
   /**
    *
    * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePages
    */
-  readonly contributor?: Array<string>
+  readonly contributor?: Array<string>;
+
+  /**
+   * SinglePages filtered by keyword.
+   * @type {string}
+   * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePages
+   */
+  readonly keyword?: string;
+
+  /**
+   *
+   * @type {'PUBLIC' | 'INTERNAL' | 'PRIVATE'}
+   * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePages
+   */
+  readonly visible?: "PUBLIC" | "INTERNAL" | "PRIVATE";
 
   /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePages
    */
-  readonly size?: number
-
-  /**
-   * The page number. Zero indicates no page.
-   * @type {number}
-   * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePages
-   */
-  readonly page?: number
+  readonly size?: number;
 
   /**
    * Label selector for filtering.
    * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePages
    */
-  readonly labelSelector?: Array<string>
+  readonly labelSelector?: Array<string>;
 
   /**
    * Field selector for filtering.
    * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePages
    */
-  readonly fieldSelector?: Array<string>
+  readonly fieldSelector?: Array<string>;
+
+  /**
+   * The page number. Zero indicates no page.
+   * @type {number}
+   * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePages
+   */
+  readonly page?: number;
 }
 
 /**
@@ -805,7 +996,7 @@ export interface ApiConsoleHaloRunV1alpha1SinglePageApiPublishSinglePageRequest 
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiPublishSinglePage
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -819,14 +1010,14 @@ export interface ApiConsoleHaloRunV1alpha1SinglePageApiUpdateDraftSinglePageRequ
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiUpdateDraftSinglePage
    */
-  readonly name: string
+  readonly name: string;
 
   /**
    *
    * @type {SinglePageRequest}
    * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiUpdateDraftSinglePage
    */
-  readonly singlePageRequest: SinglePageRequest
+  readonly singlePageRequest: SinglePageRequest;
 }
 
 /**
@@ -840,14 +1031,14 @@ export interface ApiConsoleHaloRunV1alpha1SinglePageApiUpdateSinglePageContentRe
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiUpdateSinglePageContent
    */
-  readonly name: string
+  readonly name: string;
 
   /**
    *
    * @type {Content}
    * @memberof ApiConsoleHaloRunV1alpha1SinglePageApiUpdateSinglePageContent
    */
-  readonly content: Content
+  readonly content: Content;
 }
 
 /**
@@ -866,11 +1057,11 @@ export class ApiConsoleHaloRunV1alpha1SinglePageApi extends BaseAPI {
    */
   public draftSinglePage(
     requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiDraftSinglePageRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1SinglePageApiFp(this.configuration)
       .draftSinglePage(requestParameters.singlePageRequest, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -882,11 +1073,11 @@ export class ApiConsoleHaloRunV1alpha1SinglePageApi extends BaseAPI {
    */
   public fetchSinglePageHeadContent(
     requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageHeadContentRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1SinglePageApiFp(this.configuration)
       .fetchSinglePageHeadContent(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -898,11 +1089,11 @@ export class ApiConsoleHaloRunV1alpha1SinglePageApi extends BaseAPI {
    */
   public fetchSinglePageReleaseContent(
     requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiFetchSinglePageReleaseContentRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1SinglePageApiFp(this.configuration)
       .fetchSinglePageReleaseContent(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -914,23 +1105,23 @@ export class ApiConsoleHaloRunV1alpha1SinglePageApi extends BaseAPI {
    */
   public listSinglePages(
     requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiListSinglePagesRequest = {},
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1SinglePageApiFp(this.configuration)
       .listSinglePages(
         requestParameters.sort,
-        requestParameters.keyword,
-        requestParameters.visible,
         requestParameters.sortOrder,
         requestParameters.publishPhase,
         requestParameters.contributor,
+        requestParameters.keyword,
+        requestParameters.visible,
         requestParameters.size,
-        requestParameters.page,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
-        options,
+        requestParameters.page,
+        options
       )
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -942,11 +1133,11 @@ export class ApiConsoleHaloRunV1alpha1SinglePageApi extends BaseAPI {
    */
   public publishSinglePage(
     requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiPublishSinglePageRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1SinglePageApiFp(this.configuration)
       .publishSinglePage(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -958,11 +1149,15 @@ export class ApiConsoleHaloRunV1alpha1SinglePageApi extends BaseAPI {
    */
   public updateDraftSinglePage(
     requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiUpdateDraftSinglePageRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1SinglePageApiFp(this.configuration)
-      .updateDraftSinglePage(requestParameters.name, requestParameters.singlePageRequest, options)
-      .then((request) => request(this.axios, this.basePath))
+      .updateDraftSinglePage(
+        requestParameters.name,
+        requestParameters.singlePageRequest,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -974,10 +1169,14 @@ export class ApiConsoleHaloRunV1alpha1SinglePageApi extends BaseAPI {
    */
   public updateSinglePageContent(
     requestParameters: ApiConsoleHaloRunV1alpha1SinglePageApiUpdateSinglePageContentRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1SinglePageApiFp(this.configuration)
-      .updateSinglePageContent(requestParameters.name, requestParameters.content, options)
-      .then((request) => request(this.axios, this.basePath))
+      .updateSinglePageContent(
+        requestParameters.name,
+        requestParameters.content,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
   }
 }

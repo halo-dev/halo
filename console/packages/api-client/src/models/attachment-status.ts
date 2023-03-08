@@ -23,5 +23,5 @@ export interface AttachmentStatus {
    * @type {string}
    * @memberof AttachmentStatus
    */
-  permalink?: string
+  permalink?: string;
 }

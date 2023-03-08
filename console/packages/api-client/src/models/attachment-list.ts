@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Attachment } from './attachment'
+import { Attachment } from "./attachment";
 
 /**
  *
@@ -23,57 +23,57 @@ import { Attachment } from './attachment'
  */
 export interface AttachmentList {
   /**
-   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page is the first page.
+   * @type {boolean}
    * @memberof AttachmentList
    */
-  page: number
+  first: boolean;
   /**
-   * Size of each page. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof AttachmentList
    */
-  size: number
+  hasNext: boolean;
   /**
-   * Total elements.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof AttachmentList
    */
-  total: number
+  hasPrevious: boolean;
   /**
    * A chunk of items.
    * @type {Array<Attachment>}
    * @memberof AttachmentList
    */
-  items: Array<Attachment>
-  /**
-   * Indicates whether current page is the first page.
-   * @type {boolean}
-   * @memberof AttachmentList
-   */
-  first: boolean
+  items: Array<Attachment>;
   /**
    * Indicates whether current page is the last page.
    * @type {boolean}
    * @memberof AttachmentList
    */
-  last: boolean
+  last: boolean;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof AttachmentList
    */
-  hasNext: boolean
+  page: number;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Size of each page. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof AttachmentList
    */
-  hasPrevious: boolean
+  size: number;
+  /**
+   * Total elements.
+   * @type {number}
+   * @memberof AttachmentList
+   */
+  total: number;
   /**
    * Indicates total pages.
    * @type {number}
    * @memberof AttachmentList
    */
-  totalPages: number
+  totalPages: number;
 }

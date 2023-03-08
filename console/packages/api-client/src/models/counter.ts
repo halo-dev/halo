@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 
 /**
  *
@@ -24,50 +24,50 @@ import { Metadata } from './metadata'
 export interface Counter {
   /**
    *
-   * @type {number}
+   * @type {string}
    * @memberof Counter
    */
-  visit?: number
+  apiVersion: string;
   /**
    *
    * @type {number}
    * @memberof Counter
    */
-  upvote?: number
+  approvedComment?: number;
   /**
    *
    * @type {number}
    * @memberof Counter
    */
-  downvote?: number
-  /**
-   *
-   * @type {number}
-   * @memberof Counter
-   */
-  totalComment?: number
-  /**
-   *
-   * @type {number}
-   * @memberof Counter
-   */
-  approvedComment?: number
+  downvote?: number;
   /**
    *
    * @type {string}
    * @memberof Counter
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof Counter
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof Counter
    */
-  metadata: Metadata
+  metadata: Metadata;
+  /**
+   *
+   * @type {number}
+   * @memberof Counter
+   */
+  totalComment?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof Counter
+   */
+  upvote?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof Counter
+   */
+  visit?: number;
 }

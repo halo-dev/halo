@@ -23,29 +23,29 @@ export interface OwnerInfo {
    * @type {string}
    * @memberof OwnerInfo
    */
-  kind?: string
+  avatar?: string;
   /**
    *
    * @type {string}
    * @memberof OwnerInfo
    */
-  name?: string
+  displayName?: string;
   /**
    *
    * @type {string}
    * @memberof OwnerInfo
    */
-  displayName?: string
+  email?: string;
   /**
    *
    * @type {string}
    * @memberof OwnerInfo
    */
-  avatar?: string
+  kind?: string;
   /**
    *
    * @type {string}
    * @memberof OwnerInfo
    */
-  email?: string
+  name?: string;
 }

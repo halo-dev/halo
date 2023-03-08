@@ -12,9 +12,9 @@
  * Do not edit the class manually.
  */
 
-import type { Configuration } from '../configuration'
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios'
-import globalAxios from 'axios'
+import type { Configuration } from "../configuration";
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from "axios";
+import globalAxios from "axios";
 // Some imports not used depending on template conditions
 // @ts-ignore
 import {
@@ -28,59 +28,81 @@ import {
   serializeDataIfNeeded,
   toPathString,
   createRequestFunction,
-} from '../common'
+} from "../common";
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base'
+import {
+  BASE_PATH,
+  COLLECTION_FORMATS,
+  RequestArgs,
+  BaseAPI,
+  RequiredError,
+} from "../base";
 /**
  * ApiConsoleHaloRunV1alpha1IndicesApi - axios parameter creator
  * @export
  */
-export const ApiConsoleHaloRunV1alpha1IndicesApiAxiosParamCreator = function (configuration?: Configuration) {
+export const ApiConsoleHaloRunV1alpha1IndicesApiAxiosParamCreator = function (
+  configuration?: Configuration
+) {
   return {
     /**
      * Build or rebuild post indices for full text search
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    buildPostIndices: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/indices/post`
+    buildPostIndices: async (
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/indices/post`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
-  }
-}
+  };
+};
 
 /**
  * ApiConsoleHaloRunV1alpha1IndicesApi - functional programming interface
  * @export
  */
-export const ApiConsoleHaloRunV1alpha1IndicesApiFp = function (configuration?: Configuration) {
-  const localVarAxiosParamCreator = ApiConsoleHaloRunV1alpha1IndicesApiAxiosParamCreator(configuration)
+export const ApiConsoleHaloRunV1alpha1IndicesApiFp = function (
+  configuration?: Configuration
+) {
+  const localVarAxiosParamCreator =
+    ApiConsoleHaloRunV1alpha1IndicesApiAxiosParamCreator(configuration);
   return {
     /**
      * Build or rebuild post indices for full text search
@@ -88,13 +110,21 @@ export const ApiConsoleHaloRunV1alpha1IndicesApiFp = function (configuration?: C
      * @throws {RequiredError}
      */
     async buildPostIndices(
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.buildPostIndices(options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.buildPostIndices(options);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
-  }
-}
+  };
+};
 
 /**
  * ApiConsoleHaloRunV1alpha1IndicesApi - factory interface
@@ -103,9 +133,9 @@ export const ApiConsoleHaloRunV1alpha1IndicesApiFp = function (configuration?: C
 export const ApiConsoleHaloRunV1alpha1IndicesApiFactory = function (
   configuration?: Configuration,
   basePath?: string,
-  axios?: AxiosInstance,
+  axios?: AxiosInstance
 ) {
-  const localVarFp = ApiConsoleHaloRunV1alpha1IndicesApiFp(configuration)
+  const localVarFp = ApiConsoleHaloRunV1alpha1IndicesApiFp(configuration);
   return {
     /**
      * Build or rebuild post indices for full text search
@@ -113,10 +143,12 @@ export const ApiConsoleHaloRunV1alpha1IndicesApiFactory = function (
      * @throws {RequiredError}
      */
     buildPostIndices(options?: AxiosRequestConfig): AxiosPromise<void> {
-      return localVarFp.buildPostIndices(options).then((request) => request(axios, basePath))
+      return localVarFp
+        .buildPostIndices(options)
+        .then((request) => request(axios, basePath));
     },
-  }
-}
+  };
+};
 
 /**
  * ApiConsoleHaloRunV1alpha1IndicesApi - object-oriented interface
@@ -134,6 +166,6 @@ export class ApiConsoleHaloRunV1alpha1IndicesApi extends BaseAPI {
   public buildPostIndices(options?: AxiosRequestConfig) {
     return ApiConsoleHaloRunV1alpha1IndicesApiFp(this.configuration)
       .buildPostIndices(options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 }

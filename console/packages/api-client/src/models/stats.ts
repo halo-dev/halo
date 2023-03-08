@@ -23,23 +23,23 @@ export interface Stats {
    * @type {number}
    * @memberof Stats
    */
-  visit?: number
+  approvedComment?: number;
   /**
    *
    * @type {number}
    * @memberof Stats
    */
-  upvote?: number
+  totalComment?: number;
   /**
    *
    * @type {number}
    * @memberof Stats
    */
-  totalComment?: number
+  upvote?: number;
   /**
    *
    * @type {number}
    * @memberof Stats
    */
-  approvedComment?: number
+  visit?: number;
 }

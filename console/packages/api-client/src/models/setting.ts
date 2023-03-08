@@ -14,10 +14,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 // May contain unused imports in some cases
 // @ts-ignore
-import { SettingSpec } from './setting-spec'
+import { SettingSpec } from "./setting-spec";
 
 /**
  *
@@ -27,26 +27,26 @@ import { SettingSpec } from './setting-spec'
 export interface Setting {
   /**
    *
-   * @type {SettingSpec}
+   * @type {string}
    * @memberof Setting
    */
-  spec: SettingSpec
+  apiVersion: string;
   /**
    *
    * @type {string}
    * @memberof Setting
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof Setting
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof Setting
    */
-  metadata: Metadata
+  metadata: Metadata;
+  /**
+   *
+   * @type {SettingSpec}
+   * @memberof Setting
+   */
+  spec: SettingSpec;
 }

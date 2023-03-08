@@ -23,23 +23,23 @@ export interface TemplateDescriptor {
    * @type {string}
    * @memberof TemplateDescriptor
    */
-  name: string
+  description?: string;
   /**
    *
    * @type {string}
    * @memberof TemplateDescriptor
    */
-  description?: string
+  file: string;
   /**
    *
    * @type {string}
    * @memberof TemplateDescriptor
    */
-  screenshot?: string
+  name: string;
   /**
    *
    * @type {string}
    * @memberof TemplateDescriptor
    */
-  file: string
+  screenshot?: string;
 }

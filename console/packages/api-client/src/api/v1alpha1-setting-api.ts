@@ -12,9 +12,9 @@
  * Do not edit the class manually.
  */
 
-import type { Configuration } from '../configuration'
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios'
-import globalAxios from 'axios'
+import type { Configuration } from "../configuration";
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from "axios";
+import globalAxios from "axios";
 // Some imports not used depending on template conditions
 // @ts-ignore
 import {
@@ -28,18 +28,26 @@ import {
   serializeDataIfNeeded,
   toPathString,
   createRequestFunction,
-} from '../common'
+} from "../common";
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base'
+import {
+  BASE_PATH,
+  COLLECTION_FORMATS,
+  RequestArgs,
+  BaseAPI,
+  RequiredError,
+} from "../base";
 // @ts-ignore
-import { Setting } from '../models'
+import { Setting } from "../models";
 // @ts-ignore
-import { SettingList } from '../models'
+import { SettingList } from "../models";
 /**
  * V1alpha1SettingApi - axios parameter creator
  * @export
  */
-export const V1alpha1SettingApiAxiosParamCreator = function (configuration?: Configuration) {
+export const V1alpha1SettingApiAxiosParamCreator = function (
+  configuration?: Configuration
+) {
   return {
     /**
      * Create v1alpha1/Setting
@@ -47,38 +55,54 @@ export const V1alpha1SettingApiAxiosParamCreator = function (configuration?: Con
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    createv1alpha1Setting: async (setting?: Setting, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-      const localVarPath = `/api/v1alpha1/settings`
+    createv1alpha1Setting: async (
+      setting?: Setting,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/api/v1alpha1/settings`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(setting, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        setting,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Delete v1alpha1/Setting
@@ -86,37 +110,52 @@ export const V1alpha1SettingApiAxiosParamCreator = function (configuration?: Con
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    deletev1alpha1Setting: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    deletev1alpha1Setting: async (
+      name: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('deletev1alpha1Setting', 'name', name)
-      const localVarPath = `/api/v1alpha1/settings/{name}`.replace(`{${'name'}}`, encodeURIComponent(String(name)))
+      assertParamExists("deletev1alpha1Setting", "name", name);
+      const localVarPath = `/api/v1alpha1/settings/{name}`.replace(
+        `{${"name"}}`,
+        encodeURIComponent(String(name))
+      );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "DELETE",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Get v1alpha1/Setting
@@ -124,37 +163,52 @@ export const V1alpha1SettingApiAxiosParamCreator = function (configuration?: Con
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getv1alpha1Setting: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    getv1alpha1Setting: async (
+      name: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('getv1alpha1Setting', 'name', name)
-      const localVarPath = `/api/v1alpha1/settings/{name}`.replace(`{${'name'}}`, encodeURIComponent(String(name)))
+      assertParamExists("getv1alpha1Setting", "name", name);
+      const localVarPath = `/api/v1alpha1/settings/{name}`.replace(
+        `{${"name"}}`,
+        encodeURIComponent(String(name))
+      );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * List v1alpha1/Setting
@@ -170,52 +224,61 @@ export const V1alpha1SettingApiAxiosParamCreator = function (configuration?: Con
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
-      const localVarPath = `/api/v1alpha1/settings`
+      const localVarPath = `/api/v1alpha1/settings`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
       if (page !== undefined) {
-        localVarQueryParameter['page'] = page
+        localVarQueryParameter["page"] = page;
       }
 
       if (size !== undefined) {
-        localVarQueryParameter['size'] = size
+        localVarQueryParameter["size"] = size;
       }
 
       if (labelSelector) {
-        localVarQueryParameter['labelSelector'] = labelSelector
+        localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
       if (fieldSelector) {
-        localVarQueryParameter['fieldSelector'] = fieldSelector
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Update v1alpha1/Setting
@@ -227,51 +290,68 @@ export const V1alpha1SettingApiAxiosParamCreator = function (configuration?: Con
     updatev1alpha1Setting: async (
       name: string,
       setting?: Setting,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('updatev1alpha1Setting', 'name', name)
-      const localVarPath = `/api/v1alpha1/settings/{name}`.replace(`{${'name'}}`, encodeURIComponent(String(name)))
+      assertParamExists("updatev1alpha1Setting", "name", name);
+      const localVarPath = `/api/v1alpha1/settings/{name}`.replace(
+        `{${"name"}}`,
+        encodeURIComponent(String(name))
+      );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "PUT",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(setting, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        setting,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
-  }
-}
+  };
+};
 
 /**
  * V1alpha1SettingApi - functional programming interface
  * @export
  */
 export const V1alpha1SettingApiFp = function (configuration?: Configuration) {
-  const localVarAxiosParamCreator = V1alpha1SettingApiAxiosParamCreator(configuration)
+  const localVarAxiosParamCreator =
+    V1alpha1SettingApiAxiosParamCreator(configuration);
   return {
     /**
      * Create v1alpha1/Setting
@@ -281,10 +361,18 @@ export const V1alpha1SettingApiFp = function (configuration?: Configuration) {
      */
     async createv1alpha1Setting(
       setting?: Setting,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.createv1alpha1Setting(setting, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.createv1alpha1Setting(setting, options);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Delete v1alpha1/Setting
@@ -294,10 +382,18 @@ export const V1alpha1SettingApiFp = function (configuration?: Configuration) {
      */
     async deletev1alpha1Setting(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.deletev1alpha1Setting(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.deletev1alpha1Setting(name, options);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Get v1alpha1/Setting
@@ -307,10 +403,18 @@ export const V1alpha1SettingApiFp = function (configuration?: Configuration) {
      */
     async getv1alpha1Setting(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.getv1alpha1Setting(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.getv1alpha1Setting(name, options);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * List v1alpha1/Setting
@@ -326,16 +430,24 @@ export const V1alpha1SettingApiFp = function (configuration?: Configuration) {
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingList>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.listv1alpha1Setting(
-        page,
-        size,
-        labelSelector,
-        fieldSelector,
-        options,
-      )
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingList>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.listv1alpha1Setting(
+          page,
+          size,
+          labelSelector,
+          fieldSelector,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Update v1alpha1/Setting
@@ -347,13 +459,25 @@ export const V1alpha1SettingApiFp = function (configuration?: Configuration) {
     async updatev1alpha1Setting(
       name: string,
       setting?: Setting,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.updatev1alpha1Setting(name, setting, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.updatev1alpha1Setting(
+          name,
+          setting,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
-  }
-}
+  };
+};
 
 /**
  * V1alpha1SettingApi - factory interface
@@ -362,9 +486,9 @@ export const V1alpha1SettingApiFp = function (configuration?: Configuration) {
 export const V1alpha1SettingApiFactory = function (
   configuration?: Configuration,
   basePath?: string,
-  axios?: AxiosInstance,
+  axios?: AxiosInstance
 ) {
-  const localVarFp = V1alpha1SettingApiFp(configuration)
+  const localVarFp = V1alpha1SettingApiFp(configuration);
   return {
     /**
      * Create v1alpha1/Setting
@@ -374,11 +498,11 @@ export const V1alpha1SettingApiFactory = function (
      */
     createv1alpha1Setting(
       requestParameters: V1alpha1SettingApiCreatev1alpha1SettingRequest = {},
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<Setting> {
       return localVarFp
         .createv1alpha1Setting(requestParameters.setting, options)
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * Delete v1alpha1/Setting
@@ -388,11 +512,11 @@ export const V1alpha1SettingApiFactory = function (
      */
     deletev1alpha1Setting(
       requestParameters: V1alpha1SettingApiDeletev1alpha1SettingRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<void> {
       return localVarFp
         .deletev1alpha1Setting(requestParameters.name, options)
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * Get v1alpha1/Setting
@@ -402,9 +526,11 @@ export const V1alpha1SettingApiFactory = function (
      */
     getv1alpha1Setting(
       requestParameters: V1alpha1SettingApiGetv1alpha1SettingRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<Setting> {
-      return localVarFp.getv1alpha1Setting(requestParameters.name, options).then((request) => request(axios, basePath))
+      return localVarFp
+        .getv1alpha1Setting(requestParameters.name, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      * List v1alpha1/Setting
@@ -414,7 +540,7 @@ export const V1alpha1SettingApiFactory = function (
      */
     listv1alpha1Setting(
       requestParameters: V1alpha1SettingApiListv1alpha1SettingRequest = {},
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<SettingList> {
       return localVarFp
         .listv1alpha1Setting(
@@ -422,9 +548,9 @@ export const V1alpha1SettingApiFactory = function (
           requestParameters.size,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
-          options,
+          options
         )
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * Update v1alpha1/Setting
@@ -434,14 +560,18 @@ export const V1alpha1SettingApiFactory = function (
      */
     updatev1alpha1Setting(
       requestParameters: V1alpha1SettingApiUpdatev1alpha1SettingRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<Setting> {
       return localVarFp
-        .updatev1alpha1Setting(requestParameters.name, requestParameters.setting, options)
-        .then((request) => request(axios, basePath))
+        .updatev1alpha1Setting(
+          requestParameters.name,
+          requestParameters.setting,
+          options
+        )
+        .then((request) => request(axios, basePath));
     },
-  }
-}
+  };
+};
 
 /**
  * Request parameters for createv1alpha1Setting operation in V1alpha1SettingApi.
@@ -454,7 +584,7 @@ export interface V1alpha1SettingApiCreatev1alpha1SettingRequest {
    * @type {Setting}
    * @memberof V1alpha1SettingApiCreatev1alpha1Setting
    */
-  readonly setting?: Setting
+  readonly setting?: Setting;
 }
 
 /**
@@ -468,7 +598,7 @@ export interface V1alpha1SettingApiDeletev1alpha1SettingRequest {
    * @type {string}
    * @memberof V1alpha1SettingApiDeletev1alpha1Setting
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -482,7 +612,7 @@ export interface V1alpha1SettingApiGetv1alpha1SettingRequest {
    * @type {string}
    * @memberof V1alpha1SettingApiGetv1alpha1Setting
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -496,28 +626,28 @@ export interface V1alpha1SettingApiListv1alpha1SettingRequest {
    * @type {number}
    * @memberof V1alpha1SettingApiListv1alpha1Setting
    */
-  readonly page?: number
+  readonly page?: number;
 
   /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof V1alpha1SettingApiListv1alpha1Setting
    */
-  readonly size?: number
+  readonly size?: number;
 
   /**
    * Label selector for filtering.
    * @type {Array<string>}
    * @memberof V1alpha1SettingApiListv1alpha1Setting
    */
-  readonly labelSelector?: Array<string>
+  readonly labelSelector?: Array<string>;
 
   /**
    * Field selector for filtering.
    * @type {Array<string>}
    * @memberof V1alpha1SettingApiListv1alpha1Setting
    */
-  readonly fieldSelector?: Array<string>
+  readonly fieldSelector?: Array<string>;
 }
 
 /**
@@ -531,14 +661,14 @@ export interface V1alpha1SettingApiUpdatev1alpha1SettingRequest {
    * @type {string}
    * @memberof V1alpha1SettingApiUpdatev1alpha1Setting
    */
-  readonly name: string
+  readonly name: string;
 
   /**
    * Updated setting
    * @type {Setting}
    * @memberof V1alpha1SettingApiUpdatev1alpha1Setting
    */
-  readonly setting?: Setting
+  readonly setting?: Setting;
 }
 
 /**
@@ -557,11 +687,11 @@ export class V1alpha1SettingApi extends BaseAPI {
    */
   public createv1alpha1Setting(
     requestParameters: V1alpha1SettingApiCreatev1alpha1SettingRequest = {},
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return V1alpha1SettingApiFp(this.configuration)
       .createv1alpha1Setting(requestParameters.setting, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -573,11 +703,11 @@ export class V1alpha1SettingApi extends BaseAPI {
    */
   public deletev1alpha1Setting(
     requestParameters: V1alpha1SettingApiDeletev1alpha1SettingRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return V1alpha1SettingApiFp(this.configuration)
       .deletev1alpha1Setting(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -589,11 +719,11 @@ export class V1alpha1SettingApi extends BaseAPI {
    */
   public getv1alpha1Setting(
     requestParameters: V1alpha1SettingApiGetv1alpha1SettingRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return V1alpha1SettingApiFp(this.configuration)
       .getv1alpha1Setting(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -605,7 +735,7 @@ export class V1alpha1SettingApi extends BaseAPI {
    */
   public listv1alpha1Setting(
     requestParameters: V1alpha1SettingApiListv1alpha1SettingRequest = {},
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return V1alpha1SettingApiFp(this.configuration)
       .listv1alpha1Setting(
@@ -613,9 +743,9 @@ export class V1alpha1SettingApi extends BaseAPI {
         requestParameters.size,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
-        options,
+        options
       )
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -627,10 +757,14 @@ export class V1alpha1SettingApi extends BaseAPI {
    */
   public updatev1alpha1Setting(
     requestParameters: V1alpha1SettingApiUpdatev1alpha1SettingRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return V1alpha1SettingApiFp(this.configuration)
-      .updatev1alpha1Setting(requestParameters.name, requestParameters.setting, options)
-      .then((request) => request(this.axios, this.basePath))
+      .updatev1alpha1Setting(
+        requestParameters.name,
+        requestParameters.setting,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
   }
 }

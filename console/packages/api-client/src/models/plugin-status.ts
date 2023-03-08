@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Condition } from './condition'
+import { Condition } from "./condition";
 
 /**
  *
@@ -24,55 +24,56 @@ import { Condition } from './condition'
 export interface PluginStatus {
   /**
    *
-   * @type {string}
-   * @memberof PluginStatus
-   */
-  phase?: PluginStatusPhaseEnum
-  /**
-   *
    * @type {Array<Condition>}
    * @memberof PluginStatus
    */
-  conditions?: Array<Condition>
+  conditions?: Array<Condition>;
   /**
    *
    * @type {string}
    * @memberof PluginStatus
    */
-  lastStartTime?: string
+  entry?: string;
   /**
    *
    * @type {string}
    * @memberof PluginStatus
    */
-  entry?: string
-  /**
-   *
-   * @type {string}
-   * @memberof PluginStatus
-   */
-  stylesheet?: string
-  /**
-   *
-   * @type {string}
-   * @memberof PluginStatus
-   */
-  logo?: string
+  lastStartTime?: string;
   /**
    * Load location of the plugin, often a path.
    * @type {string}
    * @memberof PluginStatus
    */
-  loadLocation?: string
+  loadLocation?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof PluginStatus
+   */
+  logo?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof PluginStatus
+   */
+  phase?: PluginStatusPhaseEnum;
+  /**
+   *
+   * @type {string}
+   * @memberof PluginStatus
+   */
+  stylesheet?: string;
 }
 
 export const PluginStatusPhaseEnum = {
-  Created: 'CREATED',
-  Disabled: 'DISABLED',
-  Resolved: 'RESOLVED',
-  Started: 'STARTED',
-  Stopped: 'STOPPED',
-  Failed: 'FAILED',
-} as const
+  Created: "CREATED",
+  Disabled: "DISABLED",
+  Resolved: "RESOLVED",
+  Started: "STARTED",
+  Stopped: "STOPPED",
+  Failed: "FAILED",
+} as const;
 
-export type PluginStatusPhaseEnum = typeof PluginStatusPhaseEnum[keyof typeof PluginStatusPhaseEnum]
+export type PluginStatusPhaseEnum =
+  typeof PluginStatusPhaseEnum[keyof typeof PluginStatusPhaseEnum];

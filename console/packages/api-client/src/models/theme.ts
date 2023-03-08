@@ -14,13 +14,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 // May contain unused imports in some cases
 // @ts-ignore
-import { ThemeSpec } from './theme-spec'
+import { ThemeSpec } from "./theme-spec";
 // May contain unused imports in some cases
 // @ts-ignore
-import { ThemeStatus } from './theme-status'
+import { ThemeStatus } from "./theme-status";
 
 /**
  *
@@ -30,32 +30,32 @@ import { ThemeStatus } from './theme-status'
 export interface Theme {
   /**
    *
-   * @type {ThemeSpec}
+   * @type {string}
    * @memberof Theme
    */
-  spec: ThemeSpec
-  /**
-   *
-   * @type {ThemeStatus}
-   * @memberof Theme
-   */
-  status?: ThemeStatus
+  apiVersion: string;
   /**
    *
    * @type {string}
    * @memberof Theme
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof Theme
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof Theme
    */
-  metadata: Metadata
+  metadata: Metadata;
+  /**
+   *
+   * @type {ThemeSpec}
+   * @memberof Theme
+   */
+  spec: ThemeSpec;
+  /**
+   *
+   * @type {ThemeStatus}
+   * @memberof Theme
+   */
+  status?: ThemeStatus;
 }

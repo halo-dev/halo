@@ -14,10 +14,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 // May contain unused imports in some cases
 // @ts-ignore
-import { ReplySpec } from './reply-spec'
+import { ReplySpec } from "./reply-spec";
 
 /**
  *
@@ -27,26 +27,26 @@ import { ReplySpec } from './reply-spec'
 export interface Reply {
   /**
    *
-   * @type {ReplySpec}
+   * @type {string}
    * @memberof Reply
    */
-  spec: ReplySpec
+  apiVersion: string;
   /**
    *
    * @type {string}
    * @memberof Reply
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof Reply
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof Reply
    */
-  metadata: Metadata
+  metadata: Metadata;
+  /**
+   *
+   * @type {ReplySpec}
+   * @memberof Reply
+   */
+  spec: ReplySpec;
 }
