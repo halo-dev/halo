@@ -14,10 +14,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Content } from './content'
+import { Content } from "./content";
 // May contain unused imports in some cases
 // @ts-ignore
-import { SinglePage } from './single-page'
+import { SinglePage } from "./single-page";
 
 /**
  *
@@ -27,14 +27,14 @@ import { SinglePage } from './single-page'
 export interface SinglePageRequest {
   /**
    *
-   * @type {SinglePage}
-   * @memberof SinglePageRequest
-   */
-  page: SinglePage
-  /**
-   *
    * @type {Content}
    * @memberof SinglePageRequest
    */
-  content: Content
+  content: Content;
+  /**
+   *
+   * @type {SinglePage}
+   * @memberof SinglePageRequest
+   */
+  page: SinglePage;
 }

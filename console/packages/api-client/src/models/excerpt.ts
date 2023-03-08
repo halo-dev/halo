@@ -23,11 +23,11 @@ export interface Excerpt {
    * @type {boolean}
    * @memberof Excerpt
    */
-  autoGenerate: boolean
+  autoGenerate: boolean;
   /**
    *
    * @type {string}
    * @memberof Excerpt
    */
-  raw?: string
+  raw?: string;
 }

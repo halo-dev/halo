@@ -14,13 +14,16 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { CommentStatsVo } from "./comment-stats-vo";
 // May contain unused imports in some cases
 // @ts-ignore
-import { OwnerInfo } from './owner-info'
+import { Metadata } from "./metadata";
 // May contain unused imports in some cases
 // @ts-ignore
-import { ReplySpec } from './reply-spec'
+import { OwnerInfo } from "./owner-info";
+// May contain unused imports in some cases
+// @ts-ignore
+import { ReplySpec } from "./reply-spec";
 
 /**
  * A chunk of items.
@@ -33,17 +36,23 @@ export interface ReplyVo {
    * @type {Metadata}
    * @memberof ReplyVo
    */
-  metadata: Metadata
-  /**
-   *
-   * @type {ReplySpec}
-   * @memberof ReplyVo
-   */
-  spec: ReplySpec
+  metadata: Metadata;
   /**
    *
    * @type {OwnerInfo}
    * @memberof ReplyVo
    */
-  owner: OwnerInfo
+  owner: OwnerInfo;
+  /**
+   *
+   * @type {ReplySpec}
+   * @memberof ReplyVo
+   */
+  spec: ReplySpec;
+  /**
+   *
+   * @type {CommentStatsVo}
+   * @memberof ReplyVo
+   */
+  stats: CommentStatsVo;
 }

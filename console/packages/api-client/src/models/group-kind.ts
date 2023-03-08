@@ -23,11 +23,11 @@ export interface GroupKind {
    * @type {string}
    * @memberof GroupKind
    */
-  group?: string
+  group?: string;
   /**
    *
    * @type {string}
    * @memberof GroupKind
    */
-  kind?: string
+  kind?: string;
 }

@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Plugin } from './plugin'
+import { Plugin } from "./plugin";
 
 /**
  *
@@ -23,57 +23,57 @@ import { Plugin } from './plugin'
  */
 export interface PluginList {
   /**
-   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page is the first page.
+   * @type {boolean}
    * @memberof PluginList
    */
-  page: number
+  first: boolean;
   /**
-   * Size of each page. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof PluginList
    */
-  size: number
+  hasNext: boolean;
   /**
-   * Total elements.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof PluginList
    */
-  total: number
+  hasPrevious: boolean;
   /**
    * A chunk of items.
    * @type {Array<Plugin>}
    * @memberof PluginList
    */
-  items: Array<Plugin>
-  /**
-   * Indicates whether current page is the first page.
-   * @type {boolean}
-   * @memberof PluginList
-   */
-  first: boolean
+  items: Array<Plugin>;
   /**
    * Indicates whether current page is the last page.
    * @type {boolean}
    * @memberof PluginList
    */
-  last: boolean
+  last: boolean;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof PluginList
    */
-  hasNext: boolean
+  page: number;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Size of each page. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof PluginList
    */
-  hasPrevious: boolean
+  size: number;
+  /**
+   * Total elements.
+   * @type {number}
+   * @memberof PluginList
+   */
+  total: number;
   /**
    * Indicates total pages.
    * @type {number}
    * @memberof PluginList
    */
-  totalPages: number
+  totalPages: number;
 }

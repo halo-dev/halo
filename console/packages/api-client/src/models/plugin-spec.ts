@@ -14,10 +14,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { License } from './license'
+import { License } from "./license";
 // May contain unused imports in some cases
 // @ts-ignore
-import { PluginAuthor } from './plugin-author'
+import { PluginAuthor } from "./plugin-author";
 
 /**
  *
@@ -27,81 +27,81 @@ import { PluginAuthor } from './plugin-author'
 export interface PluginSpec {
   /**
    *
-   * @type {string}
-   * @memberof PluginSpec
-   */
-  displayName?: string
-  /**
-   *
-   * @type {string}
-   * @memberof PluginSpec
-   */
-  version: string
-  /**
-   *
    * @type {PluginAuthor}
    * @memberof PluginSpec
    */
-  author?: PluginAuthor
+  author?: PluginAuthor;
   /**
    *
    * @type {string}
    * @memberof PluginSpec
    */
-  logo?: string
-  /**
-   *
-   * @type {{ [key: string]: string; }}
-   * @memberof PluginSpec
-   */
-  pluginDependencies?: { [key: string]: string }
+  configMapName?: string;
   /**
    *
    * @type {string}
    * @memberof PluginSpec
    */
-  homepage?: string
+  description?: string;
   /**
    *
    * @type {string}
    * @memberof PluginSpec
    */
-  description?: string
+  displayName?: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof PluginSpec
+   */
+  enabled?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof PluginSpec
+   */
+  homepage?: string;
   /**
    *
    * @type {Array<License>}
    * @memberof PluginSpec
    */
-  license?: Array<License>
+  license?: Array<License>;
   /**
    *
    * @type {string}
    * @memberof PluginSpec
    */
-  requires?: string
+  logo?: string;
   /**
    *
    * @type {string}
    * @memberof PluginSpec
    * @deprecated
    */
-  pluginClass?: string
+  pluginClass?: string;
   /**
    *
-   * @type {boolean}
+   * @type {{ [key: string]: string; }}
    * @memberof PluginSpec
    */
-  enabled?: boolean
-  /**
-   *
-   * @type {string}
-   * @memberof PluginSpec
-   */
-  settingName?: string
+  pluginDependencies?: { [key: string]: string };
   /**
    *
    * @type {string}
    * @memberof PluginSpec
    */
-  configMapName?: string
+  requires?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof PluginSpec
+   */
+  settingName?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof PluginSpec
+   */
+  version: string;
 }

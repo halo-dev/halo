@@ -23,17 +23,17 @@ export interface RoleRef {
    * @type {string}
    * @memberof RoleRef
    */
-  kind?: string
+  apiGroup?: string;
   /**
    *
    * @type {string}
    * @memberof RoleRef
    */
-  name?: string
+  kind?: string;
   /**
    *
    * @type {string}
    * @memberof RoleRef
    */
-  apiGroup?: string
+  name?: string;
 }

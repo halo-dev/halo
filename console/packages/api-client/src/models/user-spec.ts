@@ -23,59 +23,59 @@ export interface UserSpec {
    * @type {string}
    * @memberof UserSpec
    */
-  displayName: string
+  avatar?: string;
   /**
    *
    * @type {string}
    * @memberof UserSpec
    */
-  avatar?: string
-  /**
-   *
-   * @type {string}
-   * @memberof UserSpec
-   */
-  email: string
-  /**
-   *
-   * @type {string}
-   * @memberof UserSpec
-   */
-  phone?: string
-  /**
-   *
-   * @type {string}
-   * @memberof UserSpec
-   */
-  password?: string
-  /**
-   *
-   * @type {string}
-   * @memberof UserSpec
-   */
-  bio?: string
-  /**
-   *
-   * @type {string}
-   * @memberof UserSpec
-   */
-  registeredAt?: string
+  bio?: string;
   /**
    *
    * @type {boolean}
    * @memberof UserSpec
    */
-  twoFactorAuthEnabled?: boolean
+  disabled?: boolean;
   /**
    *
-   * @type {boolean}
+   * @type {string}
    * @memberof UserSpec
    */
-  disabled?: boolean
+  displayName: string;
+  /**
+   *
+   * @type {string}
+   * @memberof UserSpec
+   */
+  email: string;
   /**
    *
    * @type {number}
    * @memberof UserSpec
    */
-  loginHistoryLimit?: number
+  loginHistoryLimit?: number;
+  /**
+   *
+   * @type {string}
+   * @memberof UserSpec
+   */
+  password?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof UserSpec
+   */
+  phone?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof UserSpec
+   */
+  registeredAt?: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof UserSpec
+   */
+  twoFactorAuthEnabled?: boolean;
 }

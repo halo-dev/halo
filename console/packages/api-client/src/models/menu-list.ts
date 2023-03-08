@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Menu } from './menu'
+import { Menu } from "./menu";
 
 /**
  *
@@ -23,57 +23,57 @@ import { Menu } from './menu'
  */
 export interface MenuList {
   /**
-   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page is the first page.
+   * @type {boolean}
    * @memberof MenuList
    */
-  page: number
+  first: boolean;
   /**
-   * Size of each page. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof MenuList
    */
-  size: number
+  hasNext: boolean;
   /**
-   * Total elements.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof MenuList
    */
-  total: number
+  hasPrevious: boolean;
   /**
    * A chunk of items.
    * @type {Array<Menu>}
    * @memberof MenuList
    */
-  items: Array<Menu>
-  /**
-   * Indicates whether current page is the first page.
-   * @type {boolean}
-   * @memberof MenuList
-   */
-  first: boolean
+  items: Array<Menu>;
   /**
    * Indicates whether current page is the last page.
    * @type {boolean}
    * @memberof MenuList
    */
-  last: boolean
+  last: boolean;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof MenuList
    */
-  hasNext: boolean
+  page: number;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Size of each page. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof MenuList
    */
-  hasPrevious: boolean
+  size: number;
+  /**
+   * Total elements.
+   * @type {number}
+   * @memberof MenuList
+   */
+  total: number;
   /**
    * Indicates total pages.
    * @type {number}
    * @memberof MenuList
    */
-  totalPages: number
+  totalPages: number;
 }

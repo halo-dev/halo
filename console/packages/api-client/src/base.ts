@@ -12,24 +12,24 @@
  * Do not edit the class manually.
  */
 
-import type { Configuration } from './configuration'
+import type { Configuration } from "./configuration";
 // Some imports not used depending on template conditions
 // @ts-ignore
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios'
-import globalAxios from 'axios'
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from "axios";
+import globalAxios from "axios";
 
-export const BASE_PATH = 'http://127.0.0.1:8090'.replace(/\/+$/, '')
+export const BASE_PATH = "http://127.0.0.1:8090".replace(/\/+$/, "");
 
 /**
  *
  * @export
  */
 export const COLLECTION_FORMATS = {
-  csv: ',',
-  ssv: ' ',
-  tsv: '\t',
-  pipes: '|',
-}
+  csv: ",",
+  ssv: " ",
+  tsv: "\t",
+  pipes: "|",
+};
 
 /**
  *
@@ -37,8 +37,8 @@ export const COLLECTION_FORMATS = {
  * @interface RequestArgs
  */
 export interface RequestArgs {
-  url: string
-  options: AxiosRequestConfig
+  url: string;
+  options: AxiosRequestConfig;
 }
 
 /**
@@ -47,16 +47,16 @@ export interface RequestArgs {
  * @class BaseAPI
  */
 export class BaseAPI {
-  protected configuration: Configuration | undefined
+  protected configuration: Configuration | undefined;
 
   constructor(
     configuration?: Configuration,
     protected basePath: string = BASE_PATH,
-    protected axios: AxiosInstance = globalAxios,
+    protected axios: AxiosInstance = globalAxios
   ) {
     if (configuration) {
-      this.configuration = configuration
-      this.basePath = configuration.basePath || this.basePath
+      this.configuration = configuration;
+      this.basePath = configuration.basePath || this.basePath;
     }
   }
 }
@@ -69,7 +69,7 @@ export class BaseAPI {
  */
 export class RequiredError extends Error {
   constructor(public field: string, msg?: string) {
-    super(msg)
-    this.name = 'RequiredError'
+    super(msg);
+    this.name = "RequiredError";
   }
 }

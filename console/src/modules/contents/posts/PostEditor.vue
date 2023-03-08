@@ -213,6 +213,8 @@ const handleFetchContent = async () => {
     name: formState.value.post.metadata.name,
   });
 
+  formState.value.content = Object.assign(formState.value.content, data);
+
   // get editor provider
   if (!currentEditorProvider.value) {
     const preferredEditor = editorProviders.value.find(
@@ -256,8 +258,6 @@ const handleFetchContent = async () => {
 
     await nextTick();
   }
-
-  formState.value.content = Object.assign(formState.value.content, data);
 };
 
 const handleOpenSettingModal = async () => {

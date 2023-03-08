@@ -62,6 +62,8 @@ models/comment-list.ts
 models/comment-owner.ts
 models/comment-request.ts
 models/comment-spec.ts
+models/comment-stats-vo.ts
+models/comment-stats.ts
 models/comment-status.ts
 models/comment-vo-list.ts
 models/comment-vo.ts

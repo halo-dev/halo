@@ -12,29 +12,16 @@
  * Do not edit the class manually.
  */
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { Role } from "./role";
-// May contain unused imports in some cases
-// @ts-ignore
-import { User } from "./user";
-
 /**
- * A chunk of items.
+ *
  * @export
- * @interface ListedUser
+ * @interface CommentStats
  */
-export interface ListedUser {
+export interface CommentStats {
   /**
    *
-   * @type {Array<Role>}
-   * @memberof ListedUser
+   * @type {number}
+   * @memberof CommentStats
    */
-  roles: Array<Role>;
-  /**
-   *
-   * @type {User}
-   * @memberof ListedUser
-   */
-  user: User;
+  upvote?: number;
 }

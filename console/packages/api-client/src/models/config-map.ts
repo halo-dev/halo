@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 
 /**
  *
@@ -24,26 +24,26 @@ import { Metadata } from './metadata'
 export interface ConfigMap {
   /**
    *
+   * @type {string}
+   * @memberof ConfigMap
+   */
+  apiVersion: string;
+  /**
+   *
    * @type {{ [key: string]: string; }}
    * @memberof ConfigMap
    */
-  data?: { [key: string]: string }
+  data?: { [key: string]: string };
   /**
    *
    * @type {string}
    * @memberof ConfigMap
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof ConfigMap
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof ConfigMap
    */
-  metadata: Metadata
+  metadata: Metadata;
 }
