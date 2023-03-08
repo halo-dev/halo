@@ -12,9 +12,9 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.SystemSetting.Basic;
 import run.halo.app.infra.SystemSetting.Comment;
 import run.halo.app.infra.SystemSetting.User;
-import run.halo.app.infra.SystemSetting.Basic;
 
 @WebEndpoint(id = "globalinfo")
 @Component
