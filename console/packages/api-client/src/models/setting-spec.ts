@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { SettingForm } from './setting-form'
+import { SettingForm } from "./setting-form";
 
 /**
  *
@@ -27,5 +27,5 @@ export interface SettingSpec {
    * @type {Array<SettingForm>}
    * @memberof SettingSpec
    */
-  forms: Array<SettingForm>
+  forms: Array<SettingForm>;
 }

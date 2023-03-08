@@ -14,10 +14,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 // May contain unused imports in some cases
 // @ts-ignore
-import { SearchEngineSpec } from './search-engine-spec'
+import { SearchEngineSpec } from "./search-engine-spec";
 
 /**
  *
@@ -27,26 +27,26 @@ import { SearchEngineSpec } from './search-engine-spec'
 export interface SearchEngine {
   /**
    *
-   * @type {SearchEngineSpec}
+   * @type {string}
    * @memberof SearchEngine
    */
-  spec: SearchEngineSpec
+  apiVersion: string;
   /**
    *
    * @type {string}
    * @memberof SearchEngine
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof SearchEngine
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof SearchEngine
    */
-  metadata: Metadata
+  metadata: Metadata;
+  /**
+   *
+   * @type {SearchEngineSpec}
+   * @memberof SearchEngine
+   */
+  spec: SearchEngineSpec;
 }

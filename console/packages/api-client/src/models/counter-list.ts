@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Counter } from './counter'
+import { Counter } from "./counter";
 
 /**
  *
@@ -23,57 +23,57 @@ import { Counter } from './counter'
  */
 export interface CounterList {
   /**
-   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page is the first page.
+   * @type {boolean}
    * @memberof CounterList
    */
-  page: number
+  first: boolean;
   /**
-   * Size of each page. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof CounterList
    */
-  size: number
+  hasNext: boolean;
   /**
-   * Total elements.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof CounterList
    */
-  total: number
+  hasPrevious: boolean;
   /**
    * A chunk of items.
    * @type {Array<Counter>}
    * @memberof CounterList
    */
-  items: Array<Counter>
-  /**
-   * Indicates whether current page is the first page.
-   * @type {boolean}
-   * @memberof CounterList
-   */
-  first: boolean
+  items: Array<Counter>;
   /**
    * Indicates whether current page is the last page.
    * @type {boolean}
    * @memberof CounterList
    */
-  last: boolean
+  last: boolean;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof CounterList
    */
-  hasNext: boolean
+  page: number;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Size of each page. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof CounterList
    */
-  hasPrevious: boolean
+  size: number;
+  /**
+   * Total elements.
+   * @type {number}
+   * @memberof CounterList
+   */
+  total: number;
   /**
    * Indicates total pages.
    * @type {number}
    * @memberof CounterList
    */
-  totalPages: number
+  totalPages: number;
 }

@@ -14,10 +14,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Content } from './content'
+import { Content } from "./content";
 // May contain unused imports in some cases
 // @ts-ignore
-import { Post } from './post'
+import { Post } from "./post";
 
 /**
  *
@@ -27,14 +27,14 @@ import { Post } from './post'
 export interface PostRequest {
   /**
    *
-   * @type {Post}
-   * @memberof PostRequest
-   */
-  post: Post
-  /**
-   *
    * @type {Content}
    * @memberof PostRequest
    */
-  content: Content
+  content: Content;
+  /**
+   *
+   * @type {Post}
+   * @memberof PostRequest
+   */
+  post: Post;
 }

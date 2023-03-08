@@ -41,6 +41,7 @@ halo:
 springdoc:
   api-docs:
     enabled: false
+  writer-with-order-by-keys: true
 
 logging:
   file:

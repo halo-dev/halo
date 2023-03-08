@@ -23,23 +23,23 @@ export interface ContentWrapper {
    * @type {string}
    * @memberof ContentWrapper
    */
-  snapshotName?: string
+  content?: string;
   /**
    *
    * @type {string}
    * @memberof ContentWrapper
    */
-  raw?: string
+  raw?: string;
   /**
    *
    * @type {string}
    * @memberof ContentWrapper
    */
-  content?: string
+  rawType?: string;
   /**
    *
    * @type {string}
    * @memberof ContentWrapper
    */
-  rawType?: string
+  snapshotName?: string;
 }

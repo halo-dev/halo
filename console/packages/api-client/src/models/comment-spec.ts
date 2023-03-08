@@ -14,10 +14,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CommentOwner } from './comment-owner'
+import { CommentOwner } from "./comment-owner";
 // May contain unused imports in some cases
 // @ts-ignore
-import { Ref } from './ref'
+import { Ref } from "./ref";
 
 /**
  *
@@ -27,86 +27,86 @@ import { Ref } from './ref'
 export interface CommentSpec {
   /**
    *
-   * @type {string}
+   * @type {boolean}
    * @memberof CommentSpec
    */
-  raw: string
+  allowNotification: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CommentSpec
+   */
+  approved: boolean;
   /**
    *
    * @type {string}
    * @memberof CommentSpec
    */
-  content: string
+  approvedTime?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CommentSpec
+   */
+  content: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CommentSpec
+   */
+  creationTime?: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CommentSpec
+   */
+  hidden: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CommentSpec
+   */
+  ipAddress?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CommentSpec
+   */
+  lastReadTime?: string;
   /**
    *
    * @type {CommentOwner}
    * @memberof CommentSpec
    */
-  owner: CommentOwner
-  /**
-   *
-   * @type {string}
-   * @memberof CommentSpec
-   */
-  userAgent?: string
-  /**
-   *
-   * @type {string}
-   * @memberof CommentSpec
-   */
-  ipAddress?: string
-  /**
-   *
-   * @type {string}
-   * @memberof CommentSpec
-   */
-  approvedTime?: string
-  /**
-   *
-   * @type {string}
-   * @memberof CommentSpec
-   */
-  creationTime?: string
+  owner: CommentOwner;
   /**
    *
    * @type {number}
    * @memberof CommentSpec
    */
-  priority: number
-  /**
-   *
-   * @type {boolean}
-   * @memberof CommentSpec
-   */
-  top: boolean
-  /**
-   *
-   * @type {boolean}
-   * @memberof CommentSpec
-   */
-  allowNotification: boolean
-  /**
-   *
-   * @type {boolean}
-   * @memberof CommentSpec
-   */
-  approved: boolean
-  /**
-   *
-   * @type {boolean}
-   * @memberof CommentSpec
-   */
-  hidden: boolean
-  /**
-   *
-   * @type {Ref}
-   * @memberof CommentSpec
-   */
-  subjectRef: Ref
+  priority: number;
   /**
    *
    * @type {string}
    * @memberof CommentSpec
    */
-  lastReadTime?: string
+  raw: string;
+  /**
+   *
+   * @type {Ref}
+   * @memberof CommentSpec
+   */
+  subjectRef: Ref;
+  /**
+   *
+   * @type {boolean}
+   * @memberof CommentSpec
+   */
+  top: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof CommentSpec
+   */
+  userAgent?: string;
 }

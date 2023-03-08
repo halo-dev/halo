@@ -12,9 +12,9 @@
  * Do not edit the class manually.
  */
 
-import type { Configuration } from '../configuration'
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios'
-import globalAxios from 'axios'
+import type { Configuration } from "../configuration";
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from "axios";
+import globalAxios from "axios";
 // Some imports not used depending on template conditions
 // @ts-ignore
 import {
@@ -28,18 +28,26 @@ import {
   serializeDataIfNeeded,
   toPathString,
   createRequestFunction,
-} from '../common'
+} from "../common";
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base'
+import {
+  BASE_PATH,
+  COLLECTION_FORMATS,
+  RequestArgs,
+  BaseAPI,
+  RequiredError,
+} from "../base";
 // @ts-ignore
-import { CounterRequest } from '../models'
+import { CounterRequest } from "../models";
 // @ts-ignore
-import { VoteRequest } from '../models'
+import { VoteRequest } from "../models";
 /**
  * ApiHaloRunV1alpha1TrackerApi - axios parameter creator
  * @export
  */
-export const ApiHaloRunV1alpha1TrackerApiAxiosParamCreator = function (configuration?: Configuration) {
+export const ApiHaloRunV1alpha1TrackerApiAxiosParamCreator = function (
+  configuration?: Configuration
+) {
   return {
     /**
      * Count an extension resource visits.
@@ -47,40 +55,56 @@ export const ApiHaloRunV1alpha1TrackerApiAxiosParamCreator = function (configura
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    count: async (counterRequest: CounterRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    count: async (
+      counterRequest: CounterRequest,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'counterRequest' is not null or undefined
-      assertParamExists('count', 'counterRequest', counterRequest)
-      const localVarPath = `/apis/api.halo.run/v1alpha1/trackers/counter`
+      assertParamExists("count", "counterRequest", counterRequest);
+      const localVarPath = `/apis/api.halo.run/v1alpha1/trackers/counter`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(counterRequest, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        counterRequest,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Downvote an extension resource.
@@ -88,40 +112,56 @@ export const ApiHaloRunV1alpha1TrackerApiAxiosParamCreator = function (configura
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    downvote: async (voteRequest: VoteRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    downvote: async (
+      voteRequest: VoteRequest,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'voteRequest' is not null or undefined
-      assertParamExists('downvote', 'voteRequest', voteRequest)
-      const localVarPath = `/apis/api.halo.run/v1alpha1/trackers/downvote`
+      assertParamExists("downvote", "voteRequest", voteRequest);
+      const localVarPath = `/apis/api.halo.run/v1alpha1/trackers/downvote`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(voteRequest, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        voteRequest,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Upvote an extension resource.
@@ -129,50 +169,69 @@ export const ApiHaloRunV1alpha1TrackerApiAxiosParamCreator = function (configura
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    upvote: async (voteRequest: VoteRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    upvote: async (
+      voteRequest: VoteRequest,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'voteRequest' is not null or undefined
-      assertParamExists('upvote', 'voteRequest', voteRequest)
-      const localVarPath = `/apis/api.halo.run/v1alpha1/trackers/upvote`
+      assertParamExists("upvote", "voteRequest", voteRequest);
+      const localVarPath = `/apis/api.halo.run/v1alpha1/trackers/upvote`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(voteRequest, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        voteRequest,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
-  }
-}
+  };
+};
 
 /**
  * ApiHaloRunV1alpha1TrackerApi - functional programming interface
  * @export
  */
-export const ApiHaloRunV1alpha1TrackerApiFp = function (configuration?: Configuration) {
-  const localVarAxiosParamCreator = ApiHaloRunV1alpha1TrackerApiAxiosParamCreator(configuration)
+export const ApiHaloRunV1alpha1TrackerApiFp = function (
+  configuration?: Configuration
+) {
+  const localVarAxiosParamCreator =
+    ApiHaloRunV1alpha1TrackerApiAxiosParamCreator(configuration);
   return {
     /**
      * Count an extension resource visits.
@@ -182,10 +241,20 @@ export const ApiHaloRunV1alpha1TrackerApiFp = function (configuration?: Configur
      */
     async count(
       counterRequest: CounterRequest,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.count(counterRequest, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.count(
+        counterRequest,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Downvote an extension resource.
@@ -195,10 +264,20 @@ export const ApiHaloRunV1alpha1TrackerApiFp = function (configuration?: Configur
      */
     async downvote(
       voteRequest: VoteRequest,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.downvote(voteRequest, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.downvote(
+        voteRequest,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Upvote an extension resource.
@@ -208,13 +287,23 @@ export const ApiHaloRunV1alpha1TrackerApiFp = function (configuration?: Configur
      */
     async upvote(
       voteRequest: VoteRequest,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.upvote(voteRequest, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.upvote(
+        voteRequest,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
-  }
-}
+  };
+};
 
 /**
  * ApiHaloRunV1alpha1TrackerApi - factory interface
@@ -223,9 +312,9 @@ export const ApiHaloRunV1alpha1TrackerApiFp = function (configuration?: Configur
 export const ApiHaloRunV1alpha1TrackerApiFactory = function (
   configuration?: Configuration,
   basePath?: string,
-  axios?: AxiosInstance,
+  axios?: AxiosInstance
 ) {
-  const localVarFp = ApiHaloRunV1alpha1TrackerApiFp(configuration)
+  const localVarFp = ApiHaloRunV1alpha1TrackerApiFp(configuration);
   return {
     /**
      * Count an extension resource visits.
@@ -235,9 +324,11 @@ export const ApiHaloRunV1alpha1TrackerApiFactory = function (
      */
     count(
       requestParameters: ApiHaloRunV1alpha1TrackerApiCountRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<void> {
-      return localVarFp.count(requestParameters.counterRequest, options).then((request) => request(axios, basePath))
+      return localVarFp
+        .count(requestParameters.counterRequest, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      * Downvote an extension resource.
@@ -247,9 +338,11 @@ export const ApiHaloRunV1alpha1TrackerApiFactory = function (
      */
     downvote(
       requestParameters: ApiHaloRunV1alpha1TrackerApiDownvoteRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<void> {
-      return localVarFp.downvote(requestParameters.voteRequest, options).then((request) => request(axios, basePath))
+      return localVarFp
+        .downvote(requestParameters.voteRequest, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      * Upvote an extension resource.
@@ -259,12 +352,14 @@ export const ApiHaloRunV1alpha1TrackerApiFactory = function (
      */
     upvote(
       requestParameters: ApiHaloRunV1alpha1TrackerApiUpvoteRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<void> {
-      return localVarFp.upvote(requestParameters.voteRequest, options).then((request) => request(axios, basePath))
+      return localVarFp
+        .upvote(requestParameters.voteRequest, options)
+        .then((request) => request(axios, basePath));
     },
-  }
-}
+  };
+};
 
 /**
  * Request parameters for count operation in ApiHaloRunV1alpha1TrackerApi.
@@ -277,7 +372,7 @@ export interface ApiHaloRunV1alpha1TrackerApiCountRequest {
    * @type {CounterRequest}
    * @memberof ApiHaloRunV1alpha1TrackerApiCount
    */
-  readonly counterRequest: CounterRequest
+  readonly counterRequest: CounterRequest;
 }
 
 /**
@@ -291,7 +386,7 @@ export interface ApiHaloRunV1alpha1TrackerApiDownvoteRequest {
    * @type {VoteRequest}
    * @memberof ApiHaloRunV1alpha1TrackerApiDownvote
    */
-  readonly voteRequest: VoteRequest
+  readonly voteRequest: VoteRequest;
 }
 
 /**
@@ -305,7 +400,7 @@ export interface ApiHaloRunV1alpha1TrackerApiUpvoteRequest {
    * @type {VoteRequest}
    * @memberof ApiHaloRunV1alpha1TrackerApiUpvote
    */
-  readonly voteRequest: VoteRequest
+  readonly voteRequest: VoteRequest;
 }
 
 /**
@@ -322,10 +417,13 @@ export class ApiHaloRunV1alpha1TrackerApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof ApiHaloRunV1alpha1TrackerApi
    */
-  public count(requestParameters: ApiHaloRunV1alpha1TrackerApiCountRequest, options?: AxiosRequestConfig) {
+  public count(
+    requestParameters: ApiHaloRunV1alpha1TrackerApiCountRequest,
+    options?: AxiosRequestConfig
+  ) {
     return ApiHaloRunV1alpha1TrackerApiFp(this.configuration)
       .count(requestParameters.counterRequest, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -335,10 +433,13 @@ export class ApiHaloRunV1alpha1TrackerApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof ApiHaloRunV1alpha1TrackerApi
    */
-  public downvote(requestParameters: ApiHaloRunV1alpha1TrackerApiDownvoteRequest, options?: AxiosRequestConfig) {
+  public downvote(
+    requestParameters: ApiHaloRunV1alpha1TrackerApiDownvoteRequest,
+    options?: AxiosRequestConfig
+  ) {
     return ApiHaloRunV1alpha1TrackerApiFp(this.configuration)
       .downvote(requestParameters.voteRequest, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -348,9 +449,12 @@ export class ApiHaloRunV1alpha1TrackerApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof ApiHaloRunV1alpha1TrackerApi
    */
-  public upvote(requestParameters: ApiHaloRunV1alpha1TrackerApiUpvoteRequest, options?: AxiosRequestConfig) {
+  public upvote(
+    requestParameters: ApiHaloRunV1alpha1TrackerApiUpvoteRequest,
+    options?: AxiosRequestConfig
+  ) {
     return ApiHaloRunV1alpha1TrackerApiFp(this.configuration)
       .upvote(requestParameters.voteRequest, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 }

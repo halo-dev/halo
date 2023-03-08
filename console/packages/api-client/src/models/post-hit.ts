@@ -23,29 +23,29 @@ export interface PostHit {
    * @type {string}
    * @memberof PostHit
    */
-  name?: string
+  content?: string;
   /**
    *
    * @type {string}
    * @memberof PostHit
    */
-  title?: string
+  name?: string;
   /**
    *
    * @type {string}
    * @memberof PostHit
    */
-  content?: string
+  permalink?: string;
   /**
    *
    * @type {string}
    * @memberof PostHit
    */
-  publishTimestamp?: string
+  publishTimestamp?: string;
   /**
    *
    * @type {string}
    * @memberof PostHit
    */
-  permalink?: string
+  title?: string;
 }

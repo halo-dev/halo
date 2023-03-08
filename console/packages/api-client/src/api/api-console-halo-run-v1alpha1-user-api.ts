@@ -12,9 +12,9 @@
  * Do not edit the class manually.
  */
 
-import type { Configuration } from '../configuration'
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios'
-import globalAxios from 'axios'
+import type { Configuration } from "../configuration";
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from "axios";
+import globalAxios from "axios";
 // Some imports not used depending on template conditions
 // @ts-ignore
 import {
@@ -28,26 +28,34 @@ import {
   serializeDataIfNeeded,
   toPathString,
   createRequestFunction,
-} from '../common'
+} from "../common";
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base'
+import {
+  BASE_PATH,
+  COLLECTION_FORMATS,
+  RequestArgs,
+  BaseAPI,
+  RequiredError,
+} from "../base";
 // @ts-ignore
-import { ChangePasswordRequest } from '../models'
+import { ChangePasswordRequest } from "../models";
 // @ts-ignore
-import { DetailedUser } from '../models'
+import { DetailedUser } from "../models";
 // @ts-ignore
-import { GrantRequest } from '../models'
+import { GrantRequest } from "../models";
 // @ts-ignore
-import { ListedUserList } from '../models'
+import { ListedUserList } from "../models";
 // @ts-ignore
-import { User } from '../models'
+import { User } from "../models";
 // @ts-ignore
-import { UserPermission } from '../models'
+import { UserPermission } from "../models";
 /**
  * ApiConsoleHaloRunV1alpha1UserApi - axios parameter creator
  * @export
  */
-export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (configuration?: Configuration) {
+export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (
+  configuration?: Configuration
+) {
   return {
     /**
      * Change password of user.
@@ -59,81 +67,110 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (confi
     changePassword: async (
       name: string,
       changePasswordRequest: ChangePasswordRequest,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('changePassword', 'name', name)
+      assertParamExists("changePassword", "name", name);
       // verify required parameter 'changePasswordRequest' is not null or undefined
-      assertParamExists('changePassword', 'changePasswordRequest', changePasswordRequest)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/users/{name}/password`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists(
+        "changePassword",
+        "changePasswordRequest",
+        changePasswordRequest
+      );
+      const localVarPath =
+        `/apis/api.console.halo.run/v1alpha1/users/{name}/password`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "PUT",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(changePasswordRequest, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        changePasswordRequest,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Get current user detail
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getCurrentUserDetail: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/users/-`
+    getCurrentUserDetail: async (
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/users/-`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Get permissions of user
@@ -141,40 +178,53 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (confi
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getPermissions: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    getPermissions: async (
+      name: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('getPermissions', 'name', name)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/users/{name}/permissions`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("getPermissions", "name", name);
+      const localVarPath =
+        `/apis/api.console.halo.run/v1alpha1/users/{name}/permissions`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Get user detail by name
@@ -182,40 +232,53 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (confi
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getUserDetail: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    getUserDetail: async (
+      name: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('getUserDetail', 'name', name)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/users/{name}`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("getUserDetail", "name", name);
+      const localVarPath =
+        `/apis/api.console.halo.run/v1alpha1/users/{name}`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Grant permissions to user
@@ -227,46 +290,60 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (confi
     grantPermission: async (
       name: string,
       grantRequest: GrantRequest,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('grantPermission', 'name', name)
+      assertParamExists("grantPermission", "name", name);
       // verify required parameter 'grantRequest' is not null or undefined
-      assertParamExists('grantPermission', 'grantRequest', grantRequest)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/users/{name}/permissions`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+      assertParamExists("grantPermission", "grantRequest", grantRequest);
+      const localVarPath =
+        `/apis/api.console.halo.run/v1alpha1/users/{name}/permissions`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(grantRequest, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        grantRequest,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * List users
@@ -288,64 +365,73 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (confi
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
       page?: number,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/users`
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/users`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
       if (sort) {
-        localVarQueryParameter['sort'] = Array.from(sort)
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       if (keyword !== undefined) {
-        localVarQueryParameter['keyword'] = keyword
+        localVarQueryParameter["keyword"] = keyword;
       }
 
       if (role !== undefined) {
-        localVarQueryParameter['role'] = role
+        localVarQueryParameter["role"] = role;
       }
 
       if (size !== undefined) {
-        localVarQueryParameter['size'] = size
+        localVarQueryParameter["size"] = size;
       }
 
       if (labelSelector) {
-        localVarQueryParameter['labelSelector'] = labelSelector
+        localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
       if (fieldSelector) {
-        localVarQueryParameter['fieldSelector'] = fieldSelector
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
       if (page !== undefined) {
-        localVarQueryParameter['page'] = page
+        localVarQueryParameter["page"] = page;
       }
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Update current user profile, but password.
@@ -353,50 +439,69 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (confi
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    updateCurrentUser: async (user: User, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    updateCurrentUser: async (
+      user: User,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'user' is not null or undefined
-      assertParamExists('updateCurrentUser', 'user', user)
-      const localVarPath = `/apis/api.console.halo.run/v1alpha1/users/-`
+      assertParamExists("updateCurrentUser", "user", user);
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/users/-`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "PUT",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(user, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        user,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
-  }
-}
+  };
+};
 
 /**
  * ApiConsoleHaloRunV1alpha1UserApi - functional programming interface
  * @export
  */
-export const ApiConsoleHaloRunV1alpha1UserApiFp = function (configuration?: Configuration) {
-  const localVarAxiosParamCreator = ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator(configuration)
+export const ApiConsoleHaloRunV1alpha1UserApiFp = function (
+  configuration?: Configuration
+) {
+  const localVarAxiosParamCreator =
+    ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator(configuration);
   return {
     /**
      * Change password of user.
@@ -408,10 +513,21 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (configuration?: Conf
     async changePassword(
       name: string,
       changePasswordRequest: ChangePasswordRequest,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.changePassword(name, changePasswordRequest, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.changePassword(
+        name,
+        changePasswordRequest,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Get current user detail
@@ -419,10 +535,18 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (configuration?: Conf
      * @throws {RequiredError}
      */
     async getCurrentUserDetail(
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DetailedUser>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.getCurrentUserDetail(options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<DetailedUser>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.getCurrentUserDetail(options);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Get permissions of user
@@ -432,10 +556,20 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (configuration?: Conf
      */
     async getPermissions(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserPermission>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.getPermissions(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserPermission>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.getPermissions(
+        name,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Get user detail by name
@@ -445,10 +579,20 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (configuration?: Conf
      */
     async getUserDetail(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<DetailedUser>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.getUserDetail(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<DetailedUser>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.getUserDetail(
+        name,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Grant permissions to user
@@ -460,10 +604,21 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (configuration?: Conf
     async grantPermission(
       name: string,
       grantRequest: GrantRequest,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.grantPermission(name, grantRequest, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.grantPermission(
+        name,
+        grantRequest,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * List users
@@ -485,8 +640,10 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (configuration?: Conf
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
       page?: number,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedUserList>> {
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedUserList>
+    > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.listUsers(
         sort,
         keyword,
@@ -495,9 +652,14 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (configuration?: Conf
         labelSelector,
         fieldSelector,
         page,
-        options,
-      )
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Update current user profile, but password.
@@ -507,13 +669,21 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (configuration?: Conf
      */
     async updateCurrentUser(
       user: User,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.updateCurrentUser(user, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.updateCurrentUser(user, options);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
-  }
-}
+  };
+};
 
 /**
  * ApiConsoleHaloRunV1alpha1UserApi - factory interface
@@ -522,9 +692,9 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (configuration?: Conf
 export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
   configuration?: Configuration,
   basePath?: string,
-  axios?: AxiosInstance,
+  axios?: AxiosInstance
 ) {
-  const localVarFp = ApiConsoleHaloRunV1alpha1UserApiFp(configuration)
+  const localVarFp = ApiConsoleHaloRunV1alpha1UserApiFp(configuration);
   return {
     /**
      * Change password of user.
@@ -534,19 +704,27 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
      */
     changePassword(
       requestParameters: ApiConsoleHaloRunV1alpha1UserApiChangePasswordRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<User> {
       return localVarFp
-        .changePassword(requestParameters.name, requestParameters.changePasswordRequest, options)
-        .then((request) => request(axios, basePath))
+        .changePassword(
+          requestParameters.name,
+          requestParameters.changePasswordRequest,
+          options
+        )
+        .then((request) => request(axios, basePath));
     },
     /**
      * Get current user detail
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getCurrentUserDetail(options?: AxiosRequestConfig): AxiosPromise<DetailedUser> {
-      return localVarFp.getCurrentUserDetail(options).then((request) => request(axios, basePath))
+    getCurrentUserDetail(
+      options?: AxiosRequestConfig
+    ): AxiosPromise<DetailedUser> {
+      return localVarFp
+        .getCurrentUserDetail(options)
+        .then((request) => request(axios, basePath));
     },
     /**
      * Get permissions of user
@@ -556,9 +734,11 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
      */
     getPermissions(
       requestParameters: ApiConsoleHaloRunV1alpha1UserApiGetPermissionsRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<UserPermission> {
-      return localVarFp.getPermissions(requestParameters.name, options).then((request) => request(axios, basePath))
+      return localVarFp
+        .getPermissions(requestParameters.name, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      * Get user detail by name
@@ -568,9 +748,11 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
      */
     getUserDetail(
       requestParameters: ApiConsoleHaloRunV1alpha1UserApiGetUserDetailRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<DetailedUser> {
-      return localVarFp.getUserDetail(requestParameters.name, options).then((request) => request(axios, basePath))
+      return localVarFp
+        .getUserDetail(requestParameters.name, options)
+        .then((request) => request(axios, basePath));
     },
     /**
      * Grant permissions to user
@@ -580,11 +762,15 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
      */
     grantPermission(
       requestParameters: ApiConsoleHaloRunV1alpha1UserApiGrantPermissionRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<User> {
       return localVarFp
-        .grantPermission(requestParameters.name, requestParameters.grantRequest, options)
-        .then((request) => request(axios, basePath))
+        .grantPermission(
+          requestParameters.name,
+          requestParameters.grantRequest,
+          options
+        )
+        .then((request) => request(axios, basePath));
     },
     /**
      * List users
@@ -594,7 +780,7 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
      */
     listUsers(
       requestParameters: ApiConsoleHaloRunV1alpha1UserApiListUsersRequest = {},
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<ListedUserList> {
       return localVarFp
         .listUsers(
@@ -605,9 +791,9 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
           requestParameters.page,
-          options,
+          options
         )
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * Update current user profile, but password.
@@ -617,12 +803,14 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
      */
     updateCurrentUser(
       requestParameters: ApiConsoleHaloRunV1alpha1UserApiUpdateCurrentUserRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<User> {
-      return localVarFp.updateCurrentUser(requestParameters.user, options).then((request) => request(axios, basePath))
+      return localVarFp
+        .updateCurrentUser(requestParameters.user, options)
+        .then((request) => request(axios, basePath));
     },
-  }
-}
+  };
+};
 
 /**
  * Request parameters for changePassword operation in ApiConsoleHaloRunV1alpha1UserApi.
@@ -635,14 +823,14 @@ export interface ApiConsoleHaloRunV1alpha1UserApiChangePasswordRequest {
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiChangePassword
    */
-  readonly name: string
+  readonly name: string;
 
   /**
    *
    * @type {ChangePasswordRequest}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiChangePassword
    */
-  readonly changePasswordRequest: ChangePasswordRequest
+  readonly changePasswordRequest: ChangePasswordRequest;
 }
 
 /**
@@ -656,7 +844,7 @@ export interface ApiConsoleHaloRunV1alpha1UserApiGetPermissionsRequest {
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiGetPermissions
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -670,7 +858,7 @@ export interface ApiConsoleHaloRunV1alpha1UserApiGetUserDetailRequest {
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiGetUserDetail
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -684,14 +872,14 @@ export interface ApiConsoleHaloRunV1alpha1UserApiGrantPermissionRequest {
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiGrantPermission
    */
-  readonly name: string
+  readonly name: string;
 
   /**
    *
    * @type {GrantRequest}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiGrantPermission
    */
-  readonly grantRequest: GrantRequest
+  readonly grantRequest: GrantRequest;
 }
 
 /**
@@ -705,49 +893,49 @@ export interface ApiConsoleHaloRunV1alpha1UserApiListUsersRequest {
    * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly sort?: Array<string>
+  readonly sort?: Array<string>;
 
   /**
    *
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly keyword?: string
+  readonly keyword?: string;
 
   /**
    *
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly role?: string
+  readonly role?: string;
 
   /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly size?: number
+  readonly size?: number;
 
   /**
    * Label selector for filtering.
    * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly labelSelector?: Array<string>
+  readonly labelSelector?: Array<string>;
 
   /**
    * Field selector for filtering.
    * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly fieldSelector?: Array<string>
+  readonly fieldSelector?: Array<string>;
 
   /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly page?: number
+  readonly page?: number;
 }
 
 /**
@@ -761,7 +949,7 @@ export interface ApiConsoleHaloRunV1alpha1UserApiUpdateCurrentUserRequest {
    * @type {User}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiUpdateCurrentUser
    */
-  readonly user: User
+  readonly user: User;
 }
 
 /**
@@ -780,11 +968,15 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
    */
   public changePassword(
     requestParameters: ApiConsoleHaloRunV1alpha1UserApiChangePasswordRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
-      .changePassword(requestParameters.name, requestParameters.changePasswordRequest, options)
-      .then((request) => request(this.axios, this.basePath))
+      .changePassword(
+        requestParameters.name,
+        requestParameters.changePasswordRequest,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -796,7 +988,7 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
   public getCurrentUserDetail(options?: AxiosRequestConfig) {
     return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
       .getCurrentUserDetail(options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -808,11 +1000,11 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
    */
   public getPermissions(
     requestParameters: ApiConsoleHaloRunV1alpha1UserApiGetPermissionsRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
       .getPermissions(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -824,11 +1016,11 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
    */
   public getUserDetail(
     requestParameters: ApiConsoleHaloRunV1alpha1UserApiGetUserDetailRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
       .getUserDetail(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -840,11 +1032,15 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
    */
   public grantPermission(
     requestParameters: ApiConsoleHaloRunV1alpha1UserApiGrantPermissionRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
-      .grantPermission(requestParameters.name, requestParameters.grantRequest, options)
-      .then((request) => request(this.axios, this.basePath))
+      .grantPermission(
+        requestParameters.name,
+        requestParameters.grantRequest,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -856,7 +1052,7 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
    */
   public listUsers(
     requestParameters: ApiConsoleHaloRunV1alpha1UserApiListUsersRequest = {},
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
       .listUsers(
@@ -867,9 +1063,9 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
         requestParameters.page,
-        options,
+        options
       )
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -881,10 +1077,10 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
    */
   public updateCurrentUser(
     requestParameters: ApiConsoleHaloRunV1alpha1UserApiUpdateCurrentUserRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
       .updateCurrentUser(requestParameters.user, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 }

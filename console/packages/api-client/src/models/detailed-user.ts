@@ -14,10 +14,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Role } from './role'
+import { Role } from "./role";
 // May contain unused imports in some cases
 // @ts-ignore
-import { User } from './user'
+import { User } from "./user";
 
 /**
  *
@@ -27,14 +27,14 @@ import { User } from './user'
 export interface DetailedUser {
   /**
    *
-   * @type {User}
-   * @memberof DetailedUser
-   */
-  user: User
-  /**
-   *
    * @type {Array<Role>}
    * @memberof DetailedUser
    */
-  roles: Array<Role>
+  roles: Array<Role>;
+  /**
+   *
+   * @type {User}
+   * @memberof DetailedUser
+   */
+  user: User;
 }
