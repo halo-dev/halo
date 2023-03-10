@@ -12,9 +12,9 @@
  * Do not edit the class manually.
  */
 
-import type { Configuration } from '../configuration'
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios'
-import globalAxios from 'axios'
+import type { Configuration } from "../configuration";
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from "axios";
+import globalAxios from "axios";
 // Some imports not used depending on template conditions
 // @ts-ignore
 import {
@@ -28,18 +28,26 @@ import {
   serializeDataIfNeeded,
   toPathString,
   createRequestFunction,
-} from '../common'
+} from "../common";
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base'
+import {
+  BASE_PATH,
+  COLLECTION_FORMATS,
+  RequestArgs,
+  BaseAPI,
+  RequiredError,
+} from "../base";
 // @ts-ignore
-import { PersonalAccessToken } from '../models'
+import { PersonalAccessToken } from "../models";
 // @ts-ignore
-import { PersonalAccessTokenList } from '../models'
+import { PersonalAccessTokenList } from "../models";
 /**
  * V1alpha1PersonalAccessTokenApi - axios parameter creator
  * @export
  */
-export const V1alpha1PersonalAccessTokenApiAxiosParamCreator = function (configuration?: Configuration) {
+export const V1alpha1PersonalAccessTokenApiAxiosParamCreator = function (
+  configuration?: Configuration
+) {
   return {
     /**
      * Create v1alpha1/PersonalAccessToken
@@ -49,39 +57,52 @@ export const V1alpha1PersonalAccessTokenApiAxiosParamCreator = function (configu
      */
     createv1alpha1PersonalAccessToken: async (
       personalAccessToken?: PersonalAccessToken,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
-      const localVarPath = `/api/v1alpha1/personalaccesstokens`
+      const localVarPath = `/api/v1alpha1/personalaccesstokens`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(personalAccessToken, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        personalAccessToken,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Delete v1alpha1/PersonalAccessToken
@@ -89,40 +110,52 @@ export const V1alpha1PersonalAccessTokenApiAxiosParamCreator = function (configu
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    deletev1alpha1PersonalAccessToken: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    deletev1alpha1PersonalAccessToken: async (
+      name: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('deletev1alpha1PersonalAccessToken', 'name', name)
+      assertParamExists("deletev1alpha1PersonalAccessToken", "name", name);
       const localVarPath = `/api/v1alpha1/personalaccesstokens/{name}`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+        `{${"name"}}`,
+        encodeURIComponent(String(name))
+      );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "DELETE",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Get v1alpha1/PersonalAccessToken
@@ -130,40 +163,52 @@ export const V1alpha1PersonalAccessTokenApiAxiosParamCreator = function (configu
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    getv1alpha1PersonalAccessToken: async (name: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+    getv1alpha1PersonalAccessToken: async (
+      name: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('getv1alpha1PersonalAccessToken', 'name', name)
+      assertParamExists("getv1alpha1PersonalAccessToken", "name", name);
       const localVarPath = `/api/v1alpha1/personalaccesstokens/{name}`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+        `{${"name"}}`,
+        encodeURIComponent(String(name))
+      );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * List v1alpha1/PersonalAccessToken
@@ -179,52 +224,61 @@ export const V1alpha1PersonalAccessTokenApiAxiosParamCreator = function (configu
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
-      const localVarPath = `/api/v1alpha1/personalaccesstokens`
+      const localVarPath = `/api/v1alpha1/personalaccesstokens`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
       if (page !== undefined) {
-        localVarQueryParameter['page'] = page
+        localVarQueryParameter["page"] = page;
       }
 
       if (size !== undefined) {
-        localVarQueryParameter['size'] = size
+        localVarQueryParameter["size"] = size;
       }
 
       if (labelSelector) {
-        localVarQueryParameter['labelSelector'] = labelSelector
+        localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
       if (fieldSelector) {
-        localVarQueryParameter['fieldSelector'] = fieldSelector
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
     /**
      * Update v1alpha1/PersonalAccessToken
@@ -236,54 +290,70 @@ export const V1alpha1PersonalAccessTokenApiAxiosParamCreator = function (configu
     updatev1alpha1PersonalAccessToken: async (
       name: string,
       personalAccessToken?: PersonalAccessToken,
-      options: AxiosRequestConfig = {},
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists('updatev1alpha1PersonalAccessToken', 'name', name)
+      assertParamExists("updatev1alpha1PersonalAccessToken", "name", name);
       const localVarPath = `/api/v1alpha1/personalaccesstokens/{name}`.replace(
-        `{${'name'}}`,
-        encodeURIComponent(String(name)),
-      )
+        `{${"name"}}`,
+        encodeURIComponent(String(name))
+      );
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "PUT",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      localVarHeaderParameter['Content-Type'] = 'application/json'
+      localVarHeaderParameter["Content-Type"] = "application/json";
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
-      localVarRequestOptions.data = serializeDataIfNeeded(personalAccessToken, localVarRequestOptions, configuration)
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        personalAccessToken,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
-  }
-}
+  };
+};
 
 /**
  * V1alpha1PersonalAccessTokenApi - functional programming interface
  * @export
  */
-export const V1alpha1PersonalAccessTokenApiFp = function (configuration?: Configuration) {
-  const localVarAxiosParamCreator = V1alpha1PersonalAccessTokenApiAxiosParamCreator(configuration)
+export const V1alpha1PersonalAccessTokenApiFp = function (
+  configuration?: Configuration
+) {
+  const localVarAxiosParamCreator =
+    V1alpha1PersonalAccessTokenApiAxiosParamCreator(configuration);
   return {
     /**
      * Create v1alpha1/PersonalAccessToken
@@ -293,13 +363,24 @@ export const V1alpha1PersonalAccessTokenApiFp = function (configuration?: Config
      */
     async createv1alpha1PersonalAccessToken(
       personalAccessToken?: PersonalAccessToken,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonalAccessToken>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.createv1alpha1PersonalAccessToken(
-        personalAccessToken,
-        options,
-      )
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string
+      ) => AxiosPromise<PersonalAccessToken>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.createv1alpha1PersonalAccessToken(
+          personalAccessToken,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Delete v1alpha1/PersonalAccessToken
@@ -309,10 +390,21 @@ export const V1alpha1PersonalAccessTokenApiFp = function (configuration?: Config
      */
     async deletev1alpha1PersonalAccessToken(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.deletev1alpha1PersonalAccessToken(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.deletev1alpha1PersonalAccessToken(
+          name,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Get v1alpha1/PersonalAccessToken
@@ -322,10 +414,24 @@ export const V1alpha1PersonalAccessTokenApiFp = function (configuration?: Config
      */
     async getv1alpha1PersonalAccessToken(
       name: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonalAccessToken>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.getv1alpha1PersonalAccessToken(name, options)
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string
+      ) => AxiosPromise<PersonalAccessToken>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.getv1alpha1PersonalAccessToken(
+          name,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * List v1alpha1/PersonalAccessToken
@@ -341,16 +447,27 @@ export const V1alpha1PersonalAccessTokenApiFp = function (configuration?: Config
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonalAccessTokenList>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.listv1alpha1PersonalAccessToken(
-        page,
-        size,
-        labelSelector,
-        fieldSelector,
-        options,
-      )
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string
+      ) => AxiosPromise<PersonalAccessTokenList>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.listv1alpha1PersonalAccessToken(
+          page,
+          size,
+          labelSelector,
+          fieldSelector,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
     /**
      * Update v1alpha1/PersonalAccessToken
@@ -362,17 +479,28 @@ export const V1alpha1PersonalAccessTokenApiFp = function (configuration?: Config
     async updatev1alpha1PersonalAccessToken(
       name: string,
       personalAccessToken?: PersonalAccessToken,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PersonalAccessToken>> {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.updatev1alpha1PersonalAccessToken(
-        name,
-        personalAccessToken,
-        options,
-      )
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+      options?: AxiosRequestConfig
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string
+      ) => AxiosPromise<PersonalAccessToken>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.updatev1alpha1PersonalAccessToken(
+          name,
+          personalAccessToken,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
-  }
-}
+  };
+};
 
 /**
  * V1alpha1PersonalAccessTokenApi - factory interface
@@ -381,9 +509,9 @@ export const V1alpha1PersonalAccessTokenApiFp = function (configuration?: Config
 export const V1alpha1PersonalAccessTokenApiFactory = function (
   configuration?: Configuration,
   basePath?: string,
-  axios?: AxiosInstance,
+  axios?: AxiosInstance
 ) {
-  const localVarFp = V1alpha1PersonalAccessTokenApiFp(configuration)
+  const localVarFp = V1alpha1PersonalAccessTokenApiFp(configuration);
   return {
     /**
      * Create v1alpha1/PersonalAccessToken
@@ -393,11 +521,14 @@ export const V1alpha1PersonalAccessTokenApiFactory = function (
      */
     createv1alpha1PersonalAccessToken(
       requestParameters: V1alpha1PersonalAccessTokenApiCreatev1alpha1PersonalAccessTokenRequest = {},
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<PersonalAccessToken> {
       return localVarFp
-        .createv1alpha1PersonalAccessToken(requestParameters.personalAccessToken, options)
-        .then((request) => request(axios, basePath))
+        .createv1alpha1PersonalAccessToken(
+          requestParameters.personalAccessToken,
+          options
+        )
+        .then((request) => request(axios, basePath));
     },
     /**
      * Delete v1alpha1/PersonalAccessToken
@@ -407,11 +538,11 @@ export const V1alpha1PersonalAccessTokenApiFactory = function (
      */
     deletev1alpha1PersonalAccessToken(
       requestParameters: V1alpha1PersonalAccessTokenApiDeletev1alpha1PersonalAccessTokenRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<void> {
       return localVarFp
         .deletev1alpha1PersonalAccessToken(requestParameters.name, options)
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * Get v1alpha1/PersonalAccessToken
@@ -421,11 +552,11 @@ export const V1alpha1PersonalAccessTokenApiFactory = function (
      */
     getv1alpha1PersonalAccessToken(
       requestParameters: V1alpha1PersonalAccessTokenApiGetv1alpha1PersonalAccessTokenRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<PersonalAccessToken> {
       return localVarFp
         .getv1alpha1PersonalAccessToken(requestParameters.name, options)
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * List v1alpha1/PersonalAccessToken
@@ -435,7 +566,7 @@ export const V1alpha1PersonalAccessTokenApiFactory = function (
      */
     listv1alpha1PersonalAccessToken(
       requestParameters: V1alpha1PersonalAccessTokenApiListv1alpha1PersonalAccessTokenRequest = {},
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<PersonalAccessTokenList> {
       return localVarFp
         .listv1alpha1PersonalAccessToken(
@@ -443,9 +574,9 @@ export const V1alpha1PersonalAccessTokenApiFactory = function (
           requestParameters.size,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
-          options,
+          options
         )
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
     /**
      * Update v1alpha1/PersonalAccessToken
@@ -455,14 +586,18 @@ export const V1alpha1PersonalAccessTokenApiFactory = function (
      */
     updatev1alpha1PersonalAccessToken(
       requestParameters: V1alpha1PersonalAccessTokenApiUpdatev1alpha1PersonalAccessTokenRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<PersonalAccessToken> {
       return localVarFp
-        .updatev1alpha1PersonalAccessToken(requestParameters.name, requestParameters.personalAccessToken, options)
-        .then((request) => request(axios, basePath))
+        .updatev1alpha1PersonalAccessToken(
+          requestParameters.name,
+          requestParameters.personalAccessToken,
+          options
+        )
+        .then((request) => request(axios, basePath));
     },
-  }
-}
+  };
+};
 
 /**
  * Request parameters for createv1alpha1PersonalAccessToken operation in V1alpha1PersonalAccessTokenApi.
@@ -475,7 +610,7 @@ export interface V1alpha1PersonalAccessTokenApiCreatev1alpha1PersonalAccessToken
    * @type {PersonalAccessToken}
    * @memberof V1alpha1PersonalAccessTokenApiCreatev1alpha1PersonalAccessToken
    */
-  readonly personalAccessToken?: PersonalAccessToken
+  readonly personalAccessToken?: PersonalAccessToken;
 }
 
 /**
@@ -489,7 +624,7 @@ export interface V1alpha1PersonalAccessTokenApiDeletev1alpha1PersonalAccessToken
    * @type {string}
    * @memberof V1alpha1PersonalAccessTokenApiDeletev1alpha1PersonalAccessToken
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -503,7 +638,7 @@ export interface V1alpha1PersonalAccessTokenApiGetv1alpha1PersonalAccessTokenReq
    * @type {string}
    * @memberof V1alpha1PersonalAccessTokenApiGetv1alpha1PersonalAccessToken
    */
-  readonly name: string
+  readonly name: string;
 }
 
 /**
@@ -517,28 +652,28 @@ export interface V1alpha1PersonalAccessTokenApiListv1alpha1PersonalAccessTokenRe
    * @type {number}
    * @memberof V1alpha1PersonalAccessTokenApiListv1alpha1PersonalAccessToken
    */
-  readonly page?: number
+  readonly page?: number;
 
   /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof V1alpha1PersonalAccessTokenApiListv1alpha1PersonalAccessToken
    */
-  readonly size?: number
+  readonly size?: number;
 
   /**
    * Label selector for filtering.
    * @type {Array<string>}
    * @memberof V1alpha1PersonalAccessTokenApiListv1alpha1PersonalAccessToken
    */
-  readonly labelSelector?: Array<string>
+  readonly labelSelector?: Array<string>;
 
   /**
    * Field selector for filtering.
    * @type {Array<string>}
    * @memberof V1alpha1PersonalAccessTokenApiListv1alpha1PersonalAccessToken
    */
-  readonly fieldSelector?: Array<string>
+  readonly fieldSelector?: Array<string>;
 }
 
 /**
@@ -552,14 +687,14 @@ export interface V1alpha1PersonalAccessTokenApiUpdatev1alpha1PersonalAccessToken
    * @type {string}
    * @memberof V1alpha1PersonalAccessTokenApiUpdatev1alpha1PersonalAccessToken
    */
-  readonly name: string
+  readonly name: string;
 
   /**
    * Updated personalaccesstoken
    * @type {PersonalAccessToken}
    * @memberof V1alpha1PersonalAccessTokenApiUpdatev1alpha1PersonalAccessToken
    */
-  readonly personalAccessToken?: PersonalAccessToken
+  readonly personalAccessToken?: PersonalAccessToken;
 }
 
 /**
@@ -578,11 +713,14 @@ export class V1alpha1PersonalAccessTokenApi extends BaseAPI {
    */
   public createv1alpha1PersonalAccessToken(
     requestParameters: V1alpha1PersonalAccessTokenApiCreatev1alpha1PersonalAccessTokenRequest = {},
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return V1alpha1PersonalAccessTokenApiFp(this.configuration)
-      .createv1alpha1PersonalAccessToken(requestParameters.personalAccessToken, options)
-      .then((request) => request(this.axios, this.basePath))
+      .createv1alpha1PersonalAccessToken(
+        requestParameters.personalAccessToken,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -594,11 +732,11 @@ export class V1alpha1PersonalAccessTokenApi extends BaseAPI {
    */
   public deletev1alpha1PersonalAccessToken(
     requestParameters: V1alpha1PersonalAccessTokenApiDeletev1alpha1PersonalAccessTokenRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return V1alpha1PersonalAccessTokenApiFp(this.configuration)
       .deletev1alpha1PersonalAccessToken(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -610,11 +748,11 @@ export class V1alpha1PersonalAccessTokenApi extends BaseAPI {
    */
   public getv1alpha1PersonalAccessToken(
     requestParameters: V1alpha1PersonalAccessTokenApiGetv1alpha1PersonalAccessTokenRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return V1alpha1PersonalAccessTokenApiFp(this.configuration)
       .getv1alpha1PersonalAccessToken(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -626,7 +764,7 @@ export class V1alpha1PersonalAccessTokenApi extends BaseAPI {
    */
   public listv1alpha1PersonalAccessToken(
     requestParameters: V1alpha1PersonalAccessTokenApiListv1alpha1PersonalAccessTokenRequest = {},
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return V1alpha1PersonalAccessTokenApiFp(this.configuration)
       .listv1alpha1PersonalAccessToken(
@@ -634,9 +772,9 @@ export class V1alpha1PersonalAccessTokenApi extends BaseAPI {
         requestParameters.size,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
-        options,
+        options
       )
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 
   /**
@@ -648,10 +786,14 @@ export class V1alpha1PersonalAccessTokenApi extends BaseAPI {
    */
   public updatev1alpha1PersonalAccessToken(
     requestParameters: V1alpha1PersonalAccessTokenApiUpdatev1alpha1PersonalAccessTokenRequest,
-    options?: AxiosRequestConfig,
+    options?: AxiosRequestConfig
   ) {
     return V1alpha1PersonalAccessTokenApiFp(this.configuration)
-      .updatev1alpha1PersonalAccessToken(requestParameters.name, requestParameters.personalAccessToken, options)
-      .then((request) => request(this.axios, this.basePath))
+      .updatev1alpha1PersonalAccessToken(
+        requestParameters.name,
+        requestParameters.personalAccessToken,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
   }
 }

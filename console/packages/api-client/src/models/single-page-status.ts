@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Condition } from './condition'
+import { Condition } from "./condition";
 
 /**
  *
@@ -24,50 +24,50 @@ import { Condition } from './condition'
 export interface SinglePageStatus {
   /**
    *
-   * @type {string}
+   * @type {number}
    * @memberof SinglePageStatus
    */
-  phase: string
+  commentsCount?: number;
   /**
    *
    * @type {Array<Condition>}
    * @memberof SinglePageStatus
    */
-  conditions?: Array<Condition>
-  /**
-   *
-   * @type {string}
-   * @memberof SinglePageStatus
-   */
-  permalink?: string
-  /**
-   *
-   * @type {string}
-   * @memberof SinglePageStatus
-   */
-  excerpt?: string
-  /**
-   *
-   * @type {boolean}
-   * @memberof SinglePageStatus
-   */
-  inProgress?: boolean
-  /**
-   *
-   * @type {number}
-   * @memberof SinglePageStatus
-   */
-  commentsCount?: number
+  conditions?: Array<Condition>;
   /**
    *
    * @type {Array<string>}
    * @memberof SinglePageStatus
    */
-  contributors?: Array<string>
+  contributors?: Array<string>;
   /**
    *
    * @type {string}
    * @memberof SinglePageStatus
    */
-  lastModifyTime?: string
+  excerpt?: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof SinglePageStatus
+   */
+  inProgress?: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof SinglePageStatus
+   */
+  lastModifyTime?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SinglePageStatus
+   */
+  permalink?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof SinglePageStatus
+   */
+  phase: string;
 }

@@ -23,17 +23,17 @@ export interface TagStatus {
    * @type {string}
    * @memberof TagStatus
    */
-  permalink?: string
+  permalink?: string;
   /**
    *
    * @type {number}
    * @memberof TagStatus
    */
-  visiblePostCount?: number
+  postCount?: number;
   /**
    *
    * @type {number}
    * @memberof TagStatus
    */
-  postCount?: number
+  visiblePostCount?: number;
 }

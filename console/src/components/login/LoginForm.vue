@@ -8,6 +8,8 @@ import { Toast, VButton } from "@halo-dev/components";
 import { onMounted, ref } from "vue";
 import qs from "qs";
 import { submitForm } from "@formkit/core";
+import { JSEncrypt } from "jsencrypt";
+import { apiClient } from "@/utils/api-client";
 
 const emit = defineEmits<{
   (event: "succeed"): void;
@@ -39,9 +41,17 @@ const handleLogin = async () => {
   try {
     loading.value = true;
 
+    const { data: publicKey } = await apiClient.login.getPublicKey();
+
+    const encrypt = new JSEncrypt();
+    encrypt.setPublicKey(publicKey.base64Format as string);
+
     await axios.post(
       `${import.meta.env.VITE_API_URL}/login`,
-      qs.stringify(loginForm.value),
+      qs.stringify({
+        ...loginForm.value,
+        password: encrypt.encrypt(loginForm.value.password),
+      }),
       {
         withCredentials: true,
         headers: {
@@ -66,7 +76,7 @@ const handleLogin = async () => {
 
       if (e.response?.status === 403) {
         Toast.warning("CSRF Token 失效，请重新尝试", { duration: 5000 });
-        handleGenerateToken();
+        await handleGenerateToken();
         return;
       }
 

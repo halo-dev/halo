@@ -14,13 +14,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { GroupSpec } from './group-spec'
+import { GroupSpec } from "./group-spec";
 // May contain unused imports in some cases
 // @ts-ignore
-import { GroupStatus } from './group-status'
+import { GroupStatus } from "./group-status";
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 
 /**
  *
@@ -30,32 +30,32 @@ import { Metadata } from './metadata'
 export interface Group {
   /**
    *
-   * @type {GroupSpec}
+   * @type {string}
    * @memberof Group
    */
-  spec: GroupSpec
-  /**
-   *
-   * @type {GroupStatus}
-   * @memberof Group
-   */
-  status?: GroupStatus
+  apiVersion: string;
   /**
    *
    * @type {string}
    * @memberof Group
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof Group
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof Group
    */
-  metadata: Metadata
+  metadata: Metadata;
+  /**
+   *
+   * @type {GroupSpec}
+   * @memberof Group
+   */
+  spec: GroupSpec;
+  /**
+   *
+   * @type {GroupStatus}
+   * @memberof Group
+   */
+  status?: GroupStatus;
 }

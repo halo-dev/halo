@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Condition } from './condition'
+import { Condition } from "./condition";
 
 /**
  *
@@ -24,28 +24,29 @@ import { Condition } from './condition'
 export interface ThemeStatus {
   /**
    *
-   * @type {string}
-   * @memberof ThemeStatus
-   */
-  phase?: ThemeStatusPhaseEnum
-  /**
-   *
    * @type {Array<Condition>}
    * @memberof ThemeStatus
    */
-  conditions?: Array<Condition>
+  conditions?: Array<Condition>;
   /**
    *
    * @type {string}
    * @memberof ThemeStatus
    */
-  location?: string
+  location?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ThemeStatus
+   */
+  phase?: ThemeStatusPhaseEnum;
 }
 
 export const ThemeStatusPhaseEnum = {
-  Ready: 'READY',
-  Failed: 'FAILED',
-  Unknown: 'UNKNOWN',
-} as const
+  Ready: "READY",
+  Failed: "FAILED",
+  Unknown: "UNKNOWN",
+} as const;
 
-export type ThemeStatusPhaseEnum = typeof ThemeStatusPhaseEnum[keyof typeof ThemeStatusPhaseEnum]
+export type ThemeStatusPhaseEnum =
+  typeof ThemeStatusPhaseEnum[keyof typeof ThemeStatusPhaseEnum];

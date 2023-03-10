@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Excerpt } from './excerpt'
+import { Excerpt } from "./excerpt";
 
 /**
  *
@@ -24,124 +24,125 @@ import { Excerpt } from './excerpt'
 export interface PostSpec {
   /**
    *
-   * @type {string}
+   * @type {boolean}
    * @memberof PostSpec
    */
-  title: string
+  allowComment: boolean;
   /**
    *
    * @type {string}
    * @memberof PostSpec
    */
-  slug: string
+  baseSnapshot?: string;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof PostSpec
+   */
+  categories?: Array<string>;
   /**
    *
    * @type {string}
    * @memberof PostSpec
    */
-  releaseSnapshot?: string
-  /**
-   *
-   * @type {string}
-   * @memberof PostSpec
-   */
-  headSnapshot?: string
-  /**
-   *
-   * @type {string}
-   * @memberof PostSpec
-   */
-  baseSnapshot?: string
-  /**
-   *
-   * @type {string}
-   * @memberof PostSpec
-   */
-  owner?: string
-  /**
-   *
-   * @type {string}
-   * @memberof PostSpec
-   */
-  template?: string
-  /**
-   *
-   * @type {string}
-   * @memberof PostSpec
-   */
-  cover?: string
+  cover?: string;
   /**
    *
    * @type {boolean}
    * @memberof PostSpec
    */
-  deleted: boolean
-  /**
-   *
-   * @type {boolean}
-   * @memberof PostSpec
-   */
-  publish: boolean
-  /**
-   *
-   * @type {string}
-   * @memberof PostSpec
-   */
-  publishTime?: string
-  /**
-   *
-   * @type {boolean}
-   * @memberof PostSpec
-   */
-  pinned: boolean
-  /**
-   *
-   * @type {boolean}
-   * @memberof PostSpec
-   */
-  allowComment: boolean
-  /**
-   *
-   * @type {string}
-   * @memberof PostSpec
-   */
-  visible: PostSpecVisibleEnum
-  /**
-   *
-   * @type {number}
-   * @memberof PostSpec
-   */
-  priority: number
+  deleted: boolean;
   /**
    *
    * @type {Excerpt}
    * @memberof PostSpec
    */
-  excerpt: Excerpt
+  excerpt: Excerpt;
   /**
    *
-   * @type {Array<string>}
+   * @type {string}
    * @memberof PostSpec
    */
-  categories?: Array<string>
-  /**
-   *
-   * @type {Array<string>}
-   * @memberof PostSpec
-   */
-  tags?: Array<string>
+  headSnapshot?: string;
   /**
    *
    * @type {Array<{ [key: string]: string; }>}
    * @memberof PostSpec
    */
-  htmlMetas?: Array<{ [key: string]: string }>
+  htmlMetas?: Array<{ [key: string]: string }>;
+  /**
+   *
+   * @type {string}
+   * @memberof PostSpec
+   */
+  owner?: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof PostSpec
+   */
+  pinned: boolean;
+  /**
+   *
+   * @type {number}
+   * @memberof PostSpec
+   */
+  priority: number;
+  /**
+   *
+   * @type {boolean}
+   * @memberof PostSpec
+   */
+  publish: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof PostSpec
+   */
+  publishTime?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof PostSpec
+   */
+  releaseSnapshot?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof PostSpec
+   */
+  slug: string;
+  /**
+   *
+   * @type {Array<string>}
+   * @memberof PostSpec
+   */
+  tags?: Array<string>;
+  /**
+   *
+   * @type {string}
+   * @memberof PostSpec
+   */
+  template?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof PostSpec
+   */
+  title: string;
+  /**
+   *
+   * @type {string}
+   * @memberof PostSpec
+   */
+  visible: PostSpecVisibleEnum;
 }
 
 export const PostSpecVisibleEnum = {
-  Public: 'PUBLIC',
-  Internal: 'INTERNAL',
-  Private: 'PRIVATE',
-} as const
+  Public: "PUBLIC",
+  Internal: "INTERNAL",
+  Private: "PRIVATE",
+} as const;
 
-export type PostSpecVisibleEnum = typeof PostSpecVisibleEnum[keyof typeof PostSpecVisibleEnum]
+export type PostSpecVisibleEnum =
+  typeof PostSpecVisibleEnum[keyof typeof PostSpecVisibleEnum];

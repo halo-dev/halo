@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { PostHit } from './post-hit'
+import { PostHit } from "./post-hit";
 
 /**
  *
@@ -27,29 +27,29 @@ export interface PostHits {
    * @type {Array<PostHit>}
    * @memberof PostHits
    */
-  hits?: Array<PostHit>
+  hits?: Array<PostHit>;
   /**
    *
    * @type {string}
    * @memberof PostHits
    */
-  keyword?: string
+  keyword?: string;
   /**
    *
    * @type {number}
    * @memberof PostHits
    */
-  total?: number
+  limit?: number;
   /**
    *
    * @type {number}
    * @memberof PostHits
    */
-  limit?: number
+  processingTimeMillis?: number;
   /**
    *
    * @type {number}
    * @memberof PostHits
    */
-  processingTimeMillis?: number
+  total?: number;
 }

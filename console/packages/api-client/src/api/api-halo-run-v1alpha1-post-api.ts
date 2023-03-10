@@ -12,9 +12,9 @@
  * Do not edit the class manually.
  */
 
-import type { Configuration } from '../configuration'
-import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from 'axios'
-import globalAxios from 'axios'
+import type { Configuration } from "../configuration";
+import type { AxiosPromise, AxiosInstance, AxiosRequestConfig } from "axios";
+import globalAxios from "axios";
 // Some imports not used depending on template conditions
 // @ts-ignore
 import {
@@ -28,117 +28,144 @@ import {
   serializeDataIfNeeded,
   toPathString,
   createRequestFunction,
-} from '../common'
+} from "../common";
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError } from '../base'
+import {
+  BASE_PATH,
+  COLLECTION_FORMATS,
+  RequestArgs,
+  BaseAPI,
+  RequiredError,
+} from "../base";
 // @ts-ignore
-import { PostHits } from '../models'
+import { PostHits } from "../models";
 /**
  * ApiHaloRunV1alpha1PostApi - axios parameter creator
  * @export
  */
-export const ApiHaloRunV1alpha1PostApiAxiosParamCreator = function (configuration?: Configuration) {
+export const ApiHaloRunV1alpha1PostApiAxiosParamCreator = function (
+  configuration?: Configuration
+) {
   return {
     /**
      * Search posts with fuzzy query
      * @param {string} keyword
-     * @param {number} [limit]
      * @param {string} [highlightPreTag]
      * @param {string} [highlightPostTag]
+     * @param {number} [limit]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     searchPost: async (
       keyword: string,
-      limit?: number,
       highlightPreTag?: string,
       highlightPostTag?: string,
-      options: AxiosRequestConfig = {},
+      limit?: number,
+      options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'keyword' is not null or undefined
-      assertParamExists('searchPost', 'keyword', keyword)
-      const localVarPath = `/apis/api.halo.run/v1alpha1/indices/post`
+      assertParamExists("searchPost", "keyword", keyword);
+      const localVarPath = `/apis/api.halo.run/v1alpha1/indices/post`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL)
-      let baseOptions
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
       if (configuration) {
-        baseOptions = configuration.baseOptions
+        baseOptions = configuration.baseOptions;
       }
 
-      const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options }
-      const localVarHeaderParameter = {} as any
-      const localVarQueryParameter = {} as any
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
 
       // authentication BasicAuth required
       // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration)
+      setBasicAuthToObject(localVarRequestOptions, configuration);
 
       // authentication BearerAuth required
       // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-      if (keyword !== undefined) {
-        localVarQueryParameter['keyword'] = keyword
-      }
-
-      if (limit !== undefined) {
-        localVarQueryParameter['limit'] = limit
-      }
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
       if (highlightPreTag !== undefined) {
-        localVarQueryParameter['highlightPreTag'] = highlightPreTag
+        localVarQueryParameter["highlightPreTag"] = highlightPreTag;
       }
 
       if (highlightPostTag !== undefined) {
-        localVarQueryParameter['highlightPostTag'] = highlightPostTag
+        localVarQueryParameter["highlightPostTag"] = highlightPostTag;
       }
 
-      setSearchParams(localVarUrlObj, localVarQueryParameter)
-      let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {}
-      localVarRequestOptions.headers = { ...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers }
+      if (keyword !== undefined) {
+        localVarQueryParameter["keyword"] = keyword;
+      }
+
+      if (limit !== undefined) {
+        localVarQueryParameter["limit"] = limit;
+      }
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
 
       return {
         url: toPathString(localVarUrlObj),
         options: localVarRequestOptions,
-      }
+      };
     },
-  }
-}
+  };
+};
 
 /**
  * ApiHaloRunV1alpha1PostApi - functional programming interface
  * @export
  */
-export const ApiHaloRunV1alpha1PostApiFp = function (configuration?: Configuration) {
-  const localVarAxiosParamCreator = ApiHaloRunV1alpha1PostApiAxiosParamCreator(configuration)
+export const ApiHaloRunV1alpha1PostApiFp = function (
+  configuration?: Configuration
+) {
+  const localVarAxiosParamCreator =
+    ApiHaloRunV1alpha1PostApiAxiosParamCreator(configuration);
   return {
     /**
      * Search posts with fuzzy query
      * @param {string} keyword
-     * @param {number} [limit]
      * @param {string} [highlightPreTag]
      * @param {string} [highlightPostTag]
+     * @param {number} [limit]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async searchPost(
       keyword: string,
-      limit?: number,
       highlightPreTag?: string,
       highlightPostTag?: string,
-      options?: AxiosRequestConfig,
-    ): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PostHits>> {
+      limit?: number,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<PostHits>
+    > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.searchPost(
         keyword,
-        limit,
         highlightPreTag,
         highlightPostTag,
-        options,
-      )
-      return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)
+        limit,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
     },
-  }
-}
+  };
+};
 
 /**
  * ApiHaloRunV1alpha1PostApi - factory interface
@@ -147,9 +174,9 @@ export const ApiHaloRunV1alpha1PostApiFp = function (configuration?: Configurati
 export const ApiHaloRunV1alpha1PostApiFactory = function (
   configuration?: Configuration,
   basePath?: string,
-  axios?: AxiosInstance,
+  axios?: AxiosInstance
 ) {
-  const localVarFp = ApiHaloRunV1alpha1PostApiFp(configuration)
+  const localVarFp = ApiHaloRunV1alpha1PostApiFp(configuration);
   return {
     /**
      * Search posts with fuzzy query
@@ -159,20 +186,20 @@ export const ApiHaloRunV1alpha1PostApiFactory = function (
      */
     searchPost(
       requestParameters: ApiHaloRunV1alpha1PostApiSearchPostRequest,
-      options?: AxiosRequestConfig,
+      options?: AxiosRequestConfig
     ): AxiosPromise<PostHits> {
       return localVarFp
         .searchPost(
           requestParameters.keyword,
-          requestParameters.limit,
           requestParameters.highlightPreTag,
           requestParameters.highlightPostTag,
-          options,
+          requestParameters.limit,
+          options
         )
-        .then((request) => request(axios, basePath))
+        .then((request) => request(axios, basePath));
     },
-  }
-}
+  };
+};
 
 /**
  * Request parameters for searchPost operation in ApiHaloRunV1alpha1PostApi.
@@ -185,28 +212,28 @@ export interface ApiHaloRunV1alpha1PostApiSearchPostRequest {
    * @type {string}
    * @memberof ApiHaloRunV1alpha1PostApiSearchPost
    */
-  readonly keyword: string
+  readonly keyword: string;
+
+  /**
+   *
+   * @type {string}
+   * @memberof ApiHaloRunV1alpha1PostApiSearchPost
+   */
+  readonly highlightPreTag?: string;
+
+  /**
+   *
+   * @type {string}
+   * @memberof ApiHaloRunV1alpha1PostApiSearchPost
+   */
+  readonly highlightPostTag?: string;
 
   /**
    *
    * @type {number}
    * @memberof ApiHaloRunV1alpha1PostApiSearchPost
    */
-  readonly limit?: number
-
-  /**
-   *
-   * @type {string}
-   * @memberof ApiHaloRunV1alpha1PostApiSearchPost
-   */
-  readonly highlightPreTag?: string
-
-  /**
-   *
-   * @type {string}
-   * @memberof ApiHaloRunV1alpha1PostApiSearchPost
-   */
-  readonly highlightPostTag?: string
+  readonly limit?: number;
 }
 
 /**
@@ -223,15 +250,18 @@ export class ApiHaloRunV1alpha1PostApi extends BaseAPI {
    * @throws {RequiredError}
    * @memberof ApiHaloRunV1alpha1PostApi
    */
-  public searchPost(requestParameters: ApiHaloRunV1alpha1PostApiSearchPostRequest, options?: AxiosRequestConfig) {
+  public searchPost(
+    requestParameters: ApiHaloRunV1alpha1PostApiSearchPostRequest,
+    options?: AxiosRequestConfig
+  ) {
     return ApiHaloRunV1alpha1PostApiFp(this.configuration)
       .searchPost(
         requestParameters.keyword,
-        requestParameters.limit,
         requestParameters.highlightPreTag,
         requestParameters.highlightPostTag,
-        options,
+        requestParameters.limit,
+        options
       )
-      .then((request) => request(this.axios, this.basePath))
+      .then((request) => request(this.axios, this.basePath));
   }
 }

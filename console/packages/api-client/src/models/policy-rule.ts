@@ -23,29 +23,29 @@ export interface PolicyRule {
    * @type {Array<string>}
    * @memberof PolicyRule
    */
-  apiGroups?: Array<string>
+  apiGroups?: Array<string>;
   /**
    *
    * @type {Array<string>}
    * @memberof PolicyRule
    */
-  resources?: Array<string>
+  nonResourceURLs?: Array<string>;
   /**
    *
    * @type {Array<string>}
    * @memberof PolicyRule
    */
-  resourceNames?: Array<string>
+  resourceNames?: Array<string>;
   /**
    *
    * @type {Array<string>}
    * @memberof PolicyRule
    */
-  nonResourceURLs?: Array<string>
+  resources?: Array<string>;
   /**
    *
    * @type {Array<string>}
    * @memberof PolicyRule
    */
-  verbs?: Array<string>
+  verbs?: Array<string>;
 }

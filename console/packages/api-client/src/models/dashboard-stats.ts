@@ -23,35 +23,35 @@ export interface DashboardStats {
    * @type {number}
    * @memberof DashboardStats
    */
-  visits?: number
+  approvedComments?: number;
   /**
    *
    * @type {number}
    * @memberof DashboardStats
    */
-  comments?: number
+  comments?: number;
   /**
    *
    * @type {number}
    * @memberof DashboardStats
    */
-  approvedComments?: number
+  posts?: number;
   /**
    *
    * @type {number}
    * @memberof DashboardStats
    */
-  upvotes?: number
+  upvotes?: number;
   /**
    *
    * @type {number}
    * @memberof DashboardStats
    */
-  users?: number
+  users?: number;
   /**
    *
    * @type {number}
    * @memberof DashboardStats
    */
-  posts?: number
+  visits?: number;
 }

@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { TemplateDescriptor } from './template-descriptor'
+import { TemplateDescriptor } from "./template-descriptor";
 
 /**
  *
@@ -27,17 +27,17 @@ export interface CustomTemplates {
    * @type {Array<TemplateDescriptor>}
    * @memberof CustomTemplates
    */
-  post?: Array<TemplateDescriptor>
+  category?: Array<TemplateDescriptor>;
   /**
    *
    * @type {Array<TemplateDescriptor>}
    * @memberof CustomTemplates
    */
-  category?: Array<TemplateDescriptor>
+  page?: Array<TemplateDescriptor>;
   /**
    *
    * @type {Array<TemplateDescriptor>}
    * @memberof CustomTemplates
    */
-  page?: Array<TemplateDescriptor>
+  post?: Array<TemplateDescriptor>;
 }

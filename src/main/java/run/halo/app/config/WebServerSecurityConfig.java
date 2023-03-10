@@ -17,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
@@ -25,6 +24,8 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.MediaTypeServerWebExchangeMatcher;
+import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -33,6 +34,10 @@ import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.security.DefaultUserDetailService;
 import run.halo.app.security.SuperAdminInitializer;
 import run.halo.app.security.authentication.SecurityConfigurer;
+import run.halo.app.security.authentication.login.CryptoService;
+import run.halo.app.security.authentication.login.PublicKeyRouteBuilder;
+import run.halo.app.security.authentication.login.RsaKeyScheduledGenerator;
+import run.halo.app.security.authentication.login.impl.RsaKeyService;
 import run.halo.app.security.authorization.RequestInfoAuthorizationManager;
 
 /**
@@ -52,7 +57,7 @@ public class WebServerSecurityConfig {
         ServerSecurityContextRepository securityContextRepository) {
 
         http.securityMatcher(
-                pathMatchers("/api/**", "/apis/**", "/login", "/logout", "/actuator/**"))
+                pathMatchers("/api/**", "/apis/**", "/login/**", "/logout", "/actuator/**"))
             .authorizeExchange().anyExchange()
             .access(new RequestInfoAuthorizationManager(roleService)).and()
             .anonymous(spec -> {
@@ -98,7 +103,7 @@ public class WebServerSecurityConfig {
     }
 
     @Bean
-    ReactiveUserDetailsService userDetailsService(UserService userService,
+    DefaultUserDetailService userDetailsService(UserService userService,
         RoleService roleService) {
         return new DefaultUserDetailService(userService, roleService);
     }
@@ -116,5 +121,20 @@ public class WebServerSecurityConfig {
         HaloProperties halo) {
         return new SuperAdminInitializer(client, passwordEncoder(),
             halo.getSecurity().getInitializer());
+    }
+
+    @Bean
+    RouterFunction<ServerResponse> publicKeyRoute(CryptoService cryptoService) {
+        return new PublicKeyRouteBuilder(cryptoService).build();
+    }
+
+    @Bean
+    CryptoService cryptoService(HaloProperties haloProperties) {
+        return new RsaKeyService(haloProperties.getWorkDir().resolve("keys"));
+    }
+
+    @Bean
+    RsaKeyScheduledGenerator rsaKeyScheduledGenerator(CryptoService cryptoService) {
+        return new RsaKeyScheduledGenerator(cryptoService);
     }
 }

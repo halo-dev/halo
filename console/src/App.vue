@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { RouterView, useRoute } from "vue-router";
-import { computed, watch } from "vue";
+import { computed, watch, ref } from "vue";
 import { useTitle } from "@vueuse/core";
 import { useFavicon } from "@vueuse/core";
 import { useSystemConfigMapStore } from "./stores/system-configmap";
 import { storeToRefs } from "pinia";
+import axios from "axios";
 
 const { configMap } = storeToRefs(useSystemConfigMapStore());
 
@@ -26,16 +27,31 @@ watch(
 
 // Favicon
 const defaultFavicon = "/console/favicon.ico";
+const globalInfoFavicon = ref("");
+
+(async () => {
+  const { data } = await axios.get(
+    `${import.meta.env.VITE_API_URL}/actuator/globalinfo`,
+    {
+      withCredentials: true,
+    }
+  );
+  if (data?.favicon) {
+    globalInfoFavicon.value = data.favicon;
+  }
+})();
 
 const favicon = computed(() => {
-  if (!configMap?.value?.data?.["basic"]) {
-    return defaultFavicon;
+  if (configMap?.value?.data?.["basic"]) {
+    const basic = JSON.parse(configMap.value.data["basic"]);
+
+    if (basic.favicon) {
+      return basic.favicon;
+    }
   }
 
-  const basic = JSON.parse(configMap.value.data["basic"]);
-
-  if (basic.favicon) {
-    return basic.favicon;
+  if (globalInfoFavicon.value) {
+    return globalInfoFavicon.value;
   }
 
   return defaultFavicon;

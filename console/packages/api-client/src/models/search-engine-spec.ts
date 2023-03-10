@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Ref } from './ref'
+import { Ref } from "./ref";
 
 /**
  *
@@ -27,35 +27,35 @@ export interface SearchEngineSpec {
    * @type {string}
    * @memberof SearchEngineSpec
    */
-  logo?: string
+  description?: string;
   /**
    *
    * @type {string}
    * @memberof SearchEngineSpec
    */
-  website?: string
+  displayName: string;
   /**
    *
    * @type {string}
    * @memberof SearchEngineSpec
    */
-  displayName: string
+  logo?: string;
   /**
    *
    * @type {string}
    * @memberof SearchEngineSpec
    */
-  description?: string
+  postSearchImpl?: string;
   /**
    *
    * @type {Ref}
    * @memberof SearchEngineSpec
    */
-  settingRef?: Ref
+  settingRef?: Ref;
   /**
    *
    * @type {string}
    * @memberof SearchEngineSpec
    */
-  postSearchImpl?: string
+  website?: string;
 }

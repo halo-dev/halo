@@ -23,11 +23,11 @@ export interface Author {
    * @type {string}
    * @memberof Author
    */
-  name: string
+  name: string;
   /**
    *
    * @type {string}
    * @memberof Author
    */
-  website?: string
+  website?: string;
 }

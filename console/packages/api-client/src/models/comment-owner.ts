@@ -20,26 +20,26 @@
 export interface CommentOwner {
   /**
    *
-   * @type {string}
-   * @memberof CommentOwner
-   */
-  kind: string
-  /**
-   *
-   * @type {string}
-   * @memberof CommentOwner
-   */
-  name: string
-  /**
-   *
-   * @type {string}
-   * @memberof CommentOwner
-   */
-  displayName?: string
-  /**
-   *
    * @type {{ [key: string]: string; }}
    * @memberof CommentOwner
    */
-  annotations?: { [key: string]: string }
+  annotations?: { [key: string]: string };
+  /**
+   *
+   * @type {string}
+   * @memberof CommentOwner
+   */
+  displayName?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CommentOwner
+   */
+  kind: string;
+  /**
+   *
+   * @type {string}
+   * @memberof CommentOwner
+   */
+  name: string;
 }

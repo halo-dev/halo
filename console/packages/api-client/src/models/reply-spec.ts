@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CommentOwner } from './comment-owner'
+import { CommentOwner } from "./comment-owner";
 
 /**
  *
@@ -24,86 +24,86 @@ import { CommentOwner } from './comment-owner'
 export interface ReplySpec {
   /**
    *
-   * @type {string}
+   * @type {boolean}
    * @memberof ReplySpec
    */
-  raw: string
+  allowNotification: boolean;
+  /**
+   *
+   * @type {boolean}
+   * @memberof ReplySpec
+   */
+  approved: boolean;
   /**
    *
    * @type {string}
    * @memberof ReplySpec
    */
-  content: string
+  approvedTime?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ReplySpec
+   */
+  commentName: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ReplySpec
+   */
+  content: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ReplySpec
+   */
+  creationTime?: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof ReplySpec
+   */
+  hidden: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof ReplySpec
+   */
+  ipAddress?: string;
   /**
    *
    * @type {CommentOwner}
    * @memberof ReplySpec
    */
-  owner: CommentOwner
-  /**
-   *
-   * @type {string}
-   * @memberof ReplySpec
-   */
-  userAgent?: string
-  /**
-   *
-   * @type {string}
-   * @memberof ReplySpec
-   */
-  ipAddress?: string
-  /**
-   *
-   * @type {string}
-   * @memberof ReplySpec
-   */
-  approvedTime?: string
-  /**
-   *
-   * @type {string}
-   * @memberof ReplySpec
-   */
-  creationTime?: string
+  owner: CommentOwner;
   /**
    *
    * @type {number}
    * @memberof ReplySpec
    */
-  priority: number
-  /**
-   *
-   * @type {boolean}
-   * @memberof ReplySpec
-   */
-  top: boolean
-  /**
-   *
-   * @type {boolean}
-   * @memberof ReplySpec
-   */
-  allowNotification: boolean
-  /**
-   *
-   * @type {boolean}
-   * @memberof ReplySpec
-   */
-  approved: boolean
-  /**
-   *
-   * @type {boolean}
-   * @memberof ReplySpec
-   */
-  hidden: boolean
+  priority: number;
   /**
    *
    * @type {string}
    * @memberof ReplySpec
    */
-  commentName: string
+  quoteReply?: string;
   /**
    *
    * @type {string}
    * @memberof ReplySpec
    */
-  quoteReply?: string
+  raw: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof ReplySpec
+   */
+  top: boolean;
+  /**
+   *
+   * @type {string}
+   * @memberof ReplySpec
+   */
+  userAgent?: string;
 }

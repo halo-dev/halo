@@ -8,6 +8,7 @@ import {
   ApiConsoleHaloRunV1alpha1ReplyApi,
   ApiConsoleHaloRunV1alpha1StatsApi,
   ApiConsoleHaloRunV1alpha1AttachmentApi,
+  ApiConsoleHaloRunV1alpha1IndicesApi,
   ContentHaloRunV1alpha1CategoryApi,
   ContentHaloRunV1alpha1CommentApi,
   ContentHaloRunV1alpha1PostApi,
@@ -31,6 +32,7 @@ import {
   V1alpha1SettingApi,
   V1alpha1UserApi,
   V1alpha1AnnotationSettingApi,
+  LoginApi,
 } from "@halo-dev/api-client";
 import type { AxiosError, AxiosInstance } from "axios";
 import axios from "axios";
@@ -183,6 +185,8 @@ function setupApiClient(axios: AxiosInstance) {
       baseURL,
       axios
     ),
+    login: new LoginApi(undefined, baseURL, axios),
+    indices: new ApiConsoleHaloRunV1alpha1IndicesApi(undefined, baseURL, axios),
   };
 }
 

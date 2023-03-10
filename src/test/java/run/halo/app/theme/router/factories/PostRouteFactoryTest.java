@@ -75,6 +75,8 @@ class PostRouteFactoryTest extends RouteFactoryTestSuite {
                     assertThat(model).containsKey(ModelConst.TEMPLATE_ID);
                     assertThat(model.get(ModelConst.TEMPLATE_ID))
                         .isEqualTo(DefaultTemplateEnum.POST.getValue());
+                    assertThat(model.get("name"))
+                        .isEqualTo(post.getMetadata().getName());
                     assertThat(model.get("plural")).isEqualTo("posts");
                     assertThat(model.get("post")).isNotNull();
                     assertThat(model.get("groupVersionKind"))

@@ -23,11 +23,11 @@ export interface License {
    * @type {string}
    * @memberof License
    */
-  name?: string
+  name?: string;
   /**
    *
    * @type {string}
    * @memberof License
    */
-  url?: string
+  url?: string;
 }

@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ListedUser } from './listed-user'
+import { ListedUser } from "./listed-user";
 
 /**
  *
@@ -23,57 +23,57 @@ import { ListedUser } from './listed-user'
  */
 export interface ListedUserList {
   /**
-   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page is the first page.
+   * @type {boolean}
    * @memberof ListedUserList
    */
-  page: number
+  first: boolean;
   /**
-   * Size of each page. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof ListedUserList
    */
-  size: number
+  hasNext: boolean;
   /**
-   * Total elements.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof ListedUserList
    */
-  total: number
+  hasPrevious: boolean;
   /**
    * A chunk of items.
    * @type {Array<ListedUser>}
    * @memberof ListedUserList
    */
-  items: Array<ListedUser>
-  /**
-   * Indicates whether current page is the first page.
-   * @type {boolean}
-   * @memberof ListedUserList
-   */
-  first: boolean
+  items: Array<ListedUser>;
   /**
    * Indicates whether current page is the last page.
    * @type {boolean}
    * @memberof ListedUserList
    */
-  last: boolean
+  last: boolean;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof ListedUserList
    */
-  hasNext: boolean
+  page: number;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Size of each page. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof ListedUserList
    */
-  hasPrevious: boolean
+  size: number;
+  /**
+   * Total elements.
+   * @type {number}
+   * @memberof ListedUserList
+   */
+  total: number;
   /**
    * Indicates total pages.
    * @type {number}
    * @memberof ListedUserList
    */
-  totalPages: number
+  totalPages: number;
 }

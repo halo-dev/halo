@@ -14,13 +14,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { CommentSpec } from './comment-spec'
+import { CommentSpec } from "./comment-spec";
 // May contain unused imports in some cases
 // @ts-ignore
-import { CommentStatus } from './comment-status'
+import { CommentStatus } from "./comment-status";
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 
 /**
  *
@@ -30,32 +30,32 @@ import { Metadata } from './metadata'
 export interface Comment {
   /**
    *
-   * @type {CommentSpec}
+   * @type {string}
    * @memberof Comment
    */
-  spec: CommentSpec
-  /**
-   *
-   * @type {CommentStatus}
-   * @memberof Comment
-   */
-  status?: CommentStatus
+  apiVersion: string;
   /**
    *
    * @type {string}
    * @memberof Comment
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof Comment
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof Comment
    */
-  metadata: Metadata
+  metadata: Metadata;
+  /**
+   *
+   * @type {CommentSpec}
+   * @memberof Comment
+   */
+  spec: CommentSpec;
+  /**
+   *
+   * @type {CommentStatus}
+   * @memberof Comment
+   */
+  status?: CommentStatus;
 }

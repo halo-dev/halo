@@ -23,23 +23,23 @@ export interface Ref {
    * @type {string}
    * @memberof Ref
    */
-  group?: string
-  /**
-   * Extension version
-   * @type {string}
-   * @memberof Ref
-   */
-  version?: string
+  group?: string;
   /**
    * Extension kind
    * @type {string}
    * @memberof Ref
    */
-  kind?: string
+  kind?: string;
   /**
    * Extension name. This field is mandatory
    * @type {string}
    * @memberof Ref
    */
-  name: string
+  name: string;
+  /**
+   * Extension version
+   * @type {string}
+   * @memberof Ref
+   */
+  version?: string;
 }

@@ -14,10 +14,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { OwnerInfo } from './owner-info'
+import { CommentStats } from "./comment-stats";
 // May contain unused imports in some cases
 // @ts-ignore
-import { Reply } from './reply'
+import { OwnerInfo } from "./owner-info";
+// May contain unused imports in some cases
+// @ts-ignore
+import { Reply } from "./reply";
 
 /**
  * A chunk of items.
@@ -27,14 +30,20 @@ import { Reply } from './reply'
 export interface ListedReply {
   /**
    *
-   * @type {Reply}
-   * @memberof ListedReply
-   */
-  reply: Reply
-  /**
-   *
    * @type {OwnerInfo}
    * @memberof ListedReply
    */
-  owner: OwnerInfo
+  owner: OwnerInfo;
+  /**
+   *
+   * @type {Reply}
+   * @memberof ListedReply
+   */
+  reply: Reply;
+  /**
+   *
+   * @type {CommentStats}
+   * @memberof ListedReply
+   */
+  stats: CommentStats;
 }

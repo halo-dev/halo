@@ -14,13 +14,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Metadata } from './metadata'
+import { Metadata } from "./metadata";
 // May contain unused imports in some cases
 // @ts-ignore
-import { SinglePageSpec } from './single-page-spec'
+import { SinglePageSpec } from "./single-page-spec";
 // May contain unused imports in some cases
 // @ts-ignore
-import { SinglePageStatus } from './single-page-status'
+import { SinglePageStatus } from "./single-page-status";
 
 /**
  *
@@ -30,32 +30,32 @@ import { SinglePageStatus } from './single-page-status'
 export interface SinglePage {
   /**
    *
-   * @type {SinglePageSpec}
+   * @type {string}
    * @memberof SinglePage
    */
-  spec: SinglePageSpec
-  /**
-   *
-   * @type {SinglePageStatus}
-   * @memberof SinglePage
-   */
-  status?: SinglePageStatus
+  apiVersion: string;
   /**
    *
    * @type {string}
    * @memberof SinglePage
    */
-  apiVersion: string
-  /**
-   *
-   * @type {string}
-   * @memberof SinglePage
-   */
-  kind: string
+  kind: string;
   /**
    *
    * @type {Metadata}
    * @memberof SinglePage
    */
-  metadata: Metadata
+  metadata: Metadata;
+  /**
+   *
+   * @type {SinglePageSpec}
+   * @memberof SinglePage
+   */
+  spec: SinglePageSpec;
+  /**
+   *
+   * @type {SinglePageStatus}
+   * @memberof SinglePage
+   */
+  status?: SinglePageStatus;
 }

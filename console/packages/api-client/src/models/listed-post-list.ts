@@ -14,7 +14,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ListedPost } from './listed-post'
+import { ListedPost } from "./listed-post";
 
 /**
  *
@@ -23,57 +23,57 @@ import { ListedPost } from './listed-post'
  */
 export interface ListedPostList {
   /**
-   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page is the first page.
+   * @type {boolean}
    * @memberof ListedPostList
    */
-  page: number
+  first: boolean;
   /**
-   * Size of each page. If not set or equal to 0, it means no pagination.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof ListedPostList
    */
-  size: number
+  hasNext: boolean;
   /**
-   * Total elements.
-   * @type {number}
+   * Indicates whether current page has previous page.
+   * @type {boolean}
    * @memberof ListedPostList
    */
-  total: number
+  hasPrevious: boolean;
   /**
    * A chunk of items.
    * @type {Array<ListedPost>}
    * @memberof ListedPostList
    */
-  items: Array<ListedPost>
-  /**
-   * Indicates whether current page is the first page.
-   * @type {boolean}
-   * @memberof ListedPostList
-   */
-  first: boolean
+  items: Array<ListedPost>;
   /**
    * Indicates whether current page is the last page.
    * @type {boolean}
    * @memberof ListedPostList
    */
-  last: boolean
+  last: boolean;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Page number, starts from 1. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof ListedPostList
    */
-  hasNext: boolean
+  page: number;
   /**
-   * Indicates whether current page has previous page.
-   * @type {boolean}
+   * Size of each page. If not set or equal to 0, it means no pagination.
+   * @type {number}
    * @memberof ListedPostList
    */
-  hasPrevious: boolean
+  size: number;
+  /**
+   * Total elements.
+   * @type {number}
+   * @memberof ListedPostList
+   */
+  total: number;
   /**
    * Indicates total pages.
    * @type {number}
    * @memberof ListedPostList
    */
-  totalPages: number
+  totalPages: number;
 }

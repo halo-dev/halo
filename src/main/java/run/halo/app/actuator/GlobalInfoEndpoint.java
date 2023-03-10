@@ -12,6 +12,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.SystemSetting.Basic;
 import run.halo.app.infra.SystemSetting.Comment;
 import run.halo.app.infra.SystemSetting.User;
 
@@ -40,6 +41,7 @@ public class GlobalInfoEndpoint {
             .ifPresent(configMap -> {
                 handleCommentSetting(info, configMap);
                 handleUserSetting(info, configMap);
+                handleBasicSetting(info, configMap);
             }));
 
         return info;
@@ -59,6 +61,8 @@ public class GlobalInfoEndpoint {
         private boolean allowAnonymousComments;
 
         private boolean allowRegistration;
+
+        private String favicon;
 
     }
 
@@ -81,6 +85,13 @@ public class GlobalInfoEndpoint {
         } else {
             info.setAllowRegistration(
                 user.getAllowRegistration() != null && user.getAllowRegistration());
+        }
+    }
+
+    private void handleBasicSetting(GlobalInfo info, ConfigMap configMap) {
+        var basic = SystemSetting.get(configMap, Basic.GROUP, Basic.class);
+        if (basic != null) {
+            info.setFavicon(basic.getFavicon());
         }
     }
 
