@@ -17,6 +17,7 @@ import { toDatetimeLocal, toISOString } from "@/utils/date";
 import { submitForm } from "@formkit/core";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import useSlugify from "@/composables/use-slugify";
+import { useMutation } from "@tanstack/vue-query";
 
 const initialFormState: SinglePage = {
   spec: {
@@ -110,6 +111,41 @@ const handlePublishClick = () => {
   });
 };
 
+// Fix me:
+// Force update post settings,
+// because currently there may be errors caused by changes in version due to asynchronous processing.
+const { mutateAsync: singlePageUpdateMutate } = useMutation({
+  mutationKey: ["singlePage-update"],
+  mutationFn: async (page: SinglePage) => {
+    const { data: latestSinglePage } =
+      await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
+        name: page.metadata.name,
+      });
+
+    return apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+      {
+        name: page.metadata.name,
+        singlePage: {
+          ...latestSinglePage,
+          spec: page.spec,
+          metadata: {
+            ...latestSinglePage.metadata,
+            annotations: page.metadata.annotations,
+          },
+        },
+      },
+      {
+        mute: true,
+      }
+    );
+  },
+  retry: 3,
+  onError: (error) => {
+    console.error("Failed to update post", error);
+    Toast.error(`服务器内部错误`);
+  },
+});
+
 const handleSave = async () => {
   annotationsFormRef.value?.handleSubmit();
   await nextTick();
@@ -133,15 +169,8 @@ const handleSave = async () => {
   try {
     saving.value = true;
 
-    saving.value = true;
-
     const { data } = isUpdateMode.value
-      ? await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
-          {
-            name: formState.value.metadata.name,
-            singlePage: formState.value,
-          }
-        )
+      ? await singlePageUpdateMutate(formState.value)
       : await apiClient.extension.singlePage.createcontentHaloRunV1alpha1SinglePage(
           {
             singlePage: formState.value,
