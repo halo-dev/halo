@@ -20,7 +20,8 @@ import { useThemeStore } from "./stores/theme";
 import { useSystemStatesStore } from "./stores/system-states";
 import { useUserStore } from "./stores/user";
 import { useSystemConfigMapStore } from "./stores/system-configmap";
-import i18n from "./locales";
+import { createI18n } from "vue-i18n";
+import messages from "@intlify/unplugin-vue-i18n/messages";
 import { VueQueryPlugin } from "@tanstack/vue-query";
 
 const app = createApp(App);
@@ -28,7 +29,13 @@ const app = createApp(App);
 setupComponents(app);
 
 app.use(createPinia());
-app.use(i18n);
+app.use(
+  createI18n({
+    legacy: false,
+    locale: "en",
+    messages,
+  })
+);
 app.use(VueQueryPlugin);
 
 function registerModule(pluginModule: PluginModule, core: boolean) {

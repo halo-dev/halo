@@ -157,7 +157,7 @@ const handleResetForm = () => {
             >
               <dt class="text-sm font-medium text-gray-900">
                 <div>
-                  {{ $t(`rbac.${group.module}`, group.module as string) }}
+                  {{ $t(`core.rbac.${group.module}`, group.module as string) }}
                 </div>
                 <div
                   v-if="
@@ -200,7 +200,7 @@ const handleResetForm = () => {
                         <span class="font-medium text-gray-900">
                           {{
                             $t(
-                              `rbac.${
+                              `core.rbac.${
                                 roleTemplate.metadata.annotations?.[
                                   rbacAnnotations.DISPLAY_NAME
                                 ]
@@ -227,7 +227,7 @@ const handleResetForm = () => {
                               ]
                             )
                               .map((item: string) =>
-                                $t(`rbac.${item}`, item as string)
+                                $t(`core.rbac.${item}`, item as string)
                               )
                               .join("，")
                           }}

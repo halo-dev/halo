@@ -249,7 +249,7 @@ onMounted(() => {
             >
               <dt class="text-sm font-medium text-gray-900">
                 <div>
-                  {{ $t(`rbac.${group.module}`, group.module as string) }}
+                  {{ $t(`core.rbac.${group.module}`, group.module as string) }}
                 </div>
                 <div
                   v-if="
@@ -301,7 +301,7 @@ onMounted(() => {
                         <span class="font-medium text-gray-900">
                           {{
                             $t(
-                              `rbac.${
+                              `core.rbac.${
                                 role.metadata.annotations?.[
                                   rbacAnnotations.DISPLAY_NAME
                                 ]
@@ -328,7 +328,7 @@ onMounted(() => {
                               ]
                             )
                               .map((item: string) =>
-                                $t(`rbac.${item}`, item as string)
+                                $t(`core.rbac.${item}`, item as string)
                               )
                               .join("，")
                           }}

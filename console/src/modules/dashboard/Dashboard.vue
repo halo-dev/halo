@@ -1,5 +1,5 @@
 <template>
-  <VPageHeader title="仪表盘">
+  <VPageHeader :title="$t('core.dashboard.title')">
     <template #icon>
       <IconDashboard class="mr-2 self-center" />
     </template>
@@ -9,14 +9,18 @@
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          添加组件
+          {{ $t("core.dashboard.actions.add_widget") }}
         </VButton>
         <VButton type="secondary" @click="settings = !settings">
           <template #icon>
             <IconSettings v-if="!settings" class="h-full w-full" />
             <IconSave v-else class="h-full w-full" />
           </template>
-          {{ settings ? "完成" : "设置" }}
+          {{
+            settings
+              ? $t("core.dashboard.actions.done")
+              : $t("core.dashboard.actions.setting")
+          }}
         </VButton>
       </VSpace>
     </template>
@@ -59,7 +63,7 @@
     height="calc(100vh - 20px)"
     :width="1280"
     :layer-closable="true"
-    title="小组件"
+    :title="$t('core.dashboard.widgets.modal_title')"
   >
     <VTabbar
       v-model:active-id="activeId"

@@ -113,7 +113,7 @@ onMounted(() => {
         required: '请输入用户名',
       }"
       name="username"
-      placeholder="用户名"
+      :placeholder="$t('core.login.username')"
       :autofocus="true"
       type="text"
       validation="required"
@@ -125,7 +125,7 @@ onMounted(() => {
         required: '请输入密码',
       }"
       name="password"
-      placeholder="密码"
+      :placeholder="$t('core.login.password')"
       type="password"
       validation="required"
     >
@@ -138,6 +138,6 @@ onMounted(() => {
     type="secondary"
     @click="submitForm('login-form')"
   >
-    登录
+    {{ $t("core.login.button") }}
   </VButton>
 </template>

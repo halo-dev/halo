@@ -68,6 +68,7 @@
     "fastq": "^1.15.0",
     "floating-vue": "2.0.0-beta.20",
     "fuse.js": "^6.6.2",
+    "jsencrypt": "^3.3.2",
     "lodash.clonedeep": "^4.5.0",
     "lodash.debounce": "^4.0.8",
     "lodash.isequal": "^4.5.0",
@@ -83,13 +84,13 @@
     "vue-grid-layout": "3.0.0-beta1",
     "vue-i18n": "^9.2.2",
     "vue-router": "^4.1.6",
-    "vuedraggable": "^4.1.0",
-    "jsencrypt": "^3.3.2"
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@changesets/cli": "^2.25.2",
     "@iconify-json/mdi": "^1.1.36",
     "@iconify-json/vscode-icons": "^1.1.16",
+    "@intlify/unplugin-vue-i18n": "^0.9.1",
     "@rushstack/eslint-patch": "^1.2.0",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/container-queries": "^0.1.0",
