@@ -17,6 +17,7 @@ import { toDatetimeLocal, toISOString } from "@/utils/date";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { submitForm } from "@formkit/core";
 import useSlugify from "@/composables/use-slugify";
+import { useMutation } from "@tanstack/vue-query";
 
 const initialFormState: Post = {
   spec: {
@@ -114,6 +115,41 @@ const handlePublishClick = () => {
   });
 };
 
+// Fix me:
+// Force update post settings,
+// because currently there may be errors caused by changes in version due to asynchronous processing.
+const { mutateAsync: postUpdateMutate } = useMutation({
+  mutationKey: ["post-update"],
+  mutationFn: async (post: Post) => {
+    const { data: latestPost } =
+      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+        name: post.metadata.name,
+      });
+
+    return apiClient.extension.post.updatecontentHaloRunV1alpha1Post(
+      {
+        name: post.metadata.name,
+        post: {
+          ...latestPost,
+          spec: post.spec,
+          metadata: {
+            ...latestPost.metadata,
+            annotations: post.metadata.annotations,
+          },
+        },
+      },
+      {
+        mute: true,
+      }
+    );
+  },
+  retry: 3,
+  onError: (error) => {
+    console.error("Failed to update post", error);
+    Toast.error(`服务器内部错误`);
+  },
+});
+
 const handleSave = async () => {
   annotationsFormRef.value?.handleSubmit();
   await nextTick();
@@ -139,10 +175,7 @@ const handleSave = async () => {
     saving.value = true;
 
     const { data } = isUpdateMode.value
-      ? await apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
-          name: formState.value.metadata.name,
-          post: formState.value,
-        })
+      ? await postUpdateMutate(formState.value)
       : await apiClient.extension.post.createcontentHaloRunV1alpha1Post({
           post: formState.value,
         });
