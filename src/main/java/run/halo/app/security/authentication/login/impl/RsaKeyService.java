@@ -124,7 +124,7 @@ public class RsaKeyService implements CryptoService {
             return Mono.fromRunnable(() -> {
                 try {
                     Files.createDirectories(path.getParent());
-                    if (FileSystems.getDefault().supportedFileAttributeViews().contains("posix")){
+                    if (FileSystems.getDefault().supportedFileAttributeViews().contains("posix")) {
                         Files.createFile(path,
                             PosixFilePermissions.asFileAttribute(Set.of(OWNER_READ, OWNER_WRITE)));
                     } else {
