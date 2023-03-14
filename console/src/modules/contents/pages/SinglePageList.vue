@@ -5,7 +5,6 @@ import {
   IconArrowRight,
   IconEye,
   IconEyeOff,
-  IconTeam,
   IconAddCircle,
   IconRefreshLine,
   IconExternalLinkLine,
@@ -67,57 +66,52 @@ interface SortItem {
 
 const VisibleItems: VisibleItem[] = [
   {
-    label: "全部",
+    label: t("core.page.filters.visible.items.all"),
     value: undefined,
   },
   {
-    label: "公开",
+    label: t("core.page.filters.visible.items.public"),
     value: "PUBLIC",
   },
-  // TODO: 支持内部成员可访问
-  // {
-  //   label: "内部成员可访问",
-  //   value: "INTERNAL",
-  // },
   {
-    label: "私有",
+    label: t("core.page.filters.visible.items.private"),
     value: "PRIVATE",
   },
 ];
 
 const PublishStatusItems: PublishStatusItem[] = [
   {
-    label: "全部",
+    label: t("core.page.filters.status.items.all"),
     value: undefined,
   },
   {
-    label: "已发布",
+    label: t("core.page.filters.status.items.published"),
     value: true,
   },
   {
-    label: "未发布",
+    label: t("core.page.filters.status.items.draft"),
     value: false,
   },
 ];
 
 const SortItems: SortItem[] = [
   {
-    label: "较近发布",
+    label: t("core.page.filters.sort.items.publish_time_desc"),
     sort: "PUBLISH_TIME",
     sortOrder: false,
   },
   {
-    label: "较早发布",
+    label: t("core.page.filters.sort.items.publish_time_asc"),
     sort: "PUBLISH_TIME",
     sortOrder: true,
   },
   {
-    label: "较近创建",
+    label: t("core.page.filters.sort.items.create_time_desc"),
     sort: "CREATE_TIME",
     sortOrder: false,
   },
   {
-    label: "较早创建",
+    label: t("core.page.filters.sort.items.create_time_asc"),
     sort: "CREATE_TIME",
     sortOrder: true,
   },
@@ -389,7 +383,9 @@ const handleDeleteInBatch = async () => {
 
 const getPublishStatus = (singlePage: SinglePage) => {
   const { labels } = singlePage.metadata;
-  return labels?.[singlePageLabels.PUBLISHED] === "true" ? "已发布" : "未发布";
+  return labels?.[singlePageLabels.PUBLISHED] === "true"
+    ? t("core.page.filters.status.items.published")
+    : t("core.page.filters.status.items.draft");
 };
 
 const isPublishing = (singlePage: SinglePage) => {
@@ -433,7 +429,7 @@ watch(selectedPageNames, (newValue) => {
           :route="{ name: 'DeletedSinglePages' }"
           size="sm"
         >
-          回收站
+          {{ $t("core.page.actions.recycle_bin") }}
         </VButton>
         <VButton
           v-permission="['system:singlepages:manage']"
@@ -494,21 +490,33 @@ watch(selectedPageNames, (newValue) => {
                   v-if="selectedPublishStatusItem.value !== undefined"
                   @close="handlePublishStatusItemChange(PublishStatusItems[0])"
                 >
-                  状态：{{ selectedPublishStatusItem.label }}
+                  {{
+                    $t("core.universal.filters.results.status", {
+                      status: selectedPublishStatusItem.label,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
                   v-if="selectedVisibleItem.value"
                   @close="handleVisibleItemChange(VisibleItems[0])"
                 >
-                  可见性：{{ selectedVisibleItem.label }}
+                  {{
+                    $t("core.page.filters.visible.result", {
+                      visible: selectedVisibleItem.label,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
                   v-if="selectedContributor"
                   @close="handleSelectUser()"
                 >
-                  作者：{{ selectedContributor?.spec.displayName }}
+                  {{
+                    $t("core.page.filters.author.result", {
+                      author: selectedContributor.spec.displayName,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
@@ -539,7 +547,9 @@ watch(selectedPageNames, (newValue) => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">状态</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.universal.filters.labels.status") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -569,7 +579,9 @@ watch(selectedPageNames, (newValue) => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5"> 可见性 </span>
+                    <span class="mr-0.5">
+                      {{ $t("core.page.filters.visible.label") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -603,7 +615,9 @@ watch(selectedPageNames, (newValue) => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">作者</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.page.filters.author.label") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -613,7 +627,9 @@ watch(selectedPageNames, (newValue) => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">排序</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.universal.filters.labels.sort") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -653,7 +669,10 @@ watch(selectedPageNames, (newValue) => {
       </template>
       <VLoading v-if="isLoading" />
       <Transition v-else-if="!singlePages?.length" appear name="fade">
-        <VEmpty message="你可以尝试刷新或者新建页面" title="当前没有页面">
+        <VEmpty
+          :message="$t('core.page.empty.message')"
+          :title="$t('core.page.empty.title')"
+        >
           <template #actions>
             <VSpace>
               <VButton @click="refetch">
@@ -667,7 +686,7 @@ watch(selectedPageNames, (newValue) => {
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>
-                新建页面
+                {{ $t("core.page.empty.actions.new") }}
               </VButton>
             </VSpace>
           </template>
@@ -770,18 +789,12 @@ watch(selectedPageNames, (newValue) => {
                   <template #description>
                     <IconEye
                       v-if="singlePage.page.spec.visible === 'PUBLIC'"
-                      v-tooltip="`公开访问`"
+                      v-tooltip="$t('core.page.filters.visible.items.public')"
                       class="cursor-pointer text-sm transition-all hover:text-blue-600"
                     />
                     <IconEyeOff
                       v-if="singlePage.page.spec.visible === 'PRIVATE'"
-                      v-tooltip="`私有访问`"
-                      class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                    />
-                    <!-- TODO: 支持内部成员可访问 -->
-                    <IconTeam
-                      v-if="false"
-                      v-tooltip="`内部成员可访问`"
+                      v-tooltip="$t('core.page.filters.visible.items.private')"
                       class="cursor-pointer text-sm transition-all hover:text-blue-600"
                     />
                   </template>

@@ -75,7 +75,6 @@ core:
       categories: Categories
       tags: Tags
       recycle_bin: Recycle Bin
-      new_post: New
     empty:
       title: There are no posts currently.
       message: You can try to refresh or create a new post.
@@ -146,6 +145,37 @@ core:
     title: Deleted Posts
   page:
     title: Pages
+    actions:
+      recycle_bin: Recycle Bin
+    empty:
+      title: There are no pages currently.
+      message: You can try to refresh or create a new page.
+      actions:
+        new: New Page
+    filters:
+      status:
+        items:
+          all: All
+          published: Published
+          draft: Draft
+      visible:
+        label: Visible
+        result: "Visible: {visible}"
+        items:
+          all: All
+          public: Public
+          private: Private
+      author:
+        label: Author
+        result: "Author: {author}"
+      sort:
+        items:
+          publish_time_desc: Latest Published
+          publish_time_asc: Earliest Published
+          create_time_desc: Latest Created
+          create_time_asc: Earliest Created
+  deleted_page:
+    title: Deleted Pages
   comment:
     title: Comments
   attachment:

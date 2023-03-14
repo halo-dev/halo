@@ -205,7 +205,7 @@ function handleClearKeyword() {
 </script>
 
 <template>
-  <VPageHeader title="自定义页面回收站">
+  <VPageHeader :title="$t('core.deleted_page.title')">
     <template #icon>
       <IconDeleteBin class="mr-2 self-center text-green-600" />
     </template>

@@ -75,7 +75,6 @@ core:
       categories: 分类
       tags: 标签
       recycle_bin: 回收站
-      new_post: 新建
     empty:
       title: 当前没有文章
       message: 你可以尝试刷新或者新建文章
@@ -146,6 +145,37 @@ core:
     title: 文章回收站
   page:
     title: 页面
+    actions:
+      recycle_bin: 回收站
+    empty:
+      title: 当前没有页面
+      message: 你可以尝试刷新或者新建页面
+      actions:
+        new: 新建页面
+    filters:
+      status:
+        items:
+          all: 全部
+          published: 已发布
+          draft: 未发布
+      visible:
+        label: 可见性
+        result: "可见性：{visible}"
+        items:
+          all: 全部
+          public: 公开
+          private: 私有
+      author:
+        label: 作者
+        result: "作者：{author}"
+      sort:
+        items:
+          publish_time_desc: 较近发布
+          publish_time_asc: 较早发布
+          create_time_desc: 较近创建
+          create_time_asc: 较早创建
+  deleted_page:
+    title: 自定义页面回收站
   comment:
     title: 评论
   attachment:

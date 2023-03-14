@@ -453,7 +453,7 @@ watch(selectedPostNames, (newValue) => {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          {{ $t("core.post.actions.new_post") }}
+          {{ $t("core.universal.buttons.new") }}
         </VButton>
       </VSpace>
     </template>
