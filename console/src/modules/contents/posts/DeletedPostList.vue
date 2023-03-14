@@ -210,7 +210,7 @@ function handleClearKeyword() {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          新建
+          {{ $t("core.universal.buttons.new") }}
         </VButton>
       </VSpace>
     </template>

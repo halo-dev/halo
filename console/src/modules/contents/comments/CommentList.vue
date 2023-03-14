@@ -352,7 +352,7 @@ const handleApproveInBatch = async () => {
                   审核通过
                 </VButton>
                 <VButton type="danger" @click="handleDeleteInBatch">
-                  删除
+                  {{ $t("core.universal.buttons.delete") }}
                 </VButton>
               </VSpace>
             </div>

@@ -347,7 +347,7 @@ onMounted(() => {
               :disabled="isSystemReserved"
               @click="handleUpdateRole"
             >
-              保存
+              {{ $t("core.universal.buttons.save") }}
             </VButton>
           </div>
         </div>

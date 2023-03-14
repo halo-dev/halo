@@ -343,7 +343,7 @@ const handleDelete = async (role: Role) => {
                   type="danger"
                   @click="handleDelete(role)"
                 >
-                  删除
+                  {{ $t("core.universal.buttons.delete") }}
                 </VButton>
                 <VButton v-close-popper block @click="handleCloneRole(role)">
                   基于此角色创建

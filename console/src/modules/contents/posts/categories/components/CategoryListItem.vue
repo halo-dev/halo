@@ -119,7 +119,7 @@ function onDelete(category: CategoryTree) {
               type="danger"
               @click="onDelete(category)"
             >
-              删除
+              {{ $t("core.universal.buttons.delete") }}
             </VButton>
           </template>
         </VEntity>

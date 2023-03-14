@@ -400,7 +400,7 @@ const hasFilters = computed(() => {
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeleteInBatch">
-                  删除
+                  {{ $t("core.universal.buttons.delete") }}
                 </VButton>
               </VSpace>
             </div>
@@ -614,7 +614,7 @@ const hasFilters = computed(() => {
                   type="danger"
                   @click="handleDelete(user.user)"
                 >
-                  删除
+                  {{ $t("core.universal.buttons.delete") }}
                 </VButton>
               </template>
             </VEntity>

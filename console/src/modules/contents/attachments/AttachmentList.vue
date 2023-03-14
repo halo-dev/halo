@@ -396,7 +396,7 @@ onMounted(() => {
                   </div>
                   <VSpace v-else>
                     <VButton type="danger" @click="handleDeleteInBatch">
-                      删除
+                      {{ $t("core.universal.buttons.delete") }}
                     </VButton>
                     <VButton @click="selectedAttachments.clear()">
                       取消选择
@@ -780,7 +780,7 @@ onMounted(() => {
                         type="danger"
                         @click="handleDelete(attachment)"
                       >
-                        删除
+                        {{ $t("core.universal.buttons.delete") }}
                       </VButton>
                     </template>
                   </VEntity>

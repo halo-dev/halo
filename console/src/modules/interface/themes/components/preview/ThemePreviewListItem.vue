@@ -84,7 +84,7 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
         type="default"
         @click="emit('open-settings')"
       >
-        设置
+        {{ $t("core.universal.buttons.setting") }}
       </VButton>
     </template>
   </VEntity>

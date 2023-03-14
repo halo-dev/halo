@@ -443,7 +443,7 @@ watch(selectedPageNames, (newValue) => {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          新建
+          {{ $t("core.universal.buttons.new") }}
         </VButton>
       </VSpace>
     </template>
@@ -520,9 +520,9 @@ watch(selectedPageNames, (newValue) => {
                 />
               </div>
               <VSpace v-else>
-                <VButton type="danger" @click="handleDeleteInBatch"
-                  >删除</VButton
-                >
+                <VButton type="danger" @click="handleDeleteInBatch">
+                  {{ $t("core.universal.buttons.delete") }}
+                </VButton>
               </VSpace>
             </div>
             <div class="mt-4 flex sm:mt-0">
@@ -799,7 +799,7 @@ watch(selectedPageNames, (newValue) => {
                   type="secondary"
                   @click="handleOpenSettingModal(singlePage.page)"
                 >
-                  设置
+                  {{ $t("core.universal.buttons.setting") }}
                 </VButton>
                 <VButton
                   v-close-popper
@@ -807,7 +807,7 @@ watch(selectedPageNames, (newValue) => {
                   type="danger"
                   @click="handleDelete(singlePage.page)"
                 >
-                  删除
+                  {{ $t("core.universal.buttons.delete") }}
                 </VButton>
               </template>
             </VEntity>

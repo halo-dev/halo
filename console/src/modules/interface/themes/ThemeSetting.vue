@@ -112,7 +112,7 @@ watch(
             type="secondary"
             @click="$formkit.submit(group || '')"
           >
-            保存
+            {{ $t("core.universal.buttons.save") }}
           </VButton>
         </div>
       </div>

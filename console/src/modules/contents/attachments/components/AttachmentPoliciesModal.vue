@@ -217,7 +217,7 @@ const onEditingModalClose = () => {
               type="danger"
               @click="handleDelete(policy)"
             >
-              删除
+              {{ $t("core.universal.buttons.delete") }}
             </VButton>
           </template>
         </VEntity>

@@ -171,6 +171,8 @@ core:
       save: 保存
       close: 关闭
       delete: 删除
+      setting: 设置
+      new: 新建
     radio:
       "yes": 是
       "no": 否

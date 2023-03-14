@@ -388,7 +388,7 @@ const subjectRefResult = computed(() => {
         审核通过所有回复
       </VButton>
       <VButton v-close-popper block type="danger" @click="handleDelete">
-        删除
+        {{ $t("core.universal.buttons.delete") }}
       </VButton>
     </template>
 

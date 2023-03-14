@@ -350,7 +350,7 @@ const iframeClasses = computed(() => {
                         )
                       "
                     >
-                      保存
+                      {{ $t("core.universal.buttons.save") }}
                     </VButton>
                   </div>
                 </div>

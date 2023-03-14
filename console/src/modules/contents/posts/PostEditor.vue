@@ -368,7 +368,7 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
           <template #icon>
             <IconSave class="h-full w-full" />
           </template>
-          保存
+          {{ $t("core.universal.buttons.save") }}
         </VButton>
         <VButton
           v-if="isUpdateMode"
@@ -379,7 +379,7 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
           <template #icon>
             <IconSettings class="h-full w-full" />
           </template>
-          设置
+          {{ $t("core.universal.buttons.setting") }}
         </VButton>
         <VButton
           type="secondary"

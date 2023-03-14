@@ -129,7 +129,7 @@ onMounted(async () => {
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>
-        新建
+        {{ $t("core.universal.buttons.new") }}
       </VButton>
     </template>
   </VPageHeader>
@@ -247,7 +247,7 @@ onMounted(async () => {
                     type="danger"
                     @click="handleDelete(tag)"
                   >
-                    删除
+                    {{ $t("core.universal.buttons.delete") }}
                   </VButton>
                 </template>
               </VEntity>

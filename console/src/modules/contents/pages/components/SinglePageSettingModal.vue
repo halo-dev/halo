@@ -505,9 +505,11 @@ const { handleGenerateSlug } = useSlugify(
           </VButton>
         </template>
         <VButton :loading="saving" type="secondary" @click="handleSaveClick">
-          保存
+          {{ $t("core.universal.buttons.save") }}
         </VButton>
-        <VButton type="default" @click="onVisibleChange(false)"> 关闭 </VButton>
+        <VButton type="default" @click="onVisibleChange(false)">
+          {{ $t("core.universal.buttons.close") }}
+        </VButton>
       </VSpace>
     </template>
   </VModal>

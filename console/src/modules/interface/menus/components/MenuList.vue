@@ -263,7 +263,7 @@ onMounted(handleFetchPrimaryMenuName);
                 type="danger"
                 @click="handleDeleteMenu(menu)"
               >
-                删除
+                {{ $t("core.universal.buttons.delete") }}
               </VButton>
             </template>
           </VEntity>

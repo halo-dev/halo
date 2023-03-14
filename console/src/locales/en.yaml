@@ -171,6 +171,8 @@ core:
       save: Save
       close: Close
       delete: Delete
+      setting: Setting
+      new: New
     radio:
       "yes": Yes
       "no": No

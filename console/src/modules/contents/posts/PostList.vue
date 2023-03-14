@@ -546,7 +546,7 @@ watch(selectedPostNames, (newValue) => {
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeleteInBatch">
-                  删除
+                  {{ $t("core.universal.buttons.delete") }}
                 </VButton>
               </VSpace>
             </div>
@@ -881,7 +881,7 @@ watch(selectedPostNames, (newValue) => {
                   type="secondary"
                   @click="handleOpenSettingModal(post.post)"
                 >
-                  设置
+                  {{ $t("core.universal.buttons.setting") }}
                 </VButton>
                 <VButton
                   v-close-popper
@@ -889,7 +889,7 @@ watch(selectedPostNames, (newValue) => {
                   type="danger"
                   @click="handleDelete(post.post)"
                 >
-                  删除
+                  {{ $t("core.universal.buttons.delete") }}
                 </VButton>
               </template>
             </VEntity>

@@ -142,7 +142,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
               type="danger"
               @click="onDelete(menuItem)"
             >
-              删除
+              {{ $t("core.universal.buttons.delete") }}
             </VButton>
           </template>
         </VEntity>

@@ -205,7 +205,7 @@ const isHoveredReply = computed(() => {
         type="danger"
         @click="handleDelete"
       >
-        删除
+        {{ $t("core.universal.buttons.delete") }}
       </VButton>
     </template>
   </VEntity>
