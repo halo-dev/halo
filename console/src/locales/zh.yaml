@@ -109,6 +109,22 @@ core:
           label: 自定义模板
         cover:
           label: 封面图
+  page:
+    title: 页面
+  comment:
+    title: 评论
+  attachment:
+    title: 附件库
+  menu:
+    title: 菜单
+  plugin:
+    title: 插件
+  user:
+    title: 用户
+  setting:
+    title: 设置
+  actuator:
+    title: 系统概览
   rbac:
     Attachments Management: 附件
     Attachment Manage: 附件管理
@@ -173,6 +189,7 @@ core:
       delete: 删除
       setting: 设置
       new: 新建
+      back: 返回
     radio:
       "yes": 是
       "no": 否

@@ -201,7 +201,9 @@ function handleClearKeyword() {
     </template>
     <template #actions>
       <VSpace>
-        <VButton :route="{ name: 'Posts' }" size="sm">返回</VButton>
+        <VButton :route="{ name: 'Posts' }" size="sm">
+          {{ $t("core.universal.buttons.back") }}
+        </VButton>
         <VButton
           v-permission="['system:posts:manage']"
           :route="{ name: 'PostEditor' }"
@@ -292,7 +294,7 @@ function handleClearKeyword() {
             <VSpace>
               <VButton @click="refetch">刷新</VButton>
               <VButton :route="{ name: 'Posts' }" type="primary">
-                返回
+                {{ $t("core.universal.buttons.back") }}
               </VButton>
             </VSpace>
           </template>

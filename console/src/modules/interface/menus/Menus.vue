@@ -213,7 +213,7 @@ const handleResetMenuItems = async () => {
     @close="onMenuItemEditingModalClose"
     @saved="onMenuItemSaved"
   />
-  <VPageHeader title="菜单">
+  <VPageHeader :title="$t('core.menu.title')">
     <template #icon>
       <IconListSettings class="mr-2 self-center" />
     </template>

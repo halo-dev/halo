@@ -372,8 +372,8 @@ const { handleGenerateSlug } = useSlugify(
             <FormKit
               v-model="formState.spec.excerpt.autoGenerate"
               :options="[
-                { label: '是', value: true },
-                { label: '否', value: false },
+                { label: $t('core.universal.radio.yes'), value: true },
+                { label: $t('core.universal.radio.no'), value: false },
               ]"
               name="autoGenerate"
               label="自动生成摘要"
@@ -408,8 +408,8 @@ const { handleGenerateSlug } = useSlugify(
             <FormKit
               v-model="formState.spec.allowComment"
               :options="[
-                { label: '是', value: true },
-                { label: '否', value: false },
+                { label: $t('core.universal.radio.yes'), value: true },
+                { label: $t('core.universal.radio.no'), value: false },
               ]"
               name="allowComment"
               label="允许评论"
@@ -418,8 +418,8 @@ const { handleGenerateSlug } = useSlugify(
             <FormKit
               v-model="formState.spec.pinned"
               :options="[
-                { label: '是', value: true },
-                { label: '否', value: false },
+                { label: $t('core.universal.radio.yes'), value: true },
+                { label: $t('core.universal.radio.no'), value: false },
               ]"
               label="是否置顶"
               name="pinned"

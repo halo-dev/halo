@@ -150,7 +150,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
     @close="refetch()"
   />
 
-  <VPageHeader title="插件">
+  <VPageHeader :title="$t('core.plugin.title')">
     <template #icon>
       <IconPlug class="mr-2 self-center" />
     </template>

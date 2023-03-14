@@ -109,6 +109,22 @@ core:
           label: Template
         cover:
           label: Cover
+  page:
+    title: Pages
+  comment:
+    title: Comments
+  attachment:
+    title: Attachments
+  menu:
+    title: Menus
+  plugin:
+    title: Plugins
+  user:
+    title: Users
+  setting:
+    title: Settings
+  actuator:
+    title: Actuator
   rbac:
     Attachments Management: 附件
     Attachment Manage: 附件管理
@@ -173,6 +189,7 @@ core:
       delete: Delete
       setting: Setting
       new: New
+      back: Back
     radio:
       "yes": Yes
       "no": No

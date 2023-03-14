@@ -276,7 +276,7 @@ const handleApproveInBatch = async () => {
 };
 </script>
 <template>
-  <VPageHeader title="评论">
+  <VPageHeader :title="$t('core.comment.title')">
     <template #icon>
       <IconMessage class="mr-2 self-center" />
     </template>

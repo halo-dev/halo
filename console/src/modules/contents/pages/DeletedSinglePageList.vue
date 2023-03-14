@@ -211,7 +211,9 @@ function handleClearKeyword() {
     </template>
     <template #actions>
       <VSpace>
-        <VButton :route="{ name: 'SinglePages' }" size="sm">返回</VButton>
+        <VButton :route="{ name: 'SinglePages' }" size="sm">
+          {{ $t("core.universal.buttons.back") }}
+        </VButton>
         <VButton
           v-permission="['system:singlepages:manage']"
           :route="{ name: 'SinglePageEditor' }"
@@ -303,7 +305,7 @@ function handleClearKeyword() {
                 :route="{ name: 'SinglePages' }"
                 type="primary"
               >
-                返回
+                {{ $t("core.universal.buttons.back") }}
               </VButton>
             </VSpace>
           </template>

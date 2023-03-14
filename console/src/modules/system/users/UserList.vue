@@ -310,7 +310,7 @@ const hasFilters = computed(() => {
     @close="handleFetchUsers"
   />
 
-  <VPageHeader title="用户">
+  <VPageHeader :title="$t('core.user.title')">
     <template #icon>
       <IconUserSettings class="mr-2 self-center" />
     </template>

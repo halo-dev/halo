@@ -111,7 +111,7 @@ const handleDownloadLogfile = () => {
 </script>
 
 <template>
-  <VPageHeader title="系统概览">
+  <VPageHeader :title="$t('core.actuator.title')">
     <template #icon>
       <IconTerminalBoxLine class="mr-2 self-center" />
     </template>

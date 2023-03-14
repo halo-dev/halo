@@ -299,7 +299,7 @@ onMounted(() => {
     @close="onUploadModalClose"
   />
   <AttachmentPoliciesModal v-model:visible="policyVisible" />
-  <VPageHeader title="附件库">
+  <VPageHeader :title="$t('core.attachment.title')">
     <template #icon>
       <IconFolder class="mr-2 self-center" />
     </template>

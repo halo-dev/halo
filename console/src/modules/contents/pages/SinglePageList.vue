@@ -422,7 +422,7 @@ watch(selectedPageNames, (newValue) => {
     </template>
   </SinglePageSettingModal>
 
-  <VPageHeader title="页面">
+  <VPageHeader :title="$t('core.page.title')">
     <template #icon>
       <IconPages class="mr-2 self-center" />
     </template>
