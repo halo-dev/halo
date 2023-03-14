@@ -6,6 +6,7 @@ import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
@@ -123,8 +124,12 @@ public class RsaKeyService implements CryptoService {
             return Mono.fromRunnable(() -> {
                 try {
                     Files.createDirectories(path.getParent());
-                    Files.createFile(path,
-                        PosixFilePermissions.asFileAttribute(Set.of(OWNER_READ, OWNER_WRITE)));
+                    if (FileSystems.getDefault().supportedFileAttributeViews().contains("posix")) {
+                        Files.createFile(path,
+                            PosixFilePermissions.asFileAttribute(Set.of(OWNER_READ, OWNER_WRITE)));
+                    } else {
+                        Files.createFile(path);
+                    }
                 } catch (IOException e) {
                     // ignore the error
                     log.warn("Failed to create file for {}", path, e);
