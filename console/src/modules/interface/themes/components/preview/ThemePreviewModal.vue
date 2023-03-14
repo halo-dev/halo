@@ -25,6 +25,7 @@ import {
 } from "@halo-dev/components";
 import { storeToRefs } from "pinia";
 import { computed, markRaw, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{
@@ -43,6 +44,8 @@ const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
+
+const { t } = useI18n();
 
 interface SettingTab {
   id: string;
@@ -164,7 +167,7 @@ const handleSaveConfigMap = async () => {
     configMap: configMapToUpdate,
   });
 
-  Toast.success("保存成功");
+  Toast.success(t("core.universal.toast.save_success"));
 
   await handleFetchSettings();
   configMap.value = newConfigMap;

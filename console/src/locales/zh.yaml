@@ -176,3 +176,7 @@ core:
       "no": 否
     placeholder:
       search: 输入关键词搜索
+    toast:
+      operation_success: 操作成功
+      delete_success: 删除成功
+      save_success: 保存成功

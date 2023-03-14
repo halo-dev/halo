@@ -38,8 +38,10 @@ import FilterTag from "@/components/filter/FilterTag.vue";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const settingModal = ref(false);
 const selectedSinglePage = ref<SinglePage>();
@@ -342,7 +344,7 @@ const handleDelete = async (singlePage: SinglePage) => {
       );
       await refetch();
 
-      Toast.success("删除成功");
+      Toast.success(t("core.universal.toast.delete_success"));
     },
   });
 };
@@ -380,7 +382,7 @@ const handleDeleteInBatch = async () => {
       await refetch();
       selectedPageNames.value = [];
 
-      Toast.success("删除成功");
+      Toast.success(t("core.universal.toast.delete_success"));
     },
   });
 };

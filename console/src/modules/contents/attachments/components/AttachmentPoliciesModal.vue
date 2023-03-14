@@ -20,6 +20,7 @@ import {
   useFetchAttachmentPolicyTemplate,
 } from "../composables/use-attachment-policy";
 import { apiClient } from "@/utils/api-client";
+import { useI18n } from "vue-i18n";
 
 withDefaults(
   defineProps<{
@@ -34,6 +35,8 @@ const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
+
+const { t } = useI18n();
 
 const { policies, isLoading, handleFetchPolicies } = useFetchAttachmentPolicy();
 const { policyTemplates } = useFetchAttachmentPolicyTemplate();
@@ -92,7 +95,7 @@ const handleDelete = async (policy: Policy) => {
         { name: policy.metadata.name }
       );
 
-      Toast.success("删除成功");
+      Toast.success(t("core.universal.toast.delete_success"));
       handleFetchPolicies();
     },
   });

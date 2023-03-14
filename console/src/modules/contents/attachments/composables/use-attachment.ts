@@ -6,6 +6,7 @@ import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import type { Content, Editor } from "@halo-dev/richtext-editor";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 interface useAttachmentControlReturn {
   attachments: Ref<Attachment[] | undefined>;
@@ -39,6 +40,8 @@ export function useAttachmentControl(filterOptions: {
   page: Ref<number>;
   size: Ref<number>;
 }): useAttachmentControlReturn {
+  const { t } = useI18n();
+
   const { user, policy, group, keyword, sort, page, size } = filterOptions;
 
   const selectedAttachment = ref<Attachment>();
@@ -141,7 +144,7 @@ export function useAttachmentControl(filterOptions: {
           }
           selectedAttachments.value.delete(attachment);
 
-          Toast.success("删除成功");
+          Toast.success(t("core.universal.toast.delete_success"));
         } catch (e) {
           console.error("Failed to delete attachment", e);
         } finally {
@@ -170,7 +173,7 @@ export function useAttachmentControl(filterOptions: {
           await Promise.all(promises);
           selectedAttachments.value.clear();
 
-          Toast.success("删除成功");
+          Toast.success(t("core.universal.toast.delete_success"));
         } catch (e) {
           console.error("Failed to delete attachments", e);
         } finally {

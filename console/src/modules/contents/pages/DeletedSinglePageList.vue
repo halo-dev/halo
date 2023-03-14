@@ -27,8 +27,10 @@ import { usePermission } from "@/utils/permission";
 import { getNode } from "@formkit/core";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const selectedPageNames = ref<string[]>([]);
 const checkedAll = ref(false);
@@ -98,7 +100,7 @@ const handleDeletePermanently = async (singlePage: SinglePage) => {
       );
       await refetch();
 
-      Toast.success("删除成功");
+      Toast.success(t("core.universal.toast.delete_success"));
     },
   });
 };
@@ -121,7 +123,7 @@ const handleDeletePermanentlyInBatch = async () => {
       await refetch();
       selectedPageNames.value = [];
 
-      Toast.success("删除成功");
+      Toast.success(t("core.universal.toast.delete_success"));
     },
   });
 };

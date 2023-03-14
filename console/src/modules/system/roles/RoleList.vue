@@ -36,8 +36,10 @@ import Fuse from "fuse.js";
 import { usePermission } from "@/utils/permission";
 import { roleLabels } from "@/constants/labels";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const editingModal = ref<boolean>(false);
 const selectedRole = ref<Role>();
@@ -135,7 +137,7 @@ const handleDelete = async (role: Role) => {
           name: role.metadata.name,
         });
 
-        Toast.success("删除成功");
+        Toast.success(t("core.universal.toast.delete_success"));
       } catch (e) {
         console.error("Failed to delete role", e);
       } finally {

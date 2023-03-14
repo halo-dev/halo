@@ -8,6 +8,7 @@ import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
 import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{
@@ -29,6 +30,8 @@ const emit = defineEmits<{
   (event: "close"): void;
   (event: "saved", menuItem: MenuItem): void;
 }>();
+
+const { t } = useI18n();
 
 const initialFormState: MenuItem = {
   spec: {
@@ -128,7 +131,7 @@ const handleSaveMenuItem = async () => {
       emit("saved", data);
     }
 
-    Toast.success("保存成功");
+    Toast.success(t("core.universal.toast.save_success"));
   } catch (e) {
     console.error("Failed to create menu item", e);
   } finally {

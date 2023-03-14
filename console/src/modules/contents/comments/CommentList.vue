@@ -22,6 +22,9 @@ import FilterTag from "@/components/filter/FilterTag.vue";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const checkAll = ref(false);
 const selectedComment = ref<ListedComment>();
@@ -220,7 +223,7 @@ const handleDeleteInBatch = async () => {
         await Promise.all(promises);
         selectedCommentNames.value = [];
 
-        Toast.success("删除成功");
+        Toast.success(t("core.universal.toast.delete_success"));
       } catch (e) {
         console.error("Failed to delete comments", e);
       } finally {

@@ -6,6 +6,7 @@ import type { CategoryTree } from "@/modules/contents/posts/categories/utils";
 import { buildCategoriesTree } from "@/modules/contents/posts/categories/utils";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 interface usePostCategoryReturn {
   categories: Ref<Category[] | undefined>;
@@ -16,6 +17,8 @@ interface usePostCategoryReturn {
 }
 
 export function usePostCategory(): usePostCategoryReturn {
+  const { t } = useI18n();
+
   const categoriesTree = ref<CategoryTree[]>([] as CategoryTree[]);
 
   const {
@@ -59,7 +62,7 @@ export function usePostCategory(): usePostCategoryReturn {
             }
           );
 
-          Toast.success("删除成功");
+          Toast.success(t("core.universal.toast.delete_success"));
         } catch (e) {
           console.error("Failed to delete tag", e);
         } finally {

@@ -27,8 +27,10 @@ import cloneDeep from "lodash.clonedeep";
 import { getNode } from "@formkit/core";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const checkedAll = ref(false);
 const selectedPostNames = ref<string[]>([]);
@@ -95,7 +97,7 @@ const handleDeletePermanently = async (post: Post) => {
       });
       await refetch();
 
-      Toast.success("删除成功");
+      Toast.success(t("core.universal.toast.delete_success"));
     },
   });
 };
@@ -116,7 +118,7 @@ const handleDeletePermanentlyInBatch = async () => {
       await refetch();
       selectedPostNames.value = [];
 
-      Toast.success("删除成功");
+      Toast.success(t("core.universal.toast.delete_success"));
     },
   });
 };

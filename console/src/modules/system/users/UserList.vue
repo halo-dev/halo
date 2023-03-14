@@ -35,8 +35,10 @@ import { getNode } from "@formkit/core";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import { useFetchRole } from "../roles/composables/use-role";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const checkedAll = ref(false);
 const editingModal = ref<boolean>(false);
@@ -136,7 +138,7 @@ const handleDelete = async (user: User) => {
           name: user.metadata.name,
         });
 
-        Toast.success("删除成功");
+        Toast.success(t("core.universal.toast.delete_success"));
       } catch (e) {
         console.error("Failed to delete user", e);
       } finally {
@@ -164,7 +166,7 @@ const handleDeleteInBatch = async () => {
       );
       await handleFetchUsers();
       selectedUserNames.value.length = 0;
-      Toast.success("删除成功");
+      Toast.success(t("core.universal.toast.delete_success"));
     },
   });
 };

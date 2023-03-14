@@ -45,8 +45,10 @@ import FilteCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 import TagDropdownSelector from "@/components/dropdown-selector/TagDropdownSelector.vue";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const settingModal = ref(false);
 const selectedPost = ref<Post>();
@@ -386,7 +388,7 @@ const handleDelete = async (post: Post) => {
       });
       await refetch();
 
-      Toast.success("删除成功");
+      Toast.success(t("core.universal.toast.delete_success"));
     },
   });
 };
@@ -407,7 +409,7 @@ const handleDeleteInBatch = async () => {
       await refetch();
       selectedPostNames.value = [];
 
-      Toast.success("删除成功");
+      Toast.success(t("core.universal.toast.delete_success"));
     },
   });
 };

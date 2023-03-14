@@ -16,8 +16,10 @@ import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { useUserStore } from "@/stores/user";
+import { useI18n } from "vue-i18n";
 
 const userStore = useUserStore();
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -136,7 +138,7 @@ const handleCreateUser = async () => {
 
     onVisibleChange(false);
 
-    Toast.success("保存成功");
+    Toast.success(t("core.universal.toast.save_success"));
   } catch (e) {
     console.error("Failed to create or update user", e);
   } finally {

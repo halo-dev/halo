@@ -7,6 +7,7 @@ import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
 import { setFocus } from "@/formkit/utils/focus";
+import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{
@@ -24,6 +25,8 @@ const emit = defineEmits<{
   (event: "close"): void;
   (event: "created", menu: Menu): void;
 }>();
+
+const { t } = useI18n();
 
 const initialFormState: Menu = {
   spec: {
@@ -65,7 +68,7 @@ const handleCreateMenu = async () => {
     }
     onVisibleChange(false);
 
-    Toast.success("保存成功");
+    Toast.success(t("core.universal.toast.save_success"));
   } catch (e) {
     console.error("Failed to create menu", e);
   } finally {

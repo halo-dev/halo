@@ -19,8 +19,10 @@ import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { usePermission } from "@/utils/permission";
 import { onBeforeRouteLeave } from "vue-router";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -115,7 +117,7 @@ const handleDeleteMenu = async (menu: Menu) => {
 
         await Promise.all(deleteItemsPromises);
 
-        Toast.success("删除成功");
+        Toast.success(t("core.universal.toast.delete_success"));
       } catch (e) {
         console.error("Failed to delete menu", e);
       } finally {

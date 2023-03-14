@@ -176,3 +176,7 @@ core:
       "no": No
     placeholder:
       search: Enter keywords to search
+    toast:
+      operation_success: Successful operation
+      delete_success: Deleted successfully
+      save_success: Saved successfully

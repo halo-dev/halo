@@ -3,6 +3,7 @@ import type { Tag } from "@halo-dev/api-client";
 import type { Ref } from "vue";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 interface usePostTagReturn {
   tags: Ref<Tag[] | undefined>;
@@ -12,6 +13,8 @@ interface usePostTagReturn {
 }
 
 export function usePostTag(): usePostTagReturn {
+  const { t } = useI18n();
+
   const {
     data: tags,
     isLoading,
@@ -47,7 +50,7 @@ export function usePostTag(): usePostTagReturn {
             name: tag.metadata.name,
           });
 
-          Toast.success("删除成功");
+          Toast.success(t("core.universal.toast.delete_success"));
         } catch (e) {
           console.error("Failed to delete tag", e);
         } finally {

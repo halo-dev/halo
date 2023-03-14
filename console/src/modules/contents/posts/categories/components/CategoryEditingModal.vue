@@ -23,6 +23,7 @@ import { setFocus } from "@/formkit/utils/focus";
 import { useThemeCustomTemplates } from "@/modules/interface/themes/composables/use-theme";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import useSlugify from "@/composables/use-slugify";
+import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{
@@ -39,6 +40,8 @@ const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
+
+const { t } = useI18n();
 
 const initialFormState: Category = {
   spec: {
@@ -101,7 +104,7 @@ const handleSaveCategory = async () => {
     }
     onVisibleChange(false);
 
-    Toast.success("保存成功");
+    Toast.success(t("core.universal.toast.save_success"));
   } catch (e) {
     console.error("Failed to create category", e);
   } finally {

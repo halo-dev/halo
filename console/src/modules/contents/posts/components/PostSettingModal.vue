@@ -18,6 +18,7 @@ import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { submitForm } from "@formkit/core";
 import useSlugify from "@/composables/use-slugify";
 import { useMutation } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const initialFormState: Post = {
   spec: {
@@ -68,6 +69,8 @@ const emit = defineEmits<{
   (event: "saved", post: Post): void;
   (event: "published", post: Post): void;
 }>();
+
+const { t } = useI18n();
 
 const formState = ref<Post>(cloneDeep(initialFormState));
 const saving = ref(false);
@@ -185,7 +188,7 @@ const handleSave = async () => {
 
     handleVisibleChange(false);
 
-    Toast.success("保存成功");
+    Toast.success(t("core.universal.toast.save_success"));
   } catch (e) {
     console.error("Failed to save post", e);
   } finally {

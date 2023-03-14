@@ -15,6 +15,9 @@ import { formatDatetime } from "@/utils/date";
 import { apiClient } from "@/utils/api-client";
 import { computed, inject, type Ref } from "vue";
 import cloneDeep from "lodash.clonedeep";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -55,7 +58,7 @@ const handleDelete = async () => {
           name: props.reply?.reply.metadata.name as string,
         });
 
-        Toast.success("删除成功");
+        Toast.success(t("core.universal.toast.delete_success"));
       } catch (error) {
         console.error("Failed to delete comment reply", error);
       } finally {

@@ -34,8 +34,10 @@ import {
 } from "@/composables/use-editor-extension-points";
 import { useLocalStorage } from "@vueuse/core";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
+import { useI18n } from "vue-i18n";
 
 const router = useRouter();
+const { t } = useI18n();
 
 // Editor providers
 const { editorProviders } = useEditorExtensionPoints();
@@ -139,7 +141,7 @@ const handleSave = async () => {
       name.value = data.metadata.name;
     }
 
-    Toast.success("保存成功");
+    Toast.success(t("core.universal.toast.save_success"));
     handleClearCache(name.value as string);
     await handleFetchContent();
   } catch (e) {

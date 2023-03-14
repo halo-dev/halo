@@ -18,6 +18,7 @@ import { submitForm } from "@formkit/core";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import useSlugify from "@/composables/use-slugify";
 import { useMutation } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const initialFormState: SinglePage = {
   spec: {
@@ -66,6 +67,8 @@ const emit = defineEmits<{
   (event: "saved", singlePage: SinglePage): void;
   (event: "published", singlePage: SinglePage): void;
 }>();
+
+const { t } = useI18n();
 
 const formState = ref<SinglePage>(cloneDeep(initialFormState));
 const saving = ref(false);
@@ -182,7 +185,7 @@ const handleSave = async () => {
 
     onVisibleChange(false);
 
-    Toast.success("保存成功");
+    Toast.success(t("core.universal.toast.save_success"));
   } catch (error) {
     console.error("Failed to save single page", error);
   } finally {

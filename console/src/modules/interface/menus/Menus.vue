@@ -28,6 +28,9 @@ import {
 } from "./utils";
 import { useDebounceFn } from "@vueuse/core";
 import { onBeforeRouteLeave } from "vue-router";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const menuItems = ref<MenuItem[]>([] as MenuItem[]);
 const menuTreeItems = ref<MenuTreeItem[]>([] as MenuTreeItem[]);
@@ -175,7 +178,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
 
       await handleFetchMenuItems();
 
-      Toast.success("删除成功");
+      Toast.success(t("core.universal.toast.delete_success"));
     },
   });
 };

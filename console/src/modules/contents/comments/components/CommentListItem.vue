@@ -22,15 +22,17 @@ import type {
   SinglePage,
 } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
-import { computed, provide, ref, watch, type Ref } from "vue";
+import { computed, provide, ref, type Ref } from "vue";
 import ReplyListItem from "./ReplyListItem.vue";
 import { apiClient } from "@/utils/api-client";
 import type { RouteLocationRaw } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -65,7 +67,7 @@ const handleDelete = async () => {
           name: props.comment?.comment?.metadata.name as string,
         });
 
-        Toast.success("删除成功");
+        Toast.success(t("core.universal.toast.delete_success"));
       } catch (error) {
         console.error("Failed to delete comment", error);
       } finally {

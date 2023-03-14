@@ -12,6 +12,7 @@ import {
   type FormKitSchemaNode,
 } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
+import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{
@@ -28,6 +29,8 @@ const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
+
+const { t } = useI18n();
 
 const initialFormState: Policy = {
   spec: {
@@ -128,7 +131,7 @@ const handleSave = async () => {
       );
     }
 
-    Toast.success("保存成功");
+    Toast.success(t("core.universal.toast.save_success"));
     onVisibleChange(false);
   } catch (e) {
     console.error("Failed to save attachment policy", e);
