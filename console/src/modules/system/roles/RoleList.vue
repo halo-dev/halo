@@ -312,7 +312,11 @@ const handleDelete = async (role: Role) => {
                 </VEntityField>
                 <VEntityField v-if="role.metadata.deletionTimestamp">
                   <template #description>
-                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                    <VStatusDot
+                      v-tooltip="$t('core.universal.status.deleting')"
+                      state="warning"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField>
@@ -334,7 +338,7 @@ const handleDelete = async (role: Role) => {
                   type="secondary"
                   @click="handleOpenEditingModal(role)"
                 >
-                  编辑
+                  {{ $t("core.universal.buttons.edit") }}
                 </VButton>
                 <VButton
                   v-if="!isSystemReserved(role)"

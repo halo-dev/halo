@@ -205,7 +205,9 @@ onMounted(handleFetchPrimaryMenuName);
       <VEmpty message="你可以尝试刷新或者新建菜单" title="当前没有菜单">
         <template #actions>
           <VSpace>
-            <VButton size="sm" @click="handleFetchMenus()"> 刷新</VButton>
+            <VButton size="sm" @click="handleFetchMenus()">
+              {{ $t("core.universal.buttons.refresh") }}
+            </VButton>
           </VSpace>
         </template>
       </VEmpty>
@@ -233,7 +235,11 @@ onMounted(handleFetchPrimaryMenuName);
             <template #end>
               <VEntityField v-if="menu.metadata.deletionTimestamp">
                 <template #description>
-                  <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                  <VStatusDot
+                    v-tooltip="$t('core.universal.status.deleting')"
+                    state="warning"
+                    animate
+                  />
                 </template>
               </VEntityField>
             </template>
@@ -255,7 +261,7 @@ onMounted(handleFetchPrimaryMenuName);
                 type="default"
                 @click="handleOpenEditingModal(menu)"
               >
-                修改
+                {{ $t("core.universal.buttons.edit") }}
               </VButton>
               <VButton
                 v-close-popper

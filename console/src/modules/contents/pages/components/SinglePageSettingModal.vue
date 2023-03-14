@@ -493,7 +493,7 @@ const { handleGenerateSlug } = useSlugify(
             type="secondary"
             @click="handlePublishClick()"
           >
-            发布
+            {{ $t("core.universal.buttons.publish") }}
           </VButton>
           <VButton
             v-else
@@ -501,7 +501,7 @@ const { handleGenerateSlug } = useSlugify(
             type="danger"
             @click="handleUnpublish()"
           >
-            取消发布
+            {{ $t("core.universal.buttons.cancel_publish") }}
           </VButton>
         </template>
         <VButton :loading="saving" type="secondary" @click="handleSaveClick">

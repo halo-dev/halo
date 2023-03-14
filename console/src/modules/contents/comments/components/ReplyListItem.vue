@@ -171,7 +171,11 @@ const isHoveredReply = computed(() => {
       </VEntityField>
       <VEntityField v-if="reply?.reply.metadata.deletionTimestamp">
         <template #description>
-          <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+          <VStatusDot
+            v-tooltip="$t('core.universal.status.deleting')"
+            state="warning"
+            animate
+          />
         </template>
       </VEntityField>
       <VEntityField>

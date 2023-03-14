@@ -230,7 +230,7 @@ onMounted(async () => {
         </span>
         <VStatusDot
           v-if="group.metadata.deletionTimestamp"
-          v-tooltip="`删除中`"
+          v-tooltip="$t('core.universal.status.deleting')"
           state="warning"
           animate
         />
@@ -256,7 +256,9 @@ onMounted(async () => {
                 placement="right"
                 :triggers="['click']"
               >
-                <VButton block type="danger">删除</VButton>
+                <VButton block type="danger">
+                  {{ $t("core.universal.buttons.delete") }}
+                </VButton>
                 <template #popper>
                   <div class="w-52 p-2">
                     <VSpace class="w-full" direction="column">

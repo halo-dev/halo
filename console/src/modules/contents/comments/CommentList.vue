@@ -316,7 +316,11 @@ const handleApproveInBatch = async () => {
                 ></FormKit>
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  关键词：{{ keyword }}
+                  {{
+                    $t("core.universal.filters.results.keyword", {
+                      keyword: keyword,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
@@ -339,7 +343,11 @@ const handleApproveInBatch = async () => {
                   v-if="selectedSortFilterItem.value != undefined"
                   @close="handleSortFilterItemChange(SortFilterItems[0])"
                 >
-                  排序：{{ selectedSortFilterItem.label }}
+                  {{
+                    $t("core.universal.filters.results.sort", {
+                      sort: selectedSortFilterItem.label,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterCleanButton
@@ -440,7 +448,7 @@ const handleApproveInBatch = async () => {
                     @click="refetch()"
                   >
                     <IconRefreshLine
-                      v-tooltip="`刷新`"
+                      v-tooltip="$t('core.universal.buttons.refresh')"
                       :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
@@ -456,7 +464,9 @@ const handleApproveInBatch = async () => {
         <VEmpty message="你可以尝试刷新或者修改筛选条件" title="当前没有评论">
           <template #actions>
             <VSpace>
-              <VButton @click="refetch">刷新</VButton>
+              <VButton @click="refetch">
+                {{ $t("core.universal.buttons.refresh") }}
+              </VButton>
             </VSpace>
           </template>
         </VEmpty>

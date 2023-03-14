@@ -261,7 +261,11 @@ function handleClearKeyword() {
                 ></FormKit>
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  关键词：{{ keyword }}
+                  {{
+                    $t("core.universal.filters.results.keyword", {
+                      keyword: keyword,
+                    })
+                  }}
                 </FilterTag>
               </div>
               <VSpace v-else>
@@ -299,7 +303,9 @@ function handleClearKeyword() {
         >
           <template #actions>
             <VSpace>
-              <VButton @click="refetch">刷新</VButton>
+              <VButton @click="refetch">
+                {{ $t("core.universal.buttons.refresh") }}
+              </VButton>
               <VButton
                 v-permission="['system:singlepages:view']"
                 :route="{ name: 'SinglePages' }"
@@ -376,7 +382,11 @@ function handleClearKeyword() {
                   v-if="singlePage?.page?.metadata.deletionTimestamp"
                 >
                   <template #description>
-                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                    <VStatusDot
+                      v-tooltip="$t('core.universal.status.deleting')"
+                      state="warning"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField>

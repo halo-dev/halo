@@ -18,7 +18,7 @@ import { computed, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
 import FilterTag from "@/components/filter/FilterTag.vue";
-import FilteCleanButton from "@/components/filter/FilterCleanButton.vue";
+import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 import { useQuery } from "@tanstack/vue-query";
 import type { Plugin } from "@halo-dev/api-client";
@@ -187,7 +187,11 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
               ></FormKit>
 
               <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                关键词：{{ keyword }}
+                {{
+                  $t("core.universal.filters.results.keyword", {
+                    keyword: keyword,
+                  })
+                }}
               </FilterTag>
 
               <FilterTag
@@ -201,10 +205,17 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                 v-if="selectedSortItem"
                 @close="handleSortItemChange()"
               >
-                排序：{{ selectedSortItem.label }}
+                {{
+                  $t("core.universal.filters.results.sort", {
+                    sort: selectedSortItem.label,
+                  })
+                }}
               </FilterTag>
 
-              <FilteCleanButton v-if="hasFilters" @click="handleClearFilters" />
+              <FilterCleanButton
+                v-if="hasFilters"
+                @click="handleClearFilters"
+              />
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
@@ -268,7 +279,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                     @click="refetch()"
                   >
                     <IconRefreshLine
-                      v-tooltip="`刷新`"
+                      v-tooltip="$t('core.universal.buttons.refresh')"
                       :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
@@ -289,7 +300,9 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
         >
           <template #actions>
             <VSpace>
-              <VButton :loading="isFetching" @click="refetch()">刷新</VButton>
+              <VButton :loading="isFetching" @click="refetch()">
+                {{ $t("core.universal.buttons.refresh") }}
+              </VButton>
               <VButton
                 v-permission="['system:plugins:manage']"
                 type="secondary"

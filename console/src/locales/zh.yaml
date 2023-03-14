@@ -76,6 +76,39 @@ core:
       tags: 标签
       recycle_bin: 回收站
       new_post: 新建
+    empty:
+      title: 当前没有文章
+      message: 你可以尝试刷新或者新建文章
+      actions:
+        new: 新建文章
+    filters:
+      status:
+        items:
+          all: 全部
+          published: 已发布
+          draft: 未发布
+      visible:
+        label: 可见性
+        result: "可见性：{visible}"
+        items:
+          all: 全部
+          public: 公开
+          private: 私有
+      category:
+        label: 分类
+        result: "分类：{category}"
+      tag:
+        label: 标签
+        result: "标签：{tag}"
+      author:
+        label: 作者
+        result: "作者：{author}"
+      sort:
+        items:
+          publish_time_desc: 较近发布
+          publish_time_asc: 较早发布
+          create_time_desc: 较近创建
+          create_time_asc: 较早创建
     settings:
       title: 文章设置
       groups:
@@ -109,6 +142,8 @@ core:
           label: 自定义模板
         cover:
           label: 封面图
+  deleted_post:
+    title: 文章回收站
   page:
     title: 页面
   comment:
@@ -189,7 +224,13 @@ core:
       delete: 删除
       setting: 设置
       new: 新建
+      edit: 编辑
       back: 返回
+      refresh: 刷新
+      publish: 发布
+      cancel_publish: 取消发布
+      next: 下一项
+      previous: 上一项
     radio:
       "yes": 是
       "no": 否
@@ -199,3 +240,13 @@ core:
       operation_success: 操作成功
       delete_success: 删除成功
       save_success: 保存成功
+    filters:
+      results:
+        keyword: "关键词：{keyword}"
+        sort: "排序：{sort}"
+        status: "状态：{status}"
+      labels:
+        sort: 排序
+        status: 状态
+    status:
+      deleting: 删除中

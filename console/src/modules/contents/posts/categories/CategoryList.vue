@@ -117,7 +117,9 @@ const onEditingModalClose = () => {
         <VEmpty message="你可以尝试刷新或者新建分类" title="当前没有分类">
           <template #actions>
             <VSpace>
-              <VButton @click="handleFetchCategories">刷新</VButton>
+              <VButton @click="handleFetchCategories">
+                {{ $t("core.universal.buttons.refresh") }}
+              </VButton>
               <VButton
                 v-permission="['system:posts:manage']"
                 type="primary"

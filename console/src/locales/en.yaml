@@ -76,6 +76,39 @@ core:
       tags: Tags
       recycle_bin: Recycle Bin
       new_post: New
+    empty:
+      title: There are no posts currently.
+      message: You can try to refresh or create a new post.
+      actions:
+        new: New Post
+    filters:
+      status:
+        items:
+          all: All
+          published: Published
+          draft: Draft
+      visible:
+        label: Visible
+        result: "Visible: {visible}"
+        items:
+          all: All
+          public: Public
+          private: Private
+      category:
+        label: Category
+        result: "Category: {category}"
+      tag:
+        label: Tag
+        result: "Tag: {tag}"
+      author:
+        label: Author
+        result: "Author: {author}"
+      sort:
+        items:
+          publish_time_desc: Latest Published
+          publish_time_asc: Earliest Published
+          create_time_desc: Latest Created
+          create_time_asc: Earliest Created
     settings:
       title: Settings
       groups:
@@ -109,6 +142,8 @@ core:
           label: Template
         cover:
           label: Cover
+  deleted_post:
+    title: Deleted Posts
   page:
     title: Pages
   comment:
@@ -189,7 +224,13 @@ core:
       delete: Delete
       setting: Setting
       new: New
+      edit: Edit
       back: Back
+      refresh: Refresh
+      publish: Publish
+      cancel_publish: Cancel Publish
+      next: Next
+      previous: Previous
     radio:
       "yes": Yes
       "no": No
@@ -199,3 +240,13 @@ core:
       operation_success: Successful operation
       delete_success: Deleted successfully
       save_success: Saved successfully
+    filters:
+      results:
+        keyword: "Keyword: {keyword}"
+        sort: "Sort: {sort}"
+        status: "Status: {status}"
+      labels:
+        sort: Sort
+        status: Status
+    status:
+      deleting: Deleting

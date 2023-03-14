@@ -389,7 +389,7 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
           <template #icon>
             <IconSendPlaneFill class="h-full w-full" />
           </template>
-          发布
+          {{ $t("core.universal.buttons.publish") }}
         </VButton>
       </VSpace>
     </template>

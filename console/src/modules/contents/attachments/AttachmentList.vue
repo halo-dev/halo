@@ -42,7 +42,7 @@ import { useRouteQuery } from "@vueuse/router";
 import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
 import { usePermission } from "@/utils/permission";
 import FilterTag from "@/components/filter/FilterTag.vue";
-import FilteCleanButton from "@/components/filter/FilterCleanButton.vue";
+import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 
 const { currentUserHasPermission } = usePermission();
@@ -365,7 +365,11 @@ onMounted(() => {
                     ></FormKit>
 
                     <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                      关键词：{{ keyword }}
+                      {{
+                        $t("core.universal.filters.results.keyword", {
+                          keyword: keyword,
+                        })
+                      }}
                     </FilterTag>
 
                     <FilterTag
@@ -386,10 +390,14 @@ onMounted(() => {
                       v-if="selectedSortItem"
                       @click="handleSortItemChange()"
                     >
-                      排序：{{ selectedSortItem.label }}
+                      {{
+                        $t("core.universal.filters.results.sort", {
+                          sort: selectedSortItem.label,
+                        })
+                      }}
                     </FilterTag>
 
-                    <FilteCleanButton
+                    <FilterCleanButton
                       v-if="hasFilters"
                       @click="handleClearFilters"
                     />
@@ -545,7 +553,7 @@ onMounted(() => {
                         @click="handleFetchAttachments()"
                       >
                         <IconRefreshLine
-                          v-tooltip="`刷新`"
+                          v-tooltip="$t('core.universal.buttons.refresh')"
                           :class="{ 'animate-spin text-gray-900': isFetching }"
                           class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                         />
@@ -575,7 +583,9 @@ onMounted(() => {
             >
               <template #actions>
                 <VSpace>
-                  <VButton @click="handleFetchAttachments">刷新</VButton>
+                  <VButton @click="handleFetchAttachments">
+                    {{ $t("core.universal.buttons.refresh") }}
+                  </VButton>
                   <VButton
                     v-permission="['system:attachments:manage']"
                     type="secondary"
@@ -748,7 +758,7 @@ onMounted(() => {
                       >
                         <template #description>
                           <VStatusDot
-                            v-tooltip="`删除中`"
+                            v-tooltip="$t('core.universal.status.deleting')"
                             state="warning"
                             animate
                           />

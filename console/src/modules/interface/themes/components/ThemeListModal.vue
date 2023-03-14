@@ -193,7 +193,7 @@ const handleOpenInstallModal = () => {
             <template #actions>
               <VSpace>
                 <VButton :loading="loading" @click="handleFetchThemes()">
-                  刷新
+                  {{ $t("core.universal.buttons.refresh") }}
                 </VButton>
                 <VButton
                   v-permission="['system:themes:manage']"
@@ -239,7 +239,7 @@ const handleOpenInstallModal = () => {
             <template #actions>
               <VSpace>
                 <VButton :loading="loading" @click="handleFetchThemes">
-                  刷新
+                  {{ $t("core.universal.buttons.refresh") }}
                 </VButton>
               </VSpace>
             </template>

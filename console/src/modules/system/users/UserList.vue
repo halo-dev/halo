@@ -375,7 +375,11 @@ const hasFilters = computed(() => {
                 ></FormKit>
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  关键词：{{ keyword }}
+                  {{
+                    $t("core.universal.filters.results.keyword", {
+                      keyword: keyword,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag v-if="selectedRole" @close="handleRoleChange()">
@@ -390,7 +394,11 @@ const hasFilters = computed(() => {
                   v-if="selectedSortItem"
                   @close="handleSortItemChange()"
                 >
-                  排序：{{ selectedSortItem.label }}
+                  {{
+                    $t("core.universal.filters.results.sort", {
+                      sort: selectedSortItem.label,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterCleanButton
@@ -468,7 +476,7 @@ const hasFilters = computed(() => {
                     @click="handleFetchUsers()"
                   >
                     <IconRefreshLine
-                      v-tooltip="`刷新`"
+                      v-tooltip="$t('core.universal.buttons.refresh')"
                       :class="{ 'animate-spin text-gray-900': loading }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
@@ -489,7 +497,9 @@ const hasFilters = computed(() => {
         >
           <template #actions>
             <VSpace>
-              <VButton @click="handleFetchUsers()">刷新</VButton>
+              <VButton @click="handleFetchUsers()">
+                {{ $t("core.universal.buttons.refresh") }}
+              </VButton>
               <VButton
                 v-permission="['system:users:manage']"
                 type="secondary"
@@ -563,7 +573,11 @@ const hasFilters = computed(() => {
                 </VEntityField>
                 <VEntityField v-if="user.user.metadata.deletionTimestamp">
                   <template #description>
-                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                    <VStatusDot
+                      v-tooltip="$t('core.universal.status.deleting')"
+                      state="warning"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField>

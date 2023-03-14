@@ -414,10 +414,10 @@ watch(selectedPageNames, (newValue) => {
   >
     <template #actions>
       <span @click="handleSelectPrevious">
-        <IconArrowLeft v-tooltip="`上一项`" />
+        <IconArrowLeft v-tooltip="$t('core.universal.buttons.previous')" />
       </span>
       <span @click="handleSelectNext">
-        <IconArrowRight v-tooltip="`下一项`" />
+        <IconArrowRight v-tooltip="$t('core.universal.buttons.next')" />
       </span>
     </template>
   </SinglePageSettingModal>
@@ -483,7 +483,11 @@ watch(selectedPageNames, (newValue) => {
                 ></FormKit>
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  关键词：{{ keyword }}
+                  {{
+                    $t("core.universal.filters.results.keyword", {
+                      keyword: keyword,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
@@ -511,7 +515,11 @@ watch(selectedPageNames, (newValue) => {
                   v-if="selectedSortItem"
                   @close="handleSortItemChange()"
                 >
-                  排序：{{ selectedSortItem.label }}
+                  {{
+                    $t("core.universal.filters.results.sort", {
+                      sort: selectedSortItem.label,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterCleanButton
@@ -632,7 +640,7 @@ watch(selectedPageNames, (newValue) => {
                     @click="refetch()"
                   >
                     <IconRefreshLine
-                      v-tooltip="`刷新`"
+                      v-tooltip="$t('core.universal.buttons.refresh')"
                       :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
@@ -648,7 +656,9 @@ watch(selectedPageNames, (newValue) => {
         <VEmpty message="你可以尝试刷新或者新建页面" title="当前没有页面">
           <template #actions>
             <VSpace>
-              <VButton @click="refetch">刷新</VButton>
+              <VButton @click="refetch">
+                {{ $t("core.universal.buttons.refresh") }}
+              </VButton>
               <VButton
                 v-permission="['system:singlepages:manage']"
                 :route="{ name: 'SinglePageEditor' }"
@@ -778,7 +788,11 @@ watch(selectedPageNames, (newValue) => {
                 </VEntityField>
                 <VEntityField v-if="singlePage?.page?.spec.deleted">
                   <template #description>
-                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                    <VStatusDot
+                      v-tooltip="$t('core.universal.status.deleting')"
+                      state="warning"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField>

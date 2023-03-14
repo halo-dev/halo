@@ -195,7 +195,7 @@ function handleClearKeyword() {
 }
 </script>
 <template>
-  <VPageHeader title="文章回收站">
+  <VPageHeader :title="$t('core.deleted_post.title')">
     <template #icon>
       <IconDeleteBin class="mr-2 self-center text-green-600" />
     </template>
@@ -252,7 +252,11 @@ function handleClearKeyword() {
                 ></FormKit>
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  关键词：{{ keyword }}
+                  {{
+                    $t("core.universal.filters.results.keyword", {
+                      keyword: keyword,
+                    })
+                  }}
                 </FilterTag>
               </div>
               <VSpace v-else>
@@ -292,7 +296,9 @@ function handleClearKeyword() {
         >
           <template #actions>
             <VSpace>
-              <VButton @click="refetch">刷新</VButton>
+              <VButton @click="refetch">
+                {{ $t("core.universal.buttons.refresh") }}
+              </VButton>
               <VButton :route="{ name: 'Posts' }" type="primary">
                 {{ $t("core.universal.buttons.back") }}
               </VButton>
@@ -387,7 +393,11 @@ function handleClearKeyword() {
                 </VEntityField>
                 <VEntityField v-if="post?.post?.metadata.deletionTimestamp">
                   <template #description>
-                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                    <VStatusDot
+                      v-tooltip="$t('core.universal.status.deleting')"
+                      state="warning"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField>

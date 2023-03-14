@@ -350,7 +350,11 @@ const subjectRefResult = computed(() => {
       </VEntityField>
       <VEntityField v-if="comment?.comment?.metadata.deletionTimestamp">
         <template #description>
-          <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+          <VStatusDot
+            v-tooltip="$t('core.universal.status.deleting')"
+            state="warning"
+            animate
+          />
         </template>
       </VEntityField>
       <VEntityField>
@@ -402,7 +406,9 @@ const subjectRefResult = computed(() => {
           <VEmpty message="你可以尝试刷新或者创建新回复" title="当前没有回复">
             <template #actions>
               <VSpace>
-                <VButton @click="refetch()">刷新</VButton>
+                <VButton @click="refetch()">
+                  {{ $t("core.universal.buttons.refresh") }}
+                </VButton>
                 <VButton type="secondary" @click="replyModal = true">
                   <template #icon>
                     <IconAddCircle class="h-full w-full" />

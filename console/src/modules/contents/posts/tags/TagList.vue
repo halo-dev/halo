@@ -166,7 +166,9 @@ onMounted(async () => {
         <VEmpty message="你可以尝试刷新或者新建标签" title="当前没有标签">
           <template #actions>
             <VSpace>
-              <VButton @click="handleFetchTags">刷新</VButton>
+              <VButton @click="handleFetchTags">
+                {{ $t("core.universal.buttons.refresh") }}
+              </VButton>
               <VButton type="primary" @click="editingModal = true">
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
@@ -210,7 +212,7 @@ onMounted(async () => {
                   <VEntityField v-if="tag.metadata.deletionTimestamp">
                     <template #description>
                       <VStatusDot
-                        v-tooltip="`删除中`"
+                        v-tooltip="$t('core.universal.status.deleting')"
                         state="warning"
                         animate
                       />
@@ -238,7 +240,7 @@ onMounted(async () => {
                     type="secondary"
                     @click="handleOpenEditingModal(tag)"
                   >
-                    修改
+                    {{ $t("core.universal.buttons.edit") }}
                   </VButton>
                   <VButton
                     v-permission="['system:posts:manage']"

@@ -85,7 +85,11 @@ function onDelete(category: CategoryTree) {
           <template #end>
             <VEntityField v-if="category.metadata.deletionTimestamp">
               <template #description>
-                <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                <VStatusDot
+                  v-tooltip="$t('core.universal.status.deleting')"
+                  state="warning"
+                  animate
+                />
               </template>
             </VEntityField>
             <VEntityField
@@ -110,7 +114,7 @@ function onDelete(category: CategoryTree) {
               type="secondary"
               @click="onOpenEditingModal(category)"
             >
-              修改
+              {{ $t("core.universal.buttons.edit") }}
             </VButton>
             <VButton
               v-permission="['system:posts:manage']"

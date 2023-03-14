@@ -120,7 +120,11 @@ const getFailedMessage = (plugin: Plugin) => {
       </VEntityField>
       <VEntityField v-if="plugin?.metadata.deletionTimestamp">
         <template #description>
-          <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+          <VStatusDot
+            v-tooltip="$t('core.universal.status.deleting')"
+            state="warning"
+            animate
+          />
         </template>
       </VEntityField>
       <VEntityField v-if="plugin?.spec.author">

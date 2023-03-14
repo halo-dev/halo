@@ -146,7 +146,9 @@ const onEditingModalClose = () => {
     >
       <template #actions>
         <VSpace>
-          <VButton @click="handleFetchPolicies">刷新</VButton>
+          <VButton @click="handleFetchPolicies">
+            {{ $t("core.universal.buttons.refresh") }}
+          </VButton>
           <FloatingDropdown>
             <VButton type="secondary">
               <template #icon>
@@ -191,7 +193,11 @@ const onEditingModalClose = () => {
           <template #end>
             <VEntityField v-if="policy.metadata.deletionTimestamp">
               <template #description>
-                <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                <VStatusDot
+                  v-tooltip="$t('core.universal.status.deleting')"
+                  state="warning"
+                  animate
+                />
               </template>
             </VEntityField>
             <VEntityField>
@@ -209,7 +215,7 @@ const onEditingModalClose = () => {
               type="secondary"
               @click="handleOpenEditingModal(policy)"
             >
-              编辑
+              {{ $t("core.universal.buttons.edit") }}
             </VButton>
             <VButton
               v-close-popper

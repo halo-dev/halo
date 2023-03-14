@@ -88,7 +88,9 @@ const handleOpenDetail = (attachment: Attachment) => {
   >
     <template #actions>
       <VSpace>
-        <VButton @click="handleFetchAttachments">刷新</VButton>
+        <VButton @click="handleFetchAttachments">
+          {{ $t("core.universal.buttons.refresh") }}
+        </VButton>
         <VButton type="secondary" @click="uploadVisible = true">
           <template #icon>
             <IconUpload class="h-full w-full" />

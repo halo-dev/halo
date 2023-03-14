@@ -262,7 +262,9 @@ const handleResetMenuItems = async () => {
             >
               <template #actions>
                 <VSpace>
-                  <VButton @click="handleFetchMenuItems()"> 刷新</VButton>
+                  <VButton @click="handleFetchMenuItems()">
+                    {{ $t("core.universal.buttons.refresh") }}
+                  </VButton>
                   <VButton
                     v-permission="['system:menus:manage']"
                     type="primary"
