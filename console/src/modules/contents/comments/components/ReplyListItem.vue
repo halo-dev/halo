@@ -50,7 +50,7 @@ const quoteReply = computed(() => {
 const handleDelete = async () => {
   Dialog.warning({
     title: "确认要删除该回复吗？",
-    description: "该操作不可恢复。",
+    description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
     onConfirm: async () => {
       try {
@@ -79,7 +79,7 @@ const handleApprove = async () => {
       reply: replyToUpdate,
     });
 
-    Toast.success("操作成功");
+    Toast.success(t("core.universal.toast.operation_success"));
   } catch (error) {
     console.error("Failed to approve comment reply", error);
   } finally {

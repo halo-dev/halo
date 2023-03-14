@@ -270,7 +270,13 @@ const iframeClasses = computed(() => {
       >
         <IconSettings />
       </span>
-      <span v-tooltip="{ content: '刷新', delay: 300 }" @click="handleRefresh">
+      <span
+        v-tooltip="{
+          content: $t('core.universal.buttons.refresh'),
+          delay: 300,
+        }"
+        @click="handleRefresh"
+      >
         <IconRefreshLine />
       </span>
       <span v-tooltip="{ content: '新窗口打开', delay: 300 }">

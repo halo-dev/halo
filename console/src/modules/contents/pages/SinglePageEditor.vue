@@ -184,7 +184,7 @@ const handlePublish = async () => {
       router.push({ name: "SinglePages" });
     }
 
-    Toast.success("发布成功");
+    Toast.success(t("core.universal.toast.publish_success"));
     handleClearCache(routeQueryName.value as string);
   } catch (error) {
     console.error("Failed to publish single page", error);

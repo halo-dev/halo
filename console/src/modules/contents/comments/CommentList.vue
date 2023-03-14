@@ -265,7 +265,7 @@ const handleApproveInBatch = async () => {
         await Promise.all(promises || []);
         selectedCommentNames.value = [];
 
-        Toast.success("操作成功");
+        Toast.success(t("core.universal.toast.operation_success"));
       } catch (e) {
         console.error("Failed to approve comments in batch", e);
       } finally {

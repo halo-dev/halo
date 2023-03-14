@@ -4,6 +4,7 @@ import type { Plugin } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
+import { useI18n } from "vue-i18n";
 
 interface usePluginLifeCycleReturn {
   isStarted: ComputedRef<boolean | undefined>;
@@ -14,6 +15,8 @@ interface usePluginLifeCycleReturn {
 export function usePluginLifeCycle(
   plugin?: Ref<Plugin | undefined>
 ): usePluginLifeCycleReturn {
+  const { t } = useI18n();
+
   const isStarted = computed(() => {
     return (
       plugin?.value?.status?.phase === "STARTED" && plugin.value?.spec.enabled
@@ -59,7 +62,7 @@ export function usePluginLifeCycle(
       description: `${
         enabled
           ? "当前插件还在启用状态，将在停止运行后卸载，该操作不可恢复。"
-          : "该操作不可恢复。"
+          : t("core.universal.dialog.descriptions.cannot_be_recovered")
       }`,
       confirmType: "danger",
       confirmText: `${enabled ? "停止运行并卸载" : "卸载"}`,

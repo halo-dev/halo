@@ -375,8 +375,8 @@ const handleCheckAllChange = (e: Event) => {
 
 const handleDelete = async (post: Post) => {
   Dialog.warning({
-    title: "确定要删除该文章吗？",
-    description: "该操作会将文章放入回收站，后续可以从回收站恢复",
+    title: t("core.post.operations.delete.title"),
+    description: t("core.post.operations.delete.description"),
     confirmType: "danger",
     onConfirm: async () => {
       await apiClient.post.recyclePost({
@@ -391,8 +391,8 @@ const handleDelete = async (post: Post) => {
 
 const handleDeleteInBatch = async () => {
   Dialog.warning({
-    title: "确定要删除选中的文章吗？",
-    description: "该操作会将文章放入回收站，后续可以从回收站恢复",
+    title: t("core.post.operations.delete_in_batch.title"),
+    description: t("core.post.operations.delete_in_batch.description"),
     confirmType: "danger",
     onConfirm: async () => {
       await Promise.all(

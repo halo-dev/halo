@@ -80,6 +80,13 @@ core:
       message: You can try to refresh or create a new post.
       actions:
         new: New Post
+    operations:
+      delete:
+        title: Are you sure you want to delete this post?
+        description: This operation will move the post to the recycle bin, and it can be restored from the recycle bin later.
+      delete_in_batch:
+        title: Are you sure you want to delete the selected posts?
+        description: This operation will move the posts to the recycle bin, and it can be restored from the recycle bin later.
     filters:
       status:
         items:
@@ -143,6 +150,22 @@ core:
           label: Cover
   deleted_post:
     title: Deleted Posts
+    empty:
+      title: No posts have been put in the recycle bin.
+      message: You can try to refresh or go back to the previous page.
+    operations:
+      delete:
+        title: Are you sure you want to permanently delete this post?
+        description: After deletion, it will not be possible to recover.
+      delete_in_batch:
+        title: Are you sure you want to permanently delete the selected posts?
+        description: After deletion, it will not be possible to recover.
+      recovery:
+        title: Do you want to restore this post?
+        description: This operation will restore the post to its state before deletion.
+      recovery_in_batch:
+        title: Are you sure you want to restore the selected posts?
+        description: This operation will restore the posts to its state before deletion.
   page:
     title: Pages
     actions:
@@ -289,6 +312,7 @@ core:
       upgrade: Upgrade
       reset: Reset
       preview: Preview
+      recovery: Recovery
     radio:
       "yes": Yes
       "no": No
@@ -298,6 +322,12 @@ core:
       operation_success: Successful operation
       delete_success: Deleted successfully
       save_success: Saved successfully
+      publish_success: Published successfully
+      cancel_publish_success: Cancel publication successful
+      recovery_success: Recovery successful
+    dialog:
+      descriptions:
+        cannot_be_recovered: This operation is irreversible.
     filters:
       results:
         keyword: "Keyword: {keyword}"

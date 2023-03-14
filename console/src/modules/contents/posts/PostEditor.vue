@@ -188,7 +188,9 @@ const handlePublish = async () => {
       router.push({ name: "Posts" });
     }
 
-    Toast.success("发布成功", { duration: 2000 });
+    Toast.success(t("core.universal.toast.publish_success"), {
+      duration: 2000,
+    });
     handleClearCache(name.value as string);
   } catch (error) {
     console.error("Failed to publish post", error);

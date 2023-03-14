@@ -88,8 +88,8 @@ const handleCheckAllChange = (e: Event) => {
 
 const handleDeletePermanently = async (post: Post) => {
   Dialog.warning({
-    title: "确定要永久删除该文章吗？",
-    description: "删除之后将无法恢复",
+    title: t("core.deleted_post.operations.delete.title"),
+    description: t("core.deleted_post.operations.delete.description"),
     confirmType: "danger",
     onConfirm: async () => {
       await apiClient.extension.post.deletecontentHaloRunV1alpha1Post({
@@ -104,8 +104,8 @@ const handleDeletePermanently = async (post: Post) => {
 
 const handleDeletePermanentlyInBatch = async () => {
   Dialog.warning({
-    title: "确定要永久删除选中的文章吗？",
-    description: "删除之后将无法恢复",
+    title: t("core.deleted_post.operations.delete_in_batch.title"),
+    description: t("core.deleted_post.operations.delete_in_batch.description"),
     confirmType: "danger",
     onConfirm: async () => {
       await Promise.all(
@@ -125,8 +125,8 @@ const handleDeletePermanentlyInBatch = async () => {
 
 const handleRecovery = async (post: Post) => {
   Dialog.warning({
-    title: "确定要恢复该文章吗？",
-    description: "该操作会将文章恢复到被删除之前的状态",
+    title: t("core.deleted_post.operations.recovery.title"),
+    description: t("core.deleted_post.operations.recovery.description"),
     onConfirm: async () => {
       const postToUpdate = cloneDeep(post);
       postToUpdate.spec.deleted = false;
@@ -137,15 +137,17 @@ const handleRecovery = async (post: Post) => {
 
       await refetch();
 
-      Toast.success("恢复成功");
+      Toast.success(t("core.universal.toast.recovery_success"));
     },
   });
 };
 
 const handleRecoveryInBatch = async () => {
   Dialog.warning({
-    title: "确定要恢复选中的文章吗？",
-    description: "该操作会将文章恢复到被删除之前的状态",
+    title: t("core.deleted_post.operations.recovery_in_batch.title"),
+    description: t(
+      "core.deleted_post.operations.recovery_in_batch.description"
+    ),
     onConfirm: async () => {
       await Promise.all(
         selectedPostNames.value.map((name) => {
@@ -172,7 +174,7 @@ const handleRecoveryInBatch = async () => {
       await refetch();
       selectedPostNames.value = [];
 
-      Toast.success("恢复成功");
+      Toast.success(t("core.universal.toast.recovery_success"));
     },
   });
 };
@@ -264,7 +266,7 @@ function handleClearKeyword() {
                   永久删除
                 </VButton>
                 <VButton type="default" @click="handleRecoveryInBatch">
-                  恢复
+                  {{ $t("core.universal.buttons.recovery") }}
                 </VButton>
               </VSpace>
             </div>
@@ -291,8 +293,8 @@ function handleClearKeyword() {
 
       <Transition v-else-if="!posts?.length" appear name="fade">
         <VEmpty
-          message="你可以尝试刷新或者返回文章管理"
-          title="没有文章被放入回收站"
+          :message="$t('core.deleted_post.empty.message')"
+          :title="$t('core.deleted_post.empty.title')"
         >
           <template #actions>
             <VSpace>
@@ -426,7 +428,7 @@ function handleClearKeyword() {
                   type="default"
                   @click="handleRecovery(post.post)"
                 >
-                  恢复
+                  {{ $t("core.universal.buttons.recovery") }}
                 </VButton>
               </template>
             </VEntity>

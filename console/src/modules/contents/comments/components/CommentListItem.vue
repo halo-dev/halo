@@ -101,7 +101,7 @@ const handleApproveReplyInBatch = async () => {
         });
         await Promise.all(promises || []);
 
-        Toast.success("操作成功");
+        Toast.success(t("core.universal.toast.operation_success"));
       } catch (e) {
         console.error("Failed to approve comment replies in batch", e);
       } finally {
@@ -122,7 +122,7 @@ const handleApprove = async () => {
       comment: commentToUpdate,
     });
 
-    Toast.success("操作成功");
+    Toast.success(t("core.universal.toast.operation_success"));
   } catch (error) {
     console.error("Failed to approve comment", error);
   } finally {

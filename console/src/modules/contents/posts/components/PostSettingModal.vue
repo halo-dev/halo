@@ -215,7 +215,7 @@ const handlePublish = async () => {
 
     handleVisibleChange(false);
 
-    Toast.success("发布成功");
+    Toast.success(t("core.universal.toast.publish_success"));
   } catch (e) {
     console.error("Failed to publish post", e);
   } finally {
@@ -233,7 +233,7 @@ const handleUnpublish = async () => {
 
     handleVisibleChange(false);
 
-    Toast.success("取消发布成功");
+    Toast.success(t("core.universal.toast.cancel_publish_success"));
   } catch (e) {
     console.error("Failed to publish post", e);
   } finally {

@@ -273,7 +273,7 @@ function handleClearKeyword() {
                   永久删除
                 </VButton>
                 <VButton type="default" @click="handleRecoveryInBatch">
-                  恢复
+                  {{ $t("core.universal.buttons.recovery") }}
                 </VButton>
               </VSpace>
             </div>
@@ -415,7 +415,7 @@ function handleClearKeyword() {
                   type="default"
                   @click="handleRecovery(singlePage.page)"
                 >
-                  恢复
+                  {{ $t("core.universal.buttons.recovery") }}
                 </VButton>
               </template>
             </VEntity>

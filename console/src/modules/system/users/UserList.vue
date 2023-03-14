@@ -130,7 +130,7 @@ const handlePaginationChange = async ({
 const handleDelete = async (user: User) => {
   Dialog.warning({
     title: "确定要删除该用户吗？",
-    description: "该操作不可恢复。",
+    description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
     onConfirm: async () => {
       try {
@@ -151,7 +151,7 @@ const handleDelete = async (user: User) => {
 const handleDeleteInBatch = async () => {
   Dialog.warning({
     title: "确定要删除选中的用户吗？",
-    description: "该操作不可恢复。",
+    description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
     onConfirm: async () => {
       const userNamesToDelete = selectedUserNames.value.filter(

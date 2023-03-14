@@ -16,8 +16,10 @@ import { apiClient } from "@/utils/api-client";
 import { toRefs } from "vue";
 import { useThemeLifeCycle } from "../../composables/use-theme";
 import { usePermission } from "@/utils/permission";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -51,7 +53,7 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
         ? "确定要卸载该主题以及对应的配置吗？"
         : "确定要卸载该主题吗？"
     }`,
-    description: "该操作不可恢复。",
+    description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
     onConfirm: async () => {
       try {
         await apiClient.extension.theme.deletethemeHaloRunV1alpha1Theme({

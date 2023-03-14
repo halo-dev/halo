@@ -236,7 +236,7 @@ const handlePublish = async () => {
 
     onVisibleChange(false);
 
-    Toast.success("发布成功");
+    Toast.success(t("core.universal.toast.publish_success"));
   } catch (error) {
     console.error("Failed to publish single page", error);
   } finally {
@@ -268,7 +268,7 @@ const handleUnpublish = async () => {
 
     onVisibleChange(false);
 
-    Toast.success("取消发布成功");
+    Toast.success(t("core.universal.toast.cancel_publish_success"));
   } catch (error) {
     console.error("Failed to unpublish single page", error);
   } finally {

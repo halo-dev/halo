@@ -80,6 +80,13 @@ core:
       message: 你可以尝试刷新或者新建文章
       actions:
         new: 新建文章
+    operations:
+      delete:
+        title: 确定要删除该文章吗？
+        description: 该操作会将文章放入回收站，后续可以从回收站恢复。
+      delete_in_batch:
+        title: 确定要删除选中的文章吗？
+        description: 该操作会将文章放入回收站，后续可以从回收站恢复。
     filters:
       status:
         items:
@@ -143,6 +150,22 @@ core:
           label: 封面图
   deleted_post:
     title: 文章回收站
+    empty:
+      title: 没有文章被放入回收站
+      message: 你可以尝试刷新或者返回文章管理
+    operations:
+      delete:
+        title: 确定要永久删除该文章吗？
+        description: 删除之后将无法恢复。
+      delete_in_batch:
+        title: 确定要永久删除选中的文章吗？
+        description: 删除之后将无法恢复。
+      recovery:
+        title: 确定要恢复该文章吗？
+        description: 该操作会将文章恢复到被删除之前的状态。
+      recovery_in_batch:
+        title: 确定要恢复选中的文章吗？
+        description: 该操作会将文章恢复到被删除之前的状态。
   page:
     title: 页面
     actions:
@@ -289,6 +312,7 @@ core:
       upgrade: 升级
       reset: 重置
       preview: 预览
+      recovery: 恢复
     radio:
       "yes": 是
       "no": 否
@@ -298,6 +322,12 @@ core:
       operation_success: 操作成功
       delete_success: 删除成功
       save_success: 保存成功
+      publish_success: 发布成功
+      cancel_publish_success: 发布成功
+      recovery_success: 恢复成功
+    dialog:
+      descriptions:
+        cannot_be_recovered: 该操作不可恢复。
     filters:
       results:
         keyword: "关键词：{keyword}"
