@@ -48,6 +48,48 @@ core:
           title: 评论
         views_stats:
           title: 浏览量
+  post:
+    title: 文章
+    actions:
+      categories: 分类
+      tags: 标签
+      recycle_bin: 回收站
+      new_post: 新建
+    filters:
+      keyword_placeholder: 输入关键词搜索
+    settings:
+      title: 文章设置
+      groups:
+        general: 常规设置
+        advanced: 高级设置
+        annotations: 元数据
+      fields:
+        title:
+          label: 标题
+        slug:
+          label: 别名
+          help: 通常用于生成文章的固定链接
+          refresh_message: 根据标题重新生成别名
+        categories:
+          label: 分类目录
+        tags:
+          label: 标签
+        auto_generate_excerpt:
+          label: 自动生成摘要
+        raw_excerpt:
+          label: 自定义摘要
+        allow_comment:
+          label: 允许评论
+        pinned:
+          label: 是否置顶
+        visible:
+          label: 可见性
+        publish_time:
+          label: 发表时间
+        template:
+          label: 自定义模板
+        cover:
+          label: 封面图
   rbac:
     Attachments Management: 附件
     Attachment Manage: 附件管理
@@ -105,3 +147,11 @@ core:
     User View: 用户查看
     role-template-view-users: 用户查看
     role-template-change-password: 修改密码
+  universal:
+    buttons:
+      save: 保存
+      close: 关闭
+      delete: 删除
+    radio:
+      "yes": 是
+      "no": 否

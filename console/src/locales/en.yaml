@@ -48,6 +48,48 @@ core:
           title: Comments
         views_stats:
           title: Visits
+  post:
+    title: Posts
+    actions:
+      categories: Categories
+      tags: Tags
+      recycle_bin: Recycle Bin
+      new_post: New
+    filters:
+      keyword_placeholder: Enter keywords to search
+    settings:
+      title: Settings
+      groups:
+        general: General
+        advanced: Advanced
+        annotations: Annotations
+      fields:
+        title:
+          label: Title
+        slug:
+          label: Slug
+          help: Usually used for generating permalink to posts
+          refresh_message: Regenerate slug based on title.
+        categories:
+          label: Categories
+        tags:
+          label: Tags
+        auto_generate_excerpt:
+          label: Auto Generate Excerpt
+        raw_excerpt:
+          label: Excerpt
+        allow_comment:
+          label: Allow Comment
+        pinned:
+          label: Pinned
+        visible:
+          label: Visible
+        publish_time:
+          label: Publish Time
+        template:
+          label: Template
+        cover:
+          label: Cover
   rbac:
     Attachments Management: 附件
     Attachment Manage: 附件管理
@@ -105,3 +147,11 @@ core:
     User View: 用户查看
     role-template-view-users: 用户查看
     role-template-change-password: 修改密码
+  universal:
+    buttons:
+      save: Save
+      close: Close
+      delete: Delete
+    radio:
+      "yes": Yes
+      "no": No

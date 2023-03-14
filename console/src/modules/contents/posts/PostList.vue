@@ -431,15 +431,21 @@ watch(selectedPostNames, (newValue) => {
       </span>
     </template>
   </PostSettingModal>
-  <VPageHeader title="文章">
+  <VPageHeader :title="$t('core.post.title')">
     <template #icon>
       <IconBookRead class="mr-2 self-center" />
     </template>
     <template #actions>
       <VSpace>
-        <VButton :route="{ name: 'Categories' }" size="sm">分类</VButton>
-        <VButton :route="{ name: 'Tags' }" size="sm">标签</VButton>
-        <VButton :route="{ name: 'DeletedPosts' }" size="sm">回收站</VButton>
+        <VButton :route="{ name: 'Categories' }" size="sm">
+          {{ $t("core.post.actions.categories") }}
+        </VButton>
+        <VButton :route="{ name: 'Tags' }" size="sm">
+          {{ $t("core.post.actions.tags") }}
+        </VButton>
+        <VButton :route="{ name: 'DeletedPosts' }" size="sm">
+          {{ $t("core.post.actions.recycle_bin") }}
+        </VButton>
 
         <VButton
           v-permission="['system:posts:manage']"
@@ -449,7 +455,7 @@ watch(selectedPostNames, (newValue) => {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          新建
+          {{ $t("core.post.actions.new_post") }}
         </VButton>
       </VSpace>
     </template>
@@ -481,7 +487,7 @@ watch(selectedPostNames, (newValue) => {
                 <FormKit
                   id="keywordInput"
                   outer-class="!p-0"
-                  placeholder="输入关键词搜索"
+                  :placeholder="$t('core.post.filters.keyword_placeholder')"
                   type="text"
                   name="keyword"
                   :model-value="keyword"
