@@ -3,6 +3,27 @@ core:
     username: Username
     password: Password
     button: Login
+  sidebar:
+    search:
+      placeholder: Search
+    menu:
+      groups:
+        content: Content
+        interface: Interface
+        system: System
+        tool: Tool
+      items:
+        dashboard: Dashboard
+        posts: Posts
+        single_pages: Pages
+        comments: Comments
+        attachments: Attachments
+        themes: Themes
+        menus: Menus
+        plugins: Plugins
+        users: Users
+        settings: Settings
+        actuator: Actuator
   dashboard:
     title: Dashboard
     actions:
@@ -55,8 +76,6 @@ core:
       tags: Tags
       recycle_bin: Recycle Bin
       new_post: New
-    filters:
-      keyword_placeholder: Enter keywords to search
     settings:
       title: Settings
       groups:
@@ -155,3 +174,5 @@ core:
     radio:
       "yes": Yes
       "no": No
+    placeholder:
+      search: Enter keywords to search

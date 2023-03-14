@@ -21,11 +21,11 @@ export default definePlugin({
           name: "SinglePages",
           component: SinglePageList,
           meta: {
-            title: "页面",
+            title: "core.sidebar.menu.items.single_pages",
             searchable: true,
             permissions: ["system:singlepages:view"],
             menu: {
-              name: "页面",
+              name: "core.sidebar.menu.items.single_pages",
               group: "content",
               icon: markRaw(IconPages),
               priority: 1,

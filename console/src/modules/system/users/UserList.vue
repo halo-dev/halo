@@ -367,7 +367,7 @@ const hasFilters = computed(() => {
                   outer-class="!p-0"
                   :model-value="keyword"
                   name="keyword"
-                  placeholder="输入关键词搜索"
+                  :placeholder="$t('core.universal.placeholder.search')"
                   type="text"
                   @keyup.enter="handleKeywordChange"
                 ></FormKit>

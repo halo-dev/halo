@@ -30,7 +30,7 @@ export default definePlugin({
             searchable: true,
             permissions: ["system:posts:view"],
             menu: {
-              name: "文章",
+              name: "core.sidebar.menu.items.posts",
               group: "content",
               icon: markRaw(IconBookRead),
               priority: 0,

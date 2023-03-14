@@ -3,6 +3,27 @@ core:
     username: 用户名
     password: 密码
     button: 登录
+  sidebar:
+    search:
+      placeholder: 搜索
+    menu:
+      groups:
+        content: 内容
+        interface: 外观
+        system: 系统
+        tool: 工具
+      items:
+        dashboard: 仪表盘
+        posts: 文章
+        single_pages: 页面
+        comments: 评论
+        attachments: 附件
+        themes: 主题
+        menus: 菜单
+        plugins: 插件
+        users: 用户
+        settings: 设置
+        actuator: 概览
   dashboard:
     title: 仪表板
     actions:
@@ -55,8 +76,6 @@ core:
       tags: 标签
       recycle_bin: 回收站
       new_post: 新建
-    filters:
-      keyword_placeholder: 输入关键词搜索
     settings:
       title: 文章设置
       groups:
@@ -155,3 +174,5 @@ core:
     radio:
       "yes": 是
       "no": 否
+    placeholder:
+      search: 输入关键词搜索

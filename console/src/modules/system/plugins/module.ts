@@ -24,11 +24,11 @@ export default definePlugin({
               name: "Plugins",
               component: PluginList,
               meta: {
-                title: "插件",
+                title: "core.sidebar.menu.items.plugins",
                 searchable: true,
                 permissions: ["system:plugins:view"],
                 menu: {
-                  name: "插件",
+                  name: "core.sidebar.menu.items.plugins",
                   group: "system",
                   icon: markRaw(IconPlug),
                   priority: 0,

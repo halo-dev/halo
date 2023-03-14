@@ -228,7 +228,9 @@ onMounted(() => {
             <span class="mr-3">
               <IconSearch />
             </span>
-            <span class="flex-1 select-none text-base font-normal">搜索</span>
+            <span class="flex-1 select-none text-base font-normal">
+              {{ $t("core.sidebar.search.placeholder") }}
+            </span>
             <div class="text-sm">
               {{ `${isMac ? "⌘" : "Ctrl"}+K` }}
             </div>

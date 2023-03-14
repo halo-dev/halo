@@ -305,7 +305,7 @@ const handleApproveInBatch = async () => {
                 <FormKit
                   id="keywordInput"
                   outer-class="!p-0"
-                  placeholder="输入关键词搜索"
+                  :placeholder="$t('core.universal.placeholder.search')"
                   type="text"
                   name="keyword"
                   :model-value="keyword"

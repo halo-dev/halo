@@ -487,7 +487,7 @@ watch(selectedPostNames, (newValue) => {
                 <FormKit
                   id="keywordInput"
                   outer-class="!p-0"
-                  :placeholder="$t('core.post.filters.keyword_placeholder')"
+                  :placeholder="$t('core.universal.placeholder.search')"
                   type="text"
                   name="keyword"
                   :model-value="keyword"

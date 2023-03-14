@@ -17,11 +17,11 @@ export default definePlugin({
           name: "ThemeDetail",
           component: ThemeDetail,
           meta: {
-            title: "主题",
+            title: "core.sidebar.menu.items.themes",
             searchable: true,
             permissions: ["system:themes:view"],
             menu: {
-              name: "主题",
+              name: "core.sidebar.menu.items.themes",
               group: "interface",
               icon: markRaw(IconPalette),
               priority: 0,

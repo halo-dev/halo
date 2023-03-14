@@ -180,7 +180,7 @@ const handleDelete = async (role: Role) => {
             <div class="flex w-full flex-1 sm:w-auto">
               <FormKit
                 v-model="keyword"
-                placeholder="输入关键词搜索"
+                :placeholder="$t('core.universal.placeholder.search')"
                 type="text"
               ></FormKit>
             </div>
