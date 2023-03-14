@@ -184,6 +184,29 @@ core:
     title: 菜单
   plugin:
     title: 插件
+    filters:
+      status:
+        items:
+          all: 全部
+          active: 已启用
+          inactive: 未启用
+      sort:
+        items:
+          create_time_desc: 较近安装
+          create_time_asc: 较早安装
+    list:
+      actions:
+        uninstall_and_delete_config: 卸载并删除配置
+    detail:
+      fields:
+        display_name: 名称
+        description: 描述
+        version: 版本
+        requires: Halo 版本要求
+        author: 提供方
+        license: 协议
+        role_templates: 权限模板
+        last_starttime: 最近一次启动
   user:
     title: 用户
   setting:
@@ -261,6 +284,11 @@ core:
       cancel_publish: 取消发布
       next: 下一项
       previous: 上一项
+      install: 安装
+      uninstall: 卸载
+      upgrade: 升级
+      reset: 重置
+      preview: 预览
     radio:
       "yes": 是
       "no": 否

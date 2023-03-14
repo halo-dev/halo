@@ -325,7 +325,7 @@ const handleOpenInstallModal = () => {
                         :disabled="creating"
                         @click="handleCreateTheme(theme)"
                       >
-                        安装
+                        {{ $t("core.universal.buttons.install") }}
                       </VButton>
                     </template>
                   </VEntityField>

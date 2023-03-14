@@ -192,13 +192,15 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
         启用
       </VButton>
       <VButton v-close-popper block type="default" @click="emit('upgrade')">
-        升级
+        {{ $t("core.universal.buttons.upgrade") }}
       </VButton>
       <VButton v-close-popper block type="default" @click="emit('preview')">
-        预览
+        {{ $t("core.universal.buttons.preview") }}
       </VButton>
       <FloatingDropdown class="w-full" placement="right" :triggers="['click']">
-        <VButton block type="danger"> 卸载 </VButton>
+        <VButton block type="danger">
+          {{ $t("core.universal.buttons.uninstall") }}
+        </VButton>
         <template #popper>
           <div class="w-52 p-2">
             <VSpace class="w-full" direction="column">
@@ -208,7 +210,7 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
                 type="danger"
                 @click="handleUninstall(theme)"
               >
-                卸载
+                {{ $t("core.universal.buttons.uninstall") }}
               </VButton>
               <VButton
                 v-close-popper.all
@@ -228,7 +230,7 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
         type="danger"
         @click="handleResetSettingConfig"
       >
-        重置
+        {{ $t("core.universal.buttons.reset") }}
       </VButton>
     </template>
   </VEntity>

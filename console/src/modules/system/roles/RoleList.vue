@@ -192,7 +192,9 @@ const handleDelete = async (role: Role) => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">状态</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.universal.filters.labels.status") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -248,7 +250,9 @@ const handleDelete = async (role: Role) => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">排序</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.universal.filters.labels.sort") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>

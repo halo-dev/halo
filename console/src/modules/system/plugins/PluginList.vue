@@ -22,6 +22,9 @@ import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 import { useQuery } from "@tanstack/vue-query";
 import type { Plugin } from "@halo-dev/api-client";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 interface EnabledItem {
   label: string;
@@ -45,26 +48,26 @@ const total = ref(0);
 // Filters
 const EnabledItems: EnabledItem[] = [
   {
-    label: "全部",
+    label: t("core.plugin.filters.status.items.all"),
     value: undefined,
   },
   {
-    label: "已启用",
+    label: t("core.plugin.filters.status.items.active"),
     value: true,
   },
   {
-    label: "未启用",
+    label: t("core.plugin.filters.status.items.inactive"),
     value: false,
   },
 ];
 
 const SortItems: SortItem[] = [
   {
-    label: "较近安装",
+    label: t("core.plugin.filters.sort.items.create_time_desc"),
     value: "creationTimestamp,desc",
   },
   {
-    label: "较早安装",
+    label: t("core.plugin.filters.sort.items.create_time_asc"),
     value: "creationTimestamp,asc",
   },
 ];
@@ -163,7 +166,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>
-        安装
+        {{ $t("core.universal.buttons.install") }}
       </VButton>
     </template>
   </VPageHeader>
@@ -198,7 +201,11 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                 v-if="selectedEnabledItem?.value !== undefined"
                 @close="handleEnabledItemChange(EnabledItems[0])"
               >
-                启用状态：{{ selectedEnabledItem.label }}
+                {{
+                  $t("core.universal.filters.results.status", {
+                    status: selectedEnabledItem.label,
+                  })
+                }}
               </FilterTag>
 
               <FilterTag
@@ -223,7 +230,9 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">启用状态</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.universal.filters.labels.status") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -252,7 +261,9 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">排序</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.universal.filters.labels.sort") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>

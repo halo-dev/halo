@@ -511,7 +511,9 @@ onMounted(() => {
                       <div
                         class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                       >
-                        <span class="mr-0.5">排序</span>
+                        <span class="mr-0.5">
+                          {{ $t("core.universal.filters.labels.sort") }}
+                        </span>
                         <span>
                           <IconArrowDown />
                         </span>
@@ -662,7 +664,7 @@ onMounted(() => {
                       v-if="attachment.metadata.deletionTimestamp"
                       class="absolute top-1 right-1 text-xs text-red-300"
                     >
-                      删除中...
+                      {{ $t("core.universal.status.deleting") }}...
                     </div>
 
                     <div

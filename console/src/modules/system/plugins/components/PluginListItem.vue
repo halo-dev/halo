@@ -167,10 +167,12 @@ const getFailedMessage = (plugin: Plugin) => {
         type="secondary"
         @click="upgradeModal = true"
       >
-        升级
+        {{ $t("core.universal.buttons.upgrade") }}
       </VButton>
       <FloatingDropdown class="w-full" placement="left" :triggers="['click']">
-        <VButton block type="danger"> 卸载 </VButton>
+        <VButton block type="danger">
+          {{ $t("core.universal.buttons.uninstall") }}
+        </VButton>
         <template #popper>
           <div class="w-52 p-2">
             <VSpace class="w-full" direction="column">
@@ -180,7 +182,7 @@ const getFailedMessage = (plugin: Plugin) => {
                 type="danger"
                 @click="uninstall"
               >
-                卸载
+                {{ $t("core.universal.buttons.uninstall") }}
               </VButton>
               <VButton
                 v-close-popper.all
@@ -188,7 +190,7 @@ const getFailedMessage = (plugin: Plugin) => {
                 type="danger"
                 @click="uninstall(true)"
               >
-                卸载并删除配置
+                {{ $t("core.plugin.list.actions.uninstall_and_delete_config") }}
               </VButton>
             </VSpace>
           </div>
@@ -200,7 +202,7 @@ const getFailedMessage = (plugin: Plugin) => {
         type="danger"
         @click="handleResetSettingConfig"
       >
-        重置
+        {{ $t("core.universal.buttons.reset") }}
       </VButton>
     </template>
   </VEntity>

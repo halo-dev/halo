@@ -108,7 +108,7 @@ const onUpgradeModalClose = () => {
                     type="secondary"
                     @click="upgradeModal = true"
                   >
-                    升级
+                    {{ $t("core.universal.buttons.upgrade") }}
                   </VButton>
                   <VButton
                     v-close-popper
@@ -124,7 +124,7 @@ const onUpgradeModalClose = () => {
                     type="danger"
                     @click="handleResetSettingConfig"
                   >
-                    重置
+                    {{ $t("core.universal.buttons.reset") }}
                   </VButton>
                 </VSpace>
               </div>

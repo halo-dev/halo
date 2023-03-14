@@ -329,7 +329,11 @@ const handleApproveInBatch = async () => {
                     handleApprovedFilterItemChange(ApprovedFilterItems[0])
                   "
                 >
-                  状态：{{ selectedApprovedFilterItem.label }}
+                  {{
+                    $t("core.universal.filters.results.status", {
+                      status: selectedApprovedFilterItem.label,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
@@ -370,7 +374,9 @@ const handleApproveInBatch = async () => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5"> 状态 </span>
+                    <span class="mr-0.5">
+                      {{ $t("core.universal.filters.labels.status") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -415,7 +421,9 @@ const handleApproveInBatch = async () => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5"> 排序 </span>
+                    <span class="mr-0.5">
+                      {{ $t("core.universal.filters.labels.sort") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>

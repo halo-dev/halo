@@ -362,7 +362,7 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
           type="default"
           @click="previewModal = true"
         >
-          预览
+          {{ $t("core.universal.buttons.preview") }}
         </VButton>
         <VButton :loading="saving" size="sm" type="default" @click="handleSave">
           <template #icon>

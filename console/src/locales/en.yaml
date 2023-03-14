@@ -184,6 +184,29 @@ core:
     title: Menus
   plugin:
     title: Plugins
+    filters:
+      status:
+        items:
+          all: All
+          active: Active
+          inactive: Inactive
+      sort:
+        items:
+          create_time_desc: Latest Installed
+          create_time_asc: Earliest Installed
+    list:
+      actions:
+        uninstall_and_delete_config: Uninstall and delete config
+    detail:
+      fields:
+        display_name: Display Name
+        description: Description
+        version: Version
+        requires: Requires
+        author: Author
+        license: License
+        role_templates: Role Templates
+        last_starttime: Last Start Time
   user:
     title: Users
   setting:
@@ -261,6 +284,11 @@ core:
       cancel_publish: Cancel Publish
       next: Next
       previous: Previous
+      install: Install
+      uninstall: Uninstall
+      upgrade: Upgrade
+      reset: Reset
+      preview: Preview
     radio:
       "yes": Yes
       "no": No

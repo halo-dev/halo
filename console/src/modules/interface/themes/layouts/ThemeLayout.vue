@@ -185,7 +185,7 @@ onMounted(() => {
             <template #icon>
               <IconEye class="h-full w-full" />
             </template>
-            预览
+            {{ $t("core.universal.buttons.preview") }}
           </VButton>
           <VButton size="sm" type="default" @click="themesModal = true">
             <template #icon>
