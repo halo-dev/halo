@@ -48,6 +48,7 @@ const handleChangeEditorProvider = (provider: EditorProvider) => {
   formState.value.post.metadata.annotations = {
     "content.halo.run/preferred-editor": provider.name,
   };
+  formState.value.content.rawType = provider.rawType;
 };
 
 // Post form
