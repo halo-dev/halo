@@ -1,0 +1,405 @@
+core:
+  login:
+    username: 使用者名稱
+    password: 密碼
+    button: 登入
+  sidebar:
+    search:
+      placeholder: 搜尋
+    menu:
+      groups:
+        content: 內容
+        interface: 外觀
+        system: 系統
+        tool: 工具
+      items:
+        dashboard: 儀表板
+        posts: 文章
+        single_pages: 單頁
+        comments: 迴響
+        attachments: 附件
+        themes: 佈景主題
+        menus: 選單
+        plugins: 外掛程式
+        users: 使用者
+        settings: 設定
+        actuator: 概覽
+  dashboard:
+    title: 儀表板
+    actions:
+      setting: 設定
+      done: 完成
+      add_widget: 新增元件
+    widgets:
+      modal_title: 元件
+      presets:
+        post_stats:
+          title: 文章
+        recent_published:
+          title: 最近文章
+          visits: "瀏覽量 {visits}"
+          comments: "評論 {comments}"
+        quicklink:
+          title: 快速連結
+          actions:
+            user_profile:
+              title: 個人資料
+            view_site:
+              title: 查看網站
+            new_post:
+              title: 新增文章
+            new_page:
+              title: 新增頁面
+            upload_attachment:
+              title: 上傳附件
+            theme_manage:
+              title: 主題管理
+            plugin_manage:
+              title: 外掛管理
+            new_user:
+              title: 新建使用者
+            refresh_search_engine:
+              title: 刷新搜尋引擎
+              dialog_title: 確定要刷新搜尋引擎索引嗎？
+              dialog_content: 此操作會對所有已發佈的文章重新建立搜尋引擎索引。
+              success_message: 刷新成功
+        user_stats:
+          title: 使用者
+        comment_stats:
+          title: 評論
+        views_stats:
+          title: 瀏覽量
+  post:
+    title: 文章
+    actions:
+      categories: 分類
+      tags: 標籤
+      recycle_bin: 回收站
+    empty:
+      title: 目前沒有文章
+      message: 你可以嘗試重新整理或新增文章
+      actions:
+        new: 新增文章
+    operations:
+      delete:
+        title: 確定要刪除該文章嗎？
+        description: 該操作會將文章放入回收站，後續可以從回收站恢復。
+      delete_in_batch:
+        title: 確定要刪除選中的文章嗎？
+        description: 該操作會將文章放入回收站，後續可以從回收站恢復。
+    filters:
+      status:
+        items:
+          all: 全部
+          published: 已發佈
+          draft: 未發佈
+      visible:
+        label: 可見性
+        result: "可見性：{visible}"
+        items:
+          all: 全部
+          public: 公開
+          private: 私有
+      category:
+        label: 分類
+        result: "分類：{category}"
+      tag:
+        label: 標籤
+        result: "標籤：{tag}"
+      author:
+        label: 作者
+        result: "作者：{author}"
+      sort:
+        items:
+          publish_time_desc: 較近發佈
+          publish_time_asc: 較早發佈
+          create_time_desc: 較近建立
+          create_time_asc: 較早建立
+    settings:
+      title: 文章設定
+      groups:
+        general: 常規設定
+        advanced: 高級設定
+        annotations: 元數據
+      fields:
+        title:
+          label: 標題
+        slug:
+          label: 別名
+          help: 通常用於生成文章的固定鏈接
+          refresh_message: 根據標題重新生成別名
+        categories:
+          label: 分類目錄
+        tags:
+          label: 標籤
+        auto_generate_excerpt:
+          label: 自動生成摘要
+        raw_excerpt:
+          label: 自定義摘要
+        allow_comment:
+          label: 允許評論
+        pinned:
+          label: 是否置頂
+        visible:
+          label: 可見性
+        publish_time:
+          label: 發表時間
+        template:
+          label: 自定義模板
+        cover:
+          label: 封面圖
+  deleted_post:
+    title: 文章回收站
+    empty:
+      title: 沒有文章被放入回收站
+      message: 你可以嘗試重新整理或者返回文章管理
+    operations:
+      delete:
+        title: 確定要永久刪除該文章嗎？
+        description: 刪除之後將無法恢復。
+      delete_in_batch:
+        title: 確定要永久刪除選中的文章嗎？
+        description: 刪除之後將無法恢復。
+      recovery:
+        title: 確定要恢復該文章嗎？
+        description: 該操作會將文章恢復到被刪除之前的狀態。
+      recovery_in_batch:
+        title: 確定要恢復選中的文章嗎？
+        description: 該操作會將文章恢復到被刪除之前的狀態。
+  page:
+    title: 頁面
+    actions:
+      recycle_bin: 回收站
+    empty:
+      title: 目前沒有頁面
+      message: 你可以嘗試重新整理或者新建頁面
+      actions:
+        new: 新建頁面
+    operations:
+      delete:
+        title: 確定要刪除該自定義頁面嗎？
+        description: 該操作會將自定義頁面放入回收站，後續可以從回收站恢復。
+      delete_in_batch:
+        title: 確定要刪除選中的自定義頁面嗎？
+        description: 該操作會將自定義頁面放入回收站，後續可以從回收站恢復。
+    filters:
+      status:
+        items:
+          all: 全部
+          published: 已發佈
+          draft: 未發佈
+      visible:
+        label: 可見性
+        result: "可見性：{visible}"
+        items:
+          all: 全部
+          public: 公開
+          private: 私有
+      author:
+        label: 作者
+        result: "作者：{author}"
+      sort:
+        items:
+          publish_time_desc: 較近發佈
+          publish_time_asc: 較早發佈
+          create_time_desc: 較近建立
+          create_time_asc: 較早建立
+  deleted_page:
+    title: 自訂頁面回收站
+    empty:
+      title: 沒有自訂頁面被放入回收站
+      message: 你可以嘗試重新整理或返回自訂頁面管理
+    operations:
+      delete:
+        title: 確認要永久刪除該自訂頁面嗎？
+        description: 刪除後將無法恢復。
+      delete_in_batch:
+        title: 確定要永久刪除選中的自訂頁面嗎？
+        description: 刪除後將無法恢復。
+      recovery:
+        title: 確認要恢復該自訂頁面嗎？
+        description: 該操作會將自訂頁面恢復到被刪除之前的狀態。
+      recovery_in_batch:
+        title: 確認要恢復選中的自訂頁面嗎？
+        description: 該操作會將自訂頁面恢復到被刪除之前的狀態。
+  comment:
+    title: 評論
+    empty:
+      title: 當前沒有評論
+      message: 你可以嘗試重新整理或修改篩選條件
+    reply_empty:
+      title: 當前沒有回覆
+      message: 你可以嘗試重新整理或創建新回覆
+      new: 創建新回覆
+    operations:
+      delete_comment:
+        title: 確認要刪除該評論嗎？
+        description: 將同時刪除所有評論下的回覆，該操作不可恢復。
+      delete_comment_in_batch:
+        title: 確定要刪除所選的評論嗎？
+        description: 將同時刪除所有評論下的回覆，該操作不可恢復。
+      approve_comment_in_batch:
+        button: 審核通過
+        title: 確定要審核通過所選的評論嗎？
+      approve_applies_in_batch:
+        button: 審核通過所有回覆
+        title: 確定要審核通過該評論的所有回覆嗎？
+      delete_reply:
+        title: 確認要刪除該回覆嗎？
+    filters:
+      status:
+        items:
+          all: 全部
+          approved: 已審核
+          pending_review: 待審核
+      owner:
+        label: 評論者
+        result: "評論者：{owner}"
+      sort:
+        items:
+          default: 預設
+          last_reply_time: 最後回覆時間
+          reply_count: 回覆數
+          creation_time: 創建時間
+
+  attachment:
+    title: 附件庫
+    actions:
+      upload: 上傳
+      storage_policies: 儲存策略
+  menu:
+    title: 選單
+  plugin:
+    title: 外掛程式
+    filters:
+      status:
+        items:
+          all: 全部
+          active: 已啟用
+          inactive: 未啟用
+      sort:
+        items:
+          create_time_desc: 較近安裝
+          create_time_asc: 較早安裝
+    list:
+      actions:
+        uninstall_and_delete_config: 解除安裝並刪除設定
+    detail:
+      fields:
+        display_name: 名稱
+        description: 描述
+        version: 版本
+        requires: Halo 版本需求
+        author: 提供方
+        license: 協議
+        role_templates: 權限範本
+        last_starttime: 最近一次啟動
+  user:
+    title: 使用者
+  setting:
+    title: 設定
+  actuator:
+    title: 系統總覽
+  rbac:
+    Attachments Management: 附件
+    Attachment Manage: 附件管理
+    Attachment View: 附件檢視
+    role-template-view-attachments: 附件檢視
+    Comments Management: 評論
+    Comment Manage: 評論管理
+    Comment View: 評論檢視
+    role-template-view-comments: 評論檢視
+    ConfigMaps Management: 設定
+    ConfigMap Manage: 設定管理
+    ConfigMap View: 設定檢視
+    role-template-view-configmaps: 設定檢視
+    Menus Management: 選單
+    Menu Manage: 選單管理
+    Menu View: 選單檢視
+    role-template-view-menus: 選單檢視
+    Permissions Management: 權限
+    Permissions Manage: 權限管理
+    Permissions View: 權限檢視
+    role-template-view-permissions: 權限檢視
+    role-template-manage-permissions: 權限管理
+    Plugins Management: 外掛程式
+    Plugin Manage: 外掛程式管理
+    Plugin View: 外掛程式檢視
+    role-template-view-plugins: 外掛程式檢視
+    Posts Management: 文章
+    Post Manage: 文章管理
+    Post View: 文章檢視
+    role-template-view-posts: 文章檢視
+    role-template-manage-snaphosts: 版本管理
+    role-template-view-snaphosts: 版本檢視
+    role-template-manage-tags: 標籤管理
+    role-template-view-tags: 標籤檢視
+    role-template-manage-categories: 分類管理
+    role-template-view-categories: 分類檢視
+    Roles Management: 角色
+    Role Manage: 角色管理
+    Role View: 角色檢視
+    role-template-view-roles: 角色檢視
+    Settings Management: 設定表單
+    Setting Manage: 設定表單管理
+    Setting View: 設定表單檢視
+    role-template-view-settings: 設定表單檢視
+    SinglePages Management: 單頁
+    SinglePage Manage: 單頁管理
+    SinglePage View: 單頁檢視
+    role-template-view-singlepages: 單頁檢視
+    Themes Management: 佈景主題
+    Theme Manage: 佈景主題管理
+    Theme View: 佈景主題檢視
+    role-template-view-themes: 佈景主題檢視
+    Users Management: 使用者
+    User manage: 使用者管理
+    User View: 使用者檢視
+    role-template-view-users: 使用者檢視
+    role-template-change-password: 修改密碼
+  universal:
+    buttons:
+      save: 儲存
+      close: 關閉
+      delete: 刪除
+      setting: 設定
+      new: 新增
+      edit: 編輯
+      back: 返回
+      refresh: 重新整理
+      publish: 發佈
+      cancel_publish: 取消發佈
+      next: 下一項
+      previous: 上一項
+      install: 安裝
+      uninstall: 解除安裝
+      upgrade: 升級
+      reset: 重設
+      preview: 預覽
+      recovery: 復原
+      delete_permanently: 永久刪除
+    radio:
+      "yes": 是
+      "no": 否
+    placeholder:
+      search: 輸入關鍵字搜尋
+    toast:
+      operation_success: 操作成功
+      delete_success: 刪除成功
+      save_success: 儲存成功
+      publish_success: 發佈成功
+      cancel_publish_success: 取消發佈成功
+      recovery_success: 恢復成功
+    dialog:
+      descriptions:
+        cannot_be_recovered: 該操作不可恢復。
+    filters:
+      results:
+        keyword: "關鍵字：{keyword}"
+        sort: "排序：{sort}"
+        status: "狀態：{status}"
+      labels:
+        sort: 排序
+        status: 狀態
+    status:
+      deleting: 刪除中
