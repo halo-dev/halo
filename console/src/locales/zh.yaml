@@ -263,6 +263,9 @@ core:
           creation_time: 创建时间
   attachment:
     title: 附件库
+    actions:
+      upload: 上传
+      storage_policies: 存储策略
   menu:
     title: 菜单
   plugin:

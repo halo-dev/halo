@@ -263,6 +263,9 @@ core:
           creation_time: Creation time
   attachment:
     title: Attachments
+    actions:
+      upload: Upload
+      storage_policies: Storage Policies
   menu:
     title: Menus
   plugin:

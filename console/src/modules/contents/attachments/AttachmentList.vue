@@ -313,7 +313,7 @@ onMounted(() => {
           <template #icon>
             <IconDatabase2Line class="h-full w-full" />
           </template>
-          存储策略
+          {{ $t("core.attachment.actions.storage_policies") }}
         </VButton>
         <VButton
           v-permission="['system:attachments:manage']"
@@ -323,7 +323,7 @@ onMounted(() => {
           <template #icon>
             <IconUpload class="h-full w-full" />
           </template>
-          上传
+          {{ $t("core.attachment.actions.upload") }}
         </VButton>
       </VSpace>
     </template>
