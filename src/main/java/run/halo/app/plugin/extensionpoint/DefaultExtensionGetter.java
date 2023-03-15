@@ -2,6 +2,7 @@ package run.halo.app.plugin.extensionpoint;
 
 import java.util.Comparator;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.pf4j.ExtensionPoint;
 import org.springframework.context.ApplicationContext;
@@ -73,9 +74,13 @@ public class DefaultExtensionGetter implements ExtensionGetter {
                 if (type == ExtensionPointDefinition.ExtensionPointType.SINGLETON) {
                     return getEnabledExtension(extensionPoint).flux();
                 }
+                Stream<T> pluginExtsStream = pluginManager.getExtensions(extensionPoint)
+                    .stream();
+                Stream<T> systemExtsStream = applicationContext.getBeanProvider(extensionPoint)
+                    .orderedStream();
                 // TODO If the type is sortable, may need to process the returned order.
-                return Flux.fromStream(applicationContext.getBeanProvider(extensionPoint)
-                    .orderedStream());
+                return Flux.just(pluginExtsStream, systemExtsStream)
+                    .flatMap(Flux::fromStream);
             });
     }
 
