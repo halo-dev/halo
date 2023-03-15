@@ -266,6 +266,28 @@ core:
     actions:
       upload: 上传
       storage_policies: 存储策略
+    empty:
+      title: 当前分组没有附件
+      message: 当前分组没有附件，你可以尝试刷新或者上传附件
+      actions:
+        upload: 上传附件
+    filters:
+      storage_policy:
+        label: 存储策略
+        result: "存储策略：{storage_policy}"
+      owner:
+        label: 上传者
+        result: "上传者：{owner}"
+      sort:
+        items:
+          create_time_desc: 较近上传
+          create_time_asc: 较晚上传
+          size_desc: 文件大小降序
+          size_asc: 文件大小升序
+      view_type:
+        items:
+          grid: 网格模式
+          list: 列表模式
   menu:
     title: 菜单
   plugin:
@@ -362,6 +384,8 @@ core:
       close: 关闭
       delete: 删除
       setting: 设置
+      confirm: 确定
+      cancel: 取消
       new: 新建
       edit: 编辑
       back: 返回
@@ -390,6 +414,8 @@ core:
       cancel_publish_success: 发布成功
       recovery_success: 恢复成功
     dialog:
+      titles:
+        tip: 提示
       descriptions:
         cannot_be_recovered: 该操作不可恢复。
     filters:

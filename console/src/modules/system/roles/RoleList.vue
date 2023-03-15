@@ -131,6 +131,8 @@ const handleDelete = async (role: Role) => {
     title: "确定要删除该角色吗？",
     description: "该角色删除后，相关联的用户将被删除角色绑定，该操作不可恢复",
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.role.deletev1alpha1Role({

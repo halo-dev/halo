@@ -20,6 +20,9 @@ import type { Group } from "@halo-dev/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
 import { apiClient } from "@/utils/api-client";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -94,6 +97,8 @@ const handleDelete = (group: Group) => {
     title: "确定要删除该分组吗？",
     description: "将删除分组，并将分组下的附件移动至未分组，该操作不可恢复。",
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       // TODO: 后续将修改为在后端进行批量操作处理
       const { data } = await apiClient.attachment.searchAttachments({
@@ -133,6 +138,8 @@ const handleDeleteWithAttachments = (group: Group) => {
     title: "确定要删除该分组吗？",
     description: "将删除分组以及分组下的所有附件，该操作不可恢复。",
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       // TODO: 后续将修改为在后端进行批量操作处理
       const { data } = await apiClient.attachment.searchAttachments({

@@ -61,6 +61,8 @@ const handleDelete = async () => {
     title: t("core.comment.operations.delete_comment.title"),
     description: t("core.comment.operations.delete_comment.description"),
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.comment.deletecontentHaloRunV1alpha1Comment({
@@ -80,6 +82,8 @@ const handleDelete = async () => {
 const handleApproveReplyInBatch = async () => {
   Dialog.warning({
     title: t("core.comment.operations.approve_applies_in_batch.title"),
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       try {
         const repliesToUpdate = replies.value?.filter((reply) => {

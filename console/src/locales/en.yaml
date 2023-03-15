@@ -266,6 +266,28 @@ core:
     actions:
       upload: Upload
       storage_policies: Storage Policies
+    empty:
+      title: There are no attachments in the current group.
+      message: The current group has no attachments, you can try refreshing or uploading attachments.
+      actions:
+        upload: Upload Attachment
+    filters:
+      storage_policy:
+        label: Storage Policy
+        result: "Storage Policy：{storage_policy}"
+      owner:
+        label: Owner
+        result: "Owner：{owner}"
+      sort:
+        items:
+          create_time_desc: Latest uploaded
+          create_time_asc: Earliest uploaded
+          size_desc: Descending order by file size
+          size_asc: Ascending order by file size
+      view_type:
+        items:
+          grid: Grid Mode
+          list: List Mode
   menu:
     title: Menus
   plugin:
@@ -362,6 +384,8 @@ core:
       close: Close
       delete: Delete
       setting: Setting
+      confirm: Confirm
+      cancel: Cancel
       new: New
       edit: Edit
       back: Back
@@ -390,6 +414,8 @@ core:
       cancel_publish_success: Cancel publication successful
       recovery_success: Recovery successful
     dialog:
+      titles:
+        tip: Tip
       descriptions:
         cannot_be_recovered: This operation is irreversible.
     filters:

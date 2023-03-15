@@ -102,6 +102,8 @@ const handleDeleteMenu = async (menu: Menu) => {
     title: "确定要删除该菜单吗？",
     description: "将同时删除该菜单下的所有菜单项，该操作不可恢复。",
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.menu.deletev1alpha1Menu({

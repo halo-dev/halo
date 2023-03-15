@@ -30,9 +30,11 @@ import { useUserStore } from "@/stores/user";
 import { rbacAnnotations } from "@/constants/annotations";
 import { useScroll } from "@vueuse/core";
 import { defineStore, storeToRefs } from "pinia";
+import { useI18n } from "vue-i18n";
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
 
 const moreMenuVisible = ref(false);
 const moreMenuRootVisible = ref(false);
@@ -44,6 +46,8 @@ const { currentRoles, currentUser } = storeToRefs(userStore);
 const handleLogout = () => {
   Dialog.warning({
     title: "确定要退出登录吗？",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       try {
         await axios.post(`${import.meta.env.VITE_API_URL}/logout`, undefined, {

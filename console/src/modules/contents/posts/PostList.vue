@@ -378,6 +378,8 @@ const handleDelete = async (post: Post) => {
     title: t("core.post.operations.delete.title"),
     description: t("core.post.operations.delete.description"),
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       await apiClient.post.recyclePost({
         name: post.metadata.name,
@@ -394,6 +396,8 @@ const handleDeleteInBatch = async () => {
     title: t("core.post.operations.delete_in_batch.title"),
     description: t("core.post.operations.delete_in_batch.description"),
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPostNames.value.map((name) => {

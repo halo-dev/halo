@@ -130,6 +130,8 @@ export function useAttachmentControl(filterOptions: {
       title: "确定要删除该附件吗？",
       description: "删除之后将无法恢复",
       confirmType: "danger",
+      confirmText: t("core.universal.buttons.confirm"),
+      cancelText: t("core.universal.buttons.cancel"),
       onConfirm: async () => {
         try {
           await apiClient.extension.storage.attachment.deletestorageHaloRunV1alpha1Attachment(
@@ -159,6 +161,8 @@ export function useAttachmentControl(filterOptions: {
       title: "确定要删除所选的附件吗？",
       description: "删除之后将无法恢复",
       confirmType: "danger",
+      confirmText: t("core.universal.buttons.confirm"),
+      cancelText: t("core.universal.buttons.cancel"),
       onConfirm: async () => {
         try {
           const promises = Array.from(selectedAttachments.value).map(

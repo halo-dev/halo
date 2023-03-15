@@ -18,8 +18,10 @@ import type { Plugin } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { apiClient } from "@/utils/api-client";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -49,6 +51,8 @@ const handleResetSettingConfig = async () => {
     title: "确定要重置插件的所有配置吗？",
     description: "该操作会删除已保存的配置，重置为默认配置。",
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       try {
         if (!plugin?.value) {

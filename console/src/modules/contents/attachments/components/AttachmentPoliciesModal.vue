@@ -83,6 +83,8 @@ const handleDelete = async (policy: Policy) => {
     Dialog.warning({
       title: "删除失败",
       description: "该策略下存在附件，无法删除。",
+      confirmText: t("core.universal.buttons.confirm"),
+      cancelText: t("core.universal.buttons.cancel"),
     });
     return;
   }
@@ -90,6 +92,8 @@ const handleDelete = async (policy: Policy) => {
   Dialog.warning({
     title: "确定要删除该策略吗？",
     description: "当前策略下没有已上传的附件。",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       await apiClient.extension.storage.policy.deletestorageHaloRunV1alpha1Policy(
         { name: policy.metadata.name }

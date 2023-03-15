@@ -44,8 +44,10 @@ import { usePermission } from "@/utils/permission";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const policyVisible = ref(false);
 const uploadVisible = ref(false);
@@ -64,19 +66,19 @@ interface SortItem {
 
 const SortItems: SortItem[] = [
   {
-    label: "较近上传",
+    label: t("core.attachment.filters.sort.items.create_time_desc"),
     value: "creationTimestamp,desc",
   },
   {
-    label: "较晚上传",
+    label: t("core.attachment.filters.sort.items.create_time_asc"),
     value: "creationTimestamp,asc",
   },
   {
-    label: "文件大小降序",
+    label: t("core.attachment.filters.sort.items.size_desc"),
     value: "size,desc",
   },
   {
-    label: "文件大小升序",
+    label: t("core.attachment.filters.sort.items.size_asc"),
     value: "size,asc",
   },
 ];
@@ -229,12 +231,12 @@ const getPolicyName = (name: string | undefined) => {
 const viewTypes = [
   {
     name: "list",
-    tooltip: "列表模式",
+    tooltip: t("core.attachment.filters.view_type.items.grid"),
     icon: IconList,
   },
   {
     name: "grid",
-    tooltip: "网格模式",
+    tooltip: t("core.attachment.filters.view_type.items.list"),
     icon: IconGrid,
   },
 ];
@@ -376,14 +378,22 @@ onMounted(() => {
                       v-if="selectedPolicy"
                       @close="handleSelectPolicy(undefined)"
                     >
-                      存储策略：{{ selectedPolicy?.spec.displayName }}
+                      {{
+                        $t("core.attachment.filters.storage_policy.result", {
+                          storage_policy: selectedPolicy.spec.displayName,
+                        })
+                      }}
                     </FilterTag>
 
                     <FilterTag
                       v-if="selectedUser"
                       @close="handleSelectUser(undefined)"
                     >
-                      上传者：{{ selectedUser?.spec.displayName }}
+                      {{
+                        $t("core.attachment.filters.owner.result", {
+                          owner: selectedUser.spec.displayName,
+                        })
+                      }}
                     </FilterTag>
 
                     <FilterTag
@@ -437,7 +447,11 @@ onMounted(() => {
                       <div
                         class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                       >
-                        <span class="mr-0.5">存储策略</span>
+                        <span class="mr-0.5">
+                          {{
+                            $t("core.attachment.filters.storage_policy.label")
+                          }}
+                        </span>
                         <span>
                           <IconArrowDown />
                         </span>
@@ -472,7 +486,9 @@ onMounted(() => {
                       <div
                         class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                       >
-                        <span class="mr-0.5">上传者</span>
+                        <span class="mr-0.5">
+                          {{ $t("core.attachment.filters.owner.label") }}
+                        </span>
                         <span>
                           <IconArrowDown />
                         </span>
@@ -580,8 +596,8 @@ onMounted(() => {
 
           <Transition v-else-if="!attachments?.length" appear name="fade">
             <VEmpty
-              message="当前分组没有附件，你可以尝试刷新或者上传附件"
-              title="当前分组没有附件"
+              :message="$t('core.attachment.empty.message')"
+              :title="$t('core.attachment.empty.title')"
             >
               <template #actions>
                 <VSpace>
@@ -596,7 +612,7 @@ onMounted(() => {
                     <template #icon>
                       <IconUpload class="h-full w-full" />
                     </template>
-                    上传附件
+                    {{ $t("core.attachment.empty.actions.upload") }}
                   </VButton>
                 </VSpace>
               </template>

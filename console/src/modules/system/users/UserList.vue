@@ -132,6 +132,8 @@ const handleDelete = async (user: User) => {
     title: "确定要删除该用户吗？",
     description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.user.deletev1alpha1User({
@@ -153,6 +155,8 @@ const handleDeleteInBatch = async () => {
     title: "确定要删除选中的用户吗？",
     description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       const userNamesToDelete = selectedUserNames.value.filter(
         (name) => name != userStore.currentUser?.metadata.name

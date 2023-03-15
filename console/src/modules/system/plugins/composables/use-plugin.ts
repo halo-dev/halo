@@ -30,6 +30,8 @@ export function usePluginLifeCycle(
 
     Dialog.info({
       title: `确定要${pluginToUpdate.spec.enabled ? "停止" : "启动"}该插件吗？`,
+      confirmText: t("core.universal.buttons.confirm"),
+      cancelText: t("core.universal.buttons.cancel"),
       onConfirm: async () => {
         try {
           pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
@@ -66,6 +68,7 @@ export function usePluginLifeCycle(
       }`,
       confirmType: "danger",
       confirmText: `${enabled ? "停止运行并卸载" : "卸载"}`,
+      cancelText: t("core.universal.buttons.cancel"),
       onConfirm: async () => {
         if (!plugin.value) return;
 

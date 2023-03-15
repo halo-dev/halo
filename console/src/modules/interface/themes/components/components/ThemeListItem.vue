@@ -54,6 +54,8 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
         : "确定要卸载该主题吗？"
     }`,
     description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.theme.deletethemeHaloRunV1alpha1Theme({

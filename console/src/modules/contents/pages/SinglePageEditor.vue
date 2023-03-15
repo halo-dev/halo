@@ -246,6 +246,8 @@ const handleFetchContent = async () => {
       Dialog.warning({
         title: "警告",
         description: `未找到符合 ${data.rawType} 格式的编辑器，请检查是否已安装编辑器插件`,
+        confirmText: t("core.universal.buttons.confirm"),
+        cancelText: t("core.universal.buttons.cancel"),
         onConfirm: () => {
           router.back();
         },

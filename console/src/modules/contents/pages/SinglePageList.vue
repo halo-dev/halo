@@ -327,6 +327,8 @@ const handleDelete = async (singlePage: SinglePage) => {
     title: t("core.page.operations.delete.title"),
     description: t("core.page.operations.delete.description"),
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       const singlePageToUpdate = cloneDeep(singlePage);
       singlePageToUpdate.spec.deleted = true;
@@ -348,6 +350,8 @@ const handleDeleteInBatch = async () => {
     title: t("core.page.operations.delete_in_batch.title"),
     description: t("core.page.operations.delete_in_batch.description"),
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {

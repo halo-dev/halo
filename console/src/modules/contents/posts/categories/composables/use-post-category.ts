@@ -54,6 +54,8 @@ export function usePostCategory(): usePostCategoryReturn {
       title: "确定要删除该分类吗？",
       description: "删除此分类之后，对应文章的关联将被解除。该操作不可恢复。",
       confirmType: "danger",
+      confirmText: t("core.universal.buttons.confirm"),
+      cancelText: t("core.universal.buttons.cancel"),
       onConfirm: async () => {
         try {
           await apiClient.extension.category.deletecontentHaloRunV1alpha1Category(

@@ -213,6 +213,8 @@ const handleDeleteInBatch = async () => {
       "core.comment.operations.delete_comment_in_batch.description"
     ),
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       try {
         const promises = selectedCommentNames.value.map((name) => {
@@ -238,6 +240,8 @@ const handleDeleteInBatch = async () => {
 const handleApproveInBatch = async () => {
   Dialog.warning({
     title: t("core.comment.operations.approve_comment_in_batch.title"),
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       try {
         const commentsToUpdate = comments.value?.filter((comment) => {

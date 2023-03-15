@@ -44,6 +44,8 @@ export function usePostTag(): usePostTagReturn {
       title: "确定要删除该标签吗？",
       description: "删除此标签之后，对应文章的关联将被解除。该操作不可恢复。",
       confirmType: "danger",
+      confirmText: t("core.universal.buttons.confirm"),
+      cancelText: t("core.universal.buttons.cancel"),
       onConfirm: async () => {
         try {
           await apiClient.extension.tag.deletecontentHaloRunV1alpha1Tag({

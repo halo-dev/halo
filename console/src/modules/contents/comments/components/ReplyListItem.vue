@@ -52,6 +52,8 @@ const handleDelete = async () => {
     title: t("core.comment.operations.delete_reply.title"),
     description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.reply.deletecontentHaloRunV1alpha1Reply({

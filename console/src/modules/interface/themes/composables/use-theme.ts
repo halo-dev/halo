@@ -5,6 +5,7 @@ import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useThemeStore } from "@/stores/theme";
 import { storeToRefs } from "pinia";
+import { useI18n } from "vue-i18n";
 
 interface useThemeLifeCycleReturn {
   loading: Ref<boolean>;
@@ -17,6 +18,8 @@ interface useThemeLifeCycleReturn {
 export function useThemeLifeCycle(
   theme: Ref<Theme | undefined>
 ): useThemeLifeCycleReturn {
+  const { t } = useI18n();
+
   const loading = ref(false);
 
   const themeStore = useThemeStore();
@@ -43,6 +46,8 @@ export function useThemeLifeCycle(
     Dialog.info({
       title: "是否确认启用当前主题",
       description: theme.value?.spec.displayName,
+      confirmText: t("core.universal.buttons.confirm"),
+      cancelText: t("core.universal.buttons.cancel"),
       onConfirm: async () => {
         try {
           if (!theme.value) return;
@@ -66,6 +71,8 @@ export function useThemeLifeCycle(
       title: "确定要重置主题的所有配置吗？",
       description: "该操作会删除已保存的配置，重置为默认配置。",
       confirmType: "danger",
+      confirmText: t("core.universal.buttons.confirm"),
+      cancelText: t("core.universal.buttons.cancel"),
       onConfirm: async () => {
         try {
           if (!theme?.value) {

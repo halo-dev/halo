@@ -92,6 +92,8 @@ const handleDeletePermanently = async (singlePage: SinglePage) => {
     title: t("core.deleted_page.operations.delete.title"),
     description: t("core.deleted_page.operations.delete.description"),
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       await apiClient.extension.singlePage.deletecontentHaloRunV1alpha1SinglePage(
         {
@@ -110,6 +112,8 @@ const handleDeletePermanentlyInBatch = async () => {
     title: t("core.deleted_page.operations.delete_in_batch.title"),
     description: t("core.deleted_page.operations.delete_in_batch.description"),
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {
@@ -132,6 +136,8 @@ const handleRecovery = async (singlePage: SinglePage) => {
   Dialog.warning({
     title: t("core.deleted_page.operations.recovery.title"),
     description: t("core.deleted_page.operations.recovery.description"),
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       const singlePageToUpdate = cloneDeep(singlePage);
       singlePageToUpdate.spec.deleted = false;
@@ -154,6 +160,8 @@ const handleRecoveryInBatch = async () => {
     description: t(
       "core.deleted_page.operations.recovery_in_batch.description"
     ),
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {

@@ -6,6 +6,9 @@ import type { Plugin } from "@halo-dev/api-client";
 import { computed, ref, watch } from "vue";
 import type { SuccessResponse, ErrorResponse } from "@uppy/core";
 import type { UppyFile } from "@uppy/utils";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -56,6 +59,8 @@ const onUploaded = async (response: SuccessResponse) => {
   Dialog.success({
     title: "上传成功",
     description: "是否启动当前安装的插件？",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       try {
         const { data: pluginToUpdate } =
@@ -97,6 +102,8 @@ const onError = (file: UppyFile<unknown>, response: ErrorResponse) => {
     Dialog.info({
       title: "插件已存在",
       description: "当前安装的插件已存在，是否升级？",
+      confirmText: t("core.universal.buttons.confirm"),
+      cancelText: t("core.universal.buttons.cancel"),
       onConfirm: async () => {
         await apiClient.plugin.upgradePlugin({
           name: body.pluginName,

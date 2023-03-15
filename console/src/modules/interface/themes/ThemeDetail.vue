@@ -23,6 +23,9 @@ import type { Ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 
 import { apiClient } from "@/utils/api-client";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme", ref());
 const upgradeModal = ref(false);
@@ -34,6 +37,8 @@ const handleReloadTheme = async () => {
   Dialog.warning({
     title: "确定要重载主题的所有配置吗？",
     description: "该操作仅会重载主题配置和设置表单定义，不会删除已保存的配置。",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       try {
         if (!selectedTheme?.value) {

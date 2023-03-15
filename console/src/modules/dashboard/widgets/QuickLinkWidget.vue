@@ -141,6 +141,8 @@ const actions: Action[] = [
         description: t(
           "core.dashboard.widgets.presets.quicklink.actions.refresh_search_engine.dialog_content"
         ),
+        confirmText: t("core.universal.buttons.confirm"),
+        cancelText: t("core.universal.buttons.cancel"),
         onConfirm: async () => {
           await apiClient.indices.buildPostIndices();
           Toast.success(

@@ -91,6 +91,8 @@ const handleDeletePermanently = async (post: Post) => {
     title: t("core.deleted_post.operations.delete.title"),
     description: t("core.deleted_post.operations.delete.description"),
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       await apiClient.extension.post.deletecontentHaloRunV1alpha1Post({
         name: post.metadata.name,
@@ -107,6 +109,8 @@ const handleDeletePermanentlyInBatch = async () => {
     title: t("core.deleted_post.operations.delete_in_batch.title"),
     description: t("core.deleted_post.operations.delete_in_batch.description"),
     confirmType: "danger",
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPostNames.value.map((name) => {
@@ -127,6 +131,8 @@ const handleRecovery = async (post: Post) => {
   Dialog.warning({
     title: t("core.deleted_post.operations.recovery.title"),
     description: t("core.deleted_post.operations.recovery.description"),
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       const postToUpdate = cloneDeep(post);
       postToUpdate.spec.deleted = false;
@@ -148,6 +154,8 @@ const handleRecoveryInBatch = async () => {
     description: t(
       "core.deleted_post.operations.recovery_in_batch.description"
     ),
+    confirmText: t("core.universal.buttons.confirm"),
+    cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPostNames.value.map((name) => {
