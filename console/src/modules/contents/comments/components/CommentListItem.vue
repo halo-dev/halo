@@ -58,8 +58,8 @@ provide<Ref<ListedReply | undefined>>("hoveredReply", hoveredReply);
 
 const handleDelete = async () => {
   Dialog.warning({
-    title: "确认要删除该评论吗？",
-    description: "删除评论的同时会删除该评论下的所有回复，该操作不可恢复。",
+    title: t("core.comment.operations.delete_comment.title"),
+    description: t("core.comment.operations.delete_comment.description"),
     confirmType: "danger",
     onConfirm: async () => {
       try {
@@ -79,7 +79,7 @@ const handleDelete = async () => {
 
 const handleApproveReplyInBatch = async () => {
   Dialog.warning({
-    title: "确定要审核通过该评论的所有回复吗？",
+    title: t("core.comment.operations.approve_applies_in_batch.title"),
     onConfirm: async () => {
       try {
         const repliesToUpdate = replies.value?.filter((reply) => {
@@ -381,7 +381,7 @@ const subjectRefResult = computed(() => {
         block
         @click="handleApprove"
       >
-        审核通过
+        {{ $t("core.comment.operations.approve_comment_in_batch.button") }}
       </VButton>
       <VButton
         v-close-popper
@@ -389,7 +389,7 @@ const subjectRefResult = computed(() => {
         block
         @click="handleApproveReplyInBatch"
       >
-        审核通过所有回复
+        {{ $t("core.comment.operations.approve_applies_in_batch.button") }}
       </VButton>
       <VButton v-close-popper block type="danger" @click="handleDelete">
         {{ $t("core.universal.buttons.delete") }}
@@ -403,7 +403,10 @@ const subjectRefResult = computed(() => {
       >
         <VLoading v-if="isLoading" />
         <Transition v-else-if="!replies?.length" appear name="fade">
-          <VEmpty message="你可以尝试刷新或者创建新回复" title="当前没有回复">
+          <VEmpty
+            :message="$t('core.comment.reply_empty.message')"
+            :title="$t('core.comment.reply_empty.title')"
+          >
             <template #actions>
               <VSpace>
                 <VButton @click="refetch()">
@@ -413,7 +416,7 @@ const subjectRefResult = computed(() => {
                   <template #icon>
                     <IconAddCircle class="h-full w-full" />
                   </template>
-                  创建新回复
+                  {{ $t("core.comment.reply_empty.new") }}
                 </VButton>
               </VSpace>
             </template>

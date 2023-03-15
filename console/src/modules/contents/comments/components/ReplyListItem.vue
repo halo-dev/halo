@@ -49,7 +49,7 @@ const quoteReply = computed(() => {
 
 const handleDelete = async () => {
   Dialog.warning({
-    title: "确认要删除该回复吗？",
+    title: t("core.comment.operations.delete_reply.title"),
     description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
     onConfirm: async () => {

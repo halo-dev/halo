@@ -224,6 +224,43 @@ core:
         description: This operation will restore the pages to its state before deletion.
   comment:
     title: Comments
+    empty:
+      title: There are no comments currently.
+      message: You can try to refresh or modify the filtering criteria.
+    reply_empty:
+      title: There are no replies currently.
+      message: You can try refreshing or creating a new reply.
+      new: New Reply
+    operations:
+      delete_comment:
+        title: Are you sure you want to delete this comment?
+        description: All replies under the comments will be deleted at the same time, and this operation cannot be undone.
+      delete_comment_in_batch:
+        title: Are you sure you want to delete the selected comments?
+        description: All replies under the comments will be deleted at the same time, and this operation cannot be undone.
+      approve_comment_in_batch:
+        button: Approve
+        title: Are you sure you want to approve the selected comments for review?
+      approve_applies_in_batch:
+        button: Approve all replies
+        title: Are you sure you want to approve all replies to this comment for review?
+      delete_reply:
+        title: Are you sure you want to delete this reply?
+    filters:
+      status:
+        items:
+          all: All
+          approved: Approved
+          pending_review: Pending Review
+      owner:
+        label: Owner
+        result: "Owner: {owner}"
+      sort:
+        items:
+          default: Default
+          last_reply_time: Last reply time
+          reply_count: Reply count
+          creation_time: Creation time
   attachment:
     title: Attachments
   menu:

@@ -34,15 +34,15 @@ const keyword = ref("");
 // Filters
 const ApprovedFilterItems: { label: string; value?: boolean }[] = [
   {
-    label: "全部",
+    label: t("core.comment.filters.status.items.all"),
     value: undefined,
   },
   {
-    label: "已审核",
+    label: t("core.comment.filters.status.items.approved"),
     value: true,
   },
   {
-    label: "待审核",
+    label: t("core.comment.filters.status.items.pending_review"),
     value: false,
   },
 ];
@@ -54,19 +54,19 @@ const SortFilterItems: {
   value?: Sort;
 }[] = [
   {
-    label: "默认",
+    label: t("core.comment.filters.sort.items.default"),
     value: undefined,
   },
   {
-    label: "最后回复时间",
+    label: t("core.comment.filters.sort.items.last_reply_time"),
     value: "LAST_REPLY_TIME",
   },
   {
-    label: "回复数",
+    label: t("core.comment.filters.sort.items.reply_count"),
     value: "REPLY_COUNT",
   },
   {
-    label: "创建时间",
+    label: t("core.comment.filters.sort.items.creation_time"),
     value: "CREATE_TIME",
   },
 ];
@@ -208,8 +208,10 @@ watch(
 
 const handleDeleteInBatch = async () => {
   Dialog.warning({
-    title: "确定要删除所选的评论吗？",
-    description: "将同时删除所有评论下的回复，该操作不可恢复。",
+    title: t("core.comment.operations.delete_comment_in_batch.title"),
+    description: t(
+      "core.comment.operations.delete_comment_in_batch.description"
+    ),
     confirmType: "danger",
     onConfirm: async () => {
       try {
@@ -235,7 +237,7 @@ const handleDeleteInBatch = async () => {
 
 const handleApproveInBatch = async () => {
   Dialog.warning({
-    title: "确定要审核通过所选的评论吗？",
+    title: t("core.comment.operations.approve_comment_in_batch.title"),
     onConfirm: async () => {
       try {
         const commentsToUpdate = comments.value?.filter((comment) => {
@@ -340,7 +342,11 @@ const handleApproveInBatch = async () => {
                   v-if="selectedUser"
                   @close="handleSelectUser(undefined)"
                 >
-                  评论者：{{ selectedUser?.spec.displayName }}
+                  {{
+                    $t("core.comment.filters.owner.result", {
+                      owner: selectedUser.spec.displayName,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
@@ -361,7 +367,11 @@ const handleApproveInBatch = async () => {
               </div>
               <VSpace v-else>
                 <VButton type="secondary" @click="handleApproveInBatch">
-                  审核通过
+                  {{
+                    $t(
+                      "core.comment.operations.approve_comment_in_batch.button"
+                    )
+                  }}
                 </VButton>
                 <VButton type="danger" @click="handleDeleteInBatch">
                   {{ $t("core.universal.buttons.delete") }}
@@ -411,7 +421,9 @@ const handleApproveInBatch = async () => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">评论者</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.comment.filters.owner.label") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -469,7 +481,10 @@ const handleApproveInBatch = async () => {
       </template>
       <VLoading v-if="isLoading" />
       <Transition v-else-if="!comments?.length" appear name="fade">
-        <VEmpty message="你可以尝试刷新或者修改筛选条件" title="当前没有评论">
+        <VEmpty
+          :message="$t('core.comment.empty.message')"
+          :title="$t('core.comment.empty.title')"
+        >
           <template #actions>
             <VSpace>
               <VButton @click="refetch">
