@@ -89,8 +89,8 @@ const handleCheckAllChange = (e: Event) => {
 
 const handleDeletePermanently = async (singlePage: SinglePage) => {
   Dialog.warning({
-    title: "确认要永久删除该自定义页面吗？",
-    description: "删除之后将无法恢复",
+    title: t("core.deleted_page.operations.delete.title"),
+    description: t("core.deleted_page.operations.delete.description"),
     confirmType: "danger",
     onConfirm: async () => {
       await apiClient.extension.singlePage.deletecontentHaloRunV1alpha1SinglePage(
@@ -107,8 +107,8 @@ const handleDeletePermanently = async (singlePage: SinglePage) => {
 
 const handleDeletePermanentlyInBatch = async () => {
   Dialog.warning({
-    title: "确定要确认永久删除选中的自定义页面吗？",
-    description: "删除之后将无法恢复",
+    title: t("core.deleted_page.operations.delete_in_batch.title"),
+    description: t("core.deleted_page.operations.delete_in_batch.description"),
     confirmType: "danger",
     onConfirm: async () => {
       await Promise.all(
@@ -130,8 +130,8 @@ const handleDeletePermanentlyInBatch = async () => {
 
 const handleRecovery = async (singlePage: SinglePage) => {
   Dialog.warning({
-    title: "确认要恢复该自定义页面吗？",
-    description: "该操作会将自定义页面恢复到被删除之前的状态",
+    title: t("core.deleted_page.operations.recovery.title"),
+    description: t("core.deleted_page.operations.recovery.description"),
     onConfirm: async () => {
       const singlePageToUpdate = cloneDeep(singlePage);
       singlePageToUpdate.spec.deleted = false;
@@ -143,15 +143,17 @@ const handleRecovery = async (singlePage: SinglePage) => {
       );
       await refetch();
 
-      Toast.success("恢复成功");
+      Toast.success(t("core.universal.toast.recovery_success"));
     },
   });
 };
 
 const handleRecoveryInBatch = async () => {
   Dialog.warning({
-    title: "确认要恢复选中的自定义页面吗？",
-    description: "该操作会将自定义页面恢复到被删除之前的状态",
+    title: t("core.deleted_page.operations.recovery_in_batch.title"),
+    description: t(
+      "core.deleted_page.operations.recovery_in_batch.description"
+    ),
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {
@@ -180,7 +182,7 @@ const handleRecoveryInBatch = async () => {
       await refetch();
       selectedPageNames.value = [];
 
-      Toast.success("恢复成功");
+      Toast.success(t("core.universal.toast.recovery_success"));
     },
   });
 };
@@ -270,7 +272,7 @@ function handleClearKeyword() {
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeletePermanentlyInBatch">
-                  永久删除
+                  {{ $t("core.universal.buttons.delete_permanently") }}
                 </VButton>
                 <VButton type="default" @click="handleRecoveryInBatch">
                   {{ $t("core.universal.buttons.recovery") }}
@@ -298,8 +300,8 @@ function handleClearKeyword() {
       <VLoading v-if="isLoading" />
       <Transition v-else-if="!singlePages?.length" appear name="fade">
         <VEmpty
-          message="你可以尝试刷新或者返回自定义页面管理"
-          title="没有自定义页面被放入回收站"
+          :message="$t('core.deleted_page.empty.message')"
+          :title="$t('core.deleted_page.empty.title')"
         >
           <template #actions>
             <VSpace>
@@ -407,7 +409,7 @@ function handleClearKeyword() {
                   type="danger"
                   @click="handleDeletePermanently(singlePage.page)"
                 >
-                  永久删除
+                  {{ $t("core.universal.buttons.delete_permanently") }}
                 </VButton>
                 <VButton
                   v-close-popper

@@ -263,7 +263,7 @@ function handleClearKeyword() {
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeletePermanentlyInBatch">
-                  永久删除
+                  {{ $t("core.universal.buttons.delete_permanently") }}
                 </VButton>
                 <VButton type="default" @click="handleRecoveryInBatch">
                   {{ $t("core.universal.buttons.recovery") }}
@@ -420,7 +420,7 @@ function handleClearKeyword() {
                   type="danger"
                   @click="handleDeletePermanently(post.post)"
                 >
-                  永久删除
+                  {{ $t("core.universal.buttons.delete_permanently") }}
                 </VButton>
                 <VButton
                   v-close-popper

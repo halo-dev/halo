@@ -175,6 +175,13 @@ core:
       message: 你可以尝试刷新或者新建页面
       actions:
         new: 新建页面
+    operations:
+      delete:
+        title: 确定要删除该自定义页面吗？
+        description: 该操作会将自定义页面放入回收站，后续可以从回收站恢复。
+      delete_in_batch:
+        title: 确定要删除选中的自定义页面吗？
+        description: 该操作会将自定义页面放入回收站，后续可以从回收站恢复。
     filters:
       status:
         items:
@@ -199,6 +206,22 @@ core:
           create_time_asc: 较早创建
   deleted_page:
     title: 自定义页面回收站
+    empty:
+      title: 没有自定义页面被放入回收站
+      message: 你可以尝试刷新或者返回自定义页面管理
+    operations:
+      delete:
+        title: 确认要永久删除该自定义页面吗？
+        description: 删除之后将无法恢复。
+      delete_in_batch:
+        title: 确定要确认永久删除选中的自定义页面吗？
+        description: 删除之后将无法恢复。
+      recovery:
+        title: 确认要恢复该自定义页面吗？
+        description: 该操作会将自定义页面恢复到被删除之前的状态。
+      recovery_in_batch:
+        title: 确认要恢复选中的自定义页面吗？
+        description: 该操作会将自定义页面恢复到被删除之前的状态。
   comment:
     title: 评论
   attachment:
@@ -313,6 +336,7 @@ core:
       reset: 重置
       preview: 预览
       recovery: 恢复
+      delete_permanently: 永久删除
     radio:
       "yes": 是
       "no": 否

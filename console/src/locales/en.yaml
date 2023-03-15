@@ -175,6 +175,13 @@ core:
       message: You can try to refresh or create a new page.
       actions:
         new: New Page
+    operations:
+      delete:
+        title: Are you sure you want to delete this page?
+        description: This operation will move the page to the recycle bin, and it can be restored from the recycle bin later.
+      delete_in_batch:
+        title: Are you sure you want to delete the selected pages?
+        description: This operation will move the pages to the recycle bin, and it can be restored from the recycle bin later.
     filters:
       status:
         items:
@@ -199,6 +206,22 @@ core:
           create_time_asc: Earliest Created
   deleted_page:
     title: Deleted Pages
+    empty:
+      title: No pages have been put in the recycle bin.
+      message: You can try to refresh or go back to the previous page.
+    operations:
+      delete:
+        title: Are you sure you want to permanently delete this page?
+        description: After deletion, it will not be possible to recover.
+      delete_in_batch:
+        title: Are you sure you want to permanently delete the selected pages?
+        description: After deletion, it will not be possible to recover.
+      recovery:
+        title: Do you want to restore this page?
+        description: This operation will restore the page to its state before deletion.
+      recovery_in_batch:
+        title: Are you sure you want to restore the selected pages?
+        description: This operation will restore the pages to its state before deletion.
   comment:
     title: Comments
   attachment:
@@ -313,6 +336,7 @@ core:
       reset: Reset
       preview: Preview
       recovery: Recovery
+      delete_permanently: Delete Permanently
     radio:
       "yes": Yes
       "no": No
