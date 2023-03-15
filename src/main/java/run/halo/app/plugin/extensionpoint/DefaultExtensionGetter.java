@@ -1,8 +1,8 @@
 package run.halo.app.plugin.extensionpoint;
 
+import java.util.Comparator;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.pf4j.ExtensionPoint;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
@@ -66,9 +66,7 @@ public class DefaultExtensionGetter implements ExtensionGetter {
     @Override
     public <T extends ExtensionPoint> Flux<T> getEnabledExtensionByDefinition(
         Class<T> extensionPoint) {
-        // TODO Refactoring the way to obtain the definition name according to the class name.
-        String definitionName = StringUtils.lowerCase(extensionPoint.getName());
-        return client.fetch(ExtensionPointDefinition.class, definitionName)
+        return fetchExtensionPointDefinition(extensionPoint)
             .flatMapMany(extensionPointDefinition -> {
                 ExtensionPointDefinition.ExtensionPointType type =
                     extensionPointDefinition.getSpec().getType();
@@ -79,5 +77,15 @@ public class DefaultExtensionGetter implements ExtensionGetter {
                 return Flux.fromStream(applicationContext.getBeanProvider(extensionPoint)
                     .orderedStream());
             });
+    }
+
+    Mono<ExtensionPointDefinition> fetchExtensionPointDefinition(
+        Class<? extends ExtensionPoint> extensionPoint) {
+        // TODO Optimize query
+        return client.list(ExtensionPointDefinition.class, definition ->
+                    extensionPoint.getName().equals(definition.getSpec().getClassName()),
+                Comparator.comparing(definition -> definition.getMetadata().getCreationTimestamp())
+            )
+            .next();
     }
 }
