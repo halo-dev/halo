@@ -68,7 +68,7 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
       >
         <template #extra>
           <VTag v-if="isActivated">
-            {{ $t("core.universal.status.current_activated") }}
+            {{ $t("core.universal.status.activated") }}
           </VTag>
         </template>
       </VEntityField>

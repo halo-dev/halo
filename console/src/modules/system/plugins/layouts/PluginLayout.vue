@@ -22,8 +22,10 @@ import type { Ref } from "vue";
 import type { Plugin, Setting, SettingForm } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import { usePluginLifeCycle } from "../composables/use-plugin";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 interface PluginTab {
   id: string;
@@ -37,7 +39,7 @@ interface PluginTab {
 const initialTabs: PluginTab[] = [
   {
     id: "detail",
-    label: "详情",
+    label: t("core.plugin.tabs.detail"),
     route: {
       name: "PluginDetail",
     },

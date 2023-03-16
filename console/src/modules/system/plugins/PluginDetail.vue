@@ -56,13 +56,19 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
     <div>
       <div class="flex items-center justify-between bg-white px-4 py-4 sm:px-6">
         <div>
-          <h3 class="text-lg font-medium leading-6 text-gray-900">插件信息</h3>
+          <h3 class="text-lg font-medium leading-6 text-gray-900">
+            {{ $t("core.plugin.detail.header.title") }}
+          </h3>
           <p class="mt-1 flex max-w-2xl items-center gap-2">
-            <span class="text-sm text-gray-500">{{
-              plugin?.spec.version
-            }}</span>
+            <span class="text-sm text-gray-500">
+              {{ plugin?.spec.version }}
+            </span>
             <VTag>
-              {{ isStarted ? "已启用" : "未启用" }}
+              {{
+                isStarted
+                  ? $t("core.universal.status.activated")
+                  : $t("core.universal.status.inactivated")
+              }}
             </VTag>
           </p>
         </div>

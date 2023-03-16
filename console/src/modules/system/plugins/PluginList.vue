@@ -306,8 +306,8 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
 
       <Transition v-else-if="!data?.length" appear name="fade">
         <VEmpty
-          message="当前没有已安装的插件，你可以尝试刷新或者安装新插件"
-          title="当前没有已安装的插件"
+          :message="$t('core.plugin.empty.message')"
+          :title="$t('core.plugin.empty.title')"
         >
           <template #actions>
             <VSpace>
@@ -322,7 +322,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>
-                安装插件
+                {{ $t("core.plugin.empty.actions.install") }}
               </VButton>
             </VSpace>
           </template>

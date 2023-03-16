@@ -29,7 +29,9 @@ export function usePluginLifeCycle(
     const pluginToUpdate = cloneDeep(plugin.value);
 
     Dialog.info({
-      title: `确定要${pluginToUpdate.spec.enabled ? "停止" : "启动"}该插件吗？`,
+      title: pluginToUpdate.spec.enabled
+        ? t("core.plugin.operations.change_status.inactive_title")
+        : t("core.plugin.operations.change_status.active_title"),
       confirmText: t("core.universal.buttons.confirm"),
       cancelText: t("core.universal.buttons.cancel"),
       onConfirm: async () => {
@@ -40,7 +42,11 @@ export function usePluginLifeCycle(
             plugin: pluginToUpdate,
           });
 
-          Toast.success(`${pluginToUpdate.spec.enabled ? "启动" : "停止"}成功`);
+          Toast.success(
+            pluginToUpdate.spec.enabled
+              ? t("core.universal.toast.active_success")
+              : t("core.universal.toast.inactive_success")
+          );
         } catch (e) {
           console.error(e);
         } finally {
@@ -58,16 +64,20 @@ export function usePluginLifeCycle(
     Dialog.warning({
       title: `${
         deleteExtensions
-          ? "确定要卸载该插件以及对应的配置吗？"
-          : "确定要卸载该插件吗？"
+          ? t("core.plugin.operations.uninstall_and_delete_config.title")
+          : t("core.plugin.operations.uninstall.title")
       }`,
       description: `${
         enabled
-          ? "当前插件还在启用状态，将在停止运行后卸载，该操作不可恢复。"
+          ? t("core.plugin.operations.uninstall_when_enabled.description")
           : t("core.universal.dialog.descriptions.cannot_be_recovered")
       }`,
       confirmType: "danger",
-      confirmText: `${enabled ? "停止运行并卸载" : "卸载"}`,
+      confirmText: `${
+        enabled
+          ? t("core.plugin.operations.uninstall_when_enabled.confirm_text")
+          : t("core.universal.buttons.uninstall")
+      }`,
       cancelText: t("core.universal.buttons.cancel"),
       onConfirm: async () => {
         if (!plugin.value) return;

@@ -359,6 +359,28 @@ core:
     title: 菜单
   plugin:
     title: 插件
+    tabs:
+      detail: 详情
+    empty:
+      title: 当前没有已安装的插件
+      message: 当前没有已安装的插件，你可以尝试刷新或者安装新插件
+      actions:
+        install: 安装插件
+    operations:
+      reset:
+        title: 确定要重置插件的所有配置吗？
+        description: 该操作会删除已保存的配置，重置为默认配置。
+        toast_success: 重置配置成功
+      uninstall:
+        title: 确定要卸载该插件吗？
+      uninstall_and_delete_config:
+        title: 确定要卸载该插件以及对应的配置吗？
+      uninstall_when_enabled:
+        confirm_text: 停止运行并卸载
+        description: 当前插件还在启用状态，将在停止运行后卸载，该操作不可恢复。
+      change_status:
+        active_title: 确定要启用该插件吗？
+        inactive_title: 确定要停用该插件吗？
     filters:
       status:
         items:
@@ -372,7 +394,20 @@ core:
     list:
       actions:
         uninstall_and_delete_config: 卸载并删除配置
+    upload_modal:
+      titles:
+        install: 安装插件
+        upgrade: 升级插件（{display_name}）
+      operations:
+        active_after_install:
+          title: 安装成功
+          description: 是否启动当前安装的插件？
+        existed_during_installation:
+          title: 插件已存在
+          description: 当前安装的插件已存在，是否升级？
     detail:
+      header:
+        title: 插件信息
       fields:
         display_name: 名称
         description: 描述
@@ -482,6 +517,9 @@ core:
       cancel_publish_success: 发布成功
       recovery_success: 恢复成功
       uninstall_success: 卸载成功
+      active_success: 启用成功
+      inactive_success: 停用成功
+      upgrade_success: 升级成功
     dialog:
       titles:
         tip: 提示
@@ -499,7 +537,7 @@ core:
       deleting: 删除中
       loading: 加载中
       loading_error: 加载异常
-      current_activated: 当前启用
-      not_activated: 未启用
+      activated: 已启用
+      inactivated: 未启用
       installed: 已安装
       uninstalled: 未安装

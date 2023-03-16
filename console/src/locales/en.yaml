@@ -359,6 +359,28 @@ core:
     title: Menus
   plugin:
     title: Plugins
+    tabs:
+      detail: Detail
+    empty:
+      title: There are no installed plugins currently.
+      message: There are no installed plugins currently, you can try refreshing or installing new plugins.
+      actions:
+        install: Install Plugin
+    operations:
+      reset:
+        title: Are you sure you want to reset all configurations of the plugin?
+        description: This operation will delete the saved configuration and reset it to default settings.
+        toast_success: Reset configuration successfully
+      uninstall:
+        title: Are you sure you want to uninstall this plugin?
+      uninstall_and_delete_config:
+        title: Are you sure you want to uninstall this plugin and its corresponding configuration?
+      uninstall_when_enabled:
+        confirm_text: Stop running and uninstall
+        description: The current plugin is still in the enabled state and will be uninstalled after it stops running. This operation cannot be undone.
+      change_status:
+        active_title: Are you sure you want to active this plugin?
+        inactive_title: Are you sure you want to inactive this plugin?
     filters:
       status:
         items:
@@ -372,7 +394,20 @@ core:
     list:
       actions:
         uninstall_and_delete_config: Uninstall and delete config
+    upload_modal:
+      titles:
+        install: Install plugin
+        upgrade: Upgrade plugin ({display_name})
+      operations:
+        active_after_install:
+          title: Install successful
+          description: Would you like to activate the currently installed plugin?
+        existed_during_installation:
+          title: The plugin already exists.
+          description: The currently installed plugin already exists, do you want to upgrade?
     detail:
+      header:
+        title: Plugin information
       fields:
         display_name: Display Name
         description: Description
@@ -482,6 +517,9 @@ core:
       cancel_publish_success: Cancel publication successful
       recovery_success: Recovery successful
       uninstall_success: Uninstall successful
+      active_success: Active successfully
+      inactive_success: Inactive successfully
+      upgrade_success: Upgrade successfully
     dialog:
       titles:
         tip: Tip
@@ -499,7 +537,7 @@ core:
       deleting: Deleting
       loading: Loading
       loading_error: Loading error
-      current_activated: Activated
-      not_activated: Inactivated
+      activated: Activated
+      inactivated: Inactivated
       installed: Installed
       uninstalled: Uninstalled

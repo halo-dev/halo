@@ -48,8 +48,8 @@ const onUpgradeModalClose = () => {
 
 const handleResetSettingConfig = async () => {
   Dialog.warning({
-    title: "确定要重置插件的所有配置吗？",
-    description: "该操作会删除已保存的配置，重置为默认配置。",
+    title: t("core.plugin.operations.reset.title"),
+    description: t("core.plugin.operations.reset.description"),
     confirmType: "danger",
     confirmText: t("core.universal.buttons.confirm"),
     cancelText: t("core.universal.buttons.cancel"),
@@ -63,7 +63,7 @@ const handleResetSettingConfig = async () => {
           name: plugin.value.metadata.name as string,
         });
 
-        Toast.success("重置配置成功");
+        Toast.success(t("core.plugin.operations.reset.toast_success"));
       } catch (e) {
         console.error("Failed to reset plugin setting config", e);
       }
@@ -106,7 +106,11 @@ const getFailedMessage = (plugin: Plugin) => {
         <template #extra>
           <VSpace>
             <VTag>
-              {{ isStarted ? "已启用" : "未启用" }}
+              {{
+                isStarted
+                  ? $t("core.universal.status.activated")
+                  : $t("core.universal.status.inactivated")
+              }}
             </VTag>
           </VSpace>
         </template>

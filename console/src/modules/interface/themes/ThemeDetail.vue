@@ -89,8 +89,8 @@ const onUpgradeModalClose = () => {
                 <VTag>
                   {{
                     isActivated
-                      ? t("core.universal.status.current_activated")
-                      : t("core.universal.status.not_activated")
+                      ? t("core.universal.status.activated")
+                      : t("core.universal.status.inactivated")
                   }}
                 </VTag>
                 <VStatusDot
