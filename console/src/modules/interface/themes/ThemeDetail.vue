@@ -35,8 +35,8 @@ const { isActivated, getFailedMessage, handleResetSettingConfig } =
 
 const handleReloadTheme = async () => {
   Dialog.warning({
-    title: "确定要重载主题的所有配置吗？",
-    description: "该操作仅会重载主题配置和设置表单定义，不会删除已保存的配置。",
+    title: t("core.theme.operations.reload.title"),
+    description: t("core.theme.operations.reload.description"),
     confirmText: t("core.universal.buttons.confirm"),
     cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
@@ -49,7 +49,7 @@ const handleReloadTheme = async () => {
           name: selectedTheme.value.metadata.name as string,
         });
 
-        Toast.success("重载配置成功");
+        Toast.success(t("core.theme.operations.reload.toast_success"));
 
         window.location.reload();
       } catch (e) {
@@ -87,7 +87,11 @@ const onUpgradeModalClose = () => {
                   {{ selectedTheme?.spec.version }}
                 </span>
                 <VTag>
-                  {{ isActivated ? "当前启用" : "未启用" }}
+                  {{
+                    isActivated
+                      ? t("core.universal.status.current_activated")
+                      : t("core.universal.status.not_activated")
+                  }}
                 </VTag>
                 <VStatusDot
                   v-if="getFailedMessage()"
@@ -121,7 +125,7 @@ const onUpgradeModalClose = () => {
                     type="default"
                     @click="handleReloadTheme"
                   >
-                    重载主题配置
+                    {{ $t("core.theme.operations.reload.button") }}
                   </VButton>
                   <VButton
                     v-close-popper
@@ -150,7 +154,9 @@ const onUpgradeModalClose = () => {
           <div
             class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
           >
-            <dt class="text-sm font-medium text-gray-900">作者</dt>
+            <dt class="text-sm font-medium text-gray-900">
+              {{ $t("core.theme.detail.fields.author") }}
+            </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
               {{ selectedTheme?.spec.author.name }}
             </dd>
@@ -158,7 +164,9 @@ const onUpgradeModalClose = () => {
           <div
             class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
           >
-            <dt class="text-sm font-medium text-gray-900">网站</dt>
+            <dt class="text-sm font-medium text-gray-900">
+              {{ $t("core.theme.detail.fields.website") }}
+            </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
               <a
                 :href="selectedTheme?.spec.website"
@@ -172,7 +180,9 @@ const onUpgradeModalClose = () => {
           <div
             class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
           >
-            <dt class="text-sm font-medium text-gray-900">源码仓库</dt>
+            <dt class="text-sm font-medium text-gray-900">
+              {{ $t("core.theme.detail.fields.repo") }}
+            </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
               <a
                 :href="selectedTheme?.spec.repo"
@@ -186,7 +196,9 @@ const onUpgradeModalClose = () => {
           <div
             class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
           >
-            <dt class="text-sm font-medium text-gray-900">当前版本</dt>
+            <dt class="text-sm font-medium text-gray-900">
+              {{ $t("core.theme.detail.fields.version") }}
+            </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
               {{ selectedTheme?.spec.version }}
             </dd>
@@ -194,7 +206,9 @@ const onUpgradeModalClose = () => {
           <div
             class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
           >
-            <dt class="text-sm font-medium text-gray-900">Halo 版本要求</dt>
+            <dt class="text-sm font-medium text-gray-900">
+              {{ $t("core.theme.detail.fields.requires") }}
+            </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
               {{ selectedTheme?.spec.requires }}
             </dd>
@@ -202,7 +216,9 @@ const onUpgradeModalClose = () => {
           <div
             class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
           >
-            <dt class="text-sm font-medium text-gray-900">存储位置</dt>
+            <dt class="text-sm font-medium text-gray-900">
+              {{ $t("core.theme.detail.fields.storage_location") }}
+            </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
               {{ selectedTheme?.status?.location }}
             </dd>
@@ -212,7 +228,9 @@ const onUpgradeModalClose = () => {
             v-if="false"
             class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
           >
-            <dt class="text-sm font-medium text-gray-900">插件依赖</dt>
+            <dt class="text-sm font-medium text-gray-900">
+              {{ $t("core.theme.detail.fields.plugin_requires") }}
+            </dt>
             <dd class="mt-1 text-sm sm:col-span-3 sm:mt-0">
               <VAlert
                 description="当前有 1 个插件还未安装"
@@ -234,7 +252,7 @@ const onUpgradeModalClose = () => {
                     </RouterLink>
                     <div class="text-xs">
                       <VSpace>
-                        <VTag> 已安装</VTag>
+                        <VTag>{{ $t("core.universal.status.installed") }}</VTag>
                       </VSpace>
                     </div>
                   </div>
@@ -248,7 +266,9 @@ const onUpgradeModalClose = () => {
                     </span>
                     <div class="text-xs">
                       <VSpace>
-                        <VTag>未安装</VTag>
+                        <VTag>
+                          {{ $t("core.universal.status.uninstalled") }}
+                        </VTag>
                       </VSpace>
                     </div>
                   </div>

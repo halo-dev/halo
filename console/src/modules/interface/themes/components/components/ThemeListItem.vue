@@ -50,8 +50,8 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
   Dialog.warning({
     title: `${
       deleteExtensions
-        ? "确定要卸载该主题以及对应的配置吗？"
-        : "确定要卸载该主题吗？"
+        ? t("core.theme.operations.uninstall_and_delete_config.title")
+        : t("core.theme.operations.uninstall.title")
     }`,
     description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
     confirmText: t("core.universal.buttons.confirm"),
@@ -89,7 +89,7 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
           }
         }
 
-        Toast.success("卸载成功");
+        Toast.success(t("core.universal.toast.uninstall_success"));
       } catch (e) {
         console.error("Failed to uninstall theme", e);
       } finally {
@@ -119,14 +119,18 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
                   <div
                     class="flex h-full items-center justify-center object-cover"
                   >
-                    <span class="text-xs text-gray-400">加载中...</span>
+                    <span class="text-xs text-gray-400">
+                      {{ $t("core.universal.status.loading") }}...
+                    </span>
                   </div>
                 </template>
                 <template #error>
                   <div
                     class="flex h-full items-center justify-center object-cover"
                   >
-                    <span class="text-xs text-red-400">加载异常</span>
+                    <span class="text-xs text-red-400">
+                      {{ $t("core.universal.status.loading_error") }}
+                    </span>
                   </div>
                 </template>
               </LazyImage>
@@ -139,7 +143,9 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
         :description="theme.spec.version"
       >
         <template #extra>
-          <VTag v-if="isActivated"> 当前启用 </VTag>
+          <VTag v-if="isActivated">
+            {{ $t("core.universal.status.current_activated") }}
+          </VTag>
         </template>
       </VEntityField>
     </template>
@@ -193,7 +199,7 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
         type="secondary"
         @click="handleActiveTheme"
       >
-        启用
+        {{ $t("core.universal.buttons.active") }}
       </VButton>
       <VButton v-close-popper block type="default" @click="emit('upgrade')">
         {{ $t("core.universal.buttons.upgrade") }}
@@ -222,7 +228,9 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
                 type="danger"
                 @click="handleUninstall(theme, true)"
               >
-                卸载并删除配置
+                {{
+                  $t("core.theme.operations.uninstall_and_delete_config.button")
+                }}
               </VButton>
             </VSpace>
           </div>

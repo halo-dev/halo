@@ -44,7 +44,7 @@ export function useThemeLifeCycle(
 
   const handleActiveTheme = async () => {
     Dialog.info({
-      title: "是否确认启用当前主题",
+      title: t("core.theme.operations.active.title"),
       description: theme.value?.spec.displayName,
       confirmText: t("core.universal.buttons.confirm"),
       cancelText: t("core.universal.buttons.cancel"),
@@ -56,7 +56,7 @@ export function useThemeLifeCycle(
             name: theme.value?.metadata.name,
           });
 
-          Toast.success("启用成功");
+          Toast.success(t("core.theme.operations.active.toast_success"));
         } catch (e) {
           console.error("Failed to active theme", e);
         } finally {
@@ -68,8 +68,8 @@ export function useThemeLifeCycle(
 
   const handleResetSettingConfig = async () => {
     Dialog.warning({
-      title: "确定要重置主题的所有配置吗？",
-      description: "该操作会删除已保存的配置，重置为默认配置。",
+      title: t("core.theme.operations.reset.title"),
+      description: t("core.theme.operations.reset.description"),
       confirmType: "danger",
       confirmText: t("core.universal.buttons.confirm"),
       cancelText: t("core.universal.buttons.cancel"),
@@ -83,7 +83,7 @@ export function useThemeLifeCycle(
             name: theme.value.metadata.name as string,
           });
 
-          Toast.success("重置配置成功");
+          Toast.success(t("core.theme.operations.reset.toast_success"));
         } catch (e) {
           console.error("Failed to reset theme setting config", e);
         }
@@ -102,10 +102,12 @@ export function useThemeLifeCycle(
 
 export function useThemeCustomTemplates(type: "post" | "page" | "category") {
   const themeStore = useThemeStore();
+  const { t } = useI18n();
+
   const templates = computed(() => {
     const defaultTemplate = [
       {
-        label: "默认模板",
+        label: t("core.theme.custom_templates.default"),
         value: "",
       },
     ];

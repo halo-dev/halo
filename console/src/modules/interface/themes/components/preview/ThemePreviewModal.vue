@@ -115,7 +115,9 @@ const modalTitle = computed(() => {
   if (props.title) {
     return props.title;
   }
-  return `预览主题：${selectedTheme.value?.spec.displayName}`;
+  return t("core.theme.preview_model.title", {
+    display_name: selectedTheme.value?.spec.displayName,
+  });
 });
 
 // theme settings
@@ -257,14 +259,20 @@ const iframeClasses = computed(() => {
     </template>
     <template #actions>
       <span
-        v-tooltip="{ content: '切换主题', delay: 300 }"
+        v-tooltip="{
+          content: $t('core.theme.empty.actions.switch'),
+          delay: 300,
+        }"
         :class="{ 'bg-gray-200': themesVisible }"
         @click="handleOpenThemes"
       >
         <IconPalette />
       </span>
       <span
-        v-tooltip="{ content: '主题设置', delay: 300 }"
+        v-tooltip="{
+          content: $t('core.theme.preview_model.actions.setting'),
+          delay: 300,
+        }"
         :class="{ 'bg-gray-200': settingsVisible }"
         @click="handleOpenSettings(undefined)"
       >
@@ -279,7 +287,12 @@ const iframeClasses = computed(() => {
       >
         <IconRefreshLine />
       </span>
-      <span v-tooltip="{ content: '新窗口打开', delay: 300 }">
+      <span
+        v-tooltip="{
+          content: $t('core.theme.preview_model.actions.open'),
+          delay: 300,
+        }"
+      >
         <a :href="previewUrl" target="_blank">
           <IconLink />
         </a>

@@ -113,7 +113,7 @@ export function usePluginLifeCycle(
             }
           }
 
-          Toast.success("卸载成功");
+          Toast.success(t("core.universal.toast.uninstall_success"));
         } catch (e) {
           console.error("Failed to uninstall plugin", e);
         } finally {

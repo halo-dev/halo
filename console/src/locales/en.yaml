@@ -288,6 +288,73 @@ core:
         items:
           grid: Grid Mode
           list: List Mode
+  theme:
+    universal:
+      buttons:
+        install: Install Theme
+    tabs:
+      detail: Detail
+    actions:
+      management: Themes
+    empty:
+      title: There are currently no activated or selected themes.
+      message: There are currently no activated or selected themes, you can switch themes or install new ones.
+      actions:
+        switch: Switch Theme
+    operations:
+      active:
+        title: Are you sure to active the current theme?
+        toast_success: Active theme successful
+      reset:
+        title: Are you sure you want to reset all configurations of the theme?
+        description: This operation will delete the saved configuration and reset it to default settings.
+        toast_success: Reset configuration successful
+      reload:
+        button: Reload
+        title: Are you sure you want to reload all configurations of the theme?
+        description: This operation will only reload the theme configuration and settings form definition, and will not delete any saved configurations.
+        toast_success: Reload configuration successful
+      uninstall:
+        title: Are you sure you want to uninstall this theme?
+      uninstall_and_delete_config:
+        button: Uninstall and delete config
+        title: Are you sure you want to uninstall this theme and its corresponding settings?
+    upload_modal:
+      titles:
+        install: Install theme
+        upgrade: Upgrade theme ({display_name})
+    list_modal:
+      titles:
+        installed_themes: Installed Themes
+        uninstalled_themes: Uninstalled Themes
+      tabs:
+        installed: Installed
+        uninstalled: Uninstalled
+      empty:
+        title: There are no installed themes currently.
+        message: There are currently no installed themes, you can try refreshing or installing a new theme.
+      uninstalled_empty:
+        title: There are no themes currently not installed.
+      operations:
+        install:
+          toast_success: Installation successful
+    preview_model:
+      title: "Preview theme: {display_name}"
+      actions:
+        switch: Switch theme
+        setting: Setting
+        open: Open
+    detail:
+      fields:
+        author: Author
+        website: Website
+        repo: Source Repository
+        version: Version
+        requires: Requires
+        storage_location: Storage Location
+        plugin_requires: Plugin Requires
+    custom_templates:
+      default: Default
   menu:
     title: Menus
   plugin:
@@ -401,6 +468,7 @@ core:
       preview: Preview
       recovery: Recovery
       delete_permanently: Delete Permanently
+      active: Active
     radio:
       "yes": Yes
       "no": No
@@ -413,6 +481,7 @@ core:
       publish_success: Published successfully
       cancel_publish_success: Cancel publication successful
       recovery_success: Recovery successful
+      uninstall_success: Uninstall successful
     dialog:
       titles:
         tip: Tip
@@ -428,3 +497,9 @@ core:
         status: Status
     status:
       deleting: Deleting
+      loading: Loading
+      loading_error: Loading error
+      current_activated: Activated
+      not_activated: Inactivated
+      installed: Installed
+      uninstalled: Uninstalled

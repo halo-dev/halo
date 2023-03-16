@@ -288,6 +288,73 @@ core:
         items:
           grid: 网格模式
           list: 列表模式
+  theme:
+    universal:
+      buttons:
+        install: 安装主题
+    tabs:
+      detail: 详情
+    actions:
+      management: 主题管理
+    empty:
+      title: 当前没有已激活或已选择的主题
+      message: 当前没有已激活或者选择的主题，你可以切换主题或者安装新主题
+      actions:
+        switch: 切换主题
+    operations:
+      active:
+        title: 是否确认启用当前主题
+        toast_success: 启用成功
+      reset:
+        title: 确定要重置主题的所有配置吗？
+        description: 该操作会删除已保存的配置，重置为默认配置。
+        toast_success: 重置配置成功
+      reload:
+        button: 重载主题配置
+        title: 确定要重载主题的所有配置吗？
+        description: 该操作仅会重载主题配置和设置表单定义，不会删除已保存的配置。
+        toast_success: 重载配置成功
+      uninstall:
+        title: 确定要卸载该主题吗？
+      uninstall_and_delete_config:
+        button: 卸载并删除配置
+        title: 确定要卸载该主题以及对应的配置吗？
+    upload_modal:
+      titles:
+        install: 安装主题
+        upgrade: 升级主题（{display_name}）
+    list_modal:
+      titles:
+        installed_themes: 已安装的主题
+        uninstalled_themes: 未安装的主题
+      tabs:
+        installed: 已安装
+        uninstalled: 未安装
+      empty:
+        title: 当前没有已安装的主题
+        message: 当前没有已安装的主题，你可以尝试刷新或者安装新主题
+      uninstalled_empty:
+        title: 当前没有未安装的主题
+      operations:
+        install:
+          toast_success: 安装成功
+    preview_model:
+      title: 预览主题：{display_name}
+      actions:
+        switch: 切换主题
+        setting: 主题设置
+        open: 新窗口打开
+    detail:
+      fields:
+        author: 作者
+        website: 网站
+        repo: 源码仓库
+        version: 当前版本
+        requires: 版本要求
+        storage_location: 存储位置
+        plugin_requires: 插件依赖
+    custom_templates:
+      default: 默认模版
   menu:
     title: 菜单
   plugin:
@@ -401,6 +468,7 @@ core:
       preview: 预览
       recovery: 恢复
       delete_permanently: 永久删除
+      active: 启用
     radio:
       "yes": 是
       "no": 否
@@ -413,6 +481,7 @@ core:
       publish_success: 发布成功
       cancel_publish_success: 发布成功
       recovery_success: 恢复成功
+      uninstall_success: 卸载成功
     dialog:
       titles:
         tip: 提示
@@ -428,3 +497,9 @@ core:
         status: 状态
     status:
       deleting: 删除中
+      loading: 加载中
+      loading_error: 加载异常
+      current_activated: 当前启用
+      not_activated: 未启用
+      installed: 已安装
+      uninstalled: 未安装
