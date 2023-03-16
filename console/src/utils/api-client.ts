@@ -33,6 +33,8 @@ import {
   V1alpha1UserApi,
   V1alpha1AnnotationSettingApi,
   LoginApi,
+  AuthHaloRunV1alpha1AuthProviderApi,
+  AuthHaloRunV1alpha1UserConnectionApi,
 } from "@halo-dev/api-client";
 import type { AxiosError, AxiosInstance } from "axios";
 import axios from "axios";
@@ -162,6 +164,16 @@ function setupApiClient(axios: AxiosInstance) {
         ),
       },
       annotationSetting: new V1alpha1AnnotationSettingApi(
+        undefined,
+        baseURL,
+        axios
+      ),
+      authProvider: new AuthHaloRunV1alpha1AuthProviderApi(
+        undefined,
+        baseURL,
+        axios
+      ),
+      userConnection: new AuthHaloRunV1alpha1UserConnectionApi(
         undefined,
         baseURL,
         axios
