@@ -419,6 +419,20 @@ core:
         last_starttime: 最近一次启动
   user:
     title: 用户
+    universal:
+      buttons:
+        new: 新建用户
+    empty:
+      title: 当前没有符合筛选条件的用户
+      message: 当前没有符合筛选条件的用户，你可以尝试刷新或者创建新用户
+    detail:
+      fields:
+        display_name: 显示名称
+        username: 用户名
+        email: 电子邮箱
+        roles: 角色
+        bio: 描述
+        creation_time: 注册时间
   setting:
     title: 设置
   actuator:

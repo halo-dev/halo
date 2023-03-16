@@ -339,7 +339,7 @@ const hasFilters = computed(() => {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          添加用户
+          {{ $t("core.user.universal.buttons.new") }}
         </VButton>
       </VSpace>
     </template>
@@ -498,8 +498,8 @@ const hasFilters = computed(() => {
 
       <Transition v-else-if="!users.total" appear name="fade">
         <VEmpty
-          message="当前没有符合筛选条件的用户，你可以尝试刷新或者创建新用户"
-          title="当前没有符合筛选条件的用户"
+          :message="$t('core.user.empty.message')"
+          :title="$t('core.user.empty.title')"
         >
           <template #actions>
             <VSpace>
@@ -514,7 +514,7 @@ const hasFilters = computed(() => {
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>
-                新建用户
+                {{ $t("core.user.universal.buttons.new") }}
               </VButton>
             </VSpace>
           </template>

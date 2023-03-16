@@ -419,6 +419,20 @@ core:
         last_starttime: Last Start Time
   user:
     title: Users
+    universal:
+      buttons:
+        new: New User
+    empty:
+      title: There are no users that meet the filtering criteria currently.
+      message: There are no users that match the filtering criteria at present. You can try refreshing or creating a new user.
+    detail:
+      fields:
+        display_name: Display name
+        username: Username
+        email: Email
+        roles: Roles
+        bio: Bio
+        creation_time: Creation time
   setting:
     title: Settings
   actuator:

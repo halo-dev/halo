@@ -17,7 +17,9 @@ const router = useRouter();
       <div
         class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
-        <dt class="text-sm font-medium text-gray-900">显示名称</dt>
+        <dt class="text-sm font-medium text-gray-900">
+          {{ $t("core.user.detail.fields.display_name") }}
+        </dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
           {{ user?.user.spec?.displayName }}
         </dd>
@@ -25,7 +27,9 @@ const router = useRouter();
       <div
         class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
-        <dt class="text-sm font-medium text-gray-900">用户名</dt>
+        <dt class="text-sm font-medium text-gray-900">
+          {{ $t("core.user.detail.fields.username") }}
+        </dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
           {{ user?.user.metadata?.name }}
         </dd>
@@ -33,7 +37,9 @@ const router = useRouter();
       <div
         class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
-        <dt class="text-sm font-medium text-gray-900">电子邮箱</dt>
+        <dt class="text-sm font-medium text-gray-900">
+          {{ $t("core.user.detail.fields.email") }}
+        </dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
           {{ user?.user.spec?.email || "未设置" }}
         </dd>
@@ -41,7 +47,9 @@ const router = useRouter();
       <div
         class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
-        <dt class="text-sm font-medium text-gray-900">角色</dt>
+        <dt class="text-sm font-medium text-gray-900">
+          {{ $t("core.user.detail.fields.roles") }}
+        </dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
           <VTag
             v-for="(role, index) in user?.roles"
@@ -66,7 +74,9 @@ const router = useRouter();
       <div
         class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
-        <dt class="text-sm font-medium text-gray-900">描述</dt>
+        <dt class="text-sm font-medium text-gray-900">
+          {{ $t("core.user.detail.fields.bio") }}
+        </dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
           {{ user?.user.spec?.bio || "无" }}
         </dd>
@@ -74,7 +84,9 @@ const router = useRouter();
       <div
         class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
-        <dt class="text-sm font-medium text-gray-900">注册时间</dt>
+        <dt class="text-sm font-medium text-gray-900">
+          {{ $t("core.user.detail.fields.creation_time") }}
+        </dt>
         <dd
           class="mt-1 text-sm tabular-nums text-gray-900 sm:col-span-3 sm:mt-0"
         >
