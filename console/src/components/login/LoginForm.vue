@@ -10,6 +10,11 @@ import qs from "qs";
 import { submitForm } from "@formkit/core";
 import { JSEncrypt } from "jsencrypt";
 import { apiClient } from "@/utils/api-client";
+import { useQuery } from "@tanstack/vue-query";
+import type {
+  GlobalInfo,
+  SocialAuthProvider,
+} from "@/modules/system/actuator/types";
 
 const emit = defineEmits<{
   (event: "succeed"): void;
@@ -95,6 +100,23 @@ const handleLogin = async () => {
 onMounted(() => {
   handleGenerateToken();
 });
+
+// auth providers
+// fixme: Needs to be saved in Pinia.
+const { data: socialAuthProviders } = useQuery<SocialAuthProvider[]>({
+  queryKey: ["social-auth-providers"],
+  queryFn: async () => {
+    const { data } = await axios.get<GlobalInfo>(
+      `${import.meta.env.VITE_API_URL}/actuator/globalinfo`,
+      {
+        withCredentials: true,
+      }
+    );
+
+    return data.socialAuthProviders;
+  },
+  refetchOnWindowFocus: false,
+});
 </script>
 
 <template>
@@ -140,4 +162,17 @@ onMounted(() => {
   >
     登录
   </VButton>
+
+  <div>
+    <ul class="flex justify-center py-5">
+      <li
+        v-for="(socialAuthProvider, index) in socialAuthProviders"
+        :key="index"
+      >
+        <a class="text-4xl" :href="socialAuthProvider.authenticationUrl">
+          {{ socialAuthProvider.displayName }}
+        </a>
+      </li>
+    </ul>
+  </div>
 </template>

@@ -5,6 +5,7 @@ export interface GlobalInfo {
   allowComments: boolean;
   allowAnonymousComments: boolean;
   allowRegistration: boolean;
+  socialAuthProviders: SocialAuthProvider[];
 }
 
 export interface Info {
@@ -94,4 +95,13 @@ export interface Timeline {
 export interface Startup {
   springBootVersion: string;
   timeline: Timeline;
+}
+
+export interface SocialAuthProvider {
+  name: string;
+  displayName: string;
+  description: string;
+  logo: string;
+  website: string;
+  authenticationUrl: string;
 }
