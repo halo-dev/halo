@@ -44,7 +44,7 @@ public class AuthProviderEndpoint implements CustomEndpoint {
                     .description("Lists all auth providers")
                     .tag(tag)
                     .response(responseBuilder()
-                        .implementation(ListedAuthProvider.class))
+                        .implementationArray(ListedAuthProvider.class))
             )
             .build();
     }
