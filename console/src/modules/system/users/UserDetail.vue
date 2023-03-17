@@ -44,7 +44,9 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
   if (!authProvider.bindingUrl) {
     return;
   }
-  window.location.href = authProvider.bindingUrl;
+  window.location.href = `${
+    authProvider.bindingUrl
+  }?redirect_uri=${encodeURIComponent(window.location.href)}`;
 };
 </script>
 <template>
