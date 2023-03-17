@@ -540,6 +540,32 @@ core:
     title: 设置
   actuator:
     title: 系统概览
+    actions:
+      copy:
+        toast_browser_not_supported: 当前浏览器不支持复制
+    header:
+      titles:
+        general: 基本信息
+        environment: 环境信息
+    fields:
+      external_url: 外部访问地址
+      start_time: 启动时间
+      timezone: 时区
+      locale: 语言
+      version: 版本
+      build_time: 构建时间
+      database: 数据库
+      os: 操作系统
+      log: 运行日志
+    copy_results:
+      external_url: 外部访问地址：{external_url}
+      start_time: 启动时间：{start_time}
+      version: Halo 版本：{version}
+      build_time: 构建时间：{build_time}
+      database: 数据库：{database}
+      os: 操作系统：{os}
+    alert:
+      external_url_invalid: 检测到外部访问地址与当前访问地址不一致，可能会导致部分链接无法正常跳转，请检查外部访问地址设置。
   rbac:
     Attachments Management: 附件
     Attachment Manage: 附件管理
@@ -621,6 +647,8 @@ core:
       recovery: 恢复
       delete_permanently: 永久删除
       active: 启用
+      download: 下载
+      copy: 复制
     radio:
       "yes": 是
       "no": 否
@@ -637,6 +665,9 @@ core:
       active_success: 启用成功
       inactive_success: 停用成功
       upgrade_success: 升级成功
+      download_success: 下载成功
+      copy_success: 复制成功
+      download_failed: 下载失败
     dialog:
       titles:
         tip: 提示
@@ -661,3 +692,4 @@ core:
     text:
       none: 无
       tip: 提示
+      warning: 警告

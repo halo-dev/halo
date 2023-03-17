@@ -540,6 +540,32 @@ core:
     title: Settings
   actuator:
     title: Actuator
+    actions:
+      copy:
+        toast_browser_not_supported: The current browser does not support copying
+    header:
+      titles:
+        general: General information
+        environment: Environment information
+    fields:
+      external_url: External url
+      start_time: Start time
+      timezone: Timezone
+      locale: Locale
+      version: Version
+      build_time: Build time
+      database: Database
+      os: Operating system
+      log: System log
+    copy_results:
+      external_url: "External url: {external_url}"
+      start_time: "Start time: {start_time}"
+      version: "Version: {version}"
+      build_time: "Build time: {build_time}"
+      database: "Database: {database}"
+      os: "Operating system: {os}"
+    alert:
+      external_url_invalid: The external access url detected is inconsistent with the current access url, which may cause some links to fail to redirect properly. Please check the external access url settings.
   rbac:
     Attachments Management: Attachments
     Attachment Manage: Attachment Manage
@@ -621,6 +647,8 @@ core:
       recovery: Recovery
       delete_permanently: Delete Permanently
       active: Active
+      download: Download
+      copy: Copy
     radio:
       "yes": Yes
       "no": No
@@ -637,6 +665,9 @@ core:
       active_success: Active successfully
       inactive_success: Inactive successfully
       upgrade_success: Upgrade successfully
+      download_success: Download successful
+      copy_success: Copy successful
+      download_failed: Download failed
     dialog:
       titles:
         tip: Tip
@@ -661,3 +692,4 @@ core:
     text:
       none: None
       tip: Tip
+      warning: Warning
