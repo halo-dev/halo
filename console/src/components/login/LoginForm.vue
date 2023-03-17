@@ -163,14 +163,18 @@ const { data: socialAuthProviders } = useQuery<SocialAuthProvider[]>({
     登录
   </VButton>
 
-  <div>
-    <ul class="flex justify-center py-5">
+  <div v-if="socialAuthProviders?.length" class="mt-3 flex items-center">
+    <span class="text-sm text-slate-600">其他登录：</span>
+    <ul class="flex items-center">
       <li
         v-for="(socialAuthProvider, index) in socialAuthProviders"
         :key="index"
       >
-        <a class="text-4xl" :href="socialAuthProvider.authenticationUrl">
-          {{ socialAuthProvider.displayName }}
+        <a
+          :href="socialAuthProvider.authenticationUrl"
+          class="block h-6 w-6 rounded-full bg-gray-200 p-1"
+        >
+          <img class="rounded-full" :src="socialAuthProvider.logo" />
         </a>
       </li>
     </ul>

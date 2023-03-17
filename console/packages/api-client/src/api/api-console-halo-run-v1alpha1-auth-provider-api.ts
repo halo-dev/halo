@@ -116,7 +116,7 @@ export const ApiConsoleHaloRunV1alpha1AuthProviderApiFp = function (
       (
         axios?: AxiosInstance,
         basePath?: string
-      ) => AxiosPromise<ListedAuthProvider>
+      ) => AxiosPromise<Array<ListedAuthProvider>>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listAuthProviders(options);
@@ -148,7 +148,7 @@ export const ApiConsoleHaloRunV1alpha1AuthProviderApiFactory = function (
      */
     listAuthProviders(
       options?: AxiosRequestConfig
-    ): AxiosPromise<ListedAuthProvider> {
+    ): AxiosPromise<Array<ListedAuthProvider>> {
       return localVarFp
         .listAuthProviders(options)
         .then((request) => request(axios, basePath));
