@@ -3,6 +3,7 @@ package run.halo.app.plugin;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
+import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -22,17 +23,17 @@ import run.halo.app.extension.ExtensionClient;
  */
 @Slf4j
 public class PluginApplicationInitializer {
-    protected final HaloPluginManager haloPluginManager;
+    protected final PluginManager haloPluginManager;
 
     private final ExtensionContextRegistry contextRegistry = ExtensionContextRegistry.getInstance();
     private final SharedApplicationContextHolder sharedApplicationContextHolder;
     private final ApplicationContext rootApplicationContext;
 
-    public PluginApplicationInitializer(HaloPluginManager haloPluginManager,
+    public PluginApplicationInitializer(PluginManager pluginManager,
         ApplicationContext rootApplicationContext) {
-        Assert.notNull(haloPluginManager, "The haloPluginManager must not be null");
+        Assert.notNull(pluginManager, "The haloPluginManager must not be null");
         Assert.notNull(rootApplicationContext, "The rootApplicationContext must not be null");
-        this.haloPluginManager = haloPluginManager;
+        this.haloPluginManager = pluginManager;
         this.rootApplicationContext = rootApplicationContext;
         sharedApplicationContextHolder = rootApplicationContext
             .getBean(SharedApplicationContextHolder.class);
