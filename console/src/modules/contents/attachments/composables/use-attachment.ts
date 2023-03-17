@@ -128,7 +128,7 @@ export function useAttachmentControl(filterOptions: {
   const handleDelete = (attachment: Attachment) => {
     Dialog.warning({
       title: "确定要删除该附件吗？",
-      description: "删除之后将无法恢复",
+      description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
       confirmType: "danger",
       confirmText: t("core.universal.buttons.confirm"),
       cancelText: t("core.universal.buttons.cancel"),
@@ -159,7 +159,7 @@ export function useAttachmentControl(filterOptions: {
   const handleDeleteInBatch = () => {
     Dialog.warning({
       title: "确定要删除所选的附件吗？",
-      description: "删除之后将无法恢复",
+      description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
       confirmType: "danger",
       confirmText: t("core.universal.buttons.confirm"),
       cancelText: t("core.universal.buttons.cancel"),

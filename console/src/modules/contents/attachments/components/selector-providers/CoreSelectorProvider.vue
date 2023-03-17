@@ -128,12 +128,16 @@ const handleOpenDetail = (attachment: Attachment) => {
           >
             <template #loading>
               <div class="flex h-full items-center justify-center object-cover">
-                <span class="text-xs text-gray-400">加载中...</span>
+                <span class="text-xs text-gray-400">
+                  {{ $t("core.universal.status.loading") }}...
+                </span>
               </div>
             </template>
             <template #error>
               <div class="flex h-full items-center justify-center object-cover">
-                <span class="text-xs text-red-400">加载异常</span>
+                <span class="text-xs text-red-400">
+                  {{ $t("core.universal.status.loading_error") }}
+                </span>
               </div>
             </template>
           </LazyImage>

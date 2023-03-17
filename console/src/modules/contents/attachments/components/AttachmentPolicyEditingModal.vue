@@ -100,8 +100,12 @@ const isUpdateMode = computed(() => {
 
 const modalTitle = computed(() => {
   return isUpdateMode.value
-    ? `编辑策略：${props.policy?.spec.displayName}`
-    : `新增策略：${policyTemplate.value?.spec?.displayName}`;
+    ? t("core.attachment.policy_editing_modal.titles.update", {
+        policy: props.policy?.spec.displayName,
+      })
+    : t("core.attachment.policy_editing_modal.titles.create", {
+        policy_template: policyTemplate.value?.spec?.displayName,
+      });
 });
 
 const handleSave = async () => {
@@ -217,7 +221,9 @@ const onVisibleChange = (visible: boolean) => {
       <FormKit
         id="displayNameInput"
         v-model="formState.spec.displayName"
-        label="名称"
+        :label="
+          $t('core.attachment.policy_editing_modal.fields.display_name.label')
+        "
         type="text"
         name="displayName"
         validation="required|length:0,50"

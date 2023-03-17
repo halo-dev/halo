@@ -182,7 +182,7 @@ const handleMove = async (group: Group) => {
     await Promise.all(promises);
     selectedAttachments.value.clear();
 
-    Toast.success("移动成功");
+    Toast.success(t("core.attachment.operations.move.toast_success"));
   } catch (e) {
     console.error(e);
   } finally {
@@ -417,10 +417,14 @@ onMounted(() => {
                       {{ $t("core.universal.buttons.delete") }}
                     </VButton>
                     <VButton @click="selectedAttachments.clear()">
-                      取消选择
+                      {{
+                        $t("core.attachment.operations.deselect_items.button")
+                      }}
                     </VButton>
                     <FloatingDropdown>
-                      <VButton>移动</VButton>
+                      <VButton>
+                        {{ $t("core.attachment.operations.move.button") }}
+                      </VButton>
                       <template #popper>
                         <div class="w-72 p-4">
                           <ul class="space-y-1">
@@ -652,14 +656,18 @@ onMounted(() => {
                           <div
                             class="flex h-full items-center justify-center object-cover"
                           >
-                            <span class="text-xs text-gray-400">加载中...</span>
+                            <span class="text-xs text-gray-400">
+                              {{ $t("core.universal.status.loading") }}...
+                            </span>
                           </div>
                         </template>
                         <template #error>
                           <div
                             class="flex h-full items-center justify-center object-cover"
                           >
-                            <span class="text-xs text-red-400">加载异常</span>
+                            <span class="text-xs text-red-400">
+                              {{ $t("core.universal.status.loading_error") }}
+                            </span>
                           </div>
                         </template>
                       </LazyImage>

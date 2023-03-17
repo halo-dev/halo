@@ -47,7 +47,9 @@ const isUpdateMode = computed(() => {
 });
 
 const modalTitle = computed(() => {
-  return isUpdateMode.value ? "编辑附件分组" : "新增附件分组";
+  return isUpdateMode.value
+    ? t("core.attachment.group_editing_modal.titles.update")
+    : t("core.attachment.group_editing_modal.titles.create");
 });
 
 const handleSave = async () => {
@@ -129,7 +131,9 @@ watch(
       <FormKit
         id="displayNameInput"
         v-model="formState.spec.displayName"
-        label="名称"
+        :label="
+          $t('core.attachment.group_editing_modal.fields.display_name.label')
+        "
         type="text"
         name="displayName"
         validation="required|length:0,50"

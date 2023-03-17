@@ -111,7 +111,9 @@ const handleConfirm = () => {
             v-model:selected="selected"
             @change-provider="onChangeProvider"
           ></component>
-          <template #fallback> 加载中 </template>
+          <template #fallback>
+            {{ $t("core.universal.status.loading") }}
+          </template>
         </Suspense>
       </template>
     </div>

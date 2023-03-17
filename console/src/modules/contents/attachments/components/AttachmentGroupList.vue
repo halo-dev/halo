@@ -45,7 +45,7 @@ const emit = defineEmits<{
 const defaultGroups: Group[] = [
   {
     spec: {
-      displayName: "全部",
+      displayName: t("core.attachment.group_list.internal_groups.all"),
     },
     apiVersion: "",
     kind: "",
@@ -55,7 +55,7 @@ const defaultGroups: Group[] = [
   },
   {
     spec: {
-      displayName: "未分组",
+      displayName: t("core.attachment.group_list.internal_groups.ungrouped"),
     },
     apiVersion: "",
     kind: "",
@@ -94,8 +94,8 @@ const onEditingModalClose = () => {
 
 const handleDelete = (group: Group) => {
   Dialog.warning({
-    title: "确定要删除该分组吗？",
-    description: "将删除分组，并将分组下的附件移动至未分组，该操作不可恢复。",
+    title: t("core.attachment.group_list.operations.delete.title"),
+    description: t("core.attachment.group_list.operations.delete.title"),
     confirmType: "danger",
     confirmText: t("core.universal.buttons.confirm"),
     cancelText: t("core.universal.buttons.cancel"),
@@ -128,15 +128,23 @@ const handleDelete = (group: Group) => {
       emit("reload-attachments");
       emit("update");
 
-      Toast.success(`删除成功，${data.total} 个附件已移动至未分组`);
+      Toast.success(
+        t("core.attachment.group_list.operations.delete.toast_success", {
+          total: data.total,
+        })
+      );
     },
   });
 };
 
 const handleDeleteWithAttachments = (group: Group) => {
   Dialog.warning({
-    title: "确定要删除该分组吗？",
-    description: "将删除分组以及分组下的所有附件，该操作不可恢复。",
+    title: t(
+      "core.attachment.group_list.operations.delete_with_attachments.title"
+    ),
+    description: t(
+      "core.attachment.group_list.operations.delete_with_attachments.description"
+    ),
     confirmType: "danger",
     confirmText: t("core.universal.buttons.confirm"),
     cancelText: t("core.universal.buttons.cancel"),
@@ -164,7 +172,12 @@ const handleDeleteWithAttachments = (group: Group) => {
       emit("reload-attachments");
       emit("update");
 
-      Toast.success(`删除成功，${data.total} 个附件已被同时删除`);
+      Toast.success(
+        t(
+          "core.attachment.group_list.operations.delete_with_attachments.toast_success",
+          { total: data.total }
+        )
+      );
     },
   });
 };
@@ -256,7 +269,7 @@ onMounted(async () => {
                 type="secondary"
                 @click="handleOpenEditingModal(group)"
               >
-                重命名
+                {{ $t("core.attachment.group_list.operations.rename.button") }}
               </VButton>
               <FloatingDropdown
                 class="w-full"
@@ -276,7 +289,11 @@ onMounted(async () => {
                         size="sm"
                         @click="handleDelete(group)"
                       >
-                        删除并将附件移动至未分组
+                        {{
+                          $t(
+                            "core.attachment.group_list.operations.delete.button"
+                          )
+                        }}
                       </VButton>
                       <VButton
                         v-close-popper.all
@@ -285,7 +302,11 @@ onMounted(async () => {
                         size="sm"
                         @click="handleDeleteWithAttachments(group)"
                       >
-                        删除并同时删除附件
+                        {{
+                          $t(
+                            "core.attachment.group_list.operations.delete_with_attachments.button"
+                          )
+                        }}
                       </VButton>
                     </VSpace>
                   </div>
@@ -303,7 +324,9 @@ onMounted(async () => {
       @click="editingModal = true"
     >
       <div class="flex flex-1 items-center truncate">
-        <span class="truncate text-sm">添加分组</span>
+        <span class="truncate text-sm">
+          {{ $t("core.attachment.group_list.operations.new.button") }}
+        </span>
       </div>
       <IconAddCircle />
     </div>

@@ -271,6 +271,12 @@ core:
       message: The current group has no attachments, you can try refreshing or uploading attachments.
       actions:
         upload: Upload Attachment
+    operations:
+      deselect_items:
+        button: Deselect items
+      move:
+        button: Move
+        toast_success: Move successful
     filters:
       storage_policy:
         label: Storage Policy
@@ -288,6 +294,72 @@ core:
         items:
           grid: Grid Mode
           list: List Mode
+    detail_modal:
+      title: "Attachment: {display_name}"
+      fields:
+        preview: Preview
+        storage_policy: Storage policy
+        group: Group
+        display_name: Display name
+        media_type: Media type
+        size: Size
+        owner: Owner
+        creation_time: Creation time
+        permalink: Permalink
+      preview:
+        click_to_exit: Click to exit preview
+        video_not_support: The current browser does not support video playback.
+        audio_not_support: The current browser does not support audio playback.
+        not_support: This file does not support preview.
+    group_editing_modal:
+      titles:
+        create: Create attachment group
+        update: Update attachment group
+      fields:
+        display_name:
+          label: Display name
+    group_list:
+      internal_groups:
+        all: All
+        ungrouped: Ungrouped
+      operations:
+        new:
+          button: New
+        rename:
+          button: Rename
+        delete:
+          button: And move attachment to ungrouped
+          title: Are you sure you want to delete this group?
+          description: The group will be deleted, and the attachments under the group will be moved to ungrouped. This operation cannot be undone.
+          toast_success: Deletion successful, {total} attachments have been moved to ungrouped.
+        delete_with_attachments:
+          button: Also delete attachments
+          title: Are you sure you want to delete this group?
+          description: Deleting the group and all attachments within it, this action cannot be undone.
+          toast_success: Deletion successful, {total} attachments have been deleted simultaneously.
+    policies_modal:
+      title: Storage Policies
+      empty:
+        title: There is currently no available storage strategy.
+        message: There are no available storage policies at the moment. You can try refreshing or creating a new policy.
+        actions:
+          new: New policy
+      operations:
+        new:
+          button: Add storage policy
+        delete:
+          title: Are you sure you want to delete this policy?
+          description: There are no uploaded attachments under the current policy.
+        can_not_delete:
+          title: Deletion failed
+          description: There are attachments under this policy, which cannot be deleted.
+    policy_editing_modal:
+      titles:
+        create: "New policy: {policy_template}"
+        update: "Edit policy: {policy}"
+      fields:
+        display_name:
+          label: Display name
   theme:
     universal:
       buttons:

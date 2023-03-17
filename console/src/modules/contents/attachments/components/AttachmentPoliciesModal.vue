@@ -81,8 +81,12 @@ const handleDelete = async (policy: Policy) => {
 
   if (data.total > 0) {
     Dialog.warning({
-      title: "删除失败",
-      description: "该策略下存在附件，无法删除。",
+      title: t(
+        "core.attachment.policies_modal.operations.can_not_delete.title"
+      ),
+      description: t(
+        "core.attachment.policies_modal.operations.can_not_delete.description"
+      ),
       confirmText: t("core.universal.buttons.confirm"),
       cancelText: t("core.universal.buttons.cancel"),
     });
@@ -90,8 +94,10 @@ const handleDelete = async (policy: Policy) => {
   }
 
   Dialog.warning({
-    title: "确定要删除该策略吗？",
-    description: "当前策略下没有已上传的附件。",
+    title: t("core.attachment.policies_modal.operations.delete.title"),
+    description: t(
+      "core.attachment.policies_modal.operations.delete.description"
+    ),
     confirmText: t("core.universal.buttons.confirm"),
     cancelText: t("core.universal.buttons.cancel"),
     onConfirm: async () => {
@@ -114,14 +120,16 @@ const onEditingModalClose = () => {
   <VModal
     :visible="visible"
     :width="750"
-    title="存储策略"
+    :title="$t('core.attachment.policies_modal.title')"
     :body-class="['!p-0']"
     :layer-closable="true"
     @update:visible="onVisibleChange"
   >
     <template #actions>
       <FloatingDropdown>
-        <span v-tooltip="`添加存储策略`">
+        <span
+          v-tooltip="$t('core.attachment.policies_modal.operations.new.button')"
+        >
           <IconAddCircle />
         </span>
         <template #popper>
@@ -145,8 +153,8 @@ const onEditingModalClose = () => {
     </template>
     <VEmpty
       v-if="!policies?.length && !isLoading"
-      message="当前没有可用的存储策略，你可以尝试刷新或者新建策略"
-      title="当前没有可用的存储策略"
+      :message="$t('core.attachment.policies_modal.empty.message')"
+      :title="$t('core.attachment.policies_modal.empty.title')"
     >
       <template #actions>
         <VSpace>
@@ -158,7 +166,7 @@ const onEditingModalClose = () => {
               <template #icon>
                 <IconAddCircle class="h-full w-full" />
               </template>
-              新建策略
+              {{ $t("core.attachment.policies_modal.empty.actions.new") }}
             </VButton>
             <template #popper>
               <div class="w-72 p-4">

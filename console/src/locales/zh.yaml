@@ -271,6 +271,12 @@ core:
       message: 当前分组没有附件，你可以尝试刷新或者上传附件
       actions:
         upload: 上传附件
+    operations:
+      deselect_items:
+        button: 取消选择
+      move:
+        button: 移动
+        toast_success: 移动成功
     filters:
       storage_policy:
         label: 存储策略
@@ -288,6 +294,72 @@ core:
         items:
           grid: 网格模式
           list: 列表模式
+    detail_modal:
+      title: 附件：{display_name}
+      fields:
+        preview: 预览
+        storage_policy: 存储策略
+        group: 所在分组
+        display_name: 文件名称
+        media_type: 文件类型
+        size: 文件大小
+        owner: 上传者
+        creation_time: 上传时间
+        permalink: 原始链接
+      preview:
+        click_to_exit: 点击退出预览
+        video_not_support: 当前浏览器不支持该视频播放
+        audio_not_support: 当前浏览器不支持该音频播放
+        not_support: 此文件不支持预览
+    group_editing_modal:
+      titles:
+        create: 新增附件分组
+        update: 编辑附件分组
+      fields:
+        display_name:
+          label: 名称
+    group_list:
+      internal_groups:
+        all: 全部
+        ungrouped: 未分组
+      operations:
+        new:
+          button: 添加分组
+        rename:
+          button: 重命名
+        delete:
+          button: 删除并将附件移动至未分组
+          title: 确定要删除该分组吗？
+          description: 将删除分组，并将分组下的附件移动至未分组，该操作不可恢复。
+          toast_success: 删除成功，{total} 个附件已移动至未分组
+        delete_with_attachments:
+          button: 删除并同时删除附件
+          title: 确定要删除该分组吗？
+          description: 将删除分组以及分组下的所有附件，该操作不可恢复。
+          toast_success: 删除成功，{total} 个附件已被同时删除
+    policies_modal:
+      title: 存储策略
+      empty:
+        title: 当前没有可用的存储策略
+        message: 当前没有可用的存储策略，你可以尝试刷新或者新建策略
+        actions:
+          new: 新建策略
+      operations:
+        new:
+          button: 添加存储策略
+        delete:
+          title: 确定要删除该策略吗？
+          description: 当前策略下没有已上传的附件。
+        can_not_delete:
+          title: 删除失败
+          description: 该策略下存在附件，无法删除。
+    policy_editing_modal:
+      titles:
+        create: 新增策略：{policy_template}
+        update: 编辑策略：{policy}
+      fields:
+        display_name:
+          label: 名称
   theme:
     universal:
       buttons:
