@@ -41,6 +41,7 @@ const { data: authProvider } = useQuery<AuthProvider>({
     return data;
   },
   refetchOnWindowFocus: false,
+  enabled: computed(() => !!route.params.name),
 });
 
 // setting
@@ -55,28 +56,57 @@ const { data: setting, refetch: handleFetchSettings } = useQuery<Setting>({
     authProvider.value?.spec.settingRef?.name,
   ],
   queryFn: async () => {
-    const { data } = await apiClient.extension.setting.getv1alpha1Setting({
-      name: authProvider.value?.spec.settingRef?.name as string,
-    });
+    const { data } = await apiClient.extension.setting.getv1alpha1Setting(
+      {
+        name: authProvider.value?.spec.settingRef?.name as string,
+      },
+      {
+        mute: true,
+      }
+    );
     return data;
   },
   refetchOnWindowFocus: false,
   enabled: computed(() => !!authProvider.value?.spec.settingRef?.name),
 });
 
-const { data: configMap } = useQuery({
+const { data: configMap, refetch: handleFetchConfigMap } = useQuery({
   queryKey: [
     "auth-provider-configMap",
-    authProvider.value?.spec.configMapKeyRef?.key,
+    authProvider.value?.spec.configMapRef?.name,
   ],
   queryFn: async () => {
-    const { data } = await apiClient.extension.configMap.getv1alpha1ConfigMap({
-      name: authProvider.value?.spec.configMapKeyRef?.name as string,
-    });
+    const { data } = await apiClient.extension.configMap.getv1alpha1ConfigMap(
+      {
+        name: authProvider.value?.spec.configMapRef?.name as string,
+      },
+      {
+        mute: true,
+      }
+    );
     return data;
   },
+  retry: 0,
   refetchOnWindowFocus: false,
-  enabled: computed(() => !!authProvider.value?.spec.configMapKeyRef?.key),
+  onError: async () => {
+    const data = {};
+    data[group.value] = "";
+    await apiClient.extension.configMap.createv1alpha1ConfigMap({
+      configMap: {
+        apiVersion: "v1alpha1",
+        data: data,
+        kind: "ConfigMap",
+        metadata: {
+          name: authProvider.value?.spec.configMapRef?.name as string,
+        },
+      },
+    });
+
+    await handleFetchConfigMap();
+  },
+  enabled: computed(
+    () => !!authProvider.value?.spec.configMapRef?.name && !!setting.value
+  ),
 });
 
 const { configMapFormData, formSchema, convertToSave } = useSettingFormConvert(
@@ -95,7 +125,7 @@ const handleSaveConfigMap = async () => {
 
   const { data: newConfigMap } =
     await apiClient.extension.configMap.updatev1alpha1ConfigMap({
-      name: authProvider.value.spec.configMapKeyRef?.name as string,
+      name: authProvider.value.spec.configMapRef?.name as string,
       configMap: configMapToUpdate,
     });
 

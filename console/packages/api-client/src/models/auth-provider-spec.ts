@@ -14,7 +14,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ConfigMapKeyRef } from "./config-map-key-ref";
+import { ClientRegistration } from "./client-registration";
+// May contain unused imports in some cases
+// @ts-ignore
+import { ConfigMapRef } from "./config-map-ref";
 // May contain unused imports in some cases
 // @ts-ignore
 import { SettingRef } from "./setting-ref";
@@ -33,10 +36,22 @@ export interface AuthProviderSpec {
   authenticationUrl: string;
   /**
    *
-   * @type {ConfigMapKeyRef}
+   * @type {string}
    * @memberof AuthProviderSpec
    */
-  configMapKeyRef?: ConfigMapKeyRef;
+  bindingUrl?: string;
+  /**
+   *
+   * @type {ClientRegistration}
+   * @memberof AuthProviderSpec
+   */
+  clientRegistration: ClientRegistration;
+  /**
+   *
+   * @type {ConfigMapRef}
+   * @memberof AuthProviderSpec
+   */
+  configMapRef?: ConfigMapRef;
   /**
    *
    * @type {string}
@@ -73,6 +88,12 @@ export interface AuthProviderSpec {
    * @memberof AuthProviderSpec
    */
   settingRef?: SettingRef;
+  /**
+   *
+   * @type {string}
+   * @memberof AuthProviderSpec
+   */
+  unbindUrl?: string;
   /**
    *
    * @type {string}

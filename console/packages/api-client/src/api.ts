@@ -13,6 +13,7 @@
  */
 
 export * from "./api/api-console-halo-run-v1alpha1-attachment-api";
+export * from "./api/api-console-halo-run-v1alpha1-auth-provider-api";
 export * from "./api/api-console-halo-run-v1alpha1-comment-api";
 export * from "./api/api-console-halo-run-v1alpha1-indices-api";
 export * from "./api/api-console-halo-run-v1alpha1-plugin-api";

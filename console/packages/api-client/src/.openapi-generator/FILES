@@ -2,6 +2,7 @@
 .npmignore
 api.ts
 api/api-console-halo-run-v1alpha1-attachment-api.ts
+api/api-console-halo-run-v1alpha1-auth-provider-api.ts
 api/api-console-halo-run-v1alpha1-comment-api.ts
 api/api-console-halo-run-v1alpha1-indices-api.ts
 api/api-console-halo-run-v1alpha1-plugin-api.ts
@@ -65,6 +66,7 @@ models/category-spec.ts
 models/category-status.ts
 models/category.ts
 models/change-password-request.ts
+models/client-registration.ts
 models/comment-email-owner.ts
 models/comment-list.ts
 models/comment-owner.ts
@@ -77,8 +79,8 @@ models/comment-vo-list.ts
 models/comment-vo.ts
 models/comment.ts
 models/condition.ts
-models/config-map-key-ref.ts
 models/config-map-list.ts
+models/config-map-ref.ts
 models/config-map.ts
 models/content-wrapper.ts
 models/content.ts
@@ -106,6 +108,7 @@ models/group-status.ts
 models/group.ts
 models/index.ts
 models/license.ts
+models/listed-auth-provider.ts
 models/listed-comment-list.ts
 models/listed-comment.ts
 models/listed-post-list.ts
