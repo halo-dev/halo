@@ -123,16 +123,15 @@ const handleSaveConfigMap = async () => {
     return;
   }
 
-  const { data: newConfigMap } =
-    await apiClient.extension.configMap.updatev1alpha1ConfigMap({
-      name: authProvider.value.spec.configMapRef?.name as string,
-      configMap: configMapToUpdate,
-    });
+  await apiClient.extension.configMap.updatev1alpha1ConfigMap({
+    name: authProvider.value.spec.configMapRef?.name as string,
+    configMap: configMapToUpdate,
+  });
 
   Toast.success("保存成功");
 
   await handleFetchSettings();
-  configMap.value = newConfigMap;
+  await handleFetchConfigMap();
   saving.value = false;
 };
 </script>
