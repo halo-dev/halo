@@ -21,8 +21,11 @@ import {
 } from "@/modules/system/roles/composables/use-role";
 import { useUserFetch } from "@/modules/system/users/composables/use-user";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
+import { useI18n } from "vue-i18n";
+import { formatDatetime } from "@/utils/date";
 
 const route = useRoute();
+const { t } = useI18n();
 
 const tabActiveId = ref("detail");
 
@@ -45,14 +48,16 @@ const isSuperRole = computed(() => {
 
 const getRoleCountText = computed(() => {
   if (formState.value.metadata.name === SUPER_ROLE_NAME) {
-    return `包含所有权限`;
+    return t("core.role.universal.text.contains_all_permissions");
   }
 
   const dependenciesCount = JSON.parse(
     formState.value.metadata.annotations?.[rbacAnnotations.DEPENDENCIES] || "[]"
   ).length;
 
-  return `包含 ${dependenciesCount} 个权限`;
+  return t("core.role.universal.text.contains_n_permissions", {
+    count: dependenciesCount,
+  });
 });
 
 watch(
@@ -93,10 +98,13 @@ onMounted(() => {
 </script>
 <template>
   <VPageHeader
-    :title="`角色：${
-      formState.metadata?.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
-      formState.metadata?.name
-    }`"
+    :title="
+      $t('core.role.detail.title', {
+        role:
+          formState.metadata?.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
+          formState.metadata?.name,
+      })
+    "
   >
     <template #icon>
       <IconShieldUser class="mr-2 self-center" />
@@ -108,8 +116,11 @@ onMounted(() => {
         <VTabbar
           v-model:active-id="tabActiveId"
           :items="[
-            { id: 'detail', label: '详情' },
-            { id: 'permissions', label: '权限设置' },
+            { id: 'detail', label: $t('core.role.detail.tabs.detail') },
+            {
+              id: 'permissions',
+              label: $t('core.role.detail.tabs.permissions'),
+            },
           ]"
           class="w-full !rounded-none"
           type="outline"
@@ -117,7 +128,9 @@ onMounted(() => {
       </template>
       <div v-if="tabActiveId === 'detail'">
         <div class="px-4 py-4 sm:px-6">
-          <h3 class="text-lg font-medium leading-6 text-gray-900">权限信息</h3>
+          <h3 class="text-lg font-medium leading-6 text-gray-900">
+            {{ $t("core.role.detail.header.title") }}
+          </h3>
           <p
             class="mt-1 flex max-w-2xl items-center gap-2 text-sm text-gray-500"
           >
@@ -129,7 +142,9 @@ onMounted(() => {
             <div
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">名称</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{ $t("core.role.detail.fields.display_name") }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 {{
                   formState.metadata?.annotations?.[
@@ -141,7 +156,9 @@ onMounted(() => {
             <div
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">别名</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{ $t("core.role.detail.fields.name") }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 {{ formState.metadata?.name }}
               </dd>
@@ -149,26 +166,27 @@ onMounted(() => {
             <div
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">类型</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{ $t("core.role.detail.fields.type") }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                <VTag> {{ isSystemReserved ? "系统保留" : "自定义" }} </VTag>
+                <VTag>
+                  {{
+                    isSystemReserved
+                      ? t("core.role.universal.text.system_reserved")
+                      : t("core.role.universal.text.custom")
+                  }}
+                </VTag>
               </dd>
             </div>
             <div
-              v-if="false"
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">描述</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{ $t("core.role.detail.fields.creation_time") }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                超级管理员
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">创建时间</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ formState.metadata?.creationTimestamp }}
+                {{ formatDatetime(formState.metadata.creationTimestamp) }}
               </dd>
             </div>
             <!-- TODO: 支持通过当前角色查询用户 -->
@@ -234,8 +252,12 @@ onMounted(() => {
       <div v-if="tabActiveId === 'permissions'">
         <div v-if="isSystemReserved" class="px-4 py-5">
           <VAlert
-            title="提示"
-            description="系统保留的角色不支持修改，推荐基于此角色创建一个新的角色。"
+            :title="$t('core.universal.text.tip')"
+            :description="
+              $t(
+                'core.role.permissions_detail.system_reserved_alert.description'
+              )
+            "
             class="w-full sm:w-1/4"
           />
         </div>
@@ -320,17 +342,18 @@ onMounted(() => {
                           "
                           class="text-xs text-gray-400"
                         >
-                          依赖于
                           {{
-                            JSON.parse(
-                              role.metadata.annotations?.[
-                                rbacAnnotations.DEPENDENCIES
-                              ]
-                            )
-                              .map((item: string) =>
-                                $t(`core.rbac.${item}`, item as string)
+                            $t("core.role.universal.text.dependent_on", {
+                              roles: JSON.parse(
+                                role.metadata.annotations?.[
+                                  rbacAnnotations.DEPENDENCIES
+                                ]
                               )
-                              .join("，")
+                                .map((item: string) =>
+                                  $t(`core.rbac.${item}`, item as string)
+                                )
+                                .join("，"),
+                            })
                           }}
                         </span>
                       </div>

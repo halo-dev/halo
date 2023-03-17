@@ -495,6 +495,47 @@ core:
         roles: 角色
         bio: 描述
         creation_time: 注册时间
+  role:
+    title: 角色
+    universal:
+      text:
+        contains_all_permissions: 包含所有权限
+        contains_n_permissions: 包含 {count} 个权限
+        system_reserved: 系统保留
+        custom: 自定义
+        dependent_on: 依赖于 {roles}
+    actions:
+      new: 新建角色
+    operations:
+      delete:
+        title: 确定要删除该角色吗？
+        description: 该角色删除后，相关联的用户将被删除角色绑定，该操作不可恢复
+      create_based_on_this_role:
+        button: 基于此角色创建
+    detail:
+      title: 角色：{role}
+      header:
+        title: 角色信息
+      tabs:
+        detail: 详情
+        permissions: 权限设置
+      fields:
+        display_name: 名称
+        name: 别名
+        type: 类型
+        creation_time: 创建时间
+    permissions_detail:
+      system_reserved_alert:
+        description: 系统保留的角色不支持修改，推荐基于此角色创建一个新的角色。
+    editing_modal:
+      titles:
+        create: 创建角色
+        update: 编辑角色
+      groups:
+        general: 基本信息
+        permissions: 权限
+      fields:
+        display_name: 名称
   setting:
     title: 设置
   actuator:
@@ -619,3 +660,4 @@ core:
       uninstalled: 未安装
     text:
       none: 无
+      tip: 提示
