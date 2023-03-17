@@ -49,6 +49,10 @@ public class AuthProvider extends AbstractExtension {
         @Schema(requiredMode = REQUIRED, description = "Authentication url of the auth provider")
         private String authenticationUrl;
 
+        private String bindingUrl;
+
+        private String unbindUrl;
+
         @Schema(requiredMode = REQUIRED)
         private ClientRegistration clientRegistration;
 
