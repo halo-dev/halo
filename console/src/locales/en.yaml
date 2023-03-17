@@ -422,10 +422,72 @@ core:
     universal:
       buttons:
         new: New User
+    actions:
+      roles: Roles
     empty:
       title: There are no users that meet the filtering criteria currently.
       message: There are no users that match the filtering criteria at present. You can try refreshing or creating a new user.
+    operations:
+      delete:
+        title: Are you sure you want to delete this user?
+      delete_in_batch:
+        title: Are you sure you want to delete the selected users?
+      update_profile:
+        title: Update profile
+      change_password:
+        title: Change password
+      grant_permission:
+        title: Grant permission
+    filters:
+      role:
+        label: Role
+        result: "Role: {role}"
+      sort:
+        items:
+          create_time_desc: Latest Created
+          create_time_asc: Earliest Created
+    editing_modal:
+      titles:
+        update: Edit User
+        create: Create User
+      groups:
+        general: General
+        annotations: Annotations
+      fields:
+        username:
+          label: Username
+          validation: Please enter a valid username.
+        display_name:
+          label: Display name
+        email:
+          label: Email
+        phone:
+          label: Phone
+        avatar:
+          label: Avatar
+        bio:
+          label: Bio
+    change_password_modal:
+      title: Change password
+      fields:
+        new_password:
+          label: New password
+        confirm_password:
+          label: Confirm password
+    grant_permission_modal:
+      title: Grant permission
+      fields:
+        role:
+          label: Role
+          placeholder: Please select a role
     detail:
+      tabs:
+        detail: Detail
+      actions:
+        update_profile:
+          title: Update profile
+        change_password:
+          title: Change password
       fields:
         display_name: Display name
         username: Username
@@ -555,3 +617,5 @@ core:
       inactivated: Inactivated
       installed: Installed
       uninstalled: Uninstalled
+    text:
+      none: None

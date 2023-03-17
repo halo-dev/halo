@@ -129,7 +129,7 @@ const handlePaginationChange = async ({
 
 const handleDelete = async (user: User) => {
   Dialog.warning({
-    title: "确定要删除该用户吗？",
+    title: t("core.user.operations.delete.title"),
     description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
     confirmText: t("core.universal.buttons.confirm"),
@@ -152,7 +152,7 @@ const handleDelete = async (user: User) => {
 
 const handleDeleteInBatch = async () => {
   Dialog.warning({
-    title: "确定要删除选中的用户吗？",
+    title: t("core.user.operations.delete_in_batch.title"),
     description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
     confirmText: t("core.universal.buttons.confirm"),
@@ -260,11 +260,11 @@ interface SortItem {
 
 const SortItems: SortItem[] = [
   {
-    label: "较近创建",
+    label: t("core.user.filters.sort.items.create_time_desc"),
     value: "creationTimestamp,desc",
   },
   {
-    label: "较早创建",
+    label: t("core.user.filters.sort.items.create_time_asc"),
     value: "creationTimestamp,asc",
   },
 ];
@@ -329,7 +329,7 @@ const hasFilters = computed(() => {
           <template #icon>
             <IconUserFollow class="h-full w-full" />
           </template>
-          角色管理
+          {{ $t("core.user.actions.roles") }}
         </VButton>
         <VButton
           v-permission="['system:users:manage']"
@@ -387,10 +387,13 @@ const hasFilters = computed(() => {
                 </FilterTag>
 
                 <FilterTag v-if="selectedRole" @close="handleRoleChange()">
-                  角色：{{
-                    selectedRole.metadata.annotations?.[
-                      rbacAnnotations.DISPLAY_NAME
-                    ] || selectedRole.metadata.name
+                  {{
+                    $t("core.user.filters.role.result", {
+                      role:
+                        selectedRole.metadata.annotations?.[
+                          rbacAnnotations.DISPLAY_NAME
+                        ] || selectedRole.metadata.name,
+                    })
                   }}
                 </FilterTag>
 
@@ -422,7 +425,9 @@ const hasFilters = computed(() => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">角色</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.user.filters.role.label") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -604,14 +609,14 @@ const hasFilters = computed(() => {
                   type="secondary"
                   @click="handleOpenCreateModal(user.user)"
                 >
-                  修改资料
+                  {{ $t("core.user.operations.update_profile.title") }}
                 </VButton>
                 <VButton
                   v-close-popper
                   block
                   @click="handleOpenPasswordChangeModal(user.user)"
                 >
-                  修改密码
+                  {{ $t("core.user.operations.change_password.title") }}
                 </VButton>
                 <VButton
                   v-if="
@@ -622,7 +627,7 @@ const hasFilters = computed(() => {
                   block
                   @click="handleOpenGrantPermissionModal(user.user)"
                 >
-                  分配角色
+                  {{ $t("core.user.operations.grant_permission.title") }}
                 </VButton>
                 <VButton
                   v-if="

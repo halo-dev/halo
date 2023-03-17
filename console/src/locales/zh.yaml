@@ -422,10 +422,72 @@ core:
     universal:
       buttons:
         new: 新建用户
+    actions:
+      roles: 角色管理
     empty:
       title: 当前没有符合筛选条件的用户
       message: 当前没有符合筛选条件的用户，你可以尝试刷新或者创建新用户
+    operations:
+      delete:
+        title: 确定要删除该用户吗？
+      delete_in_batch:
+        title: 确定要删除选中的用户吗？
+      update_profile:
+        title: 修改资料
+      change_password:
+        title: 修改密码
+      grant_permission:
+        title: 分配角色
+    filters:
+      role:
+        label: 角色
+        result: 角色：{role}
+      sort:
+        items:
+          create_time_desc: 较近创建
+          create_time_asc: 较早创建
+    editing_modal:
+      titles:
+        update: 编辑用户
+        create: 新增用户
+      groups:
+        general: 常规
+        annotations: 元数据
+      fields:
+        username:
+          label: 用户名
+          validation: 请输入有效的用户名
+        display_name:
+          label: 显示名称
+        email:
+          label: 电子邮箱
+        phone:
+          label: 手机号
+        avatar:
+          label: 头像
+        bio:
+          label: 描述
+    change_password_modal:
+      title: 密码修改
+      fields:
+        new_password:
+          label: 新密码
+        confirm_password:
+          label: 确认密码
+    grant_permission_modal:
+      title: 分配角色
+      fields:
+        role:
+          label: 角色
+          placeholder: 请选择角色
     detail:
+      tabs:
+        detail: 详情
+      actions:
+        update_profile:
+          title: 修改资料
+        change_password:
+          title: 修改密码
       fields:
         display_name: 显示名称
         username: 用户名
@@ -555,3 +617,5 @@ core:
       inactivated: 未启用
       installed: 已安装
       uninstalled: 未安装
+    text:
+      none: 无

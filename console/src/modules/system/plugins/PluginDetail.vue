@@ -132,7 +132,9 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
               >
                 {{ plugin?.spec.author.name }}
               </a>
-              <span v-else>无</span>
+              <span v-else>
+                {{ $t("core.universal.text.none") }}
+              </span>
             </dd>
           </div>
           <div
@@ -168,7 +170,9 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
           >
             <dt class="text-sm font-medium text-gray-900">模型定义</dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              <span>无</span>
+              <span>
+                {{ $t("core.universal.text.none") }}
+              </span>
             </dd>
           </div>
           <div
@@ -231,7 +235,9 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
                   </dd>
                 </div>
               </dl>
-              <span v-else>无</span>
+              <span v-else>
+                {{ $t("core.universal.text.none") }}
+              </span>
             </dd>
           </div>
           <div
