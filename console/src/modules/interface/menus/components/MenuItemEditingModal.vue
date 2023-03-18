@@ -58,7 +58,9 @@ const isUpdateMode = computed(() => {
 });
 
 const modalTitle = computed(() => {
-  return isUpdateMode.value ? "编辑菜单项" : "新增菜单项";
+  return isUpdateMode.value
+    ? t("core.menu.menu_item_editing_modal.titles.update")
+    : t("core.menu.menu_item_editing_modal.titles.create");
 });
 
 const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
@@ -205,10 +207,12 @@ const baseRef: Ref = {
 
 const menuItemRefs: MenuItemRef[] = [
   {
-    label: "自定义链接",
+    label: t(
+      "core.menu.menu_item_editing_modal.fields.ref_kind.options.custom"
+    ),
   },
   {
-    label: "文章",
+    label: t("core.menu.menu_item_editing_modal.fields.ref_kind.options.post"),
     inputType: "postSelect",
     ref: {
       ...baseRef,
@@ -216,7 +220,9 @@ const menuItemRefs: MenuItemRef[] = [
     },
   },
   {
-    label: "自定义页面",
+    label: t(
+      "core.menu.menu_item_editing_modal.fields.ref_kind.options.single_page"
+    ),
     inputType: "singlePageSelect",
     ref: {
       ...baseRef,
@@ -224,7 +230,9 @@ const menuItemRefs: MenuItemRef[] = [
     },
   },
   {
-    label: "分类",
+    label: t(
+      "core.menu.menu_item_editing_modal.fields.ref_kind.options.category"
+    ),
     inputType: "categorySelect",
     ref: {
       ...baseRef,
@@ -232,7 +240,7 @@ const menuItemRefs: MenuItemRef[] = [
     },
   },
   {
-    label: "标签",
+    label: t("core.menu.menu_item_editing_modal.fields.ref_kind.options.tag"),
     inputType: "tagSelect",
     ref: {
       ...baseRef,
@@ -280,15 +288,23 @@ const onMenuItemSourceChange = () => {
         <div class="md:grid md:grid-cols-4 md:gap-6">
           <div class="md:col-span-1">
             <div class="sticky top-0">
-              <span class="text-base font-medium text-gray-900"> 常规 </span>
+              <span class="text-base font-medium text-gray-900">
+                {{ $t("core.menu.menu_item_editing_modal.groups.general") }}
+              </span>
             </div>
           </div>
           <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
             <FormKit
               v-if="!isUpdateMode && menu && visible"
               v-model="selectedParentMenuItem"
-              label="上级菜单项"
-              placeholder="选择上级菜单项"
+              :label="
+                $t('core.menu.menu_item_editing_modal.fields.parent.label')
+              "
+              :placeholder="
+                $t(
+                  'core.menu.menu_item_editing_modal.fields.parent.placeholder'
+                )
+              "
               type="menuItemSelect"
               :menu-items="menu?.spec.menuItems || []"
             />
@@ -297,7 +313,9 @@ const onMenuItemSourceChange = () => {
               v-model="selectedRefKind"
               :options="menuItemRefsMap"
               :disabled="isUpdateMode"
-              label="类型"
+              :label="
+                $t('core.menu.menu_item_editing_modal.fields.ref_kind.label')
+              "
               type="select"
               @change="onMenuItemSourceChange"
             />
@@ -306,7 +324,11 @@ const onMenuItemSourceChange = () => {
               v-if="!selectedRefKind"
               id="displayNameInput"
               v-model="formState.spec.displayName"
-              label="名称"
+              :label="
+                $t(
+                  'core.menu.menu_item_editing_modal.fields.display_name.label'
+                )
+              "
               type="text"
               name="displayName"
               validation="required|length:0,100"
@@ -315,7 +337,7 @@ const onMenuItemSourceChange = () => {
             <FormKit
               v-if="!selectedRefKind"
               v-model="formState.spec.href"
-              label="链接地址"
+              :label="$t('core.menu.menu_item_editing_modal.fields.href.label')"
               type="text"
               name="href"
               validation="required|length:0,1024"
@@ -326,7 +348,12 @@ const onMenuItemSourceChange = () => {
               :id="selectedRef.inputType"
               :key="selectedRef.inputType"
               v-model="selectedRefName"
-              :placeholder="`请选择${selectedRef.label}`"
+              :placeholder="
+                $t(
+                  'core.menu.menu_item_editing_modal.fields.ref_kind.placeholder',
+                  { label: selectedRef.label }
+                )
+              "
               :label="selectedRef.label"
               :type="selectedRef.inputType"
               validation="required"
@@ -334,24 +361,34 @@ const onMenuItemSourceChange = () => {
 
             <FormKit
               v-model="formState.spec.target"
-              label="打开方式"
+              :label="
+                $t('core.menu.menu_item_editing_modal.fields.target.label')
+              "
               type="select"
               name="target"
               :options="[
                 {
-                  label: '当前窗口',
+                  label: $t(
+                    'core.menu.menu_item_editing_modal.fields.target.options.self'
+                  ),
                   value: '_self',
                 },
                 {
-                  label: '新窗口',
+                  label: $t(
+                    'core.menu.menu_item_editing_modal.fields.target.options.blank'
+                  ),
                   value: '_blank',
                 },
                 {
-                  label: '父窗口',
+                  label: $t(
+                    'core.menu.menu_item_editing_modal.fields.target.options.parent'
+                  ),
                   value: '_parent',
                 },
                 {
-                  label: '顶级窗口',
+                  label: $t(
+                    'core.menu.menu_item_editing_modal.fields.target.options.top'
+                  ),
                   value: '_top',
                 },
               ]"
@@ -368,7 +405,9 @@ const onMenuItemSourceChange = () => {
     <div class="md:grid md:grid-cols-4 md:gap-6">
       <div class="md:col-span-1">
         <div class="sticky top-0">
-          <span class="text-base font-medium text-gray-900"> 元数据 </span>
+          <span class="text-base font-medium text-gray-900">
+            {{ $t("core.menu.menu_item_editing_modal.groups.annotations") }}
+          </span>
         </div>
       </div>
       <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">

@@ -49,7 +49,9 @@ const isUpdateMode = computed(() => {
 });
 
 const modalTitle = computed(() => {
-  return isUpdateMode.value ? "编辑菜单" : "新增菜单";
+  return isUpdateMode.value
+    ? t("core.menu.menu_editing_modal.titles.update")
+    : t("core.menu.menu_editing_modal.titles.create");
 });
 
 const handleCreateMenu = async () => {
@@ -127,7 +129,7 @@ watch(
       <FormKit
         id="menuDisplayNameInput"
         v-model="formState.spec.displayName"
-        label="菜单名称"
+        :label="$t('core.menu.menu_editing_modal.fields.display_name.label')"
         type="text"
         name="displayName"
         validation="required|length:0,100"

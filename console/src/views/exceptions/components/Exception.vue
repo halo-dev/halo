@@ -35,7 +35,7 @@ const router = useRouter();
             {{ $t("core.universal.buttons.back") }}
           </VButton>
           <VButton type="secondary" :route="{ name: 'Dashboard' }">
-            仪表盘
+            {{ $t("core.exception.actions.dashboard") }}
           </VButton>
         </VSpace>
       </div>

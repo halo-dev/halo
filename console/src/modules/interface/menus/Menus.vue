@@ -157,8 +157,8 @@ const handleUpdateInBatch = useDebounceFn(async () => {
 
 const handleDelete = async (menuItem: MenuTreeItem) => {
   Dialog.info({
-    title: "确定要删除该菜单项吗？",
-    description: "将同时删除所有子菜单项，删除后将无法恢复",
+    title: t("core.menu.operations.delete_menu_item.title"),
+    description: t("core.menu.operations.delete_menu_item.description"),
     confirmType: "danger",
     confirmText: t("core.universal.buttons.confirm"),
     cancelText: t("core.universal.buttons.cancel"),
@@ -249,7 +249,7 @@ const handleResetMenuItems = async () => {
                       type="default"
                       @click="menuItemEditingModal = true"
                     >
-                      新增
+                      {{ $t("core.universal.buttons.new") }}
                     </VButton>
                   </VSpace>
                 </div>
@@ -259,8 +259,8 @@ const handleResetMenuItems = async () => {
           <VLoading v-if="loading" />
           <Transition v-else-if="!menuItems.length" appear name="fade">
             <VEmpty
-              message="你可以尝试刷新或者新建菜单项"
-              title="当前没有菜单项"
+              :message="$t('core.menu.menu_item_empty.message')"
+              :title="$t('core.menu.menu_item_empty.title')"
             >
               <template #actions>
                 <VSpace>
@@ -275,7 +275,7 @@ const handleResetMenuItems = async () => {
                     <template #icon>
                       <IconAddCircle class="h-full w-full" />
                     </template>
-                    新增菜单项
+                    {{ $t("core.menu.menu_item_empty.actions.new") }}
                   </VButton>
                 </VSpace>
               </template>

@@ -429,6 +429,68 @@ core:
       default: 默认模版
   menu:
     title: 菜单
+    empty:
+      title: 当前没有菜单
+      message: 你可以尝试刷新或者新建菜单
+    menu_item_empty:
+      title: 当前没有菜单项
+      message: 你可以尝试刷新或者新建菜单项
+      actions:
+        new: 新增菜单项
+    operations:
+      set_primary:
+        button: 设置为主菜单
+        toast_success: 设置成功
+      delete_menu:
+        title: 确定要删除该菜单吗？
+        description: 将同时删除该菜单下的所有菜单项，该操作不可恢复。
+      delete_menu_item:
+        title: 确定要删除该菜单项吗？
+        description: 将同时删除所有子菜单项，删除后将无法恢复
+      add_sub_menu_item:
+        button: 新增子菜单项
+    list:
+      fields:
+        primary: 主菜单
+        items_count: "{count} 个菜单项"
+    menu_editing_modal:
+      titles:
+        create: 新增菜单
+        update: 编辑菜单
+      fields:
+        display_name:
+          label: 菜单名称
+    menu_item_editing_modal:
+      titles:
+        create: 新增菜单项
+        update: 编辑菜单项
+      groups:
+        general: 常规
+        annotations: 元数据
+      fields:
+        parent:
+          label: 上级菜单项
+          placeholder: 选择上级菜单项
+        ref_kind:
+          label: 类型
+          placeholder: "请选择{label}"
+          options:
+            custom: 自定义链接
+            post: 文章
+            single_page: 自定义页面
+            category: 分类
+            tag: 标签
+        display_name:
+          label: 名称
+        href:
+          label: 链接地址
+        target:
+          label: 打开方式
+          options:
+            self: 当前窗口
+            blank: 新窗口
+            parent: 父窗口
+            top: 顶级窗口
   plugin:
     title: 插件
     tabs:
@@ -638,6 +700,22 @@ core:
       os: 操作系统：{os}
     alert:
       external_url_invalid: 检测到外部访问地址与当前访问地址不一致，可能会导致部分链接无法正常跳转，请检查外部访问地址设置。
+  exception:
+    not_found:
+      message: 没有找到该页面
+    forbidden:
+      message: 没有权限访问此页面
+    actions:
+      dashboard: 仪表盘
+  setup:
+    operations:
+      submit:
+        button: 初始化
+        toast_success: 初始化成功
+    fields:
+      site_title:
+        placeholder: 站点名称
+        validation: 请输入站点名称
   rbac:
     Attachments Management: 附件
     Attachment Manage: 附件管理

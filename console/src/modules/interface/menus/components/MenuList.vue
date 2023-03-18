@@ -99,8 +99,8 @@ const handleSelect = (menu: Menu) => {
 
 const handleDeleteMenu = async (menu: Menu) => {
   Dialog.warning({
-    title: "确定要删除该菜单吗？",
-    description: "将同时删除该菜单下的所有菜单项，该操作不可恢复。",
+    title: t("core.menu.operations.delete_menu.title"),
+    description: t("core.menu.operations.delete_menu.description"),
     confirmType: "danger",
     confirmText: t("core.universal.buttons.confirm"),
     cancelText: t("core.universal.buttons.cancel"),
@@ -189,7 +189,7 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
   }
   await handleFetchPrimaryMenuName();
 
-  Toast.success("设置成功");
+  Toast.success(t("core.menu.operations.set_primary.toast_success"));
 };
 
 onMounted(handleFetchPrimaryMenuName);
@@ -201,10 +201,13 @@ onMounted(handleFetchPrimaryMenuName);
     @close="handleFetchMenus()"
     @created="handleSelect"
   />
-  <VCard :body-class="['!p-0']" title="菜单">
+  <VCard :body-class="['!p-0']" :title="$t('core.menu.title')">
     <VLoading v-if="loading" />
     <Transition v-else-if="!menus.length" appear name="fade">
-      <VEmpty message="你可以尝试刷新或者新建菜单" title="当前没有菜单">
+      <VEmpty
+        :message="$t('core.menu.empty.message')"
+        :title="$t('core.menu.empty.title')"
+      >
         <template #actions>
           <VSpace>
             <VButton size="sm" @click="handleFetchMenus()">
@@ -227,10 +230,16 @@ onMounted(handleFetchPrimaryMenuName);
             <template #start>
               <VEntityField
                 :title="menu.spec?.displayName"
-                :description="`${menu.spec.menuItems?.length || 0} 个菜单项`"
+                :description="
+                  $t('core.menu.list.fields.items_count', {
+                    count: menu.spec.menuItems?.length || 0,
+                  })
+                "
               >
                 <template v-if="menu.metadata.name === primaryMenuName" #extra>
-                  <VTag>主菜单</VTag>
+                  <VTag>
+                    {{ $t("core.menu.list.fields.primary") }}
+                  </VTag>
                 </template>
               </VEntityField>
             </template>
@@ -255,7 +264,7 @@ onMounted(handleFetchPrimaryMenuName);
                 type="secondary"
                 @click="handleSetPrimaryMenu(menu)"
               >
-                设置为主菜单
+                {{ $t("core.menu.operations.set_primary.button") }}
               </VButton>
               <VButton
                 v-close-popper
@@ -280,7 +289,7 @@ onMounted(handleFetchPrimaryMenuName);
     </Transition>
     <template v-if="currentUserHasPermission(['system:menus:manage'])" #footer>
       <VButton block type="secondary" @click="handleOpenEditingModal()">
-        新增
+        {{ $t("core.universal.buttons.new") }}
       </VButton>
     </template>
   </VCard>
