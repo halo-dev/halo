@@ -22,6 +22,7 @@ const { data: authProviders } = useQuery<ListedAuthProvider[]>({
     return data;
   },
   refetchOnWindowFocus: false,
+  enabled: isCurrentUser,
 });
 
 const handleUnbindAuth = (authProvider: ListedAuthProvider) => {
