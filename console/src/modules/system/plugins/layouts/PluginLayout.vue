@@ -21,7 +21,6 @@ import BasicLayout from "@/layouts/BasicLayout.vue";
 import type { Ref } from "vue";
 import type { Plugin, Setting, SettingForm } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
-import { usePluginLifeCycle } from "../composables/use-plugin";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -54,8 +53,6 @@ const activeTab = ref<string>();
 
 provide<Ref<Plugin | undefined>>("plugin", plugin);
 provide<Ref<string | undefined>>("activeTab", activeTab);
-
-const { isStarted } = usePluginLifeCycle(plugin);
 
 const handleFetchPlugin = async () => {
   try {
