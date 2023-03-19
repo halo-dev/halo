@@ -17,7 +17,7 @@ export default definePlugin({
           name: "ThemeDetail",
           component: ThemeDetail,
           meta: {
-            title: "core.sidebar.menu.items.themes",
+            title: "core.theme.title",
             searchable: true,
             permissions: ["system:themes:view"],
             menu: {

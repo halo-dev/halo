@@ -21,7 +21,7 @@ export default definePlugin({
           name: "SinglePages",
           component: SinglePageList,
           meta: {
-            title: "core.sidebar.menu.items.single_pages",
+            title: "core.page.title",
             searchable: true,
             permissions: ["system:singlepages:view"],
             menu: {
@@ -38,7 +38,7 @@ export default definePlugin({
           name: "DeletedSinglePages",
           component: DeletedSinglePageList,
           meta: {
-            title: "页面回收站",
+            title: "core.deleted_page.title",
             searchable: true,
             permissions: ["system:singlepages:view"],
           },

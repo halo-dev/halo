@@ -325,7 +325,7 @@ onMounted(() => {
           <template #icon>
             <IconUpload class="h-full w-full" />
           </template>
-          {{ $t("core.attachment.actions.upload") }}
+          {{ $t("core.universal.buttons.upload") }}
         </VButton>
       </VSpace>
     </template>

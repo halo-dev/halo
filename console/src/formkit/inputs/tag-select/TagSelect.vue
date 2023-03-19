@@ -285,7 +285,7 @@ const handleDelete = () => {
           @click="handleCreateTag"
         >
           <span class="text-xs text-gray-700 group-hover:text-gray-900">
-            创建 {{ text }} 标签
+            {{ $t("core.formkit.tag_select.creation_label", { text: text }) }}
           </span>
         </li>
         <li

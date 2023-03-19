@@ -8,6 +8,9 @@ import type {
   PluginModule,
 } from "@halo-dev/console-shared";
 import { usePluginModuleStore } from "@/stores/plugin";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 withDefaults(
   defineProps<{
@@ -29,7 +32,7 @@ const selected = ref<AttachmentLike[]>([] as AttachmentLike[]);
 const attachmentSelectProviders = ref<AttachmentSelectProvider[]>([
   {
     id: "core",
-    label: "附件库",
+    label: t("core.attachment.select_modal.providers.default.label"),
     component: markRaw(CoreSelectorProvider),
   },
 ]);
@@ -88,7 +91,7 @@ const handleConfirm = () => {
     :width="1240"
     :mount-to-body="true"
     :layer-closable="true"
-    title="选择附件"
+    :title="$t('core.attachment.select_modal.title')"
     height="calc(100vh - 20px)"
     @update:visible="onVisibleChange"
   >
@@ -119,9 +122,13 @@ const handleConfirm = () => {
     </div>
     <template #footer>
       <VButton type="secondary" @click="handleConfirm">
-        确定
+        {{ $t("core.universal.buttons.confirm") }}
         <span v-if="selected.length">
-          （已选择 {{ selected.length }} 项）
+          {{
+            $t("core.attachment.select_modal.operations.select.result", {
+              count: selected.length,
+            })
+          }}
         </span>
       </VButton>
     </template>

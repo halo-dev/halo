@@ -19,7 +19,7 @@ export default definePlugin({
           name: "Comments",
           component: CommentList,
           meta: {
-            title: "core.sidebar.menu.items.comments",
+            title: "core.comment.title",
             searchable: true,
             permissions: ["system:comments:view"],
             menu: {

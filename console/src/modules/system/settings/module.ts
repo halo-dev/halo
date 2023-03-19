@@ -12,7 +12,7 @@ export default definePlugin({
       component: SystemSettingsLayout,
       redirect: "/settings/basic",
       meta: {
-        title: "core.sidebar.menu.items.settings",
+        title: "core.setting.title",
         permissions: ["system:settings:view"],
         menu: {
           name: "core.sidebar.menu.items.settings",

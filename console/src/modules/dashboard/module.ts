@@ -24,7 +24,7 @@ export default definePlugin({
           name: "Dashboard",
           component: Dashboard,
           meta: {
-            title: "core.sidebar.menu.items.dashboard",
+            title: "core.dashboard.title",
             searchable: true,
             menu: {
               name: "core.sidebar.menu.items.dashboard",

@@ -111,7 +111,7 @@ const handleMoveDown = (index: number) => {
       <template #icon>
         <IconAddCircle class="h-full w-full" />
       </template>
-      添加
+      {{ $t("core.universal.buttons.add") }}
     </VButton>
   </div>
 </template>

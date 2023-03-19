@@ -6,6 +6,9 @@ import { useFavicon } from "@vueuse/core";
 import { useSystemConfigMapStore } from "./stores/system-configmap";
 import { storeToRefs } from "pinia";
 import axios from "axios";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const { configMap } = storeToRefs(useSystemConfigMapStore());
 
@@ -18,7 +21,7 @@ watch(
   () => {
     const { title: routeTitle } = route.meta;
     if (routeTitle) {
-      title.value = `${routeTitle} - ${AppName}`;
+      title.value = `${t(routeTitle)} - ${AppName}`;
       return;
     }
     title.value = AppName;

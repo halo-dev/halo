@@ -791,7 +791,9 @@ watch(selectedPostNames, (newValue) => {
                     <VSpace class="mt-1 sm:mt-0">
                       <RouterLink
                         v-if="post.post.status?.inProgress"
-                        v-tooltip="`当前有内容已保存，但还未发布。`"
+                        v-tooltip="
+                          $t('core.universal.tooltips.unpublished_content_tip')
+                        "
                         :to="{
                           name: 'PostEditor',
                           query: { name: post.post.metadata.name },

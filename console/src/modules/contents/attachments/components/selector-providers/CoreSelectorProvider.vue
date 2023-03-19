@@ -78,13 +78,13 @@ const handleOpenDetail = (attachment: Attachment) => {
       <template #icon>
         <IconUpload class="h-full w-full" />
       </template>
-      上传
+      {{ $t("core.universal.buttons.upload") }}
     </VButton>
   </div>
   <VEmpty
     v-if="!attachments?.length && !isLoading"
-    message="当前没有附件，你可以尝试刷新或者上传附件"
-    title="当前没有附件"
+    :message="$t('core.attachment.empty.message')"
+    :title="$t('core.attachment.empty.title')"
   >
     <template #actions>
       <VSpace>
@@ -95,7 +95,7 @@ const handleOpenDetail = (attachment: Attachment) => {
           <template #icon>
             <IconUpload class="h-full w-full" />
           </template>
-          上传附件
+          {{ $t("core.attachment.empty.actions.upload") }}
         </VButton>
       </VSpace>
     </template>

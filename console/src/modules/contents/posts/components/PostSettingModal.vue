@@ -411,8 +411,11 @@ const { handleGenerateSlug } = useSlugify(
             <FormKit
               v-model="formState.spec.visible"
               :options="[
-                { label: '公开', value: 'PUBLIC' },
-                { label: '私有', value: 'PRIVATE' },
+                { label: $t('core.universal.select.public'), value: 'PUBLIC' },
+                {
+                  label: $t('core.universal.select.private'),
+                  value: 'PRIVATE',
+                },
               ]"
               :label="$t('core.post.settings.fields.visible.label')"
               name="visible"

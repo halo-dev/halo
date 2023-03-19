@@ -15,7 +15,7 @@ export default definePlugin({
           path: "",
           component: Actuator,
           meta: {
-            title: "core.sidebar.menu.items.actuator",
+            title: "core.actuator.title",
             searchable: true,
             menu: {
               name: "core.sidebar.menu.items.actuator",

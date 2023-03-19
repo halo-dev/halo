@@ -26,7 +26,7 @@ export default definePlugin({
           name: "Posts",
           component: PostList,
           meta: {
-            title: "文章",
+            title: "core.post.title",
             searchable: true,
             permissions: ["system:posts:view"],
             menu: {
@@ -43,7 +43,7 @@ export default definePlugin({
           name: "DeletedPosts",
           component: DeletedPostList,
           meta: {
-            title: "文章回收站",
+            title: "core.deleted_post.title",
             searchable: true,
             permissions: ["system:posts:view"],
           },
@@ -67,7 +67,7 @@ export default definePlugin({
               name: "Categories",
               component: CategoryList,
               meta: {
-                title: "文章分类",
+                title: "core.post_category.title",
                 searchable: true,
                 permissions: ["system:posts:view"],
               },
@@ -83,7 +83,7 @@ export default definePlugin({
               name: "Tags",
               component: TagList,
               meta: {
-                title: "文章标签",
+                title: "core.post_tag.title",
                 searchable: true,
                 permissions: ["system:posts:view"],
               },

@@ -24,7 +24,7 @@ export default definePlugin({
               name: "Plugins",
               component: PluginList,
               meta: {
-                title: "core.sidebar.menu.items.plugins",
+                title: "core.plugin.title",
                 searchable: true,
                 permissions: ["system:plugins:view"],
                 menu: {

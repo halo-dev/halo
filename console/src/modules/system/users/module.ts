@@ -33,7 +33,7 @@ export default definePlugin({
               name: "Users",
               component: UserList,
               meta: {
-                title: "core.sidebar.menu.items.users",
+                title: "core.user.title",
                 searchable: true,
                 permissions: ["system:users:view"],
                 menu: {

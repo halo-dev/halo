@@ -8,6 +8,11 @@ core:
         placeholder: Password
         validation: Please enter password
     button: Login
+    modal:
+      title: Re-login
+      operations:
+        submit:
+          toast_success: Login successful
   sidebar:
     search:
       placeholder: Search
@@ -362,7 +367,6 @@ core:
   attachment:
     title: Attachments
     actions:
-      upload: Upload
       storage_policies: Storage Policies
     empty:
       title: There are no attachments in the current group.
@@ -370,6 +374,10 @@ core:
       actions:
         upload: Upload Attachment
     operations:
+      delete:
+        title: Are you sure you want to delete this attachment?
+      delete_in_batch:
+        title: Are you sure you want to delete the selected attachments?
       deselect_items:
         button: Deselect items
       move:
@@ -458,7 +466,31 @@ core:
       fields:
         display_name:
           label: Display name
+    upload_modal:
+      title: Upload attachment
+      filters:
+        group:
+          label: "Select group:"
+          options:
+            ungrouped: Ungrouped
+        policy:
+          label: "Select storage policy:"
+          actions:
+            new: New policy
+          empty:
+            title: No storage policy
+            description: Before uploading, a new storage policy needs to be created.
+          not_select: Please select a storage policy first.
+    select_modal:
+      title: Select attachment
+      providers:
+        default:
+          label: Attachments
+      operations:
+        select:
+          result: "({count} items selected)"
   theme:
+    title: Themes
     universal:
       buttons:
         install: Install Theme
@@ -892,6 +924,11 @@ core:
             draft: Draft
             owner: Owner
             permalink: Permalink
+  formkit:
+    category_select:
+      creation_label: "Create {text} category"
+    tag_select:
+      creation_label: "Create {text} tag"
   universal:
     buttons:
       save: Save
@@ -920,9 +957,14 @@ core:
       active: Active
       download: Download
       copy: Copy
+      upload: Upload
+      add: Add
     radio:
       "yes": Yes
       "no": No
+    select:
+      public: Public
+      private: Private
     placeholder:
       search: Enter keywords to search
     toast:

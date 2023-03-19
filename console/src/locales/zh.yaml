@@ -8,6 +8,11 @@ core:
         placeholder: 密码
         validation: 请输入密码
     button: 登录
+    modal:
+      title: 重新登录
+      operations:
+        submit:
+          toast_success: 登录成功
   sidebar:
     search:
       placeholder: 搜索
@@ -362,7 +367,6 @@ core:
   attachment:
     title: 附件库
     actions:
-      upload: 上传
       storage_policies: 存储策略
     empty:
       title: 当前分组没有附件
@@ -370,6 +374,10 @@ core:
       actions:
         upload: 上传附件
     operations:
+      delete:
+        title: 确定要删除该附件吗？
+      delete_in_batch:
+        title: 确定要删除所选的附件吗？
       deselect_items:
         button: 取消选择
       move:
@@ -458,7 +466,31 @@ core:
       fields:
         display_name:
           label: 名称
+    upload_modal:
+      title: 上传附件
+      filters:
+        group:
+          label: 选择分组：
+          options:
+            ungrouped: 未分组
+        policy:
+          label: 选择存储策略：
+          actions:
+            new: 新建策略
+          empty:
+            title: 没有存储策略
+            description: 在上传之前，需要新建一个存储策略
+          not_select: 请先选择存储策略
+    select_modal:
+      title: 选择附件
+      providers:
+        default:
+          label: 附件库
+      operations:
+        select:
+          result: （已选择 {count} 项）
   theme:
+    title: 主题
     universal:
       buttons:
         install: 安装主题
@@ -892,6 +924,11 @@ core:
             draft: 未发布
             owner: 创建者
             permalink: 访问链接
+  formkit:
+    category_select:
+      creation_label: 创建 {text} 分类
+    tag_select:
+      creation_label: 创建 {text} 标签
   universal:
     buttons:
       save: 保存
@@ -920,9 +957,14 @@ core:
       active: 启用
       download: 下载
       copy: 复制
+      upload: 上传
+      add: 添加
     radio:
       "yes": 是
       "no": 否
+    select:
+      public: 公开
+      private: 私有
     placeholder:
       search: 输入关键词搜索
     toast:

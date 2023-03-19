@@ -19,7 +19,7 @@ export default definePlugin({
           name: "Attachments",
           component: AttachmentList,
           meta: {
-            title: "core.sidebar.menu.items.attachments",
+            title: "core.attachment.title",
             permissions: ["system:attachments:view"],
             menu: {
               name: "core.sidebar.menu.items.attachments",

@@ -16,7 +16,7 @@ export default definePlugin({
           name: "Menus",
           component: Menus,
           meta: {
-            title: "core.sidebar.menu.items.menus",
+            title: "core.menu.title",
             searchable: true,
             permissions: ["system:menus:view"],
             menu: {
