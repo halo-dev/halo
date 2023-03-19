@@ -41,8 +41,8 @@ export function usePostTag(): usePostTagReturn {
 
   const handleDelete = async (tag: Tag) => {
     Dialog.warning({
-      title: "确定要删除该标签吗？",
-      description: "删除此标签之后，对应文章的关联将被解除。该操作不可恢复。",
+      title: t("core.post_tag.operations.delete.title"),
+      description: t("core.post_tag.operations.delete.description"),
       confirmType: "danger",
       confirmText: t("core.universal.buttons.confirm"),
       cancelText: t("core.universal.buttons.cancel"),

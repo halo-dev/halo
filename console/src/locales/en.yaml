@@ -1,7 +1,12 @@
 core:
   login:
-    username: Username
-    password: Password
+    fields:
+      username:
+        placeholder: Username
+        validation: Please enter username
+      password:
+        placeholder: Password
+        validation: Please enter password
     button: Login
   sidebar:
     search:
@@ -166,6 +171,70 @@ core:
       recovery_in_batch:
         title: Are you sure you want to restore the selected posts?
         description: This operation will restore the posts to its state before deletion.
+  post_tag:
+    title: Post tags
+    empty:
+      title: There are no tags currently.
+      message: You can try to refresh or create a new tag.
+      actions:
+        new: New tag
+    operations:
+      delete:
+        title: Are you sure you want to delete this tag?
+        description: After deleting this tag, the association with the corresponding article will be removed. This operation cannot be undone.
+    editing_modal:
+      titles:
+        update: Update post tag
+        create: Create post tag
+      groups:
+        general: General
+        annotations: Annotations
+      fields:
+        display_name:
+          label: Display name
+        slug:
+          label: Slug
+          help: Often used to generate permalink for tags
+          refresh_message: Regenerate slug based on display name.
+        color:
+          label: Color
+          help: Theme adaptation is required to support
+        cover:
+          label: Cover
+          help: Theme adaptation is required to support
+  post_category:
+    title: Post categories
+    empty:
+      title: There are no categories currently.
+      message: You can try to refresh or create a new category.
+      actions:
+        new: New category
+    operations:
+      delete:
+        title: Are you sure you want to delete this category?
+        description: After deleting this category, the association with corresponding articles will be removed. This operation cannot be undone.
+    editing_modal:
+      titles:
+        update: Update post category
+        create: Create post category
+      groups:
+        general: General
+        annotations: Annotations
+      fields:
+        display_name:
+          label: Display name
+        slug:
+          label: Slug
+          help: Often used to generate permalink for categories
+          refresh_message: Regenerate slug based on display name.
+        template:
+          label: Custom template
+        cover:
+          label: Cover
+          help: Theme adaptation is required to support
+        description:
+          label: Description
+          help: Theme adaptation is required to support
   page:
     title: Pages
     actions:
@@ -204,6 +273,35 @@ core:
           publish_time_asc: Earliest Published
           create_time_desc: Latest Created
           create_time_asc: Earliest Created
+    settings:
+      title: Settings
+      groups:
+        general: General
+        advanced: Advanced
+        annotations: Annotations
+      fields:
+        title:
+          label: Title
+        slug:
+          label: Slug
+          help: Usually used for generating permalink to pages
+          refresh_message: Regenerate slug based on title.
+        auto_generate_excerpt:
+          label: Auto Generate Excerpt
+        raw_excerpt:
+          label: Excerpt
+        allow_comment:
+          label: Allow Comment
+        pinned:
+          label: Pinned
+        visible:
+          label: Visible
+        publish_time:
+          label: Publish Time
+        template:
+          label: Template
+        cover:
+          label: Cover
   deleted_page:
     title: Deleted Pages
     empty:
@@ -773,14 +871,37 @@ core:
     User View: User View
     role-template-view-users: User View
     role-template-change-password: Change Password
+  components:
+    submit_button:
+      text: Submit
+    annotations_form:
+      custom_fields:
+        label: Custom
+        validation: The current Key is already in use
+    default_editor:
+      tabs:
+        toc:
+          title: Toc
+          empty: No Toc available
+        detail:
+          title: Detail
+          fields:
+            character_count: Character count
+            word_count: Word count
+            publish_time: Publish time
+            draft: Draft
+            owner: Owner
+            permalink: Permalink
   universal:
     buttons:
       save: Save
       close: Close
+      close_and_shortcut: Close (Esc)
       delete: Delete
       setting: Setting
       confirm: Confirm
       cancel: Cancel
+      cancel_and_shortcut: Cancel (Esc)
       new: New
       edit: Edit
       back: Back
@@ -818,11 +939,14 @@ core:
       download_success: Download successful
       copy_success: Copy successful
       download_failed: Download failed
+      save_failed_and_retry: Save failed, please try again.
+      publish_failed_and_retry: Publish failed, please try again.
     dialog:
       titles:
         tip: Tip
       descriptions:
         cannot_be_recovered: This operation is irreversible.
+        editor_not_found: No editor found that matches the {raw_type} format. Please check if the editor plugin has been installed.
     filters:
       results:
         keyword: "Keyword: {keyword}"
@@ -843,3 +967,6 @@ core:
       none: None
       tip: Tip
       warning: Warning
+    tooltips:
+      unpublished_content_tip: There is content that has been saved but not yet published.
+      publishing: Publishing

@@ -116,7 +116,7 @@ onMounted(async () => {
     @next="handleSelectNext"
     @previous="handleSelectPrevious"
   />
-  <VPageHeader title="文章标签">
+  <VPageHeader :title="$t('core.post_tag.title')">
     <template #icon>
       <IconBookRead class="mr-2 self-center" />
     </template>
@@ -163,7 +163,10 @@ onMounted(async () => {
       </template>
       <VLoading v-if="isLoading" />
       <Transition v-else-if="!tags?.length" appear name="fade">
-        <VEmpty message="你可以尝试刷新或者新建标签" title="当前没有标签">
+        <VEmpty
+          :message="$t('core.post_tag.empty.message')"
+          :title="$t('core.post_tag.empty.title')"
+        >
           <template #actions>
             <VSpace>
               <VButton @click="handleFetchTags">
@@ -173,7 +176,7 @@ onMounted(async () => {
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>
-                新建标签
+                {{ $t("core.post_tag.empty.actions.new") }}
               </VButton>
             </VSpace>
           </template>

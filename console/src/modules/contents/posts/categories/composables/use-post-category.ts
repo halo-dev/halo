@@ -51,8 +51,8 @@ export function usePostCategory(): usePostCategoryReturn {
 
   const handleDelete = async (category: CategoryTree) => {
     Dialog.warning({
-      title: "确定要删除该分类吗？",
-      description: "删除此分类之后，对应文章的关联将被解除。该操作不可恢复。",
+      title: t("core.post_category.operations.delete.title"),
+      description: t("core.post_category.operations.delete.description"),
       confirmType: "danger",
       confirmText: t("core.universal.buttons.confirm"),
       cancelText: t("core.universal.buttons.cancel"),

@@ -880,7 +880,10 @@ watch(selectedPostNames, (newValue) => {
                 </VEntityField>
                 <VEntityField :description="getPublishStatus(post.post)">
                   <template v-if="isPublishing(post.post)" #description>
-                    <VStatusDot text="发布中" animate />
+                    <VStatusDot
+                      :text="$t('core.universal.tooltips.publishing')"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField>

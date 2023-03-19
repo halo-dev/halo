@@ -317,7 +317,7 @@ const { handleGenerateSlug } = useSlugify(
   <VModal
     :visible="visible"
     :width="700"
-    title="页面设置"
+    :title="$t('core.page.settings.title')"
     :centered="false"
     @update:visible="onVisibleChange"
   >
@@ -337,29 +337,31 @@ const { handleGenerateSlug } = useSlugify(
           <div class="md:col-span-1">
             <div class="sticky top-0">
               <span class="text-base font-medium text-gray-900">
-                常规设置
+                {{ $t("core.page.settings.groups.general") }}
               </span>
             </div>
           </div>
           <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
             <FormKit
               v-model="formState.spec.title"
-              label="标题"
+              :label="$t('core.page.settings.fields.title.label')"
               type="text"
               name="title"
               validation="required|length:0,100"
             ></FormKit>
             <FormKit
               v-model="formState.spec.slug"
-              label="别名"
+              :label="$t('core.page.settings.fields.slug.label')"
               name="slug"
               type="text"
               validation="required|length:0,100"
-              help="通常用于生成页面的固定链接"
+              :help="$t('core.page.settings.fields.slug.help')"
             >
               <template #suffix>
                 <div
-                  v-tooltip="'根据标题重新生成别名'"
+                  v-tooltip="
+                    $t('core.page.settings.fields.slug.refresh_message')
+                  "
                   class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
                   @click="handleGenerateSlug"
                 >
@@ -376,7 +378,9 @@ const { handleGenerateSlug } = useSlugify(
                 { label: $t('core.universal.radio.no'), value: false },
               ]"
               name="autoGenerate"
-              label="自动生成摘要"
+              :label="
+                $t('core.page.settings.fields.auto_generate_excerpt.label')
+              "
               type="radio"
             >
             </FormKit>
@@ -384,7 +388,7 @@ const { handleGenerateSlug } = useSlugify(
               v-if="!formState.spec.excerpt.autoGenerate"
               v-model="formState.spec.excerpt.raw"
               name="raw"
-              label="自定义摘要"
+              :label="$t('core.page.settings.fields.raw_excerpt.label')"
               type="textarea"
               validation="length:0,1024"
               :rows="5"
@@ -400,7 +404,7 @@ const { handleGenerateSlug } = useSlugify(
           <div class="md:col-span-1">
             <div class="sticky top-0">
               <span class="text-base font-medium text-gray-900">
-                高级设置
+                {{ $t("core.page.settings.groups.advanced") }}
               </span>
             </div>
           </div>
@@ -412,7 +416,7 @@ const { handleGenerateSlug } = useSlugify(
                 { label: $t('core.universal.radio.no'), value: false },
               ]"
               name="allowComment"
-              label="允许评论"
+              :label="$t('core.page.settings.fields.allow_comment.label')"
               type="radio"
             ></FormKit>
             <FormKit
@@ -421,7 +425,7 @@ const { handleGenerateSlug } = useSlugify(
                 { label: $t('core.universal.radio.yes'), value: true },
                 { label: $t('core.universal.radio.no'), value: false },
               ]"
-              label="是否置顶"
+              :label="$t('core.page.settings.fields.pinned.label')"
               name="pinned"
               type="radio"
             ></FormKit>
@@ -431,13 +435,13 @@ const { handleGenerateSlug } = useSlugify(
                 { label: '公开', value: 'PUBLIC' },
                 { label: '私有', value: 'PRIVATE' },
               ]"
-              label="可见性"
+              :label="$t('core.page.settings.fields.visible.label')"
               name="visible"
               type="select"
             ></FormKit>
             <FormKit
               :model-value="publishTime"
-              label="发表时间"
+              :label="$t('core.page.settings.fields.publish_time.label')"
               type="datetime-local"
               name="publishTime"
               @input="onPublishTimeChange"
@@ -445,13 +449,13 @@ const { handleGenerateSlug } = useSlugify(
             <FormKit
               v-model="formState.spec.template"
               :options="templates"
-              label="自定义模板"
+              :label="$t('core.page.settings.fields.template.label')"
               type="select"
               name="template"
             ></FormKit>
             <FormKit
               v-model="formState.spec.cover"
-              label="封面图"
+              :label="$t('core.page.settings.fields.cover.label')"
               type="attachment"
               name="cover"
               validation="length:0,1024"
@@ -468,7 +472,9 @@ const { handleGenerateSlug } = useSlugify(
     <div class="md:grid md:grid-cols-4 md:gap-6">
       <div class="md:col-span-1">
         <div class="sticky top-0">
-          <span class="text-base font-medium text-gray-900"> 元数据 </span>
+          <span class="text-base font-medium text-gray-900">
+            {{ $t("core.page.settings.groups.annotations") }}
+          </span>
         </div>
       </div>
       <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">

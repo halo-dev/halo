@@ -147,7 +147,7 @@ const handleSave = async () => {
     await handleFetchContent();
   } catch (e) {
     console.error("Failed to save post", e);
-    Toast.error("保存失败，请重试");
+    Toast.error(t("core.universal.toast.save_failed_and_retry"));
   } finally {
     saving.value = false;
   }
@@ -195,7 +195,7 @@ const handlePublish = async () => {
     handleClearCache(name.value as string);
   } catch (error) {
     console.error("Failed to publish post", error);
-    Toast.error("发布失败，请重试");
+    Toast.error(t("core.universal.toast.publish_failed_and_retry"));
   } finally {
     publishing.value = false;
   }
@@ -254,7 +254,9 @@ const handleFetchContent = async () => {
     } else {
       Dialog.warning({
         title: "警告",
-        description: `未找到符合 ${data.rawType} 格式的编辑器，请检查是否已安装编辑器插件`,
+        description: t("core.universal.dialog.descriptions.editor_not_found", {
+          raw_type: data.rawType,
+        }),
         confirmText: t("core.universal.buttons.confirm"),
         cancelText: t("core.universal.buttons.cancel"),
         onConfirm: () => {

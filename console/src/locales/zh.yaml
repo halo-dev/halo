@@ -1,7 +1,12 @@
 core:
   login:
-    username: 用户名
-    password: 密码
+    fields:
+      username:
+        placeholder: 用户名
+        validation: 请输入用户名
+      password:
+        placeholder: 密码
+        validation: 请输入密码
     button: 登录
   sidebar:
     search:
@@ -166,6 +171,70 @@ core:
       recovery_in_batch:
         title: 确定要恢复选中的文章吗？
         description: 该操作会将文章恢复到被删除之前的状态。
+  post_tag:
+    title: 文章标签
+    empty:
+      title: 当前没有标签
+      message: 你可以尝试刷新或者新建标签
+      actions:
+        new: 新建标签
+    operations:
+      delete:
+        title: 确定要删除该标签吗？
+        description: 删除此标签之后，对应文章的关联将被解除。该操作不可恢复。
+    editing_modal:
+      titles:
+        update: 编辑文章标签
+        create: 新增文章标签
+      groups:
+        general: 常规
+        annotations: 元数据
+      fields:
+        display_name:
+          label: 名称
+        slug:
+          label: 别名
+          help: 通常用于生成分类的固定链接
+          refresh_message: 根据名称重新生成别名
+        color:
+          label: 颜色
+          help: 需要主题适配以支持
+        cover:
+          label: 封面图
+          help: 需要主题适配以支持
+  post_category:
+    title: 文章分类
+    empty:
+      title: 当前没有分类
+      message: 你可以尝试刷新或者新建分类
+      actions:
+        new: 新建分类
+    operations:
+      delete:
+        title: 确定要删除该分类吗？
+        description: 删除此分类之后，对应文章的关联将被解除。该操作不可恢复。
+    editing_modal:
+      titles:
+        update: 编辑文章分类
+        create: 新增文章分类
+      groups:
+        general: 常规
+        annotations: 元数据
+      fields:
+        display_name:
+          label: 名称
+        slug:
+          label: 别名
+          help: 通常用于生成标签的固定链接
+          refresh_message: 根据名称重新生成别名
+        template:
+          label: 自定义模板
+        cover:
+          label: 封面图
+          help: 需要主题适配以支持
+        description:
+          label: 描述
+          help: 需要主题适配以支持
   page:
     title: 页面
     actions:
@@ -204,6 +273,35 @@ core:
           publish_time_asc: 较早发布
           create_time_desc: 较近创建
           create_time_asc: 较早创建
+    settings:
+      title: 页面设置
+      groups:
+        general: 常规设置
+        advanced: 高级设置
+        annotations: 元数据
+      fields:
+        title:
+          label: 标题
+        slug:
+          label: 别名
+          help: 通常用于生成页面的固定链接
+          refresh_message: 根据标题重新生成别名
+        auto_generate_excerpt:
+          label: 自动生成摘要
+        raw_excerpt:
+          label: 自定义摘要
+        allow_comment:
+          label: 允许评论
+        pinned:
+          label: 是否置顶
+        visible:
+          label: 可见性
+        publish_time:
+          label: 发表时间
+        template:
+          label: 自定义模板
+        cover:
+          label: 封面图
   deleted_page:
     title: 自定义页面回收站
     empty:
@@ -773,14 +871,37 @@ core:
     User View: 用户查看
     role-template-view-users: 用户查看
     role-template-change-password: 修改密码
+  components:
+    submit_button:
+      text: 提交
+    annotations_form:
+      custom_fields:
+        label: 自定义
+        validation: 当前 Key 已被占用
+    default_editor:
+      tabs:
+        toc:
+          title: 大纲
+          empty: 暂无大纲
+        detail:
+          title: 详情
+          fields:
+            character_count: 字符数
+            word_count: 词数
+            publish_time: 发布时间
+            draft: 未发布
+            owner: 创建者
+            permalink: 访问链接
   universal:
     buttons:
       save: 保存
       close: 关闭
+      close_and_shortcut: 关闭（Esc）
       delete: 删除
       setting: 设置
       confirm: 确定
       cancel: 取消
+      cancel_and_shortcut: 取消（Esc）
       new: 新建
       edit: 编辑
       back: 返回
@@ -818,11 +939,14 @@ core:
       download_success: 下载成功
       copy_success: 复制成功
       download_failed: 下载失败
+      save_failed_and_retry: 保存失败，请重试
+      publish_failed_and_retry: 发布失败，请重试
     dialog:
       titles:
         tip: 提示
       descriptions:
         cannot_be_recovered: 该操作不可恢复。
+        editor_not_found: 未找到符合 {raw_type} 格式的编辑器，请检查是否已安装编辑器插件
     filters:
       results:
         keyword: "关键词：{keyword}"
@@ -843,3 +967,6 @@ core:
       none: 无
       tip: 提示
       warning: 警告
+    tooltips:
+      unpublished_content_tip: 当前有内容已保存，但还未发布。
+      publishing: 发布中

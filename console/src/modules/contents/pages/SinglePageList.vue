@@ -786,7 +786,10 @@ watch(selectedPageNames, (newValue) => {
                 </VEntityField>
                 <VEntityField :description="getPublishStatus(singlePage.page)">
                   <template v-if="isPublishing(singlePage.page)" #description>
-                    <VStatusDot text="发布中" animate />
+                    <VStatusDot
+                      :text="$t('core.universal.tooltips.publishing')"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField>

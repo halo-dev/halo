@@ -224,7 +224,7 @@ const onVisibleChange = (visible: boolean) => {
     <template #footer>
       <VSpace>
         <VButton type="default" @click="onVisibleChange(false)">
-          关闭 Esc
+          {{ $t("core.universal.buttons.close_and_shortcut") }}
         </VButton>
         <slot name="footer" />
       </VSpace>

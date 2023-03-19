@@ -536,7 +536,10 @@ watch(
     <template #extra>
       <div class="h-full w-72 overflow-y-auto border-l bg-white">
         <VTabs v-model:active-id="extraActiveId" type="outline">
-          <VTabItem id="toc" label="大纲">
+          <VTabItem
+            id="toc"
+            :label="$t('core.components.default_editor.tabs.toc.title')"
+          >
             <div class="p-1 pt-0">
               <ul v-if="headingNodes?.length" class="space-y-1">
                 <li
@@ -566,11 +569,16 @@ watch(
                 </li>
               </ul>
               <div v-else class="flex flex-col items-center py-10">
-                <span class="text-sm text-gray-600">暂无大纲</span>
+                <span class="text-sm text-gray-600">
+                  {{ $t("core.components.default_editor.tabs.toc.empty") }}
+                </span>
               </div>
             </div>
           </VTabItem>
-          <VTabItem id="information" label="详情">
+          <VTabItem
+            id="information"
+            :label="$t('core.components.default_editor.tabs.detail.title')"
+          >
             <div class="flex flex-col gap-2 p-1 pt-0">
               <div class="grid grid-cols-2 gap-2">
                 <div
@@ -580,7 +588,11 @@ watch(
                     <div
                       class="text-sm text-gray-500 group-hover:text-gray-900"
                     >
-                      字符数
+                      {{
+                        $t(
+                          "core.components.default_editor.tabs.detail.fields.character_count"
+                        )
+                      }}
                     </div>
                     <div class="rounded bg-gray-200 p-0.5">
                       <IconCharacterRecognition
@@ -599,7 +611,11 @@ watch(
                     <div
                       class="text-sm text-gray-500 group-hover:text-gray-900"
                     >
-                      词数
+                      {{
+                        $t(
+                          "core.components.default_editor.tabs.detail.fields.word_count"
+                        )
+                      }}
                     </div>
                     <div class="rounded bg-gray-200 p-0.5">
                       <IconCharacterRecognition
@@ -621,7 +637,11 @@ watch(
                     <div
                       class="text-sm text-gray-500 group-hover:text-gray-900"
                     >
-                      发布时间
+                      {{
+                        $t(
+                          "core.components.default_editor.tabs.detail.fields.publish_time"
+                        )
+                      }}
                     </div>
                     <div class="rounded bg-gray-200 p-0.5">
                       <IconCalendar
@@ -630,7 +650,12 @@ watch(
                     </div>
                   </div>
                   <div class="text-base font-medium text-gray-900">
-                    {{ formatDatetime(publishTime) || "未发布" }}
+                    {{
+                      formatDatetime(publishTime) ||
+                      $t(
+                        "core.components.default_editor.tabs.detail.fields.draft"
+                      )
+                    }}
                   </div>
                 </div>
               </div>
@@ -642,7 +667,11 @@ watch(
                     <div
                       class="text-sm text-gray-500 group-hover:text-gray-900"
                     >
-                      创建者
+                      {{
+                        $t(
+                          "core.components.default_editor.tabs.detail.fields.owner"
+                        )
+                      }}
                     </div>
                     <div class="rounded bg-gray-200 p-0.5">
                       <IconUserFollow
@@ -663,7 +692,11 @@ watch(
                     <div
                       class="text-sm text-gray-500 group-hover:text-gray-900"
                     >
-                      访问链接
+                      {{
+                        $t(
+                          "core.components.default_editor.tabs.detail.fields.permalink"
+                        )
+                      }}
                     </div>
                     <div class="rounded bg-gray-200 p-0.5">
                       <IconLink

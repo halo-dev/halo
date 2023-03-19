@@ -242,7 +242,9 @@ const onEditingModalClose = () => {
       </li>
     </ul>
     <template #footer>
-      <VButton @click="onVisibleChange(false)">关闭 Esc</VButton>
+      <VButton @click="onVisibleChange(false)">
+        {{ $t("core.universal.buttons.close_and_shortcut") }}
+      </VButton>
     </template>
   </VModal>
 

@@ -110,10 +110,10 @@ onMounted(() => {
   >
     <FormKit
       :validation-messages="{
-        required: '请输入用户名',
+        required: $t('core.login.fields.username.validation'),
       }"
       name="username"
-      :placeholder="$t('core.login.username')"
+      :placeholder="$t('core.login.fields.username.placeholder')"
       :autofocus="true"
       type="text"
       validation="required"
@@ -122,10 +122,10 @@ onMounted(() => {
     <FormKit
       id="passwordInput"
       :validation-messages="{
-        required: '请输入密码',
+        required: $t('core.login.fields.password.validation'),
       }"
       name="password"
-      :placeholder="$t('core.login.password')"
+      :placeholder="$t('core.login.fields.password.placeholder')"
       type="password"
       validation="required"
     >
