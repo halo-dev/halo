@@ -22,7 +22,7 @@ import type {
   SinglePage,
 } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
-import { computed, provide, ref, watch, type Ref } from "vue";
+import { computed, provide, ref, type Ref } from "vue";
 import ReplyListItem from "./ReplyListItem.vue";
 import { apiClient } from "@/utils/api-client";
 import type { RouteLocationRaw } from "vue-router";
