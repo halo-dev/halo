@@ -127,7 +127,7 @@ class AuthProviderServiceImplTest {
         authProviderService.listAll()
             .as(StepVerifier::create)
             .consumeNextWith(result -> {
-                assertThat(result).hasSize(2);
+                assertThat(result).hasSize(3);
                 try {
                     JSONAssert.assertEquals("""
                             [{
@@ -140,6 +140,12 @@ class AuthProviderServiceImplTest {
                                 "name": "gitlab",
                                 "displayName": "gitlab",
                                 "bindingUrl": "fake-binding-url",
+                                "enabled": false,
+                                "isBound": false
+                            },{
+                            
+                                "name": "gitee",
+                                "displayName": "gitee",
                                 "enabled": false,
                                 "isBound": false
                             }]

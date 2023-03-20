@@ -55,7 +55,6 @@ public class AuthProviderServiceImpl implements AuthProviderService {
                     provider.getMetadata().getDeletionTimestamp() == null,
                 Comparator.comparing(item -> item.getMetadata().getCreationTimestamp())
             )
-            .filter(authProvider -> StringUtils.isNotBlank(authProvider.getSpec().getBindingUrl()))
             .map(this::convertTo)
             .collectList()
             .flatMap(providers -> listMyConnections()
