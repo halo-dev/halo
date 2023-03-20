@@ -959,6 +959,8 @@ watch(selectedPostNames, (newValue) => {
           <VPagination
             v-model:page="page"
             v-model:size="size"
+            :page-label="$t('core.components.pagination.page_label')"
+            :size-label="$t('core.components.pagination.size_label')"
             :total="total"
             :size-options="[20, 30, 50, 100]"
           />

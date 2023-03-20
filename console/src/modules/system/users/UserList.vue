@@ -653,6 +653,8 @@ const hasFilters = computed(() => {
             :page="users.page"
             :size="users.size"
             :total="users.total"
+            :page-label="$t('core.components.pagination.page_label')"
+            :size-label="$t('core.components.pagination.size_label')"
             :size-options="[20, 30, 50, 100]"
             @change="handlePaginationChange"
           />

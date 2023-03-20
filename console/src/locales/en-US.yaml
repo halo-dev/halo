@@ -1027,6 +1027,9 @@ core:
         attachment: Attachment
         setting: Setting
         theme_setting: Theme setting
+    pagination:
+      page_label: page
+      size_label: items per page
   composables:
     content_cache:
       toast_recovered: Recovered unsaved content from cache

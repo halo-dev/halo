@@ -830,6 +830,8 @@ onMounted(() => {
               <VPagination
                 v-model:page="page"
                 v-model:size="size"
+                :page-label="$t('core.components.pagination.page_label')"
+                :size-label="$t('core.components.pagination.size_label')"
                 :total="total"
                 :size-options="[60, 120, 200]"
               />

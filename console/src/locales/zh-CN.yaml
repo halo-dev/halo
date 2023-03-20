@@ -1027,6 +1027,9 @@ core:
         attachment: 附件
         setting: 设置
         theme_setting: 主题设置
+    pagination:
+      page_label: 页
+      size_label: 条 / 页
   composables:
     content_cache:
       toast_recovered: 已从缓存中恢复未保存的内容
