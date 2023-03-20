@@ -4,8 +4,6 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIR
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.Map;
-import java.util.Set;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -53,45 +51,11 @@ public class AuthProvider extends AbstractExtension {
 
         private String unbindUrl;
 
-        @Schema(requiredMode = REQUIRED)
-        private ClientRegistration clientRegistration;
-
         @Schema(requiredMode = NOT_REQUIRED)
         private SettingRef settingRef;
 
         @Schema(requiredMode = NOT_REQUIRED)
         private ConfigMapRef configMapRef;
-    }
-
-    @Data
-    public static class ClientRegistration {
-
-        private String clientAuthenticationMethod;
-
-        private String authorizationGrantType;
-
-        private String redirectUri;
-
-        private Set<String> scopes;
-
-        private String authorizationUri;
-
-        @Schema(requiredMode = REQUIRED, minLength = 1)
-        private String tokenUri;
-
-        private String userInfoUri;
-
-        private String userInfoAuthenticationMethod;
-
-        private String userNameAttributeName;
-
-        private String jwkSetUri;
-
-        private String issuerUri;
-
-        private Map<String, Object> configurationMetadata;
-
-        private String clientName;
     }
 
     @Data
