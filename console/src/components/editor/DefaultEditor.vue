@@ -110,6 +110,9 @@ import * as fastq from "fastq";
 import type { queueAsPromised } from "fastq";
 import type { Attachment } from "@halo-dev/api-client";
 import { useFetchAttachmentPolicy } from "@/modules/contents/attachments/composables/use-attachment-policy";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -195,7 +198,9 @@ const editor = useEditor({
     ExtensionSubscript,
     ExtensionSuperscript,
     ExtensionPlaceholder.configure({
-      placeholder: "输入 / 以选择输入类型",
+      placeholder: t(
+        "core.components.default_editor.extensions.placeholder.options.placeholder"
+      ),
     }),
     ExtensionHighlight,
     ExtensionCommands.configure({
@@ -356,7 +361,11 @@ const uploadQueue: queueAsPromised<Task> = fastq.promise(asyncWorker, 1);
 
 async function asyncWorker(arg: Task): Promise<void> {
   if (!policies.value?.length) {
-    Toast.warning("目前没有可用的存储策略");
+    Toast.warning(
+      t(
+        "core.components.default_editor.upload_attachment.toast.no_available_policy"
+      )
+    );
     return;
   }
 
@@ -377,7 +386,12 @@ const handleFetchPermalink = async (
   maxRetry: number
 ): Promise<string | undefined> => {
   if (maxRetry === 0) {
-    Toast.error(`获取附件永久链接失败：${attachment.spec.displayName}`);
+    Toast.error(
+      t(
+        "core.components.default_editor.upload_attachment.toast.failed_fetch_permalink",
+        { display_name: attachment.spec.displayName }
+      )
+    );
     return undefined;
   }
 
@@ -433,7 +447,7 @@ const toolbarMenuItems = computed(() => {
     {
       type: "button",
       icon: markRaw(MdiFileImageBox),
-      title: "插入附件",
+      title: t("core.components.default_editor.toolbar.attachment"),
       action: () => (attachmentSelectorModal.value = true),
       isActive: () => false,
     },

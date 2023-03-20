@@ -208,7 +208,7 @@ const SubjectRefProvider = ref<
     Post: (subject: Extension): SubjectRefResult => {
       const post = subject as Post;
       return {
-        label: "文章",
+        label: t("core.comment.subject_refs.post"),
         title: post.spec.title,
         externalUrl: post.status?.permalink,
         route: {
@@ -224,7 +224,7 @@ const SubjectRefProvider = ref<
     SinglePage: (subject: Extension): SubjectRefResult => {
       const singlePage = subject as SinglePage;
       return {
-        label: "单页",
+        label: t("core.comment.subject_refs.page"),
         title: singlePage.spec.title,
         externalUrl: singlePage.status?.permalink,
         route: {
@@ -242,8 +242,8 @@ const subjectRefResult = computed(() => {
   const { subject } = props.comment;
   if (!subject) {
     return {
-      label: "未知",
-      title: "未知",
+      label: t("core.comment.subject_refs.unknown"),
+      title: t("core.comment.subject_refs.unknown"),
     };
   }
   const subjectRef = SubjectRefProvider.value.find((provider) =>
@@ -251,8 +251,8 @@ const subjectRefResult = computed(() => {
   );
   if (!subjectRef) {
     return {
-      label: "未知",
-      title: "未知",
+      label: t("core.comment.subject_refs.unknown"),
+      title: t("core.comment.subject_refs.unknown"),
     };
   }
   return subjectRef[subject.kind](subject);
@@ -307,11 +307,15 @@ const subjectRefResult = computed(() => {
                 class="select-none text-gray-700 hover:text-gray-900"
                 @click="handleToggleShowReplies"
               >
-                {{ comment?.comment?.status?.replyCount || 0 }} 条回复
+                {{
+                  $t("core.comment.list.fields.reply_count", {
+                    count: comment?.comment?.status?.replyCount || 0,
+                  })
+                }}
               </span>
               <VStatusDot
                 v-if="comment?.comment?.status?.unreadReplyCount || 0 > 0"
-                v-tooltip="`有新的回复`"
+                v-tooltip="$t('core.comment.list.fields.has_new_replies')"
                 state="success"
                 animate
               />
@@ -319,7 +323,7 @@ const subjectRefResult = computed(() => {
                 class="select-none text-gray-700 hover:text-gray-900"
                 @click="handleTriggerReply"
               >
-                回复
+                {{ $t("core.comment.operations.reply.button") }}
               </span>
             </div>
           </div>
@@ -347,7 +351,9 @@ const subjectRefResult = computed(() => {
         <template #description>
           <VStatusDot state="success">
             <template #text>
-              <span class="text-xs text-gray-500">待审核</span>
+              <span class="text-xs text-gray-500">
+                {{ $t("core.comment.list.fields.pending_review") }}
+              </span>
             </template>
           </VStatusDot>
         </template>

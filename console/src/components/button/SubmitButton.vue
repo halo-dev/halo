@@ -2,6 +2,9 @@
 import { VButton } from "@halo-dev/components";
 import { useMagicKeys } from "@vueuse/core";
 import { computed, useAttrs, watchEffect } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -21,7 +24,10 @@ const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
 const attrs = useAttrs();
 
 const buttonText = computed(() => {
-  return `${props.text} ${isMac ? "⌘" : "Ctrl"} + ↵`;
+  return t("core.components.submit_button.computed_text", {
+    text: props.text,
+    shortcut: `${isMac ? "⌘" : "Ctrl"} + ↵`,
+  });
 });
 
 const { Command_Enter, Ctrl_Enter } = useMagicKeys();

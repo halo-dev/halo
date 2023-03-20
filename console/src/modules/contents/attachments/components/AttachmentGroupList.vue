@@ -55,7 +55,7 @@ const defaultGroups: Group[] = [
   },
   {
     spec: {
-      displayName: t("core.attachment.group_list.internal_groups.ungrouped"),
+      displayName: t("core.attachment.universal.text.ungrouped"),
     },
     apiVersion: "",
     kind: "",

@@ -427,6 +427,7 @@ const onMenuItemSourceChange = () => {
           v-if="visible"
           :loading="saving"
           type="secondary"
+          :text="$t('core.universal.buttons.submit')"
           @submit="$formkit.submit('menuitem-form')"
         >
         </SubmitButton>

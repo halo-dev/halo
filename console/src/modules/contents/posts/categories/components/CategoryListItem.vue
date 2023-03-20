@@ -93,7 +93,11 @@ function onDelete(category: CategoryTree) {
               </template>
             </VEntityField>
             <VEntityField
-              :description="`${category.status?.postCount || 0} 篇文章`"
+              :description="
+                $t('core.universal.fields.post_count', {
+                  count: category.status?.postCount || 0,
+                })
+              "
             />
             <VEntityField>
               <template #description>

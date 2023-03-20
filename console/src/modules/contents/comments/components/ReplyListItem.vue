@@ -151,7 +151,7 @@ const isHoveredReply = computed(() => {
                 class="select-none text-gray-700 hover:text-gray-900"
                 @click="handleTriggerReply"
               >
-                回复
+                {{ $t("core.comment.operations.reply.button") }}
               </span>
               <div v-if="false" class="flex items-center">
                 <VTag>New</VTag>
@@ -166,7 +166,9 @@ const isHoveredReply = computed(() => {
         <template #description>
           <VStatusDot state="success">
             <template #text>
-              <span class="text-xs text-gray-500">待审核</span>
+              <span class="text-xs text-gray-500">
+                {{ $t("core.comment.list.fields.pending_review") }}
+              </span>
             </template>
           </VStatusDot>
         </template>

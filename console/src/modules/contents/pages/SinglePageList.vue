@@ -752,10 +752,18 @@ watch(selectedPageNames, (newValue) => {
                     <div class="flex w-full flex-col gap-1">
                       <VSpace class="w-full">
                         <span class="text-xs text-gray-500">
-                          访问量 {{ singlePage.stats.visit || 0 }}
+                          {{
+                            $t("core.page.list.fields.visits", {
+                              visits: singlePage.stats.visit || 0,
+                            })
+                          }}
                         </span>
                         <span class="text-xs text-gray-500">
-                          评论 {{ singlePage.stats.totalComment || 0 }}
+                          {{
+                            $t("core.page.list.fields.comments", {
+                              comments: singlePage.stats.totalComment || 0,
+                            })
+                          }}
                         </span>
                       </VSpace>
                     </div>

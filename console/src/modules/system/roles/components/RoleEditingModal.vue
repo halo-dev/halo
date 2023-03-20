@@ -175,21 +175,28 @@ const handleResetForm = () => {
                   "
                   class="mt-3 text-xs text-gray-500"
                 >
-                  由
-                  <RouterLink
-                    :to="{
-                      name: 'PluginDetail',
-                      params: {
-                        name: group.roles[0].metadata.labels?.[
-                          pluginLabels.NAME
-                        ],
-                      },
-                    }"
-                    class="hover:text-blue-600"
+                  <i18n-t
+                    keypath="core.role.universal.text.provided_by_plugin"
+                    tag="div"
                   >
-                    {{ group.roles[0].metadata.labels?.[pluginLabels.NAME] }}
-                  </RouterLink>
-                  插件提供
+                    <template #plugin>
+                      <RouterLink
+                        :to="{
+                          name: 'PluginDetail',
+                          params: {
+                            name: group.roles[0].metadata.labels?.[
+                              pluginLabels.NAME
+                            ],
+                          },
+                        }"
+                        class="hover:text-blue-600"
+                      >
+                        {{
+                          group.roles[0].metadata.labels?.[pluginLabels.NAME]
+                        }}
+                      </RouterLink>
+                    </template>
+                  </i18n-t>
                 </div>
               </dt>
               <dd class="text-sm text-gray-900">
@@ -258,6 +265,7 @@ const handleResetForm = () => {
           v-if="visible"
           :loading="saving"
           type="secondary"
+          :text="$t('core.universal.buttons.submit')"
           @submit="$formkit.submit('role-form')"
         >
         </SubmitButton>

@@ -278,6 +278,7 @@ const { handleGenerateSlug } = useSlugify(
           v-if="visible"
           :loading="saving"
           type="secondary"
+          :text="$t('core.universal.buttons.submit')"
           @submit="$formkit.submit('tag-form')"
         >
         </SubmitButton>

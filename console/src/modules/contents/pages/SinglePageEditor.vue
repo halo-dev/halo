@@ -11,7 +11,6 @@ import {
   Dialog,
 } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
-import PostPreviewModal from "../posts/components/PostPreviewModal.vue";
 import type { SinglePage, SinglePageRequest } from "@halo-dev/api-client";
 import {
   computed,
@@ -92,7 +91,6 @@ const formState = ref<SinglePageRequest>(cloneDeep(initialFormState));
 const saving = ref(false);
 const publishing = ref(false);
 const settingModal = ref(false);
-const previewModal = ref(false);
 
 const isUpdateMode = computed(() => {
   return !!formState.value.page.metadata.creationTimestamp;
@@ -120,7 +118,7 @@ const handleSave = async () => {
 
     //Set default title and slug
     if (!formState.value.page.spec.title) {
-      formState.value.page.spec.title = "无标题页面";
+      formState.value.page.spec.title = t("core.page_editor.untitled");
     }
     if (!formState.value.page.spec.slug) {
       formState.value.page.spec.slug = new Date().getTime().toString();
@@ -336,7 +334,6 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     @saved="onSettingSaved"
     @published="onSettingPublished"
   />
-  <PostPreviewModal v-model:visible="previewModal" />
   <VPageHeader :title="$t('core.page.title')">
     <template #icon>
       <IconPages class="mr-2 self-center" />
@@ -348,16 +345,6 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
           :provider="currentEditorProvider"
           @select="handleChangeEditorProvider"
         />
-
-        <!-- TODO: add preview single page support -->
-        <VButton
-          v-if="false"
-          size="sm"
-          type="default"
-          @click="previewModal = true"
-        >
-          {{ $t("core.universal.buttons.preview") }}
-        </VButton>
         <VButton :loading="saving" size="sm" type="default" @click="handleSave">
           <template #icon>
             <IconSave class="h-full w-full" />

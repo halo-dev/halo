@@ -100,6 +100,7 @@ const onVisibleChange = (visible: boolean) => {
           v-if="visible"
           :loading="saving"
           type="secondary"
+          :text="$t('core.universal.buttons.submit')"
           @submit="$formkit.submit('grant-permission-form')"
         >
         </SubmitButton>

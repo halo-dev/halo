@@ -106,7 +106,11 @@ const onEditingModalClose = () => {
           >
             <div class="flex w-full flex-1 sm:w-auto">
               <span class="text-base font-medium">
-                {{ categories?.length || 0 }} 个分类
+                {{
+                  $t("core.post_category.header.title", {
+                    count: categories?.length || 0,
+                  })
+                }}
               </span>
             </div>
           </div>

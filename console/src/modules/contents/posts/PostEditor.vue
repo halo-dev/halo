@@ -11,7 +11,6 @@ import {
   Dialog,
 } from "@halo-dev/components";
 import PostSettingModal from "./components/PostSettingModal.vue";
-import PostPreviewModal from "./components/PostPreviewModal.vue";
 import type { Post, PostRequest } from "@halo-dev/api-client";
 import {
   computed,
@@ -92,7 +91,6 @@ const initialFormState: PostRequest = {
 
 const formState = ref<PostRequest>(cloneDeep(initialFormState));
 const settingModal = ref(false);
-const previewModal = ref(false);
 const saving = ref(false);
 const publishing = ref(false);
 
@@ -120,7 +118,7 @@ const handleSave = async () => {
 
     // Set default title and slug
     if (!formState.value.post.spec.title) {
-      formState.value.post.spec.title = "无标题文章";
+      formState.value.post.spec.title = t("core.post_editor.untitled");
     }
 
     if (!formState.value.post.spec.slug) {
@@ -349,7 +347,6 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     @saved="onSettingSaved"
     @published="onSettingPublished"
   />
-  <PostPreviewModal v-model:visible="previewModal" :post="formState.post" />
   <VPageHeader :title="$t('core.post.title')">
     <template #icon>
       <IconBookRead class="mr-2 self-center" />
@@ -361,16 +358,6 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
           :provider="currentEditorProvider"
           @select="handleChangeEditorProvider"
         />
-
-        <!-- TODO: add preview post support -->
-        <VButton
-          v-if="false"
-          size="sm"
-          type="default"
-          @click="previewModal = true"
-        >
-          {{ $t("core.universal.buttons.preview") }}
-        </VButton>
         <VButton :loading="saving" size="sm" type="default" @click="handleSave">
           <template #icon>
             <IconSave class="h-full w-full" />

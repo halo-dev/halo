@@ -345,7 +345,8 @@ function handleClearKeyword() {
                           v-if="post.categories.length"
                           class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
                         >
-                          分类：<span
+                          {{ $t("core.post.list.fields.categories") }}
+                          <span
                             v-for="(category, categoryIndex) in post.categories"
                             :key="categoryIndex"
                             class="cursor-pointer hover:text-gray-900"
@@ -354,10 +355,18 @@ function handleClearKeyword() {
                           </span>
                         </p>
                         <span class="text-xs text-gray-500">
-                          访问量 {{ post.stats.visit || 0 }}
+                          {{
+                            $t("core.post.list.fields.visits", {
+                              visits: post.stats.visit,
+                            })
+                          }}
                         </span>
                         <span class="text-xs text-gray-500">
-                          评论 {{ post.stats.totalComment || 0 }}
+                          {{
+                            $t("core.post.list.fields.comments", {
+                              comments: post.stats.totalComment || 0,
+                            })
+                          }}
                         </span>
                       </VSpace>
                       <VSpace v-if="post.tags.length" class="flex-wrap">

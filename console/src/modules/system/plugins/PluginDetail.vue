@@ -219,13 +219,14 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
                               "
                               class="text-xs text-gray-400"
                             >
-                              依赖于
                               {{
-                                JSON.parse(
-                                  role.metadata.annotations?.[
-                                    rbacAnnotations.DEPENDENCIES
-                                  ]
-                                ).join(", ")
+                                $t("core.role.universal.text.dependent_on", {
+                                  roles: JSON.parse(
+                                    role.metadata.annotations?.[
+                                      rbacAnnotations.DEPENDENCIES
+                                    ]
+                                  ).join(", "),
+                                })
                               }}
                             </span>
                           </div>

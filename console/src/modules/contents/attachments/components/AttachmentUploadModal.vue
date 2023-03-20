@@ -129,9 +129,7 @@ watch(
             {
               metadata: { name: '' },
               spec: {
-                displayName: $t(
-                  'core.attachment.upload_modal.filters.group.options.ungrouped'
-                ),
+                displayName: $t('core.attachment.universal.text.ungrouped'),
               },
             },
             ...(groups || []),

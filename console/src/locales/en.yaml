@@ -54,9 +54,17 @@ core:
       add_widget: Add Widget
     widgets:
       modal_title: Widgets
+      groups:
+        post: Post
+        page: Page
+        comment: Comment
+        user: User
+        other: Other
       presets:
         post_stats:
           title: Posts
+        page_stats:
+          title: Pages
         recent_published:
           title: Recent Posts
           visits: "{visits} Visits"
@@ -137,6 +145,12 @@ core:
           publish_time_asc: Earliest Published
           create_time_desc: Latest Created
           create_time_asc: Earliest Created
+    list:
+      fields:
+        categories: "Categories:"
+        visits: "{visits} Visits"
+        comments: "{comments} Comments"
+        pinned: Pinned
     settings:
       title: Settings
       groups:
@@ -190,8 +204,11 @@ core:
         description: This operation will restore the posts to its state before deletion.
   post_editor:
     title: Post edit
+    untitled: Untitled post
   post_tag:
     title: Post tags
+    header:
+      title: "{count} Tags"
     empty:
       title: There are no tags currently.
       message: You can try to refresh or create a new tag.
@@ -223,6 +240,8 @@ core:
           help: Theme adaptation is required to support
   post_category:
     title: Post categories
+    header:
+      title: "{count} Categories"
     empty:
       title: There are no categories currently.
       message: You can try to refresh or create a new category.
@@ -292,6 +311,10 @@ core:
           publish_time_asc: Earliest Published
           create_time_desc: Latest Created
           create_time_asc: Earliest Created
+    list:
+      fields:
+        visits: "{visits} Visits"
+        comments: "{comments} Comments"
     settings:
       title: Settings
       groups:
@@ -341,6 +364,7 @@ core:
         description: This operation will restore the pages to its state before deletion.
   page_editor:
     title: Page edit
+    untitled: Untitled page
   comment:
     title: Comments
     empty:
@@ -367,6 +391,8 @@ core:
         title: Are you sure you want to delete this reply?
       approve_reply:
         button: Approve
+      reply:
+        button: Reply
     filters:
       status:
         items:
@@ -382,8 +408,28 @@ core:
           last_reply_time: Last reply time
           reply_count: Reply count
           creation_time: Creation time
+    list:
+      fields:
+        reply_count: "{count} Replies"
+        has_new_replies: New replies
+        pending_review: Pending review
+    subject_refs:
+      post: Post
+      page: Page
+      unknown: Unknown
+    reply_modal:
+      title: Reply
+      fields:
+        content:
+          label: Content
+      operations:
+        submit:
+          toast_success: Reply successfully
   attachment:
     title: Attachments
+    universal:
+      text:
+        ungrouped: Ungrouped
     actions:
       storage_policies: Storage Policies
     empty:
@@ -445,7 +491,6 @@ core:
     group_list:
       internal_groups:
         all: All
-        ungrouped: Ungrouped
       operations:
         new:
           button: New
@@ -489,8 +534,6 @@ core:
       filters:
         group:
           label: "Select group:"
-          options:
-            ungrouped: Ungrouped
         policy:
           label: "Select storage policy:"
           actions:
@@ -704,6 +747,14 @@ core:
         last_starttime: Last Start Time
     settings:
       title: Plugin settings
+    loader:
+      toast:
+        entry_load_failed: "{name}: Failed to load plugin entry file"
+        style_load_failed: "{name}: Failed to load plugin stylesheet file"
+    extension_points:
+      editor:
+        providers:
+          default: Default Editor
   user:
     title: Users
     universal:
@@ -792,6 +843,7 @@ core:
         system_reserved: System Reserved
         custom: Custom
         dependent_on: Dependent on {roles}
+        provided_by_plugin: Provided by {plugin}
     actions:
       new: New role
     operations:
@@ -930,7 +982,7 @@ core:
     role-template-change-password: Change Password
   components:
     submit_button:
-      text: Submit
+      computed_text: "{text} ({shortcut})"
     annotations_form:
       custom_fields:
         label: Custom
@@ -949,6 +1001,35 @@ core:
             draft: Draft
             owner: Owner
             permalink: Permalink
+      extensions:
+        placeholder:
+          options:
+            placeholder: "Enter / to select input type."
+      toolbar:
+        attachment: Insert attachment
+      upload_attachment:
+        toast:
+          no_available_policy: There is currently no available storage policy
+          failed_fetch_permalink: "Failed to get the permalink of the attachment: {display_name}"
+    global_search:
+      placeholder: Enter keywords to search
+      no_results: No search results
+      buttons:
+        select: Select
+      groups:
+        console: Console page
+        user: User
+        plugin: Plugin
+        post: Post
+        category: Category
+        tag: Tag
+        page: Page
+        attachment: Attachment
+        setting: Setting
+        theme_setting: Theme setting
+  composables:
+    content_cache:
+      toast_recovered: Recovered unsaved content from cache
   formkit:
     category_select:
       creation_label: "Create {text} category"
@@ -984,6 +1065,7 @@ core:
       copy: Copy
       upload: Upload
       add: Add
+      submit: Submit
     radio:
       "yes": Yes
       "no": No
@@ -1048,3 +1130,5 @@ core:
       unpublished_content_tip: There is content that has been saved but not yet published.
       publishing: Publishing
       recovering: Recovering
+    fields:
+      post_count: "{count} Posts"

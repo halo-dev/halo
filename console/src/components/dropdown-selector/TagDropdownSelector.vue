@@ -104,7 +104,11 @@ const searchResults = computed(() => {
                 </template>
                 <template #end>
                   <VEntityField
-                    :description="`${tag.status?.postCount || 0} 篇文章`"
+                    :description="
+                      $t('core.universal.fields.post_count', {
+                        count: tag.status?.postCount || 0,
+                      })
+                    "
                   />
                 </template>
               </VEntity>

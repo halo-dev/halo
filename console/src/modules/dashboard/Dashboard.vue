@@ -124,11 +124,14 @@ import { useStorage } from "@vueuse/core";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import type { DashboardStats } from "@halo-dev/api-client/index";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const widgetsGroup = [
   {
     id: "post",
-    label: "文章",
+    label: t("core.dashboard.widgets.groups.post"),
     widgets: [
       { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "PostStatsWidget" },
       { x: 0, y: 0, w: 6, h: 10, i: 1, widget: "RecentPublishedWidget" },
@@ -136,19 +139,19 @@ const widgetsGroup = [
   },
   {
     id: "page",
-    label: "页面",
+    label: t("core.dashboard.widgets.groups.page"),
     widgets: [
       { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "SinglePageStatsWidget" },
     ],
   },
   {
     id: "comment",
-    label: "评论",
+    label: t("core.dashboard.widgets.groups.comment"),
     widgets: [{ x: 0, y: 0, w: 3, h: 3, i: 0, widget: "CommentStatsWidget" }],
   },
   {
     id: "user",
-    label: "用户",
+    label: t("core.dashboard.widgets.groups.user"),
     widgets: [
       { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "UserStatsWidget" },
       { x: 0, y: 0, w: 3, h: 3, i: 1, widget: "UserProfileWidget" },
@@ -156,7 +159,7 @@ const widgetsGroup = [
   },
   {
     id: "other",
-    label: "其他",
+    label: t("core.dashboard.widgets.groups.other"),
     widgets: [
       { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "ViewsStatsWidget" },
       { x: 0, y: 0, w: 6, h: 10, i: 1, widget: "QuickLinkWidget" },

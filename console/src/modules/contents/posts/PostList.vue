@@ -820,7 +820,8 @@ watch(selectedPostNames, (newValue) => {
                           v-if="post.categories.length"
                           class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
                         >
-                          分类：<a
+                          {{ $t("core.post.list.fields.categories") }}
+                          <a
                             v-for="(category, categoryIndex) in post.categories"
                             :key="categoryIndex"
                             :href="category.status?.permalink"
@@ -832,16 +833,24 @@ watch(selectedPostNames, (newValue) => {
                           </a>
                         </p>
                         <span class="text-xs text-gray-500">
-                          访问量 {{ post.stats.visit || 0 }}
+                          {{
+                            $t("core.post.list.fields.visits", {
+                              visits: post.stats.visit,
+                            })
+                          }}
                         </span>
                         <span class="text-xs text-gray-500">
-                          评论 {{ post.stats.totalComment || 0 }}
+                          {{
+                            $t("core.post.list.fields.comments", {
+                              comments: post.stats.totalComment || 0,
+                            })
+                          }}
                         </span>
                         <span
                           v-if="post.post.spec.pinned"
                           class="text-xs text-gray-500"
                         >
-                          已置顶
+                          {{ $t("core.post.list.fields.pinned") }}
                         </span>
                       </VSpace>
                       <VSpace v-if="post.tags.length" class="flex-wrap">

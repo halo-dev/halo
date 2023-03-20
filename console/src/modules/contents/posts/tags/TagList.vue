@@ -142,7 +142,9 @@ onMounted(async () => {
           >
             <div class="flex w-full flex-1 sm:w-auto">
               <span class="text-base font-medium">
-                {{ tags?.length || 0 }} 个标签
+                {{
+                  $t("core.post_tag.header.title", { count: tags?.length || 0 })
+                }}
               </span>
             </div>
             <div class="flex flex-row gap-2">
@@ -222,7 +224,11 @@ onMounted(async () => {
                     </template>
                   </VEntityField>
                   <VEntityField
-                    :description="`${tag.status?.postCount || 0} 篇文章`"
+                    :description="
+                      $t('core.universal.fields.post_count', {
+                        count: tag.status?.postCount || 0,
+                      })
+                    "
                   />
                   <VEntityField>
                     <template #description>

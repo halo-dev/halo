@@ -9,7 +9,7 @@ import { apiClient } from "@/utils/api-client";
 // setup
 import "./setup/setupStyles";
 import { setupComponents } from "./setup/setupComponents";
-import { setupI18n } from "./setup/setupI18n";
+import { setupI18n, i18n } from "./setup/setupI18n";
 // core modules
 import { coreModules } from "./modules";
 import { useScriptTag } from "@vueuse/core";
@@ -162,7 +162,10 @@ async function loadPluginModules() {
           });
         }
       } catch (e) {
-        const message = `${plugin.metadata.name}: 加载插件入口文件失败`;
+        const message = i18n.global.t(
+          "core.plugin.loader.toast.entry_load_failed",
+          { name: plugin.spec.displayName }
+        );
         console.error(message, e);
         pluginErrorMessages.push(message);
       }
@@ -172,7 +175,10 @@ async function loadPluginModules() {
       try {
         await loadStyle(`${import.meta.env.VITE_API_URL}${stylesheet}`);
       } catch (e) {
-        const message = `${plugin.metadata.name}: 加载插件样式文件失败`;
+        const message = i18n.global.t(
+          "core.plugin.loader.toast.style_load_failed",
+          { name: plugin.spec.displayName }
+        );
         console.error(message, e);
         pluginErrorMessages.push(message);
       }
