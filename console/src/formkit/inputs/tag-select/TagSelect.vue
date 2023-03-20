@@ -52,11 +52,11 @@ const { tags: postTags, handleFetchTags } = usePostTag();
 let fuse: Fuse<Tag> | undefined = undefined;
 
 const searchResults = computed(() => {
-  if (!fuse || !text.value) {
+  if (!text.value) {
     return postTags.value;
   }
 
-  return fuse?.search(text.value).map((item) => item.item);
+  return fuse?.search(text.value).map((item) => item.item) || [];
 });
 
 watch(
