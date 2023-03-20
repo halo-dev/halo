@@ -1,6 +1,7 @@
 package run.halo.app.content;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -15,10 +16,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.service.RoleService;
+import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonUtils;
@@ -52,8 +55,11 @@ public class PostIntegrationTests {
             .verbs("*")
             .build();
         var role = new Role();
+        role.setMetadata(new Metadata());
+        role.getMetadata().setName("super-role");
         role.setRules(List.of(rule));
         when(roleService.getMonoRole("authenticated")).thenReturn(Mono.just(role));
+        when(roleService.listDependenciesFlux(anySet())).thenReturn(Flux.just(role));
         webTestClient = webTestClient.mutateWith(csrf());
     }
 

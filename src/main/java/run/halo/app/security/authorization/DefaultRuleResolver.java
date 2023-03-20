@@ -9,10 +9,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
-import reactor.core.publisher.Flux;
+import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.service.DefaultRoleBindingService;
@@ -27,6 +28,7 @@ import run.halo.app.infra.utils.JsonUtils;
  * @since 2.0.0
  */
 @Data
+@Slf4j
 public class DefaultRuleResolver implements AuthorizationRuleResolver {
     private static final String AUTHENTICATED_ROLE = "authenticated";
     private RoleService roleService;
@@ -96,26 +98,27 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
         var record = new AttributesRecord(user, requestInfo);
         var visitor = new AuthorizingVisitor(record);
         var stopVisiting = new AtomicBoolean(false);
-        return Flux.fromIterable(roleNames)
-            .flatMap(roleName -> {
+        return roleService.listDependenciesFlux(roleNames)
+            .filter(role -> !CollectionUtils.isEmpty(role.getRules()))
+            .doOnNext(role -> {
                 if (stopVisiting.get()) {
-                    return Mono.empty();
+                    return;
                 }
-                return roleService.getMonoRole(roleName)
-                    .onErrorResume(t -> visitor.visit(null, null, t), t -> {
-                        //Do nothing here
-                        return Mono.empty();
-                    })
-                    .doOnNext(role -> {
-                        var rules = fetchRules(role);
-                        var source = roleBindingDescriber(roleName, user.getUsername());
-                        for (var rule : rules) {
-                            if (!visitor.visit(source, rule, null)) {
-                                stopVisiting.set(true);
-                                return;
-                            }
-                        }
-                    });
+                String roleName = role.getMetadata().getName();
+                var rules = role.getRules();
+                var source = roleBindingDescriber(roleName, user.getUsername());
+                for (var rule : rules) {
+                    if (!visitor.visit(source, rule, null)) {
+                        stopVisiting.set(true);
+                        return;
+                    }
+                }
+            })
+            .takeUntil(item -> stopVisiting.get())
+            .onErrorResume(t -> visitor.visit(null, null, t), t -> {
+                log.warn("Error occurred when visiting rules", t);
+                //Do nothing here
+                return Mono.empty();
             })
             .then(Mono.just(visitor));
     }
@@ -125,6 +128,7 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
         if (metadata == null || metadata.getAnnotations() == null) {
             return role.getRules();
         }
+
         // merge policy rules
         String roleDependencyRules = metadata.getAnnotations()
             .get(Role.ROLE_DEPENDENCY_RULES);

@@ -453,9 +453,7 @@ class UserEndpointTest {
                     "metadata": {
                         "name": "test-A",
                         "annotations": {
-                            "rbac.authorization.halo.run/ui-permissions": "[\\"permission-A\\"]",
-                            "rbac.authorization.halo.run/ui-permissions-aggregated":
-                             "[\\"permission-B\\"]"
+                            "rbac.authorization.halo.run/ui-permissions": "[\\"permission-A\\"]"
                         }
                     },
                     "rules": []
@@ -463,6 +461,7 @@ class UserEndpointTest {
                 """, Role.class);
             when(userService.listRoles(eq("fake-user"))).thenReturn(
                 Flux.fromIterable(List.of(roleA)));
+            when(roleService.listDependenciesFlux(anySet())).thenReturn(Flux.just(roleA));
 
             webClient.get().uri("/users/fake-user/permissions")
                 .exchange()
@@ -478,15 +477,12 @@ class UserEndpointTest {
                                    "name": "test-A",
                                    "annotations": {
                                        "rbac.authorization.halo.run/ui-permissions":
-                                        "[\\"permission-A\\"]",
-                                       "rbac.authorization.halo.run/ui-permissions-aggregated":
-                                        "[\\"permission-B\\"]"
+                                        "[\\"permission-A\\"]"
                                    }
                                }
                            }],
                             "uiPermissions": [
-                               "permission-A",
-                               "permission-B"
+                               "permission-A"
                             ]
                         }
                     """);

@@ -15,15 +15,16 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
@@ -256,36 +257,33 @@ public class UserEndpoint implements CustomEndpoint {
                 list.add(role);
                 return list;
             })
-            .map(roles -> {
-                Set<String> uiPermissions = roles.stream()
-                    .map(role -> role.getMetadata().getAnnotations())
-                    .filter(Objects::nonNull)
-                    .map(this::mergeUiPermissions)
-                    .flatMap(Set::stream)
-                    .collect(Collectors.toSet());
-                return new UserPermission(roles, uiPermissions);
-            })
+            .flatMap(roles -> uiPermissions(roles)
+                .collectList()
+                .map(uiPermissions -> new UserPermission(roles, Set.copyOf(uiPermissions)))
+                .defaultIfEmpty(new UserPermission(roles, Set.of()))
+            )
             .flatMap(result -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(result)
             );
     }
 
-    private Set<String> mergeUiPermissions(Map<String, String> annotations) {
-        Set<String> result = new LinkedHashSet<>();
-        String permissionsStr = annotations.get(Role.UI_PERMISSIONS_AGGREGATED_ANNO);
-        if (StringUtils.isNotBlank(permissionsStr)) {
-            result.addAll(JsonUtils.jsonToObject(permissionsStr,
-                new TypeReference<LinkedHashSet<String>>() {
-                }));
-        }
-        String uiPermissionStr = annotations.get(Role.UI_PERMISSIONS_ANNO);
-        if (StringUtils.isNotBlank(uiPermissionStr)) {
-            result.addAll(JsonUtils.jsonToObject(uiPermissionStr,
-                new TypeReference<LinkedHashSet<String>>() {
-                }));
-        }
-        return result;
+    private Flux<String> uiPermissions(Set<Role> roles) {
+        return Flux.fromIterable(roles)
+            .map(role -> role.getMetadata().getName())
+            .collectList()
+            .flatMapMany(roleNames -> roleService.listDependenciesFlux(Set.copyOf(roleNames)))
+            .map(role -> {
+                Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(role);
+                String uiPermissionStr = annotations.get(Role.UI_PERMISSIONS_ANNO);
+                if (StringUtils.isBlank(uiPermissionStr)) {
+                    return new HashSet<String>();
+                }
+                return JsonUtils.jsonToObject(uiPermissionStr,
+                    new TypeReference<LinkedHashSet<String>>() {
+                    });
+            })
+            .flatMapIterable(Function.identity());
     }
 
     record UserPermission(@Schema(required = true) Set<Role> roles,
