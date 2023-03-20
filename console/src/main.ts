@@ -244,6 +244,11 @@ async function initApp() {
     const userStore = useUserStore();
     await userStore.fetchCurrentUser();
 
+    // set locale
+    i18n.global.locale.value =
+      userStore.currentUser?.metadata.annotations?.["locale"] ||
+      navigator.language;
+
     if (userStore.isAnonymous) {
       return;
     }

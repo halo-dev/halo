@@ -4,7 +4,7 @@ import messages from "@intlify/unplugin-vue-i18n/messages";
 
 const i18n = createI18n({
   legacy: false,
-  locale: "en",
+  locale: "zh-CN",
   messages,
 });
 
