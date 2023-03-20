@@ -3,7 +3,6 @@ package run.halo.app.actuator;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 
 import java.net.URI;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -14,15 +13,14 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint;
 import org.springframework.stereotype.Component;
-import run.halo.app.core.extension.AuthProvider;
 import run.halo.app.extension.ConfigMap;
-import run.halo.app.extension.ExtensionClient;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemSetting.Basic;
 import run.halo.app.infra.SystemSetting.Comment;
 import run.halo.app.infra.SystemSetting.User;
+import run.halo.app.security.AuthProviderService;
 
 @WebEndpoint(id = "globalinfo")
 @Component
@@ -32,7 +30,8 @@ public class GlobalInfoEndpoint {
     private final ObjectProvider<SystemConfigurableEnvironmentFetcher> systemConfigFetcher;
 
     private final ExternalUrlSupplier externalUrl;
-    private final ExtensionClient client;
+
+    private final AuthProviderService authProviderService;
 
     @ReadOperation
     public GlobalInfo globalInfo() {
@@ -116,23 +115,24 @@ public class GlobalInfoEndpoint {
     }
 
     private void handleSocialAuthProvider(GlobalInfo info) {
-        List<SocialAuthProvider> providers = client.list(AuthProvider.class,
-                authProvider -> isTrue(authProvider.getSpec().getEnabled())
-                    && authProvider.getMetadata().getDeletionTimestamp() == null,
-                Comparator.comparing(item -> item.getMetadata().getCreationTimestamp())
+        List<SocialAuthProvider> providers = authProviderService.listAll()
+            .map(listedAuthProviders -> listedAuthProviders.stream()
+                .filter(provider -> isTrue(provider.getEnabled()))
+                .filter(provider -> StringUtils.isNotBlank(provider.getBindingUrl()))
+                .map(provider -> {
+                    SocialAuthProvider socialAuthProvider = new SocialAuthProvider();
+                    socialAuthProvider.setName(provider.getName());
+                    socialAuthProvider.setDisplayName(provider.getDisplayName());
+                    socialAuthProvider.setDescription(provider.getDescription());
+                    socialAuthProvider.setLogo(provider.getLogo());
+                    socialAuthProvider.setWebsite(provider.getWebsite());
+                    socialAuthProvider.setAuthenticationUrl(provider.getAuthenticationUrl());
+                    return socialAuthProvider;
+                })
+                .toList()
             )
-            .stream()
-            .filter(authProvider -> StringUtils.isNotBlank(authProvider.getSpec().getBindingUrl()))
-            .map(provider -> {
-                SocialAuthProvider socialAuthProvider = new SocialAuthProvider();
-                socialAuthProvider.setName(provider.getMetadata().getName());
-                socialAuthProvider.setDisplayName(provider.getSpec().getDisplayName());
-                socialAuthProvider.setDescription(provider.getSpec().getDescription());
-                socialAuthProvider.setLogo(provider.getSpec().getLogo());
-                socialAuthProvider.setWebsite(provider.getSpec().getWebsite());
-                socialAuthProvider.setAuthenticationUrl(provider.getSpec().getAuthenticationUrl());
-                return socialAuthProvider;
-            }).toList();
+            .block();
+
         info.setSocialAuthProviders(providers);
     }
 

@@ -5,7 +5,7 @@ metadata:
   finalizers:
     - system-protection
 spec:
-  displayName: Form Login
+  displayName: Local
   enabled: true
   description: Built-in authentication for Halo.
   logo: https://halo.run/logo

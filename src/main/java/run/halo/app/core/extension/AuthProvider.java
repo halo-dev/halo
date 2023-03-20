@@ -39,9 +39,6 @@ public class AuthProvider extends AbstractExtension {
 
         private String website;
 
-        @Schema(requiredMode = NOT_REQUIRED, defaultValue = "false")
-        private Boolean enabled;
-
         private String helpPage;
 
         @Schema(requiredMode = REQUIRED, description = "Authentication url of the auth provider")
