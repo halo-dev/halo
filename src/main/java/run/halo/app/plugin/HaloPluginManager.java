@@ -363,16 +363,6 @@ public class HaloPluginManager extends UnSafePluginManager {
     }
 
     @Override
-    public String getVersion() {
-        LOCK.lock();
-        try {
-            return super.getVersion();
-        } finally {
-            LOCK.unlock();
-        }
-    }
-
-    @Override
     public boolean isExactVersionAllowed() {
         LOCK.lock();
         try {
