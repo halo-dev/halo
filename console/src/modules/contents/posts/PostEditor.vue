@@ -253,7 +253,7 @@ const handleFetchContent = async () => {
       formState.value.post = data;
     } else {
       Dialog.warning({
-        title: "警告",
+        title: t("core.universal.dialog.titles.warning"),
         description: t("core.universal.dialog.descriptions.editor_not_found", {
           raw_type: data.rawType,
         }),
@@ -350,7 +350,7 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     @published="onSettingPublished"
   />
   <PostPreviewModal v-model:visible="previewModal" :post="formState.post" />
-  <VPageHeader title="文章">
+  <VPageHeader :title="$t('core.post.title')">
     <template #icon>
       <IconBookRead class="mr-2 self-center" />
     </template>

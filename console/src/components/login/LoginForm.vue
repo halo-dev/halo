@@ -10,6 +10,9 @@ import qs from "qs";
 import { submitForm } from "@formkit/core";
 import { JSEncrypt } from "jsencrypt";
 import { apiClient } from "@/utils/api-client";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (event: "succeed"): void;
@@ -70,19 +73,21 @@ const handleLogin = async () => {
 
     if (e instanceof AxiosError) {
       if (/Network Error/.test(e.message)) {
-        Toast.error("网络错误，请检查网络连接");
+        Toast.error(t("core.universal.toast.network_error"));
         return;
       }
 
       if (e.response?.status === 403) {
-        Toast.warning("CSRF Token 失效，请重新尝试", { duration: 5000 });
+        Toast.warning(t("core.login.operations.submit.toast_csrf"), {
+          duration: 5000,
+        });
         await handleGenerateToken();
         return;
       }
 
-      Toast.error("登录失败，用户名或密码错误");
+      Toast.error(t("core.login.operations.submit.toast_failed"));
     } else {
-      Toast.error("未知异常");
+      Toast.error(t("core.universal.toast.unknown_error"));
     }
 
     loginForm.value.password = "";

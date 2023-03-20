@@ -194,5 +194,10 @@ const actions: Action[] = [
       </div>
     </div>
   </VCard>
-  <ThemePreviewModal v-model:visible="themePreviewVisible" title="查看站点" />
+  <ThemePreviewModal
+    v-model:visible="themePreviewVisible"
+    :title="
+      $t('core.dashboard.widgets.presets.quicklink.actions.view_site.title')
+    "
+  />
 </template>

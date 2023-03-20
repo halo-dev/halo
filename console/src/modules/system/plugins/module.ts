@@ -46,7 +46,7 @@ export default definePlugin({
               name: "PluginDetail",
               component: PluginDetail,
               meta: {
-                title: "插件详情",
+                title: "core.plugin.detail.title",
                 permissions: ["system:plugins:view"],
               },
             },
@@ -55,7 +55,7 @@ export default definePlugin({
               name: "PluginSetting",
               component: PluginSetting,
               meta: {
-                title: "插件设置",
+                title: "core.plugin.settings.title",
                 permissions: ["system:plugins:manage"],
               },
             },

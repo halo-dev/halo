@@ -7,12 +7,14 @@ core:
       password:
         placeholder: 密码
         validation: 请输入密码
+    operations:
+      submit:
+        toast_success: 登录成功
+        toast_failed: 登录失败，用户名或密码错误
+        toast_csrf: CSRF Token 失效，请重新尝试
     button: 登录
     modal:
       title: 重新登录
-      operations:
-        submit:
-          toast_success: 登录成功
   sidebar:
     search:
       placeholder: 搜索
@@ -34,6 +36,16 @@ core:
         users: 用户
         settings: 设置
         actuator: 概览
+    operations:
+      more:
+        button: 更多
+      logout:
+        button: 退出登录
+        title: 确定要退出登录吗？
+      profile:
+        button: 个人资料
+      visit_homepage:
+        title: 访问首页
   dashboard:
     title: 仪表板
     actions:
@@ -176,6 +188,8 @@ core:
       recovery_in_batch:
         title: 确定要恢复选中的文章吗？
         description: 该操作会将文章恢复到被删除之前的状态。
+  post_editor:
+    title: 文章编辑
   post_tag:
     title: 文章标签
     empty:
@@ -325,6 +339,8 @@ core:
       recovery_in_batch:
         title: 确认要恢复选中的自定义页面吗？
         description: 该操作会将自定义页面恢复到被删除之前的状态。
+  page_editor:
+    title: 页面编辑
   comment:
     title: 评论
     empty:
@@ -349,6 +365,8 @@ core:
         title: 确定要审核通过该评论的所有回复吗？
       delete_reply:
         title: 确认要删除该回复吗？
+      approve_reply:
+        button: 审核通过
     filters:
       status:
         items:
@@ -555,6 +573,8 @@ core:
         requires: 版本要求
         storage_location: 存储位置
         plugin_requires: 插件依赖
+    settings:
+      title: 主题设置
     custom_templates:
       default: 默认模版
   menu:
@@ -670,6 +690,7 @@ core:
           title: 插件已存在
           description: 当前安装的插件已存在，是否升级？
     detail:
+      title: 插件详情
       header:
         title: 插件信息
       fields:
@@ -681,6 +702,8 @@ core:
         license: 协议
         role_templates: 权限模板
         last_starttime: 最近一次启动
+    settings:
+      title: 插件设置
   user:
     title: 用户
     universal:
@@ -745,6 +768,7 @@ core:
           label: 角色
           placeholder: 请选择角色
     detail:
+      title: 用户详情
       tabs:
         detail: 详情
       actions:
@@ -777,7 +801,7 @@ core:
       create_based_on_this_role:
         button: 基于此角色创建
     detail:
-      title: 角色：{role}
+      title: 角色详情
       header:
         title: 角色信息
       tabs:
@@ -838,6 +862,7 @@ core:
     actions:
       dashboard: 仪表盘
   setup:
+    title: 系统初始化
     operations:
       submit:
         button: 初始化
@@ -983,9 +1008,19 @@ core:
       download_failed: 下载失败
       save_failed_and_retry: 保存失败，请重试
       publish_failed_and_retry: 发布失败，请重试
+      network_error: 网络错误，请检查网络连接
+      request_parameter_error: 请求参数错误：{title}
+      login_expired: 登录已过期，请重新登录
+      forbidden: 无权限访问
+      not_found: 资源不存在
+      server_internal_error_with_title: 服务器内部错误：{title}
+      server_internal_error: 服务器内部错误
+      unknown_error_with_title: 未知错误：{title}
+      unknown_error: 未知错误
     dialog:
       titles:
         tip: 提示
+        warning: 警告
       descriptions:
         cannot_be_recovered: 该操作不可恢复。
         editor_not_found: 未找到符合 {raw_type} 格式的编辑器，请检查是否已安装编辑器插件
@@ -1012,3 +1047,4 @@ core:
     tooltips:
       unpublished_content_tip: 当前有内容已保存，但还未发布。
       publishing: 发布中
+      recovering: 恢复中

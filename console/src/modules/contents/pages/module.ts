@@ -48,7 +48,7 @@ export default definePlugin({
           name: "SinglePageEditor",
           component: SinglePageEditor,
           meta: {
-            title: "页面编辑",
+            title: "core.page_editor.title",
             searchable: true,
             permissions: ["system:singlepages:manage"],
           },

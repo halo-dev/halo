@@ -245,7 +245,7 @@ const handleFetchContent = async () => {
       formState.value.page = data;
     } else {
       Dialog.warning({
-        title: "警告",
+        title: t("core.universal.dialog.titles.warning"),
         description: t("core.universal.dialog.descriptions.editor_not_found", {
           raw_type: data.rawType,
         }),
@@ -337,7 +337,7 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     @published="onSettingPublished"
   />
   <PostPreviewModal v-model:visible="previewModal" />
-  <VPageHeader title="自定义页面">
+  <VPageHeader :title="$t('core.page.title')">
     <template #icon>
       <IconPages class="mr-2 self-center" />
     </template>

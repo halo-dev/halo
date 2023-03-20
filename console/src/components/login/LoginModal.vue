@@ -13,7 +13,7 @@ const onVisibleChange = (visible: boolean) => {
 
 const onLoginSucceed = () => {
   onVisibleChange(false);
-  Toast.success(t("core.login.modal.operations.submit.toast_success"));
+  Toast.success(t("core.login.operations.submit.toast_success"));
 };
 </script>
 

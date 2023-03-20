@@ -53,7 +53,7 @@ export default definePlugin({
           name: "PostEditor",
           component: PostEditor,
           meta: {
-            title: "文章编辑",
+            title: "core.post_editor.title",
             searchable: true,
             permissions: ["system:posts:manage"],
           },

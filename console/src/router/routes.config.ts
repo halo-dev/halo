@@ -27,7 +27,7 @@ export const routes: Array<RouteRecordRaw> = [
     name: "Setup",
     component: Setup,
     meta: {
-      title: "系统初始化",
+      title: "core.setup.title",
     },
   },
 ];

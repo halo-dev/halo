@@ -145,7 +145,7 @@ const { mutateAsync: singlePageUpdateMutate } = useMutation({
   retry: 3,
   onError: (error) => {
     console.error("Failed to update post", error);
-    Toast.error(`服务器内部错误`);
+    Toast.error(t("core.universal.toast.server_internal_error"));
   },
 });
 

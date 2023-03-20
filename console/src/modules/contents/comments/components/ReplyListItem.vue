@@ -202,7 +202,7 @@ const isHoveredReply = computed(() => {
         block
         @click="handleApprove"
       >
-        审核通过
+        {{ $t("core.comment.operations.approve_reply.button") }}
       </VButton>
       <VButton
         v-permission="['system:comments:manage']"

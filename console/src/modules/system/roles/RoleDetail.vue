@@ -97,15 +97,7 @@ onMounted(() => {
 });
 </script>
 <template>
-  <VPageHeader
-    :title="
-      $t('core.role.detail.title', {
-        role:
-          formState.metadata?.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
-          formState.metadata?.name,
-      })
-    "
-  >
+  <VPageHeader :title="$t('core.role.detail.title')">
     <template #icon>
       <IconShieldUser class="mr-2 self-center" />
     </template>

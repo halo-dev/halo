@@ -7,12 +7,14 @@ core:
       password:
         placeholder: Password
         validation: Please enter password
+    operations:
+      submit:
+        toast_success: Login successful
+        toast_failed: Login failed, incorrect username or password
+        toast_csrf: CSRF Token expired, please try again
     button: Login
     modal:
       title: Re-login
-      operations:
-        submit:
-          toast_success: Login successful
   sidebar:
     search:
       placeholder: Search
@@ -34,6 +36,16 @@ core:
         users: Users
         settings: Settings
         actuator: Actuator
+    operations:
+      more:
+        button: More
+      logout:
+        button: Logout
+        title: Are you sure you want to log out?
+      profile:
+        button: Profile
+      visit_homepage:
+        title: Visit homepage
   dashboard:
     title: Dashboard
     actions:
@@ -176,6 +188,8 @@ core:
       recovery_in_batch:
         title: Are you sure you want to restore the selected posts?
         description: This operation will restore the posts to its state before deletion.
+  post_editor:
+    title: Post edit
   post_tag:
     title: Post tags
     empty:
@@ -325,6 +339,8 @@ core:
       recovery_in_batch:
         title: Are you sure you want to restore the selected pages?
         description: This operation will restore the pages to its state before deletion.
+  page_editor:
+    title: Page edit
   comment:
     title: Comments
     empty:
@@ -349,6 +365,8 @@ core:
         title: Are you sure you want to approve all replies to this comment for review?
       delete_reply:
         title: Are you sure you want to delete this reply?
+      approve_reply:
+        button: Approve
     filters:
       status:
         items:
@@ -555,6 +573,8 @@ core:
         requires: Requires
         storage_location: Storage Location
         plugin_requires: Plugin Requires
+    settings:
+      title: Theme settings
     custom_templates:
       default: Default
   menu:
@@ -670,6 +690,7 @@ core:
           title: The plugin already exists.
           description: The currently installed plugin already exists, do you want to upgrade?
     detail:
+      title: Plugin detail
       header:
         title: Plugin information
       fields:
@@ -681,6 +702,8 @@ core:
         license: License
         role_templates: Role Templates
         last_starttime: Last Start Time
+    settings:
+      title: Plugin settings
   user:
     title: Users
     universal:
@@ -745,6 +768,7 @@ core:
           label: Role
           placeholder: Please select a role
     detail:
+      title: User detail
       tabs:
         detail: Detail
       actions:
@@ -777,7 +801,7 @@ core:
       create_based_on_this_role:
         button: Create based on this role
     detail:
-      title: "Role: {role}"
+      title: Role detail
       header:
         title: Role information
       tabs:
@@ -838,6 +862,7 @@ core:
     actions:
       dashboard: Dashboard
   setup:
+    title: Setup
     operations:
       submit:
         button: Setup
@@ -981,11 +1006,21 @@ core:
       download_success: Download successful
       copy_success: Copy successful
       download_failed: Download failed
-      save_failed_and_retry: Save failed, please try again.
-      publish_failed_and_retry: Publish failed, please try again.
+      save_failed_and_retry: Save failed, please try again
+      publish_failed_and_retry: Publish failed, please try again
+      network_error: Network error, please check your network connection
+      request_parameter_error: "Request parameter error: {title}"
+      login_expired: Login has expired, please log in again
+      forbidden: Unauthorized access
+      not_found: The resource does not exist
+      server_internal_error_with_title: "Internal Server Error: {title}"
+      server_internal_error: "Internal Server Error"
+      unknown_error_with_title: "Unknown error: {title}"
+      unknown_error: "Unknown error"
     dialog:
       titles:
         tip: Tip
+        warning: Warning
       descriptions:
         cannot_be_recovered: This operation is irreversible.
         editor_not_found: No editor found that matches the {raw_type} format. Please check if the editor plugin has been installed.
@@ -1012,3 +1047,4 @@ core:
     tooltips:
       unpublished_content_tip: There is content that has been saved but not yet published.
       publishing: Publishing
+      recovering: Recovering

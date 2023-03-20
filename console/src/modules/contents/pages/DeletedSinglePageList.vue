@@ -385,7 +385,11 @@ function handleClearKeyword() {
                 </VEntityField>
                 <VEntityField v-if="!singlePage?.page?.spec.deleted">
                   <template #description>
-                    <VStatusDot v-tooltip="`恢复中`" state="success" animate />
+                    <VStatusDot
+                      v-tooltip="$t('core.universal.tooltips.recovering')"
+                      state="success"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField

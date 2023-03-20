@@ -57,7 +57,7 @@ export default definePlugin({
               name: "UserDetail",
               component: UserDetail,
               meta: {
-                title: "用户详情",
+                title: "core.user.detail.title",
               },
             },
             {

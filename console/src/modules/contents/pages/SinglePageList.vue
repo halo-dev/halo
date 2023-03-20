@@ -726,7 +726,9 @@ watch(selectedPageNames, (newValue) => {
                     <VSpace>
                       <RouterLink
                         v-if="singlePage.page.status?.inProgress"
-                        v-tooltip="`当前有内容已保存，但还未发布。`"
+                        v-tooltip="
+                          $t('core.universal.tooltips.unpublished_content_tip')
+                        "
                         :to="{
                           name: 'SinglePageEditor',
                           query: { name: singlePage.page.metadata.name },

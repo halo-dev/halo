@@ -9,6 +9,7 @@ import { apiClient } from "@/utils/api-client";
 // setup
 import "./setup/setupStyles";
 import { setupComponents } from "./setup/setupComponents";
+import { setupI18n } from "./setup/setupI18n";
 // core modules
 import { coreModules } from "./modules";
 import { useScriptTag } from "@vueuse/core";
@@ -20,22 +21,14 @@ import { useThemeStore } from "./stores/theme";
 import { useSystemStatesStore } from "./stores/system-states";
 import { useUserStore } from "./stores/user";
 import { useSystemConfigMapStore } from "./stores/system-configmap";
-import { createI18n } from "vue-i18n";
-import messages from "@intlify/unplugin-vue-i18n/messages";
 import { VueQueryPlugin } from "@tanstack/vue-query";
 
 const app = createApp(App);
 
 setupComponents(app);
+setupI18n(app);
 
 app.use(createPinia());
-app.use(
-  createI18n({
-    legacy: false,
-    locale: "en",
-    messages,
-  })
-);
 app.use(VueQueryPlugin);
 
 function registerModule(pluginModule: PluginModule, core: boolean) {
