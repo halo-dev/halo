@@ -19,7 +19,6 @@ import { usePermission } from "@/utils/permission";
 import { useThemeStore } from "@/stores/theme";
 import { storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
-import { $attrs } from "@formkit/inputs";
 
 const router = useRouter();
 const route = useRoute();
