@@ -2,19 +2,18 @@
 import { VPageHeader, IconLockPasswordLine, VCard } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { apiClient } from "@/utils/api-client";
-import type { AuthProvider } from "@halo-dev/api-client";
+import type { ListedAuthProvider } from "@halo-dev/api-client";
 import AuthProviderListItem from "./components/AuthProviderListItem.vue";
 
 const {
   data: authProviders,
   isLoading,
   refetch,
-} = useQuery<AuthProvider[]>({
+} = useQuery<ListedAuthProvider[]>({
   queryKey: ["auth-providers"],
   queryFn: async () => {
-    const { data } =
-      await apiClient.extension.authProvider.listauthHaloRunV1alpha1AuthProvider();
-    return data.items;
+    const { data } = await apiClient.authProvider.listAuthProviders();
+    return data;
   },
   refetchOnWindowFocus: false,
 });

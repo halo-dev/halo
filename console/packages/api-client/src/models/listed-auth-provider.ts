@@ -35,7 +35,19 @@ export interface ListedAuthProvider {
    * @type {string}
    * @memberof ListedAuthProvider
    */
+  description?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ListedAuthProvider
+   */
   displayName: string;
+  /**
+   *
+   * @type {boolean}
+   * @memberof ListedAuthProvider
+   */
+  enabled?: boolean;
   /**
    *
    * @type {string}

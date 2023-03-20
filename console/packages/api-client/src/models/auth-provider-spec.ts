@@ -14,9 +14,6 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ClientRegistration } from "./client-registration";
-// May contain unused imports in some cases
-// @ts-ignore
 import { ConfigMapRef } from "./config-map-ref";
 // May contain unused imports in some cases
 // @ts-ignore
@@ -42,12 +39,6 @@ export interface AuthProviderSpec {
   bindingUrl?: string;
   /**
    *
-   * @type {ClientRegistration}
-   * @memberof AuthProviderSpec
-   */
-  clientRegistration: ClientRegistration;
-  /**
-   *
    * @type {ConfigMapRef}
    * @memberof AuthProviderSpec
    */
@@ -64,12 +55,6 @@ export interface AuthProviderSpec {
    * @memberof AuthProviderSpec
    */
   displayName: string;
-  /**
-   *
-   * @type {boolean}
-   * @memberof AuthProviderSpec
-   */
-  enabled?: boolean;
   /**
    *
    * @type {string}

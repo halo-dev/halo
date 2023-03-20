@@ -14,7 +14,6 @@ export * from "./category-list";
 export * from "./category-spec";
 export * from "./category-status";
 export * from "./change-password-request";
-export * from "./client-registration";
 export * from "./comment";
 export * from "./comment-email-owner";
 export * from "./comment-list";

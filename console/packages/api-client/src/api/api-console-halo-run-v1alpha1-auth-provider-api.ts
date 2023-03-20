@@ -38,6 +38,8 @@ import {
   RequiredError,
 } from "../base";
 // @ts-ignore
+import { AuthProvider } from "../models";
+// @ts-ignore
 import { ListedAuthProvider } from "../models";
 /**
  * ApiConsoleHaloRunV1alpha1AuthProviderApi - axios parameter creator
@@ -46,6 +48,114 @@ import { ListedAuthProvider } from "../models";
 export const ApiConsoleHaloRunV1alpha1AuthProviderApiAxiosParamCreator =
   function (configuration?: Configuration) {
     return {
+      /**
+       * Disables an auth provider
+       * @param {string} name
+       * @param {*} [options] Override http request option.
+       * @throws {RequiredError}
+       */
+      disableAuthProvider: async (
+        name: string,
+        options: AxiosRequestConfig = {}
+      ): Promise<RequestArgs> => {
+        // verify required parameter 'name' is not null or undefined
+        assertParamExists("disableAuthProvider", "name", name);
+        const localVarPath =
+          `/apis/api.console.halo.run/v1alpha1/auth-providers/{name}/disable`.replace(
+            `{${"name"}}`,
+            encodeURIComponent(String(name))
+          );
+        // use dummy base URL string because the URL constructor only accepts absolute URLs.
+        const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+        let baseOptions;
+        if (configuration) {
+          baseOptions = configuration.baseOptions;
+        }
+
+        const localVarRequestOptions = {
+          method: "PUT",
+          ...baseOptions,
+          ...options,
+        };
+        const localVarHeaderParameter = {} as any;
+        const localVarQueryParameter = {} as any;
+
+        // authentication BasicAuth required
+        // http basic authentication required
+        setBasicAuthToObject(localVarRequestOptions, configuration);
+
+        // authentication BearerAuth required
+        // http bearer authentication required
+        await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+        setSearchParams(localVarUrlObj, localVarQueryParameter);
+        let headersFromBaseOptions =
+          baseOptions && baseOptions.headers ? baseOptions.headers : {};
+        localVarRequestOptions.headers = {
+          ...localVarHeaderParameter,
+          ...headersFromBaseOptions,
+          ...options.headers,
+        };
+
+        return {
+          url: toPathString(localVarUrlObj),
+          options: localVarRequestOptions,
+        };
+      },
+      /**
+       * Enables an auth provider
+       * @param {string} name
+       * @param {*} [options] Override http request option.
+       * @throws {RequiredError}
+       */
+      enableAuthProvider: async (
+        name: string,
+        options: AxiosRequestConfig = {}
+      ): Promise<RequestArgs> => {
+        // verify required parameter 'name' is not null or undefined
+        assertParamExists("enableAuthProvider", "name", name);
+        const localVarPath =
+          `/apis/api.console.halo.run/v1alpha1/auth-providers/{name}/enable`.replace(
+            `{${"name"}}`,
+            encodeURIComponent(String(name))
+          );
+        // use dummy base URL string because the URL constructor only accepts absolute URLs.
+        const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+        let baseOptions;
+        if (configuration) {
+          baseOptions = configuration.baseOptions;
+        }
+
+        const localVarRequestOptions = {
+          method: "PUT",
+          ...baseOptions,
+          ...options,
+        };
+        const localVarHeaderParameter = {} as any;
+        const localVarQueryParameter = {} as any;
+
+        // authentication BasicAuth required
+        // http basic authentication required
+        setBasicAuthToObject(localVarRequestOptions, configuration);
+
+        // authentication BearerAuth required
+        // http bearer authentication required
+        await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+        setSearchParams(localVarUrlObj, localVarQueryParameter);
+        let headersFromBaseOptions =
+          baseOptions && baseOptions.headers ? baseOptions.headers : {};
+        localVarRequestOptions.headers = {
+          ...localVarHeaderParameter,
+          ...headersFromBaseOptions,
+          ...options.headers,
+        };
+
+        return {
+          url: toPathString(localVarUrlObj),
+          options: localVarRequestOptions,
+        };
+      },
       /**
        * Lists all auth providers
        * @param {*} [options] Override http request option.
@@ -106,6 +216,48 @@ export const ApiConsoleHaloRunV1alpha1AuthProviderApiFp = function (
     ApiConsoleHaloRunV1alpha1AuthProviderApiAxiosParamCreator(configuration);
   return {
     /**
+     * Disables an auth provider
+     * @param {string} name
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async disableAuthProvider(
+      name: string,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<AuthProvider>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.disableAuthProvider(name, options);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
+     * Enables an auth provider
+     * @param {string} name
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async enableAuthProvider(
+      name: string,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<AuthProvider>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.enableAuthProvider(name, options);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
      * Lists all auth providers
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -142,6 +294,34 @@ export const ApiConsoleHaloRunV1alpha1AuthProviderApiFactory = function (
   const localVarFp = ApiConsoleHaloRunV1alpha1AuthProviderApiFp(configuration);
   return {
     /**
+     * Disables an auth provider
+     * @param {ApiConsoleHaloRunV1alpha1AuthProviderApiDisableAuthProviderRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    disableAuthProvider(
+      requestParameters: ApiConsoleHaloRunV1alpha1AuthProviderApiDisableAuthProviderRequest,
+      options?: AxiosRequestConfig
+    ): AxiosPromise<AuthProvider> {
+      return localVarFp
+        .disableAuthProvider(requestParameters.name, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     * Enables an auth provider
+     * @param {ApiConsoleHaloRunV1alpha1AuthProviderApiEnableAuthProviderRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    enableAuthProvider(
+      requestParameters: ApiConsoleHaloRunV1alpha1AuthProviderApiEnableAuthProviderRequest,
+      options?: AxiosRequestConfig
+    ): AxiosPromise<AuthProvider> {
+      return localVarFp
+        .enableAuthProvider(requestParameters.name, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
      * Lists all auth providers
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -157,12 +337,72 @@ export const ApiConsoleHaloRunV1alpha1AuthProviderApiFactory = function (
 };
 
 /**
+ * Request parameters for disableAuthProvider operation in ApiConsoleHaloRunV1alpha1AuthProviderApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1AuthProviderApiDisableAuthProviderRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1AuthProviderApiDisableAuthProviderRequest {
+  /**
+   *
+   * @type {string}
+   * @memberof ApiConsoleHaloRunV1alpha1AuthProviderApiDisableAuthProvider
+   */
+  readonly name: string;
+}
+
+/**
+ * Request parameters for enableAuthProvider operation in ApiConsoleHaloRunV1alpha1AuthProviderApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1AuthProviderApiEnableAuthProviderRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1AuthProviderApiEnableAuthProviderRequest {
+  /**
+   *
+   * @type {string}
+   * @memberof ApiConsoleHaloRunV1alpha1AuthProviderApiEnableAuthProvider
+   */
+  readonly name: string;
+}
+
+/**
  * ApiConsoleHaloRunV1alpha1AuthProviderApi - object-oriented interface
  * @export
  * @class ApiConsoleHaloRunV1alpha1AuthProviderApi
  * @extends {BaseAPI}
  */
 export class ApiConsoleHaloRunV1alpha1AuthProviderApi extends BaseAPI {
+  /**
+   * Disables an auth provider
+   * @param {ApiConsoleHaloRunV1alpha1AuthProviderApiDisableAuthProviderRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiConsoleHaloRunV1alpha1AuthProviderApi
+   */
+  public disableAuthProvider(
+    requestParameters: ApiConsoleHaloRunV1alpha1AuthProviderApiDisableAuthProviderRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return ApiConsoleHaloRunV1alpha1AuthProviderApiFp(this.configuration)
+      .disableAuthProvider(requestParameters.name, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   * Enables an auth provider
+   * @param {ApiConsoleHaloRunV1alpha1AuthProviderApiEnableAuthProviderRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiConsoleHaloRunV1alpha1AuthProviderApi
+   */
+  public enableAuthProvider(
+    requestParameters: ApiConsoleHaloRunV1alpha1AuthProviderApiEnableAuthProviderRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return ApiConsoleHaloRunV1alpha1AuthProviderApiFp(this.configuration)
+      .enableAuthProvider(requestParameters.name, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
   /**
    * Lists all auth providers
    * @param {*} [options] Override http request option.
