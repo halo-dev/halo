@@ -16,16 +16,12 @@ import { useSettingFormConvert } from "@/composables/use-setting-form";
 
 const route = useRoute();
 
-const tabs: { id: string; label: string }[] = [
+const tabs = ref<{ id: string; label: string }[]>([
   {
     id: "detail",
     label: "详情",
   },
-  {
-    id: "setting",
-    label: "设置",
-  },
-];
+]);
 
 const activeTab = ref<string>("detail");
 
@@ -39,6 +35,14 @@ const { data: authProvider } = useQuery<AuthProvider>({
         }
       );
     return data;
+  },
+  onSuccess(data) {
+    if (data.spec.settingRef?.name) {
+      tabs.value.push({
+        id: "setting",
+        label: "设置",
+      });
+    }
   },
   refetchOnWindowFocus: false,
   enabled: computed(() => !!route.params.name),

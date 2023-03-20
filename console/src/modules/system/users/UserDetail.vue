@@ -137,37 +137,39 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
         <dt class="text-sm font-medium text-gray-900">登录方式</dt>
         <dd class="mt-1 text-sm sm:col-span-3 sm:mt-0">
           <ul class="space-y-2">
-            <li v-for="(authProvider, index) in authProviders" :key="index">
-              <div
-                class="flex w-full cursor-pointer flex-wrap justify-between gap-y-3 rounded border p-5 hover:border-primary sm:w-1/2"
-              >
-                <div class="inline-flex items-center gap-3">
-                  <div>
-                    <img class="h-7 w-7 rounded" :src="authProvider.logo" />
+            <template v-for="(authProvider, index) in authProviders">
+              <li v-if="authProvider.bindingUrl" :key="index">
+                <div
+                  class="flex w-full cursor-pointer flex-wrap justify-between gap-y-3 rounded border p-5 hover:border-primary sm:w-1/2"
+                >
+                  <div class="inline-flex items-center gap-3">
+                    <div>
+                      <img class="h-7 w-7 rounded" :src="authProvider.logo" />
+                    </div>
+                    <div class="text-sm font-medium text-gray-900">
+                      {{ authProvider.displayName }}
+                    </div>
                   </div>
-                  <div class="text-sm font-medium text-gray-900">
-                    {{ authProvider.displayName }}
+                  <div class="inline-flex items-center">
+                    <VButton
+                      v-if="authProvider.isBound"
+                      size="sm"
+                      @click="handleUnbindAuth(authProvider)"
+                    >
+                      解绑
+                    </VButton>
+                    <VButton
+                      v-else
+                      size="sm"
+                      type="secondary"
+                      @click="handleBindAuth(authProvider)"
+                    >
+                      绑定
+                    </VButton>
                   </div>
                 </div>
-                <div class="inline-flex items-center">
-                  <VButton
-                    v-if="authProvider.isBound"
-                    size="sm"
-                    @click="handleUnbindAuth(authProvider)"
-                  >
-                    解绑
-                  </VButton>
-                  <VButton
-                    v-else
-                    size="sm"
-                    type="secondary"
-                    @click="handleBindAuth(authProvider)"
-                  >
-                    绑定
-                  </VButton>
-                </div>
-              </div>
-            </li>
+              </li>
+            </template>
           </ul>
         </dd>
       </div>
