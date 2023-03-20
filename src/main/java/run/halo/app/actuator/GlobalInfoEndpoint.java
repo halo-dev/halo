@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint;
@@ -121,6 +122,7 @@ public class GlobalInfoEndpoint {
                 Comparator.comparing(item -> item.getMetadata().getCreationTimestamp())
             )
             .stream()
+            .filter(authProvider -> StringUtils.isNotBlank(authProvider.getSpec().getBindingUrl()))
             .map(provider -> {
                 SocialAuthProvider socialAuthProvider = new SocialAuthProvider();
                 socialAuthProvider.setName(provider.getMetadata().getName());

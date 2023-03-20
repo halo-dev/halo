@@ -8,6 +8,6 @@ spec:
   displayName: Form Login
   enabled: true
   description: Built-in authentication for Halo.
-  logo: /logo
+  logo: https://halo.run/logo
   website: https://halo.run
   authenticationUrl: /login
