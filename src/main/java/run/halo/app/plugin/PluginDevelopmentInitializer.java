@@ -3,7 +3,6 @@ package run.halo.app.plugin;
 import java.nio.file.Path;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
-import org.pf4j.PluginWrapper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -40,30 +39,12 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
         if (!haloPluginManager.isDevelopment()) {
             return;
         }
-        createFixedPluginIfNecessary(haloPluginManager);
+        createFixedPluginIfNecessary();
     }
 
-    private void createFixedPluginIfNecessary(HaloPluginManager pluginManager) {
+    private void createFixedPluginIfNecessary() {
         for (Path path : pluginProperties.getFixedPluginPath()) {
-
-            // Already loaded do not load again
-            String pluginId = idForPath(path);
-
-            // for issue #2901
-            if (pluginId == null) {
-                try {
-                    pluginId = pluginManager.loadPlugin(path);
-                } catch (Exception e) {
-                    log.warn(e.getMessage(), e);
-                    continue;
-                }
-            }
-
-            PluginWrapper pluginWrapper = pluginManager.getPlugin(pluginId);
-            if (pluginWrapper == null) {
-                continue;
-            }
-            Plugin plugin = new YamlPluginFinder().find(pluginWrapper.getPluginPath());
+            Plugin plugin = new YamlPluginFinder().find(path);
             extensionClient.fetch(Plugin.class, plugin.getMetadata().getName())
                 .flatMap(persistent -> {
                     plugin.getMetadata().setVersion(persistent.getMetadata().getVersion());
@@ -74,14 +55,5 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
                     .filter(t -> t instanceof OptimisticLockingFailureException))
                 .block();
         }
-    }
-
-    protected String idForPath(Path pluginPath) {
-        for (PluginWrapper plugin : haloPluginManager.getPlugins()) {
-            if (plugin.getPluginPath().equals(pluginPath)) {
-                return plugin.getPluginId();
-            }
-        }
-        return null;
     }
 }
