@@ -25,5 +25,7 @@ public interface RoleService {
 
     List<Role> listDependencies(Set<String> names);
 
+    Flux<Role> listDependenciesFlux(Set<String> names);
+
     Flux<Role> list(Set<String> roleNames);
 }
