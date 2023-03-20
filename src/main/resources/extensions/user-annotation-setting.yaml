@@ -1,0 +1,17 @@
+apiVersion: v1alpha1
+kind: AnnotationSetting
+metadata:
+  generateName: annotation-setting-
+spec:
+  targetRef:
+    group: ""
+    kind: User
+  formSchema:
+    - $formkit: "select"
+      name: "locale"
+      label: "语言"
+      options:
+        - value: "zh-CN"
+          label: "简体中文"
+        - value: "en-US"
+          label: "English"
