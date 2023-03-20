@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +16,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.SynchronousSink;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.RoleBinding.RoleRef;
@@ -98,32 +96,21 @@ public class DefaultRoleService implements RoleService {
             return Flux.empty();
         }
         Set<String> visited = new HashSet<>();
-        Deque<String> queue = new ArrayDeque<>(names);
-
-        return Flux.generate((Consumer<SynchronousSink<String>>)
-                sink -> {
-                    if (queue.isEmpty()) {
-                        sink.complete();
-                        return;
-                    }
-                    sink.next(queue.poll());
-                })
-            .concatMap(roleName -> {
-                if (visited.contains(roleName)) {
-                    return Mono.empty();
+        return Flux.fromIterable(names)
+            .flatMap(name -> extensionClient.fetch(Role.class, name))
+            .expand(role -> {
+                var name = role.getMetadata().getName();
+                if (visited.contains(name)) {
+                    return Flux.empty();
                 }
-                visited.add(roleName);
-                return extensionClient.fetch(Role.class, roleName)
-                    .map(role -> {
-                        Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(role);
-                        String roleNameDependencies =
-                            annotations.get(Role.ROLE_DEPENDENCIES_ANNO);
-                        List<String> roleDependencies = stringToList(roleNameDependencies);
-                        queue.addAll(roleDependencies);
-                        return role;
-                    });
-            })
-            .doFinally(s -> visited.clear());
+                visited.add(name);
+                var annotations = ExtensionUtil.nullSafeAnnotations(role);
+                var dependenciesJson = annotations.get(Role.ROLE_DEPENDENCIES_ANNO);
+                var dependencies = stringToList(dependenciesJson);
+                return Flux.fromIterable(dependencies)
+                    .filter(dependency -> !visited.contains(dependency))
+                    .flatMap(dependencyName -> extensionClient.fetch(Role.class, dependencyName));
+            });
     }
 
     @Override
