@@ -20,6 +20,7 @@ import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.RoleBinding.RoleRef;
 import run.halo.app.core.extension.RoleBinding.Subject;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -87,6 +88,29 @@ public class DefaultRoleService implements RoleService {
                 });
         }
         return result;
+    }
+
+    @Override
+    public Flux<Role> listDependenciesFlux(Set<String> names) {
+        if (names == null) {
+            return Flux.empty();
+        }
+        Set<String> visited = new HashSet<>();
+        return Flux.fromIterable(names)
+            .flatMap(name -> extensionClient.fetch(Role.class, name))
+            .expand(role -> {
+                var name = role.getMetadata().getName();
+                if (visited.contains(name)) {
+                    return Flux.empty();
+                }
+                visited.add(name);
+                var annotations = ExtensionUtil.nullSafeAnnotations(role);
+                var dependenciesJson = annotations.get(Role.ROLE_DEPENDENCIES_ANNO);
+                var dependencies = stringToList(dependenciesJson);
+                return Flux.fromIterable(dependencies)
+                    .filter(dependency -> !visited.contains(dependency))
+                    .flatMap(dependencyName -> extensionClient.fetch(Role.class, dependencyName));
+            });
     }
 
     @Override

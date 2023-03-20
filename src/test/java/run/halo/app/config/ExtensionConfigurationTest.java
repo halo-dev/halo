@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
@@ -23,6 +24,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.service.RoleService;
@@ -55,9 +57,11 @@ class ExtensionConfigurationTest {
             .verbs("*")
             .build();
         var role = new Role();
+        role.setMetadata(new Metadata());
+        role.getMetadata().setName("supper-role");
         role.setRules(List.of(rule));
         when(roleService.getMonoRole(anyString())).thenReturn(Mono.just(role));
-
+        when(roleService.listDependenciesFlux(anySet())).thenReturn(Flux.just(role));
         // register scheme
         schemeManager.register(FakeExtension.class);
 
