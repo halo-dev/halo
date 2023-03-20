@@ -1,8 +1,10 @@
 package run.halo.app.core.extension.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,14 +14,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.TestRole;
+import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.utils.JsonUtils;
 
 /**
  * Tests for {@link DefaultRoleService}.
@@ -80,5 +87,213 @@ class DefaultRoleServiceTest {
         List<Role> rolesFromCycle =
             roleService.listDependencies(Set.of("role-template-apple-manage"));
         assertThat(rolesFromCycle).hasSize(3);
+    }
+
+    @Nested
+    class ListDependenciesTest {
+        @Test
+        void listDependencies() {
+            // prepare test data
+            Role role1 = createRole("role1", "role2");
+            Role role2 = createRole("role2", "role3");
+            Role role3 = createRole("role3");
+
+            Set<String> roleNames = Set.of("role1");
+
+            // setup mocks
+            when(extensionClient.fetch(Role.class, "role1")).thenReturn(Mono.just(role1));
+            when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
+            when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.just(role3));
+
+            // call the method under test
+            Flux<Role> result = roleService.listDependenciesFlux(roleNames);
+
+            // verify the result
+            StepVerifier.create(result)
+                .expectNext(role1)
+                .expectNext(role2)
+                .expectNext(role3)
+                .verifyComplete();
+
+            // verify the mock invocations
+            verify(extensionClient, times(3)).fetch(eq(Role.class), anyString());
+        }
+
+        @Test
+        void listDependenciesWithCycle() {
+            // prepare test data
+            Role role1 = createRole("role1", "role2");
+            Role role2 = createRole("role2", "role3");
+            Role role3 = createRole("role3", "role1");
+
+            Set<String> roleNames = Set.of("role1");
+
+            // setup mocks
+            when(extensionClient.fetch(Role.class, "role1")).thenReturn(Mono.just(role1));
+            when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
+            when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.just(role3));
+
+            // call the method under test
+            Flux<Role> result = roleService.listDependenciesFlux(roleNames);
+
+            // verify the result
+            StepVerifier.create(result)
+                .expectNext(role1)
+                .expectNext(role2)
+                .expectNext(role3)
+                .verifyComplete();
+
+            // verify the mock invocations
+            verify(extensionClient, times(3)).fetch(eq(Role.class), anyString());
+        }
+
+        @Test
+        void listDependenciesWithMiddleCycle() {
+            // prepare test data
+            // role1 -> role2 -> role3 -> role4
+            //             \<-----|
+            Role role1 = createRole("role1", "role2");
+            Role role2 = createRole("role2", "role3");
+            Role role3 = createRole("role3", "role2", "role4");
+            Role role4 = createRole("role4");
+
+            Set<String> roleNames = Set.of("role1");
+
+            // setup mocks
+            when(extensionClient.fetch(Role.class, "role1")).thenReturn(Mono.just(role1));
+            when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
+            when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.just(role3));
+            when(extensionClient.fetch(Role.class, "role4")).thenReturn(Mono.just(role4));
+
+            // call the method under test
+            Flux<Role> result = roleService.listDependenciesFlux(roleNames);
+
+            // verify the result
+            StepVerifier.create(result)
+                .expectNext(role1)
+                .expectNext(role2)
+                .expectNext(role3)
+                .expectNext(role4)
+                .verifyComplete();
+
+            // verify the mock invocations
+            verify(extensionClient, times(4)).fetch(eq(Role.class), anyString());
+        }
+
+        @Test
+        void listDependenciesWithCycleAndSequence() {
+            // prepare test data
+            // role1 -> role2 -> role3
+            //   \->role4  \<-----|
+            Role role1 = createRole("role1", "role4", "role2");
+            Role role2 = createRole("role2", "role3");
+            Role role3 = createRole("role3", "role2");
+            Role role4 = createRole("role4");
+
+            Set<String> roleNames = Set.of("role1");
+
+            // setup mocks
+            when(extensionClient.fetch(Role.class, "role1")).thenReturn(Mono.just(role1));
+            when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
+            when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.just(role3));
+            when(extensionClient.fetch(Role.class, "role4")).thenReturn(Mono.just(role4));
+
+            // call the method under test
+            Flux<Role> result = roleService.listDependenciesFlux(roleNames);
+
+            // verify the result
+            StepVerifier.create(result)
+                .expectNext(role1)
+                .expectNext(role4)
+                .expectNext(role2)
+                .expectNext(role3)
+                .verifyComplete();
+
+            // verify the mock invocations
+            verify(extensionClient, times(4)).fetch(eq(Role.class), anyString());
+        }
+
+        @Test
+        void listDependenciesAfterCycle() {
+            // prepare test data
+            // role1 -> role2 -> role3
+            //   \->role4  \<-----|
+            Role role1 = createRole("role1", "role4", "role2");
+            Role role2 = createRole("role2", "role3");
+            Role role3 = createRole("role3", "role2");
+            Role role4 = createRole("role4");
+
+            Set<String> roleNames = Set.of("role2");
+
+            // setup mocks
+            lenient().when(extensionClient.fetch(Role.class, "role1")).thenReturn(Mono.just(role1));
+            when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
+            when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.just(role3));
+            lenient().when(extensionClient.fetch(Role.class, "role4")).thenReturn(Mono.just(role4));
+
+            // call the method under test
+            Flux<Role> result = roleService.listDependenciesFlux(roleNames);
+
+            // verify the result
+            StepVerifier.create(result)
+                .expectNext(role2)
+                .expectNext(role3)
+                .verifyComplete();
+
+            // verify the mock invocations
+            verify(extensionClient, times(2)).fetch(eq(Role.class), anyString());
+        }
+
+        @Test
+        void listDependenciesWithNullParam() {
+            Flux<Role> result = roleService.listDependenciesFlux(null);
+            // verify the result
+            StepVerifier.create(result)
+                .verifyComplete();
+
+            result = roleService.listDependenciesFlux(Set.of());
+            StepVerifier.create(result)
+                .verifyComplete();
+
+            // verify the mock invocations
+            verify(extensionClient, times(0)).fetch(eq(Role.class), anyString());
+        }
+
+        @Test
+        void listDependenciesAndSomeOneNotFound() {
+            Role role1 = createRole("role1", "role2");
+            Role role2 = createRole("role2", "role3", "role4");
+            Role role4 = createRole("role4");
+
+            Set<String> roleNames = Set.of("role1");
+
+            // setup mocks
+            when(extensionClient.fetch(Role.class, "role1")).thenReturn(Mono.just(role1));
+            when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
+            when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.empty());
+            when(extensionClient.fetch(Role.class, "role4")).thenReturn(Mono.just(role4));
+
+            Flux<Role> result = roleService.listDependenciesFlux(roleNames);
+            // verify the result
+            StepVerifier.create(result)
+                .expectNext(role1)
+                .expectNext(role2)
+                .expectNext(role4)
+                .verifyComplete();
+
+            // verify the mock invocations
+            verify(extensionClient, times(4)).fetch(eq(Role.class), anyString());
+        }
+
+        private Role createRole(String name, String... dependencies) {
+            Role role = new Role();
+            role.setMetadata(new Metadata());
+            role.getMetadata().setName(name);
+
+            Map<String, String> annotations = new HashMap<>();
+            annotations.put(Role.ROLE_DEPENDENCIES_ANNO, JsonUtils.objectToJson(dependencies));
+            role.getMetadata().setAnnotations(annotations);
+            return role;
+        }
     }
 }
