@@ -17,6 +17,7 @@ import UserEditingModal from "../components/UserEditingModal.vue";
 import UserPasswordChangeModal from "../components/UserPasswordChangeModal.vue";
 import { usePermission } from "@/utils/permission";
 import { useUserStore } from "@/stores/user";
+import { useQuery } from "@tanstack/vue-query";
 
 const { currentUserHasPermission } = usePermission();
 const userStore = useUserStore();
@@ -34,31 +35,30 @@ const tabs = [
   // },
 ];
 
-const user = ref<DetailedUser>();
-const loading = ref();
 const editingModal = ref(false);
 const passwordChangeModal = ref(false);
 
 const { params } = useRoute();
 
-const handleFetchUser = async () => {
-  try {
-    loading.value = true;
+const {
+  data: user,
+  isLoading,
+  refetch,
+} = useQuery({
+  queryKey: ["user-detail", params.name],
+  queryFn: async () => {
     if (params.name === "-") {
       const { data } = await apiClient.user.getCurrentUserDetail();
-      user.value = data;
+      return data;
     } else {
       const { data } = await apiClient.user.getUserDetail({
         name: params.name as string,
       });
-      user.value = data;
+      return data;
     }
-  } catch (e) {
-    console.error(e);
-  } finally {
-    loading.value = false;
-  }
-};
+  },
+  refetchOnWindowFocus: false,
+});
 
 const isCurrentUser = computed(() => {
   if (params.name === "-") {
@@ -79,7 +79,6 @@ const router = useRouter();
 
 // set default active tab
 onMounted(() => {
-  handleFetchUser();
   const tab = tabs.find((tab) => tab.routeName === route.name);
   activeTab.value = tab ? tab.id : tabs[0].id;
 });
@@ -104,12 +103,12 @@ const handleTabChange = (id: string) => {
     <UserEditingModal
       v-model:visible="editingModal"
       :user="user?.user"
-      @close="handleFetchUser"
+      @close="refetch"
     />
     <UserPasswordChangeModal
       v-model:visible="passwordChangeModal"
       :user="user?.user"
-      @close="handleFetchUser"
+      @close="refetch"
     />
     <header class="bg-white">
       <div class="p-4">
@@ -130,7 +129,7 @@ const handleTabChange = (id: string) => {
               <h1 class="truncate text-lg font-bold text-gray-900">
                 {{ user?.user.spec.displayName }}
               </h1>
-              <span v-if="!loading" class="text-sm text-gray-600">
+              <span v-if="!isLoading" class="text-sm text-gray-600">
                 @{{ user?.user.metadata.name }}
               </span>
             </div>

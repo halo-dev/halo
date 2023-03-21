@@ -64,6 +64,11 @@ const creationModalTitle = computed(() => {
   return isUpdateMode.value ? "编辑用户" : "新增用户";
 });
 
+const handleResetForm = () => {
+  formState.value = cloneDeep(initialFormState);
+  reset("user-form");
+};
+
 watch(
   () => props.visible,
   (visible) => {
@@ -83,6 +88,9 @@ watch(
     } else {
       handleResetForm();
     }
+  },
+  {
+    immediate: true,
   }
 );
 
@@ -91,11 +99,6 @@ const onVisibleChange = (visible: boolean) => {
   if (!visible) {
     emit("close");
   }
-};
-
-const handleResetForm = () => {
-  formState.value = cloneDeep(initialFormState);
-  reset("user-form");
 };
 
 const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
