@@ -53,7 +53,7 @@ const refreshInterval = ref();
 const modalTitle = computed(() => {
   return activeTab.value === "installed"
     ? t("core.theme.list_modal.titles.installed_themes")
-    : t("core.theme.list_modal.titles.uninstalled_themes");
+    : t("core.theme.list_modal.titles.not_installed_themes");
 });
 
 const handleFetchThemes = async (options?: { mute?: boolean }) => {
@@ -243,12 +243,14 @@ const handleOpenInstallModal = () => {
       </VTabItem>
       <VTabItem
         id="uninstalled"
-        :label="$t('core.theme.list_modal.tabs.uninstalled')"
+        :label="$t('core.theme.list_modal.tabs.not_installed')"
         class="-mx-[16px]"
       >
         <VLoading v-if="loading" />
         <Transition v-else-if="!themes.length" appear name="fade">
-          <VEmpty :title="$t('core.theme.list_modal.uninstalled_empty.title')">
+          <VEmpty
+            :title="$t('core.theme.list_modal.not_installed_empty.title')"
+          >
             <template #actions>
               <VSpace>
                 <VButton :loading="loading" @click="handleFetchThemes">

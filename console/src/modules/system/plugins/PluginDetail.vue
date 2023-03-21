@@ -67,7 +67,7 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
               {{
                 isStarted
                   ? $t("core.common.status.activated")
-                  : $t("core.common.status.inactivated")
+                  : $t("core.common.status.not_activated")
               }}
             </VTag>
           </p>

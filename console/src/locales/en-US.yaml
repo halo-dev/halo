@@ -589,14 +589,14 @@ core:
     list_modal:
       titles:
         installed_themes: Installed Themes
-        uninstalled_themes: Uninstalled Themes
+        not_installed_themes: Not installed Themes
       tabs:
         installed: Installed
-        uninstalled: Uninstalled
+        not_installed: Not installed
       empty:
         title: There are no installed themes currently.
         message: There are currently no installed themes, you can try refreshing or installing a new theme.
-      uninstalled_empty:
+      not_installed_empty:
         title: There are no themes currently not installed.
       operations:
         install:
@@ -1078,30 +1078,30 @@ core:
     placeholder:
       search: Enter keywords to search
     toast:
-      operation_success: Successful operation
+      operation_success: Operated successfully
       delete_success: Deleted successfully
       save_success: Saved successfully
       publish_success: Published successfully
-      cancel_publish_success: Cancel publication successful
-      recovery_success: Recovery successful
-      uninstall_success: Uninstall successful
-      active_success: Active successfully
-      inactive_success: Inactive successfully
-      upgrade_success: Upgrade successfully
-      download_success: Download successful
-      copy_success: Copy successful
-      download_failed: Download failed
-      save_failed_and_retry: Save failed, please try again
-      publish_failed_and_retry: Publish failed, please try again
-      network_error: Network error, please check your network connection
+      cancel_publish_success: Unpublished successfully
+      recovery_success: Recovered successfully
+      uninstall_success: Uninstalled successfully
+      active_success: Activated successfully
+      inactive_success: Deactivated successfully
+      upgrade_success: Upgraded successfully
+      download_success: Downloaded successfully
+      copy_success: Copied successfully
+      download_failed: Failed to download
+      save_failed_and_retry: "Failed to save, please retry"
+      publish_failed_and_retry: "Failed to publish, please retry"
+      network_error: "Network error, please check your connection"
       request_parameter_error: "Request parameter error: {title}"
-      login_expired: Login has expired, please log in again
-      forbidden: Unauthorized access
-      not_found: The resource does not exist
-      server_internal_error_with_title: "Internal Server Error: {title}"
-      server_internal_error: "Internal Server Error"
+      login_expired: "Login expired, please log in again"
+      forbidden: Access denied
+      not_found: Resource not found
+      server_internal_error_with_title: "Internal server error: {title}"
+      server_internal_error: Internal server error
       unknown_error_with_title: "Unknown error: {title}"
-      unknown_error: "Unknown error"
+      unknown_error: Unknown error
     dialog:
       titles:
         tip: Tip
@@ -1122,9 +1122,9 @@ core:
       loading: Loading
       loading_error: Loading error
       activated: Activated
-      inactivated: Inactivated
+      not_activated: Not activated
       installed: Installed
-      uninstalled: Uninstalled
+      not_installed: Not installed
     text:
       none: None
       tip: Tip

@@ -589,14 +589,14 @@ core:
     list_modal:
       titles:
         installed_themes: 已安装的主题
-        uninstalled_themes: 未安装的主题
+        not_installed_themes: 未安装的主题
       tabs:
         installed: 已安装
-        uninstalled: 未安装
+        not_installed: 未安装
       empty:
         title: 当前没有已安装的主题
         message: 当前没有已安装的主题，你可以尝试刷新或者安装新主题
-      uninstalled_empty:
+      not_installed_empty:
         title: 当前没有未安装的主题
       operations:
         install:
@@ -1122,9 +1122,9 @@ core:
       loading: 加载中
       loading_error: 加载异常
       activated: 已启用
-      inactivated: 未启用
+      not_activated: 未启用
       installed: 已安装
-      uninstalled: 未安装
+      not_installed: 未安装
     text:
       none: 无
       tip: 提示

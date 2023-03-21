@@ -90,7 +90,7 @@ const onUpgradeModalClose = () => {
                   {{
                     isActivated
                       ? t("core.common.status.activated")
-                      : t("core.common.status.inactivated")
+                      : t("core.common.status.not_activated")
                   }}
                 </VTag>
                 <VStatusDot
@@ -267,7 +267,7 @@ const onUpgradeModalClose = () => {
                     <div class="text-xs">
                       <VSpace>
                         <VTag>
-                          {{ $t("core.common.status.uninstalled") }}
+                          {{ $t("core.common.status.not_installed") }}
                         </VTag>
                       </VSpace>
                     </div>

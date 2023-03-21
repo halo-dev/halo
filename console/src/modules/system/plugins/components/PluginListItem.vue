@@ -109,7 +109,7 @@ const getFailedMessage = (plugin: Plugin) => {
               {{
                 isStarted
                   ? $t("core.common.status.activated")
-                  : $t("core.common.status.inactivated")
+                  : $t("core.common.status.not_activated")
               }}
             </VTag>
           </VSpace>
