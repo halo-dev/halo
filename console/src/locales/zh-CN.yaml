@@ -15,6 +15,7 @@ core:
     button: 登录
     modal:
       title: 重新登录
+    other_login: 其他登录：
   sidebar:
     search:
       placeholder: 搜索
@@ -762,6 +763,7 @@ core:
         new: 新建用户
     actions:
       roles: 角色管理
+      identity_authentication: 身份认证
     empty:
       title: 当前没有符合筛选条件的用户
       message: 当前没有符合筛选条件的用户，你可以尝试刷新或者创建新用户
@@ -827,6 +829,12 @@ core:
           title: 修改资料
         change_password:
           title: 修改密码
+      operations:
+        bind:
+          button: 绑定
+        unbind:
+          button: 解绑
+          title: "确定要取消绑定 {display_name} 的登录方式吗？"
       fields:
         display_name: 显示名称
         username: 用户名
@@ -834,6 +842,7 @@ core:
         roles: 角色
         bio: 描述
         creation_time: 注册时间
+        identity_authentication: 登录方式
   role:
     title: 角色
     common:
@@ -876,6 +885,23 @@ core:
         permissions: 权限
       fields:
         display_name: 名称
+  identity_authentication:
+    title: 身份认证
+    tabs:
+      detail: 详情
+      setting: 设置
+    operations:
+      enable:
+        title: 确定要启用该身份认证方式吗？
+      disable:
+        title: 确定要停用该身份认证方式吗？
+    detail:
+      fields:
+        display_name: 名称
+        description: 描述
+        website: 网站
+        help_page: 帮助页面
+        authentication_url: 登录入口
   setting:
     title: 设置
   actuator:

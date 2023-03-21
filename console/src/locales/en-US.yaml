@@ -15,6 +15,7 @@ core:
     button: Login
     modal:
       title: Re-login
+    other_login: "Other login:"
   sidebar:
     search:
       placeholder: Search
@@ -762,6 +763,7 @@ core:
         new: New User
     actions:
       roles: Roles
+      identity_authentication: Identity authentication
     empty:
       title: There are no users that meet the filtering criteria currently.
       message: There are no users that match the filtering criteria at present. You can try refreshing or creating a new user.
@@ -827,6 +829,12 @@ core:
           title: Update profile
         change_password:
           title: Change password
+      operations:
+        bind:
+          button: Bind
+        unbind:
+          button: Unbind
+          title: "Are you sure you want to unbind the login method for {display_name}?"
       fields:
         display_name: Display name
         username: Username
@@ -834,6 +842,7 @@ core:
         roles: Roles
         bio: Bio
         creation_time: Creation time
+        identity_authentication: Identity authentication
   role:
     title: Roles
     common:
@@ -876,6 +885,23 @@ core:
         permissions: Permissions
       fields:
         display_name: Display name
+  identity_authentication:
+    title: Identity Authentication
+    tabs:
+      detail: Detail
+      setting: Settings
+    operations:
+      enable:
+        title: Are you sure you want to enable this identity authentication method?
+      disable:
+        title: Are you sure you want to disable this identity authentication method?
+    detail:
+      fields:
+        display_name: Display name
+        description: Description
+        website: Website
+        help_page: Help page
+        authentication_url: Login URL
   setting:
     title: Settings
   actuator:

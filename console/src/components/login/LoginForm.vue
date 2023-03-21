@@ -169,7 +169,9 @@ const { data: socialAuthProviders } = useQuery<SocialAuthProvider[]>({
   </VButton>
 
   <div v-if="socialAuthProviders?.length" class="mt-3 flex items-center">
-    <span class="text-sm text-slate-600">其他登录：</span>
+    <span class="text-sm text-slate-600">
+      {{ $t("core.login.other_login") }}
+    </span>
     <ul class="flex items-center">
       <li
         v-for="(socialAuthProvider, index) in socialAuthProviders"

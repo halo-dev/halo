@@ -9,11 +9,13 @@ import { formatDatetime } from "@/utils/date";
 import { useQuery } from "@tanstack/vue-query";
 import { apiClient } from "@/utils/api-client";
 import axios from "axios";
+import { useI18n } from "vue-i18n";
 
 const user = inject<Ref<DetailedUser | undefined>>("user");
 const isCurrentUser = inject<ComputedRef<boolean>>("isCurrentUser");
 
 const router = useRouter();
+const { t } = useI18n();
 
 const { data: authProviders } = useQuery<ListedAuthProvider[]>({
   queryKey: ["user-auth-providers"],
@@ -27,7 +29,11 @@ const { data: authProviders } = useQuery<ListedAuthProvider[]>({
 
 const handleUnbindAuth = (authProvider: ListedAuthProvider) => {
   Dialog.warning({
-    title: `确定要取消绑定 ${authProvider.displayName} 的登录方式吗？`,
+    title: t("core.user.detail.operations.unbind.title", {
+      display_name: authProvider.displayName,
+    }),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await axios.post(
         `${import.meta.env.VITE_API_URL}${authProvider.unbindingUrl}`,
@@ -146,7 +152,9 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
         v-if="isCurrentUser"
         class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
-        <dt class="text-sm font-medium text-gray-900">登录方式</dt>
+        <dt class="text-sm font-medium text-gray-900">
+          {{ $t("core.user.detail.fields.identity_authentication") }}
+        </dt>
         <dd class="mt-1 text-sm sm:col-span-3 sm:mt-0">
           <ul class="space-y-2">
             <template v-for="(authProvider, index) in authProviders">
@@ -168,7 +176,7 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
                       size="sm"
                       @click="handleUnbindAuth(authProvider)"
                     >
-                      解绑
+                      {{ $t("core.user.detail.operations.unbind.button") }}
                     </VButton>
                     <VButton
                       v-else
@@ -176,7 +184,7 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
                       type="secondary"
                       @click="handleBindAuth(authProvider)"
                     >
-                      绑定
+                      {{ $t("core.user.detail.operations.bind.button") }}
                     </VButton>
                   </div>
                 </div>

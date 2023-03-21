@@ -336,7 +336,7 @@ const hasFilters = computed(() => {
           <template #icon>
             <IconLockPasswordLine class="h-full w-full" />
           </template>
-          身份认证
+          {{ $t("core.user.actions.identity_authentication") }}
         </VButton>
         <VButton
           v-permission="['system:users:manage']"
