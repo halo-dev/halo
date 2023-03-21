@@ -16,15 +16,15 @@ interface useContentCacheReturn {
 
 export function useContentCache(
   key: string,
-  name: string,
+  name: Ref<string | undefined>,
   raw: Ref<string | undefined>
 ): useContentCacheReturn {
   const content_caches = useLocalStorage<ContentCache[]>(key, []);
 
   const handleResetCache = () => {
-    if (name) {
+    if (name.value) {
       const cache = content_caches.value.find(
-        (c: ContentCache) => c.name === name
+        (c: ContentCache) => c.name === name.value
       );
       if (cache) {
         Toast.info("已从缓存中恢复未保存的内容");
@@ -42,15 +42,15 @@ export function useContentCache(
   };
 
   const handleSetContentCache = debounce(() => {
-    if (name) {
+    if (name.value) {
       const cache = content_caches.value.find(
-        (c: ContentCache) => c.name === name
+        (c: ContentCache) => c.name === name.value
       );
       if (cache) {
         cache.content = raw?.value;
       } else {
         content_caches.value.push({
-          name: name,
+          name: name.value || "",
           content: raw?.value,
         });
       }
