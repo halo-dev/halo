@@ -61,6 +61,7 @@ axiosInstance.interceptors.response.use(
   },
   async (error: AxiosError<ProblemDetail>) => {
     if (/Network Error/.test(error.message)) {
+      // @ts-ignore
       Toast.error(i18n.global.t("core.universal.toast.network_error"));
       return Promise.reject(error);
     }
