@@ -4,6 +4,7 @@ import {
   IconArrowDown,
   IconUserFollow,
   IconUserSettings,
+  IconLockPasswordLine,
   VButton,
   VCard,
   VPageHeader,
@@ -324,6 +325,12 @@ const hasFilters = computed(() => {
             <IconUserFollow class="h-full w-full" />
           </template>
           角色管理
+        </VButton>
+        <VButton :route="{ name: 'AuthProviders' }" size="sm" type="default">
+          <template #icon>
+            <IconLockPasswordLine class="h-full w-full" />
+          </template>
+          身份认证
         </VButton>
         <VButton
           v-permission="['system:users:manage']"

@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.AnnotationSetting;
+import run.halo.app.core.extension.AuthProvider;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
@@ -16,6 +17,7 @@ import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.User;
+import run.halo.app.core.extension.UserConnection;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Group;
 import run.halo.app.core.extension.attachment.Policy;
@@ -29,6 +31,8 @@ import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.SchemeManager;
+import run.halo.app.plugin.extensionpoint.ExtensionDefinition;
+import run.halo.app.plugin.extensionpoint.ExtensionPointDefinition;
 import run.halo.app.search.extension.SearchEngine;
 import run.halo.app.security.authentication.pat.PersonalAccessToken;
 
@@ -53,6 +57,8 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
         // plugin.halo.run
         schemeManager.register(Plugin.class);
         schemeManager.register(SearchEngine.class);
+        schemeManager.register(ExtensionPointDefinition.class);
+        schemeManager.register(ExtensionDefinition.class);
 
         schemeManager.register(RoleBinding.class);
         schemeManager.register(User.class);
@@ -77,6 +83,9 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
         schemeManager.register(PolicyTemplate.class);
         // metrics.halo.run
         schemeManager.register(Counter.class);
+        // auth.halo.run
+        schemeManager.register(AuthProvider.class);
+        schemeManager.register(UserConnection.class);
 
         eventPublisher.publishEvent(new SchemeInitializedEvent(this));
     }

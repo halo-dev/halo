@@ -1,0 +1,13 @@
+apiVersion: auth.halo.run/v1alpha1
+kind: AuthProvider
+metadata:
+  name: local
+  finalizers:
+    - system-protection
+spec:
+  displayName: Local
+  enabled: true
+  description: Built-in authentication for Halo.
+  logo: https://halo.run/logo
+  website: https://halo.run
+  authenticationUrl: /login

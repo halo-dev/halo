@@ -1,9 +1,14 @@
 package run.halo.app.actuator;
 
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
+
 import java.net.URI;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint;
@@ -15,21 +20,18 @@ import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemSetting.Basic;
 import run.halo.app.infra.SystemSetting.Comment;
 import run.halo.app.infra.SystemSetting.User;
+import run.halo.app.security.AuthProviderService;
 
 @WebEndpoint(id = "globalinfo")
 @Component
+@RequiredArgsConstructor
 public class GlobalInfoEndpoint {
 
     private final ObjectProvider<SystemConfigurableEnvironmentFetcher> systemConfigFetcher;
 
     private final ExternalUrlSupplier externalUrl;
 
-    public GlobalInfoEndpoint(
-        ObjectProvider<SystemConfigurableEnvironmentFetcher> systemConfigFetcher,
-        ExternalUrlSupplier externalUrl) {
-        this.systemConfigFetcher = systemConfigFetcher;
-        this.externalUrl = externalUrl;
-    }
+    private final AuthProviderService authProviderService;
 
     @ReadOperation
     public GlobalInfo globalInfo() {
@@ -37,6 +39,7 @@ public class GlobalInfoEndpoint {
         info.setExternalUrl(externalUrl.get());
         info.setLocale(Locale.getDefault());
         info.setTimeZone(TimeZone.getDefault());
+        handleSocialAuthProvider(info);
         systemConfigFetcher.ifAvailable(fetcher -> fetcher.getConfigMapBlocking()
             .ifPresent(configMap -> {
                 handleCommentSetting(info, configMap);
@@ -64,6 +67,22 @@ public class GlobalInfoEndpoint {
 
         private String favicon;
 
+        private List<SocialAuthProvider> socialAuthProviders;
+    }
+
+    @Data
+    public static class SocialAuthProvider {
+        private String name;
+
+        private String displayName;
+
+        private String description;
+
+        private String logo;
+
+        private String website;
+
+        private String authenticationUrl;
     }
 
     private void handleCommentSetting(GlobalInfo info, ConfigMap configMap) {
@@ -93,6 +112,28 @@ public class GlobalInfoEndpoint {
         if (basic != null) {
             info.setFavicon(basic.getFavicon());
         }
+    }
+
+    private void handleSocialAuthProvider(GlobalInfo info) {
+        List<SocialAuthProvider> providers = authProviderService.listAll()
+            .map(listedAuthProviders -> listedAuthProviders.stream()
+                .filter(provider -> isTrue(provider.getEnabled()))
+                .filter(provider -> StringUtils.isNotBlank(provider.getBindingUrl()))
+                .map(provider -> {
+                    SocialAuthProvider socialAuthProvider = new SocialAuthProvider();
+                    socialAuthProvider.setName(provider.getName());
+                    socialAuthProvider.setDisplayName(provider.getDisplayName());
+                    socialAuthProvider.setDescription(provider.getDescription());
+                    socialAuthProvider.setLogo(provider.getLogo());
+                    socialAuthProvider.setWebsite(provider.getWebsite());
+                    socialAuthProvider.setAuthenticationUrl(provider.getAuthenticationUrl());
+                    return socialAuthProvider;
+                })
+                .toList()
+            )
+            .block();
+
+        info.setSocialAuthProviders(providers);
     }
 
 }

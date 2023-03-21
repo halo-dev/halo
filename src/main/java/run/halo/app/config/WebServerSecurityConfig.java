@@ -6,6 +6,7 @@ import static org.springframework.security.web.server.header.XFrameOptionsServer
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -31,7 +32,9 @@ import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.security.DefaultUserDetailService;
+import run.halo.app.security.DynamicMatcherSecurityWebFilterChain;
 import run.halo.app.security.SuperAdminInitializer;
 import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authentication.login.CryptoService;
@@ -47,17 +50,19 @@ import run.halo.app.security.authorization.RequestInfoAuthorizationManager;
  */
 @Configuration
 @EnableWebFluxSecurity
+@RequiredArgsConstructor
 public class WebServerSecurityConfig {
 
-    @Bean
+    @Bean(name = "apiSecurityFilterChain")
     @Order(Ordered.HIGHEST_PRECEDENCE)
     SecurityWebFilterChain apiFilterChain(ServerHttpSecurity http,
         RoleService roleService,
         ObjectProvider<SecurityConfigurer> securityConfigurers,
-        ServerSecurityContextRepository securityContextRepository) {
+        ServerSecurityContextRepository securityContextRepository,
+        ExtensionGetter extensionGetter) {
 
-        http.securityMatcher(
-                pathMatchers("/api/**", "/apis/**", "/login/**", "/logout", "/actuator/**"))
+        http.securityMatcher(pathMatchers("/api/**", "/apis/**", "/oauth2/**",
+                "/login/**", "/logout", "/actuator/**"))
             .authorizeExchange().anyExchange()
             .access(new RequestInfoAuthorizationManager(roleService)).and()
             .anonymous(spec -> {
@@ -65,15 +70,12 @@ public class WebServerSecurityConfig {
                 spec.principal(AnonymousUserConst.PRINCIPAL);
             })
             .securityContextRepository(securityContextRepository)
-            .formLogin(withDefaults())
-            .logout(withDefaults())
             .httpBasic(withDefaults());
 
         // Integrate with other configurers separately
         securityConfigurers.orderedStream()
             .forEach(securityConfigurer -> securityConfigurer.configure(http));
-
-        return http.build();
+        return new DynamicMatcherSecurityWebFilterChain(extensionGetter, http.build());
     }
 
     @Bean

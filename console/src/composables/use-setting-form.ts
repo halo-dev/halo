@@ -216,6 +216,9 @@ export function useSettingFormConvert(
           configMap.value?.data?.[form.group] || "{}"
         );
       });
+    },
+    {
+      immediate: true,
     }
   );
 

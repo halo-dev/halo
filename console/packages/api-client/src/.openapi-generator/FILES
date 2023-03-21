@@ -2,6 +2,7 @@
 .npmignore
 api.ts
 api/api-console-halo-run-v1alpha1-attachment-api.ts
+api/api-console-halo-run-v1alpha1-auth-provider-api.ts
 api/api-console-halo-run-v1alpha1-comment-api.ts
 api/api-console-halo-run-v1alpha1-indices-api.ts
 api/api-console-halo-run-v1alpha1-plugin-api.ts
@@ -14,6 +15,8 @@ api/api-console-halo-run-v1alpha1-user-api.ts
 api/api-halo-run-v1alpha1-comment-api.ts
 api/api-halo-run-v1alpha1-post-api.ts
 api/api-halo-run-v1alpha1-tracker-api.ts
+api/auth-halo-run-v1alpha1-auth-provider-api.ts
+api/auth-halo-run-v1alpha1-user-connection-api.ts
 api/content-halo-run-v1alpha1-category-api.ts
 api/content-halo-run-v1alpha1-comment-api.ts
 api/content-halo-run-v1alpha1-post-api.ts
@@ -23,6 +26,8 @@ api/content-halo-run-v1alpha1-snapshot-api.ts
 api/content-halo-run-v1alpha1-tag-api.ts
 api/login-api.ts
 api/metrics-halo-run-v1alpha1-counter-api.ts
+api/plugin-halo-run-v1alpha1-extension-definition-api.ts
+api/plugin-halo-run-v1alpha1-extension-point-definition-api.ts
 api/plugin-halo-run-v1alpha1-plugin-api.ts
 api/plugin-halo-run-v1alpha1-reverse-proxy-api.ts
 api/plugin-halo-run-v1alpha1-search-engine-api.ts
@@ -52,6 +57,9 @@ models/attachment-list.ts
 models/attachment-spec.ts
 models/attachment-status.ts
 models/attachment.ts
+models/auth-provider-list.ts
+models/auth-provider-spec.ts
+models/auth-provider.ts
 models/author.ts
 models/category-list.ts
 models/category-spec.ts
@@ -71,6 +79,7 @@ models/comment-vo.ts
 models/comment.ts
 models/condition.ts
 models/config-map-list.ts
+models/config-map-ref.ts
 models/config-map.ts
 models/content-wrapper.ts
 models/content.ts
@@ -82,6 +91,12 @@ models/custom-templates.ts
 models/dashboard-stats.ts
 models/detailed-user.ts
 models/excerpt.ts
+models/extension-definition-list.ts
+models/extension-definition.ts
+models/extension-point-definition-list.ts
+models/extension-point-definition.ts
+models/extension-point-spec.ts
+models/extension-spec.ts
 models/extension.ts
 models/file-reverse-proxy-provider.ts
 models/grant-request.ts
@@ -92,6 +107,7 @@ models/group-status.ts
 models/group.ts
 models/index.ts
 models/license.ts
+models/listed-auth-provider.ts
 models/listed-comment-list.ts
 models/listed-comment.ts
 models/listed-post-list.ts
@@ -155,6 +171,7 @@ models/search-engine-spec.ts
 models/search-engine.ts
 models/setting-form.ts
 models/setting-list.ts
+models/setting-ref.ts
 models/setting-spec.ts
 models/setting.ts
 models/single-page-list.ts
@@ -176,6 +193,9 @@ models/theme-list.ts
 models/theme-spec.ts
 models/theme-status.ts
 models/theme.ts
+models/user-connection-list.ts
+models/user-connection-spec.ts
+models/user-connection.ts
 models/user-list.ts
 models/user-permission.ts
 models/user-spec.ts

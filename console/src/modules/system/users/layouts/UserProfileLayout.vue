@@ -2,7 +2,15 @@
 import BasicLayout from "@/layouts/BasicLayout.vue";
 import { apiClient } from "@/utils/api-client";
 import { VButton, VSpace, VTabbar, VAvatar } from "@halo-dev/components";
-import { computed, onMounted, provide, ref, watch, type Ref } from "vue";
+import {
+  computed,
+  onMounted,
+  provide,
+  ref,
+  watch,
+  type ComputedRef,
+  type Ref,
+} from "vue";
 import { useRoute, useRouter } from "vue-router";
 import type { DetailedUser } from "@halo-dev/api-client";
 import UserEditingModal from "../components/UserEditingModal.vue";
@@ -62,6 +70,7 @@ const isCurrentUser = computed(() => {
 });
 
 provide<Ref<DetailedUser | undefined>>("user", user);
+provide<ComputedRef<boolean>>("isCurrentUser", isCurrentUser);
 
 const activeTab = ref();
 

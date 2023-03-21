@@ -13,6 +13,7 @@
  */
 
 export * from "./api/api-console-halo-run-v1alpha1-attachment-api";
+export * from "./api/api-console-halo-run-v1alpha1-auth-provider-api";
 export * from "./api/api-console-halo-run-v1alpha1-comment-api";
 export * from "./api/api-console-halo-run-v1alpha1-indices-api";
 export * from "./api/api-console-halo-run-v1alpha1-plugin-api";
@@ -25,6 +26,8 @@ export * from "./api/api-console-halo-run-v1alpha1-user-api";
 export * from "./api/api-halo-run-v1alpha1-comment-api";
 export * from "./api/api-halo-run-v1alpha1-post-api";
 export * from "./api/api-halo-run-v1alpha1-tracker-api";
+export * from "./api/auth-halo-run-v1alpha1-auth-provider-api";
+export * from "./api/auth-halo-run-v1alpha1-user-connection-api";
 export * from "./api/content-halo-run-v1alpha1-category-api";
 export * from "./api/content-halo-run-v1alpha1-comment-api";
 export * from "./api/content-halo-run-v1alpha1-post-api";
@@ -34,6 +37,8 @@ export * from "./api/content-halo-run-v1alpha1-snapshot-api";
 export * from "./api/content-halo-run-v1alpha1-tag-api";
 export * from "./api/login-api";
 export * from "./api/metrics-halo-run-v1alpha1-counter-api";
+export * from "./api/plugin-halo-run-v1alpha1-extension-definition-api";
+export * from "./api/plugin-halo-run-v1alpha1-extension-point-definition-api";
 export * from "./api/plugin-halo-run-v1alpha1-plugin-api";
 export * from "./api/plugin-halo-run-v1alpha1-reverse-proxy-api";
 export * from "./api/plugin-halo-run-v1alpha1-search-engine-api";
