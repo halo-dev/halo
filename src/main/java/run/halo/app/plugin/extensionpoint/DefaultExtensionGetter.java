@@ -1,16 +1,21 @@
 package run.halo.app.plugin.extensionpoint;
 
+import java.util.Comparator;
 import java.util.Set;
+import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
 import org.pf4j.ExtensionPoint;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting.ExtensionPointEnabled;
 import run.halo.app.plugin.HaloPluginManager;
 
 @Component
+@RequiredArgsConstructor
 public class DefaultExtensionGetter implements ExtensionGetter {
 
     private final SystemConfigurableEnvironmentFetcher systemConfigFetcher;
@@ -19,12 +24,7 @@ public class DefaultExtensionGetter implements ExtensionGetter {
 
     private final ApplicationContext applicationContext;
 
-    public DefaultExtensionGetter(SystemConfigurableEnvironmentFetcher systemConfigFetcher,
-        HaloPluginManager pluginManager, ApplicationContext applicationContext) {
-        this.systemConfigFetcher = systemConfigFetcher;
-        this.pluginManager = pluginManager;
-        this.applicationContext = applicationContext;
-    }
+    private final ReactiveExtensionClient client;
 
     @Override
     public <T extends ExtensionPoint> Mono<T> getEnabledExtension(Class<T> extensionPoint) {
@@ -64,4 +64,33 @@ public class DefaultExtensionGetter implements ExtensionGetter {
             });
     }
 
+    @Override
+    public <T extends ExtensionPoint> Flux<T> getEnabledExtensionByDefinition(
+        Class<T> extensionPoint) {
+        return fetchExtensionPointDefinition(extensionPoint)
+            .flatMapMany(extensionPointDefinition -> {
+                ExtensionPointDefinition.ExtensionPointType type =
+                    extensionPointDefinition.getSpec().getType();
+                if (type == ExtensionPointDefinition.ExtensionPointType.SINGLETON) {
+                    return getEnabledExtension(extensionPoint).flux();
+                }
+                Stream<T> pluginExtsStream = pluginManager.getExtensions(extensionPoint)
+                    .stream();
+                Stream<T> systemExtsStream = applicationContext.getBeanProvider(extensionPoint)
+                    .orderedStream();
+                // TODO If the type is sortable, may need to process the returned order.
+                return Flux.just(pluginExtsStream, systemExtsStream)
+                    .flatMap(Flux::fromStream);
+            });
+    }
+
+    Mono<ExtensionPointDefinition> fetchExtensionPointDefinition(
+        Class<? extends ExtensionPoint> extensionPoint) {
+        // TODO Optimize query
+        return client.list(ExtensionPointDefinition.class, definition ->
+                    extensionPoint.getName().equals(definition.getSpec().getClassName()),
+                Comparator.comparing(definition -> definition.getMetadata().getCreationTimestamp())
+            )
+            .next();
+    }
 }

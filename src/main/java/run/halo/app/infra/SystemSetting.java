@@ -102,6 +102,12 @@ public class SystemSetting {
         public String primary;
     }
 
+    @Data
+    public static class AuthProvider {
+        public static final String GROUP = "authProvider";
+        private Set<String> enabled;
+    }
+
     /**
      * ExtensionPointEnabled key is full qualified name of extension point and value is a list of
      * full qualified name of implementation.

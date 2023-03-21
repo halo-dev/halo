@@ -19,6 +19,9 @@ rules:
     resources: [ "configmaps" ]
     resourceNames: [ "system-states" ]
     verbs: [ "get" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "auth-providers" ]
+    verbs: [ "list" ]
 ---
 apiVersion: v1alpha1
 kind: "Role"

@@ -2,6 +2,7 @@ package run.halo.app.plugin;
 
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.stereotype.Component;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.ExtensionClient;
@@ -64,6 +65,8 @@ public class SharedApplicationContextHolder {
         beanFactory.registerSingleton("schemeManager", defaultSchemeManager);
         beanFactory.registerSingleton("externalUrlSupplier",
             rootApplicationContext.getBean(ExternalUrlSupplier.class));
+        beanFactory.registerSingleton("serverSecurityContextRepository",
+            rootApplicationContext.getBean(ServerSecurityContextRepository.class));
         // TODO add more shared instance here
 
         return sharedApplicationContext;
