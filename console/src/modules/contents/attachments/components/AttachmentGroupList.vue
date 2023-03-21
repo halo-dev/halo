@@ -55,7 +55,7 @@ const defaultGroups: Group[] = [
   },
   {
     spec: {
-      displayName: t("core.attachment.universal.text.ungrouped"),
+      displayName: t("core.attachment.common.text.ungrouped"),
     },
     apiVersion: "",
     kind: "",
@@ -97,8 +97,8 @@ const handleDelete = (group: Group) => {
     title: t("core.attachment.group_list.operations.delete.title"),
     description: t("core.attachment.group_list.operations.delete.title"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       // TODO: 后续将修改为在后端进行批量操作处理
       const { data } = await apiClient.attachment.searchAttachments({
@@ -146,8 +146,8 @@ const handleDeleteWithAttachments = (group: Group) => {
       "core.attachment.group_list.operations.delete_with_attachments.description"
     ),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       // TODO: 后续将修改为在后端进行批量操作处理
       const { data } = await apiClient.attachment.searchAttachments({
@@ -250,7 +250,7 @@ onMounted(async () => {
         </span>
         <VStatusDot
           v-if="group.metadata.deletionTimestamp"
-          v-tooltip="$t('core.universal.status.deleting')"
+          v-tooltip="$t('core.common.status.deleting')"
           state="warning"
           animate
         />
@@ -277,7 +277,7 @@ onMounted(async () => {
                 :triggers="['click']"
               >
                 <VButton block type="danger">
-                  {{ $t("core.universal.buttons.delete") }}
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
                 <template #popper>
                   <div class="w-52 p-2">

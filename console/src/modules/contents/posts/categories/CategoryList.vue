@@ -93,7 +93,7 @@ const onEditingModalClose = () => {
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>
-        {{ $t("core.universal.buttons.new") }}
+        {{ $t("core.common.buttons.new") }}
       </VButton>
     </template>
   </VPageHeader>
@@ -125,7 +125,7 @@ const onEditingModalClose = () => {
           <template #actions>
             <VSpace>
               <VButton @click="handleFetchCategories">
-                {{ $t("core.universal.buttons.refresh") }}
+                {{ $t("core.common.buttons.refresh") }}
               </VButton>
               <VButton
                 v-permission="['system:posts:manage']"

@@ -46,8 +46,8 @@ const { currentRoles, currentUser } = storeToRefs(userStore);
 const handleLogout = () => {
   Dialog.warning({
     title: t("core.sidebar.operations.logout.title"),
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await axios.post(`${import.meta.env.VITE_API_URL}/logout`, undefined, {

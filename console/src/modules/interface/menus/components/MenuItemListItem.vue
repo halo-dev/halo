@@ -119,7 +119,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
             <VEntityField v-if="menuItem.metadata.deletionTimestamp">
               <template #description>
                 <VStatusDot
-                  v-tooltip="$t('core.universal.status.deleting')"
+                  v-tooltip="$t('core.common.status.deleting')"
                   state="warning"
                   animate
                 />
@@ -136,7 +136,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
               type="secondary"
               @click="onOpenEditingModal(menuItem)"
             >
-              {{ $t("core.universal.buttons.edit") }}
+              {{ $t("core.common.buttons.edit") }}
             </VButton>
             <VButton
               v-close-popper
@@ -152,7 +152,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
               type="danger"
               @click="onDelete(menuItem)"
             >
-              {{ $t("core.universal.buttons.delete") }}
+              {{ $t("core.common.buttons.delete") }}
             </VButton>
           </template>
         </VEntity>

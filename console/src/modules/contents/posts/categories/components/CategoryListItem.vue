@@ -86,7 +86,7 @@ function onDelete(category: CategoryTree) {
             <VEntityField v-if="category.metadata.deletionTimestamp">
               <template #description>
                 <VStatusDot
-                  v-tooltip="$t('core.universal.status.deleting')"
+                  v-tooltip="$t('core.common.status.deleting')"
                   state="warning"
                   animate
                 />
@@ -94,7 +94,7 @@ function onDelete(category: CategoryTree) {
             </VEntityField>
             <VEntityField
               :description="
-                $t('core.universal.fields.post_count', {
+                $t('core.common.fields.post_count', {
                   count: category.status?.postCount || 0,
                 })
               "
@@ -118,7 +118,7 @@ function onDelete(category: CategoryTree) {
               type="secondary"
               @click="onOpenEditingModal(category)"
             >
-              {{ $t("core.universal.buttons.edit") }}
+              {{ $t("core.common.buttons.edit") }}
             </VButton>
             <VButton
               v-permission="['system:posts:manage']"
@@ -127,7 +127,7 @@ function onDelete(category: CategoryTree) {
               type="danger"
               @click="onDelete(category)"
             >
-              {{ $t("core.universal.buttons.delete") }}
+              {{ $t("core.common.buttons.delete") }}
             </VButton>
           </template>
         </VEntity>

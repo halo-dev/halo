@@ -73,14 +73,14 @@ const isSystemReserved = (role: Role) => {
 
 const getRoleCountText = (role: Role) => {
   if (role.metadata.name === SUPER_ROLE_NAME) {
-    return t("core.role.universal.text.contains_all_permissions");
+    return t("core.role.common.text.contains_all_permissions");
   }
 
   const dependenciesCount = JSON.parse(
     role.metadata.annotations?.[rbacAnnotations.DEPENDENCIES] || "[]"
   ).length;
 
-  return t("core.role.universal.text.contains_n_permissions", {
+  return t("core.role.common.text.contains_n_permissions", {
     count: dependenciesCount,
   });
 };
@@ -131,15 +131,15 @@ const handleDelete = async (role: Role) => {
     title: t("core.role.operations.delete.title"),
     description: t("core.role.operations.delete.description"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.role.deletev1alpha1Role({
           name: role.metadata.name,
         });
 
-        Toast.success(t("core.universal.toast.delete_success"));
+        Toast.success(t("core.common.toast.delete_success"));
       } catch (e) {
         console.error("Failed to delete role", e);
       } finally {
@@ -184,7 +184,7 @@ const handleDelete = async (role: Role) => {
             <div class="flex w-full flex-1 sm:w-auto">
               <FormKit
                 v-model="keyword"
-                :placeholder="$t('core.universal.placeholder.search')"
+                :placeholder="$t('core.common.placeholder.search')"
                 type="text"
               ></FormKit>
             </div>
@@ -222,8 +222,8 @@ const handleDelete = async (role: Role) => {
                     <VTag>
                       {{
                         isSystemReserved(role)
-                          ? t("core.role.universal.text.system_reserved")
-                          : t("core.role.universal.text.custom")
+                          ? t("core.role.common.text.system_reserved")
+                          : t("core.role.common.text.custom")
                       }}
                     </VTag>
                   </template>
@@ -231,7 +231,7 @@ const handleDelete = async (role: Role) => {
                 <VEntityField v-if="role.metadata.deletionTimestamp">
                   <template #description>
                     <VStatusDot
-                      v-tooltip="$t('core.universal.status.deleting')"
+                      v-tooltip="$t('core.common.status.deleting')"
                       state="warning"
                       animate
                     />
@@ -256,7 +256,7 @@ const handleDelete = async (role: Role) => {
                   type="secondary"
                   @click="handleOpenEditingModal(role)"
                 >
-                  {{ $t("core.universal.buttons.edit") }}
+                  {{ $t("core.common.buttons.edit") }}
                 </VButton>
                 <VButton
                   v-if="!isSystemReserved(role)"
@@ -265,7 +265,7 @@ const handleDelete = async (role: Role) => {
                   type="danger"
                   @click="handleDelete(role)"
                 >
-                  {{ $t("core.universal.buttons.delete") }}
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
                 <VButton v-close-popper block @click="handleCloneRole(role)">
                   {{

@@ -91,15 +91,15 @@ const handleDeletePermanently = async (post: Post) => {
     title: t("core.deleted_post.operations.delete.title"),
     description: t("core.deleted_post.operations.delete.description"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await apiClient.extension.post.deletecontentHaloRunV1alpha1Post({
         name: post.metadata.name,
       });
       await refetch();
 
-      Toast.success(t("core.universal.toast.delete_success"));
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
@@ -109,8 +109,8 @@ const handleDeletePermanentlyInBatch = async () => {
     title: t("core.deleted_post.operations.delete_in_batch.title"),
     description: t("core.deleted_post.operations.delete_in_batch.description"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPostNames.value.map((name) => {
@@ -122,7 +122,7 @@ const handleDeletePermanentlyInBatch = async () => {
       await refetch();
       selectedPostNames.value = [];
 
-      Toast.success(t("core.universal.toast.delete_success"));
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
@@ -131,8 +131,8 @@ const handleRecovery = async (post: Post) => {
   Dialog.warning({
     title: t("core.deleted_post.operations.recovery.title"),
     description: t("core.deleted_post.operations.recovery.description"),
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const postToUpdate = cloneDeep(post);
       postToUpdate.spec.deleted = false;
@@ -143,7 +143,7 @@ const handleRecovery = async (post: Post) => {
 
       await refetch();
 
-      Toast.success(t("core.universal.toast.recovery_success"));
+      Toast.success(t("core.common.toast.recovery_success"));
     },
   });
 };
@@ -154,8 +154,8 @@ const handleRecoveryInBatch = async () => {
     description: t(
       "core.deleted_post.operations.recovery_in_batch.description"
     ),
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPostNames.value.map((name) => {
@@ -182,7 +182,7 @@ const handleRecoveryInBatch = async () => {
       await refetch();
       selectedPostNames.value = [];
 
-      Toast.success(t("core.universal.toast.recovery_success"));
+      Toast.success(t("core.common.toast.recovery_success"));
     },
   });
 };
@@ -212,7 +212,7 @@ function handleClearKeyword() {
     <template #actions>
       <VSpace>
         <VButton :route="{ name: 'Posts' }" size="sm">
-          {{ $t("core.universal.buttons.back") }}
+          {{ $t("core.common.buttons.back") }}
         </VButton>
         <VButton
           v-permission="['system:posts:manage']"
@@ -222,7 +222,7 @@ function handleClearKeyword() {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          {{ $t("core.universal.buttons.new") }}
+          {{ $t("core.common.buttons.new") }}
         </VButton>
       </VSpace>
     </template>
@@ -254,7 +254,7 @@ function handleClearKeyword() {
                 <FormKit
                   id="keywordInput"
                   outer-class="!p-0"
-                  :placeholder="$t('core.universal.placeholder.search')"
+                  :placeholder="$t('core.common.placeholder.search')"
                   type="text"
                   name="keyword"
                   :model-value="keyword"
@@ -263,7 +263,7 @@ function handleClearKeyword() {
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
                   {{
-                    $t("core.universal.filters.results.keyword", {
+                    $t("core.common.filters.results.keyword", {
                       keyword: keyword,
                     })
                   }}
@@ -271,10 +271,10 @@ function handleClearKeyword() {
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeletePermanentlyInBatch">
-                  {{ $t("core.universal.buttons.delete_permanently") }}
+                  {{ $t("core.common.buttons.delete_permanently") }}
                 </VButton>
                 <VButton type="default" @click="handleRecoveryInBatch">
-                  {{ $t("core.universal.buttons.recovery") }}
+                  {{ $t("core.common.buttons.recovery") }}
                 </VButton>
               </VSpace>
             </div>
@@ -307,10 +307,10 @@ function handleClearKeyword() {
           <template #actions>
             <VSpace>
               <VButton @click="refetch">
-                {{ $t("core.universal.buttons.refresh") }}
+                {{ $t("core.common.buttons.refresh") }}
               </VButton>
               <VButton :route="{ name: 'Posts' }" type="primary">
-                {{ $t("core.universal.buttons.back") }}
+                {{ $t("core.common.buttons.back") }}
               </VButton>
             </VSpace>
           </template>
@@ -408,7 +408,7 @@ function handleClearKeyword() {
                 <VEntityField v-if="!post?.post?.spec.deleted">
                   <template #description>
                     <VStatusDot
-                      v-tooltip="$t('core.universal.tooltips.recovering')"
+                      v-tooltip="$t('core.common.tooltips.recovering')"
                       state="success"
                       animate
                     />
@@ -417,7 +417,7 @@ function handleClearKeyword() {
                 <VEntityField v-if="post?.post?.metadata.deletionTimestamp">
                   <template #description>
                     <VStatusDot
-                      v-tooltip="$t('core.universal.status.deleting')"
+                      v-tooltip="$t('core.common.status.deleting')"
                       state="warning"
                       animate
                     />
@@ -441,7 +441,7 @@ function handleClearKeyword() {
                   type="danger"
                   @click="handleDeletePermanently(post.post)"
                 >
-                  {{ $t("core.universal.buttons.delete_permanently") }}
+                  {{ $t("core.common.buttons.delete_permanently") }}
                 </VButton>
                 <VButton
                   v-close-popper
@@ -449,7 +449,7 @@ function handleClearKeyword() {
                   type="default"
                   @click="handleRecovery(post.post)"
                 >
-                  {{ $t("core.universal.buttons.recovery") }}
+                  {{ $t("core.common.buttons.recovery") }}
                 </VButton>
               </template>
             </VEntity>

@@ -32,7 +32,7 @@ const router = useRouter();
       <div class="mt-4">
         <VSpace>
           <VButton @click="router.back()">
-            {{ $t("core.universal.buttons.back") }}
+            {{ $t("core.common.buttons.back") }}
           </VButton>
           <VButton type="secondary" :route="{ name: 'Dashboard' }">
             {{ $t("core.exception.actions.dashboard") }}

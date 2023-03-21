@@ -427,7 +427,7 @@ core:
           toast_success: 回复成功
   attachment:
     title: 附件库
-    universal:
+    common:
       text:
         ungrouped: 未分组
     actions:
@@ -552,7 +552,7 @@ core:
           result: （已选择 {count} 项）
   theme:
     title: 主题
-    universal:
+    common:
       buttons:
         install: 安装主题
     tabs:
@@ -757,7 +757,7 @@ core:
           default: 默认编辑器
   user:
     title: 用户
-    universal:
+    common:
       buttons:
         new: 新建用户
     actions:
@@ -836,7 +836,7 @@ core:
         creation_time: 注册时间
   role:
     title: 角色
-    universal:
+    common:
       text:
         contains_all_permissions: 包含所有权限
         contains_n_permissions: 包含 {count} 个权限
@@ -1038,7 +1038,7 @@ core:
       creation_label: 创建 {text} 分类
     tag_select:
       creation_label: 创建 {text} 标签
-  universal:
+  common:
     buttons:
       save: 保存
       close: 关闭

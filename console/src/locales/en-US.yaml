@@ -427,7 +427,7 @@ core:
           toast_success: Reply successfully
   attachment:
     title: Attachments
-    universal:
+    common:
       text:
         ungrouped: Ungrouped
     actions:
@@ -552,7 +552,7 @@ core:
           result: "({count} items selected)"
   theme:
     title: Themes
-    universal:
+    common:
       buttons:
         install: Install Theme
     tabs:
@@ -757,7 +757,7 @@ core:
           default: Default Editor
   user:
     title: Users
-    universal:
+    common:
       buttons:
         new: New User
     actions:
@@ -836,7 +836,7 @@ core:
         creation_time: Creation time
   role:
     title: Roles
-    universal:
+    common:
       text:
         contains_all_permissions: Contains all permissions
         contains_n_permissions: Contains {count} permissions
@@ -1038,7 +1038,7 @@ core:
       creation_label: "Create {text} category"
     tag_select:
       creation_label: "Create {text} tag"
-  universal:
+  common:
     buttons:
       save: Save
       close: Close

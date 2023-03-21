@@ -166,7 +166,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>
-        {{ $t("core.universal.buttons.install") }}
+        {{ $t("core.common.buttons.install") }}
       </VButton>
     </template>
   </VPageHeader>
@@ -182,7 +182,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
               <FormKit
                 id="keywordInput"
                 outer-class="!p-0"
-                :placeholder="$t('core.universal.placeholder.search')"
+                :placeholder="$t('core.common.placeholder.search')"
                 type="text"
                 name="keyword"
                 :model-value="keyword"
@@ -191,7 +191,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
 
               <FilterTag v-if="keyword" @close="handleClearKeyword()">
                 {{
-                  $t("core.universal.filters.results.keyword", {
+                  $t("core.common.filters.results.keyword", {
                     keyword: keyword,
                   })
                 }}
@@ -202,7 +202,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                 @close="handleEnabledItemChange(EnabledItems[0])"
               >
                 {{
-                  $t("core.universal.filters.results.status", {
+                  $t("core.common.filters.results.status", {
                     status: selectedEnabledItem.label,
                   })
                 }}
@@ -213,7 +213,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                 @close="handleSortItemChange()"
               >
                 {{
-                  $t("core.universal.filters.results.sort", {
+                  $t("core.common.filters.results.sort", {
                     sort: selectedSortItem.label,
                   })
                 }}
@@ -231,7 +231,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
                     <span class="mr-0.5">
-                      {{ $t("core.universal.filters.labels.status") }}
+                      {{ $t("core.common.filters.labels.status") }}
                     </span>
                     <span>
                       <IconArrowDown />
@@ -262,7 +262,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
                     <span class="mr-0.5">
-                      {{ $t("core.universal.filters.labels.sort") }}
+                      {{ $t("core.common.filters.labels.sort") }}
                     </span>
                     <span>
                       <IconArrowDown />
@@ -290,7 +290,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                     @click="refetch()"
                   >
                     <IconRefreshLine
-                      v-tooltip="$t('core.universal.buttons.refresh')"
+                      v-tooltip="$t('core.common.buttons.refresh')"
                       :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
@@ -312,7 +312,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
           <template #actions>
             <VSpace>
               <VButton :loading="isFetching" @click="refetch()">
-                {{ $t("core.universal.buttons.refresh") }}
+                {{ $t("core.common.buttons.refresh") }}
               </VButton>
               <VButton
                 v-permission="['system:plugins:manage']"

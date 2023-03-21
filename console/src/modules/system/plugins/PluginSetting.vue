@@ -58,7 +58,7 @@ const handleSaveConfigMap = async () => {
     configMap: configMapToUpdate,
   });
 
-  Toast.success(t("core.universal.toast.save_success"));
+  Toast.success(t("core.common.toast.save_success"));
 
   await handleFetchSettings();
   configMap.value = newConfigMap;
@@ -95,7 +95,7 @@ await handleFetchConfigMap();
             type="secondary"
             @click="$formkit.submit(group || '')"
           >
-            {{ $t("core.universal.buttons.save") }}
+            {{ $t("core.common.buttons.save") }}
           </VButton>
         </div>
       </div>

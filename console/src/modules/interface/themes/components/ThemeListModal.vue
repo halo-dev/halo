@@ -202,7 +202,7 @@ const handleOpenInstallModal = () => {
             <template #actions>
               <VSpace>
                 <VButton :loading="loading" @click="handleFetchThemes()">
-                  {{ $t("core.universal.buttons.refresh") }}
+                  {{ $t("core.common.buttons.refresh") }}
                 </VButton>
                 <VButton
                   v-permission="['system:themes:manage']"
@@ -212,7 +212,7 @@ const handleOpenInstallModal = () => {
                   <template #icon>
                     <IconAddCircle class="h-full w-full" />
                   </template>
-                  {{ $t("core.theme.universal.buttons.install") }}
+                  {{ $t("core.theme.common.buttons.install") }}
                 </VButton>
               </VSpace>
             </template>
@@ -252,7 +252,7 @@ const handleOpenInstallModal = () => {
             <template #actions>
               <VSpace>
                 <VButton :loading="loading" @click="handleFetchThemes">
-                  {{ $t("core.universal.buttons.refresh") }}
+                  {{ $t("core.common.buttons.refresh") }}
                 </VButton>
               </VSpace>
             </template>
@@ -283,7 +283,7 @@ const handleOpenInstallModal = () => {
                                 class="flex h-full items-center justify-center object-cover"
                               >
                                 <span class="text-xs text-gray-400">
-                                  {{ $t("core.universal.status.loading") }}...
+                                  {{ $t("core.common.status.loading") }}...
                                 </span>
                               </div>
                             </template>
@@ -292,9 +292,7 @@ const handleOpenInstallModal = () => {
                                 class="flex h-full items-center justify-center object-cover"
                               >
                                 <span class="text-xs text-red-400">
-                                  {{
-                                    $t("core.universal.status.loading_error")
-                                  }}
+                                  {{ $t("core.common.status.loading_error") }}
                                 </span>
                               </div>
                             </template>
@@ -340,7 +338,7 @@ const handleOpenInstallModal = () => {
                         :disabled="creating"
                         @click="handleCreateTheme(theme)"
                       >
-                        {{ $t("core.universal.buttons.install") }}
+                        {{ $t("core.common.buttons.install") }}
                       </VButton>
                     </template>
                   </VEntityField>
@@ -359,10 +357,10 @@ const handleOpenInstallModal = () => {
           type="secondary"
           @click="handleOpenInstallModal()"
         >
-          {{ $t("core.theme.universal.buttons.install") }}
+          {{ $t("core.theme.common.buttons.install") }}
         </VButton>
         <VButton @click="onVisibleChange(false)">
-          {{ $t("core.universal.buttons.close") }}
+          {{ $t("core.common.buttons.close") }}
         </VButton>
       </VSpace>
     </template>

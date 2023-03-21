@@ -62,14 +62,14 @@ axiosInstance.interceptors.response.use(
   async (error: AxiosError<ProblemDetail>) => {
     if (/Network Error/.test(error.message)) {
       // @ts-ignore
-      Toast.error(i18n.global.t("core.universal.toast.network_error"));
+      Toast.error(i18n.global.t("core.common.toast.network_error"));
       return Promise.reject(error);
     }
 
     const errorResponse = error.response;
 
     if (!errorResponse) {
-      Toast.error(i18n.global.t("core.universal.toast.network_error"));
+      Toast.error(i18n.global.t("core.common.toast.network_error"));
       return Promise.reject(error);
     }
 
@@ -85,24 +85,24 @@ axiosInstance.interceptors.response.use(
 
     if (status === 400) {
       Toast.error(
-        i18n.global.t("core.universal.toast.request_parameter_error", { title })
+        i18n.global.t("core.common.toast.request_parameter_error", { title })
       );
     } else if (status === 401) {
       const userStore = useUserStore();
       userStore.loginModalVisible = true;
-      Toast.warning(i18n.global.t("core.universal.toast.login_expired"));
+      Toast.warning(i18n.global.t("core.common.toast.login_expired"));
       localStorage.removeItem("logged_in");
     } else if (status === 403) {
-      Toast.error(i18n.global.t("core.universal.toast.forbidden"));
+      Toast.error(i18n.global.t("core.common.toast.forbidden"));
     } else if (status === 404) {
-      Toast.error(i18n.global.t("core.universal.toast.not_found"));
+      Toast.error(i18n.global.t("core.common.toast.not_found"));
     } else if (status === 500) {
       Toast.error(
-        i18n.global.t("core.universal.toast.server_internal_error_with_title")
+        i18n.global.t("core.common.toast.server_internal_error_with_title")
       );
     } else {
       Toast.error(
-        i18n.global.t("core.universal.toast.unknown_error_with_title", {
+        i18n.global.t("core.common.toast.unknown_error_with_title", {
           title,
         })
       );

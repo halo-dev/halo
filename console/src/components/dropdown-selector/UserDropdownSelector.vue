@@ -74,7 +74,7 @@ const searchResults = computed(() => {
           <FormKit
             id="userDropdownSelectorInput"
             v-model="keyword"
-            :placeholder="$t('core.universal.placeholder.search')"
+            :placeholder="$t('core.common.placeholder.search')"
             type="text"
           ></FormKit>
         </div>

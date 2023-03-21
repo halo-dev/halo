@@ -155,7 +155,7 @@ export function useSettingForm(
         configMapName.value = data.metadata.name;
       }
 
-      Toast.success(t("core.universal.toast.save_success"));
+      Toast.success(t("core.common.toast.save_success"));
     } catch (e) {
       console.error("Failed to save configMap", e);
     } finally {

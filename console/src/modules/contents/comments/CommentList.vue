@@ -213,8 +213,8 @@ const handleDeleteInBatch = async () => {
       "core.comment.operations.delete_comment_in_batch.description"
     ),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         const promises = selectedCommentNames.value.map((name) => {
@@ -227,7 +227,7 @@ const handleDeleteInBatch = async () => {
         await Promise.all(promises);
         selectedCommentNames.value = [];
 
-        Toast.success(t("core.universal.toast.delete_success"));
+        Toast.success(t("core.common.toast.delete_success"));
       } catch (e) {
         console.error("Failed to delete comments", e);
       } finally {
@@ -240,8 +240,8 @@ const handleDeleteInBatch = async () => {
 const handleApproveInBatch = async () => {
   Dialog.warning({
     title: t("core.comment.operations.approve_comment_in_batch.title"),
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         const commentsToUpdate = comments.value?.filter((comment) => {
@@ -271,7 +271,7 @@ const handleApproveInBatch = async () => {
         await Promise.all(promises || []);
         selectedCommentNames.value = [];
 
-        Toast.success(t("core.universal.toast.operation_success"));
+        Toast.success(t("core.common.toast.operation_success"));
       } catch (e) {
         console.error("Failed to approve comments in batch", e);
       } finally {
@@ -314,7 +314,7 @@ const handleApproveInBatch = async () => {
                 <FormKit
                   id="keywordInput"
                   outer-class="!p-0"
-                  :placeholder="$t('core.universal.placeholder.search')"
+                  :placeholder="$t('core.common.placeholder.search')"
                   type="text"
                   name="keyword"
                   :model-value="keyword"
@@ -323,7 +323,7 @@ const handleApproveInBatch = async () => {
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
                   {{
-                    $t("core.universal.filters.results.keyword", {
+                    $t("core.common.filters.results.keyword", {
                       keyword: keyword,
                     })
                   }}
@@ -336,7 +336,7 @@ const handleApproveInBatch = async () => {
                   "
                 >
                   {{
-                    $t("core.universal.filters.results.status", {
+                    $t("core.common.filters.results.status", {
                       status: selectedApprovedFilterItem.label,
                     })
                   }}
@@ -358,7 +358,7 @@ const handleApproveInBatch = async () => {
                   @close="handleSortFilterItemChange(SortFilterItems[0])"
                 >
                   {{
-                    $t("core.universal.filters.results.sort", {
+                    $t("core.common.filters.results.sort", {
                       sort: selectedSortFilterItem.label,
                     })
                   }}
@@ -378,7 +378,7 @@ const handleApproveInBatch = async () => {
                   }}
                 </VButton>
                 <VButton type="danger" @click="handleDeleteInBatch">
-                  {{ $t("core.universal.buttons.delete") }}
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </VSpace>
             </div>
@@ -389,7 +389,7 @@ const handleApproveInBatch = async () => {
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
                     <span class="mr-0.5">
-                      {{ $t("core.universal.filters.labels.status") }}
+                      {{ $t("core.common.filters.labels.status") }}
                     </span>
                     <span>
                       <IconArrowDown />
@@ -438,7 +438,7 @@ const handleApproveInBatch = async () => {
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
                     <span class="mr-0.5">
-                      {{ $t("core.universal.filters.labels.sort") }}
+                      {{ $t("core.common.filters.labels.sort") }}
                     </span>
                     <span>
                       <IconArrowDown />
@@ -472,7 +472,7 @@ const handleApproveInBatch = async () => {
                     @click="refetch()"
                   >
                     <IconRefreshLine
-                      v-tooltip="$t('core.universal.buttons.refresh')"
+                      v-tooltip="$t('core.common.buttons.refresh')"
                       :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
@@ -492,7 +492,7 @@ const handleApproveInBatch = async () => {
           <template #actions>
             <VSpace>
               <VButton @click="refetch">
-                {{ $t("core.universal.buttons.refresh") }}
+                {{ $t("core.common.buttons.refresh") }}
               </VButton>
             </VSpace>
           </template>

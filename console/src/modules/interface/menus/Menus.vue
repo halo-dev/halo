@@ -160,8 +160,8 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
     title: t("core.menu.operations.delete_menu_item.title"),
     description: t("core.menu.operations.delete_menu_item.description"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await apiClient.extension.menuItem.deletev1alpha1MenuItem({
         name: menuItem.metadata.name,
@@ -180,7 +180,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
 
       await handleFetchMenuItems();
 
-      Toast.success(t("core.universal.toast.delete_success"));
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
@@ -249,7 +249,7 @@ const handleResetMenuItems = async () => {
                       type="default"
                       @click="menuItemEditingModal = true"
                     >
-                      {{ $t("core.universal.buttons.new") }}
+                      {{ $t("core.common.buttons.new") }}
                     </VButton>
                   </VSpace>
                 </div>
@@ -265,7 +265,7 @@ const handleResetMenuItems = async () => {
               <template #actions>
                 <VSpace>
                   <VButton @click="handleFetchMenuItems()">
-                    {{ $t("core.universal.buttons.refresh") }}
+                    {{ $t("core.common.buttons.refresh") }}
                   </VButton>
                   <VButton
                     v-permission="['system:menus:manage']"

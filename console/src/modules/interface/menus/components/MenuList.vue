@@ -102,8 +102,8 @@ const handleDeleteMenu = async (menu: Menu) => {
     title: t("core.menu.operations.delete_menu.title"),
     description: t("core.menu.operations.delete_menu.description"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.menu.deletev1alpha1Menu({
@@ -119,7 +119,7 @@ const handleDeleteMenu = async (menu: Menu) => {
 
         await Promise.all(deleteItemsPromises);
 
-        Toast.success(t("core.universal.toast.delete_success"));
+        Toast.success(t("core.common.toast.delete_success"));
       } catch (e) {
         console.error("Failed to delete menu", e);
       } finally {
@@ -211,7 +211,7 @@ onMounted(handleFetchPrimaryMenuName);
         <template #actions>
           <VSpace>
             <VButton size="sm" @click="handleFetchMenus()">
-              {{ $t("core.universal.buttons.refresh") }}
+              {{ $t("core.common.buttons.refresh") }}
             </VButton>
           </VSpace>
         </template>
@@ -247,7 +247,7 @@ onMounted(handleFetchPrimaryMenuName);
               <VEntityField v-if="menu.metadata.deletionTimestamp">
                 <template #description>
                   <VStatusDot
-                    v-tooltip="$t('core.universal.status.deleting')"
+                    v-tooltip="$t('core.common.status.deleting')"
                     state="warning"
                     animate
                   />
@@ -272,7 +272,7 @@ onMounted(handleFetchPrimaryMenuName);
                 type="default"
                 @click="handleOpenEditingModal(menu)"
               >
-                {{ $t("core.universal.buttons.edit") }}
+                {{ $t("core.common.buttons.edit") }}
               </VButton>
               <VButton
                 v-close-popper
@@ -280,7 +280,7 @@ onMounted(handleFetchPrimaryMenuName);
                 type="danger"
                 @click="handleDeleteMenu(menu)"
               >
-                {{ $t("core.universal.buttons.delete") }}
+                {{ $t("core.common.buttons.delete") }}
               </VButton>
             </template>
           </VEntity>
@@ -289,7 +289,7 @@ onMounted(handleFetchPrimaryMenuName);
     </Transition>
     <template v-if="currentUserHasPermission(['system:menus:manage'])" #footer>
       <VButton block type="secondary" @click="handleOpenEditingModal()">
-        {{ $t("core.universal.buttons.new") }}
+        {{ $t("core.common.buttons.new") }}
       </VButton>
     </template>
   </VCard>

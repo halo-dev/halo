@@ -63,8 +63,8 @@ const onUploaded = async (response: SuccessResponse) => {
     description: t(
       "core.plugin.upload_modal.operations.active_after_install.description"
     ),
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         const { data: pluginToUpdate } =
@@ -110,15 +110,15 @@ const onError = (file: UppyFile<unknown>, response: ErrorResponse) => {
       description: t(
         "core.plugin.upload_modal.operations.existed_during_installation.description"
       ),
-      confirmText: t("core.universal.buttons.confirm"),
-      cancelText: t("core.universal.buttons.cancel"),
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         await apiClient.plugin.upgradePlugin({
           name: body.pluginName,
           file: file.data as File,
         });
 
-        Toast.success(t("core.universal.toast.upgrade_success"));
+        Toast.success(t("core.common.toast.upgrade_success"));
 
         window.location.reload();
       },

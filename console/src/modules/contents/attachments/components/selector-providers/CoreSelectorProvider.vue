@@ -78,7 +78,7 @@ const handleOpenDetail = (attachment: Attachment) => {
       <template #icon>
         <IconUpload class="h-full w-full" />
       </template>
-      {{ $t("core.universal.buttons.upload") }}
+      {{ $t("core.common.buttons.upload") }}
     </VButton>
   </div>
   <VEmpty
@@ -89,7 +89,7 @@ const handleOpenDetail = (attachment: Attachment) => {
     <template #actions>
       <VSpace>
         <VButton @click="handleFetchAttachments">
-          {{ $t("core.universal.buttons.refresh") }}
+          {{ $t("core.common.buttons.refresh") }}
         </VButton>
         <VButton type="secondary" @click="uploadVisible = true">
           <template #icon>
@@ -129,14 +129,14 @@ const handleOpenDetail = (attachment: Attachment) => {
             <template #loading>
               <div class="flex h-full items-center justify-center object-cover">
                 <span class="text-xs text-gray-400">
-                  {{ $t("core.universal.status.loading") }}...
+                  {{ $t("core.common.status.loading") }}...
                 </span>
               </div>
             </template>
             <template #error>
               <div class="flex h-full items-center justify-center object-cover">
                 <span class="text-xs text-red-400">
-                  {{ $t("core.universal.status.loading_error") }}
+                  {{ $t("core.common.status.loading_error") }}
                 </span>
               </div>
             </template>

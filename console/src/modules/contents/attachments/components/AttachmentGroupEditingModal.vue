@@ -70,7 +70,7 @@ const handleSave = async () => {
       );
     }
 
-    Toast.success(t("core.universal.toast.save_success"));
+    Toast.success(t("core.common.toast.save_success"));
     onVisibleChange(false);
   } catch (e) {
     console.error("Failed to save attachment group", e);
@@ -145,12 +145,12 @@ watch(
           v-if="visible"
           :loading="saving"
           type="secondary"
-          :text="$t('core.universal.buttons.submit')"
+          :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('attachment-group-form')"
         >
         </SubmitButton>
         <VButton @click="onVisibleChange(false)">
-          {{ $t("core.universal.buttons.cancel_and_shortcut") }}
+          {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>
     </template>

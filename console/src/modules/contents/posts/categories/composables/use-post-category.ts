@@ -54,8 +54,8 @@ export function usePostCategory(): usePostCategoryReturn {
       title: t("core.post_category.operations.delete.title"),
       description: t("core.post_category.operations.delete.description"),
       confirmType: "danger",
-      confirmText: t("core.universal.buttons.confirm"),
-      cancelText: t("core.universal.buttons.cancel"),
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           await apiClient.extension.category.deletecontentHaloRunV1alpha1Category(
@@ -64,7 +64,7 @@ export function usePostCategory(): usePostCategoryReturn {
             }
           );
 
-          Toast.success(t("core.universal.toast.delete_success"));
+          Toast.success(t("core.common.toast.delete_success"));
         } catch (e) {
           console.error("Failed to delete tag", e);
         } finally {

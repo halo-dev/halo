@@ -77,7 +77,7 @@ const searchResults = computed(() => {
           <FormKit
             id="tagDropdownSelectorInput"
             v-model="keyword"
-            :placeholder="$t('core.universal.placeholder.search')"
+            :placeholder="$t('core.common.placeholder.search')"
             type="text"
           ></FormKit>
         </div>
@@ -105,7 +105,7 @@ const searchResults = computed(() => {
                 <template #end>
                   <VEntityField
                     :description="
-                      $t('core.universal.fields.post_count', {
+                      $t('core.common.fields.post_count', {
                         count: tag.status?.postCount || 0,
                       })
                     "

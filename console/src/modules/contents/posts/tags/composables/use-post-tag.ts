@@ -44,15 +44,15 @@ export function usePostTag(): usePostTagReturn {
       title: t("core.post_tag.operations.delete.title"),
       description: t("core.post_tag.operations.delete.description"),
       confirmType: "danger",
-      confirmText: t("core.universal.buttons.confirm"),
-      cancelText: t("core.universal.buttons.cancel"),
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           await apiClient.extension.tag.deletecontentHaloRunV1alpha1Tag({
             name: tag.metadata.name,
           });
 
-          Toast.success(t("core.universal.toast.delete_success"));
+          Toast.success(t("core.common.toast.delete_success"));
         } catch (e) {
           console.error("Failed to delete tag", e);
         } finally {

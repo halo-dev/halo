@@ -181,13 +181,13 @@ onMounted(() => {
             type="primary"
             @click="handleActiveTheme"
           >
-            {{ $t("core.universal.buttons.active") }}
+            {{ $t("core.common.buttons.active") }}
           </VButton>
           <VButton type="secondary" size="sm" @click="previewModal = true">
             <template #icon>
               <IconEye class="h-full w-full" />
             </template>
-            {{ $t("core.universal.buttons.preview") }}
+            {{ $t("core.common.buttons.preview") }}
           </VButton>
           <VButton size="sm" type="default" @click="themesModal = true">
             <template #icon>
@@ -208,7 +208,7 @@ onMounted(() => {
         <template #actions>
           <VSpace>
             <VButton @click="themesModal = true">
-              {{ $t("core.theme.universal.buttons.install") }}
+              {{ $t("core.theme.common.buttons.install") }}
             </VButton>
             <VButton type="primary" @click="themesModal = true">
               <template #icon>

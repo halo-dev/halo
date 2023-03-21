@@ -452,7 +452,7 @@ const onVisibleChange = (visible: boolean) => {
           ↓
         </kbd>
         <span class="mr-1 text-xs text-gray-600">
-          {{ $t("core.universal.buttons.confirm") }}
+          {{ $t("core.common.buttons.confirm") }}
         </span>
         <kbd
           class="mr-5 rounded border p-0.5 text-[10px] text-gray-600 shadow-sm"
@@ -460,7 +460,7 @@ const onVisibleChange = (visible: boolean) => {
           Enter
         </kbd>
         <span class="mr-1 text-xs text-gray-600">
-          {{ $t("core.universal.buttons.close") }}
+          {{ $t("core.common.buttons.close") }}
         </span>
         <kbd class="rounded border p-0.5 text-[10px] text-gray-600 shadow-sm">
           Esc

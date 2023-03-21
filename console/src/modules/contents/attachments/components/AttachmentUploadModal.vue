@@ -129,7 +129,7 @@ watch(
             {
               metadata: { name: '' },
               spec: {
-                displayName: $t('core.attachment.universal.text.ungrouped'),
+                displayName: $t('core.attachment.common.text.ungrouped'),
               },
             },
             ...(groups || []),

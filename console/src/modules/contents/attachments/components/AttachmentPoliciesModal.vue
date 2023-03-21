@@ -87,8 +87,8 @@ const handleDelete = async (policy: Policy) => {
       description: t(
         "core.attachment.policies_modal.operations.can_not_delete.description"
       ),
-      confirmText: t("core.universal.buttons.confirm"),
-      cancelText: t("core.universal.buttons.cancel"),
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
     });
     return;
   }
@@ -98,14 +98,14 @@ const handleDelete = async (policy: Policy) => {
     description: t(
       "core.attachment.policies_modal.operations.delete.description"
     ),
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await apiClient.extension.storage.policy.deletestorageHaloRunV1alpha1Policy(
         { name: policy.metadata.name }
       );
 
-      Toast.success(t("core.universal.toast.delete_success"));
+      Toast.success(t("core.common.toast.delete_success"));
       handleFetchPolicies();
     },
   });
@@ -159,7 +159,7 @@ const onEditingModalClose = () => {
       <template #actions>
         <VSpace>
           <VButton @click="handleFetchPolicies">
-            {{ $t("core.universal.buttons.refresh") }}
+            {{ $t("core.common.buttons.refresh") }}
           </VButton>
           <FloatingDropdown>
             <VButton type="secondary">
@@ -206,7 +206,7 @@ const onEditingModalClose = () => {
             <VEntityField v-if="policy.metadata.deletionTimestamp">
               <template #description>
                 <VStatusDot
-                  v-tooltip="$t('core.universal.status.deleting')"
+                  v-tooltip="$t('core.common.status.deleting')"
                   state="warning"
                   animate
                 />
@@ -227,7 +227,7 @@ const onEditingModalClose = () => {
               type="secondary"
               @click="handleOpenEditingModal(policy)"
             >
-              {{ $t("core.universal.buttons.edit") }}
+              {{ $t("core.common.buttons.edit") }}
             </VButton>
             <VButton
               v-close-popper
@@ -235,7 +235,7 @@ const onEditingModalClose = () => {
               type="danger"
               @click="handleDelete(policy)"
             >
-              {{ $t("core.universal.buttons.delete") }}
+              {{ $t("core.common.buttons.delete") }}
             </VButton>
           </template>
         </VEntity>
@@ -243,7 +243,7 @@ const onEditingModalClose = () => {
     </ul>
     <template #footer>
       <VButton @click="onVisibleChange(false)">
-        {{ $t("core.universal.buttons.close_and_shortcut") }}
+        {{ $t("core.common.buttons.close_and_shortcut") }}
       </VButton>
     </template>
   </VModal>

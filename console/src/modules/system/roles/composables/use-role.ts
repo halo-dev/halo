@@ -135,7 +135,7 @@ export function useRoleForm(): useRoleFormReturn {
         formState.value = data;
       }
 
-      Toast.success(t("core.universal.toast.save_success"));
+      Toast.success(t("core.common.toast.save_success"));
     } catch (e) {
       console.error(e);
     } finally {

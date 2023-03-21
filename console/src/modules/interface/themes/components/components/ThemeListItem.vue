@@ -53,9 +53,9 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
         ? t("core.theme.operations.uninstall_and_delete_config.title")
         : t("core.theme.operations.uninstall.title")
     }`,
-    description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    description: t("core.common.dialog.descriptions.cannot_be_recovered"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.theme.deletethemeHaloRunV1alpha1Theme({
@@ -89,7 +89,7 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
           }
         }
 
-        Toast.success(t("core.universal.toast.uninstall_success"));
+        Toast.success(t("core.common.toast.uninstall_success"));
       } catch (e) {
         console.error("Failed to uninstall theme", e);
       } finally {
@@ -120,7 +120,7 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
                     class="flex h-full items-center justify-center object-cover"
                   >
                     <span class="text-xs text-gray-400">
-                      {{ $t("core.universal.status.loading") }}...
+                      {{ $t("core.common.status.loading") }}...
                     </span>
                   </div>
                 </template>
@@ -129,7 +129,7 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
                     class="flex h-full items-center justify-center object-cover"
                   >
                     <span class="text-xs text-red-400">
-                      {{ $t("core.universal.status.loading_error") }}
+                      {{ $t("core.common.status.loading_error") }}
                     </span>
                   </div>
                 </template>
@@ -144,7 +144,7 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
       >
         <template #extra>
           <VTag v-if="isActivated">
-            {{ $t("core.universal.status.activated") }}
+            {{ $t("core.common.status.activated") }}
           </VTag>
         </template>
       </VEntityField>
@@ -158,7 +158,7 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
       <VEntityField v-if="theme.metadata.deletionTimestamp">
         <template #description>
           <VStatusDot
-            v-tooltip="$t('core.universal.status.deleting')"
+            v-tooltip="$t('core.common.status.deleting')"
             state="warning"
             animate
           />
@@ -199,17 +199,17 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
         type="secondary"
         @click="handleActiveTheme"
       >
-        {{ $t("core.universal.buttons.active") }}
+        {{ $t("core.common.buttons.active") }}
       </VButton>
       <VButton v-close-popper block type="default" @click="emit('upgrade')">
-        {{ $t("core.universal.buttons.upgrade") }}
+        {{ $t("core.common.buttons.upgrade") }}
       </VButton>
       <VButton v-close-popper block type="default" @click="emit('preview')">
-        {{ $t("core.universal.buttons.preview") }}
+        {{ $t("core.common.buttons.preview") }}
       </VButton>
       <FloatingDropdown class="w-full" placement="right" :triggers="['click']">
         <VButton block type="danger">
-          {{ $t("core.universal.buttons.uninstall") }}
+          {{ $t("core.common.buttons.uninstall") }}
         </VButton>
         <template #popper>
           <div class="w-52 p-2">
@@ -220,7 +220,7 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
                 type="danger"
                 @click="handleUninstall(theme)"
               >
-                {{ $t("core.universal.buttons.uninstall") }}
+                {{ $t("core.common.buttons.uninstall") }}
               </VButton>
               <VButton
                 v-close-popper.all
@@ -242,7 +242,7 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
         type="danger"
         @click="handleResetSettingConfig"
       >
-        {{ $t("core.universal.buttons.reset") }}
+        {{ $t("core.common.buttons.reset") }}
       </VButton>
     </template>
   </VEntity>

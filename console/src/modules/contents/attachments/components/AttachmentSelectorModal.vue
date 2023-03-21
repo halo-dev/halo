@@ -115,14 +115,14 @@ const handleConfirm = () => {
             @change-provider="onChangeProvider"
           ></component>
           <template #fallback>
-            {{ $t("core.universal.status.loading") }}
+            {{ $t("core.common.status.loading") }}
           </template>
         </Suspense>
       </template>
     </div>
     <template #footer>
       <VButton type="secondary" @click="handleConfirm">
-        {{ $t("core.universal.buttons.confirm") }}
+        {{ $t("core.common.buttons.confirm") }}
         <span v-if="selected.length">
           {{
             $t("core.attachment.select_modal.operations.select.result", {

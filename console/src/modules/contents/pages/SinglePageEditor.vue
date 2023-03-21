@@ -139,13 +139,13 @@ const handleSave = async () => {
       routeQueryName.value = data.metadata.name;
     }
 
-    Toast.success(t("core.universal.toast.save_success"));
+    Toast.success(t("core.common.toast.save_success"));
 
     handleClearCache(routeQueryName.value as string);
     await handleFetchContent();
   } catch (error) {
     console.error("Failed to save single page", error);
-    Toast.error(t("core.universal.toast.save_failed_and_retry"));
+    Toast.error(t("core.common.toast.save_failed_and_retry"));
   } finally {
     saving.value = false;
   }
@@ -183,11 +183,11 @@ const handlePublish = async () => {
       router.push({ name: "SinglePages" });
     }
 
-    Toast.success(t("core.universal.toast.publish_success"));
+    Toast.success(t("core.common.toast.publish_success"));
     handleClearCache(routeQueryName.value as string);
   } catch (error) {
     console.error("Failed to publish single page", error);
-    Toast.error(t("core.universal.toast.publish_failed_and_retry"));
+    Toast.error(t("core.common.toast.publish_failed_and_retry"));
   } finally {
     publishing.value = false;
   }
@@ -243,12 +243,12 @@ const handleFetchContent = async () => {
       formState.value.page = data;
     } else {
       Dialog.warning({
-        title: t("core.universal.dialog.titles.warning"),
-        description: t("core.universal.dialog.descriptions.editor_not_found", {
+        title: t("core.common.dialog.titles.warning"),
+        description: t("core.common.dialog.descriptions.editor_not_found", {
           raw_type: data.rawType,
         }),
-        confirmText: t("core.universal.buttons.confirm"),
-        cancelText: t("core.universal.buttons.cancel"),
+        confirmText: t("core.common.buttons.confirm"),
+        cancelText: t("core.common.buttons.cancel"),
         onConfirm: () => {
           router.back();
         },
@@ -349,7 +349,7 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
           <template #icon>
             <IconSave class="h-full w-full" />
           </template>
-          {{ $t("core.universal.buttons.save") }}
+          {{ $t("core.common.buttons.save") }}
         </VButton>
         <VButton
           v-if="isUpdateMode"
@@ -360,7 +360,7 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
           <template #icon>
             <IconSettings class="h-full w-full" />
           </template>
-          {{ $t("core.universal.buttons.setting") }}
+          {{ $t("core.common.buttons.setting") }}
         </VButton>
         <VButton
           type="secondary"
@@ -370,7 +370,7 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
           <template #icon>
             <IconSendPlaneFill class="h-full w-full" />
           </template>
-          {{ $t("core.universal.buttons.publish") }}
+          {{ $t("core.common.buttons.publish") }}
         </VButton>
       </VSpace>
     </template>

@@ -44,7 +44,7 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
                     class="flex h-full items-center justify-center object-cover"
                   >
                     <span class="text-xs text-gray-400">
-                      {{ $t("core.universal.status.loading") }}...
+                      {{ $t("core.common.status.loading") }}...
                     </span>
                   </div>
                 </template>
@@ -53,7 +53,7 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
                     class="flex h-full items-center justify-center object-cover"
                   >
                     <span class="text-xs text-red-400">
-                      {{ $t("core.universal.status.loading_error") }}
+                      {{ $t("core.common.status.loading_error") }}
                     </span>
                   </div>
                 </template>
@@ -68,7 +68,7 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
       >
         <template #extra>
           <VTag v-if="isActivated">
-            {{ $t("core.universal.status.activated") }}
+            {{ $t("core.common.status.activated") }}
           </VTag>
         </template>
       </VEntityField>
@@ -82,7 +82,7 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
         type="secondary"
         @click="handleActiveTheme"
       >
-        {{ $t("core.universal.buttons.active") }}
+        {{ $t("core.common.buttons.active") }}
       </VButton>
       <VButton
         v-close-popper
@@ -90,7 +90,7 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
         type="default"
         @click="emit('open-settings')"
       >
-        {{ $t("core.universal.buttons.setting") }}
+        {{ $t("core.common.buttons.setting") }}
       </VButton>
     </template>
   </VEntity>

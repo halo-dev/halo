@@ -92,8 +92,8 @@ const handleDeletePermanently = async (singlePage: SinglePage) => {
     title: t("core.deleted_page.operations.delete.title"),
     description: t("core.deleted_page.operations.delete.description"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await apiClient.extension.singlePage.deletecontentHaloRunV1alpha1SinglePage(
         {
@@ -102,7 +102,7 @@ const handleDeletePermanently = async (singlePage: SinglePage) => {
       );
       await refetch();
 
-      Toast.success(t("core.universal.toast.delete_success"));
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
@@ -112,8 +112,8 @@ const handleDeletePermanentlyInBatch = async () => {
     title: t("core.deleted_page.operations.delete_in_batch.title"),
     description: t("core.deleted_page.operations.delete_in_batch.description"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {
@@ -127,7 +127,7 @@ const handleDeletePermanentlyInBatch = async () => {
       await refetch();
       selectedPageNames.value = [];
 
-      Toast.success(t("core.universal.toast.delete_success"));
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
@@ -136,8 +136,8 @@ const handleRecovery = async (singlePage: SinglePage) => {
   Dialog.warning({
     title: t("core.deleted_page.operations.recovery.title"),
     description: t("core.deleted_page.operations.recovery.description"),
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const singlePageToUpdate = cloneDeep(singlePage);
       singlePageToUpdate.spec.deleted = false;
@@ -149,7 +149,7 @@ const handleRecovery = async (singlePage: SinglePage) => {
       );
       await refetch();
 
-      Toast.success(t("core.universal.toast.recovery_success"));
+      Toast.success(t("core.common.toast.recovery_success"));
     },
   });
 };
@@ -160,8 +160,8 @@ const handleRecoveryInBatch = async () => {
     description: t(
       "core.deleted_page.operations.recovery_in_batch.description"
     ),
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {
@@ -190,7 +190,7 @@ const handleRecoveryInBatch = async () => {
       await refetch();
       selectedPageNames.value = [];
 
-      Toast.success(t("core.universal.toast.recovery_success"));
+      Toast.success(t("core.common.toast.recovery_success"));
     },
   });
 };
@@ -222,7 +222,7 @@ function handleClearKeyword() {
     <template #actions>
       <VSpace>
         <VButton :route="{ name: 'SinglePages' }" size="sm">
-          {{ $t("core.universal.buttons.back") }}
+          {{ $t("core.common.buttons.back") }}
         </VButton>
         <VButton
           v-permission="['system:singlepages:manage']"
@@ -232,7 +232,7 @@ function handleClearKeyword() {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          {{ $t("core.universal.buttons.new") }}
+          {{ $t("core.common.buttons.new") }}
         </VButton>
       </VSpace>
     </template>
@@ -263,7 +263,7 @@ function handleClearKeyword() {
                 <FormKit
                   id="keywordInput"
                   outer-class="!p-0"
-                  :placeholder="$t('core.universal.placeholder.search')"
+                  :placeholder="$t('core.common.placeholder.search')"
                   type="text"
                   name="keyword"
                   :model-value="keyword"
@@ -272,7 +272,7 @@ function handleClearKeyword() {
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
                   {{
-                    $t("core.universal.filters.results.keyword", {
+                    $t("core.common.filters.results.keyword", {
                       keyword: keyword,
                     })
                   }}
@@ -280,10 +280,10 @@ function handleClearKeyword() {
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeletePermanentlyInBatch">
-                  {{ $t("core.universal.buttons.delete_permanently") }}
+                  {{ $t("core.common.buttons.delete_permanently") }}
                 </VButton>
                 <VButton type="default" @click="handleRecoveryInBatch">
-                  {{ $t("core.universal.buttons.recovery") }}
+                  {{ $t("core.common.buttons.recovery") }}
                 </VButton>
               </VSpace>
             </div>
@@ -314,14 +314,14 @@ function handleClearKeyword() {
           <template #actions>
             <VSpace>
               <VButton @click="refetch">
-                {{ $t("core.universal.buttons.refresh") }}
+                {{ $t("core.common.buttons.refresh") }}
               </VButton>
               <VButton
                 v-permission="['system:singlepages:view']"
                 :route="{ name: 'SinglePages' }"
                 type="primary"
               >
-                {{ $t("core.universal.buttons.back") }}
+                {{ $t("core.common.buttons.back") }}
               </VButton>
             </VSpace>
           </template>
@@ -394,7 +394,7 @@ function handleClearKeyword() {
                 <VEntityField v-if="!singlePage?.page?.spec.deleted">
                   <template #description>
                     <VStatusDot
-                      v-tooltip="$t('core.universal.tooltips.recovering')"
+                      v-tooltip="$t('core.common.tooltips.recovering')"
                       state="success"
                       animate
                     />
@@ -405,7 +405,7 @@ function handleClearKeyword() {
                 >
                   <template #description>
                     <VStatusDot
-                      v-tooltip="$t('core.universal.status.deleting')"
+                      v-tooltip="$t('core.common.status.deleting')"
                       state="warning"
                       animate
                     />
@@ -429,7 +429,7 @@ function handleClearKeyword() {
                   type="danger"
                   @click="handleDeletePermanently(singlePage.page)"
                 >
-                  {{ $t("core.universal.buttons.delete_permanently") }}
+                  {{ $t("core.common.buttons.delete_permanently") }}
                 </VButton>
                 <VButton
                   v-close-popper
@@ -437,7 +437,7 @@ function handleClearKeyword() {
                   type="default"
                   @click="handleRecovery(singlePage.page)"
                 >
-                  {{ $t("core.universal.buttons.recovery") }}
+                  {{ $t("core.common.buttons.recovery") }}
                 </VButton>
               </template>
             </VEntity>

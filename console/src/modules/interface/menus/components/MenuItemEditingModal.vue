@@ -133,7 +133,7 @@ const handleSaveMenuItem = async () => {
       emit("saved", data);
     }
 
-    Toast.success(t("core.universal.toast.save_success"));
+    Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
     console.error("Failed to create menu item", e);
   } finally {
@@ -427,12 +427,12 @@ const onMenuItemSourceChange = () => {
           v-if="visible"
           :loading="saving"
           type="secondary"
-          :text="$t('core.universal.buttons.submit')"
+          :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('menuitem-form')"
         >
         </SubmitButton>
         <VButton @click="onVisibleChange(false)">
-          {{ $t("core.universal.buttons.cancel_and_shortcut") }}
+          {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>
     </template>

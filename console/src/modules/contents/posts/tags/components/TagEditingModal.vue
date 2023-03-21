@@ -105,7 +105,7 @@ const handleSaveTag = async () => {
     }
     onVisibleChange(false);
 
-    Toast.success(t("core.universal.toast.save_success"));
+    Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
     console.error("Failed to create tag", e);
   } finally {
@@ -278,12 +278,12 @@ const { handleGenerateSlug } = useSlugify(
           v-if="visible"
           :loading="saving"
           type="secondary"
-          :text="$t('core.universal.buttons.submit')"
+          :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('tag-form')"
         >
         </SubmitButton>
         <VButton @click="onVisibleChange(false)">
-          {{ $t("core.universal.buttons.cancel_and_shortcut") }}
+          {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>
     </template>

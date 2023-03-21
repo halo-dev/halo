@@ -145,7 +145,7 @@ const { mutateAsync: singlePageUpdateMutate } = useMutation({
   retry: 3,
   onError: (error) => {
     console.error("Failed to update post", error);
-    Toast.error(t("core.universal.toast.server_internal_error"));
+    Toast.error(t("core.common.toast.server_internal_error"));
   },
 });
 
@@ -185,7 +185,7 @@ const handleSave = async () => {
 
     onVisibleChange(false);
 
-    Toast.success(t("core.universal.toast.save_success"));
+    Toast.success(t("core.common.toast.save_success"));
   } catch (error) {
     console.error("Failed to save single page", error);
   } finally {
@@ -236,7 +236,7 @@ const handlePublish = async () => {
 
     onVisibleChange(false);
 
-    Toast.success(t("core.universal.toast.publish_success"));
+    Toast.success(t("core.common.toast.publish_success"));
   } catch (error) {
     console.error("Failed to publish single page", error);
   } finally {
@@ -268,7 +268,7 @@ const handleUnpublish = async () => {
 
     onVisibleChange(false);
 
-    Toast.success(t("core.universal.toast.cancel_publish_success"));
+    Toast.success(t("core.common.toast.cancel_publish_success"));
   } catch (error) {
     console.error("Failed to unpublish single page", error);
   } finally {
@@ -374,8 +374,8 @@ const { handleGenerateSlug } = useSlugify(
             <FormKit
               v-model="formState.spec.excerpt.autoGenerate"
               :options="[
-                { label: $t('core.universal.radio.yes'), value: true },
-                { label: $t('core.universal.radio.no'), value: false },
+                { label: $t('core.common.radio.yes'), value: true },
+                { label: $t('core.common.radio.no'), value: false },
               ]"
               name="autoGenerate"
               :label="
@@ -412,8 +412,8 @@ const { handleGenerateSlug } = useSlugify(
             <FormKit
               v-model="formState.spec.allowComment"
               :options="[
-                { label: $t('core.universal.radio.yes'), value: true },
-                { label: $t('core.universal.radio.no'), value: false },
+                { label: $t('core.common.radio.yes'), value: true },
+                { label: $t('core.common.radio.no'), value: false },
               ]"
               name="allowComment"
               :label="$t('core.page.settings.fields.allow_comment.label')"
@@ -422,8 +422,8 @@ const { handleGenerateSlug } = useSlugify(
             <FormKit
               v-model="formState.spec.pinned"
               :options="[
-                { label: $t('core.universal.radio.yes'), value: true },
-                { label: $t('core.universal.radio.no'), value: false },
+                { label: $t('core.common.radio.yes'), value: true },
+                { label: $t('core.common.radio.no'), value: false },
               ]"
               :label="$t('core.page.settings.fields.pinned.label')"
               name="pinned"
@@ -432,9 +432,9 @@ const { handleGenerateSlug } = useSlugify(
             <FormKit
               v-model="formState.spec.visible"
               :options="[
-                { label: $t('core.universal.select.public'), value: 'PUBLIC' },
+                { label: $t('core.common.select.public'), value: 'PUBLIC' },
                 {
-                  label: $t('core.universal.select.private'),
+                  label: $t('core.common.select.private'),
                   value: 'PRIVATE',
                 },
               ]"
@@ -502,7 +502,7 @@ const { handleGenerateSlug } = useSlugify(
             type="secondary"
             @click="handlePublishClick()"
           >
-            {{ $t("core.universal.buttons.publish") }}
+            {{ $t("core.common.buttons.publish") }}
           </VButton>
           <VButton
             v-else
@@ -510,14 +510,14 @@ const { handleGenerateSlug } = useSlugify(
             type="danger"
             @click="handleUnpublish()"
           >
-            {{ $t("core.universal.buttons.cancel_publish") }}
+            {{ $t("core.common.buttons.cancel_publish") }}
           </VButton>
         </template>
         <VButton :loading="saving" type="secondary" @click="handleSaveClick">
-          {{ $t("core.universal.buttons.save") }}
+          {{ $t("core.common.buttons.save") }}
         </VButton>
         <VButton type="default" @click="onVisibleChange(false)">
-          {{ $t("core.universal.buttons.close") }}
+          {{ $t("core.common.buttons.close") }}
         </VButton>
       </VSpace>
     </template>

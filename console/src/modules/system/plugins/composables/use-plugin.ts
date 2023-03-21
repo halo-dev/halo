@@ -32,8 +32,8 @@ export function usePluginLifeCycle(
       title: pluginToUpdate.spec.enabled
         ? t("core.plugin.operations.change_status.inactive_title")
         : t("core.plugin.operations.change_status.active_title"),
-      confirmText: t("core.universal.buttons.confirm"),
-      cancelText: t("core.universal.buttons.cancel"),
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
@@ -44,8 +44,8 @@ export function usePluginLifeCycle(
 
           Toast.success(
             pluginToUpdate.spec.enabled
-              ? t("core.universal.toast.active_success")
-              : t("core.universal.toast.inactive_success")
+              ? t("core.common.toast.active_success")
+              : t("core.common.toast.inactive_success")
           );
         } catch (e) {
           console.error(e);
@@ -70,15 +70,15 @@ export function usePluginLifeCycle(
       description: `${
         enabled
           ? t("core.plugin.operations.uninstall_when_enabled.description")
-          : t("core.universal.dialog.descriptions.cannot_be_recovered")
+          : t("core.common.dialog.descriptions.cannot_be_recovered")
       }`,
       confirmType: "danger",
       confirmText: `${
         enabled
           ? t("core.plugin.operations.uninstall_when_enabled.confirm_text")
-          : t("core.universal.buttons.uninstall")
+          : t("core.common.buttons.uninstall")
       }`,
-      cancelText: t("core.universal.buttons.cancel"),
+      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         if (!plugin.value) return;
 
@@ -123,7 +123,7 @@ export function usePluginLifeCycle(
             }
           }
 
-          Toast.success(t("core.universal.toast.uninstall_success"));
+          Toast.success(t("core.common.toast.uninstall_success"));
         } catch (e) {
           console.error("Failed to uninstall plugin", e);
         } finally {

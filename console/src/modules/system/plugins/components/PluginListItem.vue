@@ -51,8 +51,8 @@ const handleResetSettingConfig = async () => {
     title: t("core.plugin.operations.reset.title"),
     description: t("core.plugin.operations.reset.description"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         if (!plugin?.value) {
@@ -108,8 +108,8 @@ const getFailedMessage = (plugin: Plugin) => {
             <VTag>
               {{
                 isStarted
-                  ? $t("core.universal.status.activated")
-                  : $t("core.universal.status.inactivated")
+                  ? $t("core.common.status.activated")
+                  : $t("core.common.status.inactivated")
               }}
             </VTag>
           </VSpace>
@@ -129,7 +129,7 @@ const getFailedMessage = (plugin: Plugin) => {
       <VEntityField v-if="plugin?.metadata.deletionTimestamp">
         <template #description>
           <VStatusDot
-            v-tooltip="$t('core.universal.status.deleting')"
+            v-tooltip="$t('core.common.status.deleting')"
             state="warning"
             animate
           />
@@ -175,11 +175,11 @@ const getFailedMessage = (plugin: Plugin) => {
         type="secondary"
         @click="upgradeModal = true"
       >
-        {{ $t("core.universal.buttons.upgrade") }}
+        {{ $t("core.common.buttons.upgrade") }}
       </VButton>
       <FloatingDropdown class="w-full" placement="left" :triggers="['click']">
         <VButton block type="danger">
-          {{ $t("core.universal.buttons.uninstall") }}
+          {{ $t("core.common.buttons.uninstall") }}
         </VButton>
         <template #popper>
           <div class="w-52 p-2">
@@ -190,7 +190,7 @@ const getFailedMessage = (plugin: Plugin) => {
                 type="danger"
                 @click="uninstall"
               >
-                {{ $t("core.universal.buttons.uninstall") }}
+                {{ $t("core.common.buttons.uninstall") }}
               </VButton>
               <VButton
                 v-close-popper.all
@@ -210,7 +210,7 @@ const getFailedMessage = (plugin: Plugin) => {
         type="danger"
         @click="handleResetSettingConfig"
       >
-        {{ $t("core.universal.buttons.reset") }}
+        {{ $t("core.common.buttons.reset") }}
       </VButton>
     </template>
   </VEntity>

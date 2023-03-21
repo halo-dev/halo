@@ -73,7 +73,7 @@ const handleLogin = async () => {
 
     if (e instanceof AxiosError) {
       if (/Network Error/.test(e.message)) {
-        Toast.error(t("core.universal.toast.network_error"));
+        Toast.error(t("core.common.toast.network_error"));
         return;
       }
 
@@ -87,7 +87,7 @@ const handleLogin = async () => {
 
       Toast.error(t("core.login.operations.submit.toast_failed"));
     } else {
-      Toast.error(t("core.universal.toast.unknown_error"));
+      Toast.error(t("core.common.toast.unknown_error"));
     }
 
     loginForm.value.password = "";

@@ -100,12 +100,12 @@ const onVisibleChange = (visible: boolean) => {
           v-if="visible"
           :loading="saving"
           type="secondary"
-          :text="$t('core.universal.buttons.submit')"
+          :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('grant-permission-form')"
         >
         </SubmitButton>
         <VButton @click="onVisibleChange(false)">
-          {{ $t("core.universal.buttons.cancel_and_shortcut") }}
+          {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>
     </template>

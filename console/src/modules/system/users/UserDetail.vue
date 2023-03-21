@@ -41,7 +41,7 @@ const router = useRouter();
           {{ $t("core.user.detail.fields.email") }}
         </dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-          {{ user?.user.spec?.email || $t("core.universal.text.none") }}
+          {{ user?.user.spec?.email || $t("core.common.text.none") }}
         </dd>
       </div>
       <div
@@ -78,7 +78,7 @@ const router = useRouter();
           {{ $t("core.user.detail.fields.bio") }}
         </dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-          {{ user?.user.spec?.bio || $t("core.universal.text.none") }}
+          {{ user?.user.spec?.bio || $t("core.common.text.none") }}
         </dd>
       </div>
       <div

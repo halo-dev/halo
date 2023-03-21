@@ -128,10 +128,10 @@ export function useAttachmentControl(filterOptions: {
   const handleDelete = (attachment: Attachment) => {
     Dialog.warning({
       title: t("core.attachment.operations.delete.title"),
-      description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
+      description: t("core.common.dialog.descriptions.cannot_be_recovered"),
       confirmType: "danger",
-      confirmText: t("core.universal.buttons.confirm"),
-      cancelText: t("core.universal.buttons.cancel"),
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           await apiClient.extension.storage.attachment.deletestorageHaloRunV1alpha1Attachment(
@@ -146,7 +146,7 @@ export function useAttachmentControl(filterOptions: {
           }
           selectedAttachments.value.delete(attachment);
 
-          Toast.success(t("core.universal.toast.delete_success"));
+          Toast.success(t("core.common.toast.delete_success"));
         } catch (e) {
           console.error("Failed to delete attachment", e);
         } finally {
@@ -159,10 +159,10 @@ export function useAttachmentControl(filterOptions: {
   const handleDeleteInBatch = () => {
     Dialog.warning({
       title: t("core.attachment.operations.delete_in_batch.title"),
-      description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
+      description: t("core.common.dialog.descriptions.cannot_be_recovered"),
       confirmType: "danger",
-      confirmText: t("core.universal.buttons.confirm"),
-      cancelText: t("core.universal.buttons.cancel"),
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           const promises = Array.from(selectedAttachments.value).map(
@@ -177,7 +177,7 @@ export function useAttachmentControl(filterOptions: {
           await Promise.all(promises);
           selectedAttachments.value.clear();
 
-          Toast.success(t("core.universal.toast.delete_success"));
+          Toast.success(t("core.common.toast.delete_success"));
         } catch (e) {
           console.error("Failed to delete attachments", e);
         } finally {

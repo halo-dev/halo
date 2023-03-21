@@ -48,14 +48,14 @@ const isSuperRole = computed(() => {
 
 const getRoleCountText = computed(() => {
   if (formState.value.metadata.name === SUPER_ROLE_NAME) {
-    return t("core.role.universal.text.contains_all_permissions");
+    return t("core.role.common.text.contains_all_permissions");
   }
 
   const dependenciesCount = JSON.parse(
     formState.value.metadata.annotations?.[rbacAnnotations.DEPENDENCIES] || "[]"
   ).length;
 
-  return t("core.role.universal.text.contains_n_permissions", {
+  return t("core.role.common.text.contains_n_permissions", {
     count: dependenciesCount,
   });
 });
@@ -165,8 +165,8 @@ onMounted(() => {
                 <VTag>
                   {{
                     isSystemReserved
-                      ? t("core.role.universal.text.system_reserved")
-                      : t("core.role.universal.text.custom")
+                      ? t("core.role.common.text.system_reserved")
+                      : t("core.role.common.text.custom")
                   }}
                 </VTag>
               </dd>
@@ -244,7 +244,7 @@ onMounted(() => {
       <div v-if="tabActiveId === 'permissions'">
         <div v-if="isSystemReserved" class="px-4 py-5">
           <VAlert
-            :title="$t('core.universal.text.tip')"
+            :title="$t('core.common.text.tip')"
             :description="
               $t(
                 'core.role.permissions_detail.system_reserved_alert.description'
@@ -273,7 +273,7 @@ onMounted(() => {
                   class="mt-3 text-xs text-gray-500"
                 >
                   <i18n-t
-                    keypath="core.role.universal.text.provided_by_plugin"
+                    keypath="core.role.common.text.provided_by_plugin"
                     tag="div"
                   >
                     <template #plugin>
@@ -342,7 +342,7 @@ onMounted(() => {
                           class="text-xs text-gray-400"
                         >
                           {{
-                            $t("core.role.universal.text.dependent_on", {
+                            $t("core.role.common.text.dependent_on", {
                               roles: JSON.parse(
                                 role.metadata.annotations?.[
                                   rbacAnnotations.DEPENDENCIES
@@ -369,7 +369,7 @@ onMounted(() => {
               :disabled="isSystemReserved"
               @click="handleUpdateRole"
             >
-              {{ $t("core.universal.buttons.save") }}
+              {{ $t("core.common.buttons.save") }}
             </VButton>
           </div>
         </div>

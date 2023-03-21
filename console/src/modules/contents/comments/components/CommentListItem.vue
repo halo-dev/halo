@@ -61,15 +61,15 @@ const handleDelete = async () => {
     title: t("core.comment.operations.delete_comment.title"),
     description: t("core.comment.operations.delete_comment.description"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.comment.deletecontentHaloRunV1alpha1Comment({
           name: props.comment?.comment?.metadata.name as string,
         });
 
-        Toast.success(t("core.universal.toast.delete_success"));
+        Toast.success(t("core.common.toast.delete_success"));
       } catch (error) {
         console.error("Failed to delete comment", error);
       } finally {
@@ -82,8 +82,8 @@ const handleDelete = async () => {
 const handleApproveReplyInBatch = async () => {
   Dialog.warning({
     title: t("core.comment.operations.approve_applies_in_batch.title"),
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         const repliesToUpdate = replies.value?.filter((reply) => {
@@ -105,7 +105,7 @@ const handleApproveReplyInBatch = async () => {
         });
         await Promise.all(promises || []);
 
-        Toast.success(t("core.universal.toast.operation_success"));
+        Toast.success(t("core.common.toast.operation_success"));
       } catch (e) {
         console.error("Failed to approve comment replies in batch", e);
       } finally {
@@ -126,7 +126,7 @@ const handleApprove = async () => {
       comment: commentToUpdate,
     });
 
-    Toast.success(t("core.universal.toast.operation_success"));
+    Toast.success(t("core.common.toast.operation_success"));
   } catch (error) {
     console.error("Failed to approve comment", error);
   } finally {
@@ -361,7 +361,7 @@ const subjectRefResult = computed(() => {
       <VEntityField v-if="comment?.comment?.metadata.deletionTimestamp">
         <template #description>
           <VStatusDot
-            v-tooltip="$t('core.universal.status.deleting')"
+            v-tooltip="$t('core.common.status.deleting')"
             state="warning"
             animate
           />
@@ -402,7 +402,7 @@ const subjectRefResult = computed(() => {
         {{ $t("core.comment.operations.approve_applies_in_batch.button") }}
       </VButton>
       <VButton v-close-popper block type="danger" @click="handleDelete">
-        {{ $t("core.universal.buttons.delete") }}
+        {{ $t("core.common.buttons.delete") }}
       </VButton>
     </template>
 
@@ -420,7 +420,7 @@ const subjectRefResult = computed(() => {
             <template #actions>
               <VSpace>
                 <VButton @click="refetch()">
-                  {{ $t("core.universal.buttons.refresh") }}
+                  {{ $t("core.common.buttons.refresh") }}
                 </VButton>
                 <VButton type="secondary" @click="replyModal = true">
                   <template #icon>

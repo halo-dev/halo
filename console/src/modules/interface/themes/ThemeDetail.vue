@@ -37,8 +37,8 @@ const handleReloadTheme = async () => {
   Dialog.warning({
     title: t("core.theme.operations.reload.title"),
     description: t("core.theme.operations.reload.description"),
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         if (!selectedTheme?.value) {
@@ -89,8 +89,8 @@ const onUpgradeModalClose = () => {
                 <VTag>
                   {{
                     isActivated
-                      ? t("core.universal.status.activated")
-                      : t("core.universal.status.inactivated")
+                      ? t("core.common.status.activated")
+                      : t("core.common.status.inactivated")
                   }}
                 </VTag>
                 <VStatusDot
@@ -117,7 +117,7 @@ const onUpgradeModalClose = () => {
                     type="secondary"
                     @click="upgradeModal = true"
                   >
-                    {{ $t("core.universal.buttons.upgrade") }}
+                    {{ $t("core.common.buttons.upgrade") }}
                   </VButton>
                   <VButton
                     v-close-popper
@@ -133,7 +133,7 @@ const onUpgradeModalClose = () => {
                     type="danger"
                     @click="handleResetSettingConfig"
                   >
-                    {{ $t("core.universal.buttons.reset") }}
+                    {{ $t("core.common.buttons.reset") }}
                   </VButton>
                 </VSpace>
               </div>
@@ -252,7 +252,7 @@ const onUpgradeModalClose = () => {
                     </RouterLink>
                     <div class="text-xs">
                       <VSpace>
-                        <VTag>{{ $t("core.universal.status.installed") }}</VTag>
+                        <VTag>{{ $t("core.common.status.installed") }}</VTag>
                       </VSpace>
                     </div>
                   </div>
@@ -267,7 +267,7 @@ const onUpgradeModalClose = () => {
                     <div class="text-xs">
                       <VSpace>
                         <VTag>
-                          {{ $t("core.universal.status.uninstalled") }}
+                          {{ $t("core.common.status.uninstalled") }}
                         </VTag>
                       </VSpace>
                     </div>

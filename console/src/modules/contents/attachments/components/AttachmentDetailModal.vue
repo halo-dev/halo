@@ -118,12 +118,12 @@ const onVisibleChange = (visible: boolean) => {
               >
                 <template #loading>
                   <span class="text-gray-400">
-                    {{ $t("core.universal.status.loading") }}...
+                    {{ $t("core.common.status.loading") }}...
                   </span>
                 </template>
                 <template #error>
                   <span class="text-red-400">
-                    {{ $t("core.universal.status.loading_error") }}
+                    {{ $t("core.common.status.loading_error") }}
                   </span>
                 </template>
               </LazyImage>
@@ -166,7 +166,7 @@ const onVisibleChange = (visible: boolean) => {
           <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
             {{
               getGroupName(attachment?.spec.groupName) ||
-              $t("core.attachment.universal.text.ungrouped")
+              $t("core.attachment.common.text.ungrouped")
             }}
           </dd>
         </div>
@@ -227,7 +227,7 @@ const onVisibleChange = (visible: boolean) => {
     <template #footer>
       <VSpace>
         <VButton type="default" @click="onVisibleChange(false)">
-          {{ $t("core.universal.buttons.close_and_shortcut") }}
+          {{ $t("core.common.buttons.close_and_shortcut") }}
         </VButton>
         <slot name="footer" />
       </VSpace>

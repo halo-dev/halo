@@ -378,15 +378,15 @@ const handleDelete = async (post: Post) => {
     title: t("core.post.operations.delete.title"),
     description: t("core.post.operations.delete.description"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await apiClient.post.recyclePost({
         name: post.metadata.name,
       });
       await refetch();
 
-      Toast.success(t("core.universal.toast.delete_success"));
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
@@ -396,8 +396,8 @@ const handleDeleteInBatch = async () => {
     title: t("core.post.operations.delete_in_batch.title"),
     description: t("core.post.operations.delete_in_batch.description"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPostNames.value.map((name) => {
@@ -409,7 +409,7 @@ const handleDeleteInBatch = async () => {
       await refetch();
       selectedPostNames.value = [];
 
-      Toast.success(t("core.universal.toast.delete_success"));
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
@@ -426,10 +426,10 @@ watch(selectedPostNames, (newValue) => {
   >
     <template #actions>
       <span @click="handleSelectPrevious">
-        <IconArrowLeft v-tooltip="$t('core.universal.buttons.previous')" />
+        <IconArrowLeft v-tooltip="$t('core.common.buttons.previous')" />
       </span>
       <span @click="handleSelectNext">
-        <IconArrowRight v-tooltip="$t('core.universal.buttons.next')" />
+        <IconArrowRight v-tooltip="$t('core.common.buttons.next')" />
       </span>
     </template>
   </PostSettingModal>
@@ -457,7 +457,7 @@ watch(selectedPostNames, (newValue) => {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          {{ $t("core.universal.buttons.new") }}
+          {{ $t("core.common.buttons.new") }}
         </VButton>
       </VSpace>
     </template>
@@ -489,7 +489,7 @@ watch(selectedPostNames, (newValue) => {
                 <FormKit
                   id="keywordInput"
                   outer-class="!p-0"
-                  :placeholder="$t('core.universal.placeholder.search')"
+                  :placeholder="$t('core.common.placeholder.search')"
                   type="text"
                   name="keyword"
                   :model-value="keyword"
@@ -498,7 +498,7 @@ watch(selectedPostNames, (newValue) => {
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
                   {{
-                    $t("core.universal.filters.results.keyword", {
+                    $t("core.common.filters.results.keyword", {
                       keyword: keyword,
                     })
                   }}
@@ -509,7 +509,7 @@ watch(selectedPostNames, (newValue) => {
                   @close="handlePublishStatusItemChange(PublishStatusItems[0])"
                 >
                   {{
-                    $t("core.universal.filters.results.status", {
+                    $t("core.common.filters.results.status", {
                       status: selectedPublishStatusItem.label,
                     })
                   }}
@@ -561,7 +561,7 @@ watch(selectedPostNames, (newValue) => {
                   @close="handleSortItemChange()"
                 >
                   {{
-                    $t("core.universal.filters.results.sort", {
+                    $t("core.common.filters.results.sort", {
                       sort: selectedSortItem.label,
                     })
                   }}
@@ -574,7 +574,7 @@ watch(selectedPostNames, (newValue) => {
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeleteInBatch">
-                  {{ $t("core.universal.buttons.delete") }}
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </VSpace>
             </div>
@@ -585,7 +585,7 @@ watch(selectedPostNames, (newValue) => {
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
                     <span class="mr-0.5">
-                      {{ $t("core.universal.filters.labels.status") }}
+                      {{ $t("core.common.filters.labels.status") }}
                     </span>
                     <span>
                       <IconArrowDown />
@@ -695,7 +695,7 @@ watch(selectedPostNames, (newValue) => {
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
                     <span class="mr-0.5">
-                      {{ $t("core.universal.filters.labels.sort") }}
+                      {{ $t("core.common.filters.labels.sort") }}
                     </span>
                     <span>
                       <IconArrowDown />
@@ -723,7 +723,7 @@ watch(selectedPostNames, (newValue) => {
                     @click="refetch()"
                   >
                     <IconRefreshLine
-                      v-tooltip="$t('core.universal.buttons.refresh')"
+                      v-tooltip="$t('core.common.buttons.refresh')"
                       :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
@@ -743,7 +743,7 @@ watch(selectedPostNames, (newValue) => {
           <template #actions>
             <VSpace>
               <VButton @click="refetch">
-                {{ $t("core.universal.buttons.refresh") }}
+                {{ $t("core.common.buttons.refresh") }}
               </VButton>
               <VButton
                 v-permission="['system:posts:manage']"
@@ -792,7 +792,7 @@ watch(selectedPostNames, (newValue) => {
                       <RouterLink
                         v-if="post.post.status?.inProgress"
                         v-tooltip="
-                          $t('core.universal.tooltips.unpublished_content_tip')
+                          $t('core.common.tooltips.unpublished_content_tip')
                         "
                         :to="{
                           name: 'PostEditor',
@@ -892,7 +892,7 @@ watch(selectedPostNames, (newValue) => {
                 <VEntityField :description="getPublishStatus(post.post)">
                   <template v-if="isPublishing(post.post)" #description>
                     <VStatusDot
-                      :text="$t('core.universal.tooltips.publishing')"
+                      :text="$t('core.common.tooltips.publishing')"
                       animate
                     />
                   </template>
@@ -914,7 +914,7 @@ watch(selectedPostNames, (newValue) => {
                 <VEntityField v-if="post?.post?.spec.deleted">
                   <template #description>
                     <VStatusDot
-                      v-tooltip="$t('core.universal.status.deleting')"
+                      v-tooltip="$t('core.common.status.deleting')"
                       state="warning"
                       animate
                     />
@@ -938,7 +938,7 @@ watch(selectedPostNames, (newValue) => {
                   type="secondary"
                   @click="handleOpenSettingModal(post.post)"
                 >
-                  {{ $t("core.universal.buttons.setting") }}
+                  {{ $t("core.common.buttons.setting") }}
                 </VButton>
                 <VButton
                   v-close-popper
@@ -946,7 +946,7 @@ watch(selectedPostNames, (newValue) => {
                   type="danger"
                   @click="handleDelete(post.post)"
                 >
-                  {{ $t("core.universal.buttons.delete") }}
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </template>
             </VEntity>

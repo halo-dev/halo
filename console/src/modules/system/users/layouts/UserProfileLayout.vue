@@ -135,7 +135,7 @@ const handleTabChange = (id: string) => {
           >
             <FloatingDropdown>
               <VButton type="default">
-                {{ $t("core.universal.buttons.edit") }}
+                {{ $t("core.common.buttons.edit") }}
               </VButton>
               <template #popper>
                 <div class="w-48 p-2">

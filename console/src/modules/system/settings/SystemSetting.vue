@@ -67,7 +67,7 @@ await handleFetchConfigMap();
             type="secondary"
             @click="$formkit.submit(group || '')"
           >
-            {{ $t("core.universal.buttons.save") }}
+            {{ $t("core.common.buttons.save") }}
           </VButton>
         </div>
       </div>

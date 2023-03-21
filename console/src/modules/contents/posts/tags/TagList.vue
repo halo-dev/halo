@@ -129,7 +129,7 @@ onMounted(async () => {
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>
-        {{ $t("core.universal.buttons.new") }}
+        {{ $t("core.common.buttons.new") }}
       </VButton>
     </template>
   </VPageHeader>
@@ -172,7 +172,7 @@ onMounted(async () => {
           <template #actions>
             <VSpace>
               <VButton @click="handleFetchTags">
-                {{ $t("core.universal.buttons.refresh") }}
+                {{ $t("core.common.buttons.refresh") }}
               </VButton>
               <VButton type="primary" @click="editingModal = true">
                 <template #icon>
@@ -217,7 +217,7 @@ onMounted(async () => {
                   <VEntityField v-if="tag.metadata.deletionTimestamp">
                     <template #description>
                       <VStatusDot
-                        v-tooltip="$t('core.universal.status.deleting')"
+                        v-tooltip="$t('core.common.status.deleting')"
                         state="warning"
                         animate
                       />
@@ -225,7 +225,7 @@ onMounted(async () => {
                   </VEntityField>
                   <VEntityField
                     :description="
-                      $t('core.universal.fields.post_count', {
+                      $t('core.common.fields.post_count', {
                         count: tag.status?.postCount || 0,
                       })
                     "
@@ -249,7 +249,7 @@ onMounted(async () => {
                     type="secondary"
                     @click="handleOpenEditingModal(tag)"
                   >
-                    {{ $t("core.universal.buttons.edit") }}
+                    {{ $t("core.common.buttons.edit") }}
                   </VButton>
                   <VButton
                     v-permission="['system:posts:manage']"
@@ -258,7 +258,7 @@ onMounted(async () => {
                     type="danger"
                     @click="handleDelete(tag)"
                   >
-                    {{ $t("core.universal.buttons.delete") }}
+                    {{ $t("core.common.buttons.delete") }}
                   </VButton>
                 </template>
               </VEntity>

@@ -176,7 +176,7 @@ const handleResetForm = () => {
                   class="mt-3 text-xs text-gray-500"
                 >
                   <i18n-t
-                    keypath="core.role.universal.text.provided_by_plugin"
+                    keypath="core.role.common.text.provided_by_plugin"
                     tag="div"
                   >
                     <template #plugin>
@@ -236,7 +236,7 @@ const handleResetForm = () => {
                           class="text-xs text-gray-400"
                         >
                           {{
-                            $t("core.role.universal.text.dependent_on", {
+                            $t("core.role.common.text.dependent_on", {
                               roles: JSON.parse(
                                 roleTemplate.metadata.annotations?.[
                                   rbacAnnotations.DEPENDENCIES
@@ -265,12 +265,12 @@ const handleResetForm = () => {
           v-if="visible"
           :loading="saving"
           type="secondary"
-          :text="$t('core.universal.buttons.submit')"
+          :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('role-form')"
         >
         </SubmitButton>
         <VButton @click="onVisibleChange(false)">
-          {{ $t("core.universal.buttons.cancel_and_shortcut") }}
+          {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>
     </template>

@@ -66,8 +66,8 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
             <VTag>
               {{
                 isStarted
-                  ? $t("core.universal.status.activated")
-                  : $t("core.universal.status.inactivated")
+                  ? $t("core.common.status.activated")
+                  : $t("core.common.status.inactivated")
               }}
             </VTag>
           </p>
@@ -133,7 +133,7 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
                 {{ plugin?.spec.author.name }}
               </a>
               <span v-else>
-                {{ $t("core.universal.text.none") }}
+                {{ $t("core.common.text.none") }}
               </span>
             </dd>
           </div>
@@ -171,7 +171,7 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
             <dt class="text-sm font-medium text-gray-900">模型定义</dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               <span>
-                {{ $t("core.universal.text.none") }}
+                {{ $t("core.common.text.none") }}
               </span>
             </dd>
           </div>
@@ -220,7 +220,7 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
                               class="text-xs text-gray-400"
                             >
                               {{
-                                $t("core.role.universal.text.dependent_on", {
+                                $t("core.role.common.text.dependent_on", {
                                   roles: JSON.parse(
                                     role.metadata.annotations?.[
                                       rbacAnnotations.DEPENDENCIES
@@ -237,7 +237,7 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
                 </div>
               </dl>
               <span v-else>
-                {{ $t("core.universal.text.none") }}
+                {{ $t("core.common.text.none") }}
               </span>
             </dd>
           </div>

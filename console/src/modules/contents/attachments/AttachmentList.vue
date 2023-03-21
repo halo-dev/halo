@@ -325,7 +325,7 @@ onMounted(() => {
           <template #icon>
             <IconUpload class="h-full w-full" />
           </template>
-          {{ $t("core.universal.buttons.upload") }}
+          {{ $t("core.common.buttons.upload") }}
         </VButton>
       </VSpace>
     </template>
@@ -359,7 +359,7 @@ onMounted(() => {
                     <FormKit
                       id="keywordInput"
                       outer-class="!p-0"
-                      :placeholder="$t('core.universal.placeholder.search')"
+                      :placeholder="$t('core.common.placeholder.search')"
                       type="text"
                       name="keyword"
                       :model-value="keyword"
@@ -368,7 +368,7 @@ onMounted(() => {
 
                     <FilterTag v-if="keyword" @close="handleClearKeyword()">
                       {{
-                        $t("core.universal.filters.results.keyword", {
+                        $t("core.common.filters.results.keyword", {
                           keyword: keyword,
                         })
                       }}
@@ -401,7 +401,7 @@ onMounted(() => {
                       @click="handleSortItemChange()"
                     >
                       {{
-                        $t("core.universal.filters.results.sort", {
+                        $t("core.common.filters.results.sort", {
                           sort: selectedSortItem.label,
                         })
                       }}
@@ -414,7 +414,7 @@ onMounted(() => {
                   </div>
                   <VSpace v-else>
                     <VButton type="danger" @click="handleDeleteInBatch">
-                      {{ $t("core.universal.buttons.delete") }}
+                      {{ $t("core.common.buttons.delete") }}
                     </VButton>
                     <VButton @click="selectedAttachments.clear()">
                       {{
@@ -532,7 +532,7 @@ onMounted(() => {
                         class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                       >
                         <span class="mr-0.5">
-                          {{ $t("core.universal.filters.labels.sort") }}
+                          {{ $t("core.common.filters.labels.sort") }}
                         </span>
                         <span>
                           <IconArrowDown />
@@ -575,7 +575,7 @@ onMounted(() => {
                         @click="handleFetchAttachments()"
                       >
                         <IconRefreshLine
-                          v-tooltip="$t('core.universal.buttons.refresh')"
+                          v-tooltip="$t('core.common.buttons.refresh')"
                           :class="{ 'animate-spin text-gray-900': isFetching }"
                           class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                         />
@@ -606,7 +606,7 @@ onMounted(() => {
               <template #actions>
                 <VSpace>
                   <VButton @click="handleFetchAttachments">
-                    {{ $t("core.universal.buttons.refresh") }}
+                    {{ $t("core.common.buttons.refresh") }}
                   </VButton>
                   <VButton
                     v-permission="['system:attachments:manage']"
@@ -657,7 +657,7 @@ onMounted(() => {
                             class="flex h-full items-center justify-center object-cover"
                           >
                             <span class="text-xs text-gray-400">
-                              {{ $t("core.universal.status.loading") }}...
+                              {{ $t("core.common.status.loading") }}...
                             </span>
                           </div>
                         </template>
@@ -666,7 +666,7 @@ onMounted(() => {
                             class="flex h-full items-center justify-center object-cover"
                           >
                             <span class="text-xs text-red-400">
-                              {{ $t("core.universal.status.loading_error") }}
+                              {{ $t("core.common.status.loading_error") }}
                             </span>
                           </div>
                         </template>
@@ -688,7 +688,7 @@ onMounted(() => {
                       v-if="attachment.metadata.deletionTimestamp"
                       class="absolute top-1 right-1 text-xs text-red-300"
                     >
-                      {{ $t("core.universal.status.deleting") }}...
+                      {{ $t("core.common.status.deleting") }}...
                     </div>
 
                     <div
@@ -784,7 +784,7 @@ onMounted(() => {
                       >
                         <template #description>
                           <VStatusDot
-                            v-tooltip="$t('core.universal.status.deleting')"
+                            v-tooltip="$t('core.common.status.deleting')"
                             state="warning"
                             animate
                           />
@@ -816,7 +816,7 @@ onMounted(() => {
                         type="danger"
                         @click="handleDelete(attachment)"
                       >
-                        {{ $t("core.universal.buttons.delete") }}
+                        {{ $t("core.common.buttons.delete") }}
                       </VButton>
                     </template>
                   </VEntity>

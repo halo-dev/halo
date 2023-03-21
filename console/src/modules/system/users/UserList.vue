@@ -130,17 +130,17 @@ const handlePaginationChange = async ({
 const handleDelete = async (user: User) => {
   Dialog.warning({
     title: t("core.user.operations.delete.title"),
-    description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
+    description: t("core.common.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.user.deletev1alpha1User({
           name: user.metadata.name,
         });
 
-        Toast.success(t("core.universal.toast.delete_success"));
+        Toast.success(t("core.common.toast.delete_success"));
       } catch (e) {
         console.error("Failed to delete user", e);
       } finally {
@@ -153,10 +153,10 @@ const handleDelete = async (user: User) => {
 const handleDeleteInBatch = async () => {
   Dialog.warning({
     title: t("core.user.operations.delete_in_batch.title"),
-    description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
+    description: t("core.common.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const userNamesToDelete = selectedUserNames.value.filter(
         (name) => name != userStore.currentUser?.metadata.name
@@ -170,7 +170,7 @@ const handleDeleteInBatch = async () => {
       );
       await handleFetchUsers();
       selectedUserNames.value.length = 0;
-      Toast.success(t("core.universal.toast.delete_success"));
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
@@ -339,7 +339,7 @@ const hasFilters = computed(() => {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          {{ $t("core.user.universal.buttons.new") }}
+          {{ $t("core.user.common.buttons.new") }}
         </VButton>
       </VSpace>
     </template>
@@ -373,14 +373,14 @@ const hasFilters = computed(() => {
                   outer-class="!p-0"
                   :model-value="keyword"
                   name="keyword"
-                  :placeholder="$t('core.universal.placeholder.search')"
+                  :placeholder="$t('core.common.placeholder.search')"
                   type="text"
                   @keyup.enter="handleKeywordChange"
                 ></FormKit>
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
                   {{
-                    $t("core.universal.filters.results.keyword", {
+                    $t("core.common.filters.results.keyword", {
                       keyword: keyword,
                     })
                   }}
@@ -402,7 +402,7 @@ const hasFilters = computed(() => {
                   @close="handleSortItemChange()"
                 >
                   {{
-                    $t("core.universal.filters.results.sort", {
+                    $t("core.common.filters.results.sort", {
                       sort: selectedSortItem.label,
                     })
                   }}
@@ -415,7 +415,7 @@ const hasFilters = computed(() => {
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeleteInBatch">
-                  {{ $t("core.universal.buttons.delete") }}
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </VSpace>
             </div>
@@ -459,7 +459,7 @@ const hasFilters = computed(() => {
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
                     <span class="mr-0.5">
-                      {{ $t("core.universal.filters.labels.sort") }}
+                      {{ $t("core.common.filters.labels.sort") }}
                     </span>
                     <span>
                       <IconArrowDown />
@@ -487,7 +487,7 @@ const hasFilters = computed(() => {
                     @click="handleFetchUsers()"
                   >
                     <IconRefreshLine
-                      v-tooltip="$t('core.universal.buttons.refresh')"
+                      v-tooltip="$t('core.common.buttons.refresh')"
                       :class="{ 'animate-spin text-gray-900': loading }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
@@ -509,7 +509,7 @@ const hasFilters = computed(() => {
           <template #actions>
             <VSpace>
               <VButton @click="handleFetchUsers()">
-                {{ $t("core.universal.buttons.refresh") }}
+                {{ $t("core.common.buttons.refresh") }}
               </VButton>
               <VButton
                 v-permission="['system:users:manage']"
@@ -519,7 +519,7 @@ const hasFilters = computed(() => {
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>
-                {{ $t("core.user.universal.buttons.new") }}
+                {{ $t("core.user.common.buttons.new") }}
               </VButton>
             </VSpace>
           </template>
@@ -585,7 +585,7 @@ const hasFilters = computed(() => {
                 <VEntityField v-if="user.user.metadata.deletionTimestamp">
                   <template #description>
                     <VStatusDot
-                      v-tooltip="$t('core.universal.status.deleting')"
+                      v-tooltip="$t('core.common.status.deleting')"
                       state="warning"
                       animate
                     />
@@ -639,7 +639,7 @@ const hasFilters = computed(() => {
                   type="danger"
                   @click="handleDelete(user.user)"
                 >
-                  {{ $t("core.universal.buttons.delete") }}
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </template>
             </VEntity>

@@ -327,8 +327,8 @@ const handleDelete = async (singlePage: SinglePage) => {
     title: t("core.page.operations.delete.title"),
     description: t("core.page.operations.delete.description"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const singlePageToUpdate = cloneDeep(singlePage);
       singlePageToUpdate.spec.deleted = true;
@@ -340,7 +340,7 @@ const handleDelete = async (singlePage: SinglePage) => {
       );
       await refetch();
 
-      Toast.success(t("core.universal.toast.delete_success"));
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
@@ -350,8 +350,8 @@ const handleDeleteInBatch = async () => {
     title: t("core.page.operations.delete_in_batch.title"),
     description: t("core.page.operations.delete_in_batch.description"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {
@@ -380,7 +380,7 @@ const handleDeleteInBatch = async () => {
       await refetch();
       selectedPageNames.value = [];
 
-      Toast.success(t("core.universal.toast.delete_success"));
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
@@ -414,10 +414,10 @@ watch(selectedPageNames, (newValue) => {
   >
     <template #actions>
       <span @click="handleSelectPrevious">
-        <IconArrowLeft v-tooltip="$t('core.universal.buttons.previous')" />
+        <IconArrowLeft v-tooltip="$t('core.common.buttons.previous')" />
       </span>
       <span @click="handleSelectNext">
-        <IconArrowRight v-tooltip="$t('core.universal.buttons.next')" />
+        <IconArrowRight v-tooltip="$t('core.common.buttons.next')" />
       </span>
     </template>
   </SinglePageSettingModal>
@@ -443,7 +443,7 @@ watch(selectedPageNames, (newValue) => {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          {{ $t("core.universal.buttons.new") }}
+          {{ $t("core.common.buttons.new") }}
         </VButton>
       </VSpace>
     </template>
@@ -475,7 +475,7 @@ watch(selectedPageNames, (newValue) => {
                 <FormKit
                   id="keywordInput"
                   outer-class="!p-0"
-                  :placeholder="$t('core.universal.placeholder.search')"
+                  :placeholder="$t('core.common.placeholder.search')"
                   type="text"
                   name="keyword"
                   :model-value="keyword"
@@ -484,7 +484,7 @@ watch(selectedPageNames, (newValue) => {
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
                   {{
-                    $t("core.universal.filters.results.keyword", {
+                    $t("core.common.filters.results.keyword", {
                       keyword: keyword,
                     })
                   }}
@@ -495,7 +495,7 @@ watch(selectedPageNames, (newValue) => {
                   @close="handlePublishStatusItemChange(PublishStatusItems[0])"
                 >
                   {{
-                    $t("core.universal.filters.results.status", {
+                    $t("core.common.filters.results.status", {
                       status: selectedPublishStatusItem.label,
                     })
                   }}
@@ -528,7 +528,7 @@ watch(selectedPageNames, (newValue) => {
                   @close="handleSortItemChange()"
                 >
                   {{
-                    $t("core.universal.filters.results.sort", {
+                    $t("core.common.filters.results.sort", {
                       sort: selectedSortItem.label,
                     })
                   }}
@@ -541,7 +541,7 @@ watch(selectedPageNames, (newValue) => {
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeleteInBatch">
-                  {{ $t("core.universal.buttons.delete") }}
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </VSpace>
             </div>
@@ -552,7 +552,7 @@ watch(selectedPageNames, (newValue) => {
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
                     <span class="mr-0.5">
-                      {{ $t("core.universal.filters.labels.status") }}
+                      {{ $t("core.common.filters.labels.status") }}
                     </span>
                     <span>
                       <IconArrowDown />
@@ -632,7 +632,7 @@ watch(selectedPageNames, (newValue) => {
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
                     <span class="mr-0.5">
-                      {{ $t("core.universal.filters.labels.sort") }}
+                      {{ $t("core.common.filters.labels.sort") }}
                     </span>
                     <span>
                       <IconArrowDown />
@@ -660,7 +660,7 @@ watch(selectedPageNames, (newValue) => {
                     @click="refetch()"
                   >
                     <IconRefreshLine
-                      v-tooltip="$t('core.universal.buttons.refresh')"
+                      v-tooltip="$t('core.common.buttons.refresh')"
                       :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
@@ -680,7 +680,7 @@ watch(selectedPageNames, (newValue) => {
           <template #actions>
             <VSpace>
               <VButton @click="refetch">
-                {{ $t("core.universal.buttons.refresh") }}
+                {{ $t("core.common.buttons.refresh") }}
               </VButton>
               <VButton
                 v-permission="['system:singlepages:manage']"
@@ -727,7 +727,7 @@ watch(selectedPageNames, (newValue) => {
                       <RouterLink
                         v-if="singlePage.page.status?.inProgress"
                         v-tooltip="
-                          $t('core.universal.tooltips.unpublished_content_tip')
+                          $t('core.common.tooltips.unpublished_content_tip')
                         "
                         :to="{
                           name: 'SinglePageEditor',
@@ -797,7 +797,7 @@ watch(selectedPageNames, (newValue) => {
                 <VEntityField :description="getPublishStatus(singlePage.page)">
                   <template v-if="isPublishing(singlePage.page)" #description>
                     <VStatusDot
-                      :text="$t('core.universal.tooltips.publishing')"
+                      :text="$t('core.common.tooltips.publishing')"
                       animate
                     />
                   </template>
@@ -819,7 +819,7 @@ watch(selectedPageNames, (newValue) => {
                 <VEntityField v-if="singlePage?.page?.spec.deleted">
                   <template #description>
                     <VStatusDot
-                      v-tooltip="$t('core.universal.status.deleting')"
+                      v-tooltip="$t('core.common.status.deleting')"
                       state="warning"
                       animate
                     />
@@ -843,7 +843,7 @@ watch(selectedPageNames, (newValue) => {
                   type="secondary"
                   @click="handleOpenSettingModal(singlePage.page)"
                 >
-                  {{ $t("core.universal.buttons.setting") }}
+                  {{ $t("core.common.buttons.setting") }}
                 </VButton>
                 <VButton
                   v-close-popper
@@ -851,7 +851,7 @@ watch(selectedPageNames, (newValue) => {
                   type="danger"
                   @click="handleDelete(singlePage.page)"
                 >
-                  {{ $t("core.universal.buttons.delete") }}
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </template>
             </VEntity>

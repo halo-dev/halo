@@ -100,7 +100,7 @@ const handleCopy = () => {
 
   copy(text);
 
-  Toast.success(t("core.universal.toast.copy_success"));
+  Toast.success(t("core.common.toast.copy_success"));
 };
 
 const handleDownloadLogfile = () => {
@@ -117,10 +117,10 @@ const handleDownloadLogfile = () => {
       document.body.removeChild(downloadElement);
       window.URL.revokeObjectURL(href);
 
-      Toast.success(t("core.universal.toast.download_success"));
+      Toast.success(t("core.common.toast.download_success"));
     })
     .catch((e) => {
-      Toast.error(t("core.universal.toast.download_failed"));
+      Toast.error(t("core.common.toast.download_failed"));
       console.log("Failed to download log file.", e);
     });
 };
@@ -136,7 +136,7 @@ const handleDownloadLogfile = () => {
         <template #icon>
           <IconClipboardLine class="h-full w-full" />
         </template>
-        {{ $t("core.universal.buttons.copy") }}
+        {{ $t("core.common.buttons.copy") }}
       </VButton>
     </template>
   </VPageHeader>
@@ -169,7 +169,7 @@ const handleDownloadLogfile = () => {
                   v-if="!isExternalUrlValid"
                   class="mt-3"
                   type="warning"
-                  :title="$t('core.universal.text.warning')"
+                  :title="$t('core.common.text.warning')"
                   :closable="false"
                 >
                   <template #description>
@@ -304,7 +304,7 @@ const handleDownloadLogfile = () => {
               </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 <VButton size="sm" @click="handleDownloadLogfile()">
-                  {{ $t("core.universal.buttons.download") }}
+                  {{ $t("core.common.buttons.download") }}
                 </VButton>
               </dd>
             </div>

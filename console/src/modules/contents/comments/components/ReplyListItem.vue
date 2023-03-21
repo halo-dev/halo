@@ -50,17 +50,17 @@ const quoteReply = computed(() => {
 const handleDelete = async () => {
   Dialog.warning({
     title: t("core.comment.operations.delete_reply.title"),
-    description: t("core.universal.dialog.descriptions.cannot_be_recovered"),
+    description: t("core.common.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
-    confirmText: t("core.universal.buttons.confirm"),
-    cancelText: t("core.universal.buttons.cancel"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.reply.deletecontentHaloRunV1alpha1Reply({
           name: props.reply?.reply.metadata.name as string,
         });
 
-        Toast.success(t("core.universal.toast.delete_success"));
+        Toast.success(t("core.common.toast.delete_success"));
       } catch (error) {
         console.error("Failed to delete comment reply", error);
       } finally {
@@ -81,7 +81,7 @@ const handleApprove = async () => {
       reply: replyToUpdate,
     });
 
-    Toast.success(t("core.universal.toast.operation_success"));
+    Toast.success(t("core.common.toast.operation_success"));
   } catch (error) {
     console.error("Failed to approve comment reply", error);
   } finally {
@@ -176,7 +176,7 @@ const isHoveredReply = computed(() => {
       <VEntityField v-if="reply?.reply.metadata.deletionTimestamp">
         <template #description>
           <VStatusDot
-            v-tooltip="$t('core.universal.status.deleting')"
+            v-tooltip="$t('core.common.status.deleting')"
             state="warning"
             animate
           />
@@ -213,7 +213,7 @@ const isHoveredReply = computed(() => {
         type="danger"
         @click="handleDelete"
       >
-        {{ $t("core.universal.buttons.delete") }}
+        {{ $t("core.common.buttons.delete") }}
       </VButton>
     </template>
   </VEntity>
