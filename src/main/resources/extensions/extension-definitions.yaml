@@ -1,0 +1,35 @@
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: username-password-authenticator
+  labels:
+    auth.halo.run/extension-point-name: "additional-webfilter"
+spec:
+  className: run.halo.app.security.authentication.login.UsernamePasswordAuthenticator
+  extensionPointName: additional-webfilter
+  displayName: "UsernamePasswordAuthenticator"
+  description: "Authenticates a user by username and password."
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: username-password-logout-handler
+  labels:
+    auth.halo.run/extension-point-name: "additional-webfilter"
+spec:
+  className: run.halo.app.security.authentication.login.UsernamePasswordLogoutHandler
+  extensionPointName: additional-webfilter
+  displayName: "UsernamePasswordLogoutHandler"
+  description: "Logout handler for username and password authentication."
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionDefinition
+metadata:
+  name: delegating-logout-page-generating-webfilter
+  labels:
+    auth.halo.run/extension-point-name: "additional-webfilter"
+spec:
+  className: run.halo.app.security.authentication.login.DelegatingLogoutPageGeneratingWebFilter
+  extensionPointName: additional-webfilter
+  displayName: "DelegatingLogoutPageGeneratingWebFilter"
+  description: "Generates a default log out page."

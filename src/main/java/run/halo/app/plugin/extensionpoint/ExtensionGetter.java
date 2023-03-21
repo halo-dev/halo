@@ -24,4 +24,14 @@ public interface ExtensionGetter {
      */
     <T extends ExtensionPoint> Flux<T> getEnabledExtensions(Class<T> extensionPoint);
 
+    /**
+     * Get the extension(s) according to the {@link ExtensionPointDefinition} queried
+     * by incoming extension point class.
+     *
+     * @param extensionPoint extension point class
+     * @return implementations of the corresponding extension point.
+     * @throws IllegalArgumentException if the incoming extension point class does not have
+     *                                  the {@link ExtensionPointDefinition}.
+     */
+    <T extends ExtensionPoint> Flux<T> getEnabledExtensionByDefinition(Class<T> extensionPoint);
 }
