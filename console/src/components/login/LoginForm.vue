@@ -150,6 +150,7 @@ const { data: socialAuthProviders } = useQuery<SocialAuthProvider[]>({
       placeholder="密码"
       type="password"
       validation="required"
+      autocomplete="current-password"
     >
     </FormKit>
   </FormKit>
