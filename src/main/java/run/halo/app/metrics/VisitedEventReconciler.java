@@ -132,7 +132,7 @@ public class VisitedEventReconciler
 
         @Async
         @EventListener(VisitedEvent.class)
-        public void handlePostPublished(VisitedEvent visitedEvent) {
+        public void onVisited(VisitedEvent visitedEvent) {
             mergeVisits(visitedEvent);
         }
 
