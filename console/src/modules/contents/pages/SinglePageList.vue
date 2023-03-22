@@ -690,7 +690,7 @@ watch(selectedPageNames, (newValue) => {
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>
-                {{ $t("core.page.empty.actions.new") }}
+                {{ $t("core.common.buttons.new") }}
               </VButton>
             </VSpace>
           </template>

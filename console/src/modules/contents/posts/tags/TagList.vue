@@ -178,7 +178,7 @@ onMounted(async () => {
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>
-                {{ $t("core.post_tag.empty.actions.new") }}
+                {{ $t("core.common.buttons.new") }}
               </VButton>
             </VSpace>
           </template>

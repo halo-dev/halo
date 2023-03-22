@@ -346,7 +346,7 @@ const hasFilters = computed(() => {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          {{ $t("core.user.common.buttons.new") }}
+          {{ $t("core.common.buttons.new") }}
         </VButton>
       </VSpace>
     </template>
@@ -526,7 +526,7 @@ const hasFilters = computed(() => {
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>
-                {{ $t("core.user.common.buttons.new") }}
+                {{ $t("core.common.buttons.new") }}
               </VButton>
             </VSpace>
           </template>

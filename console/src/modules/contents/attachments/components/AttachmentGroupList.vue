@@ -325,7 +325,7 @@ onMounted(async () => {
     >
       <div class="flex flex-1 items-center truncate">
         <span class="truncate text-sm">
-          {{ $t("core.attachment.group_list.operations.new.button") }}
+          {{ $t("core.common.buttons.new") }}
         </span>
       </div>
       <IconAddCircle />

@@ -127,9 +127,7 @@ const onEditingModalClose = () => {
   >
     <template #actions>
       <FloatingDropdown>
-        <span
-          v-tooltip="$t('core.attachment.policies_modal.operations.new.button')"
-        >
+        <span v-tooltip="$t('core.common.buttons.new')">
           <IconAddCircle />
         </span>
         <template #popper>
@@ -166,7 +164,7 @@ const onEditingModalClose = () => {
               <template #icon>
                 <IconAddCircle class="h-full w-full" />
               </template>
-              {{ $t("core.attachment.policies_modal.empty.actions.new") }}
+              {{ $t("core.common.buttons.new") }}
             </VButton>
             <template #popper>
               <div class="w-72 p-4">

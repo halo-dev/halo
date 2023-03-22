@@ -169,7 +169,7 @@ const handleDelete = async (role: Role) => {
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>
-        {{ $t("core.role.actions.new") }}
+        {{ $t("core.common.buttons.new") }}
       </VButton>
     </template>
   </VPageHeader>

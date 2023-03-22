@@ -135,7 +135,7 @@ const onEditingModalClose = () => {
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>
-                {{ $t("core.post_category.empty.actions.new") }}
+                {{ $t("core.common.buttons.new") }}
               </VButton>
             </VSpace>
           </template>

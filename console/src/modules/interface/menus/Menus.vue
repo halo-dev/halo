@@ -275,7 +275,7 @@ const handleResetMenuItems = async () => {
                     <template #icon>
                       <IconAddCircle class="h-full w-full" />
                     </template>
-                    {{ $t("core.menu.menu_item_empty.actions.new") }}
+                    {{ $t("core.common.buttons.new") }}
                   </VButton>
                 </VSpace>
               </template>

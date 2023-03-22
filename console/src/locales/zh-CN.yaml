@@ -109,8 +109,6 @@ core:
     empty:
       title: 当前没有文章
       message: 你可以尝试刷新或者新建文章
-      actions:
-        new: 新建文章
     operations:
       delete:
         title: 确定要删除该文章吗？
@@ -213,8 +211,6 @@ core:
     empty:
       title: 当前没有标签
       message: 你可以尝试刷新或者新建标签
-      actions:
-        new: 新建标签
     operations:
       delete:
         title: 确定要删除该标签吗？
@@ -246,8 +242,6 @@ core:
     empty:
       title: 当前没有分类
       message: 你可以尝试刷新或者新建分类
-      actions:
-        new: 新建分类
     operations:
       delete:
         title: 确定要删除该分类吗？
@@ -281,8 +275,6 @@ core:
     empty:
       title: 当前没有页面
       message: 你可以尝试刷新或者新建页面
-      actions:
-        new: 新建页面
     operations:
       delete:
         title: 确定要删除该自定义页面吗？
@@ -493,8 +485,6 @@ core:
       internal_groups:
         all: 全部
       operations:
-        new:
-          button: 添加分组
         rename:
           button: 重命名
         delete:
@@ -512,11 +502,7 @@ core:
       empty:
         title: 当前没有可用的存储策略
         message: 当前没有可用的存储策略，你可以尝试刷新或者新建策略
-        actions:
-          new: 新建策略
       operations:
-        new:
-          button: 添加存储策略
         delete:
           title: 确定要删除该策略吗？
           description: 当前策略下没有已上传的附件。
@@ -537,8 +523,6 @@ core:
           label: 选择分组：
         policy:
           label: 选择存储策略：
-          actions:
-            new: 新建策略
           empty:
             title: 没有存储策略
             description: 在上传之前，需要新建一个存储策略
@@ -629,8 +613,6 @@ core:
     menu_item_empty:
       title: 当前没有菜单项
       message: 你可以尝试刷新或者新建菜单项
-      actions:
-        new: 新增菜单项
     operations:
       set_primary:
         button: 设置为主菜单
@@ -640,7 +622,7 @@ core:
         description: 将同时删除该菜单下的所有菜单项，该操作不可恢复。
       delete_menu_item:
         title: 确定要删除该菜单项吗？
-        description: 将同时删除所有子菜单项，删除后将无法恢复
+        description: 将同时删除所有子菜单项，删除后将无法恢复。
       add_sub_menu_item:
         button: 新增子菜单项
     list:
@@ -758,9 +740,6 @@ core:
           default: 默认编辑器
   user:
     title: 用户
-    common:
-      buttons:
-        new: 新建用户
     actions:
       roles: 角色管理
       identity_authentication: 身份认证
@@ -853,12 +832,10 @@ core:
         custom: 自定义
         dependent_on: 依赖于 {roles}
         provided_by_plugin: 由 {plugin} 提供
-    actions:
-      new: 新建角色
     operations:
       delete:
         title: 确定要删除该角色吗？
-        description: 该角色删除后，相关联的用户将被删除角色绑定，该操作不可恢复
+        description: 该角色删除后，相关联的用户将被删除角色绑定，该操作不可恢复。
       create_based_on_this_role:
         button: 基于此角色创建
     detail:
@@ -1134,7 +1111,7 @@ core:
         warning: 警告
       descriptions:
         cannot_be_recovered: 该操作不可恢复。
-        editor_not_found: 未找到符合 {raw_type} 格式的编辑器，请检查是否已安装编辑器插件
+        editor_not_found: 未找到符合 {raw_type} 格式的编辑器，请检查是否已安装编辑器插件。
     filters:
       results:
         keyword: "关键词：{keyword}"

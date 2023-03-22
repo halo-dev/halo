@@ -181,9 +181,7 @@ watch(
           >
             <div class="flex flex-1 items-center truncate">
               <span class="truncate text-sm">
-                {{
-                  $t("core.attachment.upload_modal.filters.policy.actions.new")
-                }}
+                {{ $t("core.common.buttons.new") }}
               </span>
             </div>
             <IconAddCircle />
