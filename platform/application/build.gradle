@@ -1,6 +1,10 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
 plugins {
     id 'java-platform'
     id 'maven-publish'
+    id 'org.springframework.boot' version '3.0.4' apply false
+    id 'io.spring.dependency-management' version '1.1.0'
 }
 
 group = 'run.halo.tools.platform'
@@ -22,7 +26,7 @@ javaPlatform {
 }
 
 dependencies {
-    api platform('org.springframework.boot:spring-boot-dependencies:3.0.4')
+    api platform(SpringBootPlugin.BOM_COORDINATES)
     constraints {
         api 'org.mariadb:r2dbc-mariadb:1.1.3'
         api 'com.github.jasync-sql:jasync-r2dbc-mysql:2.1.23'
