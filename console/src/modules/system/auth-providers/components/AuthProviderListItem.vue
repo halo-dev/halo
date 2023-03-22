@@ -18,6 +18,8 @@ const emit = defineEmits<{
   (event: "reload"): void;
 }>();
 
+const LOCAL_AUTH_PROVIDER_NAME = "local";
+
 const handleChangeStatus = async () => {
   Dialog.info({
     title: `确定要${
@@ -71,7 +73,7 @@ const handleChangeStatus = async () => {
       </VEntityField>
     </template>
     <template #end>
-      <VEntityField v-permission="['system:plugins:manage']">
+      <VEntityField v-if="authProvider.name !== LOCAL_AUTH_PROVIDER_NAME">
         <template #description>
           <div class="flex items-center">
             <VSwitch
