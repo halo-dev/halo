@@ -21,11 +21,18 @@ dependencies {
     implementation 'net.bytebuddy:byte-buddy'
     implementation 'org.springdoc:springdoc-openapi-starter-common'
     implementation 'org.thymeleaf:thymeleaf'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.assertj:assertj-core'
 }
 
 java {
     withSourcesJar()
     withJavadocJar()
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
 }
 
 publishing {
