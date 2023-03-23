@@ -2,8 +2,10 @@
 import { Toast, VModal } from "@halo-dev/components";
 import LoginForm from "@/components/login/LoginForm.vue";
 import { useUserStore } from "@/stores/user";
+import { useI18n } from "vue-i18n";
 
 const userStore = useUserStore();
+const { t } = useI18n();
 
 const onVisibleChange = (visible: boolean) => {
   userStore.loginModalVisible = visible;
@@ -11,7 +13,7 @@ const onVisibleChange = (visible: boolean) => {
 
 const onLoginSucceed = () => {
   onVisibleChange(false);
-  Toast.success("登录成功");
+  Toast.success(t("core.login.operations.submit.toast_success"));
 };
 </script>
 
@@ -21,7 +23,7 @@ const onLoginSucceed = () => {
     :mount-to-body="true"
     :width="400"
     :centered="true"
-    title="重新登录"
+    :title="$t('core.login.modal.title')"
     @update:visible="onVisibleChange"
   >
     <LoginForm v-if="userStore.loginModalVisible" @succeed="onLoginSucceed" />

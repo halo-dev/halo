@@ -31,9 +31,11 @@ const router = useRouter();
 
       <div class="mt-4">
         <VSpace>
-          <VButton @click="router.back()"> 返回 </VButton>
+          <VButton @click="router.back()">
+            {{ $t("core.common.buttons.back") }}
+          </VButton>
           <VButton type="secondary" :route="{ name: 'Dashboard' }">
-            仪表盘
+            {{ $t("core.exception.actions.dashboard") }}
           </VButton>
         </VSpace>
       </div>

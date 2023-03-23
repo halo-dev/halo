@@ -7,7 +7,6 @@ import {
   IconBookRead,
   IconEye,
   IconEyeOff,
-  IconTeam,
   IconRefreshLine,
   IconExternalLinkLine,
   Dialog,
@@ -41,12 +40,14 @@ import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { postLabels } from "@/constants/labels";
 import FilterTag from "@/components/filter/FilterTag.vue";
-import FilteCleanButton from "@/components/filter/FilterCleanButton.vue";
+import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 import TagDropdownSelector from "@/components/dropdown-selector/TagDropdownSelector.vue";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const settingModal = ref(false);
 const selectedPost = ref<Post>();
@@ -59,7 +60,7 @@ interface VisibleItem {
   value?: "PUBLIC" | "INTERNAL" | "PRIVATE";
 }
 
-interface PublishStatuItem {
+interface PublishStatusItem {
   label: string;
   value?: boolean;
 }
@@ -72,64 +73,59 @@ interface SortItem {
 
 const VisibleItems: VisibleItem[] = [
   {
-    label: "全部",
+    label: t("core.post.filters.visible.items.all"),
     value: undefined,
   },
   {
-    label: "公开",
+    label: t("core.post.filters.visible.items.public"),
     value: "PUBLIC",
   },
-  // TODO: 支持内部成员可访问
-  // {
-  //   label: "内部成员可访问",
-  //   value: "INTERNAL",
-  // },
   {
-    label: "私有",
+    label: t("core.post.filters.visible.items.private"),
     value: "PRIVATE",
   },
 ];
 
-const PublishStatuItems: PublishStatuItem[] = [
+const PublishStatusItems: PublishStatusItem[] = [
   {
-    label: "全部",
+    label: t("core.post.filters.status.items.all"),
     value: undefined,
   },
   {
-    label: "已发布",
+    label: t("core.post.filters.status.items.published"),
     value: true,
   },
   {
-    label: "未发布",
+    label: t("core.post.filters.status.items.draft"),
     value: false,
   },
 ];
 
 const SortItems: SortItem[] = [
   {
-    label: "较近发布",
+    label: t("core.post.filters.sort.items.publish_time_desc"),
     sort: "PUBLISH_TIME",
     sortOrder: false,
   },
   {
-    label: "较早发布",
+    label: t("core.post.filters.sort.items.publish_time_asc"),
     sort: "PUBLISH_TIME",
     sortOrder: true,
   },
   {
-    label: "较近创建",
+    label: t("core.post.filters.sort.items.create_time_desc"),
     sort: "CREATE_TIME",
     sortOrder: false,
   },
   {
-    label: "较早创建",
+    label: t("core.post.filters.sort.items.create_time_asc"),
     sort: "CREATE_TIME",
     sortOrder: true,
   },
 ];
 
 const selectedVisibleItem = ref<VisibleItem>(VisibleItems[0]);
-const selectedPublishStatusItem = ref<PublishStatuItem>(PublishStatuItems[0]);
+const selectedPublishStatusItem = ref<PublishStatusItem>(PublishStatusItems[0]);
 const selectedSortItem = ref<SortItem>();
 const selectedCategory = ref<Category>();
 const selectedTag = ref<Tag>();
@@ -141,7 +137,7 @@ function handleVisibleItemChange(visibleItem: VisibleItem) {
   page.value = 1;
 }
 
-function handlePublishStatusItemChange(publishStatusItem: PublishStatuItem) {
+function handlePublishStatusItemChange(publishStatusItem: PublishStatusItem) {
   selectedPublishStatusItem.value = publishStatusItem;
   page.value = 1;
 }
@@ -181,7 +177,7 @@ function handleClearKeyword() {
 
 function handleClearFilters() {
   selectedVisibleItem.value = VisibleItems[0];
-  selectedPublishStatusItem.value = PublishStatuItems[0];
+  selectedPublishStatusItem.value = PublishStatusItems[0];
   selectedSortItem.value = undefined;
   selectedCategory.value = undefined;
   selectedTag.value = undefined;
@@ -351,7 +347,9 @@ const checkSelection = (post: Post) => {
 
 const getPublishStatus = (post: Post) => {
   const { labels } = post.metadata;
-  return labels?.[postLabels.PUBLISHED] === "true" ? "已发布" : "未发布";
+  return labels?.[postLabels.PUBLISHED] === "true"
+    ? t("core.post.filters.status.items.published")
+    : t("core.post.filters.status.items.draft");
 };
 
 const isPublishing = (post: Post) => {
@@ -377,25 +375,29 @@ const handleCheckAllChange = (e: Event) => {
 
 const handleDelete = async (post: Post) => {
   Dialog.warning({
-    title: "确定要删除该文章吗？",
-    description: "该操作会将文章放入回收站，后续可以从回收站恢复",
+    title: t("core.post.operations.delete.title"),
+    description: t("core.post.operations.delete.description"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await apiClient.post.recyclePost({
         name: post.metadata.name,
       });
       await refetch();
 
-      Toast.success("删除成功");
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
 
 const handleDeleteInBatch = async () => {
   Dialog.warning({
-    title: "确定要删除选中的文章吗？",
-    description: "该操作会将文章放入回收站，后续可以从回收站恢复",
+    title: t("core.post.operations.delete_in_batch.title"),
+    description: t("core.post.operations.delete_in_batch.description"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPostNames.value.map((name) => {
@@ -407,7 +409,7 @@ const handleDeleteInBatch = async () => {
       await refetch();
       selectedPostNames.value = [];
 
-      Toast.success("删除成功");
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
@@ -424,22 +426,28 @@ watch(selectedPostNames, (newValue) => {
   >
     <template #actions>
       <span @click="handleSelectPrevious">
-        <IconArrowLeft v-tooltip="`上一项`" />
+        <IconArrowLeft v-tooltip="$t('core.common.buttons.previous')" />
       </span>
       <span @click="handleSelectNext">
-        <IconArrowRight v-tooltip="`下一项`" />
+        <IconArrowRight v-tooltip="$t('core.common.buttons.next')" />
       </span>
     </template>
   </PostSettingModal>
-  <VPageHeader title="文章">
+  <VPageHeader :title="$t('core.post.title')">
     <template #icon>
       <IconBookRead class="mr-2 self-center" />
     </template>
     <template #actions>
       <VSpace>
-        <VButton :route="{ name: 'Categories' }" size="sm">分类</VButton>
-        <VButton :route="{ name: 'Tags' }" size="sm">标签</VButton>
-        <VButton :route="{ name: 'DeletedPosts' }" size="sm">回收站</VButton>
+        <VButton :route="{ name: 'Categories' }" size="sm">
+          {{ $t("core.post.actions.categories") }}
+        </VButton>
+        <VButton :route="{ name: 'Tags' }" size="sm">
+          {{ $t("core.post.actions.tags") }}
+        </VButton>
+        <VButton :route="{ name: 'DeletedPosts' }" size="sm">
+          {{ $t("core.post.actions.recycle_bin") }}
+        </VButton>
 
         <VButton
           v-permission="['system:posts:manage']"
@@ -449,7 +457,7 @@ watch(selectedPostNames, (newValue) => {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          新建
+          {{ $t("core.common.buttons.new") }}
         </VButton>
       </VSpace>
     </template>
@@ -481,7 +489,7 @@ watch(selectedPostNames, (newValue) => {
                 <FormKit
                   id="keywordInput"
                   outer-class="!p-0"
-                  placeholder="输入关键词搜索"
+                  :placeholder="$t('core.common.placeholder.search')"
                   type="text"
                   name="keyword"
                   :model-value="keyword"
@@ -489,56 +497,84 @@ watch(selectedPostNames, (newValue) => {
                 ></FormKit>
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  关键词：{{ keyword }}
+                  {{
+                    $t("core.common.filters.results.keyword", {
+                      keyword: keyword,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
                   v-if="selectedPublishStatusItem.value !== undefined"
-                  @close="handlePublishStatusItemChange(PublishStatuItems[0])"
+                  @close="handlePublishStatusItemChange(PublishStatusItems[0])"
                 >
-                  状态：{{ selectedPublishStatusItem.label }}
+                  {{
+                    $t("core.common.filters.results.status", {
+                      status: selectedPublishStatusItem.label,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
                   v-if="selectedVisibleItem.value"
                   @close="handleVisibleItemChange(VisibleItems[0])"
                 >
-                  可见性：{{ selectedVisibleItem.label }}
+                  {{
+                    $t("core.post.filters.visible.result", {
+                      visible: selectedVisibleItem.label,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
                   v-if="selectedCategory"
                   @close="handleCategoryChange()"
                 >
-                  分类：{{ selectedCategory.spec.displayName }}
+                  {{
+                    $t("core.post.filters.category.result", {
+                      category: selectedCategory.spec.displayName,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag v-if="selectedTag" @click="handleTagChange()">
-                  标签：{{ selectedTag.spec.displayName }}
+                  {{
+                    $t("core.post.filters.tag.result", {
+                      tag: selectedTag.spec.displayName,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
                   v-if="selectedContributor"
                   @close="handleContributorChange()"
                 >
-                  作者：{{ selectedContributor.spec.displayName }}
+                  {{
+                    $t("core.post.filters.author.result", {
+                      author: selectedContributor.spec.displayName,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
                   v-if="selectedSortItem"
                   @close="handleSortItemChange()"
                 >
-                  排序：{{ selectedSortItem.label }}
+                  {{
+                    $t("core.common.filters.results.sort", {
+                      sort: selectedSortItem.label,
+                    })
+                  }}
                 </FilterTag>
 
-                <FilteCleanButton
+                <FilterCleanButton
                   v-if="hasFilters"
                   @click="handleClearFilters"
                 />
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeleteInBatch">
-                  删除
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </VSpace>
             </div>
@@ -548,7 +584,9 @@ watch(selectedPostNames, (newValue) => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">状态</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.common.filters.labels.status") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -557,7 +595,7 @@ watch(selectedPostNames, (newValue) => {
                     <div class="w-72 p-4">
                       <ul class="space-y-1">
                         <li
-                          v-for="(filterItem, index) in PublishStatuItems"
+                          v-for="(filterItem, index) in PublishStatusItems"
                           :key="index"
                           v-close-popper
                           :class="{
@@ -578,7 +616,9 @@ watch(selectedPostNames, (newValue) => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5"> 可见性 </span>
+                    <span class="mr-0.5">
+                      {{ $t("core.post.filters.visible.label") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -612,7 +652,9 @@ watch(selectedPostNames, (newValue) => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">分类</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.post.filters.category.label") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -625,7 +667,9 @@ watch(selectedPostNames, (newValue) => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">标签</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.post.filters.tag.label") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -638,7 +682,9 @@ watch(selectedPostNames, (newValue) => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">作者</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.post.filters.author.label") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -648,7 +694,9 @@ watch(selectedPostNames, (newValue) => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">排序</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.common.filters.labels.sort") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -675,7 +723,7 @@ watch(selectedPostNames, (newValue) => {
                     @click="refetch()"
                   >
                     <IconRefreshLine
-                      v-tooltip="`刷新`"
+                      v-tooltip="$t('core.common.buttons.refresh')"
                       :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
@@ -688,10 +736,15 @@ watch(selectedPostNames, (newValue) => {
       </template>
       <VLoading v-if="isLoading" />
       <Transition v-else-if="!posts?.length" appear name="fade">
-        <VEmpty message="你可以尝试刷新或者新建文章" title="当前没有文章">
+        <VEmpty
+          :message="$t('core.post.empty.message')"
+          :title="$t('core.post.empty.title')"
+        >
           <template #actions>
             <VSpace>
-              <VButton @click="refetch">刷新</VButton>
+              <VButton @click="refetch">
+                {{ $t("core.common.buttons.refresh") }}
+              </VButton>
               <VButton
                 v-permission="['system:posts:manage']"
                 :route="{ name: 'PostEditor' }"
@@ -700,7 +753,7 @@ watch(selectedPostNames, (newValue) => {
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>
-                新建文章
+                {{ $t("core.common.buttons.new") }}
               </VButton>
             </VSpace>
           </template>
@@ -738,7 +791,9 @@ watch(selectedPostNames, (newValue) => {
                     <VSpace class="mt-1 sm:mt-0">
                       <RouterLink
                         v-if="post.post.status?.inProgress"
-                        v-tooltip="`当前有内容已保存，但还未发布。`"
+                        v-tooltip="
+                          $t('core.common.tooltips.unpublished_content_tip')
+                        "
                         :to="{
                           name: 'PostEditor',
                           query: { name: post.post.metadata.name },
@@ -765,7 +820,8 @@ watch(selectedPostNames, (newValue) => {
                           v-if="post.categories.length"
                           class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
                         >
-                          分类：<a
+                          {{ $t("core.post.list.fields.categories") }}
+                          <a
                             v-for="(category, categoryIndex) in post.categories"
                             :key="categoryIndex"
                             :href="category.status?.permalink"
@@ -777,16 +833,24 @@ watch(selectedPostNames, (newValue) => {
                           </a>
                         </p>
                         <span class="text-xs text-gray-500">
-                          访问量 {{ post.stats.visit || 0 }}
+                          {{
+                            $t("core.post.list.fields.visits", {
+                              visits: post.stats.visit,
+                            })
+                          }}
                         </span>
                         <span class="text-xs text-gray-500">
-                          评论 {{ post.stats.totalComment || 0 }}
+                          {{
+                            $t("core.post.list.fields.comments", {
+                              comments: post.stats.totalComment || 0,
+                            })
+                          }}
                         </span>
                         <span
                           v-if="post.post.spec.pinned"
                           class="text-xs text-gray-500"
                         >
-                          已置顶
+                          {{ $t("core.post.list.fields.pinned") }}
                         </span>
                       </VSpace>
                       <VSpace v-if="post.tags.length" class="flex-wrap">
@@ -827,32 +891,33 @@ watch(selectedPostNames, (newValue) => {
                 </VEntityField>
                 <VEntityField :description="getPublishStatus(post.post)">
                   <template v-if="isPublishing(post.post)" #description>
-                    <VStatusDot text="发布中" animate />
+                    <VStatusDot
+                      :text="$t('core.common.tooltips.publishing')"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField>
                   <template #description>
                     <IconEye
                       v-if="post.post.spec.visible === 'PUBLIC'"
-                      v-tooltip="`公开访问`"
+                      v-tooltip="$t('core.post.filters.visible.items.public')"
                       class="cursor-pointer text-sm transition-all hover:text-blue-600"
                     />
                     <IconEyeOff
                       v-if="post.post.spec.visible === 'PRIVATE'"
-                      v-tooltip="`私有访问`"
-                      class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                    />
-                    <!-- TODO: 支持内部成员可访问 -->
-                    <IconTeam
-                      v-if="false"
-                      v-tooltip="`内部成员可访问`"
+                      v-tooltip="$t('core.post.filters.visible.items.private')"
                       class="cursor-pointer text-sm transition-all hover:text-blue-600"
                     />
                   </template>
                 </VEntityField>
                 <VEntityField v-if="post?.post?.spec.deleted">
                   <template #description>
-                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                    <VStatusDot
+                      v-tooltip="$t('core.common.status.deleting')"
+                      state="warning"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField>
@@ -873,7 +938,7 @@ watch(selectedPostNames, (newValue) => {
                   type="secondary"
                   @click="handleOpenSettingModal(post.post)"
                 >
-                  设置
+                  {{ $t("core.common.buttons.setting") }}
                 </VButton>
                 <VButton
                   v-close-popper
@@ -881,7 +946,7 @@ watch(selectedPostNames, (newValue) => {
                   type="danger"
                   @click="handleDelete(post.post)"
                 >
-                  删除
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </template>
             </VEntity>
@@ -894,6 +959,8 @@ watch(selectedPostNames, (newValue) => {
           <VPagination
             v-model:page="page"
             v-model:size="size"
+            :page-label="$t('core.components.pagination.page_label')"
+            :size-label="$t('core.components.pagination.size_label')"
             :total="total"
             :size-options="[20, 30, 50, 100]"
           />

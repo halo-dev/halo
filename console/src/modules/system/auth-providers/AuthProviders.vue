@@ -20,7 +20,7 @@ const {
 </script>
 
 <template>
-  <VPageHeader title="身份认证">
+  <VPageHeader :title="$t('core.identity_authentication.title')">
     <template #icon>
       <IconLockPasswordLine class="mr-2 self-center" />
     </template>
@@ -34,7 +34,10 @@ const {
             class="relative flex flex-col items-start sm:flex-row sm:items-center"
           >
             <div class="flex w-full flex-1 sm:w-auto">
-              <FormKit placeholder="输入关键词搜索" type="text"></FormKit>
+              <FormKit
+                :placeholder="$t('core.common.placeholder.search')"
+                type="text"
+              ></FormKit>
             </div>
           </div>
         </div>

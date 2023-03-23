@@ -42,10 +42,12 @@ import { useRouteQuery } from "@vueuse/router";
 import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
 import { usePermission } from "@/utils/permission";
 import FilterTag from "@/components/filter/FilterTag.vue";
-import FilteCleanButton from "@/components/filter/FilterCleanButton.vue";
+import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const policyVisible = ref(false);
 const uploadVisible = ref(false);
@@ -64,19 +66,19 @@ interface SortItem {
 
 const SortItems: SortItem[] = [
   {
-    label: "较近上传",
+    label: t("core.attachment.filters.sort.items.create_time_desc"),
     value: "creationTimestamp,desc",
   },
   {
-    label: "较晚上传",
+    label: t("core.attachment.filters.sort.items.create_time_asc"),
     value: "creationTimestamp,asc",
   },
   {
-    label: "文件大小降序",
+    label: t("core.attachment.filters.sort.items.size_desc"),
     value: "size,desc",
   },
   {
-    label: "文件大小升序",
+    label: t("core.attachment.filters.sort.items.size_asc"),
     value: "size,asc",
   },
 ];
@@ -180,7 +182,7 @@ const handleMove = async (group: Group) => {
     await Promise.all(promises);
     selectedAttachments.value.clear();
 
-    Toast.success("移动成功");
+    Toast.success(t("core.attachment.operations.move.toast_success"));
   } catch (e) {
     console.error(e);
   } finally {
@@ -229,12 +231,12 @@ const getPolicyName = (name: string | undefined) => {
 const viewTypes = [
   {
     name: "list",
-    tooltip: "列表模式",
+    tooltip: t("core.attachment.filters.view_type.items.grid"),
     icon: IconList,
   },
   {
     name: "grid",
-    tooltip: "网格模式",
+    tooltip: t("core.attachment.filters.view_type.items.list"),
     icon: IconGrid,
   },
 ];
@@ -299,7 +301,7 @@ onMounted(() => {
     @close="onUploadModalClose"
   />
   <AttachmentPoliciesModal v-model:visible="policyVisible" />
-  <VPageHeader title="附件库">
+  <VPageHeader :title="$t('core.attachment.title')">
     <template #icon>
       <IconFolder class="mr-2 self-center" />
     </template>
@@ -313,7 +315,7 @@ onMounted(() => {
           <template #icon>
             <IconDatabase2Line class="h-full w-full" />
           </template>
-          存储策略
+          {{ $t("core.attachment.actions.storage_policies") }}
         </VButton>
         <VButton
           v-permission="['system:attachments:manage']"
@@ -323,7 +325,7 @@ onMounted(() => {
           <template #icon>
             <IconUpload class="h-full w-full" />
           </template>
-          上传
+          {{ $t("core.common.buttons.upload") }}
         </VButton>
       </VSpace>
     </template>
@@ -357,7 +359,7 @@ onMounted(() => {
                     <FormKit
                       id="keywordInput"
                       outer-class="!p-0"
-                      placeholder="输入关键词搜索"
+                      :placeholder="$t('core.common.placeholder.search')"
                       type="text"
                       name="keyword"
                       :model-value="keyword"
@@ -365,44 +367,64 @@ onMounted(() => {
                     ></FormKit>
 
                     <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                      关键词：{{ keyword }}
+                      {{
+                        $t("core.common.filters.results.keyword", {
+                          keyword: keyword,
+                        })
+                      }}
                     </FilterTag>
 
                     <FilterTag
                       v-if="selectedPolicy"
                       @close="handleSelectPolicy(undefined)"
                     >
-                      存储策略：{{ selectedPolicy?.spec.displayName }}
+                      {{
+                        $t("core.attachment.filters.storage_policy.result", {
+                          storage_policy: selectedPolicy.spec.displayName,
+                        })
+                      }}
                     </FilterTag>
 
                     <FilterTag
                       v-if="selectedUser"
                       @close="handleSelectUser(undefined)"
                     >
-                      上传者：{{ selectedUser?.spec.displayName }}
+                      {{
+                        $t("core.attachment.filters.owner.result", {
+                          owner: selectedUser.spec.displayName,
+                        })
+                      }}
                     </FilterTag>
 
                     <FilterTag
                       v-if="selectedSortItem"
                       @click="handleSortItemChange()"
                     >
-                      排序：{{ selectedSortItem.label }}
+                      {{
+                        $t("core.common.filters.results.sort", {
+                          sort: selectedSortItem.label,
+                        })
+                      }}
                     </FilterTag>
 
-                    <FilteCleanButton
+                    <FilterCleanButton
                       v-if="hasFilters"
                       @click="handleClearFilters"
                     />
                   </div>
                   <VSpace v-else>
                     <VButton type="danger" @click="handleDeleteInBatch">
-                      删除
+                      {{ $t("core.common.buttons.delete") }}
                     </VButton>
                     <VButton @click="selectedAttachments.clear()">
-                      取消选择
+                      {{
+                        $t("core.attachment.operations.deselect_items.button")
+                      }}
                     </VButton>
                     <FloatingDropdown>
-                      <VButton>移动</VButton>
+                      <VButton>
+                        {{ $t("core.attachment.operations.move.button") }}
+                      </VButton>
                       <template #popper>
                         <div class="w-72 p-4">
                           <ul class="space-y-1">
@@ -429,7 +451,11 @@ onMounted(() => {
                       <div
                         class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                       >
-                        <span class="mr-0.5">存储策略</span>
+                        <span class="mr-0.5">
+                          {{
+                            $t("core.attachment.filters.storage_policy.label")
+                          }}
+                        </span>
                         <span>
                           <IconArrowDown />
                         </span>
@@ -464,7 +490,9 @@ onMounted(() => {
                       <div
                         class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                       >
-                        <span class="mr-0.5">上传者</span>
+                        <span class="mr-0.5">
+                          {{ $t("core.attachment.filters.owner.label") }}
+                        </span>
                         <span>
                           <IconArrowDown />
                         </span>
@@ -503,7 +531,9 @@ onMounted(() => {
                       <div
                         class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                       >
-                        <span class="mr-0.5">排序</span>
+                        <span class="mr-0.5">
+                          {{ $t("core.common.filters.labels.sort") }}
+                        </span>
                         <span>
                           <IconArrowDown />
                         </span>
@@ -545,7 +575,7 @@ onMounted(() => {
                         @click="handleFetchAttachments()"
                       >
                         <IconRefreshLine
-                          v-tooltip="`刷新`"
+                          v-tooltip="$t('core.common.buttons.refresh')"
                           :class="{ 'animate-spin text-gray-900': isFetching }"
                           class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                         />
@@ -570,12 +600,14 @@ onMounted(() => {
 
           <Transition v-else-if="!attachments?.length" appear name="fade">
             <VEmpty
-              message="当前分组没有附件，你可以尝试刷新或者上传附件"
-              title="当前分组没有附件"
+              :message="$t('core.attachment.empty.message')"
+              :title="$t('core.attachment.empty.title')"
             >
               <template #actions>
                 <VSpace>
-                  <VButton @click="handleFetchAttachments">刷新</VButton>
+                  <VButton @click="handleFetchAttachments">
+                    {{ $t("core.common.buttons.refresh") }}
+                  </VButton>
                   <VButton
                     v-permission="['system:attachments:manage']"
                     type="secondary"
@@ -584,7 +616,7 @@ onMounted(() => {
                     <template #icon>
                       <IconUpload class="h-full w-full" />
                     </template>
-                    上传附件
+                    {{ $t("core.attachment.empty.actions.upload") }}
                   </VButton>
                 </VSpace>
               </template>
@@ -624,14 +656,18 @@ onMounted(() => {
                           <div
                             class="flex h-full items-center justify-center object-cover"
                           >
-                            <span class="text-xs text-gray-400">加载中...</span>
+                            <span class="text-xs text-gray-400">
+                              {{ $t("core.common.status.loading") }}...
+                            </span>
                           </div>
                         </template>
                         <template #error>
                           <div
                             class="flex h-full items-center justify-center object-cover"
                           >
-                            <span class="text-xs text-red-400">加载异常</span>
+                            <span class="text-xs text-red-400">
+                              {{ $t("core.common.status.loading_error") }}
+                            </span>
                           </div>
                         </template>
                       </LazyImage>
@@ -652,7 +688,7 @@ onMounted(() => {
                       v-if="attachment.metadata.deletionTimestamp"
                       class="absolute top-1 right-1 text-xs text-red-300"
                     >
-                      删除中...
+                      {{ $t("core.common.status.deleting") }}...
                     </div>
 
                     <div
@@ -748,7 +784,7 @@ onMounted(() => {
                       >
                         <template #description>
                           <VStatusDot
-                            v-tooltip="`删除中`"
+                            v-tooltip="$t('core.common.status.deleting')"
                             state="warning"
                             animate
                           />
@@ -780,7 +816,7 @@ onMounted(() => {
                         type="danger"
                         @click="handleDelete(attachment)"
                       >
-                        删除
+                        {{ $t("core.common.buttons.delete") }}
                       </VButton>
                     </template>
                   </VEntity>
@@ -794,6 +830,8 @@ onMounted(() => {
               <VPagination
                 v-model:page="page"
                 v-model:size="size"
+                :page-label="$t('core.components.pagination.page_label')"
+                :size-label="$t('core.components.pagination.size_label')"
                 :total="total"
                 :size-options="[60, 120, 200]"
               />

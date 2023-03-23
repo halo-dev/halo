@@ -56,13 +56,19 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
     <div>
       <div class="flex items-center justify-between bg-white px-4 py-4 sm:px-6">
         <div>
-          <h3 class="text-lg font-medium leading-6 text-gray-900">插件信息</h3>
+          <h3 class="text-lg font-medium leading-6 text-gray-900">
+            {{ $t("core.plugin.detail.header.title") }}
+          </h3>
           <p class="mt-1 flex max-w-2xl items-center gap-2">
-            <span class="text-sm text-gray-500">{{
-              plugin?.spec.version
-            }}</span>
+            <span class="text-sm text-gray-500">
+              {{ plugin?.spec.version }}
+            </span>
             <VTag>
-              {{ isStarted ? "已启用" : "未启用" }}
+              {{
+                isStarted
+                  ? $t("core.common.status.activated")
+                  : $t("core.common.status.not_activated")
+              }}
             </VTag>
           </p>
         </div>
@@ -75,7 +81,9 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
           <div
             class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
           >
-            <dt class="text-sm font-medium text-gray-900">名称</dt>
+            <dt class="text-sm font-medium text-gray-900">
+              {{ $t("core.plugin.detail.fields.display_name") }}
+            </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               {{ plugin?.spec.displayName }}
             </dd>
@@ -83,7 +91,9 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
           <div
             class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
           >
-            <dt class="text-sm font-medium text-gray-900">描述</dt>
+            <dt class="text-sm font-medium text-gray-900">
+              {{ $t("core.plugin.detail.fields.description") }}
+            </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               {{ plugin?.spec.description }}
             </dd>
@@ -91,7 +101,9 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
           <div
             class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
           >
-            <dt class="text-sm font-medium text-gray-900">版本</dt>
+            <dt class="text-sm font-medium text-gray-900">
+              {{ $t("core.plugin.detail.fields.version") }}
+            </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               {{ plugin?.spec.version }}
             </dd>
@@ -99,7 +111,9 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
           <div
             class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
           >
-            <dt class="text-sm font-medium text-gray-900">Halo 版本要求</dt>
+            <dt class="text-sm font-medium text-gray-900">
+              {{ $t("core.plugin.detail.fields.requires") }}
+            </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               {{ plugin?.spec.requires }}
             </dd>
@@ -107,7 +121,9 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
           <div
             class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
           >
-            <dt class="text-sm font-medium text-gray-900">提供方</dt>
+            <dt class="text-sm font-medium text-gray-900">
+              {{ $t("core.plugin.detail.fields.author") }}
+            </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               <a
                 v-if="plugin?.spec.author"
@@ -116,13 +132,17 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
               >
                 {{ plugin?.spec.author.name }}
               </a>
-              <span v-else>无</span>
+              <span v-else>
+                {{ $t("core.common.text.none") }}
+              </span>
             </dd>
           </div>
           <div
             class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
           >
-            <dt class="text-sm font-medium text-gray-900">协议</dt>
+            <dt class="text-sm font-medium text-gray-900">
+              {{ $t("core.plugin.detail.fields.license") }}
+            </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
               <ul
                 v-if="plugin?.spec.license && plugin?.spec.license.length"
@@ -150,7 +170,9 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
           >
             <dt class="text-sm font-medium text-gray-900">模型定义</dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              <span>无</span>
+              <span>
+                {{ $t("core.common.text.none") }}
+              </span>
             </dd>
           </div>
           <div
@@ -159,7 +181,9 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
             }`"
             class="px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
           >
-            <dt class="text-sm font-medium text-gray-900">权限模板</dt>
+            <dt class="text-sm font-medium text-gray-900">
+              {{ $t("core.plugin.detail.fields.role_templates") }}
+            </dt>
             <dd class="mt-1 text-sm text-gray-900 sm:col-span-5 sm:mt-0">
               <dl
                 v-if="pluginRoleTemplateGroups.length"
@@ -195,13 +219,14 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
                               "
                               class="text-xs text-gray-400"
                             >
-                              依赖于
                               {{
-                                JSON.parse(
-                                  role.metadata.annotations?.[
-                                    rbacAnnotations.DEPENDENCIES
-                                  ]
-                                ).join(", ")
+                                $t("core.role.common.text.dependent_on", {
+                                  roles: JSON.parse(
+                                    role.metadata.annotations?.[
+                                      rbacAnnotations.DEPENDENCIES
+                                    ]
+                                  ).join(", "),
+                                })
                               }}
                             </span>
                           </div>
@@ -211,13 +236,17 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
                   </dd>
                 </div>
               </dl>
-              <span v-else>无</span>
+              <span v-else>
+                {{ $t("core.common.text.none") }}
+              </span>
             </dd>
           </div>
           <div
             class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
           >
-            <dt class="text-sm font-medium text-gray-900">最近一次启动</dt>
+            <dt class="text-sm font-medium text-gray-900">
+              {{ $t("core.plugin.detail.fields.last_starttime") }}
+            </dt>
             <dd
               class="mt-1 text-sm tabular-nums text-gray-900 sm:col-span-2 sm:mt-0"
             >
