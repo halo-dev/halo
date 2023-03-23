@@ -94,7 +94,6 @@ axiosInstance.interceptors.response.use(
       const userStore = useUserStore();
       userStore.loginModalVisible = true;
       Toast.warning(i18n.global.t("core.common.toast.login_expired"));
-      localStorage.removeItem("logged_in");
     } else if (status === 403) {
       Toast.error(i18n.global.t("core.common.toast.forbidden"));
     } else if (status === 404) {
