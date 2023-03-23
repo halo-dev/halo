@@ -9,7 +9,7 @@ import { apiClient } from "@/utils/api-client";
 // setup
 import "./setup/setupStyles";
 import { setupComponents } from "./setup/setupComponents";
-import { setupI18n, i18n } from "./setup/setupI18n";
+import { setupI18n, i18n, getBrowserLanguage } from "./locales";
 // core modules
 import { coreModules } from "./modules";
 import { useScriptTag } from "@vueuse/core";
@@ -245,9 +245,10 @@ async function initApp() {
     await userStore.fetchCurrentUser();
 
     // set locale
+    // @ts-ignore
     i18n.global.locale.value =
       userStore.currentUser?.metadata.annotations?.["locale"] ||
-      navigator.language;
+      getBrowserLanguage();
 
     if (userStore.isAnonymous) {
       return;

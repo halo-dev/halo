@@ -32,7 +32,7 @@ export const sharedPlugins = [
     disable: true,
   }),
   VueI18nPlugin({
-    include: [path.resolve(__dirname, "./src/locales/**")],
+    include: [path.resolve(__dirname, "./src/locales/*.yaml")],
   }),
 ];
 
