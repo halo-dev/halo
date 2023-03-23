@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Constant;
-import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -29,7 +29,7 @@ public class CategoryPermalinkPolicy implements PermalinkPolicy<Category> {
 
     @Override
     public String permalink(Category category) {
-        Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(category);
+        Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(category);
         String permalinkPrefix =
             annotations.getOrDefault(Constant.PERMALINK_PATTERN_ANNO, DEFAULT_PERMALINK_PREFIX);
         String slug = encode(category.getSpec().getSlug(), StandardCharsets.UTF_8);

@@ -20,7 +20,7 @@ import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.RoleBinding.RoleRef;
 import run.halo.app.core.extension.RoleBinding.Subject;
-import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -104,7 +104,7 @@ public class DefaultRoleService implements RoleService {
                     return Flux.empty();
                 }
                 visited.add(name);
-                var annotations = ExtensionUtil.nullSafeAnnotations(role);
+                var annotations = MetadataUtil.nullSafeAnnotations(role);
                 var dependenciesJson = annotations.get(Role.ROLE_DEPENDENCIES_ANNO);
                 var dependencies = stringToList(dependenciesJson);
                 return Flux.fromIterable(dependencies)

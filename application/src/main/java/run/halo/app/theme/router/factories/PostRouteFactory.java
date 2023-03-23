@@ -29,9 +29,9 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
@@ -119,7 +119,7 @@ public class PostRouteFactory implements RouteFactory {
     Mono<PostVo> bestMatchPost(PostPatternVariable variable) {
         return postsByPredicates(variable)
             .filter(post -> {
-                Map<String, String> labels = ExtensionUtil.nullSafeLabels(post);
+                Map<String, String> labels = MetadataUtil.nullSafeLabels(post);
                 return matchIfPresent(variable.getName(), post.getMetadata().getName())
                     && matchIfPresent(variable.getSlug(), post.getSpec().getSlug())
                     && matchIfPresent(variable.getYear(), labels.get(Post.ARCHIVE_YEAR_LABEL))

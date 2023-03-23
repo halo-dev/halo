@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Post;
-import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
@@ -57,7 +57,7 @@ public class StatsEndpoint implements CustomEndpoint {
             })
             .flatMap(stats -> client.list(User.class,
                     user -> {
-                        var labels = ExtensionUtil.nullSafeLabels(user);
+                        var labels = MetadataUtil.nullSafeLabels(user);
                         return user.getMetadata().getDeletionTimestamp() == null
                             && !parseBoolean(labels.getOrDefault(User.HIDDEN_USER_LABEL, "false"));
                     },

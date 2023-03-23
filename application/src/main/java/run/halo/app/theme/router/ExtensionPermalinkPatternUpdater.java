@@ -14,8 +14,8 @@ import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.MetadataOperator;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.theme.DefaultTemplateEnum;
 
 /**
@@ -57,7 +57,7 @@ public class ExtensionPermalinkPatternUpdater
     }
 
     private void updateIfPermalinkPatternChanged(AbstractExtension extension, String pattern) {
-        Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(extension);
+        Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(extension);
         String oldPattern = annotations.get(Constant.PERMALINK_PATTERN_ANNO);
         annotations.put(Constant.PERMALINK_PATTERN_ANNO, pattern);
 

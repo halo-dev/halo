@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriUtils;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Tag;
-import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -27,7 +27,7 @@ public class TagPermalinkPolicy implements PermalinkPolicy<Tag> {
 
     @Override
     public String permalink(Tag tag) {
-        Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(tag);
+        Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(tag);
         String permalinkPrefix =
             annotations.getOrDefault(Constant.PERMALINK_PATTERN_ANNO, DEFAULT_PERMALINK_PREFIX);
 

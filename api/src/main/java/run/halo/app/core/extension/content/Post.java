@@ -13,10 +13,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataOperator;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.infra.ConditionList;
 
 /**
@@ -271,7 +271,7 @@ public class Post extends AbstractExtension {
     }
 
     public static void changePublishedState(Post post, boolean value) {
-        Map<String, String> labels = ExtensionUtil.nullSafeLabels(post);
+        Map<String, String> labels = MetadataUtil.nullSafeLabels(post);
         labels.put(PUBLISHED_LABEL, String.valueOf(value));
     }
 }

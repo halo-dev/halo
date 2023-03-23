@@ -40,9 +40,9 @@ import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.theme.SettingUtils;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
@@ -185,7 +185,7 @@ public class PluginReconciler implements Reconciler<Request> {
         Optional<Setting> settingOption = lookupPluginSetting(pluginName, settingName)
             .map(setting -> {
                 // This annotation is added to prevent it from being deleted when stopped.
-                Map<String, String> settingAnnotations = ExtensionUtil.nullSafeAnnotations(setting);
+                Map<String, String> settingAnnotations = MetadataUtil.nullSafeAnnotations(setting);
                 settingAnnotations.put(DELETE_STAGE, PluginConst.DeleteStage.UNINSTALL.name());
                 return setting;
             })

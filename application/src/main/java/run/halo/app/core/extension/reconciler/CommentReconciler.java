@@ -17,8 +17,8 @@ import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.controller.Controller;
@@ -124,7 +124,7 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
 
     private void updateUnReplyCountIfNecessary(Comment comment) {
         Instant lastReadTime = comment.getSpec().getLastReadTime();
-        Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(comment);
+        Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(comment);
         String lastReadTimeAnno = annotations.get(Constant.LAST_READ_TIME_ANNO);
         if (lastReadTime != null && lastReadTime.toString().equals(lastReadTimeAnno)) {
             return;

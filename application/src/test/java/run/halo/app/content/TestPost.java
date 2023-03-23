@@ -4,9 +4,9 @@ import java.time.Instant;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.extension.AbstractExtension;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.MetadataUtil;
 
 /**
  * @author guqing
@@ -40,7 +40,7 @@ public class TestPost {
         metadata.setName("snapshot-A");
         metadata.setCreationTimestamp(Instant.now());
         snapshot.setMetadata(metadata);
-        ExtensionUtil.nullSafeAnnotations(snapshot).put(Snapshot.KEEP_RAW_ANNO, "true");
+        MetadataUtil.nullSafeAnnotations(snapshot).put(Snapshot.KEEP_RAW_ANNO, "true");
         Snapshot.SnapShotSpec spec = new Snapshot.SnapShotSpec();
         snapshot.setSpec(spec);
 

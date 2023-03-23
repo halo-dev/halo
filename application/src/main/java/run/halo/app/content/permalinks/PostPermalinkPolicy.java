@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
-import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
@@ -36,7 +36,7 @@ public class PostPermalinkPolicy implements PermalinkPolicy<Post> {
 
     @Override
     public String permalink(Post post) {
-        Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(post);
+        Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(post);
         String permalinkPattern =
             annotations.getOrDefault(Constant.PERMALINK_PATTERN_ANNO, DEFAULT_PERMALINK_PATTERN);
         return createPermalink(post, permalinkPattern);

@@ -20,7 +20,7 @@ import org.springframework.context.ApplicationContext;
 import run.halo.app.content.TestPost;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
-import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.utils.PathUtils;
@@ -55,7 +55,7 @@ class PostPermalinkPolicyTest {
     @Test
     void permalink() {
         Post post = TestPost.postV1();
-        Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(post);
+        Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(post);
         annotations.put(Constant.PERMALINK_PATTERN_ANNO, "/{year}/{month}/{day}/{slug}");
         post.getMetadata().setName("test-post");
         post.getSpec().setSlug("test-post-slug");
@@ -96,7 +96,7 @@ class PostPermalinkPolicyTest {
     @Test
     void permalinkWithExternalUrl() {
         Post post = TestPost.postV1();
-        Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(post);
+        Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(post);
         annotations.put(Constant.PERMALINK_PATTERN_ANNO, "/{year}/{month}/{day}/{slug}");
         post.getMetadata().setName("test-post");
         post.getSpec().setSlug("test-post-slug");

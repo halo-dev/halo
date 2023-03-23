@@ -28,8 +28,8 @@ import run.halo.app.content.SinglePageRequest;
 import run.halo.app.content.SinglePageService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.QueryParamBuildUtil;
 
@@ -210,7 +210,7 @@ public class SinglePageEndpoint implements CustomEndpoint {
                 return client.fetch(SinglePage.class, name)
                     .map(latest -> {
                         String latestReleasedSnapshotName =
-                            ExtensionUtil.nullSafeAnnotations(latest)
+                            MetadataUtil.nullSafeAnnotations(latest)
                                 .get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
                         if (StringUtils.equals(latestReleasedSnapshotName,
                             latest.getSpec().getReleaseSnapshot())) {

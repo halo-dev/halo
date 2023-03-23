@@ -32,8 +32,8 @@ import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.event.post.PostRecycledEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.QueryParamBuildUtil;
 
@@ -241,7 +241,7 @@ public class PostEndpoint implements CustomEndpoint {
     private Mono<Post> awaitPostPublished(String postName) {
         return Mono.defer(() -> client.get(Post.class, postName)
                 .filter(post -> {
-                    var releasedSnapshot = ExtensionUtil.nullSafeAnnotations(post)
+                    var releasedSnapshot = MetadataUtil.nullSafeAnnotations(post)
                         .get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
                     var expectReleaseSnapshot = post.getSpec().getReleaseSnapshot();
                     return Objects.equals(releasedSnapshot, expectReleaseSnapshot);

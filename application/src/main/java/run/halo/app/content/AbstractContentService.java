@@ -11,7 +11,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Snapshot;
-import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
@@ -30,17 +30,18 @@ public abstract class AbstractContentService {
             .doOnNext(this::checkBaseSnapshot)
             .flatMap(baseSnapshot -> {
                 if (StringUtils.equals(snapshotName, baseSnapshotName)) {
-                    return Mono.just(baseSnapshot.applyPatch(baseSnapshot));
+                    var contentWrapper = ContentWrapper.patchSnapshot(baseSnapshot, baseSnapshot);
+                    return Mono.just(contentWrapper);
                 }
                 return client.fetch(Snapshot.class, snapshotName)
-                    .map(snapshot -> snapshot.applyPatch(baseSnapshot));
+                    .map(snapshot -> ContentWrapper.patchSnapshot(snapshot, baseSnapshot));
             });
     }
 
     protected void checkBaseSnapshot(Snapshot snapshot) {
         Assert.notNull(snapshot, "The snapshot must not be null.");
         String keepRawAnno =
-            ExtensionUtil.nullSafeAnnotations(snapshot).get(Snapshot.KEEP_RAW_ANNO);
+            MetadataUtil.nullSafeAnnotations(snapshot).get(Snapshot.KEEP_RAW_ANNO);
         if (!org.thymeleaf.util.StringUtils.equals(Boolean.TRUE.toString(), keepRawAnno)) {
             throw new IllegalArgumentException(
                 String.format("The snapshot [%s] is not a base snapshot.",
@@ -104,7 +105,7 @@ public abstract class AbstractContentService {
     protected Mono<ContentWrapper> restoredContent(String baseSnapshotName, Snapshot headSnapshot) {
         return client.fetch(Snapshot.class, baseSnapshotName)
             .doOnNext(this::checkBaseSnapshot)
-            .map(headSnapshot::applyPatch);
+            .map(baseSnapshot -> ContentWrapper.patchSnapshot(headSnapshot, baseSnapshot));
     }
 
     protected Snapshot determineRawAndContentPatch(Snapshot snapshotToUse, Snapshot baseSnapshot,
@@ -122,7 +123,7 @@ public abstract class AbstractContentService {
             snapshotToUse.getMetadata().getName())) {
             snapshotToUse.getSpec().setRawPatch(contentRequest.raw());
             snapshotToUse.getSpec().setContentPatch(contentRequest.content());
-            ExtensionUtil.nullSafeAnnotations(snapshotToUse)
+            MetadataUtil.nullSafeAnnotations(snapshotToUse)
                 .put(Snapshot.KEEP_RAW_ANNO, Boolean.TRUE.toString());
         } else {
             // otherwise diff a patch based on the v1 snapshot

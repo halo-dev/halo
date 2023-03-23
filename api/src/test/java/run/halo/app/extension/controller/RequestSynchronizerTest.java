@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static run.halo.app.extension.FakeExtension.createFake;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -46,7 +45,7 @@ class RequestSynchronizerTest {
     @Test
     void shouldStartCorrectlyWhenSyncingAllOnStart() {
         when(client.list(same(FakeExtension.class), any(), any())).thenReturn(
-            List.of(createFake("fake-01"), createFake("fake-02")));
+            List.of(FakeExtension.createFake("fake-01"), FakeExtension.createFake("fake-02")));
 
         synchronizer.start();
 

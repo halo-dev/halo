@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Role;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
@@ -33,7 +33,7 @@ public class RoleReconciler implements Reconciler<Request> {
     public Result reconcile(Request request) {
         client.fetch(Role.class, request.name())
             .ifPresent(role -> {
-                Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(role);
+                Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(role);
                 // override dependency rules to annotations
                 annotations.put(Role.ROLE_DEPENDENCY_RULES, "[]");
                 annotations.put(Role.UI_PERMISSIONS_AGGREGATED_ANNO, "[]");

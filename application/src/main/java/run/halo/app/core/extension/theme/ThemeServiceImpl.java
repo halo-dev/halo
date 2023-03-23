@@ -35,7 +35,7 @@ import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
-import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.SystemVersionSupplier;
@@ -277,7 +277,7 @@ public class ThemeServiceImpl implements ThemeService {
     private Mono<Void> waitForAnnotationSettingsDeleted(String themeName) {
         return client.list(AnnotationSetting.class,
                 annotationSetting -> {
-                    Map<String, String> labels = ExtensionUtil.nullSafeLabels(annotationSetting);
+                    Map<String, String> labels = MetadataUtil.nullSafeLabels(annotationSetting);
                     return StringUtils.equals(themeName, labels.get(Theme.THEME_NAME_LABEL));
                 }, null)
             .flatMap(annotationSetting -> client.delete(annotationSetting)

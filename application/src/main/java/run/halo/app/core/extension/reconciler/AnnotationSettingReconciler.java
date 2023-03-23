@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 import org.thymeleaf.util.StringUtils;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupKind;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
@@ -32,7 +32,7 @@ public class AnnotationSettingReconciler implements Reconciler<Reconciler.Reques
 
     private void populateDefaultLabels(String name) {
         client.fetch(AnnotationSetting.class, name).ifPresent(annotationSetting -> {
-            Map<String, String> labels = ExtensionUtil.nullSafeLabels(annotationSetting);
+            Map<String, String> labels = MetadataUtil.nullSafeLabels(annotationSetting);
             String oldTargetRef = labels.get(AnnotationSetting.TARGET_REF_LABEL);
 
             GroupKind targetRef = annotationSetting.getSpec().getTargetRef();

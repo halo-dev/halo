@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.extension.Watcher;
 import run.halo.app.extension.controller.RequestSynchronizer;
@@ -62,7 +62,7 @@ public class PostIndexInformer implements ApplicationListener<SchemeInitializedE
 
     private DefaultIndexer.IndexFunc<Post> labelIndexFunc() {
         return post -> {
-            Map<String, String> labels = ExtensionUtil.nullSafeLabels(post);
+            Map<String, String> labels = MetadataUtil.nullSafeLabels(post);
             Set<String> indexKeys = new HashSet<>();
             for (Map.Entry<String, String> entry : labels.entrySet()) {
                 indexKeys.add(labelKey(entry.getKey(), entry.getValue()));

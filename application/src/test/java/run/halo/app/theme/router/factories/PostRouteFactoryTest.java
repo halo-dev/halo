@@ -19,8 +19,8 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.TestPost;
 import run.halo.app.core.extension.content.Post;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
@@ -52,7 +52,7 @@ class PostRouteFactoryTest extends RouteFactoryTestSuite {
     @Test
     void create() {
         Post post = TestPost.postV1();
-        Map<String, String> labels = ExtensionUtil.nullSafeLabels(post);
+        Map<String, String> labels = MetadataUtil.nullSafeLabels(post);
         labels.put(Post.PUBLISHED_LABEL, "true");
         post.getMetadata().setName("fake-name");
         post.getSpec().setDeleted(false);

@@ -23,7 +23,7 @@ import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
-import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
@@ -111,7 +111,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
         client.fetch(Post.class, name)
             .filter(post -> Objects.equals(true, post.getSpec().getPublish()))
             .ifPresent(post -> {
-                Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(post);
+                Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(post);
                 String lastReleasedSnapshot = annotations.get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
                 String releaseSnapshot = post.getSpec().getReleaseSnapshot();
                 if (StringUtils.isBlank(releaseSnapshot)) {
@@ -225,7 +225,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             Post.PostSpec spec = post.getSpec();
 
             // handle logic delete
-            Map<String, String> labels = ExtensionUtil.nullSafeLabels(post);
+            Map<String, String> labels = MetadataUtil.nullSafeLabels(post);
             if (Objects.equals(spec.getDeleted(), true)) {
                 labels.put(Post.DELETED_LABEL, Boolean.TRUE.toString());
             } else {
@@ -244,7 +244,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 labels.put(Post.PUBLISHED_LABEL, Boolean.FALSE.toString());
             }
 
-            Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(post);
+            Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(post);
             String newPattern = postPermalinkPolicy.pattern();
             annotations.put(Constant.PERMALINK_PATTERN_ANNO, newPattern);
 

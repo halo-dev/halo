@@ -48,8 +48,8 @@ import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Comparators;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.infra.utils.JsonUtils;
@@ -214,7 +214,7 @@ public class UserEndpoint implements CustomEndpoint {
 
     Set<String> roleNames(User user) {
         Assert.notNull(user, "User must not be null");
-        Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(user);
+        Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(user);
         String roleNamesJson = annotations.get(User.ROLE_NAMES_ANNO);
         if (StringUtils.isBlank(roleNamesJson)) {
             return Set.of();
@@ -274,7 +274,7 @@ public class UserEndpoint implements CustomEndpoint {
             .collectList()
             .flatMapMany(roleNames -> roleService.listDependenciesFlux(Set.copyOf(roleNames)))
             .map(role -> {
-                Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(role);
+                Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(role);
                 String uiPermissionStr = annotations.get(Role.UI_PERMISSIONS_ANNO);
                 if (StringUtils.isBlank(uiPermissionStr)) {
                     return new HashSet<String>();

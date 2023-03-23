@@ -20,7 +20,7 @@ import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
@@ -68,7 +68,7 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
 
     void reconcileMetadata(String name) {
         client.fetch(Category.class, name).ifPresent(category -> {
-            Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(category);
+            Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(category);
             String oldPermalinkPattern = annotations.get(Constant.PERMALINK_PATTERN_ANNO);
 
             String newPattern = categoryPermalinkPolicy.pattern();

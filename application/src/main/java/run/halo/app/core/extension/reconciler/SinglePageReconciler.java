@@ -23,7 +23,7 @@ import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
-import run.halo.app.extension.ExtensionUtil;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
@@ -107,7 +107,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         client.fetch(SinglePage.class, name)
             .filter(page -> Objects.equals(true, page.getSpec().getPublish()))
             .ifPresent(page -> {
-                Map<String, String> annotations = ExtensionUtil.nullSafeAnnotations(page);
+                Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(page);
                 String lastReleasedSnapshot = annotations.get(Post.LAST_RELEASED_SNAPSHOT_ANNO);
                 String releaseSnapshot = page.getSpec().getReleaseSnapshot();
                 if (StringUtils.isBlank(releaseSnapshot)) {
@@ -263,7 +263,7 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
             SinglePage.SinglePageSpec spec = singlePage.getSpec();
             // handle logic delete
-            Map<String, String> labels = ExtensionUtil.nullSafeLabels(singlePage);
+            Map<String, String> labels = MetadataUtil.nullSafeLabels(singlePage);
             if (isDeleted(singlePage)) {
                 labels.put(SinglePage.DELETED_LABEL, Boolean.TRUE.toString());
             } else {

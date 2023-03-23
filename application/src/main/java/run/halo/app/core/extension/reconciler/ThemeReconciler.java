@@ -20,8 +20,8 @@ import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.theme.SettingUtils;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
@@ -226,7 +226,7 @@ public class ThemeReconciler implements Reconciler<Request> {
 
     private List<AnnotationSetting> listAnnotationSettingsByThemeName(String themeName) {
         return client.list(AnnotationSetting.class, annotationSetting -> {
-            Map<String, String> labels = ExtensionUtil.nullSafeLabels(annotationSetting);
+            Map<String, String> labels = MetadataUtil.nullSafeLabels(annotationSetting);
             return themeName.equals(labels.get(Theme.THEME_NAME_LABEL));
         }, null);
     }

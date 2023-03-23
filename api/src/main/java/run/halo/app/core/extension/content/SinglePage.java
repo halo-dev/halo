@@ -9,9 +9,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import run.halo.app.extension.AbstractExtension;
-import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.GVK;
 import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.extension.MetadataUtil;
 
 /**
  * <p>Single page extension.</p>
@@ -112,7 +112,7 @@ public class SinglePage extends AbstractExtension {
     }
 
     public static void changePublishedState(SinglePage page, boolean value) {
-        Map<String, String> labels = ExtensionUtil.nullSafeLabels(page);
+        Map<String, String> labels = MetadataUtil.nullSafeLabels(page);
         labels.put(PUBLISHED_LABEL, String.valueOf(value));
     }
 }
