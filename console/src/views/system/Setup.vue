@@ -21,8 +21,10 @@ import type {
 } from "@halo-dev/api-client";
 import { useThemeStore } from "@/stores/theme";
 import { useMutation } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const router = useRouter();
+const { t } = useI18n();
 
 const {
   configMapFormData,
@@ -142,7 +144,7 @@ const handleSubmit = async () => {
 
   router.push({ name: "Dashboard" });
 
-  Toast.success("初始化成功");
+  Toast.success(t("core.setup.operations.submit.toast_success"));
 };
 
 onMounted(async () => {
@@ -173,10 +175,10 @@ onMounted(async () => {
         <FormKit
           v-model="siteTitle"
           :validation-messages="{
-            required: '请输入站点名称',
+            required: $t('core.setup.fields.site_title.validation'),
           }"
           type="text"
-          placeholder="站点名称"
+          :placeholder="$t('core.setup.fields.site_title.placeholder')"
           validation="required|length:0,100"
         ></FormKit>
       </FormKit>
@@ -186,7 +188,7 @@ onMounted(async () => {
         :loading="loading"
         @click="$formkit.submit('setup-form')"
       >
-        初始化
+        {{ $t("core.setup.operations.submit.button") }}
       </VButton>
     </div>
   </div>

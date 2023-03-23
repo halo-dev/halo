@@ -1,0 +1,81 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id "io.freefair.lombok" version "8.0.0-rc2"
+}
+
+group = 'run.halo.app'
+description = 'API of halo project, connecting by other projects.'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api platform(project(':platform:application'))
+
+    api 'org.springframework.boot:spring-boot-starter-actuator'
+    api 'org.springframework.boot:spring-boot-starter-data-jpa'
+    api 'org.springframework.boot:spring-boot-starter-mail'
+    api 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    api 'org.springframework.boot:spring-boot-starter-webflux'
+    api 'org.springframework.boot:spring-boot-starter-validation'
+    api 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+
+    // Spring Security
+    api 'org.springframework.boot:spring-boot-starter-security'
+    api 'org.springframework.security:spring-security-oauth2-jose'
+    api 'org.springframework.security:spring-security-oauth2-client'
+    api 'org.springframework.security:spring-security-oauth2-resource-server'
+
+    api "org.springdoc:springdoc-openapi-starter-webflux-ui"
+    api 'org.openapi4j:openapi-schema-validator'
+    api "net.bytebuddy:byte-buddy"
+
+    // Apache Lucene
+    api "org.apache.lucene:lucene-core"
+    api "org.apache.lucene:lucene-queryparser"
+    api "org.apache.lucene:lucene-highlighter"
+    api "org.apache.lucene:lucene-backward-codecs"
+    api 'cn.shenyanchao.ik-analyzer:ik-analyzer'
+
+    api "org.apache.commons:commons-lang3"
+    api "io.seruco.encoding:base62"
+    api "org.pf4j:pf4j"
+    api "com.google.guava:guava"
+    api "org.jsoup:jsoup"
+    api "io.github.java-diff-utils:java-diff-utils"
+    api "org.springframework.integration:spring-integration-core"
+    api "com.github.java-json-tools:json-patch"
+    api "org.thymeleaf.extras:thymeleaf-extras-springsecurity6"
+
+    runtimeOnly 'io.r2dbc:r2dbc-h2'
+    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'org.postgresql:r2dbc-postgresql'
+    runtimeOnly 'org.mariadb:r2dbc-mariadb'
+    runtimeOnly 'com.github.jasync-sql:jasync-r2dbc-mysql'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'io.projectreactor:reactor-test'
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        library(MavenPublication) {
+            from components.java
+        }
+    }
+    repositories {
+        mavenLocal()
+    }
+}

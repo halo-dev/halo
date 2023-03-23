@@ -7,6 +7,7 @@ interface ContentCache {
   content?: string;
 }
 import debounce from "lodash.debounce";
+import { useI18n } from "vue-i18n";
 
 interface useContentCacheReturn {
   handleResetCache: () => void;
@@ -20,6 +21,7 @@ export function useContentCache(
   raw: Ref<string | undefined>
 ): useContentCacheReturn {
   const content_caches = useLocalStorage<ContentCache[]>(key, []);
+  const { t } = useI18n();
 
   const handleResetCache = () => {
     if (name) {
@@ -27,7 +29,7 @@ export function useContentCache(
         (c: ContentCache) => c.name === name
       );
       if (cache) {
-        Toast.info("已从缓存中恢复未保存的内容");
+        Toast.info(t("core.composables.content_cache.toast_recovered"));
         raw.value = cache.content;
       }
     } else {
@@ -35,7 +37,7 @@ export function useContentCache(
         (c: ContentCache) => c.name === "" && c.content
       );
       if (cache) {
-        Toast.info("已从缓存中恢复未保存的内容");
+        Toast.info(t("core.composables.content_cache.toast_recovered"));
         raw.value = cache.content;
       }
     }

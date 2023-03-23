@@ -2,5 +2,5 @@
 import Exception from "./components/Exception.vue";
 </script>
 <template>
-  <Exception code="403" message="没有权限访问此页面" />
+  <Exception code="403" :message="$t('core.exception.forbidden.message')" />
 </template>

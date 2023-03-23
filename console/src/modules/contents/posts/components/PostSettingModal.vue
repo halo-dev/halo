@@ -18,6 +18,7 @@ import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { submitForm } from "@formkit/core";
 import useSlugify from "@/composables/use-slugify";
 import { useMutation } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const initialFormState: Post = {
   spec: {
@@ -68,6 +69,8 @@ const emit = defineEmits<{
   (event: "saved", post: Post): void;
   (event: "published", post: Post): void;
 }>();
+
+const { t } = useI18n();
 
 const formState = ref<Post>(cloneDeep(initialFormState));
 const saving = ref(false);
@@ -146,7 +149,7 @@ const { mutateAsync: postUpdateMutate } = useMutation({
   retry: 3,
   onError: (error) => {
     console.error("Failed to update post", error);
-    Toast.error(`服务器内部错误`);
+    Toast.error(t("core.common.toast.server_internal_error"));
   },
 });
 
@@ -185,7 +188,7 @@ const handleSave = async () => {
 
     handleVisibleChange(false);
 
-    Toast.success("保存成功");
+    Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
     console.error("Failed to save post", e);
   } finally {
@@ -212,7 +215,7 @@ const handlePublish = async () => {
 
     handleVisibleChange(false);
 
-    Toast.success("发布成功");
+    Toast.success(t("core.common.toast.publish_success"));
   } catch (e) {
     console.error("Failed to publish post", e);
   } finally {
@@ -230,7 +233,7 @@ const handleUnpublish = async () => {
 
     handleVisibleChange(false);
 
-    Toast.success("取消发布成功");
+    Toast.success(t("core.common.toast.cancel_publish_success"));
   } catch (e) {
     console.error("Failed to publish post", e);
   } finally {
@@ -280,7 +283,7 @@ const { handleGenerateSlug } = useSlugify(
   <VModal
     :visible="visible"
     :width="700"
-    title="文章设置"
+    :title="$t('core.post.settings.title')"
     :centered="false"
     @update:visible="handleVisibleChange"
   >
@@ -300,29 +303,31 @@ const { handleGenerateSlug } = useSlugify(
           <div class="md:col-span-1">
             <div class="sticky top-0">
               <span class="text-base font-medium text-gray-900">
-                常规设置
+                {{ $t("core.post.settings.groups.general") }}
               </span>
             </div>
           </div>
           <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
             <FormKit
               v-model="formState.spec.title"
-              label="标题"
+              :label="$t('core.post.settings.fields.title.label')"
               type="text"
               name="title"
               validation="required|length:0,100"
             ></FormKit>
             <FormKit
               v-model="formState.spec.slug"
-              label="别名"
+              :label="$t('core.post.settings.fields.slug.label')"
               name="slug"
               type="text"
               validation="required|length:0,100"
-              help="通常用于生成文章的固定链接"
+              :help="$t('core.post.settings.fields.slug.help')"
             >
               <template #suffix>
                 <div
-                  v-tooltip="'根据标题重新生成别名'"
+                  v-tooltip="
+                    $t('core.post.settings.fields.slug.refresh_message')
+                  "
                   class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
                   @click="handleGenerateSlug"
                 >
@@ -334,14 +339,14 @@ const { handleGenerateSlug } = useSlugify(
             </FormKit>
             <FormKit
               v-model="formState.spec.categories"
-              label="分类目录"
+              :label="$t('core.post.settings.fields.categories.label')"
               name="categories"
               type="categorySelect"
               :multiple="true"
             />
             <FormKit
               v-model="formState.spec.tags"
-              label="标签"
+              :label="$t('core.post.settings.fields.tags.label')"
               name="tags"
               type="tagSelect"
               :multiple="true"
@@ -349,18 +354,20 @@ const { handleGenerateSlug } = useSlugify(
             <FormKit
               v-model="formState.spec.excerpt.autoGenerate"
               :options="[
-                { label: '是', value: true },
-                { label: '否', value: false },
+                { label: $t('core.common.radio.yes'), value: true },
+                { label: $t('core.common.radio.no'), value: false },
               ]"
               name="autoGenerate"
-              label="自动生成摘要"
+              :label="
+                $t('core.post.settings.fields.auto_generate_excerpt.label')
+              "
               type="radio"
             >
             </FormKit>
             <FormKit
               v-if="!formState.spec.excerpt.autoGenerate"
               v-model="formState.spec.excerpt.raw"
-              label="自定义摘要"
+              :label="$t('core.post.settings.fields.raw_excerpt.label')"
               name="raw"
               type="textarea"
               :rows="5"
@@ -377,7 +384,7 @@ const { handleGenerateSlug } = useSlugify(
           <div class="md:col-span-1">
             <div class="sticky top-0">
               <span class="text-base font-medium text-gray-900">
-                高级设置
+                {{ $t("core.post.settings.groups.advanced") }}
               </span>
             </div>
           </div>
@@ -385,49 +392,52 @@ const { handleGenerateSlug } = useSlugify(
             <FormKit
               v-model="formState.spec.allowComment"
               :options="[
-                { label: '是', value: true },
-                { label: '否', value: false },
+                { label: $t('core.common.radio.yes'), value: true },
+                { label: $t('core.common.radio.no'), value: false },
               ]"
-              label="允许评论"
+              :label="$t('core.post.settings.fields.allow_comment.label')"
               type="radio"
             ></FormKit>
             <FormKit
               v-model="formState.spec.pinned"
               :options="[
-                { label: '是', value: true },
-                { label: '否', value: false },
+                { label: $t('core.common.radio.yes'), value: true },
+                { label: $t('core.common.radio.no'), value: false },
               ]"
-              label="是否置顶"
+              :label="$t('core.post.settings.fields.pinned.label')"
               name="pinned"
               type="radio"
             ></FormKit>
             <FormKit
               v-model="formState.spec.visible"
               :options="[
-                { label: '公开', value: 'PUBLIC' },
-                { label: '私有', value: 'PRIVATE' },
+                { label: $t('core.common.select.public'), value: 'PUBLIC' },
+                {
+                  label: $t('core.common.select.private'),
+                  value: 'PRIVATE',
+                },
               ]"
-              label="可见性"
+              :label="$t('core.post.settings.fields.visible.label')"
               name="visible"
               type="select"
             ></FormKit>
             <FormKit
               :model-value="publishTime"
-              label="发表时间"
+              :label="$t('core.post.settings.fields.publish_time.label')"
               type="datetime-local"
               @input="onPublishTimeChange"
             ></FormKit>
             <FormKit
               v-model="formState.spec.template"
               :options="templates"
-              label="自定义模板"
+              :label="$t('core.post.settings.fields.template.label')"
               name="template"
               type="select"
             ></FormKit>
             <FormKit
               v-model="formState.spec.cover"
               name="cover"
-              label="封面图"
+              :label="$t('core.post.settings.fields.cover.label')"
               type="attachment"
               validation="length:0,1024"
             ></FormKit>
@@ -443,7 +453,9 @@ const { handleGenerateSlug } = useSlugify(
     <div class="md:grid md:grid-cols-4 md:gap-6">
       <div class="md:col-span-1">
         <div class="sticky top-0">
-          <span class="text-base font-medium text-gray-900"> 元数据 </span>
+          <span class="text-base font-medium text-gray-900">
+            {{ $t("core.post.settings.groups.annotations") }}
+          </span>
         </div>
       </div>
       <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
@@ -466,7 +478,7 @@ const { handleGenerateSlug } = useSlugify(
             type="secondary"
             @click="handlePublishClick()"
           >
-            发布
+            {{ $t("core.common.buttons.publish") }}
           </VButton>
           <VButton
             v-else
@@ -474,14 +486,14 @@ const { handleGenerateSlug } = useSlugify(
             type="danger"
             @click="handleUnpublish()"
           >
-            取消发布
+            {{ $t("core.common.buttons.cancel_publish") }}
           </VButton>
         </template>
         <VButton :loading="saving" type="secondary" @click="handleSaveClick()">
-          保存
+          {{ $t("core.common.buttons.save") }}
         </VButton>
         <VButton type="default" @click="handleVisibleChange(false)">
-          关闭
+          {{ $t("core.common.buttons.close") }}
         </VButton>
       </VSpace>
     </template>

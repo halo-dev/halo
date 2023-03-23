@@ -78,22 +78,24 @@ const handleOpenDetail = (attachment: Attachment) => {
       <template #icon>
         <IconUpload class="h-full w-full" />
       </template>
-      上传
+      {{ $t("core.common.buttons.upload") }}
     </VButton>
   </div>
   <VEmpty
     v-if="!attachments?.length && !isLoading"
-    message="当前没有附件，你可以尝试刷新或者上传附件"
-    title="当前没有附件"
+    :message="$t('core.attachment.empty.message')"
+    :title="$t('core.attachment.empty.title')"
   >
     <template #actions>
       <VSpace>
-        <VButton @click="handleFetchAttachments">刷新</VButton>
+        <VButton @click="handleFetchAttachments">
+          {{ $t("core.common.buttons.refresh") }}
+        </VButton>
         <VButton type="secondary" @click="uploadVisible = true">
           <template #icon>
             <IconUpload class="h-full w-full" />
           </template>
-          上传附件
+          {{ $t("core.attachment.empty.actions.upload") }}
         </VButton>
       </VSpace>
     </template>
@@ -126,12 +128,16 @@ const handleOpenDetail = (attachment: Attachment) => {
           >
             <template #loading>
               <div class="flex h-full items-center justify-center object-cover">
-                <span class="text-xs text-gray-400">加载中...</span>
+                <span class="text-xs text-gray-400">
+                  {{ $t("core.common.status.loading") }}...
+                </span>
               </div>
             </template>
             <template #error>
               <div class="flex h-full items-center justify-center object-cover">
-                <span class="text-xs text-red-400">加载异常</span>
+                <span class="text-xs text-red-400">
+                  {{ $t("core.common.status.loading_error") }}
+                </span>
               </div>
             </template>
           </LazyImage>
@@ -168,6 +174,8 @@ const handleOpenDetail = (attachment: Attachment) => {
     <VPagination
       v-model:page="page"
       v-model:size="size"
+      :page-label="$t('core.components.pagination.page_label')"
+      :size-label="$t('core.components.pagination.size_label')"
       :total="total"
       :size-options="[60, 120, 200]"
     />

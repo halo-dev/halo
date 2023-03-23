@@ -17,14 +17,16 @@ import UserEditingModal from "../components/UserEditingModal.vue";
 import UserPasswordChangeModal from "../components/UserPasswordChangeModal.vue";
 import { usePermission } from "@/utils/permission";
 import { useUserStore } from "@/stores/user";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
 const userStore = useUserStore();
+const { t } = useI18n();
 
 const tabs = [
   {
     id: "detail",
-    label: "详情",
+    label: t("core.user.detail.tabs.detail"),
     routeName: "UserDetail",
   },
   // {
@@ -141,7 +143,9 @@ const handleTabChange = (id: string) => {
             "
           >
             <FloatingDropdown>
-              <VButton type="default">编辑</VButton>
+              <VButton type="default">
+                {{ $t("core.common.buttons.edit") }}
+              </VButton>
               <template #popper>
                 <div class="w-48 p-2">
                   <VSpace class="w-full" direction="column">
@@ -151,14 +155,14 @@ const handleTabChange = (id: string) => {
                       type="secondary"
                       @click="editingModal = true"
                     >
-                      修改资料
+                      {{ $t("core.user.detail.actions.update_profile.title") }}
                     </VButton>
                     <VButton
                       v-close-popper
                       block
                       @click="passwordChangeModal = true"
                     >
-                      修改密码
+                      {{ $t("core.user.detail.actions.change_password.title") }}
                     </VButton>
                   </VSpace>
                 </div>

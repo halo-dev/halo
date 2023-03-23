@@ -16,8 +16,10 @@ import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { useUserStore } from "@/stores/user";
+import { useI18n } from "vue-i18n";
 
 const userStore = useUserStore();
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -61,7 +63,9 @@ const isUpdateMode = computed(() => {
 });
 
 const creationModalTitle = computed(() => {
-  return isUpdateMode.value ? "编辑用户" : "新增用户";
+  return isUpdateMode.value
+    ? t("core.user.editing_modal.titles.update")
+    : t("core.user.editing_modal.titles.create");
 });
 
 watch(
@@ -136,7 +140,7 @@ const handleCreateUser = async () => {
 
     onVisibleChange(false);
 
-    Toast.success("保存成功");
+    Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
     console.error("Failed to create or update user", e);
   } finally {
@@ -162,7 +166,9 @@ const handleCreateUser = async () => {
         <div class="md:grid md:grid-cols-4 md:gap-6">
           <div class="md:col-span-1">
             <div class="sticky top-0">
-              <span class="text-base font-medium text-gray-900"> 常规 </span>
+              <span class="text-base font-medium text-gray-900">
+                {{ $t("core.user.editing_modal.groups.general") }}
+              </span>
             </div>
           </div>
           <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
@@ -170,7 +176,7 @@ const handleCreateUser = async () => {
               id="userNameInput"
               v-model="formState.metadata.name"
               :disabled="isUpdateMode"
-              label="用户名"
+              :label="$t('core.user.editing_modal.fields.username.label')"
               type="text"
               name="name"
               :validation="[
@@ -182,41 +188,43 @@ const handleCreateUser = async () => {
                 ],
               ]"
               :validation-messages="{
-                matches: '请输入有效的用户名',
+                matches: $t(
+                  'core.user.editing_modal.fields.username.validation'
+                ),
               }"
             ></FormKit>
             <FormKit
               id="displayNameInput"
               v-model="formState.spec.displayName"
-              label="显示名称"
+              :label="$t('core.user.editing_modal.fields.display_name.label')"
               type="text"
               name="displayName"
               validation="required|length:0,50"
             ></FormKit>
             <FormKit
               v-model="formState.spec.email"
-              label="电子邮箱"
+              :label="$t('core.user.editing_modal.fields.email.label')"
               type="email"
               name="email"
               validation="required|email|length:0,100"
             ></FormKit>
             <FormKit
               v-model="formState.spec.phone"
-              label="手机号"
+              :label="$t('core.user.editing_modal.fields.phone.label')"
               type="text"
               name="phone"
               validation="length:0,20"
             ></FormKit>
             <FormKit
               v-model="formState.spec.avatar"
-              label="头像"
+              :label="$t('core.user.editing_modal.fields.avatar.label')"
               type="attachment"
               name="avatar"
               validation="url|length:0,1024"
             ></FormKit>
             <FormKit
               v-model="formState.spec.bio"
-              label="描述"
+              :label="$t('core.user.editing_modal.fields.bio.label')"
               type="textarea"
               name="bio"
               validation="length:0,2048"
@@ -233,7 +241,9 @@ const handleCreateUser = async () => {
     <div class="md:grid md:grid-cols-4 md:gap-6">
       <div class="md:col-span-1">
         <div class="sticky top-0">
-          <span class="text-base font-medium text-gray-900"> 元数据 </span>
+          <span class="text-base font-medium text-gray-900">
+            {{ $t("core.user.editing_modal.groups.annotations") }}
+          </span>
         </div>
       </div>
       <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
@@ -252,10 +262,13 @@ const handleCreateUser = async () => {
           v-if="visible"
           :loading="saving"
           type="secondary"
+          :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('user-form')"
         >
         </SubmitButton>
-        <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
+        <VButton @click="onVisibleChange(false)">
+          {{ $t("core.common.buttons.cancel_and_shortcut") }}
+        </VButton>
       </VSpace>
     </template>
   </VModal>

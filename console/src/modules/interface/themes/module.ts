@@ -17,11 +17,11 @@ export default definePlugin({
           name: "ThemeDetail",
           component: ThemeDetail,
           meta: {
-            title: "主题",
+            title: "core.theme.title",
             searchable: true,
             permissions: ["system:themes:view"],
             menu: {
-              name: "主题",
+              name: "core.sidebar.menu.items.themes",
               group: "interface",
               icon: markRaw(IconPalette),
               priority: 0,
@@ -33,7 +33,7 @@ export default definePlugin({
           name: "ThemeSetting",
           component: ThemeSetting,
           meta: {
-            title: "主题设置",
+            title: "core.theme.settings.title",
             permissions: ["system:themes:view"],
           },
         },

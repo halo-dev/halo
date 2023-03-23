@@ -21,6 +21,9 @@ import { computed, ref, watch } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { onBeforeRouteLeave } from "vue-router";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -48,7 +51,9 @@ const creating = ref(false);
 const refreshInterval = ref();
 
 const modalTitle = computed(() => {
-  return activeTab.value === "installed" ? "已安装的主题" : "未安装的主题";
+  return activeTab.value === "installed"
+    ? t("core.theme.list_modal.titles.installed_themes")
+    : t("core.theme.list_modal.titles.not_installed_themes");
 });
 
 const handleFetchThemes = async (options?: { mute?: boolean }) => {
@@ -110,7 +115,7 @@ const handleCreateTheme = async (theme: Theme) => {
 
     activeTab.value = "installed";
 
-    Toast.success("安装成功");
+    Toast.success(t("core.theme.list_modal.operations.install.toast_success"));
   } catch (error) {
     console.error("Failed to create theme", error);
   } finally {
@@ -183,17 +188,21 @@ const handleOpenInstallModal = () => {
       type="outline"
       class="my-[12px] mx-[16px]"
     >
-      <VTabItem id="installed" label="已安装" class="-mx-[16px]">
+      <VTabItem
+        id="installed"
+        :label="$t('core.theme.list_modal.tabs.installed')"
+        class="-mx-[16px]"
+      >
         <VLoading v-if="loading" />
         <Transition v-else-if="!themes.length" appear name="fade">
           <VEmpty
-            message="当前没有已安装的主题，你可以尝试刷新或者安装新主题"
-            title="当前没有已安装的主题"
+            :message="$t('core.theme.list_modal.empty.message')"
+            :title="$t('core.theme.list_modal.empty.title')"
           >
             <template #actions>
               <VSpace>
                 <VButton :loading="loading" @click="handleFetchThemes()">
-                  刷新
+                  {{ $t("core.common.buttons.refresh") }}
                 </VButton>
                 <VButton
                   v-permission="['system:themes:manage']"
@@ -203,7 +212,7 @@ const handleOpenInstallModal = () => {
                   <template #icon>
                     <IconAddCircle class="h-full w-full" />
                   </template>
-                  安装主题
+                  {{ $t("core.theme.common.buttons.install") }}
                 </VButton>
               </VSpace>
             </template>
@@ -232,14 +241,20 @@ const handleOpenInstallModal = () => {
           </ul>
         </Transition>
       </VTabItem>
-      <VTabItem id="uninstalled" label="未安装" class="-mx-[16px]">
+      <VTabItem
+        id="uninstalled"
+        :label="$t('core.theme.list_modal.tabs.not_installed')"
+        class="-mx-[16px]"
+      >
         <VLoading v-if="loading" />
         <Transition v-else-if="!themes.length" appear name="fade">
-          <VEmpty title="当前没有未安装的主题">
+          <VEmpty
+            :title="$t('core.theme.list_modal.not_installed_empty.title')"
+          >
             <template #actions>
               <VSpace>
                 <VButton :loading="loading" @click="handleFetchThemes">
-                  刷新
+                  {{ $t("core.common.buttons.refresh") }}
                 </VButton>
               </VSpace>
             </template>
@@ -269,18 +284,18 @@ const handleOpenInstallModal = () => {
                               <div
                                 class="flex h-full items-center justify-center object-cover"
                               >
-                                <span class="text-xs text-gray-400"
-                                  >加载中...</span
-                                >
+                                <span class="text-xs text-gray-400">
+                                  {{ $t("core.common.status.loading") }}...
+                                </span>
                               </div>
                             </template>
                             <template #error>
                               <div
                                 class="flex h-full items-center justify-center object-cover"
                               >
-                                <span class="text-xs text-red-400"
-                                  >加载异常</span
-                                >
+                                <span class="text-xs text-red-400">
+                                  {{ $t("core.common.status.loading_error") }}
+                                </span>
                               </div>
                             </template>
                           </LazyImage>
@@ -325,7 +340,7 @@ const handleOpenInstallModal = () => {
                         :disabled="creating"
                         @click="handleCreateTheme(theme)"
                       >
-                        安装
+                        {{ $t("core.common.buttons.install") }}
                       </VButton>
                     </template>
                   </VEntityField>
@@ -344,9 +359,11 @@ const handleOpenInstallModal = () => {
           type="secondary"
           @click="handleOpenInstallModal()"
         >
-          安装主题
+          {{ $t("core.theme.common.buttons.install") }}
         </VButton>
-        <VButton @click="onVisibleChange(false)">关闭</VButton>
+        <VButton @click="onVisibleChange(false)">
+          {{ $t("core.common.buttons.close") }}
+        </VButton>
       </VSpace>
     </template>
   </VModal>

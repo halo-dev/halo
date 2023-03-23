@@ -3,6 +3,9 @@ import { VModal } from "@halo-dev/components";
 import UppyUpload from "@/components/upload/UppyUpload.vue";
 import { computed, ref, watch } from "vue";
 import type { Theme } from "@halo-dev/api-client";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -24,8 +27,10 @@ const uploadVisible = ref(false);
 
 const modalTitle = computed(() => {
   return props.upgradeTheme
-    ? `升级主题（${props.upgradeTheme.spec.displayName}）`
-    : "安装主题";
+    ? t("core.theme.upload_modal.titles.upgrade", {
+        display_name: props.upgradeTheme.spec.displayName,
+      })
+    : t("core.theme.upload_modal.titles.install");
 });
 
 const handleVisibleChange = (visible: boolean) => {

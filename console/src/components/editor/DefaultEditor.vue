@@ -110,6 +110,9 @@ import * as fastq from "fastq";
 import type { queueAsPromised } from "fastq";
 import type { Attachment } from "@halo-dev/api-client";
 import { useFetchAttachmentPolicy } from "@/modules/contents/attachments/composables/use-attachment-policy";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -195,7 +198,9 @@ const editor = useEditor({
     ExtensionSubscript,
     ExtensionSuperscript,
     ExtensionPlaceholder.configure({
-      placeholder: "输入 / 以选择输入类型",
+      placeholder: t(
+        "core.components.default_editor.extensions.placeholder.options.placeholder"
+      ),
     }),
     ExtensionHighlight,
     ExtensionCommands.configure({
@@ -356,7 +361,11 @@ const uploadQueue: queueAsPromised<Task> = fastq.promise(asyncWorker, 1);
 
 async function asyncWorker(arg: Task): Promise<void> {
   if (!policies.value?.length) {
-    Toast.warning("目前没有可用的存储策略");
+    Toast.warning(
+      t(
+        "core.components.default_editor.upload_attachment.toast.no_available_policy"
+      )
+    );
     return;
   }
 
@@ -377,7 +386,12 @@ const handleFetchPermalink = async (
   maxRetry: number
 ): Promise<string | undefined> => {
   if (maxRetry === 0) {
-    Toast.error(`获取附件永久链接失败：${attachment.spec.displayName}`);
+    Toast.error(
+      t(
+        "core.components.default_editor.upload_attachment.toast.failed_fetch_permalink",
+        { display_name: attachment.spec.displayName }
+      )
+    );
     return undefined;
   }
 
@@ -433,7 +447,7 @@ const toolbarMenuItems = computed(() => {
     {
       type: "button",
       icon: markRaw(MdiFileImageBox),
-      title: "插入附件",
+      title: t("core.components.default_editor.toolbar.attachment"),
       action: () => (attachmentSelectorModal.value = true),
       isActive: () => false,
     },
@@ -536,7 +550,10 @@ watch(
     <template #extra>
       <div class="h-full w-72 overflow-y-auto border-l bg-white">
         <VTabs v-model:active-id="extraActiveId" type="outline">
-          <VTabItem id="toc" label="大纲">
+          <VTabItem
+            id="toc"
+            :label="$t('core.components.default_editor.tabs.toc.title')"
+          >
             <div class="p-1 pt-0">
               <ul v-if="headingNodes?.length" class="space-y-1">
                 <li
@@ -566,11 +583,16 @@ watch(
                 </li>
               </ul>
               <div v-else class="flex flex-col items-center py-10">
-                <span class="text-sm text-gray-600">暂无大纲</span>
+                <span class="text-sm text-gray-600">
+                  {{ $t("core.components.default_editor.tabs.toc.empty") }}
+                </span>
               </div>
             </div>
           </VTabItem>
-          <VTabItem id="information" label="详情">
+          <VTabItem
+            id="information"
+            :label="$t('core.components.default_editor.tabs.detail.title')"
+          >
             <div class="flex flex-col gap-2 p-1 pt-0">
               <div class="grid grid-cols-2 gap-2">
                 <div
@@ -580,7 +602,11 @@ watch(
                     <div
                       class="text-sm text-gray-500 group-hover:text-gray-900"
                     >
-                      字符数
+                      {{
+                        $t(
+                          "core.components.default_editor.tabs.detail.fields.character_count"
+                        )
+                      }}
                     </div>
                     <div class="rounded bg-gray-200 p-0.5">
                       <IconCharacterRecognition
@@ -599,7 +625,11 @@ watch(
                     <div
                       class="text-sm text-gray-500 group-hover:text-gray-900"
                     >
-                      词数
+                      {{
+                        $t(
+                          "core.components.default_editor.tabs.detail.fields.word_count"
+                        )
+                      }}
                     </div>
                     <div class="rounded bg-gray-200 p-0.5">
                       <IconCharacterRecognition
@@ -621,7 +651,11 @@ watch(
                     <div
                       class="text-sm text-gray-500 group-hover:text-gray-900"
                     >
-                      发布时间
+                      {{
+                        $t(
+                          "core.components.default_editor.tabs.detail.fields.publish_time"
+                        )
+                      }}
                     </div>
                     <div class="rounded bg-gray-200 p-0.5">
                       <IconCalendar
@@ -630,7 +664,12 @@ watch(
                     </div>
                   </div>
                   <div class="text-base font-medium text-gray-900">
-                    {{ formatDatetime(publishTime) || "未发布" }}
+                    {{
+                      formatDatetime(publishTime) ||
+                      $t(
+                        "core.components.default_editor.tabs.detail.fields.draft"
+                      )
+                    }}
                   </div>
                 </div>
               </div>
@@ -642,7 +681,11 @@ watch(
                     <div
                       class="text-sm text-gray-500 group-hover:text-gray-900"
                     >
-                      创建者
+                      {{
+                        $t(
+                          "core.components.default_editor.tabs.detail.fields.owner"
+                        )
+                      }}
                     </div>
                     <div class="rounded bg-gray-200 p-0.5">
                       <IconUserFollow
@@ -663,7 +706,11 @@ watch(
                     <div
                       class="text-sm text-gray-500 group-hover:text-gray-900"
                     >
-                      访问链接
+                      {{
+                        $t(
+                          "core.components.default_editor.tabs.detail.fields.permalink"
+                        )
+                      }}
                     </div>
                     <div class="rounded bg-gray-200 p-0.5">
                       <IconLink

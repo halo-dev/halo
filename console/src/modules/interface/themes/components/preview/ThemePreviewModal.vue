@@ -25,6 +25,7 @@ import {
 } from "@halo-dev/components";
 import { storeToRefs } from "pinia";
 import { computed, markRaw, ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{
@@ -43,6 +44,8 @@ const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
+
+const { t } = useI18n();
 
 interface SettingTab {
   id: string;
@@ -112,7 +115,9 @@ const modalTitle = computed(() => {
   if (props.title) {
     return props.title;
   }
-  return `预览主题：${selectedTheme.value?.spec.displayName}`;
+  return t("core.theme.preview_model.title", {
+    display_name: selectedTheme.value?.spec.displayName,
+  });
 });
 
 // theme settings
@@ -164,7 +169,7 @@ const handleSaveConfigMap = async () => {
     configMap: configMapToUpdate,
   });
 
-  Toast.success("保存成功");
+  Toast.success(t("core.common.toast.save_success"));
 
   await handleFetchSettings();
   configMap.value = newConfigMap;
@@ -254,23 +259,40 @@ const iframeClasses = computed(() => {
     </template>
     <template #actions>
       <span
-        v-tooltip="{ content: '切换主题', delay: 300 }"
+        v-tooltip="{
+          content: $t('core.theme.empty.actions.switch'),
+          delay: 300,
+        }"
         :class="{ 'bg-gray-200': themesVisible }"
         @click="handleOpenThemes"
       >
         <IconPalette />
       </span>
       <span
-        v-tooltip="{ content: '主题设置', delay: 300 }"
+        v-tooltip="{
+          content: $t('core.theme.preview_model.actions.setting'),
+          delay: 300,
+        }"
         :class="{ 'bg-gray-200': settingsVisible }"
         @click="handleOpenSettings(undefined)"
       >
         <IconSettings />
       </span>
-      <span v-tooltip="{ content: '刷新', delay: 300 }" @click="handleRefresh">
+      <span
+        v-tooltip="{
+          content: $t('core.common.buttons.refresh'),
+          delay: 300,
+        }"
+        @click="handleRefresh"
+      >
         <IconRefreshLine />
       </span>
-      <span v-tooltip="{ content: '新窗口打开', delay: 300 }">
+      <span
+        v-tooltip="{
+          content: $t('core.theme.preview_model.actions.open'),
+          delay: 300,
+        }"
+      >
         <a :href="previewUrl" target="_blank">
           <IconLink />
         </a>
@@ -347,7 +369,7 @@ const iframeClasses = computed(() => {
                         )
                       "
                     >
-                      保存
+                      {{ $t("core.common.buttons.save") }}
                     </VButton>
                   </div>
                 </div>
