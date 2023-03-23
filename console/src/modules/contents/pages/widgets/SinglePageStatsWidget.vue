@@ -31,7 +31,9 @@ onMounted(handleFetchSinglePages);
         </span>
 
         <div>
-          <span class="text-sm text-gray-500">页面</span>
+          <span class="text-sm text-gray-500">
+            {{ $t("core.dashboard.widgets.presets.page_stats.title") }}
+          </span>
           <p class="text-2xl font-medium text-gray-900">
             {{ singlePageTotal || 0 }}
           </p>

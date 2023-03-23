@@ -92,7 +92,7 @@ watch([() => route.name, () => route.params], async () => {
 </script>
 <template>
   <BasicLayout>
-    <VPageHeader title="设置">
+    <VPageHeader :title="$t('core.setting.title')">
       <template #icon>
         <IconSettings class="mr-2 self-center" />
       </template>

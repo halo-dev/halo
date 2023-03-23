@@ -3,6 +3,7 @@ import type { Tag } from "@halo-dev/api-client";
 import type { Ref } from "vue";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 interface usePostTagReturn {
   tags: Ref<Tag[] | undefined>;
@@ -12,6 +13,8 @@ interface usePostTagReturn {
 }
 
 export function usePostTag(): usePostTagReturn {
+  const { t } = useI18n();
+
   const {
     data: tags,
     isLoading,
@@ -38,16 +41,18 @@ export function usePostTag(): usePostTagReturn {
 
   const handleDelete = async (tag: Tag) => {
     Dialog.warning({
-      title: "确定要删除该标签吗？",
-      description: "删除此标签之后，对应文章的关联将被解除。该操作不可恢复。",
+      title: t("core.post_tag.operations.delete.title"),
+      description: t("core.post_tag.operations.delete.description"),
       confirmType: "danger",
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           await apiClient.extension.tag.deletecontentHaloRunV1alpha1Tag({
             name: tag.metadata.name,
           });
 
-          Toast.success("删除成功");
+          Toast.success(t("core.common.toast.delete_success"));
         } catch (e) {
           console.error("Failed to delete tag", e);
         } finally {

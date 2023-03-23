@@ -5,6 +5,7 @@ import { roleLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
 import { apiClient } from "@/utils/api-client";
 import { Toast } from "@halo-dev/components";
+import { useI18n } from "vue-i18n";
 
 interface RoleTemplateGroup {
   module: string | null | undefined;
@@ -107,6 +108,8 @@ export function useFetchRole(): useFetchRoleReturn {
  * @returns {useRoleFormReturn}
  */
 export function useRoleForm(): useRoleFormReturn {
+  const { t } = useI18n();
+
   const formState = ref<Role>(initialFormState);
   const saving = ref(false);
 
@@ -132,7 +135,7 @@ export function useRoleForm(): useRoleFormReturn {
         formState.value = data;
       }
 
-      Toast.success("保存成功");
+      Toast.success(t("core.common.toast.save_success"));
     } catch (e) {
       console.error(e);
     } finally {

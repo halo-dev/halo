@@ -37,8 +37,10 @@ import FilterTag from "@/components/filter/FilterTag.vue";
 import { useFetchRole } from "../roles/composables/use-role";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const checkedAll = ref(false);
 const editingModal = ref<boolean>(false);
@@ -75,11 +77,11 @@ interface SortItem {
 
 const SortItems: SortItem[] = [
   {
-    label: "较近创建",
+    label: t("core.user.filters.sort.items.create_time_desc"),
     value: "creationTimestamp,desc",
   },
   {
-    label: "较早创建",
+    label: t("core.user.filters.sort.items.create_time_asc"),
     value: "creationTimestamp,asc",
   },
 ];
@@ -155,16 +157,18 @@ const {
 
 const handleDelete = async (user: User) => {
   Dialog.warning({
-    title: "确定要删除该用户吗？",
-    description: "该操作不可恢复。",
+    title: t("core.user.operations.delete.title"),
+    description: t("core.common.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.user.deletev1alpha1User({
           name: user.metadata.name,
         });
 
-        Toast.success("删除成功");
+        Toast.success(t("core.common.toast.delete_success"));
       } catch (e) {
         console.error("Failed to delete user", e);
       } finally {
@@ -176,9 +180,11 @@ const handleDelete = async (user: User) => {
 
 const handleDeleteInBatch = async () => {
   Dialog.warning({
-    title: "确定要删除选中的用户吗？",
-    description: "该操作不可恢复。",
+    title: t("core.user.operations.delete_in_batch.title"),
+    description: t("core.common.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const userNamesToDelete = selectedUserNames.value.filter(
         (name) => name != userStore.currentUser?.metadata.name
@@ -192,7 +198,7 @@ const handleDeleteInBatch = async () => {
       );
       await refetch();
       selectedUserNames.value.length = 0;
-      Toast.success("删除成功");
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
@@ -272,7 +278,7 @@ onMounted(() => {
     @close="refetch"
   />
 
-  <VPageHeader title="用户">
+  <VPageHeader :title="$t('core.user.title')">
     <template #icon>
       <IconUserSettings class="mr-2 self-center" />
     </template>
@@ -287,13 +293,13 @@ onMounted(() => {
           <template #icon>
             <IconUserFollow class="h-full w-full" />
           </template>
-          角色管理
+          {{ $t("core.user.actions.roles") }}
         </VButton>
         <VButton :route="{ name: 'AuthProviders' }" size="sm" type="default">
           <template #icon>
             <IconLockPasswordLine class="h-full w-full" />
           </template>
-          身份认证
+          {{ $t("core.user.actions.identity_authentication") }}
         </VButton>
         <VButton
           v-permission="['system:users:manage']"
@@ -303,7 +309,7 @@ onMounted(() => {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          添加用户
+          {{ $t("core.common.buttons.new") }}
         </VButton>
       </VSpace>
     </template>
@@ -337,20 +343,27 @@ onMounted(() => {
                   outer-class="!p-0"
                   :model-value="keyword"
                   name="keyword"
-                  placeholder="输入关键词搜索"
+                  :placeholder="$t('core.common.placeholder.search')"
                   type="text"
                   @keyup.enter="handleKeywordChange"
                 ></FormKit>
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  关键词：{{ keyword }}
+                  {{
+                    $t("core.common.filters.results.keyword", {
+                      keyword: keyword,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag v-if="selectedRole" @close="handleRoleChange()">
-                  角色：{{
-                    selectedRole.metadata.annotations?.[
-                      rbacAnnotations.DISPLAY_NAME
-                    ] || selectedRole.metadata.name
+                  {{
+                    $t("core.user.filters.role.result", {
+                      role:
+                        selectedRole.metadata.annotations?.[
+                          rbacAnnotations.DISPLAY_NAME
+                        ] || selectedRole.metadata.name,
+                    })
                   }}
                 </FilterTag>
 
@@ -358,7 +371,11 @@ onMounted(() => {
                   v-if="selectedSortItem"
                   @close="handleSortItemChange()"
                 >
-                  排序：{{ selectedSortItem.label }}
+                  {{
+                    $t("core.common.filters.results.sort", {
+                      sort: selectedSortItem.label,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterCleanButton
@@ -368,7 +385,7 @@ onMounted(() => {
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeleteInBatch">
-                  删除
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </VSpace>
             </div>
@@ -378,7 +395,9 @@ onMounted(() => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">角色</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.user.filters.role.label") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -409,7 +428,9 @@ onMounted(() => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">排序</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.common.filters.labels.sort") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -436,8 +457,10 @@ onMounted(() => {
                     @click="refetch()"
                   >
                     <IconRefreshLine
-                      v-tooltip="`刷新`"
-                      :class="{ 'animate-spin text-gray-900': isFetching }"
+                      v-tooltip="$t('core.common.buttons.refresh')"
+                      :class="{
+                        'animate-spin text-gray-900': isFetching,
+                      }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
                   </div>
@@ -452,12 +475,14 @@ onMounted(() => {
 
       <Transition v-else-if="!users?.length" appear name="fade">
         <VEmpty
-          message="当前没有符合筛选条件的用户，你可以尝试刷新或者创建新用户"
-          title="当前没有符合筛选条件的用户"
+          :message="$t('core.user.empty.message')"
+          :title="$t('core.user.empty.title')"
         >
           <template #actions>
             <VSpace>
-              <VButton @click="refetch()">刷新</VButton>
+              <VButton @click="refetch()">
+                {{ $t("core.common.buttons.refresh") }}
+              </VButton>
               <VButton
                 v-permission="['system:users:manage']"
                 type="secondary"
@@ -466,7 +491,7 @@ onMounted(() => {
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>
-                新建用户
+                {{ $t("core.common.buttons.new") }}
               </VButton>
             </VSpace>
           </template>
@@ -531,7 +556,11 @@ onMounted(() => {
                 </VEntityField>
                 <VEntityField v-if="user.user.metadata.deletionTimestamp">
                   <template #description>
-                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                    <VStatusDot
+                      v-tooltip="$t('core.common.status.deleting')"
+                      state="warning"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField>
@@ -552,14 +581,14 @@ onMounted(() => {
                   type="secondary"
                   @click="handleOpenCreateModal(user.user)"
                 >
-                  修改资料
+                  {{ $t("core.user.operations.update_profile.title") }}
                 </VButton>
                 <VButton
                   v-close-popper
                   block
                   @click="handleOpenPasswordChangeModal(user.user)"
                 >
-                  修改密码
+                  {{ $t("core.user.operations.change_password.title") }}
                 </VButton>
                 <VButton
                   v-if="
@@ -570,7 +599,7 @@ onMounted(() => {
                   block
                   @click="handleOpenGrantPermissionModal(user.user)"
                 >
-                  分配角色
+                  {{ $t("core.user.operations.grant_permission.title") }}
                 </VButton>
                 <VButton
                   v-if="
@@ -582,7 +611,7 @@ onMounted(() => {
                   type="danger"
                   @click="handleDelete(user.user)"
                 >
-                  删除
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </template>
             </VEntity>
@@ -596,6 +625,8 @@ onMounted(() => {
             v-model:page="page"
             v-model:size="size"
             :total="total"
+            :page-label="$t('core.components.pagination.page_label')"
+            :size-label="$t('core.components.pagination.size_label')"
             :size-options="[20, 30, 50, 100]"
           />
         </div>

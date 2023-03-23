@@ -27,8 +27,10 @@ import cloneDeep from "lodash.clonedeep";
 import { getNode } from "@formkit/core";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const checkedAll = ref(false);
 const selectedPostNames = ref<string[]>([]);
@@ -86,25 +88,29 @@ const handleCheckAllChange = (e: Event) => {
 
 const handleDeletePermanently = async (post: Post) => {
   Dialog.warning({
-    title: "确定要永久删除该文章吗？",
-    description: "删除之后将无法恢复",
+    title: t("core.deleted_post.operations.delete.title"),
+    description: t("core.deleted_post.operations.delete.description"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await apiClient.extension.post.deletecontentHaloRunV1alpha1Post({
         name: post.metadata.name,
       });
       await refetch();
 
-      Toast.success("删除成功");
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
 
 const handleDeletePermanentlyInBatch = async () => {
   Dialog.warning({
-    title: "确定要永久删除选中的文章吗？",
-    description: "删除之后将无法恢复",
+    title: t("core.deleted_post.operations.delete_in_batch.title"),
+    description: t("core.deleted_post.operations.delete_in_batch.description"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPostNames.value.map((name) => {
@@ -116,15 +122,17 @@ const handleDeletePermanentlyInBatch = async () => {
       await refetch();
       selectedPostNames.value = [];
 
-      Toast.success("删除成功");
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
 
 const handleRecovery = async (post: Post) => {
   Dialog.warning({
-    title: "确定要恢复该文章吗？",
-    description: "该操作会将文章恢复到被删除之前的状态",
+    title: t("core.deleted_post.operations.recovery.title"),
+    description: t("core.deleted_post.operations.recovery.description"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const postToUpdate = cloneDeep(post);
       postToUpdate.spec.deleted = false;
@@ -135,15 +143,19 @@ const handleRecovery = async (post: Post) => {
 
       await refetch();
 
-      Toast.success("恢复成功");
+      Toast.success(t("core.common.toast.recovery_success"));
     },
   });
 };
 
 const handleRecoveryInBatch = async () => {
   Dialog.warning({
-    title: "确定要恢复选中的文章吗？",
-    description: "该操作会将文章恢复到被删除之前的状态",
+    title: t("core.deleted_post.operations.recovery_in_batch.title"),
+    description: t(
+      "core.deleted_post.operations.recovery_in_batch.description"
+    ),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPostNames.value.map((name) => {
@@ -170,7 +182,7 @@ const handleRecoveryInBatch = async () => {
       await refetch();
       selectedPostNames.value = [];
 
-      Toast.success("恢复成功");
+      Toast.success(t("core.common.toast.recovery_success"));
     },
   });
 };
@@ -193,13 +205,15 @@ function handleClearKeyword() {
 }
 </script>
 <template>
-  <VPageHeader title="文章回收站">
+  <VPageHeader :title="$t('core.deleted_post.title')">
     <template #icon>
       <IconDeleteBin class="mr-2 self-center text-green-600" />
     </template>
     <template #actions>
       <VSpace>
-        <VButton :route="{ name: 'Posts' }" size="sm">返回</VButton>
+        <VButton :route="{ name: 'Posts' }" size="sm">
+          {{ $t("core.common.buttons.back") }}
+        </VButton>
         <VButton
           v-permission="['system:posts:manage']"
           :route="{ name: 'PostEditor' }"
@@ -208,7 +222,7 @@ function handleClearKeyword() {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          新建
+          {{ $t("core.common.buttons.new") }}
         </VButton>
       </VSpace>
     </template>
@@ -240,7 +254,7 @@ function handleClearKeyword() {
                 <FormKit
                   id="keywordInput"
                   outer-class="!p-0"
-                  placeholder="输入关键词搜索"
+                  :placeholder="$t('core.common.placeholder.search')"
                   type="text"
                   name="keyword"
                   :model-value="keyword"
@@ -248,15 +262,19 @@ function handleClearKeyword() {
                 ></FormKit>
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  关键词：{{ keyword }}
+                  {{
+                    $t("core.common.filters.results.keyword", {
+                      keyword: keyword,
+                    })
+                  }}
                 </FilterTag>
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeletePermanentlyInBatch">
-                  永久删除
+                  {{ $t("core.common.buttons.delete_permanently") }}
                 </VButton>
                 <VButton type="default" @click="handleRecoveryInBatch">
-                  恢复
+                  {{ $t("core.common.buttons.recovery") }}
                 </VButton>
               </VSpace>
             </div>
@@ -283,14 +301,16 @@ function handleClearKeyword() {
 
       <Transition v-else-if="!posts?.length" appear name="fade">
         <VEmpty
-          message="你可以尝试刷新或者返回文章管理"
-          title="没有文章被放入回收站"
+          :message="$t('core.deleted_post.empty.message')"
+          :title="$t('core.deleted_post.empty.title')"
         >
           <template #actions>
             <VSpace>
-              <VButton @click="refetch">刷新</VButton>
+              <VButton @click="refetch">
+                {{ $t("core.common.buttons.refresh") }}
+              </VButton>
               <VButton :route="{ name: 'Posts' }" type="primary">
-                返回
+                {{ $t("core.common.buttons.back") }}
               </VButton>
             </VSpace>
           </template>
@@ -325,7 +345,8 @@ function handleClearKeyword() {
                           v-if="post.categories.length"
                           class="inline-flex flex-wrap gap-1 text-xs text-gray-500"
                         >
-                          分类：<span
+                          {{ $t("core.post.list.fields.categories") }}
+                          <span
                             v-for="(category, categoryIndex) in post.categories"
                             :key="categoryIndex"
                             class="cursor-pointer hover:text-gray-900"
@@ -334,10 +355,18 @@ function handleClearKeyword() {
                           </span>
                         </p>
                         <span class="text-xs text-gray-500">
-                          访问量 {{ post.stats.visit || 0 }}
+                          {{
+                            $t("core.post.list.fields.visits", {
+                              visits: post.stats.visit,
+                            })
+                          }}
                         </span>
                         <span class="text-xs text-gray-500">
-                          评论 {{ post.stats.totalComment || 0 }}
+                          {{
+                            $t("core.post.list.fields.comments", {
+                              comments: post.stats.totalComment || 0,
+                            })
+                          }}
                         </span>
                       </VSpace>
                       <VSpace v-if="post.tags.length" class="flex-wrap">
@@ -378,12 +407,20 @@ function handleClearKeyword() {
                 </VEntityField>
                 <VEntityField v-if="!post?.post?.spec.deleted">
                   <template #description>
-                    <VStatusDot v-tooltip="`恢复中`" state="success" animate />
+                    <VStatusDot
+                      v-tooltip="$t('core.common.tooltips.recovering')"
+                      state="success"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField v-if="post?.post?.metadata.deletionTimestamp">
                   <template #description>
-                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                    <VStatusDot
+                      v-tooltip="$t('core.common.status.deleting')"
+                      state="warning"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField>
@@ -404,7 +441,7 @@ function handleClearKeyword() {
                   type="danger"
                   @click="handleDeletePermanently(post.post)"
                 >
-                  永久删除
+                  {{ $t("core.common.buttons.delete_permanently") }}
                 </VButton>
                 <VButton
                   v-close-popper
@@ -412,7 +449,7 @@ function handleClearKeyword() {
                   type="default"
                   @click="handleRecovery(post.post)"
                 >
-                  恢复
+                  {{ $t("core.common.buttons.recovery") }}
                 </VButton>
               </template>
             </VEntity>
@@ -425,6 +462,8 @@ function handleClearKeyword() {
           <VPagination
             v-model:page="page"
             v-model:size="size"
+            :page-label="$t('core.components.pagination.page_label')"
+            :size-label="$t('core.components.pagination.size_label')"
             :total="total"
             :size-options="[20, 30, 50, 100]"
           />

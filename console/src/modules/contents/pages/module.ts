@@ -21,11 +21,11 @@ export default definePlugin({
           name: "SinglePages",
           component: SinglePageList,
           meta: {
-            title: "页面",
+            title: "core.page.title",
             searchable: true,
             permissions: ["system:singlepages:view"],
             menu: {
-              name: "页面",
+              name: "core.sidebar.menu.items.single_pages",
               group: "content",
               icon: markRaw(IconPages),
               priority: 1,
@@ -38,7 +38,7 @@ export default definePlugin({
           name: "DeletedSinglePages",
           component: DeletedSinglePageList,
           meta: {
-            title: "页面回收站",
+            title: "core.deleted_page.title",
             searchable: true,
             permissions: ["system:singlepages:view"],
           },
@@ -48,7 +48,7 @@ export default definePlugin({
           name: "SinglePageEditor",
           component: SinglePageEditor,
           meta: {
-            title: "页面编辑",
+            title: "core.page_editor.title",
             searchable: true,
             permissions: ["system:singlepages:manage"],
           },

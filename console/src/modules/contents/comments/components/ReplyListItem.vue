@@ -15,6 +15,9 @@ import { formatDatetime } from "@/utils/date";
 import { apiClient } from "@/utils/api-client";
 import { computed, inject, type Ref } from "vue";
 import cloneDeep from "lodash.clonedeep";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -46,16 +49,18 @@ const quoteReply = computed(() => {
 
 const handleDelete = async () => {
   Dialog.warning({
-    title: "确认要删除该回复吗？",
-    description: "该操作不可恢复。",
+    title: t("core.comment.operations.delete_reply.title"),
+    description: t("core.common.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.reply.deletecontentHaloRunV1alpha1Reply({
           name: props.reply?.reply.metadata.name as string,
         });
 
-        Toast.success("删除成功");
+        Toast.success(t("core.common.toast.delete_success"));
       } catch (error) {
         console.error("Failed to delete comment reply", error);
       } finally {
@@ -76,7 +81,7 @@ const handleApprove = async () => {
       reply: replyToUpdate,
     });
 
-    Toast.success("操作成功");
+    Toast.success(t("core.common.toast.operation_success"));
   } catch (error) {
     console.error("Failed to approve comment reply", error);
   } finally {
@@ -146,7 +151,7 @@ const isHoveredReply = computed(() => {
                 class="select-none text-gray-700 hover:text-gray-900"
                 @click="handleTriggerReply"
               >
-                回复
+                {{ $t("core.comment.operations.reply.button") }}
               </span>
               <div v-if="false" class="flex items-center">
                 <VTag>New</VTag>
@@ -161,14 +166,20 @@ const isHoveredReply = computed(() => {
         <template #description>
           <VStatusDot state="success">
             <template #text>
-              <span class="text-xs text-gray-500">待审核</span>
+              <span class="text-xs text-gray-500">
+                {{ $t("core.comment.list.fields.pending_review") }}
+              </span>
             </template>
           </VStatusDot>
         </template>
       </VEntityField>
       <VEntityField v-if="reply?.reply.metadata.deletionTimestamp">
         <template #description>
-          <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+          <VStatusDot
+            v-tooltip="$t('core.common.status.deleting')"
+            state="warning"
+            animate
+          />
         </template>
       </VEntityField>
       <VEntityField>
@@ -193,7 +204,7 @@ const isHoveredReply = computed(() => {
         block
         @click="handleApprove"
       >
-        审核通过
+        {{ $t("core.comment.operations.approve_reply.button") }}
       </VButton>
       <VButton
         v-permission="['system:comments:manage']"
@@ -202,7 +213,7 @@ const isHoveredReply = computed(() => {
         type="danger"
         @click="handleDelete"
       >
-        删除
+        {{ $t("core.common.buttons.delete") }}
       </VButton>
     </template>
   </VEntity>

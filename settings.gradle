@@ -6,3 +6,4 @@ pluginManagement {
 }
 
 rootProject.name = 'halo'
+include 'api', 'application', 'platform:application', 'platform:plugin'

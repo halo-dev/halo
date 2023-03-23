@@ -2,5 +2,5 @@
 import Exception from "./components/Exception.vue";
 </script>
 <template>
-  <Exception code="404" message="没有找到该页面" />
+  <Exception code="404" :message="$t('core.exception.not_found.message')" />
 </template>
