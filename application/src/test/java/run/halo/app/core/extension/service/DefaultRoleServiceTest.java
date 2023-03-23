@@ -1,6 +1,7 @@
 package run.halo.app.core.extension.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.eq;
@@ -108,6 +109,8 @@ class DefaultRoleServiceTest {
             when(extensionClient.fetch(Role.class, "role1")).thenReturn(Mono.just(role1));
             when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
             when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.just(role3));
+            when(extensionClient.list(eq(RoleBinding.class), any(), any()))
+                .thenReturn(Flux.empty());
 
             // call the method under test
             Flux<Role> result = roleService.listDependenciesFlux(roleNames);
@@ -136,6 +139,8 @@ class DefaultRoleServiceTest {
             when(extensionClient.fetch(Role.class, "role1")).thenReturn(Mono.just(role1));
             when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
             when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.just(role3));
+            when(extensionClient.list(eq(RoleBinding.class), any(), any()))
+                .thenReturn(Flux.empty());
 
             // call the method under test
             Flux<Role> result = roleService.listDependenciesFlux(roleNames);
@@ -168,6 +173,8 @@ class DefaultRoleServiceTest {
             when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
             when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.just(role3));
             when(extensionClient.fetch(Role.class, "role4")).thenReturn(Mono.just(role4));
+            when(extensionClient.list(eq(RoleBinding.class), any(), any()))
+                .thenReturn(Flux.empty());
 
             // call the method under test
             Flux<Role> result = roleService.listDependenciesFlux(roleNames);
@@ -201,6 +208,8 @@ class DefaultRoleServiceTest {
             when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
             when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.just(role3));
             when(extensionClient.fetch(Role.class, "role4")).thenReturn(Mono.just(role4));
+            when(extensionClient.list(eq(RoleBinding.class), any(), any()))
+                .thenReturn(Flux.empty());
 
             // call the method under test
             Flux<Role> result = roleService.listDependenciesFlux(roleNames);
@@ -234,6 +243,8 @@ class DefaultRoleServiceTest {
             when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
             when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.just(role3));
             lenient().when(extensionClient.fetch(Role.class, "role4")).thenReturn(Mono.just(role4));
+            when(extensionClient.list(eq(RoleBinding.class), any(), any()))
+                .thenReturn(Flux.empty());
 
             // call the method under test
             Flux<Role> result = roleService.listDependenciesFlux(roleNames);
@@ -276,6 +287,8 @@ class DefaultRoleServiceTest {
             when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
             when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.empty());
             when(extensionClient.fetch(Role.class, "role4")).thenReturn(Mono.just(role4));
+            when(extensionClient.list(eq(RoleBinding.class), any(), any()))
+                .thenReturn(Flux.empty());
 
             Flux<Role> result = roleService.listDependenciesFlux(roleNames);
             // verify the result
