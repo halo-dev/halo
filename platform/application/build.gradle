@@ -1,13 +1,13 @@
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 plugins {
+    id 'org.springframework.boot' version '3.0.4' apply false
     id 'java-platform'
     id 'maven-publish'
-    id 'org.springframework.boot' version '3.0.4' apply false
-    id 'io.spring.dependency-management' version '1.1.0'
 }
 
 group = 'run.halo.tools.platform'
+description = 'Platform of application.'
 
 ext {
     commonsLang3 = "3.12.0"
@@ -27,27 +27,48 @@ javaPlatform {
 
 dependencies {
     api platform(SpringBootPlugin.BOM_COORDINATES)
-    constraints {
-        api 'org.mariadb:r2dbc-mariadb:1.1.3'
-        api 'com.github.jasync-sql:jasync-r2dbc-mysql:2.1.23'
-        api "com.github.java-json-tools:json-patch:$jsonPatch"
-        api "io.github.java-diff-utils:java-diff-utils:$javaDiffUtils"
-        api "org.springdoc:springdoc-openapi-starter-common:$springDocOpenAPI"
-        api "org.springdoc:springdoc-openapi-starter-webflux-ui:$springDocOpenAPI"
-        api 'org.openapi4j:openapi-schema-validator:1.0.7'
-        // Apache Lucene
-        api "org.apache.lucene:lucene-core:$lucene"
-        api "org.apache.lucene:lucene-queryparser:$lucene"
-        api "org.apache.lucene:lucene-highlighter:$lucene"
-        api "org.apache.lucene:lucene-backward-codecs:$lucene"
-        api 'cn.shenyanchao.ik-analyzer:ik-analyzer:9.0.0'
 
-        api "org.apache.commons:commons-lang3:$commonsLang3"
-        api "io.seruco.encoding:base62:$base62"
-        api "org.pf4j:pf4j:$pf4j"
-        api "com.google.guava:guava:$guava"
-        api "org.jsoup:jsoup:$jsoup"
-    }
+    api 'org.springframework.boot:spring-boot-starter-actuator'
+    api 'org.springframework.boot:spring-boot-starter-data-jpa'
+    api 'org.springframework.boot:spring-boot-starter-mail'
+    api 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    api 'org.springframework.boot:spring-boot-starter-webflux'
+    api 'org.springframework.boot:spring-boot-starter-validation'
+    api 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+
+    // Spring Security
+    api 'org.springframework.boot:spring-boot-starter-security'
+    api 'org.springframework.security:spring-security-oauth2-jose'
+    api 'org.springframework.security:spring-security-oauth2-client'
+    api 'org.springframework.security:spring-security-oauth2-resource-server'
+
+    api "org.springdoc:springdoc-openapi-starter-webflux-ui:$springDocOpenAPI"
+    api 'org.openapi4j:openapi-schema-validator:1.0.7'
+    api "net.bytebuddy:byte-buddy"
+
+    // Apache Lucene
+    api "org.apache.lucene:lucene-core:$lucene"
+    api "org.apache.lucene:lucene-queryparser:$lucene"
+    api "org.apache.lucene:lucene-highlighter:$lucene"
+    api "org.apache.lucene:lucene-backward-codecs:$lucene"
+    api 'cn.shenyanchao.ik-analyzer:ik-analyzer:9.0.0'
+
+    api "org.apache.commons:commons-lang3:$commonsLang3"
+    api "io.seruco.encoding:base62:$base62"
+    api "org.pf4j:pf4j:$pf4j"
+    api "com.google.guava:guava:$guava"
+    api "org.jsoup:jsoup:$jsoup"
+    api "io.github.java-diff-utils:java-diff-utils:$javaDiffUtils"
+    api "org.springframework.integration:spring-integration-core"
+    api "com.github.java-json-tools:json-patch:$jsonPatch"
+    api "org.thymeleaf.extras:thymeleaf-extras-springsecurity6"
+
+    runtime 'io.r2dbc:r2dbc-h2'
+    runtime 'org.postgresql:postgresql'
+    runtime 'org.postgresql:r2dbc-postgresql'
+    runtime 'org.mariadb:r2dbc-mariadb:1.1.3'
+    runtime 'com.github.jasync-sql:jasync-r2dbc-mysql:2.1.23'
+
 }
 
 publishing {

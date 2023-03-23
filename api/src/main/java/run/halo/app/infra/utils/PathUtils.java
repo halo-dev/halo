@@ -52,10 +52,11 @@ public class PathUtils {
 
     /**
      * Combine paths based on the passed in path segments parameters.
+     * <br/><br/>
+     * This method doesn't work for Windows system currently.
      *
      * @param pathSegments Path segments to be combined
      * @return the combined path
-     * @apiNote This method doesn't work for Windows system currently.
      */
     public static String combinePath(String... pathSegments) {
         StringBuilder sb = new StringBuilder();

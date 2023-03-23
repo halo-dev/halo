@@ -1,5 +1,4 @@
 plugins {
-    id 'org.springframework.boot' version '3.0.4' apply false
     id 'java-library'
     id 'maven-publish'
     id "io.freefair.lombok" version "8.0.0-rc2"
@@ -14,16 +13,10 @@ repositories {
 
 dependencies {
     api platform(project(':platform:application'))
-    implementation 'org.pf4j:pf4j'
-    implementation 'org.springframework:spring-core'
-    implementation 'org.springframework:spring-web'
-    implementation 'io.projectreactor:reactor-core'
-    implementation 'net.bytebuddy:byte-buddy'
-    implementation 'org.springdoc:springdoc-openapi-starter-common'
-    implementation 'org.thymeleaf:thymeleaf'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testImplementation 'org.assertj:assertj-core'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'io.projectreactor:reactor-test'
 }
 
 java {

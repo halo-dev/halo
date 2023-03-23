@@ -12,7 +12,7 @@ javaPlatform {
 }
 
 dependencies {
-    api platform(project(':platform:application'))
+    api project(':api')
     constraints {
         // TODO other plugin API dependencies
         // e.g.: api 'halo.run.plugin:links-api:1.1.0'
