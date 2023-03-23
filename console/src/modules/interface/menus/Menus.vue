@@ -28,6 +28,9 @@ import {
 } from "./utils";
 import { useDebounceFn } from "@vueuse/core";
 import { onBeforeRouteLeave } from "vue-router";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const menuItems = ref<MenuItem[]>([] as MenuItem[]);
 const menuTreeItems = ref<MenuTreeItem[]>([] as MenuTreeItem[]);
@@ -154,9 +157,11 @@ const handleUpdateInBatch = useDebounceFn(async () => {
 
 const handleDelete = async (menuItem: MenuTreeItem) => {
   Dialog.info({
-    title: "确定要删除该菜单项吗？",
-    description: "将同时删除所有子菜单项，删除后将无法恢复",
+    title: t("core.menu.operations.delete_menu_item.title"),
+    description: t("core.menu.operations.delete_menu_item.description"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await apiClient.extension.menuItem.deletev1alpha1MenuItem({
         name: menuItem.metadata.name,
@@ -175,7 +180,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
 
       await handleFetchMenuItems();
 
-      Toast.success("删除成功");
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
@@ -210,7 +215,7 @@ const handleResetMenuItems = async () => {
     @close="onMenuItemEditingModalClose"
     @saved="onMenuItemSaved"
   />
-  <VPageHeader title="菜单">
+  <VPageHeader :title="$t('core.menu.title')">
     <template #icon>
       <IconListSettings class="mr-2 self-center" />
     </template>
@@ -244,7 +249,7 @@ const handleResetMenuItems = async () => {
                       type="default"
                       @click="menuItemEditingModal = true"
                     >
-                      新增
+                      {{ $t("core.common.buttons.new") }}
                     </VButton>
                   </VSpace>
                 </div>
@@ -254,12 +259,14 @@ const handleResetMenuItems = async () => {
           <VLoading v-if="loading" />
           <Transition v-else-if="!menuItems.length" appear name="fade">
             <VEmpty
-              message="你可以尝试刷新或者新建菜单项"
-              title="当前没有菜单项"
+              :message="$t('core.menu.menu_item_empty.message')"
+              :title="$t('core.menu.menu_item_empty.title')"
             >
               <template #actions>
                 <VSpace>
-                  <VButton @click="handleFetchMenuItems()"> 刷新</VButton>
+                  <VButton @click="handleFetchMenuItems()">
+                    {{ $t("core.common.buttons.refresh") }}
+                  </VButton>
                   <VButton
                     v-permission="['system:menus:manage']"
                     type="primary"
@@ -268,7 +275,7 @@ const handleResetMenuItems = async () => {
                     <template #icon>
                       <IconAddCircle class="h-full w-full" />
                     </template>
-                    新增菜单项
+                    {{ $t("core.common.buttons.new") }}
                   </VButton>
                 </VSpace>
               </template>

@@ -26,11 +26,11 @@ export default definePlugin({
           name: "Posts",
           component: PostList,
           meta: {
-            title: "文章",
+            title: "core.post.title",
             searchable: true,
             permissions: ["system:posts:view"],
             menu: {
-              name: "文章",
+              name: "core.sidebar.menu.items.posts",
               group: "content",
               icon: markRaw(IconBookRead),
               priority: 0,
@@ -43,7 +43,7 @@ export default definePlugin({
           name: "DeletedPosts",
           component: DeletedPostList,
           meta: {
-            title: "文章回收站",
+            title: "core.deleted_post.title",
             searchable: true,
             permissions: ["system:posts:view"],
           },
@@ -53,7 +53,7 @@ export default definePlugin({
           name: "PostEditor",
           component: PostEditor,
           meta: {
-            title: "文章编辑",
+            title: "core.post_editor.title",
             searchable: true,
             permissions: ["system:posts:manage"],
           },
@@ -67,7 +67,7 @@ export default definePlugin({
               name: "Categories",
               component: CategoryList,
               meta: {
-                title: "文章分类",
+                title: "core.post_category.title",
                 searchable: true,
                 permissions: ["system:posts:view"],
               },
@@ -83,7 +83,7 @@ export default definePlugin({
               name: "Tags",
               component: TagList,
               meta: {
-                title: "文章标签",
+                title: "core.post_tag.title",
                 searchable: true,
                 permissions: ["system:posts:view"],
               },

@@ -95,7 +95,7 @@ const handleChangePassword = async () => {
   <VModal
     :visible="visible"
     :width="500"
-    title="密码修改"
+    :title="$t('core.user.change_password_modal.title')"
     @update:visible="onVisibleChange"
   >
     <FormKit
@@ -109,13 +109,15 @@ const handleChangePassword = async () => {
     >
       <FormKit
         id="passwordInput"
-        label="新密码"
+        :label="$t('core.user.change_password_modal.fields.new_password.label')"
         name="password"
         type="password"
         validation="required|length:0,100"
       ></FormKit>
       <FormKit
-        label="确认密码"
+        :label="
+          $t('core.user.change_password_modal.fields.confirm_password.label')
+        "
         name="password_confirm"
         type="password"
         validation="required|confirm|length:0,50"
@@ -127,10 +129,13 @@ const handleChangePassword = async () => {
           v-if="visible"
           :loading="saving"
           type="secondary"
+          :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('password-form')"
         >
         </SubmitButton>
-        <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
+        <VButton @click="onVisibleChange(false)">
+          {{ $t("core.common.buttons.cancel_and_shortcut") }}
+        </VButton>
       </VSpace>
     </template>
   </VModal>

@@ -15,7 +15,7 @@ export default definePlugin({
           name: "Roles",
           component: RoleList,
           meta: {
-            title: "角色",
+            title: "core.role.title",
             searchable: true,
             permissions: ["system:roles:view"],
           },
@@ -25,7 +25,7 @@ export default definePlugin({
           name: "RoleDetail",
           component: RoleDetail,
           meta: {
-            title: "角色详情",
+            title: "core.role.detail.title",
             permissions: ["system:roles:view"],
           },
         },

@@ -1,5 +1,6 @@
 import { fileURLToPath, URL } from "url";
 import fs from "fs";
+import path from "path";
 import { defineConfig, loadEnv } from "vite";
 import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
@@ -7,6 +8,7 @@ import Compression from "vite-compression-plugin";
 import { VitePWA } from "vite-plugin-pwa";
 import Icons from "unplugin-icons/vite";
 import { setupLibraryExternal } from "./src/build/library-external";
+import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
 
 export const sharedPlugins = [
   Vue(),
@@ -28,6 +30,9 @@ export const sharedPlugins = [
       theme_color: "#fff",
     },
     disable: true,
+  }),
+  VueI18nPlugin({
+    include: [path.resolve(__dirname, "./src/locales/*.yaml")],
   }),
 ];
 

@@ -18,9 +18,11 @@ import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
 import { useThemeStore } from "@/stores/theme";
 import { storeToRefs } from "pinia";
+import { useI18n } from "vue-i18n";
 
 const router = useRouter();
 const route = useRoute();
+const { t } = useI18n();
 
 const { currentUserHasPermission } = usePermission();
 const { activatedTheme } = storeToRefs(useThemeStore());
@@ -78,7 +80,7 @@ const handleBuildSearchIndex = () => {
       icon: {
         component: markRaw(IconLink),
       },
-      group: "后台页面",
+      group: t("core.components.global_search.groups.console"),
       route,
     });
   });
@@ -91,7 +93,7 @@ const handleBuildSearchIndex = () => {
           icon: {
             component: markRaw(IconUserSettings),
           },
-          group: "用户",
+          group: t("core.components.global_search.groups.user"),
           route: {
             name: "UserDetail",
             params: {
@@ -113,7 +115,7 @@ const handleBuildSearchIndex = () => {
             icon: {
               src: plugin.status?.logo as string,
             },
-            group: "插件",
+            group: t("core.components.global_search.groups.plugin"),
             route: {
               name: "PluginDetail",
               params: {
@@ -135,7 +137,7 @@ const handleBuildSearchIndex = () => {
             icon: {
               component: markRaw(IconBookRead),
             },
-            group: "文章",
+            group: t("core.components.global_search.groups.post"),
             route: {
               name: "PostEditor",
               query: {
@@ -155,7 +157,7 @@ const handleBuildSearchIndex = () => {
             icon: {
               component: markRaw(IconBookRead),
             },
-            group: "分类",
+            group: t("core.components.global_search.groups.category"),
             route: {
               name: "Categories",
               query: {
@@ -173,7 +175,7 @@ const handleBuildSearchIndex = () => {
           icon: {
             component: markRaw(IconBookRead),
           },
-          group: "标签",
+          group: t("core.components.global_search.groups.tag"),
           route: {
             name: "Tags",
             query: {
@@ -195,7 +197,7 @@ const handleBuildSearchIndex = () => {
             icon: {
               component: markRaw(IconPages),
             },
-            group: "自定义页面",
+            group: t("core.components.global_search.groups.page"),
             route: {
               name: "SinglePageEditor",
               query: {
@@ -217,7 +219,7 @@ const handleBuildSearchIndex = () => {
             icon: {
               component: markRaw(IconFolder),
             },
-            group: "附件",
+            group: t("core.components.global_search.groups.attachment"),
             route: {
               name: "Attachments",
               query: {
@@ -242,7 +244,7 @@ const handleBuildSearchIndex = () => {
             icon: {
               component: markRaw(IconSettings),
             },
-            group: "设置",
+            group: t("core.components.global_search.groups.setting"),
             route: {
               name: "SystemSetting",
               params: {
@@ -266,7 +268,7 @@ const handleBuildSearchIndex = () => {
             icon: {
               component: markRaw(IconPalette),
             },
-            group: "主题设置",
+            group: t("core.components.global_search.groups.theme_setting"),
             route: {
               name: "ThemeSetting",
               params: {
@@ -379,7 +381,7 @@ const onVisibleChange = (visible: boolean) => {
       <input
         ref="globalSearchInput"
         v-model="keyword"
-        placeholder="输入关键词以搜索"
+        :placeholder="$t('core.components.global_search.placeholder')"
         class="w-full py-1 text-base outline-none"
         autocomplete="off"
         autocorrect="off"
@@ -391,7 +393,7 @@ const onVisibleChange = (visible: boolean) => {
         v-if="!searchResults.length"
         class="flex items-center justify-center text-sm text-gray-500"
       >
-        <span>没有搜索结果</span>
+        <span>{{ $t("core.components.global_search.no_results") }}</span>
       </div>
       <ul
         v-if="searchResults.length > 0"
@@ -436,7 +438,9 @@ const onVisibleChange = (visible: boolean) => {
     </div>
     <div class="border-t border-gray-100 px-4 py-2.5">
       <div class="flex items-center justify-end">
-        <span class="mr-1 text-xs text-gray-600">选择</span>
+        <span class="mr-1 text-xs text-gray-600">
+          {{ $t("core.components.global_search.buttons.select") }}
+        </span>
         <kbd
           class="mr-1 w-5 rounded border p-0.5 text-center text-[10px] text-gray-600 shadow-sm"
         >
@@ -447,13 +451,17 @@ const onVisibleChange = (visible: boolean) => {
         >
           ↓
         </kbd>
-        <span class="mr-1 text-xs text-gray-600">确认</span>
+        <span class="mr-1 text-xs text-gray-600">
+          {{ $t("core.common.buttons.confirm") }}
+        </span>
         <kbd
           class="mr-5 rounded border p-0.5 text-[10px] text-gray-600 shadow-sm"
         >
           Enter
         </kbd>
-        <span class="mr-1 text-xs text-gray-600">关闭</span>
+        <span class="mr-1 text-xs text-gray-600">
+          {{ $t("core.common.buttons.close") }}
+        </span>
         <kbd class="rounded border p-0.5 text-[10px] text-gray-600 shadow-sm">
           Esc
         </kbd>

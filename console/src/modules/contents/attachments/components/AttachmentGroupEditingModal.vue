@@ -7,6 +7,7 @@ import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
+import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{
@@ -23,6 +24,8 @@ const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
+
+const { t } = useI18n();
 
 const initialFormState: Group = {
   spec: {
@@ -44,7 +47,9 @@ const isUpdateMode = computed(() => {
 });
 
 const modalTitle = computed(() => {
-  return isUpdateMode.value ? "编辑附件分组" : "新增附件分组";
+  return isUpdateMode.value
+    ? t("core.attachment.group_editing_modal.titles.update")
+    : t("core.attachment.group_editing_modal.titles.create");
 });
 
 const handleSave = async () => {
@@ -65,7 +70,7 @@ const handleSave = async () => {
       );
     }
 
-    Toast.success("保存成功");
+    Toast.success(t("core.common.toast.save_success"));
     onVisibleChange(false);
   } catch (e) {
     console.error("Failed to save attachment group", e);
@@ -126,7 +131,9 @@ watch(
       <FormKit
         id="displayNameInput"
         v-model="formState.spec.displayName"
-        label="名称"
+        :label="
+          $t('core.attachment.group_editing_modal.fields.display_name.label')
+        "
         type="text"
         name="displayName"
         validation="required|length:0,50"
@@ -138,10 +145,13 @@ watch(
           v-if="visible"
           :loading="saving"
           type="secondary"
+          :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('attachment-group-form')"
         >
         </SubmitButton>
-        <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
+        <VButton @click="onVisibleChange(false)">
+          {{ $t("core.common.buttons.cancel_and_shortcut") }}
+        </VButton>
       </VSpace>
     </template>
   </VModal>

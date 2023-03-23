@@ -12,6 +12,9 @@ import { Toast, VButton } from "@halo-dev/components";
 // types
 import type { ConfigMap, Plugin, Setting } from "@halo-dev/api-client";
 import { useRouteParams } from "@vueuse/router";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const group = useRouteParams<string>("group");
 
@@ -55,7 +58,7 @@ const handleSaveConfigMap = async () => {
     configMap: configMapToUpdate,
   });
 
-  Toast.success("保存成功");
+  Toast.success(t("core.common.toast.save_success"));
 
   await handleFetchSettings();
   configMap.value = newConfigMap;
@@ -92,7 +95,7 @@ await handleFetchConfigMap();
             type="secondary"
             @click="$formkit.submit(group || '')"
           >
-            保存
+            {{ $t("core.common.buttons.save") }}
           </VButton>
         </div>
       </div>

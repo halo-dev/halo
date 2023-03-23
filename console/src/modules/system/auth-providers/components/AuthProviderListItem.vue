@@ -9,6 +9,9 @@ import {
   VEntityField,
   VSwitch,
 } from "@halo-dev/components";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps<{
   authProvider: ListedAuthProvider;
@@ -20,9 +23,11 @@ const emit = defineEmits<{
 
 const handleChangeStatus = async () => {
   Dialog.info({
-    title: `确定要${
-      props.authProvider.enabled ? "停用" : "启用"
-    }该身份认证方式吗？`,
+    title: props.authProvider.enabled
+      ? t("core.identity_authentication.operations.disable.title")
+      : t("core.identity_authentication.operations.enable.title"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         if (props.authProvider.enabled) {
@@ -30,12 +35,12 @@ const handleChangeStatus = async () => {
             name: props.authProvider.name,
           });
 
-          Toast.success("停用成功");
+          Toast.success(t("core.common.toast.inactive_success"));
         } else {
           await apiClient.authProvider.enableAuthProvider({
             name: props.authProvider.name,
           });
-          Toast.success("启用成功");
+          Toast.success(t("core.common.toast.active_success"));
         }
 
         emit("reload");

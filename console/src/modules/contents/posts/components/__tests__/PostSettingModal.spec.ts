@@ -3,6 +3,8 @@ import { mount } from "@vue/test-utils";
 import PostSettingModal from "../PostSettingModal.vue";
 import { createPinia, setActivePinia } from "pinia";
 import { VueQueryPlugin } from "@tanstack/vue-query";
+import { createI18n } from "vue-i18n";
+import messages from "@intlify/unplugin-vue-i18n/messages";
 
 describe("PostSettingModal", () => {
   beforeEach(() => {
@@ -19,7 +21,14 @@ describe("PostSettingModal", () => {
       },
       {
         global: {
-          plugins: [VueQueryPlugin],
+          plugins: [
+            VueQueryPlugin,
+            createI18n({
+              legacy: false,
+              locale: "en",
+              messages,
+            }),
+          ],
         },
       }
     );

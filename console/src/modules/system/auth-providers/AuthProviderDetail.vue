@@ -13,13 +13,15 @@ import {
   VTabbar,
 } from "@halo-dev/components";
 import { useSettingFormConvert } from "@/composables/use-setting-form";
+import { useI18n } from "vue-i18n";
 
 const route = useRoute();
+const { t } = useI18n();
 
 const tabs = ref<{ id: string; label: string }[]>([
   {
     id: "detail",
-    label: "详情",
+    label: t("core.identity_authentication.tabs.detail"),
   },
 ]);
 
@@ -40,7 +42,7 @@ const { data: authProvider } = useQuery<AuthProvider>({
     if (data.spec.settingRef?.name) {
       tabs.value.push({
         id: "setting",
-        label: "设置",
+        label: t("core.identity_authentication.tabs.setting"),
       });
     }
   },
@@ -132,7 +134,7 @@ const handleSaveConfigMap = async () => {
     configMap: configMapToUpdate,
   });
 
-  Toast.success("保存成功");
+  Toast.success(t("core.common.toast.save_success"));
 
   await handleFetchSettings();
   await handleFetchConfigMap();
@@ -169,7 +171,11 @@ const handleSaveConfigMap = async () => {
             <div
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">名称</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{
+                  $t("core.identity_authentication.detail.fields.display_name")
+                }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
                 {{ authProvider?.spec.displayName }}
               </dd>
@@ -177,7 +183,11 @@ const handleSaveConfigMap = async () => {
             <div
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">描述</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{
+                  $t("core.identity_authentication.detail.fields.description")
+                }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
                 {{ authProvider?.spec.description }}
               </dd>
@@ -185,7 +195,9 @@ const handleSaveConfigMap = async () => {
             <div
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">网站</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{ $t("core.identity_authentication.detail.fields.website") }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
                 <a
                   v-if="authProvider?.spec.website"
@@ -194,13 +206,17 @@ const handleSaveConfigMap = async () => {
                 >
                   {{ authProvider.spec.website }}
                 </a>
-                <span v-else>无</span>
+                <span v-else>
+                  {{ $t("core.common.text.none") }}
+                </span>
               </dd>
             </div>
             <div
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">帮助页面</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{ $t("core.identity_authentication.detail.fields.help_page") }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
                 <a
                   v-if="authProvider?.spec.helpPage"
@@ -209,13 +225,19 @@ const handleSaveConfigMap = async () => {
                 >
                   {{ authProvider.spec.helpPage }}
                 </a>
-                <span v-else>无</span>
+                <span v-else>{{ $t("core.common.text.none") }}</span>
               </dd>
             </div>
             <div
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">登录入口</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{
+                  $t(
+                    "core.identity_authentication.detail.fields.authentication_url"
+                  )
+                }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
                 {{ authProvider?.spec.authenticationUrl }}
               </dd>
@@ -247,7 +269,7 @@ const handleSaveConfigMap = async () => {
                 type="secondary"
                 @click="$formkit.submit(group || '')"
               >
-                保存
+                {{ $t("core.common.buttons.save") }}
               </VButton>
             </div>
           </div>

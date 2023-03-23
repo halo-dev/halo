@@ -41,6 +41,7 @@ import type { AxiosError, AxiosInstance } from "axios";
 import axios from "axios";
 import { useUserStore } from "@/stores/user";
 import { Toast } from "@halo-dev/components";
+import { i18n } from "../locales";
 
 const baseURL = import.meta.env.VITE_API_URL;
 
@@ -63,14 +64,15 @@ axiosInstance.interceptors.response.use(
   },
   async (error: AxiosError<ProblemDetail>) => {
     if (/Network Error/.test(error.message)) {
-      Toast.error("网络错误，请检查网络连接");
+      // @ts-ignore
+      Toast.error(i18n.global.t("core.common.toast.network_error"));
       return Promise.reject(error);
     }
 
     const errorResponse = error.response;
 
     if (!errorResponse) {
-      Toast.error("网络错误，请检查网络连接");
+      Toast.error(i18n.global.t("core.common.toast.network_error"));
       return Promise.reject(error);
     }
 
@@ -85,20 +87,28 @@ axiosInstance.interceptors.response.use(
     }
 
     if (status === 400) {
-      Toast.error(`请求参数错误：${title}`);
+      Toast.error(
+        i18n.global.t("core.common.toast.request_parameter_error", { title })
+      );
     } else if (status === 401) {
       const userStore = useUserStore();
       userStore.loginModalVisible = true;
-      Toast.warning("登录已过期，请重新登录");
+      Toast.warning(i18n.global.t("core.common.toast.login_expired"));
       localStorage.removeItem("logged_in");
     } else if (status === 403) {
-      Toast.error("无权限访问");
+      Toast.error(i18n.global.t("core.common.toast.forbidden"));
     } else if (status === 404) {
-      Toast.error("资源不存在");
+      Toast.error(i18n.global.t("core.common.toast.not_found"));
     } else if (status === 500) {
-      Toast.error(`服务器内部错误：${title}`);
+      Toast.error(
+        i18n.global.t("core.common.toast.server_internal_error_with_title")
+      );
     } else {
-      Toast.error(`未知错误：${title}`);
+      Toast.error(
+        i18n.global.t("core.common.toast.unknown_error_with_title", {
+          title,
+        })
+      );
     }
 
     return Promise.reject(error);

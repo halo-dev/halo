@@ -5,7 +5,6 @@ import {
   IconArrowRight,
   IconEye,
   IconEyeOff,
-  IconTeam,
   IconAddCircle,
   IconRefreshLine,
   IconExternalLinkLine,
@@ -38,8 +37,10 @@ import FilterTag from "@/components/filter/FilterTag.vue";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const settingModal = ref(false);
 const selectedSinglePage = ref<SinglePage>();
@@ -65,57 +66,52 @@ interface SortItem {
 
 const VisibleItems: VisibleItem[] = [
   {
-    label: "全部",
+    label: t("core.page.filters.visible.items.all"),
     value: undefined,
   },
   {
-    label: "公开",
+    label: t("core.page.filters.visible.items.public"),
     value: "PUBLIC",
   },
-  // TODO: 支持内部成员可访问
-  // {
-  //   label: "内部成员可访问",
-  //   value: "INTERNAL",
-  // },
   {
-    label: "私有",
+    label: t("core.page.filters.visible.items.private"),
     value: "PRIVATE",
   },
 ];
 
 const PublishStatusItems: PublishStatusItem[] = [
   {
-    label: "全部",
+    label: t("core.page.filters.status.items.all"),
     value: undefined,
   },
   {
-    label: "已发布",
+    label: t("core.page.filters.status.items.published"),
     value: true,
   },
   {
-    label: "未发布",
+    label: t("core.page.filters.status.items.draft"),
     value: false,
   },
 ];
 
 const SortItems: SortItem[] = [
   {
-    label: "较近发布",
+    label: t("core.page.filters.sort.items.publish_time_desc"),
     sort: "PUBLISH_TIME",
     sortOrder: false,
   },
   {
-    label: "较早发布",
+    label: t("core.page.filters.sort.items.publish_time_asc"),
     sort: "PUBLISH_TIME",
     sortOrder: true,
   },
   {
-    label: "较近创建",
+    label: t("core.page.filters.sort.items.create_time_desc"),
     sort: "CREATE_TIME",
     sortOrder: false,
   },
   {
-    label: "较早创建",
+    label: t("core.page.filters.sort.items.create_time_asc"),
     sort: "CREATE_TIME",
     sortOrder: true,
   },
@@ -328,9 +324,11 @@ const handleCheckAllChange = (e: Event) => {
 
 const handleDelete = async (singlePage: SinglePage) => {
   Dialog.warning({
-    title: "确定要删除该自定义页面吗？",
-    description: "该操作会将自定义页面放入回收站，后续可以从回收站恢复",
+    title: t("core.page.operations.delete.title"),
+    description: t("core.page.operations.delete.description"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const singlePageToUpdate = cloneDeep(singlePage);
       singlePageToUpdate.spec.deleted = true;
@@ -342,16 +340,18 @@ const handleDelete = async (singlePage: SinglePage) => {
       );
       await refetch();
 
-      Toast.success("删除成功");
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
 
 const handleDeleteInBatch = async () => {
   Dialog.warning({
-    title: "确定要删除选中的自定义页面吗？",
-    description: "该操作会将自定义页面放入回收站，后续可以从回收站恢复",
+    title: t("core.page.operations.delete_in_batch.title"),
+    description: t("core.page.operations.delete_in_batch.description"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {
@@ -380,14 +380,16 @@ const handleDeleteInBatch = async () => {
       await refetch();
       selectedPageNames.value = [];
 
-      Toast.success("删除成功");
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
 
 const getPublishStatus = (singlePage: SinglePage) => {
   const { labels } = singlePage.metadata;
-  return labels?.[singlePageLabels.PUBLISHED] === "true" ? "已发布" : "未发布";
+  return labels?.[singlePageLabels.PUBLISHED] === "true"
+    ? t("core.page.filters.status.items.published")
+    : t("core.page.filters.status.items.draft");
 };
 
 const isPublishing = (singlePage: SinglePage) => {
@@ -412,15 +414,15 @@ watch(selectedPageNames, (newValue) => {
   >
     <template #actions>
       <span @click="handleSelectPrevious">
-        <IconArrowLeft v-tooltip="`上一项`" />
+        <IconArrowLeft v-tooltip="$t('core.common.buttons.previous')" />
       </span>
       <span @click="handleSelectNext">
-        <IconArrowRight v-tooltip="`下一项`" />
+        <IconArrowRight v-tooltip="$t('core.common.buttons.next')" />
       </span>
     </template>
   </SinglePageSettingModal>
 
-  <VPageHeader title="页面">
+  <VPageHeader :title="$t('core.page.title')">
     <template #icon>
       <IconPages class="mr-2 self-center" />
     </template>
@@ -431,7 +433,7 @@ watch(selectedPageNames, (newValue) => {
           :route="{ name: 'DeletedSinglePages' }"
           size="sm"
         >
-          回收站
+          {{ $t("core.page.actions.recycle_bin") }}
         </VButton>
         <VButton
           v-permission="['system:singlepages:manage']"
@@ -441,7 +443,7 @@ watch(selectedPageNames, (newValue) => {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          新建
+          {{ $t("core.common.buttons.new") }}
         </VButton>
       </VSpace>
     </template>
@@ -473,7 +475,7 @@ watch(selectedPageNames, (newValue) => {
                 <FormKit
                   id="keywordInput"
                   outer-class="!p-0"
-                  placeholder="输入关键词搜索"
+                  :placeholder="$t('core.common.placeholder.search')"
                   type="text"
                   name="keyword"
                   :model-value="keyword"
@@ -481,35 +483,55 @@ watch(selectedPageNames, (newValue) => {
                 ></FormKit>
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  关键词：{{ keyword }}
+                  {{
+                    $t("core.common.filters.results.keyword", {
+                      keyword: keyword,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
                   v-if="selectedPublishStatusItem.value !== undefined"
                   @close="handlePublishStatusItemChange(PublishStatusItems[0])"
                 >
-                  状态：{{ selectedPublishStatusItem.label }}
+                  {{
+                    $t("core.common.filters.results.status", {
+                      status: selectedPublishStatusItem.label,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
                   v-if="selectedVisibleItem.value"
                   @close="handleVisibleItemChange(VisibleItems[0])"
                 >
-                  可见性：{{ selectedVisibleItem.label }}
+                  {{
+                    $t("core.page.filters.visible.result", {
+                      visible: selectedVisibleItem.label,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
                   v-if="selectedContributor"
                   @close="handleSelectUser()"
                 >
-                  作者：{{ selectedContributor?.spec.displayName }}
+                  {{
+                    $t("core.page.filters.author.result", {
+                      author: selectedContributor.spec.displayName,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
                   v-if="selectedSortItem"
                   @close="handleSortItemChange()"
                 >
-                  排序：{{ selectedSortItem.label }}
+                  {{
+                    $t("core.common.filters.results.sort", {
+                      sort: selectedSortItem.label,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterCleanButton
@@ -518,9 +540,9 @@ watch(selectedPageNames, (newValue) => {
                 />
               </div>
               <VSpace v-else>
-                <VButton type="danger" @click="handleDeleteInBatch"
-                  >删除</VButton
-                >
+                <VButton type="danger" @click="handleDeleteInBatch">
+                  {{ $t("core.common.buttons.delete") }}
+                </VButton>
               </VSpace>
             </div>
             <div class="mt-4 flex sm:mt-0">
@@ -529,7 +551,9 @@ watch(selectedPageNames, (newValue) => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">状态</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.common.filters.labels.status") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -559,7 +583,9 @@ watch(selectedPageNames, (newValue) => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5"> 可见性 </span>
+                    <span class="mr-0.5">
+                      {{ $t("core.page.filters.visible.label") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -593,7 +619,9 @@ watch(selectedPageNames, (newValue) => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">作者</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.page.filters.author.label") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -603,7 +631,9 @@ watch(selectedPageNames, (newValue) => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">排序</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.common.filters.labels.sort") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -630,7 +660,7 @@ watch(selectedPageNames, (newValue) => {
                     @click="refetch()"
                   >
                     <IconRefreshLine
-                      v-tooltip="`刷新`"
+                      v-tooltip="$t('core.common.buttons.refresh')"
                       :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
@@ -643,10 +673,15 @@ watch(selectedPageNames, (newValue) => {
       </template>
       <VLoading v-if="isLoading" />
       <Transition v-else-if="!singlePages?.length" appear name="fade">
-        <VEmpty message="你可以尝试刷新或者新建页面" title="当前没有页面">
+        <VEmpty
+          :message="$t('core.page.empty.message')"
+          :title="$t('core.page.empty.title')"
+        >
           <template #actions>
             <VSpace>
-              <VButton @click="refetch">刷新</VButton>
+              <VButton @click="refetch">
+                {{ $t("core.common.buttons.refresh") }}
+              </VButton>
               <VButton
                 v-permission="['system:singlepages:manage']"
                 :route="{ name: 'SinglePageEditor' }"
@@ -655,7 +690,7 @@ watch(selectedPageNames, (newValue) => {
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>
-                新建页面
+                {{ $t("core.common.buttons.new") }}
               </VButton>
             </VSpace>
           </template>
@@ -691,7 +726,9 @@ watch(selectedPageNames, (newValue) => {
                     <VSpace>
                       <RouterLink
                         v-if="singlePage.page.status?.inProgress"
-                        v-tooltip="`当前有内容已保存，但还未发布。`"
+                        v-tooltip="
+                          $t('core.common.tooltips.unpublished_content_tip')
+                        "
                         :to="{
                           name: 'SinglePageEditor',
                           query: { name: singlePage.page.metadata.name },
@@ -715,10 +752,18 @@ watch(selectedPageNames, (newValue) => {
                     <div class="flex w-full flex-col gap-1">
                       <VSpace class="w-full">
                         <span class="text-xs text-gray-500">
-                          访问量 {{ singlePage.stats.visit || 0 }}
+                          {{
+                            $t("core.page.list.fields.visits", {
+                              visits: singlePage.stats.visit || 0,
+                            })
+                          }}
                         </span>
                         <span class="text-xs text-gray-500">
-                          评论 {{ singlePage.stats.totalComment || 0 }}
+                          {{
+                            $t("core.page.list.fields.comments", {
+                              comments: singlePage.stats.totalComment || 0,
+                            })
+                          }}
                         </span>
                       </VSpace>
                     </div>
@@ -751,32 +796,33 @@ watch(selectedPageNames, (newValue) => {
                 </VEntityField>
                 <VEntityField :description="getPublishStatus(singlePage.page)">
                   <template v-if="isPublishing(singlePage.page)" #description>
-                    <VStatusDot text="发布中" animate />
+                    <VStatusDot
+                      :text="$t('core.common.tooltips.publishing')"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField>
                   <template #description>
                     <IconEye
                       v-if="singlePage.page.spec.visible === 'PUBLIC'"
-                      v-tooltip="`公开访问`"
+                      v-tooltip="$t('core.page.filters.visible.items.public')"
                       class="cursor-pointer text-sm transition-all hover:text-blue-600"
                     />
                     <IconEyeOff
                       v-if="singlePage.page.spec.visible === 'PRIVATE'"
-                      v-tooltip="`私有访问`"
-                      class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                    />
-                    <!-- TODO: 支持内部成员可访问 -->
-                    <IconTeam
-                      v-if="false"
-                      v-tooltip="`内部成员可访问`"
+                      v-tooltip="$t('core.page.filters.visible.items.private')"
                       class="cursor-pointer text-sm transition-all hover:text-blue-600"
                     />
                   </template>
                 </VEntityField>
                 <VEntityField v-if="singlePage?.page?.spec.deleted">
                   <template #description>
-                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                    <VStatusDot
+                      v-tooltip="$t('core.common.status.deleting')"
+                      state="warning"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField>
@@ -797,7 +843,7 @@ watch(selectedPageNames, (newValue) => {
                   type="secondary"
                   @click="handleOpenSettingModal(singlePage.page)"
                 >
-                  设置
+                  {{ $t("core.common.buttons.setting") }}
                 </VButton>
                 <VButton
                   v-close-popper
@@ -805,7 +851,7 @@ watch(selectedPageNames, (newValue) => {
                   type="danger"
                   @click="handleDelete(singlePage.page)"
                 >
-                  删除
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </template>
             </VEntity>
@@ -818,6 +864,8 @@ watch(selectedPageNames, (newValue) => {
           <VPagination
             v-model:page="page"
             v-model:size="size"
+            :page-label="$t('core.components.pagination.page_label')"
+            :size-label="$t('core.components.pagination.size_label')"
             :total="total"
             :size-options="[20, 30, 50, 100]"
           />

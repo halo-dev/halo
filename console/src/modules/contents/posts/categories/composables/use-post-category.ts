@@ -6,6 +6,7 @@ import type { CategoryTree } from "@/modules/contents/posts/categories/utils";
 import { buildCategoriesTree } from "@/modules/contents/posts/categories/utils";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 interface usePostCategoryReturn {
   categories: Ref<Category[] | undefined>;
@@ -16,6 +17,8 @@ interface usePostCategoryReturn {
 }
 
 export function usePostCategory(): usePostCategoryReturn {
+  const { t } = useI18n();
+
   const categoriesTree = ref<CategoryTree[]>([] as CategoryTree[]);
 
   const {
@@ -48,9 +51,11 @@ export function usePostCategory(): usePostCategoryReturn {
 
   const handleDelete = async (category: CategoryTree) => {
     Dialog.warning({
-      title: "确定要删除该分类吗？",
-      description: "删除此分类之后，对应文章的关联将被解除。该操作不可恢复。",
+      title: t("core.post_category.operations.delete.title"),
+      description: t("core.post_category.operations.delete.description"),
       confirmType: "danger",
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           await apiClient.extension.category.deletecontentHaloRunV1alpha1Category(
@@ -59,7 +64,7 @@ export function usePostCategory(): usePostCategoryReturn {
             }
           );
 
-          Toast.success("删除成功");
+          Toast.success(t("core.common.toast.delete_success"));
         } catch (e) {
           console.error("Failed to delete tag", e);
         } finally {
