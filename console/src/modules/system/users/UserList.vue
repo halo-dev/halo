@@ -24,9 +24,9 @@ import {
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import GrantPermissionModal from "./components/GrantPermissionModal.vue";
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
-import type { Role, User, ListedUserList } from "@halo-dev/api-client";
+import type { Role, User, ListedUser } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 import { useRouteQuery } from "@vueuse/router";
@@ -36,6 +36,7 @@ import { getNode } from "@formkit/core";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import { useFetchRole } from "../roles/composables/use-role";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
+import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
@@ -46,46 +47,86 @@ const editingModal = ref<boolean>(false);
 const passwordChangeModal = ref<boolean>(false);
 const grantPermissionModal = ref<boolean>(false);
 
-const users = ref<ListedUserList>({
-  page: 1,
-  size: 20,
-  total: 0,
-  items: [],
-  first: true,
-  last: false,
-  hasNext: false,
-  hasPrevious: false,
-  totalPages: 0,
-});
-const loading = ref(false);
 const selectedUserNames = ref<string[]>([]);
 const selectedUser = ref<User>();
 const keyword = ref("");
-const refreshInterval = ref();
 
 const userStore = useUserStore();
 
 const ANONYMOUSUSER_NAME = "anonymousUser";
 const DELETEDUSER_NAME = "ghost";
 
-const handleFetchUsers = async (options?: {
-  mute?: boolean;
-  page?: number;
-}) => {
-  try {
-    clearInterval(refreshInterval.value);
+// Filters
+function handleKeywordChange() {
+  const keywordNode = getNode("keywordInput");
+  if (keywordNode) {
+    keyword.value = keywordNode._value as string;
+  }
+  page.value = 1;
+}
 
-    if (!options?.mute) {
-      loading.value = true;
-    }
+function handleClearKeyword() {
+  keyword.value = "";
+  page.value = 1;
+}
 
-    if (options?.page) {
-      users.value.page = options.page;
-    }
+interface SortItem {
+  label: string;
+  value: string;
+}
 
+const SortItems: SortItem[] = [
+  {
+    label: t("core.user.filters.sort.items.create_time_desc"),
+    value: "creationTimestamp,desc",
+  },
+  {
+    label: t("core.user.filters.sort.items.create_time_asc"),
+    value: "creationTimestamp,asc",
+  },
+];
+
+const selectedSortItem = ref<SortItem>();
+
+function handleSortItemChange(sortItem?: SortItem) {
+  selectedSortItem.value = sortItem;
+  page.value = 1;
+}
+
+const { roles } = useFetchRole();
+const selectedRole = ref<Role>();
+
+function handleRoleChange(role?: Role) {
+  selectedRole.value = role;
+  page.value = 1;
+}
+
+function handleClearFilters() {
+  selectedRole.value = undefined;
+  selectedSortItem.value = undefined;
+  keyword.value = "";
+  page.value = 1;
+}
+
+const hasFilters = computed(() => {
+  return selectedRole.value || selectedSortItem.value || keyword.value;
+});
+
+const page = ref(1);
+const size = ref(20);
+const total = ref(0);
+
+const {
+  data: users,
+  isLoading,
+  isFetching,
+  refetch,
+} = useQuery<ListedUser[]>({
+  queryKey: ["users", page, size, keyword, selectedSortItem, selectedRole],
+  queryFn: async () => {
     const { data } = await apiClient.user.listUsers({
-      page: users.value.page,
-      size: users.value.size,
+      page: page.value,
+      size: size.value,
       keyword: keyword.value,
       fieldSelector: [
         `name!=${ANONYMOUSUSER_NAME}`,
@@ -97,36 +138,22 @@ const handleFetchUsers = async (options?: {
       role: selectedRole.value?.metadata.name,
     });
 
-    users.value = data;
+    total.value = data.total;
 
-    const deletedUsers = users.value.items.filter(
+    return data.items;
+  },
+  refetchOnWindowFocus: false,
+  refetchInterval(data) {
+    const deletingUsers = data?.filter(
       (user) => !!user.user.metadata.deletionTimestamp
     );
 
-    if (deletedUsers.length) {
-      refreshInterval.value = setInterval(() => {
-        handleFetchUsers({ mute: true });
-      }, 3000);
-    }
-  } catch (e) {
-    console.error("Failed to fetch users", e);
-  } finally {
+    return deletingUsers?.length ? 3000 : false;
+  },
+  onSuccess() {
     selectedUser.value = undefined;
-    loading.value = false;
-  }
-};
-
-const handlePaginationChange = async ({
-  page,
-  size,
-}: {
-  page: number;
-  size: number;
-}) => {
-  users.value.page = page;
-  users.value.size = size;
-  await handleFetchUsers();
-};
+  },
+});
 
 const handleDelete = async (user: User) => {
   Dialog.warning({
@@ -145,7 +172,7 @@ const handleDelete = async (user: User) => {
       } catch (e) {
         console.error("Failed to delete user", e);
       } finally {
-        await handleFetchUsers();
+        await refetch();
       }
     },
   });
@@ -169,7 +196,7 @@ const handleDeleteInBatch = async () => {
           });
         })
       );
-      await handleFetchUsers();
+      await refetch();
       selectedUserNames.value.length = 0;
       Toast.success(t("core.common.toast.delete_success"));
     },
@@ -177,7 +204,7 @@ const handleDeleteInBatch = async () => {
 };
 
 watch(selectedUserNames, (newValue) => {
-  checkedAll.value = newValue.length === users.value.items?.length;
+  checkedAll.value = newValue.length === users.value?.length;
 });
 
 const checkSelection = (user: User) => {
@@ -192,7 +219,7 @@ const handleCheckAllChange = (e: Event) => {
 
   if (checked) {
     selectedUserNames.value =
-      users.value.items.map((user) => {
+      users.value?.map((user) => {
         return user.user.metadata.name;
       }) || [];
   } else {
@@ -207,7 +234,7 @@ const handleOpenCreateModal = (user: User) => {
 
 const onEditingModalClose = () => {
   routeQueryAction.value = undefined;
-  handleFetchUsers();
+  refetch();
 };
 
 const handleOpenPasswordChangeModal = (user: User) => {
@@ -220,14 +247,6 @@ const handleOpenGrantPermissionModal = (user: User) => {
   grantPermissionModal.value = true;
 };
 
-onMounted(() => {
-  handleFetchUsers();
-});
-
-onUnmounted(() => {
-  clearInterval(refreshInterval.value);
-});
-
 // Route query action
 const routeQueryAction = useRouteQuery<string | undefined>("action");
 
@@ -238,62 +257,6 @@ onMounted(() => {
   if (routeQueryAction.value === "create") {
     editingModal.value = true;
   }
-});
-
-// Filters
-function handleKeywordChange() {
-  const keywordNode = getNode("keywordInput");
-  if (keywordNode) {
-    keyword.value = keywordNode._value as string;
-  }
-  handleFetchUsers({ page: 1 });
-}
-
-function handleClearKeyword() {
-  keyword.value = "";
-  handleFetchUsers({ page: 1 });
-}
-
-interface SortItem {
-  label: string;
-  value: string;
-}
-
-const SortItems: SortItem[] = [
-  {
-    label: t("core.user.filters.sort.items.create_time_desc"),
-    value: "creationTimestamp,desc",
-  },
-  {
-    label: t("core.user.filters.sort.items.create_time_asc"),
-    value: "creationTimestamp,asc",
-  },
-];
-
-const selectedSortItem = ref<SortItem>();
-
-function handleSortItemChange(sortItem?: SortItem) {
-  selectedSortItem.value = sortItem;
-  handleFetchUsers({ page: 1 });
-}
-
-const { roles } = useFetchRole();
-const selectedRole = ref<Role>();
-
-function handleRoleChange(role?: Role) {
-  selectedRole.value = role;
-  handleFetchUsers({ page: 1 });
-}
-
-function handleClearFilters() {
-  selectedRole.value = undefined;
-  selectedSortItem.value = undefined;
-  keyword.value = "";
-  handleFetchUsers({ page: 1 });
-}
-
-const hasFilters = computed(() => {
-  return selectedRole.value || selectedSortItem.value || keyword.value;
 });
 </script>
 <template>
@@ -306,13 +269,13 @@ const hasFilters = computed(() => {
   <UserPasswordChangeModal
     v-model:visible="passwordChangeModal"
     :user="selectedUser"
-    @close="handleFetchUsers"
+    @close="refetch"
   />
 
   <GrantPermissionModal
     v-model:visible="grantPermissionModal"
     :user="selectedUser"
-    @close="handleFetchUsers"
+    @close="refetch"
   />
 
   <VPageHeader :title="$t('core.user.title')">
@@ -491,11 +454,13 @@ const hasFilters = computed(() => {
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                    @click="handleFetchUsers()"
+                    @click="refetch()"
                   >
                     <IconRefreshLine
                       v-tooltip="$t('core.common.buttons.refresh')"
-                      :class="{ 'animate-spin text-gray-900': loading }"
+                      :class="{
+                        'animate-spin text-gray-900': isFetching,
+                      }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
                   </div>
@@ -506,16 +471,16 @@ const hasFilters = computed(() => {
         </div>
       </template>
 
-      <VLoading v-if="loading" />
+      <VLoading v-if="isLoading" />
 
-      <Transition v-else-if="!users.total" appear name="fade">
+      <Transition v-else-if="!users?.length" appear name="fade">
         <VEmpty
           :message="$t('core.user.empty.message')"
           :title="$t('core.user.empty.title')"
         >
           <template #actions>
             <VSpace>
-              <VButton @click="handleFetchUsers()">
+              <VButton @click="refetch()">
                 {{ $t("core.common.buttons.refresh") }}
               </VButton>
               <VButton
@@ -538,7 +503,7 @@ const hasFilters = computed(() => {
           class="box-border h-full w-full divide-y divide-gray-100"
           role="list"
         >
-          <li v-for="(user, index) in users.items" :key="index">
+          <li v-for="(user, index) in users" :key="index">
             <VEntity :is-selected="checkSelection(user.user)">
               <template
                 v-if="currentUserHasPermission(['system:users:manage'])"
@@ -657,13 +622,12 @@ const hasFilters = computed(() => {
       <template #footer>
         <div class="bg-white sm:flex sm:items-center sm:justify-end">
           <VPagination
-            :page="users.page"
-            :size="users.size"
-            :total="users.total"
+            v-model:page="page"
+            v-model:size="size"
+            :total="total"
             :page-label="$t('core.components.pagination.page_label')"
             :size-label="$t('core.components.pagination.size_label')"
             :size-options="[20, 30, 50, 100]"
-            @change="handlePaginationChange"
           />
         </div>
       </template>

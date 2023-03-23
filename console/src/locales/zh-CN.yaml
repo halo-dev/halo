@@ -408,7 +408,7 @@ core:
         pending_review: 待审核
     subject_refs:
       post: 文章
-      page: 单页
+      page: 页面
       unknown: 未知
     reply_modal:
       title: 回复
