@@ -13,6 +13,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+import org.assertj.core.api.AssertionsForInterfaceTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,6 +26,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.TestRole;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -283,6 +287,52 @@ class DefaultRoleServiceTest {
 
             // verify the mock invocations
             verify(extensionClient, times(4)).fetch(eq(Role.class), anyString());
+        }
+
+        @Test
+        void testSubjectMatch() {
+            RoleBinding fakeAuthenticatedBinding =
+                createRoleBinding("authenticated-fake-binding", "fake", "authenticated");
+            RoleBinding fakeEditorBinding =
+                createRoleBinding("editor-fake-binding", "fake", "editor");
+            RoleBinding fakeAnonymousBinding =
+                createRoleBinding("test-anonymous-binding", "test", "anonymous");
+
+            RoleBinding.Subject subject = new RoleBinding.Subject();
+            subject.setName("authenticated");
+            subject.setKind(Role.KIND);
+            subject.setApiGroup(Role.GROUP);
+
+            Predicate<RoleBinding> predicate = roleService.getRoleBindingPredicate(subject);
+            List<RoleBinding> result =
+                Stream.of(fakeAuthenticatedBinding, fakeEditorBinding, fakeAnonymousBinding)
+                    .filter(predicate)
+                    .toList();
+            AssertionsForInterfaceTypes.assertThat(result)
+                .containsExactly(fakeAuthenticatedBinding);
+
+            subject.setName("editor");
+            predicate = roleService.getRoleBindingPredicate(subject);
+            result =
+                Stream.of(fakeAuthenticatedBinding, fakeEditorBinding, fakeAnonymousBinding)
+                    .filter(predicate)
+                    .toList();
+            AssertionsForInterfaceTypes.assertThat(result).containsExactly(fakeEditorBinding);
+        }
+
+        RoleBinding createRoleBinding(String name, String refName, String subjectName) {
+            RoleBinding roleBinding = new RoleBinding();
+            roleBinding.setMetadata(new Metadata());
+            roleBinding.getMetadata().setName(name);
+            roleBinding.setRoleRef(new RoleBinding.RoleRef());
+            roleBinding.getRoleRef().setKind(Role.KIND);
+            roleBinding.getRoleRef().setApiGroup(Role.GROUP);
+            roleBinding.getRoleRef().setName(refName);
+            roleBinding.setSubjects(List.of(new RoleBinding.Subject()));
+            roleBinding.getSubjects().get(0).setKind(Role.KIND);
+            roleBinding.getSubjects().get(0).setName(subjectName);
+            roleBinding.getSubjects().get(0).setApiGroup(Role.GROUP);
+            return roleBinding;
         }
 
         private Role createRole(String name, String... dependencies) {

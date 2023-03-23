@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -110,7 +111,47 @@ public class DefaultRoleService implements RoleService {
                 return Flux.fromIterable(dependencies)
                     .filter(dependency -> !visited.contains(dependency))
                     .flatMap(dependencyName -> extensionClient.fetch(Role.class, dependencyName));
+            })
+            .flatMap(role -> {
+                Subject subject = createRoleSubject(role.getMetadata().getName());
+                return Flux.just(role)
+                    .mergeWith(listRoleBindingRoles(subject));
             });
+    }
+
+    private static Subject createRoleSubject(String roleName) {
+        Subject subject = new Subject();
+        subject.setName(roleName);
+        subject.setKind(Role.KIND);
+        subject.setApiGroup(Role.GROUP);
+        return subject;
+    }
+
+    Flux<Role> listRoleBindingRoles(Subject subject) {
+        return extensionClient.list(RoleBinding.class, getRoleBindingPredicate(subject),
+                null)
+            .map(RoleBinding::getRoleRef)
+            .flatMap(ref -> extensionClient.fetch(Role.class, ref.getName()));
+    }
+
+    Predicate<RoleBinding> getRoleBindingPredicate(Subject targetSubject) {
+        return roleBinding -> {
+            List<Subject> subjects = roleBinding.getSubjects();
+            for (Subject subject : subjects) {
+                return matchSubject(targetSubject, subject);
+            }
+            return false;
+        };
+    }
+
+    private static boolean matchSubject(Subject targetSubject, Subject subject) {
+        if (targetSubject == null || subject == null) {
+            return false;
+        }
+        return StringUtils.equals(targetSubject.getKind(), subject.getKind())
+            && StringUtils.equals(targetSubject.getName(), subject.getName())
+            && StringUtils.defaultString(targetSubject.getApiGroup())
+            .equals(StringUtils.defaultString(subject.getApiGroup()));
     }
 
     @Override
