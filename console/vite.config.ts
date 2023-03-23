@@ -51,7 +51,7 @@ export default ({ mode }: { mode: string }) => {
     },
     build: {
       outDir: fileURLToPath(
-        new URL("../src/main/resources/console", import.meta.url)
+        new URL("../core/src/main/resources/console", import.meta.url)
       ),
       emptyOutDir: true,
       chunkSizeWarningLimit: 2048,

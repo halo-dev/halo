@@ -1,0 +1,98 @@
+plugins {
+    id 'org.springframework.boot' version '3.0.4'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id "com.gorylenko.gradle-git-properties" version "2.3.2"
+    id "checkstyle"
+    id 'java'
+    id 'jacoco'
+    id "de.undercouch.download" version "5.3.1"
+    id "io.freefair.lombok" version "8.0.0-rc2"
+}
+
+group = "run.halo.app"
+sourceCompatibility = JavaVersion.VERSION_17
+
+checkstyle {
+    toolVersion = "9.3"
+    showViolations = false
+    ignoreFailures = false
+}
+
+repositories {
+    mavenCentral()
+
+    maven { url 'https://repo.spring.io/milestone' }
+    mavenLocal()
+}
+
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+springBoot {
+    buildInfo()
+}
+
+bootJar {
+    manifest {
+        attributes "Implementation-Title": "Halo Application",
+                "Implementation-Version": archiveVersion
+    }
+}
+
+tasks.named('jar') {
+    enabled = false
+}
+
+ext {
+    commonsLang3 = "3.12.0"
+    base62 = "0.1.3"
+    pf4j = '3.9.0'
+    javaDiffUtils = "4.12"
+    guava = "31.1-jre"
+    jsoup = '1.15.3'
+    jsonPatch = "1.13"
+    springDocOpenAPI = "2.0.2"
+    lucene = "9.5.0"
+}
+
+dependencies {
+    implementation project(':api')
+
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    annotationProcessor "org.springframework:spring-context-indexer"
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'io.projectreactor:reactor-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+tasks.named('jacocoTestReport') {
+    reports {
+        xml.required = true
+        html.required = false
+    }
+}
+
+tasks.register('downloadPluginPresets', Download) {
+    doFirst {
+        delete 'src/main/resources/presets/plugins'
+    }
+    src([
+            'https://github.com/halo-sigs/plugin-comment-widget/releases/download/v1.3.0/plugin-comment-widget-1.3.0.jar',
+            'https://github.com/halo-sigs/plugin-search-widget/releases/download/v1.0.0/plugin-search-widget-1.0.0.jar',
+            'https://github.com/halo-sigs/plugin-sitemap/releases/download/v1.0.1/plugin-sitemap-1.0.1.jar',
+            'https://github.com/halo-sigs/plugin-feed/releases/download/v1.1.0-beta.1/plugin-feed-1.1.0-beta.1.jar'
+    ])
+    dest 'src/main/resources/presets/plugins'
+}
