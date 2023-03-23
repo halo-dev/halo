@@ -155,6 +155,7 @@ const { data: socialAuthProviders } = useQuery<SocialAuthProvider[]>({
       :placeholder="$t('core.login.fields.password.placeholder')"
       type="password"
       validation="required"
+      autocomplete="current-password"
     >
     </FormKit>
   </FormKit>

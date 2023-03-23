@@ -12,6 +12,7 @@ import {
   IconExternalLinkLine,
   VLoading,
   Toast,
+  VTag,
 } from "@halo-dev/components";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import type {
@@ -296,9 +297,26 @@ const subjectRefResult = computed(() => {
         :title="comment?.owner?.displayName"
         :description="comment?.owner?.email"
       ></VEntityField>
-      <VEntityField width="60%">
+      <VEntityField width="100%">
         <template #description>
           <div class="flex flex-col gap-2">
+            <div class="mb-1 flex items-center gap-2">
+              <VTag>{{ subjectRefResult.label }}</VTag>
+              <RouterLink
+                :to="subjectRefResult.route || $route"
+                class="truncate text-sm font-medium text-gray-900 hover:text-gray-600"
+              >
+                {{ subjectRefResult.title }}
+              </RouterLink>
+              <a
+                v-if="subjectRefResult.externalUrl"
+                :href="subjectRefResult.externalUrl"
+                target="_blank"
+                class="hidden text-gray-600 hover:text-gray-900 group-hover:block"
+              >
+                <IconExternalLinkLine class="h-3.5 w-3.5" />
+              </a>
+            </div>
             <div class="break-all text-sm text-gray-900">
               {{ comment?.comment?.spec.content }}
             </div>
@@ -331,22 +349,6 @@ const subjectRefResult = computed(() => {
       </VEntityField>
     </template>
     <template #end>
-      <VEntityField
-        :title="subjectRefResult.title"
-        :description="subjectRefResult.label"
-        :route="subjectRefResult.route"
-      >
-        <template #extra>
-          <a
-            v-if="subjectRefResult.externalUrl"
-            :href="subjectRefResult.externalUrl"
-            target="_blank"
-            class="text-gray-600 hover:text-gray-900"
-          >
-            <IconExternalLinkLine class="h-3.5 w-3.5" />
-          </a>
-        </template>
-      </VEntityField>
       <VEntityField v-if="!comment?.comment.spec.approved">
         <template #description>
           <VStatusDot state="success">

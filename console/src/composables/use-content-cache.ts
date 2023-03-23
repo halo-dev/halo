@@ -17,16 +17,16 @@ interface useContentCacheReturn {
 
 export function useContentCache(
   key: string,
-  name: string,
+  name: Ref<string | undefined>,
   raw: Ref<string | undefined>
 ): useContentCacheReturn {
   const content_caches = useLocalStorage<ContentCache[]>(key, []);
   const { t } = useI18n();
 
   const handleResetCache = () => {
-    if (name) {
+    if (name.value) {
       const cache = content_caches.value.find(
-        (c: ContentCache) => c.name === name
+        (c: ContentCache) => c.name === name.value
       );
       if (cache) {
         Toast.info(t("core.composables.content_cache.toast_recovered"));
@@ -44,15 +44,15 @@ export function useContentCache(
   };
 
   const handleSetContentCache = debounce(() => {
-    if (name) {
+    if (name.value) {
       const cache = content_caches.value.find(
-        (c: ContentCache) => c.name === name
+        (c: ContentCache) => c.name === name.value
       );
       if (cache) {
         cache.content = raw?.value;
       } else {
         content_caches.value.push({
-          name: name,
+          name: name.value || "",
           content: raw?.value,
         });
       }
