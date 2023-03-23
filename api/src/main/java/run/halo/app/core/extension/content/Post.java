@@ -255,11 +255,6 @@ public class Post extends AbstractExtension {
                 return this;
             }
 
-            /**
-             * Build compact post.
-             *
-             * @return a compact post
-             */
             public CompactPost build() {
                 CompactPost compactPost = new CompactPost();
                 compactPost.setName(name);
