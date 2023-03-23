@@ -12,6 +12,9 @@ import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 import { pluginLabels } from "@/constants/labels";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -78,7 +81,9 @@ watch(
 );
 
 const editingModalTitle = computed(() => {
-  return isUpdateMode.value ? "编辑角色" : "创建角色";
+  return isUpdateMode.value
+    ? t("core.role.editing_modal.titles.update")
+    : t("core.role.editing_modal.titles.create");
 });
 
 const handleCreateOrUpdateRole = async () => {
@@ -114,7 +119,9 @@ const handleResetForm = () => {
       <div class="md:grid md:grid-cols-4 md:gap-6">
         <div class="md:col-span-1">
           <div class="sticky top-0">
-            <span class="text-base font-medium text-gray-900"> 基本信息 </span>
+            <span class="text-base font-medium text-gray-900">
+              {{ $t("core.role.editing_modal.groups.general") }}
+            </span>
           </div>
         </div>
         <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
@@ -132,7 +139,7 @@ const handleResetForm = () => {
               v-model="
                 formState.metadata.annotations[rbacAnnotations.DISPLAY_NAME]
               "
-              label="名称"
+              :label="$t('core.role.editing_modal.fields.display_name')"
               type="text"
               validation="required|length:0,50"
             ></FormKit>
@@ -145,7 +152,9 @@ const handleResetForm = () => {
       <div class="md:grid md:grid-cols-4 md:gap-6">
         <div class="md:col-span-1">
           <div class="sticky top-0">
-            <span class="text-base font-medium text-gray-900"> 权限 </span>
+            <span class="text-base font-medium text-gray-900">
+              {{ $t("core.role.editing_modal.groups.permissions") }}
+            </span>
           </div>
         </div>
         <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
@@ -157,7 +166,7 @@ const handleResetForm = () => {
             >
               <dt class="text-sm font-medium text-gray-900">
                 <div>
-                  {{ $t(`rbac.${group.module}`, group.module as string) }}
+                  {{ $t(`core.rbac.${group.module}`, group.module as string) }}
                 </div>
                 <div
                   v-if="
@@ -166,21 +175,28 @@ const handleResetForm = () => {
                   "
                   class="mt-3 text-xs text-gray-500"
                 >
-                  由
-                  <RouterLink
-                    :to="{
-                      name: 'PluginDetail',
-                      params: {
-                        name: group.roles[0].metadata.labels?.[
-                          pluginLabels.NAME
-                        ],
-                      },
-                    }"
-                    class="hover:text-blue-600"
+                  <i18n-t
+                    keypath="core.role.common.text.provided_by_plugin"
+                    tag="div"
                   >
-                    {{ group.roles[0].metadata.labels?.[pluginLabels.NAME] }}
-                  </RouterLink>
-                  插件提供
+                    <template #plugin>
+                      <RouterLink
+                        :to="{
+                          name: 'PluginDetail',
+                          params: {
+                            name: group.roles[0].metadata.labels?.[
+                              pluginLabels.NAME
+                            ],
+                          },
+                        }"
+                        class="hover:text-blue-600"
+                      >
+                        {{
+                          group.roles[0].metadata.labels?.[pluginLabels.NAME]
+                        }}
+                      </RouterLink>
+                    </template>
+                  </i18n-t>
                 </div>
               </dt>
               <dd class="text-sm text-gray-900">
@@ -200,7 +216,7 @@ const handleResetForm = () => {
                         <span class="font-medium text-gray-900">
                           {{
                             $t(
-                              `rbac.${
+                              `core.rbac.${
                                 roleTemplate.metadata.annotations?.[
                                   rbacAnnotations.DISPLAY_NAME
                                 ]
@@ -219,17 +235,18 @@ const handleResetForm = () => {
                           "
                           class="text-xs text-gray-400"
                         >
-                          依赖于
                           {{
-                            JSON.parse(
-                              roleTemplate.metadata.annotations?.[
-                                rbacAnnotations.DEPENDENCIES
-                              ]
-                            )
-                              .map((item: string) =>
-                                $t(`rbac.${item}`, item as string)
+                            $t("core.role.common.text.dependent_on", {
+                              roles: JSON.parse(
+                                roleTemplate.metadata.annotations?.[
+                                  rbacAnnotations.DEPENDENCIES
+                                ]
                               )
-                              .join("，")
+                                .map((item: string) =>
+                                  $t(`core.rbac.${item}`, item as string)
+                                )
+                                .join("，"),
+                            })
                           }}
                         </span>
                       </div>
@@ -248,10 +265,13 @@ const handleResetForm = () => {
           v-if="visible"
           :loading="saving"
           type="secondary"
+          :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('role-form')"
         >
         </SubmitButton>
-        <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
+        <VButton @click="onVisibleChange(false)">
+          {{ $t("core.common.buttons.cancel_and_shortcut") }}
+        </VButton>
       </VSpace>
     </template>
   </VModal>

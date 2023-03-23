@@ -67,7 +67,7 @@ await handleFetchConfigMap();
             type="secondary"
             @click="$formkit.submit(group || '')"
           >
-            保存
+            {{ $t("core.common.buttons.save") }}
           </VButton>
         </div>
       </div>

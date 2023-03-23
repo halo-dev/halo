@@ -6,13 +6,11 @@ import type { Role } from "@halo-dev/api-client";
 // components
 import {
   IconAddCircle,
-  IconArrowDown,
   IconShieldUser,
   Dialog,
   VButton,
   VCard,
   VPageHeader,
-  VSpace,
   VTag,
   VStatusDot,
   VEntity,
@@ -36,8 +34,10 @@ import Fuse from "fuse.js";
 import { usePermission } from "@/utils/permission";
 import { roleLabels } from "@/constants/labels";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const editingModal = ref<boolean>(false);
 const selectedRole = ref<Role>();
@@ -73,14 +73,16 @@ const isSystemReserved = (role: Role) => {
 
 const getRoleCountText = (role: Role) => {
   if (role.metadata.name === SUPER_ROLE_NAME) {
-    return `包含所有权限`;
+    return t("core.role.common.text.contains_all_permissions");
   }
 
   const dependenciesCount = JSON.parse(
     role.metadata.annotations?.[rbacAnnotations.DEPENDENCIES] || "[]"
   ).length;
 
-  return `包含 ${dependenciesCount} 个权限`;
+  return t("core.role.common.text.contains_n_permissions", {
+    count: dependenciesCount,
+  });
 };
 
 const handleOpenEditingModal = (role: Role) => {
@@ -126,16 +128,18 @@ const handleCloneRole = async (role: Role) => {
 
 const handleDelete = async (role: Role) => {
   Dialog.warning({
-    title: "确定要删除该角色吗？",
-    description: "该角色删除后，相关联的用户将被删除角色绑定，该操作不可恢复",
+    title: t("core.role.operations.delete.title"),
+    description: t("core.role.operations.delete.description"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.role.deletev1alpha1Role({
           name: role.metadata.name,
         });
 
-        Toast.success("删除成功");
+        Toast.success(t("core.common.toast.delete_success"));
       } catch (e) {
         console.error("Failed to delete role", e);
       } finally {
@@ -152,7 +156,7 @@ const handleDelete = async (role: Role) => {
     @close="onEditingModalClose"
   />
 
-  <VPageHeader title="角色">
+  <VPageHeader :title="$t('core.role.title')">
     <template #icon>
       <IconShieldUser class="mr-2 self-center" />
     </template>
@@ -165,7 +169,7 @@ const handleDelete = async (role: Role) => {
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>
-        新建角色
+        {{ $t("core.common.buttons.new") }}
       </VButton>
     </template>
   </VPageHeader>
@@ -180,97 +184,9 @@ const handleDelete = async (role: Role) => {
             <div class="flex w-full flex-1 sm:w-auto">
               <FormKit
                 v-model="keyword"
-                placeholder="输入关键词搜索"
+                :placeholder="$t('core.common.placeholder.search')"
                 type="text"
               ></FormKit>
-            </div>
-            <div v-if="false" class="mt-4 flex sm:mt-0">
-              <VSpace spacing="lg">
-                <FloatingDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">状态</span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <div class="w-52 p-4">
-                      <ul class="space-y-1">
-                        <li
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">正常</span>
-                        </li>
-                        <li
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">已禁用</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </template>
-                </FloatingDropdown>
-                <FloatingDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">类型</span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <div class="w-52 p-4">
-                      <ul class="space-y-1">
-                        <li
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">系统保留</span>
-                        </li>
-                        <li
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">自定义</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </template>
-                </FloatingDropdown>
-                <FloatingDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">排序</span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <div class="w-72 p-4">
-                      <ul class="space-y-1">
-                        <li
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">更高权限</span>
-                        </li>
-                        <li
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                        >
-                          <span class="truncate">更低权限</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </template>
-                </FloatingDropdown>
-              </VSpace>
             </div>
           </div>
         </div>
@@ -304,13 +220,21 @@ const handleDelete = async (role: Role) => {
                 <VEntityField>
                   <template #description>
                     <VTag>
-                      {{ isSystemReserved(role) ? "系统保留" : "自定义" }}
+                      {{
+                        isSystemReserved(role)
+                          ? t("core.role.common.text.system_reserved")
+                          : t("core.role.common.text.custom")
+                      }}
                     </VTag>
                   </template>
                 </VEntityField>
                 <VEntityField v-if="role.metadata.deletionTimestamp">
                   <template #description>
-                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                    <VStatusDot
+                      v-tooltip="$t('core.common.status.deleting')"
+                      state="warning"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField>
@@ -332,7 +256,7 @@ const handleDelete = async (role: Role) => {
                   type="secondary"
                   @click="handleOpenEditingModal(role)"
                 >
-                  编辑
+                  {{ $t("core.common.buttons.edit") }}
                 </VButton>
                 <VButton
                   v-if="!isSystemReserved(role)"
@@ -341,10 +265,12 @@ const handleDelete = async (role: Role) => {
                   type="danger"
                   @click="handleDelete(role)"
                 >
-                  删除
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
                 <VButton v-close-popper block @click="handleCloneRole(role)">
-                  基于此角色创建
+                  {{
+                    $t("core.role.operations.create_based_on_this_role.button")
+                  }}
                 </VButton>
               </template>
             </VEntity>

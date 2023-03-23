@@ -20,6 +20,7 @@ import {
   useFetchAttachmentPolicyTemplate,
 } from "../composables/use-attachment-policy";
 import { apiClient } from "@/utils/api-client";
+import { useI18n } from "vue-i18n";
 
 withDefaults(
   defineProps<{
@@ -34,6 +35,8 @@ const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
+
+const { t } = useI18n();
 
 const { policies, isLoading, handleFetchPolicies } = useFetchAttachmentPolicy();
 const { policyTemplates } = useFetchAttachmentPolicyTemplate();
@@ -78,21 +81,31 @@ const handleDelete = async (policy: Policy) => {
 
   if (data.total > 0) {
     Dialog.warning({
-      title: "删除失败",
-      description: "该策略下存在附件，无法删除。",
+      title: t(
+        "core.attachment.policies_modal.operations.can_not_delete.title"
+      ),
+      description: t(
+        "core.attachment.policies_modal.operations.can_not_delete.description"
+      ),
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
     });
     return;
   }
 
   Dialog.warning({
-    title: "确定要删除该策略吗？",
-    description: "当前策略下没有已上传的附件。",
+    title: t("core.attachment.policies_modal.operations.delete.title"),
+    description: t(
+      "core.attachment.policies_modal.operations.delete.description"
+    ),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await apiClient.extension.storage.policy.deletestorageHaloRunV1alpha1Policy(
         { name: policy.metadata.name }
       );
 
-      Toast.success("删除成功");
+      Toast.success(t("core.common.toast.delete_success"));
       handleFetchPolicies();
     },
   });
@@ -107,14 +120,14 @@ const onEditingModalClose = () => {
   <VModal
     :visible="visible"
     :width="750"
-    title="存储策略"
+    :title="$t('core.attachment.policies_modal.title')"
     :body-class="['!p-0']"
     :layer-closable="true"
     @update:visible="onVisibleChange"
   >
     <template #actions>
       <FloatingDropdown>
-        <span v-tooltip="`添加存储策略`">
+        <span v-tooltip="$t('core.common.buttons.new')">
           <IconAddCircle />
         </span>
         <template #popper>
@@ -138,18 +151,20 @@ const onEditingModalClose = () => {
     </template>
     <VEmpty
       v-if="!policies?.length && !isLoading"
-      message="当前没有可用的存储策略，你可以尝试刷新或者新建策略"
-      title="当前没有可用的存储策略"
+      :message="$t('core.attachment.policies_modal.empty.message')"
+      :title="$t('core.attachment.policies_modal.empty.title')"
     >
       <template #actions>
         <VSpace>
-          <VButton @click="handleFetchPolicies">刷新</VButton>
+          <VButton @click="handleFetchPolicies">
+            {{ $t("core.common.buttons.refresh") }}
+          </VButton>
           <FloatingDropdown>
             <VButton type="secondary">
               <template #icon>
                 <IconAddCircle class="h-full w-full" />
               </template>
-              新建策略
+              {{ $t("core.common.buttons.new") }}
             </VButton>
             <template #popper>
               <div class="w-72 p-4">
@@ -188,7 +203,11 @@ const onEditingModalClose = () => {
           <template #end>
             <VEntityField v-if="policy.metadata.deletionTimestamp">
               <template #description>
-                <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                <VStatusDot
+                  v-tooltip="$t('core.common.status.deleting')"
+                  state="warning"
+                  animate
+                />
               </template>
             </VEntityField>
             <VEntityField>
@@ -206,7 +225,7 @@ const onEditingModalClose = () => {
               type="secondary"
               @click="handleOpenEditingModal(policy)"
             >
-              编辑
+              {{ $t("core.common.buttons.edit") }}
             </VButton>
             <VButton
               v-close-popper
@@ -214,14 +233,16 @@ const onEditingModalClose = () => {
               type="danger"
               @click="handleDelete(policy)"
             >
-              删除
+              {{ $t("core.common.buttons.delete") }}
             </VButton>
           </template>
         </VEntity>
       </li>
     </ul>
     <template #footer>
-      <VButton @click="onVisibleChange(false)">关闭 Esc</VButton>
+      <VButton @click="onVisibleChange(false)">
+        {{ $t("core.common.buttons.close_and_shortcut") }}
+      </VButton>
     </template>
   </VModal>
 

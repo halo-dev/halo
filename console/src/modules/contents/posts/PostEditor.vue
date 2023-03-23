@@ -11,7 +11,6 @@ import {
   Dialog,
 } from "@halo-dev/components";
 import PostSettingModal from "./components/PostSettingModal.vue";
-import PostPreviewModal from "./components/PostPreviewModal.vue";
 import type { Post, PostRequest } from "@halo-dev/api-client";
 import {
   computed,
@@ -34,8 +33,10 @@ import {
 } from "@/composables/use-editor-extension-points";
 import { useLocalStorage } from "@vueuse/core";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
+import { useI18n } from "vue-i18n";
 
 const router = useRouter();
+const { t } = useI18n();
 
 // Editor providers
 const { editorProviders } = useEditorExtensionPoints();
@@ -90,7 +91,6 @@ const initialFormState: PostRequest = {
 
 const formState = ref<PostRequest>(cloneDeep(initialFormState));
 const settingModal = ref(false);
-const previewModal = ref(false);
 const saving = ref(false);
 const publishing = ref(false);
 
@@ -118,7 +118,7 @@ const handleSave = async () => {
 
     // Set default title and slug
     if (!formState.value.post.spec.title) {
-      formState.value.post.spec.title = "无标题文章";
+      formState.value.post.spec.title = t("core.post_editor.untitled");
     }
 
     if (!formState.value.post.spec.slug) {
@@ -140,12 +140,12 @@ const handleSave = async () => {
       name.value = data.metadata.name;
     }
 
-    Toast.success("保存成功");
+    Toast.success(t("core.common.toast.save_success"));
     handleClearCache(name.value as string);
     await handleFetchContent();
   } catch (e) {
     console.error("Failed to save post", e);
-    Toast.error("保存失败，请重试");
+    Toast.error(t("core.common.toast.save_failed_and_retry"));
   } finally {
     saving.value = false;
   }
@@ -187,11 +187,13 @@ const handlePublish = async () => {
       router.push({ name: "Posts" });
     }
 
-    Toast.success("发布成功", { duration: 2000 });
+    Toast.success(t("core.common.toast.publish_success"), {
+      duration: 2000,
+    });
     handleClearCache(name.value as string);
   } catch (error) {
     console.error("Failed to publish post", error);
-    Toast.error("发布失败，请重试");
+    Toast.error(t("core.common.toast.publish_failed_and_retry"));
   } finally {
     publishing.value = false;
   }
@@ -249,8 +251,12 @@ const handleFetchContent = async () => {
       formState.value.post = data;
     } else {
       Dialog.warning({
-        title: "警告",
-        description: `未找到符合 ${data.rawType} 格式的编辑器，请检查是否已安装编辑器插件`,
+        title: t("core.common.dialog.titles.warning"),
+        description: t("core.common.dialog.descriptions.editor_not_found", {
+          raw_type: data.rawType,
+        }),
+        confirmText: t("core.common.buttons.confirm"),
+        cancelText: t("core.common.buttons.cancel"),
         onConfirm: () => {
           router.back();
         },
@@ -341,8 +347,7 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     @saved="onSettingSaved"
     @published="onSettingPublished"
   />
-  <PostPreviewModal v-model:visible="previewModal" :post="formState.post" />
-  <VPageHeader title="文章">
+  <VPageHeader :title="$t('core.post.title')">
     <template #icon>
       <IconBookRead class="mr-2 self-center" />
     </template>
@@ -353,21 +358,11 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
           :provider="currentEditorProvider"
           @select="handleChangeEditorProvider"
         />
-
-        <!-- TODO: add preview post support -->
-        <VButton
-          v-if="false"
-          size="sm"
-          type="default"
-          @click="previewModal = true"
-        >
-          预览
-        </VButton>
         <VButton :loading="saving" size="sm" type="default" @click="handleSave">
           <template #icon>
             <IconSave class="h-full w-full" />
           </template>
-          保存
+          {{ $t("core.common.buttons.save") }}
         </VButton>
         <VButton
           v-if="isUpdateMode"
@@ -378,7 +373,7 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
           <template #icon>
             <IconSettings class="h-full w-full" />
           </template>
-          设置
+          {{ $t("core.common.buttons.setting") }}
         </VButton>
         <VButton
           type="secondary"
@@ -388,7 +383,7 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
           <template #icon>
             <IconSendPlaneFill class="h-full w-full" />
           </template>
-          发布
+          {{ $t("core.common.buttons.publish") }}
         </VButton>
       </VSpace>
     </template>

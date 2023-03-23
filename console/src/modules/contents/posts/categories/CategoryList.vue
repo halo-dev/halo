@@ -79,7 +79,7 @@ const onEditingModalClose = () => {
     :category="selectedCategory"
     @close="onEditingModalClose"
   />
-  <VPageHeader title="文章分类">
+  <VPageHeader :title="$t('core.post_category.title')">
     <template #icon>
       <IconBookRead class="mr-2 self-center" />
     </template>
@@ -93,7 +93,7 @@ const onEditingModalClose = () => {
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>
-        新建
+        {{ $t("core.common.buttons.new") }}
       </VButton>
     </template>
   </VPageHeader>
@@ -106,7 +106,11 @@ const onEditingModalClose = () => {
           >
             <div class="flex w-full flex-1 sm:w-auto">
               <span class="text-base font-medium">
-                {{ categories?.length || 0 }} 个分类
+                {{
+                  $t("core.post_category.header.title", {
+                    count: categories?.length || 0,
+                  })
+                }}
               </span>
             </div>
           </div>
@@ -114,10 +118,15 @@ const onEditingModalClose = () => {
       </template>
       <VLoading v-if="isLoading" />
       <Transition v-else-if="!categories?.length" appear name="fade">
-        <VEmpty message="你可以尝试刷新或者新建分类" title="当前没有分类">
+        <VEmpty
+          :message="$t('core.post_category.empty.message')"
+          :title="$t('core.post_category.empty.title')"
+        >
           <template #actions>
             <VSpace>
-              <VButton @click="handleFetchCategories">刷新</VButton>
+              <VButton @click="handleFetchCategories">
+                {{ $t("core.common.buttons.refresh") }}
+              </VButton>
               <VButton
                 v-permission="['system:posts:manage']"
                 type="primary"
@@ -126,7 +135,7 @@ const onEditingModalClose = () => {
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>
-                新建分类
+                {{ $t("core.common.buttons.new") }}
               </VButton>
             </VSpace>
           </template>

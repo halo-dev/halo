@@ -4,6 +4,7 @@ import type { Plugin } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
+import { useI18n } from "vue-i18n";
 
 interface usePluginLifeCycleReturn {
   isStarted: ComputedRef<boolean | undefined>;
@@ -14,6 +15,8 @@ interface usePluginLifeCycleReturn {
 export function usePluginLifeCycle(
   plugin?: Ref<Plugin | undefined>
 ): usePluginLifeCycleReturn {
+  const { t } = useI18n();
+
   const isStarted = computed(() => {
     return (
       plugin?.value?.status?.phase === "STARTED" && plugin.value?.spec.enabled
@@ -26,7 +29,11 @@ export function usePluginLifeCycle(
     const pluginToUpdate = cloneDeep(plugin.value);
 
     Dialog.info({
-      title: `确定要${pluginToUpdate.spec.enabled ? "停止" : "启动"}该插件吗？`,
+      title: pluginToUpdate.spec.enabled
+        ? t("core.plugin.operations.change_status.inactive_title")
+        : t("core.plugin.operations.change_status.active_title"),
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
@@ -35,7 +42,11 @@ export function usePluginLifeCycle(
             plugin: pluginToUpdate,
           });
 
-          Toast.success(`${pluginToUpdate.spec.enabled ? "启动" : "停止"}成功`);
+          Toast.success(
+            pluginToUpdate.spec.enabled
+              ? t("core.common.toast.active_success")
+              : t("core.common.toast.inactive_success")
+          );
         } catch (e) {
           console.error(e);
         } finally {
@@ -53,16 +64,21 @@ export function usePluginLifeCycle(
     Dialog.warning({
       title: `${
         deleteExtensions
-          ? "确定要卸载该插件以及对应的配置吗？"
-          : "确定要卸载该插件吗？"
+          ? t("core.plugin.operations.uninstall_and_delete_config.title")
+          : t("core.plugin.operations.uninstall.title")
       }`,
       description: `${
         enabled
-          ? "当前插件还在启用状态，将在停止运行后卸载，该操作不可恢复。"
-          : "该操作不可恢复。"
+          ? t("core.plugin.operations.uninstall_when_enabled.description")
+          : t("core.common.dialog.descriptions.cannot_be_recovered")
       }`,
       confirmType: "danger",
-      confirmText: `${enabled ? "停止运行并卸载" : "卸载"}`,
+      confirmText: `${
+        enabled
+          ? t("core.plugin.operations.uninstall_when_enabled.confirm_text")
+          : t("core.common.buttons.uninstall")
+      }`,
+      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         if (!plugin.value) return;
 
@@ -107,7 +123,7 @@ export function usePluginLifeCycle(
             }
           }
 
-          Toast.success("卸载成功");
+          Toast.success(t("core.common.toast.uninstall_success"));
         } catch (e) {
           console.error("Failed to uninstall plugin", e);
         } finally {

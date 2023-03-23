@@ -7,6 +7,9 @@ import { VModal, VSpace, VButton } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { computed, ref } from "vue";
 import { useFetchRole } from "../../roles/composables/use-role";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -31,7 +34,7 @@ const { roles } = useFetchRole();
 const rolesMap = computed<FormKitOptionsList>(() => {
   return [
     {
-      label: "请选择角色",
+      label: t("core.user.grant_permission_modal.fields.role.placeholder"),
       value: "",
     },
     ...roles.value.map((role) => {
@@ -72,7 +75,7 @@ const onVisibleChange = (visible: boolean) => {
 
 <template>
   <VModal
-    title="分类角色"
+    :title="$t('core.user.grant_permission_modal.title')"
     :visible="visible"
     :width="500"
     @update:visible="onVisibleChange"
@@ -87,7 +90,7 @@ const onVisibleChange = (visible: boolean) => {
       <FormKit
         v-model="selectedRole"
         :options="rolesMap"
-        label="角色"
+        :label="$t('core.user.grant_permission_modal.fields.role.label')"
         type="select"
       ></FormKit>
     </FormKit>
@@ -97,10 +100,13 @@ const onVisibleChange = (visible: boolean) => {
           v-if="visible"
           :loading="saving"
           type="secondary"
+          :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('grant-permission-form')"
         >
         </SubmitButton>
-        <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
+        <VButton @click="onVisibleChange(false)">
+          {{ $t("core.common.buttons.cancel_and_shortcut") }}
+        </VButton>
       </VSpace>
     </template>
   </VModal>

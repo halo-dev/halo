@@ -18,10 +18,13 @@ import { computed, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
 import FilterTag from "@/components/filter/FilterTag.vue";
-import FilteCleanButton from "@/components/filter/FilterCleanButton.vue";
+import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 import { useQuery } from "@tanstack/vue-query";
 import type { Plugin } from "@halo-dev/api-client";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 interface EnabledItem {
   label: string;
@@ -45,26 +48,26 @@ const total = ref(0);
 // Filters
 const EnabledItems: EnabledItem[] = [
   {
-    label: "全部",
+    label: t("core.plugin.filters.status.items.all"),
     value: undefined,
   },
   {
-    label: "已启用",
+    label: t("core.plugin.filters.status.items.active"),
     value: true,
   },
   {
-    label: "未启用",
+    label: t("core.plugin.filters.status.items.inactive"),
     value: false,
   },
 ];
 
 const SortItems: SortItem[] = [
   {
-    label: "较近安装",
+    label: t("core.plugin.filters.sort.items.create_time_desc"),
     value: "creationTimestamp,desc",
   },
   {
-    label: "较早安装",
+    label: t("core.plugin.filters.sort.items.create_time_asc"),
     value: "creationTimestamp,asc",
   },
 ];
@@ -150,7 +153,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
     @close="refetch()"
   />
 
-  <VPageHeader title="插件">
+  <VPageHeader :title="$t('core.plugin.title')">
     <template #icon>
       <IconPlug class="mr-2 self-center" />
     </template>
@@ -163,7 +166,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>
-        安装
+        {{ $t("core.common.buttons.install") }}
       </VButton>
     </template>
   </VPageHeader>
@@ -179,7 +182,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
               <FormKit
                 id="keywordInput"
                 outer-class="!p-0"
-                placeholder="输入关键词搜索"
+                :placeholder="$t('core.common.placeholder.search')"
                 type="text"
                 name="keyword"
                 :model-value="keyword"
@@ -187,24 +190,39 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
               ></FormKit>
 
               <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                关键词：{{ keyword }}
+                {{
+                  $t("core.common.filters.results.keyword", {
+                    keyword: keyword,
+                  })
+                }}
               </FilterTag>
 
               <FilterTag
                 v-if="selectedEnabledItem?.value !== undefined"
                 @close="handleEnabledItemChange(EnabledItems[0])"
               >
-                启用状态：{{ selectedEnabledItem.label }}
+                {{
+                  $t("core.common.filters.results.status", {
+                    status: selectedEnabledItem.label,
+                  })
+                }}
               </FilterTag>
 
               <FilterTag
                 v-if="selectedSortItem"
                 @close="handleSortItemChange()"
               >
-                排序：{{ selectedSortItem.label }}
+                {{
+                  $t("core.common.filters.results.sort", {
+                    sort: selectedSortItem.label,
+                  })
+                }}
               </FilterTag>
 
-              <FilteCleanButton v-if="hasFilters" @click="handleClearFilters" />
+              <FilterCleanButton
+                v-if="hasFilters"
+                @click="handleClearFilters"
+              />
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
@@ -212,7 +230,9 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">启用状态</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.common.filters.labels.status") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -241,7 +261,9 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">排序</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.common.filters.labels.sort") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -268,7 +290,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                     @click="refetch()"
                   >
                     <IconRefreshLine
-                      v-tooltip="`刷新`"
+                      v-tooltip="$t('core.common.buttons.refresh')"
                       :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
@@ -284,12 +306,14 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
 
       <Transition v-else-if="!data?.length" appear name="fade">
         <VEmpty
-          message="当前没有已安装的插件，你可以尝试刷新或者安装新插件"
-          title="当前没有已安装的插件"
+          :message="$t('core.plugin.empty.message')"
+          :title="$t('core.plugin.empty.title')"
         >
           <template #actions>
             <VSpace>
-              <VButton :loading="isFetching" @click="refetch()">刷新</VButton>
+              <VButton :loading="isFetching" @click="refetch()">
+                {{ $t("core.common.buttons.refresh") }}
+              </VButton>
               <VButton
                 v-permission="['system:plugins:manage']"
                 type="secondary"
@@ -298,7 +322,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>
-                安装插件
+                {{ $t("core.plugin.empty.actions.install") }}
               </VButton>
             </VSpace>
           </template>
@@ -321,6 +345,8 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
           <VPagination
             v-model:page="page"
             v-model:size="size"
+            :page-label="$t('core.components.pagination.page_label')"
+            :size-label="$t('core.components.pagination.size_label')"
             :total="total"
             :size-options="[10, 20, 30, 50, 100]"
           />

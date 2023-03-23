@@ -19,11 +19,11 @@ export default definePlugin({
           name: "Comments",
           component: CommentList,
           meta: {
-            title: "评论",
+            title: "core.comment.title",
             searchable: true,
             permissions: ["system:comments:view"],
             menu: {
-              name: "评论",
+              name: "core.sidebar.menu.items.comments",
               group: "content",
               icon: markRaw(IconMessage),
               priority: 2,

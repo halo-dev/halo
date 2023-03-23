@@ -9,6 +9,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
+    "noStrictGenericChecks": true,
     "types": ["unplugin-icons/types/vue"]
   }
 }

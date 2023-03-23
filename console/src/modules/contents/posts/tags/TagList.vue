@@ -116,7 +116,7 @@ onMounted(async () => {
     @next="handleSelectNext"
     @previous="handleSelectPrevious"
   />
-  <VPageHeader title="文章标签">
+  <VPageHeader :title="$t('core.post_tag.title')">
     <template #icon>
       <IconBookRead class="mr-2 self-center" />
     </template>
@@ -129,7 +129,7 @@ onMounted(async () => {
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>
-        新建
+        {{ $t("core.common.buttons.new") }}
       </VButton>
     </template>
   </VPageHeader>
@@ -142,7 +142,9 @@ onMounted(async () => {
           >
             <div class="flex w-full flex-1 sm:w-auto">
               <span class="text-base font-medium">
-                {{ tags?.length || 0 }} 个标签
+                {{
+                  $t("core.post_tag.header.title", { count: tags?.length || 0 })
+                }}
               </span>
             </div>
             <div class="flex flex-row gap-2">
@@ -163,15 +165,20 @@ onMounted(async () => {
       </template>
       <VLoading v-if="isLoading" />
       <Transition v-else-if="!tags?.length" appear name="fade">
-        <VEmpty message="你可以尝试刷新或者新建标签" title="当前没有标签">
+        <VEmpty
+          :message="$t('core.post_tag.empty.message')"
+          :title="$t('core.post_tag.empty.title')"
+        >
           <template #actions>
             <VSpace>
-              <VButton @click="handleFetchTags">刷新</VButton>
+              <VButton @click="handleFetchTags">
+                {{ $t("core.common.buttons.refresh") }}
+              </VButton>
               <VButton type="primary" @click="editingModal = true">
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>
-                新建标签
+                {{ $t("core.common.buttons.new") }}
               </VButton>
             </VSpace>
           </template>
@@ -210,14 +217,18 @@ onMounted(async () => {
                   <VEntityField v-if="tag.metadata.deletionTimestamp">
                     <template #description>
                       <VStatusDot
-                        v-tooltip="`删除中`"
+                        v-tooltip="$t('core.common.status.deleting')"
                         state="warning"
                         animate
                       />
                     </template>
                   </VEntityField>
                   <VEntityField
-                    :description="`${tag.status?.postCount || 0} 篇文章`"
+                    :description="
+                      $t('core.common.fields.post_count', {
+                        count: tag.status?.postCount || 0,
+                      })
+                    "
                   />
                   <VEntityField>
                     <template #description>
@@ -238,7 +249,7 @@ onMounted(async () => {
                     type="secondary"
                     @click="handleOpenEditingModal(tag)"
                   >
-                    修改
+                    {{ $t("core.common.buttons.edit") }}
                   </VButton>
                   <VButton
                     v-permission="['system:posts:manage']"
@@ -247,7 +258,7 @@ onMounted(async () => {
                     type="danger"
                     @click="handleDelete(tag)"
                   >
-                    删除
+                    {{ $t("core.common.buttons.delete") }}
                   </VButton>
                 </template>
               </VEntity>

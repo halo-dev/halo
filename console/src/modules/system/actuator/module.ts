@@ -15,10 +15,10 @@ export default definePlugin({
           path: "",
           component: Actuator,
           meta: {
-            title: "系统概览",
+            title: "core.actuator.title",
             searchable: true,
             menu: {
-              name: "概览",
+              name: "core.sidebar.menu.items.actuator",
               group: "system",
               icon: markRaw(IconTerminalBoxLine),
               priority: 3,

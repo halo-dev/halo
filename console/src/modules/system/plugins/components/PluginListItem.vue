@@ -18,8 +18,10 @@ import type { Plugin } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { apiClient } from "@/utils/api-client";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -46,9 +48,11 @@ const onUpgradeModalClose = () => {
 
 const handleResetSettingConfig = async () => {
   Dialog.warning({
-    title: "确定要重置插件的所有配置吗？",
-    description: "该操作会删除已保存的配置，重置为默认配置。",
+    title: t("core.plugin.operations.reset.title"),
+    description: t("core.plugin.operations.reset.description"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         if (!plugin?.value) {
@@ -59,7 +63,7 @@ const handleResetSettingConfig = async () => {
           name: plugin.value.metadata.name as string,
         });
 
-        Toast.success("重置配置成功");
+        Toast.success(t("core.plugin.operations.reset.toast_success"));
       } catch (e) {
         console.error("Failed to reset plugin setting config", e);
       }
@@ -102,7 +106,11 @@ const getFailedMessage = (plugin: Plugin) => {
         <template #extra>
           <VSpace>
             <VTag>
-              {{ isStarted ? "已启用" : "未启用" }}
+              {{
+                isStarted
+                  ? $t("core.common.status.activated")
+                  : $t("core.common.status.not_activated")
+              }}
             </VTag>
           </VSpace>
         </template>
@@ -120,7 +128,11 @@ const getFailedMessage = (plugin: Plugin) => {
       </VEntityField>
       <VEntityField v-if="plugin?.metadata.deletionTimestamp">
         <template #description>
-          <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+          <VStatusDot
+            v-tooltip="$t('core.common.status.deleting')"
+            state="warning"
+            animate
+          />
         </template>
       </VEntityField>
       <VEntityField v-if="plugin?.spec.author">
@@ -163,10 +175,12 @@ const getFailedMessage = (plugin: Plugin) => {
         type="secondary"
         @click="upgradeModal = true"
       >
-        升级
+        {{ $t("core.common.buttons.upgrade") }}
       </VButton>
       <FloatingDropdown class="w-full" placement="left" :triggers="['click']">
-        <VButton block type="danger"> 卸载 </VButton>
+        <VButton block type="danger">
+          {{ $t("core.common.buttons.uninstall") }}
+        </VButton>
         <template #popper>
           <div class="w-52 p-2">
             <VSpace class="w-full" direction="column">
@@ -176,7 +190,7 @@ const getFailedMessage = (plugin: Plugin) => {
                 type="danger"
                 @click="uninstall"
               >
-                卸载
+                {{ $t("core.common.buttons.uninstall") }}
               </VButton>
               <VButton
                 v-close-popper.all
@@ -184,7 +198,7 @@ const getFailedMessage = (plugin: Plugin) => {
                 type="danger"
                 @click="uninstall(true)"
               >
-                卸载并删除配置
+                {{ $t("core.plugin.list.actions.uninstall_and_delete_config") }}
               </VButton>
             </VSpace>
           </div>
@@ -196,7 +210,7 @@ const getFailedMessage = (plugin: Plugin) => {
         type="danger"
         @click="handleResetSettingConfig"
       >
-        重置
+        {{ $t("core.common.buttons.reset") }}
       </VButton>
     </template>
   </VEntity>

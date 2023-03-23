@@ -10,11 +10,14 @@ import qs from "qs";
 import { submitForm } from "@formkit/core";
 import { JSEncrypt } from "jsencrypt";
 import { apiClient } from "@/utils/api-client";
+import { useI18n } from "vue-i18n";
 import { useQuery } from "@tanstack/vue-query";
 import type {
   GlobalInfo,
   SocialAuthProvider,
 } from "@/modules/system/actuator/types";
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   (event: "succeed"): void;
@@ -75,19 +78,21 @@ const handleLogin = async () => {
 
     if (e instanceof AxiosError) {
       if (/Network Error/.test(e.message)) {
-        Toast.error("网络错误，请检查网络连接");
+        Toast.error(t("core.common.toast.network_error"));
         return;
       }
 
       if (e.response?.status === 403) {
-        Toast.warning("CSRF Token 失效，请重新尝试", { duration: 5000 });
+        Toast.warning(t("core.login.operations.submit.toast_csrf"), {
+          duration: 5000,
+        });
         await handleGenerateToken();
         return;
       }
 
-      Toast.error("登录失败，用户名或密码错误");
+      Toast.error(t("core.login.operations.submit.toast_failed"));
     } else {
-      Toast.error("未知异常");
+      Toast.error(t("core.common.toast.unknown_error"));
     }
 
     loginForm.value.password = "";
@@ -132,10 +137,10 @@ const { data: socialAuthProviders } = useQuery<SocialAuthProvider[]>({
   >
     <FormKit
       :validation-messages="{
-        required: '请输入用户名',
+        required: $t('core.login.fields.username.validation'),
       }"
       name="username"
-      placeholder="用户名"
+      :placeholder="$t('core.login.fields.username.placeholder')"
       :autofocus="true"
       type="text"
       validation="required"
@@ -144,10 +149,10 @@ const { data: socialAuthProviders } = useQuery<SocialAuthProvider[]>({
     <FormKit
       id="passwordInput"
       :validation-messages="{
-        required: '请输入密码',
+        required: $t('core.login.fields.password.validation'),
       }"
       name="password"
-      placeholder="密码"
+      :placeholder="$t('core.login.fields.password.placeholder')"
       type="password"
       validation="required"
     >
@@ -160,11 +165,13 @@ const { data: socialAuthProviders } = useQuery<SocialAuthProvider[]>({
     type="secondary"
     @click="submitForm('login-form')"
   >
-    登录
+    {{ $t("core.login.button") }}
   </VButton>
 
   <div v-if="socialAuthProviders?.length" class="mt-3 flex items-center">
-    <span class="text-sm text-slate-600">其他登录：</span>
+    <span class="text-sm text-slate-600">
+      {{ $t("core.login.other_login") }}
+    </span>
     <ul class="flex items-center">
       <li
         v-for="(socialAuthProvider, index) in socialAuthProviders"

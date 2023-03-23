@@ -4,6 +4,7 @@ import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
 import { VMenu, VMenuItem, VMenuLabel } from "@halo-dev/components";
 import type { RouteLocationMatched } from "vue-router";
 import { useRoute, useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 
 const RoutesMenu = defineComponent({
   name: "RoutesMenu",
@@ -33,6 +34,8 @@ const RoutesMenu = defineComponent({
       return <icon height="20px" width="20px" />;
     }
 
+    const { t } = useI18n();
+
     function renderItems(items: MenuItemType[] | undefined) {
       return items?.map((item) => {
         return (
@@ -41,7 +44,7 @@ const RoutesMenu = defineComponent({
               <VMenuItem
                 key={item.path}
                 id={item.path}
-                title={item.name}
+                title={t(item.name, item.name)}
                 v-slots={{
                   icon: () => renderIcon(item.icon),
                 }}
@@ -52,7 +55,7 @@ const RoutesMenu = defineComponent({
               <VMenuItem
                 key={item.path}
                 id={item.path}
-                title={item.name}
+                title={t(item.name, item.name)}
                 v-slots={{
                   icon: () => renderIcon(item.icon),
                 }}
@@ -70,7 +73,7 @@ const RoutesMenu = defineComponent({
         {props.menus?.map((menu: MenuGroupType) => {
           return (
             <>
-              {menu.name && <VMenuLabel>{menu.name}</VMenuLabel>}
+              {menu.name && <VMenuLabel>{t(menu.name, menu.name)}</VMenuLabel>}
               {menu.items?.length && renderItems(menu.items)}
             </>
           );

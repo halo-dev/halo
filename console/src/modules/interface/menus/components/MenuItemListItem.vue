@@ -11,8 +11,10 @@ import Draggable from "vuedraggable";
 import { ref } from "vue";
 import type { MenuTreeItem } from "@/modules/interface/menus/utils";
 import { usePermission } from "@/utils/permission";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 withDefaults(
   defineProps<{
@@ -49,10 +51,14 @@ function onDelete(menuItem: MenuTreeItem) {
 }
 
 const TargetRef = {
-  Post: "文章",
-  SinglePage: "页面",
-  Category: "分类",
-  Tag: "标签",
+  Post: t("core.menu.menu_item_editing_modal.fields.ref_kind.options.post"),
+  SinglePage: t(
+    "core.menu.menu_item_editing_modal.fields.ref_kind.options.single_page"
+  ),
+  Category: t(
+    "core.menu.menu_item_editing_modal.fields.ref_kind.options.category"
+  ),
+  Tag: t("core.menu.menu_item_editing_modal.fields.ref_kind.options.tag"),
 };
 
 function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
@@ -112,7 +118,11 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
           <template #end>
             <VEntityField v-if="menuItem.metadata.deletionTimestamp">
               <template #description>
-                <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                <VStatusDot
+                  v-tooltip="$t('core.common.status.deleting')"
+                  state="warning"
+                  animate
+                />
               </template>
             </VEntityField>
           </template>
@@ -126,7 +136,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
               type="secondary"
               @click="onOpenEditingModal(menuItem)"
             >
-              修改
+              {{ $t("core.common.buttons.edit") }}
             </VButton>
             <VButton
               v-close-popper
@@ -134,7 +144,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
               type="default"
               @click="onOpenCreateByParentModal(menuItem)"
             >
-              添加子菜单项
+              {{ $t("core.menu.operations.add_sub_menu_item.button") }}
             </VButton>
             <VButton
               v-close-popper
@@ -142,7 +152,7 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
               type="danger"
               @click="onDelete(menuItem)"
             >
-              删除
+              {{ $t("core.common.buttons.delete") }}
             </VButton>
           </template>
         </VEntity>

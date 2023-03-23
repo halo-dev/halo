@@ -85,11 +85,19 @@ function onDelete(category: CategoryTree) {
           <template #end>
             <VEntityField v-if="category.metadata.deletionTimestamp">
               <template #description>
-                <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                <VStatusDot
+                  v-tooltip="$t('core.common.status.deleting')"
+                  state="warning"
+                  animate
+                />
               </template>
             </VEntityField>
             <VEntityField
-              :description="`${category.status?.postCount || 0} 篇文章`"
+              :description="
+                $t('core.common.fields.post_count', {
+                  count: category.status?.postCount || 0,
+                })
+              "
             />
             <VEntityField>
               <template #description>
@@ -110,7 +118,7 @@ function onDelete(category: CategoryTree) {
               type="secondary"
               @click="onOpenEditingModal(category)"
             >
-              修改
+              {{ $t("core.common.buttons.edit") }}
             </VButton>
             <VButton
               v-permission="['system:posts:manage']"
@@ -119,7 +127,7 @@ function onDelete(category: CategoryTree) {
               type="danger"
               @click="onDelete(category)"
             >
-              删除
+              {{ $t("core.common.buttons.delete") }}
             </VButton>
           </template>
         </VEntity>
