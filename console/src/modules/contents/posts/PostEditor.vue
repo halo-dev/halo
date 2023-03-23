@@ -298,7 +298,7 @@ const onSettingPublished = (post: Post) => {
 };
 
 // Get post data when the route contains the name parameter
-const name = useRouteQuery("name");
+const name = useRouteQuery<string>("name");
 onMounted(async () => {
   if (name.value) {
     // fetch post
@@ -333,7 +333,7 @@ onMounted(async () => {
 const { handleSetContentCache, handleResetCache, handleClearCache } =
   useContentCache(
     "post-content-cache",
-    name.value as string,
+    name,
     toRef(formState.value.content, "raw")
   );
 </script>

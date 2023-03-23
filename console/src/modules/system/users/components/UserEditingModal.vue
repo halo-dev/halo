@@ -68,6 +68,11 @@ const creationModalTitle = computed(() => {
     : t("core.user.editing_modal.titles.create");
 });
 
+const handleResetForm = () => {
+  formState.value = cloneDeep(initialFormState);
+  reset("user-form");
+};
+
 watch(
   () => props.visible,
   (visible) => {
@@ -87,6 +92,9 @@ watch(
     } else {
       handleResetForm();
     }
+  },
+  {
+    immediate: true,
   }
 );
 
@@ -95,11 +103,6 @@ const onVisibleChange = (visible: boolean) => {
   if (!visible) {
     emit("close");
   }
-};
-
-const handleResetForm = () => {
-  formState.value = cloneDeep(initialFormState);
-  reset("user-form");
 };
 
 const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
