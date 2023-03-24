@@ -1,9 +1,12 @@
 package run.halo.app.core.extension.service;
 
+import static run.halo.app.extension.MetadataUtil.nullSafeLabels;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
@@ -11,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -115,8 +119,17 @@ public class DefaultRoleService implements RoleService {
             .flatMap(role -> {
                 Subject subject = createRoleSubject(role.getMetadata().getName());
                 return Flux.just(role)
-                    .mergeWith(listRoleBindingRoles(subject));
+                    .mergeWith(listRoleBindingRoles(subject))
+                    .mergeWith(listAggregatedRoles(role.getMetadata().getName()));
             });
+    }
+
+    Flux<Role> listAggregatedRoles(String roleName) {
+        return extensionClient.list(Role.class,
+            role -> BooleanUtils.TRUE.equals(nullSafeLabels(role)
+                .get(Role.ROLE_AGGREGATE_LABEL_PREFIX + roleName)
+            ),
+            Comparator.comparing(item -> item.getMetadata().getCreationTimestamp()));
     }
 
     private static Subject createRoleSubject(String roleName) {
