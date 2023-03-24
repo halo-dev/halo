@@ -43,14 +43,18 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
                   <div
                     class="flex h-full items-center justify-center object-cover"
                   >
-                    <span class="text-xs text-gray-400">加载中...</span>
+                    <span class="text-xs text-gray-400">
+                      {{ $t("core.common.status.loading") }}...
+                    </span>
                   </div>
                 </template>
                 <template #error>
                   <div
                     class="flex h-full items-center justify-center object-cover"
                   >
-                    <span class="text-xs text-red-400">加载异常</span>
+                    <span class="text-xs text-red-400">
+                      {{ $t("core.common.status.loading_error") }}
+                    </span>
                   </div>
                 </template>
               </LazyImage>
@@ -63,7 +67,9 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
         :description="theme.spec.version"
       >
         <template #extra>
-          <VTag v-if="isActivated"> 当前启用 </VTag>
+          <VTag v-if="isActivated">
+            {{ $t("core.common.status.activated") }}
+          </VTag>
         </template>
       </VEntityField>
     </template>
@@ -76,7 +82,7 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
         type="secondary"
         @click="handleActiveTheme"
       >
-        启用
+        {{ $t("core.common.buttons.active") }}
       </VButton>
       <VButton
         v-close-popper
@@ -84,7 +90,7 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
         type="default"
         @click="emit('open-settings')"
       >
-        设置
+        {{ $t("core.common.buttons.setting") }}
       </VButton>
     </template>
   </VEntity>

@@ -10,6 +10,7 @@ import merge from "lodash.merge";
 import type { ConfigMap, Setting, SettingForm } from "@halo-dev/api-client";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import { Toast } from "@halo-dev/components";
+import { useI18n } from "vue-i18n";
 
 const initialConfigMap: ConfigMap = {
   apiVersion: "v1alpha1",
@@ -35,6 +36,8 @@ export function useSettingForm(
   settingName: Ref<string | undefined>,
   configMapName: Ref<string | undefined>
 ): useSettingFormReturn {
+  const { t } = useI18n();
+
   const setting = ref<Setting>();
   const configMap = ref<ConfigMap>(cloneDeep(initialConfigMap));
   const configMapFormData = ref<
@@ -152,7 +155,7 @@ export function useSettingForm(
         configMapName.value = data.metadata.name;
       }
 
-      Toast.success("保存成功");
+      Toast.success(t("core.common.toast.save_success"));
     } catch (e) {
       console.error("Failed to save configMap", e);
     } finally {

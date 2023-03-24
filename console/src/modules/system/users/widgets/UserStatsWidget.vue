@@ -16,7 +16,9 @@ const dashboardStats = inject<Ref<DashboardStats>>("dashboardStats");
         </span>
 
         <div>
-          <span class="text-sm text-gray-500">用户</span>
+          <span class="text-sm text-gray-500">
+            {{ $t("core.dashboard.widgets.presets.user_stats.title") }}
+          </span>
           <p class="text-2xl font-medium text-gray-900">
             {{ dashboardStats?.users }}
           </p>

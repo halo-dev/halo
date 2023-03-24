@@ -7,6 +7,7 @@ import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
 import { setFocus } from "@/formkit/utils/focus";
+import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{
@@ -24,6 +25,8 @@ const emit = defineEmits<{
   (event: "close"): void;
   (event: "created", menu: Menu): void;
 }>();
+
+const { t } = useI18n();
 
 const initialFormState: Menu = {
   spec: {
@@ -46,7 +49,9 @@ const isUpdateMode = computed(() => {
 });
 
 const modalTitle = computed(() => {
-  return isUpdateMode.value ? "编辑菜单" : "新增菜单";
+  return isUpdateMode.value
+    ? t("core.menu.menu_editing_modal.titles.update")
+    : t("core.menu.menu_editing_modal.titles.create");
 });
 
 const handleCreateMenu = async () => {
@@ -65,7 +70,7 @@ const handleCreateMenu = async () => {
     }
     onVisibleChange(false);
 
-    Toast.success("保存成功");
+    Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
     console.error("Failed to create menu", e);
   } finally {
@@ -124,7 +129,7 @@ watch(
       <FormKit
         id="menuDisplayNameInput"
         v-model="formState.spec.displayName"
-        label="菜单名称"
+        :label="$t('core.menu.menu_editing_modal.fields.display_name.label')"
         type="text"
         name="displayName"
         validation="required|length:0,100"
@@ -136,10 +141,13 @@ watch(
           v-if="visible"
           :loading="saving"
           type="secondary"
+          :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('menu-form')"
         >
         </SubmitButton>
-        <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
+        <VButton @click="onVisibleChange(false)">
+          {{ $t("core.common.buttons.cancel_and_shortcut") }}
+        </VButton>
       </VSpace>
     </template>
   </VModal>

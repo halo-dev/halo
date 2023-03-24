@@ -24,9 +24,9 @@ import {
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import GrantPermissionModal from "./components/GrantPermissionModal.vue";
-import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
-import type { Role, User, ListedUserList } from "@halo-dev/api-client";
+import type { Role, User, ListedUser } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 import { useRouteQuery } from "@vueuse/router";
@@ -36,54 +36,97 @@ import { getNode } from "@formkit/core";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import { useFetchRole } from "../roles/composables/use-role";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
+import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const checkedAll = ref(false);
 const editingModal = ref<boolean>(false);
 const passwordChangeModal = ref<boolean>(false);
 const grantPermissionModal = ref<boolean>(false);
 
-const users = ref<ListedUserList>({
-  page: 1,
-  size: 20,
-  total: 0,
-  items: [],
-  first: true,
-  last: false,
-  hasNext: false,
-  hasPrevious: false,
-  totalPages: 0,
-});
-const loading = ref(false);
 const selectedUserNames = ref<string[]>([]);
 const selectedUser = ref<User>();
 const keyword = ref("");
-const refreshInterval = ref();
 
 const userStore = useUserStore();
 
 const ANONYMOUSUSER_NAME = "anonymousUser";
 const DELETEDUSER_NAME = "ghost";
 
-const handleFetchUsers = async (options?: {
-  mute?: boolean;
-  page?: number;
-}) => {
-  try {
-    clearInterval(refreshInterval.value);
+// Filters
+function handleKeywordChange() {
+  const keywordNode = getNode("keywordInput");
+  if (keywordNode) {
+    keyword.value = keywordNode._value as string;
+  }
+  page.value = 1;
+}
 
-    if (!options?.mute) {
-      loading.value = true;
-    }
+function handleClearKeyword() {
+  keyword.value = "";
+  page.value = 1;
+}
 
-    if (options?.page) {
-      users.value.page = options.page;
-    }
+interface SortItem {
+  label: string;
+  value: string;
+}
 
+const SortItems: SortItem[] = [
+  {
+    label: t("core.user.filters.sort.items.create_time_desc"),
+    value: "creationTimestamp,desc",
+  },
+  {
+    label: t("core.user.filters.sort.items.create_time_asc"),
+    value: "creationTimestamp,asc",
+  },
+];
+
+const selectedSortItem = ref<SortItem>();
+
+function handleSortItemChange(sortItem?: SortItem) {
+  selectedSortItem.value = sortItem;
+  page.value = 1;
+}
+
+const { roles } = useFetchRole();
+const selectedRole = ref<Role>();
+
+function handleRoleChange(role?: Role) {
+  selectedRole.value = role;
+  page.value = 1;
+}
+
+function handleClearFilters() {
+  selectedRole.value = undefined;
+  selectedSortItem.value = undefined;
+  keyword.value = "";
+  page.value = 1;
+}
+
+const hasFilters = computed(() => {
+  return selectedRole.value || selectedSortItem.value || keyword.value;
+});
+
+const page = ref(1);
+const size = ref(20);
+const total = ref(0);
+
+const {
+  data: users,
+  isLoading,
+  isFetching,
+  refetch,
+} = useQuery<ListedUser[]>({
+  queryKey: ["users", page, size, keyword, selectedSortItem, selectedRole],
+  queryFn: async () => {
     const { data } = await apiClient.user.listUsers({
-      page: users.value.page,
-      size: users.value.size,
+      page: page.value,
+      size: size.value,
       keyword: keyword.value,
       fieldSelector: [
         `name!=${ANONYMOUSUSER_NAME}`,
@@ -95,53 +138,41 @@ const handleFetchUsers = async (options?: {
       role: selectedRole.value?.metadata.name,
     });
 
-    users.value = data;
+    total.value = data.total;
 
-    const deletedUsers = users.value.items.filter(
+    return data.items;
+  },
+  refetchOnWindowFocus: false,
+  refetchInterval(data) {
+    const deletingUsers = data?.filter(
       (user) => !!user.user.metadata.deletionTimestamp
     );
 
-    if (deletedUsers.length) {
-      refreshInterval.value = setInterval(() => {
-        handleFetchUsers({ mute: true });
-      }, 3000);
-    }
-  } catch (e) {
-    console.error("Failed to fetch users", e);
-  } finally {
+    return deletingUsers?.length ? 3000 : false;
+  },
+  onSuccess() {
     selectedUser.value = undefined;
-    loading.value = false;
-  }
-};
-
-const handlePaginationChange = async ({
-  page,
-  size,
-}: {
-  page: number;
-  size: number;
-}) => {
-  users.value.page = page;
-  users.value.size = size;
-  await handleFetchUsers();
-};
+  },
+});
 
 const handleDelete = async (user: User) => {
   Dialog.warning({
-    title: "确定要删除该用户吗？",
-    description: "该操作不可恢复。",
+    title: t("core.user.operations.delete.title"),
+    description: t("core.common.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.user.deletev1alpha1User({
           name: user.metadata.name,
         });
 
-        Toast.success("删除成功");
+        Toast.success(t("core.common.toast.delete_success"));
       } catch (e) {
         console.error("Failed to delete user", e);
       } finally {
-        await handleFetchUsers();
+        await refetch();
       }
     },
   });
@@ -149,9 +180,11 @@ const handleDelete = async (user: User) => {
 
 const handleDeleteInBatch = async () => {
   Dialog.warning({
-    title: "确定要删除选中的用户吗？",
-    description: "该操作不可恢复。",
+    title: t("core.user.operations.delete_in_batch.title"),
+    description: t("core.common.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const userNamesToDelete = selectedUserNames.value.filter(
         (name) => name != userStore.currentUser?.metadata.name
@@ -163,15 +196,15 @@ const handleDeleteInBatch = async () => {
           });
         })
       );
-      await handleFetchUsers();
+      await refetch();
       selectedUserNames.value.length = 0;
-      Toast.success("删除成功");
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
 
 watch(selectedUserNames, (newValue) => {
-  checkedAll.value = newValue.length === users.value.items?.length;
+  checkedAll.value = newValue.length === users.value?.length;
 });
 
 const checkSelection = (user: User) => {
@@ -186,7 +219,7 @@ const handleCheckAllChange = (e: Event) => {
 
   if (checked) {
     selectedUserNames.value =
-      users.value.items.map((user) => {
+      users.value?.map((user) => {
         return user.user.metadata.name;
       }) || [];
   } else {
@@ -201,7 +234,7 @@ const handleOpenCreateModal = (user: User) => {
 
 const onEditingModalClose = () => {
   routeQueryAction.value = undefined;
-  handleFetchUsers();
+  refetch();
 };
 
 const handleOpenPasswordChangeModal = (user: User) => {
@@ -214,14 +247,6 @@ const handleOpenGrantPermissionModal = (user: User) => {
   grantPermissionModal.value = true;
 };
 
-onMounted(() => {
-  handleFetchUsers();
-});
-
-onUnmounted(() => {
-  clearInterval(refreshInterval.value);
-});
-
 // Route query action
 const routeQueryAction = useRouteQuery<string | undefined>("action");
 
@@ -232,62 +257,6 @@ onMounted(() => {
   if (routeQueryAction.value === "create") {
     editingModal.value = true;
   }
-});
-
-// Filters
-function handleKeywordChange() {
-  const keywordNode = getNode("keywordInput");
-  if (keywordNode) {
-    keyword.value = keywordNode._value as string;
-  }
-  handleFetchUsers({ page: 1 });
-}
-
-function handleClearKeyword() {
-  keyword.value = "";
-  handleFetchUsers({ page: 1 });
-}
-
-interface SortItem {
-  label: string;
-  value: string;
-}
-
-const SortItems: SortItem[] = [
-  {
-    label: "较近创建",
-    value: "creationTimestamp,desc",
-  },
-  {
-    label: "较早创建",
-    value: "creationTimestamp,asc",
-  },
-];
-
-const selectedSortItem = ref<SortItem>();
-
-function handleSortItemChange(sortItem?: SortItem) {
-  selectedSortItem.value = sortItem;
-  handleFetchUsers({ page: 1 });
-}
-
-const { roles } = useFetchRole();
-const selectedRole = ref<Role>();
-
-function handleRoleChange(role?: Role) {
-  selectedRole.value = role;
-  handleFetchUsers({ page: 1 });
-}
-
-function handleClearFilters() {
-  selectedRole.value = undefined;
-  selectedSortItem.value = undefined;
-  keyword.value = "";
-  handleFetchUsers({ page: 1 });
-}
-
-const hasFilters = computed(() => {
-  return selectedRole.value || selectedSortItem.value || keyword.value;
 });
 </script>
 <template>
@@ -300,16 +269,16 @@ const hasFilters = computed(() => {
   <UserPasswordChangeModal
     v-model:visible="passwordChangeModal"
     :user="selectedUser"
-    @close="handleFetchUsers"
+    @close="refetch"
   />
 
   <GrantPermissionModal
     v-model:visible="grantPermissionModal"
     :user="selectedUser"
-    @close="handleFetchUsers"
+    @close="refetch"
   />
 
-  <VPageHeader title="用户">
+  <VPageHeader :title="$t('core.user.title')">
     <template #icon>
       <IconUserSettings class="mr-2 self-center" />
     </template>
@@ -324,13 +293,13 @@ const hasFilters = computed(() => {
           <template #icon>
             <IconUserFollow class="h-full w-full" />
           </template>
-          角色管理
+          {{ $t("core.user.actions.roles") }}
         </VButton>
         <VButton :route="{ name: 'AuthProviders' }" size="sm" type="default">
           <template #icon>
             <IconLockPasswordLine class="h-full w-full" />
           </template>
-          身份认证
+          {{ $t("core.user.actions.identity_authentication") }}
         </VButton>
         <VButton
           v-permission="['system:users:manage']"
@@ -340,7 +309,7 @@ const hasFilters = computed(() => {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          添加用户
+          {{ $t("core.common.buttons.new") }}
         </VButton>
       </VSpace>
     </template>
@@ -374,20 +343,27 @@ const hasFilters = computed(() => {
                   outer-class="!p-0"
                   :model-value="keyword"
                   name="keyword"
-                  placeholder="输入关键词搜索"
+                  :placeholder="$t('core.common.placeholder.search')"
                   type="text"
                   @keyup.enter="handleKeywordChange"
                 ></FormKit>
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  关键词：{{ keyword }}
+                  {{
+                    $t("core.common.filters.results.keyword", {
+                      keyword: keyword,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag v-if="selectedRole" @close="handleRoleChange()">
-                  角色：{{
-                    selectedRole.metadata.annotations?.[
-                      rbacAnnotations.DISPLAY_NAME
-                    ] || selectedRole.metadata.name
+                  {{
+                    $t("core.user.filters.role.result", {
+                      role:
+                        selectedRole.metadata.annotations?.[
+                          rbacAnnotations.DISPLAY_NAME
+                        ] || selectedRole.metadata.name,
+                    })
                   }}
                 </FilterTag>
 
@@ -395,7 +371,11 @@ const hasFilters = computed(() => {
                   v-if="selectedSortItem"
                   @close="handleSortItemChange()"
                 >
-                  排序：{{ selectedSortItem.label }}
+                  {{
+                    $t("core.common.filters.results.sort", {
+                      sort: selectedSortItem.label,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterCleanButton
@@ -405,7 +385,7 @@ const hasFilters = computed(() => {
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeleteInBatch">
-                  删除
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </VSpace>
             </div>
@@ -415,7 +395,9 @@ const hasFilters = computed(() => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">角色</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.user.filters.role.label") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -446,7 +428,9 @@ const hasFilters = computed(() => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">排序</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.common.filters.labels.sort") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -470,11 +454,13 @@ const hasFilters = computed(() => {
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                    @click="handleFetchUsers()"
+                    @click="refetch()"
                   >
                     <IconRefreshLine
-                      v-tooltip="`刷新`"
-                      :class="{ 'animate-spin text-gray-900': loading }"
+                      v-tooltip="$t('core.common.buttons.refresh')"
+                      :class="{
+                        'animate-spin text-gray-900': isFetching,
+                      }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
                   </div>
@@ -485,16 +471,18 @@ const hasFilters = computed(() => {
         </div>
       </template>
 
-      <VLoading v-if="loading" />
+      <VLoading v-if="isLoading" />
 
-      <Transition v-else-if="!users.total" appear name="fade">
+      <Transition v-else-if="!users?.length" appear name="fade">
         <VEmpty
-          message="当前没有符合筛选条件的用户，你可以尝试刷新或者创建新用户"
-          title="当前没有符合筛选条件的用户"
+          :message="$t('core.user.empty.message')"
+          :title="$t('core.user.empty.title')"
         >
           <template #actions>
             <VSpace>
-              <VButton @click="handleFetchUsers()">刷新</VButton>
+              <VButton @click="refetch()">
+                {{ $t("core.common.buttons.refresh") }}
+              </VButton>
               <VButton
                 v-permission="['system:users:manage']"
                 type="secondary"
@@ -503,7 +491,7 @@ const hasFilters = computed(() => {
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
                 </template>
-                新建用户
+                {{ $t("core.common.buttons.new") }}
               </VButton>
             </VSpace>
           </template>
@@ -515,7 +503,7 @@ const hasFilters = computed(() => {
           class="box-border h-full w-full divide-y divide-gray-100"
           role="list"
         >
-          <li v-for="(user, index) in users.items" :key="index">
+          <li v-for="(user, index) in users" :key="index">
             <VEntity :is-selected="checkSelection(user.user)">
               <template
                 v-if="currentUserHasPermission(['system:users:manage'])"
@@ -568,7 +556,11 @@ const hasFilters = computed(() => {
                 </VEntityField>
                 <VEntityField v-if="user.user.metadata.deletionTimestamp">
                   <template #description>
-                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                    <VStatusDot
+                      v-tooltip="$t('core.common.status.deleting')"
+                      state="warning"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField>
@@ -589,14 +581,14 @@ const hasFilters = computed(() => {
                   type="secondary"
                   @click="handleOpenCreateModal(user.user)"
                 >
-                  修改资料
+                  {{ $t("core.user.operations.update_profile.title") }}
                 </VButton>
                 <VButton
                   v-close-popper
                   block
                   @click="handleOpenPasswordChangeModal(user.user)"
                 >
-                  修改密码
+                  {{ $t("core.user.operations.change_password.title") }}
                 </VButton>
                 <VButton
                   v-if="
@@ -607,7 +599,7 @@ const hasFilters = computed(() => {
                   block
                   @click="handleOpenGrantPermissionModal(user.user)"
                 >
-                  分配角色
+                  {{ $t("core.user.operations.grant_permission.title") }}
                 </VButton>
                 <VButton
                   v-if="
@@ -619,7 +611,7 @@ const hasFilters = computed(() => {
                   type="danger"
                   @click="handleDelete(user.user)"
                 >
-                  删除
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </template>
             </VEntity>
@@ -630,11 +622,12 @@ const hasFilters = computed(() => {
       <template #footer>
         <div class="bg-white sm:flex sm:items-center sm:justify-end">
           <VPagination
-            :page="users.page"
-            :size="users.size"
-            :total="users.total"
+            v-model:page="page"
+            v-model:size="size"
+            :total="total"
+            :page-label="$t('core.components.pagination.page_label')"
+            :size-label="$t('core.components.pagination.size_label')"
             :size-options="[20, 30, 50, 100]"
-            @change="handlePaginationChange"
           />
         </div>
       </template>

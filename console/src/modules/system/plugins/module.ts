@@ -24,11 +24,11 @@ export default definePlugin({
               name: "Plugins",
               component: PluginList,
               meta: {
-                title: "插件",
+                title: "core.plugin.title",
                 searchable: true,
                 permissions: ["system:plugins:view"],
                 menu: {
-                  name: "插件",
+                  name: "core.sidebar.menu.items.plugins",
                   group: "system",
                   icon: markRaw(IconPlug),
                   priority: 0,
@@ -46,7 +46,7 @@ export default definePlugin({
               name: "PluginDetail",
               component: PluginDetail,
               meta: {
-                title: "插件详情",
+                title: "core.plugin.detail.title",
                 permissions: ["system:plugins:view"],
               },
             },
@@ -55,7 +55,7 @@ export default definePlugin({
               name: "PluginSetting",
               component: PluginSetting,
               meta: {
-                title: "插件设置",
+                title: "core.plugin.settings.title",
                 permissions: ["system:plugins:manage"],
               },
             },

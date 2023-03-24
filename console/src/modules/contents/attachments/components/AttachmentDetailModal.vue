@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { VButton, VModal, VSpace, VTag } from "@halo-dev/components";
+import { VButton, VModal, VSpace } from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
 import type { Attachment } from "@halo-dev/api-client";
 import prettyBytes from "pretty-bytes";
@@ -69,7 +69,11 @@ const onVisibleChange = (visible: boolean) => {
 </script>
 <template>
   <VModal
-    :title="`附件：${attachment?.spec.displayName || ''}`"
+    :title="
+      $t('core.attachment.detail_modal.title', {
+        display_name: attachment?.spec.displayName || '',
+      })
+    "
     :visible="visible"
     :width="1000"
     :mount-to-body="mountToBody"
@@ -86,7 +90,9 @@ const onVisibleChange = (visible: boolean) => {
         class="flex justify-center"
       >
         <img
-          v-tooltip.bottom="`点击退出预览`"
+          v-tooltip.bottom="
+            $t('core.attachment.detail_modal.preview.click_to_exit')
+          "
           :alt="attachment?.spec.displayName"
           :src="attachment?.status?.permalink"
           class="w-auto cursor-pointer rounded"
@@ -97,7 +103,9 @@ const onVisibleChange = (visible: boolean) => {
         <div
           class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
         >
-          <dt class="text-sm font-medium text-gray-900">预览</dt>
+          <dt class="text-sm font-medium text-gray-900">
+            {{ $t("core.attachment.detail_modal.fields.preview") }}
+          </dt>
           <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
             <div
               v-if="isImage(attachment?.spec.mediaType)"
@@ -109,10 +117,14 @@ const onVisibleChange = (visible: boolean) => {
                 classes="max-w-full cursor-pointer rounded sm:max-w-[50%]"
               >
                 <template #loading>
-                  <span class="text-gray-400">加载中...</span>
+                  <span class="text-gray-400">
+                    {{ $t("core.common.status.loading") }}...
+                  </span>
                 </template>
                 <template #error>
-                  <span class="text-red-400">加载异常</span>
+                  <span class="text-red-400">
+                    {{ $t("core.common.status.loading_error") }}
+                  </span>
                 </template>
               </LazyImage>
             </div>
@@ -122,61 +134,86 @@ const onVisibleChange = (visible: boolean) => {
                 controls
                 class="max-w-full rounded sm:max-w-[50%]"
               >
-                当前浏览器不支持该视频播放
+                {{
+                  $t("core.attachment.detail_modal.preview.video_not_support")
+                }}
               </video>
             </div>
             <div v-else-if="attachment?.spec.mediaType?.startsWith('audio/')">
               <audio :src="attachment.status?.permalink" controls>
-                当前浏览器不支持该音频播放
+                {{
+                  $t("core.attachment.detail_modal.preview.audio_not_support")
+                }}
               </audio>
             </div>
-            <span v-else> 此文件不支持预览 </span>
+            <span v-else>
+              {{ $t("core.attachment.detail_modal.preview.not_support") }}
+            </span>
           </dd>
         </div>
         <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">存储策略</dt>
+          <dt class="text-sm font-medium text-gray-900">
+            {{ $t("core.attachment.detail_modal.fields.storage_policy") }}
+          </dt>
           <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
             {{ policy?.spec.displayName }}
           </dd>
         </div>
         <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">所在分组</dt>
+          <dt class="text-sm font-medium text-gray-900">
+            {{ $t("core.attachment.detail_modal.fields.group") }}
+          </dt>
           <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-            {{ getGroupName(attachment?.spec.groupName) || "未分组" }}
+            {{
+              getGroupName(attachment?.spec.groupName) ||
+              $t("core.attachment.common.text.ungrouped")
+            }}
           </dd>
         </div>
         <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">文件名称</dt>
+          <dt class="text-sm font-medium text-gray-900">
+            {{ $t("core.attachment.detail_modal.fields.display_name") }}
+          </dt>
           <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
             {{ attachment?.spec.displayName }}
           </dd>
         </div>
         <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">文件类型</dt>
+          <dt class="text-sm font-medium text-gray-900">
+            {{ $t("core.attachment.detail_modal.fields.media_type") }}
+          </dt>
           <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
             {{ attachment?.spec.mediaType }}
           </dd>
         </div>
         <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">文件大小</dt>
+          <dt class="text-sm font-medium text-gray-900">
+            {{ $t("core.attachment.detail_modal.fields.size") }}
+          </dt>
           <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
             {{ prettyBytes(attachment?.spec.size || 0) }}
           </dd>
         </div>
         <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">上传者</dt>
+          <dt class="text-sm font-medium text-gray-900">
+            {{ $t("core.attachment.detail_modal.fields.owner") }}
+          </dt>
           <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
             {{ attachment?.spec.ownerName }}
           </dd>
         </div>
         <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">上传时间</dt>
+          <dt class="text-sm font-medium text-gray-900">
+            {{ $t("core.attachment.detail_modal.fields.creation_time") }}
+          </dt>
           <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
             {{ formatDatetime(attachment?.metadata.creationTimestamp) }}
           </dd>
         </div>
         <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">原始链接</dt>
+          <dt class="text-sm font-medium text-gray-900">
+            {{ $t("core.attachment.detail_modal.fields.permalink") }}
+          </dt>
           <dd
             class="mt-1 text-sm text-gray-900 hover:text-blue-600 sm:col-span-2 sm:mt-0"
           >
@@ -185,63 +222,13 @@ const onVisibleChange = (visible: boolean) => {
             </a>
           </dd>
         </div>
-        <!-- TODO: add attachment ref support -->
-        <div
-          v-if="false"
-          class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-        >
-          <dt class="text-sm font-medium text-gray-900">引用位置</dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-            // TODO
-            <ul class="mt-2 space-y-2">
-              <li>
-                <div
-                  class="inline-flex w-96 cursor-pointer flex-row gap-x-3 rounded border p-3 hover:border-primary"
-                >
-                  <RouterLink
-                    :to="{
-                      name: 'Posts',
-                    }"
-                    class="font-medium text-gray-900 hover:text-blue-400"
-                  >
-                    Halo 1.5.3 发布了
-                  </RouterLink>
-                  <div class="text-xs">
-                    <VSpace>
-                      <VTag>文章</VTag>
-                    </VSpace>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div
-                  class="inline-flex w-96 cursor-pointer flex-row gap-x-3 rounded border p-3 hover:border-primary"
-                >
-                  <RouterLink
-                    :to="{
-                      name: 'Posts',
-                    }"
-                    class="font-medium text-gray-900 hover:text-blue-400"
-                  >
-                    Halo 1.5.2 发布
-                  </RouterLink>
-                  <div class="text-xs">
-                    <VSpace>
-                      <VTag>文章</VTag>
-                    </VSpace>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </dd>
-        </div>
       </dl>
     </div>
     <template #footer>
       <VSpace>
-        <VButton type="default" @click="onVisibleChange(false)"
-          >关闭 Esc</VButton
-        >
+        <VButton type="default" @click="onVisibleChange(false)">
+          {{ $t("core.common.buttons.close_and_shortcut") }}
+        </VButton>
         <slot name="footer" />
       </VSpace>
     </template>

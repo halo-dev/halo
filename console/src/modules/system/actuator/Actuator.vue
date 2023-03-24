@@ -13,6 +13,9 @@ import type { Info, GlobalInfo, Startup } from "./types";
 import axios from "axios";
 import { formatDatetime } from "@/utils/date";
 import { useClipboard } from "@vueuse/core";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const info = ref<Info>();
 const globalInfo = ref<GlobalInfo>();
@@ -68,23 +71,36 @@ const { copy, isSupported } = useClipboard();
 
 const handleCopy = () => {
   if (!isSupported.value) {
-    Toast.warning("当前浏览器不支持复制");
+    Toast.warning(t("core.actuator.actions.copy.toast_browser_not_supported"));
+    return;
   }
 
   const text = `
-- 外部访问地址：${globalInfo.value?.externalUrl}
-- 启动时间：${formatDatetime(startup.value?.timeline.startTime)}
-- Halo 版本：${info.value?.build?.version}
-- 构建时间：${formatDatetime(info.value?.build?.time)}
+- ${t("core.actuator.copy_results.external_url", {
+    external_url: globalInfo.value?.externalUrl,
+  })}
+- ${t("core.actuator.copy_results.start_time", {
+    start_time: formatDatetime(startup.value?.timeline.startTime),
+  })}
+- ${t("core.actuator.fields.version", { version: info.value?.build?.version })}
+- ${t("core.actuator.copy_results.build_time", {
+    build_time: formatDatetime(info.value?.build?.time),
+  })}
 - Git Commit：${info.value?.git?.commit.id}
 - Java：${info.value?.java.runtime.name} / ${info.value?.java.runtime.version}
-- 数据库：${info.value?.database.name} / ${info.value?.database.version}
-- 操作系统：${info.value?.os.name} / ${info.value?.os.version}
+- ${t("core.actuator.copy_results.database", {
+    database: [info.value?.database.name, info.value?.database.version].join(
+      " / "
+    ),
+  })}
+- ${t("core.actuator.copy_results.os", {
+    os: [info.value?.os.name, info.value?.os.version].join(" / "),
+  })}
   `;
 
   copy(text);
 
-  Toast.success("复制成功");
+  Toast.success(t("core.common.toast.copy_success"));
 };
 
 const handleDownloadLogfile = () => {
@@ -101,17 +117,17 @@ const handleDownloadLogfile = () => {
       document.body.removeChild(downloadElement);
       window.URL.revokeObjectURL(href);
 
-      Toast.success("下载成功");
+      Toast.success(t("core.common.toast.download_success"));
     })
     .catch((e) => {
-      Toast.error("下载失败");
+      Toast.error(t("core.common.toast.download_failed"));
       console.log("Failed to download log file.", e);
     });
 };
 </script>
 
 <template>
-  <VPageHeader title="系统概览">
+  <VPageHeader :title="$t('core.actuator.title')">
     <template #icon>
       <IconTerminalBoxLine class="mr-2 self-center" />
     </template>
@@ -120,7 +136,7 @@ const handleDownloadLogfile = () => {
         <template #icon>
           <IconClipboardLine class="h-full w-full" />
         </template>
-        复制
+        {{ $t("core.common.buttons.copy") }}
       </VButton>
     </template>
   </VPageHeader>
@@ -133,7 +149,7 @@ const handleDownloadLogfile = () => {
         >
           <div>
             <h3 class="text-lg font-medium leading-6 text-gray-900">
-              基本信息
+              {{ $t("core.actuator.header.titles.general") }}
             </h3>
           </div>
         </div>
@@ -142,7 +158,9 @@ const handleDownloadLogfile = () => {
             <div
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">外部访问地址</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{ $t("core.actuator.fields.external_url") }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 <span>
                   {{ globalInfo?.externalUrl }}
@@ -151,11 +169,11 @@ const handleDownloadLogfile = () => {
                   v-if="!isExternalUrlValid"
                   class="mt-3"
                   type="warning"
-                  title="警告"
+                  :title="$t('core.common.text.warning')"
                   :closable="false"
                 >
                   <template #description>
-                    检测到外部访问地址与当前访问地址不一致，可能会导致部分链接无法正常跳转，请检查外部访问地址设置。
+                    {{ $t("core.actuator.alert.external_url_invalid") }}
                   </template>
                 </VAlert>
               </dd>
@@ -163,7 +181,9 @@ const handleDownloadLogfile = () => {
             <div
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">启动时间</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{ $t("core.actuator.fields.start_time") }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 {{ formatDatetime(startup?.timeline.startTime) }}
               </dd>
@@ -171,7 +191,9 @@ const handleDownloadLogfile = () => {
             <div
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">时区</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{ $t("core.actuator.fields.timezone") }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 {{ globalInfo?.timeZone }}
               </dd>
@@ -179,7 +201,9 @@ const handleDownloadLogfile = () => {
             <div
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">语言</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{ $t("core.actuator.fields.locale") }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 {{ globalInfo?.locale }}
               </dd>
@@ -195,7 +219,7 @@ const handleDownloadLogfile = () => {
         >
           <div>
             <h3 class="text-lg font-medium leading-6 text-gray-900">
-              环境信息
+              {{ $t("core.actuator.header.titles.environment") }}
             </h3>
           </div>
         </div>
@@ -205,7 +229,9 @@ const handleDownloadLogfile = () => {
               v-if="info.build"
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">版本</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{ $t("core.actuator.fields.version") }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 <a
                   :href="`https://github.com/halo-dev/halo/releases/tag/v${info.build.version}`"
@@ -220,7 +246,9 @@ const handleDownloadLogfile = () => {
               v-if="info.build"
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">构建时间</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{ $t("core.actuator.fields.build_time") }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 {{ formatDatetime(info.build.time) }}
               </dd>
@@ -251,7 +279,9 @@ const handleDownloadLogfile = () => {
             <div
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">数据库</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{ $t("core.actuator.fields.database") }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 {{ [info.database.name, info.database.version].join(" / ") }}
               </dd>
@@ -259,7 +289,9 @@ const handleDownloadLogfile = () => {
             <div
               class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">操作系统</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{ $t("core.actuator.fields.os") }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 {{ info.os.name }} {{ info.os.version }} / {{ info.os.arch }}
               </dd>
@@ -267,10 +299,12 @@ const handleDownloadLogfile = () => {
             <div
               class="items-center bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
             >
-              <dt class="text-sm font-medium text-gray-900">运行日志</dt>
+              <dt class="text-sm font-medium text-gray-900">
+                {{ $t("core.actuator.fields.log") }}
+              </dt>
               <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
                 <VButton size="sm" @click="handleDownloadLogfile()">
-                  下载
+                  {{ $t("core.common.buttons.download") }}
                 </VButton>
               </dd>
             </div>

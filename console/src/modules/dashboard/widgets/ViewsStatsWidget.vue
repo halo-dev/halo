@@ -16,7 +16,9 @@ const dashboardStats = inject<Ref<DashboardStats>>("dashboardStats");
         </span>
 
         <div>
-          <span class="text-sm text-gray-500">浏览量</span>
+          <span class="text-sm text-gray-500">
+            {{ $t("core.dashboard.widgets.presets.views_stats.title") }}
+          </span>
           <p class="text-2xl font-medium text-gray-900">
             {{ dashboardStats?.visits || 0 }}
           </p>

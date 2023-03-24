@@ -20,6 +20,9 @@ import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
 import { setFocus } from "@/formkit/utils/focus";
 import { apiClient } from "@/utils/api-client";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -106,7 +109,9 @@ const handleCreateReply = async () => {
     });
     onVisibleChange(false);
 
-    Toast.success("回复成功");
+    Toast.success(
+      t("core.comment.reply_modal.operations.submit.toast_success")
+    );
   } catch (error) {
     console.error("Failed to create comment reply", error);
   } finally {
@@ -145,7 +150,7 @@ watchEffect(() => {
 
 <template>
   <VModal
-    title="回复"
+    :title="$t('core.comment.reply_modal.title')"
     :visible="visible"
     :width="500"
     @update:visible="onVisibleChange"
@@ -161,7 +166,7 @@ watchEffect(() => {
         :id="contentInputId"
         v-model="formState.raw"
         type="textarea"
-        validation-label="内容"
+        :validation-label="$t('core.comment.reply_modal.fields.content.label')"
         :rows="6"
         validation="required|length:0,1024"
       ></FormKit>
@@ -182,10 +187,13 @@ watchEffect(() => {
           v-if="visible"
           :loading="saving"
           type="secondary"
+          :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit(formId)"
         >
         </SubmitButton>
-        <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
+        <VButton @click="onVisibleChange(false)">
+          {{ $t("core.common.buttons.cancel_and_shortcut") }}
+        </VButton>
       </VSpace>
     </template>
   </VModal>

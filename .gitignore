@@ -5,8 +5,8 @@ logs/
 
 ### Gradle
 .gradle
-/build/
-/out/
+build/
+out/
 !gradle/wrapper/gradle-wrapper.jar
 bin/
 
@@ -71,7 +71,7 @@ application-local.yaml
 application-local.properties
 
 ### Zip file for test
-!src/test/resources/themes/*.zip
-!src/main/resources/themes/*.zip
-src/main/resources/console/
-src/main/resources/presets/
+!application/src/test/resources/themes/*.zip
+!application/src/main/resources/themes/*.zip
+application/src/main/resources/console/
+application/src/main/resources/presets/

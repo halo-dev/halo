@@ -18,6 +18,7 @@ import { markRaw, ref, type Component } from "vue";
 import { useRouter } from "vue-router";
 import ThemePreviewModal from "@/modules/interface/themes/components/preview/ThemePreviewModal.vue";
 import { apiClient } from "@/utils/api-client";
+import { useI18n } from "vue-i18n";
 
 interface Action {
   icon: Component;
@@ -30,10 +31,14 @@ const router = useRouter();
 
 const themePreviewVisible = ref(false);
 
+const { t } = useI18n();
+
 const actions: Action[] = [
   {
     icon: markRaw(IconUserLine),
-    title: "个人资料",
+    title: t(
+      "core.dashboard.widgets.presets.quicklink.actions.user_profile.title"
+    ),
     action: () => {
       router.push({
         name: "UserDetail",
@@ -43,7 +48,9 @@ const actions: Action[] = [
   },
   {
     icon: markRaw(IconWindowLine),
-    title: "查看站点",
+    title: t(
+      "core.dashboard.widgets.presets.quicklink.actions.view_site.title"
+    ),
     action: () => {
       themePreviewVisible.value = true;
     },
@@ -51,7 +58,7 @@ const actions: Action[] = [
   },
   {
     icon: markRaw(IconBookRead),
-    title: "创建文章",
+    title: t("core.dashboard.widgets.presets.quicklink.actions.new_post.title"),
     action: () => {
       router.push({
         name: "PostEditor",
@@ -61,7 +68,7 @@ const actions: Action[] = [
   },
   {
     icon: markRaw(IconPages),
-    title: "创建页面",
+    title: t("core.dashboard.widgets.presets.quicklink.actions.new_page.title"),
     action: () => {
       router.push({
         name: "SinglePageEditor",
@@ -71,7 +78,9 @@ const actions: Action[] = [
   },
   {
     icon: markRaw(IconFolder),
-    title: "附件上传",
+    title: t(
+      "core.dashboard.widgets.presets.quicklink.actions.upload_attachment.title"
+    ),
     action: () => {
       router.push({
         name: "Attachments",
@@ -84,7 +93,9 @@ const actions: Action[] = [
   },
   {
     icon: markRaw(IconPalette),
-    title: "主题管理",
+    title: t(
+      "core.dashboard.widgets.presets.quicklink.actions.theme_manage.title"
+    ),
     action: () => {
       router.push({
         name: "ThemeDetail",
@@ -94,7 +105,9 @@ const actions: Action[] = [
   },
   {
     icon: markRaw(IconPlug),
-    title: "插件管理",
+    title: t(
+      "core.dashboard.widgets.presets.quicklink.actions.plugin_manage.title"
+    ),
     action: () => {
       router.push({
         name: "Plugins",
@@ -104,7 +117,7 @@ const actions: Action[] = [
   },
   {
     icon: markRaw(IconUserSettings),
-    title: "新建用户",
+    title: t("core.dashboard.widgets.presets.quicklink.actions.new_user.title"),
     action: () => {
       router.push({
         name: "Users",
@@ -117,14 +130,26 @@ const actions: Action[] = [
   },
   {
     icon: markRaw(IconSearch),
-    title: "刷新搜索引擎",
+    title: t(
+      "core.dashboard.widgets.presets.quicklink.actions.refresh_search_engine.title"
+    ),
     action: () => {
       Dialog.warning({
-        title: "确定要刷新搜索引擎索引吗？",
-        description: "此操作会对所有已发布的文章重新创建搜索引擎索引。",
+        title: t(
+          "core.dashboard.widgets.presets.quicklink.actions.refresh_search_engine.dialog_title"
+        ),
+        description: t(
+          "core.dashboard.widgets.presets.quicklink.actions.refresh_search_engine.dialog_content"
+        ),
+        confirmText: t("core.common.buttons.confirm"),
+        cancelText: t("core.common.buttons.cancel"),
         onConfirm: async () => {
           await apiClient.indices.buildPostIndices();
-          Toast.success("刷新成功");
+          Toast.success(
+            t(
+              "core.dashboard.widgets.presets.quicklink.actions.refresh_search_engine.success_message"
+            )
+          );
         },
       });
     },
@@ -136,7 +161,7 @@ const actions: Action[] = [
   <VCard
     :body-class="['h-full', 'overflow-y-auto', '@container']"
     class="h-full"
-    title="快捷访问"
+    :title="$t('core.dashboard.widgets.presets.quicklink.title')"
   >
     <div
       class="grid grid-cols-1 gap-2 overflow-hidden @sm:grid-cols-2 @md:grid-cols-3"
@@ -169,5 +194,10 @@ const actions: Action[] = [
       </div>
     </div>
   </VCard>
-  <ThemePreviewModal v-model:visible="themePreviewVisible" title="查看站点" />
+  <ThemePreviewModal
+    v-model:visible="themePreviewVisible"
+    :title="
+      $t('core.dashboard.widgets.presets.quicklink.actions.view_site.title')
+    "
+  />
 </template>

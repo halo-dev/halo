@@ -33,11 +33,11 @@ export default definePlugin({
               name: "Users",
               component: UserList,
               meta: {
-                title: "用户",
+                title: "core.user.title",
                 searchable: true,
                 permissions: ["system:users:view"],
                 menu: {
-                  name: "用户",
+                  name: "core.sidebar.menu.items.users",
                   group: "system",
                   icon: markRaw(IconUserSettings),
                   priority: 1,
@@ -57,7 +57,7 @@ export default definePlugin({
               name: "UserDetail",
               component: UserDetail,
               meta: {
-                title: "用户详情",
+                title: "core.user.detail.title",
               },
             },
             {

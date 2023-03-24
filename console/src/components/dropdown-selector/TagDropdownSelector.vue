@@ -77,7 +77,7 @@ const searchResults = computed(() => {
           <FormKit
             id="tagDropdownSelectorInput"
             v-model="keyword"
-            placeholder="输入关键词搜索"
+            :placeholder="$t('core.common.placeholder.search')"
             type="text"
           ></FormKit>
         </div>
@@ -104,7 +104,11 @@ const searchResults = computed(() => {
                 </template>
                 <template #end>
                   <VEntityField
-                    :description="`${tag.status?.postCount || 0} 篇文章`"
+                    :description="
+                      $t('core.common.fields.post_count', {
+                        count: tag.status?.postCount || 0,
+                      })
+                    "
                   />
                 </template>
               </VEntity>

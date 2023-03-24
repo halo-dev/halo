@@ -4,6 +4,7 @@ import type { PluginModule } from "@/stores/plugin";
 import { onMounted, ref, type Ref, defineAsyncComponent } from "vue";
 import { VLoading } from "@halo-dev/components";
 import Logo from "@/assets/logo.png";
+import { useI18n } from "vue-i18n";
 
 export interface EditorProvider extends EditorProviderRaw {
   logo?: string;
@@ -16,11 +17,12 @@ interface useEditorExtensionPointsReturn {
 export function useEditorExtensionPoints(): useEditorExtensionPointsReturn {
   // resolve plugin extension points
   const { pluginModules } = usePluginModuleStore();
+  const { t } = useI18n();
 
   const editorProviders = ref<EditorProvider[]>([
     {
       name: "default",
-      displayName: "默认编辑器",
+      displayName: t("core.plugin.extension_points.editor.providers.default"),
       component: defineAsyncComponent({
         loader: () => import("@/components/editor/DefaultEditor.vue"),
         loadingComponent: VLoading,
