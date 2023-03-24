@@ -6,6 +6,7 @@ import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import type { Content, Editor } from "@halo-dev/richtext-editor";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 interface useAttachmentControlReturn {
   attachments: Ref<Attachment[] | undefined>;
@@ -39,6 +40,8 @@ export function useAttachmentControl(filterOptions: {
   page: Ref<number>;
   size: Ref<number>;
 }): useAttachmentControlReturn {
+  const { t } = useI18n();
+
   const { user, policy, group, keyword, sort, page, size } = filterOptions;
 
   const selectedAttachment = ref<Attachment>();
@@ -124,9 +127,11 @@ export function useAttachmentControl(filterOptions: {
 
   const handleDelete = (attachment: Attachment) => {
     Dialog.warning({
-      title: "确定要删除该附件吗？",
-      description: "删除之后将无法恢复",
+      title: t("core.attachment.operations.delete.title"),
+      description: t("core.common.dialog.descriptions.cannot_be_recovered"),
       confirmType: "danger",
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           await apiClient.extension.storage.attachment.deletestorageHaloRunV1alpha1Attachment(
@@ -141,7 +146,7 @@ export function useAttachmentControl(filterOptions: {
           }
           selectedAttachments.value.delete(attachment);
 
-          Toast.success("删除成功");
+          Toast.success(t("core.common.toast.delete_success"));
         } catch (e) {
           console.error("Failed to delete attachment", e);
         } finally {
@@ -153,9 +158,11 @@ export function useAttachmentControl(filterOptions: {
 
   const handleDeleteInBatch = () => {
     Dialog.warning({
-      title: "确定要删除所选的附件吗？",
-      description: "删除之后将无法恢复",
+      title: t("core.attachment.operations.delete_in_batch.title"),
+      description: t("core.common.dialog.descriptions.cannot_be_recovered"),
       confirmType: "danger",
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
         try {
           const promises = Array.from(selectedAttachments.value).map(
@@ -170,7 +177,7 @@ export function useAttachmentControl(filterOptions: {
           await Promise.all(promises);
           selectedAttachments.value.clear();
 
-          Toast.success("删除成功");
+          Toast.success(t("core.common.toast.delete_success"));
         } catch (e) {
           console.error("Failed to delete attachments", e);
         } finally {

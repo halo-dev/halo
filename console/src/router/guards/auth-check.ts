@@ -10,7 +10,7 @@ export function setupAuthCheckGuard(router: Router) {
 
     const userStore = useUserStore();
 
-    if (localStorage.getItem("logged_in") !== "true" || userStore.isAnonymous) {
+    if (userStore.isAnonymous) {
       next({ name: "Login" });
       return;
     }

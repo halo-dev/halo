@@ -9,12 +9,16 @@ const props = withDefaults(
     size?: number;
     total?: number;
     sizeOptions?: number[];
+    pageLabel?: string;
+    sizeLabel?: string;
   }>(),
   {
     page: 1,
     size: 10,
     total: 0,
     sizeOptions: () => [10],
+    pageLabel: "页",
+    sizeLabel: "条 / 页",
   }
 );
 
@@ -115,7 +119,7 @@ const {
             {{ i }} / {{ pageCount }}
           </option>
         </select>
-        <span class="text-sm text-gray-500">页</span>
+        <span class="text-sm text-gray-500">{{ pageLabel }}</span>
       </div>
       <div class="inline-flex items-center gap-2">
         <select
@@ -130,7 +134,7 @@ const {
             {{ sizeOption }}
           </option>
         </select>
-        <span class="text-sm text-gray-500">条 / 页</span>
+        <span class="text-sm text-gray-500">{{ sizeLabel }}</span>
       </div>
     </div>
   </div>

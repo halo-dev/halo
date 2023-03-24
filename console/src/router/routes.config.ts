@@ -27,7 +27,7 @@ export const routes: Array<RouteRecordRaw> = [
     name: "Setup",
     component: Setup,
     meta: {
-      title: "系统初始化",
+      title: "core.setup.title",
     },
   },
 ];
@@ -40,22 +40,22 @@ export const coreMenuGroups: MenuGroupType[] = [
   },
   {
     id: "content",
-    name: "内容",
+    name: "core.sidebar.menu.groups.content",
     priority: 1,
   },
   {
     id: "interface",
-    name: "外观",
+    name: "core.sidebar.menu.groups.interface",
     priority: 2,
   },
   {
     id: "system",
-    name: "系统",
+    name: "core.sidebar.menu.groups.system",
     priority: 3,
   },
   {
     id: "tool",
-    name: "工具",
+    name: "core.sidebar.menu.groups.tool",
     priority: 4,
   },
 ];

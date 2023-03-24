@@ -19,10 +19,10 @@ export default definePlugin({
           name: "Attachments",
           component: AttachmentList,
           meta: {
-            title: "附件",
+            title: "core.attachment.title",
             permissions: ["system:attachments:view"],
             menu: {
-              name: "附件",
+              name: "core.sidebar.menu.items.attachments",
               group: "content",
               icon: markRaw(IconFolder),
               priority: 3,

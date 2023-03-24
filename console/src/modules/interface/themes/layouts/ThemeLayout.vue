@@ -32,8 +32,10 @@ import { usePermission } from "@/utils/permission";
 import { useThemeStore } from "@/stores/theme";
 import { storeToRefs } from "pinia";
 import { apiClient } from "@/utils/api-client";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 interface ThemeTab {
   id: string;
@@ -47,7 +49,7 @@ interface ThemeTab {
 const initialTabs: ThemeTab[] = [
   {
     id: "detail",
-    label: "详情",
+    label: t("core.theme.tabs.detail"),
     route: {
       name: "ThemeDetail",
     },
@@ -179,19 +181,19 @@ onMounted(() => {
             type="primary"
             @click="handleActiveTheme"
           >
-            启用
+            {{ $t("core.common.buttons.active") }}
           </VButton>
           <VButton type="secondary" size="sm" @click="previewModal = true">
             <template #icon>
               <IconEye class="h-full w-full" />
             </template>
-            预览
+            {{ $t("core.common.buttons.preview") }}
           </VButton>
           <VButton size="sm" type="default" @click="themesModal = true">
             <template #icon>
               <IconExchange class="h-full w-full" />
             </template>
-            主题管理
+            {{ $t("core.theme.actions.management") }}
           </VButton>
         </VSpace>
       </template>
@@ -200,17 +202,19 @@ onMounted(() => {
     <div class="m-0 md:m-4">
       <VEmpty
         v-if="!selectedTheme && !loading"
-        message="当前没有已激活或者选择的主题，你可以切换主题或者安装新主题"
-        title="当前没有已激活或已选择的主题"
+        :message="$t('core.theme.empty.message')"
+        :title="$t('core.theme.empty.title')"
       >
         <template #actions>
           <VSpace>
-            <VButton @click="themesModal = true"> 安装主题 </VButton>
+            <VButton @click="themesModal = true">
+              {{ $t("core.theme.common.buttons.install") }}
+            </VButton>
             <VButton type="primary" @click="themesModal = true">
               <template #icon>
                 <IconExchange class="h-full w-full" />
               </template>
-              切换主题
+              {{ $t("core.theme.empty.actions.switch") }}
             </VButton>
           </VSpace>
         </template>

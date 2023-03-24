@@ -1,5 +1,5 @@
 <template>
-  <VPageHeader title="仪表盘">
+  <VPageHeader :title="$t('core.dashboard.title')">
     <template #icon>
       <IconDashboard class="mr-2 self-center" />
     </template>
@@ -9,14 +9,18 @@
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          添加组件
+          {{ $t("core.dashboard.actions.add_widget") }}
         </VButton>
         <VButton type="secondary" @click="settings = !settings">
           <template #icon>
             <IconSettings v-if="!settings" class="h-full w-full" />
             <IconSave v-else class="h-full w-full" />
           </template>
-          {{ settings ? "完成" : "设置" }}
+          {{
+            settings
+              ? $t("core.dashboard.actions.done")
+              : $t("core.dashboard.actions.setting")
+          }}
         </VButton>
       </VSpace>
     </template>
@@ -59,7 +63,7 @@
     height="calc(100vh - 20px)"
     :width="1280"
     :layer-closable="true"
-    title="小组件"
+    :title="$t('core.dashboard.widgets.modal_title')"
   >
     <VTabbar
       v-model:active-id="activeId"
@@ -120,11 +124,14 @@ import { useStorage } from "@vueuse/core";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import type { DashboardStats } from "@halo-dev/api-client/index";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const widgetsGroup = [
   {
     id: "post",
-    label: "文章",
+    label: t("core.dashboard.widgets.groups.post"),
     widgets: [
       { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "PostStatsWidget" },
       { x: 0, y: 0, w: 6, h: 10, i: 1, widget: "RecentPublishedWidget" },
@@ -132,19 +139,19 @@ const widgetsGroup = [
   },
   {
     id: "page",
-    label: "页面",
+    label: t("core.dashboard.widgets.groups.page"),
     widgets: [
       { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "SinglePageStatsWidget" },
     ],
   },
   {
     id: "comment",
-    label: "评论",
+    label: t("core.dashboard.widgets.groups.comment"),
     widgets: [{ x: 0, y: 0, w: 3, h: 3, i: 0, widget: "CommentStatsWidget" }],
   },
   {
     id: "user",
-    label: "用户",
+    label: t("core.dashboard.widgets.groups.user"),
     widgets: [
       { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "UserStatsWidget" },
       { x: 0, y: 0, w: 3, h: 3, i: 1, widget: "UserProfileWidget" },
@@ -152,7 +159,7 @@ const widgetsGroup = [
   },
   {
     id: "other",
-    label: "其他",
+    label: t("core.dashboard.widgets.groups.other"),
     widgets: [
       { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "ViewsStatsWidget" },
       { x: 0, y: 0, w: 6, h: 10, i: 1, widget: "QuickLinkWidget" },

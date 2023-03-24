@@ -24,10 +24,10 @@ export default definePlugin({
           name: "Dashboard",
           component: Dashboard,
           meta: {
-            title: "仪表盘",
+            title: "core.dashboard.title",
             searchable: true,
             menu: {
-              name: "仪表盘",
+              name: "core.sidebar.menu.items.dashboard",
               group: "dashboard",
               icon: markRaw(IconDashboard),
               priority: 0,

@@ -18,12 +18,13 @@ import { tagCheckbox } from "./inputs/tag-checkbox";
 
 import radioAlt from "./plugins/radio-alt";
 import stopImplicitSubmission from "./plugins/stop-implicit-submission";
+import passwordPreventAutocomplete from "./plugins/password-prevent-autocomplete";
 
 const config: DefaultConfigOptions = {
   config: {
     classes: generateClasses(theme),
   },
-  plugins: [radioAlt, stopImplicitSubmission],
+  plugins: [radioAlt, stopImplicitSubmission, passwordPreventAutocomplete],
   inputs: {
     form,
     attachment,

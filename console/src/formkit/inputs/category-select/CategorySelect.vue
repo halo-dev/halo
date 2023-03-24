@@ -294,7 +294,9 @@ const handleDelete = () => {
           class="group flex cursor-pointer items-center justify-between rounded bg-gray-100 p-2"
         >
           <span class="text-xs text-gray-700 group-hover:text-gray-900">
-            创建 {{ text }} 分类
+            {{
+              $t("core.formkit.category_select.creation_label", { text: text })
+            }}
           </span>
         </li>
         <template v-if="text">

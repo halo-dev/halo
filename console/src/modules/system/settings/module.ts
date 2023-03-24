@@ -12,10 +12,10 @@ export default definePlugin({
       component: SystemSettingsLayout,
       redirect: "/settings/basic",
       meta: {
-        title: "系统设置",
+        title: "core.setting.title",
         permissions: ["system:settings:view"],
         menu: {
-          name: "设置",
+          name: "core.sidebar.menu.items.settings",
           group: "system",
           icon: markRaw(IconSettings),
           priority: 2,
