@@ -1,5 +1,11 @@
 <script lang="ts" setup>
-import { VModal, IconAddCircle, VAlert } from "@halo-dev/components";
+import {
+  VModal,
+  IconAddCircle,
+  VAlert,
+  VDropdown,
+  VDropdownItem,
+} from "@halo-dev/components";
 import UppyUpload from "@/components/upload/UppyUpload.vue";
 import { ref, watch } from "vue";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
@@ -175,7 +181,7 @@ watch(
           </div>
         </div>
 
-        <FloatingDropdown>
+        <VDropdown>
           <div
             class="flex h-full cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
           >
@@ -187,23 +193,15 @@ watch(
             <IconAddCircle />
           </div>
           <template #popper>
-            <div class="w-72 p-4">
-              <ul class="space-y-1">
-                <li
-                  v-for="(policyTemplate, index) in policyTemplates"
-                  :key="index"
-                  v-close-popper
-                  class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                  @click="handleOpenCreateNewPolicyModal(policyTemplate)"
-                >
-                  <span class="truncate">
-                    {{ policyTemplate.spec?.displayName }}
-                  </span>
-                </li>
-              </ul>
-            </div>
+            <VDropdownItem
+              v-for="(policyTemplate, index) in policyTemplates"
+              :key="index"
+              @click="handleOpenCreateNewPolicyModal(policyTemplate)"
+            >
+              {{ policyTemplate.spec?.displayName }}
+            </VDropdownItem>
           </template>
-        </FloatingDropdown>
+        </VDropdown>
       </div>
       <div v-if="!policies?.length" class="mb-3">
         <VAlert

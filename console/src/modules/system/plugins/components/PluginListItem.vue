@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import {
-  VButton,
   VSpace,
   VSwitch,
   VTag,
@@ -10,6 +9,8 @@ import {
   VAvatar,
   Dialog,
   Toast,
+  VDropdownItem,
+  VDropdown,
 } from "@halo-dev/components";
 import PluginUploadModal from "./PluginUploadModal.vue";
 import { ref, toRefs } from "vue";
@@ -169,49 +170,29 @@ const getFailedMessage = (plugin: Plugin) => {
       v-if="currentUserHasPermission(['system:plugins:manage'])"
       #dropdownItems
     >
-      <VButton
-        v-close-popper
-        block
-        type="secondary"
-        @click="upgradeModal = true"
-      >
+      <VDropdownItem @click="upgradeModal = true">
         {{ $t("core.common.buttons.upgrade") }}
-      </VButton>
-      <FloatingDropdown class="w-full" placement="left" :triggers="['click']">
-        <VButton block type="danger">
+      </VDropdownItem>
+      <VDropdown placement="left" :triggers="['click']">
+        <VDropdownItem type="danger">
           {{ $t("core.common.buttons.uninstall") }}
-        </VButton>
+        </VDropdownItem>
         <template #popper>
-          <div class="w-52 p-2">
-            <VSpace class="w-full" direction="column">
-              <VButton
-                v-close-popper.all
-                block
-                type="danger"
-                @click="uninstall"
-              >
-                {{ $t("core.common.buttons.uninstall") }}
-              </VButton>
-              <VButton
-                v-close-popper.all
-                block
-                type="danger"
-                @click="uninstall(true)"
-              >
-                {{ $t("core.plugin.list.actions.uninstall_and_delete_config") }}
-              </VButton>
-            </VSpace>
-          </div>
+          <VDropdownItem v-close-popper.all type="danger" @click="uninstall">
+            {{ $t("core.common.buttons.uninstall") }}
+          </VDropdownItem>
+          <VDropdownItem
+            v-close-popper.all
+            type="danger"
+            @click="uninstall(true)"
+          >
+            {{ $t("core.plugin.list.actions.uninstall_and_delete_config") }}
+          </VDropdownItem>
         </template>
-      </FloatingDropdown>
-      <VButton
-        v-close-popper
-        block
-        type="danger"
-        @click="handleResetSettingConfig"
-      >
+      </VDropdown>
+      <VDropdownItem type="danger" @click="handleResetSettingConfig">
         {{ $t("core.common.buttons.reset") }}
-      </VButton>
+      </VDropdownItem>
     </template>
   </VEntity>
 </template>

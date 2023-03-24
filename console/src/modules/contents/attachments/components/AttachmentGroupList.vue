@@ -8,8 +8,8 @@ import {
   IconAddCircle,
   IconMore,
   Toast,
-  VButton,
-  VSpace,
+  VDropdown,
+  VDropdownItem,
   VStatusDot,
 } from "@halo-dev/components";
 import AttachmentGroupEditingModal from "./AttachmentGroupEditingModal.vue";
@@ -255,67 +255,39 @@ onMounted(async () => {
           animate
         />
       </div>
-      <FloatingDropdown
-        v-if="!readonly"
-        v-permission="['system:attachments:manage']"
-      >
+      <VDropdown v-if="!readonly" v-permission="['system:attachments:manage']">
         <IconMore @click.stop />
         <template #popper>
-          <div class="w-48 p-2">
-            <VSpace class="w-full" direction="column">
-              <VButton
-                v-close-popper
-                block
-                type="secondary"
-                @click="handleOpenEditingModal(group)"
+          <VDropdownItem @click="handleOpenEditingModal(group)">
+            {{ $t("core.attachment.group_list.operations.rename.button") }}
+          </VDropdownItem>
+          <VDropdown placement="right" :triggers="['click']">
+            <VDropdownItem type="danger">
+              {{ $t("core.common.buttons.delete") }}
+            </VDropdownItem>
+            <template #popper>
+              <VDropdownItem
+                v-close-popper.all
+                type="danger"
+                @click="handleDelete(group)"
               >
-                {{ $t("core.attachment.group_list.operations.rename.button") }}
-              </VButton>
-              <FloatingDropdown
-                class="w-full"
-                placement="right"
-                :triggers="['click']"
+                {{ $t("core.attachment.group_list.operations.delete.button") }}
+              </VDropdownItem>
+              <VDropdownItem
+                v-close-popper.all
+                type="danger"
+                @click="handleDeleteWithAttachments(group)"
               >
-                <VButton block type="danger">
-                  {{ $t("core.common.buttons.delete") }}
-                </VButton>
-                <template #popper>
-                  <div class="w-52 p-2">
-                    <VSpace class="w-full" direction="column">
-                      <VButton
-                        v-close-popper.all
-                        block
-                        type="danger"
-                        size="sm"
-                        @click="handleDelete(group)"
-                      >
-                        {{
-                          $t(
-                            "core.attachment.group_list.operations.delete.button"
-                          )
-                        }}
-                      </VButton>
-                      <VButton
-                        v-close-popper.all
-                        block
-                        type="danger"
-                        size="sm"
-                        @click="handleDeleteWithAttachments(group)"
-                      >
-                        {{
-                          $t(
-                            "core.attachment.group_list.operations.delete_with_attachments.button"
-                          )
-                        }}
-                      </VButton>
-                    </VSpace>
-                  </div>
-                </template>
-              </FloatingDropdown>
-            </VSpace>
-          </div>
+                {{
+                  $t(
+                    "core.attachment.group_list.operations.delete_with_attachments.button"
+                  )
+                }}
+              </VDropdownItem>
+            </template>
+          </VDropdown>
         </template>
-      </FloatingDropdown>
+      </VDropdown>
     </div>
     <div
       v-if="!loading && !readonly"

@@ -17,3 +17,5 @@ export * from "./components/status";
 export * from "./components/entity";
 export * from "./components/toast";
 export * from "./components/loading";
+export * from "./components/dropdown";
+export * from "./components/tooltip";
