@@ -23,6 +23,8 @@ import run.halo.app.extension.GVK;
     singular = "authprovider", plural = "authproviders")
 public class AuthProvider extends AbstractExtension {
 
+    public static final String AUTH_BINDING_LABEL = "auth.halo.run/auth-binding";
+
     @Schema(requiredMode = REQUIRED)
     private AuthProviderSpec spec;
 
