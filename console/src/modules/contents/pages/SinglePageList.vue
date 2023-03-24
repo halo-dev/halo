@@ -404,6 +404,23 @@ const isPublishing = (singlePage: SinglePage) => {
 watch(selectedPageNames, (newValue) => {
   checkedAll.value = newValue.length === singlePages.value?.length;
 });
+
+const changeVisibleByIcon = async (singlePage: SinglePage) => {
+  const singlePageToUpdate = cloneDeep(singlePage);
+  singlePageToUpdate.spec.visible =
+    singlePageToUpdate.spec.visible === "PRIVATE" ? "PUBLIC" : "PRIVATE";
+  await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage({
+    name: singlePage.metadata.name,
+    singlePage: singlePageToUpdate,
+  });
+  const { data } =
+    await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
+      name: singlePage.metadata.name,
+    });
+  selectedSinglePage.value = data;
+  await refetch();
+  Toast.success("可见性修改成功");
+};
 </script>
 
 <template>
@@ -808,11 +825,13 @@ watch(selectedPageNames, (newValue) => {
                       v-if="singlePage.page.spec.visible === 'PUBLIC'"
                       v-tooltip="$t('core.page.filters.visible.items.public')"
                       class="cursor-pointer text-sm transition-all hover:text-blue-600"
+                      @click="changeVisibleByIcon(singlePage.page)"
                     />
                     <IconEyeOff
                       v-if="singlePage.page.spec.visible === 'PRIVATE'"
                       v-tooltip="$t('core.page.filters.visible.items.private')"
                       class="cursor-pointer text-sm transition-all hover:text-blue-600"
+                      @click="changeVisibleByIcon(singlePage.page)"
                     />
                   </template>
                 </VEntityField>
