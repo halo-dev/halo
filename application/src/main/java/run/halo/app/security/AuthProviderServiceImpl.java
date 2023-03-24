@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -18,6 +19,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.AuthProvider;
 import run.halo.app.core.extension.UserConnection;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
@@ -122,9 +124,15 @@ public class AuthProviderServiceImpl implements AuthProviderService {
             .helpPage(authProvider.getSpec().getHelpPage())
             .bindingUrl(authProvider.getSpec().getBindingUrl())
             .unbindingUrl(authProvider.getSpec().getUnbindUrl())
+            .supportsBinding(supportsBinding(authProvider))
             .isBound(false)
             .enabled(false)
             .build();
+    }
+
+    private static boolean supportsBinding(AuthProvider authProvider) {
+        return BooleanUtils.TRUE.equals(MetadataUtil.nullSafeLabels(authProvider)
+            .get(AuthProvider.AUTH_BINDING_LABEL));
     }
 
     @NonNull
