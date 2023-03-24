@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.content.Reply;
-import run.halo.app.event.post.ReplyCreatedEvent;
+import run.halo.app.event.post.ReplyChangedEvent;
 import run.halo.app.event.post.ReplyDeletedEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Controller;
@@ -36,10 +36,9 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
                     return;
                 }
 
-                if (addFinalizerIfNecessary(reply)) {
-                    // on reply created
-                    eventPublisher.publishEvent(new ReplyCreatedEvent(this, reply));
-                }
+                addFinalizerIfNecessary(reply);
+                // on reply created
+                eventPublisher.publishEvent(new ReplyChangedEvent(this, reply));
             });
         return new Result(false, null);
     }
@@ -56,10 +55,10 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
         });
     }
 
-    private boolean addFinalizerIfNecessary(Reply oldReply) {
+    private void addFinalizerIfNecessary(Reply oldReply) {
         Set<String> finalizers = oldReply.getMetadata().getFinalizers();
         if (finalizers != null && finalizers.contains(FINALIZER_NAME)) {
-            return false;
+            return;
         }
         client.fetch(Reply.class, oldReply.getMetadata().getName())
             .ifPresent(reply -> {
@@ -71,7 +70,6 @@ public class ReplyReconciler implements Reconciler<Reconciler.Request> {
                 newFinalizers.add(FINALIZER_NAME);
                 client.update(reply);
             });
-        return true;
     }
 
     @Override
