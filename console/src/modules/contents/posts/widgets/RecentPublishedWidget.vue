@@ -34,7 +34,7 @@ const { data } = useQuery<ListedPost[]>({
   <VCard
     :body-class="['h-full', '!p-0', 'overflow-y-auto']"
     class="h-full"
-    title="最近文章"
+    :title="$t('core.dashboard.widgets.presets.recent_published.title')"
   >
     <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
       <li v-for="(post, index) in data" :key="index">
@@ -50,10 +50,20 @@ const { data } = useQuery<ListedPost[]>({
               <template #description>
                 <VSpace>
                   <span class="text-xs text-gray-500">
-                    访问量 {{ post.stats.visit || 0 }}
+                    {{
+                      $t(
+                        "core.dashboard.widgets.presets.recent_published.visits",
+                        { visits: post.stats.visit || 0 }
+                      )
+                    }}
                   </span>
                   <span class="text-xs text-gray-500">
-                    评论 {{ post.stats.totalComment || 0 }}
+                    {{
+                      $t(
+                        "core.dashboard.widgets.presets.recent_published.comments",
+                        { comments: post.stats.totalComment || 0 }
+                      )
+                    }}
                   </span>
                 </VSpace>
               </template>

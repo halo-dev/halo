@@ -213,7 +213,11 @@ defineExpose({
       @submit-invalid="onCustomFormSubmitCheck"
       @submit="customFormInvalid = false"
     >
-      <FormKit v-model="customAnnotationsState" type="repeater" label="自定义">
+      <FormKit
+        v-model="customAnnotationsState"
+        type="repeater"
+        :label="$t('core.components.annotations_form.custom_fields.label')"
+      >
         <FormKit
           type="text"
           label="Key"
@@ -221,7 +225,9 @@ defineExpose({
           validation="required|keyValidationRule"
           :validation-rules="{ keyValidationRule }"
           :validation-messages="{
-            keyValidationRule: '当前 Key 已被占用',
+            keyValidationRule: $t(
+              'core.components.annotations_form.custom_fields.validation'
+            ),
           }"
         ></FormKit>
         <FormKit

@@ -22,6 +22,9 @@ import FilterTag from "@/components/filter/FilterTag.vue";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const checkAll = ref(false);
 const selectedComment = ref<ListedComment>();
@@ -31,15 +34,15 @@ const keyword = ref("");
 // Filters
 const ApprovedFilterItems: { label: string; value?: boolean }[] = [
   {
-    label: "全部",
+    label: t("core.comment.filters.status.items.all"),
     value: undefined,
   },
   {
-    label: "已审核",
+    label: t("core.comment.filters.status.items.approved"),
     value: true,
   },
   {
-    label: "待审核",
+    label: t("core.comment.filters.status.items.pending_review"),
     value: false,
   },
 ];
@@ -51,19 +54,19 @@ const SortFilterItems: {
   value?: Sort;
 }[] = [
   {
-    label: "默认",
+    label: t("core.comment.filters.sort.items.default"),
     value: undefined,
   },
   {
-    label: "最后回复时间",
+    label: t("core.comment.filters.sort.items.last_reply_time"),
     value: "LAST_REPLY_TIME",
   },
   {
-    label: "回复数",
+    label: t("core.comment.filters.sort.items.reply_count"),
     value: "REPLY_COUNT",
   },
   {
-    label: "创建时间",
+    label: t("core.comment.filters.sort.items.creation_time"),
     value: "CREATE_TIME",
   },
 ];
@@ -205,9 +208,13 @@ watch(
 
 const handleDeleteInBatch = async () => {
   Dialog.warning({
-    title: "确定要删除所选的评论吗？",
-    description: "将同时删除所有评论下的回复，该操作不可恢复。",
+    title: t("core.comment.operations.delete_comment_in_batch.title"),
+    description: t(
+      "core.comment.operations.delete_comment_in_batch.description"
+    ),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         const promises = selectedCommentNames.value.map((name) => {
@@ -220,7 +227,7 @@ const handleDeleteInBatch = async () => {
         await Promise.all(promises);
         selectedCommentNames.value = [];
 
-        Toast.success("删除成功");
+        Toast.success(t("core.common.toast.delete_success"));
       } catch (e) {
         console.error("Failed to delete comments", e);
       } finally {
@@ -232,7 +239,9 @@ const handleDeleteInBatch = async () => {
 
 const handleApproveInBatch = async () => {
   Dialog.warning({
-    title: "确定要审核通过所选的评论吗？",
+    title: t("core.comment.operations.approve_comment_in_batch.title"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         const commentsToUpdate = comments.value?.filter((comment) => {
@@ -262,7 +271,7 @@ const handleApproveInBatch = async () => {
         await Promise.all(promises || []);
         selectedCommentNames.value = [];
 
-        Toast.success("操作成功");
+        Toast.success(t("core.common.toast.operation_success"));
       } catch (e) {
         console.error("Failed to approve comments in batch", e);
       } finally {
@@ -273,7 +282,7 @@ const handleApproveInBatch = async () => {
 };
 </script>
 <template>
-  <VPageHeader title="评论">
+  <VPageHeader :title="$t('core.comment.title')">
     <template #icon>
       <IconMessage class="mr-2 self-center" />
     </template>
@@ -305,7 +314,7 @@ const handleApproveInBatch = async () => {
                 <FormKit
                   id="keywordInput"
                   outer-class="!p-0"
-                  placeholder="输入关键词搜索"
+                  :placeholder="$t('core.common.placeholder.search')"
                   type="text"
                   name="keyword"
                   :model-value="keyword"
@@ -313,7 +322,11 @@ const handleApproveInBatch = async () => {
                 ></FormKit>
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  关键词：{{ keyword }}
+                  {{
+                    $t("core.common.filters.results.keyword", {
+                      keyword: keyword,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
@@ -322,21 +335,33 @@ const handleApproveInBatch = async () => {
                     handleApprovedFilterItemChange(ApprovedFilterItems[0])
                   "
                 >
-                  状态：{{ selectedApprovedFilterItem.label }}
+                  {{
+                    $t("core.common.filters.results.status", {
+                      status: selectedApprovedFilterItem.label,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
                   v-if="selectedUser"
                   @close="handleSelectUser(undefined)"
                 >
-                  评论者：{{ selectedUser?.spec.displayName }}
+                  {{
+                    $t("core.comment.filters.owner.result", {
+                      owner: selectedUser.spec.displayName,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterTag
                   v-if="selectedSortFilterItem.value != undefined"
                   @close="handleSortFilterItemChange(SortFilterItems[0])"
                 >
-                  排序：{{ selectedSortFilterItem.label }}
+                  {{
+                    $t("core.common.filters.results.sort", {
+                      sort: selectedSortFilterItem.label,
+                    })
+                  }}
                 </FilterTag>
 
                 <FilterCleanButton
@@ -346,10 +371,14 @@ const handleApproveInBatch = async () => {
               </div>
               <VSpace v-else>
                 <VButton type="secondary" @click="handleApproveInBatch">
-                  审核通过
+                  {{
+                    $t(
+                      "core.comment.operations.approve_comment_in_batch.button"
+                    )
+                  }}
                 </VButton>
                 <VButton type="danger" @click="handleDeleteInBatch">
-                  删除
+                  {{ $t("core.common.buttons.delete") }}
                 </VButton>
               </VSpace>
             </div>
@@ -359,7 +388,9 @@ const handleApproveInBatch = async () => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5"> 状态 </span>
+                    <span class="mr-0.5">
+                      {{ $t("core.common.filters.labels.status") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -394,7 +425,9 @@ const handleApproveInBatch = async () => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5">评论者</span>
+                    <span class="mr-0.5">
+                      {{ $t("core.comment.filters.owner.label") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -404,7 +437,9 @@ const handleApproveInBatch = async () => {
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
-                    <span class="mr-0.5"> 排序 </span>
+                    <span class="mr-0.5">
+                      {{ $t("core.common.filters.labels.sort") }}
+                    </span>
                     <span>
                       <IconArrowDown />
                     </span>
@@ -437,7 +472,7 @@ const handleApproveInBatch = async () => {
                     @click="refetch()"
                   >
                     <IconRefreshLine
-                      v-tooltip="`刷新`"
+                      v-tooltip="$t('core.common.buttons.refresh')"
                       :class="{ 'animate-spin text-gray-900': isFetching }"
                       class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
                     />
@@ -450,10 +485,15 @@ const handleApproveInBatch = async () => {
       </template>
       <VLoading v-if="isLoading" />
       <Transition v-else-if="!comments?.length" appear name="fade">
-        <VEmpty message="你可以尝试刷新或者修改筛选条件" title="当前没有评论">
+        <VEmpty
+          :message="$t('core.comment.empty.message')"
+          :title="$t('core.comment.empty.title')"
+        >
           <template #actions>
             <VSpace>
-              <VButton @click="refetch">刷新</VButton>
+              <VButton @click="refetch">
+                {{ $t("core.common.buttons.refresh") }}
+              </VButton>
             </VSpace>
           </template>
         </VEmpty>
@@ -488,6 +528,8 @@ const handleApproveInBatch = async () => {
           <VPagination
             v-model:page="page"
             v-model:size="size"
+            :page-label="$t('core.components.pagination.page_label')"
+            :size-label="$t('core.components.pagination.size_label')"
             :total="total"
             :size-options="[20, 30, 50, 100]"
           />

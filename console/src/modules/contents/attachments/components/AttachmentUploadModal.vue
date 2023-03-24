@@ -114,17 +114,24 @@ watch(
     :body-class="['!p-0']"
     :visible="visible"
     :width="650"
-    title="上传附件"
+    :title="$t('core.attachment.upload_modal.title')"
     @update:visible="onVisibleChange"
   >
     <div class="w-full p-4">
       <div class="mb-2">
-        <span class="text-sm text-gray-800">选择分组：</span>
+        <span class="text-sm text-gray-800">
+          {{ $t("core.attachment.upload_modal.filters.group.label") }}
+        </span>
       </div>
       <div class="mb-3 grid grid-cols-2 gap-x-2 gap-y-3 sm:grid-cols-4">
         <div
           v-for="(group, index) in [
-            { metadata: { name: '' }, spec: { displayName: '未分组' } },
+            {
+              metadata: { name: '' },
+              spec: {
+                displayName: $t('core.attachment.common.text.ungrouped'),
+              },
+            },
             ...(groups || []),
           ]"
           :key="index"
@@ -143,7 +150,9 @@ watch(
         </div>
       </div>
       <div class="mb-2">
-        <span class="text-sm text-gray-800">选择存储策略：</span>
+        <span class="text-sm text-gray-800">
+          {{ $t("core.attachment.upload_modal.filters.policy.label") }}
+        </span>
       </div>
       <div class="mb-3 grid grid-cols-2 gap-x-2 gap-y-3 sm:grid-cols-4">
         <div
@@ -171,7 +180,9 @@ watch(
             class="flex h-full cursor-pointer items-center rounded-base bg-gray-100 p-2 text-gray-500 transition-all hover:bg-gray-200 hover:text-gray-900 hover:shadow-sm"
           >
             <div class="flex flex-1 items-center truncate">
-              <span class="truncate text-sm">新建策略</span>
+              <span class="truncate text-sm">
+                {{ $t("core.common.buttons.new") }}
+              </span>
             </div>
             <IconAddCircle />
           </div>
@@ -196,8 +207,10 @@ watch(
       </div>
       <div v-if="!policies?.length" class="mb-3">
         <VAlert
-          title="没有存储策略"
-          description="在上传之前，需要新建一个存储策略"
+          :title="$t('core.attachment.upload_modal.filters.policy.empty.title')"
+          :description="
+            $t('core.attachment.upload_modal.filters.policy.empty.description')
+          "
           :closable="false"
         />
       </div>
@@ -210,7 +223,11 @@ watch(
           groupName: selectedGroupName,
         }"
         :allowed-meta-fields="['policyName', 'groupName']"
-        :note="selectedPolicyName ? '' : '请先选择存储策略'"
+        :note="
+          selectedPolicyName
+            ? ''
+            : $t('core.attachment.upload_modal.filters.policy.not_select')
+        "
       />
     </div>
   </VModal>

@@ -27,8 +27,10 @@ import { usePermission } from "@/utils/permission";
 import { getNode } from "@formkit/core";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const selectedPageNames = ref<string[]>([]);
 const checkedAll = ref(false);
@@ -87,9 +89,11 @@ const handleCheckAllChange = (e: Event) => {
 
 const handleDeletePermanently = async (singlePage: SinglePage) => {
   Dialog.warning({
-    title: "确认要永久删除该自定义页面吗？",
-    description: "删除之后将无法恢复",
+    title: t("core.deleted_page.operations.delete.title"),
+    description: t("core.deleted_page.operations.delete.description"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await apiClient.extension.singlePage.deletecontentHaloRunV1alpha1SinglePage(
         {
@@ -98,16 +102,18 @@ const handleDeletePermanently = async (singlePage: SinglePage) => {
       );
       await refetch();
 
-      Toast.success("删除成功");
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
 
 const handleDeletePermanentlyInBatch = async () => {
   Dialog.warning({
-    title: "确定要确认永久删除选中的自定义页面吗？",
-    description: "删除之后将无法恢复",
+    title: t("core.deleted_page.operations.delete_in_batch.title"),
+    description: t("core.deleted_page.operations.delete_in_batch.description"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {
@@ -121,15 +127,17 @@ const handleDeletePermanentlyInBatch = async () => {
       await refetch();
       selectedPageNames.value = [];
 
-      Toast.success("删除成功");
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 };
 
 const handleRecovery = async (singlePage: SinglePage) => {
   Dialog.warning({
-    title: "确认要恢复该自定义页面吗？",
-    description: "该操作会将自定义页面恢复到被删除之前的状态",
+    title: t("core.deleted_page.operations.recovery.title"),
+    description: t("core.deleted_page.operations.recovery.description"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       const singlePageToUpdate = cloneDeep(singlePage);
       singlePageToUpdate.spec.deleted = false;
@@ -141,15 +149,19 @@ const handleRecovery = async (singlePage: SinglePage) => {
       );
       await refetch();
 
-      Toast.success("恢复成功");
+      Toast.success(t("core.common.toast.recovery_success"));
     },
   });
 };
 
 const handleRecoveryInBatch = async () => {
   Dialog.warning({
-    title: "确认要恢复选中的自定义页面吗？",
-    description: "该操作会将自定义页面恢复到被删除之前的状态",
+    title: t("core.deleted_page.operations.recovery_in_batch.title"),
+    description: t(
+      "core.deleted_page.operations.recovery_in_batch.description"
+    ),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await Promise.all(
         selectedPageNames.value.map((name) => {
@@ -178,7 +190,7 @@ const handleRecoveryInBatch = async () => {
       await refetch();
       selectedPageNames.value = [];
 
-      Toast.success("恢复成功");
+      Toast.success(t("core.common.toast.recovery_success"));
     },
   });
 };
@@ -203,13 +215,15 @@ function handleClearKeyword() {
 </script>
 
 <template>
-  <VPageHeader title="自定义页面回收站">
+  <VPageHeader :title="$t('core.deleted_page.title')">
     <template #icon>
       <IconDeleteBin class="mr-2 self-center text-green-600" />
     </template>
     <template #actions>
       <VSpace>
-        <VButton :route="{ name: 'SinglePages' }" size="sm">返回</VButton>
+        <VButton :route="{ name: 'SinglePages' }" size="sm">
+          {{ $t("core.common.buttons.back") }}
+        </VButton>
         <VButton
           v-permission="['system:singlepages:manage']"
           :route="{ name: 'SinglePageEditor' }"
@@ -218,7 +232,7 @@ function handleClearKeyword() {
           <template #icon>
             <IconAddCircle class="h-full w-full" />
           </template>
-          新建
+          {{ $t("core.common.buttons.new") }}
         </VButton>
       </VSpace>
     </template>
@@ -249,7 +263,7 @@ function handleClearKeyword() {
                 <FormKit
                   id="keywordInput"
                   outer-class="!p-0"
-                  placeholder="输入关键词搜索"
+                  :placeholder="$t('core.common.placeholder.search')"
                   type="text"
                   name="keyword"
                   :model-value="keyword"
@@ -257,15 +271,19 @@ function handleClearKeyword() {
                 ></FormKit>
 
                 <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  关键词：{{ keyword }}
+                  {{
+                    $t("core.common.filters.results.keyword", {
+                      keyword: keyword,
+                    })
+                  }}
                 </FilterTag>
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeletePermanentlyInBatch">
-                  永久删除
+                  {{ $t("core.common.buttons.delete_permanently") }}
                 </VButton>
                 <VButton type="default" @click="handleRecoveryInBatch">
-                  恢复
+                  {{ $t("core.common.buttons.recovery") }}
                 </VButton>
               </VSpace>
             </div>
@@ -290,18 +308,20 @@ function handleClearKeyword() {
       <VLoading v-if="isLoading" />
       <Transition v-else-if="!singlePages?.length" appear name="fade">
         <VEmpty
-          message="你可以尝试刷新或者返回自定义页面管理"
-          title="没有自定义页面被放入回收站"
+          :message="$t('core.deleted_page.empty.message')"
+          :title="$t('core.deleted_page.empty.title')"
         >
           <template #actions>
             <VSpace>
-              <VButton @click="refetch">刷新</VButton>
+              <VButton @click="refetch">
+                {{ $t("core.common.buttons.refresh") }}
+              </VButton>
               <VButton
                 v-permission="['system:singlepages:view']"
                 :route="{ name: 'SinglePages' }"
                 type="primary"
               >
-                返回
+                {{ $t("core.common.buttons.back") }}
               </VButton>
             </VSpace>
           </template>
@@ -330,10 +350,18 @@ function handleClearKeyword() {
                   <template #description>
                     <VSpace>
                       <span class="text-xs text-gray-500">
-                        访问量 {{ singlePage.stats.visit || 0 }}
+                        {{
+                          $t("core.page.list.fields.visits", {
+                            visits: singlePage.stats.visit || 0,
+                          })
+                        }}
                       </span>
                       <span class="text-xs text-gray-500">
-                        评论 {{ singlePage.stats.totalComment || 0 }}
+                        {{
+                          $t("core.page.list.fields.comments", {
+                            comments: singlePage.stats.totalComment || 0,
+                          })
+                        }}
                       </span>
                     </VSpace>
                   </template>
@@ -365,14 +393,22 @@ function handleClearKeyword() {
                 </VEntityField>
                 <VEntityField v-if="!singlePage?.page?.spec.deleted">
                   <template #description>
-                    <VStatusDot v-tooltip="`恢复中`" state="success" animate />
+                    <VStatusDot
+                      v-tooltip="$t('core.common.tooltips.recovering')"
+                      state="success"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField
                   v-if="singlePage?.page?.metadata.deletionTimestamp"
                 >
                   <template #description>
-                    <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                    <VStatusDot
+                      v-tooltip="$t('core.common.status.deleting')"
+                      state="warning"
+                      animate
+                    />
                   </template>
                 </VEntityField>
                 <VEntityField>
@@ -393,7 +429,7 @@ function handleClearKeyword() {
                   type="danger"
                   @click="handleDeletePermanently(singlePage.page)"
                 >
-                  永久删除
+                  {{ $t("core.common.buttons.delete_permanently") }}
                 </VButton>
                 <VButton
                   v-close-popper
@@ -401,7 +437,7 @@ function handleClearKeyword() {
                   type="default"
                   @click="handleRecovery(singlePage.page)"
                 >
-                  恢复
+                  {{ $t("core.common.buttons.recovery") }}
                 </VButton>
               </template>
             </VEntity>
@@ -414,6 +450,8 @@ function handleClearKeyword() {
           <VPagination
             v-model:page="page"
             v-model:size="size"
+            :page-label="$t('core.components.pagination.page_label')"
+            :size-label="$t('core.components.pagination.size_label')"
             :total="total"
             :size-options="[20, 30, 50, 100]"
           />

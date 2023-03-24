@@ -30,9 +30,11 @@ import { useUserStore } from "@/stores/user";
 import { rbacAnnotations } from "@/constants/annotations";
 import { useScroll } from "@vueuse/core";
 import { defineStore, storeToRefs } from "pinia";
+import { useI18n } from "vue-i18n";
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
 
 const moreMenuVisible = ref(false);
 const moreMenuRootVisible = ref(false);
@@ -43,7 +45,9 @@ const { currentRoles, currentUser } = storeToRefs(userStore);
 
 const handleLogout = () => {
   Dialog.warning({
-    title: "确定要退出登录吗？",
+    title: t("core.sidebar.operations.logout.title"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await axios.post(`${import.meta.env.VITE_API_URL}/logout`, undefined, {
@@ -213,7 +217,11 @@ onMounted(() => {
       class="navbar fixed hidden h-full overflow-y-auto md:flex md:flex-col"
     >
       <div class="logo flex justify-center pt-5 pb-7">
-        <a href="/" target="_blank" title="访问首页">
+        <a
+          href="/"
+          target="_blank"
+          :title="$t('core.sidebar.operations.visit_homepage.title')"
+        >
           <IconLogo
             class="cursor-pointer select-none transition-all hover:brightness-125"
           />
@@ -228,7 +236,9 @@ onMounted(() => {
             <span class="mr-3">
               <IconSearch />
             </span>
-            <span class="flex-1 select-none text-base font-normal">搜索</span>
+            <span class="flex-1 select-none text-base font-normal">
+              {{ $t("core.sidebar.search.placeholder") }}
+            </span>
             <div class="text-sm">
               {{ `${isMac ? "⌘" : "Ctrl"}+K` }}
             </div>
@@ -279,7 +289,7 @@ onMounted(() => {
                       params: { name: '-' },
                     }"
                   >
-                    个人资料
+                    {{ $t("core.sidebar.operations.profile.button") }}
                   </VButton>
                   <VButton
                     v-close-popper
@@ -287,7 +297,7 @@ onMounted(() => {
                     type="default"
                     @click="handleLogout"
                   >
-                    退出登录
+                    {{ $t("core.sidebar.operations.logout.button") }}
                   </VButton>
                 </VSpace>
               </div>
@@ -339,7 +349,9 @@ onMounted(() => {
             <div class="text-base">
               <IconMore />
             </div>
-            <div class="mt-0.5 text-xs">更多</div>
+            <div class="mt-0.5 text-xs">
+              {{ $t("core.sidebar.operations.more.button") }}
+            </div>
           </div>
         </div>
       </div>

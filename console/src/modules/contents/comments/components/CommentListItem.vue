@@ -12,6 +12,7 @@ import {
   IconExternalLinkLine,
   VLoading,
   Toast,
+  VTag,
 } from "@halo-dev/components";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
 import type {
@@ -29,8 +30,10 @@ import type { RouteLocationRaw } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
 import { useQuery } from "@tanstack/vue-query";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -56,16 +59,18 @@ provide<Ref<ListedReply | undefined>>("hoveredReply", hoveredReply);
 
 const handleDelete = async () => {
   Dialog.warning({
-    title: "确认要删除该评论吗？",
-    description: "删除评论的同时会删除该评论下的所有回复，该操作不可恢复。",
+    title: t("core.comment.operations.delete_comment.title"),
+    description: t("core.comment.operations.delete_comment.description"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.comment.deletecontentHaloRunV1alpha1Comment({
           name: props.comment?.comment?.metadata.name as string,
         });
 
-        Toast.success("删除成功");
+        Toast.success(t("core.common.toast.delete_success"));
       } catch (error) {
         console.error("Failed to delete comment", error);
       } finally {
@@ -77,7 +82,9 @@ const handleDelete = async () => {
 
 const handleApproveReplyInBatch = async () => {
   Dialog.warning({
-    title: "确定要审核通过该评论的所有回复吗？",
+    title: t("core.comment.operations.approve_applies_in_batch.title"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         const repliesToUpdate = replies.value?.filter((reply) => {
@@ -99,7 +106,7 @@ const handleApproveReplyInBatch = async () => {
         });
         await Promise.all(promises || []);
 
-        Toast.success("操作成功");
+        Toast.success(t("core.common.toast.operation_success"));
       } catch (e) {
         console.error("Failed to approve comment replies in batch", e);
       } finally {
@@ -120,7 +127,7 @@ const handleApprove = async () => {
       comment: commentToUpdate,
     });
 
-    Toast.success("操作成功");
+    Toast.success(t("core.common.toast.operation_success"));
   } catch (error) {
     console.error("Failed to approve comment", error);
   } finally {
@@ -202,7 +209,7 @@ const SubjectRefProvider = ref<
     Post: (subject: Extension): SubjectRefResult => {
       const post = subject as Post;
       return {
-        label: "文章",
+        label: t("core.comment.subject_refs.post"),
         title: post.spec.title,
         externalUrl: post.status?.permalink,
         route: {
@@ -218,7 +225,7 @@ const SubjectRefProvider = ref<
     SinglePage: (subject: Extension): SubjectRefResult => {
       const singlePage = subject as SinglePage;
       return {
-        label: "单页",
+        label: t("core.comment.subject_refs.page"),
         title: singlePage.spec.title,
         externalUrl: singlePage.status?.permalink,
         route: {
@@ -236,8 +243,8 @@ const subjectRefResult = computed(() => {
   const { subject } = props.comment;
   if (!subject) {
     return {
-      label: "未知",
-      title: "未知",
+      label: t("core.comment.subject_refs.unknown"),
+      title: t("core.comment.subject_refs.unknown"),
     };
   }
   const subjectRef = SubjectRefProvider.value.find((provider) =>
@@ -245,8 +252,8 @@ const subjectRefResult = computed(() => {
   );
   if (!subjectRef) {
     return {
-      label: "未知",
-      title: "未知",
+      label: t("core.comment.subject_refs.unknown"),
+      title: t("core.comment.subject_refs.unknown"),
     };
   }
   return subjectRef[subject.kind](subject);
@@ -290,9 +297,26 @@ const subjectRefResult = computed(() => {
         :title="comment?.owner?.displayName"
         :description="comment?.owner?.email"
       ></VEntityField>
-      <VEntityField width="60%">
+      <VEntityField width="100%">
         <template #description>
           <div class="flex flex-col gap-2">
+            <div class="mb-1 flex items-center gap-2">
+              <VTag>{{ subjectRefResult.label }}</VTag>
+              <RouterLink
+                :to="subjectRefResult.route || $route"
+                class="truncate text-sm font-medium text-gray-900 hover:text-gray-600"
+              >
+                {{ subjectRefResult.title }}
+              </RouterLink>
+              <a
+                v-if="subjectRefResult.externalUrl"
+                :href="subjectRefResult.externalUrl"
+                target="_blank"
+                class="hidden text-gray-600 hover:text-gray-900 group-hover:block"
+              >
+                <IconExternalLinkLine class="h-3.5 w-3.5" />
+              </a>
+            </div>
             <div class="break-all text-sm text-gray-900">
               {{ comment?.comment?.spec.content }}
             </div>
@@ -301,11 +325,15 @@ const subjectRefResult = computed(() => {
                 class="select-none text-gray-700 hover:text-gray-900"
                 @click="handleToggleShowReplies"
               >
-                {{ comment?.comment?.status?.replyCount || 0 }} 条回复
+                {{
+                  $t("core.comment.list.fields.reply_count", {
+                    count: comment?.comment?.status?.replyCount || 0,
+                  })
+                }}
               </span>
               <VStatusDot
                 v-if="comment?.comment?.status?.unreadReplyCount || 0 > 0"
-                v-tooltip="`有新的回复`"
+                v-tooltip="$t('core.comment.list.fields.has_new_replies')"
                 state="success"
                 animate
               />
@@ -313,7 +341,7 @@ const subjectRefResult = computed(() => {
                 class="select-none text-gray-700 hover:text-gray-900"
                 @click="handleTriggerReply"
               >
-                回复
+                {{ $t("core.comment.operations.reply.button") }}
               </span>
             </div>
           </div>
@@ -321,34 +349,24 @@ const subjectRefResult = computed(() => {
       </VEntityField>
     </template>
     <template #end>
-      <VEntityField
-        :title="subjectRefResult.title"
-        :description="subjectRefResult.label"
-        :route="subjectRefResult.route"
-      >
-        <template #extra>
-          <a
-            v-if="subjectRefResult.externalUrl"
-            :href="subjectRefResult.externalUrl"
-            target="_blank"
-            class="text-gray-600 hover:text-gray-900"
-          >
-            <IconExternalLinkLine class="h-3.5 w-3.5" />
-          </a>
-        </template>
-      </VEntityField>
       <VEntityField v-if="!comment?.comment.spec.approved">
         <template #description>
           <VStatusDot state="success">
             <template #text>
-              <span class="text-xs text-gray-500">待审核</span>
+              <span class="text-xs text-gray-500">
+                {{ $t("core.comment.list.fields.pending_review") }}
+              </span>
             </template>
           </VStatusDot>
         </template>
       </VEntityField>
       <VEntityField v-if="comment?.comment?.metadata.deletionTimestamp">
         <template #description>
-          <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+          <VStatusDot
+            v-tooltip="$t('core.common.status.deleting')"
+            state="warning"
+            animate
+          />
         </template>
       </VEntityField>
       <VEntityField>
@@ -375,7 +393,7 @@ const subjectRefResult = computed(() => {
         block
         @click="handleApprove"
       >
-        审核通过
+        {{ $t("core.comment.operations.approve_comment_in_batch.button") }}
       </VButton>
       <VButton
         v-close-popper
@@ -383,10 +401,10 @@ const subjectRefResult = computed(() => {
         block
         @click="handleApproveReplyInBatch"
       >
-        审核通过所有回复
+        {{ $t("core.comment.operations.approve_applies_in_batch.button") }}
       </VButton>
       <VButton v-close-popper block type="danger" @click="handleDelete">
-        删除
+        {{ $t("core.common.buttons.delete") }}
       </VButton>
     </template>
 
@@ -397,15 +415,20 @@ const subjectRefResult = computed(() => {
       >
         <VLoading v-if="isLoading" />
         <Transition v-else-if="!replies?.length" appear name="fade">
-          <VEmpty message="你可以尝试刷新或者创建新回复" title="当前没有回复">
+          <VEmpty
+            :message="$t('core.comment.reply_empty.message')"
+            :title="$t('core.comment.reply_empty.title')"
+          >
             <template #actions>
               <VSpace>
-                <VButton @click="refetch()">刷新</VButton>
+                <VButton @click="refetch()">
+                  {{ $t("core.common.buttons.refresh") }}
+                </VButton>
                 <VButton type="secondary" @click="replyModal = true">
                   <template #icon>
                     <IconAddCircle class="h-full w-full" />
                   </template>
-                  创建新回复
+                  {{ $t("core.comment.reply_empty.new") }}
                 </VButton>
               </VSpace>
             </template>

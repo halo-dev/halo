@@ -1,0 +1,71 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
+plugins {
+    id 'org.springframework.boot' version '3.0.4' apply false
+    id 'java-platform'
+    id 'maven-publish'
+}
+
+group = 'run.halo.tools.platform'
+description = 'Platform of application.'
+
+ext {
+    commonsLang3 = "3.12.0"
+    base62 = "0.1.3"
+    pf4j = '3.9.0'
+    javaDiffUtils = "4.12"
+    guava = "31.1-jre"
+    jsoup = '1.15.3'
+    jsonPatch = "1.13"
+    springDocOpenAPI = "2.0.4"
+    lucene = "9.5.0"
+}
+
+javaPlatform {
+    allowDependencies()
+}
+
+dependencies {
+    api platform(SpringBootPlugin.BOM_COORDINATES)
+
+    constraints {
+        api "org.springdoc:springdoc-openapi-starter-webflux-ui:$springDocOpenAPI"
+        api 'org.openapi4j:openapi-schema-validator:1.0.7'
+
+        // Apache Lucene
+        api "org.apache.lucene:lucene-core:$lucene"
+        api "org.apache.lucene:lucene-queryparser:$lucene"
+        api "org.apache.lucene:lucene-highlighter:$lucene"
+        api "org.apache.lucene:lucene-backward-codecs:$lucene"
+        api 'cn.shenyanchao.ik-analyzer:ik-analyzer:9.0.0'
+
+        api "org.apache.commons:commons-lang3:$commonsLang3"
+        api "io.seruco.encoding:base62:$base62"
+        api "org.pf4j:pf4j:$pf4j"
+        api "com.google.guava:guava:$guava"
+        api "org.jsoup:jsoup:$jsoup"
+        api "io.github.java-diff-utils:java-diff-utils:$javaDiffUtils"
+        api "org.springframework.integration:spring-integration-core"
+        api "com.github.java-json-tools:json-patch:$jsonPatch"
+        api "org.thymeleaf.extras:thymeleaf-extras-springsecurity6"
+
+        runtime 'io.r2dbc:r2dbc-h2'
+        runtime 'org.postgresql:postgresql'
+        runtime 'org.postgresql:r2dbc-postgresql'
+        runtime 'org.mariadb:r2dbc-mariadb:1.1.3'
+        runtime 'com.github.jasync-sql:jasync-r2dbc-mysql:2.1.23'
+    }
+
+}
+
+publishing {
+    publications {
+        applicationPlatform(MavenPublication) {
+            from components.javaPlatform
+        }
+    }
+
+    repositories {
+        mavenLocal()
+    }
+}

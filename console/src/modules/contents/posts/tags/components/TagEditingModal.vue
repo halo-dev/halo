@@ -24,6 +24,7 @@ import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import useSlugify from "@/composables/use-slugify";
+import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
   defineProps<{
@@ -42,6 +43,8 @@ const emit = defineEmits<{
   (event: "previous"): void;
   (event: "next"): void;
 }>();
+
+const { t } = useI18n();
 
 const initialFormState: Tag = {
   spec: {
@@ -66,7 +69,9 @@ const isUpdateMode = computed(() => {
 });
 
 const modalTitle = computed(() => {
-  return isUpdateMode.value ? "编辑文章标签" : "新增文章标签";
+  return isUpdateMode.value
+    ? t("core.post_tag.editing_modal.titles.update")
+    : t("core.post_tag.editing_modal.titles.create");
 });
 
 const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
@@ -100,7 +105,7 @@ const handleSaveTag = async () => {
     }
     onVisibleChange(false);
 
-    Toast.success("保存成功");
+    Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
     console.error("Failed to create tag", e);
   } finally {
@@ -183,7 +188,9 @@ const { handleGenerateSlug } = useSlugify(
         <div class="md:grid md:grid-cols-4 md:gap-6">
           <div class="md:col-span-1">
             <div class="sticky top-0">
-              <span class="text-base font-medium text-gray-900"> 常规 </span>
+              <span class="text-base font-medium text-gray-900">
+                {{ $t("core.post_tag.editing_modal.groups.general") }}
+              </span>
             </div>
           </div>
           <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
@@ -191,21 +198,27 @@ const { handleGenerateSlug } = useSlugify(
               id="displayNameInput"
               v-model="formState.spec.displayName"
               name="displayName"
-              label="名称"
+              :label="
+                $t('core.post_tag.editing_modal.fields.display_name.label')
+              "
               type="text"
               validation="required|length:0,50"
             ></FormKit>
             <FormKit
               v-model="formState.spec.slug"
-              help="通常用于生成标签的固定链接"
-              label="别名"
+              :help="$t('core.post_tag.editing_modal.fields.slug.help')"
+              :label="$t('core.post_tag.editing_modal.fields.slug.label')"
               name="slug"
               type="text"
               validation="required|length:0,50"
             >
               <template #suffix>
                 <div
-                  v-tooltip="'根据名称重新生成别名'"
+                  v-tooltip="
+                    $t(
+                      'core.post_tag.editing_modal.fields.slug.refresh_message'
+                    )
+                  "
                   class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
                   @click="handleGenerateSlug"
                 >
@@ -218,16 +231,16 @@ const { handleGenerateSlug } = useSlugify(
             <FormKit
               v-model="formState.spec.color"
               name="color"
-              help="需要主题适配以支持"
-              label="颜色"
+              :help="$t('core.post_tag.editing_modal.fields.color.help')"
+              :label="$t('core.post_tag.editing_modal.fields.color.label')"
               type="color"
               validation="length:0,50"
             ></FormKit>
             <FormKit
               v-model="formState.spec.cover"
               name="cover"
-              help="需要主题适配以支持"
-              label="封面图"
+              :help="$t('core.post_tag.editing_modal.fields.cover.help')"
+              :label="$t('core.post_tag.editing_modal.fields.cover.label')"
               type="attachment"
               validation="length:0,1024"
             ></FormKit>
@@ -243,7 +256,9 @@ const { handleGenerateSlug } = useSlugify(
     <div class="md:grid md:grid-cols-4 md:gap-6">
       <div class="md:col-span-1">
         <div class="sticky top-0">
-          <span class="text-base font-medium text-gray-900"> 元数据 </span>
+          <span class="text-base font-medium text-gray-900">
+            {{ $t("core.post_tag.editing_modal.groups.annotations") }}
+          </span>
         </div>
       </div>
       <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
@@ -263,10 +278,13 @@ const { handleGenerateSlug } = useSlugify(
           v-if="visible"
           :loading="saving"
           type="secondary"
+          :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('tag-form')"
         >
         </SubmitButton>
-        <VButton @click="onVisibleChange(false)">取消 Esc</VButton>
+        <VButton @click="onVisibleChange(false)">
+          {{ $t("core.common.buttons.cancel_and_shortcut") }}
+        </VButton>
       </VSpace>
     </template>
   </VModal>

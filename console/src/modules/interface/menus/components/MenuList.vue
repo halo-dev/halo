@@ -19,8 +19,10 @@ import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { usePermission } from "@/utils/permission";
 import { onBeforeRouteLeave } from "vue-router";
+import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -97,9 +99,11 @@ const handleSelect = (menu: Menu) => {
 
 const handleDeleteMenu = async (menu: Menu) => {
   Dialog.warning({
-    title: "确定要删除该菜单吗？",
-    description: "将同时删除该菜单下的所有菜单项，该操作不可恢复。",
+    title: t("core.menu.operations.delete_menu.title"),
+    description: t("core.menu.operations.delete_menu.description"),
     confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       try {
         await apiClient.extension.menu.deletev1alpha1Menu({
@@ -115,7 +119,7 @@ const handleDeleteMenu = async (menu: Menu) => {
 
         await Promise.all(deleteItemsPromises);
 
-        Toast.success("删除成功");
+        Toast.success(t("core.common.toast.delete_success"));
       } catch (e) {
         console.error("Failed to delete menu", e);
       } finally {
@@ -185,7 +189,7 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
   }
   await handleFetchPrimaryMenuName();
 
-  Toast.success("设置成功");
+  Toast.success(t("core.menu.operations.set_primary.toast_success"));
 };
 
 onMounted(handleFetchPrimaryMenuName);
@@ -197,13 +201,18 @@ onMounted(handleFetchPrimaryMenuName);
     @close="handleFetchMenus()"
     @created="handleSelect"
   />
-  <VCard :body-class="['!p-0']" title="菜单">
+  <VCard :body-class="['!p-0']" :title="$t('core.menu.title')">
     <VLoading v-if="loading" />
     <Transition v-else-if="!menus.length" appear name="fade">
-      <VEmpty message="你可以尝试刷新或者新建菜单" title="当前没有菜单">
+      <VEmpty
+        :message="$t('core.menu.empty.message')"
+        :title="$t('core.menu.empty.title')"
+      >
         <template #actions>
           <VSpace>
-            <VButton size="sm" @click="handleFetchMenus()"> 刷新</VButton>
+            <VButton size="sm" @click="handleFetchMenus()">
+              {{ $t("core.common.buttons.refresh") }}
+            </VButton>
           </VSpace>
         </template>
       </VEmpty>
@@ -221,17 +230,27 @@ onMounted(handleFetchPrimaryMenuName);
             <template #start>
               <VEntityField
                 :title="menu.spec?.displayName"
-                :description="`${menu.spec.menuItems?.length || 0} 个菜单项`"
+                :description="
+                  $t('core.menu.list.fields.items_count', {
+                    count: menu.spec.menuItems?.length || 0,
+                  })
+                "
               >
                 <template v-if="menu.metadata.name === primaryMenuName" #extra>
-                  <VTag>主菜单</VTag>
+                  <VTag>
+                    {{ $t("core.menu.list.fields.primary") }}
+                  </VTag>
                 </template>
               </VEntityField>
             </template>
             <template #end>
               <VEntityField v-if="menu.metadata.deletionTimestamp">
                 <template #description>
-                  <VStatusDot v-tooltip="`删除中`" state="warning" animate />
+                  <VStatusDot
+                    v-tooltip="$t('core.common.status.deleting')"
+                    state="warning"
+                    animate
+                  />
                 </template>
               </VEntityField>
             </template>
@@ -245,7 +264,7 @@ onMounted(handleFetchPrimaryMenuName);
                 type="secondary"
                 @click="handleSetPrimaryMenu(menu)"
               >
-                设置为主菜单
+                {{ $t("core.menu.operations.set_primary.button") }}
               </VButton>
               <VButton
                 v-close-popper
@@ -253,7 +272,7 @@ onMounted(handleFetchPrimaryMenuName);
                 type="default"
                 @click="handleOpenEditingModal(menu)"
               >
-                修改
+                {{ $t("core.common.buttons.edit") }}
               </VButton>
               <VButton
                 v-close-popper
@@ -261,7 +280,7 @@ onMounted(handleFetchPrimaryMenuName);
                 type="danger"
                 @click="handleDeleteMenu(menu)"
               >
-                删除
+                {{ $t("core.common.buttons.delete") }}
               </VButton>
             </template>
           </VEntity>
@@ -270,7 +289,7 @@ onMounted(handleFetchPrimaryMenuName);
     </Transition>
     <template v-if="currentUserHasPermission(['system:menus:manage'])" #footer>
       <VButton block type="secondary" @click="handleOpenEditingModal()">
-        新增
+        {{ $t("core.common.buttons.new") }}
       </VButton>
     </template>
   </VCard>

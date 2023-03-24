@@ -2,9 +2,11 @@
 const props = withDefaults(
   defineProps<{
     modelValue?: boolean;
+    disabled?: boolean;
   }>(),
   {
     modelValue: false,
+    disabled: false,
   }
 );
 
@@ -14,6 +16,8 @@ const emit = defineEmits<{
 }>();
 
 const handleChange = () => {
+  if (props.disabled) return;
+
   emit("update:modelValue", !props.modelValue);
   emit("change", !props.modelValue);
 };
@@ -24,11 +28,13 @@ const handleChange = () => {
       :class="{
         'bg-gray-200': !modelValue,
         '!bg-primary': modelValue,
+        'switch-disabled': disabled,
       }"
       aria-checked="false"
       class="switch-inner"
       role="switch"
       type="button"
+      :disabled="disabled"
       @click="handleChange"
     >
       <span
@@ -62,6 +68,11 @@ const handleChange = () => {
     transition-colors
     ease-in-out
     duration-200;
+
+    &.switch-disabled {
+      @apply opacity-60
+      cursor-not-allowed;
+    }
 
     .switch-indicator {
       @apply pointer-events-none
