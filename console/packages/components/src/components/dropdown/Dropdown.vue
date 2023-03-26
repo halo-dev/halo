@@ -6,10 +6,12 @@ withDefaults(
   defineProps<{
     placement?: Placement;
     triggers?: string[];
+    classes?: string[];
   }>(),
   {
     placement: "bottom",
     triggers: () => ["click"],
+    classes: () => [],
   }
 );
 
@@ -28,6 +30,7 @@ const emit = defineEmits<{
     <template #popper>
       <div
         class="min-w-[13rem] p-1.5"
+        :class="classes"
         role="menu"
         aria-orientation="vertical"
         aria-labelledby="menu-button"

@@ -173,7 +173,7 @@ watchEffect(() => {
       ></FormKit>
     </FormKit>
     <div class="mt-2 flex justify-end">
-      <VDropdown>
+      <VDropdown :classes="['!p-0']">
         <IconMotionLine
           class="h-5 w-5 cursor-pointer text-gray-500 transition-all hover:text-gray-900"
         />

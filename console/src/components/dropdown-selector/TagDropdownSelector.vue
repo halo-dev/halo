@@ -69,7 +69,7 @@ const searchResults = computed(() => {
 </script>
 
 <template>
-  <VDropdown @show="onDropdownShow">
+  <VDropdown :classes="['!p-0']" @show="onDropdownShow">
     <slot />
     <template #popper>
       <div class="h-96 w-80">
