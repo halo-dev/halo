@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, reactive, ref, watch } from "vue";
+import { computed, nextTick, reactive, ref, watch } from "vue";
 import { IconClose } from "../../icons/icons";
 import type { UseOverlayScrollbarsParams } from "overlayscrollbars-vue";
 import { useOverlayScrollbars } from "overlayscrollbars-vue";
