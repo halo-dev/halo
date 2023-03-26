@@ -22,6 +22,15 @@ import { useSystemStatesStore } from "./stores/system-states";
 import { useUserStore } from "./stores/user";
 import { useSystemConfigMapStore } from "./stores/system-configmap";
 import { VueQueryPlugin } from "@tanstack/vue-query";
+import "overlayscrollbars/overlayscrollbars.css";
+import { OverlayScrollbars } from "overlayscrollbars";
+
+OverlayScrollbars(document.querySelector("body"), {
+  scrollbars: {
+    autoHide: "scroll",
+    autoHideDelay: 600,
+  },
+});
 
 const app = createApp(App);
 

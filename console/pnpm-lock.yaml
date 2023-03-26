@@ -76,6 +76,8 @@ importers:
       lodash.isequal: ^4.5.0
       lodash.merge: ^4.6.2
       lodash.sortby: ^4.7.0
+      overlayscrollbars: ^2.1.0
+      overlayscrollbars-vue: ^0.5.1
       path-browserify: ^1.0.1
       pinia: ^2.0.26
       postcss: ^8.4.19
@@ -147,6 +149,8 @@ importers:
       lodash.isequal: 4.5.0
       lodash.merge: 4.6.2
       lodash.sortby: 4.7.0
+      overlayscrollbars: 2.1.0
+      overlayscrollbars-vue: 0.5.1_qvtrscepjgkfzkdt53swvamjn4
       path-browserify: 1.0.1
       pinia: 2.0.26_e7lp6ggkpgyi5vqd44m2kxvk6i
       pretty-bytes: 6.0.0
@@ -2645,8 +2649,8 @@ packages:
     dependencies:
       '@babel/parser': 7.21.2
       '@babel/traverse': 7.21.2
-      '@intlify/message-compiler': 9.3.0-beta.16
-      '@intlify/shared': 9.3.0-beta.16
+      '@intlify/message-compiler': 9.3.0-beta.17
+      '@intlify/shared': 9.3.0-beta.17
       jsonc-eslint-parser: 1.4.1
       source-map: 0.6.1
       vue-i18n: 9.2.2_vue@3.2.45
@@ -2677,11 +2681,11 @@ packages:
       '@intlify/shared': 9.2.2
       source-map: 0.6.1
 
-  /@intlify/message-compiler/9.3.0-beta.16:
-    resolution: {integrity: sha512-CGQI3xRcs1ET75eDQ0DUy3MRYOqTauRIIgaMoISKiF83gqRWg93FqN8lGMKcpBqaF4tI0JhsfosCaGiBL9+dnw==}
+  /@intlify/message-compiler/9.3.0-beta.17:
+    resolution: {integrity: sha512-i7hvVIRk1Ax2uKa9xLRJCT57to08OhFMhFXXjWN07rmx5pWQYQ23MfX1xgggv9drnWTNhqEiD+u4EJeHoS5+Ww==}
     engines: {node: '>= 14'}
     dependencies:
-      '@intlify/shared': 9.3.0-beta.16
+      '@intlify/shared': 9.3.0-beta.17
       source-map: 0.6.1
     dev: true
 
@@ -2689,8 +2693,8 @@ packages:
     resolution: {integrity: sha512-wRwTpsslgZS5HNyM7uDQYZtxnbI12aGiBZURX3BTR9RFIKKRWpllTsgzHWvj3HKm3Y2Sh5LPC1r0PDCKEhVn9Q==}
     engines: {node: '>= 14'}
 
-  /@intlify/shared/9.3.0-beta.16:
-    resolution: {integrity: sha512-kXbm4svALe3lX+EjdJxfnabOphqS4yQ1Ge/iIlR8tvUiYRCoNz3hig1M4336iY++Dfx5ytEQJPNjIcknNIuvig==}
+  /@intlify/shared/9.3.0-beta.17:
+    resolution: {integrity: sha512-mscf7RQsUTOil35jTij4KGW1RC9SWQjYScwLxP53Ns6g24iEd5HN7ksbt9O6FvTmlQuX77u+MXpBdfJsGqizLQ==}
     engines: {node: '>= 14'}
     dev: true
 
@@ -2710,7 +2714,7 @@ packages:
         optional: true
     dependencies:
       '@intlify/bundle-utils': 5.0.1_vue-i18n@9.2.2
-      '@intlify/shared': 9.3.0-beta.16
+      '@intlify/shared': 9.3.0-beta.17
       '@rollup/pluginutils': 5.0.2_rollup@2.79.1
       '@vue/compiler-sfc': 3.2.47
       debug: 4.3.4
@@ -8670,6 +8674,20 @@ packages:
   /outdent/0.5.0:
     resolution: {integrity: sha512-/jHxFIzoMXdqPzTaCpFzAAWhpkSjZPF4Vsn6jAfNpmbH/ymsmd7Qc6VE9BGn0L6YMj6uwpQLxCECpus4ukKS9Q==}
     dev: true
+
+  /overlayscrollbars-vue/0.5.1_qvtrscepjgkfzkdt53swvamjn4:
+    resolution: {integrity: sha512-hYoS7qm1xq4Kv7GpCTpo1YSUmgSXF2z9OcWbwGloGO8ZXefhADwDlYy6e35r2g5Gh04slZPsyQIqEXA/CptFMA==}
+    peerDependencies:
+      overlayscrollbars: ^2.0.0
+      vue: ^3.2.25
+    dependencies:
+      overlayscrollbars: 2.1.0
+      vue: 3.2.45
+    dev: false
+
+  /overlayscrollbars/2.1.0:
+    resolution: {integrity: sha512-L6p4o4aWse5pDstRnJjZaos+al+bkuAgzGIlWwlsxRSgW6+7Kvrp+kAzlWoTZ1bgB4CJj+8u5bjdq8XHEhWjrw==}
+    dev: false
 
   /p-filter/2.1.0:
     resolution: {integrity: sha512-ZBxxZ5sL2HghephhpGAQdoskxplTwr7ICaehZwLIlfL6acuVgZPm8yBNuRAFBGEqtD/hmUeq9eqLg2ys9Xr/yw==}
