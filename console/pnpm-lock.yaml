@@ -75,6 +75,8 @@ importers:
       lodash.isequal: ^4.5.0
       lodash.merge: ^4.6.2
       lodash.sortby: ^4.7.0
+      overlayscrollbars: ^2.1.0
+      overlayscrollbars-vue: ^0.5.1
       path-browserify: ^1.0.1
       pinia: ^2.0.26
       postcss: ^8.4.19
@@ -145,6 +147,8 @@ importers:
       lodash.isequal: 4.5.0
       lodash.merge: 4.6.2
       lodash.sortby: 4.7.0
+      overlayscrollbars: 2.1.0
+      overlayscrollbars-vue: 0.5.1_qvtrscepjgkfzkdt53swvamjn4
       path-browserify: 1.0.1
       pinia: 2.0.26_e7lp6ggkpgyi5vqd44m2kxvk6i
       pretty-bytes: 6.0.0
@@ -8670,6 +8674,20 @@ packages:
   /outdent/0.5.0:
     resolution: {integrity: sha512-/jHxFIzoMXdqPzTaCpFzAAWhpkSjZPF4Vsn6jAfNpmbH/ymsmd7Qc6VE9BGn0L6YMj6uwpQLxCECpus4ukKS9Q==}
     dev: true
+
+  /overlayscrollbars-vue/0.5.1_qvtrscepjgkfzkdt53swvamjn4:
+    resolution: {integrity: sha512-hYoS7qm1xq4Kv7GpCTpo1YSUmgSXF2z9OcWbwGloGO8ZXefhADwDlYy6e35r2g5Gh04slZPsyQIqEXA/CptFMA==}
+    peerDependencies:
+      overlayscrollbars: ^2.0.0
+      vue: ^3.2.25
+    dependencies:
+      overlayscrollbars: 2.1.0
+      vue: 3.2.45
+    dev: false
+
+  /overlayscrollbars/2.1.0:
+    resolution: {integrity: sha512-L6p4o4aWse5pDstRnJjZaos+al+bkuAgzGIlWwlsxRSgW6+7Kvrp+kAzlWoTZ1bgB4CJj+8u5bjdq8XHEhWjrw==}
+    dev: false
 
   /p-filter/2.1.0:
     resolution: {integrity: sha512-ZBxxZ5sL2HghephhpGAQdoskxplTwr7ICaehZwLIlfL6acuVgZPm8yBNuRAFBGEqtD/hmUeq9eqLg2ys9Xr/yw==}

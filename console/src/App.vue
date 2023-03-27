@@ -1,12 +1,16 @@
 <script lang="ts" setup>
 import { RouterView, useRoute } from "vue-router";
-import { computed, watch, ref } from "vue";
+import { computed, watch, ref, reactive, onMounted } from "vue";
 import { useTitle } from "@vueuse/core";
 import { useFavicon } from "@vueuse/core";
 import { useSystemConfigMapStore } from "./stores/system-configmap";
 import { storeToRefs } from "pinia";
 import axios from "axios";
 import { useI18n } from "vue-i18n";
+import {
+  useOverlayScrollbars,
+  type UseOverlayScrollbarsParams,
+} from "overlayscrollbars-vue";
 
 const { t } = useI18n();
 
@@ -61,6 +65,22 @@ const favicon = computed(() => {
 });
 
 useFavicon(favicon);
+
+// body scroll
+const body = document.querySelector("body");
+const reactiveParams = reactive<UseOverlayScrollbarsParams>({
+  options: {
+    scrollbars: {
+      autoHide: "scroll",
+      autoHideDelay: 600,
+    },
+  },
+  defer: true,
+});
+const [initialize] = useOverlayScrollbars(reactiveParams);
+onMounted(() => {
+  if (body) initialize({ target: body });
+});
 </script>
 
 <template>
@@ -69,7 +89,6 @@ useFavicon(favicon);
 
 <style lang="scss">
 body {
-  overflow-y: overlay;
   background: #eff4f9;
 }
 
@@ -79,27 +98,11 @@ body {
   box-sizing: border-box;
 }
 
-*::-webkit-scrollbar-track-piece {
-  background-color: #f8f8f8;
-  -webkit-border-radius: 2em;
-  -moz-border-radius: 2em;
-  border-radius: 2em;
+.v-popper__popper {
+  outline: none;
 }
 
-*::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-*::-webkit-scrollbar-thumb {
-  background-color: #ddd;
-  background-clip: padding-box;
-  -webkit-border-radius: 2em;
-  -moz-border-radius: 2em;
-  border-radius: 2em;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background-color: #bbb;
+.v-popper--theme-tooltip {
+  pointer-events: none;
 }
 </style>

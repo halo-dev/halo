@@ -111,6 +111,7 @@ import type { queueAsPromised } from "fastq";
 import type { Attachment } from "@halo-dev/api-client";
 import { useFetchAttachmentPolicy } from "@/modules/contents/attachments/composables/use-attachment-policy";
 import { useI18n } from "vue-i18n";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 
 const { t } = useI18n();
 
@@ -548,7 +549,12 @@ watch(
     }"
   >
     <template #extra>
-      <div class="h-full w-72 overflow-y-auto border-l bg-white">
+      <OverlayScrollbarsComponent
+        element="div"
+        :options="{ scrollbars: { autoHide: 'scroll' } }"
+        class="h-full w-72 border-l bg-white"
+        defer
+      >
         <VTabs v-model:active-id="extraActiveId" type="outline">
           <VTabItem
             id="toc"
@@ -733,7 +739,7 @@ watch(
             </div>
           </VTabItem>
         </VTabs>
-      </div>
+      </OverlayScrollbarsComponent>
     </template>
   </RichTextEditor>
 </template>

@@ -18,7 +18,7 @@ import {
   useRouter,
   type RouteRecordRaw,
 } from "vue-router";
-import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import axios from "axios";
 import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
 import LoginModal from "@/components/login/LoginModal.vue";
@@ -31,6 +31,10 @@ import { rbacAnnotations } from "@/constants/annotations";
 import { useScroll } from "@vueuse/core";
 import { defineStore, storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
+import {
+  useOverlayScrollbars,
+  type UseOverlayScrollbarsParams,
+} from "overlayscrollbars-vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -209,6 +213,23 @@ onMounted(() => {
     y.value = navbarScrollStore.y;
   });
 });
+
+// aside scroll
+const reactiveParams = reactive<UseOverlayScrollbarsParams>({
+  options: {
+    scrollbars: {
+      autoHide: "scroll",
+      autoHideDelay: 600,
+    },
+  },
+  defer: true,
+});
+const [initialize] = useOverlayScrollbars(reactiveParams);
+onMounted(() => {
+  if (navbarScroller.value) {
+    initialize({ target: navbarScroller.value });
+  }
+});
 </script>
 
 <template>
@@ -227,7 +248,7 @@ onMounted(() => {
           />
         </a>
       </div>
-      <div ref="navbarScroller" class="flex-1 overflow-y-auto">
+      <div ref="navbarScroller" class="flex-1 overflow-y-hidden">
         <div class="px-3">
           <div
             class="flex cursor-pointer items-center rounded bg-gray-100 p-2 text-gray-400 transition-all hover:text-gray-900"
@@ -297,7 +318,7 @@ onMounted(() => {
       </div>
     </aside>
 
-    <main class="content w-full overflow-y-auto pb-12 mb-safe md:pb-0">
+    <main class="content w-full pb-12 mb-safe md:pb-0">
       <slot v-if="$slots.default" />
       <RouterView v-else />
     </main>

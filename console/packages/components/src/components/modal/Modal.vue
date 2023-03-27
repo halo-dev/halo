@@ -1,6 +1,8 @@
 <script lang="ts" setup>
-import { computed, nextTick, ref, watch } from "vue";
+import { computed, nextTick, reactive, ref, watch } from "vue";
 import { IconClose } from "../../icons/icons";
+import type { UseOverlayScrollbarsParams } from "overlayscrollbars-vue";
+import { useOverlayScrollbars } from "overlayscrollbars-vue";
 
 const props = withDefaults(
   defineProps<{
@@ -77,6 +79,29 @@ watch(
     }
   }
 );
+
+// body scroll
+const modalBody = ref(null);
+const reactiveParams = reactive<UseOverlayScrollbarsParams>({
+  options: {
+    scrollbars: {
+      autoHide: "scroll",
+      autoHideDelay: 600,
+    },
+  },
+  defer: true,
+});
+const [initialize, instance] = useOverlayScrollbars(reactiveParams);
+watch(
+  () => props.visible,
+  (value) => {
+    if (value) {
+      if (modalBody.value) initialize({ target: modalBody.value });
+    } else {
+      instance()?.destroy();
+    }
+  }
+);
 </script>
 <template>
   <Teleport :disabled="!mountToBody" to="body">
@@ -134,7 +159,7 @@ watch(
               </div>
             </slot>
           </div>
-          <div :class="bodyClass" class="modal-body">
+          <div ref="modalBody" :class="bodyClass" class="modal-body">
             <slot />
           </div>
           <div v-if="$slots.footer" class="modal-footer">
@@ -222,7 +247,7 @@ watch(
     }
 
     .modal-body {
-      @apply overflow-y-auto
+      @apply overflow-y-hidden
       overflow-x-hidden
       flex-1;
       word-wrap: break-word;

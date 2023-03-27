@@ -73,6 +73,8 @@
     "lodash.isequal": "^4.5.0",
     "lodash.merge": "^4.6.2",
     "lodash.sortby": "^4.7.0",
+    "overlayscrollbars": "^2.1.0",
+    "overlayscrollbars-vue": "^0.5.1",
     "path-browserify": "^1.0.1",
     "pinia": "^2.0.26",
     "pretty-bytes": "^6.0.0",
