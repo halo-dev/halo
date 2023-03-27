@@ -144,7 +144,7 @@ class AuthProviderServiceImplTest {
                                 "bindingUrl": "fake-binding-url",
                                 "enabled": true,
                                 "isBound": false,
-                                "supportsBinding": false
+                                "supportsBinding": false,
                                 "privileged": false
                             }, {
                                 "name": "gitlab",
@@ -152,7 +152,7 @@ class AuthProviderServiceImplTest {
                                 "bindingUrl": "fake-binding-url",
                                 "enabled": false,
                                 "isBound": false,
-                                "supportsBinding": false
+                                "supportsBinding": false,
                                 "privileged": false
                             },{
                                                         
@@ -160,7 +160,7 @@ class AuthProviderServiceImplTest {
                                 "displayName": "gitee",
                                 "enabled": false,
                                 "isBound": false,
-                                "supportsBinding": false
+                                "supportsBinding": false,
                                 "privileged": false
                             }]
                             """,
