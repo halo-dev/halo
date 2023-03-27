@@ -38,8 +38,6 @@ core:
         settings: Settings
         actuator: Actuator
     operations:
-      more:
-        button: More
       logout:
         button: Logout
         title: Are you sure you want to log out?
