@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.NonNull;
@@ -126,7 +125,7 @@ public class DefaultRoleService implements RoleService {
 
     Flux<Role> listAggregatedRoles(String roleName) {
         return extensionClient.list(Role.class,
-            role -> BooleanUtils.TRUE.equals(nullSafeLabels(role)
+            role -> Boolean.parseBoolean(nullSafeLabels(role)
                 .get(Role.ROLE_AGGREGATE_LABEL_PREFIX + roleName)
             ),
             Comparator.comparing(item -> item.getMetadata().getCreationTimestamp()));
