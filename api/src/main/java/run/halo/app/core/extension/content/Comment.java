@@ -123,6 +123,8 @@ public class Comment extends AbstractExtension {
 
         private Integer replyCount;
 
+        private Integer visibleReplyCount;
+
         private Integer unreadReplyCount;
 
         private Boolean hasNewReply;
