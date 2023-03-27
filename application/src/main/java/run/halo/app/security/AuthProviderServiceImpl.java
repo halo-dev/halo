@@ -122,9 +122,7 @@ public class AuthProviderServiceImpl implements AuthProviderService {
 
     private Mono<List<String>> fetchPrivilegedProviders() {
         return client.list(AuthProvider.class,
-                provider -> BooleanUtils.TRUE.equals(MetadataUtil.nullSafeLabels(provider)
-                    .get(AuthProvider.PRIVILEGED_LABEL)
-                ),
+                provider -> privileged(provider),
                 null)
             .map(provider -> provider.getMetadata().getName())
             .collectList();
@@ -143,7 +141,13 @@ public class AuthProviderServiceImpl implements AuthProviderService {
             .unbindingUrl(authProvider.getSpec().getUnbindUrl())
             .isBound(false)
             .enabled(false)
+            .privileged(privileged(authProvider))
             .build();
+    }
+
+    private boolean privileged(AuthProvider authProvider) {
+        return BooleanUtils.TRUE.equals(MetadataUtil.nullSafeLabels(authProvider)
+            .get(AuthProvider.PRIVILEGED_LABEL));
     }
 
     @NonNull
