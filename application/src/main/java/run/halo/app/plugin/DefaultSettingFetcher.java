@@ -21,7 +21,7 @@ import run.halo.app.infra.utils.JsonUtils;
  * @author guqing
  * @since 2.0.0
  */
-public class DefaultSettingFetcher implements SettingFetcher {
+public class DefaultSettingFetcher extends SettingFetcher {
 
     private final ExtensionClient extensionClient;
 
