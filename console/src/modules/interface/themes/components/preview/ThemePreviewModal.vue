@@ -27,7 +27,6 @@ import { storeToRefs } from "pinia";
 import { computed, markRaw, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { useQuery } from "@tanstack/vue-query";
-import { ItalicMenuItem } from "@halo-dev/richtext-editor";
 
 const props = withDefaults(
   defineProps<{
@@ -129,7 +128,7 @@ const settingTabs = ref<SettingTab[]>([] as SettingTab[]);
 const activeSettingTab = ref("");
 const settingsVisible = ref(false);
 
-const { data: setting, refetch: handleFetchSettings } = useQuery({
+const { data: setting, refetch: handleFetchSettings } = useQuery<Setting>({
   queryKey: ["theme-setting", selectedTheme],
   queryFn: async () => {
     const { data } = await apiClient.theme.fetchThemeSetting({
@@ -142,7 +141,7 @@ const { data: setting, refetch: handleFetchSettings } = useQuery({
   enabled: computed(() => !!selectedTheme.value?.spec.settingName),
 });
 
-const { data: configMap, refetch: handleFetchConfigMap } = useQuery({
+const { data: configMap, refetch: handleFetchConfigMap } = useQuery<ConfigMap>({
   queryKey: ["theme-configMap", selectedTheme],
   queryFn: async () => {
     const { data } = await apiClient.theme.fetchThemeConfig({
