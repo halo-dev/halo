@@ -43,9 +43,8 @@ import FilterTag from "@/components/filter/FilterTag.vue";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 import TagDropdownSelector from "@/components/dropdown-selector/TagDropdownSelector.vue";
-import { useQuery } from "@tanstack/vue-query";
+import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
-import cloneDeep from "lodash.clonedeep";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -419,17 +418,32 @@ watch(selectedPostNames, (newValue) => {
   checkedAll.value = newValue.length === posts.value?.length;
 });
 
-const changeVisibleByIcon = async (post: Post) => {
-  const singlePostToUpdate = cloneDeep(post);
-  singlePostToUpdate.spec.visible =
-    singlePostToUpdate.spec.visible === "PRIVATE" ? "PUBLIC" : "PRIVATE";
-  await apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
-    name: post.metadata.name,
-    post: singlePostToUpdate,
-  });
-  await refetch();
-  Toast.success(t("core.common.toast.operation_success"));
-};
+const { mutate: changeVisibleMutation } = useMutation({
+  mutationFn: async (post: Post) => {
+    const { data } =
+      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
+        name: post.metadata.name,
+      });
+    data.spec.visible = data.spec.visible === "PRIVATE" ? "PUBLIC" : "PRIVATE";
+    await apiClient.extension.post.updatecontentHaloRunV1alpha1Post(
+      {
+        name: post.metadata.name,
+        post: data,
+      },
+      {
+        mute: true,
+      }
+    );
+    await refetch();
+  },
+  retry: 3,
+  onSuccess: () => {
+    Toast.success(t("core.common.toast.operation_success"));
+  },
+  onError: () => {
+    Toast.error(t("core.common.toast.operation_failed"));
+  },
+});
 </script>
 <template>
   <PostSettingModal
@@ -916,13 +930,13 @@ const changeVisibleByIcon = async (post: Post) => {
                       v-if="post.post.spec.visible === 'PUBLIC'"
                       v-tooltip="$t('core.post.filters.visible.items.public')"
                       class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                      @click="changeVisibleByIcon(post.post)"
+                      @click="changeVisibleMutation(post.post)"
                     />
                     <IconEyeOff
                       v-if="post.post.spec.visible === 'PRIVATE'"
                       v-tooltip="$t('core.post.filters.visible.items.private')"
                       class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                      @click="changeVisibleByIcon(post.post)"
+                      @click="changeVisibleMutation(post.post)"
                     />
                   </template>
                 </VEntityField>

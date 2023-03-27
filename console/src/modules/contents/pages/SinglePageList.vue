@@ -36,7 +36,7 @@ import { singlePageLabels } from "@/constants/labels";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
-import { useQuery } from "@tanstack/vue-query";
+import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
@@ -405,17 +405,32 @@ watch(selectedPageNames, (newValue) => {
   checkedAll.value = newValue.length === singlePages.value?.length;
 });
 
-const changeVisibleByIcon = async (singlePage: SinglePage) => {
-  const singlePageToUpdate = cloneDeep(singlePage);
-  singlePageToUpdate.spec.visible =
-    singlePageToUpdate.spec.visible === "PRIVATE" ? "PUBLIC" : "PRIVATE";
-  await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage({
-    name: singlePage.metadata.name,
-    singlePage: singlePageToUpdate,
-  });
-  await refetch();
-  Toast.success(t("core.common.toast.operation_success"));
-};
+const { mutate: changeVisibleMutation } = useMutation({
+  mutationFn: async (singlePage: SinglePage) => {
+    const { data } =
+      await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
+        name: singlePage.metadata.name,
+      });
+    data.spec.visible = data.spec.visible === "PRIVATE" ? "PUBLIC" : "PRIVATE";
+    await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
+      {
+        name: singlePage.metadata.name,
+        singlePage: data,
+      },
+      {
+        mute: true,
+      }
+    );
+    await refetch();
+  },
+  retry: 3,
+  onSuccess: () => {
+    Toast.success(t("core.common.toast.operation_success"));
+  },
+  onError: () => {
+    Toast.error(t("core.common.toast.operation_failed"));
+  },
+});
 </script>
 
 <template>
@@ -820,13 +835,13 @@ const changeVisibleByIcon = async (singlePage: SinglePage) => {
                       v-if="singlePage.page.spec.visible === 'PUBLIC'"
                       v-tooltip="$t('core.page.filters.visible.items.public')"
                       class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                      @click="changeVisibleByIcon(singlePage.page)"
+                      @click="changeVisibleMutation(singlePage.page)"
                     />
                     <IconEyeOff
                       v-if="singlePage.page.spec.visible === 'PRIVATE'"
                       v-tooltip="$t('core.page.filters.visible.items.private')"
                       class="cursor-pointer text-sm transition-all hover:text-blue-600"
-                      @click="changeVisibleByIcon(singlePage.page)"
+                      @click="changeVisibleMutation(singlePage.page)"
                     />
                   </template>
                 </VEntityField>
