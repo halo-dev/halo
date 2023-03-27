@@ -21,8 +21,6 @@ const emit = defineEmits<{
   (event: "reload"): void;
 }>();
 
-const LOCAL_AUTH_PROVIDER_NAME = "local";
-
 const handleChangeStatus = async () => {
   Dialog.info({
     title: props.authProvider.enabled
@@ -78,11 +76,18 @@ const handleChangeStatus = async () => {
       </VEntityField>
     </template>
     <template #end>
-      <VEntityField v-if="authProvider.name !== LOCAL_AUTH_PROVIDER_NAME">
+      <VEntityField>
         <template #description>
           <div class="flex items-center">
             <VSwitch
+              v-tooltip="{
+                disabled: !authProvider.privileged,
+                content: $t(
+                  'core.identity_authentication.operations.disable_privileged.tooltip'
+                ),
+              }"
               :model-value="authProvider.enabled"
+              :disabled="authProvider.privileged"
               @click="handleChangeStatus"
             />
           </div>
