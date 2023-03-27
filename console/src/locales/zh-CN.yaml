@@ -38,8 +38,6 @@ core:
         settings: 设置
         actuator: 概览
     operations:
-      more:
-        button: 更多
       logout:
         button: 退出登录
         title: 确定要退出登录吗？

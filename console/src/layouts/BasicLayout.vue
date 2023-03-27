@@ -317,14 +317,9 @@ onMounted(() => {
         <div
           class="flex w-full cursor-pointer items-center justify-center p-1 text-white"
         >
-          <div
-            class="is-active is-active0 flex h-10 w-10 flex-col items-center justify-center"
-          >
+          <div class="flex h-10 w-10 flex-col items-center justify-center">
             <div class="text-base">
               <Component :is="menu?.icon" />
-            </div>
-            <div class="mt-0.5 text-xs">
-              {{ $t(menu?.name) }}
             </div>
           </div>
         </div>
@@ -333,14 +328,9 @@ onMounted(() => {
         <div
           class="flex w-full cursor-pointer items-center justify-center p-1 text-white"
         >
-          <div
-            class="is-active is-active0 flex h-10 w-10 flex-col items-center justify-center"
-          >
+          <div class="flex h-10 w-10 flex-col items-center justify-center">
             <div class="text-base">
               <IconMore />
-            </div>
-            <div class="mt-0.5 text-xs">
-              {{ $t("core.sidebar.operations.more.button") }}
             </div>
           </div>
         </div>
