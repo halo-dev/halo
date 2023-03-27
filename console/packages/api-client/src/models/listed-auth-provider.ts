@@ -74,6 +74,12 @@ export interface ListedAuthProvider {
   name: string;
   /**
    *
+   * @type {boolean}
+   * @memberof ListedAuthProvider
+   */
+  supportsBinding?: boolean;
+  /**
+   *
    * @type {string}
    * @memberof ListedAuthProvider
    */
