@@ -143,19 +143,22 @@ class AuthProviderServiceImplTest {
                                 "displayName": "github",
                                 "bindingUrl": "fake-binding-url",
                                 "enabled": true,
-                                "isBound": false
+                                "isBound": false,
+                                "privileged": false
                             }, {
                                 "name": "gitlab",
                                 "displayName": "gitlab",
                                 "bindingUrl": "fake-binding-url",
                                 "enabled": false,
-                                "isBound": false
+                                "isBound": false,
+                                "privileged": false
                             },{
                                                         
                                 "name": "gitee",
                                 "displayName": "gitee",
                                 "enabled": false,
-                                "isBound": false
+                                "isBound": false,
+                                "privileged": false
                             }]
                             """,
                         JsonUtils.objectToJson(result),
