@@ -870,6 +870,8 @@ core:
         title: Are you sure you want to enable this identity authentication method?
       disable:
         title: Are you sure you want to disable this identity authentication method?
+      disable_privileged:
+        tooltip: The authentication method reserved by the system cannot be disabled
     detail:
       fields:
         display_name: Display name

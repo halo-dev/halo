@@ -870,6 +870,8 @@ core:
         title: 确定要启用该身份认证方式吗？
       disable:
         title: 确定要停用该身份认证方式吗？
+      disable_privileged:
+        tooltip: 系统保留的认证方式，无法禁用
     detail:
       fields:
         display_name: 名称
