@@ -159,7 +159,7 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
           <ul class="space-y-2">
             <template v-for="(authProvider, index) in authProviders">
               <li
-                v-if="authProvider.bindingUrl && authProvider.enabled"
+                v-if="authProvider.supportsBinding && authProvider.enabled"
                 :key="index"
               >
                 <div
