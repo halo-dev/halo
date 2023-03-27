@@ -172,7 +172,7 @@ const handleOpenInstallModal = () => {
           >
             <template #actions>
               <VSpace>
-                <VButton :loading="isFetching" @click="handleFetchThemes()">
+                <VButton :loading="isFetching" @click="refetch()">
                   {{ $t("core.common.buttons.refresh") }}
                 </VButton>
                 <VButton
@@ -224,7 +224,7 @@ const handleOpenInstallModal = () => {
           >
             <template #actions>
               <VSpace>
-                <VButton :loading="isFetching" @click="handleFetchThemes">
+                <VButton :loading="isFetching" @click="refetch">
                   {{ $t("core.common.buttons.refresh") }}
                 </VButton>
               </VSpace>
@@ -343,7 +343,7 @@ const handleOpenInstallModal = () => {
     v-if="visible"
     v-model:visible="themeUploadVisible"
     :upgrade-theme="themeToUpgrade"
-    @close="handleFetchThemes"
+    @close="refetch"
   />
 
   <ThemePreviewModal
