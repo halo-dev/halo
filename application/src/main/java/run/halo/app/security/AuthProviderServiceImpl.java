@@ -139,12 +139,18 @@ public class AuthProviderServiceImpl implements AuthProviderService {
             .helpPage(authProvider.getSpec().getHelpPage())
             .bindingUrl(authProvider.getSpec().getBindingUrl())
             .unbindingUrl(authProvider.getSpec().getUnbindUrl())
+            .supportsBinding(supportsBinding(authProvider))
             .isBound(false)
             .enabled(false)
             .privileged(privileged(authProvider))
             .build();
     }
 
+    private static boolean supportsBinding(AuthProvider authProvider) {
+        return BooleanUtils.TRUE.equals(MetadataUtil.nullSafeLabels(authProvider)
+            .get(AuthProvider.AUTH_BINDING_LABEL));
+    }
+    
     private boolean privileged(AuthProvider authProvider) {
         return BooleanUtils.TRUE.equals(MetadataUtil.nullSafeLabels(authProvider)
             .get(AuthProvider.PRIVILEGED_LABEL));
