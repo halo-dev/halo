@@ -419,7 +419,7 @@ const changeVisibleByIcon = async (singlePage: SinglePage) => {
     });
   selectedSinglePage.value = data;
   await refetch();
-  Toast.success("可见性修改成功");
+  Toast.success(t("core.common.toast.operation_success"));
 };
 </script>
 

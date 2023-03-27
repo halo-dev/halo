@@ -427,14 +427,8 @@ const changeVisibleByIcon = async (post: Post) => {
     name: post.metadata.name,
     post: singlePostToUpdate,
   });
-  const { data } = await apiClient.extension.post.getcontentHaloRunV1alpha1Post(
-    {
-      name: post.metadata.name,
-    }
-  );
-  selectedPost.value = data;
   await refetch();
-  Toast.success("可见性修改成功");
+  Toast.success(t("core.common.toast.operation_success"));
 };
 </script>
 <template>
