@@ -11,6 +11,7 @@ import {
   VTag,
   VLoading,
   Toast,
+  VDropdownItem,
 } from "@halo-dev/components";
 import MenuEditingModal from "./MenuEditingModal.vue";
 import { onMounted, onUnmounted, ref } from "vue";
@@ -258,30 +259,15 @@ onMounted(handleFetchPrimaryMenuName);
               v-if="currentUserHasPermission(['system:menus:manage'])"
               #dropdownItems
             >
-              <VButton
-                v-close-popper
-                block
-                type="secondary"
-                @click="handleSetPrimaryMenu(menu)"
-              >
+              <VDropdownItem @click="handleSetPrimaryMenu(menu)">
                 {{ $t("core.menu.operations.set_primary.button") }}
-              </VButton>
-              <VButton
-                v-close-popper
-                block
-                type="default"
-                @click="handleOpenEditingModal(menu)"
-              >
+              </VDropdownItem>
+              <VDropdownItem @click="handleOpenEditingModal(menu)">
                 {{ $t("core.common.buttons.edit") }}
-              </VButton>
-              <VButton
-                v-close-popper
-                block
-                type="danger"
-                @click="handleDeleteMenu(menu)"
-              >
+              </VDropdownItem>
+              <VDropdownItem type="danger" @click="handleDeleteMenu(menu)">
                 {{ $t("core.common.buttons.delete") }}
-              </VButton>
+              </VDropdownItem>
             </template>
           </VEntity>
         </li>

@@ -65,7 +65,6 @@ importers:
       eslint-plugin-cypress: ^2.12.1
       eslint-plugin-vue: ^9.8.0
       fastq: ^1.15.0
-      floating-vue: 2.0.0-beta.20
       fuse.js: ^6.6.2
       husky: ^8.0.2
       jsdom: ^20.0.3
@@ -141,7 +140,6 @@ importers:
       dayjs: 1.11.6
       emoji-mart: 5.3.3
       fastq: 1.15.0
-      floating-vue: 2.0.0-beta.20_vue@3.2.45
       fuse.js: 6.6.2
       jsencrypt: 3.3.2
       lodash.clonedeep: 4.5.0
@@ -247,6 +245,7 @@ importers:
       '@histoire/plugin-vue': ^0.11.7
       '@iconify-json/ri': ^1.1.4
       codemirror: ^6.0.1
+      floating-vue: 2.0.0-beta.20
       histoire: ^0.11.7
       unplugin-icons: ^0.14.14
       vite-plugin-dts: ^1.7.1
@@ -263,6 +262,7 @@ importers:
       '@codemirror/state': 6.1.4
       '@codemirror/view': 6.5.1
       codemirror: 6.0.1_@lezer+common@1.0.1
+      floating-vue: 2.0.0-beta.20_vue@3.2.45
       vue: 3.2.45
       vue-router: 4.1.6_vue@3.2.45
     devDependencies:
@@ -2774,7 +2774,7 @@ packages:
     resolution: {integrity: sha512-m7O9o2uR8k2ObDysZYzdfhb08VuEml5oWGiosa1VdaPZ/A6QyPkAJuwN0Q1lhULOf6B7MtQmHENS743hWtCrgw==}
     dependencies:
       '@jridgewell/gen-mapping': 0.3.2
-      '@jridgewell/trace-mapping': 0.3.15
+      '@jridgewell/trace-mapping': 0.3.17
     dev: true
 
   /@jridgewell/sourcemap-codec/1.4.14:
@@ -10115,7 +10115,7 @@ packages:
     hasBin: true
     dependencies:
       '@jridgewell/source-map': 0.3.2
-      acorn: 8.8.1
+      acorn: 8.8.2
       commander: 2.20.3
       source-map-support: 0.5.21
     dev: true

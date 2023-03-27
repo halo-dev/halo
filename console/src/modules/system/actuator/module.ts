@@ -22,7 +22,6 @@ export default definePlugin({
               group: "system",
               icon: markRaw(IconTerminalBoxLine),
               priority: 3,
-              mobile: true,
             },
           },
         },

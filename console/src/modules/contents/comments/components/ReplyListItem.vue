@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import {
   VAvatar,
-  VButton,
   VTag,
   VEntityField,
   VEntity,
   Dialog,
   VStatusDot,
+  VDropdownItem,
   IconReplyLine,
   Toast,
 } from "@halo-dev/components";
@@ -196,25 +196,20 @@ const isHoveredReply = computed(() => {
       </VEntityField>
     </template>
     <template #dropdownItems>
-      <VButton
+      <VDropdownItem
         v-if="!reply?.reply.spec.approved"
         v-permission="['system:comments:manage']"
-        v-close-popper
-        type="secondary"
-        block
         @click="handleApprove"
       >
         {{ $t("core.comment.operations.approve_reply.button") }}
-      </VButton>
-      <VButton
+      </VDropdownItem>
+      <VDropdownItem
         v-permission="['system:comments:manage']"
-        v-close-popper
-        block
         type="danger"
         @click="handleDelete"
       >
         {{ $t("core.common.buttons.delete") }}
-      </VButton>
+      </VDropdownItem>
     </template>
   </VEntity>
 </template>

@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { VSpace } from "../space";
 import { IconMore } from "../../icons/icons";
 import { computed } from "vue";
+import { VDropdown } from "../dropdown";
+
 const props = withDefaults(
   defineProps<{
     isSelected?: boolean;
@@ -35,7 +36,7 @@ const classes = computed(() => {
         <slot name="end" />
       </div>
       <div v-if="$slots.dropdownItems" class="entity-dropdown">
-        <FloatingDropdown>
+        <VDropdown>
           <div
             class="entity-dropdown-trigger group-hover:bg-gray-200/60"
             :class="{ '!bg-gray-300/60': isSelected }"
@@ -44,13 +45,9 @@ const classes = computed(() => {
             <IconMore />
           </div>
           <template #popper>
-            <div class="w-48 p-2">
-              <VSpace class="w-full" direction="column">
-                <slot name="dropdownItems"></slot>
-              </VSpace>
-            </div>
+            <slot name="dropdownItems"></slot>
           </template>
-        </FloatingDropdown>
+        </VDropdown>
       </div>
     </div>
     <div v-if="$slots.footer">

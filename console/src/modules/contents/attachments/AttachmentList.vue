@@ -21,6 +21,8 @@ import {
   VEntityField,
   VLoading,
   Toast,
+  VDropdown,
+  VDropdownItem,
 } from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
@@ -421,33 +423,25 @@ onMounted(() => {
                         $t("core.attachment.operations.deselect_items.button")
                       }}
                     </VButton>
-                    <FloatingDropdown>
+                    <VDropdown>
                       <VButton>
                         {{ $t("core.attachment.operations.move.button") }}
                       </VButton>
                       <template #popper>
-                        <div class="w-72 p-4">
-                          <ul class="space-y-1">
-                            <li
-                              v-for="(group, index) in groups"
-                              :key="index"
-                              v-close-popper
-                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                              @click="handleMove(group)"
-                            >
-                              <span class="truncate">
-                                {{ group.spec.displayName }}
-                              </span>
-                            </li>
-                          </ul>
-                        </div>
+                        <VDropdownItem
+                          v-for="(group, index) in groups"
+                          :key="index"
+                          @click="handleMove(group)"
+                        >
+                          {{ group.spec.displayName }}
+                        </VDropdownItem>
                       </template>
-                    </FloatingDropdown>
+                    </VDropdown>
                   </VSpace>
                 </div>
                 <div class="mt-4 flex sm:mt-0">
                   <VSpace spacing="lg">
-                    <FloatingDropdown>
+                    <VDropdown>
                       <div
                         class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                       >
@@ -461,28 +455,16 @@ onMounted(() => {
                         </span>
                       </div>
                       <template #popper>
-                        <div class="w-72 p-4">
-                          <ul class="space-y-1">
-                            <li
-                              v-for="(policy, index) in policies"
-                              :key="index"
-                              v-close-popper
-                              :class="{
-                                'bg-gray-100':
-                                  selectedPolicy?.metadata.name ===
-                                  policy.metadata.name,
-                              }"
-                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                              @click="handleSelectPolicy(policy)"
-                            >
-                              <span class="truncate">
-                                {{ policy.spec.displayName }}
-                              </span>
-                            </li>
-                          </ul>
-                        </div>
+                        <VDropdownItem
+                          v-for="(policy, index) in policies"
+                          :key="index"
+                          :selected="policy === selectedPolicy"
+                          @click="handleSelectPolicy(policy)"
+                        >
+                          {{ policy.spec.displayName }}
+                        </VDropdownItem>
                       </template>
-                    </FloatingDropdown>
+                    </VDropdown>
                     <UserDropdownSelector
                       v-model:selected="selectedUser"
                       @select="handleSelectUser"
@@ -499,7 +481,7 @@ onMounted(() => {
                       </div>
                     </UserDropdownSelector>
                     <!-- TODO: add filter by ref support -->
-                    <FloatingDropdown v-if="false">
+                    <VDropdown v-if="false">
                       <div
                         class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                       >
@@ -509,25 +491,11 @@ onMounted(() => {
                         </span>
                       </div>
                       <template #popper>
-                        <div class="w-72 p-4">
-                          <ul class="space-y-1">
-                            <li
-                              v-close-popper
-                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                            >
-                              <span class="truncate">未被引用</span>
-                            </li>
-                            <li
-                              v-close-popper
-                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                            >
-                              <span class="truncate">文章</span>
-                            </li>
-                          </ul>
-                        </div>
+                        <VDropdownItem> 未被引用 </VDropdownItem>
+                        <VDropdownItem> 文章 </VDropdownItem>
                       </template>
-                    </FloatingDropdown>
-                    <FloatingDropdown>
+                    </VDropdown>
+                    <VDropdown>
                       <div
                         class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                       >
@@ -539,21 +507,16 @@ onMounted(() => {
                         </span>
                       </div>
                       <template #popper>
-                        <div class="w-72 p-4">
-                          <ul class="space-y-1">
-                            <li
-                              v-for="(sortItem, index) in SortItems"
-                              :key="index"
-                              v-close-popper
-                              class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                              @click="handleSortItemChange(sortItem)"
-                            >
-                              <span class="truncate">{{ sortItem.label }}</span>
-                            </li>
-                          </ul>
-                        </div>
+                        <VDropdownItem
+                          v-for="(sortItem, index) in SortItems"
+                          :key="index"
+                          :selected="sortItem.value === selectedSortItem?.value"
+                          @click="handleSortItemChange(sortItem)"
+                        >
+                          {{ sortItem.label }}
+                        </VDropdownItem>
                       </template>
-                    </FloatingDropdown>
+                    </VDropdown>
                     <div class="flex flex-row gap-2">
                       <div
                         v-for="(item, index) in viewTypes"
@@ -810,14 +773,12 @@ onMounted(() => {
                       "
                       #dropdownItems
                     >
-                      <VButton
-                        v-close-popper
-                        block
+                      <VDropdownItem
                         type="danger"
                         @click="handleDelete(attachment)"
                       >
                         {{ $t("core.common.buttons.delete") }}
-                      </VButton>
+                      </VDropdownItem>
                     </template>
                   </VEntity>
                 </li>

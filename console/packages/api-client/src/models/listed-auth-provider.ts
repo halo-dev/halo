@@ -74,6 +74,12 @@ export interface ListedAuthProvider {
   name: string;
   /**
    *
+   * @type {boolean}
+   * @memberof ListedAuthProvider
+   */
+  privileged?: boolean;
+  /**
+   *
    * @type {string}
    * @memberof ListedAuthProvider
    */

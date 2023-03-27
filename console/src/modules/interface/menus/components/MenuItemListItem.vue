@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import {
   IconList,
-  VButton,
   VTag,
   VStatusDot,
   VEntity,
   VEntityField,
+  VDropdownItem,
 } from "@halo-dev/components";
 import Draggable from "vuedraggable";
 import { ref } from "vue";
@@ -130,30 +130,15 @@ function getMenuItemRefDisplayName(menuItem: MenuTreeItem) {
             v-if="currentUserHasPermission(['system:menus:manage'])"
             #dropdownItems
           >
-            <VButton
-              v-close-popper
-              block
-              type="secondary"
-              @click="onOpenEditingModal(menuItem)"
-            >
+            <VDropdownItem @click="onOpenEditingModal(menuItem)">
               {{ $t("core.common.buttons.edit") }}
-            </VButton>
-            <VButton
-              v-close-popper
-              block
-              type="default"
-              @click="onOpenCreateByParentModal(menuItem)"
-            >
+            </VDropdownItem>
+            <VDropdownItem @click="onOpenCreateByParentModal(menuItem)">
               {{ $t("core.menu.operations.add_sub_menu_item.button") }}
-            </VButton>
-            <VButton
-              v-close-popper
-              block
-              type="danger"
-              @click="onDelete(menuItem)"
-            >
+            </VDropdownItem>
+            <VDropdownItem type="danger" @click="onDelete(menuItem)">
               {{ $t("core.common.buttons.delete") }}
-            </VButton>
+            </VDropdownItem>
           </template>
         </VEntity>
         <MenuItemListItem
