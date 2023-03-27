@@ -1,14 +1,18 @@
 package run.halo.app.core.extension.service;
 
+import static run.halo.app.extension.MetadataUtil.nullSafeLabels;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -110,7 +114,38 @@ public class DefaultRoleService implements RoleService {
                 return Flux.fromIterable(dependencies)
                     .filter(dependency -> !visited.contains(dependency))
                     .flatMap(dependencyName -> extensionClient.fetch(Role.class, dependencyName));
-            });
+            })
+            .flatMap(role -> Flux.just(role)
+                .mergeWith(listAggregatedRoles(role.getMetadata().getName()))
+            );
+    }
+
+    Flux<Role> listAggregatedRoles(String roleName) {
+        return extensionClient.list(Role.class,
+            role -> Boolean.parseBoolean(nullSafeLabels(role)
+                .get(Role.ROLE_AGGREGATE_LABEL_PREFIX + roleName)
+            ),
+            Comparator.comparing(item -> item.getMetadata().getCreationTimestamp()));
+    }
+
+    Predicate<RoleBinding> getRoleBindingPredicate(Subject targetSubject) {
+        return roleBinding -> {
+            List<Subject> subjects = roleBinding.getSubjects();
+            for (Subject subject : subjects) {
+                return matchSubject(targetSubject, subject);
+            }
+            return false;
+        };
+    }
+
+    private static boolean matchSubject(Subject targetSubject, Subject subject) {
+        if (targetSubject == null || subject == null) {
+            return false;
+        }
+        return StringUtils.equals(targetSubject.getKind(), subject.getKind())
+            && StringUtils.equals(targetSubject.getName(), subject.getName())
+            && StringUtils.defaultString(targetSubject.getApiGroup())
+            .equals(StringUtils.defaultString(subject.getApiGroup()));
     }
 
     @Override
