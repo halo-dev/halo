@@ -20,6 +20,9 @@ import {
   Toast,
   IconRefreshLine,
   VEmpty,
+  VDropdown,
+  VDropdownItem,
+  VDropdownDivider,
 } from "@halo-dev/components";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
@@ -391,7 +394,7 @@ onMounted(() => {
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
-                <FloatingDropdown>
+                <VDropdown>
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
@@ -403,28 +406,23 @@ onMounted(() => {
                     </span>
                   </div>
                   <template #popper>
-                    <div class="w-52 p-4">
-                      <ul class="space-y-1">
-                        <li
-                          v-for="(role, index) in roles"
-                          :key="index"
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                          @click="handleRoleChange(role)"
-                        >
-                          <span class="truncate">
-                            {{
-                              role.metadata.annotations?.[
-                                rbacAnnotations.DISPLAY_NAME
-                              ] || role.metadata.name
-                            }}
-                          </span>
-                        </li>
-                      </ul>
-                    </div>
+                    <VDropdownItem
+                      v-for="(role, index) in roles"
+                      :key="index"
+                      :selected="
+                        selectedRole?.metadata.name === role.metadata.name
+                      "
+                      @click="handleRoleChange(role)"
+                    >
+                      {{
+                        role.metadata.annotations?.[
+                          rbacAnnotations.DISPLAY_NAME
+                        ] || role.metadata.name
+                      }}
+                    </VDropdownItem>
                   </template>
-                </FloatingDropdown>
-                <FloatingDropdown>
+                </VDropdown>
+                <VDropdown>
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
@@ -436,21 +434,16 @@ onMounted(() => {
                     </span>
                   </div>
                   <template #popper>
-                    <div class="w-72 p-4">
-                      <ul class="space-y-1">
-                        <li
-                          v-for="(sortItem, index) in SortItems"
-                          :key="index"
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                          @click="handleSortItemChange(sortItem)"
-                        >
-                          <span class="truncate">{{ sortItem.label }}</span>
-                        </li>
-                      </ul>
-                    </div>
+                    <VDropdownItem
+                      v-for="(sortItem, index) in SortItems"
+                      :key="index"
+                      :selected="selectedSortItem?.value === sortItem.value"
+                      @click="handleSortItemChange(sortItem)"
+                    >
+                      {{ sortItem.label }}
+                    </VDropdownItem>
                   </template>
-                </FloatingDropdown>
+                </VDropdown>
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
@@ -575,44 +568,33 @@ onMounted(() => {
                 v-if="currentUserHasPermission(['system:users:manage'])"
                 #dropdownItems
               >
-                <VButton
-                  v-close-popper
-                  block
-                  type="secondary"
-                  @click="handleOpenCreateModal(user.user)"
-                >
+                <VDropdownItem @click="handleOpenCreateModal(user.user)">
                   {{ $t("core.user.operations.update_profile.title") }}
-                </VButton>
-                <VButton
-                  v-close-popper
-                  block
+                </VDropdownItem>
+                <VDropdownItem
                   @click="handleOpenPasswordChangeModal(user.user)"
                 >
                   {{ $t("core.user.operations.change_password.title") }}
-                </VButton>
-                <VButton
+                </VDropdownItem>
+                <VDropdownItem
                   v-if="
                     userStore.currentUser?.metadata.name !==
                     user.user.metadata.name
                   "
-                  v-close-popper
-                  block
                   @click="handleOpenGrantPermissionModal(user.user)"
                 >
                   {{ $t("core.user.operations.grant_permission.title") }}
-                </VButton>
-                <VButton
+                </VDropdownItem>
+                <VDropdownItem
                   v-if="
                     userStore.currentUser?.metadata.name !==
                     user.user.metadata.name
                   "
-                  v-close-popper
-                  block
                   type="danger"
                   @click="handleDelete(user.user)"
                 >
                   {{ $t("core.common.buttons.delete") }}
-                </VButton>
+                </VDropdownItem>
               </template>
             </VEntity>
           </li>

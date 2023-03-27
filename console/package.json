@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/console",
-  "version": "2.3.0",
+  "version": "2.4.0-rc.1",
   "scripts": {
     "prepare": "cd .. && husky install console/.husky",
     "dev": "vite --host",
@@ -66,7 +66,6 @@
     "dayjs": "^1.11.6",
     "emoji-mart": "^5.3.3",
     "fastq": "^1.15.0",
-    "floating-vue": "2.0.0-beta.20",
     "fuse.js": "^6.6.2",
     "jsencrypt": "^3.3.2",
     "lodash.clonedeep": "^4.5.0",
@@ -74,6 +73,8 @@
     "lodash.isequal": "^4.5.0",
     "lodash.merge": "^4.6.2",
     "lodash.sortby": "^4.7.0",
+    "overlayscrollbars": "^2.1.0",
+    "overlayscrollbars-vue": "^0.5.1",
     "path-browserify": "^1.0.1",
     "pinia": "^2.0.26",
     "pretty-bytes": "^6.0.0",

@@ -26,6 +26,8 @@ import {
 import { storeToRefs } from "pinia";
 import { computed, markRaw, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+import { useQuery } from "@tanstack/vue-query";
 
 const props = withDefaults(
   defineProps<{
@@ -55,33 +57,34 @@ interface SettingTab {
 const { activatedTheme } = storeToRefs(useThemeStore());
 
 const previewFrame = ref<HTMLIFrameElement | null>(null);
-const themes = ref<Theme[]>([] as Theme[]);
 const themesVisible = ref(false);
 const switching = ref(false);
 const selectedTheme = ref<Theme>();
 
-const handleFetchThemes = async () => {
-  try {
+const { data: themes } = useQuery<Theme[]>({
+  queryKey: ["themes"],
+  queryFn: async () => {
     const { data } = await apiClient.theme.listThemes({
       page: 0,
       size: 0,
       uninstalled: false,
     });
-    themes.value = data.items;
-  } catch (e) {
-    console.error("Failed to fetch themes", e);
-  }
-};
+    return data.items;
+  },
+  refetchOnWindowFocus: false,
+  enabled: computed(() => props.visible),
+});
 
 watch(
   () => props.visible,
   (visible) => {
     if (visible) {
-      handleFetchThemes();
       selectedTheme.value = props.theme || activatedTheme?.value;
     } else {
-      themesVisible.value = false;
-      settingsVisible.value = false;
+      setTimeout(() => {
+        themesVisible.value = false;
+        settingsVisible.value = false;
+      }, 200);
     }
   }
 );
@@ -121,38 +124,41 @@ const modalTitle = computed(() => {
 });
 
 // theme settings
-const setting = ref<Setting>();
-const configMap = ref<ConfigMap>();
 const saving = ref(false);
 const settingTabs = ref<SettingTab[]>([] as SettingTab[]);
 const activeSettingTab = ref("");
 const settingsVisible = ref(false);
+
+const { data: setting, refetch: handleFetchSettings } = useQuery<Setting>({
+  queryKey: ["theme-setting", selectedTheme],
+  queryFn: async () => {
+    const { data } = await apiClient.theme.fetchThemeSetting({
+      name: selectedTheme?.value?.metadata.name as string,
+    });
+
+    return data;
+  },
+  refetchOnWindowFocus: false,
+  enabled: computed(() => !!selectedTheme.value?.spec.settingName),
+});
+
+const { data: configMap, refetch: handleFetchConfigMap } = useQuery<ConfigMap>({
+  queryKey: ["theme-configMap", selectedTheme],
+  queryFn: async () => {
+    const { data } = await apiClient.theme.fetchThemeConfig({
+      name: selectedTheme?.value?.metadata.name as string,
+    });
+    return data;
+  },
+  refetchOnWindowFocus: false,
+  enabled: computed(() => !!selectedTheme.value?.spec.configMapName),
+});
 
 const { formSchema, configMapFormData, convertToSave } = useSettingFormConvert(
   setting,
   configMap,
   activeSettingTab
 );
-
-const handleFetchSettings = async () => {
-  if (!selectedTheme?.value) return;
-
-  const { data } = await apiClient.theme.fetchThemeSetting({
-    name: selectedTheme?.value?.metadata.name,
-  });
-
-  setting.value = data;
-};
-
-const handleFetchConfigMap = async () => {
-  if (!selectedTheme?.value) return;
-
-  const { data } = await apiClient.theme.fetchThemeConfig({
-    name: selectedTheme?.value?.metadata.name,
-  });
-
-  configMap.value = data;
-};
 
 const handleSaveConfigMap = async () => {
   saving.value = true;
@@ -164,7 +170,7 @@ const handleSaveConfigMap = async () => {
     return;
   }
 
-  const { data: newConfigMap } = await apiClient.theme.updateThemeConfig({
+  await apiClient.theme.updateThemeConfig({
     name: selectedTheme?.value?.metadata.name,
     configMap: configMapToUpdate,
   });
@@ -172,7 +178,7 @@ const handleSaveConfigMap = async () => {
   Toast.success(t("core.common.toast.save_success"));
 
   await handleFetchSettings();
-  configMap.value = newConfigMap;
+  await handleFetchConfigMap();
 
   saving.value = false;
 
@@ -310,11 +316,13 @@ const iframeClasses = computed(() => {
         leave-to-class="-translate-x-full"
         appear
       >
-        <div
+        <OverlayScrollbarsComponent
           v-if="themesVisible || settingsVisible"
-          class="relative h-full w-96 overflow-y-auto"
+          element="div"
+          :options="{ scrollbars: { autoHide: 'scroll' } }"
+          class="relative h-full w-96"
           :class="{ '!overflow-hidden': switching }"
-          style="overflow-y: overlay"
+          defer
         >
           <transition
             enter-active-class="transform transition ease-in-out duration-300 delay-150"
@@ -427,7 +435,7 @@ const iframeClasses = computed(() => {
               </VButton>
             </div>
           </transition>
-        </div>
+        </OverlayScrollbarsComponent>
       </transition>
       <div
         class="flex h-full flex-1 items-center justify-center transition-all duration-300"

@@ -9,6 +9,8 @@ import {
   VEntity,
   VEntityField,
   VStatusDot,
+  VDropdown,
+  VDropdownItem,
   Toast,
 } from "@halo-dev/components";
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
@@ -126,28 +128,20 @@ const onEditingModalClose = () => {
     @update:visible="onVisibleChange"
   >
     <template #actions>
-      <FloatingDropdown>
+      <VDropdown>
         <span v-tooltip="$t('core.common.buttons.new')">
           <IconAddCircle />
         </span>
         <template #popper>
-          <div class="w-72 p-4">
-            <ul class="space-y-1">
-              <li
-                v-for="(policyTemplate, index) in policyTemplates"
-                :key="index"
-                v-close-popper
-                class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                @click="handleOpenCreateNewPolicyModal(policyTemplate)"
-              >
-                <span class="truncate">
-                  {{ policyTemplate.spec?.displayName }}
-                </span>
-              </li>
-            </ul>
-          </div>
+          <VDropdownItem
+            v-for="(policyTemplate, index) in policyTemplates"
+            :key="index"
+            @click="handleOpenCreateNewPolicyModal(policyTemplate)"
+          >
+            {{ policyTemplate.spec?.displayName }}
+          </VDropdownItem>
         </template>
-      </FloatingDropdown>
+      </VDropdown>
     </template>
     <VEmpty
       v-if="!policies?.length && !isLoading"
@@ -159,7 +153,7 @@ const onEditingModalClose = () => {
           <VButton @click="handleFetchPolicies">
             {{ $t("core.common.buttons.refresh") }}
           </VButton>
-          <FloatingDropdown>
+          <VDropdown>
             <VButton type="secondary">
               <template #icon>
                 <IconAddCircle class="h-full w-full" />
@@ -167,23 +161,15 @@ const onEditingModalClose = () => {
               {{ $t("core.common.buttons.new") }}
             </VButton>
             <template #popper>
-              <div class="w-72 p-4">
-                <ul class="space-y-1">
-                  <li
-                    v-for="(policyTemplate, index) in policyTemplates"
-                    :key="index"
-                    v-close-popper
-                    class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                    @click="handleOpenCreateNewPolicyModal(policyTemplate)"
-                  >
-                    <span class="truncate">
-                      {{ policyTemplate.spec?.displayName }}
-                    </span>
-                  </li>
-                </ul>
-              </div>
+              <VDropdownItem
+                v-for="(policyTemplate, index) in policyTemplates"
+                :key="index"
+                @click="handleOpenCreateNewPolicyModal(policyTemplate)"
+              >
+                {{ policyTemplate.spec?.displayName }}
+              </VDropdownItem>
             </template>
-          </FloatingDropdown>
+          </VDropdown>
         </VSpace>
       </template>
     </VEmpty>
@@ -219,22 +205,12 @@ const onEditingModalClose = () => {
             </VEntityField>
           </template>
           <template #dropdownItems>
-            <VButton
-              v-close-popper
-              block
-              type="secondary"
-              @click="handleOpenEditingModal(policy)"
-            >
+            <VDropdownItem @click="handleOpenEditingModal(policy)">
               {{ $t("core.common.buttons.edit") }}
-            </VButton>
-            <VButton
-              v-close-popper
-              block
-              type="danger"
-              @click="handleDelete(policy)"
-            >
+            </VDropdownItem>
+            <VDropdownItem type="danger" @click="handleDelete(policy)">
               {{ $t("core.common.buttons.delete") }}
-            </VButton>
+            </VDropdownItem>
           </template>
         </VEntity>
       </li>

@@ -31,6 +31,7 @@ import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.SchemeManager;
+import run.halo.app.extension.Secret;
 import run.halo.app.plugin.extensionpoint.ExtensionDefinition;
 import run.halo.app.plugin.extensionpoint.ExtensionPointDefinition;
 import run.halo.app.search.extension.SearchEngine;
@@ -66,6 +67,7 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
         schemeManager.register(Setting.class);
         schemeManager.register(AnnotationSetting.class);
         schemeManager.register(ConfigMap.class);
+        schemeManager.register(Secret.class);
         schemeManager.register(Theme.class);
         schemeManager.register(Menu.class);
         schemeManager.register(MenuItem.class);

@@ -29,7 +29,6 @@ export default definePlugin({
               group: "content",
               icon: markRaw(IconPages),
               priority: 1,
-              mobile: true,
             },
           },
         },
