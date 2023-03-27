@@ -1,6 +1,5 @@
 import type { App } from "vue";
-import { Dropdown, Menu, Tooltip, VClosePopper, VTooltip } from "floating-vue";
-import "floating-vue/dist/style.css";
+import { VClosePopper, VTooltip } from "@halo-dev/components";
 // @ts-ignore
 import VueGridLayout from "vue-grid-layout";
 import { defaultConfig, plugin as FormKit } from "@formkit/vue";
@@ -17,7 +16,4 @@ export function setupComponents(app: App) {
 
   app.directive("tooltip", VTooltip);
   app.directive("close-popper", VClosePopper);
-  app.component("FloatingDropdown", Dropdown);
-  app.component("FloatingTooltip", Tooltip);
-  app.component("FloatingMenu", Menu);
 }

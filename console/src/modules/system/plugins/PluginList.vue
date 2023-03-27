@@ -11,6 +11,8 @@ import {
   VPagination,
   VSpace,
   VLoading,
+  VDropdown,
+  VDropdownItem,
 } from "@halo-dev/components";
 import PluginListItem from "./components/PluginListItem.vue";
 import PluginUploadModal from "./components/PluginUploadModal.vue";
@@ -226,7 +228,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
-                <FloatingDropdown>
+                <VDropdown>
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
@@ -238,26 +240,19 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                     </span>
                   </div>
                   <template #popper>
-                    <div class="w-52 p-4">
-                      <ul class="space-y-1">
-                        <li
-                          v-for="(enabledItem, index) in EnabledItems"
-                          :key="index"
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                          :class="{
-                            'bg-gray-100':
-                              selectedEnabledItem?.value === enabledItem.value,
-                          }"
-                          @click="handleEnabledItemChange(enabledItem)"
-                        >
-                          <span class="truncate">{{ enabledItem.label }}</span>
-                        </li>
-                      </ul>
-                    </div>
+                    <VDropdownItem
+                      v-for="(enabledItem, index) in EnabledItems"
+                      :key="index"
+                      :selected="
+                        enabledItem.value === selectedEnabledItem?.value
+                      "
+                      @click="handleEnabledItemChange(enabledItem)"
+                    >
+                      {{ enabledItem.label }}
+                    </VDropdownItem>
                   </template>
-                </FloatingDropdown>
-                <FloatingDropdown>
+                </VDropdown>
+                <VDropdown>
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
@@ -269,21 +264,16 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
                     </span>
                   </div>
                   <template #popper>
-                    <div class="w-72 p-4">
-                      <ul class="space-y-1">
-                        <li
-                          v-for="(sortItem, index) in SortItems"
-                          :key="index"
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                          @click="handleSortItemChange(sortItem)"
-                        >
-                          <span class="truncate">{{ sortItem.label }}</span>
-                        </li>
-                      </ul>
-                    </div>
+                    <VDropdownItem
+                      v-for="(sortItem, index) in SortItems"
+                      :key="index"
+                      :selected="sortItem.value === selectedSortItem?.value"
+                      @click="handleSortItemChange(sortItem)"
+                    >
+                      {{ sortItem.label }}
+                    </VDropdownItem>
                   </template>
-                </FloatingDropdown>
+                </VDropdown>
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"

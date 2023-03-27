@@ -17,6 +17,7 @@ import {
   VEntity,
   VEntityField,
   VLoading,
+  VDropdownItem,
 } from "@halo-dev/components";
 import TagEditingModal from "./components/TagEditingModal.vue";
 import PostTag from "./components/PostTag.vue";
@@ -242,24 +243,19 @@ onMounted(async () => {
                   v-if="currentUserHasPermission(['system:posts:manage'])"
                   #dropdownItems
                 >
-                  <VButton
+                  <VDropdownItem
                     v-permission="['system:posts:manage']"
-                    v-close-popper
-                    block
-                    type="secondary"
                     @click="handleOpenEditingModal(tag)"
                   >
                     {{ $t("core.common.buttons.edit") }}
-                  </VButton>
-                  <VButton
+                  </VDropdownItem>
+                  <VDropdownItem
                     v-permission="['system:posts:manage']"
-                    v-close-popper
-                    block
                     type="danger"
                     @click="handleDelete(tag)"
                   >
                     {{ $t("core.common.buttons.delete") }}
-                  </VButton>
+                  </VDropdownItem>
                 </template>
               </VEntity>
             </li>

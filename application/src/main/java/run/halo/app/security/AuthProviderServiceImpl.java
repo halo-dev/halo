@@ -106,11 +106,26 @@ public class AuthProviderServiceImpl implements AuthProviderService {
         return client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG)
             .flatMap(configMap -> {
                 SystemSetting.AuthProvider authProvider = getAuthProvider(configMap);
-                final Map<String, String> data = configMap.getData();
                 consumer.accept(authProvider.getEnabled());
-                data.put(SystemSetting.AuthProvider.GROUP, JsonUtils.objectToJson(authProvider));
-                return client.update(configMap);
+                return fetchPrivilegedProviders()
+                    .doOnNext(privileged -> {
+                        authProvider.getEnabled().addAll(privileged);
+                    })
+                    .then(Mono.defer(() -> {
+                        final Map<String, String> data = configMap.getData();
+                        data.put(SystemSetting.AuthProvider.GROUP,
+                            JsonUtils.objectToJson(authProvider));
+                        return client.update(configMap);
+                    }));
             });
+    }
+
+    private Mono<List<String>> fetchPrivilegedProviders() {
+        return client.list(AuthProvider.class,
+                provider -> privileged(provider),
+                null)
+            .map(provider -> provider.getMetadata().getName())
+            .collectList();
     }
 
     private ListedAuthProvider convertTo(AuthProvider authProvider) {
@@ -127,12 +142,18 @@ public class AuthProviderServiceImpl implements AuthProviderService {
             .supportsBinding(supportsBinding(authProvider))
             .isBound(false)
             .enabled(false)
+            .privileged(privileged(authProvider))
             .build();
     }
 
     private static boolean supportsBinding(AuthProvider authProvider) {
         return BooleanUtils.TRUE.equals(MetadataUtil.nullSafeLabels(authProvider)
             .get(AuthProvider.AUTH_BINDING_LABEL));
+    }
+    
+    private boolean privileged(AuthProvider authProvider) {
+        return BooleanUtils.TRUE.equals(MetadataUtil.nullSafeLabels(authProvider)
+            .get(AuthProvider.PRIVILEGED_LABEL));
     }
 
     @NonNull
@@ -154,8 +175,6 @@ public class AuthProviderServiceImpl implements AuthProviderService {
         if (authProvider.getEnabled() == null) {
             authProvider.setEnabled(new HashSet<>());
         }
-        // default enable local auth provider
-        authProvider.getEnabled().add("local");
         return authProvider;
     }
 }

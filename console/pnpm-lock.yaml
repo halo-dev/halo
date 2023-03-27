@@ -65,7 +65,6 @@ importers:
       eslint-plugin-cypress: ^2.12.1
       eslint-plugin-vue: ^9.8.0
       fastq: ^1.15.0
-      floating-vue: 2.0.0-beta.20
       fuse.js: ^6.6.2
       husky: ^8.0.2
       jsdom: ^20.0.3
@@ -139,7 +138,6 @@ importers:
       dayjs: 1.11.6
       emoji-mart: 5.3.3
       fastq: 1.15.0
-      floating-vue: 2.0.0-beta.20_vue@3.2.45
       fuse.js: 6.6.2
       jsencrypt: 3.3.2
       lodash.clonedeep: 4.5.0
@@ -243,6 +241,7 @@ importers:
       '@histoire/plugin-vue': ^0.11.7
       '@iconify-json/ri': ^1.1.4
       codemirror: ^6.0.1
+      floating-vue: 2.0.0-beta.20
       histoire: ^0.11.7
       unplugin-icons: ^0.14.14
       vite-plugin-dts: ^1.7.1
@@ -259,6 +258,7 @@ importers:
       '@codemirror/state': 6.1.4
       '@codemirror/view': 6.5.1
       codemirror: 6.0.1_@lezer+common@1.0.1
+      floating-vue: 2.0.0-beta.20_vue@3.2.45
       vue: 3.2.45
       vue-router: 4.1.6_vue@3.2.45
     devDependencies:
@@ -2645,8 +2645,8 @@ packages:
     dependencies:
       '@babel/parser': 7.21.2
       '@babel/traverse': 7.21.2
-      '@intlify/message-compiler': 9.3.0-beta.16
-      '@intlify/shared': 9.3.0-beta.16
+      '@intlify/message-compiler': 9.3.0-beta.17
+      '@intlify/shared': 9.3.0-beta.17
       jsonc-eslint-parser: 1.4.1
       source-map: 0.6.1
       vue-i18n: 9.2.2_vue@3.2.45
@@ -2677,11 +2677,11 @@ packages:
       '@intlify/shared': 9.2.2
       source-map: 0.6.1
 
-  /@intlify/message-compiler/9.3.0-beta.16:
-    resolution: {integrity: sha512-CGQI3xRcs1ET75eDQ0DUy3MRYOqTauRIIgaMoISKiF83gqRWg93FqN8lGMKcpBqaF4tI0JhsfosCaGiBL9+dnw==}
+  /@intlify/message-compiler/9.3.0-beta.17:
+    resolution: {integrity: sha512-i7hvVIRk1Ax2uKa9xLRJCT57to08OhFMhFXXjWN07rmx5pWQYQ23MfX1xgggv9drnWTNhqEiD+u4EJeHoS5+Ww==}
     engines: {node: '>= 14'}
     dependencies:
-      '@intlify/shared': 9.3.0-beta.16
+      '@intlify/shared': 9.3.0-beta.17
       source-map: 0.6.1
     dev: true
 
@@ -2689,8 +2689,8 @@ packages:
     resolution: {integrity: sha512-wRwTpsslgZS5HNyM7uDQYZtxnbI12aGiBZURX3BTR9RFIKKRWpllTsgzHWvj3HKm3Y2Sh5LPC1r0PDCKEhVn9Q==}
     engines: {node: '>= 14'}
 
-  /@intlify/shared/9.3.0-beta.16:
-    resolution: {integrity: sha512-kXbm4svALe3lX+EjdJxfnabOphqS4yQ1Ge/iIlR8tvUiYRCoNz3hig1M4336iY++Dfx5ytEQJPNjIcknNIuvig==}
+  /@intlify/shared/9.3.0-beta.17:
+    resolution: {integrity: sha512-mscf7RQsUTOil35jTij4KGW1RC9SWQjYScwLxP53Ns6g24iEd5HN7ksbt9O6FvTmlQuX77u+MXpBdfJsGqizLQ==}
     engines: {node: '>= 14'}
     dev: true
 
@@ -2710,7 +2710,7 @@ packages:
         optional: true
     dependencies:
       '@intlify/bundle-utils': 5.0.1_vue-i18n@9.2.2
-      '@intlify/shared': 9.3.0-beta.16
+      '@intlify/shared': 9.3.0-beta.17
       '@rollup/pluginutils': 5.0.2_rollup@2.79.1
       '@vue/compiler-sfc': 3.2.47
       debug: 4.3.4
@@ -2770,7 +2770,7 @@ packages:
     resolution: {integrity: sha512-m7O9o2uR8k2ObDysZYzdfhb08VuEml5oWGiosa1VdaPZ/A6QyPkAJuwN0Q1lhULOf6B7MtQmHENS743hWtCrgw==}
     dependencies:
       '@jridgewell/gen-mapping': 0.3.2
-      '@jridgewell/trace-mapping': 0.3.15
+      '@jridgewell/trace-mapping': 0.3.17
     dev: true
 
   /@jridgewell/sourcemap-codec/1.4.14:
@@ -10097,7 +10097,7 @@ packages:
     hasBin: true
     dependencies:
       '@jridgewell/source-map': 0.3.2
-      acorn: 8.8.1
+      acorn: 8.8.2
       commander: 2.20.3
       source-map-support: 0.5.21
     dev: true

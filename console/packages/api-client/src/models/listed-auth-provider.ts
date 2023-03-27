@@ -80,6 +80,12 @@ export interface ListedAuthProvider {
   supportsBinding?: boolean;
   /**
    *
+   * @type {boolean}
+   * @memberof ListedAuthProvider
+   */
+  privileged?: boolean;
+  /**
+   *
    * @type {string}
    * @memberof ListedAuthProvider
    */
