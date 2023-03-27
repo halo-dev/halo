@@ -1,5 +1,7 @@
 package run.halo.app.metrics;
 
+import static org.apache.commons.lang3.BooleanUtils.isFalse;
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.time.Duration;
@@ -8,6 +10,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.comment.ReplyService;
 import run.halo.app.core.extension.content.Comment;
@@ -62,6 +65,13 @@ public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecy
                 // total reply count
                 status.setReplyCount(replies.size());
 
+                long visibleReplyCount = replies.stream()
+                    .filter(reply -> isTrue(reply.getSpec().getApproved())
+                        && isFalse(reply.getSpec().getHidden())
+                    )
+                    .count();
+                status.setVisibleReplyCount((int) visibleReplyCount);
+
                 // calculate last reply time
                 Instant lastReplyTime = replies.stream()
                     .findFirst()
@@ -73,6 +83,7 @@ public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecy
 
                 Instant lastReadTime = comment.getSpec().getLastReadTime();
                 status.setUnreadReplyCount(Comment.getUnreadReplyCount(replies, lastReadTime));
+                status.setHasNewReply(defaultIfNull(status.getUnreadReplyCount(), 0) > 0);
 
                 client.update(comment);
             });
@@ -107,8 +118,13 @@ public class ReplyEventReconciler implements Reconciler<ReplyEvent>, SmartLifecy
         return this.running;
     }
 
-    @EventListener(ReplyEvent.class)
-    public void onReplyAdded(ReplyEvent replyEvent) {
-        replyEventQueue.addImmediately(replyEvent);
+    @Component
+    public class ReplyEventListener {
+
+        @Async
+        @EventListener(ReplyEvent.class)
+        public void onReplyEvent(ReplyEvent replyEvent) {
+            replyEventQueue.addImmediately(replyEvent);
+        }
     }
 }

@@ -142,7 +142,9 @@ public class HaloPluginManager extends DefaultPluginManager
         }
         try {
             log.info("Stop plugin '{}'", getPluginLabel(pluginDescriptor));
-            pluginWrapper.getPlugin().stop();
+            if (pluginWrapper.getPlugin() != null) {
+                pluginWrapper.getPlugin().stop();
+            }
             pluginWrapper.setPluginState(PluginState.STOPPED);
             // release plugin resources
             releaseAdditionalResources(pluginId);
@@ -304,7 +306,9 @@ public class HaloPluginManager extends DefaultPluginManager
                     rootApplicationContext.publishEvent(
                         new HaloPluginBeforeStopEvent(this, pluginWrapper));
                     log.info("Stop plugin '{}'", getPluginLabel(pluginWrapper.getDescriptor()));
-                    pluginWrapper.getPlugin().stop();
+                    if (pluginWrapper.getPlugin() != null) {
+                        pluginWrapper.getPlugin().stop();
+                    }
                     pluginWrapper.setPluginState(PluginState.STOPPED);
                     itr.remove();
                     releaseAdditionalResources(pluginWrapper.getPluginId());

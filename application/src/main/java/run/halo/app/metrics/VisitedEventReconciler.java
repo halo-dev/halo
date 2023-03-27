@@ -4,16 +4,22 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.event.post.VisitedEvent;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.extension.Scheme;
+import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.DefaultController;
@@ -88,11 +94,6 @@ public class VisitedEventReconciler
             Duration.ofMinutes(5));
     }
 
-    @EventListener(VisitedEvent.class)
-    public void handlePostPublished(VisitedEvent visitedEvent) {
-        mergeVisits(visitedEvent);
-    }
-
     @Override
     public void start() {
         this.visitedEventController.start();
@@ -121,18 +122,53 @@ public class VisitedEventReconciler
         return this.running;
     }
 
-    private void mergeVisits(VisitedEvent event) {
-        String counterName =
-            MeterUtils.nameOf(event.getGroup(), event.getPlural(), event.getName());
-        pooledVisitsMap.compute(counterName, (name, visits) -> {
-            if (visits == null) {
-                return 1;
-            } else {
-                return visits + 1;
-            }
-        });
+    public record VisitCountBucket(String name, int visits) {
     }
 
-    public record VisitCountBucket(String name, int visits) {
+    @Component
+    @RequiredArgsConstructor
+    public class VisitedEventListener {
+        private final SchemeManager schemeManager;
+
+        @Async
+        @EventListener(VisitedEvent.class)
+        public void onVisited(VisitedEvent visitedEvent) {
+            mergeVisits(visitedEvent);
+        }
+
+        private void mergeVisits(VisitedEvent event) {
+            var gpn = new GroupPluralName(event.getGroup(), event.getPlural(), event.getName());
+            if (!checkVisitSubject(gpn)) {
+                log.debug("Skip visit event for: {}", gpn);
+                return;
+            }
+            String counterName =
+                MeterUtils.nameOf(event.getGroup(), event.getPlural(), event.getName());
+            pooledVisitsMap.compute(counterName, (name, visits) -> {
+                if (visits == null) {
+                    return 1;
+                } else {
+                    return visits + 1;
+                }
+            });
+        }
+
+        private boolean checkVisitSubject(GroupPluralName groupPluralName) {
+            Optional<Scheme> schemeOptional = schemeManager.schemes().stream()
+                .filter(scheme -> {
+                    GroupVersionKind gvk = scheme.groupVersionKind();
+                    return scheme.plural().equals(groupPluralName.plural())
+                        && gvk.group().equals(groupPluralName.group());
+                })
+                .findFirst();
+            return schemeOptional.map(
+                    scheme -> client.fetch(scheme.groupVersionKind(), groupPluralName.name())
+                        .isPresent()
+                )
+                .orElse(false);
+        }
+
+        record GroupPluralName(String group, String plural, String name) {
+        }
     }
 }

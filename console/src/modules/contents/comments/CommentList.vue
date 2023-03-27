@@ -11,6 +11,8 @@ import {
   VEmpty,
   Dialog,
   VLoading,
+  VDropdown,
+  VDropdownItem,
   Toast,
 } from "@halo-dev/components";
 import CommentListItem from "./components/CommentListItem.vue";
@@ -384,7 +386,7 @@ const handleApproveInBatch = async () => {
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
-                <FloatingDropdown>
+                <VDropdown>
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
@@ -396,28 +398,18 @@ const handleApproveInBatch = async () => {
                     </span>
                   </div>
                   <template #popper>
-                    <div class="w-72 p-4">
-                      <ul class="space-y-1">
-                        <li
-                          v-for="(filterItem, index) in ApprovedFilterItems"
-                          :key="index"
-                          v-close-popper
-                          :class="{
-                            'bg-gray-100':
-                              selectedApprovedFilterItem.value ===
-                              filterItem.value,
-                          }"
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                          @click="handleApprovedFilterItemChange(filterItem)"
-                        >
-                          <span class="truncate">
-                            {{ filterItem.label }}
-                          </span>
-                        </li>
-                      </ul>
-                    </div>
+                    <VDropdownItem
+                      v-for="(filterItem, index) in ApprovedFilterItems"
+                      :key="index"
+                      :selected="
+                        selectedApprovedFilterItem.value === filterItem.value
+                      "
+                      @click="handleApprovedFilterItemChange(filterItem)"
+                    >
+                      {{ filterItem.label }}
+                    </VDropdownItem>
                   </template>
-                </FloatingDropdown>
+                </VDropdown>
                 <UserDropdownSelector
                   v-model:selected="selectedUser"
                   @select="handleSelectUser"
@@ -433,7 +425,7 @@ const handleApproveInBatch = async () => {
                     </span>
                   </div>
                 </UserDropdownSelector>
-                <FloatingDropdown>
+                <VDropdown>
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
@@ -445,27 +437,18 @@ const handleApproveInBatch = async () => {
                     </span>
                   </div>
                   <template #popper>
-                    <div class="w-72 p-4">
-                      <ul class="space-y-1">
-                        <li
-                          v-for="(filterItem, index) in SortFilterItems"
-                          :key="index"
-                          v-close-popper
-                          :class="{
-                            'bg-gray-100':
-                              selectedSortFilterItem.value === filterItem.value,
-                          }"
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                          @click="handleSortFilterItemChange(filterItem)"
-                        >
-                          <span class="truncate">
-                            {{ filterItem.label }}
-                          </span>
-                        </li>
-                      </ul>
-                    </div>
+                    <VDropdownItem
+                      v-for="(filterItem, index) in SortFilterItems"
+                      :key="index"
+                      :selected="
+                        selectedSortFilterItem.value === filterItem.value
+                      "
+                      @click="handleSortFilterItemChange(filterItem)"
+                    >
+                      {{ filterItem.label }}
+                    </VDropdownItem>
                   </template>
-                </FloatingDropdown>
+                </VDropdown>
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"

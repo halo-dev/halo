@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import {
   IconList,
-  VButton,
   VStatusDot,
   VEntity,
   VEntityField,
+  VDropdownItem,
 } from "@halo-dev/components";
 import Draggable from "vuedraggable";
 import type { CategoryTree } from "../utils";
@@ -111,24 +111,19 @@ function onDelete(category: CategoryTree) {
             v-if="currentUserHasPermission(['system:posts:manage'])"
             #dropdownItems
           >
-            <VButton
+            <VDropdownItem
               v-permission="['system:posts:manage']"
-              v-close-popper
-              block
-              type="secondary"
               @click="onOpenEditingModal(category)"
             >
               {{ $t("core.common.buttons.edit") }}
-            </VButton>
-            <VButton
+            </VDropdownItem>
+            <VDropdownItem
               v-permission="['system:posts:manage']"
-              v-close-popper
-              block
               type="danger"
               @click="onDelete(category)"
             >
               {{ $t("core.common.buttons.delete") }}
-            </VButton>
+            </VDropdownItem>
           </template>
         </VEntity>
         <CategoryListItem

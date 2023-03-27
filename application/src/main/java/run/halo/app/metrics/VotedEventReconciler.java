@@ -2,16 +2,22 @@ package run.halo.app.metrics;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.event.post.DownvotedEvent;
 import run.halo.app.event.post.UpvotedEvent;
 import run.halo.app.event.post.VotedEvent;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.GroupVersionKind;
+import run.halo.app.extension.Scheme;
+import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.DefaultController;
@@ -77,11 +83,6 @@ public class VotedEventReconciler implements Reconciler<VotedEvent>, SmartLifecy
             Duration.ofMinutes(5));
     }
 
-    @EventListener(VotedEvent.class)
-    public void handlePostPublished(VotedEvent votedEvent) {
-        votedEventQueue.addImmediately(votedEvent);
-    }
-
     @Override
     public void start() {
         this.votedEventController.start();
@@ -97,5 +98,44 @@ public class VotedEventReconciler implements Reconciler<VotedEvent>, SmartLifecy
     @Override
     public boolean isRunning() {
         return this.running;
+    }
+
+    @Component
+    @RequiredArgsConstructor
+    public class VotedEventListener {
+        private final SchemeManager schemeManager;
+
+        /**
+         * Add up/down vote event to queue.
+         */
+        @Async
+        @EventListener(VotedEvent.class)
+        public void onVoted(VotedEvent event) {
+            var gpn = new GroupPluralName(event.getGroup(), event.getPlural(), event.getName());
+            if (!checkSubject(gpn)) {
+                log.debug("Skip voted event for: {}", gpn);
+                return;
+            }
+            votedEventQueue.addImmediately(event);
+        }
+
+        private boolean checkSubject(
+            GroupPluralName groupPluralName) {
+            Optional<Scheme> schemeOptional = schemeManager.schemes().stream()
+                .filter(scheme -> {
+                    GroupVersionKind gvk = scheme.groupVersionKind();
+                    return scheme.plural().equals(groupPluralName.plural())
+                        && gvk.group().equals(groupPluralName.group());
+                })
+                .findFirst();
+            return schemeOptional.map(
+                    scheme -> client.fetch(scheme.groupVersionKind(), groupPluralName.name())
+                        .isPresent()
+                )
+                .orElse(false);
+        }
+
+        record GroupPluralName(String group, String plural, String name) {
+        }
     }
 }
