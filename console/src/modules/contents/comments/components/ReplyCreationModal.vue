@@ -5,6 +5,7 @@ import {
   VButton,
   IconMotionLine,
   Toast,
+  VDropdown,
 } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import type {
@@ -172,14 +173,14 @@ watchEffect(() => {
       ></FormKit>
     </FormKit>
     <div class="mt-2 flex justify-end">
-      <FloatingDropdown>
+      <VDropdown :classes="['!p-0']">
         <IconMotionLine
           class="h-5 w-5 cursor-pointer text-gray-500 transition-all hover:text-gray-900"
         />
         <template #popper>
           <div ref="emojiPickerRef"></div>
         </template>
-      </FloatingDropdown>
+      </VDropdown>
     </div>
     <template #footer>
       <VSpace>

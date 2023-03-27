@@ -1,7 +1,13 @@
 <script lang="ts" setup>
 import BasicLayout from "@/layouts/BasicLayout.vue";
 import { apiClient } from "@/utils/api-client";
-import { VButton, VSpace, VTabbar, VAvatar } from "@halo-dev/components";
+import {
+  VButton,
+  VTabbar,
+  VAvatar,
+  VDropdown,
+  VDropdownItem,
+} from "@halo-dev/components";
 import {
   computed,
   onMounted,
@@ -141,32 +147,19 @@ const handleTabChange = (id: string) => {
               currentUserHasPermission(['system:users:manage']) || isCurrentUser
             "
           >
-            <FloatingDropdown>
+            <VDropdown>
               <VButton type="default">
                 {{ $t("core.common.buttons.edit") }}
               </VButton>
               <template #popper>
-                <div class="w-48 p-2">
-                  <VSpace class="w-full" direction="column">
-                    <VButton
-                      v-close-popper
-                      block
-                      type="secondary"
-                      @click="editingModal = true"
-                    >
-                      {{ $t("core.user.detail.actions.update_profile.title") }}
-                    </VButton>
-                    <VButton
-                      v-close-popper
-                      block
-                      @click="passwordChangeModal = true"
-                    >
-                      {{ $t("core.user.detail.actions.change_password.title") }}
-                    </VButton>
-                  </VSpace>
-                </div>
+                <VDropdownItem @click="editingModal = true">
+                  {{ $t("core.user.detail.actions.update_profile.title") }}
+                </VDropdownItem>
+                <VDropdownItem @click="passwordChangeModal = true">
+                  {{ $t("core.user.detail.actions.change_password.title") }}
+                </VDropdownItem>
               </template>
-            </FloatingDropdown>
+            </VDropdown>
           </div>
         </div>
       </div>

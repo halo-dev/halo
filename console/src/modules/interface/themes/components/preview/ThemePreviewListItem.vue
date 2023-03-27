@@ -1,7 +1,12 @@
 <script lang="ts" setup>
 import LazyImage from "@/components/image/LazyImage.vue";
 import type { Theme } from "@halo-dev/api-client";
-import { VEntity, VEntityField, VTag, VButton } from "@halo-dev/components";
+import {
+  VEntity,
+  VEntityField,
+  VTag,
+  VDropdownItem,
+} from "@halo-dev/components";
 import { toRefs } from "vue";
 import { useThemeLifeCycle } from "../../composables/use-theme";
 
@@ -75,23 +80,12 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
     </template>
 
     <template #dropdownItems>
-      <VButton
-        v-if="!isActivated"
-        v-close-popper
-        block
-        type="secondary"
-        @click="handleActiveTheme"
-      >
+      <VDropdownItem v-if="!isActivated" @click="handleActiveTheme">
         {{ $t("core.common.buttons.active") }}
-      </VButton>
-      <VButton
-        v-close-popper
-        block
-        type="default"
-        @click="emit('open-settings')"
-      >
+      </VDropdownItem>
+      <VDropdownItem @click="emit('open-settings')">
         {{ $t("core.common.buttons.setting") }}
-      </VButton>
+      </VDropdownItem>
     </template>
   </VEntity>
 </template>

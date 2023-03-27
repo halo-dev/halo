@@ -16,6 +16,7 @@ import {
   VEntityField,
   VLoading,
   Toast,
+  VDropdownItem,
 } from "@halo-dev/components";
 import PostTag from "./tags/components/PostTag.vue";
 import { ref, watch } from "vue";
@@ -435,22 +436,15 @@ function handleClearKeyword() {
                 v-if="currentUserHasPermission(['system:posts:manage'])"
                 #dropdownItems
               >
-                <VButton
-                  v-close-popper
-                  block
+                <VDropdownItem
                   type="danger"
                   @click="handleDeletePermanently(post.post)"
                 >
                   {{ $t("core.common.buttons.delete_permanently") }}
-                </VButton>
-                <VButton
-                  v-close-popper
-                  block
-                  type="default"
-                  @click="handleRecovery(post.post)"
-                >
+                </VDropdownItem>
+                <VDropdownItem @click="handleRecovery(post.post)">
                   {{ $t("core.common.buttons.recovery") }}
-                </VButton>
+                </VDropdownItem>
               </template>
             </VEntity>
           </li>
