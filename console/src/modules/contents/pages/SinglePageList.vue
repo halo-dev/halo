@@ -413,11 +413,6 @@ const changeVisibleByIcon = async (singlePage: SinglePage) => {
     name: singlePage.metadata.name,
     singlePage: singlePageToUpdate,
   });
-  const { data } =
-    await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
-      name: singlePage.metadata.name,
-    });
-  selectedSinglePage.value = data;
   await refetch();
   Toast.success(t("core.common.toast.operation_success"));
 };
