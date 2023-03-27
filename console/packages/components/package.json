@@ -71,6 +71,7 @@
     "@codemirror/legacy-modes": "^6.3.0",
     "@codemirror/state": "^6.1.4",
     "@codemirror/view": "^6.5.1",
-    "codemirror": "^6.0.1"
+    "codemirror": "^6.0.1",
+    "floating-vue": "2.0.0-beta.20"
   }
 }

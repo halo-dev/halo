@@ -57,6 +57,10 @@ class AuthProviderServiceImplTest {
         when(client.fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG)))
             .thenReturn(Mono.just(configMap));
 
+        AuthProvider local = createAuthProvider("local");
+        local.getMetadata().getLabels().put(AuthProvider.PRIVILEGED_LABEL, "true");
+        when(client.list(eq(AuthProvider.class), any(), any())).thenReturn(Flux.just(local));
+
         // Call the method being tested
         Mono<AuthProvider> result = authProviderService.enable("github");
 
@@ -77,6 +81,10 @@ class AuthProviderServiceImplTest {
         // Create a test auth provider
         AuthProvider authProvider = createAuthProvider("github");
         when(client.get(eq(AuthProvider.class), eq("github"))).thenReturn(Mono.just(authProvider));
+
+        AuthProvider local = createAuthProvider("local");
+        local.getMetadata().getLabels().put(AuthProvider.PRIVILEGED_LABEL, "true");
+        when(client.list(eq(AuthProvider.class), any(), any())).thenReturn(Flux.just(local));
 
         ArgumentCaptor<ConfigMap> captor = ArgumentCaptor.forClass(ConfigMap.class);
         when(client.update(captor.capture())).thenReturn(Mono.empty());
@@ -135,19 +143,22 @@ class AuthProviderServiceImplTest {
                                 "displayName": "github",
                                 "bindingUrl": "fake-binding-url",
                                 "enabled": true,
-                                "isBound": false
+                                "isBound": false,
+                                "privileged": false
                             }, {
                                 "name": "gitlab",
                                 "displayName": "gitlab",
                                 "bindingUrl": "fake-binding-url",
                                 "enabled": false,
-                                "isBound": false
+                                "isBound": false,
+                                "privileged": false
                             },{
-                            
+                                                        
                                 "name": "gitee",
                                 "displayName": "gitee",
                                 "enabled": false,
-                                "isBound": false
+                                "isBound": false,
+                                "privileged": false
                             }]
                             """,
                         JsonUtils.objectToJson(result),
@@ -163,6 +174,7 @@ class AuthProviderServiceImplTest {
         AuthProvider authProvider = new AuthProvider();
         authProvider.setMetadata(new Metadata());
         authProvider.getMetadata().setName(name);
+        authProvider.getMetadata().setLabels(new HashMap<>());
         authProvider.setSpec(new AuthProvider.AuthProviderSpec());
         authProvider.getSpec().setDisplayName(name);
         return authProvider;

@@ -5,9 +5,9 @@ import {
   IconUserSettings,
   VTag,
   VAvatar,
-  VSpace,
-  VButton,
   Dialog,
+  VDropdown,
+  VDropdownItem,
 } from "@halo-dev/components";
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
@@ -273,36 +273,26 @@ onMounted(() => {
               </VTag>
             </div>
           </div>
-          <FloatingDropdown
+          <VDropdown
             class="profile-control cursor-pointer rounded p-1 transition-all hover:bg-gray-100"
           >
             <IconMore />
             <template #popper>
-              <div class="w-48 p-2">
-                <VSpace class="w-full" direction="column">
-                  <VButton
-                    v-close-popper
-                    block
-                    type="secondary"
-                    :route="{
-                      name: 'UserDetail',
-                      params: { name: '-' },
-                    }"
-                  >
-                    {{ $t("core.sidebar.operations.profile.button") }}
-                  </VButton>
-                  <VButton
-                    v-close-popper
-                    block
-                    type="default"
-                    @click="handleLogout"
-                  >
-                    {{ $t("core.sidebar.operations.logout.button") }}
-                  </VButton>
-                </VSpace>
-              </div>
+              <VDropdownItem
+                @click="
+                  $router.push({
+                    name: 'UserDetail',
+                    params: { name: '-' },
+                  })
+                "
+              >
+                {{ $t("core.sidebar.operations.profile.button") }}
+              </VDropdownItem>
+              <VDropdownItem @click="handleLogout">
+                {{ $t("core.sidebar.operations.logout.button") }}
+              </VDropdownItem>
             </template>
-          </FloatingDropdown>
+          </VDropdown>
         </div>
       </div>
     </aside>
@@ -327,14 +317,9 @@ onMounted(() => {
         <div
           class="flex w-full cursor-pointer items-center justify-center p-1 text-white"
         >
-          <div
-            class="is-active is-active0 flex h-10 w-10 flex-col items-center justify-center"
-          >
+          <div class="flex h-10 w-10 flex-col items-center justify-center">
             <div class="text-base">
               <Component :is="menu?.icon" />
-            </div>
-            <div class="mt-0.5 text-xs">
-              {{ menu?.name }}
             </div>
           </div>
         </div>
@@ -343,14 +328,9 @@ onMounted(() => {
         <div
           class="flex w-full cursor-pointer items-center justify-center p-1 text-white"
         >
-          <div
-            class="is-active is-active0 flex h-10 w-10 flex-col items-center justify-center"
-          >
+          <div class="flex h-10 w-10 flex-col items-center justify-center">
             <div class="text-base">
               <IconMore />
-            </div>
-            <div class="mt-0.5 text-xs">
-              {{ $t("core.sidebar.operations.more.button") }}
             </div>
           </div>
         </div>

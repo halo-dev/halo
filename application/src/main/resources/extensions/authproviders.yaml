@@ -2,6 +2,8 @@ apiVersion: auth.halo.run/v1alpha1
 kind: AuthProvider
 metadata:
   name: local
+  labels:
+    auth.halo.run/privileged: "true"
   finalizers:
     - system-protection
 spec:

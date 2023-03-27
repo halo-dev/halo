@@ -76,11 +76,18 @@ const handleChangeStatus = async () => {
       </VEntityField>
     </template>
     <template #end>
-      <VEntityField v-permission="['system:plugins:manage']">
+      <VEntityField>
         <template #description>
           <div class="flex items-center">
             <VSwitch
+              v-tooltip="{
+                disabled: !authProvider.privileged,
+                content: $t(
+                  'core.identity_authentication.operations.disable_privileged.tooltip'
+                ),
+              }"
               :model-value="authProvider.enabled"
+              :disabled="authProvider.privileged"
               @click="handleChangeStatus"
             />
           </div>
