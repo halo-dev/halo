@@ -1,14 +1,15 @@
 <script lang="ts" setup>
 import {
   IconGitHub,
-  VButton,
-  VSpace,
   VTag,
   VEntity,
   VEntityField,
   VStatusDot,
   Dialog,
   Toast,
+  VDropdownItem,
+  VDropdown,
+  VDropdownDivider,
 } from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
 import type { Theme } from "@halo-dev/api-client";
@@ -192,58 +193,40 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
       v-if="currentUserHasPermission(['system:themes:manage'])"
       #dropdownItems
     >
-      <VButton
-        v-if="!isActivated"
-        v-close-popper
-        block
-        type="secondary"
-        @click="handleActiveTheme"
-      >
+      <VDropdownItem v-if="!isActivated" @click="handleActiveTheme">
         {{ $t("core.common.buttons.active") }}
-      </VButton>
-      <VButton v-close-popper block type="default" @click="emit('upgrade')">
+      </VDropdownItem>
+      <VDropdownItem @click="emit('upgrade')">
         {{ $t("core.common.buttons.upgrade") }}
-      </VButton>
-      <VButton v-close-popper block type="default" @click="emit('preview')">
+      </VDropdownItem>
+      <VDropdownItem @click="emit('preview')">
         {{ $t("core.common.buttons.preview") }}
-      </VButton>
-      <FloatingDropdown class="w-full" placement="right" :triggers="['click']">
-        <VButton block type="danger">
+      </VDropdownItem>
+      <VDropdownDivider />
+      <VDropdown placement="right" :triggers="['click']">
+        <VDropdownItem type="danger">
           {{ $t("core.common.buttons.uninstall") }}
-        </VButton>
+        </VDropdownItem>
         <template #popper>
-          <div class="w-52 p-2">
-            <VSpace class="w-full" direction="column">
-              <VButton
-                v-close-popper.all
-                block
-                type="danger"
-                @click="handleUninstall(theme)"
-              >
-                {{ $t("core.common.buttons.uninstall") }}
-              </VButton>
-              <VButton
-                v-close-popper.all
-                block
-                type="danger"
-                @click="handleUninstall(theme, true)"
-              >
-                {{
-                  $t("core.theme.operations.uninstall_and_delete_config.button")
-                }}
-              </VButton>
-            </VSpace>
-          </div>
+          <VDropdownItem
+            v-close-popper.all
+            type="danger"
+            @click="handleUninstall(theme)"
+          >
+            {{ $t("core.common.buttons.uninstall") }}
+          </VDropdownItem>
+          <VDropdownItem
+            v-close-popper.all
+            type="danger"
+            @click="handleUninstall(theme, true)"
+          >
+            {{ $t("core.theme.operations.uninstall_and_delete_config.button") }}
+          </VDropdownItem>
         </template>
-      </FloatingDropdown>
-      <VButton
-        v-close-popper
-        block
-        type="danger"
-        @click="handleResetSettingConfig"
-      >
+      </VDropdown>
+      <VDropdownItem type="danger" @click="handleResetSettingConfig">
         {{ $t("core.common.buttons.reset") }}
-      </VButton>
+      </VDropdownItem>
     </template>
   </VEntity>
 </template>

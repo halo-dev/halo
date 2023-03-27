@@ -12,6 +12,7 @@ import {
   IconExternalLinkLine,
   VLoading,
   Toast,
+  VDropdownItem,
   VTag,
 } from "@halo-dev/components";
 import ReplyCreationModal from "./ReplyCreationModal.vue";
@@ -386,26 +387,18 @@ const subjectRefResult = computed(() => {
       v-if="currentUserHasPermission(['system:comments:manage'])"
       #dropdownItems
     >
-      <VButton
+      <VDropdownItem
         v-if="!comment?.comment.spec.approved"
-        v-close-popper
-        type="secondary"
-        block
         @click="handleApprove"
       >
         {{ $t("core.comment.operations.approve_comment_in_batch.button") }}
-      </VButton>
-      <VButton
-        v-close-popper
-        type="secondary"
-        block
-        @click="handleApproveReplyInBatch"
-      >
+      </VDropdownItem>
+      <VDropdownItem @click="handleApproveReplyInBatch">
         {{ $t("core.comment.operations.approve_applies_in_batch.button") }}
-      </VButton>
-      <VButton v-close-popper block type="danger" @click="handleDelete">
+      </VDropdownItem>
+      <VDropdownItem type="danger" @click="handleDelete">
         {{ $t("core.common.buttons.delete") }}
-      </VButton>
+      </VDropdownItem>
     </template>
 
     <template v-if="showReplies" #footer>

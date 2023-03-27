@@ -38,4 +38,8 @@ public class ListedAuthProvider {
     Boolean isBound;
 
     Boolean enabled;
+
+    Boolean supportsBinding;
+    
+    Boolean privileged;
 }

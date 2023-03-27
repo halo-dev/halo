@@ -17,11 +17,11 @@ import LazyImage from "@/components/image/LazyImage.vue";
 import ThemePreviewModal from "./preview/ThemePreviewModal.vue";
 import ThemeUploadModal from "./ThemeUploadModal.vue";
 import ThemeListItem from "./components/ThemeListItem.vue";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
-import { onBeforeRouteLeave } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { useQuery } from "@tanstack/vue-query";
 
 const { t } = useI18n();
 
@@ -44,11 +44,8 @@ const emit = defineEmits<{
 }>();
 
 const activeTab = ref("installed");
-const themes = ref<Theme[]>([] as Theme[]);
-const loading = ref(false);
 const themeUploadVisible = ref(false);
 const creating = ref(false);
-const refreshInterval = ref();
 
 const modalTitle = computed(() => {
   return activeTab.value === "installed"
@@ -56,50 +53,35 @@ const modalTitle = computed(() => {
     : t("core.theme.list_modal.titles.not_installed_themes");
 });
 
-const handleFetchThemes = async (options?: { mute?: boolean }) => {
-  try {
-    clearInterval(refreshInterval.value);
-
-    if (!options?.mute) {
-      loading.value = true;
-    }
+const {
+  data: themes,
+  isLoading,
+  isFetching,
+  refetch,
+} = useQuery<Theme[]>({
+  queryKey: ["themes", activeTab],
+  queryFn: async () => {
     const { data } = await apiClient.theme.listThemes({
       page: 0,
       size: 0,
       uninstalled: activeTab.value !== "installed",
     });
-    themes.value = data.items;
-
+    return data.items;
+  },
+  refetchOnWindowFocus: false,
+  refetchInterval(data) {
     if (activeTab.value !== "installed") {
-      return;
+      return false;
     }
 
-    const deletedThemes = themes.value.filter(
+    const deletingThemes = data?.filter(
       (theme) => !!theme.metadata.deletionTimestamp
     );
 
-    if (deletedThemes.length) {
-      refreshInterval.value = setInterval(() => {
-        handleFetchThemes({ mute: true });
-      }, 3000);
-    }
-  } catch (e) {
-    console.error("Failed to fetch themes", e);
-  } finally {
-    loading.value = false;
-  }
-};
-
-onBeforeRouteLeave(() => {
-  clearInterval(refreshInterval.value);
+    return deletingThemes?.length ? 3000 : false;
+  },
+  enabled: computed(() => props.visible),
 });
-
-watch(
-  () => activeTab.value,
-  () => {
-    handleFetchThemes();
-  }
-);
 
 const handleCreateTheme = async (theme: Theme) => {
   try {
@@ -120,7 +102,7 @@ const handleCreateTheme = async (theme: Theme) => {
     console.error("Failed to create theme", error);
   } finally {
     creating.value = false;
-    handleFetchThemes();
+    refetch();
   }
 };
 
@@ -137,19 +119,8 @@ const handleSelectTheme = (theme: Theme) => {
   onVisibleChange(false);
 };
 
-watch(
-  () => props.visible,
-  (visible) => {
-    if (visible) {
-      handleFetchThemes();
-    } else {
-      clearInterval(refreshInterval.value);
-    }
-  }
-);
-
 defineExpose({
-  handleFetchThemes,
+  handleFetchThemes: refetch,
 });
 
 // preview
@@ -193,15 +164,15 @@ const handleOpenInstallModal = () => {
         :label="$t('core.theme.list_modal.tabs.installed')"
         class="-mx-[16px]"
       >
-        <VLoading v-if="loading" />
-        <Transition v-else-if="!themes.length" appear name="fade">
+        <VLoading v-if="isLoading" />
+        <Transition v-else-if="!themes?.length" appear name="fade">
           <VEmpty
             :message="$t('core.theme.list_modal.empty.message')"
             :title="$t('core.theme.list_modal.empty.title')"
           >
             <template #actions>
               <VSpace>
-                <VButton :loading="loading" @click="handleFetchThemes()">
+                <VButton :loading="isFetching" @click="refetch()">
                   {{ $t("core.common.buttons.refresh") }}
                 </VButton>
                 <VButton
@@ -233,7 +204,7 @@ const handleOpenInstallModal = () => {
                 :is-selected="
                   theme.metadata.name === selectedTheme?.metadata?.name
                 "
-                @reload="handleFetchThemes({ mute: true })"
+                @reload="refetch"
                 @preview="handleOpenPreview(theme)"
                 @upgrade="handleOpenUpgradeModal(theme)"
               />
@@ -246,14 +217,14 @@ const handleOpenInstallModal = () => {
         :label="$t('core.theme.list_modal.tabs.not_installed')"
         class="-mx-[16px]"
       >
-        <VLoading v-if="loading" />
-        <Transition v-else-if="!themes.length" appear name="fade">
+        <VLoading v-if="isLoading" />
+        <Transition v-else-if="!themes?.length" appear name="fade">
           <VEmpty
             :title="$t('core.theme.list_modal.not_installed_empty.title')"
           >
             <template #actions>
               <VSpace>
-                <VButton :loading="loading" @click="handleFetchThemes">
+                <VButton :loading="isFetching" @click="refetch">
                   {{ $t("core.common.buttons.refresh") }}
                 </VButton>
               </VSpace>
@@ -372,7 +343,7 @@ const handleOpenInstallModal = () => {
     v-if="visible"
     v-model:visible="themeUploadVisible"
     :upgrade-theme="themeToUpgrade"
-    @close="handleFetchThemes"
+    @close="refetch"
   />
 
   <ThemePreviewModal

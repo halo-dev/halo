@@ -16,6 +16,7 @@ import {
   VStatusDot,
   VLoading,
   Toast,
+  VDropdownItem,
 } from "@halo-dev/components";
 import { ref, watch } from "vue";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
@@ -423,22 +424,15 @@ function handleClearKeyword() {
                 v-if="currentUserHasPermission(['system:singlepages:manage'])"
                 #dropdownItems
               >
-                <VButton
-                  v-close-popper
-                  block
+                <VDropdownItem
                   type="danger"
                   @click="handleDeletePermanently(singlePage.page)"
                 >
                   {{ $t("core.common.buttons.delete_permanently") }}
-                </VButton>
-                <VButton
-                  v-close-popper
-                  block
-                  type="default"
-                  @click="handleRecovery(singlePage.page)"
-                >
+                </VDropdownItem>
+                <VDropdownItem @click="handleRecovery(singlePage.page)">
                   {{ $t("core.common.buttons.recovery") }}
-                </VButton>
+                </VDropdownItem>
               </template>
             </VEntity>
           </li>
