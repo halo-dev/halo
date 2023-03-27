@@ -35,7 +35,7 @@ const handleUnbindAuth = (authProvider: ListedAuthProvider) => {
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
-      await axios.post(
+      await axios.put(
         `${import.meta.env.VITE_API_URL}${authProvider.unbindingUrl}`,
         {
           withCredentials: true,
@@ -158,7 +158,10 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
         <dd class="mt-1 text-sm sm:col-span-3 sm:mt-0">
           <ul class="space-y-2">
             <template v-for="(authProvider, index) in authProviders">
-              <li v-if="authProvider.bindingUrl" :key="index">
+              <li
+                v-if="authProvider.supportsBinding && authProvider.enabled"
+                :key="index"
+              >
                 <div
                   class="flex w-full cursor-pointer flex-wrap justify-between gap-y-3 rounded border p-5 hover:border-primary sm:w-1/2"
                 >

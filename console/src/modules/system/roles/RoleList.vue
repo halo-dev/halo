@@ -17,6 +17,7 @@ import {
   VEntityField,
   VLoading,
   Toast,
+  VDropdownItem,
 } from "@halo-dev/components";
 import RoleEditingModal from "./components/RoleEditingModal.vue";
 
@@ -249,29 +250,24 @@ const handleDelete = async (role: Role) => {
                 v-if="currentUserHasPermission(['system:roles:manage'])"
                 #dropdownItems
               >
-                <VButton
+                <VDropdownItem
                   v-if="!isSystemReserved(role)"
-                  v-close-popper
-                  block
-                  type="secondary"
                   @click="handleOpenEditingModal(role)"
                 >
                   {{ $t("core.common.buttons.edit") }}
-                </VButton>
-                <VButton
+                </VDropdownItem>
+                <VDropdownItem
                   v-if="!isSystemReserved(role)"
-                  v-close-popper
-                  block
                   type="danger"
                   @click="handleDelete(role)"
                 >
                   {{ $t("core.common.buttons.delete") }}
-                </VButton>
-                <VButton v-close-popper block @click="handleCloneRole(role)">
+                </VDropdownItem>
+                <VDropdownItem @click="handleCloneRole(role)">
                   {{
                     $t("core.role.operations.create_based_on_this_role.button")
                   }}
-                </VButton>
+                </VDropdownItem>
               </template>
             </VEntity>
           </li>

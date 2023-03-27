@@ -1,7 +1,12 @@
 <script lang="ts" setup>
 import type { User } from "@halo-dev/api-client";
 import { useUserFetch } from "@/modules/system/users/composables/use-user";
-import { VAvatar, VEntity, VEntityField } from "@halo-dev/components";
+import {
+  VAvatar,
+  VDropdown,
+  VEntity,
+  VEntityField,
+} from "@halo-dev/components";
 import { setFocus } from "@/formkit/utils/focus";
 import { computed, ref, watch } from "vue";
 import Fuse from "fuse.js";
@@ -66,7 +71,7 @@ const searchResults = computed(() => {
 </script>
 
 <template>
-  <FloatingDropdown @show="onDropdownShow">
+  <VDropdown :classes="['!p-0']" @show="onDropdownShow">
     <slot />
     <template #popper>
       <div class="h-96 w-80">
@@ -114,5 +119,5 @@ const searchResults = computed(() => {
         </div>
       </div>
     </template>
-  </FloatingDropdown>
+  </VDropdown>
 </template>

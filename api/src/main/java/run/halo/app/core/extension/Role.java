@@ -30,6 +30,8 @@ import run.halo.app.extension.GVK;
 public class Role extends AbstractExtension {
     public static final String ROLE_DEPENDENCY_RULES =
         "rbac.authorization.halo.run/dependency-rules";
+    public static final String ROLE_AGGREGATE_LABEL_PREFIX =
+        "rbac.authorization.halo.run/aggregate-to-";
     public static final String ROLE_DEPENDENCIES_ANNO = "rbac.authorization.halo.run/dependencies";
     public static final String UI_PERMISSIONS_ANNO = "rbac.authorization.halo.run/ui-permissions";
 

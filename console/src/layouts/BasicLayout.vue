@@ -5,9 +5,9 @@ import {
   IconUserSettings,
   VTag,
   VAvatar,
-  VSpace,
-  VButton,
   Dialog,
+  VDropdown,
+  VDropdownItem,
 } from "@halo-dev/components";
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
@@ -18,7 +18,7 @@ import {
   useRouter,
   type RouteRecordRaw,
 } from "vue-router";
-import { nextTick, onMounted, onUnmounted, ref, watch } from "vue";
+import { nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
 import axios from "axios";
 import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
 import LoginModal from "@/components/login/LoginModal.vue";
@@ -31,6 +31,10 @@ import { rbacAnnotations } from "@/constants/annotations";
 import { useScroll } from "@vueuse/core";
 import { defineStore, storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
+import {
+  useOverlayScrollbars,
+  type UseOverlayScrollbarsParams,
+} from "overlayscrollbars-vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -209,6 +213,23 @@ onMounted(() => {
     y.value = navbarScrollStore.y;
   });
 });
+
+// aside scroll
+const reactiveParams = reactive<UseOverlayScrollbarsParams>({
+  options: {
+    scrollbars: {
+      autoHide: "scroll",
+      autoHideDelay: 600,
+    },
+  },
+  defer: true,
+});
+const [initialize] = useOverlayScrollbars(reactiveParams);
+onMounted(() => {
+  if (navbarScroller.value) {
+    initialize({ target: navbarScroller.value });
+  }
+});
 </script>
 
 <template>
@@ -227,7 +248,7 @@ onMounted(() => {
           />
         </a>
       </div>
-      <div ref="navbarScroller" class="flex-1 overflow-y-auto">
+      <div ref="navbarScroller" class="flex-1 overflow-y-hidden">
         <div class="px-3">
           <div
             class="flex cursor-pointer items-center rounded bg-gray-100 p-2 text-gray-400 transition-all hover:text-gray-900"
@@ -273,41 +294,31 @@ onMounted(() => {
               </VTag>
             </div>
           </div>
-          <FloatingDropdown
+          <VDropdown
             class="profile-control cursor-pointer rounded p-1 transition-all hover:bg-gray-100"
           >
             <IconMore />
             <template #popper>
-              <div class="w-48 p-2">
-                <VSpace class="w-full" direction="column">
-                  <VButton
-                    v-close-popper
-                    block
-                    type="secondary"
-                    :route="{
-                      name: 'UserDetail',
-                      params: { name: '-' },
-                    }"
-                  >
-                    {{ $t("core.sidebar.operations.profile.button") }}
-                  </VButton>
-                  <VButton
-                    v-close-popper
-                    block
-                    type="default"
-                    @click="handleLogout"
-                  >
-                    {{ $t("core.sidebar.operations.logout.button") }}
-                  </VButton>
-                </VSpace>
-              </div>
+              <VDropdownItem
+                @click="
+                  $router.push({
+                    name: 'UserDetail',
+                    params: { name: '-' },
+                  })
+                "
+              >
+                {{ $t("core.sidebar.operations.profile.button") }}
+              </VDropdownItem>
+              <VDropdownItem @click="handleLogout">
+                {{ $t("core.sidebar.operations.logout.button") }}
+              </VDropdownItem>
             </template>
-          </FloatingDropdown>
+          </VDropdown>
         </div>
       </div>
     </aside>
 
-    <main class="content w-full overflow-y-auto pb-12 mb-safe md:pb-0">
+    <main class="content w-full pb-12 mb-safe md:pb-0">
       <slot v-if="$slots.default" />
       <RouterView v-else />
     </main>
@@ -327,14 +338,9 @@ onMounted(() => {
         <div
           class="flex w-full cursor-pointer items-center justify-center p-1 text-white"
         >
-          <div
-            class="is-active is-active0 flex h-10 w-10 flex-col items-center justify-center"
-          >
+          <div class="flex h-10 w-10 flex-col items-center justify-center">
             <div class="text-base">
               <Component :is="menu?.icon" />
-            </div>
-            <div class="mt-0.5 text-xs">
-              {{ menu?.name }}
             </div>
           </div>
         </div>
@@ -343,14 +349,9 @@ onMounted(() => {
         <div
           class="flex w-full cursor-pointer items-center justify-center p-1 text-white"
         >
-          <div
-            class="is-active is-active0 flex h-10 w-10 flex-col items-center justify-center"
-          >
+          <div class="flex h-10 w-10 flex-col items-center justify-center">
             <div class="text-base">
               <IconMore />
-            </div>
-            <div class="mt-0.5 text-xs">
-              {{ $t("core.sidebar.operations.more.button") }}
             </div>
           </div>
         </div>

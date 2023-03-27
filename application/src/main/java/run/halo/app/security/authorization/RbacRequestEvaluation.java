@@ -109,12 +109,37 @@ public class RbacRequestEvaluation {
         if (ArrayUtils.isEmpty(rule.getResourceNames())) {
             return true;
         }
+        String[] requestedNameParts = ArrayUtils.nullToEmpty(StringUtils.split(requestedName, "/"));
         for (String ruleName : rule.getResourceNames()) {
-            if (Objects.equals(ruleName, requestedName)) {
-                return true;
+            String[] patternParts = StringUtils.split(ruleName, "/");
+
+            for (int i = 0; i < patternParts.length; i++) {
+                String patternPart = patternParts[i];
+                String textPart = StringUtils.EMPTY;
+                if (requestedNameParts.length > i) {
+                    textPart = requestedNameParts[i];
+                }
+
+                if (!matchPart(patternPart, textPart)) {
+                    return false;
+                }
             }
+
+            return true;
         }
         return false;
+    }
+
+    private static boolean matchPart(String patternPart, String textPart) {
+        if (patternPart.equals("*")) {
+            return true;
+        } else if (patternPart.startsWith("*")) {
+            return textPart.endsWith(patternPart.substring(1));
+        } else if (patternPart.endsWith("*")) {
+            return textPart.startsWith(patternPart.substring(0, patternPart.length() - 1));
+        } else {
+            return patternPart.equals(textPart);
+        }
     }
 
     protected boolean nonResourceURLMatches(Role.PolicyRule rule, String requestedURL) {

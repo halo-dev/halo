@@ -10,11 +10,13 @@ import {
   VSpace,
   VTag,
   IconMore,
-  VButton,
   Dialog,
   VAvatar,
   Toast,
   VStatusDot,
+  VDropdown,
+  VDropdownItem,
+  VDropdownDivider,
 } from "@halo-dev/components";
 import ThemeUploadModal from "./components/ThemeUploadModal.vue";
 
@@ -102,43 +104,25 @@ const onUpgradeModalClose = () => {
               </p>
             </div>
           </div>
-          <FloatingDropdown v-permission="['system:themes:manage']">
+          <VDropdown v-permission="['system:themes:manage']">
             <div
               class="cursor-pointer rounded p-1 transition-all hover:text-blue-600 group-hover:bg-gray-100"
             >
               <IconMore />
             </div>
             <template #popper>
-              <div class="w-48 p-2">
-                <VSpace class="w-full" direction="column">
-                  <VButton
-                    v-close-popper
-                    block
-                    type="secondary"
-                    @click="upgradeModal = true"
-                  >
-                    {{ $t("core.common.buttons.upgrade") }}
-                  </VButton>
-                  <VButton
-                    v-close-popper
-                    block
-                    type="default"
-                    @click="handleReloadTheme"
-                  >
-                    {{ $t("core.theme.operations.reload.button") }}
-                  </VButton>
-                  <VButton
-                    v-close-popper
-                    block
-                    type="danger"
-                    @click="handleResetSettingConfig"
-                  >
-                    {{ $t("core.common.buttons.reset") }}
-                  </VButton>
-                </VSpace>
-              </div>
+              <VDropdownItem @click="upgradeModal = true">
+                {{ $t("core.common.buttons.upgrade") }}
+              </VDropdownItem>
+              <VDropdownDivider />
+              <VDropdownItem type="danger" @click="handleReloadTheme">
+                {{ $t("core.theme.operations.reload.button") }}
+              </VDropdownItem>
+              <VDropdownItem type="danger" @click="handleResetSettingConfig">
+                {{ $t("core.common.buttons.reset") }}
+              </VDropdownItem>
             </template>
-          </FloatingDropdown>
+          </VDropdown>
         </div>
       </div>
       <div class="border-t border-gray-200">

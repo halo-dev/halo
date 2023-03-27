@@ -22,6 +22,8 @@ import {
   VEntityField,
   VLoading,
   Toast,
+  VDropdownItem,
+  VDropdown,
 } from "@halo-dev/components";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import CategoryDropdownSelector from "@/components/dropdown-selector/CategoryDropdownSelector.vue";
@@ -593,7 +595,7 @@ const changeVisibleByIcon = async (post: Post) => {
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
-                <FloatingDropdown>
+                <VDropdown>
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
@@ -605,27 +607,19 @@ const changeVisibleByIcon = async (post: Post) => {
                     </span>
                   </div>
                   <template #popper>
-                    <div class="w-72 p-4">
-                      <ul class="space-y-1">
-                        <li
-                          v-for="(filterItem, index) in PublishStatusItems"
-                          :key="index"
-                          v-close-popper
-                          :class="{
-                            'bg-gray-100':
-                              selectedPublishStatusItem.value ===
-                              filterItem.value,
-                          }"
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                          @click="handlePublishStatusItemChange(filterItem)"
-                        >
-                          <span class="truncate">{{ filterItem.label }}</span>
-                        </li>
-                      </ul>
-                    </div>
+                    <VDropdownItem
+                      v-for="(filterItem, index) in PublishStatusItems"
+                      :key="index"
+                      :selected="
+                        filterItem.value === selectedPublishStatusItem.value
+                      "
+                      @click="handlePublishStatusItemChange(filterItem)"
+                    >
+                      {{ filterItem.label }}
+                    </VDropdownItem>
                   </template>
-                </FloatingDropdown>
-                <FloatingDropdown>
+                </VDropdown>
+                <VDropdown>
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
@@ -637,27 +631,16 @@ const changeVisibleByIcon = async (post: Post) => {
                     </span>
                   </div>
                   <template #popper>
-                    <div class="w-72 p-4">
-                      <ul class="space-y-1">
-                        <li
-                          v-for="(filterItem, index) in VisibleItems"
-                          :key="index"
-                          v-close-popper
-                          :class="{
-                            'bg-gray-100':
-                              selectedVisibleItem.value === filterItem.value,
-                          }"
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                          @click="handleVisibleItemChange(filterItem)"
-                        >
-                          <span class="truncate">
-                            {{ filterItem.label }}
-                          </span>
-                        </li>
-                      </ul>
-                    </div>
+                    <VDropdownItem
+                      v-for="(filterItem, index) in VisibleItems"
+                      :key="index"
+                      :selected="filterItem.value === selectedVisibleItem.value"
+                      @click="handleVisibleItemChange(filterItem)"
+                    >
+                      {{ filterItem.label }}
+                    </VDropdownItem>
                   </template>
-                </FloatingDropdown>
+                </VDropdown>
                 <CategoryDropdownSelector
                   v-model:selected="selectedCategory"
                   @select="handleCategoryChange"
@@ -703,7 +686,7 @@ const changeVisibleByIcon = async (post: Post) => {
                     </span>
                   </div>
                 </UserDropdownSelector>
-                <FloatingDropdown>
+                <VDropdown>
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
                   >
@@ -715,21 +698,19 @@ const changeVisibleByIcon = async (post: Post) => {
                     </span>
                   </div>
                   <template #popper>
-                    <div class="w-72 p-4">
-                      <ul class="space-y-1">
-                        <li
-                          v-for="(sortItem, index) in SortItems"
-                          :key="index"
-                          v-close-popper
-                          class="flex cursor-pointer items-center rounded px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                          @click="handleSortItemChange(sortItem)"
-                        >
-                          <span class="truncate">{{ sortItem.label }}</span>
-                        </li>
-                      </ul>
-                    </div>
+                    <VDropdownItem
+                      v-for="(sortItem, index) in SortItems"
+                      :key="index"
+                      :selected="
+                        sortItem.sort === selectedSortItem?.sort &&
+                        sortItem.sortOrder === selectedSortItem?.sortOrder
+                      "
+                      @click="handleSortItemChange(sortItem)"
+                    >
+                      {{ sortItem.label }}
+                    </VDropdownItem>
                   </template>
-                </FloatingDropdown>
+                </VDropdown>
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
@@ -947,22 +928,12 @@ const changeVisibleByIcon = async (post: Post) => {
                 v-if="currentUserHasPermission(['system:posts:manage'])"
                 #dropdownItems
               >
-                <VButton
-                  v-close-popper
-                  block
-                  type="secondary"
-                  @click="handleOpenSettingModal(post.post)"
-                >
+                <VDropdownItem @click="handleOpenSettingModal(post.post)">
                   {{ $t("core.common.buttons.setting") }}
-                </VButton>
-                <VButton
-                  v-close-popper
-                  block
-                  type="danger"
-                  @click="handleDelete(post.post)"
-                >
+                </VDropdownItem>
+                <VDropdownItem type="danger" @click="handleDelete(post.post)">
                   {{ $t("core.common.buttons.delete") }}
-                </VButton>
+                </VDropdownItem>
               </template>
             </VEntity>
           </li>
