@@ -109,8 +109,6 @@ class DefaultRoleServiceTest {
             when(extensionClient.fetch(Role.class, "role1")).thenReturn(Mono.just(role1));
             when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
             when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.just(role3));
-            when(extensionClient.list(eq(RoleBinding.class), any(), any()))
-                .thenReturn(Flux.empty());
             when(extensionClient.list(eq(Role.class), any(), any()))
                 .thenReturn(Flux.empty());
 
@@ -141,8 +139,6 @@ class DefaultRoleServiceTest {
             when(extensionClient.fetch(Role.class, "role1")).thenReturn(Mono.just(role1));
             when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
             when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.just(role3));
-            when(extensionClient.list(eq(RoleBinding.class), any(), any()))
-                .thenReturn(Flux.empty());
             when(extensionClient.list(eq(Role.class), any(), any()))
                 .thenReturn(Flux.empty());
 
@@ -177,8 +173,6 @@ class DefaultRoleServiceTest {
             when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
             when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.just(role3));
             when(extensionClient.fetch(Role.class, "role4")).thenReturn(Mono.just(role4));
-            when(extensionClient.list(eq(RoleBinding.class), any(), any()))
-                .thenReturn(Flux.empty());
             when(extensionClient.list(eq(Role.class), any(), any()))
                 .thenReturn(Flux.empty());
 
@@ -214,8 +208,6 @@ class DefaultRoleServiceTest {
             when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
             when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.just(role3));
             when(extensionClient.fetch(Role.class, "role4")).thenReturn(Mono.just(role4));
-            when(extensionClient.list(eq(RoleBinding.class), any(), any()))
-                .thenReturn(Flux.empty());
             when(extensionClient.list(eq(Role.class), any(), any()))
                 .thenReturn(Flux.empty());
 
@@ -251,8 +243,6 @@ class DefaultRoleServiceTest {
             when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
             when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.just(role3));
             lenient().when(extensionClient.fetch(Role.class, "role4")).thenReturn(Mono.just(role4));
-            when(extensionClient.list(eq(RoleBinding.class), any(), any()))
-                .thenReturn(Flux.empty());
             when(extensionClient.list(eq(Role.class), any(), any()))
                 .thenReturn(Flux.empty());
 
@@ -297,8 +287,6 @@ class DefaultRoleServiceTest {
             when(extensionClient.fetch(Role.class, "role2")).thenReturn(Mono.just(role2));
             when(extensionClient.fetch(Role.class, "role3")).thenReturn(Mono.empty());
             when(extensionClient.fetch(Role.class, "role4")).thenReturn(Mono.just(role4));
-            when(extensionClient.list(eq(RoleBinding.class), any(), any()))
-                .thenReturn(Flux.empty());
             when(extensionClient.list(eq(Role.class), any(), any()))
                 .thenReturn(Flux.empty());
 

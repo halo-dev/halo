@@ -115,12 +115,9 @@ public class DefaultRoleService implements RoleService {
                     .filter(dependency -> !visited.contains(dependency))
                     .flatMap(dependencyName -> extensionClient.fetch(Role.class, dependencyName));
             })
-            .flatMap(role -> {
-                Subject subject = createRoleSubject(role.getMetadata().getName());
-                return Flux.just(role)
-                    .mergeWith(listRoleBindingRoles(subject))
-                    .mergeWith(listAggregatedRoles(role.getMetadata().getName()));
-            });
+            .flatMap(role -> Flux.just(role)
+                .mergeWith(listAggregatedRoles(role.getMetadata().getName()))
+            );
     }
 
     Flux<Role> listAggregatedRoles(String roleName) {
@@ -129,21 +126,6 @@ public class DefaultRoleService implements RoleService {
                 .get(Role.ROLE_AGGREGATE_LABEL_PREFIX + roleName)
             ),
             Comparator.comparing(item -> item.getMetadata().getCreationTimestamp()));
-    }
-
-    private static Subject createRoleSubject(String roleName) {
-        Subject subject = new Subject();
-        subject.setName(roleName);
-        subject.setKind(Role.KIND);
-        subject.setApiGroup(Role.GROUP);
-        return subject;
-    }
-
-    Flux<Role> listRoleBindingRoles(Subject subject) {
-        return extensionClient.list(RoleBinding.class, getRoleBindingPredicate(subject),
-                null)
-            .map(RoleBinding::getRoleRef)
-            .flatMap(ref -> extensionClient.fetch(Role.class, ref.getName()));
     }
 
     Predicate<RoleBinding> getRoleBindingPredicate(Subject targetSubject) {
