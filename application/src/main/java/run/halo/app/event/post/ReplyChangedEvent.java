@@ -6,9 +6,9 @@ import run.halo.app.core.extension.content.Reply;
  * @author guqing
  * @since 2.0.0
  */
-public class ReplyCreatedEvent extends ReplyEvent {
+public class ReplyChangedEvent extends ReplyEvent {
 
-    public ReplyCreatedEvent(Object source, Reply reply) {
+    public ReplyChangedEvent(Object source, Reply reply) {
         super(source, reply);
     }
 }

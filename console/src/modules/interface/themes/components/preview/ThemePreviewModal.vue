@@ -26,6 +26,7 @@ import {
 import { storeToRefs } from "pinia";
 import { computed, markRaw, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { useQuery } from "@tanstack/vue-query";
 
 const props = withDefaults(
@@ -315,11 +316,13 @@ const iframeClasses = computed(() => {
         leave-to-class="-translate-x-full"
         appear
       >
-        <div
+        <OverlayScrollbarsComponent
           v-if="themesVisible || settingsVisible"
-          class="relative h-full w-96 overflow-y-auto"
+          element="div"
+          :options="{ scrollbars: { autoHide: 'scroll' } }"
+          class="relative h-full w-96"
           :class="{ '!overflow-hidden': switching }"
-          style="overflow-y: overlay"
+          defer
         >
           <transition
             enter-active-class="transform transition ease-in-out duration-300 delay-150"
@@ -432,7 +435,7 @@ const iframeClasses = computed(() => {
               </VButton>
             </div>
           </transition>
-        </div>
+        </OverlayScrollbarsComponent>
       </transition>
       <div
         class="flex h-full flex-1 items-center justify-center transition-all duration-300"
