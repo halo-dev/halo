@@ -167,22 +167,22 @@ const { data: socialAuthProviders } = useQuery<SocialAuthProvider[]>({
     {{ $t("core.login.button") }}
   </VButton>
 
-  <div v-if="socialAuthProviders?.length" class="mt-3 flex items-center">
-    <span class="text-sm text-slate-600">
-      {{ $t("core.login.other_login") }}
-    </span>
-    <ul class="flex items-center">
-      <li
-        v-for="(socialAuthProvider, index) in socialAuthProviders"
-        :key="index"
+  <div class="flex justify-center py-3 text-xs text-gray-600">OR</div>
+
+  <ul
+    v-if="socialAuthProviders?.length"
+    class="flex flex-row flex-wrap justify-center gap-2"
+  >
+    <li v-for="(socialAuthProvider, index) in socialAuthProviders" :key="index">
+      <a
+        :href="socialAuthProvider.authenticationUrl"
+        class="group inline-flex select-none flex-row items-center gap-2 rounded bg-white px-2.5 py-1.5 ring-1 ring-gray-200 transition-all hover:bg-gray-100 hover:shadow hover:ring-gray-900"
       >
-        <a
-          :href="socialAuthProvider.authenticationUrl"
-          class="block h-6 w-6 rounded-full bg-gray-200 p-1"
-        >
-          <img class="rounded-full" :src="socialAuthProvider.logo" />
-        </a>
-      </li>
-    </ul>
-  </div>
+        <img class="h-4 w-4 rounded-full" :src="socialAuthProvider.logo" />
+        <span class="text-xs text-gray-800 group-hover:text-gray-900">
+          {{ socialAuthProvider.displayName }}
+        </span>
+      </a>
+    </li>
+  </ul>
 </template>
