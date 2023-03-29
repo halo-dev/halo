@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { Dialog, IconUserSettings, VButton, VTag } from "@halo-dev/components";
 import type { ComputedRef, Ref } from "vue";
-import { inject } from "vue";
+import { inject, computed } from "vue";
 import { useRouter } from "vue-router";
 import type { DetailedUser, ListedAuthProvider } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
@@ -17,7 +17,7 @@ const isCurrentUser = inject<ComputedRef<boolean>>("isCurrentUser");
 const router = useRouter();
 const { t } = useI18n();
 
-const { data: authProviders } = useQuery<ListedAuthProvider[]>({
+const { data: authProviders, isFetching } = useQuery<ListedAuthProvider[]>({
   queryKey: ["user-auth-providers"],
   queryFn: async () => {
     const { data } = await apiClient.authProvider.listAuthProviders();
@@ -25,6 +25,12 @@ const { data: authProviders } = useQuery<ListedAuthProvider[]>({
   },
   refetchOnWindowFocus: false,
   enabled: isCurrentUser,
+});
+
+const availableAuthProviders = computed(() => {
+  return authProviders.value?.filter(
+    (authProvider) => authProvider.enabled && authProvider.supportsBinding
+  );
 });
 
 const handleUnbindAuth = (authProvider: ListedAuthProvider) => {
@@ -149,7 +155,7 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
         </dd>
       </div>
       <div
-        v-if="isCurrentUser"
+        v-if="!isFetching && isCurrentUser && availableAuthProviders?.length"
         class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
         <dt class="text-sm font-medium text-gray-900">
