@@ -45,7 +45,9 @@ public class AuthProviderServiceImpl implements AuthProviderService {
 
     @Override
     public Mono<AuthProvider> disable(String name) {
+        // privileged auth provider cannot be disabled
         return client.get(AuthProvider.class, name)
+            .filter(authProvider -> !privileged(authProvider))
             .flatMap(authProvider -> updateAuthProviderEnabled(enabled -> enabled.remove(name))
                 .thenReturn(authProvider)
             );
@@ -107,25 +109,12 @@ public class AuthProviderServiceImpl implements AuthProviderService {
             .flatMap(configMap -> {
                 SystemSetting.AuthProvider authProvider = getAuthProvider(configMap);
                 consumer.accept(authProvider.getEnabled());
-                return fetchPrivilegedProviders()
-                    .doOnNext(privileged -> {
-                        authProvider.getEnabled().addAll(privileged);
-                    })
-                    .then(Mono.defer(() -> {
-                        final Map<String, String> data = configMap.getData();
-                        data.put(SystemSetting.AuthProvider.GROUP,
-                            JsonUtils.objectToJson(authProvider));
-                        return client.update(configMap);
-                    }));
-            });
-    }
 
-    private Mono<List<String>> fetchPrivilegedProviders() {
-        return client.list(AuthProvider.class,
-                provider -> privileged(provider),
-                null)
-            .map(provider -> provider.getMetadata().getName())
-            .collectList();
+                final Map<String, String> data = configMap.getData();
+                data.put(SystemSetting.AuthProvider.GROUP,
+                    JsonUtils.objectToJson(authProvider));
+                return client.update(configMap);
+            });
     }
 
     private ListedAuthProvider convertTo(AuthProvider authProvider) {
@@ -150,7 +139,7 @@ public class AuthProviderServiceImpl implements AuthProviderService {
         return BooleanUtils.TRUE.equals(MetadataUtil.nullSafeLabels(authProvider)
             .get(AuthProvider.AUTH_BINDING_LABEL));
     }
-    
+
     private boolean privileged(AuthProvider authProvider) {
         return BooleanUtils.TRUE.equals(MetadataUtil.nullSafeLabels(authProvider)
             .get(AuthProvider.PRIVILEGED_LABEL));
