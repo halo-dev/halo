@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.skyscreamer.jsonassert.JSONAssert;
@@ -271,8 +270,6 @@ class ThemeReconcilerTest {
 
         // setting exists
         themeSpec.setSettingName("theme-test-setting");
-        when(extensionClient.fetch(eq(ConfigMap.class), any()))
-            .thenReturn(Optional.of(Mockito.mock(ConfigMap.class)));
         assertThat(theme.getSpec().getConfigMapName()).isNull();
         ArgumentCaptor<Theme> captor = ArgumentCaptor.forClass(Theme.class);
         themeReconciler.reconcile(new Reconciler.Request(metadata.getName()));
@@ -291,7 +288,7 @@ class ThemeReconcilerTest {
         when(extensionClient.fetch(eq(Setting.class), eq(themeSpec.getSettingName())))
             .thenReturn(Optional.of(getFakeSetting()));
         themeReconciler.reconcile(new Reconciler.Request(metadata.getName()));
-        verify(extensionClient, times(1))
+        verify(extensionClient, times(2))
             .fetch(eq(Setting.class), eq(themeSpec.getSettingName()));
         ArgumentCaptor<ConfigMap> configMapCaptor = ArgumentCaptor.forClass(ConfigMap.class);
         verify(extensionClient, times(1)).create(any(ConfigMap.class));
