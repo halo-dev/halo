@@ -157,7 +157,7 @@ const handleOpenInstallModal = () => {
     <VTabs
       v-model:active-id="activeTab"
       type="outline"
-      class="my-[12px] mx-[16px]"
+      class="mx-[16px] my-[12px]"
     >
       <VTabItem
         id="installed"
@@ -243,7 +243,7 @@ const handleOpenInstallModal = () => {
                     <template #description>
                       <div class="w-32">
                         <div
-                          class="group aspect-w-4 aspect-h-3 block w-full overflow-hidden rounded border bg-gray-100"
+                          class="group aspect-h-3 aspect-w-4 block w-full overflow-hidden rounded border bg-gray-100"
                         >
                           <LazyImage
                             :key="theme.metadata.name"

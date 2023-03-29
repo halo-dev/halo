@@ -134,7 +134,7 @@ const isHoveredReply = computed(() => {
               <p class="break-all">
                 <a
                   v-if="quoteReply"
-                  class="mr-1 inline-flex flex-row items-center gap-1 rounded bg-gray-200 py-0.5 px-1 text-xs font-medium text-gray-600 hover:text-blue-500 hover:underline"
+                  class="mr-1 inline-flex flex-row items-center gap-1 rounded bg-gray-200 px-1 py-0.5 text-xs font-medium text-gray-600 hover:text-blue-500 hover:underline"
                   href="javascript:void(0)"
                   @mouseenter="handleShowQuoteReply(true)"
                   @mouseleave="handleShowQuoteReply(false)"
