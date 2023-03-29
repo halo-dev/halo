@@ -19,6 +19,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.AuthProvider;
 import run.halo.app.core.extension.UserConnection;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemSetting;
@@ -106,6 +107,13 @@ public class AuthProviderServiceImpl implements AuthProviderService {
 
     private Mono<ConfigMap> updateAuthProviderEnabled(Consumer<Set<String>> consumer) {
         return client.fetch(ConfigMap.class, SystemSetting.SYSTEM_CONFIG)
+            .switchIfEmpty(Mono.defer(() -> {
+                ConfigMap configMap = new ConfigMap();
+                configMap.setMetadata(new Metadata());
+                configMap.getMetadata().setName(SystemSetting.SYSTEM_CONFIG);
+                configMap.setData(new HashMap<>());
+                return client.create(configMap);
+            }))
             .flatMap(configMap -> {
                 SystemSetting.AuthProvider authProvider = getAuthProvider(configMap);
                 consumer.accept(authProvider.getEnabled());
