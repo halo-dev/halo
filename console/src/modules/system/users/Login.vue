@@ -22,6 +22,14 @@ function onLoginSucceed() {
     <IconLogo class="mb-8" />
     <div class="login-form flex w-72 flex-col">
       <LoginForm @succeed="onLoginSucceed" />
+      <div class="flex">
+        <RouterLink
+          :to="{ name: 'Signup' }"
+          class="mt-4 text-sm text-indigo-600"
+        >
+          注册
+        </RouterLink>
+      </div>
     </div>
   </div>
 </template>

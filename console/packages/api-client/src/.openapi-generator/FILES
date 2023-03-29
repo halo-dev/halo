@@ -15,6 +15,7 @@ api/api-console-halo-run-v1alpha1-user-api.ts
 api/api-halo-run-v1alpha1-comment-api.ts
 api/api-halo-run-v1alpha1-post-api.ts
 api/api-halo-run-v1alpha1-tracker-api.ts
+api/api-halo-run-v1alpha1-user-api.ts
 api/auth-halo-run-v1alpha1-auth-provider-api.ts
 api/auth-halo-run-v1alpha1-user-connection-api.ts
 api/content-halo-run-v1alpha1-category-api.ts
@@ -43,6 +44,7 @@ api/v1alpha1-menu-item-api.ts
 api/v1alpha1-personal-access-token-api.ts
 api/v1alpha1-role-api.ts
 api/v1alpha1-role-binding-api.ts
+api/v1alpha1-secret-api.ts
 api/v1alpha1-setting-api.ts
 api/v1alpha1-user-api.ts
 base.ts
@@ -169,11 +171,14 @@ models/role.ts
 models/search-engine-list.ts
 models/search-engine-spec.ts
 models/search-engine.ts
+models/secret-list.ts
+models/secret.ts
 models/setting-form.ts
 models/setting-list.ts
 models/setting-ref.ts
 models/setting-spec.ts
 models/setting.ts
+models/sign-up-request.ts
 models/single-page-list.ts
 models/single-page-request.ts
 models/single-page-spec.ts

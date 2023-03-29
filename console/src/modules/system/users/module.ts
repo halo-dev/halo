@@ -9,6 +9,7 @@ import PersonalAccessTokens from "./PersonalAccessTokens.vue";
 import Login from "./Login.vue";
 import { IconUserSettings } from "@halo-dev/components";
 import { markRaw } from "vue";
+import Signup from "./Signup.vue";
 
 export default definePlugin({
   components: {
@@ -19,6 +20,11 @@ export default definePlugin({
       path: "/login",
       name: "Login",
       component: Login,
+    },
+    {
+      path: "/signup",
+      name: "Signup",
+      component: Signup,
     },
     {
       path: "/users",

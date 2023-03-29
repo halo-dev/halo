@@ -26,6 +26,7 @@ export * from "./api/api-console-halo-run-v1alpha1-user-api";
 export * from "./api/api-halo-run-v1alpha1-comment-api";
 export * from "./api/api-halo-run-v1alpha1-post-api";
 export * from "./api/api-halo-run-v1alpha1-tracker-api";
+export * from "./api/api-halo-run-v1alpha1-user-api";
 export * from "./api/auth-halo-run-v1alpha1-auth-provider-api";
 export * from "./api/auth-halo-run-v1alpha1-user-connection-api";
 export * from "./api/content-halo-run-v1alpha1-category-api";
