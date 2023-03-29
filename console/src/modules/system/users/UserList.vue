@@ -22,7 +22,6 @@ import {
   VEmpty,
   VDropdown,
   VDropdownItem,
-  VDropdownDivider,
 } from "@halo-dev/components";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
