@@ -19,10 +19,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.FileSystemUtils;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -42,21 +43,22 @@ import run.halo.app.infra.utils.JsonUtils;
 class ExtensionResourceInitializerTest {
 
     @Mock
-    private ReactiveExtensionClient extensionClient;
+    ReactiveExtensionClient extensionClient;
     @Mock
-    private HaloProperties haloProperties;
+    HaloProperties haloProperties;
     @Mock
-    private ApplicationReadyEvent applicationReadyEvent;
+    SchemeInitializedEvent applicationReadyEvent;
 
-    private ExtensionResourceInitializer extensionResourceInitializer;
+    @Mock
+    ApplicationEventPublisher eventPublisher;
+
+    @InjectMocks
+    ExtensionResourceInitializer extensionResourceInitializer;
 
     List<Path> dirsToClean;
 
     @BeforeEach
     void setUp() throws IOException {
-        extensionResourceInitializer =
-            new ExtensionResourceInitializer(haloProperties, extensionClient);
-
         dirsToClean = new ArrayList<>(2);
 
         Path tempDirectory = Files.createTempDirectory("extension-resource-initializer-test");
