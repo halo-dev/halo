@@ -189,9 +189,8 @@ const generateMenus = () => {
 
 onMounted(generateMenus);
 
-// store scroll position
+// aside scroll
 const navbarScroller = ref();
-const { y } = useScroll(navbarScroller);
 
 const useNavbarScrollStore = defineStore("navbar", {
   state: () => ({
@@ -201,20 +200,6 @@ const useNavbarScrollStore = defineStore("navbar", {
 
 const navbarScrollStore = useNavbarScrollStore();
 
-watch(
-  () => y.value,
-  () => {
-    navbarScrollStore.y = y.value;
-  }
-);
-
-onMounted(() => {
-  nextTick(() => {
-    y.value = navbarScrollStore.y;
-  });
-});
-
-// aside scroll
 const reactiveParams = reactive<UseOverlayScrollbarsParams>({
   options: {
     scrollbars: {
@@ -222,7 +207,17 @@ const reactiveParams = reactive<UseOverlayScrollbarsParams>({
       autoHideDelay: 600,
     },
   },
-  defer: true,
+  events: {
+    scroll: (_, onScrollArgs) => {
+      const target = onScrollArgs.target as HTMLElement;
+      navbarScrollStore.y = target.scrollTop;
+    },
+    updated: (instance) => {
+      const { viewport } = instance.elements();
+      if (!viewport) return;
+      viewport.scrollTo({ top: navbarScrollStore.y });
+    },
+  },
 });
 const [initialize] = useOverlayScrollbars(reactiveParams);
 onMounted(() => {
