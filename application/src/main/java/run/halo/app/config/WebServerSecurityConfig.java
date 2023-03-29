@@ -2,7 +2,6 @@ package run.halo.app.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 import static org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN;
-import static org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter.Mode.SAMEORIGIN;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
 import java.util.Set;
@@ -81,7 +80,8 @@ public class WebServerSecurityConfig {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE + 1)
     SecurityWebFilterChain portalFilterChain(ServerHttpSecurity http,
-        ServerSecurityContextRepository securityContextRepository) {
+        ServerSecurityContextRepository securityContextRepository,
+        HaloProperties haloProperties) {
         var pathMatcher = pathMatchers(HttpMethod.GET, "/**");
         var mediaTypeMatcher = new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML);
         mediaTypeMatcher.setIgnoredMediaTypes(Set.of(MediaType.ALL));
@@ -89,7 +89,13 @@ public class WebServerSecurityConfig {
             .authorizeExchange().anyExchange().permitAll().and()
             .securityContextRepository(securityContextRepository)
             .headers()
-            .frameOptions().mode(SAMEORIGIN)
+            .frameOptions(spec -> {
+                var frameOptions = haloProperties.getSecurity().getFrameOptions();
+                spec.mode(frameOptions.getMode());
+                if (frameOptions.isDisabled()) {
+                    spec.disable();
+                }
+            })
             .referrerPolicy().policy(STRICT_ORIGIN_WHEN_CROSS_ORIGIN).and()
             .cache().disable().and()
             .anonymous(spec -> spec.authenticationFilter(
