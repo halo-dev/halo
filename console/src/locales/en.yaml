@@ -956,8 +956,8 @@ core:
     Post Manage: Post Manage
     Post View: Post View
     role-template-view-posts: Post View
-    role-template-manage-snaphosts: Snapshot Manage
-    role-template-view-snaphosts: Snapshot View
+    role-template-manage-snapshots: Snapshot Manage
+    role-template-view-snapshots: Snapshot View
     role-template-manage-tags: Tag Manage
     role-template-view-tags: Tag View
     role-template-manage-categories: Category Manage
