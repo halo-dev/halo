@@ -1,7 +1,6 @@
 package run.halo.app.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
-import static org.springframework.security.web.server.header.ReferrerPolicyServerHttpHeadersWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
 import java.util.Set;
@@ -96,7 +95,8 @@ public class WebServerSecurityConfig {
                     spec.disable();
                 }
             })
-            .referrerPolicy().policy(STRICT_ORIGIN_WHEN_CROSS_ORIGIN).and()
+            .referrerPolicy(
+                spec -> spec.policy(haloProperties.getSecurity().getReferrerOptions().getPolicy()))
             .cache().disable().and()
             .anonymous(spec -> spec.authenticationFilter(
                 new HaloAnonymousAuthenticationWebFilter("portal", AnonymousUserConst.PRINCIPAL,
