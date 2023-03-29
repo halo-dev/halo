@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -28,6 +31,7 @@ import run.halo.app.extension.GroupVersion;
 @RequiredArgsConstructor
 public class PublicUserEndpoint implements CustomEndpoint {
     private final UserService userService;
+    private final ServerSecurityContextRepository securityContextRepository;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -55,6 +59,15 @@ public class PublicUserEndpoint implements CustomEndpoint {
             .flatMap(signUpRequest ->
                 userService.signUp(signUpRequest.user(), signUpRequest.password())
             )
+            .flatMap(user -> {
+                SecurityContextImpl securityContext = new SecurityContextImpl();
+                UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(user.getMetadata().getName(),
+                        user.getSpec().getPassword());
+                securityContext.setAuthentication(authentication);
+                return securityContextRepository.save(request.exchange(), securityContext)
+                    .thenReturn(user);
+            })
             .flatMap(user -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(user)
