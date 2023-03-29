@@ -1,7 +1,6 @@
 package run.halo.app.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
-import static org.springframework.security.web.server.header.XFrameOptionsServerHttpHeadersWriter.Mode.SAMEORIGIN;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
 import java.util.Set;
@@ -89,7 +88,13 @@ public class WebServerSecurityConfig {
             .authorizeExchange().anyExchange().permitAll().and()
             .securityContextRepository(securityContextRepository)
             .headers()
-            .frameOptions().mode(SAMEORIGIN)
+            .frameOptions(spec -> {
+                var frameOptions = haloProperties.getSecurity().getFrameOptions();
+                spec.mode(frameOptions.getMode());
+                if (frameOptions.isDisabled()) {
+                    spec.disable();
+                }
+            })
             .referrerPolicy(
                 spec -> spec.policy(haloProperties.getSecurity().getReferrerOptions().getPolicy()))
             .cache().disable().and()

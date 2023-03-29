@@ -11,11 +11,11 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler.Request;
-import run.halo.app.infra.SchemeInitializedEvent;
+import run.halo.app.infra.ExtensionInitializedEvent;
 
 @Slf4j
 public class DefaultControllerManager
-    implements ApplicationListener<SchemeInitializedEvent>,
+    implements ApplicationListener<ExtensionInitializedEvent>,
     ApplicationContextAware, DisposableBean, ControllerManager {
 
     private final ExtensionClient client;
@@ -68,7 +68,7 @@ public class DefaultControllerManager
     }
 
     @Override
-    public void onApplicationEvent(SchemeInitializedEvent event) {
+    public void onApplicationEvent(ExtensionInitializedEvent event) {
         // register reconcilers in system after scheme initialized
         applicationContext.<Reconciler<Request>>getBeanProvider(
                 forClassWithGenerics(Reconciler.class, Request.class))

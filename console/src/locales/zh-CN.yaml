@@ -1093,6 +1093,7 @@ core:
       upgrade_success: 升级成功
       download_success: 下载成功
       copy_success: 复制成功
+      operation_failed: 操作失败
       download_failed: 下载失败
       save_failed_and_retry: 保存失败，请重试
       publish_failed_and_retry: 发布失败，请重试
