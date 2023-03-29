@@ -65,6 +65,7 @@ importers:
       eslint-plugin-cypress: ^2.12.1
       eslint-plugin-vue: ^9.8.0
       fastq: ^1.15.0
+      floating-vue: 2.0.0-beta.20
       fuse.js: ^6.6.2
       husky: ^8.0.2
       jsdom: ^20.0.3
@@ -140,6 +141,7 @@ importers:
       dayjs: 1.11.6
       emoji-mart: 5.3.3
       fastq: 1.15.0
+      floating-vue: 2.0.0-beta.20_vue@3.2.45
       fuse.js: 6.6.2
       jsencrypt: 3.3.2
       lodash.clonedeep: 4.5.0
@@ -3645,6 +3647,7 @@ packages:
 
   /@tiptap/prosemirror-tables/1.1.4_jdrte4nkwfesllz53h6f6dfkhi:
     resolution: {integrity: sha512-O2XnDhZV7xTHSFxMMl8Ei3UVeCxuMlbGYZ+J2QG8CzkK8mxDpBa66kFr5DdyAhvdi1ptpcH9u7/GMwItQpN4sA==}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
     peerDependencies:
       prosemirror-keymap: ^1.1.2
       prosemirror-model: ^1.8.1
