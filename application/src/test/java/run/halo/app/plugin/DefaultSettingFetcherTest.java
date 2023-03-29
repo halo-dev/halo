@@ -18,10 +18,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ConfigMap;
-import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -34,22 +35,24 @@ import run.halo.app.infra.utils.JsonUtils;
 class DefaultSettingFetcherTest {
 
     @Mock
-    private ExtensionClient extensionClient;
+    private ReactiveExtensionClient extensionClient;
 
     private DefaultSettingFetcher settingFetcher;
 
     @BeforeEach
     void setUp() {
-        settingFetcher = new DefaultSettingFetcher("fake", extensionClient);
+        DefaultReactiveSettingFetcher reactiveSettingFetcher =
+            new DefaultReactiveSettingFetcher(extensionClient, "fake");
+        settingFetcher = new DefaultSettingFetcher(reactiveSettingFetcher);
         // do not call extensionClient when the settingFetcher first time created
         verify(extensionClient, times(0)).fetch(eq(ConfigMap.class), any());
         verify(extensionClient, times(0)).fetch(eq(Plugin.class), any());
 
         Plugin plugin = buildPlugin();
-        when(extensionClient.fetch(eq(Plugin.class), any())).thenReturn(Optional.of(plugin));
+        when(extensionClient.fetch(eq(Plugin.class), any())).thenReturn(Mono.just(plugin));
 
         ConfigMap configMap = buildConfigMap();
-        when(extensionClient.fetch(eq(ConfigMap.class), any())).thenReturn(Optional.of(configMap));
+        when(extensionClient.fetch(eq(ConfigMap.class), any())).thenReturn(Mono.just(configMap));
     }
 
     @Test
@@ -72,6 +75,7 @@ class DefaultSettingFetcherTest {
         assertThat(sns.isEmpty()).isFalse();
         JSONAssert.assertEquals(getSns(), JsonUtils.objectToJson(sns.get()), true);
 
+        when(extensionClient.fetch(eq(ConfigMap.class), any())).thenReturn(Mono.empty());
         Optional<Sns> missing = settingFetcher.fetch("sns1", Sns.class);
         assertThat(missing.isEmpty()).isTrue();
     }
