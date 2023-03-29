@@ -1,21 +1,18 @@
 package run.halo.app.infra;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.properties.HaloProperties;
@@ -38,14 +35,18 @@ public class ExtensionResourceInitializer {
     private final HaloProperties haloProperties;
     private final ReactiveExtensionClient extensionClient;
 
+    private final ApplicationEventPublisher eventPublisher;
+
     public ExtensionResourceInitializer(HaloProperties haloProperties,
-        ReactiveExtensionClient extensionClient) {
+        ReactiveExtensionClient extensionClient,
+        ApplicationEventPublisher eventPublisher) {
         this.haloProperties = haloProperties;
         this.extensionClient = extensionClient;
+        this.eventPublisher = eventPublisher;
     }
 
-    @EventListener(ApplicationReadyEvent.class)
-    public Mono<Void> initialize(ApplicationReadyEvent readyEvent) {
+    @EventListener(SchemeInitializedEvent.class)
+    public Mono<Void> initialize(SchemeInitializedEvent initializedEvent) {
         var locations = new HashSet<String>();
         if (!haloProperties.isRequiredExtensionDisabled()) {
             locations.addAll(REQUIRED_EXTENSION_LOCATIONS);
@@ -80,7 +81,8 @@ public class ExtensionResourceInitializer {
                         extension.getMetadata().getName());
                 }
             })
-            .then();
+            .then(Mono.fromRunnable(
+                () -> eventPublisher.publishEvent(new ExtensionInitializedEvent(this))));
     }
 
     private Mono<Unstructured> createOrUpdate(Unstructured extension) {
@@ -88,17 +90,11 @@ public class ExtensionResourceInitializer {
             .flatMap(ext -> extensionClient.fetch(extension.groupVersionKind(),
                 extension.getMetadata().getName()))
             .flatMap(existingExt -> {
+                // force update
                 extension.getMetadata().setVersion(existingExt.getMetadata().getVersion());
                 return extensionClient.update(extension);
             })
-            .switchIfEmpty(Mono.defer(() -> extensionClient.create(extension)))
-            .retryWhen(Retry.fixedDelay(3, Duration.ofMillis(100))
-                .filter(t -> t instanceof OptimisticLockingFailureException))
-            .onErrorContinue(OptimisticLockingFailureException.class, (throwable, o) -> {
-                log.warn("Failed to create or update extension resource: {}/{} due to modification "
-                        + "conflict",
-                    extension.groupVersionKind(), extension.getMetadata().getName());
-            });
+            .switchIfEmpty(Mono.defer(() -> extensionClient.create(extension)));
     }
 
     private List<Resource> listResources(String location) {
