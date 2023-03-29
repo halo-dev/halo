@@ -111,6 +111,7 @@ import type { queueAsPromised } from "fastq";
 import type { Attachment } from "@halo-dev/api-client";
 import { useFetchAttachmentPolicy } from "@/modules/contents/attachments/composables/use-attachment-policy";
 import { useI18n } from "vue-i18n";
+import { i18n } from "@/locales";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 
 const { t } = useI18n();
@@ -543,6 +544,7 @@ watch(
     v-if="editor"
     :editor="editor"
     :toolbar-menu-items="toolbarMenuItems"
+    :locale="i18n.global.locale.value"
     :bubble-menu-items="bubbleMenuItems"
     :content-styles="{
       width: 'calc(100% - 18rem)',

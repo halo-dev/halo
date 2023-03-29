@@ -606,7 +606,7 @@ onMounted(() => {
                 >
                   <div class="group relative bg-white">
                     <div
-                      class="aspect-w-10 aspect-h-8 block h-full w-full cursor-pointer overflow-hidden bg-gray-100"
+                      class="aspect-h-8 aspect-w-10 block h-full w-full cursor-pointer overflow-hidden bg-gray-100"
                     >
                       <LazyImage
                         v-if="isImage(attachment.spec.mediaType)"
@@ -649,7 +649,7 @@ onMounted(() => {
 
                     <div
                       v-if="attachment.metadata.deletionTimestamp"
-                      class="absolute top-1 right-1 text-xs text-red-300"
+                      class="absolute right-1 top-1 text-xs text-red-300"
                     >
                       {{ $t("core.common.status.deleting") }}...
                     </div>
@@ -658,13 +658,13 @@ onMounted(() => {
                       v-if="!attachment.metadata.deletionTimestamp"
                       v-permission="['system:attachments:manage']"
                       :class="{ '!flex': selectedAttachments.has(attachment) }"
-                      class="absolute top-0 left-0 hidden h-1/3 w-full cursor-pointer justify-end bg-gradient-to-b from-gray-300 to-transparent ease-in-out group-hover:flex"
+                      class="absolute left-0 top-0 hidden h-1/3 w-full cursor-pointer justify-end bg-gradient-to-b from-gray-300 to-transparent ease-in-out group-hover:flex"
                     >
                       <IconCheckboxFill
                         :class="{
                           '!text-primary': selectedAttachments.has(attachment),
                         }"
-                        class="mt-1 mr-1 h-6 w-6 cursor-pointer text-white transition-all hover:text-primary"
+                        class="mr-1 mt-1 h-6 w-6 cursor-pointer text-white transition-all hover:text-primary"
                         @click.stop="handleSelect(attachment)"
                       />
                     </div>

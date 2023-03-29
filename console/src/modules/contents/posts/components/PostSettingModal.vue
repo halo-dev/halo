@@ -107,10 +107,6 @@ const handleSaveClick = () => {
 };
 
 const handlePublishClick = () => {
-  if (!props.onlyEmit) {
-    handlePublish();
-  }
-
   submitType.value = "publish";
 
   nextTick(() => {
