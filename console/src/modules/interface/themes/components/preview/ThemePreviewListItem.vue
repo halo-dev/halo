@@ -36,7 +36,7 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
         <template #description>
           <div class="w-32">
             <div
-              class="group aspect-w-4 aspect-h-3 block w-full overflow-hidden rounded border bg-gray-100"
+              class="group aspect-h-3 aspect-w-4 block w-full overflow-hidden rounded border bg-gray-100"
             >
               <LazyImage
                 :key="theme.metadata.name"

@@ -4,11 +4,11 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import run.halo.app.extension.controller.Controller;
-import run.halo.app.infra.SchemeInitializedEvent;
+import run.halo.app.infra.ExtensionInitializedEvent;
 
 @Component
 public class GcControllerInitializer
-    implements ApplicationListener<SchemeInitializedEvent>, DisposableBean {
+    implements ApplicationListener<ExtensionInitializedEvent>, DisposableBean {
 
     private final Controller gcController;
 
@@ -17,7 +17,7 @@ public class GcControllerInitializer
     }
 
     @Override
-    public void onApplicationEvent(SchemeInitializedEvent event) {
+    public void onApplicationEvent(ExtensionInitializedEvent event) {
         gcController.start();
     }
 

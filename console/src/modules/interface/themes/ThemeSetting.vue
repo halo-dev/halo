@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { inject, ref, watch } from "vue";
+import { inject, ref, computed } from "vue";
 
 // components
 import { Toast, VButton } from "@halo-dev/components";
@@ -14,42 +14,37 @@ import { useRouteParams } from "@vueuse/router";
 import { apiClient } from "@/utils/api-client";
 import { useSettingFormConvert } from "@/composables/use-setting-form";
 import { useI18n } from "vue-i18n";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
 
 const { t } = useI18n();
+const queryClient = useQueryClient();
 
 const group = useRouteParams<string>("group");
 
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme");
+const setting = inject<Ref<Setting | undefined>>("setting", ref());
 
 const saving = ref(false);
-const setting = ref<Setting>();
-const configMap = ref<ConfigMap>();
+
+const { data: configMap, suspense } = useQuery<ConfigMap>({
+  queryKey: ["theme-configMap", selectedTheme],
+  queryFn: async () => {
+    const { data } = await apiClient.theme.fetchThemeConfig({
+      name: selectedTheme?.value?.metadata.name as string,
+    });
+    return data;
+  },
+  refetchOnWindowFocus: false,
+  enabled: computed(() => {
+    return !!setting.value && !!selectedTheme?.value;
+  }),
+});
 
 const { configMapFormData, formSchema, convertToSave } = useSettingFormConvert(
   setting,
   configMap,
   group
 );
-
-const handleFetchSettings = async () => {
-  if (!selectedTheme?.value) return;
-
-  const { data } = await apiClient.theme.fetchThemeSetting({
-    name: selectedTheme?.value?.metadata.name,
-  });
-
-  setting.value = data;
-};
-
-const handleFetchConfigMap = async () => {
-  if (!selectedTheme?.value) return;
-
-  const { data } = await apiClient.theme.fetchThemeConfig({
-    name: selectedTheme?.value?.metadata.name,
-  });
-
-  configMap.value = data;
-};
 
 const handleSaveConfigMap = async () => {
   saving.value = true;
@@ -61,29 +56,19 @@ const handleSaveConfigMap = async () => {
     return;
   }
 
-  const { data: newConfigMap } = await apiClient.theme.updateThemeConfig({
+  await apiClient.theme.updateThemeConfig({
     name: selectedTheme?.value?.metadata.name,
     configMap: configMapToUpdate,
   });
 
   Toast.success(t("core.common.toast.save_success"));
 
-  await handleFetchSettings();
-  configMap.value = newConfigMap;
+  queryClient.invalidateQueries({ queryKey: ["theme-configMap"] });
 
   saving.value = false;
 };
 
-await handleFetchSettings();
-await handleFetchConfigMap();
-
-watch(
-  () => selectedTheme?.value,
-  () => {
-    handleFetchSettings();
-    handleFetchConfigMap();
-  }
-);
+await suspense();
 </script>
 <template>
   <Transition mode="out-in" name="fade">
