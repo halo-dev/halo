@@ -1,7 +1,7 @@
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 plugins {
-    id 'org.springframework.boot' version '3.0.4' apply false
+    id 'org.springframework.boot' version '3.0.5' apply false
     id 'java-platform'
     id 'maven-publish'
 }
@@ -52,7 +52,7 @@ dependencies {
         runtime 'io.r2dbc:r2dbc-h2'
         runtime 'org.postgresql:postgresql'
         runtime 'org.postgresql:r2dbc-postgresql'
-        runtime 'org.mariadb:r2dbc-mariadb:1.1.3'
+        runtime 'org.mariadb:r2dbc-mariadb:1.1.4'
         runtime 'com.github.jasync-sql:jasync-r2dbc-mysql:2.1.23'
     }
 

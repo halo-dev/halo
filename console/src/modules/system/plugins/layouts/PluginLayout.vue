@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { nextTick, onMounted, provide, ref, watch } from "vue";
+import { nextTick, provide, ref, computed, watch } from "vue";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { apiClient } from "@/utils/api-client";
 
@@ -22,6 +22,7 @@ import type { Ref } from "vue";
 import type { Plugin, Setting, SettingForm } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import { useI18n } from "vue-i18n";
+import { useQuery } from "@tanstack/vue-query";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -48,33 +49,68 @@ const initialTabs: PluginTab[] = [
 const route = useRoute();
 const router = useRouter();
 
-const plugin = ref<Plugin>();
-const setting = ref<Setting>();
 const tabs = ref<PluginTab[]>(cloneDeep(initialTabs));
-const activeTab = ref<string>();
+const activeTab = ref<string>(tabs.value[0].id);
 
-provide<Ref<Plugin | undefined>>("plugin", plugin);
 provide<Ref<string | undefined>>("activeTab", activeTab);
 
-const handleFetchPlugin = async () => {
-  try {
-    const response =
+const { data: plugin } = useQuery({
+  queryKey: ["plugin", route.params.name],
+  queryFn: async () => {
+    const { data } =
       await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin({
         name: route.params.name as string,
       });
-    plugin.value = response.data;
-  } catch (e) {
-    console.error(e);
-  }
-};
+    return data;
+  },
+  refetchOnWindowFocus: false,
+});
 
-const handleFetchSettings = async () => {
-  if (!plugin.value || !plugin.value.spec.settingName) return;
-  const { data } = await apiClient.plugin.fetchPluginSetting({
-    name: plugin.value?.metadata.name,
-  });
-  setting.value = data;
-};
+provide<Ref<Plugin | undefined>>("plugin", plugin);
+
+const { data: setting } = useQuery({
+  queryKey: ["plugin-setting", plugin],
+  queryFn: async () => {
+    const { data } = await apiClient.plugin.fetchPluginSetting({
+      name: plugin.value?.metadata.name as string,
+    });
+    return data;
+  },
+  refetchOnWindowFocus: false,
+  enabled: computed(() => {
+    return (
+      !!plugin.value &&
+      !!plugin.value.spec.settingName &&
+      currentUserHasPermission(["system:plugins:manage"])
+    );
+  }),
+  async onSuccess(data) {
+    if (data) {
+      const { forms } = data.spec;
+      tabs.value = [
+        ...tabs.value,
+        ...forms.map((item: SettingForm) => {
+          return {
+            id: item.group,
+            label: item.label || "",
+            route: {
+              name: "PluginSetting",
+              params: {
+                group: item.group,
+              },
+            },
+          };
+        }),
+      ] as PluginTab[];
+    }
+
+    await nextTick();
+
+    handleTriggerTabChange();
+  },
+});
+
+provide<Ref<Setting | undefined>>("setting", setting);
 
 const handleTabChange = (id: string) => {
   const tab = tabs.value.find((item) => item.id === id);
@@ -102,42 +138,6 @@ const handleTriggerTabChange = () => {
   const tab = tabs.value.find((tab) => tab.route.name === route.name);
   activeTab.value = tab ? tab.id : tabs.value[0].id;
 };
-
-onMounted(async () => {
-  await handleFetchPlugin();
-
-  if (!currentUserHasPermission(["system:plugins:manage"])) {
-    handleTriggerTabChange();
-    return;
-  }
-
-  await handleFetchSettings();
-
-  tabs.value = cloneDeep(initialTabs);
-
-  if (setting.value) {
-    const { forms } = setting.value.spec;
-    tabs.value = [
-      ...tabs.value,
-      ...forms.map((item: SettingForm) => {
-        return {
-          id: item.group,
-          label: item.label || "",
-          route: {
-            name: "PluginSetting",
-            params: {
-              group: item.group,
-            },
-          },
-        };
-      }),
-    ] as PluginTab[];
-  }
-
-  await nextTick();
-
-  handleTriggerTabChange();
-});
 
 watch([() => route.name, () => route.params], () => {
   handleTriggerTabChange();
