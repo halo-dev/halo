@@ -1,12 +1,15 @@
 package run.halo.app.core.extension.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -35,6 +38,10 @@ import run.halo.app.core.extension.User;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.exception.AccessDeniedException;
+import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.UserNotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -43,6 +50,9 @@ class UserServiceImplTest {
 
     @Mock
     ReactiveExtensionClient client;
+
+    @Mock
+    SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     @Mock
     PasswordEncoder passwordEncoder;
@@ -376,6 +386,102 @@ class UserServiceImplTest {
             verify(client).get(User.class, "fake-user");
             verify(client).list(same(RoleBinding.class), any(), any());
             verify(client).update(notProvidedRoleBinding);
+        }
+    }
+
+
+    @Nested
+    class SignUpTest {
+        @Test
+        void signUpWhenRegistrationNotAllowed() {
+            SystemSetting.User userSetting = new SystemSetting.User();
+            userSetting.setAllowRegistration(false);
+            when(environmentFetcher.fetch(eq(SystemSetting.User.GROUP),
+                eq(SystemSetting.User.class)))
+                .thenReturn(Mono.just(userSetting));
+
+            User fakeUser = fakeSignUpUser("fake-user", "fake-password");
+
+            userService.signUp(fakeUser, "fake-password")
+                .as(StepVerifier::create)
+                .expectError(AccessDeniedException.class)
+                .verify();
+        }
+
+        @Test
+        void signUpWhenRegistrationDefaultRoleNotConfigured() {
+            SystemSetting.User userSetting = new SystemSetting.User();
+            userSetting.setAllowRegistration(true);
+            when(environmentFetcher.fetch(eq(SystemSetting.User.GROUP),
+                eq(SystemSetting.User.class)))
+                .thenReturn(Mono.just(userSetting));
+
+            User fakeUser = fakeSignUpUser("fake-user", "fake-password");
+
+            userService.signUp(fakeUser, "fake-password")
+                .as(StepVerifier::create)
+                .expectError(AccessDeniedException.class)
+                .verify();
+        }
+
+        @Test
+        void signUpWhenRegistrationUsernameExists() {
+            SystemSetting.User userSetting = new SystemSetting.User();
+            userSetting.setAllowRegistration(true);
+            userSetting.setDefaultRole("fake-role");
+            when(environmentFetcher.fetch(eq(SystemSetting.User.GROUP),
+                eq(SystemSetting.User.class)))
+                .thenReturn(Mono.just(userSetting));
+            when(passwordEncoder.encode(eq("fake-password"))).thenReturn("fake-password");
+            when(client.fetch(eq(User.class), eq("fake-user")))
+                .thenReturn(Mono.just(fakeSignUpUser("test", "test")));
+
+            User fakeUser = fakeSignUpUser("fake-user", "fake-password");
+
+            userService.signUp(fakeUser, "fake-password")
+                .as(StepVerifier::create)
+                .expectError(DuplicateNameException.class)
+                .verify();
+        }
+
+        @Test
+        void signUpWhenRegistrationSuccessfully() {
+            SystemSetting.User userSetting = new SystemSetting.User();
+            userSetting.setAllowRegistration(true);
+            userSetting.setDefaultRole("fake-role");
+            when(environmentFetcher.fetch(eq(SystemSetting.User.GROUP),
+                eq(SystemSetting.User.class)))
+                .thenReturn(Mono.just(userSetting));
+            when(passwordEncoder.encode(eq("fake-password"))).thenReturn("fake-password");
+            when(client.fetch(eq(User.class), eq("fake-user")))
+                .thenReturn(Mono.empty());
+
+            User fakeUser = fakeSignUpUser("fake-user", "fake-password");
+
+            when(client.create(any(User.class))).thenReturn(Mono.just(fakeUser));
+            UserServiceImpl spyUserService = spy(userService);
+            doReturn(Mono.just(fakeUser)).when(spyUserService).grantRoles(eq("fake-user"),
+                anySet());
+
+            spyUserService.signUp(fakeUser, "fake-password")
+                .as(StepVerifier::create)
+                .consumeNextWith(user -> {
+                    assertThat(user.getMetadata().getName()).isEqualTo("fake-user");
+                    assertThat(user.getSpec().getPassword()).isEqualTo("fake-password");
+                })
+                .verifyComplete();
+
+            verify(client).create(any(User.class));
+            verify(spyUserService).grantRoles(eq("fake-user"), anySet());
+        }
+
+        User fakeSignUpUser(String name, String password) {
+            User user = new User();
+            user.setMetadata(new Metadata());
+            user.getMetadata().setName(name);
+            user.setSpec(new User.UserSpec());
+            user.getSpec().setPassword(password);
+            return user;
         }
     }
 }

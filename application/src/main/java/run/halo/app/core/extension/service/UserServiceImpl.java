@@ -10,6 +10,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
@@ -22,6 +23,7 @@ import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.AccessDeniedException;
+import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.UserNotFoundException;
 
 @Service
@@ -127,15 +129,34 @@ public class UserServiceImpl implements UserService {
             .flatMap(userSetting -> {
                 Boolean allowRegistration = userSetting.getAllowRegistration();
                 if (BooleanUtils.isFalse(allowRegistration)) {
-                    return Mono.error(new AccessDeniedException("Registration is not allowed"));
+                    return Mono.error(new AccessDeniedException("Registration is not allowed",
+                        "problemDetail.user.signUpFailed.disallowed",
+                        null));
                 }
                 String defaultRole = userSetting.getDefaultRole();
                 if (!StringUtils.hasText(defaultRole)) {
                     return Mono.error(new AccessDeniedException(
-                        "Default registration role is not configured by admin"));
+                        "Default registration role is not configured by admin",
+                        "problemDetail.user.signUpFailed.disallowed",
+                        null));
                 }
                 String encodedPassword = passwordEncoder.encode(password);
                 user.getSpec().setPassword(encodedPassword);
+                return createNewUser(user, defaultRole);
+            });
+    }
+
+    private Mono<User> createNewUser(User user, String defaultRole) {
+        Assert.notNull(user, "User must not be null");
+        return client.fetch(User.class, user.getMetadata().getName())
+            .hasElement()
+            .flatMap(hasUser -> {
+                if (hasUser) {
+                    return Mono.error(
+                        new DuplicateNameException("User name is already in use", null,
+                            "problemDetail.user.duplicateName",
+                            new Object[] {user.getMetadata().getName()}));
+                }
                 return client.create(user)
                     .flatMap(newUser -> grantRoles(user.getMetadata().getName(),
                         Set.of(defaultRole))
