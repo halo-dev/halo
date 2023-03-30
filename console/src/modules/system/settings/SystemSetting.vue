@@ -52,7 +52,7 @@ const handleSaveConfigMap = async () => {
     return;
   }
 
-  await apiClient.extension.configMap.updatev1alpha1ConfigMap({
+  const { data } = await apiClient.extension.configMap.updatev1alpha1ConfigMap({
     name: SYSTEM_CONFIGMAP_NAME,
     configMap: configMapToUpdate,
   });
@@ -61,7 +61,7 @@ const handleSaveConfigMap = async () => {
 
   queryClient.invalidateQueries({ queryKey: ["system-configMap"] });
 
-  await systemConfigMapStore.fetchSystemConfigMap();
+  systemConfigMapStore.configMap = data;
 
   saving.value = false;
 };
