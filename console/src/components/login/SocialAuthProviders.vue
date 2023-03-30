@@ -9,12 +9,23 @@ const { socialAuthProviders } = useAuthProvidersFetch();
 </script>
 
 <template>
-  <ul
-    v-if="socialAuthProviders?.length"
-    class="flex flex-row flex-wrap justify-center gap-2"
-  >
-    <li v-for="(socialAuthProvider, index) in socialAuthProviders" :key="index">
-      <SocialAuthProviderItem :auth-provider="socialAuthProvider" />
-    </li>
-  </ul>
+  <Transition v-if="socialAuthProviders?.length" appear name="fade">
+    <div>
+      <div
+        class="my-4 flex items-center before:ml-1 before:mt-0.5 before:flex-1 before:border-t before:border-gray-200 after:mr-1 after:mt-0.5 after:flex-1 after:border-t after:border-gray-200"
+      >
+        <p class="mx-4 mb-0 text-center text-xs dark:text-neutral-600">
+          三方登录
+        </p>
+      </div>
+      <ul class="flex flex-row flex-wrap justify-center gap-2">
+        <li
+          v-for="(socialAuthProvider, index) in socialAuthProviders"
+          :key="index"
+        >
+          <SocialAuthProviderItem :auth-provider="socialAuthProvider" />
+        </li>
+      </ul>
+    </div>
+  </Transition>
 </template>

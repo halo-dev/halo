@@ -108,6 +108,9 @@ onMounted(() => {
     name="login-form"
     :actions="false"
     type="form"
+    :classes="{
+      form: '!divide-none',
+    }"
     :config="{ validationVisibility: 'submit' }"
     @submit="handleLogin"
     @keyup.enter="submitForm('login-form')"
@@ -146,10 +149,11 @@ onMounted(() => {
     {{ $t("core.login.button") }}
   </VButton>
 
-  <div
-    class="my-4 flex items-center before:ml-1 before:mt-0.5 before:flex-1 before:border-t before:border-gray-200 after:mr-1 after:mt-0.5 after:flex-1 after:border-t after:border-gray-200"
-  >
-    <p class="mx-4 mb-0 text-center text-xs dark:text-neutral-600">三方登录</p>
+  <div class="flex justify-center gap-1 pb-0.5 pt-3.5 text-xs">
+    <span class="text-slate-500">没有账号</span>
+    <span class="cursor-pointer text-secondary hover:text-gray-600">
+      立即注册
+    </span>
   </div>
 
   <SocialAuthProviders />

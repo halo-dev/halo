@@ -18,7 +18,7 @@ function onLoginSucceed() {
 }
 </script>
 <template>
-  <div class="flex h-screen flex-col items-center justify-center bg-slate-50">
+  <div class="flex h-screen flex-col items-center bg-white/80 pt-[30vh]">
     <IconLogo class="mb-8" />
     <div class="login-form flex w-72 flex-col">
       <LoginForm @succeed="onLoginSucceed" />
