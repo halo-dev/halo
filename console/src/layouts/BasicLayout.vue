@@ -18,7 +18,7 @@ import {
   useRouter,
   type RouteRecordRaw,
 } from "vue-router";
-import { nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
+import { onMounted, onUnmounted, reactive, ref } from "vue";
 import axios from "axios";
 import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
 import LoginModal from "@/components/login/LoginModal.vue";
@@ -28,7 +28,6 @@ import { useRoleStore } from "@/stores/role";
 import { hasPermission } from "@/utils/permission";
 import { useUserStore } from "@/stores/user";
 import { rbacAnnotations } from "@/constants/annotations";
-import { useScroll } from "@vueuse/core";
 import { defineStore, storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
 import {
