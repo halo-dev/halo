@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
-import org.springframework.aop.framework.AopContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -137,9 +136,8 @@ public class UserServiceImpl implements UserService {
                 }
                 String encodedPassword = passwordEncoder.encode(password);
                 user.getSpec().setPassword(encodedPassword);
-                UserServiceImpl userServiceImpl = (UserServiceImpl) AopContext.currentProxy();
                 return client.create(user)
-                    .flatMap(newUser -> userServiceImpl.grantRoles(user.getMetadata().getName(),
+                    .flatMap(newUser -> grantRoles(user.getMetadata().getName(),
                         Set.of(defaultRole))
                     );
             });
