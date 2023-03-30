@@ -83,6 +83,8 @@ public class GlobalInfoEndpoint {
         private String website;
 
         private String authenticationUrl;
+
+        private String bindingUrl;
     }
 
     private void handleCommentSetting(GlobalInfo info, ConfigMap configMap) {
@@ -127,6 +129,7 @@ public class GlobalInfoEndpoint {
                     socialAuthProvider.setLogo(provider.getLogo());
                     socialAuthProvider.setWebsite(provider.getWebsite());
                     socialAuthProvider.setAuthenticationUrl(provider.getAuthenticationUrl());
+                    socialAuthProvider.setBindingUrl(provider.getBindingUrl());
                     return socialAuthProvider;
                 })
                 .toList()

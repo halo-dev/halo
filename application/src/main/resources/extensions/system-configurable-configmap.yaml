@@ -3,6 +3,11 @@ kind: "ConfigMap"
 metadata:
   name: system-default
 data:
+  user: |
+    {
+      "allowRegistration": false,
+      "defaultRole": ""
+    }
   theme: |
     {
       "active": "theme-earth"
