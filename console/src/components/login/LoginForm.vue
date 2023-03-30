@@ -107,6 +107,10 @@ const handleLogin = async () => {
 onMounted(() => {
   handleGenerateToken();
 });
+
+const inputClasses = {
+  outer: "!py-3 first:!pt-0 last:!pb-0",
+};
 </script>
 
 <template>
@@ -124,11 +128,10 @@ onMounted(() => {
     @keyup.enter="submitForm('login-form')"
   >
     <FormKit
-      :validation-messages="{
-        required: $t('core.login.fields.username.validation'),
-      }"
+      :classes="inputClasses"
       name="username"
       :placeholder="$t('core.login.fields.username.placeholder')"
+      :validation-label="$t('core.login.fields.username.placeholder')"
       :autofocus="true"
       type="text"
       validation="required"
@@ -136,11 +139,10 @@ onMounted(() => {
     </FormKit>
     <FormKit
       id="passwordInput"
-      :validation-messages="{
-        required: $t('core.login.fields.password.validation'),
-      }"
+      :classes="inputClasses"
       name="password"
       :placeholder="$t('core.login.fields.password.placeholder')"
+      :validation-label="$t('core.login.fields.password.placeholder')"
       type="password"
       validation="required"
       autocomplete="current-password"
@@ -148,7 +150,7 @@ onMounted(() => {
     </FormKit>
   </FormKit>
   <VButton
-    class="mt-6"
+    class="mt-8"
     block
     :loading="loading"
     type="secondary"

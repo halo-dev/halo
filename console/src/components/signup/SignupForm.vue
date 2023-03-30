@@ -67,6 +67,10 @@ const handleSignup = async () => {
     loading.value = false;
   }
 };
+
+const inputClasses = {
+  outer: "!py-3 first:!pt-0 last:!pb-0",
+};
 </script>
 
 <template>
@@ -87,6 +91,7 @@ const handleSignup = async () => {
       name="username"
       :placeholder="$t('core.signup.fields.username.placeholder')"
       :validation-label="$t('core.signup.fields.username.placeholder')"
+      :classes="inputClasses"
       :autofocus="true"
       type="text"
       :validation="[
@@ -107,6 +112,7 @@ const handleSignup = async () => {
       name="displayName"
       :placeholder="$t('core.signup.fields.display_name.placeholder')"
       :validation-label="$t('core.signup.fields.display_name.placeholder')"
+      :classes="inputClasses"
       :autofocus="true"
       type="text"
       validation="required"
@@ -117,6 +123,7 @@ const handleSignup = async () => {
       name="password"
       :placeholder="$t('core.signup.fields.password.placeholder')"
       :validation-label="$t('core.signup.fields.password.placeholder')"
+      :classes="inputClasses"
       type="password"
       validation="required|length:0,100"
     >
@@ -125,13 +132,14 @@ const handleSignup = async () => {
       name="password_confirm"
       :placeholder="$t('core.signup.fields.password_confirm.placeholder')"
       :validation-label="$t('core.signup.fields.password_confirm.placeholder')"
+      :classes="inputClasses"
       type="password"
       validation="required|confirm|length:0,100"
     >
     </FormKit>
   </FormKit>
   <VButton
-    class="mt-6"
+    class="mt-8"
     block
     type="secondary"
     :loading="loading"

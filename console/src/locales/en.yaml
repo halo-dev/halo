@@ -4,10 +4,8 @@ core:
     fields:
       username:
         placeholder: Username
-        validation: Please enter username
       password:
         placeholder: Password
-        validation: Please enter password
     operations:
       submit:
         toast_success: Login successful
