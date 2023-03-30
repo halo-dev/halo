@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
-import { nextTick, onMounted, type Ref } from "vue";
-import { provide, ref, watch } from "vue";
+import { nextTick, onMounted, type Ref, computed, watch } from "vue";
+import { provide, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 // libs
@@ -33,9 +33,12 @@ import { useThemeStore } from "@/stores/theme";
 import { storeToRefs } from "pinia";
 import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
+import { useQuery } from "@tanstack/vue-query";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
+const route = useRoute();
+const router = useRouter();
 
 interface ThemeTab {
   id: string;
@@ -60,27 +63,56 @@ const tabs = ref<ThemeTab[]>(cloneDeep(initialTabs));
 const selectedTheme = ref<Theme>();
 const themesModal = ref(false);
 const previewModal = ref(false);
-const activeTab = ref("");
+const activeTab = ref(tabs.value[0].id);
 
 const { loading, isActivated, handleActiveTheme } =
   useThemeLifeCycle(selectedTheme);
 
 provide<Ref<Theme | undefined>>("selectedTheme", selectedTheme);
 
-const route = useRoute();
-const router = useRouter();
+const { data: setting } = useQuery<Setting>({
+  queryKey: ["theme-setting", selectedTheme],
+  queryFn: async () => {
+    const { data } = await apiClient.theme.fetchThemeSetting({
+      name: selectedTheme.value?.metadata.name as string,
+    });
+    return data;
+  },
+  refetchOnWindowFocus: false,
+  enabled: computed(() => {
+    return (
+      !!selectedTheme.value &&
+      !!selectedTheme.value.spec.settingName &&
+      currentUserHasPermission(["system:themes:view"])
+    );
+  }),
+  async onSuccess(data) {
+    if (data) {
+      const { forms } = data.spec;
+      tabs.value = [
+        ...tabs.value,
+        ...forms.map((item: SettingForm) => {
+          return {
+            id: item.group,
+            label: item.label || "",
+            route: {
+              name: "ThemeSetting",
+              params: {
+                group: item.group,
+              },
+            },
+          };
+        }),
+      ] as ThemeTab[];
+    }
 
-const setting = ref<Setting>();
+    await nextTick();
 
-const handleFetchSettings = async () => {
-  if (!selectedTheme.value) return;
+    handleTriggerTabChange();
+  },
+});
 
-  const { data } = await apiClient.theme.fetchThemeSetting({
-    name: selectedTheme.value?.metadata.name,
-  });
-
-  setting.value = data;
-};
+provide<Ref<Setting | undefined>>("setting", setting);
 
 const handleTabChange = (id: string) => {
   const tab = tabs.value.find((item) => item.id === id);
@@ -89,46 +121,6 @@ const handleTabChange = (id: string) => {
     router.push(tab.route);
   }
 };
-
-watch(
-  () => selectedTheme.value,
-  async () => {
-    if (selectedTheme.value) {
-      // reset tabs
-      tabs.value = cloneDeep(initialTabs);
-
-      if (!currentUserHasPermission(["system:themes:view"])) {
-        handleTriggerTabChange();
-        return;
-      }
-
-      await handleFetchSettings();
-
-      if (setting.value) {
-        const { forms } = setting.value.spec;
-        tabs.value = [
-          ...tabs.value,
-          ...forms.map((item: SettingForm) => {
-            return {
-              id: item.group,
-              label: item.label || "",
-              route: {
-                name: "ThemeSetting",
-                params: {
-                  group: item.group,
-                },
-              },
-            };
-          }),
-        ] as ThemeTab[];
-      }
-
-      await nextTick();
-
-      handleTriggerTabChange();
-    }
-  }
-);
 
 const handleTriggerTabChange = () => {
   if (route.name === "ThemeSetting") {
@@ -150,9 +142,10 @@ const handleTriggerTabChange = () => {
   activeTab.value = tab ? tab.id : tabs.value[0].id;
 };
 
-watch([() => route.name, () => route.params], async () => {
-  handleTriggerTabChange();
-});
+const onSelectTheme = () => {
+  tabs.value = cloneDeep(initialTabs);
+  handleTabChange(tabs.value[0].id);
+};
 
 onMounted(() => {
   const themeStore = useThemeStore();
@@ -161,12 +154,17 @@ onMounted(() => {
 
   selectedTheme.value = activatedTheme?.value;
 });
+
+watch([() => route.name, () => route.params], async () => {
+  handleTriggerTabChange();
+});
 </script>
 <template>
   <BasicLayout>
     <ThemeListModal
       v-model:selected-theme="selectedTheme"
       v-model:visible="themesModal"
+      @select="onSelectTheme"
     />
     <VPageHeader :title="selectedTheme?.spec.displayName">
       <template #icon>
@@ -232,7 +230,10 @@ onMounted(() => {
             ></VTabbar>
           </template>
           <div class="bg-white">
-            <RouterView :key="activeTab" v-slot="{ Component }">
+            <RouterView
+              :key="`${selectedTheme?.metadata.name}-${activeTab}`"
+              v-slot="{ Component }"
+            >
               <template v-if="Component">
                 <Suspense>
                   <component :is="Component"></component>

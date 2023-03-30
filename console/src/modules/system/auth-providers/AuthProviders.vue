@@ -1,5 +1,10 @@
 <script lang="ts" setup>
-import { VPageHeader, IconLockPasswordLine, VCard } from "@halo-dev/components";
+import {
+  VPageHeader,
+  IconLockPasswordLine,
+  VCard,
+  VLoading,
+} from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { apiClient } from "@/utils/api-client";
 import type { ListedAuthProvider } from "@halo-dev/api-client";

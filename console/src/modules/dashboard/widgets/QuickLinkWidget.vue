@@ -195,7 +195,7 @@ const actions: Action[] = [
           </div>
           <span
             aria-hidden="true"
-            class="pointer-events-none absolute top-6 right-6 text-gray-300 transition-all group-hover:translate-x-1 group-hover:text-gray-400"
+            class="pointer-events-none absolute right-6 top-6 text-gray-300 transition-all group-hover:translate-x-1 group-hover:text-gray-400"
           >
             <IconArrowRight />
           </span>
