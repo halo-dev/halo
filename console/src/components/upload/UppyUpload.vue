@@ -6,9 +6,11 @@ import Uppy, { type SuccessResponse } from "@uppy/core";
 import type { Restrictions } from "@uppy/core";
 import XHRUpload from "@uppy/xhr-upload";
 import zh_CN from "@uppy/locales/lib/zh_CN";
+import en_US from "@uppy/locales/lib/en_US";
 import { computed, onUnmounted } from "vue";
 import { Toast } from "@halo-dev/components";
 import type { ProblemDetail } from "@/utils/api-client";
+import { i18n } from "@/locales";
 
 const props = withDefaults(
   defineProps<{
@@ -39,9 +41,16 @@ const emit = defineEmits<{
   (event: "error", file, response): void;
 }>();
 
+const locales = {
+  en: en_US,
+  zh: zh_CN,
+  "en-US": en_US,
+  "zh-CN": zh_CN,
+};
+
 const uppy = computed(() => {
   return new Uppy({
-    locale: zh_CN,
+    locale: locales[i18n.global.locale.value] || locales["zh-CN"],
     meta: props.meta,
     restrictions: props.restrictions,
     autoProceed: props.autoProceed,

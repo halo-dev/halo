@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { RouterView, useRoute } from "vue-router";
-import { computed, watch, ref, reactive, onMounted } from "vue";
+import { computed, watch, ref, reactive, onMounted, inject } from "vue";
 import { useTitle } from "@vueuse/core";
 import { useFavicon } from "@vueuse/core";
 import { useSystemConfigMapStore } from "./stores/system-configmap";
@@ -11,6 +11,8 @@ import {
   useOverlayScrollbars,
   type UseOverlayScrollbarsParams,
 } from "overlayscrollbars-vue";
+import type { FormKitConfig } from "@formkit/core";
+import { i18n } from "./locales";
 
 const { t } = useI18n();
 
@@ -81,6 +83,17 @@ const [initialize] = useOverlayScrollbars(reactiveParams);
 onMounted(() => {
   if (body) initialize({ target: body });
 });
+
+// setup formkit locale
+// see https://formkit.com/essentials/internationalization
+const formkitLocales = {
+  en: "en",
+  zh: "zh",
+  "en-US": "en",
+  "zh-CN": "zh",
+};
+const formkitConfig = inject(Symbol.for("FormKitConfig")) as FormKitConfig;
+formkitConfig.locale = formkitLocales[i18n.global.locale.value] || "zh";
 </script>
 
 <template>

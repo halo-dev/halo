@@ -1,5 +1,7 @@
 package run.halo.app.core.extension.reconciler;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -9,7 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
@@ -18,9 +19,7 @@ import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.core.extension.theme.SettingUtils;
-import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
@@ -87,7 +86,7 @@ public class ThemeReconciler implements Reconciler<Request> {
     void reconcileStatus(String name) {
         client.fetch(Theme.class, name).ifPresent(theme -> {
             final Theme.ThemeStatus status =
-                ObjectUtils.defaultIfNull(theme.getStatus(), new Theme.ThemeStatus());
+                defaultIfNull(theme.getStatus(), new Theme.ThemeStatus());
             final Theme.ThemeStatus oldStatus = JsonUtils.deepCopy(status);
             theme.setStatus(status);
 
@@ -143,23 +142,8 @@ public class ThemeReconciler implements Reconciler<Request> {
 
         final String configMapNameToUse =
             StringUtils.defaultIfBlank(userDefinedConfigMapName, newConfigMapName);
-
-        boolean existConfigMap = client.fetch(ConfigMap.class, configMapNameToUse)
-            .isPresent();
-        if (existConfigMap) {
-            return;
-        }
-
-        client.fetch(Setting.class, theme.getSpec().getSettingName())
-            .ifPresent(setting -> {
-                var data = SettingUtils.settingDefinedDefaultValueMap(setting);
-                // Whether there is a default value or not
-                ConfigMap configMap = new ConfigMap();
-                configMap.setMetadata(new Metadata());
-                configMap.getMetadata().setName(configMapNameToUse);
-                configMap.setData(data);
-                client.create(configMap);
-            });
+        SettingUtils.createOrUpdateConfigMap(client, theme.getSpec().getSettingName(),
+            configMapNameToUse);
     }
 
     private void addFinalizerIfNecessary(Theme oldTheme) {

@@ -974,8 +974,8 @@ core:
     Post Manage: 文章管理
     Post View: 文章查看
     role-template-view-posts: 文章查看
-    role-template-manage-snaphosts: 版本管理
-    role-template-view-snaphosts: 版本查看
+    role-template-manage-snapshots: 版本管理
+    role-template-view-snapshots: 版本查看
     role-template-manage-tags: 标签管理
     role-template-view-tags: 标签查看
     role-template-manage-categories: 分类管理

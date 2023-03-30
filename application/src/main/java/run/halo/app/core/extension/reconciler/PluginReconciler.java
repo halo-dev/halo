@@ -38,7 +38,6 @@ import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.theme.SettingUtils;
-import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Metadata;
@@ -223,19 +222,7 @@ public class PluginReconciler implements Reconciler<Request> {
             return false;
         }
 
-        boolean existConfigMap = client.fetch(ConfigMap.class, configMapNameToUse)
-            .isPresent();
-        if (existConfigMap) {
-            return false;
-        }
-
-        var data = SettingUtils.settingDefinedDefaultValueMap(settingOption.get());
-        // Create with or without default value
-        ConfigMap configMap = new ConfigMap();
-        configMap.setMetadata(new Metadata());
-        configMap.getMetadata().setName(configMapNameToUse);
-        configMap.setData(data);
-        client.create(configMap);
+        SettingUtils.createOrUpdateConfigMap(client, settingName, configMapNameToUse);
         return false;
     }
 
