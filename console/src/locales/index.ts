@@ -5,12 +5,32 @@ import en from "./en.yaml";
 // @ts-ignore
 import zhCN from "./zh-CN.yaml";
 
-const messages = {
-  en: en,
-  zh: zhCN,
-  "en-US": en,
-  "zh-CN": zhCN,
-};
+export const locales = [
+  {
+    code: "en",
+    package: en,
+    hidden: true,
+  },
+  {
+    name: "English",
+    code: "en-US",
+    package: en,
+  },
+  {
+    name: "简体中文",
+    code: "zh-CN",
+    package: zhCN,
+  },
+  {
+    code: "zh",
+    package: zhCN,
+  },
+];
+
+const messages = locales.reduce((acc, cur) => {
+  acc[cur.code] = cur.package;
+  return acc;
+}, {});
 
 const i18n = createI18n({
   legacy: false,
