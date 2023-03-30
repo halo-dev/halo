@@ -1,58 +1,86 @@
 <script lang="ts" setup>
 // core libs
-import { computed, ref } from "vue";
+import { computed, ref, type Ref, inject } from "vue";
 
 // components
-import { VButton } from "@halo-dev/components";
+import { Toast, VButton } from "@halo-dev/components";
 
 // hooks
-import { useSettingForm } from "@/composables/use-setting-form";
+import { useSettingFormConvert } from "@/composables/use-setting-form";
 import { useRouteParams } from "@vueuse/router";
-import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import { useSystemConfigMapStore } from "@/stores/system-configmap";
+import type { ConfigMap, Setting } from "@halo-dev/api-client";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import { apiClient } from "@/utils/api-client";
+import { useI18n } from "vue-i18n";
 
+const SYSTEM_CONFIGMAP_NAME = "system";
+
+const { t } = useI18n();
+const systemConfigMapStore = useSystemConfigMapStore();
+const queryClient = useQueryClient();
+
+const saving = ref(false);
 const group = useRouteParams<string>("group");
+const setting = inject<Ref<Setting | undefined>>("setting", ref());
 
-const {
-  setting,
-  configMapFormData,
-  saving,
-  handleFetchConfigMap,
-  handleFetchSettings,
-  handleSaveConfigMap,
-} = useSettingForm(ref("system"), ref("system"));
-
-const formSchema = computed(() => {
-  if (!setting.value) {
-    return;
-  }
-  return setting.value.spec.forms.find((item) => item.group === group?.value)
-    ?.formSchema as (FormKitSchemaCondition | FormKitSchemaNode)[];
+const { data: configMap, suspense } = useQuery<ConfigMap>({
+  queryKey: ["system-configMap"],
+  queryFn: async () => {
+    const { data } = await apiClient.extension.configMap.getv1alpha1ConfigMap({
+      name: SYSTEM_CONFIGMAP_NAME,
+    });
+    return data;
+  },
+  refetchOnWindowFocus: false,
+  enabled: computed(() => !!setting.value),
 });
 
-const systemConfigMapStore = useSystemConfigMapStore();
+const { configMapFormData, formSchema, convertToSave } = useSettingFormConvert(
+  setting,
+  configMap,
+  group
+);
 
-const handleSave = async () => {
-  await handleSaveConfigMap();
-  await systemConfigMapStore.fetchSystemConfigMap();
+const handleSaveConfigMap = async () => {
+  saving.value = true;
+
+  const configMapToUpdate = convertToSave();
+
+  if (!configMapToUpdate) {
+    saving.value = false;
+    return;
+  }
+
+  const { data } = await apiClient.extension.configMap.updatev1alpha1ConfigMap({
+    name: SYSTEM_CONFIGMAP_NAME,
+    configMap: configMapToUpdate,
+  });
+
+  Toast.success(t("core.common.toast.save_success"));
+
+  queryClient.invalidateQueries({ queryKey: ["system-configMap"] });
+
+  systemConfigMapStore.configMap = data;
+
+  saving.value = false;
 };
 
-await handleFetchSettings();
-await handleFetchConfigMap();
+await suspense();
 </script>
 <template>
   <Transition mode="out-in" name="fade">
     <div class="bg-white p-4">
       <div>
         <FormKit
-          v-if="group && formSchema && configMapFormData"
+          v-if="group && formSchema && configMapFormData?.[group]"
           :id="group"
           v-model="configMapFormData[group]"
           :name="group"
           :actions="false"
           :preserve="true"
           type="form"
-          @submit="handleSave"
+          @submit="handleSaveConfigMap"
         >
           <FormKitSchema
             :schema="formSchema"
