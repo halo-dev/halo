@@ -14,9 +14,9 @@ import run.halo.app.extension.ConfigMap;
  * @since 2.0.0
  */
 public class DefaultSettingFetcher extends SettingFetcher {
-    private final DefaultReactiveSettingFetcher delegateFetcher;
+    private final ReactiveSettingFetcher delegateFetcher;
 
-    public DefaultSettingFetcher(DefaultReactiveSettingFetcher reactiveSettingFetcher) {
+    public DefaultSettingFetcher(ReactiveSettingFetcher reactiveSettingFetcher) {
         this.delegateFetcher = reactiveSettingFetcher;
     }
 

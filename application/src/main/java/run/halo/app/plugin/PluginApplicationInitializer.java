@@ -113,7 +113,7 @@ public class PluginApplicationInitializer {
         DefaultListableBeanFactory listableBeanFactory) {
         ReactiveExtensionClient extensionClient =
             rootApplicationContext.getBean(ReactiveExtensionClient.class);
-        DefaultReactiveSettingFetcher reactiveSettingFetcher =
+        ReactiveSettingFetcher reactiveSettingFetcher =
             new DefaultReactiveSettingFetcher(extensionClient, pluginName);
         listableBeanFactory.registerSingleton("settingFetcher",
             new DefaultSettingFetcher(reactiveSettingFetcher));
