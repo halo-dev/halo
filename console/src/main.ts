@@ -245,10 +245,8 @@ async function initApp() {
     await userStore.fetchCurrentUser();
 
     // set locale
-    // @ts-ignore
     i18n.global.locale.value =
-      userStore.currentUser?.metadata.annotations?.["locale"] ||
-      getBrowserLanguage();
+      localStorage.getItem("locale") || getBrowserLanguage();
 
     if (userStore.isAnonymous) {
       return;
