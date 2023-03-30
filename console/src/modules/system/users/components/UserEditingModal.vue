@@ -77,24 +77,11 @@ watch(
   () => props.visible,
   (visible) => {
     if (visible) {
+      if (props.user) formState.value = cloneDeep(props.user);
       setFocus(isUpdateMode.value ? "displayNameInput" : "userNameInput");
     } else {
       handleResetForm();
     }
-  }
-);
-
-watch(
-  () => props.user,
-  (user) => {
-    if (user) {
-      formState.value = cloneDeep(user);
-    } else {
-      handleResetForm();
-    }
-  },
-  {
-    immediate: true,
   }
 );
 

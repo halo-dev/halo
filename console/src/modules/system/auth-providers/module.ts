@@ -14,7 +14,7 @@ export default definePlugin({
           name: "AuthProviders",
           component: AuthProviders,
           meta: {
-            title: "认证方式",
+            title: "core.identity_authentication.title",
             searchable: true,
           },
         },
@@ -23,7 +23,7 @@ export default definePlugin({
           name: "AuthProviderDetail",
           component: AuthProviderDetail,
           meta: {
-            title: "认证方式详情",
+            title: "core.identity_authentication.detail.title",
           },
         },
       ],

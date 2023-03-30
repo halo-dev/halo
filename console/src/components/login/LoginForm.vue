@@ -11,9 +11,17 @@ import { submitForm } from "@formkit/core";
 import { JSEncrypt } from "jsencrypt";
 import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
-import SocialAuthProviders from "./SocialAuthProviders.vue";
 
 const { t } = useI18n();
+
+withDefaults(
+  defineProps<{
+    buttonText: string;
+  }>(),
+  {
+    buttonText: "core.login.button",
+  }
+);
 
 const emit = defineEmits<{
   (event: "succeed"): void;
@@ -146,15 +154,6 @@ onMounted(() => {
     type="secondary"
     @click="submitForm('login-form')"
   >
-    {{ $t("core.login.button") }}
+    {{ $t(buttonText) }}
   </VButton>
-
-  <div class="flex justify-center gap-1 pb-0.5 pt-3.5 text-xs">
-    <span class="text-slate-500">没有账号</span>
-    <span class="cursor-pointer text-secondary hover:text-gray-600">
-      立即注册
-    </span>
-  </div>
-
-  <SocialAuthProviders />
 </template>

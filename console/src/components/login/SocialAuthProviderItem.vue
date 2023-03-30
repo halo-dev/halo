@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { SocialAuthProvider } from "@/modules/system/actuator/types";
-import { VLoading } from "@halo-dev/components";
 import { ref } from "vue";
 
 const props = withDefaults(
