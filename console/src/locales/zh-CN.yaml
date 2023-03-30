@@ -4,19 +4,22 @@ core:
     fields:
       username:
         placeholder: 用户名
-        validation: 请输入用户名
       password:
         placeholder: 密码
-        validation: 请输入密码
     operations:
       submit:
         toast_success: 登录成功
         toast_failed: 登录失败，用户名或密码错误
         toast_csrf: CSRF Token 失效，请重新尝试
+      signup:
+        label: 没有账号
+        button: 立即注册
+      return_login:
+        label: 已有账号
+        button: 立即登录
     button: 登录
     modal:
       title: 重新登录
-    other_login: 其他登录：
   signup:
     title: 注册
     fields:
@@ -34,6 +37,17 @@ core:
         toast_success: 注册成功
   binding:
     title: 账号绑定
+    common:
+      toast:
+        mounted: 当前登录方式未绑定账号，请先绑定或注册新账号
+    operations:
+      login_and_bind:
+        button: 登录并绑定
+      signup_and_bind:
+        button: 注册并绑定
+      bind:
+        toast_success: 绑定成功
+        toast_failed: 绑定失败，没有找到已启用的登录方式
   sidebar:
     search:
       placeholder: 搜索
@@ -891,6 +905,7 @@ core:
       disable_privileged:
         tooltip: 系统保留的认证方式，无法禁用
     detail:
+      title: 身份认证详情
       fields:
         display_name: 名称
         description: 描述
@@ -1051,6 +1066,8 @@ core:
     pagination:
       page_label: 页
       size_label: 条 / 页
+    social_auth_providers:
+      title: 三方登录
   composables:
     content_cache:
       toast_recovered: 已从缓存中恢复未保存的内容

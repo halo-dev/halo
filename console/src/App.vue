@@ -13,12 +13,12 @@ import {
 } from "overlayscrollbars-vue";
 import type { FormKitConfig } from "@formkit/core";
 import { i18n } from "./locales";
+import { AppName } from "./constants/app";
 
 const { t } = useI18n();
 
 const { configMap } = storeToRefs(useSystemConfigMapStore());
 
-const AppName = "Halo";
 const route = useRoute();
 const title = useTitle();
 

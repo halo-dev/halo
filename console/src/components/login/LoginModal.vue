@@ -3,6 +3,7 @@ import { Toast, VModal } from "@halo-dev/components";
 import LoginForm from "@/components/login/LoginForm.vue";
 import { useUserStore } from "@/stores/user";
 import { useI18n } from "vue-i18n";
+import SocialAuthProviders from "./SocialAuthProviders.vue";
 
 const userStore = useUserStore();
 const { t } = useI18n();
@@ -27,5 +28,6 @@ const onLoginSucceed = () => {
     @update:visible="onVisibleChange"
   >
     <LoginForm v-if="userStore.loginModalVisible" @succeed="onLoginSucceed" />
+    <SocialAuthProviders />
   </VModal>
 </template>

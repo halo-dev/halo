@@ -1,12 +1,21 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
-import { submitForm, reset } from "@formkit/core";
+import { submitForm } from "@formkit/core";
 import { Toast, VButton } from "@halo-dev/components";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
+
+withDefaults(
+  defineProps<{
+    buttonText?: string;
+  }>(),
+  {
+    buttonText: "core.signup.operations.submit.button",
+  }
+);
 
 const formState = ref({
   password: "",
@@ -23,6 +32,7 @@ const formState = ref({
     },
   },
 });
+const loading = ref(false);
 
 const emit = defineEmits<{
   (event: "succeed"): void;
@@ -42,6 +52,8 @@ onMounted(() => {
 
 const handleSignup = async () => {
   try {
+    loading.value = true;
+
     await apiClient.common.user.signUp({
       signUpRequest: formState.value,
     });
@@ -51,7 +63,13 @@ const handleSignup = async () => {
     emit("succeed");
   } catch (error) {
     console.error("Failed to sign up", error);
+  } finally {
+    loading.value = false;
   }
+};
+
+const inputClasses = {
+  outer: "!py-3 first:!pt-0 last:!pb-0",
 };
 </script>
 
@@ -73,6 +91,7 @@ const handleSignup = async () => {
       name="username"
       :placeholder="$t('core.signup.fields.username.placeholder')"
       :validation-label="$t('core.signup.fields.username.placeholder')"
+      :classes="inputClasses"
       :autofocus="true"
       type="text"
       :validation="[
@@ -93,6 +112,7 @@ const handleSignup = async () => {
       name="displayName"
       :placeholder="$t('core.signup.fields.display_name.placeholder')"
       :validation-label="$t('core.signup.fields.display_name.placeholder')"
+      :classes="inputClasses"
       :autofocus="true"
       type="text"
       validation="required"
@@ -103,6 +123,7 @@ const handleSignup = async () => {
       name="password"
       :placeholder="$t('core.signup.fields.password.placeholder')"
       :validation-label="$t('core.signup.fields.password.placeholder')"
+      :classes="inputClasses"
       type="password"
       validation="required|length:0,100"
     >
@@ -111,17 +132,19 @@ const handleSignup = async () => {
       name="password_confirm"
       :placeholder="$t('core.signup.fields.password_confirm.placeholder')"
       :validation-label="$t('core.signup.fields.password_confirm.placeholder')"
+      :classes="inputClasses"
       type="password"
       validation="required|confirm|length:0,100"
     >
     </FormKit>
   </FormKit>
   <VButton
-    class="mt-6"
+    class="mt-8"
     block
     type="secondary"
+    :loading="loading"
     @click="submitForm('signup-form')"
   >
-    {{ $t("core.signup.operations.submit.button") }}
+    {{ $t(buttonText) }}
   </VButton>
 </template>

@@ -4,19 +4,22 @@ core:
     fields:
       username:
         placeholder: Username
-        validation: Please enter username
       password:
         placeholder: Password
-        validation: Please enter password
     operations:
       submit:
         toast_success: Login successful
         toast_failed: Login failed, incorrect username or password
         toast_csrf: CSRF Token expired, please try again
+      signup:
+        label: No account
+        button: Sign up
+      return_login:
+        label: Already have an account
+        button: Sign in
     button: Login
     modal:
       title: Re-login
-    other_login: "Other login:"
   signup:
     title: Sign up
     fields:
@@ -34,6 +37,17 @@ core:
         toast_success: Sign up successfully
   binding:
     title: Account binding
+    common:
+      toast:
+        mounted: The current login method is not bound to an account, Please bind or sign up a new account first
+    operations:
+      login_and_bind:
+        button: Login and Bind
+      signup_and_bind:
+        button: Signup and Bind
+      bind:
+        toast_success: Binding successfully
+        toast_failed: Binding failed, no enabled login method found
   sidebar:
     search:
       placeholder: Search
@@ -891,6 +905,7 @@ core:
       disable_privileged:
         tooltip: The authentication method reserved by the system cannot be disabled
     detail:
+      title: Identity authentication detail
       fields:
         display_name: Display name
         description: Description
@@ -1051,6 +1066,8 @@ core:
     pagination:
       page_label: page
       size_label: items per page
+    social_auth_providers:
+      title: Third-party login
   composables:
     content_cache:
       toast_recovered: Recovered unsaved content from cache
