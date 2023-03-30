@@ -16,7 +16,7 @@ const { t } = useI18n();
 
 withDefaults(
   defineProps<{
-    buttonText: string;
+    buttonText?: string;
   }>(),
   {
     buttonText: "core.login.button",

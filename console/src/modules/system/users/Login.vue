@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onBeforeMount, computed } from "vue";
+import { onBeforeMount, computed, watch } from "vue";
 import router from "@/router";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
 import { useUserStore } from "@/stores/user";
@@ -8,9 +8,15 @@ import { useRouteQuery } from "@vueuse/router";
 import SignupForm from "@/components/signup/SignupForm.vue";
 import SocialAuthProviders from "@/components/login/SocialAuthProviders.vue";
 import { useGlobalInfoFetch } from "@/composables/use-global-info";
+import { useTitle } from "@vueuse/core";
+import { useI18n } from "vue-i18n";
+import { AppName } from "@/constants/app";
 
 const userStore = useUserStore();
 const { globalInfo } = useGlobalInfoFetch();
+const { t } = useI18n();
+
+const SIGNUP_TYPE = "signup";
 
 onBeforeMount(() => {
   if (!userStore.isAnonymous) {
@@ -25,10 +31,22 @@ function onLoginSucceed() {
 const type = useRouteQuery<string>("type", "");
 
 function handleChangeType() {
-  type.value = type.value === "signup" ? "" : "signup";
+  type.value = type.value === SIGNUP_TYPE ? "" : SIGNUP_TYPE;
 }
 
-const isLoginType = computed(() => type.value !== "signup");
+const isLoginType = computed(() => type.value !== SIGNUP_TYPE);
+
+// page title
+const title = useTitle();
+watch(
+  () => type.value,
+  (value) => {
+    const routeTitle = t(
+      `core.${value === SIGNUP_TYPE ? SIGNUP_TYPE : "login"}.title`
+    );
+    title.value = [routeTitle, AppName].join(" - ");
+  }
+);
 </script>
 <template>
   <div class="flex h-screen flex-col items-center bg-white/90 pt-[30vh]">

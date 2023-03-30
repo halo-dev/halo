@@ -10,7 +10,7 @@ const { t } = useI18n();
 
 withDefaults(
   defineProps<{
-    buttonText: string;
+    buttonText?: string;
   }>(),
   {
     buttonText: "core.signup.operations.submit.button",
