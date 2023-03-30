@@ -18,7 +18,7 @@ import {
   useRouter,
   type RouteRecordRaw,
 } from "vue-router";
-import { nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
+import { onMounted, onUnmounted, reactive, ref } from "vue";
 import axios from "axios";
 import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
 import LoginModal from "@/components/login/LoginModal.vue";
@@ -28,7 +28,6 @@ import { useRoleStore } from "@/stores/role";
 import { hasPermission } from "@/utils/permission";
 import { useUserStore } from "@/stores/user";
 import { rbacAnnotations } from "@/constants/annotations";
-import { useScroll } from "@vueuse/core";
 import { defineStore, storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
 import {
@@ -189,9 +188,8 @@ const generateMenus = () => {
 
 onMounted(generateMenus);
 
-// store scroll position
+// aside scroll
 const navbarScroller = ref();
-const { y } = useScroll(navbarScroller);
 
 const useNavbarScrollStore = defineStore("navbar", {
   state: () => ({
@@ -201,20 +199,6 @@ const useNavbarScrollStore = defineStore("navbar", {
 
 const navbarScrollStore = useNavbarScrollStore();
 
-watch(
-  () => y.value,
-  () => {
-    navbarScrollStore.y = y.value;
-  }
-);
-
-onMounted(() => {
-  nextTick(() => {
-    y.value = navbarScrollStore.y;
-  });
-});
-
-// aside scroll
 const reactiveParams = reactive<UseOverlayScrollbarsParams>({
   options: {
     scrollbars: {
@@ -222,7 +206,17 @@ const reactiveParams = reactive<UseOverlayScrollbarsParams>({
       autoHideDelay: 600,
     },
   },
-  defer: true,
+  events: {
+    scroll: (_, onScrollArgs) => {
+      const target = onScrollArgs.target as HTMLElement;
+      navbarScrollStore.y = target.scrollTop;
+    },
+    updated: (instance) => {
+      const { viewport } = instance.elements();
+      if (!viewport) return;
+      viewport.scrollTo({ top: navbarScrollStore.y });
+    },
+  },
 });
 const [initialize] = useOverlayScrollbars(reactiveParams);
 onMounted(() => {
@@ -411,8 +405,8 @@ onMounted(() => {
 .navbar {
   @apply w-64;
   @apply bg-white;
+  @apply shadow;
   z-index: 999;
-  box-shadow: 0 4px 4px #f6c6ce;
 
   .profile-placeholder {
     height: 70px;
