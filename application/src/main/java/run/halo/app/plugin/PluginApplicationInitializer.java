@@ -11,7 +11,7 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.StopWatch;
-import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ReactiveExtensionClient;
 
 /**
  * Plugin application initializer will create plugin application context by plugin id and
@@ -111,10 +111,13 @@ public class PluginApplicationInitializer {
 
     private void populateSettingFetcher(String pluginName,
         DefaultListableBeanFactory listableBeanFactory) {
-        ExtensionClient extensionClient =
-            rootApplicationContext.getBean(ExtensionClient.class);
-        SettingFetcher settingFetcher = new DefaultSettingFetcher(pluginName, extensionClient);
-        listableBeanFactory.registerSingleton("settingFetcher", settingFetcher);
+        ReactiveExtensionClient extensionClient =
+            rootApplicationContext.getBean(ReactiveExtensionClient.class);
+        ReactiveSettingFetcher reactiveSettingFetcher =
+            new DefaultReactiveSettingFetcher(extensionClient, pluginName);
+        listableBeanFactory.registerSingleton("settingFetcher",
+            new DefaultSettingFetcher(reactiveSettingFetcher));
+        listableBeanFactory.registerSingleton("reactiveSettingFetcher", reactiveSettingFetcher);
     }
 
     public void onStartUp(String pluginId) {
