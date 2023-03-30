@@ -71,7 +71,17 @@ const handleSignup = async () => {
       :validation-label="$t('core.signup.fields.username.placeholder')"
       :autofocus="true"
       type="text"
-      validation="required"
+      :validation="[
+        ['required'],
+        ['length:0,63'],
+        [
+          'matches',
+          /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/,
+        ],
+      ]"
+      :validation-messages="{
+        matches: $t('core.user.editing_modal.fields.username.validation'),
+      }"
     >
     </FormKit>
     <FormKit
