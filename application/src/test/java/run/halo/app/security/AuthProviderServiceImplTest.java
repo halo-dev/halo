@@ -70,7 +70,7 @@ class AuthProviderServiceImplTest {
         Set<String> enabled =
             JsonUtils.jsonToObject(providerSettingStr, SystemSetting.AuthProvider.class)
                 .getEnabled();
-        assertThat(enabled).containsExactly("github", "local");
+        assertThat(enabled).containsExactly("github");
         // Verify the result
         verify(client).get(AuthProvider.class, "github");
         verify(client).fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG));
@@ -104,7 +104,7 @@ class AuthProviderServiceImplTest {
         Set<String> enabled =
             JsonUtils.jsonToObject(providerSettingStr, SystemSetting.AuthProvider.class)
                 .getEnabled();
-        assertThat(enabled).containsExactly("local");
+        assertThat(enabled).isEmpty();
         // Verify the result
         verify(client).get(AuthProvider.class, "github");
         verify(client).fetch(eq(ConfigMap.class), eq(SystemSetting.SYSTEM_CONFIG));
