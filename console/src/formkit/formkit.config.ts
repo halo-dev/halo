@@ -15,6 +15,7 @@ import { tagSelect } from "./inputs/tag-select";
 import { categorySelect } from "./inputs/category-select";
 import { categoryCheckbox } from "./inputs/category-checkbox";
 import { tagCheckbox } from "./inputs/tag-checkbox";
+import { roleSelect } from "./inputs/role-select";
 
 import radioAlt from "./plugins/radio-alt";
 import stopImplicitSubmission from "./plugins/stop-implicit-submission";
@@ -39,6 +40,7 @@ const config: DefaultConfigOptions = {
     singlePageSelect,
     categoryCheckbox,
     tagCheckbox,
+    roleSelect,
   },
   locales: { zh, en },
   locale: "zh",
