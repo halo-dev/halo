@@ -411,8 +411,8 @@ onMounted(() => {
 .navbar {
   @apply w-64;
   @apply bg-white;
+  @apply shadow;
   z-index: 999;
-  box-shadow: 0 4px 4px #f6c6ce;
 
   .profile-placeholder {
     height: 70px;
