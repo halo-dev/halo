@@ -1,5 +1,6 @@
 core:
   login:
+    title: Login
     fields:
       username:
         placeholder: Username
@@ -16,6 +17,23 @@ core:
     modal:
       title: Re-login
     other_login: "Other login:"
+  signup:
+    title: Sign up
+    fields:
+      username:
+        placeholder: Username
+      display_name:
+        placeholder: Display name
+      password:
+        placeholder: Password
+      password_confirm:
+        placeholder: Confirm password
+    operations:
+      submit:
+        button: Sign up
+        toast_success: Sign up successfully
+  binding:
+    title: Account binding
   sidebar:
     search:
       placeholder: Search
@@ -956,8 +974,8 @@ core:
     Post Manage: Post Manage
     Post View: Post View
     role-template-view-posts: Post View
-    role-template-manage-snaphosts: Snapshot Manage
-    role-template-view-snaphosts: Snapshot View
+    role-template-manage-snapshots: Snapshot Manage
+    role-template-view-snapshots: Snapshot View
     role-template-manage-tags: Tag Manage
     role-template-view-tags: Tag View
     role-template-manage-categories: Category Manage

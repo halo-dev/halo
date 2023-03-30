@@ -1,5 +1,6 @@
 core:
   login:
+    title: 登录
     fields:
       username:
         placeholder: 用户名
@@ -16,6 +17,23 @@ core:
     modal:
       title: 重新登录
     other_login: 其他登录：
+  signup:
+    title: 注册
+    fields:
+      username:
+        placeholder: 用户名
+      display_name:
+        placeholder: 名称
+      password:
+        placeholder: 密码
+      password_confirm:
+        placeholder: 确认密码
+    operations:
+      submit:
+        button: 注册
+        toast_success: 注册成功
+  binding:
+    title: 账号绑定
   sidebar:
     search:
       placeholder: 搜索
@@ -956,8 +974,8 @@ core:
     Post Manage: 文章管理
     Post View: 文章查看
     role-template-view-posts: 文章查看
-    role-template-manage-snaphosts: 版本管理
-    role-template-view-snaphosts: 版本查看
+    role-template-manage-snapshots: 版本管理
+    role-template-view-snapshots: 版本查看
     role-template-manage-tags: 标签管理
     role-template-view-tags: 标签查看
     role-template-manage-categories: 分类管理

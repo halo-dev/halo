@@ -149,3 +149,4 @@ export * from "./user-permission";
 export * from "./user-spec";
 export * from "./user-status";
 export * from "./vote-request";
+export * from "./sign-up-request";

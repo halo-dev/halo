@@ -104,4 +104,5 @@ export interface SocialAuthProvider {
   logo: string;
   website: string;
   authenticationUrl: string;
+  bindingUrl?: string;
 }
