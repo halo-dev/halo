@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { Dialog, IconUserSettings, VButton, VTag } from "@halo-dev/components";
 import type { ComputedRef, Ref } from "vue";
-import { inject } from "vue";
+import { inject, computed } from "vue";
 import { useRouter } from "vue-router";
 import type { DetailedUser, ListedAuthProvider } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
@@ -17,7 +17,7 @@ const isCurrentUser = inject<ComputedRef<boolean>>("isCurrentUser");
 const router = useRouter();
 const { t } = useI18n();
 
-const { data: authProviders } = useQuery<ListedAuthProvider[]>({
+const { data: authProviders, isFetching } = useQuery<ListedAuthProvider[]>({
   queryKey: ["user-auth-providers"],
   queryFn: async () => {
     const { data } = await apiClient.authProvider.listAuthProviders();
@@ -25,6 +25,12 @@ const { data: authProviders } = useQuery<ListedAuthProvider[]>({
   },
   refetchOnWindowFocus: false,
   enabled: isCurrentUser,
+});
+
+const availableAuthProviders = computed(() => {
+  return authProviders.value?.filter(
+    (authProvider) => authProvider.enabled && authProvider.supportsBinding
+  );
 });
 
 const handleUnbindAuth = (authProvider: ListedAuthProvider) => {
@@ -60,7 +66,7 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
   <div class="border-t border-gray-100">
     <dl class="divide-y divide-gray-50">
       <div
-        class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
+        class="bg-white px-2 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
         <dt class="text-sm font-medium text-gray-900">
           {{ $t("core.user.detail.fields.display_name") }}
@@ -70,7 +76,7 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
         </dd>
       </div>
       <div
-        class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
+        class="bg-white px-2 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
         <dt class="text-sm font-medium text-gray-900">
           {{ $t("core.user.detail.fields.username") }}
@@ -80,7 +86,7 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
         </dd>
       </div>
       <div
-        class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
+        class="bg-white px-2 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
         <dt class="text-sm font-medium text-gray-900">
           {{ $t("core.user.detail.fields.email") }}
@@ -90,7 +96,7 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
         </dd>
       </div>
       <div
-        class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
+        class="bg-white px-2 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
         <dt class="text-sm font-medium text-gray-900">
           {{ $t("core.user.detail.fields.roles") }}
@@ -117,7 +123,7 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
         </dd>
       </div>
       <div
-        class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
+        class="bg-white px-2 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
         <dt class="text-sm font-medium text-gray-900">
           {{ $t("core.user.detail.fields.bio") }}
@@ -127,7 +133,7 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
         </dd>
       </div>
       <div
-        class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
+        class="bg-white px-2 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
         <dt class="text-sm font-medium text-gray-900">
           {{ $t("core.user.detail.fields.creation_time") }}
@@ -141,7 +147,7 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
       <!-- TODO: add display last login time support -->
       <div
         v-if="false"
-        class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
+        class="bg-white px-2 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
         <dt class="text-sm font-medium text-gray-900">最近登录时间</dt>
         <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
@@ -149,8 +155,8 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
         </dd>
       </div>
       <div
-        v-if="isCurrentUser"
-        class="bg-white py-5 px-2 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
+        v-if="!isFetching && isCurrentUser && availableAuthProviders?.length"
+        class="bg-white px-2 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4"
       >
         <dt class="text-sm font-medium text-gray-900">
           {{ $t("core.user.detail.fields.identity_authentication") }}

@@ -397,7 +397,7 @@ public class UserEndpoint implements CustomEndpoint {
 
     private Mono<ListResult<ListedUser>> toListedUser(ListResult<User> listResult) {
         return Flux.fromStream(listResult.get())
-            .flatMap(user -> {
+            .concatMap(user -> {
                 Set<String> roleNames = roleNames(user);
                 return roleService.list(roleNames)
                     .collectList()

@@ -117,7 +117,7 @@ const handleOpenDetail = (attachment: Attachment) => {
     >
       <div class="group relative bg-white">
         <div
-          class="aspect-w-10 aspect-h-8 block h-full w-full cursor-pointer overflow-hidden bg-gray-100"
+          class="aspect-h-8 aspect-w-10 block h-full w-full cursor-pointer overflow-hidden bg-gray-100"
         >
           <LazyImage
             v-if="isImage(attachment.spec.mediaType)"
@@ -154,17 +154,17 @@ const handleOpenDetail = (attachment: Attachment) => {
 
         <div
           :class="{ '!flex': selectedAttachments.has(attachment) }"
-          class="absolute top-0 left-0 hidden h-1/3 w-full justify-end bg-gradient-to-b from-gray-300 to-transparent ease-in-out group-hover:flex"
+          class="absolute left-0 top-0 hidden h-1/3 w-full justify-end bg-gradient-to-b from-gray-300 to-transparent ease-in-out group-hover:flex"
         >
           <IconEye
-            class="mt-1 mr-1 hidden h-6 w-6 cursor-pointer text-white transition-all hover:text-primary group-hover:block"
+            class="mr-1 mt-1 hidden h-6 w-6 cursor-pointer text-white transition-all hover:text-primary group-hover:block"
             @click.stop="handleOpenDetail(attachment)"
           />
           <IconCheckboxFill
             :class="{
               '!text-primary': selectedAttachments.has(attachment),
             }"
-            class="mt-1 mr-1 h-6 w-6 cursor-pointer text-white transition-all hover:text-primary"
+            class="mr-1 mt-1 h-6 w-6 cursor-pointer text-white transition-all hover:text-primary"
           />
         </div>
       </div>

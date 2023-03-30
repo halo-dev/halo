@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { inject, ref, type Ref } from "vue";
+import { inject, ref, type Ref, computed } from "vue";
 
 // hooks
 import { useSettingFormConvert } from "@/composables/use-setting-form";
@@ -13,37 +13,36 @@ import { Toast, VButton } from "@halo-dev/components";
 import type { ConfigMap, Plugin, Setting } from "@halo-dev/api-client";
 import { useRouteParams } from "@vueuse/router";
 import { useI18n } from "vue-i18n";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
 
 const { t } = useI18n();
+const queryClient = useQueryClient();
 
 const group = useRouteParams<string>("group");
 
 const plugin = inject<Ref<Plugin | undefined>>("plugin");
+const setting = inject<Ref<Setting | undefined>>("setting", ref());
 const saving = ref(false);
-const setting = ref<Setting>();
-const configMap = ref<ConfigMap>();
+
+const { data: configMap, suspense } = useQuery<ConfigMap>({
+  queryKey: ["plugin-configMap", plugin],
+  queryFn: async () => {
+    const { data } = await apiClient.plugin.fetchPluginConfig({
+      name: plugin?.value?.metadata.name as string,
+    });
+    return data;
+  },
+  refetchOnWindowFocus: false,
+  enabled: computed(() => {
+    return !!setting.value && !!plugin?.value;
+  }),
+});
 
 const { configMapFormData, formSchema, convertToSave } = useSettingFormConvert(
   setting,
   configMap,
   group
 );
-
-const handleFetchSettings = async () => {
-  if (!plugin?.value) return;
-  const { data } = await apiClient.plugin.fetchPluginSetting({
-    name: plugin.value.metadata.name,
-  });
-  setting.value = data;
-};
-
-const handleFetchConfigMap = async () => {
-  if (!plugin?.value) return;
-  const { data } = await apiClient.plugin.fetchPluginConfig({
-    name: plugin.value.metadata.name,
-  });
-  configMap.value = data;
-};
 
 const handleSaveConfigMap = async () => {
   saving.value = true;
@@ -53,27 +52,26 @@ const handleSaveConfigMap = async () => {
     return;
   }
 
-  const { data: newConfigMap } = await apiClient.plugin.updatePluginConfig({
+  await apiClient.plugin.updatePluginConfig({
     name: plugin.value.metadata.name,
     configMap: configMapToUpdate,
   });
 
   Toast.success(t("core.common.toast.save_success"));
 
-  await handleFetchSettings();
-  configMap.value = newConfigMap;
+  queryClient.invalidateQueries({ queryKey: ["plugin-configMap"] });
+
   saving.value = false;
 };
 
-await handleFetchSettings();
-await handleFetchConfigMap();
+await suspense();
 </script>
 <template>
   <Transition mode="out-in" name="fade">
     <div class="bg-white p-4">
       <div>
         <FormKit
-          v-if="group && formSchema && configMapFormData"
+          v-if="group && formSchema && configMapFormData?.[group]"
           :id="group"
           v-model="configMapFormData[group]"
           :name="group"

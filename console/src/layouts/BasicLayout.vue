@@ -18,7 +18,7 @@ import {
   useRouter,
   type RouteRecordRaw,
 } from "vue-router";
-import { nextTick, onMounted, onUnmounted, reactive, ref, watch } from "vue";
+import { onMounted, onUnmounted, reactive, ref } from "vue";
 import axios from "axios";
 import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
 import LoginModal from "@/components/login/LoginModal.vue";
@@ -28,7 +28,6 @@ import { useRoleStore } from "@/stores/role";
 import { hasPermission } from "@/utils/permission";
 import { useUserStore } from "@/stores/user";
 import { rbacAnnotations } from "@/constants/annotations";
-import { useScroll } from "@vueuse/core";
 import { defineStore, storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
 import {
@@ -189,9 +188,8 @@ const generateMenus = () => {
 
 onMounted(generateMenus);
 
-// store scroll position
+// aside scroll
 const navbarScroller = ref();
-const { y } = useScroll(navbarScroller);
 
 const useNavbarScrollStore = defineStore("navbar", {
   state: () => ({
@@ -201,20 +199,6 @@ const useNavbarScrollStore = defineStore("navbar", {
 
 const navbarScrollStore = useNavbarScrollStore();
 
-watch(
-  () => y.value,
-  () => {
-    navbarScrollStore.y = y.value;
-  }
-);
-
-onMounted(() => {
-  nextTick(() => {
-    y.value = navbarScrollStore.y;
-  });
-});
-
-// aside scroll
 const reactiveParams = reactive<UseOverlayScrollbarsParams>({
   options: {
     scrollbars: {
@@ -222,7 +206,17 @@ const reactiveParams = reactive<UseOverlayScrollbarsParams>({
       autoHideDelay: 600,
     },
   },
-  defer: true,
+  events: {
+    scroll: (_, onScrollArgs) => {
+      const target = onScrollArgs.target as HTMLElement;
+      navbarScrollStore.y = target.scrollTop;
+    },
+    updated: (instance) => {
+      const { viewport } = instance.elements();
+      if (!viewport) return;
+      viewport.scrollTo({ top: navbarScrollStore.y });
+    },
+  },
 });
 const [initialize] = useOverlayScrollbars(reactiveParams);
 onMounted(() => {
@@ -237,7 +231,7 @@ onMounted(() => {
     <aside
       class="navbar fixed hidden h-full overflow-y-auto md:flex md:flex-col"
     >
-      <div class="logo flex justify-center pt-5 pb-7">
+      <div class="logo flex justify-center pb-7 pt-5">
         <a
           href="/"
           target="_blank"
@@ -326,7 +320,7 @@ onMounted(() => {
     <!--bottom nav bar-->
     <div
       v-if="minimenus"
-      class="bottom-nav-bar fixed left-0 bottom-0 right-0 grid grid-cols-6 border-t-2 border-black bg-secondary drop-shadow-2xl mt-safe pb-safe md:hidden"
+      class="bottom-nav-bar fixed bottom-0 left-0 right-0 grid grid-cols-6 border-t-2 border-black bg-secondary drop-shadow-2xl mt-safe pb-safe md:hidden"
     >
       <div
         v-for="(menu, index) in minimenus"
@@ -360,7 +354,7 @@ onMounted(() => {
       <Teleport to="body">
         <div
           v-show="moreMenuRootVisible"
-          class="drawer-wrapper fixed top-0 left-0 z-[99999] flex h-full w-full flex-row items-end justify-center"
+          class="drawer-wrapper fixed left-0 top-0 z-[99999] flex h-full w-full flex-row items-end justify-center"
         >
           <transition
             enter-active-class="ease-out duration-200"
@@ -374,7 +368,7 @@ onMounted(() => {
           >
             <div
               v-show="moreMenuVisible"
-              class="drawer-layer absolute top-0 left-0 h-full w-full flex-none bg-gray-500 bg-opacity-75 transition-opacity"
+              class="drawer-layer absolute left-0 top-0 h-full w-full flex-none bg-gray-500 bg-opacity-75 transition-opacity"
               @click="moreMenuVisible = false"
             ></div>
           </transition>
@@ -420,8 +414,8 @@ onMounted(() => {
     .current-profile {
       height: 70px;
       @apply fixed
-      left-0
       bottom-0
+      left-0
       flex
       w-64
       gap-3
