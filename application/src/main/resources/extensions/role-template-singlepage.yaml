@@ -5,7 +5,7 @@ metadata:
   labels:
     halo.run/role-template: "true"
   annotations:
-    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-singlepages\", \"role-template-manage-snaphosts\" ]"
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-singlepages\", \"role-template-manage-snapshots\" ]"
     rbac.authorization.halo.run/module: "SinglePages Management"
     rbac.authorization.halo.run/display-name: "SinglePage Manage"
     rbac.authorization.halo.run/ui-permissions: |
@@ -25,7 +25,7 @@ metadata:
   labels:
     halo.run/role-template: "true"
   annotations:
-    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-snaphosts\" ]"
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-snapshots\" ]"
     rbac.authorization.halo.run/module: "SinglePages Management"
     rbac.authorization.halo.run/display-name: "SinglePage View"
     rbac.authorization.halo.run/ui-permissions: |

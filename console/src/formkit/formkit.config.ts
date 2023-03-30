@@ -1,6 +1,6 @@
 import { generateClasses } from "@formkit/themes";
 import theme from "./theme";
-import { zh } from "@formkit/i18n";
+import { zh, en } from "@formkit/i18n";
 import type { DefaultConfigOptions } from "@formkit/vue";
 import { form } from "./inputs/form";
 import { attachment } from "./inputs/attachment";
@@ -40,7 +40,7 @@ const config: DefaultConfigOptions = {
     categoryCheckbox,
     tagCheckbox,
   },
-  locales: { zh },
+  locales: { zh, en },
   locale: "zh",
 };
 
