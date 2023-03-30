@@ -71,7 +71,7 @@ spec:
           name: allowRegistration
           label: "开放注册"
           value: false
-        - $formkit: text
+        - $formkit: roleSelect
           name: defaultRole
           label: "默认角色"
     - group: comment
