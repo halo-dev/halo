@@ -1,15 +1,9 @@
 <script lang="ts" setup>
-import { rbacAnnotations } from "@/constants/annotations";
 import { apiClient } from "@/utils/api-client";
-import type { FormKitOptionsList } from "@formkit/inputs";
 import type { User } from "@halo-dev/api-client";
 import { VModal, VSpace, VButton } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import { computed, ref } from "vue";
-import { useFetchRole } from "../../roles/composables/use-role";
-import { useI18n } from "vue-i18n";
-
-const { t } = useI18n();
+import { ref } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -29,24 +23,6 @@ const emit = defineEmits<{
 
 const selectedRole = ref("");
 const saving = ref(false);
-
-const { roles } = useFetchRole();
-const rolesMap = computed<FormKitOptionsList>(() => {
-  return [
-    {
-      label: t("core.user.grant_permission_modal.fields.role.placeholder"),
-      value: "",
-    },
-    ...roles.value.map((role) => {
-      return {
-        label:
-          role.metadata?.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
-          role.metadata.name,
-        value: role.metadata?.name,
-      };
-    }),
-  ];
-});
 
 const handleGrantPermission = async () => {
   try {
@@ -89,9 +65,8 @@ const onVisibleChange = (visible: boolean) => {
     >
       <FormKit
         v-model="selectedRole"
-        :options="rolesMap"
         :label="$t('core.user.grant_permission_modal.fields.role.label')"
-        type="select"
+        type="roleSelect"
       ></FormKit>
     </FormKit>
     <template #footer>
