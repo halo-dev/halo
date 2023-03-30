@@ -1,9 +1,11 @@
 import { useUserStore } from "@/stores/user";
 import type { Router } from "vue-router";
 
+const whiteList = ["Setup", "Login", "Binding"];
+
 export function setupAuthCheckGuard(router: Router) {
   router.beforeEach((to, from, next) => {
-    if (to.name === "Setup" || to.name === "Login") {
+    if (whiteList.includes(to.name as string)) {
       next();
       return;
     }

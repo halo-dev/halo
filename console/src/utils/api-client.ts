@@ -36,6 +36,7 @@ import {
   LoginApi,
   AuthHaloRunV1alpha1AuthProviderApi,
   AuthHaloRunV1alpha1UserConnectionApi,
+  ApiHaloRunV1alpha1UserApi,
 } from "@halo-dev/api-client";
 import type { AxiosError, AxiosInstance } from "axios";
 import axios from "axios";
@@ -214,6 +215,9 @@ function setupApiClient(axios: AxiosInstance) {
       baseURL,
       axios
     ),
+    common: {
+      user: new ApiHaloRunV1alpha1UserApi(undefined, baseURL, axios),
+    },
   };
 }
 

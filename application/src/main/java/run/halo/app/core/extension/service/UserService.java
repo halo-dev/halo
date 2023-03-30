@@ -19,4 +19,6 @@ public interface UserService {
     Flux<Role> listRoles(String username);
 
     Mono<User> grantRoles(String username, Set<String> roles);
+
+    Mono<User> signUp(User user, String password);
 }

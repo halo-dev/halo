@@ -9,6 +9,7 @@ import PersonalAccessTokens from "./PersonalAccessTokens.vue";
 import Login from "./Login.vue";
 import { IconUserSettings } from "@halo-dev/components";
 import { markRaw } from "vue";
+import Binding from "./Binding.vue";
 
 export default definePlugin({
   components: {
@@ -19,6 +20,17 @@ export default definePlugin({
       path: "/login",
       name: "Login",
       component: Login,
+      meta: {
+        title: "core.login.title",
+      },
+    },
+    {
+      path: "/binding/:provider",
+      name: "Binding",
+      component: Binding,
+      meta: {
+        title: "core.binding.title",
+      },
     },
     {
       path: "/users",

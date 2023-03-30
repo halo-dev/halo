@@ -5,9 +5,12 @@ import static run.halo.app.core.extension.RoleBinding.containsUser;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
@@ -17,9 +20,14 @@ import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.exception.AccessDeniedException;
+import run.halo.app.infra.exception.DuplicateNameException;
 import run.halo.app.infra.exception.UserNotFoundException;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     public static final String GHOST_USER_NAME = "ghost";
 
@@ -27,10 +35,8 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public UserServiceImpl(ReactiveExtensionClient client, PasswordEncoder passwordEncoder) {
-        this.client = client;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+
 
     @Override
     public Mono<User> getUser(String username) {
@@ -115,4 +121,49 @@ public class UserServiceImpl implements UserService {
             });
     }
 
+    @Override
+    @Transactional
+    public Mono<User> signUp(User user, String password) {
+        if (!StringUtils.hasText(password)) {
+            throw new IllegalArgumentException("Password must not be blank");
+        }
+        return environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
+            .switchIfEmpty(Mono.error(new IllegalStateException("User setting is not configured")))
+            .flatMap(userSetting -> {
+                Boolean allowRegistration = userSetting.getAllowRegistration();
+                if (BooleanUtils.isFalse(allowRegistration)) {
+                    return Mono.error(new AccessDeniedException("Registration is not allowed",
+                        "problemDetail.user.signUpFailed.disallowed",
+                        null));
+                }
+                String defaultRole = userSetting.getDefaultRole();
+                if (!StringUtils.hasText(defaultRole)) {
+                    return Mono.error(new AccessDeniedException(
+                        "Default registration role is not configured by admin",
+                        "problemDetail.user.signUpFailed.disallowed",
+                        null));
+                }
+                String encodedPassword = passwordEncoder.encode(password);
+                user.getSpec().setPassword(encodedPassword);
+                return createNewUser(user, defaultRole);
+            });
+    }
+
+    private Mono<User> createNewUser(User user, String defaultRole) {
+        Assert.notNull(user, "User must not be null");
+        return client.fetch(User.class, user.getMetadata().getName())
+            .hasElement()
+            .flatMap(hasUser -> {
+                if (hasUser) {
+                    return Mono.error(
+                        new DuplicateNameException("User name is already in use", null,
+                            "problemDetail.user.duplicateName",
+                            new Object[] {user.getMetadata().getName()}));
+                }
+                return client.create(user)
+                    .flatMap(newUser -> grantRoles(user.getMetadata().getName(),
+                        Set.of(defaultRole))
+                    );
+            });
+    }
 }
