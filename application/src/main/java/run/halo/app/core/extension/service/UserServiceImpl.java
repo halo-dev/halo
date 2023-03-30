@@ -131,7 +131,7 @@ public class UserServiceImpl implements UserService {
                     return Mono.error(new AccessDeniedException("Registration is not allowed"));
                 }
                 String defaultRole = userSetting.getDefaultRole();
-                if (StringUtils.hasText(defaultRole)) {
+                if (!StringUtils.hasText(defaultRole)) {
                     return Mono.error(new AccessDeniedException(
                         "Default registration role is not configured by admin"));
                 }
