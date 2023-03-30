@@ -28,7 +28,6 @@ const { data: pluginRoleTemplates } = useQuery({
         `${pluginLabels.NAME}=${plugin?.value?.metadata.name}`,
         `${roleLabels.TEMPLATE}=true`,
         "!halo.run/hidden",
-        "halo.run/hidden!=true",
       ],
     });
 
