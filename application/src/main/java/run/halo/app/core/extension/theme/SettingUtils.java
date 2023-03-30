@@ -2,6 +2,7 @@ package run.halo.app.core.extension.theme;
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -158,7 +159,7 @@ public class SettingUtils {
         try {
             JsonUtils.DEFAULT_JSON_MAPPER.readTree(jsonString);
             return true;
-        } catch (Exception e) {
+        } catch (JacksonException e) {
             return false;
         }
     }
