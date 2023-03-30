@@ -4,7 +4,7 @@ import type { Ref } from "vue";
 import { computed, inject } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { Plugin, Role } from "@halo-dev/api-client";
-import { pluginLabels } from "@/constants/labels";
+import { pluginLabels, roleLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
 import { usePluginLifeCycle } from "./composables/use-plugin";
 import { formatDatetime } from "@/utils/date";
@@ -24,7 +24,11 @@ const { data: pluginRoleTemplates } = useQuery({
     const { data } = await apiClient.extension.role.listv1alpha1Role({
       page: 0,
       size: 0,
-      labelSelector: [`${pluginLabels.NAME}=${plugin?.value?.metadata.name}`],
+      labelSelector: [
+        `${pluginLabels.NAME}=${plugin?.value?.metadata.name}`,
+        `${roleLabels.TEMPLATE}=true`,
+        "!halo.run/hidden",
+      ],
     });
 
     return data.items;
