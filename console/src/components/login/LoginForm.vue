@@ -11,11 +11,7 @@ import { submitForm } from "@formkit/core";
 import { JSEncrypt } from "jsencrypt";
 import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
-import { useQuery } from "@tanstack/vue-query";
-import type {
-  GlobalInfo,
-  SocialAuthProvider,
-} from "@/modules/system/actuator/types";
+import SocialAuthProviders from "./SocialAuthProviders.vue";
 
 const { t } = useI18n();
 
@@ -103,23 +99,6 @@ const handleLogin = async () => {
 onMounted(() => {
   handleGenerateToken();
 });
-
-// auth providers
-// fixme: Needs to be saved in Pinia.
-const { data: socialAuthProviders } = useQuery<SocialAuthProvider[]>({
-  queryKey: ["social-auth-providers"],
-  queryFn: async () => {
-    const { data } = await axios.get<GlobalInfo>(
-      `${import.meta.env.VITE_API_URL}/actuator/globalinfo`,
-      {
-        withCredentials: true,
-      }
-    );
-
-    return data.socialAuthProviders;
-  },
-  refetchOnWindowFocus: false,
-});
 </script>
 
 <template>
@@ -169,20 +148,5 @@ const { data: socialAuthProviders } = useQuery<SocialAuthProvider[]>({
 
   <div class="flex justify-center py-3 text-xs text-gray-600">OR</div>
 
-  <ul
-    v-if="socialAuthProviders?.length"
-    class="flex flex-row flex-wrap justify-center gap-2"
-  >
-    <li v-for="(socialAuthProvider, index) in socialAuthProviders" :key="index">
-      <a
-        :href="socialAuthProvider.authenticationUrl"
-        class="group inline-flex select-none flex-row items-center gap-2 rounded bg-white px-2.5 py-1.5 ring-1 ring-gray-200 transition-all hover:bg-gray-100 hover:shadow hover:ring-gray-900"
-      >
-        <img class="h-4 w-4 rounded-full" :src="socialAuthProvider.logo" />
-        <span class="text-xs text-gray-800 group-hover:text-gray-900">
-          {{ socialAuthProvider.displayName }}
-        </span>
-      </a>
-    </li>
-  </ul>
+  <SocialAuthProviders />
 </template>
