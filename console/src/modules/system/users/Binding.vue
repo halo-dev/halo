@@ -8,7 +8,7 @@ import { useRoute } from "vue-router";
 import { Toast } from "@halo-dev/components";
 import { useRouteQuery } from "@vueuse/router";
 import SignupForm from "@/components/signup/SignupForm.vue";
-import { useAuthProvidersFetch } from "@/components/login/composables/use-auth-provider";
+import { useGlobalInfoFetch } from "@/composables/use-global-info";
 import { useI18n } from "vue-i18n";
 
 const userStore = useUserStore();
@@ -21,14 +21,14 @@ onBeforeMount(() => {
   }
 });
 
-const { socialAuthProviders } = useAuthProvidersFetch();
+const { globalInfo } = useGlobalInfoFetch();
 
 onMounted(() => {
   Toast.warning(t("core.binding.common.toast.mounted"));
 });
 
 function handleBinding() {
-  const authProvider = socialAuthProviders.value?.find(
+  const authProvider = globalInfo.value?.socialAuthProviders.find(
     (p) => p.name === route.params.provider
   );
 
@@ -64,7 +64,10 @@ const isLoginType = computed(() => type.value !== "signup");
         button-text="core.binding.operations.login_and_bind.button"
         @succeed="handleBinding"
       />
-      <div class="flex justify-center gap-1 pt-3.5 text-xs">
+      <div
+        v-if="globalInfo?.allowRegistration"
+        class="flex justify-center gap-1 pt-3.5 text-xs"
+      >
         <span class="text-slate-500">
           {{
             isLoginType

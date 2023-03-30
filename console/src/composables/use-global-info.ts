@@ -1,13 +1,10 @@
-import type {
-  GlobalInfo,
-  SocialAuthProvider,
-} from "@/modules/system/actuator/types";
+import type { GlobalInfo } from "@/modules/system/actuator/types";
 import { useQuery } from "@tanstack/vue-query";
 import axios from "axios";
 
-export function useAuthProvidersFetch() {
-  const { data: socialAuthProviders } = useQuery<SocialAuthProvider[]>({
-    queryKey: ["social-auth-providers"],
+export function useGlobalInfoFetch() {
+  const { data } = useQuery<GlobalInfo>({
+    queryKey: ["globalinfo"],
     queryFn: async () => {
       const { data } = await axios.get<GlobalInfo>(
         `${import.meta.env.VITE_API_URL}/actuator/globalinfo`,
@@ -16,12 +13,12 @@ export function useAuthProvidersFetch() {
         }
       );
 
-      return data.socialAuthProviders;
+      return data;
     },
     refetchOnWindowFocus: false,
   });
 
   return {
-    socialAuthProviders,
+    globalInfo: data,
   };
 }

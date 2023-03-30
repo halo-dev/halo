@@ -7,8 +7,10 @@ import LoginForm from "@/components/login/LoginForm.vue";
 import { useRouteQuery } from "@vueuse/router";
 import SignupForm from "@/components/signup/SignupForm.vue";
 import SocialAuthProviders from "@/components/login/SocialAuthProviders.vue";
+import { useGlobalInfoFetch } from "@/composables/use-global-info";
 
 const userStore = useUserStore();
+const { globalInfo } = useGlobalInfoFetch();
 
 onBeforeMount(() => {
   if (!userStore.isAnonymous) {
@@ -35,7 +37,10 @@ const isLoginType = computed(() => type.value !== "signup");
       <SignupForm v-if="type === 'signup'" @succeed="onLoginSucceed" />
       <LoginForm v-else @succeed="onLoginSucceed" />
       <SocialAuthProviders />
-      <div class="flex justify-center gap-1 pt-3.5 text-xs">
+      <div
+        v-if="globalInfo?.allowRegistration"
+        class="flex justify-center gap-1 pt-3.5 text-xs"
+      >
         <span class="text-slate-500">
           {{
             isLoginType
