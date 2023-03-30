@@ -1,5 +1,6 @@
 core:
   login:
+    title: Login
     fields:
       username:
         placeholder: Username
@@ -16,6 +17,8 @@ core:
     modal:
       title: Re-login
     other_login: "Other login:"
+  binding:
+    title: Account binding
   sidebar:
     search:
       placeholder: Search

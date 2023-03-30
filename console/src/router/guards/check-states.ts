@@ -1,7 +1,7 @@
 import { useSystemStatesStore } from "@/stores/system-states";
 import type { Router } from "vue-router";
 
-const whiteList = ["Setup", "Login", "Signup"];
+const whiteList = ["Setup", "Login", "Binding"];
 
 export function setupCheckStatesGuard(router: Router) {
   router.beforeEach(async (to, from, next) => {

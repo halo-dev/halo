@@ -1,5 +1,6 @@
 core:
   login:
+    title: 登录
     fields:
       username:
         placeholder: 用户名
@@ -16,6 +17,8 @@ core:
     modal:
       title: 重新登录
     other_login: 其他登录：
+  binding:
+    title: 账号绑定
   sidebar:
     search:
       placeholder: 搜索
