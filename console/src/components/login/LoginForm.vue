@@ -146,7 +146,11 @@ onMounted(() => {
     {{ $t("core.login.button") }}
   </VButton>
 
-  <div class="flex justify-center py-3 text-xs text-gray-600">OR</div>
+  <div
+    class="my-4 flex items-center before:ml-1 before:mt-0.5 before:flex-1 before:border-t before:border-gray-200 after:mr-1 after:mt-0.5 after:flex-1 after:border-t after:border-gray-200"
+  >
+    <p class="mx-4 mb-0 text-center text-xs dark:text-neutral-600">三方登录</p>
+  </div>
 
   <SocialAuthProviders />
 </template>
