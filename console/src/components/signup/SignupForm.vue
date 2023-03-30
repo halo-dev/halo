@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
-import { submitForm } from "@formkit/core";
+import { submitForm, reset } from "@formkit/core";
 import { Toast, VButton } from "@halo-dev/components";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
@@ -41,13 +41,17 @@ onMounted(() => {
 });
 
 const handleSignup = async () => {
-  await apiClient.common.user.signUp({
-    signUpRequest: formState.value,
-  });
+  try {
+    await apiClient.common.user.signUp({
+      signUpRequest: formState.value,
+    });
 
-  Toast.success(t("core.signup.operations.submit.toast_success"));
+    Toast.success(t("core.signup.operations.submit.toast_success"));
 
-  emit("succeed");
+    emit("succeed");
+  } catch (error) {
+    console.error("Failed to sign up", error);
+  }
 };
 </script>
 
