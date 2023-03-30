@@ -124,6 +124,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public Mono<User> signUp(User user, String password) {
+        if (!StringUtils.hasText(password)) {
+            throw new IllegalArgumentException("Password must not be blank");
+        }
         return environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
             .switchIfEmpty(Mono.error(new IllegalStateException("User setting is not configured")))
             .flatMap(userSetting -> {
