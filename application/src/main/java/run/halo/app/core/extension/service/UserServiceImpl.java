@@ -124,6 +124,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Mono<User> signUp(User user, String password) {
         return environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
+            .switchIfEmpty(Mono.error(new IllegalStateException("User setting is not configured")))
             .flatMap(userSetting -> {
                 Boolean allowRegistration = userSetting.getAllowRegistration();
                 if (BooleanUtils.isFalse(allowRegistration)) {

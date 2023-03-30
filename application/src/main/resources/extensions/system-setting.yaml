@@ -64,6 +64,16 @@ spec:
         - $formkit: textarea
           name: description
           label: "站点描述"
+    - group: user
+      label: 用户设置
+      formSchema:
+        - $formkit: checkbox
+          name: allowRegistration
+          label: "开放注册"
+          value: false
+        - $formkit: text
+          name: defaultRole
+          label: "默认角色"
     - group: comment
       label: 评论设置
       formSchema:
