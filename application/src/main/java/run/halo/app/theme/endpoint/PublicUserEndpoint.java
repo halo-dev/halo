@@ -10,11 +10,13 @@ import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextImpl;
+import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
@@ -32,6 +34,7 @@ import run.halo.app.extension.GroupVersion;
 public class PublicUserEndpoint implements CustomEndpoint {
     private final UserService userService;
     private final ServerSecurityContextRepository securityContextRepository;
+    private final ReactiveUserDetailsService reactiveUserDetailsService;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -59,19 +62,25 @@ public class PublicUserEndpoint implements CustomEndpoint {
             .flatMap(signUpRequest ->
                 userService.signUp(signUpRequest.user(), signUpRequest.password())
             )
-            .flatMap(user -> {
-                SecurityContextImpl securityContext = new SecurityContextImpl();
-                UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(user.getMetadata().getName(),
-                        user.getSpec().getPassword());
-                securityContext.setAuthentication(authentication);
-                return securityContextRepository.save(request.exchange(), securityContext)
-                    .thenReturn(user);
-            })
+            .flatMap(user -> authenticate(user.getMetadata().getName(), request.exchange())
+                .thenReturn(user)
+            )
             .flatMap(user -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(user)
             );
+    }
+
+    private Mono<Void> authenticate(String username, ServerWebExchange exchange) {
+        return reactiveUserDetailsService.findByUsername(username)
+            .flatMap(userDetails -> {
+                SecurityContextImpl securityContext = new SecurityContextImpl();
+                UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(userDetails.getUsername(),
+                        userDetails.getPassword(), userDetails.getAuthorities());
+                securityContext.setAuthentication(authentication);
+                return securityContextRepository.save(exchange, securityContext);
+            });
     }
 
     record SignUpRequest(@Schema(requiredMode = REQUIRED) User user,
