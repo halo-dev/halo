@@ -215,7 +215,7 @@ function setupApiClient(axios: AxiosInstance) {
       baseURL,
       axios
     ),
-    themeSide: {
+    common: {
       user: new ApiHaloRunV1alpha1UserApi(undefined, baseURL, axios),
     },
   };

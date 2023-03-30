@@ -41,7 +41,7 @@ onMounted(() => {
 });
 
 const handleSignup = async () => {
-  await apiClient.themeSide.user.signUp({
+  await apiClient.common.user.signUp({
     signUpRequest: formState.value,
   });
 
