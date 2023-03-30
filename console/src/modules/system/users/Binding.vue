@@ -64,13 +64,15 @@ function handleChangeType() {
     </div>
     <div class="login-form flex w-72 flex-col">
       <div class="mb-4 flex">
-        <h1 class="text-sm">账号绑定</h1>
+        <h1 class="text-sm">{{ $t("core.binding.title") }}</h1>
       </div>
       <SignupForm v-if="type === 'signup'" @succeed="handleBinding" />
       <LoginForm v-else @succeed="handleBinding" />
       <div class="flex">
         <span class="mt-4 text-sm text-indigo-600" @click="handleChangeType">
-          {{ type === "signup" ? "登录" : "注册" }}
+          {{
+            type === "signup" ? $t("core.login.title") : $t("core.signup.title")
+          }}
         </span>
       </div>
     </div>

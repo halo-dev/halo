@@ -4,6 +4,9 @@ import { submitForm } from "@formkit/core";
 import { Toast, VButton } from "@halo-dev/components";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const formState = ref({
   password: "",
@@ -42,7 +45,7 @@ const handleSignup = async () => {
     signUpRequest: formState.value,
   });
 
-  Toast.success("注册成功");
+  Toast.success(t("core.signup.operations.submit.toast_success"));
 
   emit("succeed");
 };
@@ -64,7 +67,8 @@ const handleSignup = async () => {
     <FormKit
       v-model="formState.user.metadata.name"
       name="username"
-      placeholder="用户名"
+      :placeholder="$t('core.signup.fields.username.placeholder')"
+      :validation-label="$t('core.signup.fields.username.placeholder')"
       :autofocus="true"
       type="text"
       validation="required"
@@ -73,7 +77,8 @@ const handleSignup = async () => {
     <FormKit
       v-model="formState.user.spec.displayName"
       name="displayName"
-      placeholder="名称"
+      :placeholder="$t('core.signup.fields.display_name.placeholder')"
+      :validation-label="$t('core.signup.fields.display_name.placeholder')"
       :autofocus="true"
       type="text"
       validation="required"
@@ -82,14 +87,16 @@ const handleSignup = async () => {
     <FormKit
       v-model="formState.password"
       name="password"
-      placeholder="密码"
+      :placeholder="$t('core.signup.fields.password.placeholder')"
+      :validation-label="$t('core.signup.fields.password.placeholder')"
       type="password"
       validation="required|length:0,100"
     >
     </FormKit>
     <FormKit
       name="password_confirm"
-      placeholder="确认密码"
+      :placeholder="$t('core.signup.fields.password_confirm.placeholder')"
+      :validation-label="$t('core.signup.fields.password_confirm.placeholder')"
       type="password"
       validation="required|confirm|length:0,100"
     >
@@ -101,6 +108,6 @@ const handleSignup = async () => {
     type="secondary"
     @click="submitForm('signup-form')"
   >
-    注册
+    {{ $t("core.signup.operations.submit.button") }}
   </VButton>
 </template>

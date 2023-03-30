@@ -33,7 +33,9 @@ function handleChangeType() {
       <LoginForm v-else @succeed="onLoginSucceed" />
       <div class="flex">
         <span class="mt-4 text-sm text-indigo-600" @click="handleChangeType">
-          {{ type === "signup" ? "登录" : "注册" }}
+          {{
+            type === "signup" ? $t("core.login.title") : $t("core.signup.title")
+          }}
         </span>
       </div>
     </div>
