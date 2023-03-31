@@ -28,7 +28,7 @@ spring:
           max-age: 365d
 
 halo:
-  external-url: "http://${server.address:localhost}:${server.port}"
+  external-url: "/"
   work-dir: ${user.home}/.halo2
   plugin:
     plugins-root: ${halo.work-dir}/plugins
