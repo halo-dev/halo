@@ -55,5 +55,6 @@ export * from "./api/v1alpha1-menu-item-api";
 export * from "./api/v1alpha1-personal-access-token-api";
 export * from "./api/v1alpha1-role-api";
 export * from "./api/v1alpha1-role-binding-api";
+export * from "./api/v1alpha1-secret-api";
 export * from "./api/v1alpha1-setting-api";
 export * from "./api/v1alpha1-user-api";

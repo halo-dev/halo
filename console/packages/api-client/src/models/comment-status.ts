@@ -42,4 +42,10 @@ export interface CommentStatus {
    * @memberof CommentStatus
    */
   unreadReplyCount?: number;
+  /**
+   *
+   * @type {number}
+   * @memberof CommentStatus
+   */
+  visibleReplyCount?: number;
 }
