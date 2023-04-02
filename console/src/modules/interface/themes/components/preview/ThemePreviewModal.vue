@@ -24,7 +24,7 @@ import {
   Toast,
 } from "@halo-dev/components";
 import { storeToRefs } from "pinia";
-import { computed, markRaw, ref, watch } from "vue";
+import { computed, markRaw, ref, toRaw, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { useQuery } from "@tanstack/vue-query";
@@ -361,7 +361,7 @@ const iframeClasses = computed(() => {
                     @submit="handleSaveConfigMap"
                   >
                     <FormKitSchema
-                      :schema="formSchema"
+                      :schema="toRaw(formSchema)"
                       :data="configMapFormData[tab.id]"
                     />
                   </FormKit>
