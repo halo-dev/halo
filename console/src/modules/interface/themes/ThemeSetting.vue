@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { inject, ref, computed } from "vue";
+import { inject, ref, computed, toRaw } from "vue";
 
 // components
 import { Toast, VButton } from "@halo-dev/components";
@@ -85,7 +85,7 @@ await suspense();
           @submit="handleSaveConfigMap"
         >
           <FormKitSchema
-            :schema="formSchema"
+            :schema="toRaw(formSchema)"
             :data="configMapFormData[group]"
           />
         </FormKit>

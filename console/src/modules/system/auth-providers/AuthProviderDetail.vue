@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed, ref, toRaw } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { useQuery } from "@tanstack/vue-query";
 import type { AuthProvider, Setting } from "@halo-dev/api-client";
@@ -257,7 +257,7 @@ const handleSaveConfigMap = async () => {
               @submit="handleSaveConfigMap"
             >
               <FormKitSchema
-                :schema="formSchema"
+                :schema="toRaw(formSchema)"
                 :data="configMapFormData[group]"
               />
             </FormKit>

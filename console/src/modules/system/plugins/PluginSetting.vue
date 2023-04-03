@@ -14,6 +14,7 @@ import type { ConfigMap, Plugin, Setting } from "@halo-dev/api-client";
 import { useRouteParams } from "@vueuse/router";
 import { useI18n } from "vue-i18n";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import { toRaw } from "vue";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -81,7 +82,7 @@ await suspense();
           @submit="handleSaveConfigMap"
         >
           <FormKitSchema
-            :schema="formSchema"
+            :schema="toRaw(formSchema)"
             :data="configMapFormData[group]"
           />
         </FormKit>
