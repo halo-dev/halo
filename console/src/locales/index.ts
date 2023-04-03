@@ -30,7 +30,7 @@ export const locales = [
     name: "正體中文",
     code: "zh-TW",
     package: zhTW,
-  }
+  },
 ];
 
 const messages = locales.reduce((acc, cur) => {
