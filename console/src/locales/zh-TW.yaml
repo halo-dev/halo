@@ -1,0 +1,1176 @@
+core:
+  login:
+    title: 登入
+    fields:
+      username:
+        placeholder: 用戶名
+      password:
+        placeholder: 密碼
+    operations:
+      submit:
+        toast_success: 登入成功
+        toast_failed: 登入失敗，用戶名或密碼錯誤
+        toast_csrf: CSRF Token 失效，請重新嘗試
+      signup:
+        label: 沒有帳號
+        button: 立即註冊
+      return_login:
+        label: 已有帳號
+        button: 立即登入
+    button: 登入
+    modal:
+      title: 重新登入
+  signup:
+    title: 註冊
+    fields:
+      username:
+        placeholder: 用戶名
+      display_name:
+        placeholder: 名稱
+      password:
+        placeholder: 密碼
+      password_confirm:
+        placeholder: 確認密碼
+    operations:
+      submit:
+        button: 註冊
+        toast_success: 註冊成功
+  binding:
+    title: 帳號綁定
+    common:
+      toast:
+        mounted: 當前登入方式未綁定帳號，請先綁定或註冊新帳號
+    operations:
+      login_and_bind:
+        button: 登入並綁定
+      signup_and_bind:
+        button: 註冊並綁定
+      bind:
+        toast_success: 綁定成功
+        toast_failed: 綁定失敗，沒有找到已啟用的登入方式
+  sidebar:
+    search:
+      placeholder: 搜尋
+    menu:
+      groups:
+        content: 內容
+        interface: 外觀
+        system: 系統
+        tool: 工具
+      items:
+        dashboard: 儀表盤
+        posts: 文章
+        single_pages: 頁面
+        comments: 留言
+        attachments: 附件
+        themes: 主題
+        menus: 選單
+        plugins: 插件
+        users: 用戶
+        settings: 設置
+        actuator: 概覽
+    operations:
+      logout:
+        button: 登出
+        title: 確定要登出嗎？
+      profile:
+        button: 個人資料
+      visit_homepage:
+        title: 訪問首頁
+  dashboard:
+    title: 儀表板
+    actions:
+      setting: 設置
+      done: 完成
+      add_widget: 添加組件
+    widgets:
+      modal_title: 小組件
+      groups:
+        post: 文章
+        page: 頁面
+        comment: 留言
+        user: 用戶
+        other: 其他
+      presets:
+        post_stats:
+          title: 文章
+        page_stats:
+          title: 頁面
+        recent_published:
+          title: 最近文章
+          visits: "訪問量 {visits}"
+          comments: "留言 {comments}"
+        quicklink:
+          title: 快捷訪問
+          actions:
+            user_profile:
+              title: 個人資料
+            view_site:
+              title: 查看站點
+            new_post:
+              title: 創建文章
+            new_page:
+              title: 創建頁面
+            upload_attachment:
+              title: 附件上傳
+            theme_manage:
+              title: 主題管理
+            plugin_manage:
+              title: 插件管理
+            new_user:
+              title: 新建用戶
+            refresh_search_engine:
+              title: 刷新搜尋引擎
+              dialog_title: 確定要刷新搜尋引擎索引嗎？
+              dialog_content: 此操作會對所有已發布的文章重新創建搜尋引擎索引。
+              success_message: 刷新成功
+        user_stats:
+          title: 用戶
+        comment_stats:
+          title: 留言
+        views_stats:
+          title: 瀏覽量
+  post:
+    title: 文章
+    actions:
+      categories: 分類
+      tags: 標籤
+      recycle_bin: 回收站
+    empty:
+      title: 當前沒有文章
+      message: 你可以嘗試刷新或者新建文章
+    operations:
+      delete:
+        title: 確定要刪除該文章嗎？
+        description: 該操作會將文章放入回收站，後續可以從回收站恢復。
+      delete_in_batch:
+        title: 確定要刪除選中的文章嗎？
+        description: 該操作會將文章放入回收站，後續可以從回收站恢復。
+    filters:
+      status:
+        items:
+          all: 全部
+          published: 已發布
+          draft: 未發布
+      visible:
+        label: 可見性
+        result: "可見性：{visible}"
+        items:
+          all: 全部
+          public: 公開
+          private: 私有
+      category:
+        label: 分類
+        result: "分類：{category}"
+      tag:
+        label: 標籤
+        result: "標籤：{tag}"
+      author:
+        label: 作者
+        result: "作者：{author}"
+      sort:
+        items:
+          publish_time_desc: 較近發布
+          publish_time_asc: 較早發布
+          create_time_desc: 較近創建
+          create_time_asc: 較早創建
+    list:
+      fields:
+        categories: 分類：
+        visits: "訪問量 {visits}"
+        comments: "留言 {comments}"
+        pinned: 已置頂
+    settings:
+      title: 文章設置
+      groups:
+        general: 常規設置
+        advanced: 高級設置
+        annotations: 元數據
+      fields:
+        title:
+          label: 標題
+        slug:
+          label: 別名
+          help: 通常用於生成文章的固定連結
+          refresh_message: 根據標題重新生成別名
+        categories:
+          label: 分類目錄
+        tags:
+          label: 標籤
+        auto_generate_excerpt:
+          label: 自動生成摘要
+        raw_excerpt:
+          label: 自定義摘要
+        allow_comment:
+          label: 允許留言
+        pinned:
+          label: 是否置頂
+        visible:
+          label: 可見性
+        publish_time:
+          label: 發表時間
+        template:
+          label: 自定義模板
+        cover:
+          label: 封面圖
+  deleted_post:
+    title: 文章回收站
+    empty:
+      title: 沒有文章被放入回收站
+      message: 你可以嘗試刷新或者返回文章管理
+    operations:
+      delete:
+        title: 確定要永久刪除該文章嗎？
+        description: 刪除之後將無法恢復。
+      delete_in_batch:
+        title: 確定要永久刪除選中的文章嗎？
+        description: 刪除之後將無法恢復。
+      recovery:
+        title: 確定要恢復該文章嗎？
+        description: 該操作會將文章恢復到被刪除之前的狀態。
+      recovery_in_batch:
+        title: 確定要恢復選中的文章嗎？
+        description: 該操作會將文章恢復到被刪除之前的狀態。
+  post_editor:
+    title: 文章編輯
+    untitled: 未命名文章
+  post_tag:
+    title: 文章標籤
+    header:
+      title: "{count} 個標籤"
+    empty:
+      title: 當前沒有標籤
+      message: 你可以嘗試刷新或者新建標籤
+    operations:
+      delete:
+        title: 確定要刪除該標籤嗎？
+        description: 刪除此標籤之後，對應文章的關聯將被解除。該操作不可恢復。
+    editing_modal:
+      titles:
+        update: 編輯文章標籤
+        create: 新增文章標籤
+      groups:
+        general: 常規
+        annotations: 元數據
+      fields:
+        display_name:
+          label: 名稱
+        slug:
+          label: 別名
+          help: 通常用於生成分類的固定連結
+          refresh_message: 根據名稱重新生成別名
+        color:
+          label: 顏色
+          help: 需要主題適配以支持
+        cover:
+          label: 封面圖
+          help: 需要主題適配以支持
+  post_category:
+    title: 文章分類
+    header:
+      title: "{count} 個分類"
+    empty:
+      title: 當前沒有分類
+      message: 你可以嘗試刷新或者新建分類
+    operations:
+      delete:
+        title: 確定要刪除該分類嗎？
+        description: 刪除此分類之後，對應文章的關聯將被解除。該操作不可恢復。
+    editing_modal:
+      titles:
+        update: 編輯文章分類
+        create: 新增文章分類
+      groups:
+        general: 常規
+        annotations: 元數據
+      fields:
+        display_name:
+          label: 名稱
+        slug:
+          label: 別名
+          help: 通常用於生成標籤的固定連結
+          refresh_message: 根據名稱重新生成別名
+        template:
+          label: 自定義模板
+        cover:
+          label: 封面圖
+          help: 需要主題適配以支持
+        description:
+          label: 描述
+          help: 需要主題適配以支持
+  page:
+    title: 頁面
+    actions:
+      recycle_bin: 回收站
+    empty:
+      title: 當前沒有頁面
+      message: 你可以嘗試刷新或者新建頁面
+    operations:
+      delete:
+        title: 確定要刪除該自定義頁面嗎？
+        description: 該操作會將自定義頁面放入回收站，後續可以從回收站恢復。
+      delete_in_batch:
+        title: 確定要刪除選中的自定義頁面嗎？
+        description: 該操作會將自定義頁面放入回收站，後續可以從回收站恢復。
+    filters:
+      status:
+        items:
+          all: 全部
+          published: 已發布
+          draft: 未發布
+      visible:
+        label: 可見性
+        result: "可見性：{visible}"
+        items:
+          all: 全部
+          public: 公開
+          private: 私有
+      author:
+        label: 作者
+        result: "作者：{author}"
+      sort:
+        items:
+          publish_time_desc: 較近發布
+          publish_time_asc: 較早發布
+          create_time_desc: 較近創建
+          create_time_asc: 較早創建
+    list:
+      fields:
+        visits: "訪問量 {visits}"
+        comments: "留言 {comments}"
+    settings:
+      title: 頁面設置
+      groups:
+        general: 常規設置
+        advanced: 高級設置
+        annotations: 元數據
+      fields:
+        title:
+          label: 標題
+        slug:
+          label: 別名
+          help: 通常用於生成頁面的固定連結
+          refresh_message: 根據標題重新生成別名
+        auto_generate_excerpt:
+          label: 自動生成摘要
+        raw_excerpt:
+          label: 自定義摘要
+        allow_comment:
+          label: 允許留言
+        pinned:
+          label: 是否置頂
+        visible:
+          label: 可見性
+        publish_time:
+          label: 發表時間
+        template:
+          label: 自定義模板
+        cover:
+          label: 封面圖
+  deleted_page:
+    title: 自定義頁面回收站
+    empty:
+      title: 沒有自定義頁面被放入回收站
+      message: 你可以嘗試刷新或者返回自定義頁面管理
+    operations:
+      delete:
+        title: 確認要永久刪除該自定義頁面嗎？
+        description: 刪除之後將無法恢復。
+      delete_in_batch:
+        title: 確定要確認永久刪除選中的自定義頁面嗎？
+        description: 刪除之後將無法恢復。
+      recovery:
+        title: 確認要恢復該自定義頁面嗎？
+        description: 該操作會將自定義頁面恢復到被刪除之前的狀態。
+      recovery_in_batch:
+        title: 確認要恢復選中的自定義頁面嗎？
+        description: 該操作會將自定義頁面恢復到被刪除之前的狀態。
+  page_editor:
+    title: 頁面編輯
+    untitled: Untitled page
+  comment:
+    title: 留言
+    empty:
+      title: 當前沒有留言
+      message: 你可以嘗試刷新或者修改篩選條件
+    reply_empty:
+      title: 當前沒有回覆
+      message: 你可以嘗試刷新或者創建新回覆
+      new: 創建新回覆
+    operations:
+      delete_comment:
+        title: 確認要刪除該留言嗎？
+        description: 將同時刪除所有留言下的回覆，該操作不可恢復。
+      delete_comment_in_batch:
+        title: 確定要刪除所選的留言嗎？
+        description: 將同時刪除所有留言下的回覆，該操作不可恢復。
+      approve_comment_in_batch:
+        button: 審核通過
+        title: 確定要審核通過所選的留言嗎？
+      approve_applies_in_batch:
+        button: 審核通過所有回覆
+        title: 確定要審核通過該留言的所有回覆嗎？
+      delete_reply:
+        title: 確認要刪除該回覆嗎？
+      approve_reply:
+        button: 審核通過
+      reply:
+        button: 回覆
+    filters:
+      status:
+        items:
+          all: 全部
+          approved: 已審核
+          pending_review: 待審核
+      owner:
+        label: 留言者
+        result: "留言者：{owner}"
+      sort:
+        items:
+          default: 預設
+          last_reply_time: 最後回覆時間
+          reply_count: 回覆數
+          creation_time: 創建時間
+    list:
+      fields:
+        reply_count: "{count} 條回覆"
+        has_new_replies: 有新的回覆
+        pending_review: 待審核
+    subject_refs:
+      post: 文章
+      page: 頁面
+      unknown: 未知
+    reply_modal:
+      title: 回覆
+      fields:
+        content:
+          label: 內容
+      operations:
+        submit:
+          toast_success: 回覆成功
+  attachment:
+    title: 附件庫
+    common:
+      text:
+        ungrouped: 未分組
+    actions:
+      storage_policies: 存儲策略
+    empty:
+      title: 當前分組沒有附件
+      message: 當前分組沒有附件，你可以嘗試重整或者上傳附件
+      actions:
+        upload: 上傳附件
+    operations:
+      delete:
+        title: 確定要刪除該附件嗎？
+      delete_in_batch:
+        title: 確定要刪除所選的附件嗎？
+      deselect_items:
+        button: 取消選擇
+      move:
+        button: 移動
+        toast_success: 移動成功
+    filters:
+      storage_policy:
+        label: 存儲策略
+        result: "存儲策略：{storage_policy}"
+      owner:
+        label: 上傳者
+        result: "上傳者：{owner}"
+      sort:
+        items:
+          create_time_desc: 較近上傳
+          create_time_asc: 較晚上傳
+          size_desc: 文件大小降序
+          size_asc: 文件大小升序
+      view_type:
+        items:
+          grid: 網格模式
+          list: 列表模式
+    detail_modal:
+      title: 附件：{display_name}
+      fields:
+        preview: 預覽
+        storage_policy: 存儲策略
+        group: 所在分組
+        display_name: 文件名稱
+        media_type: 文件類型
+        size: 文件大小
+        owner: 上傳者
+        creation_time: 上傳時間
+        permalink: 原始連結
+      preview:
+        click_to_exit: 點擊離開預覽
+        video_not_support: 當前瀏覽器不支援該影片播放
+        audio_not_support: 當前瀏覽器不支援該音頻播放
+        not_support: 此文件不支援預覽
+    group_editing_modal:
+      titles:
+        create: 新增附件分組
+        update: 編輯附件分組
+      fields:
+        display_name:
+          label: 名稱
+    group_list:
+      internal_groups:
+        all: 全部
+      operations:
+        rename:
+          button: 重命名
+        delete:
+          button: 刪除並將附件移動至未分組
+          title: 確定要刪除該分組嗎？
+          description: 將刪除分組，並將分組下的附件移動至未分組，該操作不可恢復。
+          toast_success: 刪除成功，{total} 個附件已移動至未分組
+        delete_with_attachments:
+          button: 刪除並同時刪除附件
+          title: 確定要刪除該分組嗎？
+          description: 將刪除分組以及分組下的所有附件，該操作不可恢復。
+          toast_success: 刪除成功，{total} 個附件已被同時刪除
+    policies_modal:
+      title: 存儲策略
+      empty:
+        title: 當前沒有可用的存儲策略
+        message: 當前沒有可用的存儲策略，你可以嘗試刷新或者新建策略
+      operations:
+        delete:
+          title: 確定要刪除該策略嗎？
+          description: 當前策略下沒有已上傳的附件。
+        can_not_delete:
+          title: 刪除失敗
+          description: 該策略下存在附件，無法刪除。
+    policy_editing_modal:
+      titles:
+        create: 新增策略：{policy_template}
+        update: 編輯策略：{policy}
+      fields:
+        display_name:
+          label: 名稱
+    upload_modal:
+      title: 上傳附件
+      filters:
+        group:
+          label: 選擇分組：
+        policy:
+          label: 選擇存儲策略：
+          empty:
+            title: 沒有存儲策略
+            description: 在上傳之前，需要新建一個存儲策略
+          not_select: 請先選擇存儲策略
+    select_modal:
+      title: 選擇附件
+      providers:
+        default:
+          label: 附件庫
+      operations:
+        select:
+          result: （已選擇 {count} 項）
+  theme:
+    title: 主題
+    common:
+      buttons:
+        install: 安裝主題
+    tabs:
+      detail: 詳情
+    actions:
+      management: 主題管理
+    empty:
+      title: 當前沒有已啟用或已選擇的主題
+      message: 當前沒有已啟用或者選擇的主題，你可以切換主題或者安裝新主題
+      actions:
+        switch: 切換主題
+    operations:
+      active:
+        title: 是否確認啟用當前主題
+        toast_success: 啟用成功
+      reset:
+        title: 確定要重置主題的所有配置嗎？
+        description: 該操作會刪除已保存的配置，重置為預設配置。
+        toast_success: 重置配置成功
+      reload:
+        button: 重載主題配置
+        title: 確定要重載主題的所有配置嗎？
+        description: 該操作僅會重載主題配置和設置表單定義，不會刪除已保存的配置。
+        toast_success: 重載配置成功
+      uninstall:
+        title: 確定要卸載該主題嗎？
+      uninstall_and_delete_config:
+        button: 卸載並刪除配置
+        title: 確定要卸載該主題以及對應的配置嗎？
+    upload_modal:
+      titles:
+        install: 安裝主題
+        upgrade: 升級主題（{display_name}）
+    list_modal:
+      titles:
+        installed_themes: 已安裝的主題
+        not_installed_themes: 未安裝的主題
+      tabs:
+        installed: 已安裝
+        not_installed: 未安裝
+      empty:
+        title: 當前沒有已安裝的主題
+        message: 當前沒有已安裝的主題，你可以嘗試刷新或者安裝新主題
+      not_installed_empty:
+        title: 當前沒有未安裝的主題
+      operations:
+        install:
+          toast_success: 安裝成功
+    preview_model:
+      title: 預覽主題：{display_name}
+      actions:
+        switch: 切換主題
+        setting: 主題設置
+        open: 新窗口打開
+    detail:
+      fields:
+        author: 作者
+        website: 網站
+        repo: 源碼倉庫
+        version: 當前版本
+        requires: 版本要求
+        storage_location: 存儲位置
+        plugin_requires: 插件依賴
+    settings:
+      title: 主題設置
+    custom_templates:
+      default: 預設模版
+  menu:
+    title: 選單
+    empty:
+      title: 當前沒有選單
+      message: 你可以嘗試刷新或者新建選單
+    menu_item_empty:
+      title: 當前沒有選單項
+      message: 你可以嘗試刷新或者新建選單項
+    operations:
+      set_primary:
+        button: 設置為主選單
+        toast_success: 設置成功
+      delete_menu:
+        title: 確定要刪除該選單嗎？
+        description: 將同時刪除該選單下的所有選單項，該操作不可恢復。
+      delete_menu_item:
+        title: 確定要刪除該選單項嗎？
+        description: 將同時刪除所有子選單項，刪除後將無法恢復。
+      add_sub_menu_item:
+        button: 新增子選單項
+    list:
+      fields:
+        primary: 主選單
+        items_count: "{count} 個選單項"
+    menu_editing_modal:
+      titles:
+        create: 新增選單
+        update: 編輯選單
+      fields:
+        display_name:
+          label: 選單名稱
+    menu_item_editing_modal:
+      titles:
+        create: 新增選單項
+        update: 編輯選單項
+      groups:
+        general: 常規
+        annotations: 元數據
+      fields:
+        parent:
+          label: 上級選單項
+          placeholder: 選擇上級選單項
+        ref_kind:
+          label: 類型
+          placeholder: "請選擇{label}"
+          options:
+            custom: 自定義連結
+            post: 文章
+            single_page: 自定義頁面
+            category: 分類
+            tag: 標籤
+        display_name:
+          label: 名稱
+        href:
+          label: 連結地址
+        target:
+          label: 打開方式
+          options:
+            self: 當前窗口
+            blank: 新窗口
+            parent: 父窗口
+            top: 頂級窗口
+  plugin:
+    title: 插件
+    tabs:
+      detail: 詳情
+    empty:
+      title: 當前沒有已安裝的插件
+      message: 當前沒有已安裝的插件，你可以嘗試重整或者安裝新插件
+      actions:
+        install: 安裝插件
+    operations:
+      reset:
+        title: 確定要重置插件的所有配置嗎？
+        description: 該操作會刪除已保存的配置，重置為默認配置。
+        toast_success: 重置配置成功
+      uninstall:
+        title: 確定要卸載該插件嗎？
+      uninstall_and_delete_config:
+        title: 確定要卸載該插件以及對應的配置嗎？
+      uninstall_when_enabled:
+        confirm_text: 停止運行並卸載
+        description: 當前插件還在啟用狀態，將在停止運行後卸載，該操作不可恢復。
+      change_status:
+        active_title: 確定要啟用該插件嗎？
+        inactive_title: 確定要停用該插件嗎？
+    filters:
+      status:
+        items:
+          all: 全部
+          active: 已啟用
+          inactive: 未啟用
+      sort:
+        items:
+          create_time_desc: 較近安裝
+          create_time_asc: 較早安裝
+    list:
+      actions:
+        uninstall_and_delete_config: 卸載並刪除配置
+    upload_modal:
+      titles:
+        install: 安裝插件
+        upgrade: 升級插件（{display_name}）
+      operations:
+        active_after_install:
+          title: 安裝成功
+          description: 是否啟動當前安裝的插件？
+        existed_during_installation:
+          title: 插件已存在
+          description: 當前安裝的插件已存在，是否升級？
+    detail:
+      title: 插件詳情
+      header:
+        title: 插件信息
+      fields:
+        display_name: 名稱
+        description: 描述
+        version: 版本
+        requires: Halo 版本要求
+        author: 提供方
+        license: 協議
+        role_templates: 權限模板
+        last_starttime: 最近一次啟動
+    settings:
+      title: 插件設置
+    loader:
+      toast:
+        entry_load_failed: "{name}：讀取插件入口文件失敗"
+        style_load_failed: "{name}：讀取插件樣式文件失敗"
+    extension_points:
+      editor:
+        providers:
+          default: 預設編輯器
+  user:
+    title: 用戶
+    actions:
+      roles: 角色管理
+      identity_authentication: 身份認證
+    empty:
+      title: 當前沒有符合篩選條件的用戶
+      message: 當前沒有符合篩選條件的用戶，你可以嘗試刷新或者創建新用戶
+    operations:
+      delete:
+        title: 確定要刪除該用戶嗎？
+      delete_in_batch:
+        title: 確定要刪除選中的用戶嗎？
+      update_profile:
+        title: 修改資料
+      change_password:
+        title: 修改密碼
+      grant_permission:
+        title: 分配角色
+    filters:
+      role:
+        label: 角色
+        result: 角色：{role}
+      sort:
+        items:
+          create_time_desc: 較近創建
+          create_time_asc: 較早創建
+    editing_modal:
+      titles:
+        update: 編輯用戶
+        create: 新增用戶
+      groups:
+        general: 常規
+        annotations: 元數據
+      fields:
+        username:
+          label: 用戶名
+          validation: 請輸入有效的用戶名
+        display_name:
+          label: 顯示名稱
+        email:
+          label: 電子郵箱
+        phone:
+          label: 手機號
+        avatar:
+          label: 頭像
+        bio:
+          label: 描述
+    change_password_modal:
+      title: 密碼修改
+      fields:
+        new_password:
+          label: 新密碼
+        confirm_password:
+          label: 確認密碼
+    grant_permission_modal:
+      title: 分配角色
+      fields:
+        role:
+          label: 角色
+          placeholder: 請選擇角色
+    detail:
+      title: 用戶詳情
+      tabs:
+        detail: 詳情
+      actions:
+        update_profile:
+          title: 修改資料
+        change_password:
+          title: 修改密碼
+      operations:
+        bind:
+          button: 綁定
+        unbind:
+          button: 解綁
+          title: "確定要取消綁定 {display_name} 的登入方式嗎？"
+      fields:
+        display_name: 顯示名稱
+        username: 用戶名
+        email: 電子郵箱
+        roles: 角色
+        bio: 描述
+        creation_time: 註冊時間
+        identity_authentication: 登入方式
+  role:
+    title: 角色
+    common:
+      text:
+        contains_all_permissions: 包含所有權限
+        contains_n_permissions: 包含 {count} 個權限
+        system_reserved: 系統保留
+        custom: 自定義
+        dependent_on: 依賴於 {roles}
+        provided_by_plugin: 由 {plugin} 提供
+    operations:
+      delete:
+        title: 確定要刪除該角色嗎？
+        description: 該角色刪除後，相關聯的用戶將被刪除角色綁定，該操作不可恢復。
+      create_based_on_this_role:
+        button: 基於此角色創建
+    detail:
+      title: 角色詳情
+      header:
+        title: 角色信息
+      tabs:
+        detail: 詳情
+        permissions: 權限設置
+      fields:
+        display_name: 名稱
+        name: 別名
+        type: 類型
+        creation_time: 創建時間
+    permissions_detail:
+      system_reserved_alert:
+        description: 系統保留的角色不支持修改，推薦基於此角色創建一個新的角色。
+    editing_modal:
+      titles:
+        create: 創建角色
+        update: 編輯角色
+      groups:
+        general: 基本資訊
+        permissions: 權限
+      fields:
+        display_name: 名稱
+  identity_authentication:
+    title: 身份認證
+    tabs:
+      detail: 詳情
+      setting: 設置
+    operations:
+      enable:
+        title: 確定要啟用該身份認證方式嗎？
+      disable:
+        title: 確定要停用該身份認證方式嗎？
+      disable_privileged:
+        tooltip: 系統保留的認證方式，無法禁用
+    detail:
+      title: 身份認證詳情
+      fields:
+        display_name: 名稱
+        description: 描述
+        website: 網站
+        help_page: 幫助頁面
+        authentication_url: 登入入口
+  setting:
+    title: 設置
+  actuator:
+    title: 系統概覽
+    actions:
+      copy:
+        toast_browser_not_supported: 當前瀏覽器不支持複製
+    header:
+      titles:
+        general: 基本資訊
+        environment: 環境資訊
+    fields:
+      external_url: 外部訪問地址
+      start_time: 啟動時間
+      timezone: 時區
+      locale: 語言
+      version: 版本
+      build_time: 構建時間
+      database: 資料庫
+      os: 操作系統
+      log: 運行日誌
+    copy_results:
+      external_url: 外部訪問地址：{external_url}
+      start_time: 啟動時間：{start_time}
+      version: Halo 版本：{version}
+      build_time: 構建時間：{build_time}
+      database: 資料庫：{database}
+      os: 操作系統：{os}
+    alert:
+      external_url_invalid: 檢測到外部訪問地址與當前訪問地址不一致，可能會導致部分連結無法正常跳轉，請檢查外部訪問地址設置。
+  exception:
+    not_found:
+      message: 沒有找到該頁面
+    forbidden:
+      message: 沒有權限訪問此頁面
+    actions:
+      dashboard: 儀表盤
+  setup:
+    title: 系統初始化
+    operations:
+      submit:
+        button: 初始化
+        toast_success: 初始化成功
+    fields:
+      site_title:
+        placeholder: 站點名稱
+        validation: 請輸入站點名稱
+  rbac:
+    Attachments Management: 附件
+    Attachment Manage: 附件管理
+    Attachment View: 附件查看
+    role-template-view-attachments: 附件查看
+    Comments Management: 留言
+    Comment Manage: 留言管理
+    Comment View: 留言查看
+    role-template-view-comments: 留言查看
+    ConfigMaps Management: 配置
+    ConfigMap Manage: 配置管理
+    ConfigMap View: 配置查看
+    role-template-view-configmaps: 配置查看
+    Menus Management: 選單
+    Menu Manage: 選單管理
+    Menu View: 選單查看
+    role-template-view-menus: 選單查看
+    Permissions Management: 權限
+    Permissions Manage: 權限管理
+    Permissions View: 權限查看
+    role-template-view-permissions: 權限查看
+    role-template-manage-permissions: 權限管理
+    Plugins Management: 插件
+    Plugin Manage: 插件管理
+    Plugin View: 插件查看
+    role-template-view-plugins: 插件查看
+    Posts Management: 文章
+    Post Manage: 文章管理
+    Post View: 文章查看
+    role-template-view-posts: 文章查看
+    role-template-manage-snapshots: 版本管理
+    role-template-view-snapshots: 版本查看
+    role-template-manage-tags: 標籤管理
+    role-template-view-tags: 標籤查看
+    role-template-manage-categories: 分類管理
+    role-template-view-categories: 分類查看
+    Roles Management: 角色
+    Role Manage: 角色管理
+    Role View: 角色查看
+    role-template-view-roles: 角色查看
+    Settings Management: 設置表單
+    Setting Manage: 設置表單管理
+    Setting View: 設置表單查看
+    role-template-view-settings: 設置表單查看
+    SinglePages Management: 頁面
+    SinglePage Manage: 頁面管理
+    SinglePage View: 頁面查看
+    role-template-view-singlepages: 頁面查看
+    Themes Management: 主題
+    Theme Manage: 主題管理
+    Theme View: 主題查看
+    role-template-view-themes: 主題查看
+    Users Management: 用戶
+    User manage: 用戶管理
+    User View: 用戶查看
+    role-template-view-users: 用戶查看
+    role-template-change-password: 修改密碼
+  components:
+    submit_button:
+      computed_text: "{text}（{shortcut}）"
+    annotations_form:
+      custom_fields:
+        label: 自定義
+        validation: 當前 Key 已被占用
+    default_editor:
+      tabs:
+        toc:
+          title: 大綱
+          empty: 暫無大綱
+        detail:
+          title: 詳情
+          fields:
+            character_count: 字符數
+            word_count: 詞數
+            publish_time: 發布時間
+            draft: 未發布
+            owner: 創建者
+            permalink: 訪問連結
+      extensions:
+        placeholder:
+          options:
+            placeholder: "輸入 / 以選擇輸入類型"
+      toolbar:
+        attachment: 插入附件
+      upload_attachment:
+        toast:
+          no_available_policy: 目前沒有可用的存儲策略
+          failed_fetch_permalink: 獲取附件永久連結失敗：{display_name}
+    global_search:
+      placeholder: 輸入關鍵字以搜尋
+      no_results: 沒有搜尋結果
+      buttons:
+        select: 選擇
+      groups:
+        console: 後臺頁面
+        user: 用戶
+        plugin: 插件
+        post: 文章
+        category: 分類
+        tag: 標籤
+        page: 自定義頁面
+        attachment: 附件
+        setting: 設置
+        theme_setting: 主題設置
+    pagination:
+      page_label: 頁
+      size_label: 條 / 頁
+    social_auth_providers:
+      title: 三方登入
+  composables:
+    content_cache:
+      toast_recovered: 已從緩存中恢復未保存的內容
+  formkit:
+    category_select:
+      creation_label: 創建 {text} 分類
+    tag_select:
+      creation_label: 創建 {text} 標籤
+  common:
+    buttons:
+      save: 保存
+      close: 關閉
+      close_and_shortcut: 關閉（Esc）
+      delete: 刪除
+      setting: 設置
+      confirm: 確定
+      cancel: 取消
+      cancel_and_shortcut: 取消（Esc）
+      new: 新建
+      edit: 編輯
+      back: 返回
+      refresh: 刷新
+      publish: 發布
+      cancel_publish: 取消發布
+      next: 下一項
+      previous: 上一項
+      install: 安裝
+      uninstall: 卸載
+      upgrade: 升級
+      reset: 重置
+      preview: 預覽
+      recovery: 恢復
+      delete_permanently: 永久刪除
+      active: 啟用
+      download: 下載
+      copy: 複製
+      upload: 上傳
+      add: 添加
+      submit: 提交
+    radio:
+      "yes": 是
+      "no": 否
+    select:
+      public: 公開
+      private: 私有
+    placeholder:
+      search: 輸入關鍵字搜尋
+    toast:
+      operation_success: 操作成功
+      delete_success: 刪除成功
+      save_success: 保存成功
+      publish_success: 發布成功
+      cancel_publish_success: 發布成功
+      recovery_success: 恢復成功
+      uninstall_success: 卸載成功
+      active_success: 啟用成功
+      inactive_success: 停用成功
+      upgrade_success: 升級成功
+      download_success: 下載成功
+      copy_success: 複製成功
+      operation_failed: 操作失敗
+      download_failed: 下載失敗
+      save_failed_and_retry: 保存失敗，請重試
+      publish_failed_and_retry: 發布失敗，請重試
+      network_error: 網絡錯誤，請檢查網絡連接
+      request_parameter_error: 請求參數錯誤：{title}
+      login_expired: 登入已過期，請重新登入
+      forbidden: 無權限訪問
+      not_found: 資源不存在
+      server_internal_error_with_title: 伺服器內部錯誤：{title}
+      server_internal_error: 伺服器內部錯誤
+      unknown_error_with_title: 未知錯誤：{title}
+      unknown_error: 未知錯誤
+    dialog:
+      titles:
+        tip: 提示
+        warning: 警告
+      descriptions:
+        cannot_be_recovered: 該操作不可恢復。
+        editor_not_found: 未找到符合 {raw_type} 格式的編輯器，請檢查是否已安裝編輯器插件。
+    filters:
+      results:
+        keyword: "關鍵字：{keyword}"
+        sort: "排序：{sort}"
+        status: "狀態：{status}"
+      labels:
+        sort: 排序
+        status: 狀態
+    status:
+      deleting: 刪除中
+      loading: 加載中
+      loading_error: 加載異常
+      activated: 已啟用
+      not_activated: 未啟用
+      installed: 已安裝
+      not_installed: 未安裝
+    text:
+      none: 無
+      tip: 提示
+      warning: 警告
+    tooltips:
+      unpublished_content_tip: 當前有內容已保存，但還未發布。
+      publishing: 發布中
+      recovering: 還原中
+    fields:
+      post_count: "{count} 篇文章"
