@@ -28,7 +28,7 @@ const initialFormState: Post = {
     cover: "",
     deleted: false,
     publish: false,
-    publishTime: "",
+    publishTime: undefined,
     pinned: false,
     allowComment: true,
     visible: "PUBLIC",
@@ -247,17 +247,15 @@ watchEffect(() => {
 const { templates } = useThemeCustomTemplates("post");
 
 // publishTime convert
-const publishTime = computed(() => {
-  const { publishTime } = formState.value.spec;
-  if (publishTime) {
-    return toDatetimeLocal(publishTime);
-  }
-  return "";
+const publishTime = computed({
+  get() {
+    const { publishTime } = formState.value.spec;
+    return publishTime ? toDatetimeLocal(publishTime) : undefined;
+  },
+  set(value) {
+    formState.value.spec.publishTime = value ? toISOString(value) : undefined;
+  },
 });
-
-const onPublishTimeChange = (value: string) => {
-  formState.value.spec.publishTime = value ? toISOString(value) : undefined;
-};
 
 const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
 
@@ -418,10 +416,9 @@ const { handleGenerateSlug } = useSlugify(
               type="select"
             ></FormKit>
             <FormKit
-              :model-value="publishTime"
+              v-model="publishTime"
               :label="$t('core.post.settings.fields.publish_time.label')"
               type="datetime-local"
-              @input="onPublishTimeChange"
             ></FormKit>
             <FormKit
               v-model="formState.spec.template"
