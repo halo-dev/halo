@@ -113,6 +113,10 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
             return ignoringMediaTypeAll(MediaType.APPLICATION_JSON)
                 .matches(webFilterExchange.getExchange())
                 .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
+                .switchIfEmpty(
+                    defaultHandler.onAuthenticationSuccess(webFilterExchange, authentication)
+                        .then(Mono.empty())
+                )
                 .flatMap(matchResult -> {
                     var principal = authentication.getPrincipal();
                     if (principal instanceof CredentialsContainer credentialsContainer) {
@@ -124,10 +128,7 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
                         .bodyValue(principal)
                         .flatMap(serverResponse ->
                             serverResponse.writeTo(webFilterExchange.getExchange(), context));
-                })
-                .switchIfEmpty(
-                    defaultHandler.onAuthenticationSuccess(webFilterExchange, authentication)
-                );
+                });
         }
     }
 

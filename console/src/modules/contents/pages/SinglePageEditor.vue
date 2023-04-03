@@ -62,7 +62,7 @@ const initialFormState: SinglePageRequest = {
       cover: "",
       deleted: false,
       publish: false,
-      publishTime: "",
+      publishTime: undefined,
       pinned: false,
       allowComment: true,
       visible: "PUBLIC",
