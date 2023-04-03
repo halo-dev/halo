@@ -4,6 +4,7 @@ import { createI18n } from "vue-i18n";
 import en from "./en.yaml";
 // @ts-ignore
 import zhCN from "./zh-CN.yaml";
+// @ts-ignore
 import zhTW from "./zh-TW.yaml";
 
 export const locales = [
