@@ -76,7 +76,7 @@ const handleBuildSearchIndex = () => {
 
   routes.forEach((route) => {
     fuse.add({
-      title: route.meta?.title as string,
+      title: t(route.meta?.title as string),
       icon: {
         component: markRaw(IconLink),
       },

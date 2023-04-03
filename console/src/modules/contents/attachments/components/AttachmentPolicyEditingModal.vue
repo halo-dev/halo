@@ -207,32 +207,34 @@ const onVisibleChange = (visible: boolean) => {
     :width="600"
     @update:visible="onVisibleChange"
   >
-    <FormKit
-      v-if="formSchema && configMapFormData"
-      id="attachment-policy-form"
-      v-model="configMapFormData['default']"
-      name="attachment-policy-form"
-      :actions="false"
-      :preserve="true"
-      type="form"
-      :config="{ validationVisibility: 'submit' }"
-      @submit="handleSave"
-    >
+    <div>
       <FormKit
-        id="displayNameInput"
-        v-model="formState.spec.displayName"
-        :label="
-          $t('core.attachment.policy_editing_modal.fields.display_name.label')
-        "
-        type="text"
-        name="displayName"
-        validation="required|length:0,50"
-      ></FormKit>
-      <FormKitSchema
-        :schema="toRaw(formSchema)"
-        :data="configMapFormData['default']"
-      />
-    </FormKit>
+        v-if="formSchema && configMapFormData"
+        id="attachment-policy-form"
+        v-model="configMapFormData['default']"
+        name="attachment-policy-form"
+        :actions="false"
+        :preserve="true"
+        type="form"
+        :config="{ validationVisibility: 'submit' }"
+        @submit="handleSave"
+      >
+        <FormKit
+          id="displayNameInput"
+          v-model="formState.spec.displayName"
+          :label="
+            $t('core.attachment.policy_editing_modal.fields.display_name.label')
+          "
+          type="text"
+          name="displayName"
+          validation="required|length:0,50"
+        ></FormKit>
+        <FormKitSchema
+          :schema="toRaw(formSchema)"
+          :data="configMapFormData['default']"
+        />
+      </FormKit>
+    </div>
 
     <template #footer>
       <VSpace>
