@@ -45,7 +45,7 @@
     "@halo-dev/api-client": "workspace:*",
     "@halo-dev/components": "workspace:*",
     "@halo-dev/console-shared": "workspace:*",
-    "@halo-dev/richtext-editor": "0.0.0-alpha.21",
+    "@halo-dev/richtext-editor": "0.0.0-alpha.22",
     "@tanstack/vue-query": "^4.24.10",
     "@tiptap/extension-character-count": "^2.0.0-beta.220",
     "@uppy/core": "^3.1.1",
