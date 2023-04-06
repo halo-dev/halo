@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,6 +72,11 @@ class PluginCompositeRouterFunctionTest {
 
         when(reverseProxyRouterFunctionRegistry.getRouterFunctions())
             .thenReturn(List.of(routerFunction));
+    }
+
+    @AfterEach
+    void cleanUp() {
+        ExtensionContextRegistry.getInstance().remove("fake-plugin");
     }
 
     @Test
