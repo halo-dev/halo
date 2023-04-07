@@ -129,7 +129,7 @@ const settingTabs = ref<SettingTab[]>([] as SettingTab[]);
 const activeSettingTab = ref("");
 const settingsVisible = ref(false);
 
-const { data: setting, refetch: handleFetchSettings } = useQuery<Setting>({
+const { data: setting } = useQuery<Setting>({
   queryKey: ["theme-setting", selectedTheme],
   queryFn: async () => {
     const { data } = await apiClient.theme.fetchThemeSetting({
@@ -139,7 +139,22 @@ const { data: setting, refetch: handleFetchSettings } = useQuery<Setting>({
     return data;
   },
   refetchOnWindowFocus: false,
-  enabled: computed(() => !!selectedTheme.value?.spec.settingName),
+  onSuccess(data) {
+    if (data) {
+      const { forms } = data.spec;
+      settingTabs.value = forms.map((item: SettingForm) => {
+        return {
+          id: item.group,
+          label: item.label || "",
+        };
+      });
+    }
+
+    activeSettingTab.value = settingTabs.value[0].id;
+  },
+  enabled: computed(
+    () => props.visible && !!selectedTheme.value?.spec.settingName
+  ),
 });
 
 const { data: configMap, refetch: handleFetchConfigMap } = useQuery<ConfigMap>({
@@ -151,7 +166,9 @@ const { data: configMap, refetch: handleFetchConfigMap } = useQuery<ConfigMap>({
     return data;
   },
   refetchOnWindowFocus: false,
-  enabled: computed(() => !!selectedTheme.value?.spec.configMapName),
+  enabled: computed(
+    () => !!setting.value && !!selectedTheme.value?.spec.configMapName
+  ),
 });
 
 const { formSchema, configMapFormData, convertToSave } = useSettingFormConvert(
@@ -177,35 +194,12 @@ const handleSaveConfigMap = async () => {
 
   Toast.success(t("core.common.toast.save_success"));
 
-  await handleFetchSettings();
   await handleFetchConfigMap();
 
   saving.value = false;
 
   handleRefresh();
 };
-
-watch(
-  () => selectedTheme.value,
-  async () => {
-    if (selectedTheme.value) {
-      await handleFetchSettings();
-      await handleFetchConfigMap();
-
-      if (setting.value) {
-        const { forms } = setting.value.spec;
-        settingTabs.value = forms.map((item: SettingForm) => {
-          return {
-            id: item.group,
-            label: item.label || "",
-          };
-        });
-      }
-
-      activeSettingTab.value = settingTabs.value[0].id;
-    }
-  }
-);
 
 const handleOpenSettings = (theme?: Theme) => {
   if (theme) {
@@ -348,7 +342,7 @@ const iframeClasses = computed(() => {
                   <FormKit
                     v-if="
                       tab.id === activeSettingTab &&
-                      configMapFormData &&
+                      configMapFormData[tab.id] &&
                       formSchema
                     "
                     :id="`preview-setting-${tab.id}`"
