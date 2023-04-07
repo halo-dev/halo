@@ -1,13 +1,19 @@
 package run.halo.app.plugin;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
@@ -18,6 +24,7 @@ import org.springframework.web.reactive.function.server.support.RouterFunctionMa
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.plugin.resources.ReverseProxyRouterFunctionRegistry;
 
 /**
@@ -28,18 +35,35 @@ import run.halo.app.plugin.resources.ReverseProxyRouterFunctionRegistry;
  */
 @ExtendWith(MockitoExtension.class)
 class PluginCompositeRouterFunctionTest {
-    private final ServerCodecConfigurer codecConfigurer = ServerCodecConfigurer.create();
+    ServerCodecConfigurer codecConfigurer = ServerCodecConfigurer.create();
 
     @Mock
-    private ReverseProxyRouterFunctionRegistry reverseProxyRouterFunctionRegistry;
+    ReverseProxyRouterFunctionRegistry reverseProxyRouterFunctionRegistry;
 
-    private PluginCompositeRouterFunction compositeRouterFunction;
+    @Mock
+    ObjectProvider<RouterFunction> rawRouterFunctionsProvider;
 
-    private HandlerFunction<ServerResponse> handlerFunction;
+    @Mock
+    ObjectProvider<CustomEndpoint> customEndpointsProvider;
+
+    @InjectMocks
+    PluginCompositeRouterFunction compositeRouterFunction;
+
+    HandlerFunction<ServerResponse> handlerFunction;
 
     @BeforeEach
     @SuppressWarnings("unchecked")
     void setUp() {
+        var fakeContext = mock(PluginApplicationContext.class);
+        ExtensionContextRegistry.getInstance().register("fake-plugin", fakeContext);
+
+        when(rawRouterFunctionsProvider.orderedStream()).thenReturn(Stream.empty());
+        when(customEndpointsProvider.orderedStream()).thenReturn(Stream.empty());
+
+        when(fakeContext.getBeanProvider(RouterFunction.class))
+            .thenReturn(rawRouterFunctionsProvider);
+        when(fakeContext.getBeanProvider(CustomEndpoint.class)).thenReturn(customEndpointsProvider);
+
         compositeRouterFunction =
             new PluginCompositeRouterFunction(reverseProxyRouterFunctionRegistry);
 
@@ -48,6 +72,11 @@ class PluginCompositeRouterFunctionTest {
 
         when(reverseProxyRouterFunctionRegistry.getRouterFunctions())
             .thenReturn(List.of(routerFunction));
+    }
+
+    @AfterEach
+    void cleanUp() {
+        ExtensionContextRegistry.getInstance().remove("fake-plugin");
     }
 
     @Test
@@ -61,6 +90,9 @@ class PluginCompositeRouterFunctionTest {
             .expectNext(handlerFunction)
             .expectComplete()
             .verify();
+
+        verify(rawRouterFunctionsProvider).orderedStream();
+        verify(customEndpointsProvider).orderedStream();
     }
 
     private ServerWebExchange createExchange(String urlTemplate) {

@@ -8,6 +8,7 @@ import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
 import run.halo.app.extension.GroupVersion;
 
 public class CustomEndpointsBuilder {
@@ -35,6 +36,10 @@ public class CustomEndpointsBuilder {
                     .tag(gv + "/CustomEndpoint")
             );
         });
+        if (routerFunctionsMap.isEmpty()) {
+            // return empty route.
+            return request -> Mono.empty();
+        }
         routerFunctionsMap.clear();
         return routeBuilder.build();
     }
