@@ -90,7 +90,7 @@ const { data: setting } = useQuery<Setting>({
     if (data) {
       const { forms } = data.spec;
       tabs.value = [
-        ...tabs.value,
+        ...initialTabs,
         ...forms.map((item: SettingForm) => {
           return {
             id: item.group,
