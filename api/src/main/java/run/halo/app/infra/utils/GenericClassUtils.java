@@ -19,7 +19,7 @@ public enum GenericClassUtils {
      */
     public static <T> Class<?> generateConcreteClass(Class<?> rawClass, Class<T> parameterType) {
         return generateConcreteClass(rawClass, parameterType, () ->
-            parameterType.getSimpleName() + rawClass.getSimpleName());
+            parameterType.getName() + rawClass.getSimpleName());
     }
 
     /**
@@ -39,7 +39,7 @@ public enum GenericClassUtils {
             .subclass(concreteType)
             .name(nameGenerator.get())
             .make()) {
-            return unloaded.load(rawClass.getClassLoader()).getLoaded();
+            return unloaded.load(parameterType.getClassLoader()).getLoaded();
         } catch (IOException e) {
             // Should never happen
             throw Exceptions.propagate(e);
