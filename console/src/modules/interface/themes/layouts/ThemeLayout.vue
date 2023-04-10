@@ -89,18 +89,21 @@ const { data: setting } = useQuery<Setting>({
   async onSuccess(data) {
     if (data) {
       const { forms } = data.spec;
-      tabs.value = forms.map((item: SettingForm) => {
-        return {
-          id: item.group,
-          label: item.label || "",
-          route: {
-            name: "ThemeSetting",
-            params: {
-              group: item.group,
+      tabs.value = [
+        ...initialTabs,
+        ...forms.map((item: SettingForm) => {
+          return {
+            id: item.group,
+            label: item.label || "",
+            route: {
+              name: "ThemeSetting",
+              params: {
+                group: item.group,
+              },
             },
-          },
-        };
-      });
+          };
+        }),
+      ] as ThemeTab[];
     }
 
     await nextTick();
