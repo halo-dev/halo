@@ -31,12 +31,4 @@ public interface AttachmentHandler extends ExtensionPoint {
         ConfigMap configMap();
     }
 
-    record UploadOption(FilePart file,
-                        Policy policy,
-                        ConfigMap configMap) implements UploadContext {
-    }
-
-    record DeleteOption(Attachment attachment, Policy policy, ConfigMap configMap)
-        implements DeleteContext {
-    }
 }

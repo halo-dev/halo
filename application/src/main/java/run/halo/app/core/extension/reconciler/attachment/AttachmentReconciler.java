@@ -13,7 +13,7 @@ import run.halo.app.core.extension.attachment.Attachment.AttachmentStatus;
 import run.halo.app.core.extension.attachment.Constant;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler;
-import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler.DeleteOption;
+import run.halo.app.core.extension.attachment.endpoint.DeleteOption;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Controller;
