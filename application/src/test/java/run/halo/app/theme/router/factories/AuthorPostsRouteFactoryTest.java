@@ -33,7 +33,7 @@ class AuthorPostsRouteFactoryTest extends RouteFactoryTestSuite {
         RouterFunction<ServerResponse> routerFunction = authorPostsRouteFactory.create(null);
         WebTestClient webClient = getWebTestClient(routerFunction);
 
-        when(client.get(eq(User.class), eq("fake-user")))
+        when(client.fetch(eq(User.class), eq("fake-user")))
             .thenReturn(Mono.just(new User()));
         webClient.get()
             .uri("/authors/fake-user")
