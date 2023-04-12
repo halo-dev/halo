@@ -2,6 +2,7 @@ package run.halo.app.security;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -69,8 +70,11 @@ public class SuperAdminInitializer {
     }
 
     User createAdmin() {
+        String username = initializer.getSuperAdminUsername();
+        validateUsername(username);
+
         var metadata = new Metadata();
-        metadata.setName(initializer.getSuperAdminUsername());
+        metadata.setName(username);
 
         var spec = new UserSpec();
         spec.setDisplayName("Administrator");
@@ -84,6 +88,25 @@ public class SuperAdminInitializer {
         user.setMetadata(metadata);
         user.setSpec(spec);
         return user;
+    }
+
+    static void validateUsername(String username) {
+        if (!StringUtils.hasText(username)) {
+            throw new IllegalArgumentException("Super administrator username must not be blank");
+        }
+        boolean match =
+            Pattern.matches("^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$",
+                username);
+        if (!match || username.length() > 63) {
+            throw new IllegalArgumentException(
+                """
+                    Super administrator username must be a valid subdomain name, the name must:
+                    1. contain no more than 253 characters
+                    2. contain only lowercase alphanumeric characters, '-' or '.'
+                    3. start with an alphanumeric character
+                    4. end with an alphanumeric character
+                    """);
+        }
     }
 
     private String getPassword() {
