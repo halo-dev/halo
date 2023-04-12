@@ -164,7 +164,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
       const menuToUpdate = cloneDeep(selectedMenu.value);
       if (menuToUpdate) {
         menuToUpdate.spec.menuItems = menuToUpdate.spec.menuItems?.filter(
-          (name) => name !== menuItem.metadata.name
+          (name) => ![menuItem.metadata.name, ...childrenNames].includes(name)
         );
         await apiClient.extension.menu.updatev1alpha1Menu({
           name: menuToUpdate.metadata.name,
