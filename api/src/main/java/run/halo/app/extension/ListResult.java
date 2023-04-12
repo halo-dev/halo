@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import lombok.Data;
-import net.bytebuddy.ByteBuddy;
-import net.bytebuddy.description.type.TypeDescription;
 import org.springframework.util.Assert;
 import run.halo.app.infra.utils.GenericClassUtils;
 
@@ -96,15 +94,12 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
      * @return generic ListResult class.
      */
     public static Class<?> generateGenericClass(Scheme scheme) {
-        var generic =
-            TypeDescription.Generic.Builder.parameterizedType(ListResult.class, scheme.type())
-                .build();
-        return new ByteBuddy()
-            .subclass(generic)
-            .name(scheme.groupVersionKind().kind() + "List")
-            .make()
-            .load(ListResult.class.getClassLoader())
-            .getLoaded();
+        return GenericClassUtils.generateConcreteClass(ListResult.class,
+            scheme.type(),
+            () -> {
+                var pkgName = scheme.type().getPackageName();
+                return pkgName + '.' + scheme.groupVersionKind().kind() + "List";
+            });
     }
 
     /**
@@ -116,7 +111,7 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
      */
     public static <T> Class<?> generateGenericClass(Class<T> type) {
         return GenericClassUtils.generateConcreteClass(ListResult.class, type,
-            () -> type.getSimpleName() + "List");
+            () -> type.getName() + "List");
     }
 
     public static <T> ListResult<T> emptyResult() {

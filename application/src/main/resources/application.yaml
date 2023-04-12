@@ -1,5 +1,6 @@
 server:
   port: 8090
+  forward-headers-strategy: framework
   compression:
     enabled: true
   error:

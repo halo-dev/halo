@@ -219,6 +219,14 @@ export function useSettingFormConvert(
           configMap.value?.data?.[form.group] || "{}"
         );
       });
+
+      Object.keys(configMap.value?.data || {}).forEach((key) => {
+        if (!forms?.find((item) => item.group === key)) {
+          configMapFormData.value[key] = JSON.parse(
+            configMap.value?.data?.[key] || "{}"
+          );
+        }
+      });
     },
     {
       immediate: true,
@@ -236,8 +244,16 @@ export function useSettingFormConvert(
       [key: string]: string;
     } = {};
 
-    setting.value?.spec.forms.forEach((item: SettingForm) => {
+    const { forms } = setting.value?.spec || {};
+
+    forms?.forEach((item: SettingForm) => {
       data[item.group] = JSON.stringify(configMapFormData?.value?.[item.group]);
+    });
+
+    Object.keys(configMap.value?.data || {}).forEach((key) => {
+      if (!forms?.find((item) => item.group === key)) {
+        data[key] = configMap.value?.data?.[key] || "{}";
+      }
     });
 
     configMapToUpdate.data = data;
