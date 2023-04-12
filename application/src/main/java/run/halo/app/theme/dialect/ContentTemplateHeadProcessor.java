@@ -1,5 +1,10 @@
 package run.halo.app.theme.dialect;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -37,10 +42,20 @@ public class ContentTemplateHeadProcessor implements TemplateHeadProcessor {
         Mono<List<Map<String, String>>> htmlMetasMono = Mono.empty();
         if (isPostTemplate(context)) {
             htmlMetasMono = nameMono.flatMap(postFinder::getByName)
-                .map(post -> post.getSpec().getHtmlMetas());
+                .map(post -> {
+                    List<Map<String, String>> htmlMetas = post.getSpec().getHtmlMetas();
+                    String excerpt =
+                        post.getStatus() == null ? null : post.getStatus().getExcerpt();
+                    return excerptToMetaDescriptionIfAbsent(htmlMetas, excerpt);
+                });
         } else if (isPageTemplate(context)) {
             htmlMetasMono = nameMono.flatMap(singlePageFinder::getByName)
-                .map(page -> page.getSpec().getHtmlMetas());
+                .map(page -> {
+                    List<Map<String, String>> htmlMetas = page.getSpec().getHtmlMetas();
+                    String excerpt =
+                        page.getStatus() == null ? null : page.getStatus().getExcerpt();
+                    return excerptToMetaDescriptionIfAbsent(htmlMetas, excerpt);
+                });
         }
 
         return htmlMetasMono
@@ -50,6 +65,32 @@ public class ContentTemplateHeadProcessor implements TemplateHeadProcessor {
                 model.add(modelFactory.createText(metaHtml));
             })
             .then();
+    }
+
+    static List<Map<String, String>> excerptToMetaDescriptionIfAbsent(
+        List<Map<String, String>> htmlMetas,
+        String excerpt) {
+        final String excerptNullSafe = StringUtils.defaultString(excerpt);
+        List<Map<String, String>> metas = new ArrayList<>(defaultIfNull(htmlMetas, List.of()));
+        metas.stream()
+            .filter(map -> Meta.DESCRIPTION.equals(map.get(Meta.NAME)))
+            .distinct()
+            .findFirst()
+            .ifPresentOrElse(map ->
+                    map.put(Meta.CONTENT, defaultIfBlank(map.get(Meta.CONTENT), excerptNullSafe)),
+                () -> {
+                    Map<String, String> map = new HashMap<>();
+                    map.put(Meta.NAME, Meta.DESCRIPTION);
+                    map.put(Meta.CONTENT, excerptNullSafe);
+                    metas.add(map);
+                });
+        return metas;
+    }
+
+    interface Meta {
+        String DESCRIPTION = "description";
+        String NAME = "name";
+        String CONTENT = "content";
     }
 
     private String headMetaBuilder(List<Map<String, String>> htmlMetas) {
