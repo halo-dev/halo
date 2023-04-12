@@ -18,7 +18,7 @@ public enum Constant {
 
     /**
      * Do not use this key to set external link. You could implement
-     * {@link AttachmentHandler#getPermalink(Attachment)} by your self.
+     * {@link AttachmentHandler#getPermalink} by your self.
      * <p>
      *
      * @deprecated Use your own group instead.
