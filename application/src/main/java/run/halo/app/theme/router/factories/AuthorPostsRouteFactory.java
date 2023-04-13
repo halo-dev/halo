@@ -75,7 +75,7 @@ public class AuthorPostsRouteFactory implements RouteFactory {
 
     private Mono<UserVo> getByName(String name) {
         return client.fetch(User.class, name)
-            .switchIfEmpty(Mono.error(new NotFoundException("Author page not found.")))
+            .switchIfEmpty(Mono.error(() -> new NotFoundException("Author page not found.")))
             .map(UserVo::from);
     }
 }
