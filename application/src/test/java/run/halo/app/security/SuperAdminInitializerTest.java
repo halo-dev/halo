@@ -70,14 +70,14 @@ class SuperAdminInitializerTest {
 
         assertThatThrownBy(() -> SuperAdminInitializer.validateUsername("abc-"))
             .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> SuperAdminInitializer.validateUsername("ab?c-"))
+        assertThatThrownBy(() -> SuperAdminInitializer.validateUsername("ab?c"))
             .isInstanceOf(IllegalArgumentException.class);
 
         assertThatThrownBy(() -> SuperAdminInitializer.validateUsername("asdD"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("""
                 Super administrator username must be a valid subdomain name, the name must:
-                1. contain no more than 253 characters
+                1. contain no more than 63 characters
                 2. contain only lowercase alphanumeric characters, '-' or '.'
                 3. start with an alphanumeric character
                 4. end with an alphanumeric character
