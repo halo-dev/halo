@@ -7,7 +7,7 @@ metadata:
     halo.run/hidden: "true"
   annotations:
     rbac.authorization.halo.run/dependencies: |
-      [ "role-template-own-user-info", "role-template-own-permissions"]
+      [ "role-template-own-permissions"]
 rules:
   - apiGroups: [ "api.halo.run" ]
     resources: [ "comments", "comments/reply" ]
@@ -15,6 +15,10 @@ rules:
   - apiGroups: [ "api.halo.run" ]
     resources: [ "*" ]
     verbs: [ "*" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "users" ]
+    resourceNames: [ "-" ]
+    verbs: [ "get" ]
   - nonResourceURLs: [ "/apis/api.halo.run/v1alpha1/trackers/*" ]
     verbs: [ "create" ]
   - nonResourceURLs: [ "/actuator/globalinfo", "/actuator/health", "/actuator/health/*", "/login/public-key"]
