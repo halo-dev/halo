@@ -5,7 +5,6 @@ import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.boot.convert.ApplicationConversionService.getSharedInstance;
-import static org.springframework.web.reactive.function.BodyExtractors.toMultipartData;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static run.halo.app.extension.ListResult.generateGenericClass;
 import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
@@ -23,56 +22,61 @@ import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.fn.builders.requestbody.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FormFieldPart;
 import org.springframework.http.codec.multipart.Part;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.attachment.Attachment;
-import run.halo.app.core.extension.attachment.Policy;
-import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler.UploadOption;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.endpoint.SortResolver;
+import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.extension.Comparators;
-import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
-import run.halo.app.plugin.ExtensionComponentsFinder;
 
 @Slf4j
 @Component
 public class AttachmentEndpoint implements CustomEndpoint {
 
+    private final AttachmentService attachmentService;
+
     private final ReactiveExtensionClient client;
 
-    private final ExtensionComponentsFinder extensionComponentsFinder;
-
-    public AttachmentEndpoint(ReactiveExtensionClient client,
-        ExtensionComponentsFinder extensionComponentsFinder) {
+    public AttachmentEndpoint(AttachmentService attachmentService,
+        ReactiveExtensionClient client) {
+        this.attachmentService = attachmentService;
         this.client = client;
-        this.extensionComponentsFinder = extensionComponentsFinder;
     }
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "api.console.halo.run/v1alpha1/Attachment";
         return SpringdocRouteBuilder.route()
-            .POST("/attachments/upload", contentType(MediaType.MULTIPART_FORM_DATA), this::upload,
+            .POST("/attachments/upload", contentType(MediaType.MULTIPART_FORM_DATA),
+                request -> request.body(BodyExtractors.toMultipartData())
+                    .map(UploadRequest::new)
+                    .flatMap(uploadReq -> {
+                        var policyName = uploadReq.getPolicyName();
+                        var groupName = uploadReq.getGroupName();
+                        var filePart = uploadReq.getFile();
+                        return attachmentService.upload(policyName,
+                            groupName,
+                            filePart.filename(),
+                            filePart.content(),
+                            filePart.headers().getContentType());
+                    })
+                    .flatMap(attachment -> ServerResponse.ok().bodyValue(attachment)),
                 builder -> builder
                     .operationId("UploadAttachment")
                     .tag(tag)
@@ -96,56 +100,6 @@ public class AttachmentEndpoint implements CustomEndpoint {
                 }
             )
             .build();
-    }
-
-    Mono<ServerResponse> upload(ServerRequest request) {
-        return ReactiveSecurityContextHolder.getContext()
-            .switchIfEmpty(Mono.error(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,
-                "Please login first and try it again")))
-            .map(SecurityContext::getAuthentication)
-            .map(Authentication::getName)
-            .flatMap(username -> request.body(toMultipartData())
-                .map(UploadRequest::new)
-                // prepare the upload option
-                .flatMap(uploadRequest -> client.get(Policy.class, uploadRequest.getPolicyName())
-                    .filter(policy -> StringUtils.hasText(policy.getSpec().getConfigMapName()))
-                    .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
-                        "Please configure the attachment policy before uploading")))
-                    .flatMap(policy -> {
-                        var configMapName = policy.getSpec().getConfigMapName();
-                        return client.get(ConfigMap.class, configMapName)
-                            .map(configMap -> new UploadOption(uploadRequest.getFile(), policy,
-                                configMap));
-                    })
-                    // find the proper handler to handle the attachment
-                    .flatMap(uploadOption -> Flux.fromIterable(
-                            extensionComponentsFinder.getExtensions(AttachmentHandler.class))
-                        .concatMap(uploadHandler -> uploadHandler.upload(uploadOption)
-                            .doOnNext(attachment -> {
-                                var spec = attachment.getSpec();
-                                if (spec == null) {
-                                    spec = new Attachment.AttachmentSpec();
-                                    attachment.setSpec(spec);
-                                }
-                                spec.setOwnerName(username);
-                                spec.setPolicyName(uploadOption.policy().getMetadata().getName());
-                                var groupName = uploadRequest.getGroupName();
-                                if (groupName != null) {
-                                    // validate the group name
-                                    spec.setGroupName(groupName);
-                                }
-                            }))
-                        .next()
-                        .switchIfEmpty(Mono.error(
-                            () -> new ResponseStatusException(
-                                HttpStatus.INTERNAL_SERVER_ERROR,
-                                "No suitable handler found for uploading the attachment"))))
-                )
-                // create the attachment
-                .flatMap(client::create)
-                .flatMap(attachment -> ServerResponse.ok()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(attachment)));
     }
 
     Mono<ServerResponse> search(ServerRequest request) {

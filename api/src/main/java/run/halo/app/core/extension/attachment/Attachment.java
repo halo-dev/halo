@@ -56,7 +56,11 @@ public class Attachment extends AbstractExtension {
     @Data
     public static class AttachmentStatus {
 
-        @Schema(description = "Permalink of attachment")
+        @Schema(description = """
+            Permalink of attachment.
+            If it is in local storage, the public URL will be set.
+            If it is in s3 storage, the Object URL will be set.
+            """)
         private String permalink;
 
     }

@@ -1,5 +1,7 @@
 package run.halo.app.core.extension.attachment;
 
+import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler;
+
 public enum Constant {
     ;
 
@@ -14,6 +16,13 @@ public enum Constant {
      */
     public static final String URI_ANNO_KEY = GROUP + "/uri";
 
+    /**
+     * Do not use this key to set external link. You could implement
+     * {@link AttachmentHandler#getPermalink} by your self.
+     * <p>
+     *
+     * @deprecated Use your own group instead.
+     */
     public static final String EXTERNAL_LINK_ANNO_KEY = GROUP + "/external-link";
 
     public static final String FINALIZER_NAME = "attachment-manager";

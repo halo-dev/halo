@@ -4,6 +4,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
 import org.springframework.stereotype.Component;
+import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -67,6 +68,8 @@ public class SharedApplicationContextHolder {
             rootApplicationContext.getBean(ExternalUrlSupplier.class));
         beanFactory.registerSingleton("serverSecurityContextRepository",
             rootApplicationContext.getBean(ServerSecurityContextRepository.class));
+        beanFactory.registerSingleton("attachmentService",
+            rootApplicationContext.getBean(AttachmentService.class));
         // TODO add more shared instance here
 
         return sharedApplicationContext;
