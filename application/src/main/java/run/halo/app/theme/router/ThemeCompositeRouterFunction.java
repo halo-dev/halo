@@ -127,6 +127,7 @@ public class ThemeCompositeRouterFunction implements RouterFunction<ServerRespon
 
         // Add the index route to the end to prevent conflict with the queryParam rule of the post
         routePatterns.add(new RoutePattern(DefaultTemplateEnum.INDEX, "/"));
+        routePatterns.add(new RoutePattern(DefaultTemplateEnum.AUTHOR, ""));
         return routePatterns;
     }
 }
