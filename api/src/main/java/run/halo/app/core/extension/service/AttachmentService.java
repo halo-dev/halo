@@ -20,10 +20,7 @@ public interface AttachmentService {
 
     /**
      * Uploads the given attachment to specific storage using handlers in plugins. Please note
-     * that we will make
-     * sure the
-     * request is
-     * authenticated, or an unauthorized exception throws.
+     * that we will make sure the request is authenticated, or an unauthorized exception throws.
      * <p>
      * If no handler can be found to upload the given attachment, ServerError exception will be
      * thrown.

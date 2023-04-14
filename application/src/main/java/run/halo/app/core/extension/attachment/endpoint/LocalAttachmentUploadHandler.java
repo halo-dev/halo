@@ -24,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -172,6 +173,8 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
             return Mono.empty();
         }
         var uriStr = annotations.get(Constant.URI_ANNO_KEY);
+        // the uriStr is encoded before.
+        uriStr = UriUtils.decode(uriStr, StandardCharsets.UTF_8);
         var uri = UriComponentsBuilder.fromUri(externalUrl.get())
             // The URI has been encoded before, so there is no need to encode it again.
             .path(uriStr)
