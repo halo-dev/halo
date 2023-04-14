@@ -18,6 +18,7 @@ import run.halo.app.core.extension.User;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.ListedPostVo;
@@ -73,7 +74,8 @@ public class AuthorPostsRouteFactory implements RouteFactory {
     }
 
     private Mono<UserVo> getByName(String name) {
-        return client.get(User.class, name)
+        return client.fetch(User.class, name)
+            .switchIfEmpty(Mono.error(() -> new NotFoundException("Author page not found.")))
             .map(UserVo::from);
     }
 }
