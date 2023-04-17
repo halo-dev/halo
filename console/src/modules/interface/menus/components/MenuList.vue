@@ -14,23 +14,23 @@ import {
   VDropdownItem,
 } from "@halo-dev/components";
 import MenuEditingModal from "./MenuEditingModal.vue";
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import type { Menu } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { usePermission } from "@/utils/permission";
-import { onBeforeRouteLeave } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { useQuery } from "@tanstack/vue-query";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
-    selectedMenu: Menu | null;
+    selectedMenu?: Menu;
   }>(),
   {
-    selectedMenu: null,
+    selectedMenu: undefined,
   }
 );
 
@@ -39,56 +39,39 @@ const emit = defineEmits<{
   (event: "update:selectedMenu", menu: Menu): void;
 }>();
 
-const menus = ref<Menu[]>([] as Menu[]);
-const loading = ref(false);
 const selectedMenuToUpdate = ref<Menu>();
 const menuEditingModal = ref<boolean>(false);
-const refreshInterval = ref();
 
-const handleFetchMenus = async (options?: { mute?: boolean }) => {
-  selectedMenuToUpdate.value = undefined;
-  try {
-    clearInterval(refreshInterval.value);
-
-    if (!options?.mute) {
-      loading.value = true;
-    }
-
-    const { data } = await apiClient.extension.menu.listv1alpha1Menu();
-    menus.value = data.items;
-
-    // update selected menu
+const {
+  data: menus,
+  isLoading,
+  refetch,
+} = useQuery<Menu[]>({
+  queryKey: ["menus"],
+  queryFn: async () => {
+    const { data } = await apiClient.extension.menu.listv1alpha1Menu({
+      page: 0,
+      size: 0,
+    });
+    return data.items;
+  },
+  refetchOnWindowFocus: false,
+  onSuccess(data) {
     if (props.selectedMenu) {
-      const updatedMenu = menus.value.find(
+      const updatedMenu = data?.find(
         (menu) => menu.metadata.name === props.selectedMenu?.metadata.name
       );
       if (updatedMenu) {
         emit("update:selectedMenu", updatedMenu);
       }
     }
-
-    const deletedMenus = menus.value.filter(
+  },
+  refetchInterval(data) {
+    const deletingMenus = data?.filter(
       (menu) => !!menu.metadata.deletionTimestamp
     );
-
-    if (deletedMenus.length) {
-      refreshInterval.value = setInterval(() => {
-        handleFetchMenus({ mute: true });
-      }, 3000);
-    }
-  } catch (e) {
-    console.error("Failed to fetch menus", e);
-  } finally {
-    loading.value = false;
-  }
-};
-
-onUnmounted(() => {
-  clearInterval(refreshInterval.value);
-});
-
-onBeforeRouteLeave(() => {
-  clearInterval(refreshInterval.value);
+    return deletingMenus?.length ? 3000 : false;
+  },
 });
 
 const menuQuery = useRouteQuery("menu");
@@ -111,12 +94,15 @@ const handleDeleteMenu = async (menu: Menu) => {
           name: menu.metadata.name,
         });
 
-        const deleteItemsPromises = Array.from(menu.spec.menuItems || []).map(
-          (item) =>
-            apiClient.extension.menuItem.deletev1alpha1MenuItem({
-              name: item,
-            })
+        const deleteItemsPromises = menu.spec.menuItems?.map((item) =>
+          apiClient.extension.menuItem.deletev1alpha1MenuItem({
+            name: item,
+          })
         );
+
+        if (!deleteItemsPromises) {
+          return;
+        }
 
         await Promise.all(deleteItemsPromises);
 
@@ -124,7 +110,7 @@ const handleDeleteMenu = async (menu: Menu) => {
       } catch (e) {
         console.error("Failed to delete menu", e);
       } finally {
-        await handleFetchMenus();
+        await refetch();
       }
     },
   });
@@ -136,41 +122,39 @@ const handleOpenEditingModal = (menu?: Menu) => {
 };
 
 onMounted(async () => {
-  await handleFetchMenus();
+  await refetch();
 
   if (menuQuery.value) {
-    const menu = menus.value.find((m) => m.metadata.name === menuQuery.value);
+    const menu = menus.value?.find((m) => m.metadata.name === menuQuery.value);
     if (menu) {
       handleSelect(menu);
     }
     return;
   }
 
-  if (menus.value.length > 0) {
+  if (menus.value?.length) {
     handleSelect(menus.value[0]);
   }
 });
 
-defineExpose({
-  handleFetchMenus,
-});
-
 // primary menu
-const primaryMenuName = ref<string>();
+const { data: primaryMenuName, refetch: refetchPrimaryMenuName } = useQuery({
+  queryKey: ["primary-menu-name"],
+  queryFn: async () => {
+    const { data } = await apiClient.extension.configMap.getv1alpha1ConfigMap({
+      name: "system",
+    });
 
-const handleFetchPrimaryMenuName = async () => {
-  const { data } = await apiClient.extension.configMap.getv1alpha1ConfigMap({
-    name: "system",
-  });
+    if (!data.data?.menu) {
+      return "";
+    }
 
-  if (!data.data?.menu) {
-    return;
-  }
+    const menuConfig = JSON.parse(data.data.menu);
 
-  const menuConfig = JSON.parse(data.data.menu);
-
-  primaryMenuName.value = menuConfig.primary;
-};
+    return menuConfig.primary;
+  },
+  refetchOnWindowFocus: false,
+});
 
 const handleSetPrimaryMenu = async (menu: Menu) => {
   const { data: systemConfigMap } =
@@ -188,30 +172,28 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
       configMap: systemConfigMap,
     });
   }
-  await handleFetchPrimaryMenuName();
+  await refetchPrimaryMenuName();
 
   Toast.success(t("core.menu.operations.set_primary.toast_success"));
 };
-
-onMounted(handleFetchPrimaryMenuName);
 </script>
 <template>
   <MenuEditingModal
     v-model:visible="menuEditingModal"
     :menu="selectedMenuToUpdate"
-    @close="handleFetchMenus()"
+    @close="refetch()"
     @created="handleSelect"
   />
   <VCard :body-class="['!p-0']" :title="$t('core.menu.title')">
-    <VLoading v-if="loading" />
-    <Transition v-else-if="!menus.length" appear name="fade">
+    <VLoading v-if="isLoading" />
+    <Transition v-else-if="!menus?.length" appear name="fade">
       <VEmpty
         :message="$t('core.menu.empty.message')"
         :title="$t('core.menu.empty.title')"
       >
         <template #actions>
           <VSpace>
-            <VButton size="sm" @click="handleFetchMenus()">
+            <VButton size="sm" @click="refetch()">
               {{ $t("core.common.buttons.refresh") }}
             </VButton>
           </VSpace>

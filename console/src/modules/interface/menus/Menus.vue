@@ -14,7 +14,7 @@ import {
 import MenuItemEditingModal from "./components/MenuItemEditingModal.vue";
 import MenuItemListItem from "./components/MenuItemListItem.vue";
 import MenuList from "./components/MenuList.vue";
-import { onUnmounted, ref } from "vue";
+import { computed, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { Menu, MenuItem } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
@@ -27,68 +27,49 @@ import {
   resetMenuItemsTreePriority,
 } from "./utils";
 import { useDebounceFn } from "@vueuse/core";
-import { onBeforeRouteLeave } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
 
 const { t } = useI18n();
+const queryClient = useQueryClient();
 
-const menuItems = ref<MenuItem[]>([] as MenuItem[]);
 const menuTreeItems = ref<MenuTreeItem[]>([] as MenuTreeItem[]);
 const selectedMenu = ref<Menu>();
 const selectedMenuItem = ref<MenuItem>();
 const selectedParentMenuItem = ref<MenuItem>();
-const loading = ref(false);
-const menuListRef = ref();
 const menuItemEditingModal = ref();
-const refreshInterval = ref();
 
-const handleFetchMenuItems = async (options?: { mute?: boolean }) => {
-  try {
-    clearInterval(refreshInterval.value);
-
-    if (!options?.mute) {
-      loading.value = true;
-    }
-
+const {
+  data: menuItems,
+  isLoading,
+  refetch,
+} = useQuery<MenuItem[]>({
+  queryKey: ["menu-items", selectedMenu],
+  queryFn: async () => {
     if (!selectedMenu.value?.spec.menuItems) {
-      return;
+      return [];
     }
-    const menuItemNames = Array.from(selectedMenu.value.spec.menuItems)?.map(
-      (item) => item
-    );
+
+    const menuItemNames = selectedMenu.value.spec.menuItems.filter(Boolean);
     const { data } = await apiClient.extension.menuItem.listv1alpha1MenuItem({
       page: 0,
       size: 0,
       fieldSelector: [`name=(${menuItemNames.join(",")})`],
     });
-    menuItems.value = data.items;
-    // Build the menu tree
-    menuTreeItems.value = buildMenuItemsTree(data.items);
 
-    const deletedMenuItems = menuItems.value.filter(
+    return data.items;
+  },
+  onSuccess(data) {
+    menuTreeItems.value = buildMenuItemsTree(data);
+  },
+  refetchOnWindowFocus: false,
+  refetchInterval(data) {
+    const deletingMenuItems = data?.filter(
       (menuItem) => !!menuItem.metadata.deletionTimestamp
     );
-
-    if (deletedMenuItems.length) {
-      refreshInterval.value = setInterval(() => {
-        handleFetchMenuItems({ mute: true });
-      }, 3000);
-    }
-
-    await handleResetMenuItems();
-  } catch (e) {
-    console.error("Failed to fetch menu items", e);
-  } finally {
-    loading.value = false;
-  }
-};
-
-onUnmounted(() => {
-  clearInterval(refreshInterval.value);
-});
-
-onBeforeRouteLeave(() => {
-  clearInterval(refreshInterval.value);
+    return deletingMenuItems?.length ? 3000 : false;
+  },
+  enabled: computed(() => !!selectedMenu.value),
 });
 
 const handleOpenEditingModal = (menuItem: MenuTreeItem) => {
@@ -120,11 +101,10 @@ const onMenuItemSaved = async (menuItem: MenuItem) => {
     menuToUpdate &&
     !menuToUpdate.spec.menuItems?.includes(menuItem.metadata.name)
   ) {
-    if (menuToUpdate.spec.menuItems) {
-      menuToUpdate.spec.menuItems.push(menuItem.metadata.name);
-    } else {
-      menuToUpdate.spec.menuItems = [menuItem.metadata.name];
-    }
+    menuToUpdate.spec.menuItems = [
+      ...(menuToUpdate.spec.menuItems || []),
+      menuItem.metadata.name,
+    ];
 
     await apiClient.extension.menu.updatev1alpha1Menu({
       name: menuToUpdate.metadata.name,
@@ -132,8 +112,8 @@ const onMenuItemSaved = async (menuItem: MenuItem) => {
     });
   }
 
-  await menuListRef.value.handleFetchMenus();
-  await handleFetchMenuItems({ mute: true });
+  await queryClient.invalidateQueries({ queryKey: ["menus"] });
+  await refetch();
 };
 
 const handleUpdateInBatch = useDebounceFn(async () => {
@@ -150,8 +130,8 @@ const handleUpdateInBatch = useDebounceFn(async () => {
   } catch (e) {
     console.error("Failed to update menu items", e);
   } finally {
-    await menuListRef.value.handleFetchMenus();
-    await handleFetchMenuItems({ mute: true });
+    await queryClient.invalidateQueries({ queryKey: ["menus"] });
+    await refetch();
   }
 }, 300);
 
@@ -178,32 +158,25 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
         await Promise.all(deleteChildrenRequests);
       }
 
-      await handleFetchMenuItems();
+      await refetch();
+
+      // update items under menu
+      const menuToUpdate = cloneDeep(selectedMenu.value);
+      if (menuToUpdate) {
+        menuToUpdate.spec.menuItems = menuToUpdate.spec.menuItems?.filter(
+          (name) => ![menuItem.metadata.name, ...childrenNames].includes(name)
+        );
+        await apiClient.extension.menu.updatev1alpha1Menu({
+          name: menuToUpdate.metadata.name,
+          menu: menuToUpdate,
+        });
+      }
+
+      await queryClient.invalidateQueries({ queryKey: ["menus"] });
 
       Toast.success(t("core.common.toast.delete_success"));
     },
   });
-};
-
-const handleResetMenuItems = async () => {
-  if (!selectedMenu.value) {
-    return;
-  }
-
-  const menuToUpdate = cloneDeep(selectedMenu.value);
-
-  const menuItemNames = menuItems.value.map((menuItem) => {
-    return menuItem.metadata.name;
-  });
-
-  menuToUpdate.spec.menuItems = menuItemNames;
-
-  await apiClient.extension.menu.updatev1alpha1Menu({
-    name: menuToUpdate.metadata.name,
-    menu: menuToUpdate,
-  });
-
-  await menuListRef.value.handleFetchMenus({ mute: true });
 };
 </script>
 <template>
@@ -223,11 +196,7 @@ const handleResetMenuItems = async () => {
   <div class="m-0 md:m-4">
     <div class="flex flex-col gap-4 sm:flex-row">
       <div class="w-96">
-        <MenuList
-          ref="menuListRef"
-          v-model:selected-menu="selectedMenu"
-          @select="handleFetchMenuItems()"
-        />
+        <MenuList v-model:selected-menu="selectedMenu" @select="refetch()" />
       </div>
       <div class="flex-1">
         <VCard :body-class="['!p-0']">
@@ -256,15 +225,15 @@ const handleResetMenuItems = async () => {
               </div>
             </div>
           </template>
-          <VLoading v-if="loading" />
-          <Transition v-else-if="!menuItems.length" appear name="fade">
+          <VLoading v-if="isLoading" />
+          <Transition v-else-if="!menuItems?.length" appear name="fade">
             <VEmpty
               :message="$t('core.menu.menu_item_empty.message')"
               :title="$t('core.menu.menu_item_empty.title')"
             >
               <template #actions>
                 <VSpace>
-                  <VButton @click="handleFetchMenuItems()">
+                  <VButton @click="refetch()">
                     {{ $t("core.common.buttons.refresh") }}
                   </VButton>
                   <VButton
