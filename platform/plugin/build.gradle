@@ -1,6 +1,6 @@
 plugins {
     id 'java-platform'
-    id 'maven-publish'
+    id 'halo.publish'
 }
 
 group = 'run.halo.tools.platform'
@@ -17,16 +17,5 @@ dependencies {
         api project(':api')
         // TODO other plugin API dependencies
         // e.g.: api 'halo.run.plugin:links-api:1.1.0'
-    }
-}
-
-publishing {
-    publications {
-        pluginPlatform(MavenPublication) {
-            from components.javaPlatform
-        }
-    }
-    repositories {
-        mavenLocal()
     }
 }
