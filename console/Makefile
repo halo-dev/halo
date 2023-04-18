@@ -16,6 +16,8 @@ lint: build-packages ## Lint console
 test: build-packages ## Test console
 	pnpm test:unit
 
+check: lint test ## Check console
+
 dev: build-packages ## Run console with development environment
 	pnpm dev
 
