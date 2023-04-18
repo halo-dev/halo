@@ -1,11 +1,15 @@
 <script lang="ts" setup>
-import { VModal } from "@halo-dev/components";
+import { Toast, VModal } from "@halo-dev/components";
 import UppyUpload from "@/components/upload/UppyUpload.vue";
 import { computed, ref, watch } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
+import { useQueryClient } from "@tanstack/vue-query";
+import { useThemeStore } from "@/stores/theme";
 
 const { t } = useI18n();
+const queryClient = useQueryClient();
+const themeStore = useThemeStore();
 
 const props = withDefaults(
   defineProps<{
@@ -60,6 +64,21 @@ watch(
     }
   }
 );
+
+const onUploaded = () => {
+  Toast.success(
+    t(
+      props.upgradeTheme
+        ? "core.common.toast.upgrade_success"
+        : "core.common.toast.install_success"
+    )
+  );
+
+  queryClient.invalidateQueries({ queryKey: ["themes"] });
+  themeStore.fetchActivatedTheme();
+
+  handleVisibleChange(false);
+};
 </script>
 <template>
   <VModal
@@ -76,6 +95,7 @@ watch(
       }"
       :endpoint="endpoint"
       auto-proceed
+      @uploaded="onUploaded"
     />
   </VModal>
 </template>
