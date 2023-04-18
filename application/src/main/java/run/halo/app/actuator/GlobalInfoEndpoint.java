@@ -37,6 +37,7 @@ public class GlobalInfoEndpoint {
     public GlobalInfo globalInfo() {
         final var info = new GlobalInfo();
         info.setExternalUrl(haloProperties.getExternalUrl());
+        info.setUseAbsolutePermalink(haloProperties.isUseAbsolutePermalink());
         info.setLocale(Locale.getDefault());
         info.setTimeZone(TimeZone.getDefault());
         handleSocialAuthProvider(info);
@@ -54,6 +55,8 @@ public class GlobalInfoEndpoint {
     public static class GlobalInfo {
 
         private URL externalUrl;
+
+        private boolean useAbsolutePermalink;
 
         private TimeZone timeZone;
 
