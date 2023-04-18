@@ -23,7 +23,6 @@ const { data: authProviders, isFetching } = useQuery<ListedAuthProvider[]>({
     const { data } = await apiClient.authProvider.listAuthProviders();
     return data;
   },
-  refetchOnWindowFocus: false,
   enabled: isCurrentUser,
 });
 

@@ -46,7 +46,6 @@ const { data: authProvider } = useQuery<AuthProvider>({
       });
     }
   },
-  refetchOnWindowFocus: false,
   enabled: computed(() => !!route.params.name),
 });
 
@@ -72,7 +71,6 @@ const { data: setting, refetch: handleFetchSettings } = useQuery<Setting>({
     );
     return data;
   },
-  refetchOnWindowFocus: false,
   enabled: computed(() => !!authProvider.value?.spec.settingRef?.name),
 });
 
@@ -93,7 +91,6 @@ const { data: configMap, refetch: handleFetchConfigMap } = useQuery({
     return data;
   },
   retry: 0,
-  refetchOnWindowFocus: false,
   onError: async () => {
     const data = {};
     data[group.value] = "";

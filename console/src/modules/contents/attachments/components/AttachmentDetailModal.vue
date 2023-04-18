@@ -50,7 +50,6 @@ const { data: policy } = useQuery({
 
     return data;
   },
-  refetchOnWindowFocus: false,
   enabled: computed(() => !!policyName.value),
 });
 

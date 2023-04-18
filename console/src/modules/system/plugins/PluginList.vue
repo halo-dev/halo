@@ -137,7 +137,6 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
 
     return data.items;
   },
-  refetchOnWindowFocus: false,
   keepPreviousData: true,
   refetchInterval: (data) => {
     const deletingPlugins = data?.filter(

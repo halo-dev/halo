@@ -68,7 +68,6 @@ const {
     });
     return data.items;
   },
-  refetchOnWindowFocus: false,
   refetchInterval(data) {
     if (activeTab.value !== "installed") {
       return false;
