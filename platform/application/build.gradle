@@ -3,7 +3,8 @@ import org.springframework.boot.gradle.plugin.SpringBootPlugin
 plugins {
     id 'org.springframework.boot' version '3.0.5' apply false
     id 'java-platform'
-    id 'maven-publish'
+    id 'halo.publish'
+    id 'signing'
 }
 
 group = 'run.halo.tools.platform'
@@ -56,16 +57,4 @@ dependencies {
         runtime 'com.github.jasync-sql:jasync-r2dbc-mysql:2.1.23'
     }
 
-}
-
-publishing {
-    publications {
-        applicationPlatform(MavenPublication) {
-            from components.javaPlatform
-        }
-    }
-
-    repositories {
-        mavenLocal()
-    }
 }
