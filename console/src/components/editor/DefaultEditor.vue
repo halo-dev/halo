@@ -531,6 +531,9 @@ watch(
         handleGenerateTableOfContent();
       });
     }
+  },
+  {
+    immediate: true,
   }
 );
 </script>
