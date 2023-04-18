@@ -11,7 +11,7 @@ interface useThemeLifeCycleReturn {
   loading: Ref<boolean>;
   isActivated: ComputedRef<boolean>;
   getFailedMessage: () => string | undefined;
-  handleActiveTheme: () => void;
+  handleActiveTheme: (reload?: boolean) => void;
   handleResetSettingConfig: () => void;
 }
 
@@ -42,7 +42,7 @@ export function useThemeLifeCycle(
     }
   };
 
-  const handleActiveTheme = async () => {
+  const handleActiveTheme = async (reload?: boolean) => {
     Dialog.info({
       title: t("core.theme.operations.active.title"),
       description: theme.value?.spec.displayName,
@@ -57,6 +57,10 @@ export function useThemeLifeCycle(
           });
 
           Toast.success(t("core.theme.operations.active.toast_success"));
+
+          if (reload) {
+            window.location.reload();
+          }
         } catch (e) {
           console.error("Failed to active theme", e);
         } finally {
