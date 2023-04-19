@@ -930,6 +930,9 @@ core:
       database: Database
       os: Operating system
       log: System log
+    fields_values:
+      external_url:
+        not_setup: Not setup
     copy_results:
       external_url: "External url: {external_url}"
       start_time: "Start time: {start_time}"

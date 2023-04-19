@@ -22,6 +22,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.content.comment.CommentRequest;
@@ -230,7 +231,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
         public String getKind() {
             String kind = emptyToNull(queryParams.getFirst("kind"));
             if (kind == null) {
-                throw new IllegalArgumentException("The kind must not be null.");
+                throw new ServerWebInputException("The kind must not be null.");
             }
             return kind;
         }
@@ -244,7 +245,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
         public String getName() {
             String name = emptyToNull(queryParams.getFirst("name"));
             if (name == null) {
-                throw new IllegalArgumentException("The name must not be null.");
+                throw new ServerWebInputException("The name must not be null.");
             }
             return name;
         }
