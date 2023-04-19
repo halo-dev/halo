@@ -6,6 +6,7 @@ export interface GlobalInfo {
   allowAnonymousComments: boolean;
   allowRegistration: boolean;
   socialAuthProviders: SocialAuthProvider[];
+  useAbsolutePermalink: boolean;
 }
 
 export interface Info {

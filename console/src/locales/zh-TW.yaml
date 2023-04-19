@@ -930,6 +930,9 @@ core:
       database: 資料庫
       os: 操作系統
       log: 運行日誌
+    fields_values:
+      external_url:
+        not_setup: 未設置
     copy_results:
       external_url: 外部訪問地址：{external_url}
       start_time: 啟動時間：{start_time}

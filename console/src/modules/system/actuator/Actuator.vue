@@ -54,9 +54,14 @@ const handleFetchActuatorStartup = async () => {
 };
 
 const isExternalUrlValid = computed(() => {
+  if (!globalInfo.value?.useAbsolutePermalink) {
+    return true;
+  }
+
   if (!globalInfo.value?.externalUrl) {
     return true;
   }
+
   const url = new URL(globalInfo.value.externalUrl);
   const { host: currentHost, protocol: currentProtocol } = window.location;
   return url.host === currentHost && url.protocol === currentProtocol;
@@ -158,8 +163,11 @@ const handleDownloadLogfile = () => {
         <div class="border-t border-gray-200">
           <VDescription>
             <VDescriptionItem :label="$t('core.actuator.fields.external_url')">
-              <span>
+              <span v-if="globalInfo?.externalUrl">
                 {{ globalInfo?.externalUrl }}
+              </span>
+              <span v-else>
+                {{ $t("core.actuator.fields_values.external_url.not_setup") }}
               </span>
               <VAlert
                 v-if="!isExternalUrlValid"
