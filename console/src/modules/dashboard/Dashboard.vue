@@ -74,10 +74,10 @@
       "
       type="outline"
     ></VTabbar>
-
-    <template v-for="(group, groupIndex) in widgetsGroup" :key="groupIndex">
-      <div v-if="activeId === group.id" class="mt-4">
+    <div class="mt-4">
+      <template v-for="(group, groupIndex) in widgetsGroup" :key="groupIndex">
         <grid-layout
+          v-if="activeId === group.id"
           :col-num="12"
           :is-draggable="false"
           :is-resizable="false"
@@ -102,8 +102,8 @@
             <component :is="item.widget" />
           </grid-item>
         </grid-layout>
-      </div>
-    </template>
+      </template>
+    </div>
   </VModal>
 </template>
 <script lang="ts" setup>

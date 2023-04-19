@@ -80,7 +80,7 @@ const { isActivated, handleActiveTheme } = useThemeLifeCycle(theme);
     </template>
 
     <template #dropdownItems>
-      <VDropdownItem v-if="!isActivated" @click="handleActiveTheme">
+      <VDropdownItem v-if="!isActivated" @click="handleActiveTheme()">
         {{ $t("core.common.buttons.active") }}
       </VDropdownItem>
       <VDropdownItem @click="emit('open-settings')">
