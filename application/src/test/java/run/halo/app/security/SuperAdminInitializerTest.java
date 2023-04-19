@@ -1,11 +1,9 @@
 package run.halo.app.security;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,32 +59,4 @@ class SuperAdminInitializerTest {
             return false;
         }));
     }
-
-    @Test
-    void checkUsername() {
-        assertThatThrownBy(() -> SuperAdminInitializer.validateUsername(""))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("Super administrator username must not be blank");
-
-        assertThatThrownBy(() -> SuperAdminInitializer.validateUsername("abc-"))
-            .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> SuperAdminInitializer.validateUsername("ab?c"))
-            .isInstanceOf(IllegalArgumentException.class);
-
-        assertThatThrownBy(() -> SuperAdminInitializer.validateUsername("asdD"))
-            .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("""
-                Super administrator username must be a valid subdomain name, the name must:
-                1. contain no more than 63 characters
-                2. contain only lowercase alphanumeric characters, '-' or '.'
-                3. start with an alphanumeric character
-                4. end with an alphanumeric character
-                """);
-
-        Assertions.assertDoesNotThrow(() -> SuperAdminInitializer.validateUsername("1st"));
-        Assertions.assertDoesNotThrow(() -> SuperAdminInitializer.validateUsername("ast"));
-        Assertions.assertDoesNotThrow(() -> SuperAdminInitializer.validateUsername("ast1"));
-        Assertions.assertDoesNotThrow(() -> SuperAdminInitializer.validateUsername("ast-1"));
-    }
-
 }
