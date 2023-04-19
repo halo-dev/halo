@@ -46,6 +46,9 @@ public class ThemeConfiguration {
                 var resource = request.pathVariable("resource");
                 resource = StringUtils.removeStart(resource, "/");
                 var fsRes = new FileSystemResource(getThemeAssetsPath(themeName, resource));
+                if (!fsRes.exists()) {
+                    return ServerResponse.notFound().build();
+                }
                 var bodyBuilder = ServerResponse.ok()
                     .cacheControl(cacheProperties.getCachecontrol().toHttpCacheControl());
                 try {
