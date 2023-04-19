@@ -6,6 +6,7 @@ import Uppy, { type SuccessResponse } from "@uppy/core";
 import type { Restrictions } from "@uppy/core";
 import XHRUpload from "@uppy/xhr-upload";
 import zh_CN from "@uppy/locales/lib/zh_CN";
+import zh_TW from "@uppy/locales/lib/zh_TW";
 import en_US from "@uppy/locales/lib/en_US";
 import { computed, onUnmounted } from "vue";
 import { Toast } from "@halo-dev/components";
@@ -46,6 +47,7 @@ const locales = {
   zh: zh_CN,
   "en-US": en_US,
   "zh-CN": zh_CN,
+  "zh-TW": zh_TW,
 };
 
 const uppy = computed(() => {
