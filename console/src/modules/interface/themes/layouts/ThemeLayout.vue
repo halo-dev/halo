@@ -177,7 +177,7 @@ watch([() => route.name, () => route.params], async () => {
             v-permission="['system:themes:manage']"
             size="sm"
             type="primary"
-            @click="handleActiveTheme"
+            @click="handleActiveTheme()"
           >
             {{ $t("core.common.buttons.active") }}
           </VButton>
