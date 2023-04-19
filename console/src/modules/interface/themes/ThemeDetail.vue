@@ -131,11 +131,11 @@ const onUpgradeModalClose = () => {
         <VDescription>
           <VDescriptionItem
             label="ID"
-            :description="selectedTheme?.metadata.name"
+            :content="selectedTheme?.metadata.name"
           />
           <VDescriptionItem
             :label="$t('core.theme.detail.fields.author')"
-            :description="selectedTheme?.spec.author.name"
+            :content="selectedTheme?.spec.author.name"
           />
           <VDescriptionItem :label="$t('core.theme.detail.fields.website')">
             <a
@@ -157,15 +157,15 @@ const onUpgradeModalClose = () => {
           </VDescriptionItem>
           <VDescriptionItem
             :label="$t('core.theme.detail.fields.version')"
-            :description="selectedTheme?.spec.version"
+            :content="selectedTheme?.spec.version"
           />
           <VDescriptionItem
             :label="$t('core.theme.detail.fields.requires')"
-            :description="selectedTheme?.spec.requires"
+            :content="selectedTheme?.spec.requires"
           />
           <VDescriptionItem
             :label="$t('core.theme.detail.fields.storage_location')"
-            :description="selectedTheme?.status?.location"
+            :content="selectedTheme?.status?.location"
           />
         </VDescription>
       </div>

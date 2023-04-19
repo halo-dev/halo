@@ -89,19 +89,19 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
         <VDescription>
           <VDescriptionItem
             :label="$t('core.plugin.detail.fields.display_name')"
-            :description="plugin?.spec.displayName"
+            :content="plugin?.spec.displayName"
           />
           <VDescriptionItem
             :label="$t('core.plugin.detail.fields.description')"
-            :description="plugin?.spec.description"
+            :content="plugin?.spec.description"
           />
           <VDescriptionItem
             :label="$t('core.plugin.detail.fields.version')"
-            :description="plugin?.spec.version"
+            :content="plugin?.spec.version"
           />
           <VDescriptionItem
             :label="$t('core.plugin.detail.fields.requires')"
-            :description="plugin?.spec.requires"
+            :content="plugin?.spec.requires"
           />
           <VDescriptionItem :label="$t('core.plugin.detail.fields.author')">
             <a
@@ -191,7 +191,7 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
           </VDescriptionItem>
           <VDescriptionItem
             :label="$t('core.plugin.detail.fields.last_starttime')"
-            :description="formatDatetime(plugin?.status?.lastStartTime)"
+            :content="formatDatetime(plugin?.status?.lastStartTime)"
           />
         </VDescription>
       </div>

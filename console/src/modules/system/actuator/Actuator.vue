@@ -183,15 +183,15 @@ const handleDownloadLogfile = () => {
             </VDescriptionItem>
             <VDescriptionItem
               :label="$t('core.actuator.fields.start_time')"
-              :description="formatDatetime(startup?.timeline.startTime)"
+              :content="formatDatetime(startup?.timeline.startTime)"
             />
             <VDescriptionItem
               :label="$t('core.actuator.fields.timezone')"
-              :description="globalInfo?.timeZone"
+              :content="globalInfo?.timeZone"
             />
             <VDescriptionItem
               :label="$t('core.actuator.fields.locale')"
-              :description="globalInfo?.locale"
+              :content="globalInfo?.locale"
             />
           </VDescription>
         </div>
@@ -225,7 +225,7 @@ const handleDownloadLogfile = () => {
             <VDescriptionItem
               v-if="info.build"
               :label="$t('core.actuator.fields.build_time')"
-              :description="formatDatetime(info.build.time)"
+              :content="formatDatetime(info.build.time)"
             />
             <VDescriptionItem v-if="info.git" label="Git Commit">
               <a
@@ -238,20 +238,21 @@ const handleDownloadLogfile = () => {
             </VDescriptionItem>
             <VDescriptionItem
               label="Java"
-              :description="
+              :content="
                 [info.java.runtime.name, info.java.runtime.version].join(' / ')
               "
             />
             <VDescriptionItem
               :label="$t('core.actuator.fields.database')"
-              :description="
-                [info.database.name, info.database.version].join(' / ')
-              "
+              :content="[info.database.name, info.database.version].join(' / ')"
             />
             <VDescriptionItem :label="$t('core.actuator.fields.os')">
               {{ info.os.name }} {{ info.os.version }} / {{ info.os.arch }}
             </VDescriptionItem>
-            <VDescriptionItem :label="$t('core.actuator.fields.log')">
+            <VDescriptionItem
+              :label="$t('core.actuator.fields.log')"
+              vertical-center
+            >
               <VButton size="sm" @click="handleDownloadLogfile()">
                 {{ $t("core.common.buttons.download") }}
               </VButton>
