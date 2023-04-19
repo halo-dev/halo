@@ -226,6 +226,7 @@ watch(
             ? ''
             : $t('core.attachment.upload_modal.filters.policy.not_select')
         "
+        :done-button-handler="() => onVisibleChange(false)"
       />
     </div>
   </VModal>
