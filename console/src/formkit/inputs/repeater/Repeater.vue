@@ -7,6 +7,7 @@ import {
   IconArrowDownCircleLine,
 } from "@halo-dev/components";
 import type { FormKitFrameworkContext } from "@formkit/core";
+import { group } from "@formkit/inputs";
 import type { PropType } from "vue";
 import cloneDeep from "lodash.clonedeep";
 
@@ -62,7 +63,7 @@ const handleMoveDown = (index: number) => {
           :id="`${context.node.name}-group-${index}`"
           :key="`${context.node.name}-group-${index}`"
           :model-value="item"
-          type="group"
+          :type="group"
         >
           <slot />
         </FormKit>
