@@ -51,7 +51,9 @@ function handleChangeType() {
 const isLoginType = computed(() => type.value !== "signup");
 </script>
 <template>
-  <div class="flex h-screen flex-col items-center bg-white/90 pt-[30vh]">
+  <div
+    class="flex h-screen flex-col items-center bg-white/90 pt-[30vh] sm:pt-[20vh]"
+  >
     <IconLogo class="mb-8" />
     <div class="flex w-72 flex-col">
       <SignupForm

@@ -353,8 +353,14 @@ public class HaloPluginManager extends DefaultPluginManager
     }
 
     /**
-     * Reload plugin by id,it will be clean up memory resources of plugin and reload plugin from
-     * disk.
+     * <p>Reload plugin by id,it will be clean up memory resources of plugin and reload plugin from
+     * disk.</p>
+     * <p>
+     * Note: This method will not start plugin, you need to start plugin manually.
+     * this is to avoid starting plugins in different places, which will cause thread safety
+     * issues, so all of them are handed over to the
+     * {@link run.halo.app.core.extension.reconciler.PluginReconciler} to start the plugin
+     * </p>
      *
      * @param pluginId plugin id
      * @return plugin startup status
@@ -368,8 +374,7 @@ public class HaloPluginManager extends DefaultPluginManager
         } catch (Exception ex) {
             return null;
         }
-
-        return doStartPlugin(pluginId);
+        return getPlugin(pluginId).getPluginState();
     }
 
     /**

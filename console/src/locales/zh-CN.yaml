@@ -613,9 +613,6 @@ core:
         message: 当前没有已安装的主题，你可以尝试刷新或者安装新主题
       not_installed_empty:
         title: 当前没有未安装的主题
-      operations:
-        install:
-          toast_success: 安装成功
     preview_model:
       title: 预览主题：{display_name}
       actions:
@@ -1126,6 +1123,7 @@ core:
       active_success: 启用成功
       inactive_success: 停用成功
       upgrade_success: 升级成功
+      install_success: 安装成功
       download_success: 下载成功
       copy_success: 复制成功
       operation_failed: 操作失败

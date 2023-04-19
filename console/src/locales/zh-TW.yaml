@@ -613,9 +613,6 @@ core:
         message: 當前沒有已安裝的主題，你可以嘗試刷新或者安裝新主題
       not_installed_empty:
         title: 當前沒有未安裝的主題
-      operations:
-        install:
-          toast_success: 安裝成功
     preview_model:
       title: 預覽主題：{display_name}
       actions:
@@ -1126,6 +1123,7 @@ core:
       active_success: 啟用成功
       inactive_success: 停用成功
       upgrade_success: 升級成功
+      install_success: 安裝成功
       download_success: 下載成功
       copy_success: 複製成功
       operation_failed: 操作失敗

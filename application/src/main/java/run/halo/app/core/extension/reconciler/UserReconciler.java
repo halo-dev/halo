@@ -1,31 +1,42 @@
 package run.halo.app.core.extension.reconciler;
 
+import static run.halo.app.core.extension.User.GROUP;
+import static run.halo.app.core.extension.User.KIND;
+
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
+import run.halo.app.core.extension.Role;
+import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.UserConnection;
+import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.GroupKind;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.ExternalUrlSupplier;
+import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.PathUtils;
 
 @Slf4j
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserReconciler implements Reconciler<Request> {
     private static final String FINALIZER_NAME = "user-protection";
     private final ExtensionClient client;
     private final ExternalUrlSupplier externalUrlSupplier;
+    private final RoleService roleService;
     private final RetryTemplate retryTemplate = RetryTemplate.builder()
         .maxAttempts(20)
         .fixedBackoff(300)
@@ -41,9 +52,41 @@ public class UserReconciler implements Reconciler<Request> {
             }
 
             addFinalizerIfNecessary(user);
+            ensureRoleNamesAnno(request.name());
             updatePermalink(request.name());
         });
         return new Result(false, null);
+    }
+
+    private void ensureRoleNamesAnno(String name) {
+        client.fetch(User.class, name).ifPresent(user -> {
+            Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(user);
+            Map<String, String> oldAnnotations = Map.copyOf(annotations);
+
+            List<String> roleNames = listRoleNamesRef(name);
+            annotations.put(User.ROLE_NAMES_ANNO, JsonUtils.objectToJson(roleNames));
+
+            if (!oldAnnotations.equals(annotations)) {
+                client.update(user);
+            }
+        });
+    }
+
+    List<String> listRoleNamesRef(String username) {
+        var subject = new RoleBinding.Subject(KIND, username, GROUP);
+        return roleService.listRoleRefs(subject)
+            .filter(this::isRoleRef)
+            .map(RoleBinding.RoleRef::getName)
+            .distinct()
+            .collectList()
+            .blockOptional()
+            .orElse(List.of());
+    }
+
+    private boolean isRoleRef(RoleBinding.RoleRef roleRef) {
+        var roleGvk = new Role().groupVersionKind();
+        var gk = new GroupKind(roleRef.getApiGroup(), roleRef.getKind());
+        return gk.equals(roleGvk.groupKind());
     }
 
     private void updatePermalink(String name) {

@@ -9,7 +9,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Objects;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.pf4j.PluginWrapper;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.retry.RetryException;
@@ -30,11 +32,13 @@ import run.halo.app.infra.exception.PluginAlreadyExistsException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.VersionUtils;
+import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.YamlPluginFinder;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class PluginServiceImpl implements PluginService {
 
     private static final String PRESET_LOCATION_PREFIX = "classpath:/presets/plugins/";
@@ -46,12 +50,7 @@ public class PluginServiceImpl implements PluginService {
 
     private final PluginProperties pluginProperties;
 
-    public PluginServiceImpl(ReactiveExtensionClient client,
-        SystemVersionSupplier systemVersion, PluginProperties pluginProperties) {
-        this.client = client;
-        this.systemVersion = systemVersion;
-        this.pluginProperties = pluginProperties;
-    }
+    private final HaloPluginManager pluginManager;
 
     @Override
     public Flux<Plugin> getPresets() {
@@ -121,6 +120,25 @@ public class PluginServiceImpl implements PluginService {
                 // create the plugin
                 .flatMap(client::create);
         });
+    }
+
+    @Override
+    public Mono<Plugin> reload(String name) {
+        PluginWrapper pluginWrapper = pluginManager.getPlugin(name);
+        if (pluginWrapper == null) {
+            return Mono.error(() -> new ServerWebInputException(
+                "The given plugin with name " + name + " was not found."));
+        }
+        YamlPluginFinder yamlPluginFinder = new YamlPluginFinder();
+        Plugin newPlugin = yamlPluginFinder.find(pluginWrapper.getPluginPath());
+        // reload plugin
+        pluginManager.reloadPlugin(name);
+        return client.get(Plugin.class, name)
+            .flatMap(plugin -> {
+                newPlugin.getMetadata().setVersion(plugin.getMetadata().getVersion());
+                newPlugin.getSpec().setEnabled(true);
+                return client.update(newPlugin);
+            });
     }
 
     /**
