@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static run.halo.app.theme.finders.PostPublicQueryService.FIXED_PREDICATE;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PostService;
@@ -29,8 +29,10 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.ContributorFinder;
+import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.ContentVo;
+import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.PostArchiveVo;
 import run.halo.app.theme.finders.vo.PostArchiveYearMonthVo;
 
@@ -60,6 +62,9 @@ class PostFinderImplTest {
 
     @Mock
     private ContributorFinder contributorFinder;
+
+    @Mock
+    private PostPublicQueryService publicQueryService;
 
     @InjectMocks
     private PostFinderImpl postFinder;
@@ -92,7 +97,7 @@ class PostFinderImplTest {
 
     @Test
     void predicate() {
-        List<String> strings = posts().stream().filter(PostFinderImpl.FIXED_PREDICATE)
+        List<String> strings = posts().stream().filter(FIXED_PREDICATE)
             .map(post -> post.getMetadata().getName())
             .toList();
         assertThat(strings).isEqualTo(List.of("post-1", "post-2", "post-6"));
@@ -100,12 +105,12 @@ class PostFinderImplTest {
 
     @Test
     void archives() {
-        when(counterService.getByName(any())).thenReturn(Mono.empty());
-        ListResult<Post> listResult = new ListResult<>(1, 10, 3, postsForArchives());
-        when(client.list(eq(Post.class), any(), any(), anyInt(), anyInt()))
+        List<ListedPostVo> listedPostVos = postsForArchives().stream()
+            .map(ListedPostVo::from)
+            .toList();
+        ListResult<ListedPostVo> listResult = new ListResult<>(1, 10, 3, listedPostVos);
+        when(publicQueryService.list(anyInt(), anyInt(), any(), any()))
             .thenReturn(Mono.just(listResult));
-        when(contributorFinder.getContributor(any())).thenReturn(Mono.empty());
-        when(contributorFinder.getContributors(any())).thenReturn(Flux.empty());
 
         ListResult<PostArchiveVo> archives = postFinder.archives(1, 10).block();
         assertThat(archives).isNotNull();
