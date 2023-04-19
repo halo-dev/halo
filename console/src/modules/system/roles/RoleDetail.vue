@@ -21,7 +21,6 @@ import {
   useRoleForm,
   useRoleTemplateSelection,
 } from "@/modules/system/roles/composables/use-role";
-import { useUserFetch } from "@/modules/system/users/composables/use-user";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { useI18n } from "vue-i18n";
 import { formatDatetime } from "@/utils/date";
@@ -35,8 +34,6 @@ const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
   useRoleTemplateSelection();
 
 const { formState, saving, handleCreateOrUpdate } = useRoleForm();
-
-const { users } = useUserFetch({ fetchOnMounted: false });
 
 const isSystemReserved = computed(() => {
   return (
