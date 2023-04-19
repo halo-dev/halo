@@ -112,7 +112,7 @@ class I18nExceptionTest {
             .expectBody(ProblemDetail.class)
             .value(problemDetail -> {
                 assertEquals("Internal Server Error", problemDetail.getTitle());
-                assertEquals("Is currently unable to handle this request.",
+                assertEquals("Something went wrong, please try again later.",
                     problemDetail.getDetail());
             });
     }

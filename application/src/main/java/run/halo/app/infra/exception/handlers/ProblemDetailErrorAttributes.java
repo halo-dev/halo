@@ -53,7 +53,7 @@ public class ProblemDetailErrorAttributes implements ErrorAttributes {
         } else {
             var reason = Optional.of(status)
                 .filter(HttpStatusCode::is5xxServerError)
-                .map(s -> "Is currently unable to handle this request.")
+                .map(s -> "Something went wrong, please try again later.")
                 .orElseGet(() -> responseStatusAnno.getValue("reason", String.class)
                     .orElse(error.getMessage())
                 );
