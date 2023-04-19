@@ -613,9 +613,6 @@ core:
         message: There are currently no installed themes, you can try refreshing or installing a new theme.
       not_installed_empty:
         title: There are no themes currently not installed.
-      operations:
-        install:
-          toast_success: Installation successful
     preview_model:
       title: "Preview theme: {display_name}"
       actions:
@@ -1126,6 +1123,7 @@ core:
       active_success: Activated successfully
       inactive_success: Deactivated successfully
       upgrade_success: Upgraded successfully
+      install_success: Installed successfully
       download_success: Downloaded successfully
       copy_success: Copied successfully
       operation_failed: Failed to operate
