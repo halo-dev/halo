@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockUser;
@@ -13,11 +14,11 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
@@ -33,6 +34,7 @@ import run.halo.app.core.extension.attachment.Attachment.AttachmentSpec;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.Policy.PolicySpec;
 import run.halo.app.core.extension.attachment.endpoint.AttachmentEndpoint.SearchRequest;
+import run.halo.app.core.extension.service.impl.DefaultAttachmentService;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
@@ -48,13 +50,14 @@ class AttachmentEndpointTest {
     @Mock
     ExtensionComponentsFinder extensionComponentsFinder;
 
-    @InjectMocks
     AttachmentEndpoint endpoint;
 
     WebTestClient webClient;
 
     @BeforeEach
     void setUp() {
+        var attachmentService = new DefaultAttachmentService(client, extensionComponentsFinder);
+        endpoint = new AttachmentEndpoint(attachmentService, client);
         webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
             .apply(springSecurity())
             .build();
@@ -65,12 +68,44 @@ class AttachmentEndpointTest {
 
         @Test
         void shouldResponseErrorIfNotLogin() {
+            var policySpec = new PolicySpec();
+            policySpec.setConfigMapName("fake-configmap");
+            var policyMetadata = new Metadata();
+            policyMetadata.setName("fake-policy");
+            var policy = new Policy();
+            policy.setSpec(policySpec);
+            policy.setMetadata(policyMetadata);
+
+            var cm = new ConfigMap();
+            var cmMetadata = new Metadata();
+            cmMetadata.setName("fake-configmap");
+            cm.setData(Map.of());
+
+            var handler = mock(AttachmentHandler.class);
+            var metadata = new Metadata();
+            metadata.setName("fake-attachment");
+            var attachment = new Attachment();
+            attachment.setMetadata(metadata);
+
+            var builder = new MultipartBodyBuilder();
+            builder.part("policyName", "fake-policy");
+            builder.part("groupName", "fake-group");
+            builder.part("file", "fake-file")
+                .contentType(MediaType.TEXT_PLAIN)
+                .filename("fake-filename");
             webClient
                 .post()
                 .uri("/attachments/upload")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(builder.build()))
                 .exchange()
                 .expectStatus().isUnauthorized();
+
+            verify(client, never()).get(Policy.class, "fake-policy");
+            verify(client, never()).get(ConfigMap.class, "fake-configmap");
+            verify(client, never()).create(attachment);
+            verify(extensionComponentsFinder, never()).getExtensions(AttachmentHandler.class);
+            verify(handler, never()).upload(any());
         }
 
         @Test
@@ -98,6 +133,44 @@ class AttachmentEndpointTest {
                 .body(BodyInserters.fromMultipartData(builder.build()))
                 .exchange()
                 .expectStatus().isBadRequest();
+        }
+
+        void prepareForUploading(Consumer<MultipartBodyBuilder> consumer) {
+            var policySpec = new PolicySpec();
+            policySpec.setConfigMapName("fake-configmap");
+            var policyMetadata = new Metadata();
+            policyMetadata.setName("fake-policy");
+            var policy = new Policy();
+            policy.setSpec(policySpec);
+            policy.setMetadata(policyMetadata);
+
+            var cm = new ConfigMap();
+            var cmMetadata = new Metadata();
+            cmMetadata.setName("fake-configmap");
+            cm.setData(Map.of());
+
+            when(client.get(Policy.class, "fake-policy")).thenReturn(Mono.just(policy));
+            when(client.get(ConfigMap.class, "fake-configmap")).thenReturn(Mono.just(cm));
+
+            var handler = mock(AttachmentHandler.class);
+            var metadata = new Metadata();
+            metadata.setName("fake-attachment");
+            var attachment = new Attachment();
+            attachment.setMetadata(metadata);
+
+            when(handler.upload(any())).thenReturn(Mono.just(attachment));
+            when(extensionComponentsFinder.getExtensions(AttachmentHandler.class)).thenReturn(
+                List.of(handler));
+            when(client.create(attachment)).thenReturn(Mono.just(attachment));
+
+            var builder = new MultipartBodyBuilder();
+            builder.part("policyName", "fake-policy");
+            builder.part("groupName", "fake-group");
+            builder.part("file", "fake-file")
+                .contentType(MediaType.TEXT_PLAIN)
+                .filename("fake-filename");
+
+            consumer.accept(builder);
         }
 
         @Test

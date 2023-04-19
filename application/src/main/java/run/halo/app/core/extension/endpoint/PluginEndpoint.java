@@ -123,6 +123,19 @@ public class PluginEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(ConfigMap.class))
             )
+            .PUT("plugins/{name}/reload", this::reload,
+                builder -> builder.operationId("reloadPlugin")
+                    .description("Reload a plugin by name.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .response(responseBuilder()
+                        .implementation(Plugin.class))
+            )
             .GET("plugins", this::list, builder -> {
                 builder.operationId("ListPlugins")
                     .tag(tag)
@@ -162,6 +175,11 @@ public class PluginEndpoint implements CustomEndpoint {
                     .tag(tag)
                     .response(responseBuilder().implementationArray(Plugin.class)))
             .build();
+    }
+
+    private Mono<ServerResponse> reload(ServerRequest serverRequest) {
+        var name = serverRequest.pathVariable("name");
+        return ServerResponse.ok().body(pluginService.reload(name), Plugin.class);
     }
 
     private Mono<ServerResponse> listPresets(ServerRequest request) {

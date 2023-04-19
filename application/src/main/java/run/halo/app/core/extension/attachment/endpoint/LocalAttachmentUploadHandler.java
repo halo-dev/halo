@@ -5,10 +5,12 @@ import static run.halo.app.infra.utils.FileNameUtils.randomFileName;
 import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -31,7 +34,9 @@ import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Attachment.AttachmentSpec;
 import run.halo.app.core.extension.attachment.Constant;
 import run.halo.app.core.extension.attachment.Policy;
+import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
+import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.exception.AttachmentAlreadyExistsException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.JsonUtils;
@@ -42,8 +47,12 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
 
     private final HaloProperties haloProp;
 
-    public LocalAttachmentUploadHandler(HaloProperties haloProp) {
+    private final ExternalUrlSupplier externalUrl;
+
+    public LocalAttachmentUploadHandler(HaloProperties haloProp,
+        ExternalUrlSupplier externalUrl) {
         this.haloProp = haloProp;
+        this.externalUrl = externalUrl;
     }
 
     Path getAttachmentsRoot() {
@@ -151,6 +160,35 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                 }
             })
             .map(DeleteContext::attachment);
+    }
+
+    @Override
+    public Mono<URI> getPermalink(Attachment attachment, Policy policy, ConfigMap configMap) {
+        if (!this.shouldHandle(policy)) {
+            return Mono.empty();
+        }
+        var annotations = attachment.getMetadata().getAnnotations();
+        if (annotations == null
+            || !annotations.containsKey(Constant.URI_ANNO_KEY)) {
+            return Mono.empty();
+        }
+        var uriStr = annotations.get(Constant.URI_ANNO_KEY);
+        // the uriStr is encoded before.
+        uriStr = UriUtils.decode(uriStr, StandardCharsets.UTF_8);
+        var uri = UriComponentsBuilder.fromUri(externalUrl.get())
+            // The URI has been encoded before, so there is no need to encode it again.
+            .path(uriStr)
+            .build()
+            .toUri();
+        return Mono.just(uri);
+    }
+
+    @Override
+    public Mono<URI> getSharedURL(Attachment attachment,
+        Policy policy,
+        ConfigMap configMap,
+        Duration ttl) {
+        return getPermalink(attachment, policy, configMap);
     }
 
     private boolean shouldHandle(Policy policy) {

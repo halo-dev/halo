@@ -148,12 +148,14 @@ public class UserEndpoint implements CustomEndpoint {
             .map(Authentication::getName)
             .flatMap(currentUserName -> client.get(User.class, currentUserName))
             .flatMap(currentUser -> request.bodyToMono(User.class)
-                .filter(user ->
-                    Objects.equals(user.getMetadata().getName(),
-                        currentUser.getMetadata().getName()))
+                .filter(user -> user.getMetadata() != null
+                    && Objects.equals(user.getMetadata().getName(),
+                    currentUser.getMetadata().getName())
+                )
                 .switchIfEmpty(
                     Mono.error(() -> new ServerWebInputException("Username didn't match.")))
                 .map(user -> {
+                    currentUser.getMetadata().setAnnotations(user.getMetadata().getAnnotations());
                     var spec = currentUser.getSpec();
                     var newSpec = user.getSpec();
                     spec.setAvatar(newSpec.getAvatar());
