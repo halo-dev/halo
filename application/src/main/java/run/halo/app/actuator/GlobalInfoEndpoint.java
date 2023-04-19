@@ -2,7 +2,7 @@ package run.halo.app.actuator;
 
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 
-import java.net.URI;
+import java.net.URL;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -14,12 +14,12 @@ import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint;
 import org.springframework.stereotype.Component;
 import run.halo.app.extension.ConfigMap;
-import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemSetting.Basic;
 import run.halo.app.infra.SystemSetting.Comment;
 import run.halo.app.infra.SystemSetting.User;
+import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.security.AuthProviderService;
 
 @WebEndpoint(id = "globalinfo")
@@ -29,14 +29,15 @@ public class GlobalInfoEndpoint {
 
     private final ObjectProvider<SystemConfigurableEnvironmentFetcher> systemConfigFetcher;
 
-    private final ExternalUrlSupplier externalUrl;
+    private final HaloProperties haloProperties;
 
     private final AuthProviderService authProviderService;
 
     @ReadOperation
     public GlobalInfo globalInfo() {
         final var info = new GlobalInfo();
-        info.setExternalUrl(externalUrl.get());
+        info.setExternalUrl(haloProperties.getExternalUrl());
+        info.setUseAbsolutePermalink(haloProperties.isUseAbsolutePermalink());
         info.setLocale(Locale.getDefault());
         info.setTimeZone(TimeZone.getDefault());
         handleSocialAuthProvider(info);
@@ -53,7 +54,9 @@ public class GlobalInfoEndpoint {
     @Data
     public static class GlobalInfo {
 
-        private URI externalUrl;
+        private URL externalUrl;
+
+        private boolean useAbsolutePermalink;
 
         private TimeZone timeZone;
 
