@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.reactive.error.DefaultErrorAttributes;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
@@ -39,7 +40,7 @@ public class ProblemDetailErrorAttributes implements ErrorAttributes {
     @Override
     public Map<String, Object> getErrorAttributes(ServerRequest request,
         ErrorAttributeOptions options) {
-        var errAttributes = new LinkedHashMap<String, Object>();
+        final var errAttributes = new LinkedHashMap<String, Object>();
 
         var error = getError(request);
         var responseStatusAnno = from(error.getClass(), SearchStrategy.TYPE_HIERARCHY)
@@ -50,8 +51,12 @@ public class ProblemDetailErrorAttributes implements ErrorAttributes {
         if (error instanceof ErrorResponse er) {
             errorResponse = er;
         } else {
-            var reason = responseStatusAnno.getValue("reason", String.class)
-                .orElse(error.getMessage());
+            var reason = Optional.of(status)
+                .filter(HttpStatusCode::is5xxServerError)
+                .map(s -> "Something went wrong, please try again later.")
+                .orElseGet(() -> responseStatusAnno.getValue("reason", String.class)
+                    .orElse(error.getMessage())
+                );
             errorResponse = ErrorResponse.create(error, status, reason);
         }
         var problemDetail =
