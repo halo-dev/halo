@@ -30,7 +30,7 @@ public class PublicApiUtils {
      */
     public static GroupVersion groupVersion(Extension extension) {
         GroupVersionKind groupVersionKind = extension.groupVersionKind();
-        String group = StringUtils.defaultString(groupVersionKind.group(), "halo.run");
+        String group = StringUtils.defaultIfBlank(groupVersionKind.group(), "halo.run");
         return new GroupVersion("api." + group, groupVersionKind.version());
     }
 
