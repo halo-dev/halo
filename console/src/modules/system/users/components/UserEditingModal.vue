@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { computed, nextTick, ref, watch } from "vue";
+import { nextTick, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { User } from "@halo-dev/api-client";
 
@@ -17,9 +17,11 @@ import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { useUserStore } from "@/stores/user";
 import { useI18n } from "vue-i18n";
+import { useQueryClient } from "@tanstack/vue-query";
 
 const userStore = useUserStore();
 const { t } = useI18n();
+const queryClient = useQueryClient();
 
 const props = withDefaults(
   defineProps<{
@@ -58,16 +60,6 @@ const initialFormState: User = {
 const formState = ref<User>(cloneDeep(initialFormState));
 const saving = ref(false);
 
-const isUpdateMode = computed(() => {
-  return !!formState.value.metadata.creationTimestamp;
-});
-
-const creationModalTitle = computed(() => {
-  return isUpdateMode.value
-    ? t("core.user.editing_modal.titles.update")
-    : t("core.user.editing_modal.titles.create");
-});
-
 const handleResetForm = () => {
   formState.value = cloneDeep(initialFormState);
   reset("user-form");
@@ -78,7 +70,7 @@ watch(
   (visible) => {
     if (visible) {
       if (props.user) formState.value = cloneDeep(props.user);
-      setFocus(isUpdateMode.value ? "displayNameInput" : "userNameInput");
+      setFocus("displayNameInput");
     } else {
       handleResetForm();
     }
@@ -94,7 +86,7 @@ const onVisibleChange = (visible: boolean) => {
 
 const annotationsFormRef = ref<InstanceType<typeof AnnotationsForm>>();
 
-const handleCreateUser = async () => {
+const handleUpdateUser = async () => {
   annotationsFormRef.value?.handleSubmit();
   await nextTick();
 
@@ -111,24 +103,22 @@ const handleCreateUser = async () => {
 
   try {
     saving.value = true;
-    if (isUpdateMode.value) {
-      if (props.user?.metadata.name === userStore.currentUser?.metadata.name) {
-        await apiClient.user.updateCurrentUser({
-          user: formState.value,
-        });
-      } else {
-        await apiClient.extension.user.updatev1alpha1User({
-          name: formState.value.metadata.name,
-          user: formState.value,
-        });
-      }
+
+    if (props.user?.metadata.name === userStore.currentUser?.metadata.name) {
+      await apiClient.user.updateCurrentUser({
+        user: formState.value,
+      });
     } else {
-      await apiClient.extension.user.createv1alpha1User({
+      await apiClient.extension.user.updatev1alpha1User({
+        name: formState.value.metadata.name,
         user: formState.value,
       });
     }
 
     onVisibleChange(false);
+
+    queryClient.invalidateQueries({ queryKey: ["users"] });
+    queryClient.invalidateQueries({ queryKey: ["user-detail"] });
 
     Toast.success(t("core.common.toast.save_success"));
   } catch (e) {
@@ -140,7 +130,7 @@ const handleCreateUser = async () => {
 </script>
 <template>
   <VModal
-    :title="creationModalTitle"
+    :title="$t('core.user.editing_modal.titles.update')"
     :visible="visible"
     :width="700"
     @update:visible="onVisibleChange"
@@ -150,7 +140,7 @@ const handleCreateUser = async () => {
       name="user-form"
       :config="{ validationVisibility: 'submit' }"
       type="form"
-      @submit="handleCreateUser"
+      @submit="handleUpdateUser"
     >
       <div>
         <div class="md:grid md:grid-cols-4 md:gap-6">
@@ -165,7 +155,7 @@ const handleCreateUser = async () => {
             <FormKit
               id="userNameInput"
               v-model="formState.metadata.name"
-              :disabled="isUpdateMode"
+              :disabled="true"
               :label="$t('core.user.editing_modal.fields.username.label')"
               type="text"
               name="name"
