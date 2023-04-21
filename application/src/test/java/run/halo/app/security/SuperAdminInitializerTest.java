@@ -59,5 +59,4 @@ class SuperAdminInitializerTest {
             return false;
         }));
     }
-
 }
