@@ -33,6 +33,8 @@ const { data: pluginRoleTemplates } = useQuery({
 
     return data.items;
   },
+  cacheTime: 0,
+  enabled: computed(() => !!plugin?.value?.metadata.name),
 });
 
 const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
