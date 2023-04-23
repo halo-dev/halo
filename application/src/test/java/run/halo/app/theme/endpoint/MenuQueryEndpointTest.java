@@ -83,7 +83,7 @@ class MenuQueryEndpointTest {
             .jsonPath("$.menuItems[1].metadata.name").isEqualTo("item2");
 
         // 验证依赖项的方法是否被调用
-        verify(client).get(eq(Menu.class), eq("-"));
+        verify(client).get(eq(Menu.class), eq("fake-primary"));
         verify(client, times(2)).fetch(eq(MenuItem.class), anyString());
         verify(environmentFetcher).fetch(eq(SystemSetting.Menu.GROUP),
             eq(SystemSetting.Menu.class));

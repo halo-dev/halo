@@ -52,7 +52,7 @@ public class PostFinderImpl implements PostFinder {
 
     @Override
     public Mono<PostVo> getByName(String postName) {
-        return client.fetch(Post.class, postName)
+        return client.get(Post.class, postName)
             .filter(FIXED_PREDICATE)
             .flatMap(postPublicQueryService::convertToListedPostVo)
             .map(PostVo::from)

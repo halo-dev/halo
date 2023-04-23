@@ -55,6 +55,20 @@ public class TagQueryEndpoint implements CustomEndpoint {
                     QueryParamBuildUtil.buildParametersFromType(builder, TagPublicQuery.class);
                 }
             )
+            .GET("tags/{name}", this::getTagByName,
+                builder -> builder.operationId("queryTagByName")
+                    .description("Gets tag by name")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .in(ParameterIn.PATH)
+                        .name("name")
+                        .description("Tag name")
+                        .required(true)
+                    )
+                    .response(responseBuilder()
+                        .implementation(TagVo.class)
+                    )
+            )
             .GET("tags/{name}/posts", this::listPostsByTagName,
                 builder -> {
                     builder.operationId("queryPostsByTagName")
@@ -73,6 +87,15 @@ public class TagQueryEndpoint implements CustomEndpoint {
                 }
             )
             .build();
+    }
+
+    private Mono<ServerResponse> getTagByName(ServerRequest request) {
+        String name = request.pathVariable("name");
+        return tagFinder.getByName(name)
+            .flatMap(tag -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(tag)
+            );
     }
 
     private Mono<ServerResponse> listPostsByTagName(ServerRequest request) {
