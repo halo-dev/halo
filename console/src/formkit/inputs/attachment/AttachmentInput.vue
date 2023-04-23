@@ -56,6 +56,9 @@ const onAttachmentSelect = (attachments: AttachmentLike[]) => {
   </div>
   <AttachmentSelectorModal
     v-model:visible="attachmentSelectorModal"
+    :accepts="context.accepts as string[]"
+    :min="Number(context.min)"
+    :max="Number(context.max)"
     @select="onAttachmentSelect"
   />
 </template>
