@@ -12,16 +12,13 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Menu;
-import run.halo.app.core.extension.MenuItem;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.extension.GroupVersion;
-import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
-import run.halo.app.theme.finders.vo.MenuItemVo;
+import run.halo.app.theme.finders.MenuFinder;
 import run.halo.app.theme.finders.vo.MenuVo;
 
 /**
@@ -34,7 +31,7 @@ import run.halo.app.theme.finders.vo.MenuVo;
 @RequiredArgsConstructor
 public class MenuQueryEndpoint implements CustomEndpoint {
 
-    private final ReactiveExtensionClient client;
+    private final MenuFinder menuFinder;
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     @Override
@@ -68,17 +65,7 @@ public class MenuQueryEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> getByName(ServerRequest request) {
         return determineMenuName(request)
-            .flatMap(name -> client.get(Menu.class, name))
-            .flatMap(menu -> {
-                var menuItemNames = menu.getSpec().getMenuItems();
-                MenuVo menuVo = MenuVo.from(menu);
-                return Flux.fromIterable(menuItemNames)
-                    .flatMap(menuItemName -> client.fetch(MenuItem.class, menuItemName))
-                    .map(MenuItemVo::from)
-                    .collectList()
-                    .map(menuVo::withMenuItems)
-                    .defaultIfEmpty(menuVo);
-            })
+            .flatMap(menuFinder::getByName)
             .flatMap(menuVo -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(menuVo)

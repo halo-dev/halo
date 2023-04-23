@@ -1,13 +1,11 @@
 package run.halo.app.theme.endpoint;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.LinkedHashSet;
+import java.util.List;
 import lombok.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,9 +20,11 @@ import run.halo.app.core.extension.Menu;
 import run.halo.app.core.extension.MenuItem;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.Metadata;
-import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.theme.finders.MenuFinder;
+import run.halo.app.theme.finders.vo.MenuItemVo;
+import run.halo.app.theme.finders.vo.MenuVo;
 
 /**
  * Tests for {@link MenuQueryEndpoint}.
@@ -36,7 +36,7 @@ import run.halo.app.infra.SystemSetting;
 class MenuQueryEndpointTest {
 
     @Mock
-    private ReactiveExtensionClient client;
+    private MenuFinder menuFinder;
 
     @Mock
     private SystemConfigurableEnvironmentFetcher environmentFetcher;
@@ -53,20 +53,15 @@ class MenuQueryEndpointTest {
 
     @Test
     void getPrimaryMenu() {
-        Menu menu = new Menu();
-        menu.setMetadata(new Metadata());
-        menu.getMetadata().setName("fake-primary");
-        menu.setSpec(new Menu.Spec());
-        LinkedHashSet<String> items = new LinkedHashSet<>();
-        items.add("item1");
-        items.add("item2");
-        menu.getSpec().setMenuItems(items);
-        when(client.get(eq(Menu.class), eq("fake-primary"))).thenReturn(Mono.just(menu));
-
-        when(client.fetch(eq(MenuItem.class), eq("item1")))
-            .thenReturn(Mono.just(createMenuItem("item1")));
-        when(client.fetch(eq(MenuItem.class), eq("item2")))
-            .thenReturn(Mono.just(createMenuItem("item2")));
+        Metadata metadata = new Metadata();
+        metadata.setName("fake-primary");
+        MenuVo menuVo = MenuVo.builder()
+            .metadata(metadata)
+            .spec(new Menu.Spec())
+            .menuItems(List.of(MenuItemVo.from(createMenuItem("item1"))))
+            .build();
+        when(menuFinder.getByName(eq("fake-primary")))
+            .thenReturn(Mono.just(menuVo));
 
         SystemSetting.Menu menuSetting = new SystemSetting.Menu();
         menuSetting.setPrimary("fake-primary");
@@ -79,12 +74,9 @@ class MenuQueryEndpointTest {
             .expectHeader().contentType(MediaType.APPLICATION_JSON)
             .expectBody()
             .jsonPath("$.metadata.name").isEqualTo("fake-primary")
-            .jsonPath("$.menuItems[0].metadata.name").isEqualTo("item1")
-            .jsonPath("$.menuItems[1].metadata.name").isEqualTo("item2");
+            .jsonPath("$.menuItems[0].metadata.name").isEqualTo("item1");
 
-        // 验证依赖项的方法是否被调用
-        verify(client).get(eq(Menu.class), eq("fake-primary"));
-        verify(client, times(2)).fetch(eq(MenuItem.class), anyString());
+        verify(menuFinder).getByName(eq("fake-primary"));
         verify(environmentFetcher).fetch(eq(SystemSetting.Menu.GROUP),
             eq(SystemSetting.Menu.class));
     }
@@ -101,33 +93,25 @@ class MenuQueryEndpointTest {
 
     @Test
     void getMenuByName() {
-        Menu menu = new Menu();
-        menu.setMetadata(new Metadata());
-        menu.getMetadata().setName("fake-menu");
-        menu.setSpec(new Menu.Spec());
-        LinkedHashSet<String> items = new LinkedHashSet<>();
-        items.add("item1");
-        items.add("item2");
-
-        menu.getSpec().setMenuItems(items);
-
-        when(client.get(eq(Menu.class), eq("test-menu"))).thenReturn(Mono.just(menu));
-        when(client.fetch(eq(MenuItem.class), eq("item1")))
-            .thenReturn(Mono.just(createMenuItem("item1")));
-        when(client.fetch(eq(MenuItem.class), eq("item2")))
-            .thenReturn(Mono.just(createMenuItem("item2")));
+        Metadata metadata = new Metadata();
+        metadata.setName("test-menu");
+        MenuVo menuVo = MenuVo.builder()
+            .metadata(metadata)
+            .spec(new Menu.Spec())
+            .menuItems(List.of(MenuItemVo.from(createMenuItem("item2"))))
+            .build();
+        when(menuFinder.getByName(eq("test-menu")))
+            .thenReturn(Mono.just(menuVo));
 
         webClient.get().uri("/menus/test-menu")
             .exchange()
             .expectStatus().isOk()
             .expectHeader().contentType(MediaType.APPLICATION_JSON)
             .expectBody()
-            .jsonPath("$.metadata.name").isEqualTo("fake-menu")
-            .jsonPath("$.menuItems[0].metadata.name").isEqualTo("item1")
-            .jsonPath("$.menuItems[1].metadata.name").isEqualTo("item2");
+            .jsonPath("$.metadata.name").isEqualTo("test-menu")
+            .jsonPath("$.menuItems[0].metadata.name").isEqualTo("item2");
 
-        verify(client).get(eq(Menu.class), eq("test-menu"));
-        verify(client, times(2)).fetch(eq(MenuItem.class), anyString());
+        verify(menuFinder).getByName(eq("test-menu"));
     }
 
     @Test
