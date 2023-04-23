@@ -76,7 +76,9 @@ const handleCreateUser = async () => {
   try {
     saving.value = true;
 
-    formState.value.roles = [selectedRole.value];
+    if (selectedRole.value) {
+      formState.value.roles = [selectedRole.value];
+    }
 
     await apiClient.user.createUser({
       createUserRequest: formState.value,
