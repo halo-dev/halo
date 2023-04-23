@@ -65,7 +65,6 @@ const {
       return data;
     }
   },
-  refetchOnWindowFocus: false,
 });
 
 const isCurrentUser = computed(() => {

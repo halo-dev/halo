@@ -146,7 +146,6 @@ const {
 
     return data.items;
   },
-  refetchOnWindowFocus: false,
   refetchInterval(data) {
     const deletingUsers = data?.filter(
       (user) => !!user.user.metadata.deletionTimestamp

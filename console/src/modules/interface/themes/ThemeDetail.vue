@@ -17,6 +17,8 @@ import {
   VDropdown,
   VDropdownItem,
   VDropdownDivider,
+  VDescription,
+  VDescriptionItem,
 } from "@halo-dev/components";
 import ThemeUploadModal from "./components/ThemeUploadModal.vue";
 
@@ -126,141 +128,46 @@ const onUpgradeModalClose = () => {
         </div>
       </div>
       <div class="border-t border-gray-200">
-        <dl class="divide-y divide-gray-100">
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">ID</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-              {{ selectedTheme?.metadata.name }}
-            </dd>
-          </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">
-              {{ $t("core.theme.detail.fields.author") }}
-            </dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-              {{ selectedTheme?.spec.author.name }}
-            </dd>
-          </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">
-              {{ $t("core.theme.detail.fields.website") }}
-            </dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-              <a
-                :href="selectedTheme?.spec.website"
-                class="hover:text-gray-600"
-                target="_blank"
-              >
-                {{ selectedTheme?.spec.website }}
-              </a>
-            </dd>
-          </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">
-              {{ $t("core.theme.detail.fields.repo") }}
-            </dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-              <a
-                :href="selectedTheme?.spec.repo"
-                class="hover:text-gray-600"
-                target="_blank"
-              >
-                {{ selectedTheme?.spec.repo }}
-              </a>
-            </dd>
-          </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">
-              {{ $t("core.theme.detail.fields.version") }}
-            </dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-              {{ selectedTheme?.spec.version }}
-            </dd>
-          </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">
-              {{ $t("core.theme.detail.fields.requires") }}
-            </dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-              {{ selectedTheme?.spec.requires }}
-            </dd>
-          </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">
-              {{ $t("core.theme.detail.fields.storage_location") }}
-            </dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-              {{ selectedTheme?.status?.location }}
-            </dd>
-          </div>
-          <!-- TODO: add display required plugins support -->
-          <div
-            v-if="false"
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">
-              {{ $t("core.theme.detail.fields.plugin_requires") }}
-            </dt>
-            <dd class="mt-1 text-sm sm:col-span-3 sm:mt-0">
-              <VAlert
-                description="当前有 1 个插件还未安装"
-                title="提示"
-              ></VAlert>
-              <ul class="mt-2 space-y-2">
-                <li>
-                  <div
-                    class="inline-flex w-96 cursor-pointer flex-col gap-y-3 rounded border p-5 hover:border-primary"
-                  >
-                    <RouterLink
-                      :to="{
-                        name: 'PluginDetail',
-                        params: { name: 'PluginLinks' },
-                      }"
-                      class="font-medium text-gray-900 hover:text-blue-400"
-                    >
-                      run.halo.plugins.links
-                    </RouterLink>
-                    <div class="text-xs">
-                      <VSpace>
-                        <VTag>{{ $t("core.common.status.installed") }}</VTag>
-                      </VSpace>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <div
-                    class="inline-flex w-96 cursor-pointer flex-col gap-y-3 rounded border p-5 hover:border-primary"
-                  >
-                    <span class="font-medium hover:text-blue-400">
-                      run.halo.plugins.photos
-                    </span>
-                    <div class="text-xs">
-                      <VSpace>
-                        <VTag>
-                          {{ $t("core.common.status.not_installed") }}
-                        </VTag>
-                      </VSpace>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </dd>
-          </div>
-        </dl>
+        <VDescription>
+          <VDescriptionItem
+            label="ID"
+            :content="selectedTheme?.metadata.name"
+          />
+          <VDescriptionItem
+            :label="$t('core.theme.detail.fields.author')"
+            :content="selectedTheme?.spec.author.name"
+          />
+          <VDescriptionItem :label="$t('core.theme.detail.fields.website')">
+            <a
+              :href="selectedTheme?.spec.website"
+              class="hover:text-gray-600"
+              target="_blank"
+            >
+              {{ selectedTheme?.spec.website }}
+            </a>
+          </VDescriptionItem>
+          <VDescriptionItem :label="$t('core.theme.detail.fields.repo')">
+            <a
+              :href="selectedTheme?.spec.repo"
+              class="hover:text-gray-600"
+              target="_blank"
+            >
+              {{ selectedTheme?.spec.repo }}
+            </a>
+          </VDescriptionItem>
+          <VDescriptionItem
+            :label="$t('core.theme.detail.fields.version')"
+            :content="selectedTheme?.spec.version"
+          />
+          <VDescriptionItem
+            :label="$t('core.theme.detail.fields.requires')"
+            :content="selectedTheme?.spec.requires"
+          />
+          <VDescriptionItem
+            :label="$t('core.theme.detail.fields.storage_location')"
+            :content="selectedTheme?.status?.location"
+          />
+        </VDescription>
       </div>
     </div>
   </Transition>

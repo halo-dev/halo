@@ -71,7 +71,6 @@ const { data: themes } = useQuery<Theme[]>({
     });
     return data.items;
   },
-  refetchOnWindowFocus: false,
   enabled: computed(() => props.visible),
 });
 
@@ -138,7 +137,6 @@ const { data: setting } = useQuery<Setting>({
 
     return data;
   },
-  refetchOnWindowFocus: false,
   onSuccess(data) {
     if (data) {
       const { forms } = data.spec;
@@ -165,7 +163,6 @@ const { data: configMap, refetch: handleFetchConfigMap } = useQuery<ConfigMap>({
     });
     return data;
   },
-  refetchOnWindowFocus: false,
   enabled: computed(
     () => !!setting.value && !!selectedTheme.value?.spec.configMapName
   ),

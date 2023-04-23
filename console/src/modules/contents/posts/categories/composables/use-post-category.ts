@@ -43,7 +43,6 @@ export function usePostCategory(): usePostCategoryReturn {
       );
       return abnormalCategories?.length ? 3000 : false;
     },
-    refetchOnWindowFocus: false,
     onSuccess(data) {
       categoriesTree.value = buildCategoriesTree(data);
     },

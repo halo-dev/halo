@@ -62,7 +62,6 @@ const {
   onSuccess(data) {
     menuTreeItems.value = buildMenuItemsTree(data);
   },
-  refetchOnWindowFocus: false,
   refetchInterval(data) {
     const deletingMenuItems = data?.filter(
       (menuItem) => !!menuItem.metadata.deletionTimestamp

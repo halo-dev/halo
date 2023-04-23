@@ -78,7 +78,6 @@ export function useAttachmentControl(filterOptions: {
       );
       return deletingAttachments?.length ? 3000 : false;
     },
-    refetchOnWindowFocus: false,
   });
 
   const handleSelectPrevious = async () => {

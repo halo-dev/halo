@@ -50,7 +50,6 @@ const { data: setting } = useQuery({
     });
     return data;
   },
-  refetchOnWindowFocus: false,
   async onSuccess(data) {
     if (data) {
       const { forms } = data.spec;
