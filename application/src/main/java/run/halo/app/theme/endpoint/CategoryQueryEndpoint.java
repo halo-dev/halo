@@ -44,7 +44,7 @@ public class CategoryQueryEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = groupVersion().toString() + "/Category";
         return SpringdocRouteBuilder.route()
-            .GET("categories", this::listComments,
+            .GET("categories", this::listCategories,
                 builder -> {
                     builder.operationId("queryCategories")
                         .description("Lists categories.")
@@ -115,7 +115,7 @@ public class CategoryQueryEndpoint implements CustomEndpoint {
             );
     }
 
-    private Mono<ServerResponse> listComments(ServerRequest request) {
+    private Mono<ServerResponse> listCategories(ServerRequest request) {
         CategoryPublicQuery query = new CategoryPublicQuery(request.exchange());
         return client.list(Category.class,
                 query.toPredicate(),

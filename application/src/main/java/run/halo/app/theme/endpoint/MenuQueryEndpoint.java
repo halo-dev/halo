@@ -86,10 +86,11 @@ public class MenuQueryEndpoint implements CustomEndpoint {
     }
 
     private Mono<String> determineMenuName(ServerRequest request) {
-        String name = request.pathVariable("name");
+        String name = request.pathVariables().getOrDefault("name", "-");
         if (!"-".equals(name)) {
             return Mono.just(name);
         }
+        // If name is "-", then get primary menu.
         return environmentFetcher.fetch(SystemSetting.Menu.GROUP, SystemSetting.Menu.class)
             .mapNotNull(SystemSetting.Menu::getPrimary)
             .switchIfEmpty(
