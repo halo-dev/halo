@@ -243,7 +243,6 @@ const { handleGenerateSlug } = useSlugify(
               :label="$t('core.post_tag.editing_modal.fields.cover.label')"
               type="attachment"
               :accepts="['image/*']"
-              :max="1"
               validation="length:0,1024"
             ></FormKit>
           </div>

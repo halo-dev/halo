@@ -19,13 +19,11 @@ spec:
           name: logo
           accepts:
             - 'image/*'
-          max: 1
         - $formkit: attachment
           label: Favicon
           name: favicon
           accepts:
             - 'image/*'
-          max: 1
     - group: post
       label: 文章设置
       formSchema:

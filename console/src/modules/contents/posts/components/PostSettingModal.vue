@@ -434,7 +434,6 @@ const { handleGenerateSlug } = useSlugify(
               type="attachment"
               :accepts="['image/*']"
               validation="length:0,1024"
-              :max="1"
             ></FormKit>
           </div>
         </div>

@@ -4,7 +4,7 @@ import AttachmentInput from "./AttachmentInput.vue";
 
 export const attachment = createInput(AttachmentInput, {
   type: "input",
-  props: ["accepts", "max", "min"],
+  props: ["accepts"],
   forceTypeProp: "text",
   features: [initialValue],
 });
