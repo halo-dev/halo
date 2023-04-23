@@ -1,13 +1,11 @@
 <script lang="ts" setup>
 import {
-  IconArrowRight,
   IconShieldUser,
   VButton,
   VCard,
   VPageHeader,
   VTabbar,
   VTag,
-  VAvatar,
   VAlert,
   VDescription,
   VDescriptionItem,
