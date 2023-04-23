@@ -170,7 +170,6 @@ const {
 
     return data.items;
   },
-  refetchOnWindowFocus: false,
   refetchInterval(data) {
     const deletingComments = data?.filter(
       (comment) => !!comment.comment.metadata.deletionTimestamp

@@ -1,5 +1,10 @@
 <script lang="ts" setup>
-import { VSwitch, VTag } from "@halo-dev/components";
+import {
+  VDescription,
+  VDescriptionItem,
+  VSwitch,
+  VTag,
+} from "@halo-dev/components";
 import type { Ref } from "vue";
 import { computed, inject } from "vue";
 import { apiClient } from "@/utils/api-client";
@@ -83,183 +88,114 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
         </div>
       </div>
       <div class="border-t border-gray-200">
-        <dl class="divide-y divide-gray-100">
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">
-              {{ $t("core.plugin.detail.fields.display_name") }}
-            </dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              {{ plugin?.spec.displayName }}
-            </dd>
-          </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">
-              {{ $t("core.plugin.detail.fields.description") }}
-            </dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              {{ plugin?.spec.description }}
-            </dd>
-          </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">
-              {{ $t("core.plugin.detail.fields.version") }}
-            </dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              {{ plugin?.spec.version }}
-            </dd>
-          </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">
-              {{ $t("core.plugin.detail.fields.requires") }}
-            </dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              {{ plugin?.spec.requires }}
-            </dd>
-          </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">
-              {{ $t("core.plugin.detail.fields.author") }}
-            </dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              <a
-                v-if="plugin?.spec.author"
-                :href="plugin?.spec.author.website"
-                target="_blank"
-              >
-                {{ plugin?.spec.author.name }}
-              </a>
-              <span v-else>
-                {{ $t("core.common.text.none") }}
-              </span>
-            </dd>
-          </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">
-              {{ $t("core.plugin.detail.fields.license") }}
-            </dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              <ul
-                v-if="plugin?.spec.license && plugin?.spec.license.length"
-                class="list-inside"
-                :class="{ 'list-disc': plugin?.spec.license.length > 1 }"
-              >
-                <li
-                  v-for="(license, index) in plugin.spec.license"
-                  :key="index"
-                >
-                  <a v-if="license.url" :href="license.url" target="_blank">
-                    {{ license.name }}
-                  </a>
-                  <span>
-                    {{ license.name }}
-                  </span>
-                </li>
-              </ul>
-            </dd>
-          </div>
-          <!-- TODO add display extensions support -->
-          <div
-            v-if="false"
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">模型定义</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-              <span>
-                {{ $t("core.common.text.none") }}
-              </span>
-            </dd>
-          </div>
-          <div
-            :class="`${
-              pluginRoleTemplateGroups.length ? 'bg-gray-50' : 'bg-white'
-            }`"
-            class="px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">
-              {{ $t("core.plugin.detail.fields.role_templates") }}
-            </dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:col-span-5 sm:mt-0">
-              <dl
-                v-if="pluginRoleTemplateGroups.length"
-                class="divide-y divide-gray-100"
-              >
-                <div
-                  v-for="(group, groupIndex) in pluginRoleTemplateGroups"
-                  :key="groupIndex"
-                  class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-                >
-                  <dt class="text-sm font-medium text-gray-900">
-                    {{ group.module }}
-                  </dt>
-                  <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                    <ul class="space-y-2">
-                      <li v-for="(role, index) in group.roles" :key="index">
-                        <div
-                          class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-primary"
-                        >
-                          <div class="inline-flex flex-col gap-y-3">
-                            <span class="font-medium text-gray-900">
-                              {{
-                                role.metadata.annotations?.[
-                                  rbacAnnotations.DISPLAY_NAME
-                                ]
-                              }}
-                            </span>
-                            <span
-                              v-if="
-                                role.metadata.annotations?.[
-                                  rbacAnnotations.DEPENDENCIES
-                                ]
-                              "
-                              class="text-xs text-gray-400"
-                            >
-                              {{
-                                $t("core.role.common.text.dependent_on", {
-                                  roles: JSON.parse(
-                                    role.metadata.annotations?.[
-                                      rbacAnnotations.DEPENDENCIES
-                                    ]
-                                  ).join(", "),
-                                })
-                              }}
-                            </span>
-                          </div>
-                        </div>
-                      </li>
-                    </ul>
-                  </dd>
-                </div>
-              </dl>
-              <span v-else>
-                {{ $t("core.common.text.none") }}
-              </span>
-            </dd>
-          </div>
-          <div
-            class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-          >
-            <dt class="text-sm font-medium text-gray-900">
-              {{ $t("core.plugin.detail.fields.last_starttime") }}
-            </dt>
-            <dd
-              class="mt-1 text-sm tabular-nums text-gray-900 sm:col-span-2 sm:mt-0"
+        <VDescription>
+          <VDescriptionItem
+            :label="$t('core.plugin.detail.fields.display_name')"
+            :content="plugin?.spec.displayName"
+          />
+          <VDescriptionItem
+            :label="$t('core.plugin.detail.fields.description')"
+            :content="plugin?.spec.description"
+          />
+          <VDescriptionItem
+            :label="$t('core.plugin.detail.fields.version')"
+            :content="plugin?.spec.version"
+          />
+          <VDescriptionItem
+            :label="$t('core.plugin.detail.fields.requires')"
+            :content="plugin?.spec.requires"
+          />
+          <VDescriptionItem :label="$t('core.plugin.detail.fields.author')">
+            <a
+              v-if="plugin?.spec.author"
+              :href="plugin?.spec.author.website"
+              target="_blank"
             >
-              {{ formatDatetime(plugin?.status?.lastStartTime) }}
-            </dd>
-          </div>
-        </dl>
+              {{ plugin?.spec.author.name }}
+            </a>
+            <span v-else>
+              {{ $t("core.common.text.none") }}
+            </span>
+          </VDescriptionItem>
+          <VDescriptionItem :label="$t('core.plugin.detail.fields.license')">
+            <ul
+              v-if="plugin?.spec.license && plugin?.spec.license.length"
+              class="list-inside"
+              :class="{ 'list-disc': plugin?.spec.license.length > 1 }"
+            >
+              <li v-for="(license, index) in plugin.spec.license" :key="index">
+                <a v-if="license.url" :href="license.url" target="_blank">
+                  {{ license.name }}
+                </a>
+                <span>
+                  {{ license.name }}
+                </span>
+              </li>
+            </ul>
+          </VDescriptionItem>
+          <VDescriptionItem
+            :label="$t('core.plugin.detail.fields.role_templates')"
+          >
+            <dl
+              v-if="pluginRoleTemplateGroups.length"
+              class="divide-y divide-gray-100"
+            >
+              <div
+                v-for="(group, groupIndex) in pluginRoleTemplateGroups"
+                :key="groupIndex"
+                class="rounded bg-gray-50 px-4 py-5 hover:bg-gray-100 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+              >
+                <dt class="text-sm font-medium text-gray-900">
+                  {{ group.module }}
+                </dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                  <ul class="space-y-2">
+                    <li v-for="(role, index) in group.roles" :key="index">
+                      <div
+                        class="inline-flex w-72 cursor-pointer flex-row items-center gap-4 rounded border p-5 hover:border-primary"
+                      >
+                        <div class="inline-flex flex-col gap-y-3">
+                          <span class="font-medium text-gray-900">
+                            {{
+                              role.metadata.annotations?.[
+                                rbacAnnotations.DISPLAY_NAME
+                              ]
+                            }}
+                          </span>
+                          <span
+                            v-if="
+                              role.metadata.annotations?.[
+                                rbacAnnotations.DEPENDENCIES
+                              ]
+                            "
+                            class="text-xs text-gray-400"
+                          >
+                            {{
+                              $t("core.role.common.text.dependent_on", {
+                                roles: JSON.parse(
+                                  role.metadata.annotations?.[
+                                    rbacAnnotations.DEPENDENCIES
+                                  ]
+                                ).join(", "),
+                              })
+                            }}
+                          </span>
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </dd>
+              </div>
+            </dl>
+            <span v-else>
+              {{ $t("core.common.text.none") }}
+            </span>
+          </VDescriptionItem>
+          <VDescriptionItem
+            :label="$t('core.plugin.detail.fields.last_starttime')"
+            :content="formatDatetime(plugin?.status?.lastStartTime)"
+          />
+        </VDescription>
       </div>
     </div>
   </Transition>

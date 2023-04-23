@@ -60,7 +60,6 @@ const {
 
     return data.items;
   },
-  refetchOnWindowFocus: false,
   refetchInterval: (data) => {
     const deletingPosts = data?.filter(
       (post) =>

@@ -15,7 +15,6 @@ export function useGlobalInfoFetch() {
 
       return data;
     },
-    refetchOnWindowFocus: false,
   });
 
   return {
