@@ -52,7 +52,8 @@ const endpoint = computed(() => {
 
 const onUploaded = async (response: SuccessResponse) => {
   if (props.upgradePlugin) {
-    handleVisibleChange(false);
+    Toast.success(t("core.common.toast.upgrade_success"));
+    window.location.reload();
     return;
   }
 
