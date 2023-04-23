@@ -23,7 +23,7 @@ export interface CreateUserRequest {
    * @type {{ [key: string]: string; }}
    * @memberof CreateUserRequest
    */
-  additionalAttributes?: { [key: string]: string };
+  annotations?: { [key: string]: string };
   /**
    *
    * @type {string}
