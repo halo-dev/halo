@@ -28,7 +28,6 @@ const { data } = useQuery<ListedPost[]>({
     });
     return data.items;
   },
-  refetchOnWindowFocus: false,
 });
 </script>
 <template>

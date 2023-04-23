@@ -20,7 +20,6 @@ const {
     const { data } = await apiClient.authProvider.listAuthProviders();
     return data;
   },
-  refetchOnWindowFocus: false,
 });
 </script>
 

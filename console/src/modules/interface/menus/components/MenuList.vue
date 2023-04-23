@@ -55,7 +55,6 @@ const {
     });
     return data.items;
   },
-  refetchOnWindowFocus: false,
   onSuccess(data) {
     if (props.selectedMenu) {
       const updatedMenu = data?.find(
@@ -153,7 +152,6 @@ const { data: primaryMenuName, refetch: refetchPrimaryMenuName } = useQuery({
 
     return menuConfig.primary;
   },
-  refetchOnWindowFocus: false,
 });
 
 const handleSetPrimaryMenu = async (menu: Menu) => {

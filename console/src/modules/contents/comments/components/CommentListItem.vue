@@ -154,7 +154,6 @@ const {
     });
     return data.items;
   },
-  refetchOnWindowFocus: false,
   refetchInterval(data) {
     const deletingReplies = data?.filter(
       (reply) => !!reply.reply.metadata.deletionTimestamp

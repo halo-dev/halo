@@ -230,7 +230,6 @@ const {
 
     return data.items;
   },
-  refetchOnWindowFocus: false,
   refetchInterval(data) {
     const abnormalSinglePages = data?.filter((singlePage) => {
       const { spec, metadata, status } = singlePage.page;
