@@ -167,7 +167,7 @@ public class UserServiceImpl implements UserService {
                 return Flux.fromIterable(roleNames)
                     .flatMap(roleName -> client.fetch(Role.class, roleName)
                         .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
-                            "There is some illegal data in the roles parameter"))
+                            "Role [" + roleName + "] is not found."))
                         )
                     )
                     .then();
