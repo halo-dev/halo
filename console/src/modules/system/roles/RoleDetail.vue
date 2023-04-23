@@ -9,6 +9,8 @@ import {
   VTag,
   VAvatar,
   VAlert,
+  VDescription,
+  VDescriptionItem,
 } from "@halo-dev/components";
 import { useRoute } from "vue-router";
 import { computed, onMounted, ref, watch } from "vue";
@@ -19,7 +21,6 @@ import {
   useRoleForm,
   useRoleTemplateSelection,
 } from "@/modules/system/roles/composables/use-role";
-import { useUserFetch } from "@/modules/system/users/composables/use-user";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { useI18n } from "vue-i18n";
 import { formatDatetime } from "@/utils/date";
@@ -33,8 +34,6 @@ const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
   useRoleTemplateSelection();
 
 const { formState, saving, handleCreateOrUpdate } = useRoleForm();
-
-const { users } = useUserFetch({ fetchOnMounted: false });
 
 const isSystemReserved = computed(() => {
   return (
@@ -130,114 +129,34 @@ onMounted(() => {
           </p>
         </div>
         <div class="border-t border-gray-200">
-          <dl class="divide-y divide-gray-100">
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
+          <VDescription>
+            <VDescriptionItem
+              :label="$t('core.role.detail.fields.display_name')"
             >
-              <dt class="text-sm font-medium text-gray-900">
-                {{ $t("core.role.detail.fields.display_name") }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+              {{
+                formState.metadata?.annotations?.[
+                  rbacAnnotations.DISPLAY_NAME
+                ] || formState.metadata?.name
+              }}
+            </VDescriptionItem>
+            <VDescriptionItem
+              :label="$t('core.role.detail.fields.name')"
+              :content="formState.metadata?.name"
+            />
+            <VDescriptionItem :label="$t('core.role.detail.fields.type')">
+              <VTag>
                 {{
-                  formState.metadata?.annotations?.[
-                    rbacAnnotations.DISPLAY_NAME
-                  ] || formState.metadata?.name
+                  isSystemReserved
+                    ? t("core.role.common.text.system_reserved")
+                    : t("core.role.common.text.custom")
                 }}
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                {{ $t("core.role.detail.fields.name") }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ formState.metadata?.name }}
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                {{ $t("core.role.detail.fields.type") }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                <VTag>
-                  {{
-                    isSystemReserved
-                      ? t("core.role.common.text.system_reserved")
-                      : t("core.role.common.text.custom")
-                  }}
-                </VTag>
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                {{ $t("core.role.detail.fields.creation_time") }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ formatDatetime(formState.metadata.creationTimestamp) }}
-              </dd>
-            </div>
-            <!-- TODO: 支持通过当前角色查询用户 -->
-            <div
-              v-if="false"
-              class="bg-gray-50 px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">用户</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                <div
-                  class="h-96 overflow-y-auto overflow-x-hidden rounded-sm bg-white shadow-sm transition-all hover:shadow"
-                >
-                  <ul class="divide-y divide-gray-100" role="list">
-                    <RouterLink
-                      v-for="(user, index) in users"
-                      :key="index"
-                      :to="{
-                        name: 'UserDetail',
-                        params: { name: user.metadata.name },
-                      }"
-                    >
-                      <li class="block cursor-pointer hover:bg-gray-50">
-                        <div class="flex items-center px-4 py-4">
-                          <div class="flex min-w-0 flex-1 items-center">
-                            <div class="flex flex-shrink-0 items-center">
-                              <VAvatar
-                                :alt="user.spec.displayName"
-                                :src="user.spec.avatar"
-                                size="md"
-                              />
-                            </div>
-                            <div
-                              class="min-w-0 flex-1 px-4 md:grid md:grid-cols-2 md:gap-4"
-                            >
-                              <div>
-                                <p
-                                  class="truncate text-sm font-medium text-gray-900"
-                                >
-                                  {{ user.spec.displayName }}
-                                </p>
-                                <p class="mt-2 flex items-center">
-                                  <span class="text-xs text-gray-500">
-                                    {{ user.metadata.name }}
-                                  </span>
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                          <div>
-                            <IconArrowRight />
-                          </div>
-                        </div>
-                      </li>
-                    </RouterLink>
-                  </ul>
-                </div>
-              </dd>
-            </div>
-          </dl>
+              </VTag>
+            </VDescriptionItem>
+            <VDescriptionItem
+              :label="$t('core.role.detail.fields.creation_time')"
+              :content="formatDatetime(formState.metadata.creationTimestamp)"
+            />
+          </VDescription>
         </div>
       </div>
 
