@@ -165,15 +165,12 @@ public class UserServiceImpl implements UserService {
                 }
                 // Check if all roles exist
                 return Flux.fromIterable(roleNames)
-                    .flatMap(roleName -> client.get(Role.class, roleName))
-                    .onErrorMap(throwable -> {
-                        if (throwable instanceof ExtensionNotFoundException) {
-                            return new ServerWebInputException(
-                                "There is some illegal data in the roles parameter");
-                        }
-                        return throwable;
-                    })
-                    .hasElements();
+                    .flatMap(roleName -> client.fetch(Role.class, roleName)
+                        .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
+                            "There is some illegal data in the roles parameter"))
+                        )
+                    )
+                    .then();
             })
             .then(Mono.defer(() -> client.create(user)
                 .flatMap(newUser -> grantRoles(user.getMetadata().getName(), roleNames)))

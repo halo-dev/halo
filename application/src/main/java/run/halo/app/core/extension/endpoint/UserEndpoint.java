@@ -191,7 +191,7 @@ public class UserEndpoint implements CustomEndpoint {
                              String phone,
                              String password,
                              String bio,
-                             Map<String, String> additionalAttributes,
+                             Map<String, String> annotations,
                              Set<String> roles) {
 
         /**
@@ -206,9 +206,9 @@ public class UserEndpoint implements CustomEndpoint {
             user.setMetadata(new Metadata());
             user.getMetadata().setName(userRequest.name());
             user.getMetadata().setAnnotations(new HashMap<>());
-            Map<String, String> additionalAttributes =
-                defaultIfNull(userRequest.additionalAttributes(), Map.of());
-            user.getMetadata().getAnnotations().putAll(additionalAttributes);
+            Map<String, String> annotations =
+                defaultIfNull(userRequest.annotations(), Map.of());
+            user.getMetadata().getAnnotations().putAll(annotations);
 
             var spec = new User.UserSpec();
             user.setSpec(spec);
