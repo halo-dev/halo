@@ -24,7 +24,6 @@ export function useFetchAttachmentGroup(): useFetchAttachmentGroupReturn {
 
       return deletingGroups?.length ? 1000 : false;
     },
-    refetchOnWindowFocus: false,
   });
 
   return {

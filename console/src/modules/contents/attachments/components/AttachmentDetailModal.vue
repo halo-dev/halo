@@ -1,5 +1,11 @@
 <script lang="ts" setup>
-import { VButton, VModal, VSpace } from "@halo-dev/components";
+import {
+  VButton,
+  VDescription,
+  VDescriptionItem,
+  VModal,
+  VSpace,
+} from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
 import type { Attachment } from "@halo-dev/api-client";
 import prettyBytes from "pretty-bytes";
@@ -50,7 +56,6 @@ const { data: policy } = useQuery({
 
     return data;
   },
-  refetchOnWindowFocus: false,
   enabled: computed(() => !!policyName.value),
 });
 
@@ -79,6 +84,7 @@ const onVisibleChange = (visible: boolean) => {
     :mount-to-body="mountToBody"
     :layer-closable="true"
     height="calc(100vh - 20px)"
+    :body-class="['!p-0']"
     @update:visible="onVisibleChange"
   >
     <template #actions>
@@ -87,7 +93,7 @@ const onVisibleChange = (visible: boolean) => {
     <div class="overflow-hidden bg-white">
       <div
         v-if="onlyPreview && isImage(attachment?.spec.mediaType)"
-        class="flex justify-center"
+        class="flex justify-center p-4"
       >
         <img
           v-tooltip.bottom="
@@ -99,14 +105,11 @@ const onVisibleChange = (visible: boolean) => {
           @click="onlyPreview = !onlyPreview"
         />
       </div>
-      <dl v-else>
-        <div
-          class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6"
-        >
-          <dt class="text-sm font-medium text-gray-900">
-            {{ $t("core.attachment.detail_modal.fields.preview") }}
-          </dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+      <div v-else>
+        <VDescription>
+          <VDescriptionItem
+            :label="$t('core.attachment.detail_modal.fields.preview')"
+          >
             <div
               v-if="isImage(attachment?.spec.mediaType)"
               @click="onlyPreview = !onlyPreview"
@@ -149,80 +152,47 @@ const onVisibleChange = (visible: boolean) => {
             <span v-else>
               {{ $t("core.attachment.detail_modal.preview.not_support") }}
             </span>
-          </dd>
-        </div>
-        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">
-            {{ $t("core.attachment.detail_modal.fields.storage_policy") }}
-          </dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-            {{ policy?.spec.displayName }}
-          </dd>
-        </div>
-        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">
-            {{ $t("core.attachment.detail_modal.fields.group") }}
-          </dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-            {{
+          </VDescriptionItem>
+          <VDescriptionItem
+            :label="$t('core.attachment.detail_modal.fields.storage_policy')"
+            :content="policy?.spec.displayName"
+          ></VDescriptionItem>
+          <VDescriptionItem
+            :label="$t('core.attachment.detail_modal.fields.group')"
+            :content="
               getGroupName(attachment?.spec.groupName) ||
-              $t("core.attachment.common.text.ungrouped")
-            }}
-          </dd>
-        </div>
-        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">
-            {{ $t("core.attachment.detail_modal.fields.display_name") }}
-          </dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-            {{ attachment?.spec.displayName }}
-          </dd>
-        </div>
-        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">
-            {{ $t("core.attachment.detail_modal.fields.media_type") }}
-          </dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-            {{ attachment?.spec.mediaType }}
-          </dd>
-        </div>
-        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">
-            {{ $t("core.attachment.detail_modal.fields.size") }}
-          </dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-            {{ prettyBytes(attachment?.spec.size || 0) }}
-          </dd>
-        </div>
-        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">
-            {{ $t("core.attachment.detail_modal.fields.owner") }}
-          </dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-            {{ attachment?.spec.ownerName }}
-          </dd>
-        </div>
-        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">
-            {{ $t("core.attachment.detail_modal.fields.creation_time") }}
-          </dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-            {{ formatDatetime(attachment?.metadata.creationTimestamp) }}
-          </dd>
-        </div>
-        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-900">
-            {{ $t("core.attachment.detail_modal.fields.permalink") }}
-          </dt>
-          <dd
-            class="mt-1 text-sm text-gray-900 hover:text-blue-600 sm:col-span-2 sm:mt-0"
+              $t('core.attachment.common.text.ungrouped')
+            "
+          />
+          <VDescriptionItem
+            :label="$t('core.attachment.detail_modal.fields.display_name')"
+            :content="attachment?.spec.displayName"
+          />
+          <VDescriptionItem
+            :label="$t('core.attachment.detail_modal.fields.media_type')"
+            :content="attachment?.spec.mediaType"
+          />
+          <VDescriptionItem
+            :label="$t('core.attachment.detail_modal.fields.size')"
+            :content="prettyBytes(attachment?.spec.size || 0)"
+          />
+          <VDescriptionItem
+            :label="$t('core.attachment.detail_modal.fields.owner')"
+            :content="attachment?.spec.ownerName"
+          />
+          <VDescriptionItem
+            :label="$t('core.attachment.detail_modal.fields.creation_time')"
+            :content="formatDatetime(attachment?.metadata.creationTimestamp)"
+          />
+          <VDescriptionItem
+            :label="$t('core.attachment.detail_modal.fields.permalink')"
           >
             <a target="_blank" :href="attachment?.status?.permalink">
               {{ attachment?.status?.permalink }}
             </a>
-          </dd>
-        </div>
-      </dl>
+          </VDescriptionItem>
+        </VDescription>
+      </div>
     </div>
     <template #footer>
       <VSpace>

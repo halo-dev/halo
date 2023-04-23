@@ -8,7 +8,7 @@ import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import reactor.core.publisher.Mono;
 import run.halo.app.extension.GroupVersionKind;
-import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.PathUtils;
 
 /**
@@ -21,10 +21,10 @@ import run.halo.app.infra.utils.PathUtils;
 @Component
 public class HaloTrackerProcessor implements TemplateHeadProcessor {
 
-    private final HaloProperties haloProperties;
+    private final ExternalUrlSupplier externalUrlGetter;
 
-    public HaloTrackerProcessor(HaloProperties haloProperties) {
-        this.haloProperties = haloProperties;
+    public HaloTrackerProcessor(ExternalUrlSupplier externalUrlGetter) {
+        this.externalUrlGetter = externalUrlGetter;
     }
 
     @Override
@@ -42,7 +42,7 @@ public class HaloTrackerProcessor implements TemplateHeadProcessor {
 
     private String getTrackerScript(ITemplateContext context) {
         String resourceName = (String) context.getVariable("name");
-        String externalUrl = haloProperties.getExternalUrl().getPath();
+        String externalUrl = externalUrlGetter.get().getPath();
         Object groupVersionKind = context.getVariable("groupVersionKind");
         Object plural = context.getVariable("plural");
         if (groupVersionKind == null || plural == null) {

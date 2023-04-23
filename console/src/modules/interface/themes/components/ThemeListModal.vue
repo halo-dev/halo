@@ -68,7 +68,6 @@ const {
     });
     return data.items;
   },
-  refetchOnWindowFocus: false,
   refetchInterval(data) {
     if (activeTab.value !== "installed") {
       return false;
@@ -97,7 +96,7 @@ const handleCreateTheme = async (theme: Theme) => {
 
     activeTab.value = "installed";
 
-    Toast.success(t("core.theme.list_modal.operations.install.toast_success"));
+    Toast.success(t("core.common.toast.install_success"));
   } catch (error) {
     console.error("Failed to create theme", error);
   } finally {

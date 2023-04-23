@@ -279,7 +279,6 @@ const {
 
     return abnormalPosts?.length ? 3000 : false;
   },
-  refetchOnWindowFocus: false,
 });
 
 const handleOpenSettingModal = async (post: Post) => {

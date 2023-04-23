@@ -21,6 +21,7 @@ import org.pf4j.PluginState;
 import org.pf4j.PluginStateEvent;
 import org.pf4j.PluginWrapper;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -41,7 +42,7 @@ import run.halo.app.plugin.event.HaloPluginStoppedEvent;
  */
 @Slf4j
 public class HaloPluginManager extends DefaultPluginManager
-    implements ApplicationContextAware, InitializingBean {
+    implements ApplicationContextAware, InitializingBean, DisposableBean {
 
     private final Map<String, PluginStartingError> startingErrors = new HashMap<>();
 
@@ -402,6 +403,11 @@ public class HaloPluginManager extends DefaultPluginManager
         if (extensionFinder instanceof SpringComponentsFinder springComponentsFinder) {
             springComponentsFinder.removeComponentsStorage(pluginId);
         }
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        stopPlugins();
     }
     // end-region
 }

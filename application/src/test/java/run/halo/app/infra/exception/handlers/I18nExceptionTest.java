@@ -105,13 +105,14 @@ class I18nExceptionTest {
 
     @Test
     void shouldGetErrorIfThrowingGeneralException() {
+        // problem reason will be a fixed prompt when internal server error occurred.
         webClient.get().uri("/response-entity/general-error")
             .exchange()
             .expectStatus().isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR)
             .expectBody(ProblemDetail.class)
             .value(problemDetail -> {
                 assertEquals("Internal Server Error", problemDetail.getTitle());
-                assertEquals("Something went wrong",
+                assertEquals("Something went wrong, please try again later.",
                     problemDetail.getDetail());
             });
     }

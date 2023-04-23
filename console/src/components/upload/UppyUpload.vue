@@ -6,6 +6,7 @@ import Uppy, { type SuccessResponse } from "@uppy/core";
 import type { Restrictions } from "@uppy/core";
 import XHRUpload from "@uppy/xhr-upload";
 import zh_CN from "@uppy/locales/lib/zh_CN";
+import zh_TW from "@uppy/locales/lib/zh_TW";
 import en_US from "@uppy/locales/lib/en_US";
 import { computed, onUnmounted } from "vue";
 import { Toast } from "@halo-dev/components";
@@ -23,6 +24,7 @@ const props = withDefaults(
     note?: string;
     method?: "GET" | "POST" | "PUT" | "HEAD" | "get" | "post" | "put" | "head";
     disabled?: boolean;
+    doneButtonHandler?: () => void;
   }>(),
   {
     restrictions: undefined,
@@ -33,6 +35,7 @@ const props = withDefaults(
     note: undefined,
     method: "post",
     disabled: false,
+    doneButtonHandler: undefined,
   }
 );
 
@@ -46,6 +49,7 @@ const locales = {
   zh: zh_CN,
   "en-US": en_US,
   "zh-CN": zh_CN,
+  "zh-TW": zh_TW,
 };
 
 const uppy = computed(() => {
@@ -94,6 +98,11 @@ onUnmounted(() => {
 <template>
   <dashboard
     :uppy="uppy"
-    :props="{ theme: 'light', disabled: disabled, note: note }"
+    :props="{
+      theme: 'light',
+      disabled: disabled,
+      note: note,
+      doneButtonHandler: doneButtonHandler,
+    }"
   />
 </template>

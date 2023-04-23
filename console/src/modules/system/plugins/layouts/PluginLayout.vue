@@ -63,7 +63,6 @@ const { data: plugin } = useQuery({
       });
     return data;
   },
-  refetchOnWindowFocus: false,
 });
 
 provide<Ref<Plugin | undefined>>("plugin", plugin);
@@ -76,7 +75,6 @@ const { data: setting } = useQuery({
     });
     return data;
   },
-  refetchOnWindowFocus: false,
   enabled: computed(() => {
     return (
       !!plugin.value &&

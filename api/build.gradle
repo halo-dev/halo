@@ -1,6 +1,6 @@
 plugins {
     id 'java-library'
-    id 'maven-publish'
+    id 'halo.publish'
     id "io.freefair.lombok" version "8.0.0-rc2"
 }
 
@@ -67,15 +67,4 @@ java {
 
 tasks.named('test') {
     useJUnitPlatform()
-}
-
-publishing {
-    publications {
-        library(MavenPublication) {
-            from components.java
-        }
-    }
-    repositories {
-        mavenLocal()
-    }
 }

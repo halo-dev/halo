@@ -33,7 +33,6 @@ const { data: configMap, suspense } = useQuery<ConfigMap>({
     });
     return data;
   },
-  refetchOnWindowFocus: false,
   enabled: computed(() => {
     return !!setting.value && !!plugin?.value;
   }),
