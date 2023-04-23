@@ -3,6 +3,7 @@ import { computed, nextTick, reactive, ref, watch } from "vue";
 import { IconClose } from "../../icons/icons";
 import type { UseOverlayScrollbarsParams } from "overlayscrollbars-vue";
 import { useOverlayScrollbars } from "overlayscrollbars-vue";
+import { useScrollLock } from "@vueuse/core";
 
 const props = withDefaults(
   defineProps<{
@@ -92,12 +93,16 @@ const reactiveParams = reactive<UseOverlayScrollbarsParams>({
   defer: true,
 });
 const [initialize, instance] = useOverlayScrollbars(reactiveParams);
+const el = document.querySelector("body");
+const isBodyLocked = useScrollLock(el);
 watch(
   () => props.visible,
   (value) => {
     if (value) {
+      isBodyLocked.value = true;
       if (modalBody.value) initialize({ target: modalBody.value });
     } else {
+      isBodyLocked.value = false;
       instance()?.destroy();
     }
   }
