@@ -101,7 +101,7 @@ const onVisibleChange = (visible: boolean) => {
           "
           :alt="attachment?.spec.displayName"
           :src="attachment?.status?.permalink"
-          class="w-auto cursor-pointer rounded"
+          class="w-auto transform-gpu cursor-pointer rounded"
           @click="onlyPreview = !onlyPreview"
         />
       </div>
