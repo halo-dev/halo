@@ -3,6 +3,7 @@ import theme from "./theme";
 import { zh, en } from "@formkit/i18n";
 import type { DefaultConfigOptions } from "@formkit/vue";
 import { form } from "./inputs/form";
+import { group } from "./inputs/group";
 import { attachment } from "./inputs/attachment";
 import { code } from "./inputs/code";
 import { repeater } from "./inputs/repeater";
@@ -28,6 +29,7 @@ const config: DefaultConfigOptions = {
   plugins: [radioAlt, stopImplicitSubmission, passwordPreventAutocomplete],
   inputs: {
     form,
+    group,
     attachment,
     code,
     repeater,
