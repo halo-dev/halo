@@ -1,13 +1,10 @@
 <script lang="ts" setup>
 // core libs
 import { inject, ref } from "vue";
-import { RouterLink } from "vue-router";
 import { useThemeLifeCycle } from "./composables/use-theme";
 
 // components
 import {
-  VAlert,
-  VSpace,
   VTag,
   IconMore,
   Dialog,

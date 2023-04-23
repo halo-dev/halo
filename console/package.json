@@ -15,7 +15,7 @@
     "test:e2e": "start-server-and-test preview http://127.0.0.1:5050/ 'cypress open'",
     "test:e2e:ci": "start-server-and-test preview http://127.0.0.1:5050/ 'cypress run'",
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false && pnpm run typecheck:packages",
-    "lint": "eslint ./src --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore && pnpm run lint:packages",
+    "lint": "eslint ./src --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore --max-warnings=0 && pnpm run lint:packages",
     "prettier": "prettier --write './src/**/*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}' && pnpm run prettier:packages",
     "typecheck:packages": "pnpm --parallel --filter \"./packages/**\" run typecheck",
     "lint:packages": "pnpm --parallel --filter \"./packages/**\" lint",
@@ -27,7 +27,7 @@
       "prettier --write"
     ],
     "*.{js,ts,vue,tsx,jsx}": [
-      "eslint --fix"
+      "eslint --fix --max-warnings=0"
     ]
   },
   "workspaces": [
