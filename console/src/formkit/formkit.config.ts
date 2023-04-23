@@ -21,12 +21,18 @@ import { roleSelect } from "./inputs/role-select";
 import radioAlt from "./plugins/radio-alt";
 import stopImplicitSubmission from "./plugins/stop-implicit-submission";
 import passwordPreventAutocomplete from "./plugins/password-prevent-autocomplete";
+import requiredAsterisk from "./plugins/required-asterisk";
 
 const config: DefaultConfigOptions = {
   config: {
     classes: generateClasses(theme),
   },
-  plugins: [radioAlt, stopImplicitSubmission, passwordPreventAutocomplete],
+  plugins: [
+    radioAlt,
+    stopImplicitSubmission,
+    passwordPreventAutocomplete,
+    requiredAsterisk,
+  ],
   inputs: {
     form,
     group,
