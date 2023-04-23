@@ -88,8 +88,16 @@ const theme: Record<string, Record<string, string>> = {
     inner: "flex flex-col gap-4",
     items: "flex flex-col w-full gap-2",
     item: "border rounded-base grid grid-cols-12 focus-within:border-primary transition-all overflow-hidden focus-within:shadow-sm",
-    content: "flex-1 p-2 col-span-11",
+    content: "flex-1 p-2 col-span-11  divide-y divide-gray-100",
     controls: "bg-gray-200 col-span-1 flex items-center justify-center",
+  },
+  group: {
+    label: textClassification.label,
+    legend: `${textClassification.label} px-2`,
+    fieldset: boxClassification.fieldset,
+    wrapper: boxClassification.wrapper,
+    help: boxClassification.wrapper,
+    inner: "flex flex-col px-2 divide-y divide-gray-100",
   },
   tagSelect: {
     ...textClassification,
