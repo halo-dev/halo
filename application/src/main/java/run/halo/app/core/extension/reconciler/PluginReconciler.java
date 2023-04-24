@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.reconciler;
 
+import static org.pf4j.util.FileUtils.isJarFile;
 import static run.halo.app.plugin.PluginConst.DELETE_STAGE;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.pf4j.PluginDescriptor;
+import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
@@ -276,6 +278,15 @@ public class PluginReconciler implements Reconciler<Request> {
                 persistenceFailureStatus(name, e);
                 throw e;
             }
+        }
+
+        if (currentState != desiredState) {
+            log.error("Plugin [{}] state transition failed: {}", name,
+                haloPluginManager.getPluginStartingError(name));
+            var e = new PluginRuntimeException("Plugin [" + name + "] state transition from ["
+                + currentState + "] to [" + desiredState + "] failed");
+            persistenceFailureStatus(name, e);
+            throw e;
         }
     }
 
@@ -554,23 +565,39 @@ public class PluginReconciler implements Reconciler<Request> {
         }
 
         PluginWrapper pluginWrapper = haloPluginManager.getPlugin(name);
-        if (pluginWrapper == null) {
-            return;
+        if (pluginWrapper != null) {
+            // pluginWrapper must not be null in below code
+            // stop and unload plugin, see also PluginBeforeStopSyncListener
+            if (!haloPluginManager.unloadPlugin(name)) {
+                throw new IllegalStateException("Failed to unload plugin: " + name);
+            }
         }
-        // pluginWrapper must not be null in below code
-        // stop and unload plugin, see also PluginBeforeStopSyncListener
-        if (!haloPluginManager.unloadPlugin(name)) {
-            throw new IllegalStateException("Failed to unload plugin: " + name);
-        }
+
         // delete plugin resources
-        if (RuntimeMode.DEPLOYMENT.equals(pluginWrapper.getRuntimeMode())) {
+        Path pluginPath = determinePluginLocation(plugin);
+        if (pluginPath != null && !isDevelopmentMode(name) && isJarFile(pluginPath)) {
             // delete plugin file
             try {
-                Files.deleteIfExists(pluginWrapper.getPluginPath());
+                Files.deleteIfExists(pluginPath);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    @Nullable
+    Path determinePluginLocation(Plugin plugin) {
+        final var name = plugin.getMetadata().getName();
+        PluginWrapper pluginWrapper = haloPluginManager.getPlugin(name);
+        return Optional.ofNullable(pluginWrapper)
+            .map(PluginWrapper::getPluginPath)
+            .orElseGet(() -> {
+                var localtionUri = plugin.statusNonNull().getLoadLocation();
+                if (localtionUri != null) {
+                    return Path.of(localtionUri);
+                }
+                return null;
+            });
     }
 
     void createInitialReverseProxyIfNotPresent(Plugin plugin) {
