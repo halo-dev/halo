@@ -68,9 +68,7 @@ watch(
 );
 </script>
 <template>
-  <div
-    class="flex h-screen flex-col items-center bg-white/90 pt-[30vh] sm:pt-[20vh]"
-  >
+  <div class="flex h-screen flex-col items-center bg-white/90 pt-[30vh]">
     <IconLogo class="mb-8" />
     <div class="flex w-72 flex-col">
       <SignupForm v-if="type === 'signup'" @succeed="onLoginSucceed" />
@@ -100,7 +98,7 @@ watch(
       </div>
     </div>
     <div
-      class="absolute bottom-0 mb-10 flex items-center justify-center gap-2.5"
+      class="bottom-0 mb-10 mt-auto flex items-center justify-center gap-2.5"
     >
       <label
         for="locale"
