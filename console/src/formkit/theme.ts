@@ -86,9 +86,9 @@ const theme: Record<string, Record<string, string>> = {
     wrapper: boxClassification.wrapper,
     help: boxClassification.wrapper,
     inner: "flex flex-col gap-4",
-    items: "flex flex-col w-full gap-2",
-    item: "border rounded-base grid grid-cols-12 focus-within:border-primary transition-all overflow-hidden focus-within:shadow-sm",
-    content: "flex-1 p-2 col-span-11  divide-y divide-gray-100",
+    items: "flex flex-col w-full gap-2 rounded-base",
+    item: "border rounded-base grid grid-cols-12 focus-within:border-primary transition-all overflow-visible focus-within:shadow-sm",
+    content: "flex-1 p-2 col-span-11 divide-y divide-gray-100",
     controls: "bg-gray-200 col-span-1 flex items-center justify-center",
   },
   group: {
@@ -110,7 +110,7 @@ const theme: Record<string, Record<string, string>> = {
       "h-4 w-4 cursor-pointer text-gray-600 hover:text-gray-900",
     "post-tags-button": "inline-flex h-full cursor-pointer items-center px-1",
     "dropdown-wrapper":
-      "absolute ring-1 ring-white top-full bottom-auto right-0 z-10 mt-1 max-h-96 w-full overflow-auto rounded bg-white shadow-lg",
+      "absolute ring-1 ring-gray-100 top-full bottom-auto right-0 z-10 mt-1 max-h-96 w-full overflow-auto rounded bg-white shadow-lg",
   },
   categorySelect: {
     ...textClassification,
@@ -121,7 +121,7 @@ const theme: Record<string, Record<string, string>> = {
     "post-categories-button":
       "inline-flex h-full cursor-pointer items-center px-1",
     "dropdown-wrapper":
-      "absolute ring-1 ring-white top-full bottom-auto right-0 z-10 mt-1 max-h-96 w-full overflow-auto rounded bg-white shadow-lg",
+      "absolute ring-1 ring-gray-100 top-full bottom-auto right-0 z-10 mt-1 max-h-96 w-full overflow-auto rounded bg-white shadow-lg",
   },
 };
 
