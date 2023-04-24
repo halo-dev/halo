@@ -22,6 +22,7 @@ import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.exception.ExtensionNotFoundException;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.PostFinder;
@@ -85,14 +86,22 @@ public class PostFinderImpl implements PostFinder {
                         postPreviousNextPair(postNames, currentName);
                     String previousPostName = previousNextPair.getLeft();
                     String nextPostName = previousNextPair.getRight();
-                    return getByName(previousPostName)
+                    return fetchByName(previousPostName)
                         .doOnNext(builder::previous)
-                        .then(getByName(nextPostName))
+                        .then(fetchByName(nextPostName))
                         .doOnNext(builder::next)
                         .thenReturn(builder);
                 })
                 .map(NavigationPostVo.NavigationPostVoBuilder::build))
             .defaultIfEmpty(NavigationPostVo.empty());
+    }
+
+    private Mono<PostVo> fetchByName(String name) {
+        if (StringUtils.isBlank(name)) {
+            return Mono.empty();
+        }
+        return getByName(name)
+            .onErrorResume(ExtensionNotFoundException.class::isInstance, (error) -> Mono.empty());
     }
 
     @Override
