@@ -73,16 +73,20 @@ public class YamlPluginFinder {
 
     protected Plugin readPluginDescriptor(Path pluginPath) {
         Path propertiesPath = getManifestPath(pluginPath, propertiesFileName);
-        if (propertiesPath == null) {
-            throw new PluginRuntimeException("Cannot find the plugin manifest path");
-        }
+        try {
+            if (propertiesPath == null) {
+                throw new PluginRuntimeException("Cannot find the plugin manifest path");
+            }
 
-        log.debug("Lookup plugin descriptor in '{}'", propertiesPath);
-        if (Files.notExists(propertiesPath)) {
-            throw new PluginRuntimeException("Cannot find '{}' path", propertiesPath);
+            log.debug("Lookup plugin descriptor in '{}'", propertiesPath);
+            if (Files.notExists(propertiesPath)) {
+                throw new PluginRuntimeException("Cannot find '{}' path", propertiesPath);
+            }
+            Resource propertyResource = new FileSystemResource(propertiesPath);
+            return unstructuredToPlugin(propertyResource);
+        } finally {
+            FileUtils.closePath(propertiesPath);
         }
-        Resource propertyResource = new FileSystemResource(propertiesPath);
-        return unstructuredToPlugin(propertyResource);
     }
 
     protected Plugin unstructuredToPlugin(Resource propertyResource) {
