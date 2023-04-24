@@ -3,28 +3,31 @@ import {
   VButton,
   VDescription,
   VDescriptionItem,
+  VDropdown,
+  VDropdownItem,
   VModal,
   VSpace,
 } from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
 import type { Attachment } from "@halo-dev/api-client";
 import prettyBytes from "pretty-bytes";
-import { computed, ref } from "vue";
+import { computed, ref, toRef } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { isImage } from "@/utils/image";
 import { formatDatetime } from "@/utils/date";
 import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
 import { useQuery } from "@tanstack/vue-query";
+import { useAttachmentPermalinkCopy } from "../composables/use-attachment";
 
 const props = withDefaults(
   defineProps<{
     visible: boolean;
-    attachment: Attachment | null;
+    attachment: Attachment | undefined;
     mountToBody?: boolean;
   }>(),
   {
     visible: false,
-    attachment: null,
+    attachment: undefined,
     mountToBody: false,
   }
 );
@@ -35,6 +38,7 @@ const emit = defineEmits<{
 }>();
 
 const { groups } = useFetchAttachmentGroup();
+const { handleCopy } = useAttachmentPermalinkCopy(toRef(props, "attachment"));
 
 const onlyPreview = ref(false);
 
@@ -187,9 +191,29 @@ const onVisibleChange = (visible: boolean) => {
           <VDescriptionItem
             :label="$t('core.attachment.detail_modal.fields.permalink')"
           >
-            <a target="_blank" :href="attachment?.status?.permalink">
-              {{ attachment?.status?.permalink }}
-            </a>
+            <div class="space-y-4">
+              <a
+                class="block"
+                target="_blank"
+                :href="attachment?.status?.permalink"
+              >
+                {{ attachment?.status?.permalink }}
+              </a>
+              <VDropdown class="inline-block">
+                <VButton size="sm">复制</VButton>
+                <template #popper>
+                  <VDropdownItem @click="handleCopy('url')">
+                    链接
+                  </VDropdownItem>
+                  <VDropdownItem @click="handleCopy('html')">
+                    HTML 格式
+                  </VDropdownItem>
+                  <VDropdownItem @click="handleCopy('markdown')">
+                    Markdown 格式
+                  </VDropdownItem>
+                </template>
+              </VDropdown>
+            </div>
           </VDescriptionItem>
         </VDescription>
       </div>

@@ -7,6 +7,7 @@ import { Dialog, Toast } from "@halo-dev/components";
 import type { Content, Editor } from "@halo-dev/richtext-editor";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import { useClipboard } from "@vueuse/core";
 
 interface useAttachmentControlReturn {
   attachments: Ref<Attachment[] | undefined>;
@@ -325,5 +326,70 @@ export function useAttachmentSelect(
 
   return {
     onAttachmentSelect,
+  };
+}
+
+function matchMediaType(mediaType: string, accept: string) {
+  const regex = new RegExp(accept.toLowerCase().replace(/\*/g, ".*"));
+
+  return regex.test(mediaType);
+}
+
+export function useAttachmentPermalinkCopy(
+  attachment: Ref<Attachment | undefined>
+) {
+  const { copy } = useClipboard();
+
+  const handleCopy = (format: "markdown" | "html" | "url") => {
+    const { permalink } = attachment.value?.status || {};
+    const { displayName, mediaType } = attachment.value?.spec || {};
+
+    const isImage = mediaType && matchMediaType(mediaType, "image/*");
+    const isVideo = mediaType && matchMediaType(mediaType, "video/*");
+    const isAudio = mediaType && matchMediaType(mediaType, "audio/*");
+
+    if (!permalink) return;
+
+    if (format === "url") {
+      copy(permalink);
+      return;
+    }
+
+    if (format === "markdown") {
+      const text =
+        mediaType && isImage
+          ? `![${displayName}](${permalink})`
+          : `[${displayName}](${permalink})`;
+      copy(text);
+      return;
+    }
+
+    if (format === "html") {
+      if (!mediaType) {
+        copy(`<a href="${permalink}">${displayName}</a>`);
+        return;
+      }
+
+      if (isImage) {
+        copy(`<img src="${permalink}" alt="${displayName}">`);
+        return;
+      }
+
+      if (isVideo) {
+        copy(`<video src="${permalink}"></video>`);
+        return;
+      }
+
+      if (isAudio) {
+        copy(`<audio src="${permalink}"></audio>`);
+        return;
+      }
+
+      copy(`<a href="${permalink}">${displayName}</a>`);
+    }
+  };
+
+  return {
+    handleCopy,
   };
 }
