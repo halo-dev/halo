@@ -2,6 +2,8 @@ package run.halo.app.core.extension.endpoint;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static java.util.Comparator.comparing;
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
@@ -13,8 +15,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -28,6 +32,7 @@ import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
@@ -43,12 +48,14 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Comparators;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
@@ -99,6 +106,14 @@ public class UserEndpoint implements CustomEndpoint {
                         .required(true)
                         .implementation(GrantRequest.class))
                     .response(responseBuilder().implementation(User.class)))
+            .POST("/users", this::createUser,
+                builder -> builder.operationId("CreateUser")
+                    .description("Creates a new user.")
+                    .tag(tag)
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .implementation(CreateUserRequest.class))
+                    .response(responseBuilder().implementation(User.class)))
             .GET("/users/{name}/permissions", this::getUserPermission,
                 builder -> builder.operationId("GetPermissions")
                     .description("Get permissions of user")
@@ -133,13 +148,77 @@ public class UserEndpoint implements CustomEndpoint {
             .build();
     }
 
+    private Mono<ServerResponse> createUser(ServerRequest request) {
+        return request.bodyToMono(CreateUserRequest.class)
+            .doOnNext(createUserRequest -> {
+                if (StringUtils.isBlank(createUserRequest.name())) {
+                    throw new ServerWebInputException("Name is required");
+                }
+                if (StringUtils.isBlank(createUserRequest.email())) {
+                    throw new ServerWebInputException("Email is required");
+                }
+            })
+            .flatMap(userRequest -> {
+                User newUser = CreateUserRequest.from(userRequest);
+                return userService.createUser(newUser, userRequest.roles())
+                    .then(Mono.defer(() -> userService.updateWithRawPassword(userRequest.name(),
+                            userRequest.password()))
+                        .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                            .filter(OptimisticLockingFailureException.class::isInstance)
+                        )
+                    );
+            })
+            .flatMap(user -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(user)
+            );
+    }
+
     private Mono<ServerResponse> getUserByName(ServerRequest request) {
         final var name = request.pathVariable("name");
         return userService.getUser(name)
             .flatMap(this::toDetailedUser)
             .flatMap(user -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(user));
+                .bodyValue(user)
+            );
+    }
+
+    record CreateUserRequest(@Schema(requiredMode = REQUIRED) String name,
+                             @Schema(requiredMode = REQUIRED) String email,
+                             String displayName,
+                             String avatar,
+                             String phone,
+                             String password,
+                             String bio,
+                             Map<String, String> annotations,
+                             Set<String> roles) {
+
+        /**
+         * <p>Creates a new user from {@link CreateUserRequest}.</p>
+         * Note: this method will not set password.
+         *
+         * @param userRequest user request
+         * @return user from request
+         */
+        public static User from(CreateUserRequest userRequest) {
+            var user = new User();
+            user.setMetadata(new Metadata());
+            user.getMetadata().setName(userRequest.name());
+            user.getMetadata().setAnnotations(new HashMap<>());
+            Map<String, String> annotations =
+                defaultIfNull(userRequest.annotations(), Map.of());
+            user.getMetadata().getAnnotations().putAll(annotations);
+
+            var spec = new User.UserSpec();
+            user.setSpec(spec);
+            spec.setEmail(userRequest.email());
+            spec.setDisplayName(defaultIfBlank(userRequest.displayName(), userRequest.name()));
+            spec.setAvatar(userRequest.avatar());
+            spec.setPhone(userRequest.phone());
+            spec.setBio(userRequest.bio());
+            return user;
+        }
     }
 
     private Mono<ServerResponse> updateProfile(ServerRequest request) {
@@ -165,7 +244,8 @@ public class UserEndpoint implements CustomEndpoint {
                     spec.setEmail(newSpec.getEmail());
                     spec.setPhone(newSpec.getPhone());
                     return currentUser;
-                }))
+                })
+            )
             .flatMap(client::update)
             .flatMap(updatedUser -> ServerResponse.ok().bodyValue(updatedUser));
     }
@@ -238,12 +318,6 @@ public class UserEndpoint implements CustomEndpoint {
                 Mono.error(() -> new ServerWebInputException("Request body is empty")))
             .flatMap(grantRequest -> userService.grantRoles(username, grantRequest.roles())
                 .then(ServerResponse.ok().build()));
-    }
-
-    private Mono<GrantRequest> checkRoles(GrantRequest request) {
-        return Flux.fromIterable(request.roles)
-            .flatMap(role -> client.get(Role.class, role))
-            .then(Mono.just(request));
     }
 
     record GrantRequest(Set<String> roles) {

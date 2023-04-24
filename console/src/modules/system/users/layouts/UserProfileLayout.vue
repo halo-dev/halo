@@ -107,16 +107,14 @@ const handleTabChange = (id: string) => {
 </script>
 <template>
   <BasicLayout>
-    <UserEditingModal
-      v-model:visible="editingModal"
-      :user="user?.user"
-      @close="refetch"
-    />
+    <UserEditingModal v-model:visible="editingModal" :user="user?.user" />
+
     <UserPasswordChangeModal
       v-model:visible="passwordChangeModal"
       :user="user?.user"
       @close="refetch"
     />
+
     <header class="bg-white">
       <div class="p-4">
         <div class="flex items-center justify-between">

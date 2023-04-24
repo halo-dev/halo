@@ -9,7 +9,7 @@
     "prettier": "prettier --write './src/**/*.{js,jsx,ts,tsx,json,yml,yaml}'",
     "typecheck": "tsc --noEmit",
     "release": "bumpp",
-    "gen": "openapi-generator-cli generate -i http://localhost:8090/v3/api-docs/all-api -g typescript-axios -c ./src/.openapi_config.yaml -o ./src --type-mappings='set=Array' && pnpm lint && pnpm prettier"
+    "gen": "openapi-generator-cli generate -i http://localhost:8090/v3/api-docs/all-api -g typescript-axios -c ./src/.openapi_config.yaml -o ./src --type-mappings='set=Array' --skip-validate-spec && pnpm lint && pnpm prettier"
   },
   "keywords": [],
   "author": "@halo-dev",
