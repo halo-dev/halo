@@ -8,6 +8,7 @@ import type { Content, Editor } from "@halo-dev/richtext-editor";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { useClipboard } from "@vueuse/core";
+import { matchMediaType } from "@/utils/media-type";
 
 interface useAttachmentControlReturn {
   attachments: Ref<Attachment[] | undefined>;
@@ -327,12 +328,6 @@ export function useAttachmentSelect(
   return {
     onAttachmentSelect,
   };
-}
-
-function matchMediaType(mediaType: string, accept: string) {
-  const regex = new RegExp(accept.toLowerCase().replace(/\*/g, ".*"));
-
-  return regex.test(mediaType);
 }
 
 export function useAttachmentPermalinkCopy(
