@@ -28,6 +28,7 @@ import run.halo.app.core.extension.content.Reply;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.theme.finders.CommentFinder;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 
 /**
@@ -38,6 +39,9 @@ import run.halo.app.theme.finders.CommentPublicQueryService;
  */
 @ExtendWith(MockitoExtension.class)
 class CommentFinderEndpointTest {
+    @Mock
+    private CommentFinder commentFinder;
+
     @Mock
     private CommentPublicQueryService commentPublicQueryService;
 
@@ -65,7 +69,7 @@ class CommentFinderEndpointTest {
 
     @Test
     void listComments() {
-        when(commentPublicQueryService.list(any(), anyInt(), anyInt()))
+        when(commentPublicQueryService.list(any(), anyInt(), anyInt(), any()))
             .thenReturn(Mono.just(new ListResult<>(1, 10, 0, List.of())));
 
         Ref ref = new Ref();
@@ -82,15 +86,13 @@ class CommentFinderEndpointTest {
                     .queryParam("name", ref.getName())
                     .queryParam("page", 1)
                     .queryParam("size", 10)
-                    .queryParam("sort", "CREATE_TIME")
-                    .queryParam("sortOrder", true)
                     .build();
             })
             .exchange()
             .expectStatus()
             .isOk();
         ArgumentCaptor<Ref> refCaptor = ArgumentCaptor.forClass(Ref.class);
-        verify(commentPublicQueryService, times(1)).list(refCaptor.capture(), eq(1), eq(10));
+        verify(commentPublicQueryService, times(1)).list(refCaptor.capture(), eq(1), eq(10), any());
         Ref value = refCaptor.getValue();
         assertThat(value).isEqualTo(ref);
     }

@@ -22,11 +22,11 @@ public interface CommentPublicQueryService {
         @Nullable Integer size);
 
     Mono<ListResult<CommentVo>> list(Ref ref, @Nullable Integer page,
-        @Nullable Integer size, Comparator<Comment> comparator);
+        @Nullable Integer size, @Nullable Comparator<Comment> comparator);
 
     Mono<ListResult<ReplyVo>> listReply(String commentName, @Nullable Integer page,
         @Nullable Integer size);
 
     Mono<ListResult<ReplyVo>> listReply(String commentName, @Nullable Integer page,
-        @Nullable Integer size, Comparator<Reply> comparator);
+        @Nullable Integer size, @Nullable Comparator<Reply> comparator);
 }
