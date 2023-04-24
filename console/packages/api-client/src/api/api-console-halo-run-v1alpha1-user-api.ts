@@ -40,13 +40,15 @@ import {
 // @ts-ignore
 import { ChangePasswordRequest } from "../models";
 // @ts-ignore
+import { CreateUserRequest } from "../models";
+// @ts-ignore
 import { DetailedUser } from "../models";
 // @ts-ignore
 import { GrantRequest } from "../models";
 // @ts-ignore
-import { ListedUserList } from "../models";
-// @ts-ignore
 import { User } from "../models";
+// @ts-ignore
+import { UserEndpointListedUserList } from "../models";
 // @ts-ignore
 import { UserPermission } from "../models";
 /**
@@ -117,6 +119,63 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
         changePasswordRequest,
+        localVarRequestOptions,
+        configuration
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     * Creates a new user.
+     * @param {CreateUserRequest} createUserRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createUser: async (
+      createUserRequest: CreateUserRequest,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'createUserRequest' is not null or undefined
+      assertParamExists("createUser", "createUserRequest", createUserRequest);
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/users`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      localVarHeaderParameter["Content-Type"] = "application/json";
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        createUserRequest,
         localVarRequestOptions,
         configuration
       );
@@ -348,23 +407,23 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (
     /**
      * List users
      * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
-     * @param {string} [keyword]
      * @param {string} [role]
+     * @param {string} [keyword]
      * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listUsers: async (
       sort?: Array<string>,
-      keyword?: string,
       role?: string,
+      keyword?: string,
       size?: number,
+      page?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
-      page?: number,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/api.console.halo.run/v1alpha1/users`;
@@ -395,16 +454,20 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (
         localVarQueryParameter["sort"] = Array.from(sort);
       }
 
-      if (keyword !== undefined) {
-        localVarQueryParameter["keyword"] = keyword;
-      }
-
       if (role !== undefined) {
         localVarQueryParameter["role"] = role;
       }
 
+      if (keyword !== undefined) {
+        localVarQueryParameter["keyword"] = keyword;
+      }
+
       if (size !== undefined) {
         localVarQueryParameter["size"] = size;
+      }
+
+      if (page !== undefined) {
+        localVarQueryParameter["page"] = page;
       }
 
       if (labelSelector) {
@@ -413,10 +476,6 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (
 
       if (fieldSelector) {
         localVarQueryParameter["fieldSelector"] = fieldSelector;
-      }
-
-      if (page !== undefined) {
-        localVarQueryParameter["page"] = page;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -530,6 +589,29 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (
       );
     },
     /**
+     * Creates a new user.
+     * @param {CreateUserRequest} createUserRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async createUser(
+      createUserRequest: CreateUserRequest,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.createUser(
+        createUserRequest,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
      * Get current user detail
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -623,35 +705,38 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (
     /**
      * List users
      * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
-     * @param {string} [keyword]
      * @param {string} [role]
+     * @param {string} [keyword]
      * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listUsers(
       sort?: Array<string>,
-      keyword?: string,
       role?: string,
+      keyword?: string,
       size?: number,
+      page?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
-      page?: number,
       options?: AxiosRequestConfig
     ): Promise<
-      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedUserList>
+      (
+        axios?: AxiosInstance,
+        basePath?: string
+      ) => AxiosPromise<UserEndpointListedUserList>
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.listUsers(
         sort,
-        keyword,
         role,
+        keyword,
         size,
+        page,
         labelSelector,
         fieldSelector,
-        page,
         options
       );
       return createRequestFunction(
@@ -712,6 +797,20 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
           requestParameters.changePasswordRequest,
           options
         )
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     * Creates a new user.
+     * @param {ApiConsoleHaloRunV1alpha1UserApiCreateUserRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    createUser(
+      requestParameters: ApiConsoleHaloRunV1alpha1UserApiCreateUserRequest,
+      options?: AxiosRequestConfig
+    ): AxiosPromise<User> {
+      return localVarFp
+        .createUser(requestParameters.createUserRequest, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -781,16 +880,16 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
     listUsers(
       requestParameters: ApiConsoleHaloRunV1alpha1UserApiListUsersRequest = {},
       options?: AxiosRequestConfig
-    ): AxiosPromise<ListedUserList> {
+    ): AxiosPromise<UserEndpointListedUserList> {
       return localVarFp
         .listUsers(
           requestParameters.sort,
-          requestParameters.keyword,
           requestParameters.role,
+          requestParameters.keyword,
           requestParameters.size,
+          requestParameters.page,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
-          requestParameters.page,
           options
         )
         .then((request) => request(axios, basePath));
@@ -831,6 +930,20 @@ export interface ApiConsoleHaloRunV1alpha1UserApiChangePasswordRequest {
    * @memberof ApiConsoleHaloRunV1alpha1UserApiChangePassword
    */
   readonly changePasswordRequest: ChangePasswordRequest;
+}
+
+/**
+ * Request parameters for createUser operation in ApiConsoleHaloRunV1alpha1UserApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1UserApiCreateUserRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1UserApiCreateUserRequest {
+  /**
+   *
+   * @type {CreateUserRequest}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiCreateUser
+   */
+  readonly createUserRequest: CreateUserRequest;
 }
 
 /**
@@ -900,14 +1013,14 @@ export interface ApiConsoleHaloRunV1alpha1UserApiListUsersRequest {
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly keyword?: string;
+  readonly role?: string;
 
   /**
    *
    * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly role?: string;
+  readonly keyword?: string;
 
   /**
    * Size of one page. Zero indicates no limit.
@@ -915,6 +1028,13 @@ export interface ApiConsoleHaloRunV1alpha1UserApiListUsersRequest {
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
   readonly size?: number;
+
+  /**
+   * The page number. Zero indicates no page.
+   * @type {number}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
+   */
+  readonly page?: number;
 
   /**
    * Label selector for filtering.
@@ -929,13 +1049,6 @@ export interface ApiConsoleHaloRunV1alpha1UserApiListUsersRequest {
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
   readonly fieldSelector?: Array<string>;
-
-  /**
-   * The page number. Zero indicates no page.
-   * @type {number}
-   * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
-   */
-  readonly page?: number;
 }
 
 /**
@@ -976,6 +1089,22 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
         requestParameters.changePasswordRequest,
         options
       )
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   * Creates a new user.
+   * @param {ApiConsoleHaloRunV1alpha1UserApiCreateUserRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApi
+   */
+  public createUser(
+    requestParameters: ApiConsoleHaloRunV1alpha1UserApiCreateUserRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
+      .createUser(requestParameters.createUserRequest, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -1057,12 +1186,12 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
     return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
       .listUsers(
         requestParameters.sort,
-        requestParameters.keyword,
         requestParameters.role,
+        requestParameters.keyword,
         requestParameters.size,
+        requestParameters.page,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
-        requestParameters.page,
         options
       )
       .then((request) => request(this.axios, this.basePath));

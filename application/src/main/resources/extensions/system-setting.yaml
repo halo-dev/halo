@@ -17,9 +17,13 @@ spec:
         - $formkit: attachment
           label: Logo
           name: logo
+          accepts:
+            - 'image/*'
         - $formkit: attachment
           label: Favicon
           name: favicon
+          accepts:
+            - 'image/*'
     - group: post
       label: 文章设置
       formSchema:
