@@ -3,8 +3,6 @@ import {
   VButton,
   VDescription,
   VDescriptionItem,
-  VDropdown,
-  VDropdownItem,
   VModal,
   VSpace,
 } from "@halo-dev/components";
@@ -38,7 +36,9 @@ const emit = defineEmits<{
 }>();
 
 const { groups } = useFetchAttachmentGroup();
-const { handleCopy } = useAttachmentPermalinkCopy(toRef(props, "attachment"));
+const { handleCopy, htmlText, markdownText } = useAttachmentPermalinkCopy(
+  toRef(props, "attachment")
+);
 
 const onlyPreview = ref(false);
 
@@ -192,27 +192,59 @@ const onVisibleChange = (visible: boolean) => {
             :label="$t('core.attachment.detail_modal.fields.permalink')"
           >
             <div class="space-y-4">
-              <a
-                class="block"
-                target="_blank"
-                :href="attachment?.status?.permalink"
-              >
-                {{ attachment?.status?.permalink }}
-              </a>
-              <VDropdown class="inline-block">
-                <VButton size="sm">复制</VButton>
-                <template #popper>
-                  <VDropdownItem @click="handleCopy('url')">
-                    链接
-                  </VDropdownItem>
-                  <VDropdownItem @click="handleCopy('html')">
-                    HTML 格式
-                  </VDropdownItem>
-                  <VDropdownItem @click="handleCopy('markdown')">
-                    Markdown 格式
-                  </VDropdownItem>
-                </template>
-              </VDropdown>
+              <ul class="flex flex-col space-y-2">
+                <li>
+                  <div
+                    class="flex w-full cursor-pointer items-center justify-between space-x-3 rounded border p-3 hover:border-primary"
+                  >
+                    <div
+                      class="flex flex-1 text-xs font-semibold text-gray-900"
+                    >
+                      <a target="_blank" :href="attachment?.status?.permalink">
+                        {{ attachment?.status?.permalink }}
+                      </a>
+                    </div>
+                    <div>
+                      <VButton size="sm" @click="handleCopy('url')">
+                        {{ $t("core.common.buttons.copy") }}
+                      </VButton>
+                    </div>
+                  </div>
+                </li>
+
+                <li>
+                  <div
+                    class="flex w-full cursor-pointer items-center justify-between space-x-3 rounded border p-3 hover:border-primary"
+                  >
+                    <div
+                      class="flex flex-1 text-xs font-semibold text-gray-900"
+                    >
+                      {{ htmlText }}
+                    </div>
+                    <div>
+                      <VButton size="sm" @click="handleCopy('html')">
+                        {{ $t("core.common.buttons.copy") }}
+                      </VButton>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div
+                    class="flex w-full cursor-pointer items-center justify-between space-x-3 rounded border p-3 hover:border-primary"
+                  >
+                    <div
+                      class="flex flex-1 text-xs font-semibold text-gray-900"
+                    >
+                      {{ markdownText }}
+                    </div>
+                    <div>
+                      <VButton size="sm" @click="handleCopy('markdown')">
+                        {{ $t("core.common.buttons.copy") }}
+                      </VButton>
+                    </div>
+                  </div>
+                </li>
+              </ul>
             </div>
           </VDescriptionItem>
         </VDescription>

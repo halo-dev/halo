@@ -1,5 +1,5 @@
 import type { Attachment, Group, Policy, User } from "@halo-dev/api-client";
-import type { Ref } from "vue";
+import { computed, type Ref } from "vue";
 import { ref, watch } from "vue";
 import type { AttachmentLike } from "@halo-dev/console-shared";
 import { apiClient } from "@/utils/api-client";
@@ -339,57 +339,66 @@ export function useAttachmentPermalinkCopy(
   attachment: Ref<Attachment | undefined>
 ) {
   const { copy } = useClipboard();
+  const { t } = useI18n();
+
+  const mediaType = computed(() => {
+    return attachment.value?.spec.mediaType;
+  });
+
+  const isImage = computed(() => {
+    return mediaType.value && matchMediaType(mediaType.value, "image/*");
+  });
+
+  const isVideo = computed(() => {
+    return mediaType.value && matchMediaType(mediaType.value, "video/*");
+  });
+
+  const isAudio = computed(() => {
+    return mediaType.value && matchMediaType(mediaType.value, "audio/*");
+  });
+
+  const htmlText = computed(() => {
+    const { permalink } = attachment.value?.status || {};
+    const { displayName } = attachment.value?.spec || {};
+
+    if (isImage.value) {
+      return `<img src="${permalink}" alt="${displayName}">`;
+    } else if (isVideo.value) {
+      return `<video src="${permalink}"></video>`;
+    } else if (isAudio.value) {
+      return `<audio src="${permalink}"></audio>`;
+    }
+    return `<a href="${permalink}">${displayName}</a>`;
+  });
+
+  const markdownText = computed(() => {
+    const { permalink } = attachment.value?.status || {};
+    const { displayName } = attachment.value?.spec || {};
+    if (isImage.value) {
+      return `![${displayName}](${permalink})`;
+    }
+    return `[${displayName}](${permalink})`;
+  });
 
   const handleCopy = (format: "markdown" | "html" | "url") => {
     const { permalink } = attachment.value?.status || {};
-    const { displayName, mediaType } = attachment.value?.spec || {};
-
-    const isImage = mediaType && matchMediaType(mediaType, "image/*");
-    const isVideo = mediaType && matchMediaType(mediaType, "video/*");
-    const isAudio = mediaType && matchMediaType(mediaType, "audio/*");
 
     if (!permalink) return;
 
     if (format === "url") {
       copy(permalink);
-      return;
+    } else if (format === "markdown") {
+      copy(markdownText.value);
+    } else if (format === "html") {
+      copy(htmlText.value);
     }
 
-    if (format === "markdown") {
-      const text =
-        mediaType && isImage
-          ? `![${displayName}](${permalink})`
-          : `[${displayName}](${permalink})`;
-      copy(text);
-      return;
-    }
-
-    if (format === "html") {
-      if (!mediaType) {
-        copy(`<a href="${permalink}">${displayName}</a>`);
-        return;
-      }
-
-      if (isImage) {
-        copy(`<img src="${permalink}" alt="${displayName}">`);
-        return;
-      }
-
-      if (isVideo) {
-        copy(`<video src="${permalink}"></video>`);
-        return;
-      }
-
-      if (isAudio) {
-        copy(`<audio src="${permalink}"></audio>`);
-        return;
-      }
-
-      copy(`<a href="${permalink}">${displayName}</a>`);
-    }
+    Toast.success(t("core.common.toast.copy_success"));
   };
 
   return {
+    htmlText,
+    markdownText,
     handleCopy,
   };
 }
