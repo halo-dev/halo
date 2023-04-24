@@ -12,6 +12,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.comparator.Comparators;
 import reactor.core.publisher.Flux;
@@ -35,8 +36,11 @@ import run.halo.app.theme.finders.vo.ExtensionVoOperator;
 import run.halo.app.theme.finders.vo.ReplyVo;
 
 /**
+ * comment public query service implementation.
+ *
  * @author LIlGG
  */
+@Component
 @RequiredArgsConstructor
 public class CommentPublicQueryServiceImpl implements CommentPublicQueryService {
 
@@ -59,7 +63,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     public Mono<ListResult<CommentVo>> list(Ref ref, Integer page, Integer size,
         Comparator<Comment> comparator) {
         final Comparator<Comment> commentComparator =
-            ObjectUtils.defaultIfNull(defaultComparator().thenComparing(comparator),
+            ObjectUtils.defaultIfNull(comparator.thenComparing(defaultComparator()),
                 defaultComparator());
         return fixedCommentPredicate(ref)
             .flatMap(fixedPredicate ->

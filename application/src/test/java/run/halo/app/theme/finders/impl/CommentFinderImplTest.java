@@ -156,7 +156,7 @@ class CommentFinderImplTest {
             var result = Stream.of(comment1, comment2, comment3, comment4, comment5, comment6,
                     comment7, comment8, comment9, comment10, comment11, comment12, comment13,
                     comment14)
-                .sorted(CommentFinderImpl.defaultComparator())
+                .sorted(CommentPublicQueryServiceImpl.defaultComparator())
                 .map(Comment::getMetadata)
                 .map(MetadataOperator::getName)
                 .collect(Collectors.joining(", "));

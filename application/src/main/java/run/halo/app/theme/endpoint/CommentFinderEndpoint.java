@@ -11,7 +11,11 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.schema.Builder;
@@ -19,6 +23,7 @@ import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.comparator.Comparators;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -42,6 +47,7 @@ import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.IpAddressUtils;
 import run.halo.app.theme.finders.CommentFinder;
+import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.CommentVo;
 import run.halo.app.theme.finders.vo.ReplyVo;
 
@@ -52,7 +58,7 @@ import run.halo.app.theme.finders.vo.ReplyVo;
 @RequiredArgsConstructor
 public class CommentFinderEndpoint implements CustomEndpoint {
 
-    private final CommentFinder commentFinder;
+    private final CommentPublicQueryService commentPublicQueryService;
     private final CommentService commentService;
     private final ReplyService replyService;
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
@@ -186,14 +192,16 @@ public class CommentFinderEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> listComments(ServerRequest request) {
         CommentQuery commentQuery = new CommentQuery(request.queryParams());
-        return commentFinder.list(commentQuery.toRef(), commentQuery.getPage(),
-                commentQuery.getSize())
+        Comparator<Comment> comparator =
+            CommentSorter.from(commentQuery.getSort(), commentQuery.getSortOrder());
+        return commentPublicQueryService.list(commentQuery.toRef(), commentQuery.getPage(),
+                commentQuery.getSize(), comparator)
             .flatMap(list -> ServerResponse.ok().bodyValue(list));
     }
 
     Mono<ServerResponse> getComment(ServerRequest request) {
         String name = request.pathVariable("name");
-        return Mono.defer(() -> Mono.justOrEmpty(commentFinder.getByName(name)))
+        return Mono.defer(() -> Mono.justOrEmpty(commentPublicQueryService.getByName(name)))
             .subscribeOn(Schedulers.boundedElastic())
             .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
     }
@@ -202,7 +210,8 @@ public class CommentFinderEndpoint implements CustomEndpoint {
         String commentName = request.pathVariable("name");
         IListRequest.QueryListRequest queryParams =
             new IListRequest.QueryListRequest(request.queryParams());
-        return commentFinder.listReply(commentName, queryParams.getPage(), queryParams.getSize())
+        return commentPublicQueryService.listReply(commentName, queryParams.getPage(),
+                queryParams.getSize())
             .flatMap(list -> ServerResponse.ok().bodyValue(list));
     }
 
@@ -250,6 +259,23 @@ public class CommentFinderEndpoint implements CustomEndpoint {
             return name;
         }
 
+        @Schema(description = "Comment collation.")
+        public CommentSorter getSort() {
+            String sort = queryParams.getFirst("sort");
+            return CommentSorter.convertFrom(sort);
+        }
+
+        @Schema(description = "ascending order If it is true; otherwise, it is in descending "
+            + "order.")
+        public Boolean getSortOrder() {
+            String sortOrder = queryParams.getFirst("sortOrder");
+            return convertBooleanOrNull(sortOrder);
+        }
+
+        private Boolean convertBooleanOrNull(String value) {
+            return StringUtils.isBlank(value) ? null : Boolean.parseBoolean(value);
+        }
+
         Ref toRef() {
             Ref ref = new Ref();
             ref.setGroup(getGroup());
@@ -280,6 +306,49 @@ public class CommentFinderEndpoint implements CustomEndpoint {
         @JsonIgnore
         public List<String> getFieldSelector() {
             throw new UnsupportedOperationException("Unsupported this parameter");
+        }
+    }
+
+    public enum CommentSorter {
+        CREATE_TIME;
+
+        static final Function<Comment, String> name = comment -> comment.getMetadata().getName();
+
+        static Comparator<Comment> from(CommentSorter sorter, Boolean ascending) {
+            if (Objects.equals(true, ascending)) {
+                return from(sorter);
+            }
+            return from(sorter).reversed();
+        }
+
+        static Comparator<Comment> from(CommentSorter sorter) {
+            if (sorter == null) {
+                return createTimeComparator();
+            }
+            if (CREATE_TIME.equals(sorter)) {
+                Function<Comment, Instant> comparatorFunc =
+                    comment -> comment.getSpec().getCreationTime();
+                return Comparator.comparing(comparatorFunc, Comparators.nullsLow())
+                    .thenComparing(name);
+            }
+
+            throw new IllegalStateException("Unsupported sort value: " + sorter);
+        }
+
+        static CommentSorter convertFrom(String sort) {
+            for (CommentSorter sorter : values()) {
+                if (sorter.name().equalsIgnoreCase(sort)) {
+                    return sorter;
+                }
+            }
+            return null;
+        }
+
+        static Comparator<Comment> createTimeComparator() {
+            Function<Comment, Instant> comparatorFunc =
+                comment -> comment.getSpec().getCreationTime();
+            return Comparator.comparing(comparatorFunc, Comparators.nullsLow())
+                .thenComparing(name);
         }
     }
 }
