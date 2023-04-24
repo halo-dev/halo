@@ -7,23 +7,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.pf4j.PluginWrapper;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.service.PluginService;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -107,18 +104,23 @@ public class PluginServiceImpl implements PluginService {
             return client.fetch(Plugin.class, name)
                 .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
                     "The given plugin with name " + name + " was not found.")))
-                // delete the plugin and wait for the deletion
-                .then(Mono.defer(() -> deletePluginAndWaitForComplete(name)))
                 // copy plugin into plugin home
                 .flatMap(prevPlugin -> copyToPluginHome(pluginInPath)
-                    .map(pluginFinder::find)
+                    .map(targetPluginPath -> {
+                        // reload plugin from the new path
+                        pluginManager.reloadPlugin(name);
+                        return pluginInPath;
+                    })
                     // reset enabled spec
-                    .doOnNext(pluginToCreate -> {
+                    .doOnNext(pluginToUpdate -> {
                         var enabled = prevPlugin.getSpec().getEnabled();
-                        pluginToCreate.getSpec().setEnabled(enabled);
-                    }))
-                // create the plugin
-                .flatMap(client::create);
+                        pluginToUpdate.getSpec().setEnabled(enabled);
+                        pluginToUpdate.getMetadata()
+                            .setVersion(prevPlugin.getMetadata().getVersion());
+                    })
+                )
+                // update the plugin
+                .flatMap(client::update);
         });
     }
 
@@ -150,7 +152,7 @@ public class PluginServiceImpl implements PluginService {
     private Mono<Path> copyToPluginHome(Plugin plugin) {
         return Mono.fromCallable(
                 () -> {
-                    var fileName = plugin.generateFileName();
+                    var fileName = generateFileName(plugin);
                     var pluginRoot = Paths.get(pluginProperties.getPluginsRoot());
                     try {
                         Files.createDirectories(pluginRoot);
@@ -168,24 +170,16 @@ public class PluginServiceImpl implements PluginService {
             .subscribeOn(Schedulers.boundedElastic());
     }
 
-    private Mono<Plugin> deletePluginAndWaitForComplete(String pluginName) {
-        return client.fetch(Plugin.class, pluginName)
-            .flatMap(client::delete)
-            .flatMap(plugin -> waitForDeleted(pluginName).thenReturn(plugin));
+    static String generateFileName(Plugin plugin) {
+        Assert.notNull(plugin, "The plugin must not be null.");
+        Assert.notNull(plugin.getMetadata(), "The plugin metadata must not be null.");
+        Assert.notNull(plugin.getSpec(), "The plugin spec must not be null.");
+        String version = plugin.getSpec().getVersion();
+        if (StringUtils.isBlank(version)) {
+            throw new ServerWebInputException("The plugin version must not be blank.");
+        }
+        return String.format("%s-%s.jar", plugin.getMetadata().getName(), version);
     }
-
-    private Mono<Void> waitForDeleted(String pluginName) {
-        return Mono.defer(() -> client.fetch(Plugin.class, pluginName)
-                .flatMap(plugin -> Mono.error(
-                    new RetryException("Re-check if the plugin is deleted successfully"))))
-            .retryWhen(Retry.fixedDelay(20, Duration.ofMillis(100))
-                .filter(t -> t instanceof RetryException)
-            )
-            .onErrorMap(Exceptions::isRetryExhausted,
-                t -> new ServerErrorException("Wait timeout for plugin deleted", t))
-            .then();
-    }
-
 
     private void satisfiesRequiresVersion(Plugin newPlugin) {
         Assert.notNull(newPlugin, "The plugin must not be null.");

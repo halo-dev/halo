@@ -136,9 +136,4 @@ public class Plugin extends AbstractExtension {
 
         private String website;
     }
-
-    @JsonIgnore
-    public String generateFileName() {
-        return String.format("%s-%s.jar", getMetadata().getName(), spec.getVersion());
-    }
 }
