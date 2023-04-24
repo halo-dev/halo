@@ -3,6 +3,7 @@ import theme from "./theme";
 import { zh, en } from "@formkit/i18n";
 import type { DefaultConfigOptions } from "@formkit/vue";
 import { form } from "./inputs/form";
+import { group } from "./inputs/group";
 import { attachment } from "./inputs/attachment";
 import { code } from "./inputs/code";
 import { repeater } from "./inputs/repeater";
@@ -20,14 +21,21 @@ import { roleSelect } from "./inputs/role-select";
 import radioAlt from "./plugins/radio-alt";
 import stopImplicitSubmission from "./plugins/stop-implicit-submission";
 import passwordPreventAutocomplete from "./plugins/password-prevent-autocomplete";
+import requiredAsterisk from "./plugins/required-asterisk";
 
 const config: DefaultConfigOptions = {
   config: {
     classes: generateClasses(theme),
   },
-  plugins: [radioAlt, stopImplicitSubmission, passwordPreventAutocomplete],
+  plugins: [
+    radioAlt,
+    stopImplicitSubmission,
+    passwordPreventAutocomplete,
+    requiredAsterisk,
+  ],
   inputs: {
     form,
+    group,
     attachment,
     code,
     repeater,

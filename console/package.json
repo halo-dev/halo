@@ -15,7 +15,7 @@
     "test:e2e": "start-server-and-test preview http://127.0.0.1:5050/ 'cypress open'",
     "test:e2e:ci": "start-server-and-test preview http://127.0.0.1:5050/ 'cypress run'",
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false && pnpm run typecheck:packages",
-    "lint": "eslint ./src --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore && pnpm run lint:packages",
+    "lint": "eslint ./src --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore --max-warnings=0 && pnpm run lint:packages",
     "prettier": "prettier --write './src/**/*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}' && pnpm run prettier:packages",
     "typecheck:packages": "pnpm --parallel --filter \"./packages/**\" run typecheck",
     "lint:packages": "pnpm --parallel --filter \"./packages/**\" lint",
@@ -27,7 +27,7 @@
       "prettier --write"
     ],
     "*.{js,ts,vue,tsx,jsx}": [
-      "eslint --fix"
+      "eslint --fix --max-warnings=0"
     ]
   },
   "workspaces": [
@@ -46,7 +46,7 @@
     "@halo-dev/components": "workspace:*",
     "@halo-dev/console-shared": "workspace:*",
     "@halo-dev/richtext-editor": "0.0.0-alpha.22",
-    "@tanstack/vue-query": "^4.24.10",
+    "@tanstack/vue-query": "^4.29.1",
     "@tiptap/extension-character-count": "^2.0.0-beta.220",
     "@uppy/core": "^3.1.1",
     "@uppy/dashboard": "^3.3.1",

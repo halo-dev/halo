@@ -9,6 +9,8 @@ import {
   VAvatar,
   VButton,
   VCard,
+  VDescription,
+  VDescriptionItem,
   VPageHeader,
   VTabbar,
 } from "@halo-dev/components";
@@ -46,7 +48,6 @@ const { data: authProvider } = useQuery<AuthProvider>({
       });
     }
   },
-  refetchOnWindowFocus: false,
   enabled: computed(() => !!route.params.name),
 });
 
@@ -72,7 +73,6 @@ const { data: setting, refetch: handleFetchSettings } = useQuery<Setting>({
     );
     return data;
   },
-  refetchOnWindowFocus: false,
   enabled: computed(() => !!authProvider.value?.spec.settingRef?.name),
 });
 
@@ -93,7 +93,6 @@ const { data: configMap, refetch: handleFetchConfigMap } = useQuery({
     return data;
   },
   retry: 0,
-  refetchOnWindowFocus: false,
   onError: async () => {
     const data = {};
     data[group.value] = "";
@@ -167,82 +166,56 @@ const handleSaveConfigMap = async () => {
       </template>
       <div class="bg-white">
         <div v-if="activeTab === 'detail'">
-          <dl class="divide-y divide-gray-100">
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
+          <VDescription>
+            <VDescriptionItem
+              :label="
+                $t('core.identity_authentication.detail.fields.display_name')
+              "
+              :content="authProvider?.spec.displayName"
+            />
+            <VDescriptionItem
+              :label="
+                $t('core.identity_authentication.detail.fields.description')
+              "
+              :content="authProvider?.spec.description"
+            />
+            <VDescriptionItem
+              :label="$t('core.identity_authentication.detail.fields.website')"
             >
-              <dt class="text-sm font-medium text-gray-900">
-                {{
-                  $t("core.identity_authentication.detail.fields.display_name")
-                }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-                {{ authProvider?.spec.displayName }}
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
+              <a
+                v-if="authProvider?.spec.website"
+                :href="authProvider?.spec.website"
+                target="_blank"
+              >
+                {{ authProvider.spec.website }}
+              </a>
+              <span v-else>
+                {{ $t("core.common.text.none") }}
+              </span>
+            </VDescriptionItem>
+            <VDescriptionItem
+              :label="
+                $t('core.identity_authentication.detail.fields.help_page')
+              "
             >
-              <dt class="text-sm font-medium text-gray-900">
-                {{
-                  $t("core.identity_authentication.detail.fields.description")
-                }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-                {{ authProvider?.spec.description }}
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                {{ $t("core.identity_authentication.detail.fields.website") }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-                <a
-                  v-if="authProvider?.spec.website"
-                  :href="authProvider?.spec.website"
-                  target="_blank"
-                >
-                  {{ authProvider.spec.website }}
-                </a>
-                <span v-else>
-                  {{ $t("core.common.text.none") }}
-                </span>
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                {{ $t("core.identity_authentication.detail.fields.help_page") }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-                <a
-                  v-if="authProvider?.spec.helpPage"
-                  :href="authProvider?.spec.helpPage"
-                  target="_blank"
-                >
-                  {{ authProvider.spec.helpPage }}
-                </a>
-                <span v-else>{{ $t("core.common.text.none") }}</span>
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                {{
-                  $t(
-                    "core.identity_authentication.detail.fields.authentication_url"
-                  )
-                }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-3 sm:mt-0">
-                {{ authProvider?.spec.authenticationUrl }}
-              </dd>
-            </div>
-          </dl>
+              <a
+                v-if="authProvider?.spec.helpPage"
+                :href="authProvider?.spec.helpPage"
+                target="_blank"
+              >
+                {{ authProvider.spec.helpPage }}
+              </a>
+              <span v-else>{{ $t("core.common.text.none") }}</span>
+            </VDescriptionItem>
+            <VDescriptionItem
+              :label="
+                $t(
+                  'core.identity_authentication.detail.fields.authentication_url'
+                )
+              "
+              :content="authProvider?.spec.authenticationUrl"
+            />
+          </VDescription>
         </div>
         <div v-if="activeTab === 'setting'" class="bg-white p-4">
           <div>

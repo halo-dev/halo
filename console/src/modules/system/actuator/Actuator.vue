@@ -7,6 +7,8 @@ import {
   VCard,
   VButton,
   Toast,
+  VDescription,
+  VDescriptionItem,
 } from "@halo-dev/components";
 import { computed, onMounted, ref } from "vue";
 import type { Info, GlobalInfo, Startup } from "./types";
@@ -159,64 +161,39 @@ const handleDownloadLogfile = () => {
           </div>
         </div>
         <div class="border-t border-gray-200">
-          <dl class="divide-y divide-gray-100">
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                {{ $t("core.actuator.fields.external_url") }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                <span v-if="globalInfo?.externalUrl">
-                  {{ globalInfo?.externalUrl }}
-                </span>
-                <span v-else>
-                  {{ $t("core.actuator.fields_values.external_url.not_setup") }}
-                </span>
-                <VAlert
-                  v-if="!isExternalUrlValid"
-                  class="mt-3"
-                  type="warning"
-                  :title="$t('core.common.text.warning')"
-                  :closable="false"
-                >
-                  <template #description>
-                    {{ $t("core.actuator.alert.external_url_invalid") }}
-                  </template>
-                </VAlert>
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                {{ $t("core.actuator.fields.start_time") }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ formatDatetime(startup?.timeline.startTime) }}
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                {{ $t("core.actuator.fields.timezone") }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ globalInfo?.timeZone }}
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                {{ $t("core.actuator.fields.locale") }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ globalInfo?.locale }}
-              </dd>
-            </div>
-          </dl>
+          <VDescription>
+            <VDescriptionItem :label="$t('core.actuator.fields.external_url')">
+              <span v-if="globalInfo?.externalUrl">
+                {{ globalInfo?.externalUrl }}
+              </span>
+              <span v-else>
+                {{ $t("core.actuator.fields_values.external_url.not_setup") }}
+              </span>
+              <VAlert
+                v-if="!isExternalUrlValid"
+                class="mt-3"
+                type="warning"
+                :title="$t('core.common.text.warning')"
+                :closable="false"
+              >
+                <template #description>
+                  {{ $t("core.actuator.alert.external_url_invalid") }}
+                </template>
+              </VAlert>
+            </VDescriptionItem>
+            <VDescriptionItem
+              :label="$t('core.actuator.fields.start_time')"
+              :content="formatDatetime(startup?.timeline.startTime)"
+            />
+            <VDescriptionItem
+              :label="$t('core.actuator.fields.timezone')"
+              :content="globalInfo?.timeZone"
+            />
+            <VDescriptionItem
+              :label="$t('core.actuator.fields.locale')"
+              :content="globalInfo?.locale"
+            />
+          </VDescription>
         </div>
       </div>
     </VCard>
@@ -232,91 +209,55 @@ const handleDownloadLogfile = () => {
           </div>
         </div>
         <div class="border-t border-gray-200">
-          <dl class="divide-y divide-gray-100">
-            <div
+          <VDescription>
+            <VDescriptionItem
               v-if="info.build"
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
+              :label="$t('core.actuator.fields.version')"
             >
-              <dt class="text-sm font-medium text-gray-900">
-                {{ $t("core.actuator.fields.version") }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                <a
-                  :href="`https://github.com/halo-dev/halo/releases/tag/v${info.build.version}`"
-                  class="hover:text-gray-600"
-                  target="_blank"
-                >
-                  {{ info.build.version }}
-                </a>
-              </dd>
-            </div>
-            <div
+              <a
+                :href="`https://github.com/halo-dev/halo/releases/tag/v${info.build.version}`"
+                class="hover:text-gray-600"
+                target="_blank"
+              >
+                {{ info.build.version }}
+              </a>
+            </VDescriptionItem>
+            <VDescriptionItem
               v-if="info.build"
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
+              :label="$t('core.actuator.fields.build_time')"
+              :content="formatDatetime(info.build.time)"
+            />
+            <VDescriptionItem v-if="info.git" label="Git Commit">
+              <a
+                :href="`https://github.com/halo-dev/halo/commit/${info.git.commit.id}`"
+                class="hover:text-gray-600"
+                target="_blank"
+              >
+                {{ info.git.commit.id }}
+              </a>
+            </VDescriptionItem>
+            <VDescriptionItem
+              label="Java"
+              :content="
+                [info.java.runtime.name, info.java.runtime.version].join(' / ')
+              "
+            />
+            <VDescriptionItem
+              :label="$t('core.actuator.fields.database')"
+              :content="[info.database.name, info.database.version].join(' / ')"
+            />
+            <VDescriptionItem :label="$t('core.actuator.fields.os')">
+              {{ info.os.name }} {{ info.os.version }} / {{ info.os.arch }}
+            </VDescriptionItem>
+            <VDescriptionItem
+              :label="$t('core.actuator.fields.log')"
+              vertical-center
             >
-              <dt class="text-sm font-medium text-gray-900">
-                {{ $t("core.actuator.fields.build_time") }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ formatDatetime(info.build.time) }}
-              </dd>
-            </div>
-            <div
-              v-if="info.git"
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">Git Commit</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                <a
-                  :href="`https://github.com/halo-dev/halo/commit/${info.git.commit.id}`"
-                  class="hover:text-gray-600"
-                  target="_blank"
-                >
-                  {{ info.git.commit.id }}
-                </a>
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">Java</dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ info.java.runtime.name }} / {{ info.java.runtime.version }}
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                {{ $t("core.actuator.fields.database") }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ [info.database.name, info.database.version].join(" / ") }}
-              </dd>
-            </div>
-            <div
-              class="bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                {{ $t("core.actuator.fields.os") }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                {{ info.os.name }} {{ info.os.version }} / {{ info.os.arch }}
-              </dd>
-            </div>
-            <div
-              class="items-center bg-white px-4 py-5 hover:bg-gray-50 sm:grid sm:grid-cols-6 sm:gap-4 sm:px-6"
-            >
-              <dt class="text-sm font-medium text-gray-900">
-                {{ $t("core.actuator.fields.log") }}
-              </dt>
-              <dd class="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                <VButton size="sm" @click="handleDownloadLogfile()">
-                  {{ $t("core.common.buttons.download") }}
-                </VButton>
-              </dd>
-            </div>
-          </dl>
+              <VButton size="sm" @click="handleDownloadLogfile()">
+                {{ $t("core.common.buttons.download") }}
+              </VButton>
+            </VDescriptionItem>
+          </VDescription>
         </div>
       </div>
     </VCard>
