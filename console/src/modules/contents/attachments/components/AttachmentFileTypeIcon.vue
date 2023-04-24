@@ -109,7 +109,7 @@ const iconClass = computed(() => {
     <component :is="getIcon" :class="iconClass" />
     <span
       v-if="getExtname && displayExt"
-      class="font-sans text-xs text-gray-500"
+      class="select-none font-sans text-xs text-gray-500"
     >
       {{ getExtname }}
     </span>

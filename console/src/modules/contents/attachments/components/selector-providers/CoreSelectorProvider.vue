@@ -22,13 +22,20 @@ import AttachmentUploadModal from "../AttachmentUploadModal.vue";
 import AttachmentFileTypeIcon from "../AttachmentFileTypeIcon.vue";
 import AttachmentDetailModal from "../AttachmentDetailModal.vue";
 import AttachmentGroupList from "../AttachmentGroupList.vue";
+import { matchMediaTypes } from "@/utils/media-type";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     selected: AttachmentLike[];
+    accepts?: string[];
+    min?: number;
+    max?: number;
   }>(),
   {
     selected: () => [],
+    accepts: () => ["*/*"],
+    min: undefined,
+    max: undefined,
   }
 );
 
@@ -65,6 +72,23 @@ watchEffect(() => {
 const handleOpenDetail = (attachment: Attachment) => {
   selectedAttachment.value = attachment;
   detailVisible.value = true;
+};
+
+const isDisabled = (attachment: Attachment) => {
+  const isMatchMediaType = matchMediaTypes(
+    attachment.spec.mediaType || "*/*",
+    props.accepts
+  );
+
+  if (
+    props.max !== undefined &&
+    props.max <= selectedAttachments.value.size &&
+    !isChecked(attachment)
+  ) {
+    return true;
+  }
+
+  return !isMatchMediaType;
 };
 </script>
 <template>
@@ -111,6 +135,8 @@ const handleOpenDetail = (attachment: Attachment) => {
       :body-class="['!p-0']"
       :class="{
         'ring-1 ring-primary': isChecked(attachment),
+        'pointer-events-none !cursor-not-allowed opacity-50':
+          isDisabled(attachment),
       }"
       class="hover:shadow"
       @click.stop="handleSelect(attachment)"

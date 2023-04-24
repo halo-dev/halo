@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { VButton, VModal, VTabbar } from "@halo-dev/components";
-import { ref, markRaw, onMounted } from "vue";
+import { VButton, VModal, VSpace, VTabbar } from "@halo-dev/components";
+import { ref, markRaw, onMounted, computed } from "vue";
 import CoreSelectorProvider from "./selector-providers/CoreSelectorProvider.vue";
 import type {
   AttachmentLike,
@@ -12,12 +12,18 @@ import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     visible: boolean;
+    accepts?: string[];
+    min?: number;
+    max?: number;
   }>(),
   {
     visible: false,
+    accepts: () => ["*/*"],
+    min: undefined,
+    max: undefined,
   }
 );
 
@@ -84,6 +90,20 @@ const handleConfirm = () => {
   emit("select", Array.from(selected.value));
   onVisibleChange(false);
 };
+
+const confirmDisabled = computed(() => {
+  if (props.min === undefined) {
+    return false;
+  }
+  return selected.value.length < props.min;
+});
+
+const confirmCountMessage = computed(() => {
+  if (!props.min && !props.max) {
+    return selected.value.length;
+  }
+  return `${selected.value.length} / ${props.max || props.min}`;
+});
 </script>
 <template>
   <VModal
@@ -112,6 +132,9 @@ const handleConfirm = () => {
             :is="provider.component"
             v-if="activeId === provider.id"
             v-model:selected="selected"
+            :accepts="accepts"
+            :min="min"
+            :max="max"
             @change-provider="onChangeProvider"
           ></component>
           <template #fallback>
@@ -121,16 +144,25 @@ const handleConfirm = () => {
       </template>
     </div>
     <template #footer>
-      <VButton type="secondary" @click="handleConfirm">
-        {{ $t("core.common.buttons.confirm") }}
-        <span v-if="selected.length">
-          {{
-            $t("core.attachment.select_modal.operations.select.result", {
-              count: selected.length,
-            })
-          }}
-        </span>
-      </VButton>
+      <VSpace>
+        <VButton
+          type="secondary"
+          :disabled="confirmDisabled"
+          @click="handleConfirm"
+        >
+          {{ $t("core.common.buttons.confirm") }}
+          <span v-if="selected.length || props.min || props.max">
+            {{
+              $t("core.attachment.select_modal.operations.select.result", {
+                count: confirmCountMessage,
+              })
+            }}
+          </span>
+        </VButton>
+        <VButton @click="onVisibleChange(false)">
+          {{ $t("core.common.buttons.cancel") }}
+        </VButton>
+      </VSpace>
     </template>
   </VModal>
 </template>
