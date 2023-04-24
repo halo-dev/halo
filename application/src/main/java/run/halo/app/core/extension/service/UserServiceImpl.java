@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
@@ -145,12 +146,14 @@ public class UserServiceImpl implements UserService {
                 }
                 String encodedPassword = passwordEncoder.encode(password);
                 user.getSpec().setPassword(encodedPassword);
-                return createNewUser(user, defaultRole);
+                return createUser(user, Set.of(defaultRole));
             });
     }
 
-    private Mono<User> createNewUser(User user, String defaultRole) {
+    @Override
+    public Mono<User> createUser(User user, Set<String> roleNames) {
         Assert.notNull(user, "User must not be null");
+        Assert.notNull(roleNames, "Roles must not be null");
         return client.fetch(User.class, user.getMetadata().getName())
             .hasElement()
             .flatMap(hasUser -> {
@@ -160,10 +163,17 @@ public class UserServiceImpl implements UserService {
                             "problemDetail.user.duplicateName",
                             new Object[] {user.getMetadata().getName()}));
                 }
-                return client.create(user)
-                    .flatMap(newUser -> grantRoles(user.getMetadata().getName(),
-                        Set.of(defaultRole))
-                    );
-            });
+                // Check if all roles exist
+                return Flux.fromIterable(roleNames)
+                    .flatMap(roleName -> client.fetch(Role.class, roleName)
+                        .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
+                            "Role [" + roleName + "] is not found."))
+                        )
+                    )
+                    .then();
+            })
+            .then(Mono.defer(() -> client.create(user)
+                .flatMap(newUser -> grantRoles(user.getMetadata().getName(), roleNames)))
+            );
     }
 }

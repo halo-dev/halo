@@ -120,7 +120,7 @@ const handleChangePassword = async () => {
         "
         name="password_confirm"
         type="password"
-        validation="required|confirm|length:0,50"
+        validation="required|confirm|length:0,100"
       ></FormKit>
     </FormKit>
     <template #footer>

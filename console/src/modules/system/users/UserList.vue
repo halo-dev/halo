@@ -40,12 +40,14 @@ import { useFetchRole } from "../roles/composables/use-role";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import UserCreationModal from "./components/UserCreationModal.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 
 const checkedAll = ref(false);
 const editingModal = ref<boolean>(false);
+const creationModal = ref<boolean>(false);
 const passwordChangeModal = ref<boolean>(false);
 const grantPermissionModal = ref<boolean>(false);
 
@@ -233,11 +235,6 @@ const handleOpenCreateModal = (user: User) => {
   editingModal.value = true;
 };
 
-const onEditingModalClose = () => {
-  routeQueryAction.value = undefined;
-  refetch();
-};
-
 const handleOpenPasswordChangeModal = (user: User) => {
   selectedUser.value = user;
   passwordChangeModal.value = true;
@@ -252,19 +249,17 @@ const handleOpenGrantPermissionModal = (user: User) => {
 const routeQueryAction = useRouteQuery<string | undefined>("action");
 
 onMounted(() => {
-  if (!routeQueryAction.value) {
-    return;
-  }
   if (routeQueryAction.value === "create") {
-    editingModal.value = true;
+    creationModal.value = true;
   }
 });
 </script>
 <template>
-  <UserEditingModal
-    v-model:visible="editingModal"
-    :user="selectedUser"
-    @close="onEditingModalClose"
+  <UserEditingModal v-model:visible="editingModal" :user="selectedUser" />
+
+  <UserCreationModal
+    v-model:visible="creationModal"
+    @close="routeQueryAction = undefined"
   />
 
   <UserPasswordChangeModal
@@ -305,7 +300,7 @@ onMounted(() => {
         <VButton
           v-permission="['system:users:manage']"
           type="secondary"
-          @click="editingModal = true"
+          @click="creationModal = true"
         >
           <template #icon>
             <IconAddCircle class="h-full w-full" />
