@@ -3,7 +3,6 @@ package run.halo.app.theme.finders.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -62,7 +61,7 @@ class SinglePageFinderImplTest {
         singlePage.getSpec().setDeleted(false);
         singlePage.getSpec().setVisible(Post.VisibleEnum.PUBLIC);
         singlePage.setStatus(new SinglePage.SinglePageStatus());
-        when(client.fetch(eq(SinglePage.class), eq(fakePageName)))
+        when(client.get(eq(SinglePage.class), eq(fakePageName)))
             .thenReturn(Mono.just(singlePage));
 
         when(counterService.getByName(anyString())).thenReturn(Mono.empty());
@@ -77,7 +76,7 @@ class SinglePageFinderImplTest {
             })
             .verifyComplete();
 
-        verify(client, times(1)).fetch(SinglePage.class, fakePageName);
+        verify(client).get(SinglePage.class, fakePageName);
         verify(counterService).getByName(anyString());
         verify(singlePageService).getReleaseContent(anyString());
         verify(contributorFinder).getContributor(anyString());

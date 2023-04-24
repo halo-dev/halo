@@ -1,5 +1,8 @@
 package run.halo.app.theme.finders.vo;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Value;
 
@@ -13,10 +16,12 @@ import lombok.Value;
 @Builder
 public class NavigationPostVo {
 
+    @Schema(requiredMode = NOT_REQUIRED)
     PostVo previous;
 
     PostVo current;
 
+    @Schema(requiredMode = NOT_REQUIRED)
     PostVo next;
 
     public boolean hasNext() {
