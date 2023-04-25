@@ -2,10 +2,9 @@ package run.halo.app.core.extension.service.impl;
 
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -25,7 +24,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -41,6 +39,7 @@ import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.exception.PluginAlreadyExistsException;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.plugin.HaloPluginManager;
+import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.YamlPluginFinder;
 
@@ -182,59 +181,49 @@ class PluginServiceImplTest {
                 .thenReturn(Mono.just(prevPlugin))
                 .thenReturn(Mono.empty());
 
+            when(client.get(Plugin.class, "fake-plugin"))
+                .thenReturn(Mono.just(prevPlugin));
+
             when(client.update(isA(Plugin.class))).thenReturn(Mono.just(updatedPlugin));
 
             var plugin = pluginService.upgrade("fake-plugin", fakePluginPath);
 
             StepVerifier.create(plugin)
-                .expectNext(updatedPlugin)
-                .verifyComplete();
+                .expectNext(updatedPlugin).verifyComplete();
 
             verify(client, times(1)).fetch(Plugin.class, "fake-plugin");
             verify(client, times(0)).delete(isA(Plugin.class));
             verify(client).<Plugin>update(argThat(p -> p.getSpec().getEnabled()));
-            verify(pluginManager).reloadPlugin(eq("fake-plugin"));
         }
     }
 
     @Test
-    void reload() throws IOException, URISyntaxException {
-        var fakePluginUri = requireNonNull(
-            getClass().getClassLoader().getResource("plugin/plugin-0.0.2")).toURI();
-        Path tempDirectory = Files.createTempDirectory("halo-ut-plugin-service-impl-");
-        Path fakePluginPath = tempDirectory.resolve("plugin-0.0.2.jar");
-        try {
-            FileUtils.jar(Paths.get(fakePluginUri), tempDirectory.resolve("plugin-0.0.2.jar"));
+    void reload() {
+        // given
+        String pluginName = "test-plugin";
+        PluginWrapper pluginWrapper = mock(PluginWrapper.class);
+        when(pluginManager.getPlugin(pluginName)).thenReturn(pluginWrapper);
+        when(pluginWrapper.getPluginPath())
+            .thenReturn(Paths.get("/tmp/plugins/fake-plugin.jar"));
+        Plugin plugin = new Plugin();
+        plugin.setMetadata(new Metadata());
+        plugin.getMetadata().setName(pluginName);
+        plugin.setSpec(new Plugin.PluginSpec());
+        when(client.get(Plugin.class, pluginName)).thenReturn(Mono.just(plugin));
+        when(client.update(plugin)).thenReturn(Mono.just(plugin));
 
-            final String pluginName = "fake-plugin";
-            PluginWrapper pluginWrapper = mock(PluginWrapper.class);
-            when(pluginManager.getPlugin(eq(pluginName))).thenReturn(pluginWrapper);
-            when(pluginWrapper.getPluginPath()).thenReturn(fakePluginPath);
+        // when
+        Mono<Plugin> result = pluginService.reload(pluginName);
 
-            Plugin plugin = new Plugin();
-            plugin.setMetadata(new Metadata());
-            plugin.getMetadata().setName(pluginName);
-            plugin.setSpec(new Plugin.PluginSpec());
-            plugin.getSpec().setEnabled(false);
-            plugin.getSpec().setDisplayName("Fake Plugin");
-
-            when(client.get(eq(Plugin.class), eq(pluginName))).thenReturn(Mono.just(plugin));
-            when(client.update(any(Plugin.class))).thenReturn(Mono.empty());
-
-            pluginService.reload(pluginName).block();
-
-            verify(pluginManager).reloadPlugin(eq(pluginName));
-            verify(client).get(eq(Plugin.class), eq(pluginName));
-
-            ArgumentCaptor<Plugin> captor = ArgumentCaptor.forClass(Plugin.class);
-            verify(client).update(captor.capture());
-
-            Plugin updatedPlugin = captor.getValue();
-            assertThat(updatedPlugin.getSpec().getEnabled()).isTrue();
-            assertThat(updatedPlugin.getSpec().getDisplayName()).isEqualTo("Fake Display Name");
-            assertThat(updatedPlugin.getSpec().getDescription()).isEqualTo("Fake description");
-        } finally {
-            FileUtils.deleteRecursivelyAndSilently(tempDirectory);
-        }
+        // then
+        assertDoesNotThrow(() -> result.block());
+        verify(client, times(1)).update(
+            argThat(p -> {
+                String reloadPath = p.getMetadata().getAnnotations().get(PluginConst.RELOAD_ANNO);
+                assertThat(reloadPath).isEqualTo("/tmp/plugins/fake-plugin.jar");
+                return true;
+            })
+        );
+        verify(pluginWrapper, times(1)).getPluginPath();
     }
 }

@@ -7,10 +7,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Objects;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.pf4j.PluginWrapper;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -23,6 +26,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.service.PluginService;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.exception.PluginAlreadyExistsException;
@@ -30,6 +34,7 @@ import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.VersionUtils;
 import run.halo.app.plugin.HaloPluginManager;
+import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.YamlPluginFinder;
 
@@ -93,11 +98,12 @@ public class PluginServiceImpl implements PluginService {
             // pre-check the plugin in the path
             final var pluginFinder = new YamlPluginFinder();
             final var pluginInPath = pluginFinder.find(path);
+            Validate.notNull(pluginInPath.statusNonNull().getLoadLocation());
             satisfiesRequiresVersion(pluginInPath);
             if (!Objects.equals(name, pluginInPath.getMetadata().getName())) {
                 return Mono.error(new ServerWebInputException(
                     "The provided plugin " + pluginInPath.getMetadata().getName()
-                    + " didn't match the given plugin " + name));
+                        + " didn't match the given plugin " + name));
             }
 
             // check if the plugin exists
@@ -105,22 +111,8 @@ public class PluginServiceImpl implements PluginService {
                 .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
                     "The given plugin with name " + name + " was not found.")))
                 // copy plugin into plugin home
-                .flatMap(prevPlugin -> copyToPluginHome(pluginInPath)
-                    .map(targetPluginPath -> {
-                        // reload plugin from the new path
-                        pluginManager.reloadPlugin(name);
-                        return pluginInPath;
-                    })
-                    // reset enabled spec
-                    .doOnNext(pluginToUpdate -> {
-                        var enabled = prevPlugin.getSpec().getEnabled();
-                        pluginToUpdate.getSpec().setEnabled(enabled);
-                        pluginToUpdate.getMetadata()
-                            .setVersion(prevPlugin.getMetadata().getVersion());
-                    })
-                )
-                // update the plugin
-                .flatMap(client::update);
+                .flatMap(prevPlugin -> copyToPluginHome(pluginInPath))
+                .flatMap(pluginPath -> updateReloadAnno(name, pluginPath));
         });
     }
 
@@ -131,15 +123,16 @@ public class PluginServiceImpl implements PluginService {
             return Mono.error(() -> new ServerWebInputException(
                 "The given plugin with name " + name + " was not found."));
         }
-        YamlPluginFinder yamlPluginFinder = new YamlPluginFinder();
-        Plugin newPlugin = yamlPluginFinder.find(pluginWrapper.getPluginPath());
-        // reload plugin
-        pluginManager.reloadPlugin(name);
+        return updateReloadAnno(name, pluginWrapper.getPluginPath());
+    }
+
+    private Mono<Plugin> updateReloadAnno(String name, Path pluginPath) {
         return client.get(Plugin.class, name)
             .flatMap(plugin -> {
-                newPlugin.getMetadata().setVersion(plugin.getMetadata().getVersion());
-                newPlugin.getSpec().setEnabled(true);
-                return client.update(newPlugin);
+                // add reload annotation to flag the plugin to be reloaded
+                Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(plugin);
+                annotations.put(PluginConst.RELOAD_ANNO, pluginPath.toString());
+                return client.update(plugin);
             });
     }
 
@@ -152,15 +145,7 @@ public class PluginServiceImpl implements PluginService {
     private Mono<Path> copyToPluginHome(Plugin plugin) {
         return Mono.fromCallable(
                 () -> {
-                    var fileName = generateFileName(plugin);
-                    var pluginRoot = Paths.get(pluginProperties.getPluginsRoot());
-                    try {
-                        Files.createDirectories(pluginRoot);
-                    } catch (IOException e) {
-                        throw Exceptions.propagate(e);
-                    }
-                    var pluginFilePath = pluginRoot.resolve(fileName);
-                    FileUtils.checkDirectoryTraversal(pluginRoot, pluginFilePath);
+                    Path pluginFilePath = resolvePluginPath(plugin);
                     // move the plugin jar file to the plugin root
                     // replace the old plugin jar file if exists
                     var path = Path.of(plugin.getStatus().getLoadLocation());
@@ -168,6 +153,20 @@ public class PluginServiceImpl implements PluginService {
                     return pluginFilePath;
                 })
             .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @NonNull
+    private Path resolvePluginPath(Plugin plugin) {
+        var fileName = generateFileName(plugin);
+        var pluginRoot = Paths.get(pluginProperties.getPluginsRoot());
+        try {
+            Files.createDirectories(pluginRoot);
+        } catch (IOException e) {
+            throw Exceptions.propagate(e);
+        }
+        var pluginFilePath = pluginRoot.resolve(fileName);
+        FileUtils.checkDirectoryTraversal(pluginRoot, pluginFilePath);
+        return pluginFilePath;
     }
 
     static String generateFileName(Plugin plugin) {
