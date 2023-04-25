@@ -2,8 +2,11 @@ package run.halo.app.theme.finders.impl;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Tag;
@@ -45,15 +48,24 @@ public class TagFinderImpl implements TagFinder {
 
     @Override
     public Mono<ListResult<TagVo>> list(Integer page, Integer size) {
-        return client.list(Tag.class, null,
-                DEFAULT_COMPARATOR.reversed(), pageNullSafe(page), sizeNullSafe(size))
+        return list(page, size, null, null);
+    }
+
+    @Override
+    public Mono<ListResult<TagVo>> list(@Nullable Integer page, @Nullable Integer size,
+        @Nullable Predicate<Tag> predicate, @Nullable Comparator<Tag> comparator) {
+        Comparator<Tag> comparatorToUse = Optional.ofNullable(comparator)
+            .orElse(DEFAULT_COMPARATOR.reversed());
+        return client.list(Tag.class, predicate,
+                comparatorToUse, pageNullSafe(page), sizeNullSafe(size))
             .map(list -> {
                 List<TagVo> tagVos = list.get()
                     .map(TagVo::from)
                     .collect(Collectors.toList());
                 return new ListResult<>(list.getPage(), list.getSize(), list.getTotal(), tagVos);
             })
-            .defaultIfEmpty(new ListResult<>(page, size, 0L, List.of()));
+            .defaultIfEmpty(
+                new ListResult<>(pageNullSafe(page), sizeNullSafe(size), 0L, List.of()));
     }
 
     @Override

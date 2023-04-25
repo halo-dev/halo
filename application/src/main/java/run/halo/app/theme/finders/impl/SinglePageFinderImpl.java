@@ -4,10 +4,12 @@ import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -50,7 +52,7 @@ public class SinglePageFinderImpl implements SinglePageFinder {
 
     @Override
     public Mono<SinglePageVo> getByName(String pageName) {
-        return client.fetch(SinglePage.class, pageName)
+        return client.get(SinglePage.class, pageName)
             .filter(FIXED_PREDICATE)
             .map(page -> {
                 SinglePageVo pageVo = SinglePageVo.from(page);
@@ -82,8 +84,19 @@ public class SinglePageFinderImpl implements SinglePageFinder {
 
     @Override
     public Mono<ListResult<ListedSinglePageVo>> list(Integer page, Integer size) {
-        return client.list(SinglePage.class, FIXED_PREDICATE,
-                defaultComparator(), pageNullSafe(page), sizeNullSafe(size))
+        return list(page, size, null, null);
+    }
+
+    @Override
+    public Mono<ListResult<ListedSinglePageVo>> list(@Nullable Integer page, @Nullable Integer size,
+        @Nullable Predicate<SinglePage> predicate, @Nullable Comparator<SinglePage> comparator) {
+        var predicateToUse = Optional.ofNullable(predicate)
+            .map(p -> p.and(FIXED_PREDICATE))
+            .orElse(FIXED_PREDICATE);
+        var comparatorToUse = Optional.ofNullable(comparator)
+            .orElse(defaultComparator());
+        return client.list(SinglePage.class, predicateToUse,
+                comparatorToUse, pageNullSafe(page), sizeNullSafe(size))
             .flatMap(list -> Flux.fromStream(list.get())
                 .map(singlePage -> {
                     ListedSinglePageVo pageVo = ListedSinglePageVo.from(singlePage);

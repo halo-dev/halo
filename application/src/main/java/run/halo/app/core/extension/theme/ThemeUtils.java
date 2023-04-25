@@ -149,8 +149,8 @@ class ThemeUtils {
             new YamlUnstructuredLoader(new FileSystemResource(themeManifestPath))
                 .load();
         if (CollectionUtils.isEmpty(unstructureds)) {
-            throw new IllegalArgumentException(
-                "The [theme.yaml] does not conform to the theme specification.");
+            throw new ThemeInstallationException("Missing theme manifest",
+                "problemDetail.theme.install.missingManifest", null);
         }
         return unstructureds.get(0);
     }

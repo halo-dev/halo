@@ -3,6 +3,7 @@ package run.halo.app.core.extension.endpoint;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
@@ -491,4 +492,24 @@ class UserEndpointTest {
         }
     }
 
+    @Test
+    void createWhenNameDuplicate() {
+        when(userService.createUser(any(User.class), anySet()))
+            .thenReturn(Mono.just(new User()));
+        when(userService.updateWithRawPassword(anyString(), anyString()))
+            .thenReturn(Mono.just(new User()));
+        var userRequest = new UserEndpoint.CreateUserRequest("fake-user",
+            "fake-email",
+            "",
+            "",
+            "",
+            "",
+            "",
+            Map.of(),
+            Set.of());
+        webClient.post().uri("/users")
+            .bodyValue(userRequest)
+            .exchange()
+            .expectStatus().isOk();
+    }
 }

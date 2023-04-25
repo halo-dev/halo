@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.attachment.Attachment;
 
 /**
- * AttachmentService
+ * AttachmentService.
  *
  * @author johnniang
  * @since 2.5.0
