@@ -4,6 +4,7 @@ package run.halo.app.theme.finders.impl;
 import java.security.Principal;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
@@ -63,8 +64,8 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     public Mono<ListResult<CommentVo>> list(Ref ref, Integer page, Integer size,
         Comparator<Comment> comparator) {
         final Comparator<Comment> commentComparator =
-            ObjectUtils.defaultIfNull(comparator.thenComparing(defaultComparator()),
-                defaultComparator());
+            Objects.isNull(comparator) ? defaultComparator()
+                : comparator.thenComparing(defaultComparator());
         return fixedCommentPredicate(ref)
             .flatMap(fixedPredicate ->
                 client.list(Comment.class, fixedPredicate,
