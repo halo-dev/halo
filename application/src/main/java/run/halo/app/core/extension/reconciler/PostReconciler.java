@@ -10,7 +10,7 @@ import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import run.halo.app.content.PostService;
@@ -21,6 +21,7 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
+import run.halo.app.event.post.PostVisibleChangedEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
 import run.halo.app.extension.MetadataUtil;
@@ -57,7 +58,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     private final PostPermalinkPolicy postPermalinkPolicy;
     private final CounterService counterService;
 
-    private final ApplicationContext applicationContext;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public Result reconcile(Request request) {
@@ -93,7 +94,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 && Objects.equals(false, post.getSpec().getPublish())) {
                 boolean success = unPublishReconcile(name);
                 if (success) {
-                    applicationContext.publishEvent(new PostUnpublishedEvent(this, name));
+                    eventPublisher.publishEvent(new PostUnpublishedEvent(this, name));
                 }
                 return;
             }
@@ -163,7 +164,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 status.setLastModifyTime(releasedSnapshotOpt.get().getSpec().getLastModifyTime());
 
                 client.update(post);
-                applicationContext.publishEvent(new PostPublishedEvent(this, name));
+                eventPublisher.publishEvent(new PostPublishedEvent(this, name));
             });
     }
 
@@ -231,8 +232,11 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             } else {
                 labels.put(Post.DELETED_LABEL, Boolean.FALSE.toString());
             }
+
+            fireVisibleChangedEventIfChanged(post);
             labels.put(Post.VISIBLE_LABEL,
                 Objects.requireNonNullElse(spec.getVisible(), Post.VisibleEnum.PUBLIC).name());
+
             labels.put(Post.OWNER_LABEL, spec.getOwner());
             Instant publishTime = post.getSpec().getPublishTime();
             if (publishTime != null) {
@@ -252,6 +256,23 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 client.update(post);
             }
         });
+    }
+
+    private void fireVisibleChangedEventIfChanged(Post post) {
+        var labels = post.getMetadata().getLabels();
+        if (labels == null) {
+            return;
+        }
+        var name = post.getMetadata().getName();
+        var oldVisibleStr = labels.get(Post.VISIBLE_LABEL);
+        if (oldVisibleStr != null) {
+            var oldVisible = Post.VisibleEnum.valueOf(oldVisibleStr);
+            var expectVisible = post.getSpec().getVisible();
+            if (!Objects.equals(oldVisible, expectVisible)) {
+                eventPublisher.publishEvent(
+                    new PostVisibleChangedEvent(name, oldVisible, expectVisible));
+            }
+        }
     }
 
     private void reconcileStatus(String name) {
