@@ -29,7 +29,6 @@ export function useFetchAttachmentPolicy(): useFetchAttachmentPolicyReturn {
       );
       return deletingPolicies?.length ? 1000 : false;
     },
-    refetchOnWindowFocus: false,
   });
 
   return {
@@ -47,7 +46,6 @@ export function useFetchAttachmentPolicyTemplate(): useFetchAttachmentPolicyTemp
         await apiClient.extension.storage.policyTemplate.liststorageHaloRunV1alpha1PolicyTemplate();
       return data.items;
     },
-    refetchOnWindowFocus: false,
   });
 
   return {

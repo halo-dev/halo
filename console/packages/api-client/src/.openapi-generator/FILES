@@ -89,6 +89,7 @@ models/contributor.ts
 models/counter-list.ts
 models/counter-request.ts
 models/counter.ts
+models/create-user-request.ts
 models/custom-templates.ts
 models/dashboard-stats.ts
 models/detailed-user.ts
@@ -118,7 +119,6 @@ models/listed-reply-list.ts
 models/listed-reply.ts
 models/listed-single-page-list.ts
 models/listed-single-page.ts
-models/listed-user-list.ts
 models/listed-user.ts
 models/login-history.ts
 models/menu-item-list.ts
@@ -201,6 +201,7 @@ models/theme.ts
 models/user-connection-list.ts
 models/user-connection-spec.ts
 models/user-connection.ts
+models/user-endpoint-listed-user-list.ts
 models/user-list.ts
 models/user-permission.ts
 models/user-spec.ts

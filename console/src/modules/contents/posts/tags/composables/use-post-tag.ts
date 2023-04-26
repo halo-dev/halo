@@ -36,7 +36,6 @@ export function usePostTag(): usePostTagReturn {
       );
       return abnormalTags?.length ? 3000 : false;
     },
-    refetchOnWindowFocus: false,
   });
 
   const handleDelete = async (tag: Tag) => {

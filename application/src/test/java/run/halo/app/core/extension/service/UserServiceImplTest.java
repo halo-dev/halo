@@ -458,6 +458,7 @@ class UserServiceImplTest {
 
             User fakeUser = fakeSignUpUser("fake-user", "fake-password");
 
+            when(client.fetch(eq(Role.class), anyString())).thenReturn(Mono.just(new Role()));
             when(client.create(any(User.class))).thenReturn(Mono.just(fakeUser));
             UserServiceImpl spyUserService = spy(userService);
             doReturn(Mono.just(fakeUser)).when(spyUserService).grantRoles(eq("fake-user"),

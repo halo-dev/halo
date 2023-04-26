@@ -1,7 +1,7 @@
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 plugins {
-    id 'org.springframework.boot' version '3.0.5' apply false
+    id 'org.springframework.boot' version '3.0.6' apply false
     id 'java-platform'
     id 'halo.publish'
     id 'signing'

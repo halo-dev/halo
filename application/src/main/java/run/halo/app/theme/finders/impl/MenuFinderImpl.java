@@ -19,6 +19,7 @@ import run.halo.app.core.extension.MenuItem;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.MenuFinder;
 import run.halo.app.theme.finders.vo.MenuItemVo;
@@ -41,7 +42,9 @@ public class MenuFinderImpl implements MenuFinder {
     public Mono<MenuVo> getByName(String name) {
         return listAsTree()
             .filter(menu -> menu.getMetadata().getName().equals(name))
-            .next();
+            .next()
+            .switchIfEmpty(Mono.error(
+                () -> new NotFoundException("Menu with name " + name + " not found")));
     }
 
     @Override
@@ -59,7 +62,10 @@ public class MenuFinderImpl implements MenuFinder {
                         .orElse(menuVos.get(0))
                     )
                     .defaultIfEmpty(menuVos.get(0));
-            });
+            })
+            .switchIfEmpty(
+                Mono.error(() -> new NotFoundException("No primary menu found"))
+            );
     }
 
     Flux<MenuVo> listAll() {

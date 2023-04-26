@@ -458,6 +458,7 @@ const { handleGenerateSlug } = useSlugify(
               :label="$t('core.page.settings.fields.cover.label')"
               type="attachment"
               name="cover"
+              :accepts="['image/*']"
               validation="length:0,1024"
             ></FormKit>
           </div>

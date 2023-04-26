@@ -78,7 +78,6 @@ const { data: setting } = useQuery<Setting>({
     });
     return data;
   },
-  refetchOnWindowFocus: false,
   enabled: computed(() => {
     return (
       !!selectedTheme.value &&

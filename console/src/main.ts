@@ -21,15 +21,15 @@ import { useThemeStore } from "./stores/theme";
 import { useSystemStatesStore } from "./stores/system-states";
 import { useUserStore } from "./stores/user";
 import { useSystemConfigMapStore } from "./stores/system-configmap";
-import { VueQueryPlugin } from "@tanstack/vue-query";
+import { setupVueQuery } from "./setup/setupVueQuery";
 
 const app = createApp(App);
 
 setupComponents(app);
 setupI18n(app);
+setupVueQuery(app);
 
 app.use(createPinia());
-app.use(VueQueryPlugin);
 
 function registerModule(pluginModule: PluginModule, core: boolean) {
   if (pluginModule.components) {

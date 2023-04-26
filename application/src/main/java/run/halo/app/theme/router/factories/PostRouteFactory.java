@@ -2,6 +2,7 @@ package run.halo.app.theme.router.factories;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
+import static run.halo.app.theme.finders.PostPublicQueryService.FIXED_PREDICATE;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -37,7 +38,6 @@ import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
-import run.halo.app.theme.finders.impl.PostFinderImpl;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.router.ViewNameResolver;
 
@@ -143,13 +143,13 @@ public class PostRouteFactory implements RouteFactory {
 
     private Flux<Post> fetchPostsByName(String name) {
         return client.fetch(Post.class, name)
-            .filter(PostFinderImpl.FIXED_PREDICATE)
+            .filter(FIXED_PREDICATE)
             .flux();
     }
 
     private Flux<Post> fetchPostsBySlug(String slug) {
         return client.list(Post.class,
-            post -> PostFinderImpl.FIXED_PREDICATE.test(post)
+            post -> FIXED_PREDICATE.test(post)
                 && matchIfPresent(slug, post.getSpec().getSlug()),
             null);
     }
