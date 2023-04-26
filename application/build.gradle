@@ -91,8 +91,8 @@ tasks.register('downloadPluginPresets', Download) {
     src([
             'https://github.com/halo-sigs/plugin-comment-widget/releases/download/v1.5.0/plugin-comment-widget-1.5.0.jar',
             'https://github.com/halo-sigs/plugin-search-widget/releases/download/v1.0.0/plugin-search-widget-1.0.0.jar',
-            'https://github.com/halo-sigs/plugin-sitemap/releases/download/v1.0.1/plugin-sitemap-1.0.1.jar',
-            'https://github.com/halo-sigs/plugin-feed/releases/download/v1.1.0-beta.1/plugin-feed-1.1.0-beta.1.jar'
+            'https://github.com/halo-sigs/plugin-sitemap/releases/download/v1.0.2/plugin-sitemap-1.0.2.jar',
+            'https://github.com/halo-sigs/plugin-feed/releases/download/v1.1.1/plugin-feed-1.1.1.jar'
     ])
     dest 'src/main/resources/presets/plugins'
 }
