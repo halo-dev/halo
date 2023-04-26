@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Objects;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -145,7 +144,15 @@ public class PluginServiceImpl implements PluginService {
     private Mono<Path> copyToPluginHome(Plugin plugin) {
         return Mono.fromCallable(
                 () -> {
-                    Path pluginFilePath = resolvePluginPath(plugin);
+                    var fileName = generateFileName(plugin);
+                    var pluginRoot = Paths.get(pluginProperties.getPluginsRoot());
+                    try {
+                        Files.createDirectories(pluginRoot);
+                    } catch (IOException e) {
+                        throw Exceptions.propagate(e);
+                    }
+                    var pluginFilePath = pluginRoot.resolve(fileName);
+                    FileUtils.checkDirectoryTraversal(pluginRoot, pluginFilePath);
                     // move the plugin jar file to the plugin root
                     // replace the old plugin jar file if exists
                     var path = Path.of(plugin.getStatus().getLoadLocation());
@@ -153,20 +160,6 @@ public class PluginServiceImpl implements PluginService {
                     return pluginFilePath;
                 })
             .subscribeOn(Schedulers.boundedElastic());
-    }
-
-    @NonNull
-    private Path resolvePluginPath(Plugin plugin) {
-        var fileName = generateFileName(plugin);
-        var pluginRoot = Paths.get(pluginProperties.getPluginsRoot());
-        try {
-            Files.createDirectories(pluginRoot);
-        } catch (IOException e) {
-            throw Exceptions.propagate(e);
-        }
-        var pluginFilePath = pluginRoot.resolve(fileName);
-        FileUtils.checkDirectoryTraversal(pluginRoot, pluginFilePath);
-        return pluginFilePath;
     }
 
     static String generateFileName(Plugin plugin) {

@@ -411,12 +411,14 @@ class PluginReconcilerTest {
                 when(pluginStatus.getLoadLocation()).thenReturn(OLD_PLUGIN_PATH.toUri());
                 when(plugin.statusNonNull()).thenReturn(pluginStatus);
 
-                when(extensionClient.fetch(Plugin.class, PLUGIN_NAME)).thenReturn(Optional.of(plugin));
+                when(extensionClient.fetch(Plugin.class, PLUGIN_NAME))
+                    .thenReturn(Optional.of(plugin));
 
                 // call reload method
                 pluginReconciler.reload(plugin);
 
-                // verify that the plugin is updated with the new plugin's spec, annotations, and labels
+                // verify that the plugin is updated with the new plugin's spec, annotations, and
+                // labels
                 verify(plugin).setSpec(any(Plugin.PluginSpec.class));
                 verify(extensionClient).update(plugin);
 
