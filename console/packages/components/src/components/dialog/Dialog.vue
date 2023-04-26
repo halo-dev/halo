@@ -78,7 +78,14 @@ const handleCancel = () => {
 const handleConfirm = async () => {
   if (props.onConfirm) {
     loading.value = true;
-    await props.onConfirm();
+
+    try {
+      await props.onConfirm();
+    } catch (error) {
+      console.error("Failed to execute onConfirm: ", error);
+    } finally {
+      loading.value = false;
+    }
   }
   handleClose();
 };
