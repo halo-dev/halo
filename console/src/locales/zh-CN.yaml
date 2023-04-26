@@ -498,7 +498,7 @@ core:
         size: 文件大小
         owner: 上传者
         creation_time: 上传时间
-        permalink: 原始链接
+        permalink: 链接
       preview:
         click_to_exit: 点击退出预览
         video_not_support: 当前浏览器不支持该视频播放
