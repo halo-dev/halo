@@ -498,7 +498,7 @@ core:
         size: 文件大小
         owner: 上傳者
         creation_time: 上傳時間
-        permalink: 原始連結
+        permalink: 連結
       preview:
         click_to_exit: 點擊離開預覽
         video_not_support: 當前瀏覽器不支援該影片播放

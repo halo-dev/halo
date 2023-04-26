@@ -357,7 +357,7 @@ export function useAttachmentPermalinkCopy(
     const { displayName } = attachment.value?.spec || {};
 
     if (isImage.value) {
-      return `<img src="${permalink}" alt="${displayName}">`;
+      return `<img src="${permalink}" alt="${displayName}" />`;
     } else if (isVideo.value) {
       return `<video src="${permalink}"></video>`;
     } else if (isAudio.value) {

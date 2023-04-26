@@ -9,13 +9,13 @@ import {
 import LazyImage from "@/components/image/LazyImage.vue";
 import type { Attachment } from "@halo-dev/api-client";
 import prettyBytes from "pretty-bytes";
-import { computed, ref, toRef } from "vue";
+import { computed, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { isImage } from "@/utils/image";
 import { formatDatetime } from "@/utils/date";
 import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
 import { useQuery } from "@tanstack/vue-query";
-import { useAttachmentPermalinkCopy } from "../composables/use-attachment";
+import AttachmentPermalinkList from "./AttachmentPermalinkList.vue";
 
 const props = withDefaults(
   defineProps<{
@@ -36,9 +36,6 @@ const emit = defineEmits<{
 }>();
 
 const { groups } = useFetchAttachmentGroup();
-const { handleCopy, htmlText, markdownText } = useAttachmentPermalinkCopy(
-  toRef(props, "attachment")
-);
 
 const onlyPreview = ref(false);
 
@@ -72,7 +69,10 @@ const onVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
     onlyPreview.value = false;
-    emit("close");
+
+    setTimeout(() => {
+      emit("close");
+    }, 200);
   }
 };
 </script>
@@ -191,61 +191,7 @@ const onVisibleChange = (visible: boolean) => {
           <VDescriptionItem
             :label="$t('core.attachment.detail_modal.fields.permalink')"
           >
-            <div class="space-y-4">
-              <ul class="flex flex-col space-y-2">
-                <li>
-                  <div
-                    class="flex w-full cursor-pointer items-center justify-between space-x-3 rounded border p-3 hover:border-primary"
-                  >
-                    <div
-                      class="flex flex-1 text-xs font-semibold text-gray-900"
-                    >
-                      <a target="_blank" :href="attachment?.status?.permalink">
-                        {{ attachment?.status?.permalink }}
-                      </a>
-                    </div>
-                    <div>
-                      <VButton size="sm" @click="handleCopy('url')">
-                        {{ $t("core.common.buttons.copy") }}
-                      </VButton>
-                    </div>
-                  </div>
-                </li>
-
-                <li>
-                  <div
-                    class="flex w-full cursor-pointer items-center justify-between space-x-3 rounded border p-3 hover:border-primary"
-                  >
-                    <div
-                      class="flex flex-1 text-xs font-semibold text-gray-900"
-                    >
-                      {{ htmlText }}
-                    </div>
-                    <div>
-                      <VButton size="sm" @click="handleCopy('html')">
-                        {{ $t("core.common.buttons.copy") }}
-                      </VButton>
-                    </div>
-                  </div>
-                </li>
-                <li>
-                  <div
-                    class="flex w-full cursor-pointer items-center justify-between space-x-3 rounded border p-3 hover:border-primary"
-                  >
-                    <div
-                      class="flex flex-1 text-xs font-semibold text-gray-900"
-                    >
-                      {{ markdownText }}
-                    </div>
-                    <div>
-                      <VButton size="sm" @click="handleCopy('markdown')">
-                        {{ $t("core.common.buttons.copy") }}
-                      </VButton>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
+            <AttachmentPermalinkList :attachment="attachment" />
           </VDescriptionItem>
         </VDescription>
       </div>
