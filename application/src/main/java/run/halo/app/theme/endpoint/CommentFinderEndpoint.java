@@ -39,6 +39,7 @@ import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.endpoint.SortResolver;
+import run.halo.app.extension.Comparators;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Ref;
@@ -298,6 +299,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                     comparator = comparator.reversed();
                 }
                 comparators.add(comparator);
+                comparators.add(Comparators.compareName(true));
             }
             return comparators.stream()
                 .reduce(Comparator::thenComparing)
