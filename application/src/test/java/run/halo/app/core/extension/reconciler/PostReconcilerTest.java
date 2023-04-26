@@ -19,7 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PostService;
@@ -50,7 +50,7 @@ class PostReconcilerTest {
     private PostService postService;
 
     @Mock
-    private ApplicationContext applicationContext;
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private PostReconciler postReconciler;
@@ -157,7 +157,7 @@ class PostReconcilerTest {
             verify(client, times(4)).update(captor.capture());
             Post value = captor.getValue();
             assertThat(value.getStatus().getLastModifyTime()).isEqualTo(lastModifyTime);
-            verify(applicationContext).publishEvent(any(PostPublishedEvent.class));
+            verify(eventPublisher).publishEvent(any(PostPublishedEvent.class));
         }
 
         @Test
