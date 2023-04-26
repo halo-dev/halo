@@ -15,16 +15,17 @@ import { isImage } from "@/utils/image";
 import { formatDatetime } from "@/utils/date";
 import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
 import { useQuery } from "@tanstack/vue-query";
+import AttachmentPermalinkList from "./AttachmentPermalinkList.vue";
 
 const props = withDefaults(
   defineProps<{
     visible: boolean;
-    attachment: Attachment | null;
+    attachment: Attachment | undefined;
     mountToBody?: boolean;
   }>(),
   {
     visible: false,
-    attachment: null,
+    attachment: undefined,
     mountToBody: false,
   }
 );
@@ -68,7 +69,10 @@ const onVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
     onlyPreview.value = false;
-    emit("close");
+
+    setTimeout(() => {
+      emit("close");
+    }, 200);
   }
 };
 </script>
@@ -187,9 +191,7 @@ const onVisibleChange = (visible: boolean) => {
           <VDescriptionItem
             :label="$t('core.attachment.detail_modal.fields.permalink')"
           >
-            <a target="_blank" :href="attachment?.status?.permalink">
-              {{ attachment?.status?.permalink }}
-            </a>
+            <AttachmentPermalinkList :attachment="attachment" />
           </VDescriptionItem>
         </VDescription>
       </div>
