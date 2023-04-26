@@ -4,7 +4,7 @@ import lombok.Data;
 import run.halo.app.core.extension.content.Post;
 
 @Data
-public class PostVisibleChangedEvent implements PostEvent{
+public class PostVisibleChangedEvent implements PostEvent {
 
     private final String postName;
 
