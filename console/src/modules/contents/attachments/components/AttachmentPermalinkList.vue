@@ -59,7 +59,7 @@ const formats = computed(
           <span class="font-semibold">
             {{ format.label }}
           </span>
-          <span>
+          <span class="break-all">
             {{ format.value }}
           </span>
         </div>
