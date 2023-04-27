@@ -1,6 +1,7 @@
 package run.halo.app.theme.endpoint;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+import static java.util.Comparator.comparing;
 import static org.apache.commons.lang3.BooleanUtils.isFalse;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
@@ -10,18 +11,23 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -32,6 +38,8 @@ import run.halo.app.content.comment.ReplyService;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
+import run.halo.app.core.extension.endpoint.SortResolver;
+import run.halo.app.extension.Comparators;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Ref;
@@ -42,6 +50,7 @@ import run.halo.app.infra.exception.AccessDeniedException;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.IpAddressUtils;
 import run.halo.app.theme.finders.CommentFinder;
+import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.CommentVo;
 import run.halo.app.theme.finders.vo.ReplyVo;
 
@@ -52,7 +61,7 @@ import run.halo.app.theme.finders.vo.ReplyVo;
 @RequiredArgsConstructor
 public class CommentFinderEndpoint implements CustomEndpoint {
 
-    private final CommentFinder commentFinder;
+    private final CommentPublicQueryService commentPublicQueryService;
     private final CommentService commentService;
     private final ReplyService replyService;
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
@@ -185,15 +194,16 @@ public class CommentFinderEndpoint implements CustomEndpoint {
     }
 
     Mono<ServerResponse> listComments(ServerRequest request) {
-        CommentQuery commentQuery = new CommentQuery(request.queryParams());
-        return commentFinder.list(commentQuery.toRef(), commentQuery.getPage(),
-                commentQuery.getSize())
+        CommentQuery commentQuery = new CommentQuery(request);
+        var comparator = commentQuery.toComparator();
+        return commentPublicQueryService.list(commentQuery.toRef(), commentQuery.getPage(),
+                commentQuery.getSize(), comparator)
             .flatMap(list -> ServerResponse.ok().bodyValue(list));
     }
 
     Mono<ServerResponse> getComment(ServerRequest request) {
         String name = request.pathVariable("name");
-        return Mono.defer(() -> Mono.justOrEmpty(commentFinder.getByName(name)))
+        return Mono.defer(() -> Mono.justOrEmpty(commentPublicQueryService.getByName(name)))
             .subscribeOn(Schedulers.boundedElastic())
             .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
     }
@@ -202,14 +212,18 @@ public class CommentFinderEndpoint implements CustomEndpoint {
         String commentName = request.pathVariable("name");
         IListRequest.QueryListRequest queryParams =
             new IListRequest.QueryListRequest(request.queryParams());
-        return commentFinder.listReply(commentName, queryParams.getPage(), queryParams.getSize())
+        return commentPublicQueryService.listReply(commentName, queryParams.getPage(),
+                queryParams.getSize())
             .flatMap(list -> ServerResponse.ok().bodyValue(list));
     }
 
     public static class CommentQuery extends PageableRequest {
 
-        public CommentQuery(MultiValueMap<String, String> queryParams) {
-            super(queryParams);
+        private final ServerWebExchange exchange;
+
+        public CommentQuery(ServerRequest request) {
+            super(request.queryParams());
+            this.exchange = request.exchange();
         }
 
         @Schema(description = "The comment subject group.")
@@ -250,6 +264,17 @@ public class CommentFinderEndpoint implements CustomEndpoint {
             return name;
         }
 
+        @ArraySchema(uniqueItems = true,
+            arraySchema = @Schema(name = "sort",
+                description = "Sort property and direction of the list result. Supported fields: "
+                    + "creationTimestamp"),
+            schema = @Schema(description = "like field,asc or field,desc",
+                implementation = String.class,
+                example = "creationTimestamp,desc"))
+        public Sort getSort() {
+            return SortResolver.defaultInstance.resolve(exchange);
+        }
+
         Ref toRef() {
             Ref ref = new Ref();
             ref.setGroup(getGroup());
@@ -261,6 +286,24 @@ public class CommentFinderEndpoint implements CustomEndpoint {
 
         String emptyToNull(String str) {
             return StringUtils.isBlank(str) ? null : str;
+        }
+
+        public Comparator<Comment> toComparator() {
+            var sort = getSort();
+            var ctOrder = sort.getOrderFor("creationTimestamp");
+            List<Comparator<Comment>> comparators = new ArrayList<>();
+            if (ctOrder != null) {
+                Comparator<Comment> comparator =
+                    comparing(comment -> comment.getMetadata().getCreationTimestamp());
+                if (ctOrder.isDescending()) {
+                    comparator = comparator.reversed();
+                }
+                comparators.add(comparator);
+                comparators.add(Comparators.compareName(true));
+            }
+            return comparators.stream()
+                .reduce(Comparator::thenComparing)
+                .orElse(null);
         }
     }
 
