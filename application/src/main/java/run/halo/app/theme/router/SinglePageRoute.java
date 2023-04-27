@@ -119,8 +119,7 @@ public class SinglePageRoute
     }
 
     String singlePageRoute(String slug) {
-        var permalink = encodePath(slug, UTF_8);
-        return StringUtils.prependIfMissing(permalink, "/");
+        return StringUtils.prependIfMissing(slug, "/");
     }
 
     HandlerFunction<ServerResponse> handlerFunction(String name) {
