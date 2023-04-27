@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.pf4j.DefaultPluginManager;
 import org.pf4j.ExtensionFactory;
 import org.pf4j.ExtensionFinder;
+import org.pf4j.PluginAlreadyLoadedException;
 import org.pf4j.PluginDependency;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginDescriptorFinder;
@@ -376,6 +377,23 @@ public class HaloPluginManager extends DefaultPluginManager
             return null;
         }
         return getPlugin(pluginId).getPluginState();
+    }
+
+    /**
+     * Reload plugin by name and path.
+     * Note: This method will ignore {@link PluginAlreadyLoadedException}.
+     *
+     * @param pluginName plugin name
+     * @param pluginPath a new plugin path
+     */
+    public void reloadPluginWithPath(String pluginName, Path pluginPath) {
+        stopPlugin(pluginName, false);
+        unloadPlugin(pluginName, false);
+        try {
+            loadPlugin(pluginPath);
+        } catch (PluginAlreadyLoadedException ex) {
+            // ignore
+        }
     }
 
     /**

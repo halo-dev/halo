@@ -1,21 +1,33 @@
 package run.halo.app.core.extension.reconciler;
 
+import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static run.halo.app.core.extension.reconciler.PluginReconciler.initialReverseProxyName;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import org.json.JSONException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -35,8 +47,10 @@ import run.halo.app.core.extension.ReverseProxy;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.plugin.HaloPluginManager;
+import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginStartingError;
 
 /**
@@ -84,7 +98,7 @@ class PluginReconcilerTest {
         });
 
         ArgumentCaptor<Plugin> pluginCaptor = doReconcileWithoutRequeue();
-        verify(extensionClient, times(2)).update(isA(Plugin.class));
+        verify(extensionClient, times(3)).update(isA(Plugin.class));
 
         Plugin updateArgs = pluginCaptor.getAllValues().get(1);
         assertThat(updateArgs).isNotNull();
@@ -144,7 +158,7 @@ class PluginReconcilerTest {
         when(pluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
 
         ArgumentCaptor<Plugin> pluginCaptor = doReconcileWithoutRequeue();
-        verify(extensionClient, times(2)).update(any(Plugin.class));
+        verify(extensionClient, times(3)).update(any(Plugin.class));
 
         Plugin updateArgs = pluginCaptor.getValue();
         assertThat(updateArgs).isNotNull();
@@ -169,7 +183,8 @@ class PluginReconcilerTest {
                     "enabled": false
                 },
                 "status": {
-                    "phase": "STOPPED"
+                    "phase": "STOPPED",
+                    "loadLocation": "/tmp/plugins/apples.jar"
                 }
             }
             """, Plugin.class);
@@ -182,7 +197,7 @@ class PluginReconcilerTest {
         when(pluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
 
         ArgumentCaptor<Plugin> pluginCaptor = doReconcileWithoutRequeue();
-        verify(extensionClient, times(2)).update(any(Plugin.class));
+        verify(extensionClient, times(3)).update(any(Plugin.class));
 
         Plugin updateArgs = pluginCaptor.getValue();
         assertThat(updateArgs).isNotNull();
@@ -360,6 +375,119 @@ class PluginReconcilerTest {
         }
     }
 
+    @Test
+    void resolvePluginPathAnnotation() {
+        when(haloPluginManager.getPluginsRoot()).thenReturn(Paths.get("/tmp/plugins"));
+        String path = pluginReconciler.resolvePluginPathAnnotation("/tmp/plugins/sitemap-1.0.jar");
+        assertThat(path).isEqualTo("sitemap-1.0.jar");
+
+        path = pluginReconciler.resolvePluginPathAnnotation("/abc/plugins/sitemap-1.0.jar");
+        assertThat(path).isEqualTo("/abc/plugins/sitemap-1.0.jar");
+    }
+
+    @Nested
+    class ReloadPluginTest {
+        private static final String PLUGIN_NAME = "fake-plugin";
+        private static final Path OLD_PLUGIN_PATH = Paths.get("/path/to/old/plugin.jar");
+
+        @Test
+        void reload() throws IOException, URISyntaxException {
+            var fakePluginUri = requireNonNull(
+                getClass().getClassLoader().getResource("plugin/plugin-0.0.2")).toURI();
+            Path tempDirectory = Files.createTempDirectory("halo-ut-plugin-service-impl-");
+            final Path fakePluginPath = tempDirectory.resolve("plugin-0.0.2.jar");
+            try {
+                FileUtils.jar(Paths.get(fakePluginUri), tempDirectory.resolve("plugin-0.0.2.jar"));
+                when(haloPluginManager.getPluginsRoot()).thenReturn(tempDirectory);
+                // mock plugin
+                Plugin plugin = mock(Plugin.class);
+                Metadata metadata = new Metadata();
+                metadata.setName(PLUGIN_NAME);
+                when(plugin.getMetadata()).thenReturn(metadata);
+                metadata.setAnnotations(new HashMap<>());
+                metadata.getAnnotations()
+                    .put(PluginConst.RELOAD_ANNO, fakePluginPath.toString());
+                Plugin.PluginStatus pluginStatus = mock(Plugin.PluginStatus.class);
+                when(pluginStatus.getLoadLocation()).thenReturn(OLD_PLUGIN_PATH.toUri());
+                when(plugin.statusNonNull()).thenReturn(pluginStatus);
+
+                when(extensionClient.fetch(Plugin.class, PLUGIN_NAME))
+                    .thenReturn(Optional.of(plugin));
+
+                // call reload method
+                pluginReconciler.reload(plugin);
+
+                // verify that the plugin is updated with the new plugin's spec, annotations, and
+                // labels
+                verify(plugin).setSpec(any(Plugin.PluginSpec.class));
+                verify(extensionClient).update(plugin);
+
+                // verify that the plugin's load location is updated to the new plugin path
+                verify(pluginStatus).setLoadLocation(fakePluginPath.toUri());
+
+                // verify that the new plugin is reloaded
+                verify(haloPluginManager).reloadPluginWithPath(PLUGIN_NAME, fakePluginPath);
+            } finally {
+                FileUtils.deleteRecursivelyAndSilently(tempDirectory);
+            }
+        }
+
+        @Test
+        void shouldDeleteFile() throws IOException {
+            String newPluginPath = "/path/to/new/plugin.jar";
+
+            // Case 1: oldPluginLocation is null
+            assertFalse(pluginReconciler.shouldDeleteFile(newPluginPath, null));
+
+            // Case 2: oldPluginLocation is the same as newPluginPath
+            assertFalse(pluginReconciler.shouldDeleteFile(newPluginPath,
+                pluginReconciler.toUri(newPluginPath)));
+
+            Path tempDirectory = Files.createTempDirectory("halo-ut-plugin-service-impl-");
+            try {
+                Path oldPluginPath = tempDirectory.resolve("plugin.jar");
+                final URI oldPluginLocation = oldPluginPath.toUri();
+                Files.createFile(oldPluginPath);
+                // Case 3: oldPluginLocation is different from newPluginPath and is a JAR file
+                assertTrue(pluginReconciler.shouldDeleteFile(newPluginPath, oldPluginLocation));
+            } finally {
+                FileUtils.deleteRecursivelyAndSilently(tempDirectory);
+            }
+
+            // Case 4: oldPluginLocation is different from newPluginPath and is not a JAR file
+            assertFalse(pluginReconciler.shouldDeleteFile(newPluginPath,
+                Paths.get("/path/to/old/plugin.txt").toUri()));
+        }
+
+        @Test
+        void toPath() {
+            assertThat(pluginReconciler.toPath(null)).isNull();
+            assertThat(pluginReconciler.toPath("")).isNull();
+            assertThat(pluginReconciler.toPath(" ")).isNull();
+
+            Path path = pluginReconciler.toPath("file:///path/to/file.txt");
+            assertThat(path).isNotNull();
+            assertThat(path.toString()).isEqualTo("/path/to/file.txt");
+        }
+
+        @Test
+        void toUri() {
+            // Test with null pathString
+            Assertions.assertThrows(IllegalArgumentException.class, () -> {
+                pluginReconciler.toUri(null);
+            });
+
+            // Test with empty pathString
+            Assertions.assertThrows(IllegalArgumentException.class, () -> {
+                pluginReconciler.toUri("");
+            });
+
+            // Test with non-empty pathString
+            URI uri = pluginReconciler.toUri("/path/to/file");
+            Assertions.assertEquals("file:///path/to/file", uri.toString());
+        }
+    }
+
     private ArgumentCaptor<Plugin> doReconcileNeedRequeue() {
         ArgumentCaptor<Plugin> pluginCaptor = ArgumentCaptor.forClass(Plugin.class);
         doNothing().when(extensionClient).update(pluginCaptor.capture());
@@ -397,7 +525,8 @@ class PluginReconcilerTest {
                     "enabled": true
                 },
                 "status": {
-                    "phase": "STOPPED"
+                    "phase": "STOPPED",
+                    "loadLocation": "/tmp/plugins/apples.jar"
                 }
             }
             """, Plugin.class);
@@ -416,7 +545,8 @@ class PluginReconcilerTest {
                     "enabled": false
                 },
                 "status": {
-                    "phase": "STARTED"
+                    "phase": "STARTED",
+                    "loadLocation": "/tmp/plugins/apples.jar"
                 }
             }
             """, Plugin.class);

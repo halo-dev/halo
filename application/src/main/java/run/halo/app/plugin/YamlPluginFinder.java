@@ -12,6 +12,7 @@ import org.pf4j.util.FileUtils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import run.halo.app.core.extension.Plugin;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
 
@@ -68,6 +69,8 @@ public class YamlPluginFinder {
             pluginStatus.setLoadLocation(pluginPath.toUri());
             plugin.setStatus(pluginStatus);
         }
+        MetadataUtil.nullSafeAnnotations(plugin)
+            .put(PluginConst.PLUGIN_PATH, pluginPath.toString());
         return plugin;
     }
 
