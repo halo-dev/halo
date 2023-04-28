@@ -61,6 +61,7 @@ import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginExtensionLoaderUtils;
 import run.halo.app.plugin.PluginStartingError;
+import run.halo.app.plugin.PluginUtils;
 import run.halo.app.plugin.YamlPluginFinder;
 import run.halo.app.plugin.event.PluginCreatedEvent;
 import run.halo.app.plugin.resources.BundleResourceUtils;
@@ -106,6 +107,7 @@ public class PluginReconciler implements Reconciler<Request> {
                 })
                 .orElse(Result.doNotRetry());
         } catch (DoNotRetryException e) {
+            log.error("Failed to reconcile plugin: [{}]", request.name(), e);
             persistenceFailureStatus(request.name(), e);
             return Result.doNotRetry();
         }
@@ -117,12 +119,11 @@ public class PluginReconciler implements Reconciler<Request> {
             Map<String, String> annotations = nullSafeAnnotations(plugin);
             String oldPluginPath = annotations.get(PLUGIN_PATH);
             String pluginPath = oldPluginPath;
-            if (StringUtils.isBlank(oldPluginPath)) {
+            if (StringUtils.isBlank(pluginPath)) {
                 URI loadLocation = plugin.statusNonNull().getLoadLocation();
-                if (loadLocation == null) {
-                    throw new DoNotRetryException("Can not determine plugin path: " + name);
-                }
-                pluginPath = loadLocation.getPath();
+                pluginPath = Optional.ofNullable(loadLocation)
+                    .map(URI::getPath)
+                    .orElseGet(() -> PluginUtils.generateFileName(plugin));
             }
             annotations.put(PLUGIN_PATH, pluginPath);
             if (!StringUtils.equals(pluginPath, oldPluginPath)) {
@@ -321,14 +322,18 @@ public class PluginReconciler implements Reconciler<Request> {
         client.fetch(Plugin.class, pluginName).ifPresent(plugin -> {
             Plugin.PluginStatus status = plugin.statusNonNull();
 
-            PluginWrapper pluginWrapper = getPluginWrapper(pluginName);
-            status.setPhase(pluginWrapper.getPluginState());
+            PluginWrapper pluginWrapper = haloPluginManager.getPlugin(pluginName);
+            PluginState pluginState = Optional.ofNullable(pluginWrapper)
+                .map(PluginWrapper::getPluginState)
+                .orElse(PluginState.FAILED);
+
+            status.setPhase(pluginState);
 
             Plugin.PluginStatus oldStatus = JsonUtils.deepCopy(status);
             Condition condition = Condition.builder()
                 .type(PluginState.FAILED.toString())
                 .reason("UnexpectedState")
-                .message(e.getMessage())
+                .message(StringUtils.defaultString(e.getMessage()))
                 .status(ConditionStatus.FALSE)
                 .lastTransitionTime(Instant.now())
                 .build();
