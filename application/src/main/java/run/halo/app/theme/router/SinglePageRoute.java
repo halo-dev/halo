@@ -1,8 +1,6 @@
 package run.halo.app.theme.router;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
-import static org.springframework.web.util.UriUtils.encodePath;
 
 import java.util.HashMap;
 import java.util.List;
@@ -119,8 +117,7 @@ public class SinglePageRoute
     }
 
     String singlePageRoute(String slug) {
-        var permalink = encodePath(slug, UTF_8);
-        return StringUtils.prependIfMissing(permalink, "/");
+        return StringUtils.prependIfMissing(slug, "/");
     }
 
     HandlerFunction<ServerResponse> handlerFunction(String name) {
