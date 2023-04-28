@@ -127,6 +127,15 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
     }
 
     @Override
+    public void removeAllDocuments() throws Exception {
+        var writeConfig = new IndexWriterConfig(analyzer);
+        writeConfig.setOpenMode(APPEND);
+        try (var writer = new IndexWriter(postIndexDir, writeConfig)) {
+            writer.deleteAll();
+        }
+    }
+
+    @Override
     public void destroy() throws Exception {
         analyzer.close();
         postIndexDir.close();

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import reactor.core.Exceptions;
 import run.halo.app.event.post.PostEvent;
 import run.halo.app.event.post.PostPublishedEvent;
-import run.halo.app.event.post.PostRecycledEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.event.post.PostVisibleChangedEvent;
 import run.halo.app.extension.controller.Controller;
@@ -55,8 +54,7 @@ public class PostEventReconciler implements Reconciler<PostEvent>, SmartLifecycl
         if (postEvent instanceof PostPublishedEvent) {
             addPostDoc(postEvent.getName());
         }
-        if (postEvent instanceof PostUnpublishedEvent
-            || postEvent instanceof PostRecycledEvent) {
+        if (postEvent instanceof PostUnpublishedEvent) {
             deletePostDoc(postEvent.getName());
         }
         if (postEvent instanceof PostVisibleChangedEvent visibleChangedEvent) {
@@ -91,11 +89,6 @@ public class PostEventReconciler implements Reconciler<PostEvent>, SmartLifecycl
         postEventQueue.addImmediately(unpublishedEvent);
     }
 
-    @EventListener(PostRecycledEvent.class)
-    public void handlePostRecycled(PostRecycledEvent recycledEvent) {
-        postEventQueue.addImmediately(recycledEvent);
-    }
-
     @EventListener(PostVisibleChangedEvent.class)
     public void handlePostVisibleChanged(PostVisibleChangedEvent event) {
         postEventQueue.addImmediately(event);
@@ -103,7 +96,6 @@ public class PostEventReconciler implements Reconciler<PostEvent>, SmartLifecycl
 
     void addPostDoc(String postName) {
         postFinder.getByName(postName)
-            .filter(postVo -> PUBLIC.equals(postVo.getSpec().getVisible()))
             .map(PostDocUtils::from)
             .flatMap(postDoc -> extensionGetter.getEnabledExtension(PostSearchService.class)
                 .doOnNext(searchService -> {

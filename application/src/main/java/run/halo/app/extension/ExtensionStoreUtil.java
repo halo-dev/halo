@@ -7,9 +7,9 @@ import org.springframework.util.StringUtils;
  *
  * @author johnniang
  */
-public final class ExtensionUtil {
+public final class ExtensionStoreUtil {
 
-    private ExtensionUtil() {
+    private ExtensionStoreUtil() {
     }
 
     /**
