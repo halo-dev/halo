@@ -323,7 +323,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
           class="box-border h-full w-full divide-y divide-gray-100"
           role="list"
         >
-          <li v-for="(plugin, index) in data" :key="index">
+          <li v-for="plugin in data" :key="plugin.metadata.name">
             <PluginListItem :plugin="plugin" @reload="refetch()" />
           </li>
         </ul>
