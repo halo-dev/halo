@@ -36,6 +36,27 @@ const {
 const siteTitle = ref("");
 const loading = ref(false);
 
+const { mutate: pluginInstallMutate } = useMutation({
+  mutationKey: ["plugin-install"],
+  mutationFn: async (plugin: Plugin) => {
+    const { data } = await apiClient.plugin.installPlugin(
+      {
+        source: "PRESET",
+        presetName: plugin.metadata.name as string,
+      },
+      {
+        mute: true,
+      }
+    );
+    return data;
+  },
+  retry: 3,
+  retryDelay: 1000,
+  onSuccess(data) {
+    pluginStartMutate(data);
+  },
+});
+
 const { mutate: pluginStartMutate } = useMutation({
   mutationKey: ["plugin-start"],
   mutationFn: async (plugin: Plugin) => {
@@ -57,6 +78,7 @@ const { mutate: pluginStartMutate } = useMutation({
     );
   },
   retry: 3,
+  retryDelay: 1000,
 });
 
 const handleSubmit = async () => {
@@ -104,18 +126,8 @@ const handleSubmit = async () => {
     // Install preset plugins
     const { data: presetPlugins } = await apiClient.plugin.listPluginPresets();
 
-    const installPluginResponses = await Promise.all(
-      presetPlugins.map((plugin) => {
-        return apiClient.plugin.installPlugin({
-          source: "PRESET",
-          presetName: plugin.metadata.name as string,
-        });
-      })
-    );
-
-    for (let i = 0; i < installPluginResponses.length; i++) {
-      const response = installPluginResponses[i];
-      pluginStartMutate(response.data);
+    for (let i = 0; i < presetPlugins.length; i++) {
+      pluginInstallMutate(presetPlugins[i]);
     }
   } catch (error) {
     console.error("Failed to initialize preset data", error);
