@@ -1,8 +1,7 @@
 import type { FormKitNode } from "@formkit/core";
 
-const isCheckboxAndRadioMultiple = (node) =>
-  (node.props.type === "checkbox" || node.props.type === "radio") &&
-  node.props.options;
+const hasLegendNode = (node) =>
+  ["checkbox", "radio", "repeater", "group"].includes(node.props.type);
 
 export default function requiredAsterisk(node: FormKitNode) {
   node.on("created", () => {
@@ -18,7 +17,7 @@ export default function requiredAsterisk(node: FormKitNode) {
       );
 
       if (isRequired) {
-        if (isCheckboxAndRadioMultiple(node)) {
+        if (hasLegendNode(node)) {
           sectionsSchema.legend = {
             children: ["$label", " *"],
           };
