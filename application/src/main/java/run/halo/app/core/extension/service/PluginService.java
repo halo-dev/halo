@@ -40,4 +40,6 @@ public interface PluginService {
      * @see run.halo.app.plugin.HaloPluginManager#reloadPlugin(String)
      */
     Mono<Plugin> reload(String name);
+
+    Mono<String> uglifyJsBundle();
 }

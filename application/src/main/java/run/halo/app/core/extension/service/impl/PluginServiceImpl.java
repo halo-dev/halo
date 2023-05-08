@@ -4,6 +4,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import com.github.zafarkhaja.semver.Version;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,6 +37,7 @@ import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.PluginUtils;
 import run.halo.app.plugin.YamlPluginFinder;
+import run.halo.app.plugin.resources.BundleResourceUtils;
 
 @Slf4j
 @Component
@@ -123,6 +125,48 @@ public class PluginServiceImpl implements PluginService {
                 "The given plugin with name " + name + " was not found."));
         }
         return updateReloadAnno(name, pluginWrapper.getPluginPath());
+    }
+
+    @Override
+    public Mono<String> uglifyJsBundle() {
+        return Mono.defer(
+            () -> {
+                StringBuilder jsBundle = new StringBuilder();
+                StringBuilder cssBundle = new StringBuilder();
+                for (PluginWrapper pluginWrapper : pluginManager.getStartedPlugins()) {
+                    String pluginName = pluginWrapper.getPluginId();
+                    Resource jsBundleResource =
+                        BundleResourceUtils.getJsBundleResource(pluginManager, pluginName,
+                            BundleResourceUtils.JS_BUNDLE);
+                    if (jsBundleResource != null) {
+                        try {
+                            jsBundle.append(
+                                jsBundleResource.getContentAsString(StandardCharsets.UTF_8));
+                            jsBundle.append("\n");
+                        } catch (IOException e) {
+                            log.error("Failed to read js bundle of plugin [{}]", pluginName, e);
+                        }
+                    }
+                    Resource cssBundleResource =
+                        BundleResourceUtils.getJsBundleResource(pluginManager, pluginName,
+                            BundleResourceUtils.CSS_BUNDLE);
+                    if (cssBundleResource != null) {
+                        try {
+                            cssBundle.append(
+                                cssBundleResource.getContentAsString(StandardCharsets.UTF_8));
+                            jsBundle.append("\n");
+                        } catch (IOException e) {
+                            log.error("Failed to read css bundle of plugin [{}]", pluginName, e);
+                        }
+                    }
+                }
+                String cssBundleString = """
+                    const pluginCssBundle = function() {
+                        return `%s`;
+                    };
+                    """.formatted(cssBundle.toString());
+                return Mono.just(jsBundle + cssBundleString);
+            });
     }
 
     private Mono<Plugin> updateReloadAnno(String name, Path pluginPath) {

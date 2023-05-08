@@ -173,8 +173,21 @@ public class PluginEndpoint implements CustomEndpoint {
                 builder -> builder.operationId("ListPluginPresets")
                     .description("List all plugin presets in the system.")
                     .tag(tag)
-                    .response(responseBuilder().implementationArray(Plugin.class)))
+                    .response(responseBuilder().implementationArray(Plugin.class))
+            )
+            .GET("plugins/bundle.js", this::fetchJsBundle,
+                builder -> builder.operationId("fetchJsBundle")
+                    .description("Merge all bundles of enabled plugins into one.")
+                    .tag(tag)
+                    .response(responseBuilder().implementation(String.class))
+            )
             .build();
+    }
+
+    private Mono<ServerResponse> fetchJsBundle(ServerRequest request) {
+        return pluginService.uglifyJsBundle()
+            .flatMap(bundle -> ServerResponse.ok().bodyValue(bundle))
+            .switchIfEmpty(ServerResponse.ok().bodyValue(""));
     }
 
     private Mono<ServerResponse> reload(ServerRequest serverRequest) {
