@@ -34,7 +34,8 @@ public class ReactivePropertyAccessor implements PropertyAccessor {
         if (isReactiveType(target)) {
             return true;
         }
-        List<PropertyAccessor> propertyAccessors = context.getPropertyAccessors();
+        var propertyAccessors =
+            getPropertyAccessorsToTry(target.getClass(), context.getPropertyAccessors());
         for (PropertyAccessor propertyAccessor : propertyAccessors) {
             if (propertyAccessor.canRead(context, target, name)) {
                 return true;
@@ -83,7 +84,7 @@ public class ReactivePropertyAccessor implements PropertyAccessor {
 
     private boolean isReactiveType(Object target) {
         if (target == null) {
-            return false;
+            return true;
         }
         Class<?> clazz = target.getClass();
         return Mono.class.isAssignableFrom(clazz)
