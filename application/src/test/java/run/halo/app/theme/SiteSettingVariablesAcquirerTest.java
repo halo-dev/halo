@@ -1,16 +1,18 @@
 package run.halo.app.theme;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -37,23 +39,24 @@ public class SiteSettingVariablesAcquirerTest {
     private SiteSettingVariablesAcquirer siteSettingVariablesAcquirer;
 
     @Test
-    void acquire() throws URISyntaxException {
-        ConfigMap configMap = new ConfigMap();
+    void acquireWhenExternalUrlSet() throws MalformedURLException {
+        var configMap = new ConfigMap();
         configMap.setData(Map.of());
 
-        URI uri = new URI("https://halo.run");
-        when(externalUrlSupplier.get()).thenReturn(uri);
+        var url = new URL("https://halo.run");
+        when(externalUrlSupplier.getURL(any())).thenReturn(url);
         when(environmentFetcher.getConfigMap()).thenReturn(Mono.just(configMap));
 
-        siteSettingVariablesAcquirer.acquire(Mockito.mock(ServerWebExchange.class))
+        siteSettingVariablesAcquirer.acquire(mock(ServerWebExchange.class))
             .as(StepVerifier::create)
             .consumeNextWith(result -> {
                 assertThat(result).containsKey("site");
                 assertThat(result.get("site")).isInstanceOf(SiteSettingVo.class);
                 assertThat((SiteSettingVo) result.get("site"))
                     .extracting(SiteSettingVo::getUrl)
-                    .isEqualTo(uri);
+                    .isEqualTo(url);
             })
             .verifyComplete();
+        verify(externalUrlSupplier).getURL(any());
     }
 }
