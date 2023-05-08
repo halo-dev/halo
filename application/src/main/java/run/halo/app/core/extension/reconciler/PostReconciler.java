@@ -1,9 +1,11 @@
 package run.halo.app.core.extension.reconciler;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
 
+import com.google.common.hash.Hashing;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,6 +29,7 @@ import run.halo.app.core.extension.content.Post.VisibleEnum;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
+import run.halo.app.event.post.PostUpdatedEvent;
 import run.halo.app.event.post.PostVisibleChangedEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
@@ -98,14 +101,23 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                     post.setStatus(status);
                 }
 
+                // calculate the sha256sum
+                var configSha256sum = Hashing.sha256().hashString(post.getSpec().toString(), UTF_8)
+                        .toString();
+
+                var oldConfigChecksum = annotations.get(Constant.CHECKSUM_CONFIG_ANNO);
+                if (!Objects.equals(oldConfigChecksum, configSha256sum)) {
+                    // if the checksum doesn't match
+                    events.add(new PostUpdatedEvent(this, post.getMetadata().getName()));
+                    annotations.put(Constant.CHECKSUM_CONFIG_ANNO, configSha256sum);
+                }
+
                 var expectDelete = defaultIfNull(post.getSpec().getDeleted(), false);
                 var expectPublish = defaultIfNull(post.getSpec().getPublish(), false);
 
                 if (expectDelete || !expectPublish) {
-                    // TODO unpublish the post
                     unPublishPost(post, events);
                 } else {
-                    // TODO publish the post
                     publishPost(post, events);
                 }
 
@@ -158,9 +170,9 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                 }
 
 
-                Ref ref = Ref.of(post);
+                var ref = Ref.of(post);
                 // handle contributors
-                String headSnapshot = post.getSpec().getHeadSnapshot();
+                var headSnapshot = post.getSpec().getHeadSnapshot();
                 var contributors = client.list(Snapshot.class,
                         snapshot -> ref.equals(snapshot.getSpec().getSubjectRef()), null)
                     .stream()
