@@ -82,7 +82,7 @@ public class PostEventReconciler implements Reconciler<PostEvent>, SmartLifecycl
 
     @EventListener(PostEvent.class)
     public void handlePostEvent(PostEvent event) {
-       postEventQueue.addImmediately(event);
+        postEventQueue.addImmediately(event);
     }
 
     void addPostDoc(String postName) {
