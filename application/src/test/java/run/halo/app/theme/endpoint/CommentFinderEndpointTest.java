@@ -29,6 +29,7 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.theme.finders.CommentFinder;
+import run.halo.app.theme.finders.CommentPublicQueryService;
 
 /**
  * Tests for {@link CommentFinderEndpoint}.
@@ -40,6 +41,9 @@ import run.halo.app.theme.finders.CommentFinder;
 class CommentFinderEndpointTest {
     @Mock
     private CommentFinder commentFinder;
+
+    @Mock
+    private CommentPublicQueryService commentPublicQueryService;
 
     @Mock
     private CommentService commentService;
@@ -65,7 +69,7 @@ class CommentFinderEndpointTest {
 
     @Test
     void listComments() {
-        when(commentFinder.list(any(), anyInt(), anyInt()))
+        when(commentPublicQueryService.list(any(), anyInt(), anyInt(), any()))
             .thenReturn(Mono.just(new ListResult<>(1, 10, 0, List.of())));
 
         Ref ref = new Ref();
@@ -88,14 +92,14 @@ class CommentFinderEndpointTest {
             .expectStatus()
             .isOk();
         ArgumentCaptor<Ref> refCaptor = ArgumentCaptor.forClass(Ref.class);
-        verify(commentFinder, times(1)).list(refCaptor.capture(), eq(1), eq(10));
+        verify(commentPublicQueryService, times(1)).list(refCaptor.capture(), eq(1), eq(10), any());
         Ref value = refCaptor.getValue();
         assertThat(value).isEqualTo(ref);
     }
 
     @Test
     void getComment() {
-        when(commentFinder.getByName(any()))
+        when(commentPublicQueryService.getByName(any()))
             .thenReturn(null);
 
         webTestClient.get()
@@ -104,12 +108,12 @@ class CommentFinderEndpointTest {
             .expectStatus()
             .isOk();
 
-        verify(commentFinder, times(1)).getByName(eq("test-comment"));
+        verify(commentPublicQueryService, times(1)).getByName(eq("test-comment"));
     }
 
     @Test
     void listCommentReplies() {
-        when(commentFinder.listReply(any(), anyInt(), anyInt()))
+        when(commentPublicQueryService.listReply(any(), anyInt(), anyInt()))
             .thenReturn(Mono.just(new ListResult<>(2, 20, 0, List.of())));
 
         webTestClient.get()
@@ -121,7 +125,7 @@ class CommentFinderEndpointTest {
             .expectStatus()
             .isOk();
 
-        verify(commentFinder, times(1)).listReply(eq("test-comment"), eq(2), eq(20));
+        verify(commentPublicQueryService, times(1)).listReply(eq("test-comment"), eq(2), eq(20));
     }
 
     @Test

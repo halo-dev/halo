@@ -201,7 +201,7 @@ const handleUpdateUser = async () => {
               type="attachment"
               name="avatar"
               :accepts="['image/*']"
-              validation="url|length:0,1024"
+              validation="length:0,1024"
             ></FormKit>
             <FormKit
               v-model="formState.spec.bio"

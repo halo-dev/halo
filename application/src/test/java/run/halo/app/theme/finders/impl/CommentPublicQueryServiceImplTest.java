@@ -43,7 +43,7 @@ import run.halo.app.metrics.CounterService;
  * @since 2.0.0
  */
 @ExtendWith(SpringExtension.class)
-class CommentFinderImplTest {
+class CommentPublicQueryServiceImplTest {
 
     @Mock
     private ReactiveExtensionClient client;
@@ -54,7 +54,7 @@ class CommentFinderImplTest {
     private CounterService counterService;
 
     @InjectMocks
-    private CommentFinderImpl commentFinder;
+    private CommentPublicQueryServiceImpl commentPublicQueryService;
 
     @BeforeEach
     void setUp() {
@@ -72,7 +72,7 @@ class CommentFinderImplTest {
             mockWhenListComment();
 
             Ref ref = Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class));
-            commentFinder.list(ref, 1, 10)
+            commentPublicQueryService.list(ref, 1, 10)
                 .as(StepVerifier::create)
                 .consumeNextWith(listResult -> {
                     assertThat(listResult.getTotal()).isEqualTo(2);
@@ -90,7 +90,7 @@ class CommentFinderImplTest {
             mockWhenListComment();
 
             Ref ref = Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class));
-            commentFinder.list(ref, 1, 10)
+            commentPublicQueryService.list(ref, 1, 10)
                 .as(StepVerifier::create)
                 .consumeNextWith(listResult -> {
                     assertThat(listResult.getTotal()).isEqualTo(2);
@@ -108,7 +108,7 @@ class CommentFinderImplTest {
             mockWhenListComment();
 
             Ref ref = Ref.of("fake-post", GroupVersionKind.fromExtension(Post.class));
-            commentFinder.list(ref, 1, 10)
+            commentPublicQueryService.list(ref, 1, 10)
                 .as(StepVerifier::create)
                 .consumeNextWith(listResult -> {
                     assertThat(listResult.getTotal()).isEqualTo(3);
@@ -156,7 +156,7 @@ class CommentFinderImplTest {
             var result = Stream.of(comment1, comment2, comment3, comment4, comment5, comment6,
                     comment7, comment8, comment9, comment10, comment11, comment12, comment13,
                     comment14)
-                .sorted(CommentFinderImpl.defaultComparator())
+                .sorted(CommentPublicQueryServiceImpl.defaultComparator())
                 .map(Comment::getMetadata)
                 .map(MetadataOperator::getName)
                 .collect(Collectors.joining(", "));
@@ -265,7 +265,7 @@ class CommentFinderImplTest {
             // Mock
             mockWhenListRely();
 
-            commentFinder.listReply("fake-comment", 1, 10)
+            commentPublicQueryService.listReply("fake-comment", 1, 10)
                 .as(StepVerifier::create)
                 .consumeNextWith(listResult -> {
                     assertThat(listResult.getTotal()).isEqualTo(2);
@@ -283,7 +283,7 @@ class CommentFinderImplTest {
             // Mock
             mockWhenListRely();
 
-            commentFinder.listReply("fake-comment", 1, 10)
+            commentPublicQueryService.listReply("fake-comment", 1, 10)
                 .as(StepVerifier::create)
                 .consumeNextWith(listResult -> {
                     assertThat(listResult.getTotal()).isEqualTo(2);
@@ -299,7 +299,7 @@ class CommentFinderImplTest {
         void listWhenUserLoggedIn() {
             mockWhenListRely();
 
-            commentFinder.listReply("fake-comment", 1, 10)
+            commentPublicQueryService.listReply("fake-comment", 1, 10)
                 .as(StepVerifier::create)
                 .consumeNextWith(listResult -> {
                     assertThat(listResult.getTotal()).isEqualTo(3);

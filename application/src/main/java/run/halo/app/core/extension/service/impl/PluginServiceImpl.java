@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.pf4j.PluginWrapper;
 import org.springframework.core.io.Resource;
@@ -35,6 +34,7 @@ import run.halo.app.infra.utils.VersionUtils;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginProperties;
+import run.halo.app.plugin.PluginUtils;
 import run.halo.app.plugin.YamlPluginFinder;
 
 @Slf4j
@@ -144,7 +144,7 @@ public class PluginServiceImpl implements PluginService {
     private Mono<Path> copyToPluginHome(Plugin plugin) {
         return Mono.fromCallable(
                 () -> {
-                    var fileName = generateFileName(plugin);
+                    var fileName = PluginUtils.generateFileName(plugin);
                     var pluginRoot = Paths.get(pluginProperties.getPluginsRoot());
                     try {
                         Files.createDirectories(pluginRoot);
@@ -160,17 +160,6 @@ public class PluginServiceImpl implements PluginService {
                     return pluginFilePath;
                 })
             .subscribeOn(Schedulers.boundedElastic());
-    }
-
-    static String generateFileName(Plugin plugin) {
-        Assert.notNull(plugin, "The plugin must not be null.");
-        Assert.notNull(plugin.getMetadata(), "The plugin metadata must not be null.");
-        Assert.notNull(plugin.getSpec(), "The plugin spec must not be null.");
-        String version = plugin.getSpec().getVersion();
-        if (StringUtils.isBlank(version)) {
-            throw new ServerWebInputException("The plugin version must not be blank.");
-        }
-        return String.format("%s-%s.jar", plugin.getMetadata().getName(), version);
     }
 
     private void satisfiesRequiresVersion(Plugin newPlugin) {
