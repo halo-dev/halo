@@ -1,6 +1,6 @@
 package run.halo.app.theme.finders.vo;
 
-import java.net.URI;
+import java.net.URL;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Value;
@@ -23,7 +23,7 @@ public class SiteSettingVo {
     String title;
 
     @With
-    URI url;
+    URL url;
 
     String subtitle;
 
