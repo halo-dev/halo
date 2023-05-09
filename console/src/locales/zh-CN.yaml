@@ -1107,6 +1107,7 @@ core:
       upload: 上传
       add: 添加
       submit: 提交
+      detail: 详情
     radio:
       "yes": 是
       "no": 否

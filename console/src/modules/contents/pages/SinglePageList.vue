@@ -24,6 +24,7 @@ import {
   Toast,
   VDropdown,
   VDropdownItem,
+  VDropdownDivider,
 } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
@@ -846,9 +847,20 @@ const { mutate: changeVisibleMutation } = useMutation({
                 v-if="currentUserHasPermission(['system:singlepages:manage'])"
                 #dropdownItems
               >
+                <VDropdownItem
+                  @click="
+                    $router.push({
+                      name: 'SinglePageEditor',
+                      query: { name: singlePage.page.metadata.name },
+                    })
+                  "
+                >
+                  {{ $t("core.common.buttons.edit") }}
+                </VDropdownItem>
                 <VDropdownItem @click="handleOpenSettingModal(singlePage.page)">
                   {{ $t("core.common.buttons.setting") }}
                 </VDropdownItem>
+                <VDropdownDivider />
                 <VDropdownItem
                   type="danger"
                   @click="handleDelete(singlePage.page)"
