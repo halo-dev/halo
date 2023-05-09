@@ -9,6 +9,7 @@ description = 'API of halo project, connecting by other projects.'
 
 repositories {
     mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
 }
 
 dependencies {

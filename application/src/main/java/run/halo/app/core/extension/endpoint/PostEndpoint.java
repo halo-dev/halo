@@ -30,8 +30,6 @@ import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
-import run.halo.app.event.post.PostRecycledEvent;
-import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -262,9 +260,6 @@ public class PostEndpoint implements CustomEndpoint {
                 .flatMap(client::update))
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 .filter(t -> t instanceof OptimisticLockingFailureException))
-            // TODO Fire unpublished event in reconciler in the future
-            .doOnNext(post -> eventPublisher.publishEvent(
-                new PostUnpublishedEvent(this, post.getMetadata().getName())))
             .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }
 
@@ -278,9 +273,6 @@ public class PostEndpoint implements CustomEndpoint {
                 .flatMap(client::update))
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 .filter(t -> t instanceof OptimisticLockingFailureException))
-            // TODO Fire recycled event in reconciler in the future
-            .doOnNext(post -> eventPublisher.publishEvent(
-                new PostRecycledEvent(this, post.getMetadata().getName())))
             .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }
 

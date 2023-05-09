@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ExtensionUtilTest {
+class ExtensionStoreUtilTest {
 
     Scheme scheme;
 
@@ -28,19 +28,19 @@ class ExtensionUtilTest {
 
     @Test
     void buildStoreNamePrefix() {
-        var prefix = ExtensionUtil.buildStoreNamePrefix(scheme);
+        var prefix = ExtensionStoreUtil.buildStoreNamePrefix(scheme);
         assertEquals("/registry/fake.halo.run/fakes", prefix);
 
-        prefix = ExtensionUtil.buildStoreNamePrefix(grouplessScheme);
+        prefix = ExtensionStoreUtil.buildStoreNamePrefix(grouplessScheme);
         assertEquals("/registry/fakes", prefix);
     }
 
     @Test
     void buildStoreName() {
-        var storeName = ExtensionUtil.buildStoreName(scheme, "fake-name");
+        var storeName = ExtensionStoreUtil.buildStoreName(scheme, "fake-name");
         assertEquals("/registry/fake.halo.run/fakes/fake-name", storeName);
 
-        storeName = ExtensionUtil.buildStoreName(grouplessScheme, "fake-name");
+        storeName = ExtensionStoreUtil.buildStoreName(grouplessScheme, "fake-name");
         assertEquals("/registry/fakes/fake-name", storeName);
     }
 

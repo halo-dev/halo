@@ -2,15 +2,16 @@ package run.halo.app.event.post;
 
 import org.springframework.context.ApplicationEvent;
 
-public class PostRecycledEvent extends ApplicationEvent implements PostEvent {
+public class PostUpdatedEvent extends ApplicationEvent implements PostEvent {
 
     private final String postName;
 
-    public PostRecycledEvent(Object source, String postName) {
+    public PostUpdatedEvent(Object source, String postName) {
         super(source);
         this.postName = postName;
     }
 
+    @Override
     public String getName() {
         return postName;
     }

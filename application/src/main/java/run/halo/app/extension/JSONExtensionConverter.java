@@ -2,6 +2,7 @@ package run.halo.app.extension;
 
 import static org.openapi4j.core.validation.ValidationSeverity.ERROR;
 import static org.springframework.util.StringUtils.arrayToCommaDelimitedString;
+import static run.halo.app.extension.ExtensionStoreUtil.buildStoreName;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,7 +66,7 @@ public class JSONExtensionConverter implements ExtensionConverter {
             }
 
             var version = extension.getMetadata().getVersion();
-            var storeName = ExtensionUtil.buildStoreName(scheme, extension.getMetadata().getName());
+            var storeName = buildStoreName(scheme, extension.getMetadata().getName());
             var data = objectMapper.writeValueAsBytes(extensionJsonNode);
             return new ExtensionStore(storeName, data, version);
         } catch (IOException e) {
