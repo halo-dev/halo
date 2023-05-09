@@ -127,6 +127,15 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
     }
 
     @Override
+    public void removeAllDocuments() throws Exception {
+        var writeConfig = new IndexWriterConfig(analyzer);
+        writeConfig.setOpenMode(APPEND);
+        try (var writer = new IndexWriter(postIndexDir, writeConfig)) {
+            writer.deleteAll();
+        }
+    }
+
+    @Override
     public void destroy() throws Exception {
         analyzer.close();
         postIndexDir.close();
@@ -145,11 +154,19 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
         doc.add(new StringField("name", post.name(), YES));
         doc.add(new StoredField("title", post.title()));
 
-        var content = Jsoup.clean(stripToEmpty(post.excerpt()) + stripToEmpty(post.content()),
-            Safelist.none());
+        var cleanExcerpt = Jsoup.clean(stripToEmpty(post.excerpt()), Safelist.none());
+        var cleanContent = Jsoup.clean(stripToEmpty(post.content()), Safelist.none());
+
+        var contentBuilder = new StringBuilder(cleanExcerpt);
+        if (!contentBuilder.isEmpty()) {
+            contentBuilder.append(' ');
+        }
+        contentBuilder.append(cleanContent);
+
+        var content = contentBuilder.toString();
 
         doc.add(new StoredField("content", content));
-        doc.add(new TextField("searchable", post.title() + content, NO));
+        doc.add(new TextField("searchable", post.title() + " " + content, NO));
 
         long publishTimestamp = post.publishTimestamp().toEpochMilli();
         doc.add(new LongPoint("publishTimestamp", publishTimestamp));

@@ -77,7 +77,7 @@ class PostReconcilerTest {
         ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
         postReconciler.reconcile(new Reconciler.Request(name));
 
-        verify(client, times(3)).update(captor.capture());
+        verify(client, times(1)).update(captor.capture());
 
         verify(postPermalinkPolicy, times(1)).permalink(any());
 
@@ -118,7 +118,7 @@ class PostReconcilerTest {
         ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
         postReconciler.reconcile(new Reconciler.Request(name));
 
-        verify(client, times(4)).update(captor.capture());
+        verify(client, times(1)).update(captor.capture());
         Post value = captor.getValue();
         assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");
     }
@@ -154,7 +154,7 @@ class PostReconcilerTest {
             ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
             postReconciler.reconcile(new Reconciler.Request(name));
 
-            verify(client, times(4)).update(captor.capture());
+            verify(client, times(1)).update(captor.capture());
             Post value = captor.getValue();
             assertThat(value.getStatus().getLastModifyTime()).isEqualTo(lastModifyTime);
             verify(eventPublisher).publishEvent(any(PostPublishedEvent.class));
@@ -183,7 +183,7 @@ class PostReconcilerTest {
             ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
             postReconciler.reconcile(new Reconciler.Request(name));
 
-            verify(client, times(3)).update(captor.capture());
+            verify(client, times(1)).update(captor.capture());
             Post value = captor.getValue();
             assertThat(value.getStatus().getLastModifyTime()).isNull();
         }

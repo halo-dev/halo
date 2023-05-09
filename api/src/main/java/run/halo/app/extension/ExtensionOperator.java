@@ -97,7 +97,6 @@ public interface ExtensionOperator {
     }
 
     static boolean isDeleted(ExtensionOperator extension) {
-        return extension.getMetadata() != null
-            && extension.getMetadata().getDeletionTimestamp() != null;
+        return ExtensionUtil.isDeleted(extension);
     }
 }
