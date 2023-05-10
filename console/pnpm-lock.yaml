@@ -5,6 +5,15 @@ importers:
   .:
     specifiers:
       '@changesets/cli': ^2.25.2
+      '@codemirror/commands': ^6.1.2
+      '@codemirror/lang-css': ^6.0.1
+      '@codemirror/lang-html': ^6.2.0
+      '@codemirror/lang-javascript': ^6.1.1
+      '@codemirror/lang-json': ^6.0.1
+      '@codemirror/language': ^6.3.1
+      '@codemirror/legacy-modes': ^6.3.0
+      '@codemirror/state': ^6.1.4
+      '@codemirror/view': ^6.5.1
       '@emoji-mart/data': ^1.0.8
       '@formkit/core': ^0.16.4
       '@formkit/i18n': ^0.16.4
@@ -57,6 +66,7 @@ importers:
       autoprefixer: ^10.4.14
       axios: ^0.27.2
       c8: ^7.12.0
+      codemirror: ^6.0.1
       colorjs.io: ^0.4.3
       cypress: ^10.11.0
       dayjs: ^1.11.7
@@ -109,6 +119,15 @@ importers:
       vue-tsc: ^1.0.24
       vuedraggable: ^4.1.0
     dependencies:
+      '@codemirror/commands': 6.1.2
+      '@codemirror/lang-css': 6.0.1_gu445lycfriim3kznnyeahleva
+      '@codemirror/lang-html': 6.2.0
+      '@codemirror/lang-javascript': 6.1.1
+      '@codemirror/lang-json': 6.0.1
+      '@codemirror/language': 6.3.1
+      '@codemirror/legacy-modes': 6.3.0
+      '@codemirror/state': 6.1.4
+      '@codemirror/view': 6.5.1
       '@emoji-mart/data': 1.0.8
       '@formkit/core': 0.16.4
       '@formkit/i18n': 0.16.4
@@ -137,6 +156,7 @@ importers:
       '@vueuse/router': 9.6.0_xsxatmlnmmg5bcuv3xdnj6fj7y
       '@vueuse/shared': 9.6.0_vue@3.2.45
       axios: 0.27.2
+      codemirror: 6.0.1_@lezer+common@1.0.1
       colorjs.io: 0.4.3
       dayjs: 1.11.7
       emoji-mart: 5.3.3
@@ -235,18 +255,8 @@ importers:
 
   packages/components:
     specifiers:
-      '@codemirror/commands': ^6.1.2
-      '@codemirror/lang-css': ^6.0.1
-      '@codemirror/lang-html': ^6.2.0
-      '@codemirror/lang-javascript': ^6.1.1
-      '@codemirror/lang-json': ^6.0.1
-      '@codemirror/language': ^6.3.1
-      '@codemirror/legacy-modes': ^6.3.0
-      '@codemirror/state': ^6.1.4
-      '@codemirror/view': ^6.5.1
       '@histoire/plugin-vue': ^0.11.7
       '@iconify-json/ri': ^1.1.4
-      codemirror: ^6.0.1
       floating-vue: 2.0.0-beta.20
       histoire: ^0.11.7
       unplugin-icons: ^0.14.14
@@ -254,16 +264,6 @@ importers:
       vue: ^3.2.37
       vue-router: ^4.0.16
     dependencies:
-      '@codemirror/commands': 6.1.2
-      '@codemirror/lang-css': 6.0.1_gu445lycfriim3kznnyeahleva
-      '@codemirror/lang-html': 6.2.0
-      '@codemirror/lang-javascript': 6.1.1
-      '@codemirror/lang-json': 6.0.1
-      '@codemirror/language': 6.3.1
-      '@codemirror/legacy-modes': 6.3.0
-      '@codemirror/state': 6.1.4
-      '@codemirror/view': 6.5.1
-      codemirror: 6.0.1_@lezer+common@1.0.1
       floating-vue: 2.0.0-beta.20_vue@3.2.45
       vue: 3.2.45
       vue-router: 4.1.6_vue@3.2.45
