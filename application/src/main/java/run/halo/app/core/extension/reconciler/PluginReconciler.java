@@ -7,7 +7,6 @@ import static run.halo.app.plugin.PluginConst.DELETE_STAGE;
 import static run.halo.app.plugin.PluginConst.PLUGIN_PATH;
 import static run.halo.app.plugin.PluginConst.RELOAD_ANNO;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -629,9 +628,7 @@ public class PluginReconciler implements Reconciler<Request> {
         if (StringUtils.isBlank(pathString)) {
             return null;
         }
-        String separator = File.separator;
-        String processedPathString = pathString.replaceAll("[/\\\\]", separator);
-
+        String processedPathString = pathString;
         if (processedPathString.startsWith("file:")) {
             processedPathString = processedPathString.substring(7);
         }
