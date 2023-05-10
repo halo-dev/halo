@@ -9,6 +9,10 @@ const options: VueQueryPluginOptions = {
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,
+        networkMode: "always",
+      },
+      mutations: {
+        networkMode: "always",
       },
     },
   },
