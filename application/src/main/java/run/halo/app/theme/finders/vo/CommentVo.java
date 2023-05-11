@@ -57,6 +57,8 @@ public class CommentVo implements ExtensionVoOperator {
 
         private String content;
 
+        private CommentOwnerVo owner;
+
         private String userAgent;
 
         private Instant approvedTime;

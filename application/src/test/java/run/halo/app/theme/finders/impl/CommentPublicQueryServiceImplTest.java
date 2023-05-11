@@ -190,6 +190,10 @@ class CommentPublicQueryServiceImplTest {
                             "name":"1"
                         },
                         "spec":{
+                            "owner":{
+                                "kind":"User",
+                                "displayName":"fake-display-name"
+                            },
                             "priority":0,
                             "top":true
                         },
@@ -378,6 +382,10 @@ class CommentPublicQueryServiceImplTest {
                             "commentName":"fake-comment",
                             "raw":"fake-raw",
                             "content":"fake-content",
+                            "owner":{
+                                "kind":"User",
+                                "displayName":"fake-display-name"
+                            },
                             "hidden":false
                         },
                         "owner":{

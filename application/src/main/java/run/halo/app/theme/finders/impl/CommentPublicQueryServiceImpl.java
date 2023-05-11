@@ -113,7 +113,10 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                 .doOnNext(commentVo::setStats)
                 .thenReturn(commentVo))
             .flatMap(commentVo -> getCommentOwner(owner)
-                .doOnNext(commentVo::setOwner)
+                .doOnNext(ownerVo -> {
+                    commentVo.getSpec().setOwner(ownerVo);
+                    commentVo.setOwner(ownerVo);
+                })
                 .thenReturn(commentVo)
             );
     }
@@ -135,7 +138,10 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                 .doOnNext(replyVo::setStats)
                 .thenReturn(replyVo))
             .flatMap(replyVo -> getCommentOwner(reply.getSpec().getOwner())
-                .doOnNext(replyVo::setOwner)
+                .doOnNext(ownerVo -> {
+                    replyVo.getSpec().setOwner(ownerVo);
+                    replyVo.setOwner(ownerVo);
+                })
                 .thenReturn(replyVo)
             );
     }
