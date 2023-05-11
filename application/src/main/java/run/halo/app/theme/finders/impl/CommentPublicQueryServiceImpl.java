@@ -1,6 +1,5 @@
 package run.halo.app.theme.finders.impl;
 
-
 import java.security.Principal;
 import java.util.Comparator;
 import java.util.List;
@@ -18,7 +17,6 @@ import org.springframework.util.Assert;
 import org.springframework.util.comparator.Comparators;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.content.comment.OwnerInfo;
 import run.halo.app.content.comment.ReplyService;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
@@ -31,6 +29,7 @@ import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
 import run.halo.app.theme.finders.CommentPublicQueryService;
+import run.halo.app.theme.finders.vo.CommentOwnerVo;
 import run.halo.app.theme.finders.vo.CommentStatsVo;
 import run.halo.app.theme.finders.vo.CommentVo;
 import run.halo.app.theme.finders.vo.ExtensionVoOperator;
@@ -107,13 +106,13 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             );
     }
 
-    private Mono<CommentVo> toCommentVo(Comment comment) {
+    Mono<CommentVo> toCommentVo(Comment comment) {
         Comment.CommentOwner owner = comment.getSpec().getOwner();
         return Mono.just(CommentVo.from(comment))
             .flatMap(commentVo -> populateStats(Comment.class, commentVo)
                 .doOnNext(commentVo::setStats)
                 .thenReturn(commentVo))
-            .flatMap(commentVo -> getOwnerInfo(owner)
+            .flatMap(commentVo -> getCommentOwner(owner)
                 .doOnNext(commentVo::setOwner)
                 .thenReturn(commentVo)
             );
@@ -130,23 +129,23 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             .defaultIfEmpty(CommentStatsVo.empty());
     }
 
-    private Mono<ReplyVo> toReplyVo(Reply reply) {
+    Mono<ReplyVo> toReplyVo(Reply reply) {
         return Mono.just(ReplyVo.from(reply))
             .flatMap(replyVo -> populateStats(Reply.class, replyVo)
                 .doOnNext(replyVo::setStats)
                 .thenReturn(replyVo))
-            .flatMap(replyVo -> getOwnerInfo(reply.getSpec().getOwner())
+            .flatMap(replyVo -> getCommentOwner(reply.getSpec().getOwner())
                 .doOnNext(replyVo::setOwner)
                 .thenReturn(replyVo)
             );
     }
 
-    private Mono<OwnerInfo> getOwnerInfo(Comment.CommentOwner owner) {
+    private Mono<CommentOwnerVo> getCommentOwner(Comment.CommentOwner owner) {
         if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
-            return Mono.just(OwnerInfo.from(owner));
+            return Mono.just(CommentOwnerVo.from(owner));
         }
         return userService.getUserOrGhost(owner.getName())
-            .map(OwnerInfo::from);
+            .map(CommentOwnerVo::from);
     }
 
     private Mono<Predicate<Comment>> fixedCommentPredicate(Ref ref) {
