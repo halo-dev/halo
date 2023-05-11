@@ -23,8 +23,7 @@
 ## 开发环境运行
 
 ```bash
-# pnpm@7.0.0+
-npm install -g pnpm
+npm install -g pnpm@8
 ```
 
 ```bash
