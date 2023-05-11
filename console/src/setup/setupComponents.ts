@@ -1,4 +1,4 @@
-import type { App } from "vue";
+import { defineAsyncComponent, type App } from "vue";
 import { VClosePopper, VTooltip } from "@halo-dev/components";
 import { Dropdown } from "floating-vue";
 import "floating-vue/dist/style.css";
@@ -21,4 +21,8 @@ export function setupComponents(app: App) {
   // @deprecated
   // Will be removed in the future, please use the VDropdown component from @halo-dev/components.
   app.component("FloatingDropdown", Dropdown);
+  app.component(
+    "VCodemirror",
+    defineAsyncComponent(() => import("@/components/codemirror/Codemirror.vue"))
+  );
 }
