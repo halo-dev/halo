@@ -304,6 +304,7 @@ export const ApiHaloRunV1alpha1CommentApiAxiosParamCreator = function (
      * @param {string} name The comment subject name.
      * @param {string} version The comment subject version.
      * @param {string} kind The comment subject kind.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
      * @param {string} [group] The comment subject group.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {number} [page] The page number. Zero indicates no page.
@@ -314,6 +315,7 @@ export const ApiHaloRunV1alpha1CommentApiAxiosParamCreator = function (
       name: string,
       version: string,
       kind: string,
+      sort?: Array<string>,
       group?: string,
       size?: number,
       page?: number,
@@ -355,6 +357,10 @@ export const ApiHaloRunV1alpha1CommentApiAxiosParamCreator = function (
 
       if (version !== undefined) {
         localVarQueryParameter["version"] = version;
+      }
+
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       if (group !== undefined) {
@@ -507,6 +513,7 @@ export const ApiHaloRunV1alpha1CommentApiFp = function (
      * @param {string} name The comment subject name.
      * @param {string} version The comment subject version.
      * @param {string} kind The comment subject kind.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
      * @param {string} [group] The comment subject group.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {number} [page] The page number. Zero indicates no page.
@@ -517,6 +524,7 @@ export const ApiHaloRunV1alpha1CommentApiFp = function (
       name: string,
       version: string,
       kind: string,
+      sort?: Array<string>,
       group?: string,
       size?: number,
       page?: number,
@@ -528,6 +536,7 @@ export const ApiHaloRunV1alpha1CommentApiFp = function (
         name,
         version,
         kind,
+        sort,
         group,
         size,
         page,
@@ -634,6 +643,7 @@ export const ApiHaloRunV1alpha1CommentApiFactory = function (
           requestParameters.name,
           requestParameters.version,
           requestParameters.kind,
+          requestParameters.sort,
           requestParameters.group,
           requestParameters.size,
           requestParameters.page,
@@ -747,6 +757,13 @@ export interface ApiHaloRunV1alpha1CommentApiListComments1Request {
    * @memberof ApiHaloRunV1alpha1CommentApiListComments1
    */
   readonly kind: string;
+
+  /**
+   * Sort property and direction of the list result. Supported fields: creationTimestamp
+   * @type {Array<string>}
+   * @memberof ApiHaloRunV1alpha1CommentApiListComments1
+   */
+  readonly sort?: Array<string>;
 
   /**
    * The comment subject group.
@@ -866,6 +883,7 @@ export class ApiHaloRunV1alpha1CommentApi extends BaseAPI {
         requestParameters.name,
         requestParameters.version,
         requestParameters.kind,
+        requestParameters.sort,
         requestParameters.group,
         requestParameters.size,
         requestParameters.page,

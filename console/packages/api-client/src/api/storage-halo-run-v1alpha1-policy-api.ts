@@ -214,18 +214,18 @@ export const StorageHaloRunV1alpha1PolicyApiAxiosParamCreator = function (
     },
     /**
      * List storage.halo.run/v1alpha1/Policy
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     liststorageHaloRunV1alpha1Policy: async (
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/storage.halo.run/v1alpha1/policies`;
@@ -252,10 +252,6 @@ export const StorageHaloRunV1alpha1PolicyApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (page !== undefined) {
-        localVarQueryParameter["page"] = page;
-      }
-
       if (size !== undefined) {
         localVarQueryParameter["size"] = size;
       }
@@ -266,6 +262,10 @@ export const StorageHaloRunV1alpha1PolicyApiAxiosParamCreator = function (
 
       if (fieldSelector) {
         localVarQueryParameter["fieldSelector"] = fieldSelector;
+      }
+
+      if (page !== undefined) {
+        localVarQueryParameter["page"] = page;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -432,28 +432,28 @@ export const StorageHaloRunV1alpha1PolicyApiFp = function (
     },
     /**
      * List storage.halo.run/v1alpha1/Policy
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async liststorageHaloRunV1alpha1Policy(
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<PolicyList>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.liststorageHaloRunV1alpha1Policy(
-          page,
           size,
           labelSelector,
           fieldSelector,
+          page,
           options
         );
       return createRequestFunction(
@@ -558,10 +558,10 @@ export const StorageHaloRunV1alpha1PolicyApiFactory = function (
     ): AxiosPromise<PolicyList> {
       return localVarFp
         .liststorageHaloRunV1alpha1Policy(
-          requestParameters.page,
           requestParameters.size,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.page,
           options
         )
         .then((request) => request(axios, basePath));
@@ -636,13 +636,6 @@ export interface StorageHaloRunV1alpha1PolicyApiGetstorageHaloRunV1alpha1PolicyR
  */
 export interface StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1PolicyRequest {
   /**
-   * The page number. Zero indicates no page.
-   * @type {number}
-   * @memberof StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1Policy
-   */
-  readonly page?: number;
-
-  /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1Policy
@@ -662,6 +655,13 @@ export interface StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1Policy
    * @memberof StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1Policy
    */
   readonly fieldSelector?: Array<string>;
+
+  /**
+   * The page number. Zero indicates no page.
+   * @type {number}
+   * @memberof StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1Policy
+   */
+  readonly page?: number;
 }
 
 /**
@@ -753,10 +753,10 @@ export class StorageHaloRunV1alpha1PolicyApi extends BaseAPI {
   ) {
     return StorageHaloRunV1alpha1PolicyApiFp(this.configuration)
       .liststorageHaloRunV1alpha1Policy(
-        requestParameters.page,
         requestParameters.size,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.page,
         options
       )
       .then((request) => request(this.axios, this.basePath));

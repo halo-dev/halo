@@ -214,18 +214,18 @@ export const ContentHaloRunV1alpha1PostApiAxiosParamCreator = function (
     },
     /**
      * List content.halo.run/v1alpha1/Post
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listcontentHaloRunV1alpha1Post: async (
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/content.halo.run/v1alpha1/posts`;
@@ -252,10 +252,6 @@ export const ContentHaloRunV1alpha1PostApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (page !== undefined) {
-        localVarQueryParameter["page"] = page;
-      }
-
       if (size !== undefined) {
         localVarQueryParameter["size"] = size;
       }
@@ -266,6 +262,10 @@ export const ContentHaloRunV1alpha1PostApiAxiosParamCreator = function (
 
       if (fieldSelector) {
         localVarQueryParameter["fieldSelector"] = fieldSelector;
+      }
+
+      if (page !== undefined) {
+        localVarQueryParameter["page"] = page;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -432,28 +432,28 @@ export const ContentHaloRunV1alpha1PostApiFp = function (
     },
     /**
      * List content.halo.run/v1alpha1/Post
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listcontentHaloRunV1alpha1Post(
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<PostList>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listcontentHaloRunV1alpha1Post(
-          page,
           size,
           labelSelector,
           fieldSelector,
+          page,
           options
         );
       return createRequestFunction(
@@ -558,10 +558,10 @@ export const ContentHaloRunV1alpha1PostApiFactory = function (
     ): AxiosPromise<PostList> {
       return localVarFp
         .listcontentHaloRunV1alpha1Post(
-          requestParameters.page,
           requestParameters.size,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.page,
           options
         )
         .then((request) => request(axios, basePath));
@@ -636,13 +636,6 @@ export interface ContentHaloRunV1alpha1PostApiGetcontentHaloRunV1alpha1PostReque
  */
 export interface ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1PostRequest {
   /**
-   * The page number. Zero indicates no page.
-   * @type {number}
-   * @memberof ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1Post
-   */
-  readonly page?: number;
-
-  /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1Post
@@ -662,6 +655,13 @@ export interface ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1PostRequ
    * @memberof ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1Post
    */
   readonly fieldSelector?: Array<string>;
+
+  /**
+   * The page number. Zero indicates no page.
+   * @type {number}
+   * @memberof ContentHaloRunV1alpha1PostApiListcontentHaloRunV1alpha1Post
+   */
+  readonly page?: number;
 }
 
 /**
@@ -753,10 +753,10 @@ export class ContentHaloRunV1alpha1PostApi extends BaseAPI {
   ) {
     return ContentHaloRunV1alpha1PostApiFp(this.configuration)
       .listcontentHaloRunV1alpha1Post(
-        requestParameters.page,
         requestParameters.size,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.page,
         options
       )
       .then((request) => request(this.axios, this.basePath));

@@ -214,18 +214,18 @@ export const ContentHaloRunV1alpha1CommentApiAxiosParamCreator = function (
     },
     /**
      * List content.halo.run/v1alpha1/Comment
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listcontentHaloRunV1alpha1Comment: async (
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/content.halo.run/v1alpha1/comments`;
@@ -252,10 +252,6 @@ export const ContentHaloRunV1alpha1CommentApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (page !== undefined) {
-        localVarQueryParameter["page"] = page;
-      }
-
       if (size !== undefined) {
         localVarQueryParameter["size"] = size;
       }
@@ -266,6 +262,10 @@ export const ContentHaloRunV1alpha1CommentApiAxiosParamCreator = function (
 
       if (fieldSelector) {
         localVarQueryParameter["fieldSelector"] = fieldSelector;
+      }
+
+      if (page !== undefined) {
+        localVarQueryParameter["page"] = page;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -432,28 +432,28 @@ export const ContentHaloRunV1alpha1CommentApiFp = function (
     },
     /**
      * List content.halo.run/v1alpha1/Comment
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listcontentHaloRunV1alpha1Comment(
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentList>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listcontentHaloRunV1alpha1Comment(
-          page,
           size,
           labelSelector,
           fieldSelector,
+          page,
           options
         );
       return createRequestFunction(
@@ -558,10 +558,10 @@ export const ContentHaloRunV1alpha1CommentApiFactory = function (
     ): AxiosPromise<CommentList> {
       return localVarFp
         .listcontentHaloRunV1alpha1Comment(
-          requestParameters.page,
           requestParameters.size,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.page,
           options
         )
         .then((request) => request(axios, basePath));
@@ -636,13 +636,6 @@ export interface ContentHaloRunV1alpha1CommentApiGetcontentHaloRunV1alpha1Commen
  */
 export interface ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1CommentRequest {
   /**
-   * The page number. Zero indicates no page.
-   * @type {number}
-   * @memberof ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1Comment
-   */
-  readonly page?: number;
-
-  /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1Comment
@@ -662,6 +655,13 @@ export interface ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1Comme
    * @memberof ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1Comment
    */
   readonly fieldSelector?: Array<string>;
+
+  /**
+   * The page number. Zero indicates no page.
+   * @type {number}
+   * @memberof ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1Comment
+   */
+  readonly page?: number;
 }
 
 /**
@@ -753,10 +753,10 @@ export class ContentHaloRunV1alpha1CommentApi extends BaseAPI {
   ) {
     return ContentHaloRunV1alpha1CommentApiFp(this.configuration)
       .listcontentHaloRunV1alpha1Comment(
-        requestParameters.page,
         requestParameters.size,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.page,
         options
       )
       .then((request) => request(this.axios, this.basePath));

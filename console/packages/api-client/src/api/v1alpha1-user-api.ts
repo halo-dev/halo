@@ -212,18 +212,18 @@ export const V1alpha1UserApiAxiosParamCreator = function (
     },
     /**
      * List v1alpha1/User
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listv1alpha1User: async (
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/api/v1alpha1/users`;
@@ -250,10 +250,6 @@ export const V1alpha1UserApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (page !== undefined) {
-        localVarQueryParameter["page"] = page;
-      }
-
       if (size !== undefined) {
         localVarQueryParameter["size"] = size;
       }
@@ -264,6 +260,10 @@ export const V1alpha1UserApiAxiosParamCreator = function (
 
       if (fieldSelector) {
         localVarQueryParameter["fieldSelector"] = fieldSelector;
+      }
+
+      if (page !== undefined) {
+        localVarQueryParameter["page"] = page;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -420,28 +420,28 @@ export const V1alpha1UserApiFp = function (configuration?: Configuration) {
     },
     /**
      * List v1alpha1/User
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listv1alpha1User(
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserList>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listv1alpha1User(
-          page,
           size,
           labelSelector,
           fieldSelector,
+          page,
           options
         );
       return createRequestFunction(
@@ -542,10 +542,10 @@ export const V1alpha1UserApiFactory = function (
     ): AxiosPromise<UserList> {
       return localVarFp
         .listv1alpha1User(
-          requestParameters.page,
           requestParameters.size,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.page,
           options
         )
         .then((request) => request(axios, basePath));
@@ -620,13 +620,6 @@ export interface V1alpha1UserApiGetv1alpha1UserRequest {
  */
 export interface V1alpha1UserApiListv1alpha1UserRequest {
   /**
-   * The page number. Zero indicates no page.
-   * @type {number}
-   * @memberof V1alpha1UserApiListv1alpha1User
-   */
-  readonly page?: number;
-
-  /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof V1alpha1UserApiListv1alpha1User
@@ -646,6 +639,13 @@ export interface V1alpha1UserApiListv1alpha1UserRequest {
    * @memberof V1alpha1UserApiListv1alpha1User
    */
   readonly fieldSelector?: Array<string>;
+
+  /**
+   * The page number. Zero indicates no page.
+   * @type {number}
+   * @memberof V1alpha1UserApiListv1alpha1User
+   */
+  readonly page?: number;
 }
 
 /**
@@ -737,10 +737,10 @@ export class V1alpha1UserApi extends BaseAPI {
   ) {
     return V1alpha1UserApiFp(this.configuration)
       .listv1alpha1User(
-        requestParameters.page,
         requestParameters.size,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.page,
         options
       )
       .then((request) => request(this.axios, this.basePath));

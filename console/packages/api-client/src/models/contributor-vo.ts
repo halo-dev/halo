@@ -15,46 +15,37 @@
 /**
  *
  * @export
- * @interface Condition
+ * @interface ContributorVo
  */
-export interface Condition {
+export interface ContributorVo {
   /**
    *
    * @type {string}
-   * @memberof Condition
+   * @memberof ContributorVo
    */
-  lastTransitionTime: string;
+  avatar?: string;
   /**
    *
    * @type {string}
-   * @memberof Condition
+   * @memberof ContributorVo
    */
-  message: string;
+  bio?: string;
   /**
    *
    * @type {string}
-   * @memberof Condition
+   * @memberof ContributorVo
    */
-  reason: string;
+  displayName?: string;
   /**
    *
    * @type {string}
-   * @memberof Condition
+   * @memberof ContributorVo
    */
-  status: ConditionStatusEnum;
+  name?: string;
   /**
    *
    * @type {string}
-   * @memberof Condition
+   * @memberof ContributorVo
    */
-  type: string;
+  permalink?: string;
 }
-
-export const ConditionStatusEnum = {
-  True: "TRUE",
-  False: "FALSE",
-  Unknown: "UNKNOWN",
-} as const;
-
-export type ConditionStatusEnum =
-  (typeof ConditionStatusEnum)[keyof typeof ConditionStatusEnum];

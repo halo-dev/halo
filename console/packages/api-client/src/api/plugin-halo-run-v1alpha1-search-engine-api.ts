@@ -218,18 +218,18 @@ export const PluginHaloRunV1alpha1SearchEngineApiAxiosParamCreator = function (
     },
     /**
      * List plugin.halo.run/v1alpha1/SearchEngine
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listpluginHaloRunV1alpha1SearchEngine: async (
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/plugin.halo.run/v1alpha1/searchengines`;
@@ -256,10 +256,6 @@ export const PluginHaloRunV1alpha1SearchEngineApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (page !== undefined) {
-        localVarQueryParameter["page"] = page;
-      }
-
       if (size !== undefined) {
         localVarQueryParameter["size"] = size;
       }
@@ -270,6 +266,10 @@ export const PluginHaloRunV1alpha1SearchEngineApiAxiosParamCreator = function (
 
       if (fieldSelector) {
         localVarQueryParameter["fieldSelector"] = fieldSelector;
+      }
+
+      if (page !== undefined) {
+        localVarQueryParameter["page"] = page;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -440,18 +440,18 @@ export const PluginHaloRunV1alpha1SearchEngineApiFp = function (
     },
     /**
      * List plugin.halo.run/v1alpha1/SearchEngine
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listpluginHaloRunV1alpha1SearchEngine(
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -461,10 +461,10 @@ export const PluginHaloRunV1alpha1SearchEngineApiFp = function (
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listpluginHaloRunV1alpha1SearchEngine(
-          page,
           size,
           labelSelector,
           fieldSelector,
+          page,
           options
         );
       return createRequestFunction(
@@ -575,10 +575,10 @@ export const PluginHaloRunV1alpha1SearchEngineApiFactory = function (
     ): AxiosPromise<SearchEngineList> {
       return localVarFp
         .listpluginHaloRunV1alpha1SearchEngine(
-          requestParameters.page,
           requestParameters.size,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.page,
           options
         )
         .then((request) => request(axios, basePath));
@@ -653,13 +653,6 @@ export interface PluginHaloRunV1alpha1SearchEngineApiGetpluginHaloRunV1alpha1Sea
  */
 export interface PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngineRequest {
   /**
-   * The page number. Zero indicates no page.
-   * @type {number}
-   * @memberof PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngine
-   */
-  readonly page?: number;
-
-  /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngine
@@ -679,6 +672,13 @@ export interface PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1Se
    * @memberof PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngine
    */
   readonly fieldSelector?: Array<string>;
+
+  /**
+   * The page number. Zero indicates no page.
+   * @type {number}
+   * @memberof PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngine
+   */
+  readonly page?: number;
 }
 
 /**
@@ -773,10 +773,10 @@ export class PluginHaloRunV1alpha1SearchEngineApi extends BaseAPI {
   ) {
     return PluginHaloRunV1alpha1SearchEngineApiFp(this.configuration)
       .listpluginHaloRunV1alpha1SearchEngine(
-        requestParameters.page,
         requestParameters.size,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.page,
         options
       )
       .then((request) => request(this.axios, this.basePath));

@@ -214,18 +214,18 @@ export const MetricsHaloRunV1alpha1CounterApiAxiosParamCreator = function (
     },
     /**
      * List metrics.halo.run/v1alpha1/Counter
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listmetricsHaloRunV1alpha1Counter: async (
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/metrics.halo.run/v1alpha1/counters`;
@@ -252,10 +252,6 @@ export const MetricsHaloRunV1alpha1CounterApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (page !== undefined) {
-        localVarQueryParameter["page"] = page;
-      }
-
       if (size !== undefined) {
         localVarQueryParameter["size"] = size;
       }
@@ -266,6 +262,10 @@ export const MetricsHaloRunV1alpha1CounterApiAxiosParamCreator = function (
 
       if (fieldSelector) {
         localVarQueryParameter["fieldSelector"] = fieldSelector;
+      }
+
+      if (page !== undefined) {
+        localVarQueryParameter["page"] = page;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -432,28 +432,28 @@ export const MetricsHaloRunV1alpha1CounterApiFp = function (
     },
     /**
      * List metrics.halo.run/v1alpha1/Counter
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listmetricsHaloRunV1alpha1Counter(
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<CounterList>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listmetricsHaloRunV1alpha1Counter(
-          page,
           size,
           labelSelector,
           fieldSelector,
+          page,
           options
         );
       return createRequestFunction(
@@ -558,10 +558,10 @@ export const MetricsHaloRunV1alpha1CounterApiFactory = function (
     ): AxiosPromise<CounterList> {
       return localVarFp
         .listmetricsHaloRunV1alpha1Counter(
-          requestParameters.page,
           requestParameters.size,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.page,
           options
         )
         .then((request) => request(axios, basePath));
@@ -636,13 +636,6 @@ export interface MetricsHaloRunV1alpha1CounterApiGetmetricsHaloRunV1alpha1Counte
  */
 export interface MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1CounterRequest {
   /**
-   * The page number. Zero indicates no page.
-   * @type {number}
-   * @memberof MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1Counter
-   */
-  readonly page?: number;
-
-  /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1Counter
@@ -662,6 +655,13 @@ export interface MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1Count
    * @memberof MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1Counter
    */
   readonly fieldSelector?: Array<string>;
+
+  /**
+   * The page number. Zero indicates no page.
+   * @type {number}
+   * @memberof MetricsHaloRunV1alpha1CounterApiListmetricsHaloRunV1alpha1Counter
+   */
+  readonly page?: number;
 }
 
 /**
@@ -753,10 +753,10 @@ export class MetricsHaloRunV1alpha1CounterApi extends BaseAPI {
   ) {
     return MetricsHaloRunV1alpha1CounterApiFp(this.configuration)
       .listmetricsHaloRunV1alpha1Counter(
-        requestParameters.page,
         requestParameters.size,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.page,
         options
       )
       .then((request) => request(this.axios, this.basePath));

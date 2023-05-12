@@ -221,18 +221,18 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiAxiosParamCreator =
       },
       /**
        * List plugin.halo.run/v1alpha1/ExtensionDefinition
-       * @param {number} [page] The page number. Zero indicates no page.
        * @param {number} [size] Size of one page. Zero indicates no limit.
        * @param {Array<string>} [labelSelector] Label selector for filtering.
        * @param {Array<string>} [fieldSelector] Field selector for filtering.
+       * @param {number} [page] The page number. Zero indicates no page.
        * @param {*} [options] Override http request option.
        * @throws {RequiredError}
        */
       listpluginHaloRunV1alpha1ExtensionDefinition: async (
-        page?: number,
         size?: number,
         labelSelector?: Array<string>,
         fieldSelector?: Array<string>,
+        page?: number,
         options: AxiosRequestConfig = {}
       ): Promise<RequestArgs> => {
         const localVarPath = `/apis/plugin.halo.run/v1alpha1/extensiondefinitions`;
@@ -259,10 +259,6 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiAxiosParamCreator =
         // http bearer authentication required
         await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-        if (page !== undefined) {
-          localVarQueryParameter["page"] = page;
-        }
-
         if (size !== undefined) {
           localVarQueryParameter["size"] = size;
         }
@@ -273,6 +269,10 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiAxiosParamCreator =
 
         if (fieldSelector) {
           localVarQueryParameter["fieldSelector"] = fieldSelector;
+        }
+
+        if (page !== undefined) {
+          localVarQueryParameter["page"] = page;
         }
 
         setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -449,18 +449,18 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiFp = function (
     },
     /**
      * List plugin.halo.run/v1alpha1/ExtensionDefinition
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listpluginHaloRunV1alpha1ExtensionDefinition(
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -470,10 +470,10 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiFp = function (
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listpluginHaloRunV1alpha1ExtensionDefinition(
-          page,
           size,
           labelSelector,
           fieldSelector,
+          page,
           options
         );
       return createRequestFunction(
@@ -591,10 +591,10 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiFactory = function (
     ): AxiosPromise<ExtensionDefinitionList> {
       return localVarFp
         .listpluginHaloRunV1alpha1ExtensionDefinition(
-          requestParameters.page,
           requestParameters.size,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.page,
           options
         )
         .then((request) => request(axios, basePath));
@@ -669,13 +669,6 @@ export interface PluginHaloRunV1alpha1ExtensionDefinitionApiGetpluginHaloRunV1al
  */
 export interface PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinitionRequest {
   /**
-   * The page number. Zero indicates no page.
-   * @type {number}
-   * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinition
-   */
-  readonly page?: number;
-
-  /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinition
@@ -695,6 +688,13 @@ export interface PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1a
    * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinition
    */
   readonly fieldSelector?: Array<string>;
+
+  /**
+   * The page number. Zero indicates no page.
+   * @type {number}
+   * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinition
+   */
+  readonly page?: number;
 }
 
 /**
@@ -795,10 +795,10 @@ export class PluginHaloRunV1alpha1ExtensionDefinitionApi extends BaseAPI {
   ) {
     return PluginHaloRunV1alpha1ExtensionDefinitionApiFp(this.configuration)
       .listpluginHaloRunV1alpha1ExtensionDefinition(
-        requestParameters.page,
         requestParameters.size,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.page,
         options
       )
       .then((request) => request(this.axios, this.basePath));

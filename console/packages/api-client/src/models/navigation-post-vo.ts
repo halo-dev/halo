@@ -12,16 +12,32 @@
  * Do not edit the class manually.
  */
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { PostVo } from "./post-vo";
+
 /**
  *
  * @export
- * @interface AttachmentStatus
+ * @interface NavigationPostVo
  */
-export interface AttachmentStatus {
+export interface NavigationPostVo {
   /**
-   * Permalink of attachment. If it is in local storage, the public URL will be set. If it is in s3 storage, the Object URL will be set.
-   * @type {string}
-   * @memberof AttachmentStatus
+   *
+   * @type {PostVo}
+   * @memberof NavigationPostVo
    */
-  permalink?: string;
+  current?: PostVo;
+  /**
+   *
+   * @type {PostVo}
+   * @memberof NavigationPostVo
+   */
+  next?: PostVo;
+  /**
+   *
+   * @type {PostVo}
+   * @memberof NavigationPostVo
+   */
+  previous?: PostVo;
 }

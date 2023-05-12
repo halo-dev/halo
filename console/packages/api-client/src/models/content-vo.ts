@@ -15,13 +15,19 @@
 /**
  *
  * @export
- * @interface AttachmentStatus
+ * @interface ContentVo
  */
-export interface AttachmentStatus {
+export interface ContentVo {
   /**
-   * Permalink of attachment. If it is in local storage, the public URL will be set. If it is in s3 storage, the Object URL will be set.
+   *
    * @type {string}
-   * @memberof AttachmentStatus
+   * @memberof ContentVo
    */
-  permalink?: string;
+  content?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof ContentVo
+   */
+  raw?: string;
 }

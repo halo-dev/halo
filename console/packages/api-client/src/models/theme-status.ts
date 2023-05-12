@@ -49,4 +49,4 @@ export const ThemeStatusPhaseEnum = {
 } as const;
 
 export type ThemeStatusPhaseEnum =
-  typeof ThemeStatusPhaseEnum[keyof typeof ThemeStatusPhaseEnum];
+  (typeof ThemeStatusPhaseEnum)[keyof typeof ThemeStatusPhaseEnum];

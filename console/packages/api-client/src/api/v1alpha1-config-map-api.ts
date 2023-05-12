@@ -212,18 +212,18 @@ export const V1alpha1ConfigMapApiAxiosParamCreator = function (
     },
     /**
      * List v1alpha1/ConfigMap
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listv1alpha1ConfigMap: async (
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/api/v1alpha1/configmaps`;
@@ -250,10 +250,6 @@ export const V1alpha1ConfigMapApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (page !== undefined) {
-        localVarQueryParameter["page"] = page;
-      }
-
       if (size !== undefined) {
         localVarQueryParameter["size"] = size;
       }
@@ -264,6 +260,10 @@ export const V1alpha1ConfigMapApiAxiosParamCreator = function (
 
       if (fieldSelector) {
         localVarQueryParameter["fieldSelector"] = fieldSelector;
+      }
+
+      if (page !== undefined) {
+        localVarQueryParameter["page"] = page;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -421,28 +421,28 @@ export const V1alpha1ConfigMapApiFp = function (configuration?: Configuration) {
     },
     /**
      * List v1alpha1/ConfigMap
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listv1alpha1ConfigMap(
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ConfigMapList>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listv1alpha1ConfigMap(
-          page,
           size,
           labelSelector,
           fieldSelector,
+          page,
           options
         );
       return createRequestFunction(
@@ -547,10 +547,10 @@ export const V1alpha1ConfigMapApiFactory = function (
     ): AxiosPromise<ConfigMapList> {
       return localVarFp
         .listv1alpha1ConfigMap(
-          requestParameters.page,
           requestParameters.size,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.page,
           options
         )
         .then((request) => request(axios, basePath));
@@ -625,13 +625,6 @@ export interface V1alpha1ConfigMapApiGetv1alpha1ConfigMapRequest {
  */
 export interface V1alpha1ConfigMapApiListv1alpha1ConfigMapRequest {
   /**
-   * The page number. Zero indicates no page.
-   * @type {number}
-   * @memberof V1alpha1ConfigMapApiListv1alpha1ConfigMap
-   */
-  readonly page?: number;
-
-  /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof V1alpha1ConfigMapApiListv1alpha1ConfigMap
@@ -651,6 +644,13 @@ export interface V1alpha1ConfigMapApiListv1alpha1ConfigMapRequest {
    * @memberof V1alpha1ConfigMapApiListv1alpha1ConfigMap
    */
   readonly fieldSelector?: Array<string>;
+
+  /**
+   * The page number. Zero indicates no page.
+   * @type {number}
+   * @memberof V1alpha1ConfigMapApiListv1alpha1ConfigMap
+   */
+  readonly page?: number;
 }
 
 /**
@@ -742,10 +742,10 @@ export class V1alpha1ConfigMapApi extends BaseAPI {
   ) {
     return V1alpha1ConfigMapApiFp(this.configuration)
       .listv1alpha1ConfigMap(
-        requestParameters.page,
         requestParameters.size,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.page,
         options
       )
       .then((request) => request(this.axios, this.basePath));

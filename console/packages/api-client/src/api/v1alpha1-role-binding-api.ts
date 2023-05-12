@@ -212,18 +212,18 @@ export const V1alpha1RoleBindingApiAxiosParamCreator = function (
     },
     /**
      * List v1alpha1/RoleBinding
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listv1alpha1RoleBinding: async (
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/api/v1alpha1/rolebindings`;
@@ -250,10 +250,6 @@ export const V1alpha1RoleBindingApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (page !== undefined) {
-        localVarQueryParameter["page"] = page;
-      }
-
       if (size !== undefined) {
         localVarQueryParameter["size"] = size;
       }
@@ -264,6 +260,10 @@ export const V1alpha1RoleBindingApiAxiosParamCreator = function (
 
       if (fieldSelector) {
         localVarQueryParameter["fieldSelector"] = fieldSelector;
+      }
+
+      if (page !== undefined) {
+        localVarQueryParameter["page"] = page;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -426,18 +426,18 @@ export const V1alpha1RoleBindingApiFp = function (
     },
     /**
      * List v1alpha1/RoleBinding
-     * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listv1alpha1RoleBinding(
-      page?: number,
       size?: number,
       labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      page?: number,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -447,10 +447,10 @@ export const V1alpha1RoleBindingApiFp = function (
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listv1alpha1RoleBinding(
-          page,
           size,
           labelSelector,
           fieldSelector,
+          page,
           options
         );
       return createRequestFunction(
@@ -555,10 +555,10 @@ export const V1alpha1RoleBindingApiFactory = function (
     ): AxiosPromise<RoleBindingList> {
       return localVarFp
         .listv1alpha1RoleBinding(
-          requestParameters.page,
           requestParameters.size,
           requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.page,
           options
         )
         .then((request) => request(axios, basePath));
@@ -633,13 +633,6 @@ export interface V1alpha1RoleBindingApiGetv1alpha1RoleBindingRequest {
  */
 export interface V1alpha1RoleBindingApiListv1alpha1RoleBindingRequest {
   /**
-   * The page number. Zero indicates no page.
-   * @type {number}
-   * @memberof V1alpha1RoleBindingApiListv1alpha1RoleBinding
-   */
-  readonly page?: number;
-
-  /**
    * Size of one page. Zero indicates no limit.
    * @type {number}
    * @memberof V1alpha1RoleBindingApiListv1alpha1RoleBinding
@@ -659,6 +652,13 @@ export interface V1alpha1RoleBindingApiListv1alpha1RoleBindingRequest {
    * @memberof V1alpha1RoleBindingApiListv1alpha1RoleBinding
    */
   readonly fieldSelector?: Array<string>;
+
+  /**
+   * The page number. Zero indicates no page.
+   * @type {number}
+   * @memberof V1alpha1RoleBindingApiListv1alpha1RoleBinding
+   */
+  readonly page?: number;
 }
 
 /**
@@ -750,10 +750,10 @@ export class V1alpha1RoleBindingApi extends BaseAPI {
   ) {
     return V1alpha1RoleBindingApiFp(this.configuration)
       .listv1alpha1RoleBinding(
-        requestParameters.page,
         requestParameters.size,
         requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.page,
         options
       )
       .then((request) => request(this.axios, this.basePath));

@@ -366,6 +366,60 @@ export const ApiConsoleHaloRunV1alpha1PluginApiAxiosParamCreator = function (
       };
     },
     /**
+     * Reload a plugin by name.
+     * @param {string} name
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    reloadPlugin: async (
+      name: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'name' is not null or undefined
+      assertParamExists("reloadPlugin", "name", name);
+      const localVarPath =
+        `/apis/api.console.halo.run/v1alpha1/plugins/{name}/reload`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "PUT",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
      * Reset the configMap of plugin setting.
      * @param {string} name
      * @param {*} [options] Override http request option.
@@ -707,6 +761,29 @@ export const ApiConsoleHaloRunV1alpha1PluginApiFp = function (
       );
     },
     /**
+     * Reload a plugin by name.
+     * @param {string} name
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async reloadPlugin(
+      name: string,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Plugin>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.reloadPlugin(
+        name,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
      * Reset the configMap of plugin setting.
      * @param {string} name
      * @param {*} [options] Override http request option.
@@ -883,6 +960,20 @@ export const ApiConsoleHaloRunV1alpha1PluginApiFactory = function (
         .then((request) => request(axios, basePath));
     },
     /**
+     * Reload a plugin by name.
+     * @param {ApiConsoleHaloRunV1alpha1PluginApiReloadPluginRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    reloadPlugin(
+      requestParameters: ApiConsoleHaloRunV1alpha1PluginApiReloadPluginRequest,
+      options?: AxiosRequestConfig
+    ): AxiosPromise<Plugin> {
+      return localVarFp
+        .reloadPlugin(requestParameters.name, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
      * Reset the configMap of plugin setting.
      * @param {ApiConsoleHaloRunV1alpha1PluginApiResetPluginConfigRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -1050,6 +1141,20 @@ export interface ApiConsoleHaloRunV1alpha1PluginApiListPluginsRequest {
 }
 
 /**
+ * Request parameters for reloadPlugin operation in ApiConsoleHaloRunV1alpha1PluginApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1PluginApiReloadPluginRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1PluginApiReloadPluginRequest {
+  /**
+   *
+   * @type {string}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApiReloadPlugin
+   */
+  readonly name: string;
+}
+
+/**
  * Request parameters for resetPluginConfig operation in ApiConsoleHaloRunV1alpha1PluginApi.
  * @export
  * @interface ApiConsoleHaloRunV1alpha1PluginApiResetPluginConfigRequest
@@ -1213,6 +1318,22 @@ export class ApiConsoleHaloRunV1alpha1PluginApi extends BaseAPI {
         requestParameters.page,
         options
       )
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   * Reload a plugin by name.
+   * @param {ApiConsoleHaloRunV1alpha1PluginApiReloadPluginRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApi
+   */
+  public reloadPlugin(
+    requestParameters: ApiConsoleHaloRunV1alpha1PluginApiReloadPluginRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return ApiConsoleHaloRunV1alpha1PluginApiFp(this.configuration)
+      .reloadPlugin(requestParameters.name, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
