@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,6 +13,7 @@ import static org.springframework.web.reactive.function.BodyInserters.fromMultip
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.AfterEach;
@@ -63,6 +65,9 @@ class ThemeEndpointTest {
 
     @Mock
     private SystemConfigurableEnvironmentFetcher environmentFetcher;
+
+    @Mock
+    private ZipStreamFetcher zipStreamFetcher;
 
     @InjectMocks
     ThemeEndpoint themeEndpoint;
@@ -138,6 +143,31 @@ class ThemeEndpointTest {
             verify(templateEngineManager, times(1)).clearCache(eq("default"));
         }
 
+        @Test
+        void upgradeFromUri() {
+            final URI uri = URI.create("https://example.com/test-theme.zip");
+            Theme fakeTheme = mock(Theme.class);
+            Metadata metadata = new Metadata();
+            metadata.setName("default");
+            when(fakeTheme.getMetadata()).thenReturn(metadata);
+            when(themeService.upgrade(eq("default"), isA(InputStream.class)))
+                .thenReturn(Mono.just(fakeTheme));
+            when(zipStreamFetcher.fetch(eq(uri))).thenReturn(Mono.just(mock(InputStream.class)));
+            when(templateEngineManager.clearCache(eq("default")))
+                .thenReturn(Mono.empty());
+            var body = new ThemeEndpoint.UpgradeFromUriRequest(uri);
+            webTestClient.post()
+                .uri("/themes/default/upgrade-from-uri")
+                .bodyValue(body)
+                .exchange()
+                .expectStatus().isOk();
+
+            verify(themeService).upgrade(eq("default"), isA(InputStream.class));
+
+            verify(templateEngineManager, times(1)).clearCache(eq("default"));
+
+            verify(zipStreamFetcher).fetch(eq(uri));
+        }
     }
 
     @Test
@@ -171,6 +201,24 @@ class ThemeEndpointTest {
             .body(fromMultipartData(multipartBodyBuilder.build()))
             .exchange()
             .expectStatus().is5xxServerError();
+    }
+
+    @Test
+    void installFromUri() {
+        final URI uri = URI.create("https://example.com/test-theme.zip");
+        Theme fakeTheme = mock(Theme.class);
+        when(themeService.install(isA(InputStream.class)))
+            .thenReturn(Mono.just(fakeTheme));
+        when(zipStreamFetcher.fetch(eq(uri))).thenReturn(Mono.just(mock(InputStream.class)));
+        var body = new ThemeEndpoint.UpgradeFromUriRequest(uri);
+        webTestClient.post()
+            .uri("/themes/-/install-from-uri")
+            .bodyValue(body)
+            .exchange()
+            .expectStatus().isOk();
+
+        verify(themeService).install(isA(InputStream.class));
+        verify(zipStreamFetcher).fetch(eq(uri));
     }
 
     @Test
