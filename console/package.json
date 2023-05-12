@@ -34,6 +34,16 @@
     "packages/*"
   ],
   "dependencies": {
+    "@codemirror/commands": "^6.1.2",
+    "@codemirror/lang-css": "^6.0.1",
+    "@codemirror/lang-html": "^6.2.0",
+    "@codemirror/lang-javascript": "^6.1.1",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/language": "^6.3.1",
+    "@codemirror/legacy-modes": "^6.3.0",
+    "@codemirror/state": "^6.1.4",
+    "@codemirror/view": "^6.5.1",
+    "codemirror": "^6.0.1",
     "@emoji-mart/data": "^1.0.8",
     "@formkit/core": "^0.16.4",
     "@formkit/i18n": "^0.16.4",
