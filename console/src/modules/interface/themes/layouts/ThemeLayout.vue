@@ -165,8 +165,12 @@ const remoteDownloadUrl = useRouteQuery<string | null>("remote-download-url");
 onMounted(() => {
   if (remoteDownloadUrl.value) {
     Dialog.warning({
-      title: "检测到了远程下载地址，是否需要下载？",
-      description: `请仔细鉴别此地址是否可信：${remoteDownloadUrl.value}`,
+      title: t("core.theme.operations.remote_download.title"),
+      description: t("core.theme.operations.remote_download.description", {
+        url: remoteDownloadUrl.value,
+      }),
+      confirmText: t("core.common.buttons.download"),
+      cancelText: t("core.common.buttons.cancel"),
       onConfirm() {
         themesModal.value = true;
       },

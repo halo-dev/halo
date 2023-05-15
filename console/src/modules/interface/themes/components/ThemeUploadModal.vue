@@ -154,7 +154,7 @@ watch(
     @update:visible="handleVisibleChange"
   >
     <VTabs v-model:active-id="activeTabId" type="outline" class="!rounded-none">
-      <VTabItem id="local" label="本地上传">
+      <VTabItem id="local" :label="$t('core.theme.upload_modal.tabs.local')">
         <UppyUpload
           v-if="uploadVisible"
           :restrictions="{
@@ -166,7 +166,10 @@ watch(
           @uploaded="onUploaded"
         />
       </VTabItem>
-      <VTabItem id="remote" label="远程下载">
+      <VTabItem
+        id="remote"
+        :label="$t('core.theme.upload_modal.tabs.remote.title')"
+      >
         <FormKit
           id="theme-remote-download-form"
           name="theme-remote-download-form"
@@ -176,7 +179,7 @@ watch(
         >
           <FormKit
             v-model="remoteDownloadUrl"
-            label="下载地址"
+            :label="$t('core.theme.upload_modal.tabs.remote.fields.url')"
             type="text"
           ></FormKit>
         </FormKit>
@@ -187,7 +190,7 @@ watch(
             type="secondary"
             @click="$formkit.submit('theme-remote-download-form')"
           >
-            下载
+            {{ $t("core.common.buttons.download") }}
           </VButton>
         </div>
       </VTabItem>
