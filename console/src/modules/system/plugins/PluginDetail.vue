@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import {
+  VAlert,
   VDescription,
   VDescriptionItem,
-  VStatusDot,
   VSwitch,
 } from "@halo-dev/components";
 import type { Ref } from "vue";
@@ -70,21 +70,21 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
           <h3 class="text-lg font-medium leading-6 text-gray-900">
             {{ $t("core.plugin.detail.header.title") }}
           </h3>
-          <p class="mt-1 flex max-w-2xl items-center gap-2">
-            <span class="text-sm text-gray-500">
-              {{ plugin?.spec.version }}
-            </span>
-            <VStatusDot
-              v-if="getFailedMessage(plugin)"
-              v-tooltip="getFailedMessage(plugin)"
-              state="error"
-              animate
-            />
-          </p>
         </div>
         <div v-permission="['system:plugins:manage']">
           <VSwitch :model-value="plugin?.spec.enabled" @change="changeStatus" />
         </div>
+      </div>
+      <div
+        v-if="getFailedMessage() && plugin?.status?.conditions?.length"
+        class="w-full px-4 pb-2 sm:px-6"
+      >
+        <VAlert
+          type="error"
+          :title="plugin?.status?.conditions?.[0].reason"
+          :description="plugin?.status?.conditions?.[0].message"
+          :closable="false"
+        />
       </div>
       <div class="border-t border-gray-200">
         <VDescription>

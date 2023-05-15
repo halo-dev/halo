@@ -100,11 +100,7 @@ const handleResetSettingConfig = async () => {
     <template #end>
       <VEntityField v-if="plugin?.status?.phase === 'FAILED'">
         <template #description>
-          <VStatusDot
-            v-tooltip="getFailedMessage(plugin)"
-            state="error"
-            animate
-          />
+          <VStatusDot v-tooltip="getFailedMessage()" state="error" animate />
         </template>
       </VEntityField>
       <VEntityField v-if="plugin?.metadata.deletionTimestamp">
