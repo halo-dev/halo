@@ -34,6 +34,7 @@ import { storeToRefs } from "pinia";
 import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
 import { useQuery } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -156,6 +157,14 @@ onMounted(() => {
 
 watch([() => route.name, () => route.params], async () => {
   handleTriggerTabChange();
+});
+
+// handle remote download url from route
+const remoteDownloadUrl = useRouteQuery<string>("remote-download-url");
+onMounted(() => {
+  if (remoteDownloadUrl.value) {
+    themesModal.value = true;
+  }
 });
 </script>
 <template>

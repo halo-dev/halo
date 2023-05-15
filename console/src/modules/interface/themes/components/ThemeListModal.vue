@@ -17,11 +17,12 @@ import LazyImage from "@/components/image/LazyImage.vue";
 import ThemePreviewModal from "./preview/ThemePreviewModal.vue";
 import ThemeUploadModal from "./ThemeUploadModal.vue";
 import ThemeListItem from "./components/ThemeListItem.vue";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref, nextTick } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
 import { useQuery } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
 
 const { t } = useI18n();
 
@@ -143,6 +144,16 @@ const handleOpenInstallModal = () => {
   themeToUpgrade.value = undefined;
   themeUploadVisible.value = true;
 };
+
+// handle remote wordpress url from route
+const remoteDownloadUrl = useRouteQuery<string>("remote-download-url");
+onMounted(() => {
+  if (remoteDownloadUrl.value) {
+    nextTick(() => {
+      handleOpenInstallModal();
+    });
+  }
+});
 </script>
 <template>
   <VModal
