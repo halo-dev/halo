@@ -172,7 +172,7 @@ watch([() => route.name, () => route.params], async () => {
       <template #actions>
         <VSpace>
           <VButton
-            v-if="!isActivated"
+            v-show="!isActivated"
             v-permission="['system:themes:manage']"
             size="sm"
             type="primary"
