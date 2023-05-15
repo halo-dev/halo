@@ -32,6 +32,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.Unstructured;
+import run.halo.app.infra.exception.ThemeAlreadyExistsException;
 import run.halo.app.infra.exception.ThemeInstallationException;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
@@ -138,8 +139,7 @@ class ThemeUtils {
                 var themeTargetPath = themeWorkDir.resolve(themeName);
                 try {
                     if (!override && !FileUtils.isEmpty(themeTargetPath)) {
-                        throw new ThemeInstallationException("Theme already exists.",
-                            "problemDetail.theme.install.alreadyExists", new Object[] {themeName});
+                        throw new ThemeAlreadyExistsException(themeName);
                     }
                     // install theme to theme work dir
                     copyRecursively(themeManifestPath.getParent(), themeTargetPath);
