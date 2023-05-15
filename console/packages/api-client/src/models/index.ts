@@ -153,3 +153,5 @@ export * from "./user-permission";
 export * from "./user-spec";
 export * from "./user-status";
 export * from "./vote-request";
+export * from "./install-from-uri-request";
+export * from "./upgrade-from-uri-request";
