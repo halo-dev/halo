@@ -24,6 +24,7 @@ import {
   VSpace,
   VTabbar,
   VLoading,
+  Dialog,
 } from "@halo-dev/components";
 import ThemeListModal from "../components/ThemeListModal.vue";
 import ThemePreviewModal from "../components/preview/ThemePreviewModal.vue";
@@ -160,10 +161,19 @@ watch([() => route.name, () => route.params], async () => {
 });
 
 // handle remote download url from route
-const remoteDownloadUrl = useRouteQuery<string>("remote-download-url");
+const remoteDownloadUrl = useRouteQuery<string | null>("remote-download-url");
 onMounted(() => {
   if (remoteDownloadUrl.value) {
-    themesModal.value = true;
+    Dialog.warning({
+      title: "检测到了远程下载地址，是否需要下载？",
+      description: `请仔细鉴别此地址是否可信：${remoteDownloadUrl.value}`,
+      onConfirm() {
+        themesModal.value = true;
+      },
+      onCancel() {
+        remoteDownloadUrl.value = null;
+      },
+    });
   }
 });
 </script>

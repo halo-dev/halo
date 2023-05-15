@@ -184,6 +184,7 @@ watch(
         <div class="pt-5">
           <VButton
             :loading="downloading"
+            type="secondary"
             @click="$formkit.submit('theme-remote-download-form')"
           >
             下载
