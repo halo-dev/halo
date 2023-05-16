@@ -195,7 +195,7 @@ onMounted(() => {
       <template #actions>
         <VSpace>
           <VButton
-            v-if="!isActivated"
+            v-show="!isActivated"
             v-permission="['system:themes:manage']"
             size="sm"
             type="primary"
