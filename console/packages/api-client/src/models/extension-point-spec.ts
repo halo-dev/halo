@@ -56,4 +56,4 @@ export const ExtensionPointSpecTypeEnum = {
 } as const;
 
 export type ExtensionPointSpecTypeEnum =
-  typeof ExtensionPointSpecTypeEnum[keyof typeof ExtensionPointSpecTypeEnum];
+  (typeof ExtensionPointSpecTypeEnum)[keyof typeof ExtensionPointSpecTypeEnum];

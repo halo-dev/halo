@@ -212,18 +212,18 @@ export const V1alpha1SettingApiAxiosParamCreator = function (
     },
     /**
      * List v1alpha1/Setting
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listv1alpha1Setting: async (
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/api/v1alpha1/settings`;
@@ -250,20 +250,20 @@ export const V1alpha1SettingApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (page !== undefined) {
-        localVarQueryParameter["page"] = page;
-      }
-
-      if (size !== undefined) {
-        localVarQueryParameter["size"] = size;
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
       if (labelSelector) {
         localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
+      if (page !== undefined) {
+        localVarQueryParameter["page"] = page;
+      }
+
+      if (size !== undefined) {
+        localVarQueryParameter["size"] = size;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -418,28 +418,28 @@ export const V1alpha1SettingApiFp = function (configuration?: Configuration) {
     },
     /**
      * List v1alpha1/Setting
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listv1alpha1Setting(
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingList>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listv1alpha1Setting(
+          fieldSelector,
+          labelSelector,
           page,
           size,
-          labelSelector,
-          fieldSelector,
           options
         );
       return createRequestFunction(
@@ -544,10 +544,10 @@ export const V1alpha1SettingApiFactory = function (
     ): AxiosPromise<SettingList> {
       return localVarFp
         .listv1alpha1Setting(
+          requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
           requestParameters.size,
-          requestParameters.labelSelector,
-          requestParameters.fieldSelector,
           options
         )
         .then((request) => request(axios, basePath));
@@ -622,6 +622,20 @@ export interface V1alpha1SettingApiGetv1alpha1SettingRequest {
  */
 export interface V1alpha1SettingApiListv1alpha1SettingRequest {
   /**
+   * Field selector for filtering.
+   * @type {Array<string>}
+   * @memberof V1alpha1SettingApiListv1alpha1Setting
+   */
+  readonly fieldSelector?: Array<string>;
+
+  /**
+   * Label selector for filtering.
+   * @type {Array<string>}
+   * @memberof V1alpha1SettingApiListv1alpha1Setting
+   */
+  readonly labelSelector?: Array<string>;
+
+  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof V1alpha1SettingApiListv1alpha1Setting
@@ -634,20 +648,6 @@ export interface V1alpha1SettingApiListv1alpha1SettingRequest {
    * @memberof V1alpha1SettingApiListv1alpha1Setting
    */
   readonly size?: number;
-
-  /**
-   * Label selector for filtering.
-   * @type {Array<string>}
-   * @memberof V1alpha1SettingApiListv1alpha1Setting
-   */
-  readonly labelSelector?: Array<string>;
-
-  /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof V1alpha1SettingApiListv1alpha1Setting
-   */
-  readonly fieldSelector?: Array<string>;
 }
 
 /**
@@ -739,10 +739,10 @@ export class V1alpha1SettingApi extends BaseAPI {
   ) {
     return V1alpha1SettingApiFp(this.configuration)
       .listv1alpha1Setting(
+        requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
         requestParameters.size,
-        requestParameters.labelSelector,
-        requestParameters.fieldSelector,
         options
       )
       .then((request) => request(this.axios, this.basePath));

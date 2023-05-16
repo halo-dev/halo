@@ -76,4 +76,4 @@ export const PluginStatusPhaseEnum = {
 } as const;
 
 export type PluginStatusPhaseEnum =
-  typeof PluginStatusPhaseEnum[keyof typeof PluginStatusPhaseEnum];
+  (typeof PluginStatusPhaseEnum)[keyof typeof PluginStatusPhaseEnum];

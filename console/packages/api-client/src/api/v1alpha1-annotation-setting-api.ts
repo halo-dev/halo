@@ -212,18 +212,18 @@ export const V1alpha1AnnotationSettingApiAxiosParamCreator = function (
     },
     /**
      * List v1alpha1/AnnotationSetting
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listv1alpha1AnnotationSetting: async (
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/api/v1alpha1/annotationsettings`;
@@ -250,20 +250,20 @@ export const V1alpha1AnnotationSettingApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (page !== undefined) {
-        localVarQueryParameter["page"] = page;
-      }
-
-      if (size !== undefined) {
-        localVarQueryParameter["size"] = size;
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
       if (labelSelector) {
         localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
+      if (page !== undefined) {
+        localVarQueryParameter["page"] = page;
+      }
+
+      if (size !== undefined) {
+        localVarQueryParameter["size"] = size;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -435,18 +435,18 @@ export const V1alpha1AnnotationSettingApiFp = function (
     },
     /**
      * List v1alpha1/AnnotationSetting
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listv1alpha1AnnotationSetting(
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -456,10 +456,10 @@ export const V1alpha1AnnotationSettingApiFp = function (
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listv1alpha1AnnotationSetting(
+          fieldSelector,
+          labelSelector,
           page,
           size,
-          labelSelector,
-          fieldSelector,
           options
         );
       return createRequestFunction(
@@ -570,10 +570,10 @@ export const V1alpha1AnnotationSettingApiFactory = function (
     ): AxiosPromise<AnnotationSettingList> {
       return localVarFp
         .listv1alpha1AnnotationSetting(
+          requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
           requestParameters.size,
-          requestParameters.labelSelector,
-          requestParameters.fieldSelector,
           options
         )
         .then((request) => request(axios, basePath));
@@ -648,6 +648,20 @@ export interface V1alpha1AnnotationSettingApiGetv1alpha1AnnotationSettingRequest
  */
 export interface V1alpha1AnnotationSettingApiListv1alpha1AnnotationSettingRequest {
   /**
+   * Field selector for filtering.
+   * @type {Array<string>}
+   * @memberof V1alpha1AnnotationSettingApiListv1alpha1AnnotationSetting
+   */
+  readonly fieldSelector?: Array<string>;
+
+  /**
+   * Label selector for filtering.
+   * @type {Array<string>}
+   * @memberof V1alpha1AnnotationSettingApiListv1alpha1AnnotationSetting
+   */
+  readonly labelSelector?: Array<string>;
+
+  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof V1alpha1AnnotationSettingApiListv1alpha1AnnotationSetting
@@ -660,20 +674,6 @@ export interface V1alpha1AnnotationSettingApiListv1alpha1AnnotationSettingReques
    * @memberof V1alpha1AnnotationSettingApiListv1alpha1AnnotationSetting
    */
   readonly size?: number;
-
-  /**
-   * Label selector for filtering.
-   * @type {Array<string>}
-   * @memberof V1alpha1AnnotationSettingApiListv1alpha1AnnotationSetting
-   */
-  readonly labelSelector?: Array<string>;
-
-  /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof V1alpha1AnnotationSettingApiListv1alpha1AnnotationSetting
-   */
-  readonly fieldSelector?: Array<string>;
 }
 
 /**
@@ -768,10 +768,10 @@ export class V1alpha1AnnotationSettingApi extends BaseAPI {
   ) {
     return V1alpha1AnnotationSettingApiFp(this.configuration)
       .listv1alpha1AnnotationSetting(
+        requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
         requestParameters.size,
-        requestParameters.labelSelector,
-        requestParameters.fieldSelector,
         options
       )
       .then((request) => request(this.axios, this.basePath));

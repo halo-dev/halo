@@ -50,19 +50,19 @@ export const ApiConsoleHaloRunV1alpha1ReplyApiAxiosParamCreator = function (
     /**
      * List replies.
      * @param {string} [commentName] Replies filtered by commentName.
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listReplies: async (
       commentName?: string,
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/api.console.halo.run/v1alpha1/replies`;
@@ -93,20 +93,20 @@ export const ApiConsoleHaloRunV1alpha1ReplyApiAxiosParamCreator = function (
         localVarQueryParameter["commentName"] = commentName;
       }
 
-      if (size !== undefined) {
-        localVarQueryParameter["size"] = size;
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
       if (labelSelector) {
         localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
-      }
-
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
+      }
+
+      if (size !== undefined) {
+        localVarQueryParameter["size"] = size;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -139,19 +139,19 @@ export const ApiConsoleHaloRunV1alpha1ReplyApiFp = function (
     /**
      * List replies.
      * @param {string} [commentName] Replies filtered by commentName.
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listReplies(
       commentName?: string,
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -161,10 +161,10 @@ export const ApiConsoleHaloRunV1alpha1ReplyApiFp = function (
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.listReplies(
         commentName,
-        size,
-        labelSelector,
         fieldSelector,
+        labelSelector,
         page,
+        size,
         options
       );
       return createRequestFunction(
@@ -201,10 +201,10 @@ export const ApiConsoleHaloRunV1alpha1ReplyApiFactory = function (
       return localVarFp
         .listReplies(
           requestParameters.commentName,
-          requestParameters.size,
-          requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
+          requestParameters.size,
           options
         )
         .then((request) => request(axios, basePath));
@@ -226,11 +226,11 @@ export interface ApiConsoleHaloRunV1alpha1ReplyApiListRepliesRequest {
   readonly commentName?: string;
 
   /**
-   * Size of one page. Zero indicates no limit.
-   * @type {number}
+   * Field selector for filtering.
+   * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1ReplyApiListReplies
    */
-  readonly size?: number;
+  readonly fieldSelector?: Array<string>;
 
   /**
    * Label selector for filtering.
@@ -240,18 +240,18 @@ export interface ApiConsoleHaloRunV1alpha1ReplyApiListRepliesRequest {
   readonly labelSelector?: Array<string>;
 
   /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof ApiConsoleHaloRunV1alpha1ReplyApiListReplies
-   */
-  readonly fieldSelector?: Array<string>;
-
-  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof ApiConsoleHaloRunV1alpha1ReplyApiListReplies
    */
   readonly page?: number;
+
+  /**
+   * Size of one page. Zero indicates no limit.
+   * @type {number}
+   * @memberof ApiConsoleHaloRunV1alpha1ReplyApiListReplies
+   */
+  readonly size?: number;
 }
 
 /**
@@ -275,10 +275,10 @@ export class ApiConsoleHaloRunV1alpha1ReplyApi extends BaseAPI {
     return ApiConsoleHaloRunV1alpha1ReplyApiFp(this.configuration)
       .listReplies(
         requestParameters.commentName,
-        requestParameters.size,
-        requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
+        requestParameters.size,
         options
       )
       .then((request) => request(this.axios, this.basePath));

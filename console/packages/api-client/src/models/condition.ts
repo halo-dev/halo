@@ -57,4 +57,4 @@ export const ConditionStatusEnum = {
 } as const;
 
 export type ConditionStatusEnum =
-  typeof ConditionStatusEnum[keyof typeof ConditionStatusEnum];
+  (typeof ConditionStatusEnum)[keyof typeof ConditionStatusEnum];

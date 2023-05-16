@@ -133,4 +133,4 @@ export const SinglePageSpecVisibleEnum = {
 } as const;
 
 export type SinglePageSpecVisibleEnum =
-  typeof SinglePageSpecVisibleEnum[keyof typeof SinglePageSpecVisibleEnum];
+  (typeof SinglePageSpecVisibleEnum)[keyof typeof SinglePageSpecVisibleEnum];
