@@ -53,20 +53,20 @@ export const ApiContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (
   return {
     /**
      * Lists categories.
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     queryCategories: async (
-      sort?: Array<string>,
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/api.content.halo.run/v1alpha1/categories`;
@@ -93,24 +93,24 @@ export const ApiContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (sort) {
-        localVarQueryParameter["sort"] = Array.from(sort);
-      }
-
-      if (size !== undefined) {
-        localVarQueryParameter["size"] = size;
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
       if (labelSelector) {
         localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
-      }
-
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
+      }
+
+      if (size !== undefined) {
+        localVarQueryParameter["size"] = size;
+      }
+
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -184,21 +184,21 @@ export const ApiContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (
     /**
      * Lists posts by category name.
      * @param {string} name Category name
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     queryPostsByCategoryName: async (
       name: string,
-      sort?: Array<string>,
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
@@ -231,24 +231,24 @@ export const ApiContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (sort) {
-        localVarQueryParameter["sort"] = Array.from(sort);
-      }
-
-      if (size !== undefined) {
-        localVarQueryParameter["size"] = size;
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
       if (labelSelector) {
         localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
-      }
-
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
+      }
+
+      if (size !== undefined) {
+        localVarQueryParameter["size"] = size;
+      }
+
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -280,30 +280,30 @@ export const ApiContentHaloRunV1alpha1CategoryApiFp = function (
   return {
     /**
      * Lists categories.
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async queryCategories(
-      sort?: Array<string>,
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<CategoryVoList>
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.queryCategories(
-        sort,
-        size,
-        labelSelector,
         fieldSelector,
+        labelSelector,
         page,
+        size,
+        sort,
         options
       );
       return createRequestFunction(
@@ -337,21 +337,21 @@ export const ApiContentHaloRunV1alpha1CategoryApiFp = function (
     /**
      * Lists posts by category name.
      * @param {string} name Category name
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async queryPostsByCategoryName(
       name: string,
-      sort?: Array<string>,
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -362,11 +362,11 @@ export const ApiContentHaloRunV1alpha1CategoryApiFp = function (
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.queryPostsByCategoryName(
           name,
-          sort,
-          size,
-          labelSelector,
           fieldSelector,
+          labelSelector,
           page,
+          size,
+          sort,
           options
         );
       return createRequestFunction(
@@ -402,11 +402,11 @@ export const ApiContentHaloRunV1alpha1CategoryApiFactory = function (
     ): AxiosPromise<CategoryVoList> {
       return localVarFp
         .queryCategories(
-          requestParameters.sort,
-          requestParameters.size,
-          requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
+          requestParameters.size,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -438,11 +438,11 @@ export const ApiContentHaloRunV1alpha1CategoryApiFactory = function (
       return localVarFp
         .queryPostsByCategoryName(
           requestParameters.name,
-          requestParameters.sort,
-          requestParameters.size,
-          requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
+          requestParameters.size,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -457,18 +457,11 @@ export const ApiContentHaloRunV1alpha1CategoryApiFactory = function (
  */
 export interface ApiContentHaloRunV1alpha1CategoryApiQueryCategoriesRequest {
   /**
-   * Sort property and direction of the list result. Support sorting based on attribute name path.
+   * Field selector for filtering.
    * @type {Array<string>}
    * @memberof ApiContentHaloRunV1alpha1CategoryApiQueryCategories
    */
-  readonly sort?: Array<string>;
-
-  /**
-   * Size of one page. Zero indicates no limit.
-   * @type {number}
-   * @memberof ApiContentHaloRunV1alpha1CategoryApiQueryCategories
-   */
-  readonly size?: number;
+  readonly fieldSelector?: Array<string>;
 
   /**
    * Label selector for filtering.
@@ -478,18 +471,25 @@ export interface ApiContentHaloRunV1alpha1CategoryApiQueryCategoriesRequest {
   readonly labelSelector?: Array<string>;
 
   /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof ApiContentHaloRunV1alpha1CategoryApiQueryCategories
-   */
-  readonly fieldSelector?: Array<string>;
-
-  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof ApiContentHaloRunV1alpha1CategoryApiQueryCategories
    */
   readonly page?: number;
+
+  /**
+   * Size of one page. Zero indicates no limit.
+   * @type {number}
+   * @memberof ApiContentHaloRunV1alpha1CategoryApiQueryCategories
+   */
+  readonly size?: number;
+
+  /**
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
+   * @type {Array<string>}
+   * @memberof ApiContentHaloRunV1alpha1CategoryApiQueryCategories
+   */
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -520,18 +520,11 @@ export interface ApiContentHaloRunV1alpha1CategoryApiQueryPostsByCategoryNameReq
   readonly name: string;
 
   /**
-   * Sort property and direction of the list result. Support sorting based on attribute name path.
+   * Field selector for filtering.
    * @type {Array<string>}
    * @memberof ApiContentHaloRunV1alpha1CategoryApiQueryPostsByCategoryName
    */
-  readonly sort?: Array<string>;
-
-  /**
-   * Size of one page. Zero indicates no limit.
-   * @type {number}
-   * @memberof ApiContentHaloRunV1alpha1CategoryApiQueryPostsByCategoryName
-   */
-  readonly size?: number;
+  readonly fieldSelector?: Array<string>;
 
   /**
    * Label selector for filtering.
@@ -541,18 +534,25 @@ export interface ApiContentHaloRunV1alpha1CategoryApiQueryPostsByCategoryNameReq
   readonly labelSelector?: Array<string>;
 
   /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof ApiContentHaloRunV1alpha1CategoryApiQueryPostsByCategoryName
-   */
-  readonly fieldSelector?: Array<string>;
-
-  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof ApiContentHaloRunV1alpha1CategoryApiQueryPostsByCategoryName
    */
   readonly page?: number;
+
+  /**
+   * Size of one page. Zero indicates no limit.
+   * @type {number}
+   * @memberof ApiContentHaloRunV1alpha1CategoryApiQueryPostsByCategoryName
+   */
+  readonly size?: number;
+
+  /**
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
+   * @type {Array<string>}
+   * @memberof ApiContentHaloRunV1alpha1CategoryApiQueryPostsByCategoryName
+   */
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -575,11 +575,11 @@ export class ApiContentHaloRunV1alpha1CategoryApi extends BaseAPI {
   ) {
     return ApiContentHaloRunV1alpha1CategoryApiFp(this.configuration)
       .queryCategories(
-        requestParameters.sort,
-        requestParameters.size,
-        requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
+        requestParameters.size,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));
@@ -615,11 +615,11 @@ export class ApiContentHaloRunV1alpha1CategoryApi extends BaseAPI {
     return ApiContentHaloRunV1alpha1CategoryApiFp(this.configuration)
       .queryPostsByCategoryName(
         requestParameters.name,
-        requestParameters.sort,
-        requestParameters.size,
-        requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
+        requestParameters.size,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));

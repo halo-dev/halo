@@ -104,20 +104,20 @@ export const ApiContentHaloRunV1alpha1SinglePageApiAxiosParamCreator =
       },
       /**
        * Lists single pages
-       * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
-       * @param {number} [size] Size of one page. Zero indicates no limit.
-       * @param {Array<string>} [labelSelector] Label selector for filtering.
        * @param {Array<string>} [fieldSelector] Field selector for filtering.
+       * @param {Array<string>} [labelSelector] Label selector for filtering.
        * @param {number} [page] The page number. Zero indicates no page.
+       * @param {number} [size] Size of one page. Zero indicates no limit.
+       * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
        * @param {*} [options] Override http request option.
        * @throws {RequiredError}
        */
       querySinglePages: async (
-        sort?: Array<string>,
-        size?: number,
-        labelSelector?: Array<string>,
         fieldSelector?: Array<string>,
+        labelSelector?: Array<string>,
         page?: number,
+        size?: number,
+        sort?: Array<string>,
         options: AxiosRequestConfig = {}
       ): Promise<RequestArgs> => {
         const localVarPath = `/apis/api.content.halo.run/v1alpha1/singlepages`;
@@ -144,24 +144,24 @@ export const ApiContentHaloRunV1alpha1SinglePageApiAxiosParamCreator =
         // http bearer authentication required
         await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-        if (sort) {
-          localVarQueryParameter["sort"] = Array.from(sort);
-        }
-
-        if (size !== undefined) {
-          localVarQueryParameter["size"] = size;
+        if (fieldSelector) {
+          localVarQueryParameter["fieldSelector"] = fieldSelector;
         }
 
         if (labelSelector) {
           localVarQueryParameter["labelSelector"] = labelSelector;
         }
 
-        if (fieldSelector) {
-          localVarQueryParameter["fieldSelector"] = fieldSelector;
-        }
-
         if (page !== undefined) {
           localVarQueryParameter["page"] = page;
+        }
+
+        if (size !== undefined) {
+          localVarQueryParameter["size"] = size;
+        }
+
+        if (sort) {
+          localVarQueryParameter["sort"] = Array.from(sort);
         }
 
         setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -214,20 +214,20 @@ export const ApiContentHaloRunV1alpha1SinglePageApiFp = function (
     },
     /**
      * Lists single pages
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async querySinglePages(
-      sort?: Array<string>,
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -237,11 +237,11 @@ export const ApiContentHaloRunV1alpha1SinglePageApiFp = function (
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.querySinglePages(
-          sort,
-          size,
-          labelSelector,
           fieldSelector,
+          labelSelector,
           page,
+          size,
+          sort,
           options
         );
       return createRequestFunction(
@@ -291,11 +291,11 @@ export const ApiContentHaloRunV1alpha1SinglePageApiFactory = function (
     ): AxiosPromise<ListedSinglePageVoList> {
       return localVarFp
         .querySinglePages(
-          requestParameters.sort,
-          requestParameters.size,
-          requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
+          requestParameters.size,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -324,18 +324,11 @@ export interface ApiContentHaloRunV1alpha1SinglePageApiQuerySinglePageByNameRequ
  */
 export interface ApiContentHaloRunV1alpha1SinglePageApiQuerySinglePagesRequest {
   /**
-   * Sort property and direction of the list result. Support sorting based on attribute name path.
+   * Field selector for filtering.
    * @type {Array<string>}
    * @memberof ApiContentHaloRunV1alpha1SinglePageApiQuerySinglePages
    */
-  readonly sort?: Array<string>;
-
-  /**
-   * Size of one page. Zero indicates no limit.
-   * @type {number}
-   * @memberof ApiContentHaloRunV1alpha1SinglePageApiQuerySinglePages
-   */
-  readonly size?: number;
+  readonly fieldSelector?: Array<string>;
 
   /**
    * Label selector for filtering.
@@ -345,18 +338,25 @@ export interface ApiContentHaloRunV1alpha1SinglePageApiQuerySinglePagesRequest {
   readonly labelSelector?: Array<string>;
 
   /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof ApiContentHaloRunV1alpha1SinglePageApiQuerySinglePages
-   */
-  readonly fieldSelector?: Array<string>;
-
-  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof ApiContentHaloRunV1alpha1SinglePageApiQuerySinglePages
    */
   readonly page?: number;
+
+  /**
+   * Size of one page. Zero indicates no limit.
+   * @type {number}
+   * @memberof ApiContentHaloRunV1alpha1SinglePageApiQuerySinglePages
+   */
+  readonly size?: number;
+
+  /**
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
+   * @type {Array<string>}
+   * @memberof ApiContentHaloRunV1alpha1SinglePageApiQuerySinglePages
+   */
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -395,11 +395,11 @@ export class ApiContentHaloRunV1alpha1SinglePageApi extends BaseAPI {
   ) {
     return ApiContentHaloRunV1alpha1SinglePageApiFp(this.configuration)
       .querySinglePages(
-        requestParameters.sort,
-        requestParameters.size,
-        requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
+        requestParameters.size,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));

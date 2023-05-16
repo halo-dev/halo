@@ -214,18 +214,18 @@ export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (
     },
     /**
      * List storage.halo.run/v1alpha1/Attachment
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     liststorageHaloRunV1alpha1Attachment: async (
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/storage.halo.run/v1alpha1/attachments`;
@@ -252,20 +252,20 @@ export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (size !== undefined) {
-        localVarQueryParameter["size"] = size;
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
       if (labelSelector) {
         localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
-      }
-
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
+      }
+
+      if (size !== undefined) {
+        localVarQueryParameter["size"] = size;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -432,28 +432,28 @@ export const StorageHaloRunV1alpha1AttachmentApiFp = function (
     },
     /**
      * List storage.halo.run/v1alpha1/Attachment
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async liststorageHaloRunV1alpha1Attachment(
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<AttachmentList>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.liststorageHaloRunV1alpha1Attachment(
-          size,
-          labelSelector,
           fieldSelector,
+          labelSelector,
           page,
+          size,
           options
         );
       return createRequestFunction(
@@ -561,10 +561,10 @@ export const StorageHaloRunV1alpha1AttachmentApiFactory = function (
     ): AxiosPromise<AttachmentList> {
       return localVarFp
         .liststorageHaloRunV1alpha1Attachment(
-          requestParameters.size,
-          requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
+          requestParameters.size,
           options
         )
         .then((request) => request(axios, basePath));
@@ -639,11 +639,11 @@ export interface StorageHaloRunV1alpha1AttachmentApiGetstorageHaloRunV1alpha1Att
  */
 export interface StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1AttachmentRequest {
   /**
-   * Size of one page. Zero indicates no limit.
-   * @type {number}
+   * Field selector for filtering.
+   * @type {Array<string>}
    * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
    */
-  readonly size?: number;
+  readonly fieldSelector?: Array<string>;
 
   /**
    * Label selector for filtering.
@@ -653,18 +653,18 @@ export interface StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1At
   readonly labelSelector?: Array<string>;
 
   /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
-   */
-  readonly fieldSelector?: Array<string>;
-
-  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
    */
   readonly page?: number;
+
+  /**
+   * Size of one page. Zero indicates no limit.
+   * @type {number}
+   * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
+   */
+  readonly size?: number;
 }
 
 /**
@@ -759,10 +759,10 @@ export class StorageHaloRunV1alpha1AttachmentApi extends BaseAPI {
   ) {
     return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration)
       .liststorageHaloRunV1alpha1Attachment(
-        requestParameters.size,
-        requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
+        requestParameters.size,
         options
       )
       .then((request) => request(this.axios, this.basePath));

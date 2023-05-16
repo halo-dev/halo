@@ -279,24 +279,24 @@ export const ApiConsoleHaloRunV1alpha1PluginApiAxiosParamCreator = function (
     },
     /**
      * List plugins using query criteria and sort params
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
-     * @param {string} [keyword] Keyword of plugin name or description
      * @param {boolean} [enabled] Whether the plugin is enabled
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {string} [keyword] Keyword of plugin name or description
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listPlugins: async (
-      sort?: Array<string>,
-      keyword?: string,
       enabled?: boolean,
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      keyword?: string,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/api.console.halo.run/v1alpha1/plugins`;
@@ -323,32 +323,32 @@ export const ApiConsoleHaloRunV1alpha1PluginApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (sort) {
-        localVarQueryParameter["sort"] = Array.from(sort);
-      }
-
-      if (keyword !== undefined) {
-        localVarQueryParameter["keyword"] = keyword;
-      }
-
       if (enabled !== undefined) {
         localVarQueryParameter["enabled"] = enabled;
-      }
-
-      if (size !== undefined) {
-        localVarQueryParameter["size"] = size;
-      }
-
-      if (labelSelector) {
-        localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
       if (fieldSelector) {
         localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
+      if (keyword !== undefined) {
+        localVarQueryParameter["keyword"] = keyword;
+      }
+
+      if (labelSelector) {
+        localVarQueryParameter["labelSelector"] = labelSelector;
+      }
+
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
+      }
+
+      if (size !== undefined) {
+        localVarQueryParameter["size"] = size;
+      }
+
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -721,36 +721,36 @@ export const ApiConsoleHaloRunV1alpha1PluginApiFp = function (
     },
     /**
      * List plugins using query criteria and sort params
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
-     * @param {string} [keyword] Keyword of plugin name or description
      * @param {boolean} [enabled] Whether the plugin is enabled
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {string} [keyword] Keyword of plugin name or description
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listPlugins(
-      sort?: Array<string>,
-      keyword?: string,
       enabled?: boolean,
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      keyword?: string,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<PluginList>
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.listPlugins(
-        sort,
-        keyword,
         enabled,
-        size,
-        labelSelector,
         fieldSelector,
+        keyword,
+        labelSelector,
         page,
+        size,
+        sort,
         options
       );
       return createRequestFunction(
@@ -948,13 +948,13 @@ export const ApiConsoleHaloRunV1alpha1PluginApiFactory = function (
     ): AxiosPromise<PluginList> {
       return localVarFp
         .listPlugins(
-          requestParameters.sort,
-          requestParameters.keyword,
           requestParameters.enabled,
-          requestParameters.size,
-          requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.keyword,
+          requestParameters.labelSelector,
           requestParameters.page,
+          requestParameters.size,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -1091,39 +1091,11 @@ export interface ApiConsoleHaloRunV1alpha1PluginApiInstallPluginRequest {
  */
 export interface ApiConsoleHaloRunV1alpha1PluginApiListPluginsRequest {
   /**
-   * Sort property and direction of the list result. Supported fields: creationTimestamp
-   * @type {Array<string>}
-   * @memberof ApiConsoleHaloRunV1alpha1PluginApiListPlugins
-   */
-  readonly sort?: Array<string>;
-
-  /**
-   * Keyword of plugin name or description
-   * @type {string}
-   * @memberof ApiConsoleHaloRunV1alpha1PluginApiListPlugins
-   */
-  readonly keyword?: string;
-
-  /**
    * Whether the plugin is enabled
    * @type {boolean}
    * @memberof ApiConsoleHaloRunV1alpha1PluginApiListPlugins
    */
   readonly enabled?: boolean;
-
-  /**
-   * Size of one page. Zero indicates no limit.
-   * @type {number}
-   * @memberof ApiConsoleHaloRunV1alpha1PluginApiListPlugins
-   */
-  readonly size?: number;
-
-  /**
-   * Label selector for filtering.
-   * @type {Array<string>}
-   * @memberof ApiConsoleHaloRunV1alpha1PluginApiListPlugins
-   */
-  readonly labelSelector?: Array<string>;
 
   /**
    * Field selector for filtering.
@@ -1133,11 +1105,39 @@ export interface ApiConsoleHaloRunV1alpha1PluginApiListPluginsRequest {
   readonly fieldSelector?: Array<string>;
 
   /**
+   * Keyword of plugin name or description
+   * @type {string}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApiListPlugins
+   */
+  readonly keyword?: string;
+
+  /**
+   * Label selector for filtering.
+   * @type {Array<string>}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApiListPlugins
+   */
+  readonly labelSelector?: Array<string>;
+
+  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof ApiConsoleHaloRunV1alpha1PluginApiListPlugins
    */
   readonly page?: number;
+
+  /**
+   * Size of one page. Zero indicates no limit.
+   * @type {number}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApiListPlugins
+   */
+  readonly size?: number;
+
+  /**
+   * Sort property and direction of the list result. Supported fields: creationTimestamp
+   * @type {Array<string>}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApiListPlugins
+   */
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -1309,13 +1309,13 @@ export class ApiConsoleHaloRunV1alpha1PluginApi extends BaseAPI {
   ) {
     return ApiConsoleHaloRunV1alpha1PluginApiFp(this.configuration)
       .listPlugins(
-        requestParameters.sort,
-        requestParameters.keyword,
         requestParameters.enabled,
-        requestParameters.size,
-        requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.keyword,
+        requestParameters.labelSelector,
         requestParameters.page,
+        requestParameters.size,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));

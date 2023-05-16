@@ -54,21 +54,21 @@ export const ApiContentHaloRunV1alpha1TagApiAxiosParamCreator = function (
     /**
      * Lists posts by tag name
      * @param {string} name Tag name
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     queryPostsByTagName: async (
       name: string,
-      sort?: Array<string>,
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
@@ -101,24 +101,24 @@ export const ApiContentHaloRunV1alpha1TagApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (sort) {
-        localVarQueryParameter["sort"] = Array.from(sort);
-      }
-
-      if (size !== undefined) {
-        localVarQueryParameter["size"] = size;
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
       if (labelSelector) {
         localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
-      }
-
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
+      }
+
+      if (size !== undefined) {
+        localVarQueryParameter["size"] = size;
+      }
+
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -191,20 +191,20 @@ export const ApiContentHaloRunV1alpha1TagApiAxiosParamCreator = function (
     },
     /**
      * Lists tags
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     queryTags: async (
-      sort?: Array<string>,
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/api.content.halo.run/v1alpha1/tags`;
@@ -231,24 +231,24 @@ export const ApiContentHaloRunV1alpha1TagApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (sort) {
-        localVarQueryParameter["sort"] = Array.from(sort);
-      }
-
-      if (size !== undefined) {
-        localVarQueryParameter["size"] = size;
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
       if (labelSelector) {
         localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
-      }
-
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
+      }
+
+      if (size !== undefined) {
+        localVarQueryParameter["size"] = size;
+      }
+
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -281,21 +281,21 @@ export const ApiContentHaloRunV1alpha1TagApiFp = function (
     /**
      * Lists posts by tag name
      * @param {string} name Tag name
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async queryPostsByTagName(
       name: string,
-      sort?: Array<string>,
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListedPostVo>
@@ -303,11 +303,11 @@ export const ApiContentHaloRunV1alpha1TagApiFp = function (
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.queryPostsByTagName(
           name,
-          sort,
-          size,
-          labelSelector,
           fieldSelector,
+          labelSelector,
           page,
+          size,
+          sort,
           options
         );
       return createRequestFunction(
@@ -342,30 +342,30 @@ export const ApiContentHaloRunV1alpha1TagApiFp = function (
     },
     /**
      * Lists tags
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async queryTags(
-      sort?: Array<string>,
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<TagVoList>
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.queryTags(
-        sort,
-        size,
-        labelSelector,
         fieldSelector,
+        labelSelector,
         page,
+        size,
+        sort,
         options
       );
       return createRequestFunction(
@@ -402,11 +402,11 @@ export const ApiContentHaloRunV1alpha1TagApiFactory = function (
       return localVarFp
         .queryPostsByTagName(
           requestParameters.name,
-          requestParameters.sort,
-          requestParameters.size,
-          requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
+          requestParameters.size,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -437,11 +437,11 @@ export const ApiContentHaloRunV1alpha1TagApiFactory = function (
     ): AxiosPromise<TagVoList> {
       return localVarFp
         .queryTags(
-          requestParameters.sort,
-          requestParameters.size,
-          requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
+          requestParameters.size,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -463,18 +463,11 @@ export interface ApiContentHaloRunV1alpha1TagApiQueryPostsByTagNameRequest {
   readonly name: string;
 
   /**
-   * Sort property and direction of the list result. Support sorting based on attribute name path.
+   * Field selector for filtering.
    * @type {Array<string>}
    * @memberof ApiContentHaloRunV1alpha1TagApiQueryPostsByTagName
    */
-  readonly sort?: Array<string>;
-
-  /**
-   * Size of one page. Zero indicates no limit.
-   * @type {number}
-   * @memberof ApiContentHaloRunV1alpha1TagApiQueryPostsByTagName
-   */
-  readonly size?: number;
+  readonly fieldSelector?: Array<string>;
 
   /**
    * Label selector for filtering.
@@ -484,18 +477,25 @@ export interface ApiContentHaloRunV1alpha1TagApiQueryPostsByTagNameRequest {
   readonly labelSelector?: Array<string>;
 
   /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof ApiContentHaloRunV1alpha1TagApiQueryPostsByTagName
-   */
-  readonly fieldSelector?: Array<string>;
-
-  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof ApiContentHaloRunV1alpha1TagApiQueryPostsByTagName
    */
   readonly page?: number;
+
+  /**
+   * Size of one page. Zero indicates no limit.
+   * @type {number}
+   * @memberof ApiContentHaloRunV1alpha1TagApiQueryPostsByTagName
+   */
+  readonly size?: number;
+
+  /**
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
+   * @type {Array<string>}
+   * @memberof ApiContentHaloRunV1alpha1TagApiQueryPostsByTagName
+   */
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -519,18 +519,11 @@ export interface ApiContentHaloRunV1alpha1TagApiQueryTagByNameRequest {
  */
 export interface ApiContentHaloRunV1alpha1TagApiQueryTagsRequest {
   /**
-   * Sort property and direction of the list result. Support sorting based on attribute name path.
+   * Field selector for filtering.
    * @type {Array<string>}
    * @memberof ApiContentHaloRunV1alpha1TagApiQueryTags
    */
-  readonly sort?: Array<string>;
-
-  /**
-   * Size of one page. Zero indicates no limit.
-   * @type {number}
-   * @memberof ApiContentHaloRunV1alpha1TagApiQueryTags
-   */
-  readonly size?: number;
+  readonly fieldSelector?: Array<string>;
 
   /**
    * Label selector for filtering.
@@ -540,18 +533,25 @@ export interface ApiContentHaloRunV1alpha1TagApiQueryTagsRequest {
   readonly labelSelector?: Array<string>;
 
   /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof ApiContentHaloRunV1alpha1TagApiQueryTags
-   */
-  readonly fieldSelector?: Array<string>;
-
-  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof ApiContentHaloRunV1alpha1TagApiQueryTags
    */
   readonly page?: number;
+
+  /**
+   * Size of one page. Zero indicates no limit.
+   * @type {number}
+   * @memberof ApiContentHaloRunV1alpha1TagApiQueryTags
+   */
+  readonly size?: number;
+
+  /**
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
+   * @type {Array<string>}
+   * @memberof ApiContentHaloRunV1alpha1TagApiQueryTags
+   */
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -575,11 +575,11 @@ export class ApiContentHaloRunV1alpha1TagApi extends BaseAPI {
     return ApiContentHaloRunV1alpha1TagApiFp(this.configuration)
       .queryPostsByTagName(
         requestParameters.name,
-        requestParameters.sort,
-        requestParameters.size,
-        requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
+        requestParameters.size,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));
@@ -614,11 +614,11 @@ export class ApiContentHaloRunV1alpha1TagApi extends BaseAPI {
   ) {
     return ApiContentHaloRunV1alpha1TagApiFp(this.configuration)
       .queryTags(
-        requestParameters.sort,
-        requestParameters.size,
-        requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
+        requestParameters.size,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));

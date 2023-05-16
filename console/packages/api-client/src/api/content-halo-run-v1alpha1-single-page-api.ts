@@ -214,18 +214,18 @@ export const ContentHaloRunV1alpha1SinglePageApiAxiosParamCreator = function (
     },
     /**
      * List content.halo.run/v1alpha1/SinglePage
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listcontentHaloRunV1alpha1SinglePage: async (
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/content.halo.run/v1alpha1/singlepages`;
@@ -252,20 +252,20 @@ export const ContentHaloRunV1alpha1SinglePageApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (size !== undefined) {
-        localVarQueryParameter["size"] = size;
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
       if (labelSelector) {
         localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
-      }
-
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
+      }
+
+      if (size !== undefined) {
+        localVarQueryParameter["size"] = size;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -432,28 +432,28 @@ export const ContentHaloRunV1alpha1SinglePageApiFp = function (
     },
     /**
      * List content.halo.run/v1alpha1/SinglePage
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listcontentHaloRunV1alpha1SinglePage(
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<SinglePageList>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listcontentHaloRunV1alpha1SinglePage(
-          size,
-          labelSelector,
           fieldSelector,
+          labelSelector,
           page,
+          size,
           options
         );
       return createRequestFunction(
@@ -561,10 +561,10 @@ export const ContentHaloRunV1alpha1SinglePageApiFactory = function (
     ): AxiosPromise<SinglePageList> {
       return localVarFp
         .listcontentHaloRunV1alpha1SinglePage(
-          requestParameters.size,
-          requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
+          requestParameters.size,
           options
         )
         .then((request) => request(axios, basePath));
@@ -639,11 +639,11 @@ export interface ContentHaloRunV1alpha1SinglePageApiGetcontentHaloRunV1alpha1Sin
  */
 export interface ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1SinglePageRequest {
   /**
-   * Size of one page. Zero indicates no limit.
-   * @type {number}
+   * Field selector for filtering.
+   * @type {Array<string>}
    * @memberof ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1SinglePage
    */
-  readonly size?: number;
+  readonly fieldSelector?: Array<string>;
 
   /**
    * Label selector for filtering.
@@ -653,18 +653,18 @@ export interface ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1Si
   readonly labelSelector?: Array<string>;
 
   /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1SinglePage
-   */
-  readonly fieldSelector?: Array<string>;
-
-  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1SinglePage
    */
   readonly page?: number;
+
+  /**
+   * Size of one page. Zero indicates no limit.
+   * @type {number}
+   * @memberof ContentHaloRunV1alpha1SinglePageApiListcontentHaloRunV1alpha1SinglePage
+   */
+  readonly size?: number;
 }
 
 /**
@@ -759,10 +759,10 @@ export class ContentHaloRunV1alpha1SinglePageApi extends BaseAPI {
   ) {
     return ContentHaloRunV1alpha1SinglePageApiFp(this.configuration)
       .listcontentHaloRunV1alpha1SinglePage(
-        requestParameters.size,
-        requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
+        requestParameters.size,
         options
       )
       .then((request) => request(this.axios, this.basePath));

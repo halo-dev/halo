@@ -212,18 +212,18 @@ export const V1alpha1MenuApiAxiosParamCreator = function (
     },
     /**
      * List v1alpha1/Menu
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listv1alpha1Menu: async (
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/api/v1alpha1/menus`;
@@ -250,20 +250,20 @@ export const V1alpha1MenuApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (size !== undefined) {
-        localVarQueryParameter["size"] = size;
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
       if (labelSelector) {
         localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
-      }
-
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
+      }
+
+      if (size !== undefined) {
+        localVarQueryParameter["size"] = size;
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -420,28 +420,28 @@ export const V1alpha1MenuApiFp = function (configuration?: Configuration) {
     },
     /**
      * List v1alpha1/Menu
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listv1alpha1Menu(
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<MenuList>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listv1alpha1Menu(
-          size,
-          labelSelector,
           fieldSelector,
+          labelSelector,
           page,
+          size,
           options
         );
       return createRequestFunction(
@@ -542,10 +542,10 @@ export const V1alpha1MenuApiFactory = function (
     ): AxiosPromise<MenuList> {
       return localVarFp
         .listv1alpha1Menu(
-          requestParameters.size,
-          requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
+          requestParameters.size,
           options
         )
         .then((request) => request(axios, basePath));
@@ -620,11 +620,11 @@ export interface V1alpha1MenuApiGetv1alpha1MenuRequest {
  */
 export interface V1alpha1MenuApiListv1alpha1MenuRequest {
   /**
-   * Size of one page. Zero indicates no limit.
-   * @type {number}
+   * Field selector for filtering.
+   * @type {Array<string>}
    * @memberof V1alpha1MenuApiListv1alpha1Menu
    */
-  readonly size?: number;
+  readonly fieldSelector?: Array<string>;
 
   /**
    * Label selector for filtering.
@@ -634,18 +634,18 @@ export interface V1alpha1MenuApiListv1alpha1MenuRequest {
   readonly labelSelector?: Array<string>;
 
   /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof V1alpha1MenuApiListv1alpha1Menu
-   */
-  readonly fieldSelector?: Array<string>;
-
-  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof V1alpha1MenuApiListv1alpha1Menu
    */
   readonly page?: number;
+
+  /**
+   * Size of one page. Zero indicates no limit.
+   * @type {number}
+   * @memberof V1alpha1MenuApiListv1alpha1Menu
+   */
+  readonly size?: number;
 }
 
 /**
@@ -737,10 +737,10 @@ export class V1alpha1MenuApi extends BaseAPI {
   ) {
     return V1alpha1MenuApiFp(this.configuration)
       .listv1alpha1Menu(
-        requestParameters.size,
-        requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
+        requestParameters.size,
         options
       )
       .then((request) => request(this.axios, this.basePath));
