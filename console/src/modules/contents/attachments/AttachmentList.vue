@@ -767,13 +767,16 @@ onMounted(() => {
                         </template>
                       </VEntityField>
                     </template>
-                    <template
-                      v-if="
-                        currentUserHasPermission(['system:attachments:manage'])
-                      "
-                      #dropdownItems
-                    >
+                    <template #dropdownItems>
+                      <VDropdownItem @click="handleClickItem(attachment)">
+                        {{ $t("core.common.buttons.detail") }}
+                      </VDropdownItem>
                       <VDropdownItem
+                        v-if="
+                          currentUserHasPermission([
+                            'system:attachments:manage',
+                          ])
+                        "
                         type="danger"
                         @click="handleDelete(attachment)"
                       >

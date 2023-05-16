@@ -11,6 +11,7 @@ import {
   Toast,
   VDropdownItem,
   VDropdown,
+  VDropdownDivider,
 } from "@halo-dev/components";
 import PluginUploadModal from "./PluginUploadModal.vue";
 import { ref, toRefs } from "vue";
@@ -170,9 +171,20 @@ const getFailedMessage = (plugin: Plugin) => {
       v-if="currentUserHasPermission(['system:plugins:manage'])"
       #dropdownItems
     >
+      <VDropdownItem
+        @click="
+          $router.push({
+            name: 'PluginDetail',
+            params: { name: plugin?.metadata.name },
+          })
+        "
+      >
+        {{ $t("core.common.buttons.detail") }}
+      </VDropdownItem>
       <VDropdownItem @click="upgradeModal = true">
         {{ $t("core.common.buttons.upgrade") }}
       </VDropdownItem>
+      <VDropdownDivider />
       <VDropdown placement="left" :triggers="['click']">
         <VDropdownItem type="danger">
           {{ $t("core.common.buttons.uninstall") }}
