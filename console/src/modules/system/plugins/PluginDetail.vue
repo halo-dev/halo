@@ -16,7 +16,7 @@ import { formatDatetime } from "@/utils/date";
 import { useQuery } from "@tanstack/vue-query";
 
 const plugin = inject<Ref<Plugin | undefined>>("plugin");
-const { changeStatus, getFailedMessage } = usePluginLifeCycle(plugin);
+const { changeStatus } = usePluginLifeCycle(plugin);
 
 interface RoleTemplateGroup {
   module: string | null | undefined;
@@ -76,7 +76,10 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
         </div>
       </div>
       <div
-        v-if="getFailedMessage() && plugin?.status?.conditions?.length"
+        v-if="
+          plugin?.status?.phase === 'FAILED' &&
+          plugin?.status?.conditions?.length
+        "
         class="w-full px-4 pb-2 sm:px-6"
       >
         <VAlert
