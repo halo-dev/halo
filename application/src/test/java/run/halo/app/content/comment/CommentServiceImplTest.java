@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,10 +22,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.mock.web.reactive.function.server.MockServerRequest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.content.TestPost;
@@ -115,8 +119,17 @@ class CommentServiceImplTest {
         when(userService.getUserOrGhost("B-owner"))
             .thenReturn(Mono.just(createUser("B-owner")));
 
+        ServerWebExchange exchange = mock(ServerWebExchange.class);
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+        MockServerRequest request = MockServerRequest.builder()
+            .queryParams(queryParams)
+            .exchange(exchange)
+            .build();
+        ServerHttpRequest httpRequest = mock(ServerHttpRequest.class);
+        when(exchange.getRequest()).thenReturn(httpRequest);
+        when(httpRequest.getQueryParams()).thenReturn(queryParams);
         Mono<ListResult<ListedComment>> listResultMono =
-            commentService.listComment(new CommentQuery(new LinkedMultiValueMap<>()));
+            commentService.listComment(new CommentQuery(request));
         Counter counterA = new Counter();
         counterA.setUpvote(3);
         String commentACounter = MeterUtils.nameOf(Comment.class, "A");
@@ -214,8 +227,11 @@ class CommentServiceImplTest {
         queryParams.add("subjectKind", "Post");
         queryParams.add("subjectName", "fake-post");
 
-        final Predicate<Comment> predicate =
-            commentService.commentPredicate(new CommentQuery(queryParams));
+        MockServerRequest request = MockServerRequest.builder()
+            .queryParams(queryParams)
+            .exchange(mock(ServerWebExchange.class))
+            .build();
+        final Predicate<Comment> predicate = new CommentQuery(request).toPredicate();
 
         Comment comment = comment("A");
         comment.getSpec().setRaw("hello-world");
@@ -233,8 +249,11 @@ class CommentServiceImplTest {
 
         queryParams.remove("keyword");
         queryParams.add("keyword", "nothing");
-        final Predicate<Comment> predicateTwo =
-            commentService.commentPredicate(new CommentQuery(queryParams));
+        request = MockServerRequest.builder()
+            .queryParams(queryParams)
+            .exchange(mock(ServerWebExchange.class))
+            .build();
+        final Predicate<Comment> predicateTwo = new CommentQuery(request).toPredicate();
         assertThat(predicateTwo.test(comment)).isFalse();
     }
 
