@@ -77,13 +77,13 @@ export interface ListedAuthProvider {
    * @type {boolean}
    * @memberof ListedAuthProvider
    */
-  supportsBinding?: boolean;
+  privileged?: boolean;
   /**
    *
    * @type {boolean}
    * @memberof ListedAuthProvider
    */
-  privileged?: boolean;
+  supportsBinding?: boolean;
   /**
    *
    * @type {string}

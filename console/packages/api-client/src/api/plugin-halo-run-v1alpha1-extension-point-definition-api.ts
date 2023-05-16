@@ -221,18 +221,18 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiAxiosParamCreator =
       },
       /**
        * List plugin.halo.run/v1alpha1/ExtensionPointDefinition
+       * @param {Array<string>} [fieldSelector] Field selector for filtering.
+       * @param {Array<string>} [labelSelector] Label selector for filtering.
        * @param {number} [page] The page number. Zero indicates no page.
        * @param {number} [size] Size of one page. Zero indicates no limit.
-       * @param {Array<string>} [labelSelector] Label selector for filtering.
-       * @param {Array<string>} [fieldSelector] Field selector for filtering.
        * @param {*} [options] Override http request option.
        * @throws {RequiredError}
        */
       listpluginHaloRunV1alpha1ExtensionPointDefinition: async (
+        fieldSelector?: Array<string>,
+        labelSelector?: Array<string>,
         page?: number,
         size?: number,
-        labelSelector?: Array<string>,
-        fieldSelector?: Array<string>,
         options: AxiosRequestConfig = {}
       ): Promise<RequestArgs> => {
         const localVarPath = `/apis/plugin.halo.run/v1alpha1/extensionpointdefinitions`;
@@ -259,20 +259,20 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiAxiosParamCreator =
         // http bearer authentication required
         await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-        if (page !== undefined) {
-          localVarQueryParameter["page"] = page;
-        }
-
-        if (size !== undefined) {
-          localVarQueryParameter["size"] = size;
+        if (fieldSelector) {
+          localVarQueryParameter["fieldSelector"] = fieldSelector;
         }
 
         if (labelSelector) {
           localVarQueryParameter["labelSelector"] = labelSelector;
         }
 
-        if (fieldSelector) {
-          localVarQueryParameter["fieldSelector"] = fieldSelector;
+        if (page !== undefined) {
+          localVarQueryParameter["page"] = page;
+        }
+
+        if (size !== undefined) {
+          localVarQueryParameter["size"] = size;
         }
 
         setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -451,18 +451,18 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp = function (
     },
     /**
      * List plugin.halo.run/v1alpha1/ExtensionPointDefinition
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listpluginHaloRunV1alpha1ExtensionPointDefinition(
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -472,10 +472,10 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp = function (
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listpluginHaloRunV1alpha1ExtensionPointDefinition(
+          fieldSelector,
+          labelSelector,
           page,
           size,
-          labelSelector,
-          fieldSelector,
           options
         );
       return createRequestFunction(
@@ -594,10 +594,10 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiFactory =
       ): AxiosPromise<ExtensionPointDefinitionList> {
         return localVarFp
           .listpluginHaloRunV1alpha1ExtensionPointDefinition(
+            requestParameters.fieldSelector,
+            requestParameters.labelSelector,
             requestParameters.page,
             requestParameters.size,
-            requestParameters.labelSelector,
-            requestParameters.fieldSelector,
             options
           )
           .then((request) => request(axios, basePath));
@@ -672,6 +672,20 @@ export interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiGetpluginHaloRu
  */
 export interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinitionRequest {
   /**
+   * Field selector for filtering.
+   * @type {Array<string>}
+   * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinition
+   */
+  readonly fieldSelector?: Array<string>;
+
+  /**
+   * Label selector for filtering.
+   * @type {Array<string>}
+   * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinition
+   */
+  readonly labelSelector?: Array<string>;
+
+  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinition
@@ -684,20 +698,6 @@ export interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloR
    * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinition
    */
   readonly size?: number;
-
-  /**
-   * Label selector for filtering.
-   * @type {Array<string>}
-   * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinition
-   */
-  readonly labelSelector?: Array<string>;
-
-  /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinition
-   */
-  readonly fieldSelector?: Array<string>;
 }
 
 /**
@@ -806,10 +806,10 @@ export class PluginHaloRunV1alpha1ExtensionPointDefinitionApi extends BaseAPI {
       this.configuration
     )
       .listpluginHaloRunV1alpha1ExtensionPointDefinition(
+        requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
         requestParameters.size,
-        requestParameters.labelSelector,
-        requestParameters.fieldSelector,
         options
       )
       .then((request) => request(this.axios, this.basePath));
