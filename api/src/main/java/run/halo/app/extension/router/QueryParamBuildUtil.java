@@ -40,29 +40,33 @@ public final class QueryParamBuildUtil {
         var properties = (Map<String, Schema>) resolvedSchema.schema.getProperties();
         var requiredNames = defaultIfNull(resolvedSchema.schema.getRequired(),
             Collections.emptyList());
-        properties.forEach((propName, propSchema) -> {
-            final var paramBuilder = parameterBuilder().in(ParameterIn.QUERY);
-            paramBuilder.name(propSchema.getName())
-                .description(propSchema.getDescription())
-                .style(ParameterStyle.FORM)
-                .explode(Explode.TRUE);
-            if (requiredNames.contains(propSchema.getName())) {
-                paramBuilder.required(true);
-            }
+        properties.keySet()
+            .stream()
+            .sorted()
+            .forEach(propName -> {
+                var propSchema = properties.get(propName);
+                final var paramBuilder = parameterBuilder().in(ParameterIn.QUERY);
+                paramBuilder.name(propSchema.getName())
+                    .description(propSchema.getDescription())
+                    .style(ParameterStyle.FORM)
+                    .explode(Explode.TRUE);
+                if (requiredNames.contains(propSchema.getName())) {
+                    paramBuilder.required(true);
+                }
 
-            if (propSchema instanceof ArraySchema arraySchema) {
-                paramBuilder.array(arraySchemaBuilder()
-                    .uniqueItems(defaultIfNull(arraySchema.getUniqueItems(), false))
-                    .minItems(defaultIfNull(arraySchema.getMinItems(), 0))
-                    .maxItems(defaultIfNull(arraySchema.getMaxItems(), Integer.MAX_VALUE))
-                    .arraySchema(convertSchemaBuilder(arraySchema))
-                    .schema(convertSchemaBuilder(arraySchema.getItems()))
-                );
-            } else {
-                paramBuilder.schema(convertSchemaBuilder(propSchema));
-            }
-            operationBuilder.parameter(paramBuilder);
-        });
+                if (propSchema instanceof ArraySchema arraySchema) {
+                    paramBuilder.array(arraySchemaBuilder()
+                        .uniqueItems(defaultIfNull(arraySchema.getUniqueItems(), false))
+                        .minItems(defaultIfNull(arraySchema.getMinItems(), 0))
+                        .maxItems(defaultIfNull(arraySchema.getMaxItems(), Integer.MAX_VALUE))
+                        .arraySchema(convertSchemaBuilder(arraySchema))
+                        .schema(convertSchemaBuilder(arraySchema.getItems()))
+                    );
+                } else {
+                    paramBuilder.schema(convertSchemaBuilder(propSchema));
+                }
+                operationBuilder.parameter(paramBuilder);
+            });
     }
 
     private static org.springdoc.core.fn.builders.schema.Builder convertSchemaBuilder(
