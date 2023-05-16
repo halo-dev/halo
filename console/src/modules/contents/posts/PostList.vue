@@ -24,6 +24,7 @@ import {
   Toast,
   VDropdownItem,
   VDropdown,
+  VDropdownDivider,
 } from "@halo-dev/components";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import CategoryDropdownSelector from "@/components/dropdown-selector/CategoryDropdownSelector.vue";
@@ -941,9 +942,20 @@ const { mutate: changeVisibleMutation } = useMutation({
                 v-if="currentUserHasPermission(['system:posts:manage'])"
                 #dropdownItems
               >
+                <VDropdownItem
+                  @click="
+                    $router.push({
+                      name: 'PostEditor',
+                      query: { name: post.post.metadata.name },
+                    })
+                  "
+                >
+                  {{ $t("core.common.buttons.edit") }}
+                </VDropdownItem>
                 <VDropdownItem @click="handleOpenSettingModal(post.post)">
                   {{ $t("core.common.buttons.setting") }}
                 </VDropdownItem>
+                <VDropdownDivider />
                 <VDropdownItem type="danger" @click="handleDelete(post.post)">
                   {{ $t("core.common.buttons.delete") }}
                 </VDropdownItem>

@@ -145,4 +145,4 @@ export const PostSpecVisibleEnum = {
 } as const;
 
 export type PostSpecVisibleEnum =
-  typeof PostSpecVisibleEnum[keyof typeof PostSpecVisibleEnum];
+  (typeof PostSpecVisibleEnum)[keyof typeof PostSpecVisibleEnum];

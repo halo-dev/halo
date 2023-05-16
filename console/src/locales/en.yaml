@@ -1107,6 +1107,7 @@ core:
       upload: Upload
       add: Add
       submit: Submit
+      detail: Detail
     radio:
       "yes": Yes
       "no": No
