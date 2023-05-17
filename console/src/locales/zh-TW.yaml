@@ -427,10 +427,12 @@ core:
         result: "留言者：{owner}"
       sort:
         items:
-          default: 預設
-          last_reply_time: 最後回覆時間
-          reply_count: 回覆數
-          creation_time: 創建時間
+          last_reply_time_desc: 較近回覆
+          last_reply_time_asc: 較早回覆
+          reply_count_desc: 較多回覆數
+          reply_count_asc: 較少回覆數
+          create_time_desc: 較近創建
+          create_time_asc: 較早創建
     list:
       fields:
         reply_count: "{count} 條回覆"
