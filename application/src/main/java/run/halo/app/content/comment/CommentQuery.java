@@ -1,6 +1,7 @@
 package run.halo.app.content.comment;
 
 import static java.util.Comparator.comparing;
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -126,10 +127,8 @@ public class CommentQuery extends IListRequest.QueryListRequest {
 
         var replyCountOrder = sort.getOrderFor("replyCount");
         if (replyCountOrder != null) {
-            Comparator<Comment> comparator =
-                comparing(comment -> comment.getStatusOrDefault().getReplyCount(),
-                    Comparators.nullsComparator(replyCountOrder.isAscending())
-                );
+            Comparator<Comment> comparator = comparing(
+                comment -> defaultIfNull(comment.getStatusOrDefault().getReplyCount(), 0));
             if (replyCountOrder.isDescending()) {
                 comparator = comparator.reversed();
             }
