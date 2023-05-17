@@ -40,11 +40,15 @@ import {
 // @ts-ignore
 import { ConfigMap } from "../models";
 // @ts-ignore
+import { InstallFromUriRequest } from "../models";
+// @ts-ignore
 import { Plugin } from "../models";
 // @ts-ignore
 import { PluginList } from "../models";
 // @ts-ignore
 import { Setting } from "../models";
+// @ts-ignore
+import { UpgradeFromUriRequest } from "../models";
 /**
  * ApiConsoleHaloRunV1alpha1PluginApi - axios parameter creator
  * @export
@@ -225,6 +229,67 @@ export const ApiConsoleHaloRunV1alpha1PluginApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = localVarFormParams;
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     * Install a plugin from uri.
+     * @param {InstallFromUriRequest} installFromUriRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    installPluginFromUri: async (
+      installFromUriRequest: InstallFromUriRequest,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'installFromUriRequest' is not null or undefined
+      assertParamExists(
+        "installPluginFromUri",
+        "installFromUriRequest",
+        installFromUriRequest
+      );
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/plugins/-/install-from-uri`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      localVarHeaderParameter["Content-Type"] = "application/json";
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        installFromUriRequest,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
@@ -616,6 +681,75 @@ export const ApiConsoleHaloRunV1alpha1PluginApiAxiosParamCreator = function (
         options: localVarRequestOptions,
       };
     },
+    /**
+     * Upgrade a plugin from uri.
+     * @param {string} name
+     * @param {UpgradeFromUriRequest} upgradeFromUriRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    upgradePluginFromUri: async (
+      name: string,
+      upgradeFromUriRequest: UpgradeFromUriRequest,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'name' is not null or undefined
+      assertParamExists("upgradePluginFromUri", "name", name);
+      // verify required parameter 'upgradeFromUriRequest' is not null or undefined
+      assertParamExists(
+        "upgradePluginFromUri",
+        "upgradeFromUriRequest",
+        upgradeFromUriRequest
+      );
+      const localVarPath =
+        `/apis/api.console.halo.run/v1alpha1/plugins/{name}/upgrade-from-uri`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      localVarHeaderParameter["Content-Type"] = "application/json";
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        upgradeFromUriRequest,
+        localVarRequestOptions,
+        configuration
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
   };
 };
 
@@ -693,6 +827,30 @@ export const ApiConsoleHaloRunV1alpha1PluginApiFp = function (
         source,
         options
       );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
+     * Install a plugin from uri.
+     * @param {InstallFromUriRequest} installFromUriRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async installPluginFromUri(
+      installFromUriRequest: InstallFromUriRequest,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Plugin>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.installPluginFromUri(
+          installFromUriRequest,
+          options
+        );
       return createRequestFunction(
         localVarAxiosArgs,
         globalAxios,
@@ -863,6 +1021,33 @@ export const ApiConsoleHaloRunV1alpha1PluginApiFp = function (
         configuration
       );
     },
+    /**
+     * Upgrade a plugin from uri.
+     * @param {string} name
+     * @param {UpgradeFromUriRequest} upgradeFromUriRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async upgradePluginFromUri(
+      name: string,
+      upgradeFromUriRequest: UpgradeFromUriRequest,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Plugin>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.upgradePluginFromUri(
+          name,
+          upgradeFromUriRequest,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
   };
 };
 
@@ -922,6 +1107,20 @@ export const ApiConsoleHaloRunV1alpha1PluginApiFactory = function (
           requestParameters.source,
           options
         )
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     * Install a plugin from uri.
+     * @param {ApiConsoleHaloRunV1alpha1PluginApiInstallPluginFromUriRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    installPluginFromUri(
+      requestParameters: ApiConsoleHaloRunV1alpha1PluginApiInstallPluginFromUriRequest,
+      options?: AxiosRequestConfig
+    ): AxiosPromise<Plugin> {
+      return localVarFp
+        .installPluginFromUri(requestParameters.installFromUriRequest, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -1025,6 +1224,24 @@ export const ApiConsoleHaloRunV1alpha1PluginApiFactory = function (
         )
         .then((request) => request(axios, basePath));
     },
+    /**
+     * Upgrade a plugin from uri.
+     * @param {ApiConsoleHaloRunV1alpha1PluginApiUpgradePluginFromUriRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    upgradePluginFromUri(
+      requestParameters: ApiConsoleHaloRunV1alpha1PluginApiUpgradePluginFromUriRequest,
+      options?: AxiosRequestConfig
+    ): AxiosPromise<Plugin> {
+      return localVarFp
+        .upgradePluginFromUri(
+          requestParameters.name,
+          requestParameters.upgradeFromUriRequest,
+          options
+        )
+        .then((request) => request(axios, basePath));
+    },
   };
 };
 
@@ -1082,6 +1299,20 @@ export interface ApiConsoleHaloRunV1alpha1PluginApiInstallPluginRequest {
    * @memberof ApiConsoleHaloRunV1alpha1PluginApiInstallPlugin
    */
   readonly source?: string;
+}
+
+/**
+ * Request parameters for installPluginFromUri operation in ApiConsoleHaloRunV1alpha1PluginApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1PluginApiInstallPluginFromUriRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1PluginApiInstallPluginFromUriRequest {
+  /**
+   *
+   * @type {InstallFromUriRequest}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApiInstallPluginFromUri
+   */
+  readonly installFromUriRequest: InstallFromUriRequest;
 }
 
 /**
@@ -1225,6 +1456,27 @@ export interface ApiConsoleHaloRunV1alpha1PluginApiUpgradePluginRequest {
 }
 
 /**
+ * Request parameters for upgradePluginFromUri operation in ApiConsoleHaloRunV1alpha1PluginApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1PluginApiUpgradePluginFromUriRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1PluginApiUpgradePluginFromUriRequest {
+  /**
+   *
+   * @type {string}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApiUpgradePluginFromUri
+   */
+  readonly name: string;
+
+  /**
+   *
+   * @type {UpgradeFromUriRequest}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApiUpgradePluginFromUri
+   */
+  readonly upgradeFromUriRequest: UpgradeFromUriRequest;
+}
+
+/**
  * ApiConsoleHaloRunV1alpha1PluginApi - object-oriented interface
  * @export
  * @class ApiConsoleHaloRunV1alpha1PluginApi
@@ -1281,6 +1533,22 @@ export class ApiConsoleHaloRunV1alpha1PluginApi extends BaseAPI {
         requestParameters.source,
         options
       )
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   * Install a plugin from uri.
+   * @param {ApiConsoleHaloRunV1alpha1PluginApiInstallPluginFromUriRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApi
+   */
+  public installPluginFromUri(
+    requestParameters: ApiConsoleHaloRunV1alpha1PluginApiInstallPluginFromUriRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return ApiConsoleHaloRunV1alpha1PluginApiFp(this.configuration)
+      .installPluginFromUri(requestParameters.installFromUriRequest, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -1390,6 +1658,26 @@ export class ApiConsoleHaloRunV1alpha1PluginApi extends BaseAPI {
         requestParameters.file,
         requestParameters.presetName,
         requestParameters.source,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   * Upgrade a plugin from uri.
+   * @param {ApiConsoleHaloRunV1alpha1PluginApiUpgradePluginFromUriRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApi
+   */
+  public upgradePluginFromUri(
+    requestParameters: ApiConsoleHaloRunV1alpha1PluginApiUpgradePluginFromUriRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return ApiConsoleHaloRunV1alpha1PluginApiFp(this.configuration)
+      .upgradePluginFromUri(
+        requestParameters.name,
+        requestParameters.upgradeFromUriRequest,
         options
       )
       .then((request) => request(this.axios, this.basePath));
