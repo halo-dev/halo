@@ -1,4 +1,4 @@
-package run.halo.app.core.extension.theme;
+package run.halo.app.infra;
 
 import java.io.InputStream;
 import java.net.URI;

@@ -48,6 +48,7 @@ import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.infra.ZipStreamFetcher;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.exception.ThemeInstallationException;
 import run.halo.app.infra.exception.ThemeUpgradeException;
