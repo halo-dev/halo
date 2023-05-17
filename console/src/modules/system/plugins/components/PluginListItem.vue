@@ -32,20 +32,12 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits<{
-  (event: "reload"): void;
-}>();
-
 const { plugin } = toRefs(props);
 
 const upgradeModal = ref(false);
 
 const { getFailedMessage, changeStatus, uninstall } =
   usePluginLifeCycle(plugin);
-
-const onUpgradeModalClose = () => {
-  emit("reload");
-};
 
 const handleResetSettingConfig = async () => {
   Dialog.warning({
@@ -73,11 +65,7 @@ const handleResetSettingConfig = async () => {
 };
 </script>
 <template>
-  <PluginUploadModal
-    v-model:visible="upgradeModal"
-    :upgrade-plugin="plugin"
-    @close="onUpgradeModalClose"
-  />
+  <PluginUploadModal v-model:visible="upgradeModal" :upgrade-plugin="plugin" />
   <VEntity>
     <template #start>
       <VEntityField>

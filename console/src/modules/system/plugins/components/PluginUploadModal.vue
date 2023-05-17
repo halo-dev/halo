@@ -1,14 +1,25 @@
 <script lang="ts" setup>
-import { VModal, Dialog, Toast } from "@halo-dev/components";
+import {
+  VModal,
+  Dialog,
+  Toast,
+  VTabs,
+  VTabItem,
+  VButton,
+} from "@halo-dev/components";
 import UppyUpload from "@/components/upload/UppyUpload.vue";
 import { apiClient } from "@/utils/api-client";
 import type { Plugin } from "@halo-dev/api-client";
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, nextTick } from "vue";
 import type { SuccessResponse, ErrorResponse } from "@uppy/core";
 import type { UppyFile } from "@uppy/utils";
 import { useI18n } from "vue-i18n";
+import { useQueryClient } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
+import { submitForm } from "@formkit/core";
 
 const { t } = useI18n();
+const queryClient = useQueryClient();
 
 const props = withDefaults(
   defineProps<{
@@ -57,8 +68,13 @@ const onUploaded = async (response: SuccessResponse) => {
     return;
   }
 
-  const plugin = response.body as Plugin;
   handleVisibleChange(false);
+  queryClient.invalidateQueries({ queryKey: ["plugins"] });
+
+  handleShowActiveModalAfterInstall(response.body as Plugin);
+};
+
+const handleShowActiveModalAfterInstall = (plugin: Plugin) => {
   Dialog.success({
     title: t("core.plugin.upload_modal.operations.active_after_install.title"),
     description: t(
@@ -103,28 +119,47 @@ const PLUGIN_ALREADY_EXISTS_TYPE =
 
 const onError = (file: UppyFile<unknown>, response: ErrorResponse) => {
   const body = response.body as PluginInstallationErrorResponse;
+
   if (body.type === PLUGIN_ALREADY_EXISTS_TYPE) {
-    Dialog.info({
-      title: t(
-        "core.plugin.upload_modal.operations.existed_during_installation.title"
-      ),
-      description: t(
-        "core.plugin.upload_modal.operations.existed_during_installation.description"
-      ),
-      confirmText: t("core.common.buttons.confirm"),
-      cancelText: t("core.common.buttons.cancel"),
-      onConfirm: async () => {
-        await apiClient.plugin.upgradePlugin({
-          name: body.pluginName,
-          file: file.data as File,
-        });
-
-        Toast.success(t("core.common.toast.upgrade_success"));
-
-        window.location.reload();
-      },
-    });
+    handleCatchExistsException(body, file.data as File);
   }
+};
+
+const handleCatchExistsException = async (
+  error: PluginInstallationErrorResponse,
+  file?: File
+) => {
+  Dialog.info({
+    title: t(
+      "core.plugin.upload_modal.operations.existed_during_installation.title"
+    ),
+    description: t(
+      "core.plugin.upload_modal.operations.existed_during_installation.description"
+    ),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    onConfirm: async () => {
+      if (activeTabId.value === "local") {
+        await apiClient.plugin.upgradePlugin({
+          name: error.pluginName,
+          file: file,
+        });
+      } else if (activeTabId.value === "remote") {
+        await apiClient.plugin.upgradePluginFromUri({
+          name: error.pluginName,
+          upgradeFromUriRequest: {
+            uri: remoteDownloadUrl.value,
+          },
+        });
+      } else {
+        throw new Error("Unknown tab id");
+      }
+
+      Toast.success(t("core.common.toast.upgrade_success"));
+
+      window.location.reload();
+    },
+  });
 };
 
 watch(
@@ -140,24 +175,120 @@ watch(
     }
   }
 );
+
+// remote download
+const activeTabId = ref("local");
+const remoteDownloadUrl = ref("");
+const downloading = ref(false);
+
+const handleDownloadPlugin = async () => {
+  try {
+    downloading.value = true;
+    if (props.upgradePlugin) {
+      await apiClient.plugin.upgradePluginFromUri({
+        name: props.upgradePlugin.metadata.name,
+        upgradeFromUriRequest: {
+          uri: remoteDownloadUrl.value,
+        },
+      });
+
+      Toast.success(t("core.common.toast.upgrade_success"));
+      window.location.reload();
+      return;
+    }
+
+    const { data: plugin } = await apiClient.plugin.installPluginFromUri({
+      installFromUriRequest: {
+        uri: remoteDownloadUrl.value,
+      },
+    });
+
+    handleVisibleChange(false);
+    queryClient.invalidateQueries({ queryKey: ["plugins"] });
+
+    handleShowActiveModalAfterInstall(plugin);
+
+    // eslint-disable-next-line
+  } catch (error: any) {
+    const data = error?.response.data as PluginInstallationErrorResponse;
+    if (data?.type === PLUGIN_ALREADY_EXISTS_TYPE) {
+      handleCatchExistsException(data);
+    }
+
+    console.error("Failed to download plugin", error);
+  } finally {
+    routeRemoteDownloadUrl.value = null;
+    downloading.value = false;
+  }
+};
+
+// handle remote download url from route
+const routeRemoteDownloadUrl = useRouteQuery<string | null>(
+  "remote-download-url"
+);
+watch(
+  () => props.visible,
+  (visible) => {
+    if (routeRemoteDownloadUrl.value && visible) {
+      activeTabId.value = "remote";
+      remoteDownloadUrl.value = routeRemoteDownloadUrl.value;
+      nextTick(() => {
+        submitForm("plugin-remote-download-form");
+      });
+    }
+  }
+);
 </script>
 <template>
   <VModal
     :visible="visible"
     :width="600"
     :title="modalTitle"
+    :centered="false"
     @update:visible="handleVisibleChange"
   >
-    <UppyUpload
-      v-if="uploadVisible"
-      :restrictions="{
-        maxNumberOfFiles: 1,
-        allowedFileTypes: ['.jar'],
-      }"
-      :endpoint="endpoint"
-      auto-proceed
-      @uploaded="onUploaded"
-      @error="onError"
-    />
+    <VTabs v-model:active-id="activeTabId" type="outline" class="!rounded-none">
+      <VTabItem id="local" :label="$t('core.plugin.upload_modal.tabs.local')">
+        <UppyUpload
+          v-if="uploadVisible"
+          :restrictions="{
+            maxNumberOfFiles: 1,
+            allowedFileTypes: ['.jar'],
+          }"
+          :endpoint="endpoint"
+          auto-proceed
+          @uploaded="onUploaded"
+          @error="onError"
+        />
+      </VTabItem>
+      <VTabItem
+        id="remote"
+        :label="$t('core.plugin.upload_modal.tabs.remote.title')"
+      >
+        <FormKit
+          id="plugin-remote-download-form"
+          name="plugin-remote-download-form"
+          type="form"
+          :preserve="true"
+          @submit="handleDownloadPlugin"
+        >
+          <FormKit
+            v-model="remoteDownloadUrl"
+            :label="$t('core.plugin.upload_modal.tabs.remote.fields.url')"
+            type="text"
+          ></FormKit>
+        </FormKit>
+
+        <div class="pt-5">
+          <VButton
+            :loading="downloading"
+            type="secondary"
+            @click="$formkit.submit('plugin-remote-download-form')"
+          >
+            {{ $t("core.common.buttons.download") }}
+          </VButton>
+        </div>
+      </VTabItem>
+    </VTabs>
   </VModal>
 </template>

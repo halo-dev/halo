@@ -13,10 +13,11 @@ import {
   VLoading,
   VDropdown,
   VDropdownItem,
+  Dialog,
 } from "@halo-dev/components";
 import PluginListItem from "./components/PluginListItem.vue";
 import PluginUploadModal from "./components/PluginUploadModal.vue";
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
 import FilterTag from "@/components/filter/FilterTag.vue";
@@ -25,6 +26,7 @@ import { getNode } from "@formkit/core";
 import { useQuery } from "@tanstack/vue-query";
 import type { Plugin } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
+import { useRouteQuery } from "@vueuse/router";
 
 const { t } = useI18n();
 
@@ -146,12 +148,34 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
     return deletingPlugins?.length ? 3000 : false;
   },
 });
+
+// handle remote download url from route
+const routeRemoteDownloadUrl = useRouteQuery<string | null>(
+  "remote-download-url"
+);
+onMounted(() => {
+  if (routeRemoteDownloadUrl.value) {
+    Dialog.warning({
+      title: t("core.plugin.operations.remote_download.title"),
+      description: t("core.plugin.operations.remote_download.description", {
+        url: routeRemoteDownloadUrl.value,
+      }),
+      confirmText: t("core.common.buttons.download"),
+      cancelText: t("core.common.buttons.cancel"),
+      onConfirm() {
+        pluginInstall.value = true;
+      },
+      onCancel() {
+        routeRemoteDownloadUrl.value = null;
+      },
+    });
+  }
+});
 </script>
 <template>
   <PluginUploadModal
     v-if="currentUserHasPermission(['system:plugins:manage'])"
     v-model:visible="pluginInstall"
-    @close="refetch()"
   />
 
   <VPageHeader :title="$t('core.plugin.title')">
@@ -324,7 +348,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
           role="list"
         >
           <li v-for="plugin in data" :key="plugin.metadata.name">
-            <PluginListItem :plugin="plugin" @reload="refetch()" />
+            <PluginListItem :plugin="plugin" />
           </li>
         </ul>
       </Transition>
