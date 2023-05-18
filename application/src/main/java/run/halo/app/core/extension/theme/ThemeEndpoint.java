@@ -45,13 +45,14 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
+import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ThemeRootGetter;
-import run.halo.app.infra.ZipStreamFetcher;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.exception.ThemeInstallationException;
 import run.halo.app.infra.exception.ThemeUpgradeException;
+import run.halo.app.infra.utils.DataBufferUtils;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.TemplateEngineManager;
 
@@ -76,7 +77,7 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     private final SystemConfigurableEnvironmentFetcher systemEnvironmentFetcher;
 
-    private final ZipStreamFetcher zipStreamFetcher;
+    private final ReactiveUrlDataBufferFetcher reactiveUrlDataBufferFetcher;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -243,7 +244,9 @@ public class ThemeEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> upgradeFromUri(ServerRequest request) {
         final var name = request.pathVariable("name");
         return request.bodyToMono(UpgradeFromUriRequest.class)
-            .flatMap(upgradeRequest -> zipStreamFetcher.fetch(upgradeRequest.uri()))
+            .flatMap(upgradeRequest -> Mono.fromCallable(() -> DataBufferUtils.toInputStream(
+                reactiveUrlDataBufferFetcher.fetch(upgradeRequest.uri())))
+            )
             .doOnError(throwable -> {
                 log.error("Failed to fetch zip file from uri.", throwable);
                 throw new ThemeUpgradeException("Failed to fetch zip file from uri.", null,
@@ -262,7 +265,9 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> installFromUri(ServerRequest request) {
         return request.bodyToMono(InstallFromUriRequest.class)
-            .flatMap(installRequest -> zipStreamFetcher.fetch(installRequest.uri()))
+            .flatMap(installRequest -> Mono.fromCallable(() -> DataBufferUtils.toInputStream(
+                reactiveUrlDataBufferFetcher.fetch(installRequest.uri())))
+            )
             .doOnError(throwable -> {
                 log.error("Failed to fetch zip file from uri.", throwable);
                 throw new ThemeInstallationException("Failed to fetch zip file from uri.", null,

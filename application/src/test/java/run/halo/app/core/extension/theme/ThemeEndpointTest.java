@@ -25,22 +25,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.server.ServerWebInputException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ThemeRootGetter;
-import run.halo.app.infra.ZipStreamFetcher;
 import run.halo.app.theme.TemplateEngineManager;
 
 /**
@@ -68,7 +70,7 @@ class ThemeEndpointTest {
     private SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     @Mock
-    private ZipStreamFetcher zipStreamFetcher;
+    private ReactiveUrlDataBufferFetcher reactiveUrlDataBufferFetcher;
 
     @InjectMocks
     ThemeEndpoint themeEndpoint;
@@ -153,7 +155,8 @@ class ThemeEndpointTest {
             when(fakeTheme.getMetadata()).thenReturn(metadata);
             when(themeService.upgrade(eq("default"), isA(InputStream.class)))
                 .thenReturn(Mono.just(fakeTheme));
-            when(zipStreamFetcher.fetch(eq(uri))).thenReturn(Mono.just(mock(InputStream.class)));
+            when(reactiveUrlDataBufferFetcher.fetch(eq(uri)))
+                .thenReturn(Flux.just(mock(DataBuffer.class)));
             when(templateEngineManager.clearCache(eq("default")))
                 .thenReturn(Mono.empty());
             var body = new ThemeEndpoint.UpgradeFromUriRequest(uri);
@@ -167,7 +170,7 @@ class ThemeEndpointTest {
 
             verify(templateEngineManager, times(1)).clearCache(eq("default"));
 
-            verify(zipStreamFetcher).fetch(eq(uri));
+            verify(reactiveUrlDataBufferFetcher).fetch(eq(uri));
         }
     }
 
@@ -210,7 +213,8 @@ class ThemeEndpointTest {
         Theme fakeTheme = mock(Theme.class);
         when(themeService.install(isA(InputStream.class)))
             .thenReturn(Mono.just(fakeTheme));
-        when(zipStreamFetcher.fetch(eq(uri))).thenReturn(Mono.just(mock(InputStream.class)));
+        when(reactiveUrlDataBufferFetcher.fetch(eq(uri)))
+            .thenReturn(Flux.just(mock(DataBuffer.class)));
         var body = new ThemeEndpoint.UpgradeFromUriRequest(uri);
         webTestClient.post()
             .uri("/themes/-/install-from-uri")
@@ -219,7 +223,7 @@ class ThemeEndpointTest {
             .expectStatus().isOk();
 
         verify(themeService).install(isA(InputStream.class));
-        verify(zipStreamFetcher).fetch(eq(uri));
+        verify(reactiveUrlDataBufferFetcher).fetch(eq(uri));
     }
 
     @Test
