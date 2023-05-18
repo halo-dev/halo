@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import {
-  VSpace,
   VSwitch,
-  VTag,
   VStatusDot,
   VEntity,
   VEntityField,
@@ -42,7 +40,8 @@ const { plugin } = toRefs(props);
 
 const upgradeModal = ref(false);
 
-const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
+const { getFailedMessage, changeStatus, uninstall } =
+  usePluginLifeCycle(plugin);
 
 const onUpgradeModalClose = () => {
   emit("reload");
@@ -72,13 +71,6 @@ const handleResetSettingConfig = async () => {
     },
   });
 };
-
-const getFailedMessage = (plugin: Plugin) => {
-  if (plugin.status?.conditions?.length) {
-    const lastCondition = plugin.status.conditions[0];
-    return [lastCondition.reason, lastCondition.message].join(":");
-  }
-};
 </script>
 <template>
   <PluginUploadModal
@@ -104,28 +96,12 @@ const getFailedMessage = (plugin: Plugin) => {
           name: 'PluginDetail',
           params: { name: plugin?.metadata.name },
         }"
-      >
-        <template #extra>
-          <VSpace>
-            <VTag>
-              {{
-                isStarted
-                  ? $t("core.common.status.activated")
-                  : $t("core.common.status.not_activated")
-              }}
-            </VTag>
-          </VSpace>
-        </template>
-      </VEntityField>
+      />
     </template>
     <template #end>
       <VEntityField v-if="plugin?.status?.phase === 'FAILED'">
         <template #description>
-          <VStatusDot
-            v-tooltip="getFailedMessage(plugin)"
-            state="error"
-            animate
-          />
+          <VStatusDot v-tooltip="getFailedMessage()" state="error" animate />
         </template>
       </VEntityField>
       <VEntityField v-if="plugin?.metadata.deletionTimestamp">

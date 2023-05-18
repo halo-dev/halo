@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import {
+  VAlert,
   VDescription,
   VDescriptionItem,
   VSwitch,
-  VTag,
 } from "@halo-dev/components";
 import type { Ref } from "vue";
 import { computed, inject } from "vue";
@@ -16,7 +16,7 @@ import { formatDatetime } from "@/utils/date";
 import { useQuery } from "@tanstack/vue-query";
 
 const plugin = inject<Ref<Plugin | undefined>>("plugin");
-const { changeStatus, isStarted } = usePluginLifeCycle(plugin);
+const { changeStatus } = usePluginLifeCycle(plugin);
 
 interface RoleTemplateGroup {
   module: string | null | undefined;
@@ -70,22 +70,24 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
           <h3 class="text-lg font-medium leading-6 text-gray-900">
             {{ $t("core.plugin.detail.header.title") }}
           </h3>
-          <p class="mt-1 flex max-w-2xl items-center gap-2">
-            <span class="text-sm text-gray-500">
-              {{ plugin?.spec.version }}
-            </span>
-            <VTag>
-              {{
-                isStarted
-                  ? $t("core.common.status.activated")
-                  : $t("core.common.status.not_activated")
-              }}
-            </VTag>
-          </p>
         </div>
         <div v-permission="['system:plugins:manage']">
-          <VSwitch :model-value="isStarted" @change="changeStatus" />
+          <VSwitch :model-value="plugin?.spec.enabled" @change="changeStatus" />
         </div>
+      </div>
+      <div
+        v-if="
+          plugin?.status?.phase === 'FAILED' &&
+          plugin?.status?.conditions?.length
+        "
+        class="w-full px-4 pb-2 sm:px-6"
+      >
+        <VAlert
+          type="error"
+          :title="plugin?.status?.conditions?.[0].reason"
+          :description="plugin?.status?.conditions?.[0].message"
+          :closable="false"
+        />
       </div>
       <div class="border-t border-gray-200">
         <VDescription>

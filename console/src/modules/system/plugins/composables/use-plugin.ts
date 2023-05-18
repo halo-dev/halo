@@ -8,6 +8,7 @@ import { useI18n } from "vue-i18n";
 
 interface usePluginLifeCycleReturn {
   isStarted: ComputedRef<boolean | undefined>;
+  getFailedMessage: () => string | undefined;
   changeStatus: () => void;
   uninstall: (deleteExtensions?: boolean) => void;
 }
@@ -22,6 +23,18 @@ export function usePluginLifeCycle(
       plugin?.value?.status?.phase === "STARTED" && plugin.value?.spec.enabled
     );
   });
+
+  const getFailedMessage = () => {
+    if (!plugin?.value) return;
+
+    if (!isStarted.value) {
+      const lastCondition = plugin.value.status?.conditions?.[0];
+
+      return (
+        [lastCondition?.reason, lastCondition?.message].join(":") || "Unknown"
+      );
+    }
+  };
 
   const changeStatus = () => {
     if (!plugin?.value) return;
@@ -135,6 +148,7 @@ export function usePluginLifeCycle(
 
   return {
     isStarted,
+    getFailedMessage,
     changeStatus,
     uninstall,
   };
