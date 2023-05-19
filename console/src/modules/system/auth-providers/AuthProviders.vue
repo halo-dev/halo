@@ -9,6 +9,8 @@ import { useQuery } from "@tanstack/vue-query";
 import { apiClient } from "@/utils/api-client";
 import type { ListedAuthProvider } from "@halo-dev/api-client";
 import AuthProviderListItem from "./components/AuthProviderListItem.vue";
+import { computed, ref, watch } from "vue";
+import Fuse from "fuse.js";
 
 const {
   data: authProviders,
@@ -20,6 +22,29 @@ const {
     const { data } = await apiClient.authProvider.listAuthProviders();
     return data;
   },
+  initialData: [],
+});
+
+const keyword = ref("");
+let fuse: Fuse<ListedAuthProvider> | undefined = undefined;
+
+watch(
+  () => authProviders.value,
+  () => {
+    fuse = new Fuse(authProviders.value, {
+      keys: ["name", "displayName"],
+      useExtendedSearch: true,
+      threshold: 0.2,
+    });
+  }
+);
+
+const searchResults = computed(() => {
+  if (!fuse || !keyword.value) {
+    return authProviders.value;
+  }
+
+  return fuse?.search(keyword.value).map((item) => item.item);
 });
 </script>
 
@@ -39,6 +64,7 @@ const {
           >
             <div class="flex w-full flex-1 sm:w-auto">
               <FormKit
+                v-model="keyword"
                 :placeholder="$t('core.common.placeholder.search')"
                 type="text"
               ></FormKit>
@@ -52,7 +78,7 @@ const {
           class="box-border h-full w-full divide-y divide-gray-100"
           role="list"
         >
-          <li v-for="(authProvider, index) in authProviders" :key="index">
+          <li v-for="(authProvider, index) in searchResults" :key="index">
             <AuthProviderListItem
               :auth-provider="authProvider"
               @reload="refetch"
