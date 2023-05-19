@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/vue-query";
 import { apiClient } from "@/utils/api-client";
 import type { ListedAuthProvider } from "@halo-dev/api-client";
 import AuthProviderListItem from "./components/AuthProviderListItem.vue";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
 import Fuse from "fuse.js";
 
 const {
@@ -22,22 +22,17 @@ const {
     const { data } = await apiClient.authProvider.listAuthProviders();
     return data;
   },
-  initialData: [],
-});
-
-const keyword = ref("");
-let fuse: Fuse<ListedAuthProvider> | undefined = undefined;
-
-watch(
-  () => authProviders.value,
-  () => {
-    fuse = new Fuse(authProviders.value, {
+  onSuccess(data) {
+    fuse = new Fuse(data, {
       keys: ["name", "displayName"],
       useExtendedSearch: true,
       threshold: 0.2,
     });
-  }
-);
+  },
+});
+
+const keyword = ref("");
+let fuse: Fuse<ListedAuthProvider> | undefined = undefined;
 
 const searchResults = computed(() => {
   if (!fuse || !keyword.value) {
