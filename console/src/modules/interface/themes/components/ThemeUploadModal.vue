@@ -1,5 +1,12 @@
 <script lang="ts" setup>
-import { Toast, VButton, VModal, VTabItem, VTabs } from "@halo-dev/components";
+import {
+  Dialog,
+  Toast,
+  VButton,
+  VModal,
+  VTabItem,
+  VTabs,
+} from "@halo-dev/components";
 import UppyUpload from "@/components/upload/UppyUpload.vue";
 import { computed, ref, watch, nextTick } from "vue";
 import type { Theme } from "@halo-dev/api-client";
@@ -9,6 +16,8 @@ import { useThemeStore } from "@/stores/theme";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { submitForm } from "@formkit/core";
+import type { ErrorResponse } from "@uppy/core";
+import type { UppyFile } from "@uppy/utils";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -83,6 +92,71 @@ const onUploaded = () => {
   handleVisibleChange(false);
 };
 
+interface ThemeInstallationErrorResponse {
+  detail: string;
+  instance: string;
+  themeName: string;
+  requestId: string;
+  status: number;
+  timestamp: string;
+  title: string;
+  type: string;
+}
+
+const THEME_ALREADY_EXISTS_TYPE = "https://halo.run/probs/theme-alreay-exists";
+
+const onError = (file: UppyFile<unknown>, response: ErrorResponse) => {
+  const body = response.body as ThemeInstallationErrorResponse;
+
+  if (body.type === THEME_ALREADY_EXISTS_TYPE) {
+    handleCatchExistsException(body, file.data as File);
+  }
+};
+
+const handleCatchExistsException = async (
+  error: ThemeInstallationErrorResponse,
+  file?: File
+) => {
+  Dialog.info({
+    title: t(
+      "core.theme.upload_modal.operations.existed_during_installation.title"
+    ),
+    description: t(
+      "core.theme.upload_modal.operations.existed_during_installation.description"
+    ),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    onConfirm: async () => {
+      if (activeTabId.value === "local") {
+        if (!file) {
+          throw new Error("File is required");
+        }
+
+        await apiClient.theme.upgradeTheme({
+          name: error.themeName,
+          file: file,
+        });
+      } else if (activeTabId.value === "remote") {
+        await apiClient.theme.upgradeThemeFromUri({
+          name: error.themeName,
+          upgradeFromUriRequest: {
+            uri: remoteDownloadUrl.value,
+          },
+        });
+      } else {
+        throw new Error("Unknown tab id");
+      }
+
+      Toast.success(t("core.common.toast.upgrade_success"));
+
+      queryClient.invalidateQueries({ queryKey: ["themes"] });
+      themeStore.fetchActivatedTheme();
+
+      handleVisibleChange(false);
+    },
+  });
+};
+
 // remote download
 const activeTabId = ref("local");
 const remoteDownloadUrl = ref("");
@@ -120,10 +194,16 @@ const handleDownloadTheme = async () => {
 
     handleVisibleChange(false);
 
-    routeRemoteDownloadUrl.value = null;
-  } catch (error) {
-    console.log("Failed to download theme", error);
+    // eslint-disable-next-line
+  } catch (error: any) {
+    const data = error?.response.data as ThemeInstallationErrorResponse;
+    if (data?.type === THEME_ALREADY_EXISTS_TYPE) {
+      handleCatchExistsException(data);
+    }
+
+    console.error("Failed to download theme", error);
   } finally {
+    routeRemoteDownloadUrl.value = null;
     downloading.value = false;
   }
 };
@@ -164,6 +244,7 @@ watch(
           :endpoint="endpoint"
           auto-proceed
           @uploaded="onUploaded"
+          @error="onError"
         />
       </VTabItem>
       <VTabItem
