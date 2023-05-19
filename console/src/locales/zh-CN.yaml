@@ -597,10 +597,19 @@ core:
       uninstall_and_delete_config:
         button: 卸载并删除配置
         title: 确定要卸载该主题以及对应的配置吗？
+      remote_download:
+        title: 检测到了远程下载地址，是否需要下载？
+        description: 请仔细鉴别此地址是否可信：{url}
     upload_modal:
       titles:
         install: 安装主题
         upgrade: 升级主题（{display_name}）
+      tabs:
+        local: 本地上传
+        remote:
+          title: 远程下载
+          fields:
+            url: 下载地址
     list_modal:
       titles:
         installed_themes: 已安装的主题

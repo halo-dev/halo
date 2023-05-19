@@ -19,20 +19,25 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.BaseStream;
 import java.util.stream.Stream;
 import java.util.zip.ZipInputStream;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.Unstructured;
+import run.halo.app.infra.exception.ThemeAlreadyExistsException;
 import run.halo.app.infra.exception.ThemeInstallationException;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
 
+@Slf4j
 class ThemeUtils {
     private static final String THEME_TMP_PREFIX = "halo-theme-";
     private static final String[] THEME_MANIFESTS = {"theme.yaml", "theme.yml"};
@@ -97,7 +102,11 @@ class ThemeUtils {
     }
 
     static Mono<Unstructured> unzipThemeTo(InputStream inputStream, Path themeWorkDir) {
-        return unzipThemeTo(inputStream, themeWorkDir, false);
+        return unzipThemeTo(inputStream, themeWorkDir, false)
+            .onErrorMap(e -> !(e instanceof ResponseStatusException), e -> {
+                log.error("Failed to unzip theme", e);
+                throw new ServerWebInputException("Failed to unzip theme");
+            });
     }
 
     static Mono<Unstructured> unzipThemeTo(InputStream inputStream, Path themeWorkDir,
@@ -130,8 +139,7 @@ class ThemeUtils {
                 var themeTargetPath = themeWorkDir.resolve(themeName);
                 try {
                     if (!override && !FileUtils.isEmpty(themeTargetPath)) {
-                        throw new ThemeInstallationException("Theme already exists.",
-                            "problemDetail.theme.install.alreadyExists", new Object[] {themeName});
+                        throw new ThemeAlreadyExistsException(themeName);
                     }
                     // install theme to theme work dir
                     copyRecursively(themeManifestPath.getParent(), themeTargetPath);
@@ -141,7 +149,10 @@ class ThemeUtils {
                     throw Exceptions.propagate(e);
                 }
             })
-            .doFinally(signalType -> deleteRecursivelyAndSilently(tempDir.get()));
+            .doFinally(signalType -> {
+                FileUtils.closeQuietly(inputStream);
+                deleteRecursivelyAndSilently(tempDir.get());
+            });
     }
 
     static Unstructured loadThemeManifest(Path themeManifestPath) {
