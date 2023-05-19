@@ -597,10 +597,19 @@ core:
       uninstall_and_delete_config:
         button: Uninstall and delete config
         title: Are you sure you want to uninstall this theme and its corresponding settings?
+      remote_download:
+        title: Remote download address detected, do you want to download?
+        description: "Please carefully verify whether this address can be trusted: {url}"
     upload_modal:
       titles:
         install: Install theme
         upgrade: Upgrade theme ({display_name})
+      tabs:
+        local: Local
+        remote:
+          title: Remote
+          fields:
+            url: Remote URL
     list_modal:
       titles:
         installed_themes: Installed Themes

@@ -24,6 +24,7 @@ import {
   VSpace,
   VTabbar,
   VLoading,
+  Dialog,
 } from "@halo-dev/components";
 import ThemeListModal from "../components/ThemeListModal.vue";
 import ThemePreviewModal from "../components/preview/ThemePreviewModal.vue";
@@ -34,6 +35,7 @@ import { storeToRefs } from "pinia";
 import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
 import { useQuery } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -156,6 +158,27 @@ onMounted(() => {
 
 watch([() => route.name, () => route.params], async () => {
   handleTriggerTabChange();
+});
+
+// handle remote download url from route
+const remoteDownloadUrl = useRouteQuery<string | null>("remote-download-url");
+onMounted(() => {
+  if (remoteDownloadUrl.value) {
+    Dialog.warning({
+      title: t("core.theme.operations.remote_download.title"),
+      description: t("core.theme.operations.remote_download.description", {
+        url: remoteDownloadUrl.value,
+      }),
+      confirmText: t("core.common.buttons.download"),
+      cancelText: t("core.common.buttons.cancel"),
+      onConfirm() {
+        themesModal.value = true;
+      },
+      onCancel() {
+        remoteDownloadUrl.value = null;
+      },
+    });
+  }
 });
 </script>
 <template>
