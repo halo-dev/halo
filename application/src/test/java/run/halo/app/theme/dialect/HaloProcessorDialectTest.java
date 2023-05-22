@@ -38,7 +38,7 @@ import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.SinglePageFinder;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.finders.vo.UserVo;
-import run.halo.app.theme.router.factories.ModelConst;
+import run.halo.app.theme.router.ModelConst;
 
 /**
  * Tests for {@link HaloProcessorDialect}.
