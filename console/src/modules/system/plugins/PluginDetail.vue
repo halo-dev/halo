@@ -129,7 +129,7 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
                 <a v-if="license.url" :href="license.url" target="_blank">
                   {{ license.name }}
                 </a>
-                <span>
+                <span v-else>
                   {{ license.name }}
                 </span>
               </li>
