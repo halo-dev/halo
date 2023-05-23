@@ -446,6 +446,13 @@ const { mutate: changeVisibleMutation } = useMutation({
     Toast.error(t("core.common.toast.operation_failed"));
   },
 });
+
+const getExternalUrl = (post: Post) => {
+  if (post.metadata.labels?.[postLabels.PUBLISHED] === "true") {
+    return post.status?.permalink;
+  }
+  return `/preview/posts/${post.metadata.name}`;
+};
 </script>
 <template>
   <PostSettingModal
@@ -811,10 +818,8 @@ const { mutate: changeVisibleMutation } = useMutation({
                         <VStatusDot state="success" animate />
                       </RouterLink>
                       <a
-                        v-if="post.post.status?.permalink"
                         target="_blank"
-                        :href="post.post.status?.permalink"
-                        :title="post.post.status?.permalink"
+                        :href="getExternalUrl(post.post)"
                         class="hidden text-gray-600 transition-all hover:text-gray-900 group-hover:inline-block"
                       >
                         <IconExternalLinkLine class="h-3.5 w-3.5" />
