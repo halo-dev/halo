@@ -1,6 +1,7 @@
 package run.halo.app.theme.router;
 
 import java.security.Principal;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -89,6 +90,24 @@ public class PreviewRouterFunction {
     private Mono<PostVo> convertToPostVo(Post post, String snapshotName) {
         return postPublicQueryService.convertToListedPostVo(post)
             .map(PostVo::from)
+            .doOnNext(postVo -> {
+                // fake some attributes only for preview when they are not published
+                Post.PostSpec spec = postVo.getSpec();
+                if (spec.getPublishTime() == null) {
+                    spec.setPublishTime(Instant.now());
+                }
+                if (spec.getPublish() == null) {
+                    spec.setPublish(false);
+                }
+                Post.PostStatus status = postVo.getStatus();
+                if (status == null) {
+                    status = new Post.PostStatus();
+                    postVo.setStatus(status);
+                }
+                if (status.getLastModifyTime() == null) {
+                    status.setLastModifyTime(Instant.now());
+                }
+            })
             .flatMap(postVo ->
                 postService.getContent(snapshotName, postVo.getSpec().getBaseSnapshot())
                     .map(contentWrapper -> ContentVo.builder()
@@ -109,6 +128,24 @@ public class PreviewRouterFunction {
                 String snapshotName = request.queryParam(SNAPSHOT_NAME_PARAM)
                     .orElse(singlePage.getSpec().getHeadSnapshot());
                 return singlePageConversionService.convertToVo(singlePage, snapshotName);
+            })
+            .doOnNext(pageVo -> {
+                // fake some attributes only for preview when they are not published
+                SinglePage.SinglePageSpec spec = pageVo.getSpec();
+                if (spec.getPublishTime() == null) {
+                    spec.setPublishTime(Instant.now());
+                }
+                if (spec.getPublish() == null) {
+                    spec.setPublish(false);
+                }
+                SinglePage.SinglePageStatus status = pageVo.getStatus();
+                if (status == null) {
+                    status = new SinglePage.SinglePageStatus();
+                    pageVo.setStatus(status);
+                }
+                if (status.getLastModifyTime() == null) {
+                    status.setLastModifyTime(Instant.now());
+                }
             })
             .flatMap(singlePageVo -> canPreview(singlePageVo.getContributors())
                 .doOnNext(canPreview -> {
