@@ -26,6 +26,7 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.SinglePageConversionService;
 import run.halo.app.theme.finders.vo.ContributorVo;
@@ -38,7 +39,6 @@ import run.halo.app.theme.finders.vo.SinglePageVo;
  * @author guqing
  * @since 2.6.x
  */
-@WithMockUser(username = "testuser")
 @ExtendWith(SpringExtension.class)
 class PreviewRouterFunctionTest {
     @Mock
@@ -83,6 +83,7 @@ class PreviewRouterFunctionTest {
     }
 
     @Test
+    @WithMockUser(username = "testuser")
     public void previewPost() {
         Post post = new Post();
         post.setMetadata(new Metadata());
@@ -118,6 +119,14 @@ class PreviewRouterFunctionTest {
     }
 
     @Test
+    public void previewPostWhenUnAuthenticated() {
+        webTestClient.get().uri("/preview/posts/post1")
+            .exchange()
+            .expectStatus().isEqualTo(404);
+    }
+
+    @Test
+    @WithMockUser(username = "testuser")
     public void previewSinglePage() {
         SinglePage singlePage = new SinglePage();
         singlePage.setMetadata(new Metadata());
@@ -142,6 +151,21 @@ class PreviewRouterFunctionTest {
 
         verify(viewResolver).resolveViewName(any(), any());
         verify(client).fetch(eq(SinglePage.class), eq("page1"));
+    }
+
+    @Test
+    public void previewSinglePageWhenUnAuthenticated() {
+        webTestClient.get().uri("/preview/singlepages/page1")
+            .exchange()
+            .expectStatus().isEqualTo(404);
+    }
+
+    @Test
+    @WithMockUser(username = AnonymousUserConst.PRINCIPAL)
+    public void previewWithAnonymousUser() {
+        webTestClient.get().uri("/preview/singlepages/page1")
+            .exchange()
+            .expectStatus().isEqualTo(404);
     }
 
     List<ContributorVo> contributorVos() {

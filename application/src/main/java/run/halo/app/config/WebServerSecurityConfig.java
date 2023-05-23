@@ -85,11 +85,7 @@ public class WebServerSecurityConfig {
         var mediaTypeMatcher = new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML);
         mediaTypeMatcher.setIgnoredMediaTypes(Set.of(MediaType.ALL));
         http.securityMatcher(new AndServerWebExchangeMatcher(pathMatcher, mediaTypeMatcher))
-            .authorizeExchange()
-            .pathMatchers(HttpMethod.GET, "/preview/posts/*", "/preview/singlepages/*")
-            .authenticated()
-            .anyExchange().permitAll()
-            .and()
+            .authorizeExchange().anyExchange().permitAll().and()
             .securityContextRepository(securityContextRepository)
             .headers()
             .frameOptions(spec -> {

@@ -20,7 +20,7 @@ import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.infra.exception.AccessDeniedException;
+import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostPublicQueryService;
@@ -60,7 +60,8 @@ public class PreviewRouterFunction {
 
     private Mono<ServerResponse> previewPost(ServerRequest request) {
         final var name = request.pathVariable("name");
-        return client.fetch(Post.class, name)
+        return currentAuthenticatedUserName()
+            .flatMap(principal -> client.fetch(Post.class, name))
             .flatMap(post -> {
                 String snapshotName = request.queryParam(SNAPSHOT_NAME_PARAM)
                     .orElse(post.getSpec().getHeadSnapshot());
@@ -69,8 +70,7 @@ public class PreviewRouterFunction {
             .flatMap(post -> canPreview(post.getContributors())
                 .doOnNext(canPreview -> {
                     if (!canPreview) {
-                        throw new AccessDeniedException(
-                            "You have no permission to preview this post.");
+                        throw new NotFoundException("Page not found.");
                     }
                 })
                 .thenReturn(post)
@@ -103,7 +103,8 @@ public class PreviewRouterFunction {
 
     private Mono<ServerResponse> previewSinglePage(ServerRequest request) {
         final var name = request.pathVariable("name");
-        return client.fetch(SinglePage.class, name)
+        return currentAuthenticatedUserName()
+            .flatMap(principal -> client.fetch(SinglePage.class, name))
             .flatMap(singlePage -> {
                 String snapshotName = request.queryParam(SNAPSHOT_NAME_PARAM)
                     .orElse(singlePage.getSpec().getHeadSnapshot());
@@ -112,8 +113,7 @@ public class PreviewRouterFunction {
             .flatMap(singlePageVo -> canPreview(singlePageVo.getContributors())
                 .doOnNext(canPreview -> {
                     if (!canPreview) {
-                        throw new AccessDeniedException(
-                            "You have no permission to preview this page.");
+                        throw new NotFoundException("Page not found.");
                     }
                 })
                 .thenReturn(singlePageVo)
@@ -135,15 +135,14 @@ public class PreviewRouterFunction {
             .map(ContributorVo::getName)
             .collect(Collectors.toSet());
         return currentAuthenticatedUserName()
-            .map(contributorNames::contains);
+            .map(contributorNames::contains)
+            .defaultIfEmpty(false);
     }
 
     Mono<String> currentAuthenticatedUserName() {
         return ReactiveSecurityContextHolder.getContext()
             .map(SecurityContext::getAuthentication)
             .map(Principal::getName)
-            .switchIfEmpty(
-                Mono.error(() -> new AccessDeniedException("Authentication required"))
-            );
+            .filter(name -> !AnonymousUserConst.isAnonymousUser(name));
     }
 }
