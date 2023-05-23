@@ -368,7 +368,7 @@ const handlePreview = async () => {
   <UrlPreviewModal
     v-if="isUpdateMode"
     v-model:visible="previewModal"
-    title="Preview"
+    :title="formState.post.spec.title"
     :url="`/preview/posts/${formState.post.metadata.name}`"
   />
 
