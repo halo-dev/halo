@@ -3,10 +3,13 @@ package run.halo.app.security.authentication.login;
 import static run.halo.app.security.authentication.WebExchangeMatchers.ignoringMediaTypeAll;
 
 import io.micrometer.observation.ObservationRegistry;
+import java.net.URI;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.ObservationReactiveAuthenticationManager;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -18,10 +21,11 @@ import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsPasswordService;
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.server.DefaultServerRedirectStrategy;
+import org.springframework.security.web.server.ServerRedirectStrategy;
 import org.springframework.security.web.server.WebFilterExchange;
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter;
 import org.springframework.security.web.server.authentication.RedirectServerAuthenticationFailureHandler;
-import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.ServerAuthenticationFailureHandler;
 import org.springframework.security.web.server.authentication.ServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.context.ServerSecurityContextRepository;
@@ -104,8 +108,9 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
 
     public class LoginSuccessHandler implements ServerAuthenticationSuccessHandler {
 
-        private final ServerAuthenticationSuccessHandler defaultHandler =
-            new RedirectServerAuthenticationSuccessHandler("/console/");
+        private static final String REDIRECT_URI_PARAM = "redirect_uri";
+        private final URI location = URI.create("/console/");
+        private final ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
 
         @Override
         public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange,
@@ -113,10 +118,6 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
             return ignoringMediaTypeAll(MediaType.APPLICATION_JSON)
                 .matches(webFilterExchange.getExchange())
                 .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
-                .switchIfEmpty(
-                    defaultHandler.onAuthenticationSuccess(webFilterExchange, authentication)
-                        .then(Mono.empty())
-                )
                 .flatMap(matchResult -> {
                     var principal = authentication.getPrincipal();
                     if (principal instanceof CredentialsContainer credentialsContainer) {
@@ -128,7 +129,31 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
                         .bodyValue(principal)
                         .flatMap(serverResponse ->
                             serverResponse.writeTo(webFilterExchange.getExchange(), context));
-                });
+                })
+                .switchIfEmpty(redirectToOriginalUrl(webFilterExchange));
+        }
+
+        Mono<Void> redirectToOriginalUrl(WebFilterExchange webFilterExchange) {
+            return getRedirectUri(webFilterExchange.getExchange())
+                .defaultIfEmpty(this.location)
+                .flatMap(redirectUri ->
+                    redirectStrategy.sendRedirect(webFilterExchange.getExchange(), redirectUri)
+                );
+        }
+
+        Mono<URI> getRedirectUri(ServerWebExchange exchange) {
+            ServerHttpRequest request = exchange.getRequest();
+            String redirectUriString = request.getQueryParams().getFirst(REDIRECT_URI_PARAM);
+            if (StringUtils.isBlank(redirectUriString)) {
+                return Mono.empty();
+            }
+            URI redirectUri = URI.create(redirectUriString);
+            // Only redirect to the same host and port
+            if (redirectUri.getAuthority() != null
+                && !redirectUri.getAuthority().equals(request.getURI().getAuthority())) {
+                return Mono.empty();
+            }
+            return Mono.just(redirectUri);
         }
     }
 
