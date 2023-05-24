@@ -384,7 +384,6 @@ const handlePreview = async () => {
           @select="handleChangeEditorProvider"
         />
         <VButton
-          v-if="isUpdateMode"
           size="sm"
           type="default"
           :loading="previewPending"
