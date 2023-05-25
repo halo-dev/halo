@@ -2,7 +2,6 @@ package run.halo.app.theme.router;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,16 +24,12 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
-import run.halo.app.extension.GVK;
-import run.halo.app.extension.GroupVersionKind;
-import run.halo.app.extension.Scheme;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.SinglePageFinder;
-import run.halo.app.theme.router.factories.ModelConst;
 
 /**
  * The {@link SinglePageRoute} for route request to specific template <code>page.html</code>.
@@ -46,8 +41,6 @@ import run.halo.app.theme.router.factories.ModelConst;
 @RequiredArgsConstructor
 public class SinglePageRoute
     implements RouterFunction<ServerResponse>, Reconciler<Reconciler.Request>, DisposableBean {
-    private final GroupVersionKind gvk = GroupVersionKind.fromExtension(SinglePage.class);
-
     private final Map<NameSlugPair, HandlerFunction<ServerResponse>> quickRouteMap =
         new ConcurrentHashMap<>();
 
@@ -123,12 +116,7 @@ public class SinglePageRoute
     HandlerFunction<ServerResponse> handlerFunction(String name) {
         return request -> singlePageFinder.getByName(name)
             .flatMap(singlePageVo -> {
-                Map<String, Object> model = new HashMap<>();
-                model.put("name", singlePageVo.getMetadata().getName());
-                model.put("groupVersionKind", gvk);
-                model.put("plural", getPlural());
-                model.put(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.SINGLE_PAGE.getValue());
-                model.put("singlePage", singlePageVo);
+                Map<String, Object> model = ModelMapUtils.singlePageModel(singlePageVo);
                 String template = singlePageVo.getSpec().getTemplate();
                 return viewNameResolver.resolveViewNameOrDefault(request, template,
                         DefaultTemplateEnum.SINGLE_PAGE.getValue())
@@ -137,10 +125,5 @@ public class SinglePageRoute
             .switchIfEmpty(
                 Mono.error(new NotFoundException("Single page not found"))
             );
-    }
-
-    private String getPlural() {
-        GVK gvk = Scheme.getGvkFromType(SinglePage.class);
-        return gvk.plural();
     }
 }

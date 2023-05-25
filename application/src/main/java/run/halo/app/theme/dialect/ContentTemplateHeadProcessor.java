@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.SinglePageFinder;
-import run.halo.app.theme.router.factories.ModelConst;
+import run.halo.app.theme.router.ModelConst;
 
 /**
  * <p>The <code>head</code> html snippet injection processor for content template such as post
