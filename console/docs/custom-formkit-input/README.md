@@ -16,6 +16,9 @@
   - 参数
     1. accepts：允许上传的文件类型，如：`image/*`
 - `repeater`: 定义一个对象集合，可以让使用者可视化的操作集合。
+  - 参数
+    1. min: 最小数量，默认为 `0`
+    2. max: 最大数量，默认为 `Infinity`，即无限制。
 - `menuCheckbox`：选择一组菜单
 - `menuRadio`：选择一个菜单
 - `menuItemSelect`：选择菜单项

@@ -1,14 +1,8 @@
 package run.halo.app.content.comment;
 
-import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
-
 import java.time.Instant;
-import java.util.Comparator;
-import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -56,10 +50,8 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Mono<ListResult<ListedComment>> listComment(CommentQuery commentQuery) {
-        Comparator<Comment> comparator =
-            CommentSorter.from(commentQuery.getSort(), commentQuery.getSortOrder());
-        return this.client.list(Comment.class, commentPredicate(commentQuery),
-                comparator,
+        return this.client.list(Comment.class, commentQuery.toPredicate(),
+                commentQuery.toComparator(),
                 commentQuery.getPage(), commentQuery.getSize())
             .flatMap(comments -> Flux.fromStream(comments.get()
                     .map(this::toListedComment))
@@ -199,84 +191,5 @@ public class CommentServiceImpl implements CommentService {
             .findFirst()
             .map(commentSubject -> commentSubject.get(ref.getName()))
             .orElseGet(Mono::empty);
-    }
-
-    Predicate<Comment> commentPredicate(CommentQuery query) {
-        Predicate<Comment> predicate = comment -> true;
-
-        String keyword = query.getKeyword();
-        if (keyword != null) {
-            predicate = predicate.and(comment -> {
-                String raw = comment.getSpec().getRaw();
-                return StringUtils.containsIgnoreCase(raw, keyword);
-            });
-        }
-
-        Boolean approved = query.getApproved();
-        if (approved != null) {
-            predicate =
-                predicate.and(comment -> Objects.equals(comment.getSpec().getApproved(), approved));
-        }
-        Boolean hidden = query.getHidden();
-        if (hidden != null) {
-            predicate =
-                predicate.and(comment -> Objects.equals(comment.getSpec().getHidden(), hidden));
-        }
-
-        Boolean top = query.getTop();
-        if (top != null) {
-            predicate = predicate.and(comment -> Objects.equals(comment.getSpec().getTop(), top));
-        }
-
-        Boolean allowNotification = query.getAllowNotification();
-        if (allowNotification != null) {
-            predicate = predicate.and(
-                comment -> Objects.equals(comment.getSpec().getAllowNotification(),
-                    allowNotification));
-        }
-
-        String ownerKind = query.getOwnerKind();
-        if (ownerKind != null) {
-            predicate = predicate.and(comment -> {
-                Comment.CommentOwner owner = comment.getSpec().getOwner();
-                return Objects.equals(owner.getKind(), ownerKind);
-            });
-        }
-
-        String ownerName = query.getOwnerName();
-        if (ownerName != null) {
-            predicate = predicate.and(comment -> {
-                Comment.CommentOwner owner = comment.getSpec().getOwner();
-                if (Comment.CommentOwner.KIND_EMAIL.equals(owner.getKind())) {
-                    return Objects.equals(owner.getKind(), ownerKind)
-                        && (StringUtils.containsIgnoreCase(owner.getName(), ownerName)
-                        || StringUtils.containsIgnoreCase(owner.getDisplayName(), ownerName));
-                }
-                return Objects.equals(owner.getKind(), ownerKind)
-                    && StringUtils.containsIgnoreCase(owner.getName(), ownerName);
-            });
-        }
-
-        String subjectKind = query.getSubjectKind();
-        if (subjectKind != null) {
-            predicate = predicate.and(comment -> {
-                Ref subjectRef = comment.getSpec().getSubjectRef();
-                return Objects.equals(subjectRef.getKind(), subjectKind);
-            });
-        }
-
-        String subjectName = query.getSubjectName();
-        if (subjectName != null) {
-            predicate = predicate.and(comment -> {
-                Ref subjectRef = comment.getSpec().getSubjectRef();
-                return Objects.equals(subjectRef.getKind(), subjectKind)
-                    && StringUtils.containsIgnoreCase(subjectRef.getName(), subjectName);
-            });
-        }
-
-        Predicate<Extension> labelAndFieldSelectorPredicate =
-            labelAndFieldSelectorToPredicate(query.getLabelSelector(),
-                query.getFieldSelector());
-        return predicate.and(labelAndFieldSelectorPredicate);
     }
 }

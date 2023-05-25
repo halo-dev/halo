@@ -74,32 +74,32 @@ importers:
         specifier: ^2.0.0-beta.220
         version: 2.0.0-beta.220(@tiptap/core@2.0.0-beta.217)(@tiptap/pm@2.0.0-beta.220)
       '@uppy/core':
-        specifier: ^3.1.1
-        version: 3.1.1
+        specifier: ^3.2.0
+        version: 3.2.0
       '@uppy/dashboard':
-        specifier: ^3.3.1
-        version: 3.3.1(@uppy/core@3.1.1)
+        specifier: ^3.4.0
+        version: 3.4.0(@uppy/core@3.2.0)
       '@uppy/drag-drop':
-        specifier: ^3.0.1
-        version: 3.0.1(@uppy/core@3.1.1)
+        specifier: ^3.0.2
+        version: 3.0.2(@uppy/core@3.2.0)
       '@uppy/file-input':
-        specifier: ^3.0.1
-        version: 3.0.1(@uppy/core@3.1.1)
+        specifier: ^3.0.2
+        version: 3.0.2(@uppy/core@3.2.0)
       '@uppy/locales':
-        specifier: ^3.0.7
-        version: 3.0.7
+        specifier: ^3.2.1
+        version: 3.2.1
       '@uppy/progress-bar':
-        specifier: ^3.0.1
-        version: 3.0.1(@uppy/core@3.1.1)
+        specifier: ^3.0.2
+        version: 3.0.2(@uppy/core@3.2.0)
       '@uppy/status-bar':
-        specifier: ^3.0.1
-        version: 3.0.1(@uppy/core@3.1.1)
+        specifier: ^3.1.2
+        version: 3.1.2(@uppy/core@3.2.0)
       '@uppy/vue':
-        specifier: ^1.0.1
-        version: 1.0.1(@uppy/core@3.1.1)(@uppy/dashboard@3.3.1)(@uppy/drag-drop@3.0.1)(@uppy/file-input@3.0.1)(@uppy/progress-bar@3.0.1)(@uppy/status-bar@3.0.1)(vue@3.2.45)
+        specifier: ^1.0.2
+        version: 1.0.2(@uppy/core@3.2.0)(@uppy/dashboard@3.4.0)(@uppy/drag-drop@3.0.2)(@uppy/file-input@3.0.2)(@uppy/progress-bar@3.0.2)(@uppy/status-bar@3.1.2)(vue@3.2.45)
       '@uppy/xhr-upload':
-        specifier: ^3.1.0
-        version: 3.1.0(@uppy/core@3.1.1)
+        specifier: ^3.2.0
+        version: 3.2.0(@uppy/core@3.2.0)
       '@vueuse/components':
         specifier: ^9.6.0
         version: 9.6.0(vue@3.2.45)
@@ -4205,19 +4205,19 @@ packages:
       eslint-visitor-keys: 3.4.1
     dev: true
 
-  /@uppy/companion-client@3.1.1:
-    resolution: {integrity: sha512-S1M37vjWu8gdOgdI3Hh/1fVZ9GaLdyPQjVyUujZDTsr79b4VG7v/zjdqJ0FiOTjfGbpnj8s9kr1uyYi0Zf5VFw==}
+  /@uppy/companion-client@3.1.3:
+    resolution: {integrity: sha512-l70qOd4P9PSqxPDOFD1LMusDGGi36LCCiQko/e+Uw5hBtzN9vhAG5rQm242FlNoFdxK5T6jmfoZJSVel0UTvzg==}
     dependencies:
-      '@uppy/utils': 5.1.3
+      '@uppy/utils': 5.3.0
       namespace-emitter: 2.0.1
     dev: false
 
-  /@uppy/core@3.1.1:
-    resolution: {integrity: sha512-cVH2R+snO4zexw5P1jujY+am4gndI/deWRxrvJ8RKGz6P5g/c89buIEX+5I2aYRT9yPjqstLe7Oob61yspVMpQ==}
+  /@uppy/core@3.2.0:
+    resolution: {integrity: sha512-w/jdNCIdmxt4uPt4UBPfzmQ7HanIE73GiKKeHtZo6Gp+HWOsUhY7DBimGUk3IsX/vMJTSB2+RhZAUOBGRaP5fA==}
     dependencies:
       '@transloadit/prettier-bytes': 0.0.9
-      '@uppy/store-default': 3.0.2
-      '@uppy/utils': 5.1.3
+      '@uppy/store-default': 3.0.3
+      '@uppy/utils': 5.3.0
       lodash.throttle: 4.1.1
       mime-match: 1.0.2
       namespace-emitter: 2.0.1
@@ -4225,18 +4225,18 @@ packages:
       preact: 10.11.2
     dev: false
 
-  /@uppy/dashboard@3.3.1(@uppy/core@3.1.1):
-    resolution: {integrity: sha512-KzOElKUbZajwp+OVXM3/4bSAJq59o1yWNOlzDEvA4Uu/DMDQbd+jmorjyE8zuJwWyhEAWnuIoMrz+ng0FKvCnA==}
+  /@uppy/dashboard@3.4.0(@uppy/core@3.2.0):
+    resolution: {integrity: sha512-4zns7+C3didR8AKUa4T8+0dg7TWTpeMsUjqhBNWYdxGptcG+m5+zMr+olCLA2Tjou41x75j4BqtPLrEGTr1yVA==}
     peerDependencies:
-      '@uppy/core': ^3.1.1
+      '@uppy/core': ^3.2.0
     dependencies:
       '@transloadit/prettier-bytes': 0.0.7
-      '@uppy/core': 3.1.1
-      '@uppy/informer': 3.0.1(@uppy/core@3.1.1)
-      '@uppy/provider-views': 3.1.0(@uppy/core@3.1.1)
-      '@uppy/status-bar': 3.0.1(@uppy/core@3.1.1)
-      '@uppy/thumbnail-generator': 3.0.2(@uppy/core@3.1.1)
-      '@uppy/utils': 5.1.3
+      '@uppy/core': 3.2.0
+      '@uppy/informer': 3.0.2(@uppy/core@3.2.0)
+      '@uppy/provider-views': 3.3.0(@uppy/core@3.2.0)
+      '@uppy/status-bar': 3.1.2(@uppy/core@3.2.0)
+      '@uppy/thumbnail-generator': 3.0.3(@uppy/core@3.2.0)
+      '@uppy/utils': 5.3.0
       classnames: 2.3.2
       is-shallow-equal: 1.0.1
       lodash.debounce: 4.0.8
@@ -4245,109 +4245,105 @@ packages:
       preact: 10.11.2
     dev: false
 
-  /@uppy/drag-drop@3.0.1(@uppy/core@3.1.1):
-    resolution: {integrity: sha512-1jMlF2V5AFfvSYtbIR1N2M8WbjhQPW14FcEElpeWjzwlF3OnbUARwk4jBlGfcAsDcV4dYf6hG192xPPdnuBc6A==}
+  /@uppy/drag-drop@3.0.2(@uppy/core@3.2.0):
+    resolution: {integrity: sha512-zUOEYuUBtO1kfFbiwq24ZuDninu17IWkTTyV1covARm9YiZkrqG11n6VsTe/SQbXJxYh0kAttKIVP+QK1/n48g==}
     peerDependencies:
-      '@uppy/core': ^3.0.2
+      '@uppy/core': ^3.2.0
     dependencies:
-      '@uppy/core': 3.1.1
-      '@uppy/utils': 5.0.2
+      '@uppy/core': 3.2.0
+      '@uppy/utils': 5.3.0
       preact: 10.11.2
     dev: false
 
-  /@uppy/file-input@3.0.1(@uppy/core@3.1.1):
-    resolution: {integrity: sha512-RTOm09Z1JjfSnvULY41u3VXm5nMkORmOCwo68oI4Kd1UL/h3V64bqqd34IN5vDDhJ2O58qDAKohPdReqhcNJAQ==}
+  /@uppy/file-input@3.0.2(@uppy/core@3.2.0):
+    resolution: {integrity: sha512-NGjtj5NjmYVMY1jRsFrZqhJ3KF88BcDWOaElgqBa1axehIg8Hp62bK4MaFyCqfwg35XBgyIkETHsB4+KkWkP9w==}
     peerDependencies:
-      '@uppy/core': ^3.0.2
+      '@uppy/core': ^3.2.0
     dependencies:
-      '@uppy/core': 3.1.1
-      '@uppy/utils': 5.0.2
+      '@uppy/core': 3.2.0
+      '@uppy/utils': 5.3.0
       preact: 10.11.2
     dev: false
 
-  /@uppy/informer@3.0.1(@uppy/core@3.1.1):
-    resolution: {integrity: sha512-Mip+l2CYsTVYa0fSwD0okHRS5/UhAqCfQO2CRwwR5/vC6DpR1VAALDqx6RpssOaFiOACAx12VCcZiP5J8+2BJw==}
+  /@uppy/informer@3.0.2(@uppy/core@3.2.0):
+    resolution: {integrity: sha512-WPOEZCxAaw9JBhkneIW3bm6SqceUtZGxDT++3SlwKUyn4kr0p808LrCVITooUkyqrd0lOn9TAFKFNjinUxbCGw==}
     peerDependencies:
-      '@uppy/core': ^3.0.2
+      '@uppy/core': ^3.2.0
     dependencies:
-      '@uppy/core': 3.1.1
-      '@uppy/utils': 5.1.3
+      '@uppy/core': 3.2.0
+      '@uppy/utils': 5.3.0
       preact: 10.11.2
     dev: false
 
-  /@uppy/locales@3.0.7:
-    resolution: {integrity: sha512-wDLVznIM3olp5qSNULKaWjemxyVpCSicWDnKVB5LZssjPRw+xAm5C10HYBhDlOygq4k3IJF/gBSO2hl5WZ1RfQ==}
+  /@uppy/locales@3.2.1:
+    resolution: {integrity: sha512-qlEB1uNgJgIM7C0bZiIihio9yE/WpBD02Pckhf1ZPPKIaEAQthk5wKsvSQmCelmyaoXqXpcmvuU9YgFrtSDq9g==}
     dev: false
 
-  /@uppy/progress-bar@3.0.1(@uppy/core@3.1.1):
-    resolution: {integrity: sha512-cjBLOst0sPV1yF6YzkQIx/mHpytMXN7MRF7H/6Yc8ahDzm8XkbwMQCf2zksaanGfHUNCHlQFgCkfjfizK6VJIw==}
+  /@uppy/progress-bar@3.0.2(@uppy/core@3.2.0):
+    resolution: {integrity: sha512-vVV+mvPfe4AbTajDAkZo64u15/epgFAMAt0FFs1SX+U8GzwA5Ry+MQ6Tagn1mN+POkql6OZS4F3Dv2Y5pKusBg==}
     peerDependencies:
-      '@uppy/core': ^3.0.2
+      '@uppy/core': ^3.2.0
     dependencies:
-      '@uppy/core': 3.1.1
-      '@uppy/utils': 5.0.2
+      '@uppy/core': 3.2.0
+      '@uppy/utils': 5.3.0
       preact: 10.11.2
     dev: false
 
-  /@uppy/provider-views@3.1.0(@uppy/core@3.1.1):
-    resolution: {integrity: sha512-98XoOP+MECgBR3Dj17D/5JH51DeGtyqcVvrsHZIzjPg7bgpI+tOHUzXEYLAMC0conDlzOVI8V1d5a9tr1V7MMA==}
+  /@uppy/provider-views@3.3.0(@uppy/core@3.2.0):
+    resolution: {integrity: sha512-J2yhALNzsEAtR9NDN5ZJ1Poy/SaTIg9gdZfKCaD4G7+xaKnnbb8E9ca5YjVNbOJnW0LNazggNvpJu0D6SeNgHg==}
     peerDependencies:
-      '@uppy/core': ^3.1.0
+      '@uppy/core': ^3.2.0
     dependencies:
-      '@uppy/core': 3.1.1
-      '@uppy/utils': 5.1.3
+      '@uppy/core': 3.2.0
+      '@uppy/utils': 5.3.0
       classnames: 2.3.2
+      nanoid: 4.0.0
+      p-queue: 7.3.4
       preact: 10.11.2
     dev: false
 
-  /@uppy/status-bar@3.0.1(@uppy/core@3.1.1):
-    resolution: {integrity: sha512-QQqIjiHBsNjZFR6xEc5SAT5UYbKnRcgNWwyLmJR0BYVINfx/aeIueXIm0jkBuJ4XFkebH7nDjKGW89JE9WKkgg==}
+  /@uppy/status-bar@3.1.2(@uppy/core@3.2.0):
+    resolution: {integrity: sha512-oDwq8BRf5HwHyc6enl/S8aIkJ50TrTRtS59OywP0TAr+xW7EfqKGnaQze18m2sryAhSMjzBCJOOJYfLl/v5Hmw==}
     peerDependencies:
-      '@uppy/core': ^3.0.2
+      '@uppy/core': ^3.2.0
     dependencies:
       '@transloadit/prettier-bytes': 0.0.9
-      '@uppy/core': 3.1.1
-      '@uppy/utils': 5.0.2
+      '@uppy/core': 3.2.0
+      '@uppy/utils': 5.3.0
       classnames: 2.3.2
       lodash.throttle: 4.1.1
       preact: 10.11.2
     dev: false
 
-  /@uppy/store-default@3.0.2:
-    resolution: {integrity: sha512-kIQMCjXui6tjF1E9xGo4YHkvt71McXkU0FStrcQuBrRXuOhb+NcuWh3sMh3KryivVNgT6w5Odrlw2FUFkl9cqA==}
+  /@uppy/store-default@3.0.3:
+    resolution: {integrity: sha512-/zlvQNj4HjkthI+7dNdj/8mOlTg1Zb1gJ/ZsOxof0g3xXD+OAwm7asRnOwpfj2dos+lExdW/zMn8XsRGsuvb6Q==}
     dev: false
 
-  /@uppy/thumbnail-generator@3.0.2(@uppy/core@3.1.1):
-    resolution: {integrity: sha512-3qE1giGu1O9BkO8MCYYV78X9p95l5Ptv7JUDpqKlIMN/NGBHblMFCn5mjmt4soyQFUGgnZ7+bxq0DtjXPpWJYA==}
+  /@uppy/thumbnail-generator@3.0.3(@uppy/core@3.2.0):
+    resolution: {integrity: sha512-tiTNqHU/Co8HQ2ag88JZv6KMV1/dbOLbtpI0QJBKOdnPtcDtzQbT8LM69EW9JRrqSAxaoLPrr/VccXvv8BIe2A==}
     peerDependencies:
-      '@uppy/core': ^3.0.2
+      '@uppy/core': ^3.2.0
     dependencies:
-      '@uppy/core': 3.1.1
-      '@uppy/utils': 5.1.3
+      '@uppy/core': 3.2.0
+      '@uppy/utils': 5.3.0
       exifr: 7.1.3
     dev: false
 
-  /@uppy/utils@5.0.2:
-    resolution: {integrity: sha512-3LpqR6o60DgdNQSnKx0eXta5wupnHjzcQvTvWNGI/ZA/AYgmhnufybK0Q/t+c0D37MaDUL10RydmFxQ+G/dXvw==}
+  /@uppy/utils@5.3.0:
+    resolution: {integrity: sha512-tPW+HtRkjanFQAa/XD2e6kjJ7ZeMHtVxEVeBeRtKTnltsCA9kNF2gDwxtUVPEWyLrKzW+CvRm60NDiOKaWUuww==}
     dependencies:
       lodash.throttle: 4.1.1
     dev: false
 
-  /@uppy/utils@5.1.3:
-    resolution: {integrity: sha512-ws6eh5JClNe91AYVRMBy7RJzMlhdvQpVtLKJoyIAoJDEf0m4cvdqDJethB3KTq4WtBQkLpMD4I6mvR4eN3talA==}
-    dependencies:
-      lodash.throttle: 4.1.1
-    dev: false
-
-  /@uppy/vue@1.0.1(@uppy/core@3.1.1)(@uppy/dashboard@3.3.1)(@uppy/drag-drop@3.0.1)(@uppy/file-input@3.0.1)(@uppy/progress-bar@3.0.1)(@uppy/status-bar@3.0.1)(vue@3.2.45):
-    resolution: {integrity: sha512-2cAzNz/a3GSscPfBh6WBelK0X6tY0DL5xAcOlSSENzZ0kxuGUq4a6N55ThUWC3THoCwbT0zFbUrjS41UEJDy/g==}
+  /@uppy/vue@1.0.2(@uppy/core@3.2.0)(@uppy/dashboard@3.4.0)(@uppy/drag-drop@3.0.2)(@uppy/file-input@3.0.2)(@uppy/progress-bar@3.0.2)(@uppy/status-bar@3.1.2)(vue@3.2.45):
+    resolution: {integrity: sha512-wKDf8dWP+Klf09ms9LT060LuwIdOY/uQfPRaJVi1EBWoL/ESvtL2rjycBbyjbNg798Dy10lrSsrrHoCFcDcWSQ==}
     peerDependencies:
-      '@uppy/core': ^3.0.2
-      '@uppy/dashboard': ^3.1.0
-      '@uppy/drag-drop': ^3.0.1
-      '@uppy/file-input': ^3.0.1
-      '@uppy/progress-bar': ^3.0.1
-      '@uppy/status-bar': ^3.0.1
+      '@uppy/core': ^3.2.0
+      '@uppy/dashboard': ^3.4.0
+      '@uppy/drag-drop': ^3.0.2
+      '@uppy/file-input': ^3.0.2
+      '@uppy/progress-bar': ^3.0.2
+      '@uppy/status-bar': ^3.1.1
       vue: '>=2.6.11'
     peerDependenciesMeta:
       '@uppy/dashboard':
@@ -4361,24 +4357,24 @@ packages:
       '@uppy/status-bar':
         optional: true
     dependencies:
-      '@uppy/core': 3.1.1
-      '@uppy/dashboard': 3.3.1(@uppy/core@3.1.1)
-      '@uppy/drag-drop': 3.0.1(@uppy/core@3.1.1)
-      '@uppy/file-input': 3.0.1(@uppy/core@3.1.1)
-      '@uppy/progress-bar': 3.0.1(@uppy/core@3.1.1)
-      '@uppy/status-bar': 3.0.1(@uppy/core@3.1.1)
+      '@uppy/core': 3.2.0
+      '@uppy/dashboard': 3.4.0(@uppy/core@3.2.0)
+      '@uppy/drag-drop': 3.0.2(@uppy/core@3.2.0)
+      '@uppy/file-input': 3.0.2(@uppy/core@3.2.0)
+      '@uppy/progress-bar': 3.0.2(@uppy/core@3.2.0)
+      '@uppy/status-bar': 3.1.2(@uppy/core@3.2.0)
       shallow-equal: 1.2.1
       vue: 3.2.45
     dev: false
 
-  /@uppy/xhr-upload@3.1.0(@uppy/core@3.1.1):
-    resolution: {integrity: sha512-v0OsrB74w9RcFU8VMFElxMuGaSFHBuAlkbK30zHEY2YEKUsCfkWMdUbpaWNc1KWERH66Fv57IsA3AbK2HTjWdw==}
+  /@uppy/xhr-upload@3.2.0(@uppy/core@3.2.0):
+    resolution: {integrity: sha512-iMz9xUEslgvfdAXb+R2R6n+bYPpAPOtI5dnYAKo4f8rsxB0KmuPSzaLO1GW2v+Gx3Qz3ghiIhWlTeHZ6zwLtoQ==}
     peerDependencies:
-      '@uppy/core': ^3.0.6
+      '@uppy/core': ^3.2.0
     dependencies:
-      '@uppy/companion-client': 3.1.1
-      '@uppy/core': 3.1.1
-      '@uppy/utils': 5.1.3
+      '@uppy/companion-client': 3.1.3
+      '@uppy/core': 3.2.0
+      '@uppy/utils': 5.3.0
       nanoid: 4.0.0
     dev: false
 
@@ -6790,6 +6786,10 @@ packages:
     resolution: {integrity: sha512-tYUSVOGeQPKt/eC1ABfhHy5Xd96N3oIijJvN3O9+TsC28T5V9yX9oEfEK5faP0EFSNVOG97qtAS68GBrQB2hDg==}
     dev: true
 
+  /eventemitter3@4.0.7:
+    resolution: {integrity: sha512-8guHBZCwKnFhYdHr2ysuRWErTwhoN2X8XELRlrRwpmfeY2jjuUN4taQMsULKUVo1K4DvZl+0pgfyoysHxvmvEw==}
+    dev: false
+
   /execa@4.1.0:
     resolution: {integrity: sha512-j5W0//W7f8UxAn8hXVnwG8tLwdiUy4FJLcSupCg6maBYZDpyBvTApK7KyuI4bKj8KOh1r2YH+6ucuYtJv1bTZA==}
     engines: {node: '>=10'}
@@ -8949,6 +8949,19 @@ packages:
     dependencies:
       aggregate-error: 3.1.0
     dev: true
+
+  /p-queue@7.3.4:
+    resolution: {integrity: sha512-esox8CWt0j9EZECFvkFl2WNPat8LN4t7WWeXq73D9ha0V96qPRufApZi4ZhPwXAln1uVVal429HVVKPa2X0yQg==}
+    engines: {node: '>=12'}
+    dependencies:
+      eventemitter3: 4.0.7
+      p-timeout: 5.1.0
+    dev: false
+
+  /p-timeout@5.1.0:
+    resolution: {integrity: sha512-auFDyzzzGZZZdHz3BtET9VEz0SE/uMEAx7uWfGPucfzEwwe/xH0iVeZibQmANYE/hp9T2+UUZT5m+BKyrDp3Ew==}
+    engines: {node: '>=12'}
+    dev: false
 
   /p-try@2.2.0:
     resolution: {integrity: sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==}
