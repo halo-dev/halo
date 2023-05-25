@@ -226,9 +226,9 @@ public class PluginEndpoint implements CustomEndpoint {
             .flatMap(upgradeRequest -> Mono.fromCallable(() -> DataBufferUtils.toInputStream(
                 reactiveUrlDataBufferFetcher.fetch(upgradeRequest.uri())))
             )
-            .doOnError(throwable -> {
+            .onErrorMap(throwable -> {
                 log.error("Failed to fetch plugin file from uri.", throwable);
-                throw new ThemeUpgradeException("Failed to fetch plugin file from uri.", null,
+                return new ThemeUpgradeException("Failed to fetch plugin file from uri.", null,
                     null);
             })
             .flatMap(inputStream -> Mono.usingWhen(
