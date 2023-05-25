@@ -129,6 +129,7 @@ const handleSelect = (category: CategoryTree | Category) => {
       );
     } else {
       props.context.node.input([...currentValue, category.metadata.name]);
+      text.value = "";
     }
     return;
   }

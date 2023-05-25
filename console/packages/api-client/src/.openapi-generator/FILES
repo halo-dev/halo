@@ -120,6 +120,7 @@ models/group-spec.ts
 models/group-status.ts
 models/group.ts
 models/index.ts
+models/install-from-uri-request.ts
 models/license.ts
 models/listed-auth-provider.ts
 models/listed-comment-list.ts
@@ -222,6 +223,7 @@ models/theme-list.ts
 models/theme-spec.ts
 models/theme-status.ts
 models/theme.ts
+models/upgrade-from-uri-request.ts
 models/user-connection-list.ts
 models/user-connection-spec.ts
 models/user-connection.ts
