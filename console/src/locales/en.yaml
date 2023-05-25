@@ -427,10 +427,12 @@ core:
         result: "Owner: {owner}"
       sort:
         items:
-          default: Default
-          last_reply_time: Last reply time
-          reply_count: Reply count
-          creation_time: Creation time
+          last_reply_time_desc: Recent reply
+          last_reply_time_asc: Earlier reply
+          reply_count_desc: More replies
+          reply_count_asc: Fewer replies
+          create_time_desc: Latest Created
+          create_time_asc: Earliest Created
     list:
       fields:
         reply_count: "{count} Replies"

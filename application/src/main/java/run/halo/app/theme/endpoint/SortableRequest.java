@@ -11,9 +11,9 @@ import java.util.stream.Stream;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Sort;
-import org.springframework.util.comparator.Comparators;
 import org.springframework.web.server.ServerWebExchange;
 import run.halo.app.core.extension.endpoint.SortResolver;
+import run.halo.app.extension.Comparators;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.router.IListRequest;
 
@@ -66,9 +66,8 @@ public class SortableRequest extends IListRequest.QueryListRequest {
                     BeanWrapper beanWrapper = new BeanWrapperImpl(extension);
                     return beanWrapper.getPropertyValue(property);
                 };
-                Comparator<Object> nullsComparator =
-                    direction.isAscending() ? Comparators.nullsLow() : Comparators.nullsHigh();
-                Comparator<T> comparator = Comparator.comparing(function, nullsComparator);
+                Comparator<T> comparator = Comparator.comparing(function,
+                    Comparators.nullsComparator(direction.isAscending()));
                 if (direction.isDescending()) {
                     comparator = comparator.reversed();
                 }

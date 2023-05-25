@@ -17,4 +17,15 @@ public enum Comparators {
         return asc ? comparator : comparator.reversed();
     }
 
+    /**
+     * Get a nulls comparator.
+     *
+     * @param isAscending is ascending
+     * @return if ascending, return nulls high, else return nulls low
+     */
+    public static Comparator<Object> nullsComparator(boolean isAscending) {
+        return isAscending
+            ? org.springframework.util.comparator.Comparators.nullsHigh()
+            : org.springframework.util.comparator.Comparators.nullsLow();
+    }
 }

@@ -1,15 +1,10 @@
 package run.halo.app.content.impl;
 
-import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
-
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -26,7 +21,6 @@ import run.halo.app.content.ListedSinglePage;
 import run.halo.app.content.SinglePageQuery;
 import run.halo.app.content.SinglePageRequest;
 import run.halo.app.content.SinglePageService;
-import run.halo.app.content.SinglePageSorter;
 import run.halo.app.content.Stats;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
@@ -81,10 +75,8 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
 
     @Override
     public Mono<ListResult<ListedSinglePage>> list(SinglePageQuery query) {
-        Comparator<SinglePage> comparator =
-            SinglePageSorter.from(query.getSort(), query.getSortOrder());
-        return client.list(SinglePage.class, pageListPredicate(query),
-                comparator, query.getPage(), query.getSize())
+        return client.list(SinglePage.class, query.toPredicate(),
+                query.toComparator(), query.getPage(), query.getSize())
             .flatMap(listResult -> Flux.fromStream(
                         listResult.get().map(this::getListedSinglePage)
                     )
@@ -176,48 +168,6 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
                 .filter(throwable -> throwable instanceof OptimisticLockingFailureException));
     }
 
-    Predicate<SinglePage> pageListPredicate(SinglePageQuery query) {
-        Predicate<SinglePage> paramPredicate = singlePage -> contains(query.getContributors(),
-            singlePage.getStatusOrDefault().getContributors());
-
-        String keyword = query.getKeyword();
-        if (keyword != null) {
-            paramPredicate = paramPredicate.and(page -> {
-                String excerpt = page.getStatusOrDefault().getExcerpt();
-                return StringUtils.containsIgnoreCase(excerpt, keyword)
-                    || StringUtils.containsIgnoreCase(page.getSpec().getSlug(), keyword)
-                    || StringUtils.containsIgnoreCase(page.getSpec().getTitle(), keyword);
-            });
-        }
-
-        Post.PostPhase publishPhase = query.getPublishPhase();
-        if (publishPhase != null) {
-            paramPredicate = paramPredicate.and(page -> {
-                if (Post.PostPhase.PENDING_APPROVAL.equals(publishPhase)) {
-                    return !page.isPublished()
-                        && Post.PostPhase.PENDING_APPROVAL.name()
-                        .equalsIgnoreCase(page.getStatusOrDefault().getPhase());
-                }
-                // published
-                if (Post.PostPhase.PUBLISHED.equals(publishPhase)) {
-                    return page.isPublished();
-                }
-                // draft
-                return !page.isPublished();
-            });
-        }
-
-        Post.VisibleEnum visible = query.getVisible();
-        if (visible != null) {
-            paramPredicate =
-                paramPredicate.and(post -> visible.equals(post.getSpec().getVisible()));
-        }
-
-        Predicate<SinglePage> predicate = labelAndFieldSelectorToPredicate(query.getLabelSelector(),
-            query.getFieldSelector());
-        return predicate.and(paramPredicate);
-    }
-
     private Mono<ListedSinglePage> getListedSinglePage(SinglePage singlePage) {
         Assert.notNull(singlePage, "The singlePage must not be null.");
         return Mono.just(singlePage)
@@ -284,20 +234,5 @@ public class SinglePageServiceImpl extends AbstractContentService implements Sin
                 contributor.setAvatar(user.getSpec().getAvatar());
                 return contributor;
             });
-    }
-
-    boolean contains(Collection<String> left, List<String> right) {
-        // parameter is null, it means that ignore this condition
-        if (left == null) {
-            return true;
-        }
-        // else, it means that right is empty
-        if (left.isEmpty()) {
-            return right.isEmpty();
-        }
-        if (right == null) {
-            return false;
-        }
-        return right.stream().anyMatch(left::contains);
     }
 }
