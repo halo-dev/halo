@@ -63,8 +63,7 @@ interface PublishStatusItem {
 
 interface SortItem {
   label: string;
-  sort: "PUBLISH_TIME" | "CREATE_TIME";
-  sortOrder: boolean;
+  sort: string;
 }
 
 const VisibleItems: VisibleItem[] = [
@@ -100,23 +99,19 @@ const PublishStatusItems: PublishStatusItem[] = [
 const SortItems: SortItem[] = [
   {
     label: t("core.page.filters.sort.items.publish_time_desc"),
-    sort: "PUBLISH_TIME",
-    sortOrder: false,
+    sort: "publishTime,desc",
   },
   {
     label: t("core.page.filters.sort.items.publish_time_asc"),
-    sort: "PUBLISH_TIME",
-    sortOrder: true,
+    sort: "publishTime,asc",
   },
   {
     label: t("core.page.filters.sort.items.create_time_desc"),
-    sort: "CREATE_TIME",
-    sortOrder: false,
+    sort: "creationTimestamp,desc",
   },
   {
     label: t("core.page.filters.sort.items.create_time_asc"),
-    sort: "CREATE_TIME",
-    sortOrder: true,
+    sort: "creationTimestamp,asc",
   },
 ];
 
@@ -219,8 +214,7 @@ const {
       page: page.value,
       size: size.value,
       visible: selectedVisibleItem.value.value,
-      sort: selectedSortItem.value?.sort,
-      sortOrder: selectedSortItem.value?.sortOrder,
+      sort: [selectedSortItem.value?.sort].filter(Boolean) as string[],
       keyword: keyword.value,
       contributor: contributors,
     });
@@ -652,10 +646,7 @@ const { mutate: changeVisibleMutation } = useMutation({
                     <VDropdownItem
                       v-for="(sortItem, index) in SortItems"
                       :key="index"
-                      :selected="
-                        sortItem.sort === selectedSortItem?.sort &&
-                        sortItem.sortOrder === selectedSortItem?.sortOrder
-                      "
+                      :selected="sortItem.sort === selectedSortItem?.sort"
                       @click="handleSortItemChange(sortItem)"
                     >
                       {{ sortItem.label }}

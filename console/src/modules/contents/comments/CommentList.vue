@@ -34,6 +34,12 @@ const selectedCommentNames = ref<string[]>([]);
 const keyword = ref("");
 
 // Filters
+
+interface SortItem {
+  label: string;
+  sort: string;
+}
+
 const ApprovedFilterItems: { label: string; value?: boolean }[] = [
   {
     label: t("core.comment.filters.status.items.all"),
@@ -49,27 +55,30 @@ const ApprovedFilterItems: { label: string; value?: boolean }[] = [
   },
 ];
 
-type Sort = "LAST_REPLY_TIME" | "REPLY_COUNT" | "CREATE_TIME";
-
-const SortFilterItems: {
-  label: string;
-  value?: Sort;
-}[] = [
+const SortItems: SortItem[] = [
   {
-    label: t("core.comment.filters.sort.items.default"),
-    value: undefined,
+    label: t("core.comment.filters.sort.items.last_reply_time_desc"),
+    sort: "lastReplyTime,desc",
   },
   {
-    label: t("core.comment.filters.sort.items.last_reply_time"),
-    value: "LAST_REPLY_TIME",
+    label: t("core.comment.filters.sort.items.last_reply_time_asc"),
+    sort: "lastReplyTime,asc",
   },
   {
-    label: t("core.comment.filters.sort.items.reply_count"),
-    value: "REPLY_COUNT",
+    label: t("core.comment.filters.sort.items.reply_count_desc"),
+    sort: "replyCount,desc",
   },
   {
-    label: t("core.comment.filters.sort.items.creation_time"),
-    value: "CREATE_TIME",
+    label: t("core.comment.filters.sort.items.reply_count_asc"),
+    sort: "replyCount,asc",
+  },
+  {
+    label: t("core.comment.filters.sort.items.create_time_desc"),
+    sort: "creationTimestamp,desc",
+  },
+  {
+    label: t("core.comment.filters.sort.items.create_time_asc"),
+    sort: "creationTimestamp,asc",
   },
 ];
 
@@ -77,10 +86,7 @@ const selectedApprovedFilterItem = ref<{ label: string; value?: boolean }>(
   ApprovedFilterItems[0]
 );
 
-const selectedSortFilterItem = ref<{
-  label: string;
-  value?: Sort;
-}>(SortFilterItems[0]);
+const selectedSortItem = ref<SortItem>();
 
 const selectedUser = ref<User>();
 
@@ -93,11 +99,8 @@ const handleApprovedFilterItemChange = (filterItem: {
   page.value = 1;
 };
 
-const handleSortFilterItemChange = (filterItem: {
-  label: string;
-  value?: Sort;
-}) => {
-  selectedSortFilterItem.value = filterItem;
+const handleSortItemChange = (sortItem: SortItem) => {
+  selectedSortItem.value = sortItem;
   selectedCommentNames.value = [];
   page.value = 1;
 };
@@ -123,7 +126,7 @@ function handleClearKeyword() {
 const hasFilters = computed(() => {
   return (
     selectedApprovedFilterItem.value.value !== undefined ||
-    selectedSortFilterItem.value.value !== undefined ||
+    selectedSortItem.value ||
     selectedUser.value ||
     keyword.value
   );
@@ -131,7 +134,7 @@ const hasFilters = computed(() => {
 
 function handleClearFilters() {
   selectedApprovedFilterItem.value = ApprovedFilterItems[0];
-  selectedSortFilterItem.value = SortFilterItems[0];
+  selectedSortItem.value = undefined;
   selectedUser.value = undefined;
   keyword.value = "";
   page.value = 1;
@@ -152,7 +155,7 @@ const {
     page,
     size,
     selectedApprovedFilterItem,
-    selectedSortFilterItem,
+    selectedSortItem,
     selectedUser,
     keyword,
   ],
@@ -161,7 +164,7 @@ const {
       page: page.value,
       size: size.value,
       approved: selectedApprovedFilterItem.value.value,
-      sort: selectedSortFilterItem.value.value,
+      sort: [selectedSortItem.value?.sort].filter(Boolean) as string[],
       keyword: keyword.value,
       ownerName: selectedUser.value?.metadata.name,
     });
@@ -355,12 +358,12 @@ const handleApproveInBatch = async () => {
                 </FilterTag>
 
                 <FilterTag
-                  v-if="selectedSortFilterItem.value != undefined"
-                  @close="handleSortFilterItemChange(SortFilterItems[0])"
+                  v-if="selectedSortItem"
+                  @close="handleSortItemChange(SortItems[0])"
                 >
                   {{
                     $t("core.common.filters.results.sort", {
-                      sort: selectedSortFilterItem.label,
+                      sort: selectedSortItem.label,
                     })
                   }}
                 </FilterTag>
@@ -437,12 +440,10 @@ const handleApproveInBatch = async () => {
                   </div>
                   <template #popper>
                     <VDropdownItem
-                      v-for="(filterItem, index) in SortFilterItems"
+                      v-for="(filterItem, index) in SortItems"
                       :key="index"
-                      :selected="
-                        selectedSortFilterItem.value === filterItem.value
-                      "
-                      @click="handleSortFilterItemChange(filterItem)"
+                      :selected="selectedSortItem?.sort === filterItem.sort"
+                      @click="handleSortItemChange(filterItem)"
                     >
                       {{ filterItem.label }}
                     </VDropdownItem>

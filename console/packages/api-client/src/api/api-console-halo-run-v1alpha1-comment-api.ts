@@ -189,8 +189,7 @@ export const ApiConsoleHaloRunV1alpha1CommentApiAxiosParamCreator = function (
      * @param {string} [ownerName] Commenter name.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {'LAST_REPLY_TIME' | 'REPLY_COUNT' | 'CREATE_TIME'} [sort] Comment collation.
-     * @param {boolean} [sortOrder] ascending order If it is true; otherwise, it is in descending order.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp,replyCount,lastReplyTime
      * @param {string} [subjectKind] Comment subject kind.
      * @param {string} [subjectName] Comment subject name.
      * @param {boolean} [top] Comment top display.
@@ -208,8 +207,7 @@ export const ApiConsoleHaloRunV1alpha1CommentApiAxiosParamCreator = function (
       ownerName?: string,
       page?: number,
       size?: number,
-      sort?: "LAST_REPLY_TIME" | "REPLY_COUNT" | "CREATE_TIME",
-      sortOrder?: boolean,
+      sort?: Array<string>,
       subjectKind?: string,
       subjectName?: string,
       top?: boolean,
@@ -279,12 +277,8 @@ export const ApiConsoleHaloRunV1alpha1CommentApiAxiosParamCreator = function (
         localVarQueryParameter["size"] = size;
       }
 
-      if (sort !== undefined) {
-        localVarQueryParameter["sort"] = sort;
-      }
-
-      if (sortOrder !== undefined) {
-        localVarQueryParameter["sortOrder"] = sortOrder;
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       if (subjectKind !== undefined) {
@@ -387,8 +381,7 @@ export const ApiConsoleHaloRunV1alpha1CommentApiFp = function (
      * @param {string} [ownerName] Commenter name.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {'LAST_REPLY_TIME' | 'REPLY_COUNT' | 'CREATE_TIME'} [sort] Comment collation.
-     * @param {boolean} [sortOrder] ascending order If it is true; otherwise, it is in descending order.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp,replyCount,lastReplyTime
      * @param {string} [subjectKind] Comment subject kind.
      * @param {string} [subjectName] Comment subject name.
      * @param {boolean} [top] Comment top display.
@@ -406,8 +399,7 @@ export const ApiConsoleHaloRunV1alpha1CommentApiFp = function (
       ownerName?: string,
       page?: number,
       size?: number,
-      sort?: "LAST_REPLY_TIME" | "REPLY_COUNT" | "CREATE_TIME",
-      sortOrder?: boolean,
+      sort?: Array<string>,
       subjectKind?: string,
       subjectName?: string,
       top?: boolean,
@@ -430,7 +422,6 @@ export const ApiConsoleHaloRunV1alpha1CommentApiFp = function (
         page,
         size,
         sort,
-        sortOrder,
         subjectKind,
         subjectName,
         top,
@@ -512,7 +503,6 @@ export const ApiConsoleHaloRunV1alpha1CommentApiFactory = function (
           requestParameters.page,
           requestParameters.size,
           requestParameters.sort,
-          requestParameters.sortOrder,
           requestParameters.subjectKind,
           requestParameters.subjectName,
           requestParameters.top,
@@ -635,18 +625,11 @@ export interface ApiConsoleHaloRunV1alpha1CommentApiListCommentsRequest {
   readonly size?: number;
 
   /**
-   * Comment collation.
-   * @type {'LAST_REPLY_TIME' | 'REPLY_COUNT' | 'CREATE_TIME'}
+   * Sort property and direction of the list result. Supported fields: creationTimestamp,replyCount,lastReplyTime
+   * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1CommentApiListComments
    */
-  readonly sort?: "LAST_REPLY_TIME" | "REPLY_COUNT" | "CREATE_TIME";
-
-  /**
-   * ascending order If it is true; otherwise, it is in descending order.
-   * @type {boolean}
-   * @memberof ApiConsoleHaloRunV1alpha1CommentApiListComments
-   */
-  readonly sortOrder?: boolean;
+  readonly sort?: Array<string>;
 
   /**
    * Comment subject kind.
@@ -737,7 +720,6 @@ export class ApiConsoleHaloRunV1alpha1CommentApi extends BaseAPI {
         requestParameters.page,
         requestParameters.size,
         requestParameters.sort,
-        requestParameters.sortOrder,
         requestParameters.subjectKind,
         requestParameters.subjectName,
         requestParameters.top,
