@@ -606,6 +606,10 @@ core:
       titles:
         install: Install theme
         upgrade: Upgrade theme ({display_name})
+      operations:
+        existed_during_installation:
+          title: The theme already exists.
+          description: The currently installed theme already exists, do you want to upgrade?
       tabs:
         local: Local
         remote:
