@@ -107,7 +107,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             );
     }
 
-    private Mono<CommentVo> toCommentVo(Comment comment) {
+    Mono<CommentVo> toCommentVo(Comment comment) {
         Comment.CommentOwner owner = comment.getSpec().getOwner();
         return Mono.just(CommentVo.from(comment))
             .flatMap(commentVo -> populateStats(Comment.class, commentVo)
@@ -116,7 +116,26 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             .flatMap(commentVo -> getOwnerInfo(owner)
                 .doOnNext(commentVo::setOwner)
                 .thenReturn(commentVo)
-            );
+            )
+            .flatMap(commentVo -> filterCommentSensitiveData(commentVo));
+    }
+
+    private Mono<? extends CommentVo> filterCommentSensitiveData(CommentVo commentVo) {
+        var owner = commentVo.getOwner();
+        commentVo.setOwner(OwnerInfo
+            .builder()
+            .displayName(owner.getDisplayName())
+            .avatar(owner.getAvatar())
+            .kind(owner.getKind())
+            .build());
+
+        commentVo.getSpec().setIpAddress("");
+        var specOwner = commentVo.getSpec().getOwner();
+        specOwner.setName("");
+        if (specOwner.getAnnotations() != null) {
+            specOwner.getAnnotations().remove("Email");
+        }
+        return Mono.just(commentVo);
     }
 
     private <E extends AbstractExtension, T extends ExtensionVoOperator> Mono<CommentStatsVo>
@@ -130,7 +149,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             .defaultIfEmpty(CommentStatsVo.empty());
     }
 
-    private Mono<ReplyVo> toReplyVo(Reply reply) {
+    Mono<ReplyVo> toReplyVo(Reply reply) {
         return Mono.just(ReplyVo.from(reply))
             .flatMap(replyVo -> populateStats(Reply.class, replyVo)
                 .doOnNext(replyVo::setStats)
@@ -138,7 +157,26 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             .flatMap(replyVo -> getOwnerInfo(reply.getSpec().getOwner())
                 .doOnNext(replyVo::setOwner)
                 .thenReturn(replyVo)
-            );
+            )
+            .flatMap(replyVo -> filterReplySensitiveData(replyVo));
+    }
+
+    private Mono<? extends ReplyVo> filterReplySensitiveData(ReplyVo replyVo) {
+        var owner = replyVo.getOwner();
+        replyVo.setOwner(OwnerInfo
+            .builder()
+            .displayName(owner.getDisplayName())
+            .avatar(owner.getAvatar())
+            .kind(owner.getKind())
+            .build());
+
+        replyVo.getSpec().setIpAddress("");
+        var specOwner = replyVo.getSpec().getOwner();
+        specOwner.setName("");
+        if (specOwner.getAnnotations() != null) {
+            specOwner.getAnnotations().remove("Email");
+        }
+        return Mono.just(replyVo);
     }
 
     private Mono<OwnerInfo> getOwnerInfo(Comment.CommentOwner owner) {

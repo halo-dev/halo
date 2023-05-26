@@ -6,10 +6,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.stubbing.Answer;
+import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
@@ -34,6 +37,7 @@ import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Ref;
 import run.halo.app.infra.AnonymousUserConst;
+import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.CounterService;
 
 /**
@@ -161,6 +165,57 @@ class CommentPublicQueryServiceImplTest {
                 .map(MetadataOperator::getName)
                 .collect(Collectors.joining(", "));
             assertThat(result).isEqualTo("1, 2, 3, 4, 5, 6, 9, 14, 10, 8, 7, 13, 12, 11");
+        }
+
+        @Test
+        void desensitizeComment() throws JSONException {
+            var commentOwner = new Comment.CommentOwner();
+            commentOwner.setName("fake-user");
+            commentOwner.setDisplayName("Fake User");
+            commentOwner.setAnnotations(new HashMap<>() {
+                {
+                    put(Comment.CommentOwner.KIND_EMAIL, "mail@halo.run");
+                }
+            });
+            var comment = commentForCompare("1", null, true, 0);
+            comment.getSpec().setIpAddress("127.0.0.1");
+            comment.getSpec().setOwner(commentOwner);
+
+            Counter counter = new Counter();
+            counter.setUpvote(0);
+            when(counterService.getByName(any())).thenReturn(Mono.just(counter));
+
+            var result = commentPublicQueryService.toCommentVo(comment).block();
+            result.getMetadata().setCreationTimestamp(null);
+            result.getSpec().setCreationTime(null);
+            JSONAssert.assertEquals("""
+                    {
+                         "metadata":{
+                             "name":"1"
+                         },
+                         "spec":{
+                             "owner":{
+                                 "name":"",
+                                 "displayName":"Fake User",
+                                 "annotations":{
+                     
+                                 }
+                             },
+                             "ipAddress":"",
+                             "priority":0,
+                             "top":true
+                         },
+                         "owner":{
+                             "kind":"User",
+                             "displayName":"fake-display-name"
+                         },
+                         "stats":{
+                             "upvote":0
+                         }
+                     }
+                    """,
+                JsonUtils.objectToJson(result),
+                true);
         }
 
         Comment commentForCompare(String name, Instant creationTime, boolean top, int priority) {
@@ -310,6 +365,57 @@ class CommentPublicQueryServiceImplTest {
                         .isEqualTo("reply-approved");
                 })
                 .verifyComplete();
+        }
+
+        @Test
+        void desensitizeReply() throws JSONException {
+            var reply = createReply();
+            reply.getSpec().getOwner()
+                .setAnnotations(new HashMap<>() {
+                    {
+                        put(Comment.CommentOwner.KIND_EMAIL, "mail@halo.run");
+                    }
+                });
+            reply.getSpec().setIpAddress("127.0.0.1");
+
+            Counter counter = new Counter();
+            counter.setUpvote(0);
+            when(counterService.getByName(any())).thenReturn(Mono.just(counter));
+
+            var result = commentPublicQueryService.toReplyVo(reply).block();
+            result.getMetadata().setCreationTimestamp(null);
+            result.getSpec().setCreationTime(null);
+            JSONAssert.assertEquals("""
+                        {
+                            "metadata":{
+                                "name":"fake-reply"
+                            },
+                            "spec":{
+                                "raw":"fake-raw",
+                                "content":"fake-content",
+                                "owner":{
+                                    "kind":"User",
+                                    "name":"",
+                                    "displayName":"fake-display-name",
+                                    "annotations":{
+
+                                    }
+                                },
+                                "ipAddress":"",
+                                "hidden":false,
+                                "commentName":"fake-comment"
+                            },
+                            "owner":{
+                                "kind":"User",
+                                "displayName":"fake-display-name"
+                            },
+                            "stats":{
+                                "upvote":0
+                            }
+                        }
+                    """,
+                JsonUtils.objectToJson(result),
+                true);
         }
 
         @SuppressWarnings("unchecked")
