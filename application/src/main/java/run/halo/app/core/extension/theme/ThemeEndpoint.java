@@ -36,6 +36,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
@@ -247,6 +248,7 @@ public class ThemeEndpoint implements CustomEndpoint {
             .flatMap(upgradeRequest -> Mono.fromCallable(() -> DataBufferUtils.toInputStream(
                 reactiveUrlDataBufferFetcher.fetch(upgradeRequest.uri())))
             )
+            .subscribeOn(Schedulers.boundedElastic())
             .doOnError(throwable -> {
                 log.error("Failed to fetch zip file from uri.", throwable);
                 throw new ThemeUpgradeException("Failed to fetch zip file from uri.", null,
@@ -268,6 +270,7 @@ public class ThemeEndpoint implements CustomEndpoint {
             .flatMap(installRequest -> Mono.fromCallable(() -> DataBufferUtils.toInputStream(
                 reactiveUrlDataBufferFetcher.fetch(installRequest.uri())))
             )
+            .subscribeOn(Schedulers.boundedElastic())
             .doOnError(throwable -> {
                 log.error("Failed to fetch zip file from uri.", throwable);
                 throw new ThemeInstallationException("Failed to fetch zip file from uri.", null,

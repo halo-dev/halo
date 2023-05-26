@@ -226,6 +226,7 @@ public class PluginEndpoint implements CustomEndpoint {
             .flatMap(upgradeRequest -> Mono.fromCallable(() -> DataBufferUtils.toInputStream(
                 reactiveUrlDataBufferFetcher.fetch(upgradeRequest.uri())))
             )
+            .subscribeOn(Schedulers.boundedElastic())
             .onErrorMap(throwable -> {
                 log.error("Failed to fetch plugin file from uri.", throwable);
                 return new ThemeUpgradeException("Failed to fetch plugin file from uri.", null,
@@ -247,6 +248,7 @@ public class PluginEndpoint implements CustomEndpoint {
             .flatMap(installRequest -> Mono.fromCallable(() -> DataBufferUtils.toInputStream(
                 reactiveUrlDataBufferFetcher.fetch(installRequest.uri())))
             )
+            .subscribeOn(Schedulers.boundedElastic())
             .doOnError(throwable -> {
                 log.error("Failed to fetch plugin file from uri.", throwable);
                 throw new ThemeInstallationException("Failed to fetch plugin file from uri.", null,
@@ -605,6 +607,6 @@ public class PluginEndpoint implements CustomEndpoint {
             Path tempFile = Files.createTempFile("halo-plugins", ".jar");
             FileCopyUtils.copy(inputStream, Files.newOutputStream(tempFile));
             return tempFile;
-        });
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 }
