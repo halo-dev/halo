@@ -172,9 +172,11 @@ class CommentPublicQueryServiceImplTest {
             var commentOwner = new Comment.CommentOwner();
             commentOwner.setName("fake-user");
             commentOwner.setDisplayName("Fake User");
-            commentOwner.setAnnotations(new HashMap<>() {{
-                put(Comment.CommentOwner.KIND_EMAIL, "mail@halo.run");
-            }});
+            commentOwner.setAnnotations(new HashMap<>() {
+                {
+                    put(Comment.CommentOwner.KIND_EMAIL, "mail@halo.run");
+                }
+            });
             var comment = commentForCompare("1", null, true, 0);
             comment.getSpec().setIpAddress("127.0.0.1");
             comment.getSpec().setOwner(commentOwner);
@@ -369,9 +371,11 @@ class CommentPublicQueryServiceImplTest {
         void desensitizeReply() throws JSONException {
             var reply = createReply();
             reply.getSpec().getOwner()
-                .setAnnotations(new HashMap<>() {{
-                    put(Comment.CommentOwner.KIND_EMAIL, "mail@halo.run");
-                }});
+                .setAnnotations(new HashMap<>() {
+                    {
+                        put(Comment.CommentOwner.KIND_EMAIL, "mail@halo.run");
+                    }
+                });
             reply.getSpec().setIpAddress("127.0.0.1");
 
             Counter counter = new Counter();
