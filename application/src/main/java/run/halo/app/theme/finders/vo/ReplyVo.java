@@ -6,13 +6,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.Value;
 import run.halo.app.content.comment.OwnerInfo;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.extension.MetadataOperator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
 
 /**
  * A value object for {@link Reply}.

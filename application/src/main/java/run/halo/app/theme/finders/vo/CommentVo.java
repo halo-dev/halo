@@ -40,7 +40,6 @@ public class CommentVo implements ExtensionVoOperator {
      * @return a value object for {@link Comment}
      */
     public static CommentVo from(Comment comment) {
-        var spec = comment.getSpec();
         return CommentVo.builder()
             .metadata(comment.getMetadata())
             .spec(comment.getSpec())
