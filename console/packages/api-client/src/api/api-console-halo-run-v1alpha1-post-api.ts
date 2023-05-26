@@ -230,8 +230,7 @@ export const ApiConsoleHaloRunV1alpha1PostApiAxiosParamCreator = function (
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {'DRAFT' | 'PENDING_APPROVAL' | 'PUBLISHED' | 'FAILED'} [publishPhase]
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {'PUBLISH_TIME' | 'CREATE_TIME'} [sort] Post collation.
-     * @param {boolean} [sortOrder] ascending order If it is true; otherwise, it is in descending order.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp,publishTime
      * @param {Array<string>} [tag]
      * @param {'PUBLIC' | 'INTERNAL' | 'PRIVATE'} [visible]
      * @param {*} [options] Override http request option.
@@ -246,8 +245,7 @@ export const ApiConsoleHaloRunV1alpha1PostApiAxiosParamCreator = function (
       page?: number,
       publishPhase?: "DRAFT" | "PENDING_APPROVAL" | "PUBLISHED" | "FAILED",
       size?: number,
-      sort?: "PUBLISH_TIME" | "CREATE_TIME",
-      sortOrder?: boolean,
+      sort?: Array<string>,
       tag?: Array<string>,
       visible?: "PUBLIC" | "INTERNAL" | "PRIVATE",
       options: AxiosRequestConfig = {}
@@ -308,12 +306,8 @@ export const ApiConsoleHaloRunV1alpha1PostApiAxiosParamCreator = function (
         localVarQueryParameter["size"] = size;
       }
 
-      if (sort !== undefined) {
-        localVarQueryParameter["sort"] = sort;
-      }
-
-      if (sortOrder !== undefined) {
-        localVarQueryParameter["sortOrder"] = sortOrder;
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       if (tag) {
@@ -724,8 +718,7 @@ export const ApiConsoleHaloRunV1alpha1PostApiFp = function (
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {'DRAFT' | 'PENDING_APPROVAL' | 'PUBLISHED' | 'FAILED'} [publishPhase]
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {'PUBLISH_TIME' | 'CREATE_TIME'} [sort] Post collation.
-     * @param {boolean} [sortOrder] ascending order If it is true; otherwise, it is in descending order.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp,publishTime
      * @param {Array<string>} [tag]
      * @param {'PUBLIC' | 'INTERNAL' | 'PRIVATE'} [visible]
      * @param {*} [options] Override http request option.
@@ -740,8 +733,7 @@ export const ApiConsoleHaloRunV1alpha1PostApiFp = function (
       page?: number,
       publishPhase?: "DRAFT" | "PENDING_APPROVAL" | "PUBLISHED" | "FAILED",
       size?: number,
-      sort?: "PUBLISH_TIME" | "CREATE_TIME",
-      sortOrder?: boolean,
+      sort?: Array<string>,
       tag?: Array<string>,
       visible?: "PUBLIC" | "INTERNAL" | "PRIVATE",
       options?: AxiosRequestConfig
@@ -758,7 +750,6 @@ export const ApiConsoleHaloRunV1alpha1PostApiFp = function (
         publishPhase,
         size,
         sort,
-        sortOrder,
         tag,
         visible,
         options
@@ -972,7 +963,6 @@ export const ApiConsoleHaloRunV1alpha1PostApiFactory = function (
           requestParameters.publishPhase,
           requestParameters.size,
           requestParameters.sort,
-          requestParameters.sortOrder,
           requestParameters.tag,
           requestParameters.visible,
           options
@@ -1169,18 +1159,11 @@ export interface ApiConsoleHaloRunV1alpha1PostApiListPostsRequest {
   readonly size?: number;
 
   /**
-   * Post collation.
-   * @type {'PUBLISH_TIME' | 'CREATE_TIME'}
+   * Sort property and direction of the list result. Supported fields: creationTimestamp,publishTime
+   * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1PostApiListPosts
    */
-  readonly sort?: "PUBLISH_TIME" | "CREATE_TIME";
-
-  /**
-   * ascending order If it is true; otherwise, it is in descending order.
-   * @type {boolean}
-   * @memberof ApiConsoleHaloRunV1alpha1PostApiListPosts
-   */
-  readonly sortOrder?: boolean;
+  readonly sort?: Array<string>;
 
   /**
    *
@@ -1365,7 +1348,6 @@ export class ApiConsoleHaloRunV1alpha1PostApi extends BaseAPI {
         requestParameters.publishPhase,
         requestParameters.size,
         requestParameters.sort,
-        requestParameters.sortOrder,
         requestParameters.tag,
         requestParameters.visible,
         options

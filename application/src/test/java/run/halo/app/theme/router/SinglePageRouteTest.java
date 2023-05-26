@@ -27,7 +27,6 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.SinglePageFinder;
 import run.halo.app.theme.finders.vo.SinglePageVo;
-import run.halo.app.theme.router.factories.ModelConst;
 
 /**
  * Tests for {@link SinglePageRoute}.

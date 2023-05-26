@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.retry.RetryException;
@@ -48,8 +47,6 @@ public class PostEndpoint implements CustomEndpoint {
 
     private final PostService postService;
     private final ReactiveExtensionClient client;
-
-    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -277,7 +274,7 @@ public class PostEndpoint implements CustomEndpoint {
     }
 
     Mono<ServerResponse> listPost(ServerRequest request) {
-        PostQuery postQuery = new PostQuery(request.queryParams());
+        PostQuery postQuery = new PostQuery(request);
         return postService.listPost(postQuery)
             .flatMap(listedPosts -> ServerResponse.ok().bodyValue(listedPosts));
     }

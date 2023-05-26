@@ -9,6 +9,7 @@ import {
   VSpace,
   Toast,
   Dialog,
+  IconEye,
 } from "@halo-dev/components";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import type { Post, PostRequest } from "@halo-dev/api-client";
@@ -34,6 +35,7 @@ import {
 import { useLocalStorage } from "@vueuse/core";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
 import { useI18n } from "vue-i18n";
+import UrlPreviewModal from "@/components/preview/UrlPreviewModal.vue";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -112,9 +114,11 @@ provide<ComputedRef<string | undefined>>(
   computed(() => formState.value.post.status?.permalink)
 );
 
-const handleSave = async () => {
+const handleSave = async (options?: { mute?: boolean }) => {
   try {
-    saving.value = true;
+    if (!options?.mute) {
+      saving.value = true;
+    }
 
     // Set default title and slug
     if (!formState.value.post.spec.title) {
@@ -140,7 +144,9 @@ const handleSave = async () => {
       name.value = data.metadata.name;
     }
 
-    Toast.success(t("core.common.toast.save_success"));
+    if (!options?.mute) {
+      Toast.success(t("core.common.toast.save_success"));
+    }
     handleClearCache(name.value as string);
     await handleFetchContent();
   } catch (e) {
@@ -336,6 +342,17 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     name,
     toRef(formState.value.content, "raw")
   );
+
+// Post preview
+const previewModal = ref(false);
+const previewPending = ref(false);
+
+const handlePreview = async () => {
+  previewPending.value = true;
+  await handleSave({ mute: true });
+  previewModal.value = true;
+  previewPending.value = false;
+};
 </script>
 
 <template>
@@ -347,6 +364,14 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     @saved="onSettingSaved"
     @published="onSettingPublished"
   />
+
+  <UrlPreviewModal
+    v-if="isUpdateMode"
+    v-model:visible="previewModal"
+    :title="formState.post.spec.title"
+    :url="`/preview/posts/${formState.post.metadata.name}`"
+  />
+
   <VPageHeader :title="$t('core.post.title')">
     <template #icon>
       <IconBookRead class="mr-2 self-center" />
@@ -358,6 +383,17 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
           :provider="currentEditorProvider"
           @select="handleChangeEditorProvider"
         />
+        <VButton
+          size="sm"
+          type="default"
+          :loading="previewPending"
+          @click="handlePreview"
+        >
+          <template #icon>
+            <IconEye class="h-full w-full" />
+          </template>
+          {{ $t("core.common.buttons.preview") }}
+        </VButton>
         <VButton :loading="saving" size="sm" type="default" @click="handleSave">
           <template #icon>
             <IconSave class="h-full w-full" />

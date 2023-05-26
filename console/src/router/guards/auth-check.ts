@@ -13,7 +13,12 @@ export function setupAuthCheckGuard(router: Router) {
     const userStore = useUserStore();
 
     if (userStore.isAnonymous) {
-      next({ name: "Login" });
+      next({
+        name: "Login",
+        query: {
+          redirect_uri: from.path !== "/" ? window.location.href : undefined,
+        },
+      });
       return;
     }
     next();

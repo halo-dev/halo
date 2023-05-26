@@ -10,7 +10,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.DefaultTemplateEnum;
-import run.halo.app.theme.router.factories.ModelConst;
+import run.halo.app.theme.router.ModelConst;
 
 /**
  * <p>Global custom head snippet injection for theme global setting.</p>

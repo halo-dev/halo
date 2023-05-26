@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.TagFinder;
+import run.halo.app.theme.router.ModelConst;
 
 /**
  * The {@link TagsRouteFactory} for generate {@link RouterFunction} specific to the template

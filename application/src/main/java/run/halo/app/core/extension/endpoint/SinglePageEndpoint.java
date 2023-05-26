@@ -229,7 +229,7 @@ public class SinglePageEndpoint implements CustomEndpoint {
     }
 
     Mono<ServerResponse> listSinglePage(ServerRequest request) {
-        var listRequest = new SinglePageQuery(request.queryParams());
+        var listRequest = new SinglePageQuery(request);
         return singlePageService.list(listRequest)
             .flatMap(listedPages -> ServerResponse.ok().bodyValue(listedPages));
     }

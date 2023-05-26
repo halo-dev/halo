@@ -427,10 +427,12 @@ core:
         result: "评论者：{owner}"
       sort:
         items:
-          default: 默认
-          last_reply_time: 最后回复时间
-          reply_count: 回复数
-          creation_time: 创建时间
+          last_reply_time_desc: 较近回复
+          last_reply_time_asc: 较早回复
+          reply_count_desc: 较多回复数
+          reply_count_asc: 较少回复数
+          create_time_desc: 较近创建
+          create_time_asc: 较早创建
     list:
       fields:
         reply_count: "{count} 条回复"
@@ -604,6 +606,10 @@ core:
       titles:
         install: 安装主题
         upgrade: 升级主题（{display_name}）
+      operations:
+        existed_during_installation:
+          title: 主题已存在
+          description: 当前安装的主题已存在，是否升级？
       tabs:
         local: 本地上传
         remote:
