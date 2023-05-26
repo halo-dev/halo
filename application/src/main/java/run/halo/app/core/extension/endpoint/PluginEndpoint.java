@@ -1,6 +1,7 @@
 package run.halo.app.core.extension.endpoint;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static java.util.Comparator.comparing;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
@@ -17,6 +18,8 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,6 +41,7 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FormFieldPart;
 import org.springframework.http.codec.multipart.Part;
 import org.springframework.stereotype.Component;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -56,6 +60,10 @@ import run.halo.app.extension.Comparators;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
+import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
+import run.halo.app.infra.exception.ThemeInstallationException;
+import run.halo.app.infra.exception.ThemeUpgradeException;
+import run.halo.app.infra.utils.DataBufferUtils;
 import run.halo.app.plugin.PluginNotFoundException;
 
 @Slf4j
@@ -66,6 +74,8 @@ public class PluginEndpoint implements CustomEndpoint {
     private final ReactiveExtensionClient client;
 
     private final PluginService pluginService;
+
+    private final ReactiveUrlDataBufferFetcher reactiveUrlDataBufferFetcher;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -82,6 +92,39 @@ public class PluginEndpoint implements CustomEndpoint {
                             .schema(schemaBuilder().implementation(InstallRequest.class))
                         ))
                     .response(responseBuilder().implementation(Plugin.class))
+            )
+            .POST("plugins/-/install-from-uri", this::installFromUri,
+                builder -> builder.operationId("InstallPluginFromUri")
+                    .description("Install a plugin from uri.")
+                    .tag(tag)
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(schemaBuilder()
+                                .implementation(InstallFromUriRequest.class))
+                        ))
+                    .response(responseBuilder()
+                        .implementation(Plugin.class))
+            )
+            .POST("plugins/{name}/upgrade-from-uri", this::upgradeFromUri,
+                builder -> builder.operationId("UpgradePluginFromUri")
+                    .description("Upgrade a plugin from uri.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .in(ParameterIn.PATH)
+                        .name("name")
+                        .required(true)
+                    )
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(schemaBuilder()
+                                .implementation(UpgradeFromUriRequest.class))
+                        ))
+                    .response(responseBuilder()
+                        .implementation(Plugin.class))
             )
             .POST("plugins/{name}/upgrade", contentType(MediaType.MULTIPART_FORM_DATA),
                 this::upgrade, builder -> builder.operationId("UpgradePlugin")
@@ -175,6 +218,57 @@ public class PluginEndpoint implements CustomEndpoint {
                     .tag(tag)
                     .response(responseBuilder().implementationArray(Plugin.class)))
             .build();
+    }
+
+    private Mono<ServerResponse> upgradeFromUri(ServerRequest request) {
+        final var name = request.pathVariable("name");
+        return request.bodyToMono(UpgradeFromUriRequest.class)
+            .flatMap(upgradeRequest -> Mono.fromCallable(() -> DataBufferUtils.toInputStream(
+                reactiveUrlDataBufferFetcher.fetch(upgradeRequest.uri())))
+            )
+            .subscribeOn(Schedulers.boundedElastic())
+            .onErrorMap(throwable -> {
+                log.error("Failed to fetch plugin file from uri.", throwable);
+                return new ThemeUpgradeException("Failed to fetch plugin file from uri.", null,
+                    null);
+            })
+            .flatMap(inputStream -> Mono.usingWhen(
+                transferToTemp(inputStream),
+                (path) -> pluginService.upgrade(name, path),
+                this::deleteFileIfExists)
+            )
+            .flatMap(theme -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(theme)
+            );
+    }
+
+    private Mono<ServerResponse> installFromUri(ServerRequest request) {
+        return request.bodyToMono(InstallFromUriRequest.class)
+            .flatMap(installRequest -> Mono.fromCallable(() -> DataBufferUtils.toInputStream(
+                reactiveUrlDataBufferFetcher.fetch(installRequest.uri())))
+            )
+            .subscribeOn(Schedulers.boundedElastic())
+            .doOnError(throwable -> {
+                log.error("Failed to fetch plugin file from uri.", throwable);
+                throw new ThemeInstallationException("Failed to fetch plugin file from uri.", null,
+                    null);
+            })
+            .flatMap(inputStream -> Mono.usingWhen(
+                transferToTemp(inputStream),
+                pluginService::install,
+                this::deleteFileIfExists)
+            )
+            .flatMap(theme -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(theme)
+            );
+    }
+
+    public record InstallFromUriRequest(@Schema(requiredMode = REQUIRED) URI uri) {
+    }
+
+    public record UpgradeFromUriRequest(@Schema(requiredMode = REQUIRED) URI uri) {
     }
 
     private Mono<ServerResponse> reload(ServerRequest serverRequest) {
@@ -508,4 +602,11 @@ public class PluginEndpoint implements CustomEndpoint {
             );
     }
 
+    private Mono<Path> transferToTemp(InputStream inputStream) {
+        return Mono.fromCallable(() -> {
+            Path tempFile = Files.createTempFile("halo-plugins", ".jar");
+            FileCopyUtils.copy(inputStream, Files.newOutputStream(tempFile));
+            return tempFile;
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
 }

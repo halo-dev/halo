@@ -733,6 +733,9 @@ core:
       change_status:
         active_title: Are you sure you want to active this plugin?
         inactive_title: Are you sure you want to inactive this plugin?
+      remote_download:
+        title: Remote download address detected, do you want to download?
+        description: "Please carefully verify whether this address can be trusted: {url}"
     filters:
       status:
         items:
@@ -750,6 +753,12 @@ core:
       titles:
         install: Install plugin
         upgrade: Upgrade plugin ({display_name})
+      tabs:
+        local: Local
+        remote:
+          title: Remote
+          fields:
+            url: Remote URL
       operations:
         active_after_install:
           title: Install successful

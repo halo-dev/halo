@@ -733,6 +733,9 @@ core:
       change_status:
         active_title: 确定要启用该插件吗？
         inactive_title: 确定要停用该插件吗？
+      remote_download:
+        title: 检测到了远程下载地址，是否需要下载？
+        description: 请仔细鉴别此地址是否可信：{url}
     filters:
       status:
         items:
@@ -750,6 +753,12 @@ core:
       titles:
         install: 安装插件
         upgrade: 升级插件（{display_name}）
+      tabs:
+        local: 本地上传
+        remote:
+          title: 远程下载
+          fields:
+            url: 下载地址
       operations:
         active_after_install:
           title: 安装成功
