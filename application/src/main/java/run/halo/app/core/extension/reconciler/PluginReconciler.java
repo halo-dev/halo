@@ -577,7 +577,6 @@ public class PluginReconciler implements Reconciler<Request> {
         return pluginPath.toString();
     }
 
-
     /**
      * Returns absolute plugin path.
      * if plugin path is absolute, use it directly in development mode.
@@ -629,7 +628,11 @@ public class PluginReconciler implements Reconciler<Request> {
         if (StringUtils.isBlank(pathString)) {
             return null;
         }
-        return Paths.get(URI.create(pathString).getPath());
+        String processedPathString = pathString;
+        if (processedPathString.startsWith("file:")) {
+            processedPathString = processedPathString.substring(7);
+        }
+        return Paths.get(processedPathString);
     }
 
     URI toUri(String pathString) {

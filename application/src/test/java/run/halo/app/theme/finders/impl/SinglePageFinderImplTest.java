@@ -1,8 +1,8 @@
 package run.halo.app.theme.finders.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -14,13 +14,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.content.SinglePageService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.metrics.CounterService;
-import run.halo.app.theme.finders.ContributorFinder;
+import run.halo.app.theme.finders.SinglePageConversionService;
+import run.halo.app.theme.finders.vo.SinglePageVo;
 
 /**
  * Tests for {@link SinglePageFinderImpl}.
@@ -35,13 +34,7 @@ class SinglePageFinderImplTest {
     private ReactiveExtensionClient client;
 
     @Mock
-    private SinglePageService singlePageService;
-
-    @Mock
-    private ContributorFinder contributorFinder;
-
-    @Mock
-    private CounterService counterService;
+    private SinglePageConversionService singlePageConversionService;
 
     @InjectMocks
     private SinglePageFinderImpl singlePageFinder;
@@ -64,21 +57,14 @@ class SinglePageFinderImplTest {
         when(client.get(eq(SinglePage.class), eq(fakePageName)))
             .thenReturn(Mono.just(singlePage));
 
-        when(counterService.getByName(anyString())).thenReturn(Mono.empty());
-        when(contributorFinder.getContributor(anyString())).thenReturn(Mono.empty());
-        when(singlePageService.getReleaseContent(anyString())).thenReturn(Mono.empty());
+        when(singlePageConversionService.convertToVo(eq(singlePage)))
+            .thenReturn(Mono.just(mock(SinglePageVo.class)));
 
         singlePageFinder.getByName(fakePageName)
             .as(StepVerifier::create)
-            .consumeNextWith(page -> {
-                assertThat(page.getStats()).isNotNull();
-                assertThat(page.getContent()).isNotNull();
-            })
+            .consumeNextWith(page -> assertThat(page).isNotNull())
             .verifyComplete();
 
         verify(client).get(SinglePage.class, fakePageName);
-        verify(counterService).getByName(anyString());
-        verify(singlePageService).getReleaseContent(anyString());
-        verify(contributorFinder).getContributor(anyString());
     }
 }

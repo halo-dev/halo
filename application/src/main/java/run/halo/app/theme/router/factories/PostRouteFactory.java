@@ -6,7 +6,6 @@ import static run.halo.app.theme.finders.PostPublicQueryService.FIXED_PREDICATE;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -30,8 +29,6 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
-import run.halo.app.extension.GVK;
-import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.exception.NotFoundException;
@@ -39,6 +36,7 @@ import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.router.ModelMapUtils;
 import run.halo.app.theme.router.ViewNameResolver;
 
 /**
@@ -101,14 +99,7 @@ public class PostRouteFactory implements RouteFactory {
         Mono<PostVo> postVoMono = bestMatchPost(patternVariable);
         return postVoMono
             .flatMap(postVo -> {
-                Map<String, Object> model = new HashMap<>();
-                model.put("name", postVo.getMetadata().getName());
-                model.put(ModelConst.TEMPLATE_ID, DefaultTemplateEnum.POST.getValue());
-                model.put("groupVersionKind", GroupVersionKind.fromExtension(Post.class));
-                GVK gvk = Post.class.getAnnotation(GVK.class);
-                model.put("plural", gvk.plural());
-                model.put("post", postVo);
-
+                Map<String, Object> model = ModelMapUtils.postModel(postVo);
                 String template = postVo.getSpec().getTemplate();
                 return viewNameResolver.resolveViewNameOrDefault(request, template,
                         DefaultTemplateEnum.POST.getValue())

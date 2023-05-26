@@ -468,6 +468,14 @@ class PluginReconcilerTest {
             Path path = pluginReconciler.toPath("file:///path/to/file.txt");
             assertThat(path).isNotNull();
             assertThat(path.toString()).isEqualTo("/path/to/file.txt");
+
+            assertThat(pluginReconciler.toPath("C:\\Users\\faker\\halo\\plugins").toString())
+                .isEqualTo("C:\\Users\\faker\\halo\\plugins");
+            assertThat(pluginReconciler.toPath("C:/Users/faker/halo/plugins").toString())
+                .isEqualTo("C:/Users/faker/halo/plugins");
+            Path windowsPath = Paths.get("C:/Users/username/Documents/file.txt");
+            assertThat(pluginReconciler.toPath("file://C:/Users/username/Documents/file.txt"))
+                .isEqualTo(windowsPath);
         }
 
         @Test

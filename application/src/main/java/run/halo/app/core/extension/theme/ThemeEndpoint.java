@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.theme;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
@@ -11,6 +12,7 @@ import static run.halo.app.infra.utils.DataBufferUtils.toInputStream;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -43,10 +45,14 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
+import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.infra.exception.ThemeInstallationException;
+import run.halo.app.infra.exception.ThemeUpgradeException;
+import run.halo.app.infra.utils.DataBufferUtils;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.TemplateEngineManager;
 
@@ -71,6 +77,8 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     private final SystemConfigurableEnvironmentFetcher systemEnvironmentFetcher;
 
+    private final ReactiveUrlDataBufferFetcher reactiveUrlDataBufferFetcher;
+
     @Override
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "api.console.halo.run/v1alpha1/Theme";
@@ -85,6 +93,39 @@ public class ThemeEndpoint implements CustomEndpoint {
                             .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .schema(schemaBuilder()
                                 .implementation(InstallRequest.class))
+                        ))
+                    .response(responseBuilder()
+                        .implementation(Theme.class))
+            )
+            .POST("themes/-/install-from-uri", this::installFromUri,
+                builder -> builder.operationId("InstallThemeFromUri")
+                    .description("Install a theme from uri.")
+                    .tag(tag)
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(schemaBuilder()
+                                .implementation(InstallFromUriRequest.class))
+                        ))
+                    .response(responseBuilder()
+                        .implementation(Theme.class))
+            )
+            .POST("themes/{name}/upgrade-from-uri", this::upgradeFromUri,
+                builder -> builder.operationId("UpgradeThemeFromUri")
+                    .description("Upgrade a theme from uri.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .in(ParameterIn.PATH)
+                        .name("name")
+                        .required(true)
+                    )
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(schemaBuilder()
+                                .implementation(UpgradeFromUriRequest.class))
                         ))
                     .response(responseBuilder()
                         .implementation(Theme.class))
@@ -198,6 +239,45 @@ public class ThemeEndpoint implements CustomEndpoint {
                         .implementation(ConfigMap.class))
             )
             .build();
+    }
+
+    private Mono<ServerResponse> upgradeFromUri(ServerRequest request) {
+        final var name = request.pathVariable("name");
+        return request.bodyToMono(UpgradeFromUriRequest.class)
+            .flatMap(upgradeRequest -> Mono.fromCallable(() -> DataBufferUtils.toInputStream(
+                reactiveUrlDataBufferFetcher.fetch(upgradeRequest.uri())))
+            )
+            .doOnError(throwable -> {
+                log.error("Failed to fetch zip file from uri.", throwable);
+                throw new ThemeUpgradeException("Failed to fetch zip file from uri.", null,
+                    null);
+            })
+            .flatMap(inputStream -> themeService.upgrade(name, inputStream))
+            .flatMap((updatedTheme) -> templateEngineManager.clearCache(
+                    updatedTheme.getMetadata().getName())
+                .thenReturn(updatedTheme)
+            )
+            .flatMap(theme -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(theme)
+            );
+    }
+
+    private Mono<ServerResponse> installFromUri(ServerRequest request) {
+        return request.bodyToMono(InstallFromUriRequest.class)
+            .flatMap(installRequest -> Mono.fromCallable(() -> DataBufferUtils.toInputStream(
+                reactiveUrlDataBufferFetcher.fetch(installRequest.uri())))
+            )
+            .doOnError(throwable -> {
+                log.error("Failed to fetch zip file from uri.", throwable);
+                throw new ThemeInstallationException("Failed to fetch zip file from uri.", null,
+                    null);
+            })
+            .flatMap(themeService::install)
+            .flatMap(theme -> ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(theme)
+            );
     }
 
     private Mono<ServerResponse> activateTheme(ServerRequest request) {
@@ -332,6 +412,9 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     }
 
+    public record UpgradeFromUriRequest(@Schema(requiredMode = REQUIRED) URI uri) {
+    }
+
     public static class UpgradeRequest implements IUpgradeRequest {
 
         private final MultiValueMap<String, Part> multipartData;
@@ -416,6 +499,9 @@ public class ThemeEndpoint implements CustomEndpoint {
     @Schema(name = "ThemeInstallRequest")
     public record InstallRequest(
         @Schema(required = true, description = "Theme zip file.") FilePart file) {
+    }
+
+    public record InstallFromUriRequest(@Schema(requiredMode = REQUIRED) URI uri) {
     }
 
     Mono<ServerResponse> install(ServerRequest request) {

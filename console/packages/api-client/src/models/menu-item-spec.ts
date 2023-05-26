@@ -68,4 +68,4 @@ export const MenuItemSpecTargetEnum = {
 } as const;
 
 export type MenuItemSpecTargetEnum =
-  typeof MenuItemSpecTargetEnum[keyof typeof MenuItemSpecTargetEnum];
+  (typeof MenuItemSpecTargetEnum)[keyof typeof MenuItemSpecTargetEnum];

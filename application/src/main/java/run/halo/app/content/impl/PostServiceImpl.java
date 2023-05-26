@@ -1,15 +1,10 @@
 package run.halo.app.content.impl;
 
-import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
-
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -26,7 +21,6 @@ import run.halo.app.content.ListedPost;
 import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
-import run.halo.app.content.PostSorter;
 import run.halo.app.content.Stats;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
@@ -63,10 +57,8 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
 
     @Override
     public Mono<ListResult<ListedPost>> listPost(PostQuery query) {
-        Comparator<Post> comparator =
-            PostSorter.from(query.getSort(), query.getSortOrder());
-        return client.list(Post.class, postListPredicate(query),
-                comparator, query.getPage(), query.getSize())
+        return client.list(Post.class, query.toPredicate(),
+                query.toComparator(), query.getPage(), query.getSize())
             .flatMap(listResult -> Flux.fromStream(
                         listResult.get().map(this::getListedPost)
                     )
@@ -90,65 +82,6 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
                 .build()
             )
             .defaultIfEmpty(Stats.empty());
-    }
-
-    Predicate<Post> postListPredicate(PostQuery query) {
-        Predicate<Post> paramPredicate = post ->
-            contains(query.getCategories(), post.getSpec().getCategories())
-                && contains(query.getTags(), post.getSpec().getTags())
-                && contains(query.getContributors(), post.getStatusOrDefault().getContributors());
-
-        String keyword = query.getKeyword();
-        if (keyword != null) {
-            paramPredicate = paramPredicate.and(post -> {
-                String excerpt = post.getStatusOrDefault().getExcerpt();
-                return StringUtils.containsIgnoreCase(excerpt, keyword)
-                    || StringUtils.containsIgnoreCase(post.getSpec().getSlug(), keyword)
-                    || StringUtils.containsIgnoreCase(post.getSpec().getTitle(), keyword);
-            });
-        }
-
-        Post.PostPhase publishPhase = query.getPublishPhase();
-        if (publishPhase != null) {
-            paramPredicate = paramPredicate.and(post -> {
-                if (Post.PostPhase.PENDING_APPROVAL.equals(publishPhase)) {
-                    return !post.isPublished()
-                        && Post.PostPhase.PENDING_APPROVAL.name()
-                        .equalsIgnoreCase(post.getStatusOrDefault().getPhase());
-                }
-                // published
-                if (Post.PostPhase.PUBLISHED.equals(publishPhase)) {
-                    return post.isPublished();
-                }
-                // draft
-                return !post.isPublished();
-            });
-        }
-
-        Post.VisibleEnum visible = query.getVisible();
-        if (visible != null) {
-            paramPredicate =
-                paramPredicate.and(post -> visible.equals(post.getSpec().getVisible()));
-        }
-
-        Predicate<Post> predicate = labelAndFieldSelectorToPredicate(query.getLabelSelector(),
-            query.getFieldSelector());
-        return predicate.and(paramPredicate);
-    }
-
-    boolean contains(Collection<String> left, List<String> right) {
-        // parameter is null, it means that ignore this condition
-        if (left == null) {
-            return true;
-        }
-        // else, it means that right is empty
-        if (left.isEmpty()) {
-            return right.isEmpty();
-        }
-        if (right == null) {
-            return false;
-        }
-        return right.stream().anyMatch(left::contains);
     }
 
     private Mono<ListedPost> getListedPost(Post post) {

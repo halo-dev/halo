@@ -9,6 +9,7 @@ import {
   IconSave,
   Toast,
   Dialog,
+  IconEye,
 } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import type { SinglePage, SinglePageRequest } from "@halo-dev/api-client";
@@ -34,6 +35,7 @@ import {
 import { useLocalStorage } from "@vueuse/core";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
 import { useI18n } from "vue-i18n";
+import UrlPreviewModal from "@/components/preview/UrlPreviewModal.vue";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -112,9 +114,11 @@ provide<ComputedRef<string | undefined>>(
 
 const routeQueryName = useRouteQuery<string>("name");
 
-const handleSave = async () => {
+const handleSave = async (options?: { mute?: boolean }) => {
   try {
-    saving.value = true;
+    if (!options?.mute) {
+      saving.value = true;
+    }
 
     //Set default title and slug
     if (!formState.value.page.spec.title) {
@@ -139,7 +143,9 @@ const handleSave = async () => {
       routeQueryName.value = data.metadata.name;
     }
 
-    Toast.success(t("core.common.toast.save_success"));
+    if (!options?.mute) {
+      Toast.success(t("core.common.toast.save_success"));
+    }
 
     handleClearCache(routeQueryName.value as string);
     await handleFetchContent();
@@ -323,6 +329,17 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     routeQueryName,
     toRef(formState.value.content, "raw")
   );
+
+// SinglePage preview
+const previewModal = ref(false);
+const previewPending = ref(false);
+
+const handlePreview = async () => {
+  previewPending.value = true;
+  await handleSave({ mute: true });
+  previewModal.value = true;
+  previewPending.value = false;
+};
 </script>
 
 <template>
@@ -334,6 +351,14 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     @saved="onSettingSaved"
     @published="onSettingPublished"
   />
+
+  <UrlPreviewModal
+    v-if="isUpdateMode"
+    v-model:visible="previewModal"
+    :title="formState.page.spec.title"
+    :url="`/preview/singlepages/${formState.page.metadata.name}`"
+  />
+
   <VPageHeader :title="$t('core.page.title')">
     <template #icon>
       <IconPages class="mr-2 self-center" />
@@ -345,6 +370,17 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
           :provider="currentEditorProvider"
           @select="handleChangeEditorProvider"
         />
+        <VButton
+          size="sm"
+          type="default"
+          :loading="previewPending"
+          @click="handlePreview"
+        >
+          <template #icon>
+            <IconEye class="h-full w-full" />
+          </template>
+          {{ $t("core.common.buttons.preview") }}
+        </VButton>
         <VButton :loading="saving" size="sm" type="default" @click="handleSave">
           <template #icon>
             <IconSave class="h-full w-full" />

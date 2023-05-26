@@ -50,16 +50,16 @@ export const ApiHaloRunV1alpha1PostApiAxiosParamCreator = function (
     /**
      * Search posts with fuzzy query
      * @param {string} keyword
-     * @param {string} [highlightPreTag]
      * @param {string} [highlightPostTag]
+     * @param {string} [highlightPreTag]
      * @param {number} [limit]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     searchPost: async (
       keyword: string,
-      highlightPreTag?: string,
       highlightPostTag?: string,
+      highlightPreTag?: string,
       limit?: number,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
@@ -89,12 +89,12 @@ export const ApiHaloRunV1alpha1PostApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (highlightPreTag !== undefined) {
-        localVarQueryParameter["highlightPreTag"] = highlightPreTag;
-      }
-
       if (highlightPostTag !== undefined) {
         localVarQueryParameter["highlightPostTag"] = highlightPostTag;
+      }
+
+      if (highlightPreTag !== undefined) {
+        localVarQueryParameter["highlightPreTag"] = highlightPreTag;
       }
 
       if (keyword !== undefined) {
@@ -135,16 +135,16 @@ export const ApiHaloRunV1alpha1PostApiFp = function (
     /**
      * Search posts with fuzzy query
      * @param {string} keyword
-     * @param {string} [highlightPreTag]
      * @param {string} [highlightPostTag]
+     * @param {string} [highlightPreTag]
      * @param {number} [limit]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async searchPost(
       keyword: string,
-      highlightPreTag?: string,
       highlightPostTag?: string,
+      highlightPreTag?: string,
       limit?: number,
       options?: AxiosRequestConfig
     ): Promise<
@@ -152,8 +152,8 @@ export const ApiHaloRunV1alpha1PostApiFp = function (
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.searchPost(
         keyword,
-        highlightPreTag,
         highlightPostTag,
+        highlightPreTag,
         limit,
         options
       );
@@ -191,8 +191,8 @@ export const ApiHaloRunV1alpha1PostApiFactory = function (
       return localVarFp
         .searchPost(
           requestParameters.keyword,
-          requestParameters.highlightPreTag,
           requestParameters.highlightPostTag,
+          requestParameters.highlightPreTag,
           requestParameters.limit,
           options
         )
@@ -219,14 +219,14 @@ export interface ApiHaloRunV1alpha1PostApiSearchPostRequest {
    * @type {string}
    * @memberof ApiHaloRunV1alpha1PostApiSearchPost
    */
-  readonly highlightPreTag?: string;
+  readonly highlightPostTag?: string;
 
   /**
    *
    * @type {string}
    * @memberof ApiHaloRunV1alpha1PostApiSearchPost
    */
-  readonly highlightPostTag?: string;
+  readonly highlightPreTag?: string;
 
   /**
    *
@@ -257,8 +257,8 @@ export class ApiHaloRunV1alpha1PostApi extends BaseAPI {
     return ApiHaloRunV1alpha1PostApiFp(this.configuration)
       .searchPost(
         requestParameters.keyword,
-        requestParameters.highlightPreTag,
         requestParameters.highlightPostTag,
+        requestParameters.highlightPreTag,
         requestParameters.limit,
         options
       )
