@@ -75,8 +75,9 @@ public class YamlPluginFinder {
     }
 
     protected Plugin readPluginDescriptor(Path pluginPath) {
-        Path propertiesPath = getManifestPath(pluginPath, propertiesFileName);
+        Path propertiesPath = null;
         try {
+            propertiesPath = getManifestPath(pluginPath, propertiesFileName);
             if (propertiesPath == null) {
                 throw new PluginRuntimeException("Cannot find the plugin manifest path");
             }

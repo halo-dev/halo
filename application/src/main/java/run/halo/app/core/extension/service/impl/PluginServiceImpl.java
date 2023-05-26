@@ -28,6 +28,7 @@ import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.exception.PluginAlreadyExistsException;
+import run.halo.app.infra.exception.PluginInstallationException;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.VersionUtils;
@@ -70,49 +71,47 @@ public class PluginServiceImpl implements PluginService {
 
     @Override
     public Mono<Plugin> install(Path path) {
-        return Mono.defer(() -> {
-            final var pluginFinder = new YamlPluginFinder();
-            final var pluginInPath = pluginFinder.find(path);
-            // validate the plugin version
-            satisfiesRequiresVersion(pluginInPath);
+        return findPluginManifest(path)
+            .flatMap(pluginInPath -> {
+                // validate the plugin version
+                satisfiesRequiresVersion(pluginInPath);
 
-            return client.fetch(Plugin.class, pluginInPath.getMetadata().getName())
-                .flatMap(oldPlugin -> Mono.<Plugin>error(
-                    new PluginAlreadyExistsException(oldPlugin.getMetadata().getName())))
-                .switchIfEmpty(Mono.defer(
-                    () -> copyToPluginHome(pluginInPath)
-                        .map(pluginFinder::find)
-                        .doOnNext(p -> {
-                            // Disable auto enable after installation
-                            p.getSpec().setEnabled(false);
-                        })
-                        .flatMap(client::create)));
-
-        });
+                return client.fetch(Plugin.class, pluginInPath.getMetadata().getName())
+                    .flatMap(oldPlugin -> Mono.<Plugin>error(
+                        new PluginAlreadyExistsException(oldPlugin.getMetadata().getName())))
+                    .switchIfEmpty(Mono.defer(
+                        () -> copyToPluginHome(pluginInPath)
+                            .flatMap(this::findPluginManifest)
+                            .doOnNext(p -> {
+                                // Disable auto enable after installation
+                                p.getSpec().setEnabled(false);
+                            })
+                            .flatMap(client::create))
+                    );
+            });
     }
 
     @Override
     public Mono<Plugin> upgrade(String name, Path path) {
-        return Mono.defer(() -> {
-            // pre-check the plugin in the path
-            final var pluginFinder = new YamlPluginFinder();
-            final var pluginInPath = pluginFinder.find(path);
-            Validate.notNull(pluginInPath.statusNonNull().getLoadLocation());
-            satisfiesRequiresVersion(pluginInPath);
-            if (!Objects.equals(name, pluginInPath.getMetadata().getName())) {
-                return Mono.error(new ServerWebInputException(
-                    "The provided plugin " + pluginInPath.getMetadata().getName()
-                        + " didn't match the given plugin " + name));
-            }
+        return findPluginManifest(path)
+            .flatMap(pluginInPath -> {
+                // pre-check the plugin in the path
+                Validate.notNull(pluginInPath.statusNonNull().getLoadLocation());
+                satisfiesRequiresVersion(pluginInPath);
+                if (!Objects.equals(name, pluginInPath.getMetadata().getName())) {
+                    return Mono.error(new ServerWebInputException(
+                        "The provided plugin " + pluginInPath.getMetadata().getName()
+                            + " didn't match the given plugin " + name));
+                }
 
-            // check if the plugin exists
-            return client.fetch(Plugin.class, name)
-                .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
-                    "The given plugin with name " + name + " was not found.")))
-                // copy plugin into plugin home
-                .flatMap(prevPlugin -> copyToPluginHome(pluginInPath))
-                .flatMap(pluginPath -> updateReloadAnno(name, pluginPath));
-        });
+                // check if the plugin exists
+                return client.fetch(Plugin.class, name)
+                    .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
+                        "The given plugin with name " + name + " was not found.")))
+                    // copy plugin into plugin home
+                    .flatMap(prevPlugin -> copyToPluginHome(pluginInPath))
+                    .flatMap(pluginPath -> updateReloadAnno(name, pluginPath));
+            });
     }
 
     @Override
@@ -123,6 +122,17 @@ public class PluginServiceImpl implements PluginService {
                 "The given plugin with name " + name + " was not found."));
         }
         return updateReloadAnno(name, pluginWrapper.getPluginPath());
+    }
+
+    Mono<Plugin> findPluginManifest(Path path) {
+        return Mono.fromSupplier(
+                () -> {
+                    final var pluginFinder = new YamlPluginFinder();
+                    return pluginFinder.find(path);
+                })
+            .onErrorMap(e -> new PluginInstallationException("Failed to parse the plugin manifest",
+                "problemDetail.plugin.missingManifest", null)
+            );
     }
 
     private Mono<Plugin> updateReloadAnno(String name, Path pluginPath) {
