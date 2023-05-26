@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Setter;
 import lombok.ToString;
 import run.halo.app.content.comment.OwnerInfo;
 import run.halo.app.core.extension.content.Reply;
@@ -28,7 +27,6 @@ public class ReplyVo implements ExtensionVoOperator {
     @Schema(required = true)
     private Reply.ReplySpec spec;
 
-    @Setter
     @Schema(required = true)
     private OwnerInfo owner;
 
