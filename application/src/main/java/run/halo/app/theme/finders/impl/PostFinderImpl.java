@@ -133,7 +133,7 @@ public class PostFinderImpl implements PostFinder {
         int index = elements.indexOf(currentName);
 
         String previousPostName = null;
-        if (index != 0) {
+        if (index > 0) {
             previousPostName = elements.get(index - 1);
         }
 

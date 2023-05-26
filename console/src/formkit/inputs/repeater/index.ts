@@ -23,6 +23,7 @@ export const repeater: FormKitTypeDefinition = {
     messages(message("$message.value"))
   ),
   type: "list",
+  props: ["min", "max"],
   library: {
     Repeater: Repeater,
   },

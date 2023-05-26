@@ -356,7 +356,6 @@ watch(
     v-if="visible"
     v-model:visible="themeUploadVisible"
     :upgrade-theme="themeToUpgrade"
-    @close="refetch"
   />
 
   <ThemePreviewModal

@@ -427,6 +427,13 @@ const { mutate: changeVisibleMutation } = useMutation({
     Toast.error(t("core.common.toast.operation_failed"));
   },
 });
+
+const getExternalUrl = (singlePage: SinglePage) => {
+  if (singlePage.metadata.labels?.[singlePageLabels.PUBLISHED] === "true") {
+    return singlePage.status?.permalink;
+  }
+  return `/preview/singlepages/${singlePage.metadata.name}`;
+};
 </script>
 
 <template>
@@ -737,10 +744,8 @@ const { mutate: changeVisibleMutation } = useMutation({
                         <VStatusDot state="success" animate />
                       </RouterLink>
                       <a
-                        v-if="singlePage.page.status?.permalink"
                         target="_blank"
-                        :href="singlePage.page.status?.permalink"
-                        :title="singlePage.page.status?.permalink"
+                        :href="getExternalUrl(singlePage.page)"
                         class="hidden text-gray-600 transition-all hover:text-gray-900 group-hover:inline-block"
                       >
                         <IconExternalLinkLine class="h-3.5 w-3.5" />

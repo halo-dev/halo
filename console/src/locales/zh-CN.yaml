@@ -606,6 +606,10 @@ core:
       titles:
         install: 安装主题
         upgrade: 升级主题（{display_name}）
+      operations:
+        existed_during_installation:
+          title: 主题已存在
+          description: 当前安装的主题已存在，是否升级？
       tabs:
         local: 本地上传
         remote:
