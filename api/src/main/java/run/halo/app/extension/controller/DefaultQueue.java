@@ -3,6 +3,7 @@ package run.halo.app.extension.controller;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.locks.Lock;
@@ -61,7 +62,15 @@ public class DefaultQueue<R> implements RequestQueue<R> {
                 entry = new DelayedEntry<>(entry.getEntry(), minDelay, nowSupplier);
             }
             if (dirty.contains(entry.getEntry())) {
-                return false;
+                var oldEntry = findOldEntry(entry);
+                if (oldEntry.isEmpty()) {
+                    return false;
+                }
+                var oldReadyAt = oldEntry.get().getReadyAt();
+                var readyAt = entry.getReadyAt();
+                if (!readyAt.isBefore(oldReadyAt)) {
+                    return false;
+                }
             }
             dirty.add(entry.getEntry());
             if (processing.contains(entry.getEntry())) {
@@ -136,6 +145,15 @@ public class DefaultQueue<R> implements RequestQueue<R> {
     @Override
     public boolean isDisposed() {
         return this.disposed;
+    }
+
+    private Optional<DelayedEntry<R>> findOldEntry(DelayedEntry<R> entry) {
+        for (DelayedEntry<R> element : queue) {
+            if (element.equals(entry)) {
+                return Optional.of(element);
+            }
+        }
+        return Optional.empty();
     }
 
 }

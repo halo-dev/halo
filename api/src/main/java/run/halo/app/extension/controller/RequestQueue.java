@@ -56,6 +56,10 @@ public interface RequestQueue<E> extends Disposable {
             return retryAfter;
         }
 
+        public Instant getReadyAt() {
+            return readyAt;
+        }
+
         @Override
         public int compareTo(Delayed o) {
             return Long.compare(getDelay(TimeUnit.MILLISECONDS), o.getDelay(TimeUnit.MILLISECONDS));
