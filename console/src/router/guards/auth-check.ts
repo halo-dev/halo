@@ -16,7 +16,7 @@ export function setupAuthCheckGuard(router: Router) {
       next({
         name: "Login",
         query: {
-          redirect_uri: from.path !== "/" ? window.location.href : undefined,
+          redirect_uri: window.location.href,
         },
       });
       return;
