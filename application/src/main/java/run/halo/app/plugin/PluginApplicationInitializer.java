@@ -1,17 +1,22 @@
 package run.halo.app.plugin;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginWrapper;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.boot.env.YamlPropertySourceLoader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.StopWatch;
+import reactor.core.Exceptions;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.properties.HaloProperties;
 
 /**
  * Plugin application initializer will create plugin application context by plugin id and
@@ -28,6 +33,8 @@ public class PluginApplicationInitializer {
     private final SharedApplicationContextHolder sharedApplicationContextHolder;
     private final ApplicationContext rootApplicationContext;
 
+    private final HaloProperties haloProperties;
+
     public PluginApplicationInitializer(HaloPluginManager haloPluginManager,
         ApplicationContext rootApplicationContext) {
         Assert.notNull(haloPluginManager, "The haloPluginManager must not be null");
@@ -36,6 +43,7 @@ public class PluginApplicationInitializer {
         this.rootApplicationContext = rootApplicationContext;
         sharedApplicationContextHolder = rootApplicationContext
             .getBean(SharedApplicationContextHolder.class);
+        haloProperties = rootApplicationContext.getBean(HaloProperties.class);
     }
 
     private PluginApplicationContext createPluginApplicationContext(String pluginId) {
@@ -48,6 +56,22 @@ public class PluginApplicationInitializer {
 
         if (sharedApplicationContextHolder != null) {
             pluginApplicationContext.setParent(sharedApplicationContextHolder.getInstance());
+        }
+
+        var configPath = haloProperties.getWorkDir().resolve("configs").resolve(pluginId + ".yaml");
+        // TODO Directory traversal detection needed.
+        var configResource = new FileSystemResource(configPath);
+
+        if (configResource.exists()) {
+            try {
+                var propertySources =
+                    new YamlPropertySourceLoader().load(pluginId + "-config", configResource);
+                var mutablePropertySources =
+                    pluginApplicationContext.getEnvironment().getPropertySources();
+                propertySources.forEach(mutablePropertySources::addLast);
+            } catch (IOException e) {
+                throw Exceptions.propagate(e);
+            }
         }
 
         pluginApplicationContext.setClassLoader(pluginClassLoader);
