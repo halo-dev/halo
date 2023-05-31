@@ -1,5 +1,5 @@
 import { useUserStore } from "@/stores/user";
-import type { RouteLocationNormalized, Router } from "vue-router";
+import type { Router } from "vue-router";
 
 const whiteList = ["Setup", "Login", "Binding"];
 
@@ -22,7 +22,7 @@ export function setupAuthCheckGuard(router: Router) {
       return;
     } else {
       if (to.name === "Login") {
-        if (allowRedirect(to)) {
+        if (to.query.redirect_uri) {
           next({
             name: "Redirect",
             query: {
@@ -40,28 +40,4 @@ export function setupAuthCheckGuard(router: Router) {
 
     next();
   });
-}
-
-function allowRedirect(route: RouteLocationNormalized) {
-  const redirect_uri = route.query.redirect_uri as string;
-
-  if (!redirect_uri || redirect_uri === window.location.href) {
-    return false;
-  }
-
-  if (redirect_uri.startsWith("/")) {
-    return true;
-  }
-
-  if (
-    redirect_uri.startsWith("https://") ||
-    redirect_uri.startsWith("http://")
-  ) {
-    const url = new URL(redirect_uri);
-    if (url.origin === window.location.origin) {
-      return true;
-    }
-  }
-
-  return false;
 }
