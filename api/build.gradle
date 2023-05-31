@@ -54,7 +54,7 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'org.postgresql:r2dbc-postgresql'
     runtimeOnly 'org.mariadb:r2dbc-mariadb'
-    runtimeOnly 'com.github.jasync-sql:jasync-r2dbc-mysql'
+    runtimeOnly 'io.asyncer:r2dbc-mysql'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
