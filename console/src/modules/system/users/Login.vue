@@ -1,8 +1,6 @@
 <script lang="ts" setup>
-import { onBeforeMount, computed, watch } from "vue";
-import router from "@/router";
+import { computed, watch } from "vue";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
-import { useUserStore } from "@/stores/user";
 import LoginForm from "@/components/login/LoginForm.vue";
 import { useRouteQuery } from "@vueuse/router";
 import SignupForm from "@/components/signup/SignupForm.vue";
@@ -14,51 +12,11 @@ import { AppName } from "@/constants/app";
 import { locales, getBrowserLanguage, i18n } from "@/locales";
 import MdiTranslate from "~icons/mdi/translate";
 import { useLocalStorage } from "@vueuse/core";
-import { useRoute } from "vue-router";
 
-const route = useRoute();
-const userStore = useUserStore();
 const { globalInfo } = useGlobalInfoFetch();
 const { t } = useI18n();
 
 const SIGNUP_TYPE = "signup";
-
-onBeforeMount(() => {
-  if (userStore.isAnonymous) {
-    return;
-  }
-
-  if (allowRedirect()) {
-    window.location.href = route.query.redirect_uri as string;
-    return;
-  }
-
-  router.push({ name: "Dashboard" });
-});
-
-function allowRedirect() {
-  const redirect_uri = route.query.redirect_uri as string;
-
-  if (!redirect_uri || redirect_uri === window.location.href) {
-    return false;
-  }
-
-  if (redirect_uri.startsWith("/")) {
-    return true;
-  }
-
-  if (
-    redirect_uri.startsWith("https://") ||
-    redirect_uri.startsWith("http://")
-  ) {
-    const url = new URL(redirect_uri);
-    if (url.origin === window.location.origin) {
-      return true;
-    }
-  }
-
-  return false;
-}
 
 function onLoginSucceed() {
   window.location.reload();

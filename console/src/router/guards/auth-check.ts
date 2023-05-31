@@ -5,14 +5,14 @@ const whiteList = ["Setup", "Login", "Binding"];
 
 export function setupAuthCheckGuard(router: Router) {
   router.beforeEach((to, from, next) => {
-    if (whiteList.includes(to.name as string)) {
-      next();
-      return;
-    }
-
     const userStore = useUserStore();
 
     if (userStore.isAnonymous) {
+      if (whiteList.includes(to.name as string)) {
+        next();
+        return;
+      }
+
       next({
         name: "Login",
         query: {
@@ -20,7 +20,24 @@ export function setupAuthCheckGuard(router: Router) {
         },
       });
       return;
+    } else {
+      if (to.name === "Login") {
+        if (to.query.redirect_uri) {
+          next({
+            name: "Redirect",
+            query: {
+              redirect_uri: to.query.redirect_uri,
+            },
+          });
+        } else {
+          next({
+            name: "Dashboard",
+          });
+          return;
+        }
+      }
     }
+
     next();
   });
 }
