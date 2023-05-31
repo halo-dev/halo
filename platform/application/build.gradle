@@ -50,11 +50,7 @@ dependencies {
         api "com.github.java-json-tools:json-patch:$jsonPatch"
         api "org.thymeleaf.extras:thymeleaf-extras-springsecurity6"
 
-        runtime 'io.r2dbc:r2dbc-h2'
-        runtime 'org.postgresql:postgresql'
-        runtime 'org.postgresql:r2dbc-postgresql'
         runtime 'org.mariadb:r2dbc-mariadb:1.1.4'
-        runtime 'com.github.jasync-sql:jasync-r2dbc-mysql:2.1.23'
     }
 
 }
