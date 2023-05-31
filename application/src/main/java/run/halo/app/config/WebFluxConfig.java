@@ -1,12 +1,13 @@
 package run.halo.app.config;
 
 import static org.springframework.util.ResourceUtils.FILE_URL_PREFIX;
-import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
+import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
+import static org.springframework.web.reactive.function.server.RequestPredicates.method;
+import static org.springframework.web.reactive.function.server.RequestPredicates.path;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -15,6 +16,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.CacheControl;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.codec.CodecConfigurer;
 import org.springframework.http.codec.HttpMessageWriter;
 import org.springframework.http.codec.ServerCodecConfigurer;
@@ -96,13 +99,10 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     @Bean
     RouterFunction<ServerResponse> consoleIndexRedirection() {
-        return route(GET("/console")
-                .or(GET("/console/index"))
-                .or(GET("/console/index.html")),
-            this::redirectConsole)
-            .and(route(GET("/console/"),
-                this::serveConsoleIndex
-            ));
+        var consolePredicate = method(HttpMethod.GET)
+            .and(path("/console/**").and(path("/console/assets/**").negate()))
+            .and(accept(MediaType.TEXT_HTML));
+        return route(consolePredicate, this::serveConsoleIndex);
     }
 
     private Mono<ServerResponse> serveConsoleIndex(ServerRequest request) {
@@ -115,10 +115,6 @@ public class WebFluxConfig implements WebFluxConfigurer {
         } catch (Throwable e) {
             return Mono.error(e);
         }
-    }
-
-    private Mono<ServerResponse> redirectConsole(ServerRequest request) {
-        return ServerResponse.permanentRedirect(URI.create("/console/")).build();
     }
 
     @Override
@@ -135,9 +131,9 @@ public class WebFluxConfig implements WebFluxConfigurer {
             .setUseLastModified(useLastModified)
             .setCacheControl(cacheControl);
 
-        // For console project
-        registry.addResourceHandler("/console/**")
-            .addResourceLocations(haloProp.getConsole().getLocation())
+        // For console assets
+        registry.addResourceHandler("/console/assets/**")
+            .addResourceLocations(haloProp.getConsole().getLocation() + "assets/")
             .setCacheControl(cacheControl)
             .setUseLastModified(useLastModified)
             .resourceChain(true)
