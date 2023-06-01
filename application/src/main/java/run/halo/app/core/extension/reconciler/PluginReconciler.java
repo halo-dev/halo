@@ -289,8 +289,7 @@ public class PluginReconciler implements Reconciler<Request> {
 
     void stateTransition(String name, Function<PluginState, Boolean> stateAction,
         PluginState desiredState) {
-        PluginWrapper pluginWrapper = getPluginWrapper(name);
-        PluginState currentState = pluginWrapper.getPluginState();
+        PluginState currentState = getPluginWrapper(name).getPluginState();
         int maxRetries = PluginState.values().length;
         for (int i = 0; i < maxRetries && currentState != desiredState; i++) {
             try {
@@ -303,7 +302,7 @@ public class PluginReconciler implements Reconciler<Request> {
                     break;
                 }
                 // update current state
-                currentState = pluginWrapper.getPluginState();
+                currentState = getPluginWrapper(name).getPluginState();
             } catch (Throwable e) {
                 persistenceFailureStatus(name, e);
                 throw e;
