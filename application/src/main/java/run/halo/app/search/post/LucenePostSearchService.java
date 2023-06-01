@@ -3,7 +3,6 @@ package run.halo.app.search.post;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import static org.apache.lucene.document.Field.Store.NO;
 import static org.apache.lucene.document.Field.Store.YES;
-import static org.apache.lucene.index.IndexWriterConfig.OpenMode.APPEND;
 import static org.apache.lucene.index.IndexWriterConfig.OpenMode.CREATE_OR_APPEND;
 
 import java.io.IOException;
@@ -116,7 +115,7 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
     @Override
     public void removeDocuments(Set<String> postNames) throws IOException {
         var writeConfig = new IndexWriterConfig(analyzer);
-        writeConfig.setOpenMode(APPEND);
+        writeConfig.setOpenMode(CREATE_OR_APPEND);
         try (var writer = new IndexWriter(postIndexDir, writeConfig)) {
             var terms = postNames.stream()
                 .map(postName -> new Term(PostDoc.ID_FIELD, postName))
@@ -129,7 +128,7 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
     @Override
     public void removeAllDocuments() throws Exception {
         var writeConfig = new IndexWriterConfig(analyzer);
-        writeConfig.setOpenMode(APPEND);
+        writeConfig.setOpenMode(CREATE_OR_APPEND);
         try (var writer = new IndexWriter(postIndexDir, writeConfig)) {
             writer.deleteAll();
         }
