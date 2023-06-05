@@ -24,7 +24,7 @@ import type {
   SinglePage,
 } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
-import { computed, provide, ref, type Ref } from "vue";
+import { computed, provide, ref, onMounted, type Ref } from "vue";
 import ReplyListItem from "./ReplyListItem.vue";
 import { apiClient } from "@/utils/api-client";
 import type { RouteLocationRaw } from "vue-router";
@@ -32,6 +32,8 @@ import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import { usePluginModuleStore, type PluginModule } from "@/stores/plugin";
+import type { CommentSubjectRefProvider } from "packages/shared/dist";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -202,7 +204,7 @@ interface SubjectRefResult {
   externalUrl?: string;
 }
 
-const SubjectRefProvider = ref<
+const SubjectRefProviders = ref<
   Record<string, (subject: Extension) => SubjectRefResult>[]
 >([
   {
@@ -239,6 +241,27 @@ const SubjectRefProvider = ref<
   },
 ]);
 
+onMounted(() => {
+  const { pluginModules } = usePluginModuleStore();
+
+  pluginModules.forEach((pluginModule: PluginModule) => {
+    const { extensionPoints } = pluginModule;
+    if (!extensionPoints?.["comment:subject-ref:create"]) {
+      return;
+    }
+
+    const providers = extensionPoints[
+      "comment:subject-ref:create"
+    ]() as CommentSubjectRefProvider[];
+
+    if (providers) {
+      providers.forEach((provider) => {
+        SubjectRefProviders.value.push(provider);
+      });
+    }
+  });
+});
+
 const subjectRefResult = computed(() => {
   const { subject } = props.comment;
   if (!subject) {
@@ -247,7 +270,7 @@ const subjectRefResult = computed(() => {
       title: t("core.comment.subject_refs.unknown"),
     };
   }
-  const subjectRef = SubjectRefProvider.value.find((provider) =>
+  const subjectRef = SubjectRefProviders.value.find((provider) =>
     Object.keys(provider).includes(subject.kind)
   );
   if (!subjectRef) {
