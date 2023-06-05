@@ -10,6 +10,7 @@ import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.HtmlUtils;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
@@ -70,18 +71,19 @@ public class ContentTemplateHeadProcessor implements TemplateHeadProcessor {
     static List<Map<String, String>> excerptToMetaDescriptionIfAbsent(
         List<Map<String, String>> htmlMetas,
         String excerpt) {
-        final String excerptNullSafe = StringUtils.defaultString(excerpt);
+        String excerptNullSafe = StringUtils.defaultString(excerpt);
+        final String excerptSafe = HtmlUtils.htmlEscape(excerptNullSafe);
         List<Map<String, String>> metas = new ArrayList<>(defaultIfNull(htmlMetas, List.of()));
         metas.stream()
             .filter(map -> Meta.DESCRIPTION.equals(map.get(Meta.NAME)))
             .distinct()
             .findFirst()
             .ifPresentOrElse(map ->
-                    map.put(Meta.CONTENT, defaultIfBlank(map.get(Meta.CONTENT), excerptNullSafe)),
+                    map.put(Meta.CONTENT, defaultIfBlank(map.get(Meta.CONTENT), excerptSafe)),
                 () -> {
                     Map<String, String> map = new HashMap<>();
                     map.put(Meta.NAME, Meta.DESCRIPTION);
-                    map.put(Meta.CONTENT, excerptNullSafe);
+                    map.put(Meta.CONTENT, excerptSafe);
                     metas.add(map);
                 });
         return metas;
