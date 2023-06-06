@@ -3,7 +3,7 @@ import type { RouteRecordRaw, RouteRecordName } from "vue-router";
 import type { FunctionalPage } from "../states/pages";
 import type { AttachmentSelectProvider } from "../states/attachment-selector";
 import type { EditorProvider } from "..";
-import type { CommentSubjectRefProvider } from "@/states/comment-subject-ref-provider";
+import type { CommentSubjectRefProvider } from "@/states/comment-subject-ref";
 
 export interface RouteRecordAppend {
   parentName: RouteRecordName;

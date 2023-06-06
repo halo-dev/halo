@@ -8,7 +8,8 @@ export interface CommentSubjectRefResult {
   externalUrl?: string;
 }
 
-export type CommentSubjectRefProvider = Record<
-  string,
-  (subject: Extension) => CommentSubjectRefResult
->;
+export type CommentSubjectRefProvider = {
+  kind: string;
+  group: string;
+  resolve: (subject: Extension) => CommentSubjectRefResult;
+};

@@ -27,13 +27,15 @@ import { formatDatetime } from "@/utils/date";
 import { computed, provide, ref, onMounted, type Ref } from "vue";
 import ReplyListItem from "./ReplyListItem.vue";
 import { apiClient } from "@/utils/api-client";
-import type { RouteLocationRaw } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { usePluginModuleStore, type PluginModule } from "@/stores/plugin";
-import type { CommentSubjectRefProvider } from "packages/shared/dist";
+import type {
+  CommentSubjectRefProvider,
+  CommentSubjectRefResult,
+} from "packages/shared/dist";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -197,18 +199,11 @@ const onReplyCreationModalClose = () => {
 };
 
 // Subject ref processing
-interface SubjectRefResult {
-  label: string;
-  title: string;
-  route?: RouteLocationRaw;
-  externalUrl?: string;
-}
-
-const SubjectRefProviders = ref<
-  Record<string, (subject: Extension) => SubjectRefResult>[]
->([
+const SubjectRefProviders = ref<CommentSubjectRefProvider[]>([
   {
-    Post: (subject: Extension): SubjectRefResult => {
+    kind: "Post",
+    group: "content.halo.run",
+    resolve: (subject: Extension): CommentSubjectRefResult => {
       const post = subject as Post;
       return {
         label: t("core.comment.subject_refs.post"),
@@ -224,7 +219,9 @@ const SubjectRefProviders = ref<
     },
   },
   {
-    SinglePage: (subject: Extension): SubjectRefResult => {
+    kind: "SinglePage",
+    group: "content.halo.run",
+    resolve: (subject: Extension): CommentSubjectRefResult => {
       const singlePage = subject as SinglePage;
       return {
         label: t("core.comment.subject_refs.page"),
@@ -270,8 +267,10 @@ const subjectRefResult = computed(() => {
       title: t("core.comment.subject_refs.unknown"),
     };
   }
-  const subjectRef = SubjectRefProviders.value.find((provider) =>
-    Object.keys(provider).includes(subject.kind)
+  const subjectRef = SubjectRefProviders.value.find(
+    (provider) =>
+      provider.kind === subject.kind &&
+      subject.apiVersion.startsWith(provider.group)
   );
   if (!subjectRef) {
     return {
@@ -279,7 +278,7 @@ const subjectRefResult = computed(() => {
       title: t("core.comment.subject_refs.unknown"),
     };
   }
-  return subjectRef[subject.kind](subject);
+  return subjectRef.resolve(subject);
 });
 </script>
 
