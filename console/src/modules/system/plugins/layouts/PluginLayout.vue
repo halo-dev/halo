@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { nextTick, provide, ref, computed, watch } from "vue";
+import { nextTick, provide, ref, computed, watch, onMounted } from "vue";
 import { RouterView, useRoute, useRouter } from "vue-router";
 import { apiClient } from "@/utils/api-client";
 
@@ -23,20 +23,13 @@ import type { Plugin, Setting, SettingForm } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import { useI18n } from "vue-i18n";
 import { useQuery } from "@tanstack/vue-query";
+import type { PluginTab } from "@halo-dev/console-shared";
+import { usePluginModuleStore } from "@/stores/plugin";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 
-interface PluginTab {
-  id: string;
-  label: string;
-  route: {
-    name: string;
-    params?: Record<string, string>;
-  };
-}
-
-const initialTabs: PluginTab[] = [
+const initialTabs = ref<PluginTab[]>([
   {
     id: "detail",
     label: t("core.plugin.tabs.detail"),
@@ -44,12 +37,12 @@ const initialTabs: PluginTab[] = [
       name: "PluginDetail",
     },
   },
-];
+]);
 
 const route = useRoute();
 const router = useRouter();
 
-const tabs = ref<PluginTab[]>(cloneDeep(initialTabs));
+const tabs = ref<PluginTab[]>(cloneDeep(initialTabs.value));
 const activeTab = ref<string>(tabs.value[0].id);
 
 provide<Ref<string | undefined>>("activeTab", activeTab);
@@ -86,7 +79,7 @@ const { data: setting } = useQuery({
     if (data) {
       const { forms } = data.spec;
       tabs.value = [
-        ...initialTabs,
+        ...initialTabs.value,
         ...forms.map((item: SettingForm) => {
           return {
             id: item.group,
@@ -139,6 +132,31 @@ const handleTriggerTabChange = () => {
 
 watch([() => route.name, () => route.params], () => {
   handleTriggerTabChange();
+});
+
+onMounted(() => {
+  const { pluginModules } = usePluginModuleStore();
+  const currentPluginModule = pluginModules.find(
+    (item) => item.extension.metadata.name === route.params.name
+  );
+
+  console.log(currentPluginModule);
+
+  if (!currentPluginModule) {
+    return;
+  }
+
+  const { extensionPoints } = currentPluginModule;
+
+  if (!extensionPoints?.["plugin:tabs:create"]) {
+    return;
+  }
+
+  const extraTabs = extensionPoints["plugin:tabs:create"]() as PluginTab[];
+
+  extraTabs.forEach((tab) => {
+    initialTabs.value.push(tab);
+  });
 });
 </script>
 <template>

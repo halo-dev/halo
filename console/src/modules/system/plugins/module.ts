@@ -40,6 +40,8 @@ export default definePlugin({
         {
           path: ":name",
           component: PluginLayout,
+          name: "PluginRoot",
+          redirect: { name: "PluginDetail" },
           children: [
             {
               path: "detail",
