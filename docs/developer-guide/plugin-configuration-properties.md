@@ -7,7 +7,7 @@
 > 优先级从上到下由高到低。
 
 1. `${halo.work-dir}/plugins/configs/${plugin-id}.{yaml|yml}`
-2. `claspath:/config.{yaml|yml}`
+2. `classpath:/config.{yaml|yml}`
 
 插件开发者可在 `Class Path` 下 添加 `config.{yaml|yml}` 作为默认配置。当 `.yaml` 和 `.yml` 同时出现时，以 `.yml` 的配置将会被忽略。
 
