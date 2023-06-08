@@ -40,11 +40,7 @@ public class AttachmentReconciler implements Reconciler<Request> {
         client.fetch(Attachment.class, request.name()).ifPresent(attachment -> {
             // TODO Handle the finalizer
             if (attachment.getMetadata().getDeletionTimestamp() != null) {
-                attachmentService.delete(attachment)
-                    .doOnNext(deletedAttachment -> {
-                        removeFinalizer(attachment.getMetadata().getName());
-                    })
-                    .blockOptional();
+                removeFinalizer(attachment);
                 return;
             }
             // add finalizer
@@ -77,6 +73,9 @@ public class AttachmentReconciler implements Reconciler<Request> {
     public Controller setupWith(ControllerBuilder builder) {
         return builder
             .extension(new Attachment())
+            .onUpdatePredicate(
+                (oldExtension, newExtension) -> !oldExtension.getMetadata().getFinalizers()
+                    .equals(newExtension.getMetadata().getFinalizers()))
             .build();
     }
 
@@ -89,14 +88,25 @@ public class AttachmentReconciler implements Reconciler<Request> {
             });
     }
 
-    void removeFinalizer(String attachmentName) {
-        client.fetch(Attachment.class, attachmentName).ifPresent(attachment -> {
-            var finalizers = attachment.getMetadata().getFinalizers();
-            if (finalizers != null && finalizers.remove(Constant.FINALIZER_NAME)) {
-                // update it
-                client.update(attachment);
-            }
-        });
+    void removeFinalizer(Attachment oldAttachment) {
+        if (!hasFinalizer(oldAttachment, Constant.FINALIZER_NAME)) {
+            return;
+        }
+        attachmentService.delete(oldAttachment).block();
+        client.fetch(Attachment.class, oldAttachment.getMetadata().getName())
+            .ifPresent(attachment -> {
+                var finalizers = attachment.getMetadata().getFinalizers();
+                if (hasFinalizer(attachment, Constant.FINALIZER_NAME) &&
+                    finalizers.remove(Constant.FINALIZER_NAME)) {
+                    // update it
+                    client.update(attachment);
+                }
+            });
+    }
+
+    boolean hasFinalizer(Attachment attachment, String finalizer) {
+        var finalizers = attachment.getMetadata().getFinalizers();
+        return finalizers != null && finalizers.contains(finalizer);
     }
 
     void addFinalizerIfNotSet(String attachmentName, Set<String> existingFinalizers) {
