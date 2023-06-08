@@ -77,6 +77,9 @@ public class AttachmentReconciler implements Reconciler<Request> {
     public Controller setupWith(ControllerBuilder builder) {
         return builder
             .extension(new Attachment())
+            .onUpdatePredicate(
+                (oldExtension, newExtension) -> !oldExtension.getMetadata().getFinalizers()
+                    .equals(newExtension.getMetadata().getFinalizers()))
             .build();
     }
 
