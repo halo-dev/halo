@@ -93,8 +93,8 @@ public class AttachmentReconciler implements Reconciler<Request> {
         client.fetch(Attachment.class, oldAttachment.getMetadata().getName())
             .ifPresent(attachment -> {
                 var finalizers = attachment.getMetadata().getFinalizers();
-                if (hasFinalizer(attachment, Constant.FINALIZER_NAME) &&
-                    finalizers.remove(Constant.FINALIZER_NAME)) {
+                if (hasFinalizer(attachment, Constant.FINALIZER_NAME)
+                    && finalizers.remove(Constant.FINALIZER_NAME)) {
                     // update it
                     client.update(attachment);
                 }
