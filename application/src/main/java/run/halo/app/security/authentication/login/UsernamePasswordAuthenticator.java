@@ -196,7 +196,7 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
             return ServerResponse.status(TOO_MANY_REQUESTS)
                 .contentType(APPLICATION_JSON)
                 .bodyValue(Map.of("error", e.getLocalizedMessage()))
-                .flatMap(ServerResponse -> ServerResponse.writeTo(exchange, context));
+                .flatMap(response -> response.writeTo(exchange, context));
         }
 
         private Mono<Void> handleAuthenticationException(AuthenticationException exception,
@@ -204,7 +204,7 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
             return ServerResponse.status(UNAUTHORIZED)
                 .contentType(APPLICATION_JSON)
                 .bodyValue(Map.of("error", exception.getLocalizedMessage()))
-                .flatMap(serverResponse -> serverResponse.writeTo(exchange, context));
+                .flatMap(response -> response.writeTo(exchange, context));
         }
 
     }
