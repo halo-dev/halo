@@ -91,6 +91,12 @@ export interface PluginSpec {
    * @type {string}
    * @memberof PluginSpec
    */
+  repo?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof PluginSpec
+   */
   requires?: string;
   /**
    *
