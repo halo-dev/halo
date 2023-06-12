@@ -1,12 +1,17 @@
 package run.halo.app.security.authentication.login;
 
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static run.halo.app.security.authentication.WebExchangeMatchers.ignoringMediaTypeAll;
 
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.micrometer.observation.ObservationRegistry;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.ObservationReactiveAuthenticationManager;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -32,6 +37,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.utils.IpAddressUtils;
 import run.halo.app.security.AdditionalWebFilter;
 
 /**
@@ -40,6 +46,7 @@ import run.halo.app.security.AdditionalWebFilter;
  * @author guqing
  * @since 2.4.0
  */
+@Slf4j
 @Component
 public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
 
@@ -62,7 +69,8 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
     public UsernamePasswordAuthenticator(ServerResponse.Context context,
         ObservationRegistry observationRegistry, ReactiveUserDetailsService userDetailsService,
         ReactiveUserDetailsPasswordService passwordService, PasswordEncoder passwordEncoder,
-        ServerSecurityContextRepository securityContextRepository, CryptoService cryptoService) {
+        ServerSecurityContextRepository securityContextRepository, CryptoService cryptoService,
+        RateLimiterRegistry rateLimiterRegistry) {
         this.context = context;
         this.observationRegistry = observationRegistry;
         this.userDetailsService = userDetailsService;
@@ -72,7 +80,7 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         this.cryptoService = cryptoService;
 
         this.authenticationWebFilter = new AuthenticationWebFilter(authenticationManager());
-        configureAuthenticationWebFilter(this.authenticationWebFilter);
+        configureAuthenticationWebFilter(this.authenticationWebFilter, rateLimiterRegistry);
     }
 
     @Override
@@ -86,12 +94,14 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         return SecurityWebFiltersOrder.FORM_LOGIN.getOrder();
     }
 
-    void configureAuthenticationWebFilter(AuthenticationWebFilter filter) {
+    void configureAuthenticationWebFilter(AuthenticationWebFilter filter,
+        RateLimiterRegistry rateLimiterRegistry) {
         var requiresMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, "/login");
         filter.setRequiresAuthenticationMatcher(requiresMatcher);
-        filter.setAuthenticationFailureHandler(new LoginFailureHandler());
+        filter.setAuthenticationFailureHandler(new LoginFailureHandler(rateLimiterRegistry));
         filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
-        filter.setServerAuthenticationConverter(new LoginAuthenticationConverter(cryptoService));
+        filter.setServerAuthenticationConverter(new LoginAuthenticationConverter(cryptoService
+        ));
         filter.setSecurityContextRepository(securityContextRepository);
     }
 
@@ -110,7 +120,7 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         @Override
         public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange,
             Authentication authentication) {
-            return ignoringMediaTypeAll(MediaType.APPLICATION_JSON)
+            return ignoringMediaTypeAll(APPLICATION_JSON)
                 .matches(webFilterExchange.getExchange())
                 .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
                 .switchIfEmpty(
@@ -124,7 +134,7 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
                     }
 
                     return ServerResponse.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .bodyValue(principal)
                         .flatMap(serverResponse ->
                             serverResponse.writeTo(webFilterExchange.getExchange(), context));
@@ -142,21 +152,60 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         private final ServerAuthenticationFailureHandler defaultHandler =
             new RedirectServerAuthenticationFailureHandler("/console?error#/login");
 
+        private final RateLimiterRegistry rateLimiterRegistry;
+
+        public LoginFailureHandler(RateLimiterRegistry rateLimiterRegistry) {
+            this.rateLimiterRegistry = rateLimiterRegistry;
+        }
+
         @Override
         public Mono<Void> onAuthenticationFailure(WebFilterExchange webFilterExchange,
             AuthenticationException exception) {
-            return ignoringMediaTypeAll(MediaType.APPLICATION_JSON).matches(
-                    webFilterExchange.getExchange())
+            var exchange = webFilterExchange.getExchange();
+            return ignoringMediaTypeAll(APPLICATION_JSON)
+                .matches(exchange)
                 .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
-                .flatMap(matchResult -> ServerResponse.status(HttpStatus.UNAUTHORIZED)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(Map.of(
-                        "error", exception.getLocalizedMessage()
-                    ))
-                    .flatMap(serverResponse -> serverResponse.writeTo(
-                        webFilterExchange.getExchange(), context)))
-                .switchIfEmpty(
-                    defaultHandler.onAuthenticationFailure(webFilterExchange, exception));
+                .switchIfEmpty(defaultHandler.onAuthenticationFailure(webFilterExchange, exception)
+                    // Skip the handleAuthenticationException.
+                    .then(Mono.empty())
+                )
+                .flatMap(matchResult -> handleAuthenticationException(exception, exchange))
+                .transformDeferred(createIPBasedRateLimiter(exchange))
+                .onErrorResume(RequestNotPermitted.class,
+                    e -> this.handleRequestNotPermitted(e, exchange));
         }
+
+        private <T> RateLimiterOperator<T> createIPBasedRateLimiter(ServerWebExchange exchange) {
+            var clientIp = IpAddressUtils.getClientIp(exchange.getRequest());
+            var rateLimiter =
+                rateLimiterRegistry.rateLimiter("authentication-failure-from-ip-" + clientIp,
+                    "authentication-failure");
+            if (log.isDebugEnabled()) {
+                var metrics = rateLimiter.getMetrics();
+                log.debug(
+                    "Authentication with Rate Limiter: {}, available permissions: {}, number of "
+                        + "waiting threads: {}",
+                    rateLimiter, metrics.getAvailablePermissions(),
+                    metrics.getNumberOfWaitingThreads());
+            }
+            return RateLimiterOperator.of(rateLimiter);
+        }
+
+        private Mono<Void> handleRequestNotPermitted(RequestNotPermitted e,
+            ServerWebExchange exchange) {
+            return ServerResponse.status(TOO_MANY_REQUESTS)
+                .contentType(APPLICATION_JSON)
+                .bodyValue(Map.of("error", e.getLocalizedMessage()))
+                .flatMap(ServerResponse -> ServerResponse.writeTo(exchange, context));
+        }
+
+        private Mono<Void> handleAuthenticationException(AuthenticationException exception,
+            ServerWebExchange exchange) {
+            return ServerResponse.status(UNAUTHORIZED)
+                .contentType(APPLICATION_JSON)
+                .bodyValue(Map.of("error", exception.getLocalizedMessage()))
+                .flatMap(serverResponse -> serverResponse.writeTo(exchange, context));
+        }
+
     }
 }

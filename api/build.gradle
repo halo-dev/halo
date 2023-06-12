@@ -50,6 +50,9 @@ dependencies {
     api "com.github.java-json-tools:json-patch"
     api "org.thymeleaf.extras:thymeleaf-extras-springsecurity6"
 
+    api "io.github.resilience4j:resilience4j-spring-boot3:2.0.2"
+    api "io.github.resilience4j:resilience4j-reactor:2.0.2"
+
     runtimeOnly 'io.r2dbc:r2dbc-h2'
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'org.postgresql:r2dbc-postgresql'
