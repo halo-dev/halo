@@ -174,6 +174,15 @@ class PluginRequestMappingHandlerMappingTest {
                 Set.of(HttpMethod.GET, HttpMethod.HEAD)));
     }
 
+    @Test
+    void buildPrefix() {
+        String s = handlerMapping.buildPrefix("fakePlugin", "v1");
+        assertThat(s).isEqualTo("/apis/api.plugin.halo.run/v1/plugins/fakePlugin");
+
+        s = handlerMapping.buildPrefix("fakePlugin", "fake.halo.run/v1alpha1");
+        assertThat(s).isEqualTo("/apis/fake.halo.run/v1alpha1");
+    }
+
     @SuppressWarnings("unchecked")
     private <T> void assertError(Mono<Object> mono, final Class<T> exceptionClass,
         final Consumer<T> consumer) {
