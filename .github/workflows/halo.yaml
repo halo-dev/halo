@@ -3,15 +3,13 @@ name: Halo CI
 on:
   pull_request:
     branches:
-      - main
-      - release-*
+      - release-2.5
     paths:
       - "**"
       - "!**.md"
   push:
     branches:
-      - main
-      - release-*
+      - release-2.5
     paths:
       - "**"
       - "!**.md"
@@ -45,7 +43,7 @@ jobs:
         uses: codecov/codecov-action@v3
       - name: Setup console environment
         if: steps.changes.outputs.console == 'true'
-        uses: halo-sigs/actions/admin-env-setup@main
+        uses: halo-sigs/actions/admin-env-setup@release-2.5
       - name: Check console
         if: steps.changes.outputs.console == 'true'
         run: make -C console check
@@ -54,11 +52,11 @@ jobs:
     needs: check
     steps:
       - uses: actions/checkout@v3
-      - uses: halo-sigs/actions/halo-next-docker-build@main # change the version to specific ref or release tag while the action is stable.
+      - uses: halo-sigs/actions/halo-next-docker-build@release-2.5 # change the version to specific ref or release tag while the action is stable.
         with:
           image-name: ${{ github.event_name == 'release' && 'halo' || 'halo-dev' }}
           ghcr-token: ${{ secrets.GHCR_TOKEN }}
           dockerhub-user: ${{ secrets.DOCKER_USERNAME }}
           dockerhub-token: ${{ secrets.DOCKER_TOKEN }}
           push: ${{ github.event_name == 'push' || github.event_name == 'release' }} # we only push to GHCR if the push is to the next branch
-          console-ref: ${{ github.event_name == 'release' &&  github.ref || 'main' }}
+          console-ref: ${{ github.event_name == 'release' &&  github.ref || 'release-2.5' }}
