@@ -3,15 +3,21 @@ package run.halo.app.security.authentication.login;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static run.halo.app.infra.exception.Exceptions.INVALID_CREDENTIAL_TYPE;
+import static run.halo.app.infra.exception.Exceptions.REQUEST_NOT_PERMITTED_TYPE;
 import static run.halo.app.security.authentication.WebExchangeMatchers.ignoringMediaTypeAll;
 
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.micrometer.observation.ObservationRegistry;
-import java.util.Map;
+import java.net.URI;
+import java.time.Instant;
+import java.util.Locale;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.ObservationReactiveAuthenticationManager;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
@@ -33,6 +39,7 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
 import org.springframework.stereotype.Component;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
@@ -66,11 +73,13 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
 
     private final AuthenticationWebFilter authenticationWebFilter;
 
+    private final MessageSource messageSource;
+
     public UsernamePasswordAuthenticator(ServerResponse.Context context,
         ObservationRegistry observationRegistry, ReactiveUserDetailsService userDetailsService,
         ReactiveUserDetailsPasswordService passwordService, PasswordEncoder passwordEncoder,
         ServerSecurityContextRepository securityContextRepository, CryptoService cryptoService,
-        RateLimiterRegistry rateLimiterRegistry) {
+        RateLimiterRegistry rateLimiterRegistry, MessageSource messageSource) {
         this.context = context;
         this.observationRegistry = observationRegistry;
         this.userDetailsService = userDetailsService;
@@ -78,6 +87,7 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         this.passwordEncoder = passwordEncoder;
         this.securityContextRepository = securityContextRepository;
         this.cryptoService = cryptoService;
+        this.messageSource = messageSource;
 
         this.authenticationWebFilter = new AuthenticationWebFilter(authenticationManager());
         configureAuthenticationWebFilter(this.authenticationWebFilter, rateLimiterRegistry);
@@ -193,18 +203,41 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
 
         private Mono<Void> handleRequestNotPermitted(RequestNotPermitted e,
             ServerWebExchange exchange) {
-            return ServerResponse.status(TOO_MANY_REQUESTS)
-                .contentType(APPLICATION_JSON)
-                .bodyValue(Map.of("error", e.getLocalizedMessage()))
-                .flatMap(response -> response.writeTo(exchange, context));
+            var errorResponse =
+                createErrorResponse(e, TOO_MANY_REQUESTS, REQUEST_NOT_PERMITTED_TYPE, exchange);
+            return writeErrorResponse(errorResponse, exchange);
         }
 
         private Mono<Void> handleAuthenticationException(AuthenticationException exception,
             ServerWebExchange exchange) {
-            return ServerResponse.status(UNAUTHORIZED)
+            var errorResponse =
+                createErrorResponse(exception, UNAUTHORIZED, INVALID_CREDENTIAL_TYPE, exchange);
+            return writeErrorResponse(errorResponse, exchange);
+        }
+
+        private ErrorResponse createErrorResponse(Throwable t, HttpStatus status, String type,
+            ServerWebExchange exchange) {
+            var errorResponse =
+                ErrorResponse.create(t, status, t.getMessage());
+            var problemDetail = errorResponse.updateAndGetBody(messageSource, getLocale(exchange));
+            problemDetail.setType(URI.create(type));
+            problemDetail.setInstance(exchange.getRequest().getURI());
+            problemDetail.setProperty("requestId", exchange.getRequest().getId());
+            problemDetail.setProperty("timestamp", Instant.now());
+            return errorResponse;
+        }
+
+        private Mono<Void> writeErrorResponse(ErrorResponse errorResponse,
+            ServerWebExchange exchange) {
+            return ServerResponse.status(errorResponse.getStatusCode())
                 .contentType(APPLICATION_JSON)
-                .bodyValue(Map.of("error", exception.getLocalizedMessage()))
+                .bodyValue(errorResponse.getBody())
                 .flatMap(response -> response.writeTo(exchange, context));
+        }
+
+        private Locale getLocale(ServerWebExchange exchange) {
+            var locale = exchange.getLocaleContext().getLocale();
+            return locale == null ? Locale.getDefault() : locale;
         }
 
     }
