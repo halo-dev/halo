@@ -13,7 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.infra.ThemeRootGetter;
-import run.halo.app.infra.exception.NotFoundException;
+import run.halo.app.infra.exception.AccessDeniedException;
 
 @ExtendWith(MockitoExtension.class)
 class ThemeConfigurationTest {
@@ -40,8 +40,10 @@ class ThemeConfigurationTest {
 
         assertThatThrownBy(() -> {
             themeConfiguration.getThemeAssetsPath("fake-theme", "../../hello.jpg");
-        }).isInstanceOf(NotFoundException.class)
-            .hasMessage("404 NOT_FOUND \"Resource not found.\"");
+        }).isInstanceOf(AccessDeniedException.class)
+            .hasMessage(
+                "403 FORBIDDEN \"Directory traversal detected: /tmp/.halo/themes/fake-theme/hello"
+                    + ".jpg\"");
 
         path = themeConfiguration.getThemeAssetsPath("fake-theme", "%2e%2e/f.jpg");
         assertThat(path).isEqualTo(themeRoot.resolve("fake-theme/templates/assets/%2e%2e/f.jpg"));
