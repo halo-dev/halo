@@ -36,20 +36,20 @@ class ThemeConfigurationTest {
         assertThat(path).isEqualTo(themeRoot.resolve("fake-theme/templates/assets/hello.jpg"));
 
         path = themeConfiguration.getThemeAssetsPath("fake-theme", "./hello.jpg");
-        assertThat(path).isEqualTo(themeRoot.resolve("fake-theme/templates/assets/hello.jpg"));
+        assertThat(path).isEqualTo(themeRoot.resolve("fake-theme/templates/assets/./hello.jpg"));
 
         assertThatThrownBy(() -> {
             themeConfiguration.getThemeAssetsPath("fake-theme", "../../hello.jpg");
         }).isInstanceOf(AccessDeniedException.class)
             .hasMessage(
-                "403 FORBIDDEN \"Directory traversal detected: /tmp/.halo/themes/fake-theme/hello"
-                    + ".jpg\"");
+                "403 FORBIDDEN \"Directory traversal detected: /tmp/"
+                    + ".halo/themes/fake-theme/templates/assets/../../hello.jpg\"");
 
         path = themeConfiguration.getThemeAssetsPath("fake-theme", "%2e%2e/f.jpg");
         assertThat(path).isEqualTo(themeRoot.resolve("fake-theme/templates/assets/%2e%2e/f.jpg"));
 
         path = themeConfiguration.getThemeAssetsPath("fake-theme", "f/./../p.jpg");
-        assertThat(path).isEqualTo(themeRoot.resolve("fake-theme/templates/assets/p.jpg"));
+        assertThat(path).isEqualTo(themeRoot.resolve("fake-theme/templates/assets/f/./../p.jpg"));
 
         path = themeConfiguration.getThemeAssetsPath("fake-theme", "f../p.jpg");
         assertThat(path).isEqualTo(themeRoot.resolve("fake-theme/templates/assets/f../p.jpg"));
