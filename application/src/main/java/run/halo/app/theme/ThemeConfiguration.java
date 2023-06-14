@@ -71,8 +71,7 @@ public class ThemeConfiguration {
             .resolve(themeName)
             .resolve("templates")
             .resolve("assets");
-        String safeResourcePath = org.springframework.util.StringUtils.cleanPath(resource);
-        Path result = basePath.resolve(safeResourcePath).normalize();
+        Path result = basePath.resolve(resource);
         FileUtils.checkDirectoryTraversal(basePath, result);
         return result;
     }
