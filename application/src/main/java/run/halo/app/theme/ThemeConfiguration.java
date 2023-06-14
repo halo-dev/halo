@@ -20,6 +20,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect;
 import reactor.core.publisher.Mono;
 import run.halo.app.infra.ThemeRootGetter;
+import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.dialect.HaloSpringSecurityDialect;
 import run.halo.app.theme.dialect.LinkExpressionObjectDialect;
 
@@ -65,12 +66,17 @@ public class ThemeConfiguration {
             });
     }
 
-    private Path getThemeAssetsPath(String themeName, String resource) {
-        return themeRoot.get()
+    Path getThemeAssetsPath(String themeName, String resource) {
+        Path basePath = themeRoot.get()
             .resolve(themeName)
             .resolve("templates")
-            .resolve("assets")
-            .resolve(resource);
+            .resolve("assets");
+        String safeResourcePath = org.springframework.util.StringUtils.cleanPath(resource);
+        Path result = basePath.resolve(safeResourcePath).normalize();
+        if (!result.startsWith(basePath)) {
+            throw new NotFoundException("Resource not found.");
+        }
+        return result;
     }
 
     @Bean
