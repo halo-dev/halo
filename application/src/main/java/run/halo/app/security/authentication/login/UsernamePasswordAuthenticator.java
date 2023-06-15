@@ -73,6 +73,7 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
 
     private final AuthenticationWebFilter authenticationWebFilter;
 
+    private final RateLimiterRegistry rateLimiterRegistry;
     private final MessageSource messageSource;
 
     public UsernamePasswordAuthenticator(ServerResponse.Context context,
@@ -87,10 +88,11 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         this.passwordEncoder = passwordEncoder;
         this.securityContextRepository = securityContextRepository;
         this.cryptoService = cryptoService;
+        this.rateLimiterRegistry = rateLimiterRegistry;
         this.messageSource = messageSource;
 
         this.authenticationWebFilter = new AuthenticationWebFilter(authenticationManager());
-        configureAuthenticationWebFilter(this.authenticationWebFilter, rateLimiterRegistry);
+        configureAuthenticationWebFilter(this.authenticationWebFilter);
     }
 
     @Override
@@ -104,11 +106,10 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         return SecurityWebFiltersOrder.FORM_LOGIN.getOrder();
     }
 
-    void configureAuthenticationWebFilter(AuthenticationWebFilter filter,
-        RateLimiterRegistry rateLimiterRegistry) {
+    void configureAuthenticationWebFilter(AuthenticationWebFilter filter) {
         var requiresMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.POST, "/login");
         filter.setRequiresAuthenticationMatcher(requiresMatcher);
-        filter.setAuthenticationFailureHandler(new LoginFailureHandler(rateLimiterRegistry));
+        filter.setAuthenticationFailureHandler(new LoginFailureHandler());
         filter.setAuthenticationSuccessHandler(new LoginSuccessHandler());
         filter.setServerAuthenticationConverter(new LoginAuthenticationConverter(cryptoService
         ));
@@ -122,6 +123,62 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         return new ObservationReactiveAuthenticationManager(observationRegistry, manager);
     }
 
+
+    private <T> RateLimiterOperator<T> createIPBasedRateLimiter(ServerWebExchange exchange) {
+        var clientIp = IpAddressUtils.getClientIp(exchange.getRequest());
+        var rateLimiter =
+            rateLimiterRegistry.rateLimiter("authentication-failure-from-ip-" + clientIp,
+                "authentication-failure");
+        if (log.isDebugEnabled()) {
+            var metrics = rateLimiter.getMetrics();
+            log.debug(
+                "Authentication with Rate Limiter: {}, available permissions: {}, number of "
+                    + "waiting threads: {}",
+                rateLimiter, metrics.getAvailablePermissions(),
+                metrics.getNumberOfWaitingThreads());
+        }
+        return RateLimiterOperator.of(rateLimiter);
+    }
+
+    private Mono<Void> handleRequestNotPermitted(RequestNotPermitted e,
+        ServerWebExchange exchange) {
+        var errorResponse =
+            createErrorResponse(e, TOO_MANY_REQUESTS, REQUEST_NOT_PERMITTED_TYPE, exchange);
+        return writeErrorResponse(errorResponse, exchange);
+    }
+
+    private Mono<Void> handleAuthenticationException(AuthenticationException exception,
+        ServerWebExchange exchange) {
+        var errorResponse =
+            createErrorResponse(exception, UNAUTHORIZED, INVALID_CREDENTIAL_TYPE, exchange);
+        return writeErrorResponse(errorResponse, exchange);
+    }
+
+    private ErrorResponse createErrorResponse(Throwable t, HttpStatus status, String type,
+        ServerWebExchange exchange) {
+        var errorResponse =
+            ErrorResponse.create(t, status, t.getMessage());
+        var problemDetail = errorResponse.updateAndGetBody(messageSource, getLocale(exchange));
+        problemDetail.setType(URI.create(type));
+        problemDetail.setInstance(exchange.getRequest().getURI());
+        problemDetail.setProperty("requestId", exchange.getRequest().getId());
+        problemDetail.setProperty("timestamp", Instant.now());
+        return errorResponse;
+    }
+
+    private Mono<Void> writeErrorResponse(ErrorResponse errorResponse,
+        ServerWebExchange exchange) {
+        return ServerResponse.status(errorResponse.getStatusCode())
+            .contentType(APPLICATION_JSON)
+            .bodyValue(errorResponse.getBody())
+            .flatMap(response -> response.writeTo(exchange, context));
+    }
+
+    private Locale getLocale(ServerWebExchange exchange) {
+        var locale = exchange.getLocaleContext().getLocale();
+        return locale == null ? Locale.getDefault() : locale;
+    }
+
     public class LoginSuccessHandler implements ServerAuthenticationSuccessHandler {
 
         private final ServerAuthenticationSuccessHandler defaultHandler =
@@ -130,8 +187,9 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         @Override
         public Mono<Void> onAuthenticationSuccess(WebFilterExchange webFilterExchange,
             Authentication authentication) {
+            var exchange = webFilterExchange.getExchange();
             return ignoringMediaTypeAll(APPLICATION_JSON)
-                .matches(webFilterExchange.getExchange())
+                .matches(exchange)
                 .filter(ServerWebExchangeMatcher.MatchResult::isMatch)
                 .switchIfEmpty(
                     defaultHandler.onAuthenticationSuccess(webFilterExchange, authentication)
@@ -147,8 +205,11 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
                         .contentType(APPLICATION_JSON)
                         .bodyValue(principal)
                         .flatMap(serverResponse ->
-                            serverResponse.writeTo(webFilterExchange.getExchange(), context));
-                });
+                            serverResponse.writeTo(exchange, context));
+                })
+                .transformDeferred(createIPBasedRateLimiter(exchange))
+                .onErrorResume(RequestNotPermitted.class,
+                    e -> handleRequestNotPermitted(e, exchange));
         }
     }
 
@@ -162,10 +223,7 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         private final ServerAuthenticationFailureHandler defaultHandler =
             new RedirectServerAuthenticationFailureHandler("/console?error#/login");
 
-        private final RateLimiterRegistry rateLimiterRegistry;
-
-        public LoginFailureHandler(RateLimiterRegistry rateLimiterRegistry) {
-            this.rateLimiterRegistry = rateLimiterRegistry;
+        public LoginFailureHandler() {
         }
 
         @Override
@@ -182,62 +240,7 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
                 .flatMap(matchResult -> handleAuthenticationException(exception, exchange))
                 .transformDeferred(createIPBasedRateLimiter(exchange))
                 .onErrorResume(RequestNotPermitted.class,
-                    e -> this.handleRequestNotPermitted(e, exchange));
-        }
-
-        private <T> RateLimiterOperator<T> createIPBasedRateLimiter(ServerWebExchange exchange) {
-            var clientIp = IpAddressUtils.getClientIp(exchange.getRequest());
-            var rateLimiter =
-                rateLimiterRegistry.rateLimiter("authentication-failure-from-ip-" + clientIp,
-                    "authentication-failure");
-            if (log.isDebugEnabled()) {
-                var metrics = rateLimiter.getMetrics();
-                log.debug(
-                    "Authentication with Rate Limiter: {}, available permissions: {}, number of "
-                        + "waiting threads: {}",
-                    rateLimiter, metrics.getAvailablePermissions(),
-                    metrics.getNumberOfWaitingThreads());
-            }
-            return RateLimiterOperator.of(rateLimiter);
-        }
-
-        private Mono<Void> handleRequestNotPermitted(RequestNotPermitted e,
-            ServerWebExchange exchange) {
-            var errorResponse =
-                createErrorResponse(e, TOO_MANY_REQUESTS, REQUEST_NOT_PERMITTED_TYPE, exchange);
-            return writeErrorResponse(errorResponse, exchange);
-        }
-
-        private Mono<Void> handleAuthenticationException(AuthenticationException exception,
-            ServerWebExchange exchange) {
-            var errorResponse =
-                createErrorResponse(exception, UNAUTHORIZED, INVALID_CREDENTIAL_TYPE, exchange);
-            return writeErrorResponse(errorResponse, exchange);
-        }
-
-        private ErrorResponse createErrorResponse(Throwable t, HttpStatus status, String type,
-            ServerWebExchange exchange) {
-            var errorResponse =
-                ErrorResponse.create(t, status, t.getMessage());
-            var problemDetail = errorResponse.updateAndGetBody(messageSource, getLocale(exchange));
-            problemDetail.setType(URI.create(type));
-            problemDetail.setInstance(exchange.getRequest().getURI());
-            problemDetail.setProperty("requestId", exchange.getRequest().getId());
-            problemDetail.setProperty("timestamp", Instant.now());
-            return errorResponse;
-        }
-
-        private Mono<Void> writeErrorResponse(ErrorResponse errorResponse,
-            ServerWebExchange exchange) {
-            return ServerResponse.status(errorResponse.getStatusCode())
-                .contentType(APPLICATION_JSON)
-                .bodyValue(errorResponse.getBody())
-                .flatMap(response -> response.writeTo(exchange, context));
-        }
-
-        private Locale getLocale(ServerWebExchange exchange) {
-            var locale = exchange.getLocaleContext().getLocale();
-            return locale == null ? Locale.getDefault() : locale;
+                    e -> handleRequestNotPermitted(e, exchange));
         }
 
     }
