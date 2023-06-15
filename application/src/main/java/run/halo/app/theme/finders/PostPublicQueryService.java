@@ -7,6 +7,8 @@ import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
+import run.halo.app.theme.ReactivePostContentHandler;
+import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
 
 public interface PostPublicQueryService {
@@ -35,4 +37,15 @@ public interface PostPublicQueryService {
      * @return listed post vo
      */
     Mono<ListedPostVo> convertToListedPostVo(@NonNull Post post);
+
+    /**
+     * Gets post content by post name.
+     * <p> This method will get post released content by post name and try to find
+     * {@link ReactivePostContentHandler}s to extend the content</p>
+     *
+     * @param postName post name must not be blank
+     * @return post content for theme-side
+     * @see ReactivePostContentHandler
+     */
+    Mono<ContentVo> getContent(String postName);
 }

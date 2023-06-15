@@ -65,9 +65,7 @@ public class PostFinderImpl implements PostFinder {
 
     @Override
     public Mono<ContentVo> content(String postName) {
-        return postService.getReleaseContent(postName)
-            .map(wrapper -> ContentVo.builder().content(wrapper.getContent())
-                .raw(wrapper.getRaw()).build());
+        return postPublicQueryService.getContent(postName);
     }
 
     @Override

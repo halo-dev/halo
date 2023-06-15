@@ -2,6 +2,7 @@ package run.halo.app.theme.finders.impl;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
@@ -11,15 +12,20 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.content.ContentWrapper;
+import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
+import run.halo.app.theme.ReactivePostContentHandler;
 import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.TagFinder;
+import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.StatsVo;
 
@@ -36,6 +42,10 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
     private final ContributorFinder contributorFinder;
 
     private final CounterService counterService;
+
+    private final PostService postService;
+
+    private final ExtensionGetter extensionGetter;
 
     @Override
     public Mono<ListResult<ListedPostVo>> list(Integer page, Integer size,
@@ -103,6 +113,35 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
                 .thenReturn(p)
             )
             .defaultIfEmpty(postVo);
+    }
+
+    @Override
+    public Mono<ContentVo> getContent(String postName) {
+        return postService.getReleaseContent(postName)
+            .flatMap(wrapper -> extendPostContent(postName, wrapper));
+    }
+
+    @NonNull
+    protected Mono<ContentVo> extendPostContent(String postName,
+        ContentWrapper wrapper) {
+        Assert.notNull(postName, "Post name must not be null");
+        Assert.notNull(wrapper, "Post content must not be null");
+        return extensionGetter.getEnabledExtensionByDefinition(ReactivePostContentHandler.class)
+            .reduce(Mono.fromSupplier(() -> ReactivePostContentHandler.PostContent.builder()
+                    .postName(postName)
+                    .content(wrapper.getContent())
+                    .raw(wrapper.getRaw())
+                    .rawType(wrapper.getRawType())
+                    .build()
+                ),
+                (contentMono, handler) -> contentMono.flatMap(handler::handle)
+            )
+            .flatMap(Function.identity())
+            .map(postContent -> ContentVo.builder()
+                .content(postContent.getContent())
+                .raw(postContent.getRaw())
+                .build()
+            );
     }
 
     private <T extends ListedPostVo> Mono<StatsVo> populateStats(T postVo) {
