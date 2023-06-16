@@ -165,7 +165,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                 comment.getSpec().setUserAgent(HaloUtils.userAgentFrom(request));
                 return commentService.create(comment);
             })
-            .transformDeferred(createIPBasedRateLimiter(request))
+            .transformDeferred(createIpBasedRateLimiter(request))
             .flatMap(comment -> ServerResponse.ok().bodyValue(comment))
             .onErrorResume(RequestNotPermitted.class, e -> ServerResponse.status(TOO_MANY_REQUESTS)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -191,10 +191,9 @@ public class CommentFinderEndpoint implements CustomEndpoint {
         return locale == null ? Locale.getDefault() : locale;
     }
 
-    private <T> RateLimiterOperator<T> createIPBasedRateLimiter(ServerRequest request) {
+    private <T> RateLimiterOperator<T> createIpBasedRateLimiter(ServerRequest request) {
         var clientIp = IpAddressUtils.getIpAddress(request);
-        var rateLimiter = rateLimiterRegistry.rateLimiter("comment-creation-from-ip-" +
-                clientIp,
+        var rateLimiter = rateLimiterRegistry.rateLimiter("comment-creation-from-ip-" + clientIp,
             "comment-creation");
         return RateLimiterOperator.of(rateLimiter);
     }
