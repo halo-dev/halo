@@ -8,22 +8,33 @@ import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
+import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
+import static run.halo.app.infra.exception.Exceptions.REQUEST_NOT_PERMITTED_TYPE;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.net.URI;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -65,6 +76,8 @@ public class CommentFinderEndpoint implements CustomEndpoint {
     private final CommentService commentService;
     private final ReplyService replyService;
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final RateLimiterRegistry rateLimiterRegistry;
+    private final MessageSource messageSource;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -152,7 +165,38 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                 comment.getSpec().setUserAgent(HaloUtils.userAgentFrom(request));
                 return commentService.create(comment);
             })
-            .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
+            .transformDeferred(createIPBasedRateLimiter(request))
+            .flatMap(comment -> ServerResponse.ok().bodyValue(comment))
+            .onErrorResume(RequestNotPermitted.class, e -> ServerResponse.status(TOO_MANY_REQUESTS)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(createErrorResponse(e,
+                    TOO_MANY_REQUESTS,
+                    REQUEST_NOT_PERMITTED_TYPE,
+                    request.exchange())));
+    }
+
+    private ErrorResponse createErrorResponse(Throwable t, HttpStatus status, String type,
+        ServerWebExchange exchange) {
+        var errorResponse = ErrorResponse.create(t, status, t.getMessage());
+        var problemDetail = errorResponse.updateAndGetBody(messageSource, getLocale(exchange));
+        problemDetail.setType(URI.create(type));
+        problemDetail.setInstance(exchange.getRequest().getURI());
+        problemDetail.setProperty("requestId", exchange.getRequest().getId());
+        problemDetail.setProperty("timestamp", Instant.now());
+        return errorResponse;
+    }
+
+    private Locale getLocale(ServerWebExchange exchange) {
+        var locale = exchange.getLocaleContext().getLocale();
+        return locale == null ? Locale.getDefault() : locale;
+    }
+
+    private <T> RateLimiterOperator<T> createIPBasedRateLimiter(ServerRequest request) {
+        var clientIp = IpAddressUtils.getIpAddress(request);
+        var rateLimiter = rateLimiterRegistry.rateLimiter("comment-creation-from-ip-" +
+                clientIp,
+            "comment-creation");
+        return RateLimiterOperator.of(rateLimiter);
     }
 
     Mono<ServerResponse> createReply(ServerRequest request) {
