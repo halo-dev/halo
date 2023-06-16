@@ -69,7 +69,7 @@ management:
 
 resilience4j.ratelimiter:
   configs:
-    authentication-failure:
+    authentication:
       limitForPeriod: 3
       limitRefreshPeriod: 1m
       timeoutDuration: 0

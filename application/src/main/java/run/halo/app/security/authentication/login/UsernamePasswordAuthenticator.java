@@ -127,8 +127,8 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
     private <T> RateLimiterOperator<T> createIPBasedRateLimiter(ServerWebExchange exchange) {
         var clientIp = IpAddressUtils.getClientIp(exchange.getRequest());
         var rateLimiter =
-            rateLimiterRegistry.rateLimiter("authentication-failure-from-ip-" + clientIp,
-                "authentication-failure");
+            rateLimiterRegistry.rateLimiter("authentication-from-ip-" + clientIp,
+                "authentication");
         if (log.isDebugEnabled()) {
             var metrics = rateLimiter.getMetrics();
             log.debug(
