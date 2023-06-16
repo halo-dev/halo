@@ -10,6 +10,7 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.theme.ReactivePostContentHandler;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
+import run.halo.app.theme.finders.vo.PostVo;
 
 public interface PostPublicQueryService {
     Predicate<Post> FIXED_PREDICATE = post -> post.isPublished()
@@ -36,7 +37,18 @@ public interface PostPublicQueryService {
      * @param post post must not be null
      * @return listed post vo
      */
-    Mono<ListedPostVo> convertToListedPostVo(@NonNull Post post);
+    Mono<ListedPostVo> convertToListedVo(@NonNull Post post);
+
+    /**
+     * Converts {@link Post} to post vo and populate post content by the given snapshot name.
+     * <p> This method will get post content by {@code snapshotName} and try to find
+     * {@link ReactivePostContentHandler}s to extend the content</p>
+     *
+     * @param post post must not be null
+     * @param snapshotName snapshot name must not be blank
+     * @return converted post vo
+     */
+    Mono<PostVo> convertToVo(Post post, String snapshotName);
 
     /**
      * Gets post content by post name.

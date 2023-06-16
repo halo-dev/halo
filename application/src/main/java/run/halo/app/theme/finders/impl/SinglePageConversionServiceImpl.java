@@ -3,6 +3,7 @@ package run.halo.app.theme.finders.impl;
 import java.util.List;
 import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -42,17 +43,12 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
 
     @Override
     public Mono<SinglePageVo> convertToVo(SinglePage singlePage, String snapshotName) {
-        return convertWithoutContent(singlePage)
-            .flatMap(page -> populateContent(page, snapshotName));
+        return convert(singlePage, snapshotName);
     }
 
     @Override
-    public Mono<SinglePageVo> convertToVo(SinglePage singlePage) {
-        return convertWithoutContent(singlePage)
-            .flatMap(page -> getContent(page.getMetadata().getName())
-                .doOnNext(page::setContent)
-                .thenReturn(page)
-            );
+    public Mono<SinglePageVo> convertToVo(@NonNull SinglePage singlePage) {
+        return convert(singlePage, singlePage.getSpec().getReleaseSnapshot());
     }
 
     protected Mono<ContentVo> extendPageContent(String pageName,
@@ -98,8 +94,9 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
             .flatMap(this::populateContributors);
     }
 
-    Mono<SinglePageVo> convertWithoutContent(SinglePage singlePage) {
+    Mono<SinglePageVo> convert(SinglePage singlePage, String snapshotName) {
         Assert.notNull(singlePage, "Single page must not be null");
+        Assert.hasText(snapshotName, "Snapshot name must not be empty");
         return Mono.just(singlePage)
             .map(page -> {
                 SinglePageVo pageVo = SinglePageVo.from(page);
@@ -109,6 +106,7 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
             })
             .flatMap(this::populateStats)
             .flatMap(this::populateContributors)
+            .flatMap(page -> populateContent(page, snapshotName))
             .flatMap(page -> contributorFinder.getContributor(page.getSpec().getOwner())
                 .doOnNext(page::setOwner)
                 .thenReturn(page)
@@ -119,11 +117,7 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
         Assert.notNull(singlePageVo, "Single page vo must not be null");
         Assert.hasText(snapshotName, "Snapshot name must not be empty");
         return singlePageService.getContent(snapshotName, singlePageVo.getSpec().getBaseSnapshot())
-            .map(contentWrapper -> ContentVo.builder()
-                .content(contentWrapper.getContent())
-                .raw(contentWrapper.getRaw())
-                .build()
-            )
+            .flatMap(wrapper -> extendPageContent(singlePageVo.getMetadata().getName(), wrapper))
             .doOnNext(singlePageVo::setContent)
             .thenReturn(singlePageVo);
     }

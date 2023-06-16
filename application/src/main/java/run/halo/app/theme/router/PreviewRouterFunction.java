@@ -26,7 +26,6 @@ import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.SinglePageConversionService;
-import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.ContributorVo;
 import run.halo.app.theme.finders.vo.PostVo;
 
@@ -88,8 +87,7 @@ public class PreviewRouterFunction {
     }
 
     private Mono<PostVo> convertToPostVo(Post post, String snapshotName) {
-        return postPublicQueryService.convertToListedPostVo(post)
-            .map(PostVo::from)
+        return postPublicQueryService.convertToVo(post, snapshotName)
             .doOnNext(postVo -> {
                 // fake some attributes only for preview when they are not published
                 Post.PostSpec spec = postVo.getSpec();
@@ -107,17 +105,7 @@ public class PreviewRouterFunction {
                 if (status.getLastModifyTime() == null) {
                     status.setLastModifyTime(Instant.now());
                 }
-            })
-            .flatMap(postVo ->
-                postService.getContent(snapshotName, postVo.getSpec().getBaseSnapshot())
-                    .map(contentWrapper -> ContentVo.builder()
-                        .raw(contentWrapper.getRaw())
-                        .content(contentWrapper.getContent())
-                        .build()
-                    )
-                    .doOnNext(postVo::setContent)
-                    .thenReturn(postVo)
-            );
+            });
     }
 
     private Mono<ServerResponse> previewSinglePage(ServerRequest request) {

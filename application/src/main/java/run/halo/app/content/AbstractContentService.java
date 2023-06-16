@@ -26,14 +26,14 @@ public abstract class AbstractContentService {
     private final ReactiveExtensionClient client;
 
     public Mono<ContentWrapper> getContent(String snapshotName, String baseSnapshotName) {
-        return client.fetch(Snapshot.class, baseSnapshotName)
+        return client.get(Snapshot.class, baseSnapshotName)
             .doOnNext(this::checkBaseSnapshot)
             .flatMap(baseSnapshot -> {
                 if (StringUtils.equals(snapshotName, baseSnapshotName)) {
                     var contentWrapper = ContentWrapper.patchSnapshot(baseSnapshot, baseSnapshot);
                     return Mono.just(contentWrapper);
                 }
-                return client.fetch(Snapshot.class, snapshotName)
+                return client.get(Snapshot.class, snapshotName)
                     .map(snapshot -> ContentWrapper.patchSnapshot(snapshot, baseSnapshot));
             });
     }
@@ -42,7 +42,7 @@ public abstract class AbstractContentService {
         Assert.notNull(snapshot, "The snapshot must not be null.");
         String keepRawAnno =
             MetadataUtil.nullSafeAnnotations(snapshot).get(Snapshot.KEEP_RAW_ANNO);
-        if (!org.thymeleaf.util.StringUtils.equals(Boolean.TRUE.toString(), keepRawAnno)) {
+        if (!StringUtils.equals(Boolean.TRUE.toString(), keepRawAnno)) {
             throw new IllegalArgumentException(
                 String.format("The snapshot [%s] is not a base snapshot.",
                     snapshot.getMetadata().getName()));

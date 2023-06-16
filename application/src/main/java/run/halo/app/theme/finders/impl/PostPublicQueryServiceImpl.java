@@ -27,6 +27,7 @@ import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
+import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.finders.vo.StatsVo;
 
 @Component
@@ -55,7 +56,7 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
         return client.list(Post.class, predicate,
                 comparator, pageNullSafe(page), sizeNullSafe(size))
             .flatMap(list -> Flux.fromStream(list.get())
-                .concatMap(post -> convertToListedPostVo(post)
+                .concatMap(post -> convertToListedVo(post)
                     .flatMap(postVo -> populateStats(postVo)
                         .doOnNext(postVo::setStats).thenReturn(postVo)
                     )
@@ -69,7 +70,7 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
     }
 
     @Override
-    public Mono<ListedPostVo> convertToListedPostVo(@NonNull Post post) {
+    public Mono<ListedPostVo> convertToListedVo(@NonNull Post post) {
         Assert.notNull(post, "Post must not be null");
         ListedPostVo postVo = ListedPostVo.from(post);
         postVo.setCategories(List.of());
@@ -116,8 +117,26 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
     }
 
     @Override
+    public Mono<PostVo> convertToVo(Post post, String snapshotName) {
+        final String postName = post.getMetadata().getName();
+        final String baseSnapshotName = post.getSpec().getBaseSnapshot();
+        return convertToListedVo(post)
+            .map(PostVo::from)
+            .flatMap(postVo -> postService.getContent(snapshotName, baseSnapshotName)
+                .flatMap(wrapper -> extendPostContent(postName, wrapper))
+                .doOnNext(postVo::setContent)
+                .thenReturn(postVo)
+            );
+    }
+
+    @Override
     public Mono<ContentVo> getContent(String postName) {
-        return postService.getReleaseContent(postName)
+        return client.get(Post.class, postName)
+            .filter(FIXED_PREDICATE)
+            .flatMap(post -> {
+                String releaseSnapshot = post.getSpec().getReleaseSnapshot();
+                return postService.getContent(releaseSnapshot, post.getSpec().getBaseSnapshot());
+            })
             .flatMap(wrapper -> extendPostContent(postName, wrapper));
     }
 

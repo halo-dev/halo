@@ -1,5 +1,6 @@
 package run.halo.app.theme.finders;
 
+import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.theme.ReactiveSinglePageContentHandler;
@@ -15,6 +16,15 @@ import run.halo.app.theme.finders.vo.SinglePageVo;
  */
 public interface SinglePageConversionService {
 
+    /**
+     * Converts the given {@link SinglePage} to {@link SinglePageVo} and populate content by
+     * given snapshot name.
+     *
+     * @param singlePage the single page must not be null
+     * @param snapshotName the snapshot name to get content must not be blank
+     * @return the converted single page vo
+     * @see #convertToVo(SinglePage)
+     */
     Mono<SinglePageVo> convertToVo(SinglePage singlePage, String snapshotName);
 
     /**
@@ -28,7 +38,7 @@ public interface SinglePageConversionService {
      * @return the converted single page vo
      * @see #getContent(String)
      */
-    Mono<SinglePageVo> convertToVo(SinglePage singlePage);
+    Mono<SinglePageVo> convertToVo(@NonNull SinglePage singlePage);
 
     /**
      * Gets content by given page name.
