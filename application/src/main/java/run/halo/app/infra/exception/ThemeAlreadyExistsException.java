@@ -12,9 +12,6 @@ import org.springframework.web.server.ServerWebInputException;
  */
 public class ThemeAlreadyExistsException extends ServerWebInputException {
 
-    public static final String THEME_ALREADY_EXISTS_TYPE =
-        "https://halo.run/probs/theme-alreay-exists";
-
     /**
      * Constructs a {@code ThemeAlreadyExistsException} with the given theme name.
      *
@@ -23,7 +20,7 @@ public class ThemeAlreadyExistsException extends ServerWebInputException {
     public ThemeAlreadyExistsException(@NonNull String themeName) {
         super("Theme already exists.", null, null, "problemDetail.theme.install.alreadyExists",
             new Object[] {themeName});
-        setType(URI.create(THEME_ALREADY_EXISTS_TYPE));
+        setType(URI.create(Exceptions.THEME_ALREADY_EXISTS_TYPE));
         getBody().setProperty("themeName", themeName);
     }
 }
