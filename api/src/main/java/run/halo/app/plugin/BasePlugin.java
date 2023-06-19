@@ -2,7 +2,6 @@ package run.halo.app.plugin;
 
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.Plugin;
-import org.pf4j.PluginManager;
 import org.pf4j.PluginWrapper;
 
 /**
@@ -15,12 +14,12 @@ import org.pf4j.PluginWrapper;
 @Slf4j
 public class BasePlugin extends Plugin {
 
+    @Deprecated
     public BasePlugin(PluginWrapper wrapper) {
         super(wrapper);
         log.info("Initialized plugin {}", wrapper.getPluginId());
     }
 
-    private PluginManager getPluginManager() {
-        return getWrapper().getPluginManager();
+    public BasePlugin() {
     }
 }

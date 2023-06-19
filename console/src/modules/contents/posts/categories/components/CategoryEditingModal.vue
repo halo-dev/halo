@@ -28,11 +28,13 @@ import { useI18n } from "vue-i18n";
 const props = withDefaults(
   defineProps<{
     visible: boolean;
-    category: Category | null;
+    category?: Category;
+    parentCategory?: Category;
   }>(),
   {
     visible: false,
-    category: null,
+    category: undefined,
+    parentCategory: undefined,
   }
 );
 
@@ -63,6 +65,7 @@ const initialFormState: Category = {
 };
 
 const formState = ref<Category>(cloneDeep(initialFormState));
+const selectedParentCategory = ref("");
 const saving = ref(false);
 
 const isUpdateMode = computed(() => {
@@ -100,9 +103,45 @@ const handleSaveCategory = async () => {
         category: formState.value,
       });
     } else {
-      await apiClient.extension.category.createcontentHaloRunV1alpha1Category({
-        category: formState.value,
-      });
+      // Gets parent category, calculates priority and updates it.
+      let parentCategory: Category | undefined = undefined;
+
+      if (selectedParentCategory.value) {
+        const { data } =
+          await apiClient.extension.category.getcontentHaloRunV1alpha1Category({
+            name: selectedParentCategory.value,
+          });
+        parentCategory = data;
+      }
+
+      const priority = parentCategory?.spec.children
+        ? parentCategory.spec.children.length + 1
+        : 0;
+
+      formState.value.spec.priority = priority;
+
+      const { data: createdCategory } =
+        await apiClient.extension.category.createcontentHaloRunV1alpha1Category(
+          {
+            category: formState.value,
+          }
+        );
+
+      if (parentCategory) {
+        parentCategory.spec.children = Array.from(
+          new Set([
+            ...(parentCategory.spec.children || []),
+            createdCategory.metadata.name,
+          ])
+        );
+
+        await apiClient.extension.category.updatecontentHaloRunV1alpha1Category(
+          {
+            name: selectedParentCategory.value,
+            category: parentCategory,
+          }
+        );
+      }
     }
     onVisibleChange(false);
 
@@ -122,6 +161,7 @@ const onVisibleChange = (visible: boolean) => {
 };
 
 const handleResetForm = () => {
+  selectedParentCategory.value = "";
   formState.value = cloneDeep(initialFormState);
   reset("category-form");
 };
@@ -130,18 +170,15 @@ watch(
   () => props.visible,
   (visible) => {
     if (visible) {
-      setFocus("displayNameInput");
-    } else {
-      handleResetForm();
-    }
-  }
-);
+      if (props.parentCategory) {
+        selectedParentCategory.value = props.parentCategory.metadata.name;
+      }
 
-watch(
-  () => props.category,
-  (category) => {
-    if (category) {
-      formState.value = cloneDeep(category);
+      if (props.category) {
+        formState.value = cloneDeep(props.category);
+      }
+
+      setFocus("displayNameInput");
     } else {
       handleResetForm();
     }
@@ -189,6 +226,14 @@ const { handleGenerateSlug } = useSlugify(
             </div>
           </div>
           <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
+            <FormKit
+              v-if="!isUpdateMode"
+              v-model="selectedParentCategory"
+              type="categorySelect"
+              :label="
+                $t('core.post_category.editing_modal.fields.parent.label')
+              "
+            ></FormKit>
             <FormKit
               id="displayNameInput"
               v-model="formState.spec.displayName"
