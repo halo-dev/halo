@@ -20,6 +20,7 @@ ext {
     jsonPatch = "1.13"
     springDocOpenAPI = "2.1.0"
     lucene = "9.5.0"
+    resilience4jVersion = "2.0.2"
 }
 
 javaPlatform {
@@ -49,6 +50,8 @@ dependencies {
         api "org.springframework.integration:spring-integration-core"
         api "com.github.java-json-tools:json-patch:$jsonPatch"
         api "org.thymeleaf.extras:thymeleaf-extras-springsecurity6"
+        api "io.github.resilience4j:resilience4j-spring-boot3:$resilience4jVersion"
+        api "io.github.resilience4j:resilience4j-reactor:$resilience4jVersion"
 
         runtime 'org.mariadb:r2dbc-mariadb:1.1.4'
     }

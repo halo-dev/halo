@@ -276,6 +276,8 @@ core:
       delete:
         title: 确定要删除该分类吗？
         description: 删除此分类之后，对应文章的关联将被解除。该操作不可恢复。
+      add_sub_category:
+        button: 新增子分类
     editing_modal:
       titles:
         update: 编辑文章分类
@@ -284,6 +286,8 @@ core:
         general: 常规
         annotations: 元数据
       fields:
+        parent:
+          label: 上级分类
         display_name:
           label: 名称
         slug:
