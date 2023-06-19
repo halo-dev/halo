@@ -92,7 +92,13 @@ const handleLogin = async () => {
         return;
       }
 
-      Toast.error(t("core.login.operations.submit.toast_failed"));
+      const { title: errorTitle, detail: errorDetail } = e.response?.data || {};
+
+      if (errorTitle || errorDetail) {
+        Toast.error([errorTitle, errorDetail].filter(Boolean).join(" - "));
+      } else {
+        Toast.error(t("core.common.toast.unknown_error"));
+      }
     } else {
       Toast.error(t("core.common.toast.unknown_error"));
     }
