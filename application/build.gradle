@@ -46,18 +46,6 @@ tasks.named('jar') {
     enabled = false
 }
 
-ext {
-    commonsLang3 = "3.12.0"
-    base62 = "0.1.3"
-    pf4j = '3.9.0'
-    javaDiffUtils = "4.12"
-    guava = "31.1-jre"
-    jsoup = '1.15.3'
-    jsonPatch = "1.13"
-    springDocOpenAPI = "2.0.2"
-    lucene = "9.5.0"
-}
-
 dependencies {
     implementation project(':api')
 
