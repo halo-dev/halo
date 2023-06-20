@@ -12,6 +12,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -40,20 +41,22 @@ public enum Exceptions {
         BadCredentialsException.class, INVALID_CREDENTIAL_TYPE
     );
 
-    public static ErrorResponse createErrorResponse(Throwable t, HttpStatusCode status,
+    public static ErrorResponse createErrorResponse(Throwable t, @Nullable HttpStatusCode status,
         ServerWebExchange exchange, MessageSource messageSource) {
         final ErrorResponse errorResponse;
         if (t instanceof ErrorResponse er) {
             errorResponse = er;
         } else {
+            var responseStatusAnno =
+                MergedAnnotations.from(t.getClass(), TYPE_HIERARCHY).get(ResponseStatus.class);
             if (status == null) {
-                var responseStatusAnno =
-                    MergedAnnotations.from(t.getClass(), TYPE_HIERARCHY).get(ResponseStatus.class);
                 status = responseStatusAnno.getValue("code", HttpStatus.class)
                     .orElse(HttpStatus.INTERNAL_SERVER_ERROR);
             }
             var type = EXCEPTION_TYPE_MAP.getOrDefault(t.getClass(), DEFAULT_TYPE);
-            var builder = ErrorResponse.builder(t, status, t.getMessage())
+            var detail = responseStatusAnno.getValue("reason", String.class)
+                .orElseGet(t::getMessage);
+            var builder = ErrorResponse.builder(t, status, detail)
                 .type(URI.create(type));
             if (status.is5xxServerError()) {
                 builder.detailMessageCode("problemDetail.internalServerError")
