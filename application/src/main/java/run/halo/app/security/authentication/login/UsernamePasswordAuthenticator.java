@@ -3,8 +3,8 @@ package run.halo.app.security.authentication.login;
 import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static run.halo.app.infra.exception.Exceptions.INVALID_CREDENTIAL_TYPE;
-import static run.halo.app.infra.exception.Exceptions.REQUEST_NOT_PERMITTED_TYPE;
+import static run.halo.app.infra.exception.Exceptions.DEFAULT_TYPE;
+import static run.halo.app.infra.exception.Exceptions.EXCEPTION_TYPE_MAP;
 import static run.halo.app.security.authentication.WebExchangeMatchers.ignoringMediaTypeAll;
 
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
@@ -142,23 +142,24 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
 
     private Mono<Void> handleRequestNotPermitted(RequestNotPermitted e,
         ServerWebExchange exchange) {
-        var errorResponse =
-            createErrorResponse(e, TOO_MANY_REQUESTS, REQUEST_NOT_PERMITTED_TYPE, exchange);
+        var errorResponse = createErrorResponse(e, TOO_MANY_REQUESTS, exchange);
         return writeErrorResponse(errorResponse, exchange);
     }
 
     private Mono<Void> handleAuthenticationException(AuthenticationException exception,
         ServerWebExchange exchange) {
-        var errorResponse =
-            createErrorResponse(exception, UNAUTHORIZED, INVALID_CREDENTIAL_TYPE, exchange);
+        var errorResponse = createErrorResponse(exception, UNAUTHORIZED, exchange);
         return writeErrorResponse(errorResponse, exchange);
     }
 
-    private ErrorResponse createErrorResponse(Throwable t, HttpStatus status, String type,
+    private ErrorResponse createErrorResponse(Throwable t, HttpStatus status,
         ServerWebExchange exchange) {
-        var errorResponse =
-            ErrorResponse.create(t, status, t.getMessage());
-        var problemDetail = errorResponse.updateAndGetBody(messageSource, getLocale(exchange));
+        var type = EXCEPTION_TYPE_MAP.getOrDefault(t.getClass(), DEFAULT_TYPE);
+
+        var errorResponse = ErrorResponse.builder(t, status, t.getMessage())
+            .type(URI.create(type))
+            .build(messageSource, getLocale(exchange));
+        var problemDetail = errorResponse.getBody();
         problemDetail.setType(URI.create(type));
         problemDetail.setInstance(exchange.getRequest().getURI());
         problemDetail.setProperty("requestId", exchange.getRequest().getId());

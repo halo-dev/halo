@@ -2,6 +2,8 @@ package run.halo.app.infra.exception.handlers;
 
 import static org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
 import static org.springframework.core.annotation.MergedAnnotations.from;
+import static run.halo.app.infra.exception.Exceptions.DEFAULT_TYPE;
+import static run.halo.app.infra.exception.Exceptions.EXCEPTION_TYPE_MAP;
 
 import java.net.URI;
 import java.time.Instant;
@@ -57,7 +59,11 @@ public class ProblemDetailErrorAttributes implements ErrorAttributes {
                 .orElseGet(() -> responseStatusAnno.getValue("reason", String.class)
                     .orElse(error.getMessage())
                 );
-            errorResponse = ErrorResponse.create(error, status, reason);
+            var type = EXCEPTION_TYPE_MAP.getOrDefault(error.getClass(), DEFAULT_TYPE);
+
+            errorResponse = ErrorResponse.builder(error, status, reason)
+                .type(URI.create(type))
+                .build();
         }
         var problemDetail =
             errorResponse.updateAndGetBody(messageSource, getLocale(request.exchange()));
