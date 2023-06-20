@@ -276,6 +276,8 @@ core:
       delete:
         title: Are you sure you want to delete this category?
         description: After deleting this category, the association with corresponding articles will be removed. This operation cannot be undone.
+      add_sub_category:
+        button: Add sub category
     editing_modal:
       titles:
         update: Update post category
@@ -284,6 +286,8 @@ core:
         general: General
         annotations: Annotations
       fields:
+        parent:
+          label: Parent
         display_name:
           label: Display name
         slug:
