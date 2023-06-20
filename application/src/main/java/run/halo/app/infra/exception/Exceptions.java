@@ -1,9 +1,23 @@
 package run.halo.app.infra.exception;
 
-import io.github.resilience4j.ratelimiter.RequestNotPermitted;
-import java.util.Map;
-import org.springframework.security.authentication.BadCredentialsException;
+import static org.springframework.core.annotation.MergedAnnotations.SearchStrategy.TYPE_HIERARCHY;
 
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import java.net.URI;
+import java.time.Instant;
+import java.util.Locale;
+import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
+import org.springframework.core.annotation.MergedAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.ErrorResponse;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ServerWebExchange;
+
+@Slf4j
 public enum Exceptions {
     ;
 
@@ -25,4 +39,37 @@ public enum Exceptions {
         RequestNotPermitted.class, REQUEST_NOT_PERMITTED_TYPE,
         BadCredentialsException.class, INVALID_CREDENTIAL_TYPE
     );
+
+    public static ErrorResponse createErrorResponse(Throwable t, HttpStatusCode status,
+        ServerWebExchange exchange, MessageSource messageSource) {
+        final ErrorResponse errorResponse;
+        if (t instanceof ErrorResponse er) {
+            errorResponse = er;
+        } else {
+            if (status == null) {
+                var responseStatusAnno =
+                    MergedAnnotations.from(t.getClass(), TYPE_HIERARCHY).get(ResponseStatus.class);
+                status = responseStatusAnno.getValue("code", HttpStatus.class)
+                    .orElse(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            var type = EXCEPTION_TYPE_MAP.getOrDefault(t.getClass(), DEFAULT_TYPE);
+            var builder = ErrorResponse.builder(t, status, t.getMessage())
+                .type(URI.create(type));
+            if (status.is5xxServerError()) {
+                builder.detailMessageCode("problemDetail.internalServerError")
+                    .titleMessageCode("problemDetail.title.internalServerError");
+            }
+            errorResponse = builder.build();
+        }
+        var problemDetail = errorResponse.updateAndGetBody(messageSource, getLocale(exchange));
+        problemDetail.setInstance(exchange.getRequest().getURI());
+        problemDetail.setProperty("requestId", exchange.getRequest().getId());
+        problemDetail.setProperty("timestamp", Instant.now());
+        return errorResponse;
+    }
+
+    public static Locale getLocale(ServerWebExchange exchange) {
+        var locale = exchange.getLocaleContext().getLocale();
+        return locale == null ? Locale.getDefault() : locale;
+    }
 }
