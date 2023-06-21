@@ -55,6 +55,7 @@ const inputPreventFn = (node: FormKitNode) => {
       if (
         node.children.length == 1 &&
         node.props.type == "form" &&
+        "props" in node.children[0] &&
         implicitSubmissionType.includes(node.children[0].props.type)
       ) {
         if (!controller) {
