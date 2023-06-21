@@ -32,7 +32,7 @@ import {
   ExtensionVideo,
   ExtensionAudio,
   ExtensionCodeBlock,
-  ToolbarButton,
+  ToolbarItem,
   lowlight,
   type AnyExtension,
   Editor,
@@ -213,7 +213,7 @@ onMounted(() => {
             getToolbarItems: ({ editor }: { editor: Editor }) => {
               return {
                 priority: 220,
-                component: ToolbarButton,
+                component: ToolbarItem,
                 props: {
                   editor,
                   isActive: false,
