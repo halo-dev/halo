@@ -91,7 +91,8 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         this.rateLimiterRegistry = rateLimiterRegistry;
         this.messageSource = messageSource;
 
-        this.authenticationWebFilter = new AuthenticationWebFilter(authenticationManager());
+        this.authenticationWebFilter =
+            new UsernamePasswordAuthenticationWebFilter(authenticationManager());
         configureAuthenticationWebFilter(this.authenticationWebFilter);
     }
 
@@ -179,6 +180,23 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         return locale == null ? Locale.getDefault() : locale;
     }
 
+    private class UsernamePasswordAuthenticationWebFilter extends AuthenticationWebFilter {
+
+        public UsernamePasswordAuthenticationWebFilter(
+            ReactiveAuthenticationManager authenticationManager) {
+            super(authenticationManager);
+        }
+
+        @Override
+        protected Mono<Void> onAuthenticationSuccess(Authentication authentication,
+            WebFilterExchange webFilterExchange) {
+            return super.onAuthenticationSuccess(authentication, webFilterExchange)
+                .transformDeferred(createIPBasedRateLimiter(webFilterExchange.getExchange()))
+                .onErrorResume(RequestNotPermitted.class,
+                    e -> handleRequestNotPermitted(e, webFilterExchange.getExchange()));
+        }
+    }
+
     public class LoginSuccessHandler implements ServerAuthenticationSuccessHandler {
 
         private final ServerAuthenticationSuccessHandler defaultHandler =
@@ -206,10 +224,7 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
                         .bodyValue(principal)
                         .flatMap(serverResponse ->
                             serverResponse.writeTo(exchange, context));
-                })
-                .transformDeferred(createIPBasedRateLimiter(exchange))
-                .onErrorResume(RequestNotPermitted.class,
-                    e -> handleRequestNotPermitted(e, exchange));
+                });
         }
     }
 
