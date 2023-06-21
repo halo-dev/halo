@@ -2,6 +2,7 @@ package run.halo.app.theme.finders.impl;
 
 
 import java.security.Principal;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
@@ -33,6 +35,7 @@ import run.halo.app.metrics.MeterUtils;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.CommentStatsVo;
 import run.halo.app.theme.finders.vo.CommentVo;
+import run.halo.app.theme.finders.vo.CommentWithReplyVo;
 import run.halo.app.theme.finders.vo.ExtensionVoOperator;
 import run.halo.app.theme.finders.vo.ReplyVo;
 
@@ -44,6 +47,7 @@ import run.halo.app.theme.finders.vo.ReplyVo;
 @Component
 @RequiredArgsConstructor
 public class CommentPublicQueryServiceImpl implements CommentPublicQueryService {
+    private static final int DEFAULT_SIZE = 10;
 
     private final ReactiveExtensionClient client;
     private final UserService userService;
@@ -107,6 +111,34 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             );
     }
 
+    @Override
+    public Flux<CommentWithReplyVo> listNewestComments(int k) {
+        // only fetch 100 comments at most
+        return fixedCommentPredicate(null)
+            .flatMapMany(fixedPredicate -> listWithReplyVo(fixedPredicate, Math.max(k, 100)));
+    }
+
+    private Flux<CommentWithReplyVo> listWithReplyVo(Predicate<Comment> fixedPredicate, int size) {
+        return client.list(Comment.class, fixedPredicate, creationTimeComparator(), 1, size)
+            .flatMapMany(list -> Flux.fromStream(list.get()))
+            .flatMap(this::toCommentVo)
+            .flatMap(commentVo -> listReply(commentVo.getMetadata().getName(), 1, DEFAULT_SIZE)
+                .map(replies -> CommentWithReplyVo.builder()
+                    .comment(commentVo)
+                    .replies(replies)
+                    .build()
+                )
+            );
+    }
+
+    private static Comparator<Comment> creationTimeComparator() {
+        return Comparator.comparing(
+                (Function<Comment, Instant>) comment -> comment.getSpec().getCreationTime())
+            .thenComparing(comment -> comment.getMetadata().getCreationTimestamp())
+            .thenComparing(comment -> comment.getMetadata().getName())
+            .reversed();
+    }
+
     Mono<CommentVo> toCommentVo(Comment comment) {
         Comment.CommentOwner owner = comment.getSpec().getOwner();
         return Mono.just(CommentVo.from(comment))
@@ -117,7 +149,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                 .doOnNext(commentVo::setOwner)
                 .thenReturn(commentVo)
             )
-            .flatMap(commentVo -> filterCommentSensitiveData(commentVo));
+            .flatMap(this::filterCommentSensitiveData);
     }
 
     private Mono<? extends CommentVo> filterCommentSensitiveData(CommentVo commentVo) {
@@ -138,8 +170,9 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         return Mono.just(commentVo);
     }
 
-    private <E extends AbstractExtension, T extends ExtensionVoOperator> Mono<CommentStatsVo>
-        populateStats(Class<E> clazz, T vo) {
+    // @formatter:off
+    private <E extends AbstractExtension, T extends ExtensionVoOperator>
+        Mono<CommentStatsVo> populateStats(Class<E> clazz, T vo) {
         return counterService.getByName(MeterUtils.nameOf(clazz, vo.getMetadata()
                 .getName()))
             .map(counter -> CommentStatsVo.builder()
@@ -148,6 +181,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             )
             .defaultIfEmpty(CommentStatsVo.empty());
     }
+    // @formatter:on
 
     Mono<ReplyVo> toReplyVo(Reply reply) {
         return Mono.just(ReplyVo.from(reply))
@@ -158,7 +192,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                 .doOnNext(replyVo::setOwner)
                 .thenReturn(replyVo)
             )
-            .flatMap(replyVo -> filterReplySensitiveData(replyVo));
+            .flatMap(this::filterReplySensitiveData);
     }
 
     private Mono<? extends ReplyVo> filterReplySensitiveData(ReplyVo replyVo) {
@@ -187,11 +221,13 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             .map(OwnerInfo::from);
     }
 
-    private Mono<Predicate<Comment>> fixedCommentPredicate(Ref ref) {
-        Assert.notNull(ref, "Comment subject reference must not be null");
-        // Ref must be equal to the comment subject
-        Predicate<Comment> refPredicate = comment -> comment.getSpec().getSubjectRef().equals(ref)
-            && comment.getMetadata().getDeletionTimestamp() == null;
+    private Mono<Predicate<Comment>> fixedCommentPredicate(@Nullable Ref ref) {
+        Predicate<Comment> basePredicate =
+            comment -> comment.getMetadata().getDeletionTimestamp() == null;
+        if (ref != null) {
+            basePredicate = basePredicate
+                .and(comment -> comment.getSpec().getSubjectRef().equals(ref));
+        }
 
         // is approved and not hidden
         Predicate<Comment> approvedPredicate =
@@ -206,7 +242,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                 return approvedPredicate.or(isOwner);
             })
             .defaultIfEmpty(approvedPredicate)
-            .map(refPredicate::and);
+            .map(basePredicate::and);
     }
 
     private Mono<Predicate<Reply>> fixedReplyPredicate(String commentName) {
@@ -277,6 +313,6 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     }
 
     int sizeNullSafe(Integer size) {
-        return ObjectUtils.defaultIfNull(size, 10);
+        return ObjectUtils.defaultIfNull(size, DEFAULT_SIZE);
     }
 }

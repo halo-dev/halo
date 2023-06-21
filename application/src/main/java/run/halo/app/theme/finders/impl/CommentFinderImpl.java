@@ -1,6 +1,9 @@
 package run.halo.app.theme.finders.impl;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Ref;
@@ -8,6 +11,7 @@ import run.halo.app.theme.finders.CommentFinder;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.vo.CommentVo;
+import run.halo.app.theme.finders.vo.CommentWithReplyVo;
 import run.halo.app.theme.finders.vo.ReplyVo;
 
 /**
@@ -35,5 +39,10 @@ public class CommentFinderImpl implements CommentFinder {
     @Override
     public Mono<ListResult<ReplyVo>> listReply(String commentName, Integer page, Integer size) {
         return commentPublicQueryService.listReply(commentName, page, size);
+    }
+
+    @Override
+    public Flux<CommentWithReplyVo> listNewest(Integer k) {
+        return commentPublicQueryService.listNewestComments(defaultIfNull(k, 0));
     }
 }
