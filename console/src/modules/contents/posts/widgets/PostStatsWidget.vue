@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { VCard, IconBookRead } from "@halo-dev/components";
 import { inject, type Ref } from "vue";
-import type { DashboardStats } from "@halo-dev/api-client/index";
+import type { DashboardStats } from "@halo-dev/api-client";
 
 const dashboardStats = inject<Ref<DashboardStats>>("dashboardStats");
 </script>
