@@ -48,6 +48,7 @@ import { getNode } from "@formkit/core";
 import TagDropdownSelector from "@/components/dropdown-selector/TagDropdownSelector.vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import { useRouteQuery } from "@vueuse/router";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -128,7 +129,7 @@ const selectedSortItem = ref<SortItem>();
 const selectedCategory = ref<Category>();
 const selectedTag = ref<Tag>();
 const selectedContributor = ref<User>();
-const keyword = ref("");
+const keyword = useRouteQuery<string>("keyword", "");
 
 function handleVisibleItemChange(visibleItem: VisibleItem) {
   selectedVisibleItem.value = visibleItem;
@@ -196,8 +197,8 @@ const hasFilters = computed(() => {
   );
 });
 
-const page = ref(1);
-const size = ref(20);
+const page = useRouteQuery("page", 1, { transform: Number });
+const size = useRouteQuery("size", 20, { transform: Number });
 const total = ref(0);
 const hasPrevious = ref(false);
 const hasNext = ref(false);
