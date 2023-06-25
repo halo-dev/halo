@@ -5,7 +5,7 @@ server:
     enabled: true
   error:
     whitelabel:
-        enabled: false
+      enabled: false
 spring:
   output:
     ansi:
@@ -27,6 +27,10 @@ spring:
       cache:
         cachecontrol:
           max-age: 365d
+  cache:
+    type: caffeine
+    caffeine:
+      spec: expireAfterAccess=1h, maximumSize=10000
 
 halo:
   work-dir: ${user.home}/.halo2
@@ -56,7 +60,7 @@ management:
   endpoints:
     web:
       exposure:
-          include: ["health", "info", "startup", "globalinfo", "logfile"]
+        include: ["health", "info", "startup", "globalinfo", "logfile"]
   endpoint:
     health:
       probes:
