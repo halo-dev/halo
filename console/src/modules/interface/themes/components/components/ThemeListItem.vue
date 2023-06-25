@@ -208,18 +208,10 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
           {{ $t("core.common.buttons.uninstall") }}
         </VDropdownItem>
         <template #popper>
-          <VDropdownItem
-            v-close-popper.all
-            type="danger"
-            @click="handleUninstall(theme)"
-          >
+          <VDropdownItem type="danger" @click="handleUninstall(theme)">
             {{ $t("core.common.buttons.uninstall") }}
           </VDropdownItem>
-          <VDropdownItem
-            v-close-popper.all
-            type="danger"
-            @click="handleUninstall(theme, true)"
-          >
+          <VDropdownItem type="danger" @click="handleUninstall(theme, true)">
             {{ $t("core.theme.operations.uninstall_and_delete_config.button") }}
           </VDropdownItem>
         </template>
