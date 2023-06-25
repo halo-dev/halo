@@ -1,14 +1,12 @@
 package run.halo.app.console;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
-import org.springframework.security.web.server.util.matcher.MediaTypeServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.NegatedServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatcher;
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers;
-import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -31,8 +29,6 @@ public class ConsoleProxyFilter implements WebFilter {
         this.proxyProperties = haloProperties.getConsole().getProxy();
         var consoleMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.GET, "/console/**");
         consoleMatcher = new AndServerWebExchangeMatcher(consoleMatcher,
-            new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML));
-        consoleMatcher = new AndServerWebExchangeMatcher(consoleMatcher,
             new NegatedServerWebExchangeMatcher(new WebSocketServerWebExchangeMatcher()));
         this.consoleMatcher = consoleMatcher;
         this.webClient = WebClient.create(proxyProperties.getEndpoint().toString());
@@ -53,8 +49,8 @@ public class ConsoleProxyFilter implements WebFilter {
                     .toUriString();
             })
             .doOnNext(uri -> {
-                if (log.isDebugEnabled()) {
-                    log.debug("Proxy {} to {}", uri, proxyProperties.getEndpoint());
+                if (log.isTraceEnabled()) {
+                    log.trace("Proxy {} to {}", uri, proxyProperties.getEndpoint());
                 }
             })
             .flatMap(uri -> webClient.get()
@@ -68,8 +64,8 @@ public class ConsoleProxyFilter implements WebFilter {
                     response.getCookies().putAll(clientResponse.cookies());
                     // set status code
                     response.setStatusCode(clientResponse.statusCode());
-                    var body = clientResponse.body(BodyExtractors.toDataBuffers());
-                    return exchange.getResponse().writeAndFlushWith(Mono.just(body));
+                    var body = clientResponse.bodyToFlux(DataBuffer.class);
+                    return exchange.getResponse().writeWith(body);
                 }));
     }
 }
