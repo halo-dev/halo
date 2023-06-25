@@ -46,14 +46,11 @@ public class CacheWebFilter implements WebFilter, Ordered {
     @NonNull
     public Mono<Void> filter(@NonNull ServerWebExchange exchange, @NonNull WebFilterChain chain) {
         return ReactiveSecurityContextHolder.getContext()
-            .switchIfEmpty(Mono.defer(() -> chain.filter(exchange).then(Mono.empty())))
             .map(SecurityContext::getAuthentication)
             .map(Authentication::getName)
-            .flatMap(username -> {
-                if (!isAnonymousUser(username) || !requestCacheable(exchange.getRequest())) {
-                    return chain.filter(exchange);
-                }
-                // get cached response from cache then return the response.
+            .filter(name -> isAnonymousUser(name) && requestCacheable(exchange.getRequest()))
+            .switchIfEmpty(Mono.defer(() -> chain.filter(exchange).then(Mono.empty())))
+            .flatMap(name -> {
                 var cacheKey = generateCacheKey(exchange.getRequest());
                 var cachedResponse = cache.get(cacheKey, CachedResponse.class);
                 if (cachedResponse != null) {
