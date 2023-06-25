@@ -304,7 +304,7 @@ const subjectRefResult = computed(() => {
               <VTag>{{ subjectRefResult.label }}</VTag>
               <RouterLink
                 :to="subjectRefResult.route || $route"
-                class="truncate text-sm font-medium text-gray-900 hover:text-gray-600"
+                class="line-clamp-2 inline-block text-sm font-medium text-gray-900 hover:text-gray-600"
               >
                 {{ subjectRefResult.title }}
               </RouterLink>
