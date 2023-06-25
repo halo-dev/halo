@@ -166,29 +166,7 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                 return commentService.create(comment);
             })
             .transformDeferred(createIpBasedRateLimiter(request))
-            .flatMap(comment -> ServerResponse.ok().bodyValue(comment))
-            .onErrorResume(RequestNotPermitted.class, e -> ServerResponse.status(TOO_MANY_REQUESTS)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(createErrorResponse(e,
-                    TOO_MANY_REQUESTS,
-                    REQUEST_NOT_PERMITTED_TYPE,
-                    request.exchange())));
-    }
-
-    private ErrorResponse createErrorResponse(Throwable t, HttpStatus status, String type,
-        ServerWebExchange exchange) {
-        var errorResponse = ErrorResponse.create(t, status, t.getMessage());
-        var problemDetail = errorResponse.updateAndGetBody(messageSource, getLocale(exchange));
-        problemDetail.setType(URI.create(type));
-        problemDetail.setInstance(exchange.getRequest().getURI());
-        problemDetail.setProperty("requestId", exchange.getRequest().getId());
-        problemDetail.setProperty("timestamp", Instant.now());
-        return errorResponse;
-    }
-
-    private Locale getLocale(ServerWebExchange exchange) {
-        var locale = exchange.getLocaleContext().getLocale();
-        return locale == null ? Locale.getDefault() : locale;
+            .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
     }
 
     private <T> RateLimiterOperator<T> createIpBasedRateLimiter(ServerRequest request) {
