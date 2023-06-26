@@ -405,9 +405,6 @@ importers:
 
   packages/shared:
     dependencies:
-      '@tiptap/vue-3':
-        specifier: ^2.0.3
-        version: 2.0.3(@tiptap/core@2.0.3)(@tiptap/pm@2.0.3)(vue@3.2.45)
       vue:
         specifier: ^3.2.37
         version: 3.2.45
