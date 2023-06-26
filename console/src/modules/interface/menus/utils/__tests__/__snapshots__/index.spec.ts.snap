@@ -301,9 +301,6 @@ exports[`sortMenuItemsTree > will match snapshot 1`] = `
       "version": 12,
     },
     "spec": {
-      "categoryRef": {
-        "name": "",
-      },
       "children": [
         {
           "apiVersion": "v1alpha1",
@@ -314,22 +311,10 @@ exports[`sortMenuItemsTree > will match snapshot 1`] = `
             "version": 0,
           },
           "spec": {
-            "categoryRef": {
-              "name": "",
-            },
             "children": [],
             "displayName": "Java",
             "href": "https://ryanc.cc/categories/java",
-            "pageRef": {
-              "name": "",
-            },
-            "postRef": {
-              "name": "",
-            },
             "priority": 0,
-            "tagRef": {
-              "name": "",
-            },
           },
         },
         {
@@ -341,37 +326,16 @@ exports[`sortMenuItemsTree > will match snapshot 1`] = `
             "version": 4,
           },
           "spec": {
-            "categoryRef": {
-              "name": "",
-            },
             "children": [],
             "displayName": "Halo",
             "href": "https://ryanc.cc/categories/halo",
-            "pageRef": {
-              "name": "",
-            },
-            "postRef": {
-              "name": "",
-            },
             "priority": 1,
-            "tagRef": {
-              "name": "",
-            },
           },
         },
       ],
       "displayName": "文章分类",
       "href": "https://ryanc.cc/categories",
-      "pageRef": {
-        "name": "",
-      },
-      "postRef": {
-        "name": "",
-      },
       "priority": 0,
-      "tagRef": {
-        "name": "",
-      },
     },
   },
 ]

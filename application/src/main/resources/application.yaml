@@ -73,3 +73,8 @@ resilience4j.ratelimiter:
       limitForPeriod: 3
       limitRefreshPeriod: 1m
       timeoutDuration: 0
+    comment-creation:
+      limitForPeriod: 10
+      limitRefreshPeriod: 1m
+      timeoutDuration: 10s
+

@@ -154,14 +154,10 @@ const handleResetSettingConfig = async () => {
           {{ $t("core.common.buttons.uninstall") }}
         </VDropdownItem>
         <template #popper>
-          <VDropdownItem v-close-popper.all type="danger" @click="uninstall">
+          <VDropdownItem type="danger" @click="uninstall">
             {{ $t("core.common.buttons.uninstall") }}
           </VDropdownItem>
-          <VDropdownItem
-            v-close-popper.all
-            type="danger"
-            @click="uninstall(true)"
-          >
+          <VDropdownItem type="danger" @click="uninstall(true)">
             {{ $t("core.plugin.list.actions.uninstall_and_delete_config") }}
           </VDropdownItem>
         </template>

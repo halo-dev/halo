@@ -3,6 +3,8 @@ import type { RouteRecordRaw, RouteRecordName } from "vue-router";
 import type { FunctionalPage } from "../states/pages";
 import type { AttachmentSelectProvider } from "../states/attachment-selector";
 import type { EditorProvider } from "..";
+import type { AnyExtension } from "@tiptap/vue-3";
+import type { CommentSubjectRefProvider } from "@/states/comment-subject-ref";
 
 export interface RouteRecordAppend {
   parentName: RouteRecordName;
@@ -18,6 +20,12 @@ export interface ExtensionPoint {
     | Promise<AttachmentSelectProvider[]>;
 
   "editor:create"?: () => EditorProvider[] | Promise<EditorProvider[]>;
+
+  "default:editor:extension:create": () =>
+    | AnyExtension[]
+    | Promise<AnyExtension[]>;
+
+  "comment:subject-ref:create"?: () => CommentSubjectRefProvider[];
 }
 
 export interface PluginModule {

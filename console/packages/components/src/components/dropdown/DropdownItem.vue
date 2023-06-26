@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { VClosePopper } from "floating-vue";
+import { DropdownContextInjectionKey } from "./symbols";
+import { inject } from "vue";
 
 withDefaults(
   defineProps<{
@@ -11,15 +12,26 @@ withDefaults(
     type: "default",
   }
 );
+
+const emit = defineEmits<{
+  (event: "click", e: MouseEvent): void;
+}>();
+
+const { hide } = inject(DropdownContextInjectionKey) || {};
+
+function onClick(e: MouseEvent) {
+  hide?.();
+  emit("click", e);
+}
 </script>
 
 <template>
   <div
-    v-close-popper
     class="dropdown-item-wrapper"
     :class="[`dropdown-item-wrapper--${type}${selected ? '--selected' : ''}`]"
     role="menuitem"
     tabindex="-1"
+    @click="onClick"
   >
     <div class="flex items-center gap-3">
       <slot name="prefix-icon" />
