@@ -125,7 +125,7 @@ import { onMounted, provide, ref, type Ref } from "vue";
 import { useStorage } from "@vueuse/core";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
-import type { DashboardStats } from "@halo-dev/api-client/index";
+import type { DashboardStats } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { usePermission } from "@/utils/permission";
 
