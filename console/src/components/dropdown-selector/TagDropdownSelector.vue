@@ -23,6 +23,8 @@ const emit = defineEmits<{
 
 const { tags } = usePostTag();
 
+const dropdown = ref();
+
 const handleSelect = (tag: Tag) => {
   if (props.selected && tag.metadata.name === props.selected.metadata.name) {
     emit("update:selected", undefined);
@@ -32,6 +34,8 @@ const handleSelect = (tag: Tag) => {
 
   emit("update:selected", tag);
   emit("select", tag);
+
+  dropdown.value.hide();
 };
 
 function onDropdownShow() {
@@ -69,7 +73,7 @@ const searchResults = computed(() => {
 </script>
 
 <template>
-  <VDropdown :classes="['!p-0']" @show="onDropdownShow">
+  <VDropdown ref="dropdown" :classes="['!p-0']" @show="onDropdownShow">
     <slot />
     <template #popper>
       <div class="h-96 w-80">
@@ -89,7 +93,6 @@ const searchResults = computed(() => {
             <li
               v-for="(tag, index) in searchResults"
               :key="index"
-              v-close-popper
               @click="handleSelect(tag)"
             >
               <VEntity

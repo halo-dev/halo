@@ -27,6 +27,8 @@ const emit = defineEmits<{
 
 const { users, handleFetchUsers } = useUserFetch();
 
+const dropdown = ref();
+
 const handleSelect = (user: User) => {
   if (props.selected && user.metadata.name === props.selected.metadata.name) {
     emit("update:selected", undefined);
@@ -36,6 +38,8 @@ const handleSelect = (user: User) => {
 
   emit("update:selected", user);
   emit("select", user);
+
+  dropdown.value.hide();
 };
 
 function onDropdownShow() {
@@ -71,7 +75,7 @@ const searchResults = computed(() => {
 </script>
 
 <template>
-  <VDropdown :classes="['!p-0']" @show="onDropdownShow">
+  <VDropdown ref="dropdown" :classes="['!p-0']" @show="onDropdownShow">
     <slot />
     <template #popper>
       <div class="h-96 w-80">
@@ -91,7 +95,6 @@ const searchResults = computed(() => {
             <li
               v-for="(user, index) in searchResults"
               :key="index"
-              v-close-popper
               @click="handleSelect(user)"
             >
               <VEntity
