@@ -2,14 +2,12 @@ package run.halo.app.theme.finders;
 
 import java.util.Comparator;
 import org.springframework.lang.Nullable;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Reply;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Ref;
 import run.halo.app.theme.finders.vo.CommentVo;
-import run.halo.app.theme.finders.vo.CommentWithReplyVo;
 import run.halo.app.theme.finders.vo.ReplyVo;
 
 /**
@@ -31,12 +29,4 @@ public interface CommentPublicQueryService {
 
     Mono<ListResult<ReplyVo>> listReply(String commentName, @Nullable Integer page,
         @Nullable Integer size, @Nullable Comparator<Reply> comparator);
-
-    /**
-     * List newest comments with one page of replies.
-     *
-     * @param k the number of newest comments, maximum support 100
-     * @return a list of {@link CommentWithReplyVo}
-     */
-    Flux<CommentWithReplyVo> listNewestComments(int k);
 }

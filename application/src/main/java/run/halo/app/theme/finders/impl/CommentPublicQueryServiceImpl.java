@@ -2,7 +2,6 @@ package run.halo.app.theme.finders.impl;
 
 
 import java.security.Principal;
-import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +34,6 @@ import run.halo.app.metrics.MeterUtils;
 import run.halo.app.theme.finders.CommentPublicQueryService;
 import run.halo.app.theme.finders.vo.CommentStatsVo;
 import run.halo.app.theme.finders.vo.CommentVo;
-import run.halo.app.theme.finders.vo.CommentWithReplyVo;
 import run.halo.app.theme.finders.vo.ExtensionVoOperator;
 import run.halo.app.theme.finders.vo.ReplyVo;
 
@@ -109,34 +107,6 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                     )
                     .defaultIfEmpty(new ListResult<>(page, size, 0L, List.of()))
             );
-    }
-
-    @Override
-    public Flux<CommentWithReplyVo> listNewestComments(int k) {
-        // only fetch 100 comments at most
-        return fixedCommentPredicate(null)
-            .flatMapMany(fixedPredicate -> listWithReplyVo(fixedPredicate, Math.max(k, 100)));
-    }
-
-    private Flux<CommentWithReplyVo> listWithReplyVo(Predicate<Comment> fixedPredicate, int size) {
-        return client.list(Comment.class, fixedPredicate, creationTimeComparator(), 1, size)
-            .flatMapMany(list -> Flux.fromStream(list.get()))
-            .flatMap(this::toCommentVo)
-            .flatMap(commentVo -> listReply(commentVo.getMetadata().getName(), 1, DEFAULT_SIZE)
-                .map(replies -> CommentWithReplyVo.builder()
-                    .comment(commentVo)
-                    .replies(replies)
-                    .build()
-                )
-            );
-    }
-
-    private static Comparator<Comment> creationTimeComparator() {
-        return Comparator.comparing(
-                (Function<Comment, Instant>) comment -> comment.getSpec().getCreationTime())
-            .thenComparing(comment -> comment.getMetadata().getCreationTimestamp())
-            .thenComparing(comment -> comment.getMetadata().getName())
-            .reversed();
     }
 
     Mono<CommentVo> toCommentVo(Comment comment) {
