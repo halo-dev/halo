@@ -1,5 +1,6 @@
 package run.halo.app.config;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -12,6 +13,7 @@ import run.halo.app.cache.CacheWebFilter;
 public class CacheConfiguration {
 
     @Bean
+    @ConditionalOnProperty(name = "halo.cache.disabled", havingValue = "false")
     WebFilter cacheWebFilter(CacheManager cacheManager) {
         return new CacheWebFilter(cacheManager);
     }
