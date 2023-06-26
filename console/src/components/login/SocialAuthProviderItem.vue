@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { SocialAuthProvider } from "@/modules/system/actuator/types";
+import { useRouteQuery } from "@vueuse/router";
 import { inject, ref } from "vue";
 import type { Ref } from "vue";
 
@@ -10,8 +11,11 @@ const props = withDefaults(
   {}
 );
 
+const REDIRECT_URI_QUERY_PARAM = "login_redirect_uri";
+
 const loading = ref(false);
 
+const redirect_uri = useRouteQuery<string>("redirect_uri", "");
 const disabled = inject<Ref<boolean>>("disabled");
 
 function handleSocialLogin() {
@@ -20,7 +24,14 @@ function handleSocialLogin() {
   }
 
   loading.value = true;
-  window.location.href = props.authProvider.authenticationUrl;
+
+  let authenticationUrl = props.authProvider.authenticationUrl;
+
+  if (redirect_uri.value) {
+    authenticationUrl = `${authenticationUrl}?${REDIRECT_URI_QUERY_PARAM}=${redirect_uri.value}`;
+  }
+
+  window.location.href = authenticationUrl;
 }
 </script>
 
