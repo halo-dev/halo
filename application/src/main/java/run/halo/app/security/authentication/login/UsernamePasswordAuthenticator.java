@@ -1,6 +1,5 @@
 package run.halo.app.security.authentication.login;
 
-import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static run.halo.app.infra.exception.Exceptions.createErrorResponse;
@@ -39,6 +38,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.utils.IpAddressUtils;
 import run.halo.app.security.AdditionalWebFilter;
 
@@ -136,9 +136,9 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         return RateLimiterOperator.of(rateLimiter);
     }
 
-    private Mono<Void> handleRequestNotPermitted(RequestNotPermitted e,
+    private Mono<Void> handleRateLimitExceededException(RateLimitExceededException e,
         ServerWebExchange exchange) {
-        var errorResponse = createErrorResponse(e, TOO_MANY_REQUESTS, exchange, messageSource);
+        var errorResponse = createErrorResponse(e, null, exchange, messageSource);
         return writeErrorResponse(errorResponse, exchange);
     }
 
@@ -168,8 +168,9 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
             WebFilterExchange webFilterExchange) {
             return super.onAuthenticationSuccess(authentication, webFilterExchange)
                 .transformDeferred(createIPBasedRateLimiter(webFilterExchange.getExchange()))
-                .onErrorResume(RequestNotPermitted.class,
-                    e -> handleRequestNotPermitted(e, webFilterExchange.getExchange()));
+                .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new)
+                .onErrorResume(RateLimitExceededException.class,
+                    e -> handleRateLimitExceededException(e, webFilterExchange.getExchange()));
         }
     }
 
@@ -230,8 +231,9 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
                 )
                 .flatMap(matchResult -> handleAuthenticationException(exception, exchange))
                 .transformDeferred(createIPBasedRateLimiter(exchange))
-                .onErrorResume(RequestNotPermitted.class,
-                    e -> handleRequestNotPermitted(e, exchange));
+                .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new)
+                .onErrorResume(RateLimitExceededException.class,
+                    e -> handleRateLimitExceededException(e, exchange));
         }
 
     }
