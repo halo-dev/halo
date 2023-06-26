@@ -137,9 +137,6 @@ describe("sortMenuItemsTree", () => {
           version: 12,
         },
         spec: {
-          categoryRef: {
-            name: "",
-          },
           children: [
             {
               apiVersion: "v1alpha1",
@@ -150,22 +147,10 @@ describe("sortMenuItemsTree", () => {
                 version: 4,
               },
               spec: {
-                categoryRef: {
-                  name: "",
-                },
                 children: [],
                 priority: 1,
                 displayName: "Halo",
                 href: "https://ryanc.cc/categories/halo",
-                pageRef: {
-                  name: "",
-                },
-                postRef: {
-                  name: "",
-                },
-                tagRef: {
-                  name: "",
-                },
               },
             },
             {
@@ -177,37 +162,16 @@ describe("sortMenuItemsTree", () => {
                 version: 0,
               },
               spec: {
-                categoryRef: {
-                  name: "",
-                },
                 children: [],
                 priority: 0,
                 displayName: "Java",
                 href: "https://ryanc.cc/categories/java",
-                pageRef: {
-                  name: "",
-                },
-                postRef: {
-                  name: "",
-                },
-                tagRef: {
-                  name: "",
-                },
               },
             },
           ],
           priority: 0,
           displayName: "文章分类",
           href: "https://ryanc.cc/categories",
-          pageRef: {
-            name: "",
-          },
-          postRef: {
-            name: "",
-          },
-          tagRef: {
-            name: "",
-          },
         },
       },
     ];
