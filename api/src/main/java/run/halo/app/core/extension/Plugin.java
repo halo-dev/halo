@@ -97,7 +97,8 @@ public class Plugin extends AbstractExtension {
     }
 
     /**
-     * TODO instead of {@link run.halo.app.infra.model.License}.
+     * In the future, we may consider using {@link run.halo.app.infra.model.License} instead of it.
+     * But now, replace it will lead to incompatibility with downstream.
      */
     @Data
     public static class License {
