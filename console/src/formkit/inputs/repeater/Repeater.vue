@@ -9,6 +9,7 @@ import {
 import type { FormKitFrameworkContext } from "@formkit/core";
 import { group } from "@formkit/inputs";
 import type { PropType } from "vue";
+import { onMounted } from "vue";
 import cloneDeep from "lodash.clonedeep";
 
 const props = defineProps({
@@ -18,6 +19,9 @@ const props = defineProps({
   },
 });
 
+const min = Number(props.context.min) || 0;
+const max = Number(props.context.max) || Infinity;
+
 const handleAppend = (index: number) => {
   const value = cloneDeep(props.context._value);
   value.splice(index + 1, 0, {});
@@ -25,6 +29,10 @@ const handleAppend = (index: number) => {
 };
 
 const handleRemove = (index: number) => {
+  if (props.context._value?.length <= min) {
+    return;
+  }
+
   const value = cloneDeep(props.context._value);
   value.splice(index, 1);
   props.context.node.input(value);
@@ -49,6 +57,18 @@ const handleMoveDown = (index: number) => {
   value.splice(index + 1, 0, value.splice(index, 1)[0]);
   props.context.node.input(value);
 };
+
+onMounted(() => {
+  const value = cloneDeep(props.context._value);
+  const differenceCount = min - value?.length || 0;
+
+  if (differenceCount > 0) {
+    for (let i = 0; i < differenceCount; i++) {
+      value.push({});
+    }
+    props.context.node.input(value);
+  }
+});
 </script>
 
 <template>
@@ -73,7 +93,8 @@ const handleMoveDown = (index: number) => {
           <li
             class="cursor-pointer text-gray-500 transition-all hover:text-primary"
             :class="{
-              'cursor-not-allowed opacity-50 hover:!text-gray-500': index === 0,
+              '!cursor-not-allowed opacity-50 hover:!text-gray-500':
+                index === 0,
             }"
           >
             <IconArrowUpCircleLine
@@ -83,6 +104,10 @@ const handleMoveDown = (index: number) => {
           </li>
           <li
             class="cursor-pointer text-gray-500 transition-all hover:text-primary"
+            :class="{
+              '!cursor-not-allowed opacity-50 hover:!text-gray-500':
+                context._value?.length <= min,
+            }"
           >
             <IconCloseCircle class="h-5 w-5" @click="handleRemove(index)" />
           </li>
@@ -94,7 +119,7 @@ const handleMoveDown = (index: number) => {
           <li
             class="cursor-pointer text-gray-500 transition-all hover:text-primary"
             :class="{
-              'cursor-not-allowed opacity-50 hover:!text-gray-500':
+              '!cursor-not-allowed opacity-50 hover:!text-gray-500':
                 index === context._value.length - 1,
             }"
           >
@@ -108,7 +133,11 @@ const handleMoveDown = (index: number) => {
     </li>
   </ul>
   <div :class="context.classes.add">
-    <VButton type="secondary" @click="handleAppend(context._value.length)">
+    <VButton
+      :disabled="context._value?.length >= max"
+      type="secondary"
+      @click="handleAppend(context._value.length)"
+    >
       <template #icon>
         <IconAddCircle class="h-full w-full" />
       </template>

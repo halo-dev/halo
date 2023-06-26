@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.pf4j.DefaultPluginManager;
 import org.pf4j.ExtensionFactory;
 import org.pf4j.ExtensionFinder;
+import org.pf4j.PluginAlreadyLoadedException;
 import org.pf4j.PluginDependency;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginDescriptorFinder;
@@ -228,7 +229,11 @@ public class HaloPluginManager extends DefaultPluginManager
     private PluginState doStartPlugin(String pluginId) {
         checkPluginId(pluginId);
 
-        PluginWrapper pluginWrapper = getPlugin(pluginId);
+        // refresh plugin to ensure cache object of PluginWrapper.plugin is up-to-date
+        // see gh-4016 to know why we need this
+        // TODO if has a better way to do this?
+        PluginWrapper pluginWrapper = refreshPluginWrapper(pluginId);
+
         checkExtensionFinderReady(pluginWrapper);
 
         PluginDescriptor pluginDescriptor = pluginWrapper.getDescriptor();
@@ -379,6 +384,23 @@ public class HaloPluginManager extends DefaultPluginManager
     }
 
     /**
+     * Reload plugin by name and path.
+     * Note: This method will ignore {@link PluginAlreadyLoadedException}.
+     *
+     * @param pluginName plugin name
+     * @param pluginPath a new plugin path
+     */
+    public void reloadPluginWithPath(String pluginName, Path pluginPath) {
+        stopPlugin(pluginName, false);
+        unloadPlugin(pluginName, false);
+        try {
+            loadPlugin(pluginPath);
+        } catch (PluginAlreadyLoadedException ex) {
+            // ignore
+        }
+    }
+
+    /**
      * Release plugin holding release on stop.
      */
     public void releaseAdditionalResources(String pluginId) {
@@ -403,6 +425,37 @@ public class HaloPluginManager extends DefaultPluginManager
         if (extensionFinder instanceof SpringComponentsFinder springComponentsFinder) {
             springComponentsFinder.removeComponentsStorage(pluginId);
         }
+    }
+
+    /**
+     * <p>Refresh plugin wrapper by plugin name.</p>
+     *
+     * <p>It will be create a new plugin wrapper and replace old plugin wrapper to clean
+     * {@link PluginWrapper#getPlugin()} cache object.</p>
+     *
+     * @param pluginName plugin name
+     * @return refreshed plugin wrapper instance, plugin cache object will be null
+     * @throws IllegalArgumentException if plugin not found
+     */
+    protected synchronized PluginWrapper refreshPluginWrapper(String pluginName) {
+        checkPluginId(pluginName);
+        // get old plugin wrapper
+        PluginWrapper pluginWrapper = getPlugin(pluginName);
+        // create new plugin wrapper to replace old plugin wrapper
+        PluginWrapper refreshed = copyPluginWrapper(pluginWrapper);
+        this.plugins.put(pluginName, refreshed);
+        return refreshed;
+    }
+
+    @NonNull
+    PluginWrapper copyPluginWrapper(@NonNull PluginWrapper pluginWrapper) {
+        PluginWrapper refreshed =
+            createPluginWrapper(pluginWrapper.getDescriptor(), pluginWrapper.getPluginPath(),
+                pluginWrapper.getPluginClassLoader());
+        refreshed.setPluginFactory(getPluginFactory());
+        refreshed.setPluginState(pluginWrapper.getPluginState());
+        refreshed.setFailedException(pluginWrapper.getFailedException());
+        return refreshed;
     }
 
     @Override

@@ -1,8 +1,6 @@
 <script lang="ts" setup>
-import { onBeforeMount, computed, watch } from "vue";
-import router from "@/router";
+import { computed, watch } from "vue";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
-import { useUserStore } from "@/stores/user";
 import LoginForm from "@/components/login/LoginForm.vue";
 import { useRouteQuery } from "@vueuse/router";
 import SignupForm from "@/components/signup/SignupForm.vue";
@@ -15,17 +13,10 @@ import { locales, getBrowserLanguage, i18n } from "@/locales";
 import MdiTranslate from "~icons/mdi/translate";
 import { useLocalStorage } from "@vueuse/core";
 
-const userStore = useUserStore();
 const { globalInfo } = useGlobalInfoFetch();
 const { t } = useI18n();
 
 const SIGNUP_TYPE = "signup";
-
-onBeforeMount(() => {
-  if (!userStore.isAnonymous) {
-    router.push({ name: "Dashboard" });
-  }
-});
 
 function onLoginSucceed() {
   window.location.reload();

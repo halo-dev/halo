@@ -1,10 +1,11 @@
 package run.halo.app.search.post;
 
+import static run.halo.app.core.extension.content.Post.VisibleEnum.PUBLIC;
+
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.event.EventListener;
@@ -12,8 +13,9 @@ import org.springframework.stereotype.Component;
 import reactor.core.Exceptions;
 import run.halo.app.event.post.PostEvent;
 import run.halo.app.event.post.PostPublishedEvent;
-import run.halo.app.event.post.PostRecycledEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
+import run.halo.app.event.post.PostUpdatedEvent;
+import run.halo.app.event.post.PostVisibleChangedEvent;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.DefaultController;
@@ -50,22 +52,20 @@ public class PostEventReconciler implements Reconciler<PostEvent>, SmartLifecycl
 
     @Override
     public Result reconcile(PostEvent postEvent) {
-        if (postEvent instanceof PostPublishedEvent) {
-            try {
-                addPostDoc(postEvent.getName());
-            } catch (InterruptedException e) {
-                throw Exceptions.propagate(e);
-            }
+        if (postEvent instanceof PostPublishedEvent || postEvent instanceof PostUpdatedEvent) {
+            addPostDoc(postEvent.getName());
         }
-        if (postEvent instanceof PostUnpublishedEvent
-            || postEvent instanceof PostRecycledEvent) {
-            try {
+        if (postEvent instanceof PostUnpublishedEvent) {
+            deletePostDoc(postEvent.getName());
+        }
+        if (postEvent instanceof PostVisibleChangedEvent visibleChangedEvent) {
+            if (PUBLIC.equals(visibleChangedEvent.getOldVisible())) {
                 deletePostDoc(postEvent.getName());
-            } catch (InterruptedException e) {
-                throw Exceptions.propagate(e);
+            } else if (PUBLIC.equals(visibleChangedEvent.getNewVisible())) {
+                addPostDoc(postEvent.getName());
             }
         }
-        return null;
+        return Result.doNotRetry();
     }
 
     @Override
@@ -80,24 +80,13 @@ public class PostEventReconciler implements Reconciler<PostEvent>, SmartLifecycl
         );
     }
 
-    @EventListener(PostPublishedEvent.class)
-    public void handlePostPublished(PostPublishedEvent publishedEvent) {
-        postEventQueue.addImmediately(publishedEvent);
+    @EventListener(PostEvent.class)
+    public void handlePostEvent(PostEvent event) {
+        postEventQueue.addImmediately(event);
     }
 
-    @EventListener(PostUnpublishedEvent.class)
-    public void handlePostUnpublished(PostUnpublishedEvent unpublishedEvent) {
-        postEventQueue.addImmediately(unpublishedEvent);
-    }
-
-    @EventListener(PostRecycledEvent.class)
-    public void handlePostRecycled(PostRecycledEvent recycledEvent) {
-        postEventQueue.addImmediately(recycledEvent);
-    }
-
-    void addPostDoc(String postName) throws InterruptedException {
-        var latch = new CountDownLatch(1);
-        var disposable = postFinder.getByName(postName)
+    void addPostDoc(String postName) {
+        postFinder.getByName(postName)
             .map(PostDocUtils::from)
             .flatMap(postDoc -> extensionGetter.getEnabledExtension(PostSearchService.class)
                 .doOnNext(searchService -> {
@@ -108,21 +97,12 @@ public class PostEventReconciler implements Reconciler<PostEvent>, SmartLifecycl
                     }
                 })
             )
-            .doFinally(signalType -> latch.countDown())
-            .subscribe(service -> {
-            }, throwable -> {
-                throw Exceptions.propagate(throwable);
-            });
-        try {
-            latch.await();
-        } finally {
-            disposable.dispose();
-        }
+            .then()
+            .block();
     }
 
-    void deletePostDoc(String postName) throws InterruptedException {
-        var latch = new CountDownLatch(1);
-        var disposable = extensionGetter.getEnabledExtension(PostSearchService.class)
+    void deletePostDoc(String postName) {
+        extensionGetter.getEnabledExtension(PostSearchService.class)
             .doOnNext(searchService -> {
                 try {
                     searchService.removeDocuments(Set.of(postName));
@@ -130,16 +110,8 @@ public class PostEventReconciler implements Reconciler<PostEvent>, SmartLifecycl
                     throw Exceptions.propagate(e);
                 }
             })
-            .doFinally(signalType -> latch.countDown())
-            .subscribe(service -> {
-            }, throwable -> {
-                throw Exceptions.propagate(throwable);
-            });
-        try {
-            latch.await();
-        } finally {
-            disposable.dispose();
-        }
+            .then()
+            .block();
     }
 
     @Override

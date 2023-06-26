@@ -1,32 +1,35 @@
 import type { FormKitNode } from "@formkit/core";
 
-const isCheckboxAndRadioMultiple = (node) =>
-  (node.props.type === "checkbox" || node.props.type === "radio") &&
-  node.props.options;
+const hasLegendNode = (node) =>
+  ["checkbox", "radio", "repeater", "group"].includes(node.props.type);
 
 export default function requiredAsterisk(node: FormKitNode) {
   node.on("created", () => {
+    const isRequired = node.props.parsedRules.some(
+      (rule) => rule.name === "required"
+    );
+
+    if (!isRequired) return;
+
     if (!node.props.definition) return;
+
+    node.props.definition.schemaMemoKey = `required_${
+      hasLegendNode(node) ? "multi_" : ""
+    }${node.props.definition.schemaMemoKey}`;
 
     const schemaFn = node.props.definition?.schema;
 
     if (typeof schemaFn !== "function") return;
 
     node.props.definition.schema = (sectionsSchema = {}) => {
-      const isRequired = node.props.parsedRules.some(
-        (rule) => rule.name === "required"
-      );
-
-      if (isRequired) {
-        if (isCheckboxAndRadioMultiple(node)) {
-          sectionsSchema.legend = {
-            children: ["$label", " *"],
-          };
-        } else {
-          sectionsSchema.label = {
-            children: ["$label", " *"],
-          };
-        }
+      if (hasLegendNode(node)) {
+        sectionsSchema.legend = {
+          children: ["$label", " *"],
+        };
+      } else {
+        sectionsSchema.label = {
+          children: ["$label", " *"],
+        };
       }
 
       return schemaFn(sectionsSchema);

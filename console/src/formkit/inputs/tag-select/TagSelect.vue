@@ -119,6 +119,7 @@ const handleSelect = (tag: Tag) => {
       );
     } else {
       props.context.node.input([...currentValue, tag.metadata.name]);
+      text.value = "";
     }
     return;
   }

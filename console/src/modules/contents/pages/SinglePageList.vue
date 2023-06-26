@@ -24,6 +24,7 @@ import {
   Toast,
   VDropdown,
   VDropdownItem,
+  VDropdownDivider,
 } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
@@ -62,8 +63,7 @@ interface PublishStatusItem {
 
 interface SortItem {
   label: string;
-  sort: "PUBLISH_TIME" | "CREATE_TIME";
-  sortOrder: boolean;
+  sort: string;
 }
 
 const VisibleItems: VisibleItem[] = [
@@ -99,23 +99,19 @@ const PublishStatusItems: PublishStatusItem[] = [
 const SortItems: SortItem[] = [
   {
     label: t("core.page.filters.sort.items.publish_time_desc"),
-    sort: "PUBLISH_TIME",
-    sortOrder: false,
+    sort: "publishTime,desc",
   },
   {
     label: t("core.page.filters.sort.items.publish_time_asc"),
-    sort: "PUBLISH_TIME",
-    sortOrder: true,
+    sort: "publishTime,asc",
   },
   {
     label: t("core.page.filters.sort.items.create_time_desc"),
-    sort: "CREATE_TIME",
-    sortOrder: false,
+    sort: "creationTimestamp,desc",
   },
   {
     label: t("core.page.filters.sort.items.create_time_asc"),
-    sort: "CREATE_TIME",
-    sortOrder: true,
+    sort: "creationTimestamp,asc",
   },
 ];
 
@@ -218,8 +214,7 @@ const {
       page: page.value,
       size: size.value,
       visible: selectedVisibleItem.value.value,
-      sort: selectedSortItem.value?.sort,
-      sortOrder: selectedSortItem.value?.sortOrder,
+      sort: [selectedSortItem.value?.sort].filter(Boolean) as string[],
       keyword: keyword.value,
       contributor: contributors,
     });
@@ -432,6 +427,13 @@ const { mutate: changeVisibleMutation } = useMutation({
     Toast.error(t("core.common.toast.operation_failed"));
   },
 });
+
+const getExternalUrl = (singlePage: SinglePage) => {
+  if (singlePage.metadata.labels?.[singlePageLabels.PUBLISHED] === "true") {
+    return singlePage.status?.permalink;
+  }
+  return `/preview/singlepages/${singlePage.metadata.name}`;
+};
 </script>
 
 <template>
@@ -651,10 +653,7 @@ const { mutate: changeVisibleMutation } = useMutation({
                     <VDropdownItem
                       v-for="(sortItem, index) in SortItems"
                       :key="index"
-                      :selected="
-                        sortItem.sort === selectedSortItem?.sort &&
-                        sortItem.sortOrder === selectedSortItem?.sortOrder
-                      "
+                      :selected="sortItem.sort === selectedSortItem?.sort"
                       @click="handleSortItemChange(sortItem)"
                     >
                       {{ sortItem.label }}
@@ -745,10 +744,8 @@ const { mutate: changeVisibleMutation } = useMutation({
                         <VStatusDot state="success" animate />
                       </RouterLink>
                       <a
-                        v-if="singlePage.page.status?.permalink"
                         target="_blank"
-                        :href="singlePage.page.status?.permalink"
-                        :title="singlePage.page.status?.permalink"
+                        :href="getExternalUrl(singlePage.page)"
                         class="hidden text-gray-600 transition-all hover:text-gray-900 group-hover:inline-block"
                       >
                         <IconExternalLinkLine class="h-3.5 w-3.5" />
@@ -846,9 +843,20 @@ const { mutate: changeVisibleMutation } = useMutation({
                 v-if="currentUserHasPermission(['system:singlepages:manage'])"
                 #dropdownItems
               >
+                <VDropdownItem
+                  @click="
+                    $router.push({
+                      name: 'SinglePageEditor',
+                      query: { name: singlePage.page.metadata.name },
+                    })
+                  "
+                >
+                  {{ $t("core.common.buttons.edit") }}
+                </VDropdownItem>
                 <VDropdownItem @click="handleOpenSettingModal(singlePage.page)">
                   {{ $t("core.common.buttons.setting") }}
                 </VDropdownItem>
+                <VDropdownDivider />
                 <VDropdownItem
                   type="danger"
                   @click="handleDelete(singlePage.page)"

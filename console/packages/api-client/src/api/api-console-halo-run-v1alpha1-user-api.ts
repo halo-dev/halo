@@ -406,24 +406,24 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (
     },
     /**
      * List users
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
-     * @param {string} [role]
-     * @param {string} [keyword]
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {number} [page] The page number. Zero indicates no page.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {string} [keyword]
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
+     * @param {string} [role]
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listUsers: async (
-      sort?: Array<string>,
-      role?: string,
-      keyword?: string,
-      size?: number,
-      page?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      keyword?: string,
+      labelSelector?: Array<string>,
+      page?: number,
+      role?: string,
+      size?: number,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/api.console.halo.run/v1alpha1/users`;
@@ -450,32 +450,32 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (sort) {
-        localVarQueryParameter["sort"] = Array.from(sort);
-      }
-
-      if (role !== undefined) {
-        localVarQueryParameter["role"] = role;
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
       if (keyword !== undefined) {
         localVarQueryParameter["keyword"] = keyword;
       }
 
-      if (size !== undefined) {
-        localVarQueryParameter["size"] = size;
+      if (labelSelector) {
+        localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
       }
 
-      if (labelSelector) {
-        localVarQueryParameter["labelSelector"] = labelSelector;
+      if (role !== undefined) {
+        localVarQueryParameter["role"] = role;
       }
 
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
+      if (size !== undefined) {
+        localVarQueryParameter["size"] = size;
+      }
+
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -704,24 +704,24 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (
     },
     /**
      * List users
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
-     * @param {string} [role]
-     * @param {string} [keyword]
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {number} [page] The page number. Zero indicates no page.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {string} [keyword]
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
+     * @param {string} [role]
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listUsers(
-      sort?: Array<string>,
-      role?: string,
-      keyword?: string,
-      size?: number,
-      page?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      keyword?: string,
+      labelSelector?: Array<string>,
+      page?: number,
+      role?: string,
+      size?: number,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -730,13 +730,13 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (
       ) => AxiosPromise<UserEndpointListedUserList>
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.listUsers(
-        sort,
-        role,
-        keyword,
-        size,
-        page,
-        labelSelector,
         fieldSelector,
+        keyword,
+        labelSelector,
+        page,
+        role,
+        size,
+        sort,
         options
       );
       return createRequestFunction(
@@ -883,13 +883,13 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
     ): AxiosPromise<UserEndpointListedUserList> {
       return localVarFp
         .listUsers(
-          requestParameters.sort,
-          requestParameters.role,
-          requestParameters.keyword,
-          requestParameters.size,
-          requestParameters.page,
-          requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.keyword,
+          requestParameters.labelSelector,
+          requestParameters.page,
+          requestParameters.role,
+          requestParameters.size,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -1002,18 +1002,11 @@ export interface ApiConsoleHaloRunV1alpha1UserApiGrantPermissionRequest {
  */
 export interface ApiConsoleHaloRunV1alpha1UserApiListUsersRequest {
   /**
-   * Sort property and direction of the list result. Supported fields: creationTimestamp
+   * Field selector for filtering.
    * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly sort?: Array<string>;
-
-  /**
-   *
-   * @type {string}
-   * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
-   */
-  readonly role?: string;
+  readonly fieldSelector?: Array<string>;
 
   /**
    *
@@ -1023,11 +1016,11 @@ export interface ApiConsoleHaloRunV1alpha1UserApiListUsersRequest {
   readonly keyword?: string;
 
   /**
-   * Size of one page. Zero indicates no limit.
-   * @type {number}
+   * Label selector for filtering.
+   * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly size?: number;
+  readonly labelSelector?: Array<string>;
 
   /**
    * The page number. Zero indicates no page.
@@ -1037,18 +1030,25 @@ export interface ApiConsoleHaloRunV1alpha1UserApiListUsersRequest {
   readonly page?: number;
 
   /**
-   * Label selector for filtering.
-   * @type {Array<string>}
+   *
+   * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly labelSelector?: Array<string>;
+  readonly role?: string;
 
   /**
-   * Field selector for filtering.
+   * Size of one page. Zero indicates no limit.
+   * @type {number}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
+   */
+  readonly size?: number;
+
+  /**
+   * Sort property and direction of the list result. Supported fields: creationTimestamp
    * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly fieldSelector?: Array<string>;
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -1185,13 +1185,13 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
   ) {
     return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
       .listUsers(
-        requestParameters.sort,
-        requestParameters.role,
-        requestParameters.keyword,
-        requestParameters.size,
-        requestParameters.page,
-        requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.keyword,
+        requestParameters.labelSelector,
+        requestParameters.page,
+        requestParameters.role,
+        requestParameters.size,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));

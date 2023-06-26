@@ -19,7 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PostService;
@@ -50,7 +50,7 @@ class PostReconcilerTest {
     private PostService postService;
 
     @Mock
-    private ApplicationContext applicationContext;
+    private ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
     private PostReconciler postReconciler;
@@ -77,7 +77,7 @@ class PostReconcilerTest {
         ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
         postReconciler.reconcile(new Reconciler.Request(name));
 
-        verify(client, times(3)).update(captor.capture());
+        verify(client, times(1)).update(captor.capture());
 
         verify(postPermalinkPolicy, times(1)).permalink(any());
 
@@ -118,7 +118,7 @@ class PostReconcilerTest {
         ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
         postReconciler.reconcile(new Reconciler.Request(name));
 
-        verify(client, times(4)).update(captor.capture());
+        verify(client, times(1)).update(captor.capture());
         Post value = captor.getValue();
         assertThat(value.getStatus().getExcerpt()).isEqualTo("hello world");
     }
@@ -154,10 +154,10 @@ class PostReconcilerTest {
             ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
             postReconciler.reconcile(new Reconciler.Request(name));
 
-            verify(client, times(4)).update(captor.capture());
+            verify(client, times(1)).update(captor.capture());
             Post value = captor.getValue();
             assertThat(value.getStatus().getLastModifyTime()).isEqualTo(lastModifyTime);
-            verify(applicationContext).publishEvent(any(PostPublishedEvent.class));
+            verify(eventPublisher).publishEvent(any(PostPublishedEvent.class));
         }
 
         @Test
@@ -183,7 +183,7 @@ class PostReconcilerTest {
             ArgumentCaptor<Post> captor = ArgumentCaptor.forClass(Post.class);
             postReconciler.reconcile(new Reconciler.Request(name));
 
-            verify(client, times(3)).update(captor.capture());
+            verify(client, times(1)).update(captor.capture());
             Post value = captor.getValue();
             assertThat(value.getStatus().getLastModifyTime()).isNull();
         }

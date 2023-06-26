@@ -18,6 +18,7 @@ class DelayedEntryTest {
         var delayedEntry = new DelayedEntry<>("fake", Duration.ofMillis(100), () -> now);
         assertEquals(100, delayedEntry.getDelay(TimeUnit.MILLISECONDS));
         assertEquals(Duration.ofMillis(100), delayedEntry.getRetryAfter());
+        assertEquals(now.plusMillis(100), delayedEntry.getReadyAt());
         assertEquals("fake", delayedEntry.getEntry());
 
         delayedEntry = new DelayedEntry<>("fake", now.plus(Duration.ofSeconds(1)), () -> now);

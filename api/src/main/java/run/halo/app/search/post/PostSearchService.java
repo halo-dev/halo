@@ -14,4 +14,6 @@ public interface PostSearchService extends ExtensionPoint {
 
     void removeDocuments(Set<String> postNames) throws Exception;
 
+    void removeAllDocuments() throws Exception;
+
 }

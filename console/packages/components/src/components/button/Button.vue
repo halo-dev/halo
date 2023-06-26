@@ -123,6 +123,10 @@ function handleClick() {
 .btn-default {
   border: 1px solid #d9d9d9;
 
+  &:hover {
+    @apply bg-gray-100;
+  }
+
   .btn-icon {
     @apply text-secondary;
   }

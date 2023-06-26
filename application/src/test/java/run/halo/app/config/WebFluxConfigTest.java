@@ -19,22 +19,33 @@ class WebFluxConfigTest {
     class ConsoleRequest {
 
         @Test
-        void shouldRedirect() {
-            List.of("/console", "/console/index", "/console/index.html")
-                .forEach(index -> {
-                    webClient.get().uri(index)
-                        .exchange()
-                        .expectStatus().isPermanentRedirect()
-                        .expectHeader().location("/console/");
-                });
+        void shouldRequestConsoleIndex() {
+            List.of(
+                    "/console",
+                    "/console/index",
+                    "/console/index.html",
+                    "/console/dashboard",
+                    "/console/fake"
+                )
+                .forEach(uri -> webClient.get().uri(uri)
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody(String.class).isEqualTo("console index\n"));
         }
 
         @Test
-        void shouldRequestConsoleIndex() {
-            webClient.get().uri("/console/")
+        void shouldRequestConsoleAssetsCorrectly() {
+            webClient.get().uri("/console/assets/fake.txt")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(String.class).isEqualTo("console index\n");
+                .expectBody(String.class).isEqualTo("fake.\n");
+        }
+
+        @Test
+        void shouldResponseNotFoundWhenAssetsNotExist() {
+            webClient.get().uri("/console/assets/not-found.txt")
+                .exchange()
+                .expectStatus().isNotFound();
         }
     }
 

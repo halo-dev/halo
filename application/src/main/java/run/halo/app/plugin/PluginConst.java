@@ -16,6 +16,10 @@ public interface PluginConst {
 
     String SYSTEM_PLUGIN_NAME = "system";
 
+    String RELOAD_ANNO = "plugin.halo.run/reload";
+
+    String PLUGIN_PATH = "plugin.halo.run/plugin-path";
+
     static String assertsRoutePrefix(String pluginName) {
         return "/plugins/" + pluginName + "/assets/";
     }

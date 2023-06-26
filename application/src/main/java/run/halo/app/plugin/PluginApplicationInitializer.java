@@ -1,17 +1,30 @@
 package run.halo.app.plugin;
 
+import static org.springframework.util.ResourceUtils.CLASSPATH_URL_PREFIX;
+
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.PluginWrapper;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.boot.env.PropertySourceLoader;
+import org.springframework.boot.env.YamlPropertySourceLoader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigUtils;
+import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.util.StopWatch;
+import reactor.core.Exceptions;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.properties.HaloProperties;
 
 /**
  * Plugin application initializer will create plugin application context by plugin id and
@@ -28,6 +41,8 @@ public class PluginApplicationInitializer {
     private final SharedApplicationContextHolder sharedApplicationContextHolder;
     private final ApplicationContext rootApplicationContext;
 
+    private final HaloProperties haloProperties;
+
     public PluginApplicationInitializer(HaloPluginManager haloPluginManager,
         ApplicationContext rootApplicationContext) {
         Assert.notNull(haloPluginManager, "The haloPluginManager must not be null");
@@ -36,6 +51,7 @@ public class PluginApplicationInitializer {
         this.rootApplicationContext = rootApplicationContext;
         sharedApplicationContextHolder = rootApplicationContext
             .getBean(SharedApplicationContextHolder.class);
+        haloProperties = rootApplicationContext.getBean(HaloProperties.class);
     }
 
     private PluginApplicationContext createPluginApplicationContext(String pluginId) {
@@ -45,12 +61,12 @@ public class PluginApplicationInitializer {
         StopWatch stopWatch = new StopWatch("initialize-plugin-context");
         stopWatch.start("Create PluginApplicationContext");
         PluginApplicationContext pluginApplicationContext = new PluginApplicationContext();
+        pluginApplicationContext.setClassLoader(pluginClassLoader);
 
         if (sharedApplicationContextHolder != null) {
             pluginApplicationContext.setParent(sharedApplicationContextHolder.getInstance());
         }
 
-        pluginApplicationContext.setClassLoader(pluginClassLoader);
         // populate plugin to plugin application context
         pluginApplicationContext.setPluginId(pluginId);
         stopWatch.stop();
@@ -58,6 +74,11 @@ public class PluginApplicationInitializer {
         stopWatch.start("Create DefaultResourceLoader");
         DefaultResourceLoader defaultResourceLoader = new DefaultResourceLoader(pluginClassLoader);
         pluginApplicationContext.setResourceLoader(defaultResourceLoader);
+
+        var mutablePropertySources = pluginApplicationContext.getEnvironment().getPropertySources();
+        resolvePropertySources(pluginId, pluginApplicationContext)
+            .forEach(mutablePropertySources::addLast);
+
         stopWatch.stop();
 
         DefaultListableBeanFactory beanFactory =
@@ -168,5 +189,56 @@ public class PluginApplicationInitializer {
         log.debug("total millis: {}ms -> {}", stopWatch.getTotalTimeMillis(),
             stopWatch.prettyPrint());
         return candidateComponents;
+    }
+
+    private List<PropertySource<?>> resolvePropertySources(String pluginId,
+        ResourceLoader resourceLoader) {
+        var propertySourceLoader = new YamlPropertySourceLoader();
+        var propertySources = new ArrayList<PropertySource<?>>();
+        var configsPath = haloProperties.getWorkDir().resolve("plugins").resolve("configs");
+
+        // resolve user defined config
+        Stream.of(
+                configsPath.resolve(pluginId + ".yaml"),
+                configsPath.resolve(pluginId + ".yml")
+            )
+            .map(path -> resourceLoader.getResource(path.toUri().toString()))
+            .forEach(resource -> {
+                var sources =
+                    loadPropertySources("user-defined-config", resource, propertySourceLoader);
+                propertySources.addAll(sources);
+            });
+
+        // resolve default config
+        Stream.of(
+                CLASSPATH_URL_PREFIX + "/config.yaml",
+                CLASSPATH_URL_PREFIX + "/config.yaml"
+            )
+            .map(resourceLoader::getResource)
+            .forEach(resource -> {
+                var sources = loadPropertySources("default-config", resource, propertySourceLoader);
+                propertySources.addAll(sources);
+            });
+        return propertySources;
+    }
+
+    private List<PropertySource<?>> loadPropertySources(String propertySourceName,
+        Resource resource,
+        PropertySourceLoader propertySourceLoader) {
+        logConfigLocation(resource);
+        if (resource.exists()) {
+            try {
+                return propertySourceLoader.load(propertySourceName, resource);
+            } catch (IOException e) {
+                throw Exceptions.propagate(e);
+            }
+        }
+        return List.of();
+    }
+
+    private void logConfigLocation(Resource resource) {
+        if (log.isDebugEnabled()) {
+            log.debug("Loading property sources from {}", resource);
+        }
     }
 }

@@ -26,6 +26,7 @@ import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.router.EmptyView;
+import run.halo.app.theme.router.ModelConst;
 import run.halo.app.theme.router.ViewNameResolver;
 
 /**

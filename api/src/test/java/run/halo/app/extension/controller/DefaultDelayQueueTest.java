@@ -98,6 +98,38 @@ class DefaultDelayQueueTest {
         assertEquals(fakeEntry, queue.peek());
     }
 
+    @Test
+    void shouldNotAddIfHavingEarlierEntryInQueue() {
+        queue = new DefaultQueue<>(() -> now, Duration.ZERO);
+        var fakeEntry = new DelayedEntry<>(newRequest("fake-name"), Duration.ZERO,
+            () -> this.now);
+
+        assertTrue(queue.add(fakeEntry));
+        assertEquals(1, queue.size());
+        assertEquals(fakeEntry, queue.peek());
+
+        assertFalse(queue.add(fakeEntry));
+        var laterEntry = new DelayedEntry<>(newRequest("fake-name"), Duration.ofMillis(100),
+            () -> this.now);
+        assertFalse(queue.add(laterEntry));
+    }
+
+    @Test
+    void shouldAddIfHavingLaterEntryInQueue() {
+        queue = new DefaultQueue<>(() -> now, Duration.ZERO);
+        var fakeEntry = new DelayedEntry<>(newRequest("fake-name"), Duration.ofMillis(100),
+            () -> this.now);
+
+        assertTrue(queue.add(fakeEntry));
+        assertEquals(1, queue.size());
+        assertEquals(fakeEntry, queue.peek());
+
+        assertFalse(queue.add(fakeEntry));
+        var laterEntry = new DelayedEntry<>(newRequest("fake-name"), Duration.ofMillis(99),
+            () -> this.now);
+        assertTrue(queue.add(laterEntry));
+    }
+
     Request newRequest(String name) {
         return new Request(name);
     }

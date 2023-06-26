@@ -19,6 +19,14 @@ import run.halo.app.theme.finders.vo.PostVo;
  */
 public interface PostFinder {
 
+    /**
+     * Gets post detail by name.
+     * <p>
+     * We ensure the post is public, non-deleted and published.
+     *
+     * @param postName is post name
+     * @return post detail
+     */
     Mono<PostVo> getByName(String postName);
 
     Mono<ContentVo> content(String postName);

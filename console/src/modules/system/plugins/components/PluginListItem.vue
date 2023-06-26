@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import {
-  VSpace,
   VSwitch,
-  VTag,
   VStatusDot,
   VEntity,
   VEntityField,
@@ -11,6 +9,7 @@ import {
   Toast,
   VDropdownItem,
   VDropdown,
+  VDropdownDivider,
 } from "@halo-dev/components";
 import PluginUploadModal from "./PluginUploadModal.vue";
 import { ref, toRefs } from "vue";
@@ -33,19 +32,12 @@ const props = withDefaults(
   }
 );
 
-const emit = defineEmits<{
-  (event: "reload"): void;
-}>();
-
 const { plugin } = toRefs(props);
 
 const upgradeModal = ref(false);
 
-const { isStarted, changeStatus, uninstall } = usePluginLifeCycle(plugin);
-
-const onUpgradeModalClose = () => {
-  emit("reload");
-};
+const { getFailedMessage, changeStatus, uninstall } =
+  usePluginLifeCycle(plugin);
 
 const handleResetSettingConfig = async () => {
   Dialog.warning({
@@ -71,20 +63,9 @@ const handleResetSettingConfig = async () => {
     },
   });
 };
-
-const getFailedMessage = (plugin: Plugin) => {
-  if (plugin.status?.conditions?.length) {
-    const lastCondition = plugin.status.conditions[0];
-    return [lastCondition.reason, lastCondition.message].join(":");
-  }
-};
 </script>
 <template>
-  <PluginUploadModal
-    v-model:visible="upgradeModal"
-    :upgrade-plugin="plugin"
-    @close="onUpgradeModalClose"
-  />
+  <PluginUploadModal v-model:visible="upgradeModal" :upgrade-plugin="plugin" />
   <VEntity>
     <template #start>
       <VEntityField>
@@ -103,28 +84,12 @@ const getFailedMessage = (plugin: Plugin) => {
           name: 'PluginDetail',
           params: { name: plugin?.metadata.name },
         }"
-      >
-        <template #extra>
-          <VSpace>
-            <VTag>
-              {{
-                isStarted
-                  ? $t("core.common.status.activated")
-                  : $t("core.common.status.not_activated")
-              }}
-            </VTag>
-          </VSpace>
-        </template>
-      </VEntityField>
+      />
     </template>
     <template #end>
       <VEntityField v-if="plugin?.status?.phase === 'FAILED'">
         <template #description>
-          <VStatusDot
-            v-tooltip="getFailedMessage(plugin)"
-            state="error"
-            animate
-          />
+          <VStatusDot v-tooltip="getFailedMessage()" state="error" animate />
         </template>
       </VEntityField>
       <VEntityField v-if="plugin?.metadata.deletionTimestamp">
@@ -170,9 +135,20 @@ const getFailedMessage = (plugin: Plugin) => {
       v-if="currentUserHasPermission(['system:plugins:manage'])"
       #dropdownItems
     >
+      <VDropdownItem
+        @click="
+          $router.push({
+            name: 'PluginDetail',
+            params: { name: plugin?.metadata.name },
+          })
+        "
+      >
+        {{ $t("core.common.buttons.detail") }}
+      </VDropdownItem>
       <VDropdownItem @click="upgradeModal = true">
         {{ $t("core.common.buttons.upgrade") }}
       </VDropdownItem>
+      <VDropdownDivider />
       <VDropdown placement="left" :triggers="['click']">
         <VDropdownItem type="danger">
           {{ $t("core.common.buttons.uninstall") }}

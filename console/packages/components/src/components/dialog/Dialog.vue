@@ -78,7 +78,14 @@ const handleCancel = () => {
 const handleConfirm = async () => {
   if (props.onConfirm) {
     loading.value = true;
-    await props.onConfirm();
+
+    try {
+      await props.onConfirm();
+    } catch (error) {
+      console.error("Failed to execute onConfirm: ", error);
+    } finally {
+      loading.value = false;
+    }
   }
   handleClose();
 };
@@ -111,7 +118,7 @@ const handleClose = () => {
     </div>
     <div class="flex items-center gap-4">
       <div class="flex-1 flex items-stretch">
-        <div class="text-sm text-gray-700">{{ description }}</div>
+        <div class="text-sm text-gray-700 break-all">{{ description }}</div>
       </div>
     </div>
     <template #footer>
