@@ -133,6 +133,7 @@
     "jsdom": "^20.0.3",
     "lint-staged": "^13.2.2",
     "postcss": "^8.4.21",
+    "postcss-viewport-height-correction": "^1.1.1",
     "prettier": "^2.8.8",
     "prettier-plugin-tailwindcss": "^0.1.13",
     "randomstring": "^1.2.3",
