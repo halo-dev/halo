@@ -10,6 +10,9 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -47,6 +51,7 @@ import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.exception.AccessDeniedException;
+import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.infra.utils.IpAddressUtils;
 import run.halo.app.theme.finders.CommentFinder;
@@ -65,6 +70,8 @@ public class CommentFinderEndpoint implements CustomEndpoint {
     private final CommentService commentService;
     private final ReplyService replyService;
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
+    private final RateLimiterRegistry rateLimiterRegistry;
+    private final MessageSource messageSource;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -152,7 +159,16 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                 comment.getSpec().setUserAgent(HaloUtils.userAgentFrom(request));
                 return commentService.create(comment);
             })
-            .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
+            .flatMap(comment -> ServerResponse.ok().bodyValue(comment))
+            .transformDeferred(createIpBasedRateLimiter(request))
+            .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
+    }
+
+    private <T> RateLimiterOperator<T> createIpBasedRateLimiter(ServerRequest request) {
+        var clientIp = IpAddressUtils.getIpAddress(request);
+        var rateLimiter = rateLimiterRegistry.rateLimiter("comment-creation-from-ip-" + clientIp,
+            "comment-creation");
+        return RateLimiterOperator.of(rateLimiter);
     }
 
     Mono<ServerResponse> createReply(ServerRequest request) {

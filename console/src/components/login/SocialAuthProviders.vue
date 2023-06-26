@@ -1,10 +1,14 @@
 <script lang="ts" setup>
-// auth providers
+import { ref, provide } from "vue";
+import type { Ref } from "vue";
 
+// auth providers
 import { useGlobalInfoFetch } from "@/composables/use-global-info";
 import SocialAuthProviderItem from "./SocialAuthProviderItem.vue";
 
 const { globalInfo } = useGlobalInfoFetch();
+
+provide<Ref<boolean>>("disabled", ref(false));
 </script>
 
 <template>

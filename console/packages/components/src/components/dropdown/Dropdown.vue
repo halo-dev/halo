@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { Dropdown as FloatingDropdown, type Placement } from "floating-vue";
 import "floating-vue/dist/style.css";
+import { provide, ref } from "vue";
+import { DropdownContextInjectionKey } from "./symbols";
 
 withDefaults(
   defineProps<{
@@ -15,13 +17,28 @@ withDefaults(
   }
 );
 
+const dropdownRef = ref();
+
+function hide() {
+  dropdownRef.value?.hide();
+}
+
+provide(DropdownContextInjectionKey, {
+  hide,
+});
+
 const emit = defineEmits<{
   (event: "show"): void;
 }>();
+
+defineExpose({
+  hide,
+});
 </script>
 
 <template>
   <FloatingDropdown
+    ref="dropdownRef"
     :placement="placement"
     :triggers="triggers"
     @show="emit('show')"

@@ -4,3 +4,4 @@ export * from "./core/plugins";
 export * from "./states/pages";
 export * from "./states/attachment-selector";
 export * from "./states/editor";
+export * from "./states/comment-subject-ref";

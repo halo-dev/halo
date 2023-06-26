@@ -29,7 +29,7 @@ public class BasePluginFactory implements PluginFactory {
                         "No bean named 'basePlugin' found in the context create default instance");
                     DefaultListableBeanFactory beanFactory =
                         context.getDefaultListableBeanFactory();
-                    BasePlugin pluginInstance = new BasePlugin(pluginWrapper);
+                    BasePlugin pluginInstance = new BasePlugin();
                     beanFactory.registerSingleton(Plugin.class.getName(), pluginInstance);
                     return pluginInstance;
                 }

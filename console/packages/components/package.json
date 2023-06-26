@@ -48,7 +48,7 @@
     "@iconify-json/ri": "^1.1.4",
     "histoire": "^0.11.7",
     "unplugin-icons": "^0.14.14",
-    "vite-plugin-dts": "^1.7.3"
+    "vite-plugin-dts": "^2.3.0"
   },
   "peerDependencies": {
     "vue": "^3.2.37",
