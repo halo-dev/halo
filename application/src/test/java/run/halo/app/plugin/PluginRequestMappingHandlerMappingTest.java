@@ -1,7 +1,6 @@
 package run.halo.app.plugin;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.get;
 import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.post;
@@ -20,7 +19,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.pf4j.PluginRuntimeException;
 import org.springframework.core.MethodIntrospector;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.HttpMethod;
@@ -74,15 +72,14 @@ class PluginRequestMappingHandlerMappingTest {
     }
 
     @Test
-    public void shouldFailWhenMissingApiVersion() throws Exception {
+    public void shouldKeepRawWhenMissingApiVersion() throws Exception {
         Method method = AppleMissingApiVersionController.class.getMethod("getName");
-        assertThatThrownBy(() ->
+        RequestMappingInfo info =
             this.handlerMapping.getPluginMappingForMethod("fakePlugin", method,
-                AppleMissingApiVersionController.class)).isInstanceOf(PluginRuntimeException.class)
-            .hasMessage(
-                "The handler [class run.halo.app.plugin"
-                    + ".PluginRequestMappingHandlerMappingTest$AppleMissingApiVersionController] "
-                    + "is missing @ApiVersion annotation.");
+                AppleMissingApiVersionController.class);
+
+        assertThat(info.getPatternsCondition().getPatterns())
+            .isEqualTo(Collections.singleton(new PathPatternParser().parse("/apples")));
     }
 
     @Test
@@ -172,6 +169,15 @@ class PluginRequestMappingHandlerMappingTest {
         assertError(mono, MethodNotAllowedException.class,
             ex -> assertThat(ex.getSupportedMethods()).isEqualTo(
                 Set.of(HttpMethod.GET, HttpMethod.HEAD)));
+    }
+
+    @Test
+    void buildPrefix() {
+        String s = handlerMapping.buildPrefix("fakePlugin", "v1");
+        assertThat(s).isEqualTo("/apis/api.plugin.halo.run/v1/plugins/fakePlugin");
+
+        s = handlerMapping.buildPrefix("fakePlugin", "fake.halo.run/v1alpha1");
+        assertThat(s).isEqualTo("/apis/fake.halo.run/v1alpha1");
     }
 
     @SuppressWarnings("unchecked")
