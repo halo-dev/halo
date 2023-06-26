@@ -15,7 +15,7 @@ import run.halo.app.core.extension.RoleBinding.Subject;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.GroupKind;
-import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.infra.exception.UserNotFoundException;
 
 public class DefaultUserDetailService
     implements ReactiveUserDetailsService, ReactiveUserDetailsPasswordService {
@@ -38,6 +38,8 @@ public class DefaultUserDetailService
     @Override
     public Mono<UserDetails> findByUsername(String username) {
         return userService.getUser(username)
+            .onErrorMap(UserNotFoundException.class,
+                e -> new BadCredentialsException("Invalid Credentials"))
             .flatMap(user -> {
                 var subject = new Subject(KIND, username, GROUP);
                 return roleService.listRoleRefs(subject)
@@ -49,9 +51,7 @@ public class DefaultUserDetailService
                         .password(user.getSpec().getPassword())
                         .roles(roleNames.toArray(new String[0]))
                         .build());
-            })
-            .onErrorMap(ExtensionNotFoundException.class,
-                e -> new BadCredentialsException("Invalid Credentials"));
+            });
     }
 
     private boolean isRoleRef(RoleRef roleRef) {
