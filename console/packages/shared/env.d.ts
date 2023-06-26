@@ -2,8 +2,8 @@
 
 export {};
 
+import type { Component } from "vue";
 import type { CoreMenuGroupId } from "./src/types/menus";
-
 
 declare module "*.vue" {
   import type { DefineComponent } from "vue";

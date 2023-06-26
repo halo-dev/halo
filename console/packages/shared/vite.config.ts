@@ -11,6 +11,7 @@ export default defineConfig({
     Vue(),
     VueJsx(),
     Dts({
+      tsConfigFilePath: "./tsconfig.app.json",
       entryRoot: "./src",
       outputDir: "./dist",
       insertTypesEntry: true,
