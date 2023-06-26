@@ -39,7 +39,7 @@ class ThemeTest {
 
         themeSpec.setRepo("https://test.com");
         themeSpec.setLogo("https://test.com");
-        themeSpec.setWebsite("https://test.com");
+        themeSpec.setHomepage("https://test.com");
         themeSpec.setDescription("test-description");
         themeSpec.setConfigMapName("test-config-map");
         themeSpec.setSettingName("test-setting");
@@ -56,7 +56,7 @@ class ThemeTest {
                         },
                         "description": "test-description",
                         "logo": "https://test.com",
-                        "website": "https://test.com",
+                        "homepage": "https://test.com",
                         "repo": "https://test.com",
                         "version": "*",
                         "requires": "*",
