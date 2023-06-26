@@ -117,7 +117,12 @@ const confirmCountMessage = computed(() => {
   >
     <VTabbar
       v-model:active-id="activeId"
-      :items="attachmentSelectProviders"
+      :items="
+        attachmentSelectProviders.map((provider) => ({
+          id: provider.id,
+          label: provider.label,
+        }))
+      "
       class="w-full"
       type="outline"
     ></VTabbar>
