@@ -124,6 +124,11 @@ core:
               dialog_title: Do you want to refresh the search engine index?
               dialog_content: This operation will recreate search engine indexes for all published posts.
               success_message: Refresh search engine index successfully.
+            refresh_page_cache:
+              title: Refresh Page Cache
+              dialog_title: Do you want to refresh the page cache?
+              dialog_content: This operation will clear the cache for all pages.
+              success_message: Refresh page cache successfully.
         user_stats:
           title: Users
         comment_stats:

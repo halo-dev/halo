@@ -25,7 +25,7 @@ public class CacheEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         return SpringdocRouteBuilder
             .route()
-            .POST("/cache/{name}/invalidation", request -> {
+            .POST("/caches/{name}/invalidation", request -> {
                 var cacheName = request.pathVariable("name");
                 if (cacheManager.getCacheNames().contains(cacheName)) {
                     var cache = cacheManager.getCache(cacheName);

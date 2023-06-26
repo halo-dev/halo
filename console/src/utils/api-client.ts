@@ -33,6 +33,7 @@ import {
   V1alpha1SettingApi,
   V1alpha1UserApi,
   V1alpha1AnnotationSettingApi,
+  V1alpha1CacheApi,
   LoginApi,
   AuthHaloRunV1alpha1AuthProviderApi,
   AuthHaloRunV1alpha1UserConnectionApi,
@@ -218,6 +219,7 @@ function setupApiClient(axios: AxiosInstance) {
     common: {
       user: new ApiHaloRunV1alpha1UserApi(undefined, baseURL, axios),
     },
+    cache: new V1alpha1CacheApi(undefined, baseURL, axios),
   };
 }
 
