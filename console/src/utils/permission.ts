@@ -36,7 +36,7 @@ export function hasPermission(
 }
 
 interface usePermissionReturn {
-  currentUserHasPermission: (targetPermissions: Array<string>) => boolean;
+  currentUserHasPermission: (targetPermissions?: Array<string>) => boolean;
 }
 
 /**
@@ -49,9 +49,9 @@ export function usePermission(): usePermissionReturn {
   const { uiPermissions } = roleStore.permissions;
 
   const currentUserHasPermission = (
-    targetPermissions: Array<string>
+    targetPermissions?: Array<string>
   ): boolean => {
-    return hasPermission(uiPermissions, targetPermissions, true);
+    return hasPermission(uiPermissions, targetPermissions || [], true);
   };
 
   return {

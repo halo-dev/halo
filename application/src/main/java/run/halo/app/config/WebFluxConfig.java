@@ -37,6 +37,7 @@ import org.springframework.web.reactive.result.view.ViewResolutionResultHandler;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.console.ConsoleProxyFilter;
+import run.halo.app.console.WebSocketRequestPredicate;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.endpoint.CustomEndpointsBuilder;
 import run.halo.app.infra.properties.HaloProperties;
@@ -101,7 +102,8 @@ public class WebFluxConfig implements WebFluxConfigurer {
     RouterFunction<ServerResponse> consoleIndexRedirection() {
         var consolePredicate = method(HttpMethod.GET)
             .and(path("/console/**").and(path("/console/assets/**").negate()))
-            .and(accept(MediaType.TEXT_HTML));
+            .and(accept(MediaType.TEXT_HTML))
+            .and(new WebSocketRequestPredicate().negate());
         return route(consolePredicate, this::serveConsoleIndex);
     }
 

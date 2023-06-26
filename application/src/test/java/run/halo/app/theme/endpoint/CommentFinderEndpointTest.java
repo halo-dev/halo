@@ -3,12 +3,17 @@ package run.halo.app.theme.endpoint;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.github.resilience4j.ratelimiter.RateLimiter;
+import io.github.resilience4j.ratelimiter.RateLimiterConfig;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,6 +58,9 @@ class CommentFinderEndpointTest {
 
     @Mock
     private ReplyService replyService;
+
+    @Mock
+    private RateLimiterRegistry rateLimiterRegistry;
 
     @InjectMocks
     private CommentFinderEndpoint commentFinderEndpoint;
@@ -131,6 +139,15 @@ class CommentFinderEndpointTest {
     @Test
     void createComment() {
         when(commentService.create(any())).thenReturn(Mono.empty());
+
+        RateLimiterConfig config = RateLimiterConfig.custom()
+            .limitForPeriod(10)
+            .limitRefreshPeriod(Duration.ofSeconds(1))
+            .timeoutDuration(Duration.ofSeconds(10))
+            .build();
+        RateLimiter rateLimiter = RateLimiter.of("comment-creation-from-ip-" + "0:0:0:0:0:0:0:0", 
+            config);
+        when(rateLimiterRegistry.rateLimiter(anyString(), anyString())).thenReturn(rateLimiter);
 
         final CommentRequest commentRequest = new CommentRequest();
         Ref ref = new Ref();

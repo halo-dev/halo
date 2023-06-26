@@ -18,6 +18,9 @@ import { Author } from "./author";
 // May contain unused imports in some cases
 // @ts-ignore
 import { CustomTemplates } from "./custom-templates";
+// May contain unused imports in some cases
+// @ts-ignore
+import { License } from "./license";
 
 /**
  *
@@ -60,6 +63,18 @@ export interface ThemeSpec {
    * @type {string}
    * @memberof ThemeSpec
    */
+  homepage?: string;
+  /**
+   *
+   * @type {Array<License>}
+   * @memberof ThemeSpec
+   */
+  license?: Array<License>;
+  /**
+   *
+   * @type {string}
+   * @memberof ThemeSpec
+   */
   logo?: string;
   /**
    *
@@ -96,6 +111,7 @@ export interface ThemeSpec {
    *
    * @type {string}
    * @memberof ThemeSpec
+   * @deprecated
    */
   website?: string;
 }
