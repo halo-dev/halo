@@ -124,6 +124,11 @@ core:
               dialog_title: 确定要刷新搜索引擎索引吗？
               dialog_content: 此操作会对所有已发布的文章重新创建搜索引擎索引。
               success_message: 刷新成功
+            refresh_page_cache:
+              title: 刷新页面缓存
+              dialog_title: 确定要刷新页面缓存吗？
+              dialog_content: 此操作会清空所有页面的缓存。
+              success_message: 刷新成功
         user_stats:
           title: 用户
         comment_stats:

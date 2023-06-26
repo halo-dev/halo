@@ -56,6 +56,7 @@ export * from "./api/storage-halo-run-v1alpha1-policy-api";
 export * from "./api/storage-halo-run-v1alpha1-policy-template-api";
 export * from "./api/theme-halo-run-v1alpha1-theme-api";
 export * from "./api/v1alpha1-annotation-setting-api";
+export * from "./api/v1alpha1-cache-api";
 export * from "./api/v1alpha1-config-map-api";
 export * from "./api/v1alpha1-menu-api";
 export * from "./api/v1alpha1-menu-item-api";

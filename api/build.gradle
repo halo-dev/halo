@@ -29,6 +29,10 @@ dependencies {
     api 'org.springframework.security:spring-security-oauth2-client'
     api 'org.springframework.security:spring-security-oauth2-resource-server'
 
+    // Cache
+    api "org.springframework.boot:spring-boot-starter-cache"
+    api "com.github.ben-manes.caffeine:caffeine"
+
     api "org.springdoc:springdoc-openapi-starter-webflux-ui"
     api 'org.openapi4j:openapi-schema-validator'
     api "net.bytebuddy:byte-buddy"
