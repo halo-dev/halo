@@ -1172,9 +1172,7 @@ core:
       login_expired: "Login expired, please log in again"
       forbidden: Access denied
       not_found: Resource not found
-      server_internal_error_with_title: "Internal server error: {title}"
       server_internal_error: Internal server error
-      unknown_error_with_title: "Unknown error: {title}"
       unknown_error: Unknown error
     dialog:
       titles:

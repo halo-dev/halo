@@ -1172,9 +1172,7 @@ core:
       login_expired: 登录已过期，请重新登录
       forbidden: 无权限访问
       not_found: 资源不存在
-      server_internal_error_with_title: 服务器内部错误：{title}
       server_internal_error: 服务器内部错误
-      unknown_error_with_title: 未知错误：{title}
       unknown_error: 未知错误
     dialog:
       titles:
