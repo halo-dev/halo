@@ -2,9 +2,10 @@ package run.halo.app.theme.dialect;
 
 import java.util.Collection;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
-import org.thymeleaf.model.IModelFactory;
+import org.thymeleaf.model.ITemplateEvent;
 import org.thymeleaf.processor.element.AbstractElementModelProcessor;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
 import org.thymeleaf.spring6.context.SpringContextUtils;
@@ -51,14 +52,23 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
         structureHandler.setLocalVariable(PROCESS_FLAG, true);
 
         // handle <head> tag
+        if (model.size() < 2) {
+            return;
+        }
 
         /*
          * Create the DOM structure that will be substituting our custom tag.
          * The headline will be shown inside a '<div>' tag, and so this must
          * be created first and then a Text node must be added to it.
          */
-        final IModelFactory modelFactory = context.getModelFactory();
-        IModel modelToInsert = modelFactory.createModel();
+        IModel modelToInsert = model.cloneModel();
+        // close </head> tag
+        final ITemplateEvent closeHeadTag = modelToInsert.get(modelToInsert.size() - 1);
+        modelToInsert.remove(modelToInsert.size() - 1);
+
+        // open <head> tag
+        final ITemplateEvent openHeadTag = modelToInsert.get(0);
+        modelToInsert.remove(0);
 
         // apply processors to modelToInsert
         Collection<TemplateHeadProcessor> templateHeadProcessors =
@@ -69,14 +79,20 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
                 .block();
         }
 
-        // add to target model
-        model.insertModel(model.size() - 1, modelToInsert);
+        // reset model to insert
+        model.reset();
+        model.add(openHeadTag);
+        model.addModel(modelToInsert);
+        model.add(closeHeadTag);
     }
 
     private Collection<TemplateHeadProcessor> getTemplateHeadProcessors(ITemplateContext context) {
         ApplicationContext appCtx = SpringContextUtils.getApplicationContext(context);
         ExtensionComponentsFinder componentsFinder =
             appCtx.getBean(ExtensionComponentsFinder.class);
-        return componentsFinder.getExtensions(TemplateHeadProcessor.class);
+        return componentsFinder.getExtensions(TemplateHeadProcessor.class)
+            .stream()
+            .sorted(AnnotationAwareOrderComparator.INSTANCE)
+            .toList();
     }
 }
