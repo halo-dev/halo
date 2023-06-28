@@ -2,6 +2,7 @@ package run.halo.app.infra.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.net.InetSocketAddress;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
@@ -19,8 +20,27 @@ class IpAddressUtilsTest {
     }
 
     @Test
-    void testGetUnknownIPAddress() {
+    void testGetIPAddressFromXRealIpHeader() {
+        var request = MockServerHttpRequest.get("/")
+            .header("X-Real-IP", "127.0.0.1")
+            .build();
+        var expected = "127.0.0.1";
+        var actual = IpAddressUtils.getClientIp(request);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testGetUnknownIPAddressWhenRemoteAddressIsNull() {
         var request = MockServerHttpRequest.get("/").build();
+        var actual = IpAddressUtils.getClientIp(request);
+        assertEquals(IpAddressUtils.UNKNOWN, actual);
+    }
+
+    @Test
+    void testGetUnknownIPAddressWhenRemoteAddressIsUnresolved() {
+        var request = MockServerHttpRequest.get("/")
+            .remoteAddress(InetSocketAddress.createUnresolved("localhost", 8090))
+            .build();
         var actual = IpAddressUtils.getClientIp(request);
         assertEquals(IpAddressUtils.UNKNOWN, actual);
     }

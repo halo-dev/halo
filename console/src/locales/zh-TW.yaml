@@ -1076,6 +1076,10 @@ core:
             placeholder: "輸入 / 以選擇輸入類型"
       toolbar:
         attachment: 插入附件
+        select_attachment: 從附件庫選擇
+        insert_image: 從外部連結插入圖片
+        insert_video: 從外部連結插入影片
+        insert_audio: 從外部連結插入音訊
       upload_attachment:
         toast:
           no_available_policy: 目前沒有可用的存儲策略
@@ -1168,13 +1172,10 @@ core:
       save_failed_and_retry: 保存失敗，請重試
       publish_failed_and_retry: 發布失敗，請重試
       network_error: 網絡錯誤，請檢查網絡連接
-      request_parameter_error: 請求參數錯誤：{title}
       login_expired: 登入已過期，請重新登入
       forbidden: 無權限訪問
       not_found: 資源不存在
-      server_internal_error_with_title: 伺服器內部錯誤：{title}
       server_internal_error: 伺服器內部錯誤
-      unknown_error_with_title: 未知錯誤：{title}
       unknown_error: 未知錯誤
     dialog:
       titles:

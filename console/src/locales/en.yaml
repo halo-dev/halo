@@ -1076,6 +1076,10 @@ core:
             placeholder: "Enter / to select input type."
       toolbar:
         attachment: Insert attachment
+        select_attachment: Attachments library
+        insert_image: Insert image
+        insert_video: Insert video
+        insert_audio: Insert audio
       upload_attachment:
         toast:
           no_available_policy: There is currently no available storage policy
@@ -1168,13 +1172,10 @@ core:
       save_failed_and_retry: "Failed to save, please retry"
       publish_failed_and_retry: "Failed to publish, please retry"
       network_error: "Network error, please check your connection"
-      request_parameter_error: "Request parameter error: {title}"
       login_expired: "Login expired, please log in again"
       forbidden: Access denied
       not_found: Resource not found
-      server_internal_error_with_title: "Internal server error: {title}"
       server_internal_error: Internal server error
-      unknown_error_with_title: "Unknown error: {title}"
       unknown_error: Unknown error
     dialog:
       titles:
