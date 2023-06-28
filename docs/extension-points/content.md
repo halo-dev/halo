@@ -42,7 +42,7 @@ String katexScript="""
 public class KatexPostContentHandler implements ReactivePostContentHandler {
 
     @Override
-    public Mono<PostContent> handle(PostContent postContent) {
+    public Mono<PostContentContext> handle(PostContentContext postContent) {
         postContent.setContent(katexScript + "\n" + postContent.getContent());
         return Mono.just(postContent);
     }
@@ -81,7 +81,7 @@ spec:
 public class KatexSinglePageContentHandler implements ReactiveSinglePageContentHandler {
 
     @Override
-    public Mono<SinglePageContent> handle(SinglePageContent pageContent) {
+    public Mono<SinglePageContentContext> handle(SinglePageContentContext pageContent) {
 
         String katexScript = ""; // 参考文章内容扩展点的示例脚本块
         pageContent.setContent(katexScript + "\n" + pageContent.getContent());
