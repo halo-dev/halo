@@ -96,7 +96,7 @@ axiosInstance.interceptors.response.use(
     }
 
     if (title || detail) {
-      Toast.error([title, detail].filter(Boolean).join(" - "));
+      Toast.error(detail || title);
       return Promise.reject(error);
     }
 
