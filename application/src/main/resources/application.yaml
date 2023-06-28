@@ -81,4 +81,7 @@ resilience4j.ratelimiter:
       limitForPeriod: 10
       limitRefreshPeriod: 1m
       timeoutDuration: 0s
-
+    signup:
+      limitForPeriod: 3
+      limitRefreshPeriod: 1h
+      timeoutDuration: 0s

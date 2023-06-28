@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.github.resilience4j.ratelimiter.RateLimiter;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,6 +37,9 @@ class PublicUserEndpointTest {
     @Mock
     private ReactiveUserDetailsService reactiveUserDetailsService;
 
+    @Mock
+    RateLimiterRegistry rateLimiterRegistry;
+
     @InjectMocks
     private PublicUserEndpoint publicUserEndpoint;
 
@@ -63,8 +68,12 @@ class PublicUserEndpointTest {
                 .authorities("test-role")
                 .build()));
 
+        when(rateLimiterRegistry.rateLimiter("signup-from-ip-127.0.0.1", "signup"))
+            .thenReturn(RateLimiter.ofDefaults("signup"));
+
         webClient.post()
             .uri("/users/-/signup")
+            .header("X-Forwarded-For", "127.0.0.1")
             .bodyValue(new PublicUserEndpoint.SignUpRequest(user, "fake-password"))
             .exchange()
             .expectStatus().isOk();
