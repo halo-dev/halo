@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import org.pf4j.PluginRuntimeException;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.MethodIntrospector;
 import org.springframework.stereotype.Controller;
@@ -117,8 +116,7 @@ public class PluginRequestMappingHandlerMapping extends RequestMappingHandlerMap
         if (info != null) {
             ApiVersion apiVersion = handlerType.getAnnotation(ApiVersion.class);
             if (apiVersion == null) {
-                throw new PluginRuntimeException(
-                    "The handler [" + handlerType + "] is missing @ApiVersion annotation.");
+                return info;
             }
             info = RequestMappingInfo.paths(buildPrefix(pluginId, apiVersion.value())).build()
                 .combine(info);
@@ -126,9 +124,14 @@ public class PluginRequestMappingHandlerMapping extends RequestMappingHandlerMap
         return info;
     }
 
-    protected String buildPrefix(String pluginId, String version) {
-        GroupVersion groupVersion = GroupVersion.parseAPIVersion(version);
+    protected String buildPrefix(String pluginName, String apiVersion) {
+        GroupVersion groupVersion = GroupVersion.parseAPIVersion(apiVersion);
+        if (StringUtils.hasText(groupVersion.group())) {
+            // apis/{group}/{version}
+            return String.format("/apis/%s/%s", groupVersion.group(), groupVersion.version());
+        }
+        // apis/api.plugin.halo.run/{version}/plugins/{pluginName}
         return String.format("/apis/api.plugin.halo.run/%s/plugins/%s", groupVersion.version(),
-            pluginId);
+            pluginName);
     }
 }

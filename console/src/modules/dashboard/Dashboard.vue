@@ -38,23 +38,24 @@
       :use-css-transforms="true"
       :vertical-compact="true"
     >
-      <grid-item
-        v-for="(item, index) in layout"
-        :key="index"
-        :h="item.h"
-        :i="item.i"
-        :w="item.w"
-        :x="item.x"
-        :y="item.y"
-      >
-        <component :is="item.widget" />
-        <div v-if="settings" class="absolute right-2 top-2">
-          <IconCloseCircle
-            class="cursor-pointer text-lg text-gray-500 hover:text-gray-900"
-            @click="handleRemove(item)"
-          />
-        </div>
-      </grid-item>
+      <template v-for="(item, index) in layout" :key="index">
+        <grid-item
+          v-if="currentUserHasPermission(item.permissions)"
+          :h="item.h"
+          :i="item.i"
+          :w="item.w"
+          :x="item.x"
+          :y="item.y"
+        >
+          <component :is="item.widget" />
+          <div v-if="settings" class="absolute right-2 top-2">
+            <IconCloseCircle
+              class="cursor-pointer text-lg text-gray-500 hover:text-gray-900"
+              @click="handleRemove(item)"
+            />
+          </div>
+        </grid-item>
+      </template>
     </grid-layout>
   </div>
 
@@ -88,19 +89,20 @@
           :use-css-transforms="true"
           :vertical-compact="true"
         >
-          <grid-item
-            v-for="(item, index) in group.widgets"
-            :key="index"
-            :h="item.h"
-            :i="item.i"
-            :w="item.w"
-            :x="item.x"
-            :y="item.y"
-            class="cursor-pointer"
-            @click="handleAddWidget(item)"
-          >
-            <component :is="item.widget" />
-          </grid-item>
+          <template v-for="(item, index) in group.widgets" :key="index">
+            <grid-item
+              v-if="currentUserHasPermission(item.permissions)"
+              :h="item.h"
+              :i="item.i"
+              :w="item.w"
+              :x="item.x"
+              :y="item.y"
+              class="cursor-pointer"
+              @click="handleAddWidget(item)"
+            >
+              <component :is="item.widget" />
+            </grid-item>
+          </template>
         </grid-layout>
       </template>
     </div>
@@ -123,25 +125,50 @@ import { onMounted, provide, ref, type Ref } from "vue";
 import { useStorage } from "@vueuse/core";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
-import type { DashboardStats } from "@halo-dev/api-client/index";
+import type { DashboardStats } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
+import { usePermission } from "@/utils/permission";
 
 const { t } = useI18n();
+const { currentUserHasPermission } = usePermission();
 
 const widgetsGroup = [
   {
     id: "post",
     label: t("core.dashboard.widgets.groups.post"),
     widgets: [
-      { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "PostStatsWidget" },
-      { x: 0, y: 0, w: 6, h: 10, i: 1, widget: "RecentPublishedWidget" },
+      {
+        x: 0,
+        y: 0,
+        w: 3,
+        h: 3,
+        i: 0,
+        widget: "PostStatsWidget",
+      },
+      {
+        x: 0,
+        y: 0,
+        w: 6,
+        h: 10,
+        i: 1,
+        widget: "RecentPublishedWidget",
+        permissions: ["system:posts:view"],
+      },
     ],
   },
   {
     id: "page",
     label: t("core.dashboard.widgets.groups.page"),
     widgets: [
-      { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "SinglePageStatsWidget" },
+      {
+        x: 0,
+        y: 0,
+        w: 3,
+        h: 3,
+        i: 0,
+        widget: "SinglePageStatsWidget",
+        permissions: ["system:singlepages:view"],
+      },
     ],
   },
   {
@@ -152,10 +179,7 @@ const widgetsGroup = [
   {
     id: "user",
     label: t("core.dashboard.widgets.groups.user"),
-    widgets: [
-      { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "UserStatsWidget" },
-      { x: 0, y: 0, w: 3, h: 3, i: 1, widget: "UserProfileWidget" },
-    ],
+    widgets: [{ x: 0, y: 0, w: 3, h: 3, i: 0, widget: "UserStatsWidget" }],
   },
   {
     id: "other",
@@ -172,18 +196,54 @@ const widgetsModal = ref(false);
 const activeId = ref(widgetsGroup[0].id);
 
 const layout = useStorage("widgets", [
-  { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "PostStatsWidget" },
-  { x: 3, y: 0, w: 3, h: 3, i: 1, widget: "UserStatsWidget" },
-  { x: 6, y: 0, w: 3, h: 3, i: 2, widget: "CommentStatsWidget" },
-  { x: 9, y: 0, w: 3, h: 3, i: 3, widget: "ViewsStatsWidget" },
-  { x: 0, y: 3, w: 4, h: 10, i: 4, widget: "QuickLinkWidget" },
   {
-    x: 4,
+    x: 0,
+    y: 0,
+    w: 3,
+    h: 3,
+    i: 0,
+    widget: "PostStatsWidget",
+  },
+  {
+    x: 3,
+    y: 0,
+    w: 3,
+    h: 3,
+    i: 1,
+    widget: "UserStatsWidget",
+  },
+  {
+    x: 6,
+    y: 0,
+    w: 3,
+    h: 3,
+    i: 2,
+    widget: "CommentStatsWidget",
+  },
+  {
+    x: 9,
+    y: 0,
+    w: 3,
+    h: 3,
+    i: 3,
+    widget: "ViewsStatsWidget",
+  },
+  {
+    x: 0,
     y: 3,
-    w: 4,
-    h: 10,
+    w: 6,
+    h: 12,
+    i: 4,
+    widget: "QuickLinkWidget",
+  },
+  {
+    x: 6,
+    y: 3,
+    w: 6,
+    h: 12,
     i: 5,
     widget: "RecentPublishedWidget",
+    permissions: ["system:posts:view"],
   },
 ]);
 

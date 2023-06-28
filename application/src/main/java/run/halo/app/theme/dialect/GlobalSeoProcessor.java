@@ -3,6 +3,7 @@ package run.halo.app.theme.dialect;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.ITemplateContext;
@@ -20,7 +21,7 @@ import run.halo.app.infra.SystemSetting;
  * @see SystemSetting.Seo
  * @since 2.0.0
  */
-@Order
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 @Component
 @AllArgsConstructor
 public class GlobalSeoProcessor implements TemplateHeadProcessor {

@@ -9,6 +9,7 @@ import {
   IconPalette,
   IconWindowLine,
   IconSearch,
+  IconDatabase2Line,
   VCard,
   IconUserLine,
   Dialog,
@@ -155,6 +156,32 @@ const actions: Action[] = [
       });
     },
     permissions: ["system:posts:manage"],
+  },
+  {
+    icon: markRaw(IconDatabase2Line),
+    title: t(
+      "core.dashboard.widgets.presets.quicklink.actions.refresh_page_cache.title"
+    ),
+    action: () => {
+      Dialog.warning({
+        title: t(
+          "core.dashboard.widgets.presets.quicklink.actions.refresh_page_cache.dialog_title"
+        ),
+        description: t(
+          "core.dashboard.widgets.presets.quicklink.actions.refresh_page_cache.dialog_content"
+        ),
+        confirmText: t("core.common.buttons.confirm"),
+        cancelText: t("core.common.buttons.cancel"),
+        onConfirm: async () => {
+          await apiClient.cache.invalidCache({ name: "page-cache" });
+          Toast.success(
+            t(
+              "core.dashboard.widgets.presets.quicklink.actions.refresh_page_cache.success_message"
+            )
+          );
+        },
+      });
+    },
   },
 ];
 </script>

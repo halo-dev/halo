@@ -58,6 +58,9 @@ public class HaloProperties implements Validator {
     @Valid
     private final AttachmentProperties attachment = new AttachmentProperties();
 
+    @Valid
+    private final CacheProperties cache = new CacheProperties();
+
     @Override
     public boolean supports(Class<?> clazz) {
         return HaloProperties.class.isAssignableFrom(clazz);

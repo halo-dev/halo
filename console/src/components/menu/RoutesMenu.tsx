@@ -69,6 +69,7 @@ const RoutesMenu = defineComponent({
     }
 
     return () => (
+      // @ts-ignore
       <VMenu openIds={openIds.value}>
         {props.menus?.map((menu: MenuGroupType) => {
           return (

@@ -61,7 +61,7 @@ public class Plugin extends AbstractExtension {
          *
          * @see <a href="semver.org">semantic version</a>
          */
-        @Schema(required = true, pattern = "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-("
+        @Schema(requiredMode = REQUIRED, pattern = "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-("
             + "(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\."
             + "(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\"
             + ".[0-9a-zA-Z-]+)*))?$")
@@ -74,6 +74,8 @@ public class Plugin extends AbstractExtension {
         private Map<String, String> pluginDependencies = new HashMap<>(4);
 
         private String homepage;
+
+        private String repo;
 
         private String description;
 
@@ -94,6 +96,10 @@ public class Plugin extends AbstractExtension {
         private String configMapName;
     }
 
+    /**
+     * In the future, we may consider using {@link run.halo.app.infra.model.License} instead of it.
+     * But now, replace it will lead to incompatibility with downstream.
+     */
     @Data
     public static class License {
         private String name;

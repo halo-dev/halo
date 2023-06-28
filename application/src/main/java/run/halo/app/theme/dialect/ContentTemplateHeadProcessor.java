@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.HtmlUtils;
 import org.thymeleaf.context.ITemplateContext;
@@ -29,6 +30,7 @@ import run.halo.app.theme.router.ModelConst;
  * @since 2.0.0
  */
 @Component
+@Order(1)
 @AllArgsConstructor
 public class ContentTemplateHeadProcessor implements TemplateHeadProcessor {
     private static final String POST_NAME_VARIABLE = "name";

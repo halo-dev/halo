@@ -22,6 +22,8 @@ const emit = defineEmits<{
 
 const { categories } = usePostCategory();
 
+const dropdown = ref();
+
 const handleSelect = (category: Category) => {
   if (
     props.selected &&
@@ -34,6 +36,8 @@ const handleSelect = (category: Category) => {
 
   emit("update:selected", category);
   emit("select", category);
+
+  dropdown.value.hide();
 };
 
 function onDropdownShow() {
@@ -71,7 +75,7 @@ const searchResults = computed(() => {
 </script>
 
 <template>
-  <VDropdown :classes="['!p-0']" @show="onDropdownShow">
+  <VDropdown ref="dropdown" :classes="['!p-0']" @show="onDropdownShow">
     <slot />
     <template #popper>
       <div class="h-96 w-80">
@@ -91,7 +95,6 @@ const searchResults = computed(() => {
             <li
               v-for="(category, index) in searchResults"
               :key="index"
-              v-close-popper
               @click="handleSelect(category)"
             >
               <VEntity
