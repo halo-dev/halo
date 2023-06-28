@@ -32,7 +32,6 @@ public interface ReactivePostContentHandler extends ExtensionPoint {
     @Data
     @Builder
     class PostContentContext {
-        private String postName;
         private Post post;
         private String content;
         private String raw;

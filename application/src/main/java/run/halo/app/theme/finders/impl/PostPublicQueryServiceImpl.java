@@ -147,7 +147,6 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
         Assert.notNull(wrapper, "Post content must not be null");
         return extensionGetter.getEnabledExtensionByDefinition(ReactivePostContentHandler.class)
             .reduce(Mono.fromSupplier(() -> ReactivePostContentHandler.PostContentContext.builder()
-                    .postName(post.getMetadata().getName())
                     .post(post)
                     .content(wrapper.getContent())
                     .raw(wrapper.getRaw())

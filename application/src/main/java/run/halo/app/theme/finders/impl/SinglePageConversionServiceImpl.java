@@ -61,7 +61,6 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
         return extensionGetter.getEnabledExtensionByDefinition(
                 ReactiveSinglePageContentHandler.class)
             .reduce(Mono.fromSupplier(() -> SinglePageContentContext.builder()
-                    .singlePageName(singlePage.getMetadata().getName())
                     .singlePage(singlePage)
                     .content(wrapper.getContent())
                     .raw(wrapper.getRaw())

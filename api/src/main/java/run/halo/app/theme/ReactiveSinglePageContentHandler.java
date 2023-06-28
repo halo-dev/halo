@@ -30,7 +30,6 @@ public interface ReactiveSinglePageContentHandler extends ExtensionPoint {
     @Data
     @Builder
     class SinglePageContentContext {
-        private String singlePageName;
         private SinglePage singlePage;
         private String content;
         private String raw;
