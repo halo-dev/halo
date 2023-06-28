@@ -33,7 +33,8 @@ import { useDebounceFn } from "@vueuse/core";
 import { usePostCategory } from "./composables/use-post-category";
 
 const editingModal = ref(false);
-const selectedCategory = ref<Category | null>(null);
+const selectedCategory = ref<Category>();
+const selectedParentCategory = ref<Category>();
 
 const {
   categories,
@@ -68,8 +69,14 @@ const handleOpenEditingModal = (category: CategoryTree) => {
   editingModal.value = true;
 };
 
+const handleOpenCreateByParentModal = (category: CategoryTree) => {
+  selectedParentCategory.value = convertCategoryTreeToCategory(category);
+  editingModal.value = true;
+};
+
 const onEditingModalClose = () => {
-  selectedCategory.value = null;
+  selectedCategory.value = undefined;
+  selectedParentCategory.value = undefined;
   handleFetchCategories();
 };
 </script>
@@ -77,6 +84,7 @@ const onEditingModalClose = () => {
   <CategoryEditingModal
     v-model:visible="editingModal"
     :category="selectedCategory"
+    :parent-category="selectedParentCategory"
     @close="onEditingModalClose"
   />
   <VPageHeader :title="$t('core.post_category.title')">
@@ -147,6 +155,7 @@ const onEditingModalClose = () => {
           @change="handleUpdateInBatch"
           @delete="handleDelete"
           @open-editing="handleOpenEditingModal"
+          @open-create-by-parent="handleOpenCreateByParentModal"
         />
       </Transition>
     </VCard>

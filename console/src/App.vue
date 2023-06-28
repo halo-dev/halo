@@ -94,6 +94,26 @@ const formkitLocales = {
 };
 const formkitConfig = inject(Symbol.for("FormKitConfig")) as FormKitConfig;
 formkitConfig.locale = formkitLocales[i18n.global.locale.value] || "zh";
+
+// Fix 100vh issue in ios devices
+function setViewportProperty(doc: HTMLElement) {
+  let prevClientHeight: number;
+  const customVar = "--vh";
+  function handleResize() {
+    const clientHeight = doc.clientHeight;
+    if (clientHeight === prevClientHeight) return;
+    requestAnimationFrame(function updateViewportHeight() {
+      doc.style.setProperty(customVar, clientHeight * 0.01 + "px");
+      prevClientHeight = clientHeight;
+    });
+  }
+  handleResize();
+  return handleResize;
+}
+window.addEventListener(
+  "resize",
+  setViewportProperty(document.documentElement)
+);
 </script>
 
 <template>

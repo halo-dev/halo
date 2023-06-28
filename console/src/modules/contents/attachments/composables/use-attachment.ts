@@ -333,7 +333,7 @@ export function useAttachmentSelect(
 export function useAttachmentPermalinkCopy(
   attachment: Ref<Attachment | undefined>
 ) {
-  const { copy } = useClipboard();
+  const { copy } = useClipboard({ legacy: true });
   const { t } = useI18n();
 
   const mediaType = computed(() => {

@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import type { SocialAuthProvider } from "@/modules/system/actuator/types";
-import { ref } from "vue";
+import { useRouteQuery } from "@vueuse/router";
+import { inject, ref } from "vue";
+import type { Ref } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -9,17 +11,38 @@ const props = withDefaults(
   {}
 );
 
+const REDIRECT_URI_QUERY_PARAM = "login_redirect_uri";
+
 const loading = ref(false);
 
+const redirect_uri = useRouteQuery<string>("redirect_uri", "");
+const disabled = inject<Ref<boolean>>("disabled");
+
 function handleSocialLogin() {
+  if (disabled) {
+    disabled.value = true;
+  }
+
   loading.value = true;
-  window.location.href = props.authProvider.authenticationUrl;
+
+  let authenticationUrl = props.authProvider.authenticationUrl;
+
+  if (redirect_uri.value) {
+    authenticationUrl = `${authenticationUrl}?${REDIRECT_URI_QUERY_PARAM}=${redirect_uri.value}`;
+  }
+
+  window.location.href = authenticationUrl;
 }
 </script>
 
 <template>
   <button
     class="group inline-flex select-none flex-row items-center gap-2 rounded bg-white px-2.5 py-1.5 ring-1 ring-gray-200 transition-all hover:bg-gray-100 hover:shadow hover:ring-gray-900"
+    :class="{
+      'cursor-not-allowed opacity-80 hover:shadow-none hover:ring-gray-200':
+        disabled,
+    }"
+    :disabled="disabled"
     @click="handleSocialLogin"
   >
     <svg

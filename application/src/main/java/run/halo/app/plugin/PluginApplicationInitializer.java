@@ -95,7 +95,6 @@ public class PluginApplicationInitializer {
         log.debug("Total millis: {} ms -> {}", stopWatch.getTotalTimeMillis(),
             stopWatch.prettyPrint());
 
-        contextRegistry.register(pluginId, pluginApplicationContext);
         return pluginApplicationContext;
     }
 
@@ -125,6 +124,8 @@ public class PluginApplicationInitializer {
         stopWatch.start("refresh plugin application context");
         pluginApplicationContext.refresh();
         stopWatch.stop();
+
+        contextRegistry.register(pluginId, pluginApplicationContext);
 
         log.debug("initApplicationContext total millis: {} ms -> {}",
             stopWatch.getTotalTimeMillis(), stopWatch.prettyPrint());

@@ -16,8 +16,7 @@ import { useThemeStore } from "@/stores/theme";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { submitForm } from "@formkit/core";
-import type { ErrorResponse } from "@uppy/core";
-import type { UppyFile } from "@uppy/utils";
+import type { ErrorResponse, UppyFile } from "@uppy/core";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();

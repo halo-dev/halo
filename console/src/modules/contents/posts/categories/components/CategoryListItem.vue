@@ -26,6 +26,7 @@ withDefaults(
 const emit = defineEmits<{
   (event: "change"): void;
   (event: "open-editing", category: CategoryTree): void;
+  (event: "open-create-by-parent", category: CategoryTree): void;
   (event: "delete", category: CategoryTree): void;
 }>();
 
@@ -37,6 +38,10 @@ function onChange() {
 
 function onOpenEditingModal(category: CategoryTree) {
   emit("open-editing", category);
+}
+
+function onOpenCreateByParentModal(category: CategoryTree) {
+  emit("open-create-by-parent", category);
 }
 
 function onDelete(category: CategoryTree) {
@@ -117,6 +122,9 @@ function onDelete(category: CategoryTree) {
             >
               {{ $t("core.common.buttons.edit") }}
             </VDropdownItem>
+            <VDropdownItem @click="onOpenCreateByParentModal(category)">
+              {{ $t("core.post_category.operations.add_sub_category.button") }}
+            </VDropdownItem>
             <VDropdownItem
               v-permission="['system:posts:manage']"
               type="danger"
@@ -132,6 +140,7 @@ function onDelete(category: CategoryTree) {
           @change="onChange"
           @delete="onDelete"
           @open-editing="onOpenEditingModal"
+          @open-create-by-parent="onOpenCreateByParentModal"
         />
       </li>
     </template>

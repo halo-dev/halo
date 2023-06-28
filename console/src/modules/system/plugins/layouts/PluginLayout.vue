@@ -178,7 +178,7 @@ onMounted(() => {
         <template #header>
           <VTabbar
             v-model:active-id="activeTab"
-            :items="tabs"
+            :items="tabs.map((item) => ({ id: item.id, label: item.label }))"
             class="w-full !rounded-none"
             type="outline"
             @change="handleTabChange"
