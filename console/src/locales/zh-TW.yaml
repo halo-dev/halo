@@ -1168,7 +1168,6 @@ core:
       save_failed_and_retry: 保存失敗，請重試
       publish_failed_and_retry: 發布失敗，請重試
       network_error: 網絡錯誤，請檢查網絡連接
-      request_parameter_error: 請求參數錯誤：{title}
       login_expired: 登入已過期，請重新登入
       forbidden: 無權限訪問
       not_found: 資源不存在

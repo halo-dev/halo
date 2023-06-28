@@ -1168,7 +1168,6 @@ core:
       save_failed_and_retry: "Failed to save, please retry"
       publish_failed_and_retry: "Failed to publish, please retry"
       network_error: "Network error, please check your connection"
-      request_parameter_error: "Request parameter error: {title}"
       login_expired: "Login expired, please log in again"
       forbidden: Access denied
       not_found: Resource not found

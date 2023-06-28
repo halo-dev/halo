@@ -1168,7 +1168,6 @@ core:
       save_failed_and_retry: 保存失败，请重试
       publish_failed_and_retry: 发布失败，请重试
       network_error: 网络错误，请检查网络连接
-      request_parameter_error: 请求参数错误：{title}
       login_expired: 登录已过期，请重新登录
       forbidden: 无权限访问
       not_found: 资源不存在

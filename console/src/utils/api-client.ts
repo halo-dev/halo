@@ -95,13 +95,6 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (status === 400) {
-      Toast.error(
-        i18n.global.t("core.common.toast.request_parameter_error", { title })
-      );
-      return Promise.reject(error);
-    }
-
     if (title || detail) {
       Toast.error([title, detail].filter(Boolean).join(" - "));
       return Promise.reject(error);
