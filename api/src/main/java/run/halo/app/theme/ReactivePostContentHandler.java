@@ -5,6 +5,7 @@ import lombok.Data;
 import org.pf4j.ExtensionPoint;
 import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.content.Post;
 
 /**
  * <p>{@link ReactivePostContentHandler} provides a way to extend the content to be displayed in
@@ -26,12 +27,13 @@ public interface ReactivePostContentHandler extends ExtensionPoint {
      * @param postContent content to be handled
      * @return handled content
      */
-    Mono<PostContent> handle(@NonNull PostContent postContent);
+    Mono<PostContentContext> handle(@NonNull PostContentContext postContent);
 
     @Data
     @Builder
-    class PostContent {
+    class PostContentContext {
         private String postName;
+        private Post post;
         private String content;
         private String raw;
         private String rawType;

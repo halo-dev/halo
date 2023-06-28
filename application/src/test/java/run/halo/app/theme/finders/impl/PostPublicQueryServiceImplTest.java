@@ -13,6 +13,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.content.ContentWrapper;
+import run.halo.app.content.TestPost;
+import run.halo.app.core.extension.content.Post;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.ReactivePostContentHandler;
 
@@ -37,10 +39,12 @@ class PostPublicQueryServiceImplTest {
             eq(ReactivePostContentHandler.class))).thenReturn(
             Flux.just(new PostContentHandlerB(), new PostContentHandlerA(),
                 new PostContentHandlerC()));
+        Post post = TestPost.postV1();
+        post.getMetadata().setName("fake-post");
         ContentWrapper contentWrapper =
             ContentWrapper.builder().content("fake-content").raw("fake-raw").rawType("markdown")
                 .build();
-        postPublicQueryService.extendPostContent("fake-post", contentWrapper)
+        postPublicQueryService.extendPostContent(post, contentWrapper)
             .as(StepVerifier::create).consumeNextWith(contentVo -> {
                 assertThat(contentVo.getContent()).isEqualTo("fake-content-B-A-C");
             }).verifyComplete();
@@ -49,7 +53,7 @@ class PostPublicQueryServiceImplTest {
     static class PostContentHandlerA implements ReactivePostContentHandler {
 
         @Override
-        public Mono<PostContent> handle(PostContent postContent) {
+        public Mono<PostContentContext> handle(PostContentContext postContent) {
             postContent.setContent(postContent.getContent() + "-A");
             return Mono.just(postContent);
         }
@@ -58,7 +62,7 @@ class PostPublicQueryServiceImplTest {
     static class PostContentHandlerB implements ReactivePostContentHandler {
 
         @Override
-        public Mono<PostContent> handle(PostContent postContent) {
+        public Mono<PostContentContext> handle(PostContentContext postContent) {
             postContent.setContent(postContent.getContent() + "-B");
             return Mono.just(postContent);
         }
@@ -67,7 +71,7 @@ class PostPublicQueryServiceImplTest {
     static class PostContentHandlerC implements ReactivePostContentHandler {
 
         @Override
-        public Mono<PostContent> handle(PostContent postContent) {
+        public Mono<PostContentContext> handle(PostContentContext postContent) {
             postContent.setContent(postContent.getContent() + "-C");
             return Mono.just(postContent);
         }

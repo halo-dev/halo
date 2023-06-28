@@ -14,6 +14,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.content.ContentWrapper;
+import run.halo.app.core.extension.content.SinglePage;
+import run.halo.app.extension.Metadata;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.theme.ReactiveSinglePageContentHandler;
 
@@ -46,7 +48,10 @@ class SinglePageConversionServiceImplTest {
             .raw("fake-raw")
             .rawType("markdown")
             .build();
-        pageConversionService.extendPageContent("fake-page", contentWrapper)
+        SinglePage singlePage = new SinglePage();
+        singlePage.setMetadata(new Metadata());
+        singlePage.getMetadata().setName("fake-page");
+        pageConversionService.extendPageContent(singlePage, contentWrapper)
             .as(StepVerifier::create)
             .consumeNextWith(contentVo -> {
                 assertThat(contentVo.getContent()).isEqualTo("fake-content-B-A-C");
@@ -57,7 +62,7 @@ class SinglePageConversionServiceImplTest {
     static class PageContentHandlerA implements ReactiveSinglePageContentHandler {
 
         @Override
-        public Mono<SinglePageContent> handle(@NonNull SinglePageContent pageContent) {
+        public Mono<SinglePageContentContext> handle(@NonNull SinglePageContentContext pageContent) {
             pageContent.setContent(pageContent.getContent() + "-A");
             return Mono.just(pageContent);
         }
@@ -66,7 +71,7 @@ class SinglePageConversionServiceImplTest {
     static class PageContentHandlerB implements ReactiveSinglePageContentHandler {
 
         @Override
-        public Mono<SinglePageContent> handle(@NonNull SinglePageContent pageContent) {
+        public Mono<SinglePageContentContext> handle(@NonNull SinglePageContentContext pageContent) {
             pageContent.setContent(pageContent.getContent() + "-B");
             return Mono.just(pageContent);
         }
@@ -75,7 +80,7 @@ class SinglePageConversionServiceImplTest {
     static class PageContentHandlerC implements ReactiveSinglePageContentHandler {
 
         @Override
-        public Mono<SinglePageContent> handle(@NonNull SinglePageContent pageContent) {
+        public Mono<SinglePageContentContext> handle(@NonNull SinglePageContentContext pageContent) {
             pageContent.setContent(pageContent.getContent() + "-C");
             return Mono.just(pageContent);
         }

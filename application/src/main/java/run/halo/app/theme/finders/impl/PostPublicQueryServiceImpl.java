@@ -123,7 +123,7 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
         return convertToListedVo(post)
             .map(PostVo::from)
             .flatMap(postVo -> postService.getContent(snapshotName, baseSnapshotName)
-                .flatMap(wrapper -> extendPostContent(postName, wrapper))
+                .flatMap(wrapper -> extendPostContent(post, wrapper))
                 .doOnNext(postVo::setContent)
                 .thenReturn(postVo)
             );
@@ -135,19 +135,20 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
             .filter(FIXED_PREDICATE)
             .flatMap(post -> {
                 String releaseSnapshot = post.getSpec().getReleaseSnapshot();
-                return postService.getContent(releaseSnapshot, post.getSpec().getBaseSnapshot());
-            })
-            .flatMap(wrapper -> extendPostContent(postName, wrapper));
+                return postService.getContent(releaseSnapshot, post.getSpec().getBaseSnapshot())
+                    .flatMap(wrapper -> extendPostContent(post, wrapper));
+            });
     }
 
     @NonNull
-    protected Mono<ContentVo> extendPostContent(String postName,
+    protected Mono<ContentVo> extendPostContent(Post post,
         ContentWrapper wrapper) {
-        Assert.notNull(postName, "Post name must not be null");
+        Assert.notNull(post, "Post name must not be null");
         Assert.notNull(wrapper, "Post content must not be null");
         return extensionGetter.getEnabledExtensionByDefinition(ReactivePostContentHandler.class)
-            .reduce(Mono.fromSupplier(() -> ReactivePostContentHandler.PostContent.builder()
-                    .postName(postName)
+            .reduce(Mono.fromSupplier(() -> ReactivePostContentHandler.PostContentContext.builder()
+                    .postName(post.getMetadata().getName())
+                    .post(post)
                     .content(wrapper.getContent())
                     .raw(wrapper.getRaw())
                     .rawType(wrapper.getRawType())

@@ -5,6 +5,7 @@ import lombok.Data;
 import org.pf4j.ExtensionPoint;
 import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
+import run.halo.app.core.extension.content.SinglePage;
 
 /**
  * <p>{@link ReactiveSinglePageContentHandler} provides a way to extend the content to be
@@ -24,12 +25,13 @@ public interface ReactiveSinglePageContentHandler extends ExtensionPoint {
      * @param singlePageContent content to be handled
      * @return handled content
      */
-    Mono<SinglePageContent> handle(@NonNull SinglePageContent singlePageContent);
+    Mono<SinglePageContentContext> handle(@NonNull SinglePageContentContext singlePageContent);
 
     @Data
     @Builder
-    class SinglePageContent {
+    class SinglePageContentContext {
         private String singlePageName;
+        private SinglePage singlePage;
         private String content;
         private String raw;
         private String rawType;
