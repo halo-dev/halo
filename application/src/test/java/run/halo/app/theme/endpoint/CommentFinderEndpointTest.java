@@ -145,7 +145,7 @@ class CommentFinderEndpointTest {
             .limitRefreshPeriod(Duration.ofSeconds(1))
             .timeoutDuration(Duration.ofSeconds(10))
             .build();
-        RateLimiter rateLimiter = RateLimiter.of("comment-creation-from-ip-" + "0:0:0:0:0:0:0:0", 
+        RateLimiter rateLimiter = RateLimiter.of("comment-creation-from-ip-" + "0:0:0:0:0:0:0:0",
             config);
         when(rateLimiterRegistry.rateLimiter(anyString(), anyString())).thenReturn(rateLimiter);
 
@@ -183,8 +183,13 @@ class CommentFinderEndpointTest {
         replyRequest.setContent("content");
         replyRequest.setAllowNotification(true);
 
+        when(rateLimiterRegistry.rateLimiter("comment-creation-from-ip-127.0.0.1",
+            "comment-creation"))
+            .thenReturn(RateLimiter.ofDefaults("comment-creation"));
+
         webTestClient.post()
             .uri("/comments/test-comment/reply")
+            .header("X-Forwarded-For", "127.0.0.1")
             .bodyValue(replyRequest)
             .exchange()
             .expectStatus()
@@ -196,5 +201,8 @@ class CommentFinderEndpointTest {
         assertThat(value.getSpec().getIpAddress()).isNotNull();
         assertThat(value.getSpec().getUserAgent()).isNotNull();
         assertThat(value.getSpec().getQuoteReply()).isNull();
+
+        verify(rateLimiterRegistry).rateLimiter("comment-creation-from-ip-127.0.0.1",
+            "comment-creation");
     }
 }

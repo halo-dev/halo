@@ -61,10 +61,11 @@ public class Plugin extends AbstractExtension {
          *
          * @see <a href="semver.org">semantic version</a>
          */
-        @Schema(requiredMode = REQUIRED, pattern = "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-("
-            + "(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\."
-            + "(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\"
-            + ".[0-9a-zA-Z-]+)*))?$")
+        @Schema(requiredMode = REQUIRED,
+            pattern = "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-("
+                + "(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\."
+                + "(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\"
+                + ".[0-9a-zA-Z-]+)*))?$")
         private String version;
 
         private PluginAuthor author;

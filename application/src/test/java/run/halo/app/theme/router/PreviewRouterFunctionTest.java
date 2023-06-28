@@ -20,7 +20,6 @@ import org.springframework.web.reactive.function.server.HandlerStrategies;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
@@ -97,14 +96,8 @@ class PreviewRouterFunctionTest {
 
         PostVo postVo = PostVo.from(post);
         postVo.setContributors(contributorVos());
-        when(postPublicQueryService.convertToListedPostVo(post)).thenReturn(Mono.just(postVo));
-
-        ContentWrapper contentWrapper = ContentWrapper.builder()
-            .raw("raw content")
-            .content("formatted content")
-            .build();
-        when(postService.getContent(eq("snapshot1"), eq("snapshot2")))
-            .thenReturn(Mono.just(contentWrapper));
+        when(postPublicQueryService.convertToVo(eq(post), eq(post.getSpec().getHeadSnapshot())))
+            .thenReturn(Mono.just(postVo));
 
         when(viewNameResolver.resolveViewNameOrDefault(any(), eq("postTemplate"),
             eq("post"))).thenReturn(Mono.just("postView"));
@@ -114,7 +107,7 @@ class PreviewRouterFunctionTest {
             .expectStatus().isOk();
 
         verify(viewResolver).resolveViewName(any(), any());
-        verify(postService).getContent(eq("snapshot1"), eq("snapshot2"));
+        verify(postPublicQueryService).convertToVo(eq(post), eq(post.getSpec().getHeadSnapshot()));
         verify(client).fetch(eq(Post.class), eq("post1"));
     }
 
