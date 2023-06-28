@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.jsoup.Jsoup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -79,6 +80,7 @@ class ContentTemplateHeadProcessorIntegrationTest {
             new ContentTemplateHeadProcessor(postFinder, singlePageFinder));
         map.put("templateGlobalHeadProcessor", new TemplateGlobalHeadProcessor(fetcher));
         map.put("seoProcessor", new GlobalSeoProcessor(fetcher));
+        map.put("duplicateMetaTagProcessor", new DuplicateMetaTagProcessor());
         lenient().when(applicationContext.getBeansOfType(eq(TemplateHeadProcessor.class)))
             .thenReturn(map);
 
@@ -134,21 +136,20 @@ class ContentTemplateHeadProcessorIntegrationTest {
             2. global head meta is overridden by content head meta
             3. but global head meta is not overridden by global seo meta
          */
-        assertThat(result).isEqualTo("""
-            <!DOCTYPE html>
-            <html lang="en">
-              <head>
-                <meta charset="UTF-8" />
-                <title>Post detail</title>
-              <meta name="keyword" content="postK1,postK2" />
-            <meta name="description" content="post-description" />
-            <meta name="other" content="post-other-meta" />
+        assertThat(Jsoup.parse(result).html()).isEqualTo("""
+           <!doctype html>
+           <html lang="en">
+            <head>
+             <meta charset="UTF-8">
+             <title>Post detail</title>
+             <meta name="description" content="post-description">
+             <meta name="keyword" content="postK1,postK2">
+             <meta name="other" content="post-other-meta">
             </head>
-              <body>
-                this is body
-              </body>
-            </html>
-             """);
+            <body>
+             this is body
+            </body>
+           </html>""");
     }
 
     Map<String, String> mutableMetaMap(String nameValue, String contentValue) {

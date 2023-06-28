@@ -82,10 +82,7 @@ public class GlobalHeadInjectionProcessor extends AbstractElementModelProcessor 
         // reset model to insert
         model.reset();
         model.add(openHeadTag);
-        // add to target model
-        for (int i = 0; i < modelToInsert.size(); i++) {
-            model.add(modelToInsert.get(i));
-        }
+        model.addModel(modelToInsert);
         model.add(closeHeadTag);
     }
 
