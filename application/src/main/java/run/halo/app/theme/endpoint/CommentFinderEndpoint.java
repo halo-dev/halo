@@ -198,7 +198,9 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                     .defaultIfEmpty(reply);
             })
             .flatMap(reply -> replyService.create(commentName, reply))
-            .flatMap(comment -> ServerResponse.ok().bodyValue(comment));
+            .flatMap(comment -> ServerResponse.ok().bodyValue(comment))
+            .transformDeferred(createIpBasedRateLimiter(request))
+            .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
     }
 
     private boolean checkReplyOwner(Reply reply, Boolean onlySystemUser) {
