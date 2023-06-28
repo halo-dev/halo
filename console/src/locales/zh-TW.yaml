@@ -1076,6 +1076,10 @@ core:
             placeholder: "輸入 / 以選擇輸入類型"
       toolbar:
         attachment: 插入附件
+        select_attachment: 從附件庫選擇
+        insert_image: 從外部連結插入圖片
+        insert_video: 從外部連結插入影片
+        insert_audio: 從外部連結插入音訊
       upload_attachment:
         toast:
           no_available_policy: 目前沒有可用的存儲策略
