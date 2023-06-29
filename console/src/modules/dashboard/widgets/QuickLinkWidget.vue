@@ -173,7 +173,7 @@ const actions: Action[] = [
         confirmText: t("core.common.buttons.confirm"),
         cancelText: t("core.common.buttons.cancel"),
         onConfirm: async () => {
-          await apiClient.cache.invalidCache({ name: "page-cache" });
+          await apiClient.cache.evictCache({ name: "page-cache" });
           Toast.success(
             t(
               "core.dashboard.widgets.presets.quicklink.actions.refresh_page_cache.success_message"
