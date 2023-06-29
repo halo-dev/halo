@@ -3,6 +3,7 @@ package run.halo.app.infra;
 import java.net.URI;
 import java.net.URL;
 import java.util.function.Supplier;
+import javax.annotation.Nullable;
 import org.springframework.http.HttpRequest;
 
 /**
@@ -30,4 +31,11 @@ public interface ExternalUrlSupplier extends Supplier<URI> {
      */
     URL getURL(HttpRequest request);
 
+    /**
+     * Gets user-configured external URL from <code>HaloProperties#getExternalUrl()</code>.
+     *
+     * @return user-configured external URL or null if it is not provided.
+     */
+    @Nullable
+    URL getRaw();
 }

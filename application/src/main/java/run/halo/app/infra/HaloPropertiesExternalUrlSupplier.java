@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import org.springframework.boot.autoconfigure.web.reactive.WebFluxProperties;
 import org.springframework.http.HttpRequest;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import run.halo.app.infra.properties.HaloProperties;
@@ -52,6 +53,12 @@ public class HaloPropertiesExternalUrlSupplier implements ExternalUrlSupplier {
             }
         }
         return externalUrl;
+    }
+
+    @Nullable
+    @Override
+    public URL getRaw() {
+        return haloProperties.getExternalUrl();
     }
 
     private String getBasePath() {
