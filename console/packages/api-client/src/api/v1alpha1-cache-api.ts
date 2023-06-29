@@ -46,19 +46,19 @@ export const V1alpha1CacheApiAxiosParamCreator = function (
 ) {
   return {
     /**
-     * Invalidate a cache.
+     * Evict a cache.
      * @param {string} name Cache name
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    invalidCache: async (
+    evictCache: async (
       name: string,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists("invalidCache", "name", name);
+      assertParamExists("evictCache", "name", name);
       const localVarPath =
-        `/apis/api.console.halo.run/v1alpha1/caches/{name}/invalidation`.replace(
+        `/apis/api.console.halo.run/v1alpha1/caches/{name}`.replace(
           `{${"name"}}`,
           encodeURIComponent(String(name))
         );
@@ -70,7 +70,7 @@ export const V1alpha1CacheApiAxiosParamCreator = function (
       }
 
       const localVarRequestOptions = {
-        method: "POST",
+        method: "DELETE",
         ...baseOptions,
         ...options,
       };
@@ -111,18 +111,18 @@ export const V1alpha1CacheApiFp = function (configuration?: Configuration) {
     V1alpha1CacheApiAxiosParamCreator(configuration);
   return {
     /**
-     * Invalidate a cache.
+     * Evict a cache.
      * @param {string} name Cache name
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async invalidCache(
+    async evictCache(
       name: string,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
     > {
-      const localVarAxiosArgs = await localVarAxiosParamCreator.invalidCache(
+      const localVarAxiosArgs = await localVarAxiosParamCreator.evictCache(
         name,
         options
       );
@@ -148,32 +148,32 @@ export const V1alpha1CacheApiFactory = function (
   const localVarFp = V1alpha1CacheApiFp(configuration);
   return {
     /**
-     * Invalidate a cache.
-     * @param {V1alpha1CacheApiInvalidCacheRequest} requestParameters Request parameters.
+     * Evict a cache.
+     * @param {V1alpha1CacheApiEvictCacheRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    invalidCache(
-      requestParameters: V1alpha1CacheApiInvalidCacheRequest,
+    evictCache(
+      requestParameters: V1alpha1CacheApiEvictCacheRequest,
       options?: AxiosRequestConfig
     ): AxiosPromise<void> {
       return localVarFp
-        .invalidCache(requestParameters.name, options)
+        .evictCache(requestParameters.name, options)
         .then((request) => request(axios, basePath));
     },
   };
 };
 
 /**
- * Request parameters for invalidCache operation in V1alpha1CacheApi.
+ * Request parameters for evictCache operation in V1alpha1CacheApi.
  * @export
- * @interface V1alpha1CacheApiInvalidCacheRequest
+ * @interface V1alpha1CacheApiEvictCacheRequest
  */
-export interface V1alpha1CacheApiInvalidCacheRequest {
+export interface V1alpha1CacheApiEvictCacheRequest {
   /**
    * Cache name
    * @type {string}
-   * @memberof V1alpha1CacheApiInvalidCache
+   * @memberof V1alpha1CacheApiEvictCache
    */
   readonly name: string;
 }
@@ -186,18 +186,18 @@ export interface V1alpha1CacheApiInvalidCacheRequest {
  */
 export class V1alpha1CacheApi extends BaseAPI {
   /**
-   * Invalidate a cache.
-   * @param {V1alpha1CacheApiInvalidCacheRequest} requestParameters Request parameters.
+   * Evict a cache.
+   * @param {V1alpha1CacheApiEvictCacheRequest} requestParameters Request parameters.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof V1alpha1CacheApi
    */
-  public invalidCache(
-    requestParameters: V1alpha1CacheApiInvalidCacheRequest,
+  public evictCache(
+    requestParameters: V1alpha1CacheApiEvictCacheRequest,
     options?: AxiosRequestConfig
   ) {
     return V1alpha1CacheApiFp(this.configuration)
-      .invalidCache(requestParameters.name, options)
+      .evictCache(requestParameters.name, options)
       .then((request) => request(this.axios, this.basePath));
   }
 }
