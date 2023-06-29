@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class CacheProperties {
 
-    private boolean disabled = true;
+    private boolean disabled;
 
 }
