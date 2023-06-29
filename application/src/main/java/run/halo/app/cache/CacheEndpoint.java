@@ -2,14 +2,16 @@ package run.halo.app.cache;
 
 import static io.swagger.v3.oas.annotations.enums.ParameterIn.PATH;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
+import static org.springdoc.webflux.core.fn.SpringdocRouteBuilder.route;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 import org.springdoc.core.fn.builders.apiresponse.Builder;
-import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 
 @Component
@@ -23,21 +25,11 @@ public class CacheEndpoint implements CustomEndpoint {
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
-        return SpringdocRouteBuilder
-            .route()
-            .POST("/caches/{name}/invalidation", request -> {
-                var cacheName = request.pathVariable("name");
-                if (cacheManager.getCacheNames().contains(cacheName)) {
-                    var cache = cacheManager.getCache(cacheName);
-                    if (cache != null) {
-                        cache.invalidate();
-                    }
-                }
-                return ServerResponse.noContent().build();
-            }, builder -> builder
+        return route()
+            .DELETE("/caches/{name}", this::evictCache, builder -> builder
                 .tag("v1alpha1/Cache")
-                .operationId("InvalidCache")
-                .description("Invalidate a cache.")
+                .operationId("EvictCache")
+                .description("Evict a cache.")
                 .parameter(parameterBuilder()
                     .name("name")
                     .in(PATH)
@@ -49,4 +41,14 @@ public class CacheEndpoint implements CustomEndpoint {
             .build();
     }
 
+    private Mono<ServerResponse> evictCache(ServerRequest request) {
+        var cacheName = request.pathVariable("name");
+        if (cacheManager.getCacheNames().contains(cacheName)) {
+            var cache = cacheManager.getCache(cacheName);
+            if (cache != null) {
+                cache.invalidate();
+            }
+        }
+        return ServerResponse.accepted().build();
+    }
 }

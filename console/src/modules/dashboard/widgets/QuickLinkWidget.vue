@@ -182,6 +182,7 @@ const actions: Action[] = [
         },
       });
     },
+    permissions: ["system:caches:manage"],
   },
 ];
 </script>
