@@ -15,7 +15,7 @@ import org.thymeleaf.spring6.view.reactive.ThymeleafReactiveView;
 import org.thymeleaf.spring6.view.reactive.ThymeleafReactiveViewResolver;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.cache.CacheWebFilter;
+import run.halo.app.cache.PageCacheWebFilter;
 import run.halo.app.theme.finders.FinderRegistry;
 
 @Component("thymeleafReactiveViewResolver")
@@ -53,7 +53,7 @@ public class HaloViewResolver extends ThymeleafReactiveViewResolver {
             return themeResolver.getTheme(exchange).flatMap(theme -> {
                 // calculate the engine before rendering
                 setTemplateEngine(engineManager.getTemplateEngine(theme));
-                exchange.getAttributes().put(CacheWebFilter.REQUEST_TO_CACHE, true);
+                exchange.getAttributes().put(PageCacheWebFilter.REQUEST_TO_CACHE, true);
                 return super.render(model, contentType, exchange);
             });
         }

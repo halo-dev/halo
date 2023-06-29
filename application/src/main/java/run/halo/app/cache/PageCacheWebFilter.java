@@ -30,15 +30,15 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
-public class CacheWebFilter implements WebFilter, Ordered {
+public class PageCacheWebFilter implements WebFilter, Ordered {
 
     public static final String REQUEST_TO_CACHE = "RequestCacheWebFilterToCache";
 
-    public static final String CACHE_NAME = "page-cache";
+    public static final String CACHE_NAME = "page";
 
     private final Cache cache;
 
-    public CacheWebFilter(CacheManager cacheManager) {
+    public PageCacheWebFilter(CacheManager cacheManager) {
         this.cache = cacheManager.getCache(CACHE_NAME);
     }
 
