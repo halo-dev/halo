@@ -26,14 +26,17 @@ public abstract class AbstractContentService {
     private final ReactiveExtensionClient client;
 
     public Mono<ContentWrapper> getContent(String snapshotName, String baseSnapshotName) {
-        return client.get(Snapshot.class, baseSnapshotName)
+        if (StringUtils.isBlank(snapshotName) || StringUtils.isBlank(baseSnapshotName)) {
+            return Mono.empty();
+        }
+        return client.fetch(Snapshot.class, baseSnapshotName)
             .doOnNext(this::checkBaseSnapshot)
             .flatMap(baseSnapshot -> {
                 if (StringUtils.equals(snapshotName, baseSnapshotName)) {
                     var contentWrapper = ContentWrapper.patchSnapshot(baseSnapshot, baseSnapshot);
                     return Mono.just(contentWrapper);
                 }
-                return client.get(Snapshot.class, snapshotName)
+                return client.fetch(Snapshot.class, snapshotName)
                     .map(snapshot -> ContentWrapper.patchSnapshot(snapshot, baseSnapshot));
             });
     }
