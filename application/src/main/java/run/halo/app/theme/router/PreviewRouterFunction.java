@@ -70,7 +70,7 @@ public class PreviewRouterFunction {
             .flatMap(post -> canPreview(post.getContributors())
                 .doOnNext(canPreview -> {
                     if (!canPreview) {
-                        throw new NotFoundException("Page not found.");
+                        throw new NotFoundException("Post not found.");
                     }
                 })
                 .thenReturn(post)
@@ -138,7 +138,7 @@ public class PreviewRouterFunction {
             .flatMap(singlePageVo -> canPreview(singlePageVo.getContributors())
                 .doOnNext(canPreview -> {
                     if (!canPreview) {
-                        throw new NotFoundException("Page not found.");
+                        throw new NotFoundException("Single page not found.");
                     }
                 })
                 .thenReturn(singlePageVo)
