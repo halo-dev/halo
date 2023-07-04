@@ -32,6 +32,60 @@ PostgreSQL，虽然数据库有备份和恢复的功能，但是仍然缺少应�
 
 ## Draft
 
+恢复数据之前需要完整备份当前 Halo，以便恢复过程中发生错误导致无法回滚。
+
+备份文件将存储在 `${halo.work-dir}/backups/halo-full-backup-2023.07.03-17:52:59.zip`。
+
+备份整站可能需要大量的时间，所以我们需要创建自定义模型（Backup）用于保存用户创建备份的请求，并异步执行备份操作，最终将结果反馈至自定义模型数据中。Backup
+模型样例如下：
+
+- 备份成功样例
+
+```yaml
+apiVersion: backup.halo.run/v1alpha1
+kind: Backup
+metadata:
+  name: halo-full-backup-xyz
+  creationTimestamp: 2023.07.04-10:25:30
+spec:
+  format: zip
+status:
+  phase: Succeeded
+  startTimestamp: 2023.07.04-10:25:31
+  completionTimestamp: 2023.07.04-10:26:30
+  filename: halo-full-backup-2023-07-04-10-25-30.zip
+  size: 1024 # data unit: bytes
+```
+
+- 备份失败样例
+
+```yaml
+apiVersion: backup.halo.run/v1alpha1
+kind: Backup
+metadata:
+  name: halo-full-backup-xyz
+  creationTimestamp: 2023.07.04-10:25:30
+spec:
+  compressionFormat: zip | 7z | tar | tar.gz # 压缩格式
+status:
+  startTimestamp: 2023.07.04-10:25:31
+  # Pending: 刚刚创建好 Backup 资源，等待 Reconciler reconcile。
+  # Running: Reconciler 正在备份 Halo。
+  # Succeeded: Reconciler 成功执行备份 Halo 操作。
+  # Failed: 备份 Halo 失败。
+  phase: Failed
+  failureReason: DatabaseConnectionReset | UnsupportedCompression # 机器可识别的信息
+  failureMessage: The database connection reset. # 人可阅读的信息
+```
+
+同时，BackupReconciler 将负责备份操作，并更新 Backup 数据。
+
+用户请求示例如下：
+
+```text
+POST /apis/backup.halo.run/v1alpha1/backups
+```
+
 ### 数据库备份和恢复
 
 因为 Halo 的 [Extension 设计](https://github.com/halo-dev/rfcs/tree/main/extension)，所以 Halo 的在数据库中的数据备份相对比较简单，只需要简单备份
@@ -113,7 +167,7 @@ Halo 工作目录样例如下所示：
     │   └── theme.yaml
 ```
 
-备份时需要过滤 `db` 和 `indices` 目录。
+备份时需要过滤 `db`、`backups` 和 `indices` 目录。
 
 ### 备份文件结构
 
