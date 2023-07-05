@@ -1,4 +1,4 @@
-# 备份和恢复
+# 备份和恢复 Proposal
 
 ## Motivation
 
@@ -19,6 +19,7 @@ PostgreSQL，虽然数据库有备份和恢复的功能，但是仍然缺少应�
 - 仅备份部分自定义资源。
 - 仅备份和恢复文章 Markdown。
 - 定时备份。
+- 加密备份文件。
 
 ## Use Cases
 
@@ -42,7 +43,7 @@ PostgreSQL，虽然数据库有备份和恢复的功能，但是仍然缺少应�
 - 备份成功样例
 
 ```yaml
-apiVersion: backup.halo.run/v1alpha1
+apiVersion: migration.halo.run/v1alpha1
 kind: Backup
 metadata:
   name: halo-full-backup-xyz
@@ -60,7 +61,7 @@ status:
 - 备份失败样例
 
 ```yaml
-apiVersion: backup.halo.run/v1alpha1
+apiVersion: migration.halo.run/v1alpha1
 kind: Backup
 metadata:
   name: halo-full-backup-xyz
@@ -75,23 +76,28 @@ status:
   # Failed: 备份 Halo 失败。
   phase: Failed
   failureReason: DatabaseConnectionReset | UnsupportedCompression # 机器可识别的信息
-  failureMessage: The database connection reset. # 人可阅读的信息
+  failureMessage: The database connection reset. # 人类可阅读的信息
 ```
 
 同时，BackupReconciler 将负责备份操作，并更新 Backup 数据。
 
-用户请求示例如下：
+请求示例如下：
 
 ```text
-POST /apis/backup.halo.run/v1alpha1/backups
+POST /apis/migration.halo.run/v1alpha1/backups
+Content-Type: application/json
 ```
 
-### 数据库备份和恢复
+### 备份
+
+准备好所有的备份内容后，需要计算摘要并保存，以便后期恢复校验备份文件完整性使用。
+
+#### 数据库备份和恢复
 
 因为 Halo 的 [Extension 设计](https://github.com/halo-dev/rfcs/tree/main/extension)，所以 Halo 的在数据库中的数据备份相对比较简单，只需要简单备份
 ExtensionStore 即可。恢复同理。
 
-### 工作目录备份和恢复
+#### 工作目录备份和恢复
 
 Halo 工作目录样例如下所示：
 
@@ -167,9 +173,9 @@ Halo 工作目录样例如下所示：
     │   └── theme.yaml
 ```
 
-备份时需要过滤 `db`、`backups` 和 `indices` 目录。
+备份时需要过滤 `db`、backups` 和 `indices` 目录。
 
-### 备份文件结构
+#### 备份文件结构
 
 备份文件主要包含自定义资源（`extensions.data`）和工作目录（`workdir.data`）的数据。
 
@@ -192,6 +198,33 @@ compressions:
 ```
 
 前期可不实现该功能。
+
+### 恢复
+
+用户通过上传备份文件的方式进行恢复。当且仅当博客未初始化阶段才能进行恢复操作，否则可能会造成数据不一致。
+
+请求示例如下：
+
+```text
+POST /apis/migration.halo.run/v1alpha1/restorations
+Content-Type: multipart/form-data; boundary="boundary"
+
+'''
+--boundary
+Content-Disposition: form-data; name="backupfile"; filename="halo-full-backup.zip"
+Content-Type: application/zip
+'''
+```
+
+恢复步骤如下：
+
+1. 解压缩备份文件。
+2. 校验备份文件的完整性。
+2. 恢复所有 ExtensionStore。
+3. 覆盖当前工作目录。
+4. 备份完成。
+
+> 需要注意内存占用问题。
 
 ## TBDs
 
