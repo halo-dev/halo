@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import {
   IconAddCircle,
-  IconArrowDown,
   IconUserFollow,
   IconUserSettings,
   IconLockPasswordLine,
@@ -20,7 +19,6 @@ import {
   Toast,
   IconRefreshLine,
   VEmpty,
-  VDropdown,
   VDropdownItem,
 } from "@halo-dev/components";
 import UserEditingModal from "./components/UserEditingModal.vue";
@@ -28,7 +26,7 @@ import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
 import GrantPermissionModal from "./components/GrantPermissionModal.vue";
 import { computed, onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
-import type { Role, User, ListedUser } from "@halo-dev/api-client";
+import type { User, ListedUser } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 import { useRouteQuery } from "@vueuse/router";
@@ -41,6 +39,7 @@ import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import UserCreationModal from "./components/UserCreationModal.vue";
+import FilterDropdown from "@/components/filter/FilterDropdown.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -74,46 +73,19 @@ function handleClearKeyword() {
   page.value = 1;
 }
 
-interface SortItem {
-  label: string;
-  value: string;
-}
-
-const SortItems: SortItem[] = [
-  {
-    label: t("core.user.filters.sort.items.create_time_desc"),
-    value: "creationTimestamp,desc",
-  },
-  {
-    label: t("core.user.filters.sort.items.create_time_asc"),
-    value: "creationTimestamp,asc",
-  },
-];
-
-const selectedSortItem = ref<SortItem>();
-
-function handleSortItemChange(sortItem?: SortItem) {
-  selectedSortItem.value = sortItem;
-  page.value = 1;
-}
-
 const { roles } = useFetchRole();
-const selectedRole = ref<Role>();
-
-function handleRoleChange(role?: Role) {
-  selectedRole.value = role;
-  page.value = 1;
-}
+const selectedRoleValue = ref();
+const selectedSortValue = ref();
 
 function handleClearFilters() {
-  selectedRole.value = undefined;
-  selectedSortItem.value = undefined;
+  selectedRoleValue.value = undefined;
+  selectedSortValue.value = undefined;
   keyword.value = "";
   page.value = 1;
 }
 
 const hasFilters = computed(() => {
-  return selectedRole.value || selectedSortItem.value || keyword.value;
+  return selectedRoleValue.value || selectedSortValue.value || keyword.value;
 });
 
 const page = ref(1);
@@ -126,7 +98,14 @@ const {
   isFetching,
   refetch,
 } = useQuery<ListedUser[]>({
-  queryKey: ["users", page, size, keyword, selectedSortItem, selectedRole],
+  queryKey: [
+    "users",
+    page,
+    size,
+    keyword,
+    selectedSortValue,
+    selectedRoleValue,
+  ],
   queryFn: async () => {
     const { data } = await apiClient.user.listUsers({
       page: page.value,
@@ -136,10 +115,8 @@ const {
         `name!=${ANONYMOUSUSER_NAME}`,
         `name!=${DELETEDUSER_NAME}`,
       ],
-      sort: [selectedSortItem.value?.value].filter(
-        (item) => !!item
-      ) as string[],
-      role: selectedRole.value?.metadata.name,
+      sort: [selectedSortValue.value].filter(Boolean) as string[],
+      role: selectedRoleValue.value,
     });
 
     total.value = data.total;
@@ -352,28 +329,6 @@ onMounted(() => {
                   }}
                 </FilterTag>
 
-                <FilterTag v-if="selectedRole" @close="handleRoleChange()">
-                  {{
-                    $t("core.user.filters.role.result", {
-                      role:
-                        selectedRole.metadata.annotations?.[
-                          rbacAnnotations.DISPLAY_NAME
-                        ] || selectedRole.metadata.name,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterTag
-                  v-if="selectedSortItem"
-                  @close="handleSortItemChange()"
-                >
-                  {{
-                    $t("core.common.filters.results.sort", {
-                      sort: selectedSortItem.label,
-                    })
-                  }}
-                </FilterTag>
-
                 <FilterCleanButton
                   v-if="hasFilters"
                   @click="handleClearFilters"
@@ -387,56 +342,35 @@ onMounted(() => {
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
-                <VDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.user.filters.role.label") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <VDropdownItem
-                      v-for="(role, index) in roles"
-                      :key="index"
-                      :selected="
-                        selectedRole?.metadata.name === role.metadata.name
-                      "
-                      @click="handleRoleChange(role)"
-                    >
-                      {{
-                        role.metadata.annotations?.[
-                          rbacAnnotations.DISPLAY_NAME
-                        ] || role.metadata.name
-                      }}
-                    </VDropdownItem>
-                  </template>
-                </VDropdown>
-                <VDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.common.filters.labels.sort") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <VDropdownItem
-                      v-for="(sortItem, index) in SortItems"
-                      :key="index"
-                      :selected="selectedSortItem?.value === sortItem.value"
-                      @click="handleSortItemChange(sortItem)"
-                    >
-                      {{ sortItem.label }}
-                    </VDropdownItem>
-                  </template>
-                </VDropdown>
+                <FilterDropdown
+                  v-model="selectedRoleValue"
+                  :label="$t('core.user.filters.role.label')"
+                  :items="
+                    roles.map((role) => {
+                      return {
+                        label:
+                          role.metadata.annotations?.[
+                            rbacAnnotations.DISPLAY_NAME
+                          ] || role.metadata.name,
+                        value: role.metadata.name,
+                      };
+                    })
+                  "
+                />
+                <FilterDropdown
+                  v-model="selectedSortValue"
+                  :label="$t('core.common.filters.labels.sort')"
+                  :items="[
+                    {
+                      label: t('core.user.filters.sort.items.create_time_desc'),
+                      value: 'creationTimestamp,desc',
+                    },
+                    {
+                      label: t('core.user.filters.sort.items.create_time_asc'),
+                      value: 'creationTimestamp,asc',
+                    },
+                  ]"
+                />
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
