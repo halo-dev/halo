@@ -32,14 +32,13 @@ import { formatDatetime } from "@/utils/date";
 import { useRouteQuery } from "@vueuse/router";
 import { usePermission } from "@/utils/permission";
 import { useUserStore } from "@/stores/user";
-import { getNode } from "@formkit/core";
-import FilterTag from "@/components/filter/FilterTag.vue";
 import { useFetchRole } from "../roles/composables/use-role";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import UserCreationModal from "./components/UserCreationModal.vue";
 import FilterDropdown from "@/components/filter/FilterDropdown.vue";
+import SearchInput from "@/components/input/SearchInput.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -60,19 +59,6 @@ const ANONYMOUSUSER_NAME = "anonymousUser";
 const DELETEDUSER_NAME = "ghost";
 
 // Filters
-function handleKeywordChange() {
-  const keywordNode = getNode("keywordInput");
-  if (keywordNode) {
-    keyword.value = keywordNode._value as string;
-  }
-  page.value = 1;
-}
-
-function handleClearKeyword() {
-  keyword.value = "";
-  page.value = 1;
-}
-
 const { roles } = useFetchRole();
 const selectedRoleValue = ref();
 const selectedSortValue = ref();
@@ -80,13 +66,18 @@ const selectedSortValue = ref();
 function handleClearFilters() {
   selectedRoleValue.value = undefined;
   selectedSortValue.value = undefined;
-  keyword.value = "";
-  page.value = 1;
 }
 
 const hasFilters = computed(() => {
-  return selectedRoleValue.value || selectedSortValue.value || keyword.value;
+  return selectedRoleValue.value || selectedSortValue.value;
 });
+
+watch(
+  () => [selectedRoleValue.value, selectedSortValue.value, keyword.value],
+  () => {
+    page.value = 1;
+  }
+);
 
 const page = ref(1);
 const size = ref(20);
@@ -307,33 +298,7 @@ onMounted(() => {
               />
             </div>
             <div class="flex w-full flex-1 items-center sm:w-auto">
-              <div
-                v-if="!selectedUserNames.length"
-                class="flex items-center gap-2"
-              >
-                <FormKit
-                  id="keywordInput"
-                  outer-class="!p-0"
-                  :model-value="keyword"
-                  name="keyword"
-                  :placeholder="$t('core.common.placeholder.search')"
-                  type="text"
-                  @keyup.enter="handleKeywordChange"
-                ></FormKit>
-
-                <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  {{
-                    $t("core.common.filters.results.keyword", {
-                      keyword: keyword,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterCleanButton
-                  v-if="hasFilters"
-                  @click="handleClearFilters"
-                />
-              </div>
+              <SearchInput v-if="!selectedUserNames.length" v-model="keyword" />
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeleteInBatch">
                   {{ $t("core.common.buttons.delete") }}
@@ -342,6 +307,10 @@ onMounted(() => {
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
+                <FilterCleanButton
+                  v-if="hasFilters"
+                  @click="handleClearFilters"
+                />
                 <FilterDropdown
                   v-model="selectedRoleValue"
                   :label="$t('core.user.filters.role.label')"

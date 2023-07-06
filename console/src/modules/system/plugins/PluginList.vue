@@ -17,14 +17,14 @@ import PluginUploadModal from "./components/PluginUploadModal.vue";
 import { computed, ref, onMounted } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
-import FilterTag from "@/components/filter/FilterTag.vue";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
-import { getNode } from "@formkit/core";
 import { useQuery } from "@tanstack/vue-query";
 import type { Plugin } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { useRouteQuery } from "@vueuse/router";
 import FilterDropdown from "@/components/filter/FilterDropdown.vue";
+import { watch } from "vue";
+import SearchInput from "@/components/input/SearchInput.vue";
 
 const { t } = useI18n();
 
@@ -40,33 +40,21 @@ const total = ref(0);
 const selectedEnabledValue = ref();
 const selectedSortValue = ref();
 
-function handleKeywordChange() {
-  const keywordNode = getNode("keywordInput");
-  if (keywordNode) {
-    keyword.value = keywordNode._value as string;
-  }
-  page.value = 1;
-}
-
-function handleClearKeyword() {
-  keyword.value = "";
-  page.value = 1;
-}
-
 const hasFilters = computed(() => {
-  return (
-    selectedEnabledValue.value !== undefined ||
-    selectedSortValue.value ||
-    keyword.value
-  );
+  return selectedEnabledValue.value !== undefined || selectedSortValue.value;
 });
 
 function handleClearFilters() {
   selectedSortValue.value = undefined;
   selectedEnabledValue.value = undefined;
-  keyword.value = "";
-  page.value = 1;
 }
+
+watch(
+  () => [selectedEnabledValue.value, selectedSortValue.value, keyword.value],
+  () => {
+    page.value = 1;
+  }
+);
 
 const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
   queryKey: [
@@ -155,31 +143,14 @@ onMounted(() => {
             class="relative flex flex-col items-start sm:flex-row sm:items-center"
           >
             <div class="flex w-full flex-1 items-center gap-2 sm:w-auto">
-              <FormKit
-                id="keywordInput"
-                outer-class="!p-0"
-                :placeholder="$t('core.common.placeholder.search')"
-                type="text"
-                name="keyword"
-                :model-value="keyword"
-                @keyup.enter="handleKeywordChange"
-              ></FormKit>
-
-              <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                {{
-                  $t("core.common.filters.results.keyword", {
-                    keyword: keyword,
-                  })
-                }}
-              </FilterTag>
-
-              <FilterCleanButton
-                v-if="hasFilters"
-                @click="handleClearFilters"
-              />
+              <SearchInput v-model="keyword" />
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
+                <FilterCleanButton
+                  v-if="hasFilters"
+                  @click="handleClearFilters"
+                />
                 <FilterDropdown
                   v-model="selectedEnabledValue"
                   :label="$t('core.common.filters.labels.status')"
