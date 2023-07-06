@@ -102,11 +102,11 @@ onMounted(() => {
 
   const { extensionPoints } = currentPluginModule;
 
-  if (!extensionPoints?.["plugin:tabs:create"]) {
+  if (!extensionPoints?.["plugin:self:tabs:create"]) {
     return;
   }
 
-  const extraTabs = extensionPoints["plugin:tabs:create"]() as PluginTab[];
+  const extraTabs = extensionPoints["plugin:self:tabs:create"]() as PluginTab[];
 
   extraTabs.forEach((tab) => {
     if (currentUserHasPermission(tab.permissions)) {

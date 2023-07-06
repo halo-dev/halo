@@ -21,7 +21,7 @@ export interface ExtensionPoint {
 
   "editor:create"?: () => EditorProvider[] | Promise<EditorProvider[]>;
 
-  "plugin:tabs:create"?: () => PluginTab[] | Promise<PluginTab[]>;
+  "plugin:self:tabs:create"?: () => PluginTab[] | Promise<PluginTab[]>;
 
   "default:editor:extension:create": () =>
     | AnyExtension[]
