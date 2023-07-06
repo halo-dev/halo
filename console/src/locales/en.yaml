@@ -788,8 +788,6 @@ core:
         license: License
         role_templates: Role Templates
         last_starttime: Last Start Time
-    settings:
-      title: Plugin settings
     loader:
       toast:
         entry_load_failed: "{name}: Failed to load plugin entry file"

@@ -1,8 +1,8 @@
+import type { Component, Raw } from "vue";
+
 export interface PluginTab {
   id: string;
   label: string;
-  route: {
-    name: string;
-    params?: Record<string, string>;
-  };
+  component: Raw<Component>;
+  permissions?: string[];
 }
