@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import {
   IconAddCircle,
-  IconArrowDown,
   IconPlug,
   IconRefreshLine,
   VButton,
@@ -11,8 +10,6 @@ import {
   VPagination,
   VSpace,
   VLoading,
-  VDropdown,
-  VDropdownItem,
   Dialog,
 } from "@halo-dev/components";
 import PluginListItem from "./components/PluginListItem.vue";
@@ -27,18 +24,9 @@ import { useQuery } from "@tanstack/vue-query";
 import type { Plugin } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { useRouteQuery } from "@vueuse/router";
+import FilterDropdown from "@/components/filter/FilterDropdown.vue";
 
 const { t } = useI18n();
-
-interface EnabledItem {
-  label: string;
-  value?: boolean;
-}
-
-interface SortItem {
-  label: string;
-  value: string;
-}
 
 const { currentUserHasPermission } = usePermission();
 
@@ -49,45 +37,8 @@ const page = ref(1);
 const size = ref(20);
 const total = ref(0);
 
-// Filters
-const EnabledItems: EnabledItem[] = [
-  {
-    label: t("core.plugin.filters.status.items.all"),
-    value: undefined,
-  },
-  {
-    label: t("core.plugin.filters.status.items.active"),
-    value: true,
-  },
-  {
-    label: t("core.plugin.filters.status.items.inactive"),
-    value: false,
-  },
-];
-
-const SortItems: SortItem[] = [
-  {
-    label: t("core.plugin.filters.sort.items.create_time_desc"),
-    value: "creationTimestamp,desc",
-  },
-  {
-    label: t("core.plugin.filters.sort.items.create_time_asc"),
-    value: "creationTimestamp,asc",
-  },
-];
-
-const selectedEnabledItem = ref<EnabledItem>();
-const selectedSortItem = ref<SortItem>();
-
-function handleEnabledItemChange(enabledItem: EnabledItem) {
-  selectedEnabledItem.value = enabledItem;
-  page.value = 1;
-}
-
-function handleSortItemChange(sortItem?: SortItem) {
-  selectedSortItem.value = sortItem;
-  page.value = 1;
-}
+const selectedEnabledValue = ref();
+const selectedSortValue = ref();
 
 function handleKeywordChange() {
   const keywordNode = getNode("keywordInput");
@@ -104,15 +55,15 @@ function handleClearKeyword() {
 
 const hasFilters = computed(() => {
   return (
-    selectedEnabledItem.value?.value !== undefined ||
-    selectedSortItem.value?.value ||
+    selectedEnabledValue.value !== undefined ||
+    selectedSortValue.value ||
     keyword.value
   );
 });
 
 function handleClearFilters() {
-  selectedEnabledItem.value = undefined;
-  selectedSortItem.value = undefined;
+  selectedSortValue.value = undefined;
+  selectedEnabledValue.value = undefined;
   keyword.value = "";
   page.value = 1;
 }
@@ -123,16 +74,16 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
     page,
     size,
     keyword,
-    selectedEnabledItem,
-    selectedSortItem,
+    selectedEnabledValue,
+    selectedSortValue,
   ],
   queryFn: async () => {
     const { data } = await apiClient.plugin.listPlugins({
       page: page.value,
       size: size.value,
       keyword: keyword.value,
-      enabled: selectedEnabledItem.value?.value,
-      sort: [selectedSortItem.value?.value].filter(Boolean) as string[],
+      enabled: selectedEnabledValue.value,
+      sort: [selectedSortValue.value].filter(Boolean) as string[],
     });
 
     total.value = data.total;
@@ -222,28 +173,6 @@ onMounted(() => {
                 }}
               </FilterTag>
 
-              <FilterTag
-                v-if="selectedEnabledItem?.value !== undefined"
-                @close="handleEnabledItemChange(EnabledItems[0])"
-              >
-                {{
-                  $t("core.common.filters.results.status", {
-                    status: selectedEnabledItem.label,
-                  })
-                }}
-              </FilterTag>
-
-              <FilterTag
-                v-if="selectedSortItem"
-                @close="handleSortItemChange()"
-              >
-                {{
-                  $t("core.common.filters.results.sort", {
-                    sort: selectedSortItem.label,
-                  })
-                }}
-              </FilterTag>
-
               <FilterCleanButton
                 v-if="hasFilters"
                 @click="handleClearFilters"
@@ -251,52 +180,42 @@ onMounted(() => {
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
-                <VDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.common.filters.labels.status") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <VDropdownItem
-                      v-for="(enabledItem, index) in EnabledItems"
-                      :key="index"
-                      :selected="
-                        enabledItem.value === selectedEnabledItem?.value
-                      "
-                      @click="handleEnabledItemChange(enabledItem)"
-                    >
-                      {{ enabledItem.label }}
-                    </VDropdownItem>
-                  </template>
-                </VDropdown>
-                <VDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.common.filters.labels.sort") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <VDropdownItem
-                      v-for="(sortItem, index) in SortItems"
-                      :key="index"
-                      :selected="sortItem.value === selectedSortItem?.value"
-                      @click="handleSortItemChange(sortItem)"
-                    >
-                      {{ sortItem.label }}
-                    </VDropdownItem>
-                  </template>
-                </VDropdown>
+                <FilterDropdown
+                  v-model="selectedEnabledValue"
+                  :label="$t('core.common.filters.labels.status')"
+                  :items="[
+                    {
+                      label: t('core.plugin.filters.status.items.all'),
+                      value: undefined,
+                    },
+                    {
+                      label: t('core.plugin.filters.status.items.active'),
+                      value: true,
+                    },
+                    {
+                      label: t('core.plugin.filters.status.items.inactive'),
+                      value: false,
+                    },
+                  ]"
+                />
+                <FilterDropdown
+                  v-model="selectedSortValue"
+                  :label="$t('core.common.filters.labels.sort')"
+                  :items="[
+                    {
+                      label: t(
+                        'core.plugin.filters.sort.items.create_time_desc'
+                      ),
+                      value: 'creationTimestamp,desc',
+                    },
+                    {
+                      label: t(
+                        'core.plugin.filters.sort.items.create_time_asc'
+                      ),
+                      value: 'creationTimestamp,asc',
+                    },
+                  ]"
+                />
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
