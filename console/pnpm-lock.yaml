@@ -65,8 +65,8 @@ importers:
         specifier: workspace:*
         version: link:packages/shared
       '@halo-dev/richtext-editor':
-        specifier: 0.0.0-alpha.23
-        version: 0.0.0-alpha.23(@tiptap/pm@2.0.3)(vue@3.2.45)
+        specifier: 0.0.0-alpha.24
+        version: 0.0.0-alpha.24(@tiptap/pm@2.0.3)(vue@3.2.45)
       '@tanstack/vue-query':
         specifier: ^4.29.1
         version: 4.29.1(vue@3.2.45)
@@ -2350,8 +2350,8 @@ packages:
       - windicss
     dev: false
 
-  /@halo-dev/richtext-editor@0.0.0-alpha.23(@tiptap/pm@2.0.3)(vue@3.2.45):
-    resolution: {integrity: sha512-SlvAD5NrBSGr2mRf9zr+1Bbj07yLgqDPWtmTEZgl/h4GhdeboMlvSApQFjR8KAPItrgSChUsMtniVksNGPXtnQ==}
+  /@halo-dev/richtext-editor@0.0.0-alpha.24(@tiptap/pm@2.0.3)(vue@3.2.45):
+    resolution: {integrity: sha512-x/R6Y1v6LslvlAwRm99mx04GPchw0ubIKSQazfx3i4s+WSWzrcDR91bxZEYrK8Nei38BKalkTj2SPolbescDIg==}
     peerDependencies:
       vue: ^3.2.37
     dependencies:
@@ -8308,7 +8308,6 @@ packages:
 
   /lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-    dev: true
 
   /log-symbols@4.1.0:
     resolution: {integrity: sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==}

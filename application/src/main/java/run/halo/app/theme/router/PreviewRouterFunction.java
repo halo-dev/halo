@@ -26,7 +26,6 @@ import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.SinglePageConversionService;
-import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.ContributorVo;
 import run.halo.app.theme.finders.vo.PostVo;
 
@@ -71,7 +70,7 @@ public class PreviewRouterFunction {
             .flatMap(post -> canPreview(post.getContributors())
                 .doOnNext(canPreview -> {
                     if (!canPreview) {
-                        throw new NotFoundException("Page not found.");
+                        throw new NotFoundException("Post not found.");
                     }
                 })
                 .thenReturn(post)
@@ -88,8 +87,7 @@ public class PreviewRouterFunction {
     }
 
     private Mono<PostVo> convertToPostVo(Post post, String snapshotName) {
-        return postPublicQueryService.convertToListedPostVo(post)
-            .map(PostVo::from)
+        return postPublicQueryService.convertToVo(post, snapshotName)
             .doOnNext(postVo -> {
                 // fake some attributes only for preview when they are not published
                 Post.PostSpec spec = postVo.getSpec();
@@ -107,17 +105,7 @@ public class PreviewRouterFunction {
                 if (status.getLastModifyTime() == null) {
                     status.setLastModifyTime(Instant.now());
                 }
-            })
-            .flatMap(postVo ->
-                postService.getContent(snapshotName, postVo.getSpec().getBaseSnapshot())
-                    .map(contentWrapper -> ContentVo.builder()
-                        .raw(contentWrapper.getRaw())
-                        .content(contentWrapper.getContent())
-                        .build()
-                    )
-                    .doOnNext(postVo::setContent)
-                    .thenReturn(postVo)
-            );
+            });
     }
 
     private Mono<ServerResponse> previewSinglePage(ServerRequest request) {
@@ -150,7 +138,7 @@ public class PreviewRouterFunction {
             .flatMap(singlePageVo -> canPreview(singlePageVo.getContributors())
                 .doOnNext(canPreview -> {
                     if (!canPreview) {
-                        throw new NotFoundException("Page not found.");
+                        throw new NotFoundException("Single page not found.");
                     }
                 })
                 .thenReturn(singlePageVo)

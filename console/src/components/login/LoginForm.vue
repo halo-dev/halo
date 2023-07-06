@@ -95,7 +95,7 @@ const handleLogin = async () => {
       const { title: errorTitle, detail: errorDetail } = e.response?.data || {};
 
       if (errorTitle || errorDetail) {
-        Toast.error([errorTitle, errorDetail].filter(Boolean).join(" - "));
+        Toast.error(errorDetail || errorTitle);
       } else {
         Toast.error(t("core.common.toast.unknown_error"));
       }

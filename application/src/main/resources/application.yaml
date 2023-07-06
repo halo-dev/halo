@@ -33,6 +33,10 @@ spring:
       spec: expireAfterAccess=1h, maximumSize=10000
 
 halo:
+  caches:
+    page:
+      # Disable page cache by default due to experimental feature
+      disabled: true
   work-dir: ${user.home}/.halo2
   plugin:
     plugins-root: ${halo.work-dir}/plugins
@@ -80,5 +84,8 @@ resilience4j.ratelimiter:
     comment-creation:
       limitForPeriod: 10
       limitRefreshPeriod: 1m
-      timeoutDuration: 10s
-
+      timeoutDuration: 0s
+    signup:
+      limitForPeriod: 3
+      limitRefreshPeriod: 1h
+      timeoutDuration: 0s

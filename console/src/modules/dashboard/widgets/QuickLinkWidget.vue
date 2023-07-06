@@ -160,28 +160,29 @@ const actions: Action[] = [
   {
     icon: markRaw(IconDatabase2Line),
     title: t(
-      "core.dashboard.widgets.presets.quicklink.actions.refresh_page_cache.title"
+      "core.dashboard.widgets.presets.quicklink.actions.evict_page_cache.title"
     ),
     action: () => {
       Dialog.warning({
         title: t(
-          "core.dashboard.widgets.presets.quicklink.actions.refresh_page_cache.dialog_title"
+          "core.dashboard.widgets.presets.quicklink.actions.evict_page_cache.dialog_title"
         ),
         description: t(
-          "core.dashboard.widgets.presets.quicklink.actions.refresh_page_cache.dialog_content"
+          "core.dashboard.widgets.presets.quicklink.actions.evict_page_cache.dialog_content"
         ),
         confirmText: t("core.common.buttons.confirm"),
         cancelText: t("core.common.buttons.cancel"),
         onConfirm: async () => {
-          await apiClient.cache.invalidCache({ name: "page-cache" });
+          await apiClient.cache.evictCache({ name: "page" });
           Toast.success(
             t(
-              "core.dashboard.widgets.presets.quicklink.actions.refresh_page_cache.success_message"
+              "core.dashboard.widgets.presets.quicklink.actions.evict_page_cache.success_message"
             )
           );
         },
       });
     },
+    permissions: ["system:caches:manage"],
   },
 ];
 </script>

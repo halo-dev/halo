@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -20,12 +21,17 @@ import run.halo.app.extension.ReactiveExtensionClient;
  * @author guqing
  * @since 2.0.0
  */
+@Slf4j
 @AllArgsConstructor
 public abstract class AbstractContentService {
 
     private final ReactiveExtensionClient client;
 
     public Mono<ContentWrapper> getContent(String snapshotName, String baseSnapshotName) {
+        if (StringUtils.isBlank(snapshotName) || StringUtils.isBlank(baseSnapshotName)) {
+            return Mono.empty();
+        }
+        // TODO: refactor this method to use client.get instead of fetch but please be careful
         return client.fetch(Snapshot.class, baseSnapshotName)
             .doOnNext(this::checkBaseSnapshot)
             .flatMap(baseSnapshot -> {
@@ -35,14 +41,19 @@ public abstract class AbstractContentService {
                 }
                 return client.fetch(Snapshot.class, snapshotName)
                     .map(snapshot -> ContentWrapper.patchSnapshot(snapshot, baseSnapshot));
-            });
+            })
+            .switchIfEmpty(Mono.defer(() -> {
+                log.error("The content snapshot [{}] or base snapshot [{}] not found.",
+                    snapshotName, baseSnapshotName);
+                return Mono.empty();
+            }));
     }
 
     protected void checkBaseSnapshot(Snapshot snapshot) {
         Assert.notNull(snapshot, "The snapshot must not be null.");
         String keepRawAnno =
             MetadataUtil.nullSafeAnnotations(snapshot).get(Snapshot.KEEP_RAW_ANNO);
-        if (!org.thymeleaf.util.StringUtils.equals(Boolean.TRUE.toString(), keepRawAnno)) {
+        if (!StringUtils.equals(Boolean.TRUE.toString(), keepRawAnno)) {
             throw new IllegalArgumentException(
                 String.format("The snapshot [%s] is not a base snapshot.",
                     snapshot.getMetadata().getName()));

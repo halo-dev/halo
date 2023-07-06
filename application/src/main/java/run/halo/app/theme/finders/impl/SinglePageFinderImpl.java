@@ -12,7 +12,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.content.SinglePageService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.ListResult;
@@ -42,8 +41,6 @@ public class SinglePageFinderImpl implements SinglePageFinder {
 
     private final SinglePageConversionService singlePagePublicQueryService;
 
-    private final SinglePageService singlePageService;
-
     @Override
     public Mono<SinglePageVo> getByName(String pageName) {
         return client.get(SinglePage.class, pageName)
@@ -53,9 +50,7 @@ public class SinglePageFinderImpl implements SinglePageFinder {
 
     @Override
     public Mono<ContentVo> content(String pageName) {
-        return singlePageService.getReleaseContent(pageName)
-            .map(wrapper -> ContentVo.builder().content(wrapper.getContent())
-                .raw(wrapper.getRaw()).build());
+        return singlePagePublicQueryService.getContent(pageName);
     }
 
     @Override

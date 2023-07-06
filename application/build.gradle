@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '3.1.0'
+    id 'org.springframework.boot' version '3.1.1'
     id 'io.spring.dependency-management' version '1.1.0'
     id "com.gorylenko.gradle-git-properties" version "2.3.2"
     id "checkstyle"
@@ -76,8 +76,8 @@ tasks.register('downloadPluginPresets', Download) {
         delete 'src/main/resources/presets/plugins'
     }
     src([
-            'https://github.com/halo-sigs/plugin-comment-widget/releases/download/v1.5.0/plugin-comment-widget-1.5.0.jar',
-            'https://github.com/halo-sigs/plugin-search-widget/releases/download/v1.0.0/plugin-search-widget-1.0.0.jar',
+            'https://github.com/halo-sigs/plugin-comment-widget/releases/download/v1.6.1/plugin-comment-widget-1.6.1.jar',
+            'https://github.com/halo-sigs/plugin-search-widget/releases/download/v1.1.0/plugin-search-widget-1.1.0.jar',
             'https://github.com/halo-sigs/plugin-sitemap/releases/download/v1.0.2/plugin-sitemap-1.0.2.jar',
             'https://github.com/halo-sigs/plugin-feed/releases/download/v1.1.1/plugin-feed-1.1.1.jar'
     ])

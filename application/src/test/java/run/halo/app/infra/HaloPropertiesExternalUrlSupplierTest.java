@@ -1,6 +1,7 @@
 package run.halo.app.infra;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -103,6 +104,16 @@ class HaloPropertiesExternalUrlSupplierTest {
         when(mockRequest.getURI()).thenReturn(fakeUri);
         var url = externalUrl.getURL(mockRequest);
         assertEquals(new URL("https://localhost/blog"), url);
+    }
+
+    @Test
+    void getRaw() throws MalformedURLException {
+        var fakeUri = URI.create("http://localhost/fake");
+        when(haloProperties.getExternalUrl()).thenReturn(fakeUri.toURL());
+        assertEquals(fakeUri.toURL(), externalUrl.getRaw());
+
+        when(haloProperties.getExternalUrl()).thenReturn(null);
+        assertNull(externalUrl.getRaw());
     }
 
 }
