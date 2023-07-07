@@ -25,18 +25,11 @@ import {
   VDropdownItem,
   VDropdownDivider,
 } from "@halo-dev/components";
-import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import CategoryDropdownSelector from "@/components/dropdown-selector/CategoryDropdownSelector.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import PostTag from "../posts/tags/components/PostTag.vue";
 import { computed, ref, watch } from "vue";
-import type {
-  User,
-  Category,
-  Post,
-  Tag,
-  ListedPost,
-} from "@halo-dev/api-client";
+import type { Category, Post, Tag, ListedPost } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
@@ -45,6 +38,7 @@ import FilterTag from "@/components/filter/FilterTag.vue";
 import TagDropdownSelector from "@/components/dropdown-selector/TagDropdownSelector.vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -60,7 +54,7 @@ const selectedPublishStatusValue = ref();
 const selectedSortValue = ref();
 const selectedCategory = ref<Category>();
 const selectedTag = ref<Tag>();
-const selectedContributor = ref<User>();
+const selectedContributor = ref();
 const keyword = ref("");
 
 function handleCategoryChange(category?: Category) {
@@ -70,11 +64,6 @@ function handleCategoryChange(category?: Category) {
 
 function handleTagChange(tag?: Tag) {
   selectedTag.value = tag;
-  page.value = 1;
-}
-
-function handleContributorChange(user?: User) {
-  selectedContributor.value = user;
   page.value = 1;
 }
 
@@ -138,7 +127,7 @@ const {
     }
 
     if (selectedContributor.value) {
-      contributors = [selectedContributor.value.metadata.name];
+      contributors = [selectedContributor.value];
     }
 
     if (selectedPublishStatusValue.value !== undefined) {
@@ -439,17 +428,6 @@ const getExternalUrl = (post: Post) => {
                     })
                   }}
                 </FilterTag>
-
-                <FilterTag
-                  v-if="selectedContributor"
-                  @close="handleContributorChange()"
-                >
-                  {{
-                    $t("core.post.filters.author.result", {
-                      author: selectedContributor.spec.displayName,
-                    })
-                  }}
-                </FilterTag>
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeleteInBatch">
@@ -529,21 +507,10 @@ const getExternalUrl = (post: Post) => {
                     </span>
                   </div>
                 </TagDropdownSelector>
-                <UserDropdownSelector
-                  v-model:selected="selectedContributor"
-                  @select="handleContributorChange"
-                >
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.post.filters.author.label") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                </UserDropdownSelector>
+                <UserFilterDropdown
+                  v-model="selectedContributor"
+                  :label="$t('core.post.filters.author.label')"
+                />
                 <FilterDropdown
                   v-model="selectedSortValue"
                   :label="$t('core.common.filters.labels.sort')"

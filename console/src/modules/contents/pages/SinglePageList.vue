@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import {
-  IconArrowDown,
   IconArrowLeft,
   IconArrowRight,
   IconEye,
@@ -26,18 +25,17 @@ import {
   VDropdownDivider,
 } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
-import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import { computed, ref, watch } from "vue";
-import type { ListedSinglePage, SinglePage, User } from "@halo-dev/api-client";
+import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { RouterLink } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
 import { singlePageLabels } from "@/constants/labels";
-import FilterTag from "@/components/filter/FilterTag.vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -48,16 +46,11 @@ const selectedPageNames = ref<string[]>([]);
 const checkedAll = ref(false);
 
 // Filters
-const selectedContributor = ref<User>();
+const selectedContributor = ref();
 const selectedVisibleValue = ref();
 const selectedPublishStatusValue = ref();
 const selectedSortValue = ref();
 const keyword = ref("");
-
-const handleSelectUser = (user?: User) => {
-  selectedContributor.value = user;
-  page.value = 1;
-};
 
 const hasFilters = computed(() => {
   return (
@@ -103,7 +96,7 @@ const {
     const labelSelector: string[] = ["content.halo.run/deleted=false"];
 
     if (selectedContributor.value) {
-      contributors = [selectedContributor.value.metadata.name];
+      contributors = [selectedContributor.value];
     }
 
     if (selectedPublishStatusValue.value !== undefined) {
@@ -401,23 +394,7 @@ const getExternalUrl = (singlePage: SinglePage) => {
               />
             </div>
             <div class="flex w-full flex-1 items-center sm:w-auto">
-              <div
-                v-if="!selectedPageNames.length"
-                class="flex items-center gap-2"
-              >
-                <SearchInput v-model="keyword" />
-
-                <FilterTag
-                  v-if="selectedContributor"
-                  @close="handleSelectUser()"
-                >
-                  {{
-                    $t("core.page.filters.author.result", {
-                      author: selectedContributor.spec.displayName,
-                    })
-                  }}
-                </FilterTag>
-              </div>
+              <SearchInput v-if="!selectedPageNames.length" v-model="keyword" />
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeleteInBatch">
                   {{ $t("core.common.buttons.delete") }}
@@ -466,21 +443,10 @@ const getExternalUrl = (singlePage: SinglePage) => {
                     },
                   ]"
                 />
-                <UserDropdownSelector
-                  v-model:selected="selectedContributor"
-                  @select="handleSelectUser"
-                >
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.page.filters.author.label") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                </UserDropdownSelector>
+                <UserFilterDropdown
+                  v-model="selectedContributor"
+                  :label="$t('core.page.filters.author.label')"
+                />
                 <FilterDropdown
                   v-model="selectedSortValue"
                   :label="$t('core.common.filters.labels.sort')"
