@@ -21,7 +21,6 @@ import type { ListedComment, User } from "@halo-dev/api-client";
 import { computed, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import FilterTag from "@/components/filter/FilterTag.vue";
-import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";

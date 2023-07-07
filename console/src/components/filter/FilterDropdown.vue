@@ -9,12 +9,14 @@ const props = withDefaults(
       value?: string | boolean | number;
     }[];
     label: string;
-    modelValue: string | boolean | number | undefined;
+    modelValue?: string | boolean | number;
   }>(),
-  {}
+  {
+    modelValue: undefined,
+  }
 );
 
-defineEmits<{
+const emit = defineEmits<{
   (
     event: "update:modelValue",
     modelValue: string | boolean | number | undefined
@@ -24,12 +26,24 @@ defineEmits<{
 const selectedItem = computed(() => {
   return props.items.find((item) => item.value === props.modelValue);
 });
+
+function handleSelect(item: {
+  label: string;
+  value?: string | boolean | number;
+}) {
+  if (item.value === props.modelValue) {
+    emit("update:modelValue", undefined);
+    return;
+  }
+  emit("update:modelValue", item.value);
+}
 </script>
 
 <template>
   <VDropdown>
     <div
       class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
+      :class="{ 'font-semibold text-gray-700': modelValue !== undefined }"
     >
       <span v-if="!selectedItem" class="mr-0.5">
         {{ label }}
@@ -44,7 +58,7 @@ const selectedItem = computed(() => {
         v-for="(item, index) in items"
         :key="index"
         :selected="item.value === modelValue"
-        @click="$emit('update:modelValue', item.value)"
+        @click="handleSelect(item)"
       >
         {{ item.label }}
       </VDropdownItem>

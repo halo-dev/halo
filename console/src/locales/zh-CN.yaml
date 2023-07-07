@@ -748,7 +748,6 @@ core:
     filters:
       status:
         items:
-          all: 全部
           active: 已启用
           inactive: 未启用
       sort:
@@ -1192,6 +1191,9 @@ core:
       labels:
         sort: 排序
         status: 状态
+      item_labels:
+        all: 全部
+        default: 默认
     status:
       deleting: 删除中
       loading: 加载中

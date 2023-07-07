@@ -6,6 +6,9 @@ import "floating-vue/dist/style.css";
 import VueGridLayout from "vue-grid-layout";
 import { defaultConfig, plugin as FormKit } from "@formkit/vue";
 import FormKitConfig from "@/formkit/formkit.config";
+import FilterDropdown from "@/components/filter/FilterDropdown.vue";
+import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
+import SearchInput from "@/components/input/SearchInput.vue";
 
 export function setupComponents(app: App) {
   app.use(VueGridLayout);
@@ -25,4 +28,9 @@ export function setupComponents(app: App) {
     "VCodemirror",
     defineAsyncComponent(() => import("@/components/codemirror/Codemirror.vue"))
   );
+
+  // Console components
+  app.component("FilterDropdown", FilterDropdown);
+  app.component("FilterCleanButton", FilterCleanButton);
+  app.component("SearchInput", SearchInput);
 }

@@ -748,7 +748,6 @@ core:
     filters:
       status:
         items:
-          all: All
           active: Active
           inactive: Inactive
       sort:
@@ -1192,6 +1191,9 @@ core:
       labels:
         sort: Sort
         status: Status
+      item_labels:
+        all: All
+        default: Default
     status:
       deleting: Deleting
       loading: Loading

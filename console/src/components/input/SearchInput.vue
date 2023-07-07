@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { reset } from "@formkit/core";
+import { getNode, reset } from "@formkit/core";
 import { IconCloseCircle } from "@halo-dev/components";
 
 withDefaults(
@@ -16,37 +16,40 @@ const emit = defineEmits<{
   (event: "update:modelValue", modelValue: string): void;
 }>();
 
-const id = `search-form-${crypto.randomUUID()}`;
-
-function onKeywordChange(data: { keyword: string }) {
-  emit("update:modelValue", data.keyword);
-}
+const id = `search-input-${crypto.randomUUID()}`;
 
 function handleReset() {
   emit("update:modelValue", "");
   reset(id);
 }
+
+function onKeywordChange() {
+  const keywordNode = getNode(id);
+  if (keywordNode) {
+    emit("update:modelValue", keywordNode._value as string);
+  }
+}
 </script>
 
 <template>
-  <FormKit :id="id" type="form" @submit="onKeywordChange">
-    <FormKit
-      outer-class="!p-0"
-      :placeholder="placeholder || $t('core.common.placeholder.search')"
-      type="text"
-      name="keyword"
-      :model-value="modelValue"
-    >
-      <template v-if="modelValue" #suffix>
-        <div
-          class="group flex h-full cursor-pointer items-center bg-white px-2 transition-all hover:bg-gray-50"
-          @click="handleReset"
-        >
-          <IconCloseCircle
-            class="h-4 w-4 text-gray-500 group-hover:text-gray-700"
-          />
-        </div>
-      </template>
-    </FormKit>
+  <FormKit
+    :id="id"
+    outer-class="!p-0"
+    :placeholder="placeholder || $t('core.common.placeholder.search')"
+    type="text"
+    name="keyword"
+    :model-value="modelValue"
+    @keyup.enter="onKeywordChange"
+  >
+    <template v-if="modelValue" #suffix>
+      <div
+        class="group flex h-full cursor-pointer items-center bg-white px-2 transition-all hover:bg-gray-50"
+        @click="handleReset"
+      >
+        <IconCloseCircle
+          class="h-4 w-4 text-gray-500 group-hover:text-gray-700"
+        />
+      </div>
+    </template>
   </FormKit>
 </template>

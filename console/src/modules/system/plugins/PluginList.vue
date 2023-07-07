@@ -17,14 +17,11 @@ import PluginUploadModal from "./components/PluginUploadModal.vue";
 import { computed, ref, onMounted } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
-import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { useQuery } from "@tanstack/vue-query";
 import type { Plugin } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { useRouteQuery } from "@vueuse/router";
-import FilterDropdown from "@/components/filter/FilterDropdown.vue";
 import { watch } from "vue";
-import SearchInput from "@/components/input/SearchInput.vue";
 
 const { t } = useI18n();
 
@@ -156,8 +153,7 @@ onMounted(() => {
                   :label="$t('core.common.filters.labels.status')"
                   :items="[
                     {
-                      label: t('core.plugin.filters.status.items.all'),
-                      value: undefined,
+                      label: t('core.common.filters.item_labels.all'),
                     },
                     {
                       label: t('core.plugin.filters.status.items.active'),
@@ -173,6 +169,9 @@ onMounted(() => {
                   v-model="selectedSortValue"
                   :label="$t('core.common.filters.labels.sort')"
                   :items="[
+                    {
+                      label: t('core.common.filters.item_labels.default'),
+                    },
                     {
                       label: t(
                         'core.plugin.filters.sort.items.create_time_desc'

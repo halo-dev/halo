@@ -33,12 +33,9 @@ import { useRouteQuery } from "@vueuse/router";
 import { usePermission } from "@/utils/permission";
 import { useUserStore } from "@/stores/user";
 import { useFetchRole } from "../roles/composables/use-role";
-import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import UserCreationModal from "./components/UserCreationModal.vue";
-import FilterDropdown from "@/components/filter/FilterDropdown.vue";
-import SearchInput from "@/components/input/SearchInput.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -314,8 +311,11 @@ onMounted(() => {
                 <FilterDropdown
                   v-model="selectedRoleValue"
                   :label="$t('core.user.filters.role.label')"
-                  :items="
-                    roles.map((role) => {
+                  :items="[
+                    {
+                      label: t('core.common.filters.item_labels.all'),
+                    },
+                    ...roles.map((role) => {
                       return {
                         label:
                           role.metadata.annotations?.[
@@ -323,13 +323,16 @@ onMounted(() => {
                           ] || role.metadata.name,
                         value: role.metadata.name,
                       };
-                    })
-                  "
+                    }),
+                  ]"
                 />
                 <FilterDropdown
                   v-model="selectedSortValue"
                   :label="$t('core.common.filters.labels.sort')"
                   :items="[
+                    {
+                      label: t('core.common.filters.item_labels.default'),
+                    },
                     {
                       label: t('core.user.filters.sort.items.create_time_desc'),
                       value: 'creationTimestamp,desc',
