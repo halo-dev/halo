@@ -788,8 +788,6 @@ core:
         license: 协议
         role_templates: 权限模板
         last_starttime: 最近一次启动
-    settings:
-      title: 插件设置
     loader:
       toast:
         entry_load_failed: "{name}：加载插件入口文件失败"
