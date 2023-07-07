@@ -22,7 +22,6 @@ import {
   VLoading,
   VPageHeader,
   Toast,
-  VDropdown,
   VDropdownItem,
   VDropdownDivider,
 } from "@halo-dev/components";
@@ -37,7 +36,6 @@ import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
 import { singlePageLabels } from "@/constants/labels";
 import FilterTag from "@/components/filter/FilterTag.vue";
-import { getNode } from "@formkit/core";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 
@@ -50,125 +48,31 @@ const selectedPageNames = ref<string[]>([]);
 const checkedAll = ref(false);
 
 // Filters
-interface VisibleItem {
-  label: string;
-  value?: "PUBLIC" | "INTERNAL" | "PRIVATE";
-}
-
-interface PublishStatusItem {
-  label: string;
-  value?: boolean;
-}
-
-interface SortItem {
-  label: string;
-  sort: string;
-}
-
-const VisibleItems: VisibleItem[] = [
-  {
-    label: t("core.page.filters.visible.items.all"),
-    value: undefined,
-  },
-  {
-    label: t("core.page.filters.visible.items.public"),
-    value: "PUBLIC",
-  },
-  {
-    label: t("core.page.filters.visible.items.private"),
-    value: "PRIVATE",
-  },
-];
-
-const PublishStatusItems: PublishStatusItem[] = [
-  {
-    label: t("core.page.filters.status.items.all"),
-    value: undefined,
-  },
-  {
-    label: t("core.page.filters.status.items.published"),
-    value: true,
-  },
-  {
-    label: t("core.page.filters.status.items.draft"),
-    value: false,
-  },
-];
-
-const SortItems: SortItem[] = [
-  {
-    label: t("core.page.filters.sort.items.publish_time_desc"),
-    sort: "publishTime,desc",
-  },
-  {
-    label: t("core.page.filters.sort.items.publish_time_asc"),
-    sort: "publishTime,asc",
-  },
-  {
-    label: t("core.page.filters.sort.items.create_time_desc"),
-    sort: "creationTimestamp,desc",
-  },
-  {
-    label: t("core.page.filters.sort.items.create_time_asc"),
-    sort: "creationTimestamp,asc",
-  },
-];
-
 const selectedContributor = ref<User>();
-const selectedVisibleItem = ref<VisibleItem>(VisibleItems[0]);
-const selectedPublishStatusItem = ref<PublishStatusItem>(PublishStatusItems[0]);
-const selectedSortItem = ref<SortItem>();
+const selectedVisibleValue = ref();
+const selectedPublishStatusValue = ref();
+const selectedSortValue = ref();
 const keyword = ref("");
-
-function handleVisibleItemChange(visibleItem: VisibleItem) {
-  selectedVisibleItem.value = visibleItem;
-  page.value = 1;
-}
 
 const handleSelectUser = (user?: User) => {
   selectedContributor.value = user;
   page.value = 1;
 };
 
-function handlePublishStatusItemChange(publishStatusItem: PublishStatusItem) {
-  selectedPublishStatusItem.value = publishStatusItem;
-  page.value = 1;
-}
-
-function handleSortItemChange(sortItem?: SortItem) {
-  selectedSortItem.value = sortItem;
-  page.value = 1;
-}
-
-function handleKeywordChange() {
-  const keywordNode = getNode("keywordInput");
-  if (keywordNode) {
-    keyword.value = keywordNode._value as string;
-  }
-  page.value = 1;
-}
-
-function handleClearKeyword() {
-  keyword.value = "";
-  page.value = 1;
-}
-
 const hasFilters = computed(() => {
   return (
     selectedContributor.value ||
-    selectedVisibleItem.value.value ||
-    selectedPublishStatusItem.value.value !== undefined ||
-    selectedSortItem.value ||
-    keyword.value
+    selectedVisibleValue.value ||
+    selectedPublishStatusValue.value !== undefined ||
+    selectedSortValue.value
   );
 });
 
 function handleClearFilters() {
   selectedContributor.value = undefined;
-  selectedVisibleItem.value = VisibleItems[0];
-  selectedPublishStatusItem.value = PublishStatusItems[0];
-  selectedSortItem.value = undefined;
-  keyword.value = "";
+  selectedVisibleValue.value = undefined;
+  selectedPublishStatusValue.value = undefined;
+  selectedSortValue.value = undefined;
   page.value = 1;
 }
 
@@ -187,11 +91,11 @@ const {
   queryKey: [
     "singlePages",
     selectedContributor,
-    selectedPublishStatusItem,
+    selectedPublishStatusValue,
     page,
     size,
-    selectedVisibleItem,
-    selectedSortItem,
+    selectedVisibleValue,
+    selectedSortValue,
     keyword,
   ],
   queryFn: async () => {
@@ -202,9 +106,9 @@ const {
       contributors = [selectedContributor.value.metadata.name];
     }
 
-    if (selectedPublishStatusItem.value.value !== undefined) {
+    if (selectedPublishStatusValue.value !== undefined) {
       labelSelector.push(
-        `${singlePageLabels.PUBLISHED}=${selectedPublishStatusItem.value.value}`
+        `${singlePageLabels.PUBLISHED}=${selectedPublishStatusValue.value}`
       );
     }
 
@@ -212,8 +116,8 @@ const {
       labelSelector,
       page: page.value,
       size: size.value,
-      visible: selectedVisibleItem.value.value,
-      sort: [selectedSortItem.value?.sort].filter(Boolean) as string[],
+      visible: selectedVisibleValue.value,
+      sort: [selectedSortValue.value].filter(Boolean) as string[],
       keyword: keyword.value,
       contributor: contributors,
     });
@@ -501,45 +405,7 @@ const getExternalUrl = (singlePage: SinglePage) => {
                 v-if="!selectedPageNames.length"
                 class="flex items-center gap-2"
               >
-                <FormKit
-                  id="keywordInput"
-                  outer-class="!p-0"
-                  :placeholder="$t('core.common.placeholder.search')"
-                  type="text"
-                  name="keyword"
-                  :model-value="keyword"
-                  @keyup.enter="handleKeywordChange"
-                ></FormKit>
-
-                <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  {{
-                    $t("core.common.filters.results.keyword", {
-                      keyword: keyword,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterTag
-                  v-if="selectedPublishStatusItem.value !== undefined"
-                  @close="handlePublishStatusItemChange(PublishStatusItems[0])"
-                >
-                  {{
-                    $t("core.common.filters.results.status", {
-                      status: selectedPublishStatusItem.label,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterTag
-                  v-if="selectedVisibleItem.value"
-                  @close="handleVisibleItemChange(VisibleItems[0])"
-                >
-                  {{
-                    $t("core.page.filters.visible.result", {
-                      visible: selectedVisibleItem.label,
-                    })
-                  }}
-                </FilterTag>
+                <SearchInput v-model="keyword" />
 
                 <FilterTag
                   v-if="selectedContributor"
@@ -551,22 +417,6 @@ const getExternalUrl = (singlePage: SinglePage) => {
                     })
                   }}
                 </FilterTag>
-
-                <FilterTag
-                  v-if="selectedSortItem"
-                  @close="handleSortItemChange()"
-                >
-                  {{
-                    $t("core.common.filters.results.sort", {
-                      sort: selectedSortItem.label,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterCleanButton
-                  v-if="hasFilters"
-                  @click="handleClearFilters"
-                />
               </div>
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeleteInBatch">
@@ -576,52 +426,46 @@ const getExternalUrl = (singlePage: SinglePage) => {
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
-                <VDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.common.filters.labels.status") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <VDropdownItem
-                      v-for="(filterItem, index) in PublishStatusItems"
-                      :key="index"
-                      :selected="
-                        filterItem.value === selectedPublishStatusItem.value
-                      "
-                      @click="handlePublishStatusItemChange(filterItem)"
-                    >
-                      {{ filterItem.label }}
-                    </VDropdownItem>
-                  </template>
-                </VDropdown>
-                <VDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.page.filters.visible.label") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <VDropdownItem
-                      v-for="(filterItem, index) in VisibleItems"
-                      :key="index"
-                      :selected="filterItem.value === selectedVisibleItem.value"
-                      @click="handleVisibleItemChange(filterItem)"
-                    >
-                      {{ filterItem.label }}
-                    </VDropdownItem>
-                  </template>
-                </VDropdown>
+                <FilterCleanButton
+                  v-if="hasFilters"
+                  @click="handleClearFilters"
+                />
+                <FilterDropdown
+                  v-model="selectedPublishStatusValue"
+                  :label="$t('core.common.filters.labels.status')"
+                  :items="[
+                    {
+                      label: t('core.common.filters.item_labels.all'),
+                      value: undefined,
+                    },
+                    {
+                      label: t('core.page.filters.status.items.published'),
+                      value: true,
+                    },
+                    {
+                      label: t('core.page.filters.status.items.draft'),
+                      value: false,
+                    },
+                  ]"
+                />
+                <FilterDropdown
+                  v-model="selectedVisibleValue"
+                  :label="$t('core.page.filters.visible.label')"
+                  :items="[
+                    {
+                      label: t('core.common.filters.item_labels.all'),
+                      value: undefined,
+                    },
+                    {
+                      label: t('core.page.filters.visible.items.public'),
+                      value: 'PUBLIC',
+                    },
+                    {
+                      label: t('core.page.filters.visible.items.private'),
+                      value: 'PRIVATE',
+                    },
+                  ]"
+                />
                 <UserDropdownSelector
                   v-model:selected="selectedContributor"
                   @select="handleSelectUser"
@@ -637,28 +481,33 @@ const getExternalUrl = (singlePage: SinglePage) => {
                     </span>
                   </div>
                 </UserDropdownSelector>
-                <VDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.common.filters.labels.sort") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <VDropdownItem
-                      v-for="(sortItem, index) in SortItems"
-                      :key="index"
-                      :selected="sortItem.sort === selectedSortItem?.sort"
-                      @click="handleSortItemChange(sortItem)"
-                    >
-                      {{ sortItem.label }}
-                    </VDropdownItem>
-                  </template>
-                </VDropdown>
+                <FilterDropdown
+                  v-model="selectedSortValue"
+                  :label="$t('core.common.filters.labels.sort')"
+                  :items="[
+                    {
+                      label: t('core.common.filters.item_labels.default'),
+                    },
+                    {
+                      label: t(
+                        'core.page.filters.sort.items.publish_time_desc'
+                      ),
+                      value: 'publishTime,desc',
+                    },
+                    {
+                      label: t('core.page.filters.sort.items.publish_time_asc'),
+                      value: 'publishTime,asc',
+                    },
+                    {
+                      label: t('core.page.filters.sort.items.create_time_desc'),
+                      value: 'creationTimestamp,desc',
+                    },
+                    {
+                      label: t('core.page.filters.sort.items.create_time_asc'),
+                      value: 'creationTimestamp,asc',
+                    },
+                  ]"
+                />
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"
