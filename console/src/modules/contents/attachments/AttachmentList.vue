@@ -31,7 +31,7 @@ import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
 import AttachmentPoliciesModal from "./components/AttachmentPoliciesModal.vue";
 import AttachmentGroupList from "./components/AttachmentGroupList.vue";
 import { computed, onMounted, ref, watch } from "vue";
-import type { Attachment, Group, Policy, User } from "@halo-dev/api-client";
+import type { Attachment, Group, User } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import prettyBytes from "pretty-bytes";
 import { useFetchAttachmentPolicy } from "./composables/use-attachment-policy";
@@ -44,7 +44,6 @@ import { useRouteQuery } from "@vueuse/router";
 import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
 import { usePermission } from "@/utils/permission";
 import FilterTag from "@/components/filter/FilterTag.vue";
-import { getNode } from "@formkit/core";
 import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();
@@ -60,85 +59,38 @@ const { groups, handleFetchGroups } = useFetchAttachmentGroup();
 const selectedGroup = ref<Group>();
 
 // Filter
-interface SortItem {
-  label: string;
-  value: string;
-}
-
-const SortItems: SortItem[] = [
-  {
-    label: t("core.attachment.filters.sort.items.create_time_desc"),
-    value: "creationTimestamp,desc",
-  },
-  {
-    label: t("core.attachment.filters.sort.items.create_time_asc"),
-    value: "creationTimestamp,asc",
-  },
-  {
-    label: t("core.attachment.filters.sort.items.size_desc"),
-    value: "size,desc",
-  },
-  {
-    label: t("core.attachment.filters.sort.items.size_asc"),
-    value: "size,asc",
-  },
-];
-
-const selectedPolicy = ref<Policy>();
+const keyword = ref<string>("");
+const page = ref<number>(1);
+const size = ref<number>(60);
+const selectedPolicy = ref();
 const selectedUser = ref<User>();
-const selectedSortItem = ref<SortItem>();
-const selectedSortItemValue = computed(() => {
-  return selectedSortItem.value?.value;
-});
-
-function handleSelectPolicy(policy: Policy | undefined) {
-  selectedPolicy.value = policy;
-  page.value = 1;
-}
+const selectedSort = ref();
 
 function handleSelectUser(user: User | undefined) {
   selectedUser.value = user;
-  page.value = 1;
 }
 
-function handleSortItemChange(sortItem?: SortItem) {
-  selectedSortItem.value = sortItem;
-  page.value = 1;
-}
-
-function handleKeywordChange() {
-  const keywordNode = getNode("keywordInput");
-  if (keywordNode) {
-    keyword.value = keywordNode._value as string;
+watch(
+  () => [
+    selectedPolicy.value,
+    selectedUser.value,
+    selectedSort.value,
+    keyword.value,
+  ],
+  () => {
+    page.value = 1;
   }
-  page.value = 1;
-}
-
-function handleClearKeyword() {
-  keyword.value = "";
-  page.value = 1;
-}
+);
 
 const hasFilters = computed(() => {
-  return (
-    selectedPolicy.value ||
-    selectedUser.value ||
-    selectedSortItem.value ||
-    keyword.value
-  );
+  return selectedPolicy.value || selectedUser.value || selectedSort.value;
 });
 
 function handleClearFilters() {
   selectedPolicy.value = undefined;
   selectedUser.value = undefined;
-  selectedSortItem.value = undefined;
-  keyword.value = "";
-  page.value = 1;
+  selectedSort.value = undefined;
 }
-
-const keyword = ref<string>("");
-const page = ref<number>(1);
-const size = ref<number>(60);
 
 const {
   attachments,
@@ -159,10 +111,14 @@ const {
   handleReset,
 } = useAttachmentControl({
   group: selectedGroup,
-  policy: selectedPolicy,
+  policy: computed(() => {
+    return policies.value?.find(
+      (policy) => policy.metadata.name === selectedPolicy.value
+    );
+  }),
   user: selectedUser,
   keyword: keyword,
-  sort: selectedSortItemValue,
+  sort: selectedSort,
   page: page,
   size: size,
 });
@@ -357,35 +313,7 @@ onMounted(() => {
                     v-if="!selectedAttachments.size"
                     class="flex items-center gap-2"
                   >
-                    <FormKit
-                      id="keywordInput"
-                      outer-class="!p-0"
-                      :placeholder="$t('core.common.placeholder.search')"
-                      type="text"
-                      name="keyword"
-                      :model-value="keyword"
-                      @keyup.enter="handleKeywordChange"
-                    ></FormKit>
-
-                    <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                      {{
-                        $t("core.common.filters.results.keyword", {
-                          keyword: keyword,
-                        })
-                      }}
-                    </FilterTag>
-
-                    <FilterTag
-                      v-if="selectedPolicy"
-                      @close="handleSelectPolicy(undefined)"
-                    >
-                      {{
-                        $t("core.attachment.filters.storage_policy.result", {
-                          storage_policy: selectedPolicy.spec.displayName,
-                        })
-                      }}
-                    </FilterTag>
-
+                    <SearchInput v-model="keyword" />
                     <FilterTag
                       v-if="selectedUser"
                       @close="handleSelectUser(undefined)"
@@ -396,22 +324,6 @@ onMounted(() => {
                         })
                       }}
                     </FilterTag>
-
-                    <FilterTag
-                      v-if="selectedSortItem"
-                      @click="handleSortItemChange()"
-                    >
-                      {{
-                        $t("core.common.filters.results.sort", {
-                          sort: selectedSortItem.label,
-                        })
-                      }}
-                    </FilterTag>
-
-                    <FilterCleanButton
-                      v-if="hasFilters"
-                      @click="handleClearFilters"
-                    />
                   </div>
                   <VSpace v-else>
                     <VButton type="danger" @click="handleDeleteInBatch">
@@ -440,30 +352,27 @@ onMounted(() => {
                 </div>
                 <div class="mt-4 flex sm:mt-0">
                   <VSpace spacing="lg">
-                    <VDropdown>
-                      <div
-                        class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                      >
-                        <span class="mr-0.5">
-                          {{
-                            $t("core.attachment.filters.storage_policy.label")
-                          }}
-                        </span>
-                        <span>
-                          <IconArrowDown />
-                        </span>
-                      </div>
-                      <template #popper>
-                        <VDropdownItem
-                          v-for="(policy, index) in policies"
-                          :key="index"
-                          :selected="policy === selectedPolicy"
-                          @click="handleSelectPolicy(policy)"
-                        >
-                          {{ policy.spec.displayName }}
-                        </VDropdownItem>
-                      </template>
-                    </VDropdown>
+                    <FilterCleanButton
+                      v-if="hasFilters"
+                      @click="handleClearFilters"
+                    />
+                    <FilterDropdown
+                      v-model="selectedPolicy"
+                      :label="
+                        $t('core.attachment.filters.storage_policy.label')
+                      "
+                      :items="[
+                        {
+                          label: t('core.common.filters.item_labels.all'),
+                        },
+                        ...(policies?.map((policy) => {
+                          return {
+                            label: policy.spec.displayName,
+                            value: policy.metadata.name,
+                          };
+                        }) || []),
+                      ]"
+                    />
                     <UserDropdownSelector
                       v-model:selected="selectedUser"
                       @select="handleSelectUser"
@@ -479,43 +388,39 @@ onMounted(() => {
                         </span>
                       </div>
                     </UserDropdownSelector>
-                    <!-- TODO: add filter by ref support -->
-                    <VDropdown v-if="false">
-                      <div
-                        class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                      >
-                        <span class="mr-0.5">引用位置</span>
-                        <span>
-                          <IconArrowDown />
-                        </span>
-                      </div>
-                      <template #popper>
-                        <VDropdownItem> 未被引用 </VDropdownItem>
-                        <VDropdownItem> 文章 </VDropdownItem>
-                      </template>
-                    </VDropdown>
-                    <VDropdown>
-                      <div
-                        class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                      >
-                        <span class="mr-0.5">
-                          {{ $t("core.common.filters.labels.sort") }}
-                        </span>
-                        <span>
-                          <IconArrowDown />
-                        </span>
-                      </div>
-                      <template #popper>
-                        <VDropdownItem
-                          v-for="(sortItem, index) in SortItems"
-                          :key="index"
-                          :selected="sortItem.value === selectedSortItem?.value"
-                          @click="handleSortItemChange(sortItem)"
-                        >
-                          {{ sortItem.label }}
-                        </VDropdownItem>
-                      </template>
-                    </VDropdown>
+                    <FilterDropdown
+                      v-model="selectedSort"
+                      :label="$t('core.common.filters.labels.sort')"
+                      :items="[
+                        {
+                          label: t('core.common.filters.item_labels.default'),
+                        },
+                        {
+                          label: t(
+                            'core.attachment.filters.sort.items.create_time_desc'
+                          ),
+                          value: 'creationTimestamp,desc',
+                        },
+                        {
+                          label: t(
+                            'core.attachment.filters.sort.items.create_time_asc'
+                          ),
+                          value: 'creationTimestamp,asc',
+                        },
+                        {
+                          label: t(
+                            'core.attachment.filters.sort.items.size_desc'
+                          ),
+                          value: 'size,desc',
+                        },
+                        {
+                          label: t(
+                            'core.attachment.filters.sort.items.size_asc'
+                          ),
+                          value: 'size,asc',
+                        },
+                      ]"
+                    />
                     <div class="flex flex-row gap-2">
                       <div
                         v-for="(item, index) in viewTypes"
