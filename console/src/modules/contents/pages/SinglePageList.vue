@@ -47,26 +47,38 @@ const checkedAll = ref(false);
 
 // Filters
 const selectedContributor = ref();
-const selectedVisibleValue = ref();
-const selectedPublishStatusValue = ref();
+const selectedVisible = ref();
+const selectedPublishStatus = ref();
 const selectedSortValue = ref();
 const keyword = ref("");
+
+watch(
+  () => [
+    selectedContributor.value,
+    selectedVisible.value,
+    selectedPublishStatus.value,
+    selectedSortValue.value,
+    keyword.value,
+  ],
+  () => {
+    page.value = 1;
+  }
+);
 
 const hasFilters = computed(() => {
   return (
     selectedContributor.value ||
-    selectedVisibleValue.value ||
-    selectedPublishStatusValue.value !== undefined ||
+    selectedVisible.value ||
+    selectedPublishStatus.value !== undefined ||
     selectedSortValue.value
   );
 });
 
 function handleClearFilters() {
   selectedContributor.value = undefined;
-  selectedVisibleValue.value = undefined;
-  selectedPublishStatusValue.value = undefined;
+  selectedVisible.value = undefined;
+  selectedPublishStatus.value = undefined;
   selectedSortValue.value = undefined;
-  page.value = 1;
 }
 
 const page = ref(1);
@@ -84,10 +96,10 @@ const {
   queryKey: [
     "singlePages",
     selectedContributor,
-    selectedPublishStatusValue,
+    selectedPublishStatus,
     page,
     size,
-    selectedVisibleValue,
+    selectedVisible,
     selectedSortValue,
     keyword,
   ],
@@ -99,9 +111,9 @@ const {
       contributors = [selectedContributor.value];
     }
 
-    if (selectedPublishStatusValue.value !== undefined) {
+    if (selectedPublishStatus.value !== undefined) {
       labelSelector.push(
-        `${singlePageLabels.PUBLISHED}=${selectedPublishStatusValue.value}`
+        `${singlePageLabels.PUBLISHED}=${selectedPublishStatus.value}`
       );
     }
 
@@ -109,7 +121,7 @@ const {
       labelSelector,
       page: page.value,
       size: size.value,
-      visible: selectedVisibleValue.value,
+      visible: selectedVisible.value,
       sort: [selectedSortValue.value].filter(Boolean) as string[],
       keyword: keyword.value,
       contributor: contributors,
@@ -408,7 +420,7 @@ const getExternalUrl = (singlePage: SinglePage) => {
                   @click="handleClearFilters"
                 />
                 <FilterDropdown
-                  v-model="selectedPublishStatusValue"
+                  v-model="selectedPublishStatus"
                   :label="$t('core.common.filters.labels.status')"
                   :items="[
                     {
@@ -426,7 +438,7 @@ const getExternalUrl = (singlePage: SinglePage) => {
                   ]"
                 />
                 <FilterDropdown
-                  v-model="selectedVisibleValue"
+                  v-model="selectedVisible"
                   :label="$t('core.page.filters.visible.label')"
                   :items="[
                     {

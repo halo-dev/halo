@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import {
   IconAddCircle,
-  IconArrowDown,
   IconArrowLeft,
   IconArrowRight,
   IconBookRead,
@@ -25,20 +24,19 @@ import {
   VDropdownItem,
   VDropdownDivider,
 } from "@halo-dev/components";
-import CategoryDropdownSelector from "@/components/dropdown-selector/CategoryDropdownSelector.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import PostTag from "../posts/tags/components/PostTag.vue";
 import { computed, ref, watch } from "vue";
-import type { Category, Post, Tag, ListedPost } from "@halo-dev/api-client";
+import type { Post, ListedPost } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { postLabels } from "@/constants/labels";
-import FilterTag from "@/components/filter/FilterTag.vue";
-import TagDropdownSelector from "@/components/dropdown-selector/TagDropdownSelector.vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
+import CategoryFilterDropdown from "@/components/filter/CategoryFilterDropdown.vue";
+import TagFilterDropdown from "@/components/filter/TagFilterDropdown.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -49,39 +47,43 @@ const checkedAll = ref(false);
 const selectedPostNames = ref<string[]>([]);
 
 // Filters
-const selectedVisibleValue = ref();
-const selectedPublishStatusValue = ref();
-const selectedSortValue = ref();
-const selectedCategory = ref<Category>();
-const selectedTag = ref<Tag>();
+const selectedVisible = ref();
+const selectedPublishStatus = ref();
+const selectedSort = ref();
+const selectedCategory = ref();
+const selectedTag = ref();
 const selectedContributor = ref();
 const keyword = ref("");
 
-function handleCategoryChange(category?: Category) {
-  selectedCategory.value = category;
-  page.value = 1;
-}
-
-function handleTagChange(tag?: Tag) {
-  selectedTag.value = tag;
-  page.value = 1;
-}
+watch(
+  () => [
+    selectedVisible.value,
+    selectedPublishStatus.value,
+    selectedSort.value,
+    selectedCategory.value,
+    selectedTag.value,
+    selectedContributor.value,
+    keyword.value,
+  ],
+  () => {
+    page.value = 1;
+  }
+);
 
 function handleClearFilters() {
-  selectedVisibleValue.value = undefined;
-  selectedPublishStatusValue.value = undefined;
-  selectedSortValue.value = undefined;
+  selectedVisible.value = undefined;
+  selectedPublishStatus.value = undefined;
+  selectedSort.value = undefined;
   selectedCategory.value = undefined;
   selectedTag.value = undefined;
   selectedContributor.value = undefined;
-  page.value = 1;
 }
 
 const hasFilters = computed(() => {
   return (
-    selectedVisibleValue.value ||
-    selectedPublishStatusValue.value !== undefined ||
-    selectedSortValue.value ||
+    selectedVisible.value ||
+    selectedPublishStatus.value !== undefined ||
+    selectedSort.value ||
     selectedCategory.value ||
     selectedTag.value ||
     selectedContributor.value
@@ -107,9 +109,9 @@ const {
     selectedCategory,
     selectedTag,
     selectedContributor,
-    selectedPublishStatusValue,
-    selectedVisibleValue,
-    selectedSortValue,
+    selectedPublishStatus,
+    selectedVisible,
+    selectedSort,
     keyword,
   ],
   queryFn: async () => {
@@ -119,20 +121,20 @@ const {
     const labelSelector: string[] = ["content.halo.run/deleted=false"];
 
     if (selectedCategory.value) {
-      categories = [selectedCategory.value.metadata.name];
+      categories = [selectedCategory.value];
     }
 
     if (selectedTag.value) {
-      tags = [selectedTag.value.metadata.name];
+      tags = [selectedTag.value];
     }
 
     if (selectedContributor.value) {
       contributors = [selectedContributor.value];
     }
 
-    if (selectedPublishStatusValue.value !== undefined) {
+    if (selectedPublishStatus.value !== undefined) {
       labelSelector.push(
-        `${postLabels.PUBLISHED}=${selectedPublishStatusValue.value}`
+        `${postLabels.PUBLISHED}=${selectedPublishStatus.value}`
       );
     }
 
@@ -140,8 +142,8 @@ const {
       labelSelector,
       page: page.value,
       size: size.value,
-      visible: selectedVisibleValue.value,
-      sort: [selectedSortValue.value?.sort].filter(Boolean) as string[],
+      visible: selectedVisible.value,
+      sort: [selectedSort.value?.sort].filter(Boolean) as string[],
       keyword: keyword.value,
       category: categories,
       tag: tags,
@@ -404,31 +406,7 @@ const getExternalUrl = (post: Post) => {
               />
             </div>
             <div class="flex w-full flex-1 items-center sm:w-auto">
-              <div
-                v-if="!selectedPostNames.length"
-                class="flex items-center gap-2"
-              >
-                <SearchInput v-model="keyword" />
-
-                <FilterTag
-                  v-if="selectedCategory"
-                  @close="handleCategoryChange()"
-                >
-                  {{
-                    $t("core.post.filters.category.result", {
-                      category: selectedCategory.spec.displayName,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterTag v-if="selectedTag" @click="handleTagChange()">
-                  {{
-                    $t("core.post.filters.tag.result", {
-                      tag: selectedTag.spec.displayName,
-                    })
-                  }}
-                </FilterTag>
-              </div>
+              <SearchInput v-if="!selectedPostNames.length" v-model="keyword" />
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeleteInBatch">
                   {{ $t("core.common.buttons.delete") }}
@@ -442,7 +420,7 @@ const getExternalUrl = (post: Post) => {
                   @click="handleClearFilters"
                 />
                 <FilterDropdown
-                  v-model="selectedPublishStatusValue"
+                  v-model="selectedPublishStatus"
                   :label="$t('core.common.filters.labels.status')"
                   :items="[
                     {
@@ -460,7 +438,7 @@ const getExternalUrl = (post: Post) => {
                   ]"
                 />
                 <FilterDropdown
-                  v-model="selectedVisibleValue"
+                  v-model="selectedVisible"
                   :label="$t('core.post.filters.visible.label')"
                   :items="[
                     {
@@ -477,42 +455,20 @@ const getExternalUrl = (post: Post) => {
                     },
                   ]"
                 />
-                <CategoryDropdownSelector
-                  v-model:selected="selectedCategory"
-                  @select="handleCategoryChange"
-                >
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.post.filters.category.label") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                </CategoryDropdownSelector>
-                <TagDropdownSelector
-                  v-model:selected="selectedTag"
-                  @select="handleTagChange"
-                >
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.post.filters.tag.label") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                </TagDropdownSelector>
+                <CategoryFilterDropdown
+                  v-model="selectedCategory"
+                  :label="$t('core.post.filters.category.label')"
+                />
+                <TagFilterDropdown
+                  v-model="selectedTag"
+                  :label="$t('core.post.filters.tag.label')"
+                />
                 <UserFilterDropdown
                   v-model="selectedContributor"
                   :label="$t('core.post.filters.author.label')"
                 />
                 <FilterDropdown
-                  v-model="selectedSortValue"
+                  v-model="selectedSort"
                   :label="$t('core.common.filters.labels.sort')"
                   :items="[
                     {

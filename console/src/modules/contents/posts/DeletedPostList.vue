@@ -239,12 +239,7 @@ watch(
               />
             </div>
             <div class="flex w-full flex-1 items-center sm:w-auto">
-              <div
-                v-if="!selectedPostNames.length"
-                class="flex items-center gap-2"
-              >
-                <SearchInput v-model="keyword" />
-              </div>
+              <SearchInput v-if="!selectedPostNames.length" v-model="keyword" />
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeletePermanentlyInBatch">
                   {{ $t("core.common.buttons.delete_permanently") }}
