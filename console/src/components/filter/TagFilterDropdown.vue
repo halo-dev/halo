@@ -42,7 +42,7 @@ const handleSelect = (tag: Tag) => {
 
 function onDropdownShow() {
   setTimeout(() => {
-    setFocus("tagDropdownSelectorInput");
+    setFocus("tagFilterDropdownInput");
   }, 200);
 }
 
@@ -98,7 +98,7 @@ const selectedTag = computed(() => {
       <div class="h-96 w-80">
         <div class="border-b border-b-gray-100 bg-white p-4">
           <FormKit
-            id="tagDropdownSelectorInput"
+            id="tagFilterDropdownInput"
             v-model="keyword"
             :placeholder="$t('core.common.placeholder.search')"
             type="text"

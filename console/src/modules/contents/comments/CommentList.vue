@@ -16,14 +16,14 @@ import {
   Toast,
 } from "@halo-dev/components";
 import CommentListItem from "./components/CommentListItem.vue";
-import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
-import type { ListedComment, User } from "@halo-dev/api-client";
+import type { ListedComment } from "@halo-dev/api-client";
 import { computed, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import { getNode } from "@formkit/core";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 
 const { t } = useI18n();
 
@@ -87,7 +87,7 @@ const selectedApprovedFilterItem = ref<{ label: string; value?: boolean }>(
 
 const selectedSortItem = ref<SortItem>();
 
-const selectedUser = ref<User>();
+const selectedUser = ref();
 
 const handleApprovedFilterItemChange = (filterItem: {
   label: string;
@@ -103,11 +103,6 @@ const handleSortItemChange = (sortItem: SortItem) => {
   selectedCommentNames.value = [];
   page.value = 1;
 };
-
-function handleSelectUser(user: User | undefined) {
-  selectedUser.value = user;
-  page.value = 1;
-}
 
 function handleKeywordChange() {
   const keywordNode = getNode("keywordInput");
@@ -165,7 +160,7 @@ const {
       approved: selectedApprovedFilterItem.value.value,
       sort: [selectedSortItem.value?.sort].filter(Boolean) as string[],
       keyword: keyword.value,
-      ownerName: selectedUser.value?.metadata.name,
+      ownerName: selectedUser.value,
     });
 
     total.value = data.total;
@@ -346,17 +341,6 @@ const handleApproveInBatch = async () => {
                 </FilterTag>
 
                 <FilterTag
-                  v-if="selectedUser"
-                  @close="handleSelectUser(undefined)"
-                >
-                  {{
-                    $t("core.comment.filters.owner.result", {
-                      owner: selectedUser.spec.displayName,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterTag
                   v-if="selectedSortItem"
                   @close="handleSortItemChange(SortItems[0])"
                 >
@@ -411,21 +395,10 @@ const handleApproveInBatch = async () => {
                     </VDropdownItem>
                   </template>
                 </VDropdown>
-                <UserDropdownSelector
-                  v-model:selected="selectedUser"
-                  @select="handleSelectUser"
-                >
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.comment.filters.owner.label") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                </UserDropdownSelector>
+                <UserFilterDropdown
+                  v-model="selectedUser"
+                  :label="$t('core.comment.filters.owner.label')"
+                />
                 <VDropdown>
                   <div
                     class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"

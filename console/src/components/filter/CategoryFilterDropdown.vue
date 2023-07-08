@@ -41,7 +41,7 @@ const handleSelect = (category: Category) => {
 
 function onDropdownShow() {
   setTimeout(() => {
-    setFocus("categoryDropdownSelectorInput");
+    setFocus("categoryFilterDropdownInput");
   }, 200);
 }
 
@@ -99,7 +99,7 @@ const selectedCategory = computed(() => {
       <div class="h-96 w-80">
         <div class="border-b border-b-gray-100 bg-white p-4">
           <FormKit
-            id="categoryDropdownSelectorInput"
+            id="categoryFilterDropdownInput"
             v-model="keyword"
             :placeholder="$t('core.common.placeholder.search')"
             type="text"

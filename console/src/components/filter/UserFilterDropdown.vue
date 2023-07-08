@@ -43,7 +43,7 @@ const handleSelect = (user: User) => {
 function onDropdownShow() {
   handleFetchUsers();
   setTimeout(() => {
-    setFocus("userDropdownSelectorInput");
+    setFocus("userFilterDropdownInput");
   }, 200);
 }
 
@@ -96,7 +96,7 @@ const selectedUser = computed(() => {
       <div class="h-96 w-80">
         <div class="border-b border-b-gray-100 bg-white p-4">
           <FormKit
-            id="userDropdownSelectorInput"
+            id="userFilterDropdownInput"
             v-model="keyword"
             :placeholder="$t('core.common.placeholder.search')"
             type="text"
