@@ -43,7 +43,6 @@ import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { postLabels } from "@/constants/labels";
 import FilterTag from "@/components/filter/FilterTag.vue";
-import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import { getNode } from "@formkit/core";
 import TagDropdownSelector from "@/components/dropdown-selector/TagDropdownSelector.vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";

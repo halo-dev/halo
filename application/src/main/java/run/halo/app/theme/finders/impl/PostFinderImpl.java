@@ -18,7 +18,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.util.comparator.Comparators;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -47,27 +46,20 @@ public class PostFinderImpl implements PostFinder {
 
     private final ReactiveExtensionClient client;
 
-    private final PostService postService;
-
     private final PostPublicQueryService postPublicQueryService;
 
     @Override
     public Mono<PostVo> getByName(String postName) {
         return client.get(Post.class, postName)
             .filter(FIXED_PREDICATE)
-            .flatMap(postPublicQueryService::convertToListedPostVo)
-            .map(PostVo::from)
-            .flatMap(postVo -> content(postName)
-                .doOnNext(postVo::setContent)
-                .thenReturn(postVo)
+            .flatMap(post -> postPublicQueryService.convertToVo(post,
+                post.getSpec().getReleaseSnapshot())
             );
     }
 
     @Override
     public Mono<ContentVo> content(String postName) {
-        return postService.getReleaseContent(postName)
-            .map(wrapper -> ContentVo.builder().content(wrapper.getContent())
-                .raw(wrapper.getRaw()).build());
+        return postPublicQueryService.getContent(postName);
     }
 
     @Override
@@ -107,7 +99,7 @@ public class PostFinderImpl implements PostFinder {
     @Override
     public Flux<ListedPostVo> listAll() {
         return client.list(Post.class, FIXED_PREDICATE, defaultComparator())
-            .concatMap(postPublicQueryService::convertToListedPostVo);
+            .concatMap(postPublicQueryService::convertToListedVo);
     }
 
     static Pair<String, String> postPreviousNextPair(List<String> postNames,

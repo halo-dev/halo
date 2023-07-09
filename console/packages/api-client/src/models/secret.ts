@@ -30,10 +30,10 @@ export interface Secret {
   apiVersion: string;
   /**
    *
-   * @type {{ [key: string]: string; }}
+   * @type {{ [key: string]: Array<string>; }}
    * @memberof Secret
    */
-  data?: { [key: string]: string };
+  data?: { [key: string]: Array<string> };
   /**
    *
    * @type {string}

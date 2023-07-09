@@ -5,7 +5,7 @@ server:
     enabled: true
   error:
     whitelabel:
-        enabled: false
+      enabled: false
 spring:
   output:
     ansi:
@@ -27,8 +27,16 @@ spring:
       cache:
         cachecontrol:
           max-age: 365d
+  cache:
+    type: caffeine
+    caffeine:
+      spec: expireAfterAccess=1h, maximumSize=10000
 
 halo:
+  caches:
+    page:
+      # Disable page cache by default due to experimental feature
+      disabled: true
   work-dir: ${user.home}/.halo2
   plugin:
     plugins-root: ${halo.work-dir}/plugins
@@ -56,7 +64,7 @@ management:
   endpoints:
     web:
       exposure:
-          include: ["health", "info", "startup", "globalinfo", "logfile"]
+        include: ["health", "info", "startup", "globalinfo", "logfile"]
   endpoint:
     health:
       probes:
@@ -73,3 +81,11 @@ resilience4j.ratelimiter:
       limitForPeriod: 3
       limitRefreshPeriod: 1m
       timeoutDuration: 0
+    comment-creation:
+      limitForPeriod: 10
+      limitRefreshPeriod: 1m
+      timeoutDuration: 0s
+    signup:
+      limitForPeriod: 3
+      limitRefreshPeriod: 1h
+      timeoutDuration: 0s

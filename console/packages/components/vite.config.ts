@@ -1,6 +1,6 @@
 import { fileURLToPath, URL } from "url";
 
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
 import Icons from "unplugin-icons/vite";
@@ -13,10 +13,11 @@ export default defineConfig({
     VueJsx(),
     Icons({ compiler: "vue3" }),
     Dts({
+      tsConfigFilePath: "./tsconfig.app.json",
       entryRoot: "./src",
       outputDir: "./dist",
       insertTypesEntry: true,
-    }),
+    }) as Plugin,
   ],
   define: {
     "process.env": process.env,

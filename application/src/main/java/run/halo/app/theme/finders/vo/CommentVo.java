@@ -1,5 +1,7 @@
 package run.halo.app.theme.finders.vo;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
@@ -19,18 +21,18 @@ import run.halo.app.extension.MetadataOperator;
 @EqualsAndHashCode
 public class CommentVo implements ExtensionVoOperator {
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private MetadataOperator metadata;
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private Comment.CommentSpec spec;
 
     private Comment.CommentStatus status;
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private OwnerInfo owner;
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private CommentStatsVo stats;
 
     /**
