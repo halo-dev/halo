@@ -7,7 +7,7 @@ import { Toast, VButton } from "@halo-dev/components";
 
 // hooks
 import { useSettingFormConvert } from "@/composables/use-setting-form";
-import { useRouteParams } from "@vueuse/router";
+import { useRouteQuery } from "@vueuse/router";
 import { useSystemConfigMapStore } from "@/stores/system-configmap";
 import type { ConfigMap, Setting } from "@halo-dev/api-client";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
@@ -20,11 +20,11 @@ const { t } = useI18n();
 const systemConfigMapStore = useSystemConfigMapStore();
 const queryClient = useQueryClient();
 
-const saving = ref(false);
-const group = useRouteParams<string>("group");
+const group = useRouteQuery<string>("tab", undefined, { mode: "push" });
 const setting = inject<Ref<Setting | undefined>>("setting", ref());
+const saving = ref(false);
 
-const { data: configMap, suspense } = useQuery<ConfigMap>({
+const { data: configMap } = useQuery<ConfigMap>({
   queryKey: ["system-configMap"],
   queryFn: async () => {
     const { data } = await apiClient.extension.configMap.getv1alpha1ConfigMap({
@@ -64,8 +64,6 @@ const handleSaveConfigMap = async () => {
 
   saving.value = false;
 };
-
-await suspense();
 </script>
 <template>
   <Transition mode="out-in" name="fade">
