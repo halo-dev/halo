@@ -5,6 +5,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
+import run.halo.app.migration.Backup;
 import run.halo.app.core.extension.AnnotationSetting;
 import run.halo.app.core.extension.AuthProvider;
 import run.halo.app.core.extension.Counter;
@@ -88,6 +89,9 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
         // auth.halo.run
         schemeManager.register(AuthProvider.class);
         schemeManager.register(UserConnection.class);
+
+        // migration.halo.run
+        schemeManager.register(Backup.class);
 
         eventPublisher.publishEvent(new SchemeInitializedEvent(this));
     }
