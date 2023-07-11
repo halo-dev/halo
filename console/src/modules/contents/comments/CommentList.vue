@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import {
-  IconArrowDown,
   IconMessage,
   VButton,
   VCard,
@@ -14,13 +13,12 @@ import {
   Toast,
 } from "@halo-dev/components";
 import CommentListItem from "./components/CommentListItem.vue";
-import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
-import type { ListedComment, User } from "@halo-dev/api-client";
+import type { ListedComment } from "@halo-dev/api-client";
 import { computed, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
-import FilterTag from "@/components/filter/FilterTag.vue";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 
 const { t } = useI18n();
 
@@ -31,7 +29,7 @@ const selectedCommentNames = ref<string[]>([]);
 const keyword = ref("");
 const selectedApprovedStatus = ref();
 const selectedSort = ref();
-const selectedUser = ref<User>();
+const selectedUser = ref();
 
 watch(
   () => [
@@ -44,10 +42,6 @@ watch(
     page.value = 1;
   }
 );
-
-function handleSelectUser(user: User | undefined) {
-  selectedUser.value = user;
-}
 
 const hasFilters = computed(() => {
   return (
@@ -89,7 +83,7 @@ const {
       approved: selectedApprovedStatus.value,
       sort: [selectedSort.value].filter(Boolean) as string[],
       keyword: keyword.value,
-      ownerName: selectedUser.value?.metadata.name,
+      ownerName: selectedUser.value,
     });
 
     total.value = data.total;
@@ -234,23 +228,10 @@ const handleApproveInBatch = async () => {
               />
             </div>
             <div class="flex w-full flex-1 items-center sm:w-auto">
-              <div
+              <SearchInput
                 v-if="!selectedCommentNames.length"
-                class="flex items-center gap-2"
-              >
-                <SearchInput v-model="keyword" />
-
-                <FilterTag
-                  v-if="selectedUser"
-                  @close="handleSelectUser(undefined)"
-                >
-                  {{
-                    $t("core.comment.filters.owner.result", {
-                      owner: selectedUser.spec.displayName,
-                    })
-                  }}
-                </FilterTag>
-              </div>
+                v-model="keyword"
+              />
               <VSpace v-else>
                 <VButton type="secondary" @click="handleApproveInBatch">
                   {{
@@ -289,21 +270,10 @@ const handleApproveInBatch = async () => {
                     },
                   ]"
                 />
-                <UserDropdownSelector
-                  v-model:selected="selectedUser"
-                  @select="handleSelectUser"
-                >
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.comment.filters.owner.label") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                </UserDropdownSelector>
+                <UserFilterDropdown
+                  v-model="selectedUser"
+                  :label="$t('core.comment.filters.owner.label')"
+                />
                 <FilterDropdown
                   v-model="selectedSort"
                   :label="$t('core.common.filters.labels.sort')"

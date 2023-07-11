@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import {
   IconAddCircle,
-  IconArrowDown,
   IconArrowLeft,
   IconArrowRight,
   IconBookRead,
@@ -23,30 +22,21 @@ import {
   VLoading,
   Toast,
   VDropdownItem,
-  VDropdown,
   VDropdownDivider,
 } from "@halo-dev/components";
-import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
-import CategoryDropdownSelector from "@/components/dropdown-selector/CategoryDropdownSelector.vue";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import PostTag from "../posts/tags/components/PostTag.vue";
 import { computed, ref, watch } from "vue";
-import type {
-  User,
-  Category,
-  Post,
-  Tag,
-  ListedPost,
-} from "@halo-dev/api-client";
+import type { Post, ListedPost } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { postLabels } from "@/constants/labels";
-import FilterTag from "@/components/filter/FilterTag.vue";
-import { getNode } from "@formkit/core";
-import TagDropdownSelector from "@/components/dropdown-selector/TagDropdownSelector.vue";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
+import CategoryFilterDropdown from "@/components/filter/CategoryFilterDropdown.vue";
+import TagFilterDropdown from "@/components/filter/TagFilterDropdown.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -57,141 +47,46 @@ const checkedAll = ref(false);
 const selectedPostNames = ref<string[]>([]);
 
 // Filters
-interface VisibleItem {
-  label: string;
-  value?: "PUBLIC" | "INTERNAL" | "PRIVATE";
-}
-
-interface PublishStatusItem {
-  label: string;
-  value?: boolean;
-}
-
-interface SortItem {
-  label: string;
-  sort: string;
-}
-
-const VisibleItems: VisibleItem[] = [
-  {
-    label: t("core.post.filters.visible.items.all"),
-    value: undefined,
-  },
-  {
-    label: t("core.post.filters.visible.items.public"),
-    value: "PUBLIC",
-  },
-  {
-    label: t("core.post.filters.visible.items.private"),
-    value: "PRIVATE",
-  },
-];
-
-const PublishStatusItems: PublishStatusItem[] = [
-  {
-    label: t("core.post.filters.status.items.all"),
-    value: undefined,
-  },
-  {
-    label: t("core.post.filters.status.items.published"),
-    value: true,
-  },
-  {
-    label: t("core.post.filters.status.items.draft"),
-    value: false,
-  },
-];
-
-const SortItems: SortItem[] = [
-  {
-    label: t("core.post.filters.sort.items.publish_time_desc"),
-    sort: "publishTime,desc",
-  },
-  {
-    label: t("core.post.filters.sort.items.publish_time_asc"),
-    sort: "publishTime,asc",
-  },
-  {
-    label: t("core.post.filters.sort.items.create_time_desc"),
-    sort: "creationTimestamp,desc",
-  },
-  {
-    label: t("core.post.filters.sort.items.create_time_asc"),
-    sort: "creationTimestamp,asc",
-  },
-];
-
-const selectedVisibleItem = ref<VisibleItem>(VisibleItems[0]);
-const selectedPublishStatusItem = ref<PublishStatusItem>(PublishStatusItems[0]);
-const selectedSortItem = ref<SortItem>();
-const selectedCategory = ref<Category>();
-const selectedTag = ref<Tag>();
-const selectedContributor = ref<User>();
+const selectedVisible = ref();
+const selectedPublishStatus = ref();
+const selectedSort = ref();
+const selectedCategory = ref();
+const selectedTag = ref();
+const selectedContributor = ref();
 const keyword = ref("");
 
-function handleVisibleItemChange(visibleItem: VisibleItem) {
-  selectedVisibleItem.value = visibleItem;
-  page.value = 1;
-}
-
-function handlePublishStatusItemChange(publishStatusItem: PublishStatusItem) {
-  selectedPublishStatusItem.value = publishStatusItem;
-  page.value = 1;
-}
-
-function handleSortItemChange(sortItem?: SortItem) {
-  selectedSortItem.value = sortItem;
-  page.value = 1;
-}
-
-function handleCategoryChange(category?: Category) {
-  selectedCategory.value = category;
-  page.value = 1;
-}
-
-function handleTagChange(tag?: Tag) {
-  selectedTag.value = tag;
-  page.value = 1;
-}
-
-function handleContributorChange(user?: User) {
-  selectedContributor.value = user;
-  page.value = 1;
-}
-
-function handleKeywordChange() {
-  const keywordNode = getNode("keywordInput");
-  if (keywordNode) {
-    keyword.value = keywordNode._value as string;
+watch(
+  () => [
+    selectedVisible.value,
+    selectedPublishStatus.value,
+    selectedSort.value,
+    selectedCategory.value,
+    selectedTag.value,
+    selectedContributor.value,
+    keyword.value,
+  ],
+  () => {
+    page.value = 1;
   }
-  page.value = 1;
-}
-
-function handleClearKeyword() {
-  keyword.value = "";
-  page.value = 1;
-}
+);
 
 function handleClearFilters() {
-  selectedVisibleItem.value = VisibleItems[0];
-  selectedPublishStatusItem.value = PublishStatusItems[0];
-  selectedSortItem.value = undefined;
+  selectedVisible.value = undefined;
+  selectedPublishStatus.value = undefined;
+  selectedSort.value = undefined;
   selectedCategory.value = undefined;
   selectedTag.value = undefined;
   selectedContributor.value = undefined;
-  keyword.value = "";
-  page.value = 1;
 }
 
 const hasFilters = computed(() => {
   return (
-    selectedVisibleItem.value.value ||
-    selectedPublishStatusItem.value.value !== undefined ||
-    selectedSortItem.value ||
+    selectedVisible.value ||
+    selectedPublishStatus.value !== undefined ||
+    selectedSort.value ||
     selectedCategory.value ||
     selectedTag.value ||
-    selectedContributor.value ||
-    keyword.value
+    selectedContributor.value
   );
 });
 
@@ -214,9 +109,9 @@ const {
     selectedCategory,
     selectedTag,
     selectedContributor,
-    selectedPublishStatusItem,
-    selectedVisibleItem,
-    selectedSortItem,
+    selectedPublishStatus,
+    selectedVisible,
+    selectedSort,
     keyword,
   ],
   queryFn: async () => {
@@ -226,20 +121,20 @@ const {
     const labelSelector: string[] = ["content.halo.run/deleted=false"];
 
     if (selectedCategory.value) {
-      categories = [selectedCategory.value.metadata.name];
+      categories = [selectedCategory.value];
     }
 
     if (selectedTag.value) {
-      tags = [selectedTag.value.metadata.name];
+      tags = [selectedTag.value];
     }
 
     if (selectedContributor.value) {
-      contributors = [selectedContributor.value.metadata.name];
+      contributors = [selectedContributor.value];
     }
 
-    if (selectedPublishStatusItem.value.value !== undefined) {
+    if (selectedPublishStatus.value !== undefined) {
       labelSelector.push(
-        `${postLabels.PUBLISHED}=${selectedPublishStatusItem.value.value}`
+        `${postLabels.PUBLISHED}=${selectedPublishStatus.value}`
       );
     }
 
@@ -247,8 +142,8 @@ const {
       labelSelector,
       page: page.value,
       size: size.value,
-      visible: selectedVisibleItem.value?.value,
-      sort: [selectedSortItem.value?.sort].filter(Boolean) as string[],
+      visible: selectedVisible.value,
+      sort: [selectedSort.value?.sort].filter(Boolean) as string[],
       keyword: keyword.value,
       category: categories,
       tag: tags,
@@ -511,96 +406,7 @@ const getExternalUrl = (post: Post) => {
               />
             </div>
             <div class="flex w-full flex-1 items-center sm:w-auto">
-              <div
-                v-if="!selectedPostNames.length"
-                class="flex items-center gap-2"
-              >
-                <FormKit
-                  id="keywordInput"
-                  outer-class="!p-0"
-                  :placeholder="$t('core.common.placeholder.search')"
-                  type="text"
-                  name="keyword"
-                  :model-value="keyword"
-                  @keyup.enter="handleKeywordChange"
-                ></FormKit>
-
-                <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  {{
-                    $t("core.common.filters.results.keyword", {
-                      keyword: keyword,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterTag
-                  v-if="selectedPublishStatusItem.value !== undefined"
-                  @close="handlePublishStatusItemChange(PublishStatusItems[0])"
-                >
-                  {{
-                    $t("core.common.filters.results.status", {
-                      status: selectedPublishStatusItem.label,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterTag
-                  v-if="selectedVisibleItem.value"
-                  @close="handleVisibleItemChange(VisibleItems[0])"
-                >
-                  {{
-                    $t("core.post.filters.visible.result", {
-                      visible: selectedVisibleItem.label,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterTag
-                  v-if="selectedCategory"
-                  @close="handleCategoryChange()"
-                >
-                  {{
-                    $t("core.post.filters.category.result", {
-                      category: selectedCategory.spec.displayName,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterTag v-if="selectedTag" @click="handleTagChange()">
-                  {{
-                    $t("core.post.filters.tag.result", {
-                      tag: selectedTag.spec.displayName,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterTag
-                  v-if="selectedContributor"
-                  @close="handleContributorChange()"
-                >
-                  {{
-                    $t("core.post.filters.author.result", {
-                      author: selectedContributor.spec.displayName,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterTag
-                  v-if="selectedSortItem"
-                  @close="handleSortItemChange()"
-                >
-                  {{
-                    $t("core.common.filters.results.sort", {
-                      sort: selectedSortItem.label,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterCleanButton
-                  v-if="hasFilters"
-                  @click="handleClearFilters"
-                />
-              </div>
+              <SearchInput v-if="!selectedPostNames.length" v-model="keyword" />
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeleteInBatch">
                   {{ $t("core.common.buttons.delete") }}
@@ -609,119 +415,85 @@ const getExternalUrl = (post: Post) => {
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
-                <VDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.common.filters.labels.status") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <VDropdownItem
-                      v-for="(filterItem, index) in PublishStatusItems"
-                      :key="index"
-                      :selected="
-                        filterItem.value === selectedPublishStatusItem.value
-                      "
-                      @click="handlePublishStatusItemChange(filterItem)"
-                    >
-                      {{ filterItem.label }}
-                    </VDropdownItem>
-                  </template>
-                </VDropdown>
-                <VDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.post.filters.visible.label") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <VDropdownItem
-                      v-for="(filterItem, index) in VisibleItems"
-                      :key="index"
-                      :selected="filterItem.value === selectedVisibleItem.value"
-                      @click="handleVisibleItemChange(filterItem)"
-                    >
-                      {{ filterItem.label }}
-                    </VDropdownItem>
-                  </template>
-                </VDropdown>
-                <CategoryDropdownSelector
-                  v-model:selected="selectedCategory"
-                  @select="handleCategoryChange"
-                >
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.post.filters.category.label") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                </CategoryDropdownSelector>
-                <TagDropdownSelector
-                  v-model:selected="selectedTag"
-                  @select="handleTagChange"
-                >
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.post.filters.tag.label") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                </TagDropdownSelector>
-                <UserDropdownSelector
-                  v-model:selected="selectedContributor"
-                  @select="handleContributorChange"
-                >
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.post.filters.author.label") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                </UserDropdownSelector>
-                <VDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.common.filters.labels.sort") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <VDropdownItem
-                      v-for="(sortItem, index) in SortItems"
-                      :key="index"
-                      :selected="sortItem.sort === selectedSortItem?.sort"
-                      @click="handleSortItemChange(sortItem)"
-                    >
-                      {{ sortItem.label }}
-                    </VDropdownItem>
-                  </template>
-                </VDropdown>
+                <FilterCleanButton
+                  v-if="hasFilters"
+                  @click="handleClearFilters"
+                />
+                <FilterDropdown
+                  v-model="selectedPublishStatus"
+                  :label="$t('core.common.filters.labels.status')"
+                  :items="[
+                    {
+                      label: t('core.common.filters.item_labels.all'),
+                      value: undefined,
+                    },
+                    {
+                      label: t('core.post.filters.status.items.published'),
+                      value: true,
+                    },
+                    {
+                      label: t('core.post.filters.status.items.draft'),
+                      value: false,
+                    },
+                  ]"
+                />
+                <FilterDropdown
+                  v-model="selectedVisible"
+                  :label="$t('core.post.filters.visible.label')"
+                  :items="[
+                    {
+                      label: t('core.common.filters.item_labels.all'),
+                      value: undefined,
+                    },
+                    {
+                      label: t('core.post.filters.visible.items.public'),
+                      value: 'PUBLIC',
+                    },
+                    {
+                      label: t('core.post.filters.visible.items.private'),
+                      value: 'PRIVATE',
+                    },
+                  ]"
+                />
+                <CategoryFilterDropdown
+                  v-model="selectedCategory"
+                  :label="$t('core.post.filters.category.label')"
+                />
+                <TagFilterDropdown
+                  v-model="selectedTag"
+                  :label="$t('core.post.filters.tag.label')"
+                />
+                <UserFilterDropdown
+                  v-model="selectedContributor"
+                  :label="$t('core.post.filters.author.label')"
+                />
+                <FilterDropdown
+                  v-model="selectedSort"
+                  :label="$t('core.common.filters.labels.sort')"
+                  :items="[
+                    {
+                      label: t('core.common.filters.item_labels.default'),
+                    },
+                    {
+                      label: t(
+                        'core.post.filters.sort.items.publish_time_desc'
+                      ),
+                      value: 'publishTime,desc',
+                    },
+                    {
+                      label: t('core.post.filters.sort.items.publish_time_asc'),
+                      value: 'publishTime,asc',
+                    },
+                    {
+                      label: t('core.post.filters.sort.items.create_time_desc'),
+                      value: 'creationTimestamp,desc',
+                    },
+                    {
+                      label: t('core.post.filters.sort.items.create_time_asc'),
+                      value: 'creationTimestamp,asc',
+                    },
+                  ]"
+                />
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"

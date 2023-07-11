@@ -154,14 +154,12 @@ core:
     filters:
       status:
         items:
-          all: All
           published: Published
           draft: Draft
       visible:
         label: Visible
         result: "Visible: {visible}"
         items:
-          all: All
           public: Public
           private: Private
       category:
@@ -324,14 +322,12 @@ core:
     filters:
       status:
         items:
-          all: All
           published: Published
           draft: Draft
       visible:
         label: Visible
         result: "Visible: {visible}"
         items:
-          all: All
           public: Public
           private: Private
       author:
