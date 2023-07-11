@@ -55,6 +55,7 @@ public class MigrationServiceImpl implements MigrationService {
         "**/.git/**",
         "**/node_modules/**",
         "backups/**",
+        "db/**",
         "logs/**",
         "**/.idea/**",
         "**/.vscode/**"
