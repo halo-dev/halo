@@ -48,7 +48,7 @@ function handleSelect(item: {
       <span v-if="!selectedItem" class="mr-0.5">
         {{ label }}
       </span>
-      <span v-else> {{ label }}：{{ selectedItem.label }} </span>
+      <span v-else class="mr-0.5"> {{ label }}：{{ selectedItem.label }} </span>
       <span>
         <IconArrowDown />
       </span>

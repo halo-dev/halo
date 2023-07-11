@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import {
-  IconArrowDown,
   IconArrowLeft,
   IconArrowRight,
   IconCheckboxFill,
@@ -25,13 +24,12 @@ import {
   VDropdownItem,
 } from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
-import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
 import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
 import AttachmentPoliciesModal from "./components/AttachmentPoliciesModal.vue";
 import AttachmentGroupList from "./components/AttachmentGroupList.vue";
 import { computed, onMounted, ref, watch } from "vue";
-import type { Attachment, Group, User } from "@halo-dev/api-client";
+import type { Attachment, Group } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import prettyBytes from "pretty-bytes";
 import { useFetchAttachmentPolicy } from "./composables/use-attachment-policy";
@@ -43,8 +41,8 @@ import { isImage } from "@/utils/image";
 import { useRouteQuery } from "@vueuse/router";
 import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
 import { usePermission } from "@/utils/permission";
-import FilterTag from "@/components/filter/FilterTag.vue";
 import { useI18n } from "vue-i18n";
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -63,12 +61,8 @@ const keyword = ref<string>("");
 const page = ref<number>(1);
 const size = ref<number>(60);
 const selectedPolicy = ref();
-const selectedUser = ref<User>();
+const selectedUser = ref();
 const selectedSort = ref();
-
-function handleSelectUser(user: User | undefined) {
-  selectedUser.value = user;
-}
 
 watch(
   () => [
@@ -309,22 +303,10 @@ onMounted(() => {
                   />
                 </div>
                 <div class="flex w-full flex-1 items-center sm:w-auto">
-                  <div
+                  <SearchInput
                     v-if="!selectedAttachments.size"
-                    class="flex items-center gap-2"
-                  >
-                    <SearchInput v-model="keyword" />
-                    <FilterTag
-                      v-if="selectedUser"
-                      @close="handleSelectUser(undefined)"
-                    >
-                      {{
-                        $t("core.attachment.filters.owner.result", {
-                          owner: selectedUser.spec.displayName,
-                        })
-                      }}
-                    </FilterTag>
-                  </div>
+                    v-model="keyword"
+                  />
                   <VSpace v-else>
                     <VButton type="danger" @click="handleDeleteInBatch">
                       {{ $t("core.common.buttons.delete") }}
@@ -373,21 +355,10 @@ onMounted(() => {
                         }) || []),
                       ]"
                     />
-                    <UserDropdownSelector
-                      v-model:selected="selectedUser"
-                      @select="handleSelectUser"
-                    >
-                      <div
-                        class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                      >
-                        <span class="mr-0.5">
-                          {{ $t("core.attachment.filters.owner.label") }}
-                        </span>
-                        <span>
-                          <IconArrowDown />
-                        </span>
-                      </div>
-                    </UserDropdownSelector>
+                    <UserFilterDropdown
+                      v-model="selectedUser"
+                      :label="$t('core.attachment.filters.owner.label')"
+                    />
                     <FilterDropdown
                       v-model="selectedSort"
                       :label="$t('core.common.filters.labels.sort')"
