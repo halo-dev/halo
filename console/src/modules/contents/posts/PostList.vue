@@ -48,18 +48,24 @@ const checkedAll = ref(false);
 const selectedPostNames = ref<string[]>([]);
 
 // Filters
-const page = useRouteQuery("page", 1, { transform: Number });
-const size = useRouteQuery("size", 20, { transform: Number });
+const page = useRouteQuery<number>("page", 1, {
+  transform: Number,
+});
+const size = useRouteQuery<number>("size", 20, {
+  transform: Number,
+});
+const selectedVisible = useRouteQuery<
+  "PUBLIC" | "INTERNAL" | "PRIVATE" | undefined
+>("visible");
+const selectedPublishStatus = useRouteQuery<string | undefined>("status");
+const selectedSort = useRouteQuery<string | undefined>("sort");
+const selectedCategory = useRouteQuery<string | undefined>("category");
+const selectedTag = useRouteQuery<string | undefined>("tag");
+const selectedContributor = useRouteQuery<string | undefined>("contributor");
+const keyword = useRouteQuery<string>("keyword", "");
 const total = ref(0);
 const hasPrevious = ref(false);
 const hasNext = ref(false);
-const selectedVisible = ref();
-const selectedPublishStatus = ref();
-const selectedSort = ref();
-const selectedCategory = ref();
-const selectedTag = ref();
-const selectedContributor = ref();
-const keyword = ref("");
 
 watch(
   () => [
@@ -143,7 +149,7 @@ const {
       page: page.value,
       size: size.value,
       visible: selectedVisible.value,
-      sort: [selectedSort.value?.sort].filter(Boolean) as string[],
+      sort: [selectedSort.value].filter(Boolean) as string[],
       keyword: keyword.value,
       category: categories,
       tag: tags,
