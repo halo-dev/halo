@@ -18,24 +18,30 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.zip.ZipInputStream;
+import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.util.PathMatcher;
 import reactor.core.Exceptions;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.context.Context;
+import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreRepository;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.migration.Backup;
 import run.halo.app.migration.MigrationService;
 
+@Slf4j
 @Service
 public class MigrationServiceImpl implements MigrationService {
 
@@ -95,48 +101,80 @@ public class MigrationServiceImpl implements MigrationService {
 
     @Override
     public Mono<Void> restore(Publisher<DataBuffer> content) {
-        return Mono.create(sink -> {
-            try (var pipedIs = new PipedInputStream();
-                 var pipedOs = new PipedOutputStream(pipedIs)) {
-                DataBufferUtils.write(content, pipedOs)
-                    .doOnSubscribe(subscription -> {
-                    })
-                    .subscribe(
-                        releaseConsumer(),
-                        sink::error,
-                        () -> {
-                            try (var zipIs = new ZipInputStream(pipedIs)) {
-                                var tempDir = Files.createTempDirectory("halo-restore-");
-                                FileUtils.unzip(zipIs, tempDir);
-                                sink.success();
-                            } catch (IOException e) {
-                                sink.error(e);
-                            }
-                        },
-                        Context.of(sink.contextView()));
+        try {
+            var tempDir = Files.createTempDirectory("halo-restore-");
+            return unpackBackup(content, tempDir)
+                .and(restoreExtensions(tempDir))
+                .and(restoreWorkdir(tempDir))
+                // check the integration
+                .doFinally(signalType -> FileUtils.deleteRecursivelyAndSilently(tempDir));
+        } catch (IOException e) {
+            return Mono.error(e);
+        }
+    }
+
+    private Mono<Void> restoreWorkdir(Path backupRoot) {
+        var workdir = backupRoot.resolve("workdir");
+        return Mono.fromRunnable(() -> {
+            try {
+                FileSystemUtils.copyRecursively(workdir, haloProperties.getWorkDir());
             } catch (IOException e) {
-                sink.error(e);
+                throw Exceptions.propagate(e);
             }
         });
     }
 
-    private Mono<Void> unzip(Publisher<DataBuffer> content, Path target) {
+    private Mono<Void> restoreExtensions(Path backupRoot) {
+        var extensionsPath = backupRoot.resolve("extensions.data");
+        var jsonMapper = JsonMapper.builder()
+            .defaultPrettyPrinter(new MinimalPrettyPrinter())
+            .build();
+        return Mono.using(
+            () -> jsonMapper.createParser(extensionsPath.toFile()),
+            parser -> Flux.<ExtensionStore, Iterator<ExtensionStore>>generate(
+                    () -> {
+                        // skip the start array
+                        parser.nextToken(); // this is null
+                        parser.nextToken(); // this is start array token
+                        return parser.readValuesAs(ExtensionStore.class);
+                    }, (iterator, sink) -> {
+                        if (iterator.hasNext()) {
+                            sink.next(iterator.next());
+                        } else {
+                            sink.complete();
+                        }
+                        return iterator;
+                    })
+                .doOnNext(extensionStore -> {
+                    if (log.isDebugEnabled()) {
+                        log.debug("Restoring extension store: {}", extensionStore.getName());
+                    }
+                })
+                .buffer(100)
+                .doOnNext(repository::saveAll)
+                .then(),
+            parser -> {
+                try {
+                    parser.close();
+                } catch (IOException e) {
+                    throw Exceptions.propagate(e);
+                }
+            });
+    }
+
+    private Mono<Void> unpackBackup(Publisher<DataBuffer> content, Path target) {
         return Mono.create(sink -> {
             try (var pipedIs = new PipedInputStream();
-                 var pipedOs = new PipedOutputStream(pipedIs)) {
-                var disposable = DataBufferUtils.write(content, pipedOs)
+                 var pipedOs = new PipedOutputStream(pipedIs);
+                 var zipIs = new ZipInputStream(pipedIs)) {
+                DataBufferUtils.write(content, pipedOs)
                     .subscribe(
                         releaseConsumer(),
                         sink::error,
-                        () -> {
-                            try (var zipIs = new ZipInputStream(pipedIs)) {
-                                FileUtils.unzip(zipIs, target);
-                                sink.success();
-                            } catch (IOException e) {
-                                sink.error(e);
-                            }
-                        },
+                        null,
                         Context.of(sink.contextView()));
+                FileUtils.unzip(zipIs, target);
+                sink.success();
             } catch (IOException e) {
                 sink.error(e);
             }
