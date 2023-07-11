@@ -1,4 +1,4 @@
-import type { Attachment, Group, Policy, User } from "@halo-dev/api-client";
+import type { Attachment, Group, Policy } from "@halo-dev/api-client";
 import { computed, type Ref } from "vue";
 import { ref, watch } from "vue";
 import type { AttachmentLike } from "@halo-dev/console-shared";
@@ -36,7 +36,7 @@ interface useAttachmentSelectReturn {
 export function useAttachmentControl(filterOptions: {
   policy?: Ref<Policy | undefined>;
   group?: Ref<Group | undefined>;
-  user?: Ref<User | undefined>;
+  user?: Ref<string | undefined>;
   keyword?: Ref<string | undefined>;
   sort?: Ref<string | undefined>;
   page: Ref<number>;
@@ -62,7 +62,7 @@ export function useAttachmentControl(filterOptions: {
         displayName: keyword?.value,
         group: group?.value?.metadata.name,
         ungrouped: group?.value?.metadata.name === "ungrouped",
-        uploadedBy: user?.value?.metadata.name,
+        uploadedBy: user?.value,
         page: page?.value,
         size: size?.value,
         sort: [sort?.value as string].filter(Boolean),
