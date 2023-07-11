@@ -154,14 +154,12 @@ core:
     filters:
       status:
         items:
-          all: 全部
           published: 已发布
           draft: 未发布
       visible:
         label: 可见性
         result: "可见性：{visible}"
         items:
-          all: 全部
           public: 公开
           private: 私有
       category:
@@ -324,14 +322,12 @@ core:
     filters:
       status:
         items:
-          all: 全部
           published: 已发布
           draft: 未发布
       visible:
         label: 可见性
         result: "可见性：{visible}"
         items:
-          all: 全部
           public: 公开
           private: 私有
       author:

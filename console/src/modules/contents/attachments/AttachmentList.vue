@@ -25,13 +25,12 @@ import {
   VDropdownItem,
 } from "@halo-dev/components";
 import LazyImage from "@/components/image/LazyImage.vue";
-import UserDropdownSelector from "@/components/dropdown-selector/UserDropdownSelector.vue";
 import AttachmentDetailModal from "./components/AttachmentDetailModal.vue";
 import AttachmentUploadModal from "./components/AttachmentUploadModal.vue";
 import AttachmentPoliciesModal from "./components/AttachmentPoliciesModal.vue";
 import AttachmentGroupList from "./components/AttachmentGroupList.vue";
 import { computed, onMounted, ref, watch } from "vue";
-import type { Attachment, Group, Policy, User } from "@halo-dev/api-client";
+import type { Attachment, Group, Policy } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import prettyBytes from "pretty-bytes";
 import { useFetchAttachmentPolicy } from "./composables/use-attachment-policy";
@@ -46,6 +45,7 @@ import { usePermission } from "@/utils/permission";
 import FilterTag from "@/components/filter/FilterTag.vue";
 import { getNode } from "@formkit/core";
 import { useI18n } from "vue-i18n";
+import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -85,7 +85,7 @@ const SortItems: SortItem[] = [
 ];
 
 const selectedPolicy = ref<Policy>();
-const selectedUser = ref<User>();
+const selectedUser = ref();
 const selectedSortItem = ref<SortItem>();
 const selectedSortItemValue = computed(() => {
   return selectedSortItem.value?.value;
@@ -93,11 +93,6 @@ const selectedSortItemValue = computed(() => {
 
 function handleSelectPolicy(policy: Policy | undefined) {
   selectedPolicy.value = policy;
-  page.value = 1;
-}
-
-function handleSelectUser(user: User | undefined) {
-  selectedUser.value = user;
   page.value = 1;
 }
 
@@ -387,17 +382,6 @@ onMounted(() => {
                     </FilterTag>
 
                     <FilterTag
-                      v-if="selectedUser"
-                      @close="handleSelectUser(undefined)"
-                    >
-                      {{
-                        $t("core.attachment.filters.owner.result", {
-                          owner: selectedUser.spec.displayName,
-                        })
-                      }}
-                    </FilterTag>
-
-                    <FilterTag
                       v-if="selectedSortItem"
                       @click="handleSortItemChange()"
                     >
@@ -464,21 +448,11 @@ onMounted(() => {
                         </VDropdownItem>
                       </template>
                     </VDropdown>
-                    <UserDropdownSelector
-                      v-model:selected="selectedUser"
-                      @select="handleSelectUser"
-                    >
-                      <div
-                        class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                      >
-                        <span class="mr-0.5">
-                          {{ $t("core.attachment.filters.owner.label") }}
-                        </span>
-                        <span>
-                          <IconArrowDown />
-                        </span>
-                      </div>
-                    </UserDropdownSelector>
+
+                    <UserFilterDropdown
+                      v-model="selectedUser"
+                      :label="$t('core.attachment.filters.owner.label')"
+                    />
                     <!-- TODO: add filter by ref support -->
                     <VDropdown v-if="false">
                       <div
