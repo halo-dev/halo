@@ -6,6 +6,7 @@ import static org.springframework.core.io.buffer.DataBufferUtils.releaseConsumer
 import static org.springframework.util.FileSystemUtils.deleteRecursively;
 
 import com.fasterxml.jackson.core.util.MinimalPrettyPrinter;
+import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import java.io.IOException;
 import java.io.PipedInputStream;
@@ -18,7 +19,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.zip.ZipInputStream;
@@ -27,6 +27,7 @@ import org.reactivestreams.Publisher;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.PathMatcher;
@@ -78,6 +79,7 @@ public class MigrationServiceImpl implements MigrationService {
     }
 
     @Override
+    @Transactional
     public Mono<Void> backup(Backup backup) {
         final var status = backup.getStatus();
         status.setPhase(Backup.Phase.RUNNING);
@@ -101,6 +103,7 @@ public class MigrationServiceImpl implements MigrationService {
     }
 
     @Override
+    @Transactional
     public Mono<Void> restore(Publisher<DataBuffer> content) {
         try {
             var tempDir = Files.createTempDirectory("halo-restore-");
@@ -130,33 +133,28 @@ public class MigrationServiceImpl implements MigrationService {
         var jsonMapper = JsonMapper.builder()
             .defaultPrettyPrinter(new MinimalPrettyPrinter())
             .build();
-        return Mono.using(
-            () -> jsonMapper.createParser(extensionsPath.toFile()),
-            parser -> Flux.<ExtensionStore, Iterator<ExtensionStore>>generate(
-                    () -> {
-                        // skip the start array
-                        parser.nextToken(); // this is null
-                        parser.nextToken(); // this is start array token
-                        return parser.readValuesAs(ExtensionStore.class);
-                    }, (iterator, sink) -> {
-                        if (iterator.hasNext()) {
-                            sink.next(iterator.next());
-                        } else {
-                            sink.complete();
-                        }
-                        return iterator;
-                    })
-                .doOnNext(extensionStore -> {
-                    if (log.isDebugEnabled()) {
-                        log.debug("Restoring extension store: {}", extensionStore.getName());
+        var reader = jsonMapper.readerFor(ExtensionStore.class);
+        return Mono.<Void, MappingIterator<ExtensionStore>>using(
+            () -> reader.readValues(extensionsPath.toFile()),
+            itr -> Flux.<ExtensionStore>create(sink -> {
+                    while (itr.hasNext()) {
+                        sink.next(itr.next());
                     }
+                    sink.complete();
                 })
+                // reset version
+                .doOnNext(extensionStore -> extensionStore.setVersion(null))
                 .buffer(100)
-                .doOnNext(repository::saveAll)
+                // We might encounter OptimisticLockingFailureException when saving extension store,
+                // So we have to delete all extension stores before saving.
+                .flatMap(extensionStores -> repository.deleteAll(extensionStores)
+                    .thenMany(repository.saveAll(extensionStores)))
+                .doOnNext(extensionStore ->
+                    log.info("Restored extension store: {}", extensionStore.getName()))
                 .then(),
-            parser -> {
+            itr -> {
                 try {
-                    parser.close();
+                    itr.close();
                 } catch (IOException e) {
                     throw Exceptions.propagate(e);
                 }
