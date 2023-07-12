@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import {
-  IconArrowDown,
   IconMessage,
   VButton,
   VCard,
@@ -11,16 +10,12 @@ import {
   VEmpty,
   Dialog,
   VLoading,
-  VDropdown,
-  VDropdownItem,
   Toast,
 } from "@halo-dev/components";
 import CommentListItem from "./components/CommentListItem.vue";
 import type { ListedComment } from "@halo-dev/api-client";
 import { computed, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
-import FilterTag from "@/components/filter/FilterTag.vue";
-import { getNode } from "@formkit/core";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
@@ -30,108 +25,36 @@ const { t } = useI18n();
 const checkAll = ref(false);
 const selectedComment = ref<ListedComment>();
 const selectedCommentNames = ref<string[]>([]);
+
 const keyword = ref("");
-
-// Filters
-
-interface SortItem {
-  label: string;
-  sort: string;
-}
-
-const ApprovedFilterItems: { label: string; value?: boolean }[] = [
-  {
-    label: t("core.comment.filters.status.items.all"),
-    value: undefined,
-  },
-  {
-    label: t("core.comment.filters.status.items.approved"),
-    value: true,
-  },
-  {
-    label: t("core.comment.filters.status.items.pending_review"),
-    value: false,
-  },
-];
-
-const SortItems: SortItem[] = [
-  {
-    label: t("core.comment.filters.sort.items.last_reply_time_desc"),
-    sort: "lastReplyTime,desc",
-  },
-  {
-    label: t("core.comment.filters.sort.items.last_reply_time_asc"),
-    sort: "lastReplyTime,asc",
-  },
-  {
-    label: t("core.comment.filters.sort.items.reply_count_desc"),
-    sort: "replyCount,desc",
-  },
-  {
-    label: t("core.comment.filters.sort.items.reply_count_asc"),
-    sort: "replyCount,asc",
-  },
-  {
-    label: t("core.comment.filters.sort.items.create_time_desc"),
-    sort: "creationTimestamp,desc",
-  },
-  {
-    label: t("core.comment.filters.sort.items.create_time_asc"),
-    sort: "creationTimestamp,asc",
-  },
-];
-
-const selectedApprovedFilterItem = ref<{ label: string; value?: boolean }>(
-  ApprovedFilterItems[0]
-);
-
-const selectedSortItem = ref<SortItem>();
-
+const selectedApprovedStatus = ref();
+const selectedSort = ref();
 const selectedUser = ref();
 
-const handleApprovedFilterItemChange = (filterItem: {
-  label: string;
-  value?: boolean;
-}) => {
-  selectedApprovedFilterItem.value = filterItem;
-  selectedCommentNames.value = [];
-  page.value = 1;
-};
-
-const handleSortItemChange = (sortItem: SortItem) => {
-  selectedSortItem.value = sortItem;
-  selectedCommentNames.value = [];
-  page.value = 1;
-};
-
-function handleKeywordChange() {
-  const keywordNode = getNode("keywordInput");
-  if (keywordNode) {
-    keyword.value = keywordNode._value as string;
+watch(
+  () => [
+    selectedApprovedStatus.value,
+    selectedSort.value,
+    selectedUser.value,
+    keyword.value,
+  ],
+  () => {
+    page.value = 1;
   }
-  page.value = 1;
-}
-
-function handleClearKeyword() {
-  keyword.value = "";
-  page.value = 1;
-}
+);
 
 const hasFilters = computed(() => {
   return (
-    selectedApprovedFilterItem.value.value !== undefined ||
-    selectedSortItem.value ||
-    selectedUser.value ||
-    keyword.value
+    selectedApprovedStatus.value !== undefined ||
+    selectedSort.value ||
+    selectedUser.value
   );
 });
 
 function handleClearFilters() {
-  selectedApprovedFilterItem.value = ApprovedFilterItems[0];
-  selectedSortItem.value = undefined;
+  selectedApprovedStatus.value = undefined;
+  selectedSort.value = undefined;
   selectedUser.value = undefined;
-  keyword.value = "";
-  page.value = 1;
 }
 
 const page = ref(1);
@@ -148,8 +71,8 @@ const {
     "comments",
     page,
     size,
-    selectedApprovedFilterItem,
-    selectedSortItem,
+    selectedApprovedStatus,
+    selectedSort,
     selectedUser,
     keyword,
   ],
@@ -157,8 +80,8 @@ const {
     const { data } = await apiClient.comment.listComments({
       page: page.value,
       size: size.value,
-      approved: selectedApprovedFilterItem.value.value,
-      sort: [selectedSortItem.value?.sort].filter(Boolean) as string[],
+      approved: selectedApprovedStatus.value,
+      sort: [selectedSort.value].filter(Boolean) as string[],
       keyword: keyword.value,
       ownerName: selectedUser.value,
     });
@@ -305,57 +228,10 @@ const handleApproveInBatch = async () => {
               />
             </div>
             <div class="flex w-full flex-1 items-center sm:w-auto">
-              <div
+              <SearchInput
                 v-if="!selectedCommentNames.length"
-                class="flex items-center gap-2"
-              >
-                <FormKit
-                  id="keywordInput"
-                  outer-class="!p-0"
-                  :placeholder="$t('core.common.placeholder.search')"
-                  type="text"
-                  name="keyword"
-                  :model-value="keyword"
-                  @keyup.enter="handleKeywordChange"
-                ></FormKit>
-
-                <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  {{
-                    $t("core.common.filters.results.keyword", {
-                      keyword: keyword,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterTag
-                  v-if="selectedApprovedFilterItem.value != undefined"
-                  @close="
-                    handleApprovedFilterItemChange(ApprovedFilterItems[0])
-                  "
-                >
-                  {{
-                    $t("core.common.filters.results.status", {
-                      status: selectedApprovedFilterItem.label,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterTag
-                  v-if="selectedSortItem"
-                  @close="handleSortItemChange(SortItems[0])"
-                >
-                  {{
-                    $t("core.common.filters.results.sort", {
-                      sort: selectedSortItem.label,
-                    })
-                  }}
-                </FilterTag>
-
-                <FilterCleanButton
-                  v-if="hasFilters"
-                  @click="handleClearFilters"
-                />
-              </div>
+                v-model="keyword"
+              />
               <VSpace v-else>
                 <VButton type="secondary" @click="handleApproveInBatch">
                   {{
@@ -371,56 +247,78 @@ const handleApproveInBatch = async () => {
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
-                <VDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.common.filters.labels.status") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <VDropdownItem
-                      v-for="(filterItem, index) in ApprovedFilterItems"
-                      :key="index"
-                      :selected="
-                        selectedApprovedFilterItem.value === filterItem.value
-                      "
-                      @click="handleApprovedFilterItemChange(filterItem)"
-                    >
-                      {{ filterItem.label }}
-                    </VDropdownItem>
-                  </template>
-                </VDropdown>
+                <FilterCleanButton
+                  v-if="hasFilters"
+                  @click="handleClearFilters"
+                />
+                <FilterDropdown
+                  v-model="selectedApprovedStatus"
+                  :label="$t('core.common.filters.labels.status')"
+                  :items="[
+                    {
+                      label: t('core.common.filters.item_labels.all'),
+                    },
+                    {
+                      label: t('core.comment.filters.status.items.approved'),
+                      value: true,
+                    },
+                    {
+                      label: t(
+                        'core.comment.filters.status.items.pending_review'
+                      ),
+                      value: false,
+                    },
+                  ]"
+                />
                 <UserFilterDropdown
                   v-model="selectedUser"
                   :label="$t('core.comment.filters.owner.label')"
                 />
-                <VDropdown>
-                  <div
-                    class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
-                  >
-                    <span class="mr-0.5">
-                      {{ $t("core.common.filters.labels.sort") }}
-                    </span>
-                    <span>
-                      <IconArrowDown />
-                    </span>
-                  </div>
-                  <template #popper>
-                    <VDropdownItem
-                      v-for="(filterItem, index) in SortItems"
-                      :key="index"
-                      :selected="selectedSortItem?.sort === filterItem.sort"
-                      @click="handleSortItemChange(filterItem)"
-                    >
-                      {{ filterItem.label }}
-                    </VDropdownItem>
-                  </template>
-                </VDropdown>
+                <FilterDropdown
+                  v-model="selectedSort"
+                  :label="$t('core.common.filters.labels.sort')"
+                  :items="[
+                    {
+                      label: t('core.common.filters.item_labels.default'),
+                    },
+                    {
+                      label: t(
+                        'core.comment.filters.sort.items.last_reply_time_desc'
+                      ),
+                      value: 'lastReplyTime,desc',
+                    },
+                    {
+                      label: t(
+                        'core.comment.filters.sort.items.last_reply_time_asc'
+                      ),
+                      value: 'lastReplyTime,asc',
+                    },
+                    {
+                      label: t(
+                        'core.comment.filters.sort.items.reply_count_desc'
+                      ),
+                      value: 'replyCount,desc',
+                    },
+                    {
+                      label: t(
+                        'core.comment.filters.sort.items.reply_count_asc'
+                      ),
+                      value: 'replyCount,asc',
+                    },
+                    {
+                      label: t(
+                        'core.comment.filters.sort.items.create_time_desc'
+                      ),
+                      value: 'creationTimestamp,desc',
+                    },
+                    {
+                      label: t(
+                        'core.comment.filters.sort.items.create_time_asc'
+                      ),
+                      value: 'creationTimestamp,asc',
+                    },
+                  ]"
+                />
                 <div class="flex flex-row gap-2">
                   <div
                     class="group cursor-pointer rounded p-1 hover:bg-gray-200"

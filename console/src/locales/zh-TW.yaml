@@ -424,7 +424,6 @@ core:
     filters:
       status:
         items:
-          all: 全部
           approved: 已審核
           pending_review: 待審核
       owner:

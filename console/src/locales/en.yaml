@@ -424,7 +424,6 @@ core:
     filters:
       status:
         items:
-          all: All
           approved: Approved
           pending_review: Pending Review
       owner:
