@@ -8,6 +8,7 @@ api/api-console-halo-run-v1alpha1-indices-api.ts
 api/api-console-halo-run-v1alpha1-plugin-api.ts
 api/api-console-halo-run-v1alpha1-post-api.ts
 api/api-console-halo-run-v1alpha1-reply-api.ts
+api/api-console-halo-run-v1alpha1-restoration-api.ts
 api/api-console-halo-run-v1alpha1-single-page-api.ts
 api/api-console-halo-run-v1alpha1-stats-api.ts
 api/api-console-halo-run-v1alpha1-theme-api.ts
@@ -34,6 +35,7 @@ api/content-halo-run-v1alpha1-snapshot-api.ts
 api/content-halo-run-v1alpha1-tag-api.ts
 api/login-api.ts
 api/metrics-halo-run-v1alpha1-counter-api.ts
+api/migration-halo-run-v1alpha1-backup-api.ts
 api/plugin-halo-run-v1alpha1-extension-definition-api.ts
 api/plugin-halo-run-v1alpha1-extension-point-definition-api.ts
 api/plugin-halo-run-v1alpha1-plugin-api.ts
@@ -71,6 +73,8 @@ models/auth-provider-list.ts
 models/auth-provider-spec.ts
 models/auth-provider.ts
 models/author.ts
+models/backup-list.ts
+models/backup.ts
 models/category-list.ts
 models/category-spec.ts
 models/category-status.ts
@@ -210,8 +214,10 @@ models/site-stats-vo.ts
 models/snap-shot-spec.ts
 models/snapshot-list.ts
 models/snapshot.ts
+models/spec.ts
 models/stats-vo.ts
 models/stats.ts
+models/status.ts
 models/subject.ts
 models/tag-list.ts
 models/tag-spec.ts
