@@ -74,6 +74,8 @@ models/auth-provider-spec.ts
 models/auth-provider.ts
 models/author.ts
 models/backup-list.ts
+models/backup-spec.ts
+models/backup-status.ts
 models/backup.ts
 models/category-list.ts
 models/category-spec.ts
@@ -214,10 +216,8 @@ models/site-stats-vo.ts
 models/snap-shot-spec.ts
 models/snapshot-list.ts
 models/snapshot.ts
-models/spec.ts
 models/stats-vo.ts
 models/stats.ts
-models/status.ts
 models/subject.ts
 models/tag-list.ts
 models/tag-spec.ts

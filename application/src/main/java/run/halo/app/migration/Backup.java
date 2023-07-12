@@ -1,6 +1,7 @@
 package run.halo.app.migration;
 
 import java.time.Instant;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -19,6 +20,7 @@ public class Backup extends AbstractExtension {
     private Status status;
 
     @Data
+    @Schema(name = "BackupSpec")
     public static class Spec {
 
         private String format;
@@ -28,6 +30,7 @@ public class Backup extends AbstractExtension {
     }
 
     @Data
+    @Schema(name = "BackupStatus")
     public static class Status {
 
         private Phase phase = Phase.PENDING;

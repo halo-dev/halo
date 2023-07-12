@@ -14,13 +14,13 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import { BackupSpec } from "./backup-spec";
+// May contain unused imports in some cases
+// @ts-ignore
+import { BackupStatus } from "./backup-status";
+// May contain unused imports in some cases
+// @ts-ignore
 import { Metadata } from "./metadata";
-// May contain unused imports in some cases
-// @ts-ignore
-import { Spec } from "./spec";
-// May contain unused imports in some cases
-// @ts-ignore
-import { Status } from "./status";
 
 /**
  *
@@ -48,14 +48,14 @@ export interface Backup {
   metadata: Metadata;
   /**
    *
-   * @type {Spec}
+   * @type {BackupSpec}
    * @memberof Backup
    */
-  spec?: Spec;
+  spec?: BackupSpec;
   /**
    *
-   * @type {Status}
+   * @type {BackupStatus}
    * @memberof Backup
    */
-  status?: Status;
+  status?: BackupStatus;
 }
