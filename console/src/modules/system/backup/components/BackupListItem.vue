@@ -1,5 +1,7 @@
 <script lang="ts" setup>
 import {
+  Dialog,
+  Toast,
   VDropdownItem,
   VEntity,
   VEntityField,
@@ -8,6 +10,10 @@ import {
 import type { Backup } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { computed } from "vue";
+import { apiClient } from "@/utils/api-client";
+import { useQueryClient } from "@tanstack/vue-query";
+
+const queryClient = useQueryClient();
 
 const props = defineProps<{
   backup: Backup;
@@ -53,6 +59,22 @@ const getPhase = computed(() => {
   }
   return phases.find((phase) => phase.value === props.backup.status?.phase);
 });
+
+function handleDelete() {
+  Dialog.warning({
+    title: "删除备份",
+    description: "确定要删除该备份吗？",
+    async onConfirm() {
+      await apiClient.extension.backup.deletemigrationHaloRunV1alpha1Backup({
+        name: props.backup.metadata.name,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["backups"] });
+
+      Toast.success("删除成功");
+    },
+  });
+}
 </script>
 
 <template>
@@ -77,6 +99,15 @@ const getPhase = computed(() => {
           />
         </template>
       </VEntityField>
+      <VEntityField v-if="backup.metadata.deletionTimestamp">
+        <template #description>
+          <VStatusDot
+            v-tooltip="$t('core.common.status.deleting')"
+            state="warning"
+            animate
+          />
+        </template>
+      </VEntityField>
       <VEntityField v-if="backup.metadata.creationTimestamp">
         <template #description>
           <span class="truncate text-xs tabular-nums text-gray-500">
@@ -87,7 +118,7 @@ const getPhase = computed(() => {
     </template>
     <template #dropdownItems>
       <VDropdownItem> 下载 </VDropdownItem>
-      <VDropdownItem type="danger"> 删除 </VDropdownItem>
+      <VDropdownItem type="danger" @click="handleDelete"> 删除 </VDropdownItem>
     </template>
   </VEntity>
 </template>

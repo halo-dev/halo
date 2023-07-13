@@ -14,6 +14,7 @@ import {
 import BackupListItem from "./components/BackupListItem.vue";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { apiClient } from "@/utils/api-client";
+import { BackupStatusPhaseEnum } from "@halo-dev/api-client";
 
 const queryClient = useQueryClient();
 
@@ -28,6 +29,16 @@ const {
     const { data } =
       await apiClient.extension.backup.listmigrationHaloRunV1alpha1Backup();
     return data;
+  },
+  refetchInterval(data) {
+    const pendingBackups = data?.items.filter((backup) => {
+      return (
+        backup.status?.phase !== BackupStatusPhaseEnum.Succeeded ||
+        !!backup.metadata.deletionTimestamp
+      );
+    });
+
+    return pendingBackups?.length ? 1000 : false;
   },
 });
 
