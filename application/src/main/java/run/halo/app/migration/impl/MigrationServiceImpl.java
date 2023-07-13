@@ -16,7 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -81,9 +80,9 @@ public class MigrationServiceImpl implements MigrationService {
     @Override
     @Transactional
     public Mono<Void> backup(Backup backup) {
-        final var status = backup.getStatus();
-        status.setPhase(Backup.Phase.RUNNING);
-        status.setStartTimestamp(Instant.now());
+        // final var status = backup.getStatus();
+        // status.setPhase(Backup.Phase.RUNNING);
+        // status.setStartTimestamp(Instant.now());
         try {
             // create temporary folder to store all backup files into single files.
             var tempDir = Files.createTempDirectory("halo-full-backup-");
@@ -193,8 +192,9 @@ public class MigrationServiceImpl implements MigrationService {
                     .withZone(ZoneId.systemDefault());
                 var timePart = dateTimeFormatter.format(startTimestamp);
                 var backupFile = backupsFolder.resolve(backupName + "-" + timePart + ".zip");
-                backup.getStatus().setFilename(backupFile.getFileName().toString());
                 FileUtils.zip(baseDir, backupFile);
+                backup.getStatus().setFilename(backupFile.getFileName().toString());
+                backup.getStatus().setSize(Files.size(backupFile));
             } catch (IOException e) {
                 throw Exceptions.propagate(e);
             }
@@ -249,30 +249,30 @@ public class MigrationServiceImpl implements MigrationService {
         try {
             var extensionsPath = Files.createFile(baseDir.resolve("extensions.data"));
             return Mono.using(() -> jsonMapper.createGenerator(extensionsPath.toFile(), UTF8),
-                gen -> Mono.create(sink -> {
-                    try {
-                        gen.writeStartArray();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    repository.findAll()
-                        .doOnNext(extensionStore -> {
-                            try {
-                                gen.writeObject(extensionStore);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                        .doOnComplete(() -> {
-                            try {
-                                gen.writeEndArray();
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                        .subscribe(null, sink::error, sink::success,
-                            Context.of(sink.contextView()));
-                }),
+                gen -> Mono.create(sink -> repository.findAll()
+                    .doFirst(() -> {
+                        try {
+                            gen.writeStartArray();
+                        } catch (IOException e) {
+                            throw Exceptions.propagate(e);
+                        }
+                    })
+                    .doOnNext(extensionStore -> {
+                        try {
+                            gen.writeObject(extensionStore);
+                        } catch (IOException e) {
+                            throw Exceptions.propagate(e);
+                        }
+                    })
+                    .doOnComplete(() -> {
+                        try {
+                            gen.writeEndArray();
+                        } catch (IOException e) {
+                            throw Exceptions.propagate(e);
+                        }
+                    })
+                    .subscribe(null, sink::error, sink::success,
+                        Context.of(sink.contextView()))),
                 jsonGenerator -> {
                     try {
                         jsonGenerator.close();

@@ -9,6 +9,7 @@ import static run.halo.app.extension.controller.Reconciler.Result.doNotRetry;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import run.halo.app.migration.Backup.Phase;
 import run.halo.app.extension.ExtensionClient;
@@ -17,6 +18,7 @@ import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
 
+@Slf4j
 @Component
 public class BackupReconciler implements Reconciler<Request> {
 
@@ -70,15 +72,24 @@ public class BackupReconciler implements Reconciler<Request> {
 
                 if (Phase.PENDING.equals(status.getPhase())) {
                     // Do backup
-                    migrationService.backup(backup)
-                        .doOnError(t -> {
-                            backup.getStatus().setPhase(Phase.FAILED);
-                            backup.getStatus().setFailureReason("SystemError");
-                            backup.getStatus().setFailureMessage(t.getMessage());
-                        })
-                        .doOnSuccess(v -> backup.getStatus().setPhase(Phase.SUCCEEDED))
-                        .doFinally(s -> backup.getStatus().setCompletionTimestamp(Instant.now()))
-                        .block();
+                    try {
+                        migrationService.backup(backup)
+                            .doFirst(() -> {
+                                backup.getStatus().setPhase(Phase.RUNNING);
+                                backup.getStatus().setStartTimestamp(Instant.now());
+                            })
+                            .doOnError(t -> {
+                                backup.getStatus().setPhase(Phase.FAILED);
+                                backup.getStatus().setFailureReason("SystemError");
+                                backup.getStatus().setFailureMessage(t.getMessage());
+                            })
+                            .doOnSuccess(v -> backup.getStatus().setPhase(Phase.SUCCEEDED))
+                            .doFinally(
+                                s -> backup.getStatus().setCompletionTimestamp(Instant.now()))
+                            .block();
+                    } catch (Throwable t) {
+                        log.error("Failed to backup", t);
+                    }
                 }
 
                 client.update(backup);
