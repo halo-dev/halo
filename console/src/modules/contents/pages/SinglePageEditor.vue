@@ -179,7 +179,7 @@ const handlePublish = async () => {
       if (returnToView.value && permalink) {
         window.location.href = permalink;
       } else {
-        router.push({ name: "SinglePages" });
+        router.back();
       }
     } else {
       formState.value.page.spec.publish = true;

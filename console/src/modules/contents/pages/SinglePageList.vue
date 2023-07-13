@@ -36,6 +36,7 @@ import { singlePageLabels } from "@/constants/labels";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
+import { useRouteQuery } from "@vueuse/router";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -46,18 +47,20 @@ const selectedPageNames = ref<string[]>([]);
 const checkedAll = ref(false);
 
 // Filters
-const selectedContributor = ref();
-const selectedVisible = ref();
-const selectedPublishStatus = ref();
-const selectedSortValue = ref();
-const keyword = ref("");
+const selectedContributor = useRouteQuery<string | undefined>("contributor");
+const selectedVisible = useRouteQuery<
+  "PUBLIC" | "INTERNAL" | "PRIVATE" | undefined
+>("visible");
+const selectedPublishStatus = useRouteQuery<string | undefined>("status");
+const selectedSort = useRouteQuery<string | undefined>("sort");
+const keyword = useRouteQuery<string>("keyword", "");
 
 watch(
   () => [
     selectedContributor.value,
     selectedVisible.value,
     selectedPublishStatus.value,
-    selectedSortValue.value,
+    selectedSort.value,
     keyword.value,
   ],
   () => {
@@ -70,7 +73,7 @@ const hasFilters = computed(() => {
     selectedContributor.value ||
     selectedVisible.value ||
     selectedPublishStatus.value !== undefined ||
-    selectedSortValue.value
+    selectedSort.value
   );
 });
 
@@ -78,11 +81,15 @@ function handleClearFilters() {
   selectedContributor.value = undefined;
   selectedVisible.value = undefined;
   selectedPublishStatus.value = undefined;
-  selectedSortValue.value = undefined;
+  selectedSort.value = undefined;
 }
 
-const page = ref(1);
-const size = ref(20);
+const page = useRouteQuery<number>("page", 1, {
+  transform: Number,
+});
+const size = useRouteQuery<number>("size", 20, {
+  transform: Number,
+});
 const total = ref(0);
 const hasNext = ref(false);
 const hasPrevious = ref(false);
@@ -100,7 +107,7 @@ const {
     page,
     size,
     selectedVisible,
-    selectedSortValue,
+    selectedSort,
     keyword,
   ],
   queryFn: async () => {
@@ -122,7 +129,7 @@ const {
       page: page.value,
       size: size.value,
       visible: selectedVisible.value,
-      sort: [selectedSortValue.value].filter(Boolean) as string[],
+      sort: [selectedSort.value].filter(Boolean) as string[],
       keyword: keyword.value,
       contributor: contributors,
     });
@@ -460,7 +467,7 @@ const getExternalUrl = (singlePage: SinglePage) => {
                   :label="$t('core.page.filters.author.label')"
                 />
                 <FilterDropdown
-                  v-model="selectedSortValue"
+                  v-model="selectedSort"
                   :label="$t('core.common.filters.labels.sort')"
                   :items="[
                     {

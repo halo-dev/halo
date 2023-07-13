@@ -179,7 +179,7 @@ const handlePublish = async () => {
       if (returnToView.value === "true" && permalink) {
         window.location.href = permalink;
       } else {
-        router.push({ name: "Posts" });
+        router.back();
       }
     } else {
       const { data } = await apiClient.post.draftPost({
