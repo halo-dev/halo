@@ -33,6 +33,7 @@ import org.springframework.util.PathMatcher;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import reactor.util.context.Context;
 import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreRepository;
@@ -78,11 +79,8 @@ public class MigrationServiceImpl implements MigrationService {
     }
 
     @Override
-    @Transactional
+    // @Transactional(readOnly = true)
     public Mono<Void> backup(Backup backup) {
-        // final var status = backup.getStatus();
-        // status.setPhase(Backup.Phase.RUNNING);
-        // status.setStartTimestamp(Instant.now());
         try {
             // create temporary folder to store all backup files into single files.
             var tempDir = Files.createTempDirectory("halo-full-backup-");
@@ -95,7 +93,8 @@ public class MigrationServiceImpl implements MigrationService {
                     } catch (IOException e) {
                         throw Exceptions.propagate(e);
                     }
-                });
+                })
+                .subscribeOn(Schedulers.boundedElastic());
         } catch (IOException e) {
             return Mono.error(e);
         }
@@ -110,10 +109,30 @@ public class MigrationServiceImpl implements MigrationService {
                 .and(restoreExtensions(tempDir))
                 .and(restoreWorkdir(tempDir))
                 // check the integration
-                .doFinally(signalType -> FileUtils.deleteRecursivelyAndSilently(tempDir));
+                .doFinally(signalType -> FileUtils.deleteRecursivelyAndSilently(tempDir))
+                .subscribeOn(Schedulers.boundedElastic());
         } catch (IOException e) {
             return Mono.error(e);
         }
+    }
+
+    @Override
+    public Mono<Void> cleanup(Backup backup) {
+        return Mono.<Void>fromRunnable(() -> {
+            var status = backup.getStatus();
+            if (status == null || status.getFilename() == null) {
+                return;
+            }
+            var filename = status.getFilename();
+            var backupsRoot = haloProperties.getWorkDir().resolve("backups");
+            var backupFile = backupsRoot.resolve(filename);
+            try {
+                FileUtils.checkDirectoryTraversal(backupsRoot, backupFile);
+                Files.deleteIfExists(backupFile);
+            } catch (IOException e) {
+                throw Exceptions.propagate(e);
+            }
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 
     private Mono<Void> restoreWorkdir(Path backupRoot) {
@@ -191,7 +210,7 @@ public class MigrationServiceImpl implements MigrationService {
                     .withLocale(Locale.getDefault())
                     .withZone(ZoneId.systemDefault());
                 var timePart = dateTimeFormatter.format(startTimestamp);
-                var backupFile = backupsFolder.resolve(backupName + "-" + timePart + ".zip");
+                var backupFile = backupsFolder.resolve(timePart + '-' + backupName + ".zip");
                 FileUtils.zip(baseDir, backupFile);
                 backup.getStatus().setFilename(backupFile.getFileName().toString());
                 backup.getStatus().setSize(Files.size(backupFile));

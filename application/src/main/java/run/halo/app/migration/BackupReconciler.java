@@ -1,22 +1,22 @@
 package run.halo.app.migration;
 
-import static run.halo.app.migration.Constant.HOUSE_KEEPER_FINALIZER;
 import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 import static run.halo.app.extension.ExtensionUtil.isDeleted;
 import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
 import static run.halo.app.extension.controller.Reconciler.Result.doNotRetry;
+import static run.halo.app.migration.Constant.HOUSE_KEEPER_FINALIZER;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import run.halo.app.migration.Backup.Phase;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
+import run.halo.app.migration.Backup.Phase;
 
 @Slf4j
 @Component
@@ -48,9 +48,7 @@ public class BackupReconciler implements Reconciler<Request> {
                 }
                 if (isDeleted(backup)) {
                     if (metadata.getFinalizers().contains(HOUSE_KEEPER_FINALIZER)) {
-                        if (isTerminal(status.getPhase())) {
-                            // TODO cleanup resources
-                        }
+                        migrationService.cleanup(backup).block();
                         removeFinalizers(metadata, Set.of(HOUSE_KEEPER_FINALIZER));
                     }
                     client.update(backup);

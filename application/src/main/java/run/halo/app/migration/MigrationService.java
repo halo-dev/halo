@@ -10,4 +10,12 @@ public interface MigrationService {
 
     Mono<Void> restore(Publisher<DataBuffer> content);
 
+    /**
+     * Clean up backup file.
+     *
+     * @param backup backup detail.
+     * @return void publisher.
+     */
+    Mono<Void> cleanup(Backup backup);
+
 }
