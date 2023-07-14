@@ -49,6 +49,9 @@ public class User extends AbstractExtension {
 
         private String avatar;
 
+        @Schema(nullable = true)
+        private String avatarName;
+
         @Schema(required = true)
         private String email;
 
