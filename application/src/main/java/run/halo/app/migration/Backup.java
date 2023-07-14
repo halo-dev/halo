@@ -15,9 +15,9 @@ import run.halo.app.extension.GVK;
     plural = "backups", singular = "backup")
 public class Backup extends AbstractExtension {
 
-    private Spec spec;
+    private Spec spec = new Spec();
 
-    private Status status;
+    private Status status = new Status();
 
     @Data
     @Schema(name = "BackupSpec")
