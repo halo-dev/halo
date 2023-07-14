@@ -31,14 +31,26 @@ const {
     return data;
   },
   refetchInterval(data) {
+    const deletingBackups = data?.items.filter((backup) => {
+      return !!backup.metadata.deletionTimestamp;
+    });
+
+    if (deletingBackups?.length) {
+      return 1000;
+    }
+
     const pendingBackups = data?.items.filter((backup) => {
       return (
-        backup.status?.phase !== BackupStatusPhaseEnum.Succeeded ||
-        !!backup.metadata.deletionTimestamp
+        backup.status?.phase === BackupStatusPhaseEnum.Pending ||
+        backup.status?.phase === BackupStatusPhaseEnum.Running
       );
     });
 
-    return pendingBackups?.length ? 1000 : false;
+    if (pendingBackups?.length) {
+      return 3000;
+    }
+
+    return false;
   },
 });
 

@@ -5,6 +5,7 @@ import {
   VDropdownItem,
   VEntity,
   VEntityField,
+  VSpace,
   VStatusDot,
 } from "@halo-dev/components";
 import type { Backup } from "@halo-dev/api-client";
@@ -12,6 +13,7 @@ import { formatDatetime } from "@/utils/date";
 import { computed } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { useQueryClient } from "@tanstack/vue-query";
+import prettyBytes from "pretty-bytes";
 
 const queryClient = useQueryClient();
 
@@ -87,7 +89,21 @@ function handleDelete() {
       />
     </template>
     <template #start>
-      <VEntityField :title="backup.status?.filename"> </VEntityField>
+      <VEntityField
+        :title="backup.metadata.name"
+        :description="backup.status?.filename"
+      >
+        <template #description>
+          <VSpace class="flex-wrap">
+            <span class="text-xs text-gray-500">
+              {{ backup.status?.filename }}
+            </span>
+            <span class="text-xs text-gray-500">
+              {{ prettyBytes(backup.status?.size || 0) }}
+            </span>
+          </VSpace>
+        </template>
+      </VEntityField>
     </template>
     <template #end>
       <VEntityField v-if="getPhase">
