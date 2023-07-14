@@ -8,11 +8,11 @@ api/api-console-halo-run-v1alpha1-indices-api.ts
 api/api-console-halo-run-v1alpha1-plugin-api.ts
 api/api-console-halo-run-v1alpha1-post-api.ts
 api/api-console-halo-run-v1alpha1-reply-api.ts
-api/api-console-halo-run-v1alpha1-restoration-api.ts
 api/api-console-halo-run-v1alpha1-single-page-api.ts
 api/api-console-halo-run-v1alpha1-stats-api.ts
 api/api-console-halo-run-v1alpha1-theme-api.ts
 api/api-console-halo-run-v1alpha1-user-api.ts
+api/api-console-migration-halo-run-v1alpha1-migration-api.ts
 api/api-content-halo-run-v1alpha1-category-api.ts
 api/api-content-halo-run-v1alpha1-post-api.ts
 api/api-content-halo-run-v1alpha1-single-page-api.ts

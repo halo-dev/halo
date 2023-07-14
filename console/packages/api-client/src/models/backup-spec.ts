@@ -23,7 +23,7 @@ export interface BackupSpec {
    * @type {string}
    * @memberof BackupSpec
    */
-  autoDeleteWhen?: string;
+  expiresAt?: string;
   /**
    *
    * @type {string}

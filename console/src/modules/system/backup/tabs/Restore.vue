@@ -46,7 +46,7 @@ async function handleShutdown() {
         maxNumberOfFiles: 1,
         allowedFileTypes: ['.zip'],
       }"
-      endpoint="/apis/api.console.halo.run/v1alpha1/restorations"
+      endpoint="/apis/api.console.migration.halo.run/v1alpha1/restorations"
       width="100%"
       @uploaded="onUploaded"
     />
