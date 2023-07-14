@@ -7,6 +7,7 @@ import {
   VAvatar,
   VDropdown,
   VDropdownItem,
+  VModal,
 } from "@halo-dev/components";
 import {
   computed,
@@ -104,8 +105,25 @@ const handleTabChange = (id: string) => {
     router.push({ name: tab.routeName });
   }
 };
+const avatarInput = ref();
+const showAvatarEditor = ref(false);
+const visibleCropperModal = ref(false);
+const handleOpenUploadModal = () => {
+  avatarInput.value?.click();
+};
+
+// const handleSelectedAvatar = () => {
+
+// }
 </script>
 <template>
+  <VModal
+    :visible="visibleCropperModal"
+    :width="700"
+    title="裁剪图片"
+    :centered="false"
+    @update:visible="(visible) => (visibleCropperModal = visible)"
+  ></VModal>
   <BasicLayout>
     <UserEditingModal v-model:visible="editingModal" :user="user?.user" />
 
@@ -119,7 +137,11 @@ const handleTabChange = (id: string) => {
       <div class="p-4">
         <div class="flex items-center justify-between">
           <div class="flex flex-row items-center gap-5">
-            <div class="h-20 w-20">
+            <div
+              class="group relative h-20 w-20"
+              @mouseenter="showAvatarEditor = true"
+              @mouseleave="showAvatarEditor = false"
+            >
               <VAvatar
                 v-if="user"
                 :src="user.user.spec.avatar"
@@ -128,6 +150,25 @@ const handleTabChange = (id: string) => {
                 width="100%"
                 height="100%"
                 class="ring-4 ring-white drop-shadow-md"
+              />
+              <VDropdown>
+                <div
+                  class="absolute left-0 right-0 top-0 h-full w-full rounded-full border-0 bg-black/60 text-center text-2xl font-bold leading-[5rem] text-white transition-opacity duration-300 group-hover:opacity-100"
+                >
+                  1
+                </div>
+                <template #popper>
+                  <VDropdownItem @click="handleOpenUploadModal">
+                    上传
+                  </VDropdownItem>
+                  <VDropdownItem> 移除 </VDropdownItem>
+                </template>
+              </VDropdown>
+              <input
+                v-show="false"
+                ref="avatarInput"
+                type="file"
+                accept=".jpg, .jpeg, .png, .bmp, .gif"
               />
             </div>
             <div class="block">
