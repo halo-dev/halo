@@ -1,7 +1,7 @@
 import { definePlugin } from "@halo-dev/console-shared";
 import BasicLayout from "@/layouts/BasicLayout.vue";
-import BackupList from "./BackupList.vue";
-import { IconPlug } from "@halo-dev/components";
+import Backups from "./Backups.vue";
+import { IconServerLine } from "@halo-dev/components";
 import { markRaw } from "vue";
 
 export default definePlugin({
@@ -14,7 +14,7 @@ export default definePlugin({
         {
           path: "",
           name: "Backup",
-          component: BackupList,
+          component: Backups,
           meta: {
             title: "备份",
             searchable: true,
@@ -22,7 +22,7 @@ export default definePlugin({
             menu: {
               name: "备份",
               group: "system",
-              icon: markRaw(IconPlug),
+              icon: markRaw(IconServerLine),
               priority: 4,
             },
           },

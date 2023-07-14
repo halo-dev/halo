@@ -22,7 +22,7 @@ const props = defineProps<{
 }>();
 
 type Phase = {
-  tooltip: string;
+  text: string;
   state: "default" | "warning" | "success" | "error";
   animate: boolean;
   value: "PENDING" | "RUNNING" | "SUCCEEDED" | "FAILED";
@@ -30,25 +30,25 @@ type Phase = {
 
 const phases: Phase[] = [
   {
-    tooltip: "准备中",
+    text: "准备中",
     state: "default",
     animate: false,
     value: "PENDING",
   },
   {
-    tooltip: "备份中",
+    text: "备份中",
     state: "warning",
     animate: true,
     value: "RUNNING",
   },
   {
-    tooltip: "备份完成",
+    text: "备份完成",
     state: "success",
     animate: false,
     value: "SUCCEEDED",
   },
   {
-    tooltip: "备份失败",
+    text: "备份失败",
     state: "error",
     animate: false,
     value: "FAILED",
@@ -81,19 +81,12 @@ function handleDelete() {
 
 <template>
   <VEntity>
-    <template #checkbox>
-      <input
-        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-        name="backup-checkbox"
-        type="checkbox"
-      />
-    </template>
     <template #start>
       <VEntityField
         :title="backup.metadata.name"
         :description="backup.status?.filename"
       >
-        <template #description>
+        <template v-if="backup.status?.filename" #description>
           <VSpace class="flex-wrap">
             <span class="text-xs text-gray-500">
               {{ backup.status?.filename }}
@@ -109,8 +102,8 @@ function handleDelete() {
       <VEntityField v-if="getPhase">
         <template #description>
           <VStatusDot
-            v-tooltip="getPhase.tooltip"
             :state="getPhase.state"
+            :text="getPhase.text"
             :animate="getPhase.animate"
           />
         </template>
