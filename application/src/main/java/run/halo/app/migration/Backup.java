@@ -25,7 +25,7 @@ public class Backup extends AbstractExtension {
 
         private String format;
 
-        private Instant autoDeleteWhen;
+        private Instant expiresAt;
 
     }
 

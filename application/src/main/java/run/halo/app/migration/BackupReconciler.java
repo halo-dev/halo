@@ -37,15 +37,7 @@ public class BackupReconciler implements Reconciler<Request> {
             .map(backup -> {
                 var metadata = backup.getMetadata();
                 var status = backup.getStatus();
-                if (status == null) {
-                    status = new Backup.Status();
-                    backup.setStatus(status);
-                }
                 var spec = backup.getSpec();
-                if (spec == null) {
-                    spec = new Backup.Spec();
-                    backup.setSpec(spec);
-                }
                 if (isDeleted(backup)) {
                     if (metadata.getFinalizers().contains(HOUSE_KEEPER_FINALIZER)) {
                         migrationService.cleanup(backup).block();
@@ -56,7 +48,7 @@ public class BackupReconciler implements Reconciler<Request> {
                 }
                 addFinalizers(metadata, Set.of(HOUSE_KEEPER_FINALIZER));
                 if (isTerminal(status.getPhase())) {
-                    var autoDeleteWhen = spec.getAutoDeleteWhen();
+                    var autoDeleteWhen = spec.getExpiresAt();
                     if (autoDeleteWhen != null) {
                         var now = Instant.now();
                         if (now.isBefore(autoDeleteWhen)) {
@@ -75,28 +67,30 @@ public class BackupReconciler implements Reconciler<Request> {
                     try {
                         migrationService.backup(backup)
                             .doFirst(() -> {
-                                backup.getStatus().setPhase(Phase.RUNNING);
-                                backup.getStatus().setStartTimestamp(Instant.now());
-                                updateStatus(request.name(), backup.getStatus());
+                                status.setPhase(Phase.RUNNING);
+                                status.setStartTimestamp(Instant.now());
+                                updateStatus(request.name(), status);
                             })
                             .doOnError(t -> {
-                                backup.getStatus().setPhase(Phase.FAILED);
-                                backup.getStatus().setFailureReason("SystemError");
-                                backup.getStatus().setFailureMessage(t.getMessage());
-                                updateStatus(request.name(), backup.getStatus());
+                                status.setPhase(Phase.FAILED);
+                                status.setFailureReason("SystemError");
+                                status.setFailureMessage(t.getMessage());
+                                updateStatus(request.name(), status);
                             })
                             .doOnSuccess(v -> {
-                                backup.getStatus().setPhase(Phase.SUCCEEDED);
-                                backup.getStatus().setCompletionTimestamp(Instant.now());
-                                updateStatus(request.name(), backup.getStatus());
+                                status.setPhase(Phase.SUCCEEDED);
+                                status.setCompletionTimestamp(Instant.now());
+                                updateStatus(request.name(), status);
                             })
                             .block();
                     } catch (Throwable t) {
                         log.error("Failed to backup", t);
                     }
                 }
-
-                client.update(backup);
+                if (isTerminal(status.getPhase())) {
+                    // requeue for applying autoDeleteWhen
+                    return new Result(true, Duration.ofSeconds(1));
+                }
                 return doNotRetry();
             }).orElseGet(Result::doNotRetry);
     }
