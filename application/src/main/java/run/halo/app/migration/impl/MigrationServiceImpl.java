@@ -23,6 +23,8 @@ import java.util.Set;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.PathMatcher;
+import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -98,6 +101,20 @@ public class MigrationServiceImpl implements MigrationService {
         } catch (IOException e) {
             return Mono.error(e);
         }
+    }
+
+    @Override
+    public Mono<Resource> download(Backup backup) {
+        var status = backup.getStatus();
+        if (!Backup.Phase.SUCCEEDED.equals(status.getPhase()) || status.getFilename() == null) {
+            return Mono.error(new ServerWebInputException("Current backup is not downloadable."));
+        }
+
+        var backupFile = haloProperties.getWorkDir()
+            .resolve("backups")
+            .resolve(status.getFilename());
+
+        return Mono.just(new FileSystemResource(backupFile));
     }
 
     @Override
