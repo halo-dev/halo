@@ -9,7 +9,6 @@ import static run.halo.app.migration.Constant.HOUSE_KEEPER_FINALIZER;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Set;
-import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import run.halo.app.extension.ExtensionClient;
@@ -75,22 +74,22 @@ public class BackupReconciler implements Reconciler<Request> {
                     // Do backup
                     try {
                         migrationService.backup(backup)
-                            .doFirst(() -> updateStatus(request.name(), s -> {
-                                s.setPhase(Phase.RUNNING);
-                                s.setStartTimestamp(Instant.now());
-                            }))
-                            .doOnError(t -> updateStatus(request.name(), s -> {
-                                s.setPhase(Phase.FAILED);
-                                s.setFailureReason("SystemError");
-                                s.setFailureMessage(t.getMessage());
-                            }))
-                            .doOnSuccess(v -> updateStatus(request.name(), s -> {
-                                var latestStatus = backup.getStatus();
-                                s.setPhase(Phase.SUCCEEDED);
-                                s.setFilename(latestStatus.getFilename());
-                                s.setSize(latestStatus.getSize());
-                                s.setCompletionTimestamp(Instant.now());
-                            }))
+                            .doFirst(() -> {
+                                backup.getStatus().setPhase(Phase.RUNNING);
+                                backup.getStatus().setStartTimestamp(Instant.now());
+                                updateStatus(request.name(), backup.getStatus());
+                            })
+                            .doOnError(t -> {
+                                backup.getStatus().setPhase(Phase.FAILED);
+                                backup.getStatus().setFailureReason("SystemError");
+                                backup.getStatus().setFailureMessage(t.getMessage());
+                                updateStatus(request.name(), backup.getStatus());
+                            })
+                            .doOnSuccess(v -> {
+                                backup.getStatus().setPhase(Phase.SUCCEEDED);
+                                backup.getStatus().setCompletionTimestamp(Instant.now());
+                                updateStatus(request.name(), backup.getStatus());
+                            })
                             .block();
                     } catch (Throwable t) {
                         log.error("Failed to backup", t);
@@ -102,10 +101,10 @@ public class BackupReconciler implements Reconciler<Request> {
             }).orElseGet(Result::doNotRetry);
     }
 
-    private void updateStatus(String name, Consumer<Backup.Status> statusConsumer) {
+    private void updateStatus(String name, Backup.Status status) {
         client.fetch(Backup.class, name)
             .ifPresent(backup -> {
-                statusConsumer.accept(backup.getStatus());
+                backup.setStatus(status);
                 client.update(backup);
             });
     }
