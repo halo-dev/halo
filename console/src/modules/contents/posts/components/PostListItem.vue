@@ -96,7 +96,7 @@ const { mutate: changeVisibleMutation } = useMutation({
   },
 });
 
-const handleDelete = async (post: Post) => {
+const handleDelete = async () => {
   Dialog.warning({
     title: t("core.post.operations.delete.title"),
     description: t("core.post.operations.delete.description"),
@@ -105,7 +105,7 @@ const handleDelete = async (post: Post) => {
     cancelText: t("core.common.buttons.cancel"),
     onConfirm: async () => {
       await apiClient.post.recyclePost({
-        name: post.metadata.name,
+        name: props.post.post.metadata.name,
       });
       await queryClient.invalidateQueries({ queryKey: ["posts"] });
 
@@ -287,7 +287,7 @@ const handleDelete = async (post: Post) => {
         {{ $t("core.common.buttons.setting") }}
       </VDropdownItem>
       <VDropdownDivider />
-      <VDropdownItem type="danger" @click="handleDelete(post.post)">
+      <VDropdownItem type="danger" @click="handleDelete">
         {{ $t("core.common.buttons.delete") }}
       </VDropdownItem>
     </template>
