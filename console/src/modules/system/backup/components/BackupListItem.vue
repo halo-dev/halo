@@ -14,8 +14,10 @@ import { computed } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { useQueryClient } from "@tanstack/vue-query";
 import prettyBytes from "pretty-bytes";
+import { useI18n } from "vue-i18n";
 
 const queryClient = useQueryClient();
+const { t } = useI18n();
 
 const props = defineProps<{
   backup: Backup;
@@ -30,25 +32,25 @@ type Phase = {
 
 const phases: Phase[] = [
   {
-    text: "准备中",
+    text: t("core.backup.list.phases.pending"),
     state: "default",
     animate: false,
     value: "PENDING",
   },
   {
-    text: "备份中",
+    text: t("core.backup.list.phases.running"),
     state: "warning",
     animate: true,
     value: "RUNNING",
   },
   {
-    text: "备份完成",
+    text: t("core.backup.list.phases.succeeded"),
     state: "success",
     animate: false,
     value: "SUCCEEDED",
   },
   {
-    text: "备份失败",
+    text: t("core.backup.list.phases.failed"),
     state: "error",
     animate: false,
     value: "FAILED",
@@ -71,8 +73,11 @@ function handleDownload() {
 
 function handleDelete() {
   Dialog.warning({
-    title: "删除备份",
-    description: "确定要删除该备份吗？",
+    title: t("core.backup.operations.delete.title"),
+    description: t("core.backup.operations.delete.description"),
+    confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
       await apiClient.extension.backup.deletemigrationHaloRunV1alpha1Backup({
         name: props.backup.metadata.name,
@@ -80,7 +85,7 @@ function handleDelete() {
 
       queryClient.invalidateQueries({ queryKey: ["backups"] });
 
-      Toast.success("删除成功");
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 }
@@ -137,9 +142,11 @@ function handleDelete() {
         v-if="backup.status?.phase === 'SUCCEEDED'"
         @click="handleDownload"
       >
-        下载
+        {{ $t("core.common.buttons.download") }}
       </VDropdownItem>
-      <VDropdownItem type="danger" @click="handleDelete"> 删除 </VDropdownItem>
+      <VDropdownItem type="danger" @click="handleDelete">
+        {{ $t("core.common.buttons.delete") }}
+      </VDropdownItem>
     </template>
   </VEntity>
 </template>

@@ -7,6 +7,7 @@ import {
   VTabbar,
   IconAddCircle,
   IconServerLine,
+  Dialog,
 } from "@halo-dev/components";
 
 import { useQueryClient } from "@tanstack/vue-query";
@@ -18,8 +19,10 @@ import ListTab from "./tabs/List.vue";
 import RestoreTab from "./tabs/Restore.vue";
 import { useRouteQuery } from "@vueuse/router";
 import { markRaw } from "vue";
+import { useI18n } from "vue-i18n";
 
 const queryClient = useQueryClient();
+const { t } = useI18n();
 
 interface BackupTab {
   id: string;
@@ -31,12 +34,12 @@ interface BackupTab {
 const tabs = shallowRef<BackupTab[]>([
   {
     id: "backups",
-    label: "备份",
+    label: t("core.backup.tabs.backup_list"),
     component: markRaw(ListTab),
   },
   {
     id: "restore",
-    label: "恢复",
+    label: t("core.backup.tabs.restore"),
     component: markRaw(RestoreTab),
   },
 ]);
@@ -44,26 +47,34 @@ const tabs = shallowRef<BackupTab[]>([
 const activeTab = useRouteQuery<string>("tab", tabs.value[0].id);
 
 const handleCreate = async () => {
-  await apiClient.extension.backup.createmigrationHaloRunV1alpha1Backup({
-    backup: {
-      apiVersion: "migration.halo.run/v1alpha1",
-      kind: "Backup",
-      metadata: {
-        generateName: "backup-",
-        name: "",
-      },
-      spec: {},
+  Dialog.info({
+    title: t("core.backup.operations.create.title"),
+    description: t("core.backup.operations.create.description"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    async onConfirm() {
+      await apiClient.extension.backup.createmigrationHaloRunV1alpha1Backup({
+        backup: {
+          apiVersion: "migration.halo.run/v1alpha1",
+          kind: "Backup",
+          metadata: {
+            generateName: "backup-",
+            name: "",
+          },
+          spec: {},
+        },
+      });
+
+      queryClient.invalidateQueries({ queryKey: ["backups"] });
+
+      Toast.success(t("core.backup.operations.create.toast_success"));
     },
   });
-
-  queryClient.invalidateQueries({ queryKey: ["backups"] });
-
-  Toast.success("创建成功");
 };
 </script>
 
 <template>
-  <VPageHeader title="备份与恢复">
+  <VPageHeader :title="$t('core.backup.title')">
     <template #icon>
       <IconServerLine class="mr-2 self-center" />
     </template>
@@ -72,7 +83,7 @@ const handleCreate = async () => {
         <template #icon>
           <IconAddCircle class="h-full w-full" />
         </template>
-        创建备份
+        {{ $t("core.backup.operations.create.button") }}
       </VButton>
     </template>
   </VPageHeader>

@@ -16,11 +16,11 @@ export default definePlugin({
           name: "Backup",
           component: Backups,
           meta: {
-            title: "备份",
+            title: "core.backup.title",
             searchable: true,
             permissions: [],
             menu: {
-              name: "备份",
+              name: "core.sidebar.menu.items.backup",
               group: "system",
               icon: markRaw(IconServerLine),
               priority: 4,
