@@ -7,7 +7,6 @@ import { Toast, VButton } from "@halo-dev/components";
 
 // hooks
 import { useSettingFormConvert } from "@/composables/use-setting-form";
-import { useRouteQuery } from "@vueuse/router";
 import { useSystemConfigMapStore } from "@/stores/system-configmap";
 import type { ConfigMap, Setting } from "@halo-dev/api-client";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
@@ -20,7 +19,7 @@ const { t } = useI18n();
 const systemConfigMapStore = useSystemConfigMapStore();
 const queryClient = useQueryClient();
 
-const group = useRouteQuery<string>("tab", undefined, { mode: "push" });
+const group = inject<Ref<string>>("activeTab", ref("basic"));
 const setting = inject<Ref<Setting | undefined>>("setting", ref());
 const saving = ref(false);
 
