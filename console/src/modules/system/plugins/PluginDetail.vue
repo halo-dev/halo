@@ -39,7 +39,7 @@ const route = useRoute();
 const tabs = ref<PluginTab[]>(cloneDeep(initialTabs.value));
 const activeTab = useRouteQuery<string>("tab", tabs.value[0].id);
 
-provide<Ref<string | undefined>>("activeTab", activeTab);
+provide<Ref<string>>("activeTab", activeTab);
 
 const { data: plugin } = useQuery({
   queryKey: ["plugin", route.params.name],

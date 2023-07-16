@@ -18,7 +18,7 @@ import { toRaw } from "vue";
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
-const group = inject<Ref<string | undefined>>("activeTab", ref());
+const group = inject<Ref<string>>("activeTab", ref("basic"));
 const plugin = inject<Ref<Plugin | undefined>>("plugin");
 const setting = inject<Ref<Setting | undefined>>("setting", ref());
 const saving = ref(false);
