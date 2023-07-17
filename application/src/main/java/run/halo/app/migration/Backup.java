@@ -23,6 +23,7 @@ public class Backup extends AbstractExtension {
     @Schema(name = "BackupSpec")
     public static class Spec {
 
+        @Schema(description = "Backup file format. Currently, only zip format is supported.")
         private String format;
 
         private Instant expiresAt;

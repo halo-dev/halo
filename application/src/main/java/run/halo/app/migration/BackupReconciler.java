@@ -6,6 +6,7 @@ import static run.halo.app.extension.ExtensionUtil.removeFinalizers;
 import static run.halo.app.extension.controller.Reconciler.Result.doNotRetry;
 import static run.halo.app.migration.Constant.HOUSE_KEEPER_FINALIZER;
 
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Set;
@@ -27,9 +28,20 @@ public class BackupReconciler implements Reconciler<Request> {
 
     private final MigrationService migrationService;
 
+    private Clock clock;
+
     public BackupReconciler(ExtensionClient client, MigrationService migrationService) {
         this.client = client;
         this.migrationService = migrationService;
+        clock = Clock.systemDefaultZone();
+    }
+
+    /**
+     * Set clock. The method is only for unit test.
+     * @param clock is new clock
+     */
+    void setClock(Clock clock) {
+        this.clock = clock;
     }
 
     @Override
@@ -40,26 +52,26 @@ public class BackupReconciler implements Reconciler<Request> {
                 var status = backup.getStatus();
                 var spec = backup.getSpec();
                 if (isDeleted(backup)) {
-                    if (metadata.getFinalizers().contains(HOUSE_KEEPER_FINALIZER)) {
+                    if (removeFinalizers(metadata, Set.of(HOUSE_KEEPER_FINALIZER))) {
                         migrationService.cleanup(backup).block();
-                        removeFinalizers(metadata, Set.of(HOUSE_KEEPER_FINALIZER));
+                        client.update(backup);
                     }
-                    client.update(backup);
                     return doNotRetry();
                 }
-                addFinalizers(metadata, Set.of(HOUSE_KEEPER_FINALIZER));
-                client.update(backup);
+                if (addFinalizers(metadata, Set.of(HOUSE_KEEPER_FINALIZER))) {
+                    client.update(backup);
+                }
 
                 if (Phase.PENDING.equals(status.getPhase())) {
                     // Do backup
                     try {
                         status.setPhase(Phase.RUNNING);
-                        status.setStartTimestamp(Instant.now());
+                        status.setStartTimestamp(Instant.now(clock));
                         updateStatus(request.name(), status);
                         // Long period execution when backing up
                         migrationService.backup(backup).block();
                         status.setPhase(Phase.SUCCEEDED);
-                        status.setCompletionTimestamp(Instant.now());
+                        status.setCompletionTimestamp(Instant.now(clock));
                         updateStatus(request.name(), status);
                     } catch (Throwable t) {
                         var unwrapped = Exceptions.unwrap(t);
@@ -88,9 +100,9 @@ public class BackupReconciler implements Reconciler<Request> {
                 if (isTerminal(status.getPhase())) {
                     var expiresAt = spec.getExpiresAt();
                     if (expiresAt != null) {
-                        var now = Instant.now();
+                        var now = Instant.now(clock);
                         if (now.isBefore(expiresAt)) {
-                            return new Result(true, Duration.between(expiresAt, now));
+                            return new Result(true, Duration.between(now, expiresAt));
                         }
                         client.delete(backup);
                     }
