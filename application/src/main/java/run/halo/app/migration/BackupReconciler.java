@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import reactor.core.Exceptions;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
@@ -52,35 +53,38 @@ public class BackupReconciler implements Reconciler<Request> {
                 if (Phase.PENDING.equals(status.getPhase())) {
                     // Do backup
                     try {
-                        migrationService.backup(backup)
-                            .doFirst(() -> {
-                                status.setPhase(Phase.RUNNING);
-                                status.setStartTimestamp(Instant.now());
-                                updateStatus(request.name(), status);
-                            })
-                            .doOnError(t -> {
-                                status.setPhase(Phase.FAILED);
-                                status.setFailureReason("SystemError");
-                                status.setFailureMessage(
-                                    "Something went wrong! Error message: " + t.getMessage());
-                                updateStatus(request.name(), status);
-                            })
-                            .doOnSuccess(v -> {
-                                status.setPhase(Phase.SUCCEEDED);
-                                status.setCompletionTimestamp(Instant.now());
-                                updateStatus(request.name(), status);
-                            })
-                            .block();
+                        status.setPhase(Phase.RUNNING);
+                        status.setStartTimestamp(Instant.now());
+                        updateStatus(request.name(), status);
+                        // Long period execution when backing up
+                        migrationService.backup(backup).block();
+                        status.setPhase(Phase.SUCCEEDED);
+                        status.setCompletionTimestamp(Instant.now());
+                        updateStatus(request.name(), status);
                     } catch (Throwable t) {
-                        log.error("Failed to backup", t);
+                        var unwrapped = Exceptions.unwrap(t);
+                        log.error("Failed to backup", unwrapped);
+                        // Only happen when shutting down
+                        status.setPhase(Phase.FAILED);
+                        if (unwrapped instanceof InterruptedException) {
+                            status.setFailureReason("Interrupted");
+                            status.setFailureMessage("The backup process was interrupted.");
+                        } else {
+                            status.setFailureReason("SystemError");
+                            status.setFailureMessage(
+                                "Something went wrong! Error message: " + unwrapped.getMessage());
+                        }
+                        updateStatus(request.name(), status);
                     }
                 }
+                // Only happen when failing to update status when interrupted
                 if (Phase.RUNNING.equals(status.getPhase())) {
                     status.setPhase(Phase.FAILED);
                     status.setFailureReason("UnexpectedExit");
                     status.setFailureMessage("The backup process may exit abnormally.");
                     updateStatus(request.name(), status);
                 }
+                // Check the expires at and requeue if necessary
                 if (isTerminal(status.getPhase())) {
                     var expiresAt = spec.getExpiresAt();
                     if (expiresAt != null) {
