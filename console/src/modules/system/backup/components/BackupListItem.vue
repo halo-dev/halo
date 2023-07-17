@@ -64,6 +64,13 @@ const getPhase = computed(() => {
   return phases.find((phase) => phase.value === props.backup.status?.phase);
 });
 
+const getFailureMessage = computed(() => {
+  if (props.backup.status?.phase === "FAILED") {
+    return props.backup.status?.failureMessage;
+  }
+  return undefined;
+});
+
 function handleDownload() {
   window.open(
     `/apis/api.console.migration.halo.run/v1alpha1/backups/${props.backup.metadata.name}/files/${props.backup.status?.filename}`,
@@ -114,6 +121,7 @@ function handleDelete() {
       <VEntityField v-if="getPhase">
         <template #description>
           <VStatusDot
+            v-tooltip="{ content: getFailureMessage }"
             :state="getPhase.state"
             :text="getPhase.text"
             :animate="getPhase.animate"
