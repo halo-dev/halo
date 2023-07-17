@@ -1077,6 +1077,8 @@ core:
     Users Management: 用户
     User manage: 用户管理
     User View: 用户查看
+    Migration Management: 备份与恢复
+    Migration Manage: 备份与恢复管理
     role-template-view-users: 用户查看
     role-template-change-password: 修改密码
   components:

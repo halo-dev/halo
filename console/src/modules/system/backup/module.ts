@@ -18,7 +18,7 @@ export default definePlugin({
           meta: {
             title: "core.backup.title",
             searchable: true,
-            permissions: [],
+            permissions: ["system:migrations:manage"],
             menu: {
               name: "core.sidebar.menu.items.backup",
               group: "system",

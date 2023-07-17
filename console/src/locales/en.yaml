@@ -1077,6 +1077,8 @@ core:
     Users Management: Users
     User manage: User Manage
     User View: User View
+    Migration Management: Backup and Restore
+    Migration Manage: Backup and Restore Manage
     role-template-view-users: User View
     role-template-change-password: Change Password
   components:
