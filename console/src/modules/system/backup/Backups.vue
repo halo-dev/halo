@@ -20,6 +20,7 @@ import RestoreTab from "./tabs/Restore.vue";
 import { useRouteQuery } from "@vueuse/router";
 import { markRaw } from "vue";
 import { useI18n } from "vue-i18n";
+import dayjs from "dayjs";
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
@@ -61,7 +62,9 @@ const handleCreate = async () => {
             generateName: "backup-",
             name: "",
           },
-          spec: {},
+          spec: {
+            expiresAt: dayjs().add(7, "day").toISOString(),
+          },
         },
       });
 

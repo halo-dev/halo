@@ -998,6 +998,8 @@ core:
         running: 备份中
         succeeded: 备份完成
         failed: 备份失败
+      fields:
+        expiresAt: "{expiresAt}失效"
     restore:
       tips:
         first: 1. 恢复过程可能会持续较长时间，期间请勿刷新页面。

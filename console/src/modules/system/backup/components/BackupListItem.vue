@@ -9,7 +9,7 @@ import {
   VStatusDot,
 } from "@halo-dev/components";
 import type { Backup } from "@halo-dev/api-client";
-import { formatDatetime } from "@/utils/date";
+import { relativeTimeTo, formatDatetime } from "@/utils/date";
 import { computed } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { useQueryClient } from "@tanstack/vue-query";
@@ -133,6 +133,17 @@ function handleDelete() {
             state="warning"
             animate
           />
+        </template>
+      </VEntityField>
+      <VEntityField v-if="backup.metadata.creationTimestamp">
+        <template #description>
+          <span class="truncate text-xs tabular-nums text-gray-500">
+            {{
+              $t("core.backup.list.fields.expiresAt", {
+                expiresAt: relativeTimeTo(backup.spec?.expiresAt),
+              })
+            }}
+          </span>
         </template>
       </VEntityField>
       <VEntityField v-if="backup.metadata.creationTimestamp">

@@ -998,6 +998,8 @@ core:
         running: 備份中
         succeeded: 備份完成
         failed: 備份失敗
+      fields:
+        expiresAt: "{expiresAt}失效"
     restore:
       tips:
         first: 1. 還原過程可能需要較長時間，期間請勿重新整理頁面。

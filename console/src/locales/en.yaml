@@ -998,6 +998,8 @@ core:
         running: Running
         succeeded: Succeeded
         failed: Failed
+      fields:
+        expiresAt: Expires {expiresAt}
     restore:
       tips:
         first: 1. The restore process may last for a long time, please do not refresh the page during this period.
