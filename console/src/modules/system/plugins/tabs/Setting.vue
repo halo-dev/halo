@@ -11,7 +11,6 @@ import { Toast, VButton } from "@halo-dev/components";
 
 // types
 import type { ConfigMap, Plugin, Setting } from "@halo-dev/api-client";
-import { useRouteQuery } from "@vueuse/router";
 import { useI18n } from "vue-i18n";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { toRaw } from "vue";
@@ -19,8 +18,7 @@ import { toRaw } from "vue";
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
-const group = useRouteQuery<string>("tab", undefined, { mode: "push" });
-
+const group = inject<Ref<string>>("activeTab", ref("basic"));
 const plugin = inject<Ref<Plugin | undefined>>("plugin");
 const setting = inject<Ref<Setting | undefined>>("setting", ref());
 const saving = ref(false);
