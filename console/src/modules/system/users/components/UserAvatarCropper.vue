@@ -5,24 +5,38 @@ import "cropperjs/dist/cropper.css";
 import Cropper from "cropperjs";
 import { onMounted } from "vue";
 
-const props = defineProps({
-  file: {
-    type: File,
-    required: true,
-  },
-});
+const props = withDefaults(
+  defineProps<{
+    file: File;
+    preview?: boolean;
+    cropperWidth?: number;
+    cropperHeight?: number;
+  }>(),
+  {
+    preview: true,
+    cropperWidth: 200,
+    cropperHeight: 200,
+  }
+);
 
+const isLoading = ref(false);
 const cropper = ref<Cropper>();
+const previewElement = ref<HTMLElement>();
 
 onMounted(() => {
   cropper.value = new Cropper(imageElement.value, {
-    initialAspectRatio: 1,
-    viewMode: 3,
+    initialAspectRatio: props.cropperHeight / props.cropperWidth,
+    viewMode: 1,
     dragMode: "move",
     checkCrossOrigin: false,
     cropBoxResizable: false,
-    minCropBoxWidth: 200,
-    minCropBoxHeight: 200,
+    center: false,
+    minCropBoxWidth: props.cropperWidth,
+    minCropBoxHeight: props.cropperHeight,
+    preview: previewElement.value,
+    ready: function () {
+      console.log("ready");
+    },
   });
 });
 
@@ -37,12 +51,21 @@ const renderImages = (file: File) => {
   reader.readAsDataURL(file);
 };
 
-const cropperContainer = ref();
+const getCropperCanvas = (): HTMLCanvasElement | undefined => {
+  if (!cropper.value) {
+    return undefined;
+  }
+  return cropper.value.getCroppedCanvas({
+    width: props.cropperWidth,
+    height: props.cropperHeight,
+  });
+};
 
 watch(
   () => props.file,
   (file) => {
     if (file) {
+      isLoading.value = true;
       renderImages(file);
     }
   },
@@ -62,15 +85,29 @@ watch(
     immediate: true,
   }
 );
+
+defineExpose({
+  getCropperCanvas,
+});
 </script>
 <template>
-  <div>
-    <img
-      ref="imageElement"
-      alt="Uploaded Image"
-      class="block h-full w-full object-cover"
-    />
-    <div ref="cropperContainer"></div>
-    <button>Crop Image</button>
+  <div class="flex">
+    <div
+      class="mr-4 max-h-[500px] flex-auto"
+      :style="{ minHeight: `${cropperHeight}px` }"
+    >
+      <img
+        ref="imageElement"
+        alt="Uploaded Image"
+        class="block h-full w-full object-cover"
+      />
+    </div>
+    <div class="flex-auto">
+      <div
+        ref="previewElement"
+        class="overflow-hidden"
+        :style="{ width: `${cropperWidth}px`, height: `${cropperHeight}px` }"
+      ></div>
+    </div>
   </div>
 </template>

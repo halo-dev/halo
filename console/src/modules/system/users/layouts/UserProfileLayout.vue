@@ -28,6 +28,12 @@ import { useUserStore } from "@/stores/user";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { useFileDialog } from "@vueuse/core";
+import SubmitButton from "@/components/button/SubmitButton.vue";
+
+interface IUserAvatarCropperType
+  extends Ref<InstanceType<typeof UserAvatarCropper>> {
+  getCropperCanvas(): HTMLCanvasElement | undefined;
+}
 
 const { files, open } = useFileDialog({
   accept: ".jpg, .jpeg, .png",
@@ -112,6 +118,7 @@ const handleTabChange = (id: string) => {
   }
 };
 
+const userAvatarCropper = ref<IUserAvatarCropperType>();
 const showAvatarEditor = ref(false);
 const visibleCropperModal = ref(false);
 const originalFile = ref<File>() as Ref<File>;
@@ -130,6 +137,20 @@ watch(
     deep: true,
   }
 );
+
+const uploadSaving = ref(false);
+const handleUploadAvatar = () => {
+  uploadSaving.value = true;
+  userAvatarCropper.value?.getCropperCanvas()?.toBlob((blob: Blob | null) => {
+    if (!blob) {
+      return;
+    }
+    const formData = new FormData();
+    formData.append("file", blob);
+    // upload avatar
+  });
+  uploadSaving.value = false;
+};
 </script>
 <template>
   <BasicLayout>
@@ -216,15 +237,26 @@ watch(
     </section>
     <VModal
       :visible="visibleCropperModal"
-      :width="800"
-      :height="'800px'"
+      :width="1200"
       title="裁剪图片"
       @update:visible="(visible) => (visibleCropperModal = visible)"
     >
-      <UserAvatarCropper
-        :file="originalFile"
-        @close="visibleCropperModal = false"
-      />
+      <UserAvatarCropper ref="userAvatarCropper" :file="originalFile" />
+      <template #footer>
+        <VSpace>
+          <SubmitButton
+            v-if="visibleCropperModal"
+            :loading="uploadSaving"
+            type="secondary"
+            :text="$t('core.common.buttons.submit')"
+            @submit="handleUploadAvatar"
+          >
+          </SubmitButton>
+          <VButton @click="(visible) => (visibleCropperModal = visible)">
+            {{ $t("core.common.buttons.cancel_and_shortcut") }}
+          </VButton>
+        </VSpace>
+      </template>
     </VModal>
   </BasicLayout>
 </template>
