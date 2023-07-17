@@ -65,10 +65,8 @@ const getPhase = computed(() => {
 });
 
 const getFailureMessage = computed(() => {
-  if (props.backup.status?.phase === "FAILED") {
-    return props.backup.status?.failureMessage;
-  }
-  return undefined;
+  const { phase, failureMessage } = props.backup.status || {};
+  return phase === "FAILED" ? failureMessage : undefined;
 });
 
 function handleDownload() {
