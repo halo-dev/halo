@@ -10,10 +10,7 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import BackupListItem from "../components/BackupListItem.vue";
-
-const emit = defineEmits<{
-  (event: "trigger-create"): void;
-}>();
+import { useBackup } from "../composables/use-backup";
 
 const {
   data: backups,
@@ -50,6 +47,8 @@ const {
     return false;
   },
 });
+
+const { handleCreate } = useBackup();
 </script>
 
 <template>
@@ -64,7 +63,7 @@ const {
           <VButton :loading="isFetching" @click="refetch()">
             {{ $t("core.common.buttons.refresh") }}
           </VButton>
-          <VButton type="secondary" @click="emit('trigger-create')">
+          <VButton type="secondary" @click="handleCreate">
             <template #icon>
               <IconAddCircle class="h-full w-full" />
             </template>

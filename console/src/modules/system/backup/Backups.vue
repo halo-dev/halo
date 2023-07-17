@@ -3,15 +3,11 @@ import {
   VPageHeader,
   VCard,
   VButton,
-  Toast,
   VTabbar,
   IconAddCircle,
   IconServerLine,
-  Dialog,
 } from "@halo-dev/components";
 
-import { useQueryClient } from "@tanstack/vue-query";
-import { apiClient } from "@/utils/api-client";
 import type { Raw } from "vue";
 import type { Component } from "vue";
 import { shallowRef } from "vue";
@@ -20,9 +16,8 @@ import RestoreTab from "./tabs/Restore.vue";
 import { useRouteQuery } from "@vueuse/router";
 import { markRaw } from "vue";
 import { useI18n } from "vue-i18n";
-import dayjs from "dayjs";
+import { useBackup } from "./composables/use-backup";
 
-const queryClient = useQueryClient();
 const { t } = useI18n();
 
 interface BackupTab {
@@ -47,33 +42,7 @@ const tabs = shallowRef<BackupTab[]>([
 
 const activeTab = useRouteQuery<string>("tab", tabs.value[0].id);
 
-const handleCreate = async () => {
-  Dialog.info({
-    title: t("core.backup.operations.create.title"),
-    description: t("core.backup.operations.create.description"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
-    async onConfirm() {
-      await apiClient.extension.backup.createmigrationHaloRunV1alpha1Backup({
-        backup: {
-          apiVersion: "migration.halo.run/v1alpha1",
-          kind: "Backup",
-          metadata: {
-            generateName: "backup-",
-            name: "",
-          },
-          spec: {
-            expiresAt: dayjs().add(7, "day").toISOString(),
-          },
-        },
-      });
-
-      queryClient.invalidateQueries({ queryKey: ["backups"] });
-
-      Toast.success(t("core.backup.operations.create.toast_success"));
-    },
-  });
-};
+const { handleCreate } = useBackup();
 </script>
 
 <template>
@@ -103,11 +72,7 @@ const handleCreate = async () => {
       </template>
       <div class="bg-white">
         <template v-for="tab in tabs" :key="tab.id">
-          <component
-            :is="tab.component"
-            v-if="activeTab === tab.id"
-            @trigger-create="handleCreate"
-          />
+          <component :is="tab.component" v-if="activeTab === tab.id" />
         </template>
       </div>
     </VCard>
