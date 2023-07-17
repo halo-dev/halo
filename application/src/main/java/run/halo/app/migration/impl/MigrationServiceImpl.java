@@ -12,7 +12,6 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -85,7 +84,6 @@ public class MigrationServiceImpl implements MigrationService {
             return backupExtensions(tempDir)
                 .and(backupWorkDir(tempDir))
                 .and(packageBackup(tempDir, backup))
-                .and(Mono.delay(Duration.ofSeconds(10)))
                 .doFinally(signalType -> {
                     try {
                         deleteRecursively(tempDir);
