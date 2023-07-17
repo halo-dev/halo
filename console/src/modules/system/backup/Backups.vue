@@ -100,7 +100,11 @@ const handleCreate = async () => {
       </template>
       <div class="bg-white">
         <template v-for="tab in tabs" :key="tab.id">
-          <component :is="tab.component" v-if="activeTab === tab.id" />
+          <component
+            :is="tab.component"
+            v-if="activeTab === tab.id"
+            @trigger-create="handleCreate"
+          />
         </template>
       </div>
     </VCard>
