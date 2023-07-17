@@ -74,7 +74,7 @@ public class BackupReconciler implements Reconciler<Request> {
                             .doOnError(t -> {
                                 status.setPhase(Phase.FAILED);
                                 status.setFailureReason("SystemError");
-                                status.setFailureMessage(t.getMessage());
+                                status.setFailureMessage("Something went wrong! Error message: " + t.getMessage());
                                 updateStatus(request.name(), status);
                             })
                             .doOnSuccess(v -> {
@@ -86,6 +86,12 @@ public class BackupReconciler implements Reconciler<Request> {
                     } catch (Throwable t) {
                         log.error("Failed to backup", t);
                     }
+                }
+                if (Phase.RUNNING.equals(status.getPhase())) {
+                    status.setPhase(Phase.FAILED);
+                    status.setFailureReason("UnexpectedExit");
+                    status.setFailureMessage("The backup process may exit abnormally.");
+                    updateStatus(request.name(), status);
                 }
                 if (isTerminal(status.getPhase())) {
                     // requeue for applying autoDeleteWhen
