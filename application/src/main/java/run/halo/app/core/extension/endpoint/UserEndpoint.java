@@ -1,6 +1,5 @@
 package run.halo.app.core.extension.endpoint;
 
-import static io.swagger.v3.oas.annotations.enums.ParameterIn.PATH;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static java.util.Comparator.comparing;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
@@ -48,6 +47,8 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -59,7 +60,6 @@ import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.User;
-import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
@@ -157,7 +157,7 @@ public class UserEndpoint implements CustomEndpoint {
                         .implementation(generateGenericClass(ListedUser.class)));
                 buildParametersFromType(builder, ListRequest.class);
             })
-            .POST("users/-/avatar/upload", contentType(MediaType.MULTIPART_FORM_DATA),
+            .POST("users/-/avatar", contentType(MediaType.MULTIPART_FORM_DATA),
                 this::uploadUserAvatar,
                 builder -> builder
                     .operationId("UploadCurrentUserAvatar")
@@ -166,7 +166,7 @@ public class UserEndpoint implements CustomEndpoint {
                         .required(true)
                         .content(contentBuilder()
                             .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                            .schema(schemaBuilder().implementation(FilePart.class))
+                            .schema(schemaBuilder().implementation(IAvatarUploadRequest.class))
                         ))
                     .response(responseBuilder().implementation(User.class))
             )
@@ -181,55 +181,57 @@ public class UserEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> deleteUserAvatar(ServerRequest request) {
         return getCurrentUser()
-            .map(user -> {
-                String avatarName = user.getSpec().getAvatarName();
-                if (Objects.nonNull(avatarName)) {
-                    client.fetch(Attachment.class, avatarName)
-                        .doOnNext(attachmentService::delete);
-                }
-                user.getSpec().setAvatar(null);
-                user.getSpec().setAvatarName(null);
-                return user;
+            .flatMap(user -> {
+                MetadataUtil.nullSafeAnnotations(user)
+                    .remove(User.AVATAR_ATTACHMENT_NAME_ANNO);
+                return client.update(user);
             })
-            .flatMap(client::update)
             .flatMap(user -> ServerResponse.ok().bodyValue(user));
     }
 
     private Mono<ServerResponse> uploadUserAvatar(ServerRequest request) {
         return request.body(BodyExtractors.toMultipartData())
-            .map(formData -> {
-                Part file = formData.getFirst("file");
-                if (file == null) {
-                    throw new ServerWebInputException("No file part found in the request");
-                }
-                if (file instanceof FilePart filePart) {
-                    return filePart;
-                }
-                throw new ServerWebInputException("Invalid part of file");
-            })
-            .flatMap(filePart -> {
+            .map(AvatarUploadRequest::new)
+            .flatMap(uploadRequest -> {
                 // TODO policyName 由用户设置等获取，目前暂时先写死
                 String policyName = "default-policy";
+                FilePart filePart = uploadRequest.getFile();
                 return attachmentService.upload(policyName,
                     USER_AVATAR_GROUP_NAME,
                     filePart.filename(),
                     filePart.content(),
                     filePart.headers().getContentType());
             })
-            .flatMap(attachment -> getCurrentUser()
-                .map(user -> {
-                    String avatarName = user.getSpec().getAvatarName();
-                    if (Objects.nonNull(avatarName)) {
-                        client.fetch(Attachment.class, avatarName)
-                            .doOnNext(attachmentService::delete);
-                    }
-                    user.getSpec().setAvatarName(attachment.getMetadata().getName());
-                    user.getSpec().setAvatar(attachment.getStatus().getPermalink());
-                    return user;
-                })
-                .flatMap(client::update)
+            .flatMap(attachment -> Mono.defer(() -> getCurrentUser()
+                    .flatMap(user -> {
+                        MetadataUtil.nullSafeAnnotations(user)
+                            .put(User.AVATAR_ATTACHMENT_NAME_ANNO,
+                                attachment.getMetadata().getName());
+                        return client.update(user);
+                    }))
+                .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                    .filter(OptimisticLockingFailureException.class::isInstance))
             )
             .flatMap(user -> ServerResponse.ok().bodyValue(user));
+    }
+
+    public interface IAvatarUploadRequest {
+        @Schema(requiredMode = REQUIRED, description = "Avatar file")
+        FilePart getFile();
+    }
+
+    public record AvatarUploadRequest(MultiValueMap<String, Part> formData) {
+
+        public FilePart getFile() {
+            Part file = formData.getFirst("file");
+            if (file == null) {
+                throw new ServerWebInputException("No file part found in the request");
+            }
+            if (file instanceof FilePart filePart) {
+                return filePart;
+            }
+            throw new ServerWebInputException("Invalid part of file");
+        }
     }
 
     private Mono<User> getCurrentUser() {
@@ -325,7 +327,16 @@ public class UserEndpoint implements CustomEndpoint {
                 .switchIfEmpty(
                     Mono.error(() -> new ServerWebInputException("Username didn't match.")))
                 .map(user -> {
-                    currentUser.getMetadata().setAnnotations(user.getMetadata().getAnnotations());
+                    Map<String, String> oldAnnotations =
+                        MetadataUtil.nullSafeAnnotations(currentUser);
+                    Map<String, String> newAnnotations = user.getMetadata().getAnnotations();
+                    if (!CollectionUtils.isEmpty(newAnnotations)) {
+                        newAnnotations.put(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO,
+                            oldAnnotations.get(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO));
+                        newAnnotations.put(User.AVATAR_ATTACHMENT_NAME_ANNO,
+                            oldAnnotations.get(User.AVATAR_ATTACHMENT_NAME_ANNO));
+                        currentUser.getMetadata().setAnnotations(newAnnotations);
+                    }
                     var spec = currentUser.getSpec();
                     var newSpec = user.getSpec();
                     spec.setBio(newSpec.getBio());

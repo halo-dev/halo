@@ -22,11 +22,17 @@ import { useRoute, useRouter } from "vue-router";
 import type { DetailedUser } from "@halo-dev/api-client";
 import UserEditingModal from "../components/UserEditingModal.vue";
 import UserPasswordChangeModal from "../components/UserPasswordChangeModal.vue";
+import UserAvatarCropper from "../components/UserAvatarCropper.vue";
 import { usePermission } from "@/utils/permission";
 import { useUserStore } from "@/stores/user";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import { useFileDialog } from "@vueuse/core";
 
+const { files, open } = useFileDialog({
+  accept: ".jpg, .jpeg, .png",
+  multiple: false,
+});
 const { currentUserHasPermission } = usePermission();
 const userStore = useUserStore();
 const { t } = useI18n();
@@ -105,25 +111,27 @@ const handleTabChange = (id: string) => {
     router.push({ name: tab.routeName });
   }
 };
-const avatarInput = ref();
+
 const showAvatarEditor = ref(false);
 const visibleCropperModal = ref(false);
-const handleOpenUploadModal = () => {
-  avatarInput.value?.click();
-};
-
-// const handleSelectedAvatar = () => {
-
-// }
+const originalFile = ref<File>() as Ref<File>;
+watch(
+  () => files,
+  (files) => {
+    if (!files.value) {
+      return;
+    }
+    if (files.value?.length > 0) {
+      originalFile.value = files.value[0];
+      visibleCropperModal.value = true;
+    }
+  },
+  {
+    deep: true,
+  }
+);
 </script>
 <template>
-  <VModal
-    :visible="visibleCropperModal"
-    :width="700"
-    title="裁剪图片"
-    :centered="false"
-    @update:visible="(visible) => (visibleCropperModal = visible)"
-  ></VModal>
   <BasicLayout>
     <UserEditingModal v-model:visible="editingModal" :user="user?.user" />
 
@@ -153,23 +161,15 @@ const handleOpenUploadModal = () => {
               />
               <VDropdown>
                 <div
-                  class="absolute left-0 right-0 top-0 h-full w-full rounded-full border-0 bg-black/60 text-center text-2xl font-bold leading-[5rem] text-white transition-opacity duration-300 group-hover:opacity-100"
+                  class="absolute left-0 right-0 top-0 h-full w-full cursor-pointer rounded-full border-0 bg-black/60 text-center text-2xl font-bold leading-[5rem] text-white transition-opacity duration-300 group-hover:opacity-100"
                 >
                   1
                 </div>
                 <template #popper>
-                  <VDropdownItem @click="handleOpenUploadModal">
-                    上传
-                  </VDropdownItem>
+                  <VDropdownItem @click="open"> 上传 </VDropdownItem>
                   <VDropdownItem> 移除 </VDropdownItem>
                 </template>
               </VDropdown>
-              <input
-                v-show="false"
-                ref="avatarInput"
-                type="file"
-                accept=".jpg, .jpeg, .png, .bmp, .gif"
-              />
             </div>
             <div class="block">
               <h1 class="truncate text-lg font-bold text-gray-900">
@@ -214,5 +214,17 @@ const handleOpenUploadModal = () => {
         <RouterView></RouterView>
       </div>
     </section>
+    <VModal
+      :visible="visibleCropperModal"
+      :width="800"
+      :height="'800px'"
+      title="裁剪图片"
+      @update:visible="(visible) => (visibleCropperModal = visible)"
+    >
+      <UserAvatarCropper
+        :file="originalFile"
+        @close="visibleCropperModal = false"
+      />
+    </VModal>
   </BasicLayout>
 </template>
