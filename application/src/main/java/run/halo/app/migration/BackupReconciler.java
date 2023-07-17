@@ -47,19 +47,6 @@ public class BackupReconciler implements Reconciler<Request> {
                     return doNotRetry();
                 }
                 addFinalizers(metadata, Set.of(HOUSE_KEEPER_FINALIZER));
-                if (isTerminal(status.getPhase())) {
-                    var autoDeleteWhen = spec.getExpiresAt();
-                    if (autoDeleteWhen != null) {
-                        var now = Instant.now();
-                        if (now.isBefore(autoDeleteWhen)) {
-                            return new Result(true, Duration.between(autoDeleteWhen, now));
-                        }
-                        client.delete(backup);
-                        return null;
-                    }
-                    return doNotRetry();
-                }
-
                 client.update(backup);
 
                 if (Phase.PENDING.equals(status.getPhase())) {
@@ -74,7 +61,8 @@ public class BackupReconciler implements Reconciler<Request> {
                             .doOnError(t -> {
                                 status.setPhase(Phase.FAILED);
                                 status.setFailureReason("SystemError");
-                                status.setFailureMessage("Something went wrong! Error message: " + t.getMessage());
+                                status.setFailureMessage(
+                                    "Something went wrong! Error message: " + t.getMessage());
                                 updateStatus(request.name(), status);
                             })
                             .doOnSuccess(v -> {
@@ -94,8 +82,14 @@ public class BackupReconciler implements Reconciler<Request> {
                     updateStatus(request.name(), status);
                 }
                 if (isTerminal(status.getPhase())) {
-                    // requeue for applying autoDeleteWhen
-                    return new Result(true, Duration.ofSeconds(1));
+                    var expiresAt = spec.getExpiresAt();
+                    if (expiresAt != null) {
+                        var now = Instant.now();
+                        if (now.isBefore(expiresAt)) {
+                            return new Result(true, Duration.between(expiresAt, now));
+                        }
+                        client.delete(backup);
+                    }
                 }
                 return doNotRetry();
             }).orElseGet(Result::doNotRetry);
