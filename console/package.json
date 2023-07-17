@@ -74,6 +74,7 @@
     "axios": "^0.27.2",
     "codemirror": "^6.0.1",
     "colorjs.io": "^0.4.3",
+    "cropperjs": "^1.5.13",
     "dayjs": "^1.11.7",
     "emoji-mart": "^5.3.3",
     "fastq": "^1.15.0",
