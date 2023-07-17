@@ -55,6 +55,10 @@ public class MigrationServiceImpl implements MigrationService {
         "backups/**",
         "db/**",
         "logs/**",
+        "docker-compose.yaml",
+        "docker-compose.yml",
+        "mysql/**",
+        "mysqlBackup/**",
         "**/.idea/**",
         "**/.vscode/**"
     );
@@ -73,7 +77,6 @@ public class MigrationServiceImpl implements MigrationService {
     }
 
     @Override
-    // @Transactional(readOnly = true)
     public Mono<Void> backup(Backup backup) {
         try {
             // create temporary folder to store all backup files into single files.
