@@ -59,6 +59,7 @@ import IconArrowDownCircleLine from "~icons/ri/arrow-down-circle-line";
 import IconTerminalBoxLine from "~icons/ri/terminal-box-line";
 import IconClipboardLine from "~icons/ri/clipboard-line";
 import IconLockPasswordLine from "~icons/ri/lock-password-line";
+import IconRiPencilFill from "~icons/ri/pencil-fill";
 
 export {
   IconDashboard,
@@ -122,4 +123,5 @@ export {
   IconTerminalBoxLine,
   IconClipboardLine,
   IconLockPasswordLine,
+  IconRiPencilFill,
 };
