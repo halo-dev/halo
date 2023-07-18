@@ -11,17 +11,19 @@ const props = withDefaults(
     preview?: boolean;
     cropperWidth?: number;
     cropperHeight?: number;
+    cropperImageType?: "png" | "jpeg" | "webp" | "jpg";
   }>(),
   {
     preview: true,
     cropperWidth: 200,
     cropperHeight: 200,
+    cropperImageType: "png",
   }
 );
 
-const isLoading = ref(false);
 const cropper = ref<Cropper>();
 const previewElement = ref<HTMLElement>();
+const imageElement = ref<HTMLImageElement>() as Ref<HTMLImageElement>;
 
 onMounted(() => {
   cropper.value = new Cropper(imageElement.value, {
@@ -34,13 +36,9 @@ onMounted(() => {
     minCropBoxWidth: props.cropperWidth,
     minCropBoxHeight: props.cropperHeight,
     preview: previewElement.value,
-    ready: function () {
-      console.log("ready");
-    },
   });
 });
 
-const imageElement = ref<HTMLImageElement>() as Ref<HTMLImageElement>;
 const imageUrl = ref<string>("");
 
 const renderImages = (file: File) => {
@@ -51,13 +49,31 @@ const renderImages = (file: File) => {
   reader.readAsDataURL(file);
 };
 
-const getCropperCanvas = (): HTMLCanvasElement | undefined => {
-  if (!cropper.value) {
-    return undefined;
-  }
-  return cropper.value.getCroppedCanvas({
-    width: props.cropperWidth,
-    height: props.cropperHeight,
+const getCropperFile = (): Promise<File> => {
+  return new Promise<File>((resolve, reject) => {
+    if (!cropper.value) {
+      reject();
+      return;
+    }
+    cropper.value
+      .getCroppedCanvas({
+        width: props.cropperWidth,
+        height: props.cropperHeight,
+      })
+      .toBlob((blob) => {
+        if (blob === null) {
+          reject();
+          return;
+        }
+        const fileName = props.file.name.replace(
+          /\.[^/.]+$/,
+          `.${props.cropperImageType}`
+        );
+        const file = new File([blob], fileName, {
+          type: `image/${props.cropperImageType}`,
+        });
+        resolve(file);
+      });
   });
 };
 
@@ -65,7 +81,9 @@ watch(
   () => props.file,
   (file) => {
     if (file) {
-      isLoading.value = true;
+      if (file.type.indexOf("image") === -1) {
+        return;
+      }
       renderImages(file);
     }
   },
@@ -87,7 +105,7 @@ watch(
 );
 
 defineExpose({
-  getCropperCanvas,
+  getCropperFile,
 });
 </script>
 <template>

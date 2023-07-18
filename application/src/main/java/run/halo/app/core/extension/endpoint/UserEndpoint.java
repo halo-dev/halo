@@ -221,16 +221,20 @@ public class UserEndpoint implements CustomEndpoint {
     }
 
     public record AvatarUploadRequest(MultiValueMap<String, Part> formData) {
-
         public FilePart getFile() {
             Part file = formData.getFirst("file");
             if (file == null) {
                 throw new ServerWebInputException("No file part found in the request");
             }
-            if (file instanceof FilePart filePart) {
-                return filePart;
+
+            if (!(file instanceof FilePart filePart)) {
+                throw new ServerWebInputException("Invalid part of file");
             }
-            throw new ServerWebInputException("Invalid part of file");
+
+            if (!filePart.filename().endsWith(".png")) {
+                throw new ServerWebInputException("Only support avatar in PNG format");
+            }
+            return filePart;
         }
     }
 
