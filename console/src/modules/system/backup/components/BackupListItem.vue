@@ -135,7 +135,9 @@ function handleDelete() {
           />
         </template>
       </VEntityField>
-      <VEntityField v-if="backup.metadata.creationTimestamp">
+      <VEntityField
+        v-if="backup.spec?.expiresAt && backup.status?.phase === 'SUCCEEDED'"
+      >
         <template #description>
           <span class="truncate text-xs tabular-nums text-gray-500">
             {{
