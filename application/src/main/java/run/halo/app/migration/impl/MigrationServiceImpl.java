@@ -173,12 +173,13 @@ public class MigrationServiceImpl implements MigrationService {
         var reader = objectMapper.readerFor(ExtensionStore.class);
         return Mono.<Void, MappingIterator<ExtensionStore>>using(
             () -> reader.readValues(extensionsPath.toFile()),
-            itr -> Flux.<ExtensionStore>create(sink -> {
-                    while (itr.hasNext()) {
-                        sink.next(itr.next());
-                    }
-                    sink.complete();
-                })
+            itr -> Flux.<ExtensionStore>create(
+                    sink -> {
+                        while (itr.hasNext()) {
+                            sink.next(itr.next());
+                        }
+                        sink.complete();
+                    })
                 // reset version
                 .doOnNext(extensionStore -> extensionStore.setVersion(null))
                 .buffer(100)

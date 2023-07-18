@@ -38,6 +38,7 @@ public class BackupReconciler implements Reconciler<Request> {
 
     /**
      * Set clock. The method is only for unit test.
+     *
      * @param clock is new clock
      */
     void setClock(Clock clock) {

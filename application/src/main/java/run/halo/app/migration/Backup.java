@@ -1,7 +1,7 @@
 package run.halo.app.migration;
 
-import java.time.Instant;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

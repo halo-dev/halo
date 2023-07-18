@@ -38,7 +38,8 @@ public class MigrationEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = groupVersion().toString() + "/Migration";
         return SpringdocRouteBuilder.route()
-            .GET("/backups/{name}/files/{filename}", request -> {
+            .GET("/backups/{name}/files/{filename}",
+                request -> {
                     var name = request.pathVariable("name");
                     return client.get(Backup.class, name)
                         .flatMap(migrationService::download)
