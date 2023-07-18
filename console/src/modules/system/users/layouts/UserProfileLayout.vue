@@ -2,6 +2,7 @@
 import BasicLayout from "@/layouts/BasicLayout.vue";
 import { apiClient } from "@/utils/api-client";
 import {
+  IconRiPencilFill,
   VButton,
   VTabbar,
   VAvatar,
@@ -211,11 +212,14 @@ const handleCloseCropperModal = () => {
                   height="100%"
                   class="ring-4 ring-white drop-shadow-md"
                 />
-                <VDropdown v-show="showAvatarEditor">
+                <VDropdown>
                   <div
-                    class="absolute left-0 right-0 top-0 h-full w-full cursor-pointer rounded-full border-0 bg-black/60 text-center text-2xl font-bold leading-[5rem] text-white transition-opacity duration-300 group-hover:opacity-100"
+                    v-show="showAvatarEditor"
+                    class="absolute left-0 right-0 top-0 h-full w-full cursor-pointer rounded-full border-0 bg-black/60 text-center leading-[5rem] transition-opacity duration-300 group-hover:opacity-100"
                   >
-                    >
+                    <IconRiPencilFill
+                      class="inline-block w-full self-center text-2xl text-white"
+                    />
                   </div>
                   <template #popper>
                     <VDropdownItem @click="open()">
