@@ -8,6 +8,9 @@ import {
   VDropdown,
   VDropdownItem,
   VModal,
+  VSpace,
+  Toast,
+  VLoading,
 } from "@halo-dev/components";
 import {
   computed,
@@ -28,14 +31,14 @@ import { useUserStore } from "@/stores/user";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { useFileDialog } from "@vueuse/core";
-import SubmitButton from "@/components/button/SubmitButton.vue";
+import { rbacAnnotations } from "@/constants/annotations";
 
 interface IUserAvatarCropperType
   extends Ref<InstanceType<typeof UserAvatarCropper>> {
-  getCropperCanvas(): HTMLCanvasElement | undefined;
+  getCropperFile(): Promise<File>;
 }
 
-const { files, open } = useFileDialog({
+const { open, reset, onChange } = useFileDialog({
   accept: ".jpg, .jpeg, .png",
   multiple: false,
 });
@@ -63,6 +66,7 @@ const { params } = useRoute();
 
 const {
   data: user,
+  isFetching,
   isLoading,
   refetch,
 } = useQuery({
@@ -77,6 +81,13 @@ const {
       });
       return data;
     }
+  },
+  refetchInterval: (data) => {
+    const annotations = data?.user.metadata.annotations;
+    return annotations?.[rbacAnnotations.AVATAR_ATTACHMENT_NAME] !==
+      annotations?.[rbacAnnotations.LAST_AVATAR_ATTACHMENT_NAME]
+      ? 1000
+      : false;
   },
 });
 
@@ -122,34 +133,51 @@ const userAvatarCropper = ref<IUserAvatarCropperType>();
 const showAvatarEditor = ref(false);
 const visibleCropperModal = ref(false);
 const originalFile = ref<File>() as Ref<File>;
-watch(
-  () => files,
-  (files) => {
-    if (!files.value) {
-      return;
-    }
-    if (files.value?.length > 0) {
-      originalFile.value = files.value[0];
-      visibleCropperModal.value = true;
-    }
-  },
-  {
-    deep: true,
+onChange((files) => {
+  if (!files) {
+    return;
   }
-);
+  if (files.length > 0) {
+    originalFile.value = files[0];
+    visibleCropperModal.value = true;
+  }
+});
 
 const uploadSaving = ref(false);
 const handleUploadAvatar = () => {
-  uploadSaving.value = true;
-  userAvatarCropper.value?.getCropperCanvas()?.toBlob((blob: Blob | null) => {
-    if (!blob) {
-      return;
-    }
-    const formData = new FormData();
-    formData.append("file", blob);
-    // upload avatar
+  userAvatarCropper.value?.getCropperFile().then((file) => {
+    uploadSaving.value = true;
+    apiClient.user
+      .uploadCurrentUserAvatar({
+        file: file,
+      })
+      .then(() => {
+        refetch();
+        handleCloseCropperModal();
+      })
+      .catch(() => {
+        Toast.error(t("core.user.detail.avatar.toast_upload_failed"));
+      })
+      .finally(() => {
+        uploadSaving.value = false;
+      });
   });
-  uploadSaving.value = false;
+};
+
+const handleRemoveCurrentAvatar = () => {
+  apiClient.user
+    .deleteCurrentUserAvatar()
+    .then(() => {
+      refetch();
+    })
+    .catch(() => {
+      Toast.error(t("core.user.detail.avatar.toast_remove_failed"));
+    });
+};
+
+const handleCloseCropperModal = () => {
+  visibleCropperModal.value = false;
+  reset();
 };
 </script>
 <template>
@@ -166,31 +194,39 @@ const handleUploadAvatar = () => {
       <div class="p-4">
         <div class="flex items-center justify-between">
           <div class="flex flex-row items-center gap-5">
-            <div
-              class="group relative h-20 w-20"
-              @mouseenter="showAvatarEditor = true"
-              @mouseleave="showAvatarEditor = false"
-            >
-              <VAvatar
-                v-if="user"
-                :src="user.user.spec.avatar"
-                :alt="user.user.spec.displayName"
-                circle
-                width="100%"
-                height="100%"
-                class="ring-4 ring-white drop-shadow-md"
-              />
-              <VDropdown>
-                <div
-                  class="absolute left-0 right-0 top-0 h-full w-full cursor-pointer rounded-full border-0 bg-black/60 text-center text-2xl font-bold leading-[5rem] text-white transition-opacity duration-300 group-hover:opacity-100"
-                >
-                  1
-                </div>
-                <template #popper>
-                  <VDropdownItem @click="open"> 上传 </VDropdownItem>
-                  <VDropdownItem> 移除 </VDropdownItem>
-                </template>
-              </VDropdown>
+            <div class="group relative h-20 w-20">
+              <VLoading v-if="isFetching" class="h-full w-full" />
+              <div
+                v-else
+                class="h-full w-full"
+                @mouseover="showAvatarEditor = true"
+                @mouseout="showAvatarEditor = false"
+              >
+                <VAvatar
+                  v-if="user"
+                  :src="user.user.spec.avatar"
+                  :alt="user.user.spec.displayName"
+                  circle
+                  width="100%"
+                  height="100%"
+                  class="ring-4 ring-white drop-shadow-md"
+                />
+                <VDropdown v-show="showAvatarEditor">
+                  <div
+                    class="absolute left-0 right-0 top-0 h-full w-full cursor-pointer rounded-full border-0 bg-black/60 text-center text-2xl font-bold leading-[5rem] text-white transition-opacity duration-300 group-hover:opacity-100"
+                  >
+                    >
+                  </div>
+                  <template #popper>
+                    <VDropdownItem @click="open()">
+                      {{ $t("core.user.detail.avatar.upload.button") }}
+                    </VDropdownItem>
+                    <VDropdownItem @click="handleRemoveCurrentAvatar">
+                      {{ $t("core.user.detail.avatar.remove.button") }}
+                    </VDropdownItem>
+                  </template>
+                </VDropdown>
+              </div>
             </div>
             <div class="block">
               <h1 class="truncate text-lg font-bold text-gray-900">
@@ -238,22 +274,22 @@ const handleUploadAvatar = () => {
     <VModal
       :visible="visibleCropperModal"
       :width="1200"
-      title="裁剪图片"
-      @update:visible="(visible) => (visibleCropperModal = visible)"
+      :title="$t('core.user.detail.avatar.cropper_modal.title')"
+      @update:visible="handleCloseCropperModal"
     >
       <UserAvatarCropper ref="userAvatarCropper" :file="originalFile" />
       <template #footer>
         <VSpace>
-          <SubmitButton
+          <VButton
             v-if="visibleCropperModal"
             :loading="uploadSaving"
             type="secondary"
-            :text="$t('core.common.buttons.submit')"
-            @submit="handleUploadAvatar"
+            @click="handleUploadAvatar"
           >
-          </SubmitButton>
-          <VButton @click="(visible) => (visibleCropperModal = visible)">
-            {{ $t("core.common.buttons.cancel_and_shortcut") }}
+            {{ $t("core.common.buttons.submit") }}
+          </VButton>
+          <VButton @click="handleCloseCropperModal">
+            {{ $t("core.common.buttons.cancel") }}
           </VButton>
         </VSpace>
       </template>
