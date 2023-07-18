@@ -13,9 +13,11 @@ import {
 withDefaults(
   defineProps<{
     provider?: EditorProvider;
+    allowForcedSelect: boolean;
   }>(),
   {
     provider: undefined,
+    allowForcedSelect: false,
   }
 );
 
@@ -42,6 +44,11 @@ const { editorProviders } = useEditorExtensionPoints();
         v-for="(editorProvider, index) in editorProviders"
         :key="index"
         :selected="provider?.name === editorProvider.name"
+        :disabled="
+          !allowForcedSelect &&
+          provider?.rawType.toLowerCase() !==
+            editorProvider.rawType.toLowerCase()
+        "
         @click="emit('select', editorProvider)"
       >
         <template #prefix-icon>
