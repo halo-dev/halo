@@ -1,7 +1,8 @@
 package run.halo.app.migration.impl;
 
 import static org.springframework.core.io.buffer.DataBufferUtils.releaseConsumer;
-import static org.springframework.util.FileSystemUtils.deleteRecursively;
+import static run.halo.app.infra.utils.FileUtils.closeQuietly;
+import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
 
 import com.fasterxml.jackson.core.util.MinimalPrettyPrinter;
 import com.fasterxml.jackson.databind.MappingIterator;
@@ -63,6 +64,8 @@ public class MigrationServiceImpl implements MigrationService {
         "**/.vscode/**"
     );
 
+    private final DateTimeFormatter dateTimeFormatter;
+
     public MigrationServiceImpl(ExtensionStoreRepository repository,
         HaloProperties haloProperties) {
         this.repository = repository;
@@ -70,9 +73,21 @@ public class MigrationServiceImpl implements MigrationService {
         this.objectMapper = JsonMapper.builder()
             .defaultPrettyPrinter(new MinimalPrettyPrinter())
             .build();
+        this.dateTimeFormatter = DateTimeFormatter
+            .ofPattern("yyyyMMddHHmmss")
+            .withLocale(Locale.getDefault())
+            .withZone(ZoneId.systemDefault());
     }
 
-    private Path getBackupsRoot() {
+    DateTimeFormatter getDateTimeFormatter() {
+        return dateTimeFormatter;
+    }
+
+    ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
+    Path getBackupsRoot() {
         return haloProperties.getWorkDir().resolve("backups");
     }
 
@@ -84,13 +99,7 @@ public class MigrationServiceImpl implements MigrationService {
             return backupExtensions(tempDir)
                 .and(backupWorkDir(tempDir))
                 .and(packageBackup(tempDir, backup))
-                .doFinally(signalType -> {
-                    try {
-                        deleteRecursively(tempDir);
-                    } catch (IOException e) {
-                        throw Exceptions.propagate(e);
-                    }
-                })
+                .doFinally(signalType -> deleteRecursivelyAndSilently(tempDir))
                 .subscribeOn(Schedulers.boundedElastic());
         } catch (IOException e) {
             return Mono.error(e);
@@ -113,17 +122,18 @@ public class MigrationServiceImpl implements MigrationService {
     @Override
     @Transactional
     public Mono<Void> restore(Publisher<DataBuffer> content) {
-        try {
-            var tempDir = Files.createTempDirectory("halo-restore-");
-            return unpackBackup(content, tempDir)
-                .and(restoreExtensions(tempDir))
-                .and(restoreWorkdir(tempDir))
-                // check the integration
-                .doFinally(signalType -> FileUtils.deleteRecursivelyAndSilently(tempDir))
-                .subscribeOn(Schedulers.boundedElastic());
-        } catch (IOException e) {
-            return Mono.error(e);
-        }
+        return Mono.defer(() -> {
+            try {
+                var tempDir = Files.createTempDirectory("halo-restore-");
+                return unpackBackup(content, tempDir)
+                    .and(restoreExtensions(tempDir))
+                    .and(restoreWorkdir(tempDir))
+                    .doFinally(signalType -> deleteRecursivelyAndSilently(tempDir))
+                    .subscribeOn(Schedulers.boundedElastic());
+            } catch (IOException e) {
+                return Mono.error(e);
+            }
+        });
     }
 
     @Override
@@ -146,10 +156,12 @@ public class MigrationServiceImpl implements MigrationService {
     }
 
     private Mono<Void> restoreWorkdir(Path backupRoot) {
-        var workdir = backupRoot.resolve("workdir");
         return Mono.fromRunnable(() -> {
             try {
-                FileSystemUtils.copyRecursively(workdir, haloProperties.getWorkDir());
+                var workdir = backupRoot.resolve("workdir");
+                if (Files.exists(workdir)) {
+                    FileSystemUtils.copyRecursively(workdir, haloProperties.getWorkDir());
+                }
             } catch (IOException e) {
                 throw Exceptions.propagate(e);
             }
@@ -195,7 +207,7 @@ public class MigrationServiceImpl implements MigrationService {
                     .subscribe(
                         releaseConsumer(),
                         sink::error,
-                        null,
+                        () -> closeQuietly(pipedOs),
                         Context.of(sink.contextView()));
                 FileUtils.unzip(zipIs, target);
                 sink.success();
@@ -212,11 +224,7 @@ public class MigrationServiceImpl implements MigrationService {
                 Files.createDirectories(backupsFolder);
                 var backupName = backup.getMetadata().getName();
                 var startTimestamp = backup.getStatus().getStartTimestamp();
-                var dateTimeFormatter = DateTimeFormatter
-                    .ofPattern("yyyyMMddHHmmss")
-                    .withLocale(Locale.getDefault())
-                    .withZone(ZoneId.systemDefault());
-                var timePart = dateTimeFormatter.format(startTimestamp);
+                var timePart = this.dateTimeFormatter.format(startTimestamp);
                 var backupFile = backupsFolder.resolve(timePart + '-' + backupName + ".zip");
                 FileUtils.zip(baseDir, backupFile);
                 backup.getStatus().setFilename(backupFile.getFileName().toString());
