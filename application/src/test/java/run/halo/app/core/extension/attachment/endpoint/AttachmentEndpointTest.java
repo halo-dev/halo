@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyByte;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
@@ -242,6 +241,9 @@ class AttachmentEndpointTest {
 
         @Test
         void shouldListUngroupedAttachments() {
+            when(client.list(eq(Group.class), any(), any()))
+                .thenReturn(Flux.empty());
+
             when(client.list(same(Attachment.class), any(), any(), anyInt(), anyInt()))
                 .thenReturn(Mono.just(ListResult.emptyResult()));
 
