@@ -66,7 +66,7 @@ const {
     const deletingMenuItems = data?.filter(
       (menuItem) => !!menuItem.metadata.deletionTimestamp
     );
-    return deletingMenuItems?.length ? 3000 : false;
+    return deletingMenuItems?.length ? 1000 : false;
   },
   enabled: computed(() => !!selectedMenu.value),
 });

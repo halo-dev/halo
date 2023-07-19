@@ -143,7 +143,7 @@ const {
         (spec.releaseSnapshot === spec.headSnapshot && status?.inProgress)
       );
     });
-    return abnormalSinglePages?.length ? 3000 : false;
+    return abnormalSinglePages?.length ? 1000 : false;
   },
 });
 

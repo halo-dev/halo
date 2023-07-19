@@ -34,7 +34,7 @@ export function usePostTag(): usePostTagReturn {
       const abnormalTags = data?.filter(
         (tag) => !!tag.metadata.deletionTimestamp || !tag.status?.permalink
       );
-      return abnormalTags?.length ? 3000 : false;
+      return abnormalTags?.length ? 1000 : false;
     },
   });
 

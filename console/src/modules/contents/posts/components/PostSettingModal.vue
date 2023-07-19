@@ -17,8 +17,8 @@ import { toDatetimeLocal, toISOString } from "@/utils/date";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { submitForm } from "@formkit/core";
 import useSlugify from "@/composables/use-slugify";
-import { useMutation } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import { usePostUpdateMutate } from "../composables/use-post-update-mutate";
 
 const initialFormState: Post = {
   spec: {
@@ -117,37 +117,7 @@ const handlePublishClick = () => {
 // Fix me:
 // Force update post settings,
 // because currently there may be errors caused by changes in version due to asynchronous processing.
-const { mutateAsync: postUpdateMutate } = useMutation({
-  mutationKey: ["post-update"],
-  mutationFn: async (post: Post) => {
-    const { data: latestPost } =
-      await apiClient.extension.post.getcontentHaloRunV1alpha1Post({
-        name: post.metadata.name,
-      });
-
-    return apiClient.extension.post.updatecontentHaloRunV1alpha1Post(
-      {
-        name: post.metadata.name,
-        post: {
-          ...latestPost,
-          spec: post.spec,
-          metadata: {
-            ...latestPost.metadata,
-            annotations: post.metadata.annotations,
-          },
-        },
-      },
-      {
-        mute: true,
-      }
-    );
-  },
-  retry: 3,
-  onError: (error) => {
-    console.error("Failed to update post", error);
-    Toast.error(t("core.common.toast.server_internal_error"));
-  },
-});
+const { mutateAsync: postUpdateMutate } = usePostUpdateMutate();
 
 const handleSave = async () => {
   annotationsFormRef.value?.handleSubmit();
