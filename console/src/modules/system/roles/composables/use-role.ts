@@ -80,7 +80,7 @@ export function useFetchRole(): useFetchRoleReturn {
       if (deletedRoles.length) {
         refreshInterval.value = setInterval(() => {
           handleFetchRoles({ mute: true });
-        }, 3000);
+        }, 1000);
       }
     } catch (e) {
       console.error("Failed to fetch roles", e);

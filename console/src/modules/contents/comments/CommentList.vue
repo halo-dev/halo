@@ -94,7 +94,7 @@ const {
     const deletingComments = data?.filter(
       (comment) => !!comment.comment.metadata.deletionTimestamp
     );
-    return deletingComments?.length ? 3000 : false;
+    return deletingComments?.length ? 1000 : false;
   },
 });
 

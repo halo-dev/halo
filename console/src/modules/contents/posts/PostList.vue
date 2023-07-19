@@ -172,7 +172,7 @@ const {
       );
     });
 
-    return abnormalPosts?.length ? 3000 : false;
+    return abnormalPosts?.length ? 1000 : false;
   },
 });
 
