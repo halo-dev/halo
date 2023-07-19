@@ -10,3 +10,9 @@ export enum rbacAnnotations {
   DISPLAY_NAME = "rbac.authorization.halo.run/display-name",
   DEPENDENCIES = "rbac.authorization.halo.run/dependencies",
 }
+
+// content
+
+export enum contentAnnotations {
+  PREFERRED_EDITOR = "content.halo.run/preferred-editor",
+}
