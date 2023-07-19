@@ -12,3 +12,9 @@ export enum rbacAnnotations {
   AVATAR_ATTACHMENT_NAME = "rbac.authorization.halo.run/avatar-attachment-name",
   LAST_AVATAR_ATTACHMENT_NAME = "rbac.authorization.halo.run/last-avatar-attachment-name",
 }
+
+// content
+
+export enum contentAnnotations {
+  PREFERRED_EDITOR = "content.halo.run/preferred-editor",
+}

@@ -78,7 +78,7 @@ const {
       (theme) => !!theme.metadata.deletionTimestamp
     );
 
-    return deletingThemes?.length ? 3000 : false;
+    return deletingThemes?.length ? 1000 : false;
   },
   enabled: computed(() => props.visible),
 });
