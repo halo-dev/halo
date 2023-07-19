@@ -436,11 +436,11 @@ const getExternalUrl = (singlePage: SinglePage) => {
                     },
                     {
                       label: t('core.page.filters.status.items.published'),
-                      value: true,
+                      value: 'true',
                     },
                     {
                       label: t('core.page.filters.status.items.draft'),
-                      value: false,
+                      value: 'false',
                     },
                   ]"
                 />
