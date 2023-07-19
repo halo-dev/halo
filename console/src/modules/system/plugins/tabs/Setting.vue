@@ -11,7 +11,6 @@ import { Toast, VButton } from "@halo-dev/components";
 
 // types
 import type { ConfigMap, Plugin, Setting } from "@halo-dev/api-client";
-import { useRouteParams } from "@vueuse/router";
 import { useI18n } from "vue-i18n";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { toRaw } from "vue";
@@ -19,13 +18,12 @@ import { toRaw } from "vue";
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
-const group = useRouteParams<string>("group");
-
+const group = inject<Ref<string>>("activeTab", ref("basic"));
 const plugin = inject<Ref<Plugin | undefined>>("plugin");
 const setting = inject<Ref<Setting | undefined>>("setting", ref());
 const saving = ref(false);
 
-const { data: configMap, suspense } = useQuery<ConfigMap>({
+const { data: configMap } = useQuery<ConfigMap>({
   queryKey: ["plugin-configMap", plugin],
   queryFn: async () => {
     const { data } = await apiClient.plugin.fetchPluginConfig({
@@ -63,8 +61,6 @@ const handleSaveConfigMap = async () => {
 
   saving.value = false;
 };
-
-await suspense();
 </script>
 <template>
   <Transition mode="out-in" name="fade">

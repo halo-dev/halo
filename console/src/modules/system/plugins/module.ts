@@ -1,9 +1,7 @@
 import { definePlugin } from "@halo-dev/console-shared";
 import BasicLayout from "@/layouts/BasicLayout.vue";
 import BlankLayout from "@/layouts/BlankLayout.vue";
-import PluginLayout from "./layouts/PluginLayout.vue";
 import PluginList from "./PluginList.vue";
-import PluginSetting from "./PluginSetting.vue";
 import PluginDetail from "./PluginDetail.vue";
 import { IconPlug } from "@halo-dev/components";
 import { markRaw } from "vue";
@@ -39,24 +37,15 @@ export default definePlugin({
         },
         {
           path: ":name",
-          component: PluginLayout,
+          component: BasicLayout,
           children: [
             {
-              path: "detail",
+              path: "",
               name: "PluginDetail",
               component: PluginDetail,
               meta: {
                 title: "core.plugin.detail.title",
                 permissions: ["system:plugins:view"],
-              },
-            },
-            {
-              path: "settings/:group",
-              name: "PluginSetting",
-              component: PluginSetting,
-              meta: {
-                title: "core.plugin.settings.title",
-                permissions: ["system:plugins:manage"],
               },
             },
           ],

@@ -2,7 +2,7 @@ import type { Component } from "vue";
 import type { RouteRecordRaw, RouteRecordName } from "vue-router";
 import type { FunctionalPage } from "../states/pages";
 import type { AttachmentSelectProvider } from "../states/attachment-selector";
-import type { EditorProvider } from "..";
+import type { EditorProvider, PluginTab } from "..";
 import type { AnyExtension } from "@tiptap/vue-3";
 import type { CommentSubjectRefProvider } from "@/states/comment-subject-ref";
 
@@ -20,6 +20,8 @@ export interface ExtensionPoint {
     | Promise<AttachmentSelectProvider[]>;
 
   "editor:create"?: () => EditorProvider[] | Promise<EditorProvider[]>;
+
+  "plugin:self:tabs:create"?: () => PluginTab[] | Promise<PluginTab[]>;
 
   "default:editor:extension:create": () =>
     | AnyExtension[]
