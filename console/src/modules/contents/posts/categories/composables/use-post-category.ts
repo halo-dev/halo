@@ -41,7 +41,7 @@ export function usePostCategory(): usePostCategoryReturn {
         (category) =>
           !!category.metadata.deletionTimestamp || !category.status?.permalink
       );
-      return abnormalCategories?.length ? 3000 : false;
+      return abnormalCategories?.length ? 1000 : false;
     },
     onSuccess(data) {
       categoriesTree.value = buildCategoriesTree(data);

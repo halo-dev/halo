@@ -63,7 +63,7 @@ const {
       (post) =>
         !!post.post.metadata.deletionTimestamp || !post.post.spec.deleted
     );
-    return deletingPosts?.length ? 3000 : false;
+    return deletingPosts?.length ? 1000 : false;
   },
 });
 

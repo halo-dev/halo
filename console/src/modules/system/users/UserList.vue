@@ -116,7 +116,7 @@ const {
       (user) => !!user.user.metadata.deletionTimestamp
     );
 
-    return deletingUsers?.length ? 3000 : false;
+    return deletingUsers?.length ? 1000 : false;
   },
   onSuccess() {
     selectedUser.value = undefined;
