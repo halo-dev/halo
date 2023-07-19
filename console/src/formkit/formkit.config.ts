@@ -17,6 +17,7 @@ import { categorySelect } from "./inputs/category-select";
 import { categoryCheckbox } from "./inputs/category-checkbox";
 import { tagCheckbox } from "./inputs/tag-checkbox";
 import { roleSelect } from "./inputs/role-select";
+import { attachmentPolicySelect } from "./inputs/attachment-policy-select";
 
 import radioAlt from "./plugins/radio-alt";
 import stopImplicitSubmission from "./plugins/stop-implicit-submission";
@@ -49,6 +50,7 @@ const config: DefaultConfigOptions = {
     categoryCheckbox,
     tagCheckbox,
     roleSelect,
+    attachmentPolicySelect,
   },
   locales: { zh, en },
   locale: "zh",
