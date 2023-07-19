@@ -112,7 +112,10 @@ const handleChangePassword = async () => {
         :label="$t('core.user.change_password_modal.fields.new_password.label')"
         name="password"
         type="password"
-        validation="required|length:0,100"
+        validation="required:trim|length:5,100|matches:/^\S.*\S$/"
+        :validation-messages="{
+          matches: $t('core.formkit.validation.trim'),
+        }"
       ></FormKit>
       <FormKit
         :label="
@@ -120,7 +123,10 @@ const handleChangePassword = async () => {
         "
         name="password_confirm"
         type="password"
-        validation="required|confirm|length:0,100"
+        validation="confirm|required:trim|length:5,100|matches:/^\S.*\S$/"
+        :validation-messages="{
+          matches: $t('core.formkit.validation.trim'),
+        }"
       ></FormKit>
     </FormKit>
     <template #footer>
