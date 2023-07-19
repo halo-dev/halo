@@ -17,8 +17,8 @@ import { toDatetimeLocal, toISOString } from "@/utils/date";
 import { submitForm } from "@formkit/core";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import useSlugify from "@/composables/use-slugify";
-import { useMutation } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import { usePageUpdateMutate } from "../composables/use-page-update-mutate";
 
 const initialFormState: SinglePage = {
   spec: {
@@ -117,37 +117,7 @@ const handlePublishClick = () => {
 // Fix me:
 // Force update post settings,
 // because currently there may be errors caused by changes in version due to asynchronous processing.
-const { mutateAsync: singlePageUpdateMutate } = useMutation({
-  mutationKey: ["singlePage-update"],
-  mutationFn: async (page: SinglePage) => {
-    const { data: latestSinglePage } =
-      await apiClient.extension.singlePage.getcontentHaloRunV1alpha1SinglePage({
-        name: page.metadata.name,
-      });
-
-    return apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
-      {
-        name: page.metadata.name,
-        singlePage: {
-          ...latestSinglePage,
-          spec: page.spec,
-          metadata: {
-            ...latestSinglePage.metadata,
-            annotations: page.metadata.annotations,
-          },
-        },
-      },
-      {
-        mute: true,
-      }
-    );
-  },
-  retry: 3,
-  onError: (error) => {
-    console.error("Failed to update post", error);
-    Toast.error(t("core.common.toast.server_internal_error"));
-  },
-});
+const { mutateAsync: singlePageUpdateMutate } = usePageUpdateMutate();
 
 const handleSave = async () => {
   annotationsFormRef.value?.handleSubmit();
