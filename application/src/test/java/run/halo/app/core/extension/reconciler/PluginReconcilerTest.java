@@ -79,6 +79,7 @@ class PluginReconcilerTest {
     @BeforeEach
     void setUp() {
         pluginReconciler = new PluginReconciler(extensionClient, haloPluginManager, eventPublisher);
+        lenient().when(haloPluginManager.getPluginsRoot()).thenReturn(Paths.get("plugins"));
         lenient().when(haloPluginManager.validatePluginVersion(any())).thenReturn(true);
         lenient().when(haloPluginManager.getSystemVersion()).thenReturn("0.0.0");
         lenient().when(haloPluginManager.getPlugin(any())).thenReturn(pluginWrapper);
@@ -378,10 +379,10 @@ class PluginReconcilerTest {
     @Test
     void resolvePluginPathAnnotation() {
         when(haloPluginManager.getPluginsRoot()).thenReturn(Paths.get("/tmp/plugins"));
-        String path = pluginReconciler.resolvePluginPathAnnotation("/tmp/plugins/sitemap-1.0.jar");
+        String path = pluginReconciler.resolvePluginPathForAnno("/tmp/plugins/sitemap-1.0.jar");
         assertThat(path).isEqualTo("sitemap-1.0.jar");
 
-        path = pluginReconciler.resolvePluginPathAnnotation("/abc/plugins/sitemap-1.0.jar");
+        path = pluginReconciler.resolvePluginPathForAnno("/abc/plugins/sitemap-1.0.jar");
         assertThat(path).isEqualTo("/abc/plugins/sitemap-1.0.jar");
     }
 
