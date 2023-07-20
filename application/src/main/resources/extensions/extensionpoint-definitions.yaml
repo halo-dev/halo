@@ -18,7 +18,7 @@ spec:
   className: run.halo.app.theme.ReactivePostContentHandler
   displayName: ReactivePostContentHandler
   type: MULTI_INSTANCE
-  description: "Provides a way to extend the post content to be displayed in the theme-side."
+  description: "Provides a way to extend the post content to be displayed on the theme-side."
 
 ---
 apiVersion: plugin.halo.run/v1alpha1
@@ -29,4 +29,15 @@ spec:
   className: run.halo.app.theme.ReactiveSinglePageContentHandler
   displayName: ReactiveSinglePageContentHandler
   type: MULTI_INSTANCE
-  description: "Provides a way to extend the single page content to be displayed in the theme-side."
+  description: "Provides a way to extend the single page content to be displayed on the theme-side."
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: comment-widget
+spec:
+  className: run.halo.app.theme.dialect.CommentWidget
+  displayName: CommentWidget
+  type: SINGLETON
+  description: "Provides an extension point for the comment widget on the theme-side."
