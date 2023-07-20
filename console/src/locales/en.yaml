@@ -874,6 +874,16 @@ core:
         bio: Bio
         creation_time: Creation time
         identity_authentication: Identity authentication
+      avatar:
+        title: Avatar
+        toast_upload_failed: Failed to upload avatar
+        toast_remove_failed: Failed to remove avatar
+        cropper_modal:
+          title: Crop Avatar
+        upload:
+          button: Upload
+        remove:
+          button: Remove
   role:
     title: Roles
     common:
