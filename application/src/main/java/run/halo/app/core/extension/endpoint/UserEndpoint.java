@@ -74,7 +74,6 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
-import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.JsonUtils;
 
 @Component
