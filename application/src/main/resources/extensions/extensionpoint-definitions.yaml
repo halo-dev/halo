@@ -30,3 +30,14 @@ spec:
   displayName: ReactiveSinglePageContentHandler
   type: MULTI_INSTANCE
   description: "Provides a way to extend the single page content to be displayed in the theme-side."
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: username-password-authentication-manager
+spec:
+  className: run.halo.app.security.authentication.login.UsernamePasswordAuthenticationManager
+  displayName: Username password authentication manager
+  type: SINGLE_INSTANCE
+  description: "Provides a way to extend the username password authentication."
