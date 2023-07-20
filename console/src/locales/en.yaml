@@ -1105,6 +1105,8 @@ core:
       creation_label: "Create {text} category"
     tag_select:
       creation_label: "Create {text} tag"
+    validation:
+      trim: Please remove the leading and trailing spaces
   common:
     buttons:
       save: Save

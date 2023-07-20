@@ -26,6 +26,7 @@ import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 import SinglePageListItem from "./components/SinglePageListItem.vue";
 import { provide } from "vue";
 import type { Ref } from "vue";
+import { useRouteQuery } from "@vueuse/router";
 
 const { t } = useI18n();
 
@@ -37,18 +38,20 @@ const checkedAll = ref(false);
 provide<Ref<string[]>>("selectedPageNames", selectedPageNames);
 
 // Filters
-const selectedContributor = ref();
-const selectedVisible = ref();
-const selectedPublishStatus = ref();
-const selectedSortValue = ref();
-const keyword = ref("");
+const selectedContributor = useRouteQuery<string | undefined>("contributor");
+const selectedVisible = useRouteQuery<
+  "PUBLIC" | "INTERNAL" | "PRIVATE" | undefined
+>("visible");
+const selectedPublishStatus = useRouteQuery<string | undefined>("status");
+const selectedSort = useRouteQuery<string | undefined>("sort");
+const keyword = useRouteQuery<string>("keyword", "");
 
 watch(
   () => [
     selectedContributor.value,
     selectedVisible.value,
     selectedPublishStatus.value,
-    selectedSortValue.value,
+    selectedSort.value,
     keyword.value,
   ],
   () => {
@@ -61,7 +64,7 @@ const hasFilters = computed(() => {
     selectedContributor.value ||
     selectedVisible.value ||
     selectedPublishStatus.value !== undefined ||
-    selectedSortValue.value
+    selectedSort.value
   );
 });
 
@@ -69,11 +72,15 @@ function handleClearFilters() {
   selectedContributor.value = undefined;
   selectedVisible.value = undefined;
   selectedPublishStatus.value = undefined;
-  selectedSortValue.value = undefined;
+  selectedSort.value = undefined;
 }
 
-const page = ref(1);
-const size = ref(20);
+const page = useRouteQuery<number>("page", 1, {
+  transform: Number,
+});
+const size = useRouteQuery<number>("size", 20, {
+  transform: Number,
+});
 const total = ref(0);
 const hasNext = ref(false);
 const hasPrevious = ref(false);
@@ -91,7 +98,7 @@ const {
     page,
     size,
     selectedVisible,
-    selectedSortValue,
+    selectedSort,
     keyword,
   ],
   queryFn: async () => {
@@ -113,7 +120,7 @@ const {
       page: page.value,
       size: size.value,
       visible: selectedVisible.value,
-      sort: [selectedSortValue.value].filter(Boolean) as string[],
+      sort: [selectedSort.value].filter(Boolean) as string[],
       keyword: keyword.value,
       contributor: contributors,
     });
@@ -134,7 +141,7 @@ const {
         (spec.releaseSnapshot === spec.headSnapshot && status?.inProgress)
       );
     });
-    return abnormalSinglePages?.length ? 3000 : false;
+    return abnormalSinglePages?.length ? 1000 : false;
   },
 });
 
@@ -347,11 +354,11 @@ watch(selectedPageNames, (newValue) => {
                     },
                     {
                       label: t('core.page.filters.status.items.published'),
-                      value: true,
+                      value: 'true',
                     },
                     {
                       label: t('core.page.filters.status.items.draft'),
-                      value: false,
+                      value: 'false',
                     },
                   ]"
                 />
@@ -378,7 +385,7 @@ watch(selectedPageNames, (newValue) => {
                   :label="$t('core.page.filters.author.label')"
                 />
                 <FilterDropdown
-                  v-model="selectedSortValue"
+                  v-model="selectedSort"
                   :label="$t('core.common.filters.labels.sort')"
                   :items="[
                     {

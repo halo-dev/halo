@@ -18,11 +18,8 @@ import type { Component } from "vue";
 import { markRaw } from "vue";
 import SettingTab from "./tabs/Setting.vue";
 import { useRouteQuery } from "@vueuse/router";
-import { watch } from "vue";
-import { useRouter } from "vue-router";
 
 const { t } = useI18n();
-const router = useRouter();
 
 interface Tab {
   id: string;
@@ -38,7 +35,8 @@ const tabs = ref<Tab[]>([
   },
 ]);
 
-const activeTab = useRouteQuery<string>("tab", undefined, { mode: "push" });
+const activeTab = useRouteQuery<string>("tab", "basic");
+provide<Ref<string>>("activeTab", activeTab);
 
 const { data: setting } = useQuery({
   queryKey: ["system-setting"],
@@ -65,18 +63,6 @@ const { data: setting } = useQuery({
     }
   },
 });
-
-watch(
-  () => activeTab.value,
-  (value) => {
-    if (!value) {
-      router.replace({
-        name: "SystemSetting",
-        query: { tab: tabs.value[0].id },
-      });
-    }
-  }
-);
 
 provide<Ref<Setting | undefined>>("setting", setting);
 </script>

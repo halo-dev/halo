@@ -10,7 +10,6 @@ import type { Ref } from "vue";
 import type { ConfigMap, Setting, Theme } from "@halo-dev/api-client";
 
 // hooks
-import { useRouteParams } from "@vueuse/router";
 import { apiClient } from "@/utils/api-client";
 import { useSettingFormConvert } from "@/composables/use-setting-form";
 import { useI18n } from "vue-i18n";
@@ -19,7 +18,7 @@ import { useQuery, useQueryClient } from "@tanstack/vue-query";
 const { t } = useI18n();
 const queryClient = useQueryClient();
 
-const group = useRouteParams<string>("group");
+const group = inject<Ref<string>>("activeTab", ref(""));
 
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme");
 const setting = inject<Ref<Setting | undefined>>("setting", ref());
