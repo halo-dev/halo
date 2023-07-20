@@ -161,7 +161,10 @@ const handleCreateUser = async () => {
         :label="$t('core.user.change_password_modal.fields.new_password.label')"
         type="password"
         name="password"
-        validation="required|length:0,100"
+        validation="required:trim|length:5,100|matches:/^\S.*\S$/"
+        :validation-messages="{
+          matches: $t('core.formkit.validation.trim'),
+        }"
       ></FormKit>
       <FormKit
         v-model="selectedRole"

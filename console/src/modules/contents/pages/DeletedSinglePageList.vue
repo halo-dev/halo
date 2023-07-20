@@ -64,7 +64,7 @@ const {
         !!singlePage.page.metadata.deletionTimestamp ||
         !singlePage.page.spec.deleted
     );
-    return deletedSinglePages?.length ? 3000 : false;
+    return deletedSinglePages?.length ? 1000 : false;
   },
 });
 
