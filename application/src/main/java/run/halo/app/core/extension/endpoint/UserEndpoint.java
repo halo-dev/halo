@@ -69,6 +69,8 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 
 @Component
@@ -77,10 +79,12 @@ public class UserEndpoint implements CustomEndpoint {
 
     private static final String SELF_USER = "-";
     private static final String USER_AVATAR_GROUP_NAME = "user-avatar-group";
+    private static final String DEFAULT_USER_AVATAR_ATTACHMENT_POLICY_NAME = "default-policy";
     private final ReactiveExtensionClient client;
     private final UserService userService;
     private final RoleService roleService;
     private final AttachmentService attachmentService;
+    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -192,16 +196,42 @@ public class UserEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> uploadUserAvatar(ServerRequest request) {
         return request.body(BodyExtractors.toMultipartData())
             .map(AvatarUploadRequest::new)
-            .flatMap(uploadRequest -> {
-                // TODO policyName 由用户设置等获取，目前暂时先写死
-                String policyName = "default-policy";
-                FilePart filePart = uploadRequest.getFile();
-                return attachmentService.upload(policyName,
-                    USER_AVATAR_GROUP_NAME,
-                    filePart.filename(),
-                    filePart.content(),
-                    filePart.headers().getContentType());
-            })
+            .flatMap(uploadRequest -> environmentFetcher.fetch(SystemSetting.User.GROUP,
+                    SystemSetting.User.class)
+                .switchIfEmpty(
+                    Mono.error(new IllegalStateException("User setting is not configured"))
+                )
+                .flatMap(userSetting -> {
+                    FilePart filePart = uploadRequest.getFile();
+                    Integer avatarMaxSize = userSetting.getAvatarMaxSize();
+                    if (Objects.isNull(avatarMaxSize)) {
+                        avatarMaxSize = 1;
+                    }
+                    final Integer finalAvatarMaxSize = avatarMaxSize;
+                    return filePart.content()
+                        .reduce(0L, (totalSize, dataBuffer) -> {
+                            long byteCount = dataBuffer.readableByteCount();
+                            if (totalSize + byteCount > finalAvatarMaxSize * 1024 * 1024) {
+                                throw new ServerWebInputException(
+                                    "The avatar file needs to be smaller than " + finalAvatarMaxSize
+                                        + " MB.");
+                            }
+                            return totalSize + byteCount;
+                        })
+                        .flatMap(item -> {
+                            String avatarPolicy = userSetting.getAvatarPolicy();
+                            if (StringUtils.isBlank(avatarPolicy)) {
+                                avatarPolicy = DEFAULT_USER_AVATAR_ATTACHMENT_POLICY_NAME;
+                            }
+                            return attachmentService.upload(avatarPolicy,
+                                USER_AVATAR_GROUP_NAME,
+                                filePart.filename(),
+                                filePart.content(),
+                                filePart.headers().getContentType()
+                            );
+                        });
+                })
+            )
             .flatMap(attachment -> Mono.defer(() -> getCurrentUser()
                     .flatMap(user -> {
                         MetadataUtil.nullSafeAnnotations(user)

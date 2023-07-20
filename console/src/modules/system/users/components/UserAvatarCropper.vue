@@ -123,7 +123,7 @@ defineExpose({
     <div class="flex-auto">
       <div
         ref="previewElement"
-        class="overflow-hidden"
+        class="overflow-hidden rounded-md border border-gray-300 shadow-md"
         :style="{ width: `${cropperWidth}px`, height: `${cropperHeight}px` }"
       ></div>
     </div>
