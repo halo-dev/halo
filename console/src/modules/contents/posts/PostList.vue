@@ -435,11 +435,11 @@ const getExternalUrl = (post: Post) => {
                     },
                     {
                       label: t('core.post.filters.status.items.published'),
-                      value: true,
+                      value: 'true',
                     },
                     {
                       label: t('core.post.filters.status.items.draft'),
-                      value: false,
+                      value: 'false',
                     },
                   ]"
                 />
