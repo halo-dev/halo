@@ -883,6 +883,7 @@ core:
         upload:
           button: Upload
         remove:
+          title: Are you sure you want to remove the avatar?
           button: Remove
   role:
     title: Roles

@@ -195,9 +195,9 @@ defineExpose({
 });
 </script>
 <template>
-  <div class="flex">
+  <div class="flex flex-col-reverse md:flex-row">
     <div
-      class="relative mr-4 max-h-[500px] flex-auto"
+      class="relative max-h-[500px] flex-auto md:mr-4"
       :style="{ minHeight: `${cropperHeight}px` }"
     >
       <img
@@ -223,12 +223,15 @@ defineExpose({
         </ul>
       </div>
     </div>
-    <div ref="previewElement" class="flex-auto">
+    <div
+      ref="previewElement"
+      class="mb-4 flex justify-around md:mb-0 md:inline-block md:flex-auto md:justify-start"
+    >
       <div
-        class="preview mb-4 overflow-hidden rounded-md border border-gray-300 shadow-md"
+        class="preview overflow-hidden rounded-md border border-gray-300 shadow-md md:mb-4"
         :style="{ width: `${cropperWidth}px`, height: `${cropperHeight}px` }"
       ></div>
-      <div class="flex justify-between">
+      <div class="flex flex-col justify-between md:flex-row">
         <div
           class="preview overflow-hidden rounded-full border border-gray-300"
           :style="{

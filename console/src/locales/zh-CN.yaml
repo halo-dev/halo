@@ -883,6 +883,7 @@ core:
         upload:
           button: 上传
         remove:
+          title: 确定要移除头像吗？
           button: 移除
   role:
     title: 角色

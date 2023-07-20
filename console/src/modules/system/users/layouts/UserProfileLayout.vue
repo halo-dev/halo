@@ -12,6 +12,7 @@ import {
   VSpace,
   Toast,
   VLoading,
+  Dialog,
 } from "@halo-dev/components";
 import {
   computed,
@@ -153,7 +154,8 @@ const handleUploadAvatar = () => {
   userAvatarCropper.value?.getCropperFile().then((file) => {
     uploadSaving.value = true;
     apiClient.user
-      .uploadCurrentUserAvatar({
+      .uploadUserAvatar({
+        name: params.name as string,
         file: file,
       })
       .then(() => {
@@ -170,14 +172,25 @@ const handleUploadAvatar = () => {
 };
 
 const handleRemoveCurrentAvatar = () => {
-  apiClient.user
-    .deleteCurrentUserAvatar()
-    .then(() => {
-      refetch();
-    })
-    .catch(() => {
-      Toast.error(t("core.user.detail.avatar.toast_remove_failed"));
-    });
+  Dialog.warning({
+    title: t("core.user.detail.avatar.remove.title"),
+    description: t("core.common.dialog.descriptions.cannot_be_recovered"),
+    confirmType: "danger",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    onConfirm: async () => {
+      apiClient.user
+        .deleteUserAvatar({
+          name: params.name as string,
+        })
+        .then(() => {
+          refetch();
+        })
+        .catch(() => {
+          Toast.error(t("core.user.detail.avatar.toast_remove_failed"));
+        });
+    },
+  });
 };
 
 const handleCloseCropperModal = () => {
@@ -221,7 +234,12 @@ const changeUploadAvatar = () => {
                   height="100%"
                   class="ring-4 ring-white drop-shadow-md"
                 />
-                <VDropdown>
+                <VDropdown
+                  v-if="
+                    currentUserHasPermission(['system:users:manage']) ||
+                    isCurrentUser
+                  "
+                >
                   <div
                     v-show="showAvatarEditor"
                     class="absolute left-0 right-0 top-0 h-full w-full cursor-pointer rounded-full border-0 bg-black/60 text-center leading-[5rem] transition-opacity duration-300 group-hover:opacity-100"
