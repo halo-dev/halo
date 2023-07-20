@@ -15,6 +15,7 @@ import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersF
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.io.Files;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -60,6 +62,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.User;
+import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
@@ -71,6 +74,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.JsonUtils;
 
 @Component
@@ -161,11 +165,18 @@ public class UserEndpoint implements CustomEndpoint {
                         .implementation(generateGenericClass(ListedUser.class)));
                 buildParametersFromType(builder, ListRequest.class);
             })
-            .POST("users/-/avatar", contentType(MediaType.MULTIPART_FORM_DATA),
+            .POST("users/{name}/avatar", contentType(MediaType.MULTIPART_FORM_DATA),
                 this::uploadUserAvatar,
                 builder -> builder
-                    .operationId("UploadCurrentUserAvatar")
+                    .operationId("UploadUserAvatar")
+                    .description("upload user avatar")
                     .tag(tag)
+                    .parameter(parameterBuilder()
+                        .in(ParameterIn.PATH)
+                        .name("name")
+                        .description("User name")
+                        .required(true)
+                    )
                     .requestBody(Builder.requestBodyBuilder()
                         .required(true)
                         .content(contentBuilder()
@@ -174,17 +185,24 @@ public class UserEndpoint implements CustomEndpoint {
                         ))
                     .response(responseBuilder().implementation(User.class))
             )
-            .DELETE("users/-/avatar", this::deleteUserAvatar, builder -> builder
+            .DELETE("users/{name}/avatar", this::deleteUserAvatar, builder -> builder
                 .tag(tag)
-                .operationId("DeleteCurrentUserAvatar")
-                .description("delete current user avatar")
+                .operationId("DeleteUserAvatar")
+                .description("delete user avatar")
+                .parameter(parameterBuilder()
+                    .in(ParameterIn.PATH)
+                    .name("name")
+                    .description("User name")
+                    .required(true)
+                )
                 .response(responseBuilder().implementation(User.class))
                 .build())
             .build();
     }
 
     private Mono<ServerResponse> deleteUserAvatar(ServerRequest request) {
-        return getCurrentUser()
+        final var nameInPath = request.pathVariable("name");
+        return getUserOrSelf(nameInPath)
             .flatMap(user -> {
                 MetadataUtil.nullSafeAnnotations(user)
                     .remove(User.AVATAR_ATTACHMENT_NAME_ANNO);
@@ -193,52 +211,28 @@ public class UserEndpoint implements CustomEndpoint {
             .flatMap(user -> ServerResponse.ok().bodyValue(user));
     }
 
+    private Mono<User> getUserOrSelf(String name) {
+        if (!SELF_USER.equals(name)) {
+            return client.get(User.class, name);
+        }
+        return ReactiveSecurityContextHolder.getContext()
+            .map(SecurityContext::getAuthentication)
+            .map(Authentication::getName)
+            .flatMap(currentUserName -> client.get(User.class, currentUserName));
+    }
+
     private Mono<ServerResponse> uploadUserAvatar(ServerRequest request) {
+        final var username = request.pathVariable("name");
         return request.body(BodyExtractors.toMultipartData())
             .map(AvatarUploadRequest::new)
-            .flatMap(uploadRequest -> environmentFetcher.fetch(SystemSetting.User.GROUP,
-                    SystemSetting.User.class)
-                .switchIfEmpty(
-                    Mono.error(new IllegalStateException("User setting is not configured"))
-                )
-                .flatMap(userSetting -> {
-                    FilePart filePart = uploadRequest.getFile();
-                    Integer avatarMaxSize = userSetting.getAvatarMaxSize();
-                    if (Objects.isNull(avatarMaxSize)) {
-                        avatarMaxSize = 1;
-                    }
-                    final Integer finalAvatarMaxSize = avatarMaxSize;
-                    return filePart.content()
-                        .reduce(0L, (totalSize, dataBuffer) -> {
-                            long byteCount = dataBuffer.readableByteCount();
-                            if (totalSize + byteCount > finalAvatarMaxSize * 1024 * 1024) {
-                                throw new ServerWebInputException(
-                                    "The avatar file needs to be smaller than " + finalAvatarMaxSize
-                                        + " MB.");
-                            }
-                            return totalSize + byteCount;
-                        })
-                        .flatMap(item -> {
-                            String avatarPolicy = userSetting.getAvatarPolicy();
-                            if (StringUtils.isBlank(avatarPolicy)) {
-                                avatarPolicy = DEFAULT_USER_AVATAR_ATTACHMENT_POLICY_NAME;
-                            }
-                            return attachmentService.upload(avatarPolicy,
-                                USER_AVATAR_GROUP_NAME,
-                                filePart.filename(),
-                                filePart.content(),
-                                filePart.headers().getContentType()
-                            );
-                        });
+            .flatMap(this::uploadAvatar)
+            .flatMap(attachment -> getUserOrSelf(username)
+                .flatMap(user -> {
+                    MetadataUtil.nullSafeAnnotations(user)
+                        .put(User.AVATAR_ATTACHMENT_NAME_ANNO,
+                            attachment.getMetadata().getName());
+                    return client.update(user);
                 })
-            )
-            .flatMap(attachment -> Mono.defer(() -> getCurrentUser()
-                    .flatMap(user -> {
-                        MetadataUtil.nullSafeAnnotations(user)
-                            .put(User.AVATAR_ATTACHMENT_NAME_ANNO,
-                                attachment.getMetadata().getName());
-                        return client.update(user);
-                    }))
                 .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
                     .filter(OptimisticLockingFailureException.class::isInstance))
             )
@@ -268,11 +262,48 @@ public class UserEndpoint implements CustomEndpoint {
         }
     }
 
-    private Mono<User> getCurrentUser() {
-        return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
-            .map(Authentication::getName)
-            .flatMap(currentUserName -> client.get(User.class, currentUserName));
+    private Mono<Attachment> uploadAvatar(AvatarUploadRequest uploadRequest) {
+        return environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
+            .switchIfEmpty(
+                Mono.error(new IllegalStateException("User setting is not configured"))
+            )
+            .flatMap(userSetting -> checkAvatar(userSetting.getAvatarMaxSize(), uploadRequest)
+                .then(Mono.defer(
+                    () -> {
+                        String avatarPolicy = userSetting.getAvatarPolicy();
+                        if (StringUtils.isBlank(avatarPolicy)) {
+                            avatarPolicy = DEFAULT_USER_AVATAR_ATTACHMENT_POLICY_NAME;
+                        }
+                        FilePart filePart = uploadRequest.getFile();
+                        var ext = Files.getFileExtension(filePart.filename());
+                        return attachmentService.upload(avatarPolicy,
+                            USER_AVATAR_GROUP_NAME,
+                            UUID.randomUUID() + "." + ext,
+                            filePart.content(),
+                            filePart.headers().getContentType()
+                        );
+                    })
+                )
+            );
+    }
+
+    private Mono<Void> checkAvatar(Integer avatarMaxSize, AvatarUploadRequest uploadRequest) {
+        FilePart filePart = uploadRequest.getFile();
+        if (Objects.isNull(avatarMaxSize)) {
+            avatarMaxSize = 1;
+        }
+        final Integer finalAvatarMaxSize = avatarMaxSize;
+        return filePart.content()
+            .reduce(0L, (totalSize, dataBuffer) -> {
+                long byteCount = dataBuffer.readableByteCount();
+                if (totalSize + byteCount > finalAvatarMaxSize * 1024 * 1024) {
+                    throw new ServerWebInputException(
+                        "The avatar file needs to be smaller than " + finalAvatarMaxSize
+                            + " MB.");
+                }
+                return totalSize + byteCount;
+            })
+            .then();
     }
 
     private Mono<ServerResponse> createUser(ServerRequest request) {
