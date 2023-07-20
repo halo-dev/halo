@@ -78,6 +78,17 @@ spec:
         - $formkit: roleSelect
           name: defaultRole
           label: "默认角色"
+        - $formkit: select
+          name: avatarPolicy
+          label: "头像附件存储策略"
+          value: "default-policy"
+        - $formkit: number
+          label: "允许上传的头像大小(MB)"
+          name: avatarMaxSize
+          value: 2
+          min: 1
+          max: 100
+          validation: required | max:100
     - group: comment
       label: 评论设置
       formSchema:
