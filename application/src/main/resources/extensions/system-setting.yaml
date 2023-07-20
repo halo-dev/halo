@@ -78,7 +78,7 @@ spec:
         - $formkit: roleSelect
           name: defaultRole
           label: "默认角色"
-        - $formkit: select
+        - $formkit: attachmentPolicySelect
           name: avatarPolicy
           label: "头像附件存储策略"
           value: "default-policy"
@@ -88,7 +88,7 @@ spec:
           value: 2
           min: 1
           max: 100
-          validation: required | max:100
+          validation: required | max:100 | min:1
     - group: comment
       label: 评论设置
       formSchema:

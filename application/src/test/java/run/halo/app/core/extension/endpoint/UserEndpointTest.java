@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -48,6 +49,8 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.exception.ExtensionNotFoundException;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 
 @SpringBootTest
@@ -62,6 +65,9 @@ class UserEndpointTest {
 
     @Mock
     AttachmentService attachmentService;
+
+    @Mock
+    SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     @Mock
     ReactiveExtensionClient client;
@@ -525,10 +531,15 @@ class UserEndpointTest {
     class AvatarUploadTest {
         @Test
         void respondWithErrorIfTypeNotPNG() {
+
             var multipartBodyBuilder = new MultipartBodyBuilder();
             multipartBodyBuilder.part("file", "fake-file")
                 .contentType(MediaType.IMAGE_JPEG)
                 .filename("fake-filename.jpg");
+
+            SystemSetting.User user = mock(SystemSetting.User.class);
+            when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(user));
 
             webClient
                 .post()
@@ -540,7 +551,6 @@ class UserEndpointTest {
                 .is4xxClientError();
         }
 
-        @SuppressWarnings("checkstyle:WhitespaceAfter")
         @Test
         void shouldUploadSuccessfully() {
             var currentUser = createUser("fake-user");
@@ -555,6 +565,10 @@ class UserEndpointTest {
                 .contentType(MediaType.IMAGE_PNG)
                 .filename("fake-filename.png");
 
+            SystemSetting.User user = new SystemSetting.User();
+            user.setAvatarMaxSize(1);
+            when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
+                .thenReturn(Mono.just(user));
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
             when(attachmentService.upload(anyString(), anyString(), eq("fake-filename.png"),
                 any(), any(MediaType.IMAGE_PNG.getClass()))).thenReturn(Mono.just(attachment));

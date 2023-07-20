@@ -40,5 +40,9 @@ apiVersion: storage.halo.run/v1alpha1
 kind: Group
 metadata:
   name: user-avatar-group
+  labels:
+    halo.run/hidden: "true"
+  finalizers:
+    - system-protection
 spec:
   displayName: UserAvatar

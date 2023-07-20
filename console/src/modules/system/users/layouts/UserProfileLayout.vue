@@ -19,6 +19,7 @@ import {
   provide,
   ref,
   watch,
+  defineAsyncComponent,
   type ComputedRef,
   type Ref,
 } from "vue";
@@ -26,13 +27,16 @@ import { useRoute, useRouter } from "vue-router";
 import type { DetailedUser } from "@halo-dev/api-client";
 import UserEditingModal from "../components/UserEditingModal.vue";
 import UserPasswordChangeModal from "../components/UserPasswordChangeModal.vue";
-import UserAvatarCropper from "../components/UserAvatarCropper.vue";
 import { usePermission } from "@/utils/permission";
 import { useUserStore } from "@/stores/user";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { useFileDialog } from "@vueuse/core";
 import { rbacAnnotations } from "@/constants/annotations";
+
+const UserAvatarCropper = defineAsyncComponent(
+  () => import("../components/UserAvatarCropper.vue")
+);
 
 interface IUserAvatarCropperType
   extends Ref<InstanceType<typeof UserAvatarCropper>> {
@@ -180,6 +184,11 @@ const handleCloseCropperModal = () => {
   visibleCropperModal.value = false;
   reset();
 };
+
+const changeUploadAvatar = () => {
+  reset();
+  open();
+};
 </script>
 <template>
   <BasicLayout>
@@ -281,7 +290,11 @@ const handleCloseCropperModal = () => {
       :title="$t('core.user.detail.avatar.cropper_modal.title')"
       @update:visible="handleCloseCropperModal"
     >
-      <UserAvatarCropper ref="userAvatarCropper" :file="originalFile" />
+      <UserAvatarCropper
+        ref="userAvatarCropper"
+        :file="originalFile"
+        @change-file="changeUploadAvatar"
+      />
       <template #footer>
         <VSpace>
           <VButton
