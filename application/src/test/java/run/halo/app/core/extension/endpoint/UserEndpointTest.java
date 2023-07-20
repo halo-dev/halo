@@ -570,7 +570,7 @@ class UserEndpointTest {
             when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
                 .thenReturn(Mono.just(user));
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
-            when(attachmentService.upload(anyString(), anyString(), eq("fake-filename.png"),
+            when(attachmentService.upload(anyString(), anyString(), anyString(),
                 any(), any(MediaType.IMAGE_PNG.getClass()))).thenReturn(Mono.just(attachment));
 
             when(client.update(currentUser)).thenReturn(Mono.just(currentUser));
