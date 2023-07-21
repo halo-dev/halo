@@ -158,19 +158,6 @@ const handleUpdateUser = async () => {
               :label="$t('core.user.editing_modal.fields.username.label')"
               type="text"
               name="name"
-              :validation="[
-                ['required'],
-                ['length:0,63'],
-                [
-                  'matches',
-                  /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/,
-                ],
-              ]"
-              :validation-messages="{
-                matches: $t(
-                  'core.user.editing_modal.fields.username.validation'
-                ),
-              }"
             ></FormKit>
             <FormKit
               id="displayNameInput"
