@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +23,9 @@ import org.thymeleaf.spring6.expression.ThymeleafEvaluationContext;
 import org.thymeleaf.templateresolver.StringTemplateResolver;
 import org.thymeleaf.templateresource.ITemplateResource;
 import org.thymeleaf.templateresource.StringTemplateResource;
+import reactor.core.publisher.Flux;
 import run.halo.app.plugin.ExtensionComponentsFinder;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 
 /**
  * Tests for {@link CommentElementTagProcessor}.
@@ -41,7 +42,7 @@ class CommentElementTagProcessorTest {
     private ApplicationContext applicationContext;
 
     @Mock
-    private ExtensionComponentsFinder componentsFinder;
+    private ExtensionGetter extensionGetter;
 
     private TemplateEngine templateEngine;
 
@@ -51,14 +52,16 @@ class CommentElementTagProcessorTest {
         templateEngine = new TemplateEngine();
         templateEngine.setDialects(Set.of(haloProcessorDialect, new SpringStandardDialect()));
         templateEngine.addTemplateResolver(new TestTemplateResolver());
-        when(applicationContext.getBean(eq(ExtensionComponentsFinder.class)))
-            .thenReturn(componentsFinder);
+        when(applicationContext.getBean(eq(ExtensionGetter.class)))
+            .thenReturn(extensionGetter);
     }
 
     @Test
     void doProcess() {
         Context context = getContext();
 
+        when(extensionGetter.getEnabledExtensionByDefinition(eq(CommentWidget.class)))
+            .thenReturn(Flux.empty());
         String result = templateEngine.process("commentWidget", context);
         assertThat(result).isEqualTo("""
             <!DOCTYPE html>
@@ -70,8 +73,8 @@ class CommentElementTagProcessorTest {
             </html>
             """);
 
-        when(componentsFinder.getExtensions(CommentWidget.class))
-            .thenReturn(List.of(new DefaultCommentWidget()));
+        when(extensionGetter.getEnabledExtensionByDefinition(eq(CommentWidget.class)))
+            .thenReturn(Flux.just(new DefaultCommentWidget()));
         result = templateEngine.process("commentWidget", context);
         assertThat(result).isEqualTo("""
             <!DOCTYPE html>

@@ -118,15 +118,13 @@ public class PluginReconciler implements Reconciler<Request> {
         client.fetch(Plugin.class, name).ifPresent(plugin -> {
             Map<String, String> annotations = nullSafeAnnotations(plugin);
             String oldPluginPath = annotations.get(PLUGIN_PATH);
-            String pluginPath = oldPluginPath;
-            if (StringUtils.isBlank(pluginPath)) {
-                URI loadLocation = plugin.statusNonNull().getLoadLocation();
-                pluginPath = Optional.ofNullable(loadLocation)
-                    .map(URI::getPath)
-                    .orElseGet(() -> PluginUtils.generateFileName(plugin));
-            }
-            annotations.put(PLUGIN_PATH, pluginPath);
-            if (!StringUtils.equals(pluginPath, oldPluginPath)) {
+            String pluginPath = StringUtils.isBlank(oldPluginPath)
+                ? Optional.ofNullable(plugin.statusNonNull().getLoadLocation())
+                .map(URI::getPath)
+                .orElseGet(() -> PluginUtils.generateFileName(plugin)) : oldPluginPath;
+            String pluginPathAnno = resolvePluginPathForAnno(pluginPath);
+            annotations.put(PLUGIN_PATH, pluginPathAnno);
+            if (!StringUtils.equals(pluginPathAnno, oldPluginPath)) {
                 client.update(plugin);
             }
         });
@@ -555,7 +553,7 @@ public class PluginReconciler implements Reconciler<Request> {
                 Map<String, String> newAnnotations = nullSafeAnnotations(persisted);
                 newAnnotations.putAll(nullSafeAnnotations(pluginInPath));
 
-                newAnnotations.put(PLUGIN_PATH, resolvePluginPathAnnotation(newPluginPath));
+                newAnnotations.put(PLUGIN_PATH, resolvePluginPathForAnno(newPluginPath));
                 newAnnotations.remove(RELOAD_ANNO);
                 nullSafeLabels(persisted).putAll(nullSafeLabels(pluginInPath));
                 persisted.statusNonNull().setLoadLocation(toUri(newPluginPath));
@@ -567,7 +565,7 @@ public class PluginReconciler implements Reconciler<Request> {
             });
     }
 
-    String resolvePluginPathAnnotation(String pluginPathString) {
+    String resolvePluginPathForAnno(String pluginPathString) {
         Path pluginsRoot = toPath(haloPluginManager.getPluginsRoot().toString());
         Path pluginPath = toPath(pluginPathString);
         if (pluginPath.startsWith(pluginsRoot)) {

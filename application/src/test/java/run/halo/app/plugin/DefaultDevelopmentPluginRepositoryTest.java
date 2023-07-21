@@ -13,7 +13,7 @@ import org.pf4j.PluginRepository;
  * Tests for {@link DefaultDevelopmentPluginRepository}.
  *
  * @author guqing
- * @since 2.7.0
+ * @since 2.8.0
  */
 class DefaultDevelopmentPluginRepositoryTest {
 

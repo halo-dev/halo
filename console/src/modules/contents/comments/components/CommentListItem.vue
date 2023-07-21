@@ -162,7 +162,7 @@ const {
     const deletingReplies = data?.filter(
       (reply) => !!reply.reply.metadata.deletionTimestamp
     );
-    return deletingReplies?.length ? 3000 : false;
+    return deletingReplies?.length ? 1000 : false;
   },
   enabled: computed(() => showReplies.value),
 });

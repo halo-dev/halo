@@ -81,7 +81,7 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
       (plugin) => !!plugin.metadata.deletionTimestamp
     );
 
-    return deletingPlugins?.length ? 3000 : false;
+    return deletingPlugins?.length ? 2000 : false;
   },
 });
 

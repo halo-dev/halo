@@ -1105,6 +1105,8 @@ core:
       creation_label: 創建 {text} 分類
     tag_select:
       creation_label: 創建 {text} 標籤
+    validation:
+      trim: 不能以空格開頭或結尾
   common:
     buttons:
       save: 保存
