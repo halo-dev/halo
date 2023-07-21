@@ -19,6 +19,7 @@ import { apiClient } from "@/utils/api-client";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
+import { useRouteQuery } from "@vueuse/router";
 
 const { t } = useI18n();
 
@@ -26,10 +27,13 @@ const checkAll = ref(false);
 const selectedComment = ref<ListedComment>();
 const selectedCommentNames = ref<string[]>([]);
 
-const keyword = ref("");
-const selectedApprovedStatus = ref();
-const selectedSort = ref();
-const selectedUser = ref();
+const keyword = useRouteQuery<string>("keyword", "");
+const selectedApprovedStatus = useRouteQuery<string | undefined>(
+  "approved",
+  undefined
+);
+const selectedSort = useRouteQuery<string | undefined>("sort");
+const selectedUser = useRouteQuery<string | undefined>("user");
 
 watch(
   () => [
@@ -57,8 +61,12 @@ function handleClearFilters() {
   selectedUser.value = undefined;
 }
 
-const page = ref(1);
-const size = ref(20);
+const page = useRouteQuery<number>("page", 1, {
+  transform: Number,
+});
+const size = useRouteQuery<number>("size", 20, {
+  transform: Number,
+});
 const total = ref(0);
 
 const {
@@ -80,7 +88,10 @@ const {
     const { data } = await apiClient.comment.listComments({
       page: page.value,
       size: size.value,
-      approved: selectedApprovedStatus.value,
+      approved:
+        selectedApprovedStatus.value !== undefined
+          ? Boolean(selectedApprovedStatus.value)
+          : undefined,
       sort: [selectedSort.value].filter(Boolean) as string[],
       keyword: keyword.value,
       ownerName: selectedUser.value,
@@ -260,13 +271,13 @@ const handleApproveInBatch = async () => {
                     },
                     {
                       label: t('core.comment.filters.status.items.approved'),
-                      value: true,
+                      value: 'true',
                     },
                     {
                       label: t(
                         'core.comment.filters.status.items.pending_review'
                       ),
-                      value: false,
+                      value: 'false',
                     },
                   ]"
                 />
