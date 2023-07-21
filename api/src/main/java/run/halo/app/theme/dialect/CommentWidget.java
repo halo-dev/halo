@@ -13,6 +13,8 @@ import org.thymeleaf.processor.element.IElementTagStructureHandler;
  */
 public interface CommentWidget extends ExtensionPoint {
 
+    String ENABLE_COMMENT_ATTRIBUTE = CommentWidget.class.getName() + ".ENABLE";
+
     void render(ITemplateContext context, IProcessableElementTag tag,
         IElementTagStructureHandler structureHandler);
 }
