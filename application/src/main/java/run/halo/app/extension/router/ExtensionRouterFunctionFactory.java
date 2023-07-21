@@ -13,7 +13,6 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
-import run.halo.app.theme.endpoint.SortableRequest;
 
 public class ExtensionRouterFunctionFactory {
 

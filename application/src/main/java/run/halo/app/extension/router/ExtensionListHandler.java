@@ -10,7 +10,6 @@ import reactor.core.publisher.Mono;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
 import run.halo.app.extension.router.ExtensionRouterFunctionFactory.ListHandler;
-import run.halo.app.theme.endpoint.SortableRequest;
 
 class ExtensionListHandler implements ListHandler {
     private final Scheme scheme;
