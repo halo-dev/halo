@@ -565,8 +565,7 @@ class UserEndpointTest {
                 .contentType(MediaType.IMAGE_PNG)
                 .filename("fake-filename.png");
 
-            SystemSetting.User user = new SystemSetting.User();
-            user.setAvatarMaxSize(1);
+            SystemSetting.User user = mock(SystemSetting.User.class);
             when(environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class))
                 .thenReturn(Mono.just(user));
             when(client.get(User.class, "fake-user")).thenReturn(Mono.just(currentUser));
