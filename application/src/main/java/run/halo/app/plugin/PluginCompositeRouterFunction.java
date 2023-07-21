@@ -4,6 +4,7 @@ import static run.halo.app.plugin.ExtensionContextRegistry.getInstance;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.HandlerFunction;
@@ -48,27 +49,35 @@ public class PluginCompositeRouterFunction implements RouterFunction<ServerRespo
 
     @SuppressWarnings("unchecked")
     private List<RouterFunction<ServerResponse>> routerFunctions() {
-        var rawRouterFunctions = getInstance().getPluginApplicationContexts()
-            .stream()
-            .flatMap(applicationContext -> applicationContext
-                .getBeanProvider(RouterFunction.class)
-                .orderedStream())
-            .map(router -> (RouterFunction<ServerResponse>) router)
-            .toList();
-        var reverseProxies = reverseProxyRouterFunctionFactory.getRouterFunctions();
+        getInstance().acquireReadLock();
+        try {
+            List<PluginApplicationContext> contexts = getInstance().getPluginApplicationContexts()
+                .stream()
+                .filter(AbstractApplicationContext::isActive)
+                .toList();
+            var rawRouterFunctions = contexts
+                .stream()
+                .flatMap(applicationContext -> applicationContext
+                    .getBeanProvider(RouterFunction.class)
+                    .orderedStream())
+                .map(router -> (RouterFunction<ServerResponse>) router)
+                .toList();
+            var reverseProxies = reverseProxyRouterFunctionFactory.getRouterFunctions();
 
-        var endpointBuilder = new CustomEndpointsBuilder();
-        getInstance().getPluginApplicationContexts()
-            .forEach(context -> context.getBeanProvider(CustomEndpoint.class)
+            var endpointBuilder = new CustomEndpointsBuilder();
+            contexts.forEach(context -> context.getBeanProvider(CustomEndpoint.class)
                 .orderedStream()
                 .forEach(endpointBuilder::add));
-        var customEndpoint = endpointBuilder.build();
+            var customEndpoint = endpointBuilder.build();
 
-        List<RouterFunction<ServerResponse>> routerFunctions =
-            new ArrayList<>(rawRouterFunctions.size() + reverseProxies.size() + 1);
-        routerFunctions.addAll(rawRouterFunctions);
-        routerFunctions.addAll(reverseProxies);
-        routerFunctions.add(customEndpoint);
-        return routerFunctions;
+            List<RouterFunction<ServerResponse>> routerFunctions =
+                new ArrayList<>(rawRouterFunctions.size() + reverseProxies.size() + 1);
+            routerFunctions.addAll(rawRouterFunctions);
+            routerFunctions.addAll(reverseProxies);
+            routerFunctions.add(customEndpoint);
+            return routerFunctions;
+        } finally {
+            getInstance().releaseReadLock();
+        }
     }
 }
