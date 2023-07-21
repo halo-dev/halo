@@ -27,12 +27,17 @@ public class PluginApplicationEventBridgeDispatcher
         if (!isSharedEventAnnotationPresent(event.getClass())) {
             return;
         }
-        List<PluginApplicationContext> pluginApplicationContexts =
-            ExtensionContextRegistry.getInstance().getPluginApplicationContexts();
-        for (PluginApplicationContext pluginApplicationContext : pluginApplicationContexts) {
-            log.debug("Bridging broadcast event [{}] to plugin [{}]", event,
-                pluginApplicationContext.getPluginId());
-            pluginApplicationContext.publishEvent(event);
+        ExtensionContextRegistry.getInstance().acquireReadLock();
+        try {
+            List<PluginApplicationContext> pluginApplicationContexts =
+                ExtensionContextRegistry.getInstance().getPluginApplicationContexts();
+            for (PluginApplicationContext pluginApplicationContext : pluginApplicationContexts) {
+                log.debug("Bridging broadcast event [{}] to plugin [{}]", event,
+                    pluginApplicationContext.getPluginId());
+                pluginApplicationContext.publishEvent(event);
+            }
+        } finally {
+            ExtensionContextRegistry.getInstance().releaseReadLock();
         }
     }
 
