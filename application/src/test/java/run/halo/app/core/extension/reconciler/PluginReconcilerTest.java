@@ -115,11 +115,7 @@ class PluginReconcilerTest {
 
         // mock start plugin failed
         when(extensionClient.fetch(eq(Plugin.class), eq("apples"))).thenReturn(Optional.of(plugin));
-        when(haloPluginManager.startPlugin(any())).thenAnswer((Answer<PluginState>) invocation -> {
-            // mock plugin real state is started
-            when(pluginWrapper.getPluginState()).thenReturn(PluginState.FAILED);
-            return PluginState.FAILED;
-        });
+        when(haloPluginManager.startPlugin(any())).thenReturn(PluginState.FAILED);
 
         // mock plugin real state is started
         when(pluginWrapper.getPluginState()).thenReturn(PluginState.STOPPED);
