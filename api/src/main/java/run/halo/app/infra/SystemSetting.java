@@ -69,7 +69,6 @@ public class SystemSetting {
         Boolean allowRegistration;
         String defaultRole;
         String avatarPolicy;
-        Integer avatarMaxSize;
     }
 
     @Data

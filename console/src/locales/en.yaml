@@ -877,14 +877,11 @@ core:
       avatar:
         title: Avatar
         toast_upload_failed: Failed to upload avatar
-        toast_remove_failed: Failed to remove avatar
+        toast_remove_failed: Failed to delete avatar
         cropper_modal:
           title: Crop Avatar
-        upload:
-          button: Upload
         remove:
-          title: Are you sure you want to remove the avatar?
-          button: Remove
+          title: Are you sure you want to delete the avatar?
   role:
     title: Roles
     common:

@@ -83,6 +83,7 @@ public class UserEndpoint implements CustomEndpoint {
     private static final String SELF_USER = "-";
     private static final String USER_AVATAR_GROUP_NAME = "user-avatar-group";
     private static final String DEFAULT_USER_AVATAR_ATTACHMENT_POLICY_NAME = "default-policy";
+    private static final Integer DEFAULT_AVATAR_FILE_SIZE = 2;
     private final ReactiveExtensionClient client;
     private final UserService userService;
     private final RoleService roleService;
@@ -266,8 +267,7 @@ public class UserEndpoint implements CustomEndpoint {
             .switchIfEmpty(
                 Mono.error(new IllegalStateException("User setting is not configured"))
             )
-            .flatMap(userSetting -> checkAvatar(userSetting.getAvatarMaxSize(), uploadRequest)
-                .then(Mono.defer(
+            .flatMap(userSetting -> checkAvatar(uploadRequest).then(Mono.defer(
                     () -> {
                         String avatarPolicy = userSetting.getAvatarPolicy();
                         if (StringUtils.isBlank(avatarPolicy)) {
@@ -286,18 +286,14 @@ public class UserEndpoint implements CustomEndpoint {
             );
     }
 
-    private Mono<Void> checkAvatar(Integer avatarMaxSize, AvatarUploadRequest uploadRequest) {
+    private Mono<Void> checkAvatar(AvatarUploadRequest uploadRequest) {
         FilePart filePart = uploadRequest.getFile();
-        if (Objects.isNull(avatarMaxSize)) {
-            avatarMaxSize = 1;
-        }
-        final Integer finalAvatarMaxSize = avatarMaxSize;
         return filePart.content()
             .reduce(0L, (totalSize, dataBuffer) -> {
                 long byteCount = dataBuffer.readableByteCount();
-                if (totalSize + byteCount > finalAvatarMaxSize * 1024 * 1024) {
+                if (totalSize + byteCount > DEFAULT_AVATAR_FILE_SIZE * 1024 * 1024) {
                     throw new ServerWebInputException(
-                        "The avatar file needs to be smaller than " + finalAvatarMaxSize
+                        "The avatar file needs to be smaller than " + DEFAULT_AVATAR_FILE_SIZE
                             + " MB.");
                 }
                 return totalSize + byteCount;

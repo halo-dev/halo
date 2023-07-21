@@ -877,14 +877,11 @@ core:
       avatar:
         title: 頭像
         toast_upload_failed: 上傳頭像失敗
-        toast_remove_failed: 移除頭像失敗
+        toast_remove_failed: 刪除頭像失敗
         cropper_modal:
           title: 裁剪頭像
-        upload:
-          button: 上傳
         remove:
-          title: 確定要移除頭像嗎？
-          button: 移除
+          title: 確定要刪除頭像嗎？
   role:
     title: 角色
     common:

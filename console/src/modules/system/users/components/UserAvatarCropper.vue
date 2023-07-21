@@ -197,7 +197,7 @@ defineExpose({
 <template>
   <div class="flex flex-col-reverse md:flex-row">
     <div
-      class="relative max-h-[500px] flex-auto md:mr-4"
+      class="relative max-h-[500px] flex-auto overflow-hidden rounded-md md:mr-4"
       :style="{ minHeight: `${cropperHeight}px` }"
     >
       <img
@@ -225,7 +225,7 @@ defineExpose({
     </div>
     <div
       ref="previewElement"
-      class="mb-4 flex justify-around md:mb-0 md:inline-block md:flex-auto md:justify-start"
+      class="mb-4 flex justify-around md:mb-0 md:inline-block md:justify-start"
     >
       <div
         class="preview overflow-hidden rounded-md border border-gray-300 shadow-md md:mb-4"

@@ -250,10 +250,10 @@ const changeUploadAvatar = () => {
                   </div>
                   <template #popper>
                     <VDropdownItem @click="open()">
-                      {{ $t("core.user.detail.avatar.upload.button") }}
+                      {{ $t("core.common.buttons.upload") }}
                     </VDropdownItem>
                     <VDropdownItem @click="handleRemoveCurrentAvatar">
-                      {{ $t("core.user.detail.avatar.remove.button") }}
+                      {{ $t("core.common.buttons.delete") }}
                     </VDropdownItem>
                   </template>
                 </VDropdown>
