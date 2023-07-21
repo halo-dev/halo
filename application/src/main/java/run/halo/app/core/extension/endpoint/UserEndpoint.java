@@ -51,6 +51,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -83,7 +84,7 @@ public class UserEndpoint implements CustomEndpoint {
     private static final String SELF_USER = "-";
     private static final String USER_AVATAR_GROUP_NAME = "user-avatar-group";
     private static final String DEFAULT_USER_AVATAR_ATTACHMENT_POLICY_NAME = "default-policy";
-    private static final Integer DEFAULT_AVATAR_FILE_SIZE = 2;
+    private static final DataSize MAX_AVATAR_FILE_SIZE = DataSize.ofMegabytes(2L);
     private final ReactiveExtensionClient client;
     private final UserService userService;
     private final RoleService roleService;
@@ -291,10 +292,10 @@ public class UserEndpoint implements CustomEndpoint {
         return filePart.content()
             .reduce(0L, (totalSize, dataBuffer) -> {
                 long byteCount = dataBuffer.readableByteCount();
-                if (totalSize + byteCount > DEFAULT_AVATAR_FILE_SIZE * 1024 * 1024) {
+                if (totalSize + byteCount > MAX_AVATAR_FILE_SIZE.toBytes()) {
                     throw new ServerWebInputException(
-                        "The avatar file needs to be smaller than " + DEFAULT_AVATAR_FILE_SIZE
-                            + " MB.");
+                        "The avatar file needs to be smaller than "
+                            + MAX_AVATAR_FILE_SIZE.toMegabytes() + " MB.");
                 }
                 return totalSize + byteCount;
             })
