@@ -18,6 +18,7 @@ import run.halo.app.extension.GVK;
 public class Group extends AbstractExtension {
 
     public static final String KIND = "Group";
+    public static final String HIDDEN_LABEL = "halo.run/hidden";
 
     @Schema(required = true)
     private GroupSpec spec;

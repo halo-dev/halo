@@ -78,7 +78,7 @@ export function useAttachmentControl(filterOptions: {
       const deletingAttachments = data?.filter(
         (attachment) => !!attachment.metadata.deletionTimestamp
       );
-      return deletingAttachments?.length ? 3000 : false;
+      return deletingAttachments?.length ? 1000 : false;
     },
   });
 

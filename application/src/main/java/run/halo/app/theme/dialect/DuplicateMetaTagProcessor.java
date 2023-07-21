@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.ITemplateContext;
@@ -30,7 +29,7 @@ import reactor.core.publisher.Mono;
 @Component
 @AllArgsConstructor
 public class DuplicateMetaTagProcessor implements TemplateHeadProcessor {
-    static final Pattern META_PATTERN = Pattern.compile("<meta\\s+name=\"(\\w+)\"(.*?)>");
+    static final Pattern META_PATTERN = Pattern.compile("<meta[^>]+?name=\"([^\"]+)\"[^>]*>\\n*");
 
     @Override
     public Mono<Void> process(ITemplateContext context, IModel model,
@@ -49,15 +48,17 @@ public class DuplicateMetaTagProcessor implements TemplateHeadProcessor {
                 while (matcher.find()) {
                     String tagLine = matcher.group(0);
                     String nameAttribute = matcher.group(1);
-                    IText metaTagNode = context.getModelFactory().createText(tagLine);
+                    // create a new text node to replace the original text node
+                    // replace multiple line breaks with one line break
+                    IText metaTagNode = context.getModelFactory()
+                        .createText(tagLine.replaceAll("\\n+", "\n"));
                     uniqueMetaTags.put(nameAttribute, new IndexedModel(i, metaTagNode));
                     text = text.replace(tagLine, "");
                 }
-                if (StringUtils.isNotBlank(text)) {
-                    IText otherText = context.getModelFactory()
-                        .createText(text);
-                    otherModel.add(new IndexedModel(i, otherText));
-                }
+                // put the rest of the text into the other model
+                IText otherText = context.getModelFactory()
+                    .createText(text);
+                otherModel.add(new IndexedModel(i, otherText));
             } else {
                 otherModel.add(new IndexedModel(i, templateEvent));
             }

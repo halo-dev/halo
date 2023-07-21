@@ -72,7 +72,10 @@ public class ThemeMessageResolverIntegrationTest {
             .isEqualTo("""
                 <!DOCTYPE html>
                 <html lang="en">
-                <head><meta charset="UTF-8"><title>Title</title></head>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Title</title>
+                </head>
                 <body>
                 index
                 <div>zh</div>
@@ -93,7 +96,10 @@ public class ThemeMessageResolverIntegrationTest {
             .isEqualTo("""
                 <!DOCTYPE html>
                 <html lang="en">
-                <head><meta charset="UTF-8"><title>Title</title></head>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Title</title>
+                </head>
                 <body>
                 index
                 <div>en</div>
@@ -114,7 +120,10 @@ public class ThemeMessageResolverIntegrationTest {
             .isEqualTo("""
                 <!DOCTYPE html>
                 <html lang="en">
-                <head><meta charset="UTF-8"><title>Title</title></head>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Title</title>
+                </head>
                 <body>
                 index
                 <div>foo</div>
@@ -135,7 +144,10 @@ public class ThemeMessageResolverIntegrationTest {
             .isEqualTo("""
                 <!DOCTYPE html>
                 <html lang="en">
-                <head><meta charset="UTF-8"><title>Title</title></head>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Title</title>
+                </head>
                 <body>
                 index
                 <div>zh</div>
@@ -154,7 +166,10 @@ public class ThemeMessageResolverIntegrationTest {
             .isEqualTo("""
                 <!DOCTYPE html>
                 <html lang="en">
-                <head><meta charset="UTF-8"><title>Other theme title</title></head>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Other theme title</title>
+                </head>
                 <body>
                 <p>Other 首页</p>
                 </body>
@@ -167,7 +182,10 @@ public class ThemeMessageResolverIntegrationTest {
             .isEqualTo("""
                 <!DOCTYPE html>
                 <html lang="en">
-                <head><meta charset="UTF-8"><title>Other theme title</title></head>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Other theme title</title>
+                </head>
                 <body>
                 <p>other index</p>
                 </body>

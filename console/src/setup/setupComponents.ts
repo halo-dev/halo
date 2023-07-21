@@ -9,6 +9,7 @@ import FormKitConfig from "@/formkit/formkit.config";
 import FilterDropdown from "@/components/filter/FilterDropdown.vue";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import SearchInput from "@/components/input/SearchInput.vue";
+import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 
 export function setupComponents(app: App) {
   app.use(VueGridLayout);
@@ -33,4 +34,5 @@ export function setupComponents(app: App) {
   app.component("FilterDropdown", FilterDropdown);
   app.component("FilterCleanButton", FilterCleanButton);
   app.component("SearchInput", SearchInput);
+  app.component("AnnotationsForm", AnnotationsForm);
 }

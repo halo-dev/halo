@@ -153,10 +153,7 @@ public class PluginApplicationInitializer {
 
     public void contextDestroyed(String pluginId) {
         Assert.notNull(pluginId, "pluginId must not be null");
-        PluginApplicationContext removed = contextRegistry.remove(pluginId);
-        if (removed != null) {
-            removed.close();
-        }
+        contextRegistry.remove(pluginId);
     }
 
     private Set<Class<?>> findCandidateComponents(String pluginId) {

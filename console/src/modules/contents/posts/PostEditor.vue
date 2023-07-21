@@ -36,22 +36,33 @@ import { useLocalStorage } from "@vueuse/core";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
 import { useI18n } from "vue-i18n";
 import UrlPreviewModal from "@/components/preview/UrlPreviewModal.vue";
+import { usePostUpdateMutate } from "./composables/use-post-update-mutate";
+import { contentAnnotations } from "@/constants/annotations";
 
 const router = useRouter();
 const { t } = useI18n();
+const { mutateAsync: postUpdateMutate } = usePostUpdateMutate();
 
 // Editor providers
 const { editorProviders } = useEditorExtensionPoints();
 const currentEditorProvider = ref<EditorProvider>();
 const storedEditorProviderName = useLocalStorage("editor-provider-name", "");
 
-const handleChangeEditorProvider = (provider: EditorProvider) => {
+const handleChangeEditorProvider = async (provider: EditorProvider) => {
   currentEditorProvider.value = provider;
   storedEditorProviderName.value = provider.name;
+
   formState.value.post.metadata.annotations = {
-    "content.halo.run/preferred-editor": provider.name,
+    ...formState.value.post.metadata.annotations,
+    [contentAnnotations.PREFERRED_EDITOR]: provider.name,
   };
+
   formState.value.content.rawType = provider.rawType;
+
+  if (isUpdateMode.value) {
+    const { data } = await postUpdateMutate(formState.value.post);
+    formState.value.post = data;
+  }
 };
 
 // Post form
@@ -179,7 +190,7 @@ const handlePublish = async () => {
       if (returnToView.value === "true" && permalink) {
         window.location.href = permalink;
       } else {
-        router.push({ name: "Posts" });
+        router.back();
       }
     } else {
       const { data } = await apiClient.post.draftPost({
@@ -230,7 +241,7 @@ const handleFetchContent = async () => {
       (provider) =>
         provider.name ===
         formState.value.post.metadata.annotations?.[
-          "content.halo.run/preferred-editor"
+          contentAnnotations.PREFERRED_EDITOR
         ]
     );
 
@@ -245,14 +256,10 @@ const handleFetchContent = async () => {
 
       formState.value.post.metadata.annotations = {
         ...formState.value.post.metadata.annotations,
-        "content.halo.run/preferred-editor": provider.name,
+        [contentAnnotations.PREFERRED_EDITOR]: provider.name,
       };
 
-      const { data } =
-        await apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
-          name: formState.value.post.metadata.name,
-          post: formState.value.post,
-        });
+      const { data } = await postUpdateMutate(formState.value.post);
 
       formState.value.post = data;
     } else {
@@ -264,6 +271,9 @@ const handleFetchContent = async () => {
         confirmText: t("core.common.buttons.confirm"),
         cancelText: t("core.common.buttons.cancel"),
         onConfirm: () => {
+          router.back();
+        },
+        onCancel: () => {
           router.back();
         },
       });
@@ -329,7 +339,7 @@ onMounted(async () => {
     }
 
     formState.value.post.metadata.annotations = {
-      "content.halo.run/preferred-editor": provider.name,
+      [contentAnnotations.PREFERRED_EDITOR]: provider.name,
     };
   }
   handleResetCache();
@@ -379,8 +389,9 @@ const handlePreview = async () => {
     <template #actions>
       <VSpace>
         <EditorProviderSelector
-          v-if="editorProviders.length > 1 && !isUpdateMode"
+          v-if="editorProviders.length > 1"
           :provider="currentEditorProvider"
+          :allow-forced-select="!isUpdateMode"
           @select="handleChangeEditorProvider"
         />
         <VButton

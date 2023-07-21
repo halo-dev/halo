@@ -7,6 +7,11 @@ import org.pf4j.DevelopmentPluginRepository;
 import org.springframework.util.CollectionUtils;
 
 /**
+ * <p>A {@link org.pf4j.PluginRepository} implementation that can add fixed plugin paths for
+ * development {@link org.pf4j.RuntimeMode#DEVELOPMENT}.</p>
+ * <p>change {@link #deletePluginPath(Path)} to a no-op method.</p>
+ * Note: This class is not thread-safe.
+ *
  * @author guqing
  * @since 2.0.0
  */
@@ -38,5 +43,11 @@ public class DefaultDevelopmentPluginRepository extends DevelopmentPluginReposit
         List<Path> paths = new ArrayList<>(fixedPaths);
         paths.addAll(super.getPluginPaths());
         return paths;
+    }
+
+    @Override
+    public boolean deletePluginPath(Path pluginPath) {
+        // do nothing
+        return true;
     }
 }
