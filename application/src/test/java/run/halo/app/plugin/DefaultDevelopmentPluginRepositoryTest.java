@@ -2,12 +2,11 @@ package run.halo.app.plugin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.pf4j.PluginRepository;
 
 /**
@@ -19,18 +18,14 @@ import org.pf4j.PluginRepository;
 class DefaultDevelopmentPluginRepositoryTest {
 
     private PluginRepository developmentPluginRepository;
+
+    @TempDir
     private Path tempDir;
 
     @BeforeEach
-    void setUp() throws IOException {
-        this.tempDir = Files.createTempDirectory("halo-plugin-repo");
+    void setUp() {
         this.developmentPluginRepository =
             new DefaultDevelopmentPluginRepository();
-    }
-
-    @AfterEach
-    void tearDown() throws IOException {
-        Files.delete(tempDir);
     }
 
     @Test
