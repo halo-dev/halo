@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -38,6 +39,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.requestbody.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
@@ -268,38 +270,33 @@ public class UserEndpoint implements CustomEndpoint {
             .switchIfEmpty(
                 Mono.error(new IllegalStateException("User setting is not configured"))
             )
-            .flatMap(userSetting -> checkAvatar(uploadRequest).then(Mono.defer(
-                    () -> {
-                        String avatarPolicy = userSetting.getAvatarPolicy();
-                        if (StringUtils.isBlank(avatarPolicy)) {
-                            avatarPolicy = DEFAULT_USER_AVATAR_ATTACHMENT_POLICY_NAME;
-                        }
-                        FilePart filePart = uploadRequest.getFile();
-                        var ext = Files.getFileExtension(filePart.filename());
-                        return attachmentService.upload(avatarPolicy,
-                            USER_AVATAR_GROUP_NAME,
-                            UUID.randomUUID() + "." + ext,
-                            filePart.content(),
-                            filePart.headers().getContentType()
-                        );
-                    })
-                )
+            .flatMap(userSetting -> Mono.defer(
+                () -> {
+                    String avatarPolicy = userSetting.getAvatarPolicy();
+                    if (StringUtils.isBlank(avatarPolicy)) {
+                        avatarPolicy = DEFAULT_USER_AVATAR_ATTACHMENT_POLICY_NAME;
+                    }
+                    FilePart filePart = uploadRequest.getFile();
+                    var ext = Files.getFileExtension(filePart.filename());
+                    return attachmentService.upload(avatarPolicy,
+                        USER_AVATAR_GROUP_NAME,
+                        UUID.randomUUID() + "." + ext,
+                        maxSizeCheck(filePart.content()),
+                        filePart.headers().getContentType()
+                    );
+                })
             );
     }
 
-    private Mono<Void> checkAvatar(AvatarUploadRequest uploadRequest) {
-        FilePart filePart = uploadRequest.getFile();
-        return filePart.content()
-            .reduce(0L, (totalSize, dataBuffer) -> {
-                long byteCount = dataBuffer.readableByteCount();
-                if (totalSize + byteCount > MAX_AVATAR_FILE_SIZE.toBytes()) {
-                    throw new ServerWebInputException(
-                        "The avatar file needs to be smaller than "
-                            + MAX_AVATAR_FILE_SIZE.toMegabytes() + " MB.");
-                }
-                return totalSize + byteCount;
-            })
-            .then();
+    private Flux<DataBuffer> maxSizeCheck(Flux<DataBuffer> content) {
+        var lenRef = new AtomicInteger(0);
+        return content.doOnNext(dataBuffer -> {
+            int len = lenRef.accumulateAndGet(dataBuffer.readableByteCount(), Integer::sum);
+            if (len > MAX_AVATAR_FILE_SIZE.toBytes()) {
+                throw new ServerWebInputException("The avatar file needs to be smaller than "
+                    + MAX_AVATAR_FILE_SIZE.toMegabytes() + " MB.");
+            }
+        });
     }
 
     private Mono<ServerResponse> createUser(ServerRequest request) {

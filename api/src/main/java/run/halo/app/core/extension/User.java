@@ -35,10 +35,9 @@ public class User extends AbstractExtension {
     public static final String ROLE_NAMES_ANNO = "rbac.authorization.halo.run/role-names";
 
     public static final String LAST_AVATAR_ATTACHMENT_NAME_ANNO =
-        "rbac.authorization.halo.run/last-avatar-attachment-name";
+        "halo.run/last-avatar-attachment-name";
 
-    public static final String AVATAR_ATTACHMENT_NAME_ANNO =
-        "rbac.authorization.halo.run/avatar-attachment-name";
+    public static final String AVATAR_ATTACHMENT_NAME_ANNO = "halo.run/avatar-attachment-name";
 
     public static final String HIDDEN_USER_LABEL = "halo.run/hidden-user";
 

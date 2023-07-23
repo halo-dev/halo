@@ -597,7 +597,7 @@ class UserEndpointTest {
                               "metadata":{
                                   "name":"fake-user",
                                   "annotations":{
-                                      "rbac.authorization.halo.run/avatar-attachment-name":
+                                      "halo.run/avatar-attachment-name":
                                       "fake-attachment"
                                   }
                               }
