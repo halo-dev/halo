@@ -113,7 +113,7 @@ const toolbarItems = computed(() => {
 
 onMounted(() => {
   cropper.value = new Cropper(imageElement.value, {
-    initialAspectRatio: props.cropperHeight / props.cropperWidth,
+    aspectRatio: props.cropperHeight / props.cropperWidth,
     viewMode: 1,
     dragMode: "move",
     checkCrossOrigin: false,
@@ -195,9 +195,9 @@ defineExpose({
 });
 </script>
 <template>
-  <div class="flex flex-col-reverse md:flex-row">
+  <div class="flex flex-col-reverse sm:flex-row">
     <div
-      class="relative max-h-[500px] flex-auto overflow-hidden rounded-md md:mr-4"
+      class="relative max-h-[500px] flex-auto overflow-hidden rounded-md sm:mr-4"
       :style="{ minHeight: `${cropperHeight}px` }"
     >
       <img
@@ -225,13 +225,13 @@ defineExpose({
     </div>
     <div
       ref="previewElement"
-      class="mb-4 flex justify-around md:mb-0 md:inline-block md:justify-start"
+      class="mb-4 flex justify-around sm:mb-0 sm:inline-block sm:justify-start"
     >
       <div
-        class="preview overflow-hidden rounded-md border border-gray-300 shadow-md md:mb-4"
+        class="preview overflow-hidden rounded-md border border-gray-300 shadow-md sm:mb-4"
         :style="{ width: `${cropperWidth}px`, height: `${cropperHeight}px` }"
       ></div>
-      <div class="flex flex-col justify-between md:flex-row">
+      <div class="flex flex-col justify-between sm:flex-row">
         <div
           class="preview overflow-hidden rounded-full border border-gray-300"
           :style="{
