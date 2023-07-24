@@ -69,6 +69,7 @@ core:
         users: 用戶
         settings: 設置
         actuator: 概覽
+        backup: 備份
     operations:
       logout:
         button: 登出
@@ -874,6 +875,14 @@ core:
         bio: 描述
         creation_time: 註冊時間
         identity_authentication: 登入方式
+      avatar:
+        title: 頭像
+        toast_upload_failed: 上傳頭像失敗
+        toast_remove_failed: 刪除頭像失敗
+        cropper_modal:
+          title: 裁剪頭像
+        remove:
+          title: 確定要刪除頭像嗎？
   role:
     title: 角色
     common:
@@ -967,6 +976,43 @@ core:
       os: 操作系統：{os}
     alert:
       external_url_invalid: 檢測到外部訪問地址與當前訪問地址不一致，可能會導致部分連結無法正常跳轉，請檢查外部訪問地址設置。
+  backup:
+    title: 備份與還原
+    tabs:
+      backup_list: 備份
+      restore: 還原
+    empty:
+      title: 沒有備份
+      message: 目前沒有已建立的備份，您可以點擊重新整理或建立新的備份。
+      actions:
+        create: 建立備份
+    operations:
+      create:
+        button: 建立備份
+        title: 建立備份
+        description: 確定要建立備份嗎？此操作可能需要較長時間。
+        toast_success: 已請求建立備份
+      delete:
+        title: 刪除備份
+        description: 確定要刪除此備份嗎？
+      restore:
+        title: 還原成功
+        description: 還原成功後，需要重新啟動 Halo 才能正常載入系統資源，點擊確定後我們會自動停止運行 Halo。
+      shutdown:
+        toast_success: 已請求停止運行
+    list:
+      phases:
+        pending: 準備中
+        running: 備份中
+        succeeded: 備份完成
+        failed: 備份失敗
+      fields:
+        expiresAt: "{expiresAt}失效"
+    restore:
+      tips:
+        first: 1. 還原過程可能需要較長時間，期間請勿重新整理頁面。
+        second: 2. 在還原過程中，雖然已有的資料不會被清除，但若有衝突的資料將被覆蓋。
+        third: 3. 還原完成後會提示停止運行 Halo，停止後可能需要手動啟動。
   exception:
     not_found:
       message: 沒有找到該頁面
@@ -1039,6 +1085,8 @@ core:
     Users Management: 用戶
     User manage: 用戶管理
     User View: 用戶查看
+    Migration Management: 備份與還原
+    Migration Manage: 備份與還原管理
     role-template-view-users: 用戶查看
     role-template-change-password: 修改密碼
   components:

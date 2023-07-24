@@ -69,6 +69,7 @@ core:
         users: Users
         settings: Settings
         actuator: Actuator
+        backup: Backup
     operations:
       logout:
         button: Logout
@@ -874,6 +875,14 @@ core:
         bio: Bio
         creation_time: Creation time
         identity_authentication: Identity authentication
+      avatar:
+        title: Avatar
+        toast_upload_failed: Failed to upload avatar
+        toast_remove_failed: Failed to delete avatar
+        cropper_modal:
+          title: Crop Avatar
+        remove:
+          title: Are you sure you want to delete the avatar?
   role:
     title: Roles
     common:
@@ -967,6 +976,43 @@ core:
       os: "Operating system: {os}"
     alert:
       external_url_invalid: The external access url detected is inconsistent with the current access url, which may cause some links to fail to redirect properly. Please check the external access url settings.
+  backup:
+    title: Backup and Restore
+    tabs:
+      backup_list: Backups
+      restore: Restore
+    empty:
+      title: No backups have been created yet
+      message: You can click the button below to create a backup
+      actions:
+        create: Create backup
+    operations:
+      create:
+        button: Create backup
+        title: Create backup
+        description: Are you sure you want to create a backup? This operation may last for a long time.
+        toast_success: Requested to create a backup
+      delete:
+        title: Delete the backup
+        description: Are you sure you want to delete the backup?
+      restore:
+        title: Restore successfully
+        description: After successful restore, you need to restart Halo to load the system resources normally. After clicking OK, we will automatically stop running Halo.
+      shutdown:
+        toast_success: Requested to shutdown operation
+    list:
+      phases:
+        pending: Pending
+        running: Running
+        succeeded: Succeeded
+        failed: Failed
+      fields:
+        expiresAt: Expires {expiresAt}
+    restore:
+      tips:
+        first: 1. The restore process may last for a long time, please do not refresh the page during this period.
+        second: 2. During the restore process, although the existing data will not be cleaned up, if there is a conflict, the data will be overwritten.
+        third: 3. After the restore is completed, you will be prompted to stop running Halo, and you may need to run it manually after stopping.
   exception:
     not_found:
       message: Page not found
@@ -1039,6 +1085,8 @@ core:
     Users Management: Users
     User manage: User Manage
     User View: User View
+    Migration Management: Backup and Restore
+    Migration Manage: Backup and Restore Manage
     role-template-view-users: User View
     role-template-change-password: Change Password
   components:

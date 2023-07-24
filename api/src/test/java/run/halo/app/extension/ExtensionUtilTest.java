@@ -34,25 +34,25 @@ class ExtensionUtilTest {
     void addFinalizers() {
         var metadata = new Metadata();
         assertNull(metadata.getFinalizers());
-        ExtensionUtil.addFinalizers(metadata, Set.of("fake"));
+        assertTrue(ExtensionUtil.addFinalizers(metadata, Set.of("fake")));
 
         assertEquals(Set.of("fake"), metadata.getFinalizers());
 
-        ExtensionUtil.addFinalizers(metadata, Set.of("fake"));
+        assertFalse(ExtensionUtil.addFinalizers(metadata, Set.of("fake")));
         assertEquals(Set.of("fake"), metadata.getFinalizers());
 
-        ExtensionUtil.addFinalizers(metadata, Set.of("another-fake"));
+        assertTrue(ExtensionUtil.addFinalizers(metadata, Set.of("another-fake")));
         assertEquals(Set.of("fake", "another-fake"), metadata.getFinalizers());
     }
 
     @Test
     void removeFinalizers() {
         var metadata = new Metadata();
-        ExtensionUtil.removeFinalizers(metadata, Set.of("fake"));
+        assertFalse(ExtensionUtil.removeFinalizers(metadata, Set.of("fake")));
         assertNull(metadata.getFinalizers());
 
         metadata.setFinalizers(new HashSet<>(Set.of("fake")));
-        ExtensionUtil.removeFinalizers(metadata, Set.of("fake"));
+        assertTrue(ExtensionUtil.removeFinalizers(metadata, Set.of("fake")));
         assertEquals(Set.of(), metadata.getFinalizers());
     }
 
