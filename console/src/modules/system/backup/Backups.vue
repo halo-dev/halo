@@ -8,24 +8,17 @@ import {
   IconServerLine,
 } from "@halo-dev/components";
 
-import type { Raw } from "vue";
-import type { Component } from "vue";
-import { shallowRef } from "vue";
+import { onMounted, shallowRef } from "vue";
 import ListTab from "./tabs/List.vue";
 import RestoreTab from "./tabs/Restore.vue";
 import { useRouteQuery } from "@vueuse/router";
 import { markRaw } from "vue";
 import { useI18n } from "vue-i18n";
 import { useBackup } from "./composables/use-backup";
+import { usePluginModuleStore } from "@/stores/plugin";
+import type { BackupTab } from "@halo-dev/console-shared";
 
 const { t } = useI18n();
-
-interface BackupTab {
-  id: string;
-  label: string;
-  component: Raw<Component>;
-  permissions?: string[];
-}
 
 const tabs = shallowRef<BackupTab[]>([
   {
@@ -43,6 +36,23 @@ const tabs = shallowRef<BackupTab[]>([
 const activeTab = useRouteQuery<string>("tab", tabs.value[0].id);
 
 const { handleCreate } = useBackup();
+
+onMounted(() => {
+  const { pluginModules } = usePluginModuleStore();
+
+  pluginModules.forEach((pluginModule) => {
+    const { extensionPoints } = pluginModule;
+    if (!extensionPoints?.["backup:tabs:create"]) {
+      return;
+    }
+
+    const backupTabs = extensionPoints["backup:tabs:create"]() as BackupTab[];
+
+    if (backupTabs) {
+      tabs.value = tabs.value.concat(backupTabs);
+    }
+  });
+});
 </script>
 
 <template>
