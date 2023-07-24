@@ -24,6 +24,8 @@ const props = withDefaults(
     note?: string;
     method?: "GET" | "POST" | "PUT" | "HEAD" | "get" | "post" | "put" | "head";
     disabled?: boolean;
+    width?: string;
+    height?: string;
     doneButtonHandler?: () => void;
   }>(),
   {
@@ -35,6 +37,8 @@ const props = withDefaults(
     note: undefined,
     method: "post",
     disabled: false,
+    width: "750px",
+    height: "550px",
     doneButtonHandler: undefined,
   }
 );
@@ -97,11 +101,14 @@ onUnmounted(() => {
 
 <template>
   <dashboard
+    class="w-full"
     :uppy="uppy"
     :props="{
       theme: 'light',
       disabled: disabled,
       note: note,
+      width,
+      height,
       doneButtonHandler: doneButtonHandler,
     }"
   />

@@ -32,6 +32,7 @@ import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.Secret;
+import run.halo.app.migration.Backup;
 import run.halo.app.plugin.extensionpoint.ExtensionDefinition;
 import run.halo.app.plugin.extensionpoint.ExtensionPointDefinition;
 import run.halo.app.search.extension.SearchEngine;
@@ -88,6 +89,9 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
         // auth.halo.run
         schemeManager.register(AuthProvider.class);
         schemeManager.register(UserConnection.class);
+
+        // migration.halo.run
+        schemeManager.register(Backup.class);
 
         eventPublisher.publishEvent(new SchemeInitializedEvent(this));
     }

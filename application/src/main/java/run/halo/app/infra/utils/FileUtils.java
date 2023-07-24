@@ -1,5 +1,6 @@
 package run.halo.app.infra.utils;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.springframework.util.FileSystemUtils.deleteRecursively;
 
 import java.io.Closeable;
@@ -12,7 +13,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.stream.Stream;
@@ -21,6 +24,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
 import run.halo.app.infra.exception.AccessDeniedException;
 
@@ -245,5 +249,32 @@ public abstract class FileUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void copyRecursively(Path src, Path target, Set<String> excludes)
+        throws IOException {
+        var pathMatcher = new AntPathMatcher();
+        Predicate<Path> shouldExclude = path -> excludes.stream()
+            .anyMatch(pattern -> pathMatcher.match(pattern, path.toString()));
+        Files.walkFileTree(src, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                throws IOException {
+                if (!shouldExclude.test(src.relativize(file))) {
+                    Files.copy(file, target.resolve(src.relativize(file)), REPLACE_EXISTING);
+                }
+                return super.visitFile(file, attrs);
+            }
+
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
+                throws IOException {
+                if (shouldExclude.test(src.relativize(dir))) {
+                    return FileVisitResult.SKIP_SUBTREE;
+                }
+                Files.createDirectories(target.resolve(src.relativize(dir)));
+                return super.preVisitDirectory(dir, attrs);
+            }
+        });
     }
 }
