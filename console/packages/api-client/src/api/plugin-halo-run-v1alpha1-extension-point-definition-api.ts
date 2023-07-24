@@ -225,6 +225,7 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiAxiosParamCreator =
        * @param {Array<string>} [labelSelector] Label selector for filtering.
        * @param {number} [page] The page number. Zero indicates no page.
        * @param {number} [size] Size of one page. Zero indicates no limit.
+       * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
        * @param {*} [options] Override http request option.
        * @throws {RequiredError}
        */
@@ -233,6 +234,7 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiAxiosParamCreator =
         labelSelector?: Array<string>,
         page?: number,
         size?: number,
+        sort?: Array<string>,
         options: AxiosRequestConfig = {}
       ): Promise<RequestArgs> => {
         const localVarPath = `/apis/plugin.halo.run/v1alpha1/extensionpointdefinitions`;
@@ -273,6 +275,10 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiAxiosParamCreator =
 
         if (size !== undefined) {
           localVarQueryParameter["size"] = size;
+        }
+
+        if (sort) {
+          localVarQueryParameter["sort"] = Array.from(sort);
         }
 
         setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -455,6 +461,7 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp = function (
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -463,6 +470,7 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp = function (
       labelSelector?: Array<string>,
       page?: number,
       size?: number,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -476,6 +484,7 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiFp = function (
           labelSelector,
           page,
           size,
+          sort,
           options
         );
       return createRequestFunction(
@@ -598,6 +607,7 @@ export const PluginHaloRunV1alpha1ExtensionPointDefinitionApiFactory =
             requestParameters.labelSelector,
             requestParameters.page,
             requestParameters.size,
+            requestParameters.sort,
             options
           )
           .then((request) => request(axios, basePath));
@@ -698,6 +708,13 @@ export interface PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloR
    * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinition
    */
   readonly size?: number;
+
+  /**
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
+   * @type {Array<string>}
+   * @memberof PluginHaloRunV1alpha1ExtensionPointDefinitionApiListpluginHaloRunV1alpha1ExtensionPointDefinition
+   */
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -810,6 +827,7 @@ export class PluginHaloRunV1alpha1ExtensionPointDefinitionApi extends BaseAPI {
         requestParameters.labelSelector,
         requestParameters.page,
         requestParameters.size,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));
