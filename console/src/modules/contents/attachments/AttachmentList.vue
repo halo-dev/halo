@@ -57,12 +57,16 @@ const { groups, handleFetchGroups } = useFetchAttachmentGroup();
 const selectedGroup = ref<Group>();
 
 // Filter
-const keyword = ref<string>("");
-const page = ref<number>(1);
-const size = ref<number>(60);
-const selectedPolicy = ref();
-const selectedUser = ref();
-const selectedSort = ref();
+const keyword = useRouteQuery<string>("keyword", "");
+const page = useRouteQuery<number>("page", 1, {
+  transform: Number,
+});
+const size = useRouteQuery<number>("size", 60, {
+  transform: Number,
+});
+const selectedPolicy = useRouteQuery<string | undefined>("policy");
+const selectedUser = useRouteQuery<string | undefined>("user");
+const selectedSort = useRouteQuery<string | undefined>("sort");
 
 watch(
   () => [
