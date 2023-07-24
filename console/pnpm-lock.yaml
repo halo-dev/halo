@@ -69,8 +69,8 @@ importers:
         specifier: workspace:*
         version: link:packages/shared
       '@halo-dev/richtext-editor':
-        specifier: 0.0.0-alpha.27
-        version: 0.0.0-alpha.27(@tiptap/pm@2.0.3)(vue@3.2.45)
+        specifier: 0.0.0-alpha.29
+        version: 0.0.0-alpha.29(@tiptap/pm@2.0.3)(vue@3.2.45)
       '@tanstack/vue-query':
         specifier: ^4.29.1
         version: 4.29.1(vue@3.2.45)
@@ -2373,8 +2373,8 @@ packages:
       - windicss
     dev: false
 
-  /@halo-dev/richtext-editor@0.0.0-alpha.27(@tiptap/pm@2.0.3)(vue@3.2.45):
-    resolution: {integrity: sha512-kuD0BLKFU/nKvr9DnqWkReZUEGYqDeymWS9eki/BPk9fPoTnEc0iqBMBiv7jAZk6+HIsBnU3Zi9HhUWNnOs2aA==}
+  /@halo-dev/richtext-editor@0.0.0-alpha.29(@tiptap/pm@2.0.3)(vue@3.2.45):
+    resolution: {integrity: sha512-5lRL3rpHR6xiuYfvpAT0wvKi1dC0NIadPL2lbHwxMCQDKoZV1BQllsdzrkMfcppsSmS99ZUR+YWlFigMeKwZjw==}
     peerDependencies:
       vue: ^3.2.37
     dependencies:
