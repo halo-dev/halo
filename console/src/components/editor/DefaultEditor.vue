@@ -457,6 +457,13 @@ watch(
     immediate: true,
   }
 );
+
+// fixme: temporary solution
+const currentLocale = i18n.global.locale.value as
+  | "zh-CN"
+  | "en"
+  | "zh"
+  | "en-US";
 </script>
 
 <template>
@@ -464,10 +471,11 @@ watch(
     v-model:visible="attachmentSelectorModal"
     @select="onAttachmentSelect"
   />
+  <!-- @ts-ignore -->
   <RichTextEditor
     v-if="editor"
     :editor="editor"
-    :locale="i18n.global.locale.value"
+    :locale="currentLocale"
     :content-styles="{
       width: 'calc(100% - 18rem)',
     }"
