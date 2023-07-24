@@ -4,7 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
-import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
+import static run.halo.app.infra.utils.FileUtils.deleteFileSilently;
 import static run.halo.app.infra.utils.FileUtils.jar;
 import static run.halo.app.infra.utils.FileUtils.unzip;
 import static run.halo.app.infra.utils.FileUtils.zip;
@@ -16,13 +16,16 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.ZipInputStream;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import reactor.test.StepVerifier;
 import run.halo.app.infra.exception.AccessDeniedException;
 
 class FileUtilsTest {
+
+    @TempDir
+    Path tempDirectory;
 
     @Nested
     class DirectoryTraversalTest {
@@ -48,18 +51,6 @@ class FileUtilsTest {
 
     @Nested
     class ZipTest {
-
-        Path tempDirectory;
-
-        @BeforeEach
-        void setUp() throws IOException {
-            tempDirectory = Files.createTempDirectory("halo-test-fileutils-zip-");
-        }
-
-        @AfterEach
-        void cleanUp() {
-            deleteRecursivelyAndSilently(tempDirectory);
-        }
 
         @Test
         void zipFolderAndUnzip() throws IOException, URISyntaxException {
@@ -104,5 +95,23 @@ class FileUtilsTest {
             assertThrows(NoSuchFileException.class, () ->
                 jar(Paths.get("no-such-folder"), tempDirectory.resolve("example.zip")));
         }
+
     }
+
+    @Test
+    void deleteFileSilentlyTest() throws IOException {
+        StepVerifier.create(deleteFileSilently(null))
+            .expectNext(false)
+            .verifyComplete();
+
+        StepVerifier.create(deleteFileSilently(tempDirectory))
+            .expectNext(false)
+            .verifyComplete();
+
+        StepVerifier.create(
+                deleteFileSilently(Files.createFile(tempDirectory.resolve("for-deleting"))))
+            .expectNext(true)
+            .verifyComplete();
+    }
+
 }

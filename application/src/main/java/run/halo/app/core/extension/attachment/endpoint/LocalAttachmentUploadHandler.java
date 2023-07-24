@@ -3,6 +3,7 @@ package run.halo.app.core.extension.attachment.endpoint;
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 import static run.halo.app.infra.utils.FileNameUtils.randomFileName;
 import static run.halo.app.infra.utils.FileUtils.checkDirectoryTraversal;
+import static run.halo.app.infra.utils.FileUtils.deleteFileSilently;
 
 import java.io.IOException;
 import java.net.URI;
@@ -236,6 +237,9 @@ class LocalAttachmentUploadHandler implements AttachmentHandler {
                         var fileName = randomFileName(oldPath.toString(), 4);
                         pathRef.set(oldPath.resolveSibling(fileName));
                     }))
+                // Delete file already wrote partially into attachment folder
+                // in case of content is terminated with an error
+                .onErrorResume(t -> deleteFileSilently(pathRef.get()).then(Mono.error(t)))
                 .then(Mono.fromSupplier(pathRef::get));
         });
     }
