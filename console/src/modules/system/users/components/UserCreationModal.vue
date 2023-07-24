@@ -150,13 +150,6 @@ const handleCreateUser = async () => {
         validation="length:0,20"
       ></FormKit>
       <FormKit
-        v-model="formState.avatar"
-        :label="$t('core.user.editing_modal.fields.avatar.label')"
-        type="attachment"
-        name="avatar"
-        validation="length:0,1024"
-      ></FormKit>
-      <FormKit
         v-model="formState.password"
         :label="$t('core.user.change_password_modal.fields.new_password.label')"
         type="password"

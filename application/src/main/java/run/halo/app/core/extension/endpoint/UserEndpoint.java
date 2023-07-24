@@ -5,13 +5,17 @@ import static java.util.Comparator.comparing;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
+import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
+import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
+import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static run.halo.app.extension.ListResult.generateGenericClass;
 import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.io.Files;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,22 +29,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springdoc.core.fn.builders.requestbody.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.http.codec.multipart.Part;
 import org.springframework.lang.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.unit.DataSize;
+import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -51,6 +65,8 @@ import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.User;
+import run.halo.app.core.extension.attachment.Attachment;
+import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Comparators;
@@ -59,6 +75,8 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 
 @Component
@@ -66,9 +84,14 @@ import run.halo.app.infra.utils.JsonUtils;
 public class UserEndpoint implements CustomEndpoint {
 
     private static final String SELF_USER = "-";
+    private static final String USER_AVATAR_GROUP_NAME = "user-avatar-group";
+    private static final String DEFAULT_USER_AVATAR_ATTACHMENT_POLICY_NAME = "default-policy";
+    private static final DataSize MAX_AVATAR_FILE_SIZE = DataSize.ofMegabytes(2L);
     private final ReactiveExtensionClient client;
     private final UserService userService;
     private final RoleService roleService;
+    private final AttachmentService attachmentService;
+    private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -145,7 +168,135 @@ public class UserEndpoint implements CustomEndpoint {
                         .implementation(generateGenericClass(ListedUser.class)));
                 buildParametersFromType(builder, ListRequest.class);
             })
+            .POST("users/{name}/avatar", contentType(MediaType.MULTIPART_FORM_DATA),
+                this::uploadUserAvatar,
+                builder -> builder
+                    .operationId("UploadUserAvatar")
+                    .description("upload user avatar")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .in(ParameterIn.PATH)
+                        .name("name")
+                        .description("User name")
+                        .required(true)
+                    )
+                    .requestBody(Builder.requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                            .schema(schemaBuilder().implementation(IAvatarUploadRequest.class))
+                        ))
+                    .response(responseBuilder().implementation(User.class))
+            )
+            .DELETE("users/{name}/avatar", this::deleteUserAvatar, builder -> builder
+                .tag(tag)
+                .operationId("DeleteUserAvatar")
+                .description("delete user avatar")
+                .parameter(parameterBuilder()
+                    .in(ParameterIn.PATH)
+                    .name("name")
+                    .description("User name")
+                    .required(true)
+                )
+                .response(responseBuilder().implementation(User.class))
+                .build())
             .build();
+    }
+
+    private Mono<ServerResponse> deleteUserAvatar(ServerRequest request) {
+        final var nameInPath = request.pathVariable("name");
+        return getUserOrSelf(nameInPath)
+            .flatMap(user -> {
+                MetadataUtil.nullSafeAnnotations(user)
+                    .remove(User.AVATAR_ATTACHMENT_NAME_ANNO);
+                return client.update(user);
+            })
+            .flatMap(user -> ServerResponse.ok().bodyValue(user));
+    }
+
+    private Mono<User> getUserOrSelf(String name) {
+        if (!SELF_USER.equals(name)) {
+            return client.get(User.class, name);
+        }
+        return ReactiveSecurityContextHolder.getContext()
+            .map(SecurityContext::getAuthentication)
+            .map(Authentication::getName)
+            .flatMap(currentUserName -> client.get(User.class, currentUserName));
+    }
+
+    private Mono<ServerResponse> uploadUserAvatar(ServerRequest request) {
+        final var username = request.pathVariable("name");
+        return request.body(BodyExtractors.toMultipartData())
+            .map(AvatarUploadRequest::new)
+            .flatMap(this::uploadAvatar)
+            .flatMap(attachment -> getUserOrSelf(username)
+                .flatMap(user -> {
+                    MetadataUtil.nullSafeAnnotations(user)
+                        .put(User.AVATAR_ATTACHMENT_NAME_ANNO,
+                            attachment.getMetadata().getName());
+                    return client.update(user);
+                })
+                .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                    .filter(OptimisticLockingFailureException.class::isInstance))
+            )
+            .flatMap(user -> ServerResponse.ok().bodyValue(user));
+    }
+
+    public interface IAvatarUploadRequest {
+        @Schema(requiredMode = REQUIRED, description = "Avatar file")
+        FilePart getFile();
+    }
+
+    public record AvatarUploadRequest(MultiValueMap<String, Part> formData) {
+        public FilePart getFile() {
+            Part file = formData.getFirst("file");
+            if (file == null) {
+                throw new ServerWebInputException("No file part found in the request");
+            }
+
+            if (!(file instanceof FilePart filePart)) {
+                throw new ServerWebInputException("Invalid part of file");
+            }
+
+            if (!filePart.filename().endsWith(".png")) {
+                throw new ServerWebInputException("Only support avatar in PNG format");
+            }
+            return filePart;
+        }
+    }
+
+    private Mono<Attachment> uploadAvatar(AvatarUploadRequest uploadRequest) {
+        return environmentFetcher.fetch(SystemSetting.User.GROUP, SystemSetting.User.class)
+            .switchIfEmpty(
+                Mono.error(new IllegalStateException("User setting is not configured"))
+            )
+            .flatMap(userSetting -> Mono.defer(
+                () -> {
+                    String avatarPolicy = userSetting.getAvatarPolicy();
+                    if (StringUtils.isBlank(avatarPolicy)) {
+                        avatarPolicy = DEFAULT_USER_AVATAR_ATTACHMENT_POLICY_NAME;
+                    }
+                    FilePart filePart = uploadRequest.getFile();
+                    var ext = Files.getFileExtension(filePart.filename());
+                    return attachmentService.upload(avatarPolicy,
+                        USER_AVATAR_GROUP_NAME,
+                        UUID.randomUUID() + "." + ext,
+                        maxSizeCheck(filePart.content()),
+                        filePart.headers().getContentType()
+                    );
+                })
+            );
+    }
+
+    private Flux<DataBuffer> maxSizeCheck(Flux<DataBuffer> content) {
+        var lenRef = new AtomicInteger(0);
+        return content.doOnNext(dataBuffer -> {
+            int len = lenRef.accumulateAndGet(dataBuffer.readableByteCount(), Integer::sum);
+            if (len > MAX_AVATAR_FILE_SIZE.toBytes()) {
+                throw new ServerWebInputException("The avatar file needs to be smaller than "
+                    + MAX_AVATAR_FILE_SIZE.toMegabytes() + " MB.");
+            }
+        });
     }
 
     private Mono<ServerResponse> createUser(ServerRequest request) {
@@ -234,10 +385,18 @@ public class UserEndpoint implements CustomEndpoint {
                 .switchIfEmpty(
                     Mono.error(() -> new ServerWebInputException("Username didn't match.")))
                 .map(user -> {
-                    currentUser.getMetadata().setAnnotations(user.getMetadata().getAnnotations());
+                    Map<String, String> oldAnnotations =
+                        MetadataUtil.nullSafeAnnotations(currentUser);
+                    Map<String, String> newAnnotations = user.getMetadata().getAnnotations();
+                    if (!CollectionUtils.isEmpty(newAnnotations)) {
+                        newAnnotations.put(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO,
+                            oldAnnotations.get(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO));
+                        newAnnotations.put(User.AVATAR_ATTACHMENT_NAME_ANNO,
+                            oldAnnotations.get(User.AVATAR_ATTACHMENT_NAME_ANNO));
+                        currentUser.getMetadata().setAnnotations(newAnnotations);
+                    }
                     var spec = currentUser.getSpec();
                     var newSpec = user.getSpec();
-                    spec.setAvatar(newSpec.getAvatar());
                     spec.setBio(newSpec.getBio());
                     spec.setDisplayName(newSpec.getDisplayName());
                     spec.setTwoFactorAuthEnabled(newSpec.getTwoFactorAuthEnabled());

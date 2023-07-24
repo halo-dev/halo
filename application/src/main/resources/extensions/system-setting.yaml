@@ -78,6 +78,10 @@ spec:
         - $formkit: roleSelect
           name: defaultRole
           label: "默认角色"
+        - $formkit: attachmentPolicySelect
+          name: avatarPolicy
+          label: "头像存储位置"
+          value: "default-policy"
     - group: comment
       label: 评论设置
       formSchema:
