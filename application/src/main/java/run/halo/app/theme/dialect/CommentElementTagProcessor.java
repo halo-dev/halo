@@ -27,6 +27,7 @@ import run.halo.app.plugin.extensionpoint.ExtensionGetter;
  */
 public class CommentElementTagProcessor extends AbstractElementTagProcessor {
 
+    public static final String COMMENT_ENABLED_MODEL_ATTRIBUTE = "haloCommentEnabled";
     private static final String TAG_NAME = "comment";
 
     private static final int PRECEDENCE = 1000;
@@ -59,10 +60,11 @@ public class CommentElementTagProcessor extends AbstractElementTagProcessor {
         });
     }
 
-    void populateAllowCommentAttribute(ITemplateContext context, boolean allowComment) {
+    static void populateAllowCommentAttribute(ITemplateContext context, boolean allowComment) {
         if (Contexts.isWebContext(context)) {
             IWebContext webContext = Contexts.asWebContext(context);
-            webContext.getExchange().setAttributeValue("haloCommentVisible", allowComment);
+            webContext.getExchange()
+                .setAttributeValue(COMMENT_ENABLED_MODEL_ATTRIBUTE, allowComment);
         }
     }
 

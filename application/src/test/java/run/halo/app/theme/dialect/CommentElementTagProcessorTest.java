@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Map;
@@ -155,6 +156,21 @@ class CommentElementTagProcessorTest {
         when(webExchange.getAttributeValue(CommentWidget.ENABLE_COMMENT_ATTRIBUTE))
             .thenReturn("false");
         assertThat(CommentElementTagProcessor.getCommentWidget(webContext).isPresent()).isFalse();
+    }
+
+    @Test
+    void populateAllowCommentAttribute() {
+        WebEngineContext webContext = mock(WebEngineContext.class);
+        IWebExchange webExchange = mock(IWebExchange.class);
+        when(webContext.getExchange()).thenReturn(webExchange);
+
+        CommentElementTagProcessor.populateAllowCommentAttribute(webContext, true);
+        verify(webExchange).setAttributeValue(
+            eq(CommentElementTagProcessor.COMMENT_ENABLED_MODEL_ATTRIBUTE), eq(true));
+
+        CommentElementTagProcessor.populateAllowCommentAttribute(webContext, false);
+        verify(webExchange).setAttributeValue(
+            eq(CommentElementTagProcessor.COMMENT_ENABLED_MODEL_ATTRIBUTE), eq(false));
     }
 
     static class DefaultCommentWidget implements CommentWidget {
