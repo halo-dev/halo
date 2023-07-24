@@ -50,5 +50,5 @@ metadata:
 spec:
   className: run.halo.app.security.authentication.login.UsernamePasswordAuthenticationManager
   displayName: Username password authentication manager
-  type: SINGLE_INSTANCE
+  type: SINGLETON
   description: "Provides a way to extend the username password authentication."
