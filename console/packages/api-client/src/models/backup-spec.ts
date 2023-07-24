@@ -25,7 +25,7 @@ export interface BackupSpec {
    */
   expiresAt?: string;
   /**
-   *
+   * Backup file format. Currently, only zip format is supported.
    * @type {string}
    * @memberof BackupSpec
    */

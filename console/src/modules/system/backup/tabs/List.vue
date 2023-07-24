@@ -21,7 +21,9 @@ const {
   queryKey: ["backups"],
   queryFn: async () => {
     const { data } =
-      await apiClient.extension.backup.listmigrationHaloRunV1alpha1Backup();
+      await apiClient.extension.backup.listmigrationHaloRunV1alpha1Backup({
+        sort: ["metadata.creationTimestamp,desc"],
+      });
     return data;
   },
   refetchInterval(data) {
