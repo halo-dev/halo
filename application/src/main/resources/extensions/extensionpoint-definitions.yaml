@@ -41,3 +41,14 @@ spec:
   displayName: CommentWidget
   type: SINGLETON
   description: "Provides an extension point for the comment widget on the theme-side."
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: username-password-authentication-manager
+spec:
+  className: run.halo.app.security.authentication.login.UsernamePasswordAuthenticationManager
+  displayName: Username password authentication manager
+  type: SINGLETON
+  description: "Provides a way to extend the username password authentication."
