@@ -60,6 +60,12 @@ import IconTerminalBoxLine from "~icons/ri/terminal-box-line";
 import IconClipboardLine from "~icons/ri/clipboard-line";
 import IconLockPasswordLine from "~icons/ri/lock-password-line";
 import IconServerLine from "~icons/ri/server-line";
+import IconRiPencilFill from "~icons/ri/pencil-fill";
+import IconZoomInLine from "~icons/ri/zoom-in-line";
+import IconZoomOutLine from "~icons/ri/zoom-out-line";
+import IconArrowLeftRightLine from "~icons/ri/arrow-left-right-line";
+import IconArrowUpDownLine from "~icons/ri/arrow-up-down-line";
+import IconRiUpload2Fill from "~icons/ri/upload-2-fill";
 
 export {
   IconDashboard,
@@ -124,4 +130,10 @@ export {
   IconClipboardLine,
   IconLockPasswordLine,
   IconServerLine,
+  IconRiPencilFill,
+  IconZoomInLine,
+  IconZoomOutLine,
+  IconArrowLeftRightLine,
+  IconArrowUpDownLine,
+  IconRiUpload2Fill,
 };

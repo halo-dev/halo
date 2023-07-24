@@ -35,3 +35,14 @@ spec:
           name: location
           label: 存储位置
           help: ~/.halo2/attachments/upload 下的子目录
+---
+apiVersion: storage.halo.run/v1alpha1
+kind: Group
+metadata:
+  name: user-avatar-group
+  labels:
+    halo.run/hidden: "true"
+  finalizers:
+    - system-protection
+spec:
+  displayName: UserAvatar

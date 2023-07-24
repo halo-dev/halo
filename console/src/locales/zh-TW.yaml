@@ -875,6 +875,14 @@ core:
         bio: 描述
         creation_time: 註冊時間
         identity_authentication: 登入方式
+      avatar:
+        title: 頭像
+        toast_upload_failed: 上傳頭像失敗
+        toast_remove_failed: 刪除頭像失敗
+        cropper_modal:
+          title: 裁剪頭像
+        remove:
+          title: 確定要刪除頭像嗎？
   role:
     title: 角色
     common:
