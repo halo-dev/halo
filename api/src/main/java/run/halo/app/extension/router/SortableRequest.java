@@ -1,5 +1,8 @@
-package run.halo.app.theme.endpoint;
+package run.halo.app.extension.router;
 
+import static run.halo.app.extension.Comparators.compareCreationTimestamp;
+import static run.halo.app.extension.Comparators.compareName;
+import static run.halo.app.extension.Comparators.nullsComparator;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -13,9 +16,7 @@ import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.server.ServerWebExchange;
 import run.halo.app.core.extension.endpoint.SortResolver;
-import run.halo.app.extension.Comparators;
 import run.halo.app.extension.Extension;
-import run.halo.app.extension.router.IListRequest;
 
 public class SortableRequest extends IListRequest.QueryListRequest {
 
@@ -55,24 +56,24 @@ public class SortableRequest extends IListRequest.QueryListRequest {
      */
     public <T extends Extension> Comparator<T> toComparator() {
         var sort = getSort();
-        Stream<Comparator<T>> fallbackComparator =
-            Stream.of(run.halo.app.extension.Comparators.compareCreationTimestamp(false),
-                run.halo.app.extension.Comparators.compareName(true));
-        var comparatorStream = sort.stream()
-            .map(order -> {
-                String property = order.getProperty();
-                Sort.Direction direction = order.getDirection();
-                Function<T, Object> function = extension -> {
-                    BeanWrapper beanWrapper = new BeanWrapperImpl(extension);
-                    return beanWrapper.getPropertyValue(property);
-                };
-                Comparator<T> comparator = Comparator.comparing(function,
-                    Comparators.nullsComparator(direction.isAscending()));
-                if (direction.isDescending()) {
-                    comparator = comparator.reversed();
-                }
-                return comparator;
-            });
+        var fallbackComparator = Stream.<Comparator<T>>of(
+            compareCreationTimestamp(false),
+            compareName(true)
+        );
+        var comparatorStream = sort.stream().map(order -> {
+            var property = order.getProperty();
+            var direction = order.getDirection();
+            Function<T, Object> function = extension -> {
+                BeanWrapper beanWrapper = new BeanWrapperImpl(extension);
+                return beanWrapper.getPropertyValue(property);
+            };
+            var comparator =
+                Comparator.comparing(function, nullsComparator(direction.isAscending()));
+            if (direction.isDescending()) {
+                comparator = comparator.reversed();
+            }
+            return comparator;
+        });
         return Stream.concat(comparatorStream, fallbackComparator)
             .reduce(Comparator::thenComparing)
             .orElse(null);
