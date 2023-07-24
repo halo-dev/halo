@@ -471,7 +471,6 @@ const currentLocale = i18n.global.locale.value as
     v-model:visible="attachmentSelectorModal"
     @select="onAttachmentSelect"
   />
-  <!-- @ts-ignore -->
   <RichTextEditor
     v-if="editor"
     :editor="editor"
