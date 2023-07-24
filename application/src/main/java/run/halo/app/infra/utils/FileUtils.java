@@ -22,6 +22,8 @@ import java.util.zip.ZipOutputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import run.halo.app.infra.exception.AccessDeniedException;
 
 /**
@@ -239,6 +241,21 @@ public abstract class FileUtils {
         }
     }
 
+    public static Mono<Boolean> deleteFileSilently(Path file) {
+        return Mono.fromSupplier(
+                () -> {
+                    if (file == null || !Files.isRegularFile(file)) {
+                        return false;
+                    }
+                    try {
+                        return Files.deleteIfExists(file);
+                    } catch (IOException ignored) {
+                        return false;
+                    }
+                })
+            .subscribeOn(Schedulers.boundedElastic());
+    }
+
     public static void copy(Path source, Path dest, CopyOption... options) {
         try {
             Files.copy(source, dest, options);
@@ -246,4 +263,5 @@ public abstract class FileUtils {
             throw new RuntimeException(e);
         }
     }
+
 }
