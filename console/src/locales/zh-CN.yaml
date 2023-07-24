@@ -69,6 +69,7 @@ core:
         users: 用户
         settings: 设置
         actuator: 概览
+        backup: 备份
     operations:
       logout:
         button: 退出登录
@@ -874,6 +875,14 @@ core:
         bio: 描述
         creation_time: 注册时间
         identity_authentication: 登录方式
+      avatar:
+        title: 头像
+        toast_upload_failed: 上传头像失败
+        toast_remove_failed: 删除头像失败
+        cropper_modal:
+          title: 裁剪头像
+        remove:
+          title: 确定要删除头像吗？
   role:
     title: 角色
     common:
@@ -967,6 +976,43 @@ core:
       os: 操作系统：{os}
     alert:
       external_url_invalid: 检测到外部访问地址与当前访问地址不一致，可能会导致部分链接无法正常跳转，请检查外部访问地址设置。
+  backup:
+    title: 备份与恢复
+    tabs:
+      backup_list: 备份
+      restore: 恢复
+    empty:
+      title: 没有备份
+      message: 当前没有已创建的备份，你可以点击刷新或者创建新的备份
+      actions:
+        create: 创建备份
+    operations:
+      create:
+        button: 创建备份
+        title: 创建备份
+        description: 确定要创建备份吗，此操作可能会持续较长时间。
+        toast_success: 已请求创建备份
+      delete:
+        title: 删除备份
+        description: 确定要删除该备份吗？
+      restore:
+        title: 恢复成功
+        description: 恢复成功之后，需要重启一下 Halo 才能够正常加载系统资源，点击确定之后我们会自动停止运行 Halo
+      shutdown:
+        toast_success: 已请求停止运行
+    list:
+      phases:
+        pending: 准备中
+        running: 备份中
+        succeeded: 备份完成
+        failed: 备份失败
+      fields:
+        expiresAt: "{expiresAt}失效"
+    restore:
+      tips:
+        first: 1. 恢复过程可能会持续较长时间，期间请勿刷新页面。
+        second: 2. 在恢复的过程中，虽然已有的数据不会被清理掉，但如果有冲突的数据将被覆盖。
+        third: 3. 恢复完成之后会提示停止运行 Halo，停止之后可能需要手动运行。
   exception:
     not_found:
       message: 没有找到该页面
@@ -1039,6 +1085,8 @@ core:
     Users Management: 用户
     User manage: 用户管理
     User View: 用户查看
+    Migration Management: 备份与恢复
+    Migration Manage: 备份与恢复管理
     role-template-view-users: 用户查看
     role-template-change-password: 修改密码
   components:

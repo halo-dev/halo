@@ -16,7 +16,7 @@ rules:
     resources: [ "users" ]
     verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
   - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "users", "users/permissions", "users/password" ]
+    resources: [ "users", "users/permissions", "users/password", "users/avatar" ]
     verbs: [ "*" ]
 ---
 apiVersion: v1alpha1

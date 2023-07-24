@@ -9,6 +9,8 @@ export enum rbacAnnotations {
   ROLE_NAMES = "rbac.authorization.halo.run/role-names",
   DISPLAY_NAME = "rbac.authorization.halo.run/display-name",
   DEPENDENCIES = "rbac.authorization.halo.run/dependencies",
+  AVATAR_ATTACHMENT_NAME = "halo.run/avatar-attachment-name",
+  LAST_AVATAR_ATTACHMENT_NAME = "halo.run/last-avatar-attachment-name",
 }
 
 // content

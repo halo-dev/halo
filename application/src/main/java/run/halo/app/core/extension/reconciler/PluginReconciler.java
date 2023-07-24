@@ -320,11 +320,12 @@ public class PluginReconciler implements Reconciler<Request> {
             Plugin.PluginStatus status = plugin.statusNonNull();
 
             PluginWrapper pluginWrapper = haloPluginManager.getPlugin(pluginName);
-            PluginState pluginState = Optional.ofNullable(pluginWrapper)
-                .map(PluginWrapper::getPluginState)
-                .orElse(PluginState.FAILED);
+            if (pluginWrapper != null) {
+                pluginWrapper.setPluginState(PluginState.FAILED);
+                pluginWrapper.setFailedException(e);
+            }
 
-            status.setPhase(pluginState);
+            status.setPhase(PluginState.FAILED);
 
             Plugin.PluginStatus oldStatus = JsonUtils.deepCopy(status);
             Condition condition = Condition.builder()

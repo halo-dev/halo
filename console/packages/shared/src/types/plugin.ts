@@ -5,6 +5,7 @@ import type { AttachmentSelectProvider } from "../states/attachment-selector";
 import type { EditorProvider, PluginTab } from "..";
 import type { AnyExtension } from "@tiptap/vue-3";
 import type { CommentSubjectRefProvider } from "@/states/comment-subject-ref";
+import type { BackupTab } from "@/states/backup";
 
 export interface RouteRecordAppend {
   parentName: RouteRecordName;
@@ -23,11 +24,13 @@ export interface ExtensionPoint {
 
   "plugin:self:tabs:create"?: () => PluginTab[] | Promise<PluginTab[]>;
 
-  "default:editor:extension:create": () =>
+  "default:editor:extension:create"?: () =>
     | AnyExtension[]
     | Promise<AnyExtension[]>;
 
   "comment:subject-ref:create"?: () => CommentSubjectRefProvider[];
+
+  "backup:tabs:create"?: () => BackupTab[] | Promise<BackupTab[]>;
 }
 
 export interface PluginModule {

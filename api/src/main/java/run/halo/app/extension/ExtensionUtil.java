@@ -1,5 +1,6 @@
 package run.halo.app.extension;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,21 +12,26 @@ public enum ExtensionUtil {
             && extension.getMetadata().getDeletionTimestamp() != null;
     }
 
-    public static void addFinalizers(MetadataOperator metadata, Set<String> finalizers) {
-        var existingFinalizers = metadata.getFinalizers();
-        if (existingFinalizers == null) {
-            existingFinalizers = new HashSet<>();
+    public static boolean addFinalizers(MetadataOperator metadata, Set<String> finalizers) {
+        var modifiableFinalizers = new HashSet<>(
+            metadata.getFinalizers() == null ? Collections.emptySet() : metadata.getFinalizers());
+        var added = modifiableFinalizers.addAll(finalizers);
+        if (added) {
+            metadata.setFinalizers(modifiableFinalizers);
         }
-        existingFinalizers.addAll(finalizers);
-        metadata.setFinalizers(existingFinalizers);
+        return added;
     }
 
-    public static void removeFinalizers(MetadataOperator metadata, Set<String> finalizers) {
-        var existingFinalizers = metadata.getFinalizers();
-        if (existingFinalizers != null) {
-            existingFinalizers.removeAll(finalizers);
+    public static boolean removeFinalizers(MetadataOperator metadata, Set<String> finalizers) {
+        if (metadata.getFinalizers() == null) {
+            return false;
         }
-        metadata.setFinalizers(existingFinalizers);
+        var existingFinalizers = new HashSet<>(metadata.getFinalizers());
+        var removed = existingFinalizers.removeAll(finalizers);
+        if (removed) {
+            metadata.setFinalizers(existingFinalizers);
+        }
+        return removed;
     }
 
 }

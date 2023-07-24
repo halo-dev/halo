@@ -3,6 +3,7 @@ package run.halo.app.core.extension.reconciler;
 import static run.halo.app.core.extension.User.GROUP;
 import static run.halo.app.core.extension.User.KIND;
 
+import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,8 @@ import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.RoleBinding;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.UserConnection;
+import run.halo.app.core.extension.attachment.Attachment;
+import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupKind;
@@ -37,6 +40,7 @@ public class UserReconciler implements Reconciler<Request> {
     private final ExtensionClient client;
     private final ExternalUrlSupplier externalUrlSupplier;
     private final RoleService roleService;
+    private final AttachmentService attachmentService;
     private final RetryTemplate retryTemplate = RetryTemplate.builder()
         .maxAttempts(20)
         .fixedBackoff(300)
@@ -54,8 +58,46 @@ public class UserReconciler implements Reconciler<Request> {
             addFinalizerIfNecessary(user);
             ensureRoleNamesAnno(request.name());
             updatePermalink(request.name());
+            handleAvatar(request.name());
         });
         return new Result(false, null);
+    }
+
+    private void handleAvatar(String name) {
+        client.fetch(User.class, name).ifPresent(user -> {
+            Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(user);
+
+            String avatarAttachmentName = annotations.get(User.AVATAR_ATTACHMENT_NAME_ANNO);
+            String oldAvatarAttachmentName = annotations.get(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO);
+
+            if (StringUtils.isNotBlank(oldAvatarAttachmentName)
+                && !StringUtils.equals(oldAvatarAttachmentName, avatarAttachmentName)) {
+                client.fetch(Attachment.class, oldAvatarAttachmentName)
+                    .ifPresent(client::delete);
+                annotations.remove(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO);
+                oldAvatarAttachmentName = null;
+            }
+
+            if (StringUtils.isBlank(oldAvatarAttachmentName)
+                && StringUtils.isNotBlank(avatarAttachmentName)) {
+                oldAvatarAttachmentName = avatarAttachmentName;
+                annotations.put(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO, oldAvatarAttachmentName);
+            }
+
+            if (StringUtils.isNotBlank(avatarAttachmentName)) {
+                client.fetch(Attachment.class, avatarAttachmentName)
+                    .ifPresent(attachment -> {
+                        URI avatarUri = attachmentService.getPermalink(attachment).block();
+                        if (avatarUri == null) {
+                            throw new IllegalStateException("User avatar attachment not found.");
+                        }
+                        user.getSpec().setAvatar(avatarUri.toString());
+                    });
+            } else {
+                user.getSpec().setAvatar(null);
+            }
+            client.update(user);
+        });
     }
 
     private void ensureRoleNamesAnno(String name) {

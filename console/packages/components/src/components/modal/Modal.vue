@@ -183,7 +183,7 @@ watch(
   justify-center
   top-0
   py-10;
-  z-index: 999;
+  z-index: 2000;
 
   .modal-layer {
     @apply flex-none
