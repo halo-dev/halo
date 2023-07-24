@@ -218,6 +218,7 @@ export const ContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -226,6 +227,7 @@ export const ContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (
       labelSelector?: Array<string>,
       page?: number,
       size?: number,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/content.halo.run/v1alpha1/categories`;
@@ -266,6 +268,10 @@ export const ContentHaloRunV1alpha1CategoryApiAxiosParamCreator = function (
 
       if (size !== undefined) {
         localVarQueryParameter["size"] = size;
+      }
+
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -436,6 +442,7 @@ export const ContentHaloRunV1alpha1CategoryApiFp = function (
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -444,6 +451,7 @@ export const ContentHaloRunV1alpha1CategoryApiFp = function (
       labelSelector?: Array<string>,
       page?: number,
       size?: number,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<CategoryList>
@@ -454,6 +462,7 @@ export const ContentHaloRunV1alpha1CategoryApiFp = function (
           labelSelector,
           page,
           size,
+          sort,
           options
         );
       return createRequestFunction(
@@ -565,6 +574,7 @@ export const ContentHaloRunV1alpha1CategoryApiFactory = function (
           requestParameters.labelSelector,
           requestParameters.page,
           requestParameters.size,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -665,6 +675,13 @@ export interface ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1Cate
    * @memberof ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1Category
    */
   readonly size?: number;
+
+  /**
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
+   * @type {Array<string>}
+   * @memberof ContentHaloRunV1alpha1CategoryApiListcontentHaloRunV1alpha1Category
+   */
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -760,6 +777,7 @@ export class ContentHaloRunV1alpha1CategoryApi extends BaseAPI {
         requestParameters.labelSelector,
         requestParameters.page,
         requestParameters.size,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));

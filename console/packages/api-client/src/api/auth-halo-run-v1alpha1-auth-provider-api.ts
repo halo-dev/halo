@@ -218,6 +218,7 @@ export const AuthHaloRunV1alpha1AuthProviderApiAxiosParamCreator = function (
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -226,6 +227,7 @@ export const AuthHaloRunV1alpha1AuthProviderApiAxiosParamCreator = function (
       labelSelector?: Array<string>,
       page?: number,
       size?: number,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/auth.halo.run/v1alpha1/authproviders`;
@@ -266,6 +268,10 @@ export const AuthHaloRunV1alpha1AuthProviderApiAxiosParamCreator = function (
 
       if (size !== undefined) {
         localVarQueryParameter["size"] = size;
+      }
+
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -436,6 +442,7 @@ export const AuthHaloRunV1alpha1AuthProviderApiFp = function (
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -444,6 +451,7 @@ export const AuthHaloRunV1alpha1AuthProviderApiFp = function (
       labelSelector?: Array<string>,
       page?: number,
       size?: number,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -457,6 +465,7 @@ export const AuthHaloRunV1alpha1AuthProviderApiFp = function (
           labelSelector,
           page,
           size,
+          sort,
           options
         );
       return createRequestFunction(
@@ -568,6 +577,7 @@ export const AuthHaloRunV1alpha1AuthProviderApiFactory = function (
           requestParameters.labelSelector,
           requestParameters.page,
           requestParameters.size,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -668,6 +678,13 @@ export interface AuthHaloRunV1alpha1AuthProviderApiListauthHaloRunV1alpha1AuthPr
    * @memberof AuthHaloRunV1alpha1AuthProviderApiListauthHaloRunV1alpha1AuthProvider
    */
   readonly size?: number;
+
+  /**
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
+   * @type {Array<string>}
+   * @memberof AuthHaloRunV1alpha1AuthProviderApiListauthHaloRunV1alpha1AuthProvider
+   */
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -766,6 +783,7 @@ export class AuthHaloRunV1alpha1AuthProviderApi extends BaseAPI {
         requestParameters.labelSelector,
         requestParameters.page,
         requestParameters.size,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));
