@@ -160,6 +160,13 @@ public class WebFluxConfig implements WebFluxConfigurer {
             });
         });
 
+
+        var haloStaticPath = haloProp.getWorkDir().resolve("static");
+        registry.addResourceHandler("/**")
+            .addResourceLocations(FILE_URL_PREFIX + haloStaticPath + "/")
+            .addResourceLocations(resourceProperties.getStaticLocations())
+            .setCacheControl(CacheControl.noCache())
+            .setUseLastModified(true);
     }
 
 
