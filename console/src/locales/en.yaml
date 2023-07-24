@@ -1114,12 +1114,8 @@ core:
         placeholder:
           options:
             placeholder: "Enter / to select input type."
-      toolbar:
-        attachment: Insert attachment
-        select_attachment: Attachments library
-        insert_image: Insert image
-        insert_video: Insert video
-        insert_audio: Insert audio
+      toolbox:
+        attachment: Attachment
       upload_attachment:
         toast:
           no_available_policy: There is currently no available storage policy
