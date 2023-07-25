@@ -35,6 +35,7 @@ import reactor.core.scheduler.Schedulers;
 import reactor.util.context.Context;
 import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreRepository;
+import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.migration.Backup;
@@ -113,10 +114,13 @@ public class MigrationServiceImpl implements MigrationService {
             return Mono.error(new ServerWebInputException("Current backup is not downloadable."));
         }
 
-        var backupFile = getBackupsRoot()
-            .resolve(status.getFilename());
-
-        return Mono.just(new FileSystemResource(backupFile));
+        var backupFile = getBackupsRoot().resolve(status.getFilename());
+        var resource = new FileSystemResource(backupFile);
+        if (!resource.exists()) {
+            return Mono.error(new NotFoundException("problemDetail.migration.backup.notFound",
+                new Object[] {}, "Backup file doesn't exist or deleted."));
+        }
+        return Mono.just(resource);
     }
 
     @Override
