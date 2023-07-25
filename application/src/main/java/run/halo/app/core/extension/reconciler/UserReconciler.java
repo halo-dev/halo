@@ -93,8 +93,7 @@ public class UserReconciler implements Reconciler<Request> {
 
             if (StringUtils.isBlank(oldAvatarAttachmentName)
                 && StringUtils.isNotBlank(avatarAttachmentName)) {
-                oldAvatarAttachmentName = avatarAttachmentName;
-                annotations.put(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO, oldAvatarAttachmentName);
+                annotations.put(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO, avatarAttachmentName);
             }
 
             client.update(user);
