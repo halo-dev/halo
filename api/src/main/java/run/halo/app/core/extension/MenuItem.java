@@ -1,5 +1,7 @@
 package run.halo.app.core.extension;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -19,7 +21,7 @@ import run.halo.app.extension.Ref;
     plural = "menuitems", singular = "menuitem")
 public class MenuItem extends AbstractExtension {
 
-    @Schema(description = "The spec of menu item.", required = true)
+    @Schema(description = "The spec of menu item.", requiredMode = REQUIRED)
     private MenuItemSpec spec;
 
     @Schema(description = "The status of menu item.")

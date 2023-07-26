@@ -1,5 +1,7 @@
 package run.halo.app.extension;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,7 +15,7 @@ import org.springframework.util.StringUtils;
  */
 public interface ExtensionOperator {
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     @JsonProperty("apiVersion")
     default String getApiVersion() {
         final var gvk = getClass().getAnnotation(GVK.class);
@@ -27,7 +29,7 @@ public interface ExtensionOperator {
         return gvk.version();
     }
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     @JsonProperty("kind")
     default String getKind() {
         final var gvk = getClass().getAnnotation(GVK.class);
@@ -38,7 +40,7 @@ public interface ExtensionOperator {
         return gvk.kind();
     }
 
-    @Schema(required = true, implementation = Metadata.class)
+    @Schema(requiredMode = REQUIRED, implementation = Metadata.class)
     @JsonProperty("metadata")
     MetadataOperator getMetadata();
 

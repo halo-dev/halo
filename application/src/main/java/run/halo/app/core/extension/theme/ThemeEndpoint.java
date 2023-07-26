@@ -410,7 +410,7 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     public interface IUpgradeRequest {
 
-        @Schema(required = true, description = "Theme zip file.")
+        @Schema(requiredMode = REQUIRED, description = "Theme zip file.")
         FilePart getFile();
 
     }
@@ -501,7 +501,7 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     @Schema(name = "ThemeInstallRequest")
     public record InstallRequest(
-        @Schema(required = true, description = "Theme zip file.") FilePart file) {
+        @Schema(requiredMode = REQUIRED, description = "Theme zip file.") FilePart file) {
     }
 
     public record InstallFromUriRequest(@Schema(requiredMode = REQUIRED) URI uri) {

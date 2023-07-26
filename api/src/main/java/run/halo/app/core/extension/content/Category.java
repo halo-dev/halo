@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.content;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static run.halo.app.core.extension.content.Category.KIND;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -28,7 +29,7 @@ public class Category extends AbstractExtension {
 
     public static final GroupVersionKind GVK = GroupVersionKind.fromExtension(Category.class);
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private CategorySpec spec;
 
     @Schema
@@ -42,10 +43,10 @@ public class Category extends AbstractExtension {
     @Data
     public static class CategorySpec {
 
-        @Schema(required = true, minLength = 1)
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String displayName;
 
-        @Schema(required = true, minLength = 1)
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String slug;
 
         private String description;
@@ -54,7 +55,7 @@ public class Category extends AbstractExtension {
 
         private String template;
 
-        @Schema(required = true, defaultValue = "0")
+        @Schema(requiredMode = REQUIRED, defaultValue = "0")
         private Integer priority;
 
         private List<String> children;

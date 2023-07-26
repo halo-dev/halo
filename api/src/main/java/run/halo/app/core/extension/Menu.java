@@ -1,5 +1,7 @@
 package run.halo.app.core.extension;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.LinkedHashSet;
@@ -15,14 +17,14 @@ import run.halo.app.extension.GVK;
 @GVK(group = "", version = "v1alpha1", kind = "Menu", plural = "menus", singular = "menu")
 public class Menu extends AbstractExtension {
 
-    @Schema(description = "The spec of menu.", required = true)
+    @Schema(description = "The spec of menu.", requiredMode = REQUIRED)
     private Spec spec;
 
     @Data
     @Schema(name = "MenuSpec")
     public static class Spec {
 
-        @Schema(description = "The display name of the menu.", required = true)
+        @Schema(description = "The display name of the menu.", requiredMode = REQUIRED)
         private String displayName;
 
         @Schema(description = "Names of menu children below this menu.")

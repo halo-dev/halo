@@ -1,5 +1,6 @@
 package run.halo.app.core.extension;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static java.util.Arrays.compare;
 import static run.halo.app.core.extension.Role.GROUP;
 import static run.halo.app.core.extension.Role.KIND;
@@ -44,7 +45,7 @@ public class Role extends AbstractExtension {
     public static final String VERSION = "v1alpha1";
     public static final String KIND = "Role";
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     List<PolicyRule> rules;
 
     /**
