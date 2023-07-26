@@ -1139,6 +1139,7 @@ core:
     pagination:
       page_label: 页
       size_label: 条 / 页
+      total_label: 共 {total} 项数据
     social_auth_providers:
       title: 三方登录
   composables:
