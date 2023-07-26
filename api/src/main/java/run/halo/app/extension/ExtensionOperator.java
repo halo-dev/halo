@@ -49,30 +49,6 @@ public interface ExtensionOperator {
     void setMetadata(MetadataOperator metadata);
 
     /**
-     * This method is only for backward compatibility. Same as {@link #getMetadata()}.
-     *
-     * @return Extension metadata.
-     * @see #getMetadata()
-     */
-    @JsonIgnore
-    @Deprecated(forRemoval = true)
-    default MetadataOperator metadata() {
-        return getMetadata();
-    }
-
-    /**
-     * This method is only for backward compatibility. Same as
-     * {@link #setMetadata(MetadataOperator)}.
-     *
-     * @param metadata is Extension metadata.
-     * @see #setMetadata(MetadataOperator)
-     */
-    @Deprecated(forRemoval = true)
-    default void metadata(MetadataOperator metadata) {
-        setMetadata(metadata);
-    }
-
-    /**
      * Sets GroupVersionKind of the Extension.
      *
      * @param gvk is GroupVersionKind data.
