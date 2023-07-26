@@ -102,6 +102,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <E extends Extension> Mono<E> create(E extension) {
         return Mono.just(extension)
             .doOnNext(ext -> {
@@ -133,6 +134,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <E extends Extension> Mono<E> update(E extension) {
         // Refactor the atomic reference if we have a better solution.
         final var statusChangeOnly = new AtomicBoolean(false);
@@ -181,6 +183,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <E extends Extension> Mono<E> delete(E extension) {
         // set deletionTimestamp
         extension.getMetadata().setDeletionTimestamp(Instant.now());

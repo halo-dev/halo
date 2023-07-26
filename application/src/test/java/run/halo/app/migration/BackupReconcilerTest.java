@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -175,9 +174,8 @@ class BackupReconcilerTest {
         backup.getSpec().setFormat("zip");
         when(client.fetch(Backup.class, name)).thenReturn(Optional.of(backup));
         doNothing().when(client).update(backup);
-        Mono<Void> mono = mock(Mono.class);
-        when(mono.block()).thenThrow(Exceptions.propagate(new InterruptedException()));
-        when(migrationService.backup(backup)).thenReturn(mono);
+        when(migrationService.backup(backup)).thenReturn(
+            Mono.error(Exceptions.propagate(new InterruptedException())));
 
         var result = reconciler.reconcile(new Reconciler.Request(name));
 
@@ -196,7 +194,6 @@ class BackupReconcilerTest {
         verify(client, times(3)).fetch(Backup.class, name);
         verify(client, times(3)).update(backup);
         verify(migrationService).backup(backup);
-        verify(mono).block();
     }
 
     @Test
@@ -206,9 +203,8 @@ class BackupReconcilerTest {
         backup.getSpec().setFormat("zip");
         when(client.fetch(Backup.class, name)).thenReturn(Optional.of(backup));
         doNothing().when(client).update(backup);
-        Mono<Void> mono = mock(Mono.class);
-        when(mono.block()).thenThrow(Exceptions.propagate(new IOException("File not found")));
-        when(migrationService.backup(backup)).thenReturn(mono);
+        when(migrationService.backup(backup))
+            .thenReturn(Mono.error(Exceptions.propagate(new IOException("File not found"))));
 
         var result = reconciler.reconcile(new Reconciler.Request(name));
 
@@ -227,7 +223,6 @@ class BackupReconcilerTest {
         verify(client, times(3)).fetch(Backup.class, name);
         verify(client, times(3)).update(backup);
         verify(migrationService).backup(backup);
-        verify(mono).block();
     }
 
     @Test
