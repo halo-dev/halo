@@ -85,7 +85,7 @@ useQuery({
   <div v-else class="flex h-72 flex-col items-center justify-center">
     <VLoading />
     <div class="text-xs text-gray-600">
-      {{ $t("core.backup.restore.tips.complete") }}...
+      {{ $t("core.backup.restore.tips.complete") }}
     </div>
   </div>
 </template>
