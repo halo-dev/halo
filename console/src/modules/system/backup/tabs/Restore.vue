@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import UppyUpload from "@/components/upload/UppyUpload.vue";
-import { Dialog, Toast, VAlert, VLoading } from "@halo-dev/components";
+import { Dialog, Toast, VAlert, VButton, VLoading } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import axios from "axios";
 import { computed } from "vue";
@@ -10,17 +10,15 @@ import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
 const complete = ref(false);
+const showUploader = ref(false);
 
 const onUploaded = () => {
   Dialog.success({
     title: t("core.backup.operations.restore.title"),
     description: t("core.backup.operations.restore.description"),
     confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
+    showCancel: false,
     async onConfirm() {
-      await handleShutdown();
-    },
-    async onCancel() {
       await handleShutdown();
     },
   });
@@ -67,9 +65,14 @@ useQuery({
             </li>
           </ul>
         </template>
+        <template v-if="!showUploader" #actions>
+          <VButton @click="showUploader = true">
+            {{ $t("core.backup.restore.start") }}
+          </VButton>
+        </template>
       </VAlert>
     </div>
-    <div class="flex items-center justify-center px-4 py-3">
+    <div v-if="showUploader" class="flex items-center justify-center px-4 py-3">
       <UppyUpload
         :restrictions="{
           maxNumberOfFiles: 1,

@@ -1014,6 +1014,7 @@ core:
         second: 2. 在還原過程中，雖然已有的資料不會被清除，但若有衝突的資料將被覆蓋。
         third: 3. 還原完成後會提示停止運行 Halo，停止後可能需要手動啟動。
         complete: 恢復完成，等待重啟...
+      start: 開始還原
   exception:
     not_found:
       message: 沒有找到該頁面

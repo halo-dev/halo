@@ -1014,6 +1014,7 @@ core:
         second: 2. 在恢复的过程中，虽然已有的数据不会被清理掉，但如果有冲突的数据将被覆盖。
         third: 3. 恢复完成之后会提示停止运行 Halo，停止之后可能需要手动运行。
         complete: 恢复完成，等待重启...
+      start: 开始恢复
   exception:
     not_found:
       message: 没有找到该页面
