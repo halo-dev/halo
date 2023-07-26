@@ -257,11 +257,8 @@ const handleFetchContent = async () => {
           raw_type: data.rawType,
         }),
         confirmText: t("core.common.buttons.confirm"),
-        cancelText: t("core.common.buttons.cancel"),
+        showCancel: false,
         onConfirm: () => {
-          router.back();
-        },
-        onCancel: () => {
           router.back();
         },
       });
