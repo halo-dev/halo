@@ -29,7 +29,7 @@ import ReplyListItem from "./ReplyListItem.vue";
 import { apiClient } from "@/utils/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
-import { useQuery } from "@tanstack/vue-query";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { usePluginModuleStore, type PluginModule } from "@/stores/plugin";
 import type {
@@ -39,6 +39,7 @@ import type {
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
+const queryClient = useQueryClient();
 
 const props = withDefaults(
   defineProps<{
@@ -50,10 +51,6 @@ const props = withDefaults(
     isSelected: false,
   }
 );
-
-const emit = defineEmits<{
-  (event: "reload"): void;
-}>();
 
 const selectedReply = ref<ListedReply>();
 const hoveredReply = ref<ListedReply>();
@@ -79,7 +76,7 @@ const handleDelete = async () => {
       } catch (error) {
         console.error("Failed to delete comment", error);
       } finally {
-        emit("reload");
+        queryClient.invalidateQueries({ queryKey: ["comments"] });
       }
     },
   });
@@ -136,7 +133,7 @@ const handleApprove = async () => {
   } catch (error) {
     console.error("Failed to approve comment", error);
   } finally {
-    emit("reload");
+    queryClient.invalidateQueries({ queryKey: ["comments"] });
   }
 };
 
@@ -180,7 +177,7 @@ const handleToggleShowReplies = async () => {
       });
     }
   } else {
-    emit("reload");
+    queryClient.invalidateQueries({ queryKey: ["comments"] });
   }
 };
 
@@ -195,7 +192,12 @@ const onTriggerReply = (reply: ListedReply) => {
 
 const onReplyCreationModalClose = () => {
   selectedReply.value = undefined;
-  refetch();
+
+  queryClient.invalidateQueries({ queryKey: ["comments"] });
+
+  if (showReplies.value) {
+    refetch();
+  }
 };
 
 // Subject ref processing
@@ -354,7 +356,7 @@ const subjectRefResult = computed(() => {
                 }}
               </span>
               <VStatusDot
-                v-if="comment?.comment?.status?.unreadReplyCount || 0 > 0"
+                v-show="(comment?.comment?.status?.unreadReplyCount || 0) > 0"
                 v-tooltip="$t('core.comment.list.fields.has_new_replies')"
                 state="success"
                 animate
@@ -456,7 +458,6 @@ const subjectRefResult = computed(() => {
               :class="{ 'hover:bg-white': showReplies }"
               :reply="reply"
               :replies="replies"
-              @reload="refetch()"
               @reply="onTriggerReply"
             ></ReplyListItem>
           </div>

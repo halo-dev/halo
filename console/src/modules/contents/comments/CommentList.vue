@@ -371,7 +371,6 @@ const handleApproveInBatch = async () => {
             <CommentListItem
               :comment="comment"
               :is-selected="checkSelection(comment)"
-              @reload="refetch()"
             >
               <template #checkbox>
                 <input
