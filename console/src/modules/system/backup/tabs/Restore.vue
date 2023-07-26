@@ -16,11 +16,8 @@ const onUploaded = () => {
     title: t("core.backup.operations.restore.title"),
     description: t("core.backup.operations.restore.description"),
     confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
+    showCancel: false,
     async onConfirm() {
-      await handleShutdown();
-    },
-    async onCancel() {
       await handleShutdown();
     },
   });
