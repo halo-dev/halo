@@ -55,7 +55,8 @@ public class SystemInitializationEndpoint implements CustomEndpoint {
                 builder -> builder.operationId("initialize")
                     .description("Initialize system")
                     .tag(tag)
-                    .requestBody(requestBodyBuilder().implementation(SystemInitializationRequest.class))
+                    .requestBody(requestBodyBuilder()
+                        .implementation(SystemInitializationRequest.class))
                     .response(responseBuilder().implementation(Boolean.class))
             )
             .build();
