@@ -885,8 +885,8 @@ core:
           title: Are you sure you want to delete the avatar?
         tooltips:
           upload: Upload
-          zoom_in: ZoomIn
-          zoom_out: ZoomOut
+          zoom_in: Zoom In
+          zoom_out: Zoom Out
           flip_horizontal: Flip Horizontal
           flip_vertical: Flip Vertical
           reset: Reset
