@@ -150,6 +150,9 @@ const handleSave = async (options?: { mute?: boolean }) => {
       });
       formState.value.page = data;
       routeQueryName.value = data.metadata.name;
+
+      // Clear new page content cache
+      handleClearCache();
     }
 
     if (!options?.mute) {
@@ -195,6 +198,10 @@ const handlePublish = async () => {
       await apiClient.singlePage.draftSinglePage({
         singlePageRequest: formState.value,
       });
+
+      // Clear new page content cache
+      handleClearCache();
+
       router.push({ name: "SinglePages" });
     }
 
