@@ -883,6 +883,13 @@ core:
           title: 裁剪头像
         remove:
           title: 确定要删除头像吗？
+        tooltips:
+          upload: 上传
+          zoom_in: 放大
+          zoom_out: 缩小
+          flip_horizontal: 水平翻转
+          flip_vertical: 垂直翻转
+          reset: 重置
   role:
     title: 角色
     common:
