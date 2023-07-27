@@ -12,6 +12,7 @@ import { AppName } from "@/constants/app";
 import { locales, getBrowserLanguage, i18n } from "@/locales";
 import MdiTranslate from "~icons/mdi/translate";
 import { useLocalStorage } from "@vueuse/core";
+import MdiKeyboardBackspace from "~icons/mdi/keyboard-backspace";
 
 const { globalInfo } = useGlobalInfoFetch();
 const { t } = useI18n();
@@ -86,6 +87,15 @@ watch(
               : $t("core.login.operations.return_login.button")
           }}
         </span>
+      </div>
+      <div class="flex justify-center pt-3.5">
+        <a
+          class="inline-flex items-center gap-0.5 text-xs text-gray-600 hover:text-gray-900"
+          href="/"
+        >
+          <MdiKeyboardBackspace class="!h-3.5 !w-3.5" />
+          <span> {{ $t("core.login.operations.return_site") }} </span>
+        </a>
       </div>
     </div>
     <div

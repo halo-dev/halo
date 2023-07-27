@@ -17,6 +17,7 @@ core:
       return_login:
         label: 已有帳號
         button: 立即登入
+      return_site: 返回到首頁
     button: 登入
     modal:
       title: 重新登入
