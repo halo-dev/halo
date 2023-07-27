@@ -16,6 +16,7 @@ import { useI18n } from "vue-i18n";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
 import { submitForm } from "@formkit/core";
+import AppDownloadAlert from "@/components/common/AppDownloadAlert.vue";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -248,6 +249,10 @@ watch(
   >
     <VTabs v-model:active-id="activeTabId" type="outline" class="!rounded-none">
       <VTabItem id="local" :label="$t('core.plugin.upload_modal.tabs.local')">
+        <div class="pb-3">
+          <AppDownloadAlert />
+        </div>
+
         <UppyUpload
           v-if="uploadVisible"
           :restrictions="{

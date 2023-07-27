@@ -1143,6 +1143,11 @@ core:
       size_label: 條 / 頁
     social_auth_providers:
       title: 三方登入
+    app_download_alert:
+      description: Halo 的主題和插件可以在以下地址下載：
+      sources:
+        app_store: "官方應用市場：{url}"
+        github: "GitHub：{url}"
   composables:
     content_cache:
       toast_recovered: 已從緩存中恢復未保存的內容
