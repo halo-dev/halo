@@ -888,7 +888,7 @@ core:
           zoom_in: ZoomIn
           zoom_out: ZoomOut
           flip_horizontal: Flip Horizontal
-          flip_vertical: FlipVertical
+          flip_vertical: Flip Vertical
           reset: Reset
   role:
     title: Roles
