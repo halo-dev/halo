@@ -78,12 +78,6 @@ public class UserReconciler implements Reconciler<Request> {
                 oldAvatarAttachmentName = null;
             }
 
-            if (StringUtils.isBlank(oldAvatarAttachmentName)
-                && StringUtils.isNotBlank(avatarAttachmentName)) {
-                oldAvatarAttachmentName = avatarAttachmentName;
-                annotations.put(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO, oldAvatarAttachmentName);
-            }
-
             if (StringUtils.isNotBlank(avatarAttachmentName)) {
                 client.fetch(Attachment.class, avatarAttachmentName)
                     .ifPresent(attachment -> {
@@ -93,9 +87,15 @@ public class UserReconciler implements Reconciler<Request> {
                         }
                         user.getSpec().setAvatar(avatarUri.toString());
                     });
-            } else {
+            } else if (StringUtils.isNotBlank(oldAvatarAttachmentName)) {
                 user.getSpec().setAvatar(null);
             }
+
+            if (StringUtils.isBlank(oldAvatarAttachmentName)
+                && StringUtils.isNotBlank(avatarAttachmentName)) {
+                annotations.put(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO, avatarAttachmentName);
+            }
+
             client.update(user);
         });
     }

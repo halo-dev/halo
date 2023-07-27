@@ -209,6 +209,7 @@ public class UserEndpoint implements CustomEndpoint {
             .flatMap(user -> {
                 MetadataUtil.nullSafeAnnotations(user)
                     .remove(User.AVATAR_ATTACHMENT_NAME_ANNO);
+                user.getSpec().setAvatar(null);
                 return client.update(user);
             })
             .flatMap(user -> ServerResponse.ok().bodyValue(user));
