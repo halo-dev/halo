@@ -1,25 +1,46 @@
 <script lang="ts" setup>
-import { VClosePopper } from "floating-vue";
+import { DropdownContextInjectionKey } from "./symbols";
+import { inject } from "vue";
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     selected?: boolean;
+    disabled?: boolean;
     type: "default" | "danger";
   }>(),
   {
     selected: false,
+    disabled: false,
     type: "default",
   }
 );
+
+const emit = defineEmits<{
+  (event: "click", e: MouseEvent): void;
+}>();
+
+const { hide } = inject(DropdownContextInjectionKey) || {};
+
+function onClick(e: MouseEvent) {
+  if (props.disabled) {
+    return;
+  }
+
+  hide?.();
+  emit("click", e);
+}
 </script>
 
 <template>
   <div
-    v-close-popper
     class="dropdown-item-wrapper"
-    :class="[`dropdown-item-wrapper--${type}${selected ? '--selected' : ''}`]"
+    :class="[
+      `dropdown-item-wrapper--${type}${selected ? '--selected' : ''}`,
+      { 'dropdown-item-wrapper--disabled': disabled },
+    ]"
     role="menuitem"
     tabindex="-1"
+    @click="onClick"
   >
     <div class="flex items-center gap-3">
       <slot name="prefix-icon" />
@@ -49,6 +70,10 @@ withDefaults(
     &--selected {
       @apply bg-red-50 text-red-700;
     }
+  }
+
+  &--disabled {
+    @apply opacity-70 cursor-not-allowed;
   }
 }
 </style>

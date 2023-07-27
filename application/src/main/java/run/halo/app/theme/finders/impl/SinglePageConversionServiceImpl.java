@@ -1,15 +1,22 @@
 package run.halo.app.theme.finders.impl;
 
 import java.util.List;
+import java.util.function.Function;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Mono;
+import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.SinglePageService;
 import run.halo.app.core.extension.content.SinglePage;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
+import run.halo.app.theme.ReactiveSinglePageContentHandler;
+import run.halo.app.theme.ReactiveSinglePageContentHandler.SinglePageContentContext;
 import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.SinglePageConversionService;
 import run.halo.app.theme.finders.vo.ContentVo;
@@ -27,11 +34,15 @@ import run.halo.app.theme.finders.vo.StatsVo;
 @RequiredArgsConstructor
 public class SinglePageConversionServiceImpl implements SinglePageConversionService {
 
+    private final ReactiveExtensionClient client;
+
     private final SinglePageService singlePageService;
 
     private final ContributorFinder contributorFinder;
 
     private final CounterService counterService;
+
+    private final ExtensionGetter extensionGetter;
 
     @Override
     public Mono<SinglePageVo> convertToVo(SinglePage singlePage, String snapshotName) {
@@ -39,8 +50,44 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
     }
 
     @Override
-    public Mono<SinglePageVo> convertToVo(SinglePage singlePage) {
+    public Mono<SinglePageVo> convertToVo(@NonNull SinglePage singlePage) {
         return convert(singlePage, singlePage.getSpec().getReleaseSnapshot());
+    }
+
+    protected Mono<ContentVo> extendPageContent(SinglePage singlePage,
+        ContentWrapper wrapper) {
+        Assert.notNull(singlePage, "SinglePage must not be null");
+        Assert.notNull(wrapper, "SinglePage content must not be null");
+        return extensionGetter.getEnabledExtensionByDefinition(
+                ReactiveSinglePageContentHandler.class)
+            .reduce(Mono.fromSupplier(() -> SinglePageContentContext.builder()
+                    .singlePage(singlePage)
+                    .content(wrapper.getContent())
+                    .raw(wrapper.getRaw())
+                    .rawType(wrapper.getRawType())
+                    .build()
+                ),
+                (contentMono, handler) -> contentMono.flatMap(handler::handle)
+            )
+            .flatMap(Function.identity())
+            .map(pageContent -> ContentVo.builder()
+                .content(pageContent.getContent())
+                .raw(pageContent.getRaw())
+                .build()
+            );
+    }
+
+    @Override
+    public Mono<ContentVo> getContent(String pageName) {
+        return client.get(SinglePage.class, pageName)
+            .flatMap(singlePage -> {
+                String releaseSnapshot = singlePage.getSpec().getReleaseSnapshot();
+                String baseSnapshot = singlePage.getSpec().getBaseSnapshot();
+                return singlePageService.getContent(releaseSnapshot, baseSnapshot)
+                    .flatMap(wrapper -> extendPageContent(singlePage, wrapper));
+            })
+            .map(wrapper -> ContentVo.builder().content(wrapper.getContent())
+                .raw(wrapper.getRaw()).build());
     }
 
     @Override
@@ -67,24 +114,17 @@ public class SinglePageConversionServiceImpl implements SinglePageConversionServ
             })
             .flatMap(this::populateStats)
             .flatMap(this::populateContributors)
-            .flatMap(page -> populateContent(page, snapshotName))
+            .flatMap(page -> {
+                String baseSnapshot = page.getSpec().getBaseSnapshot();
+                return singlePageService.getContent(snapshotName, baseSnapshot)
+                    .flatMap(wrapper -> extendPageContent(singlePage, wrapper))
+                    .doOnNext(page::setContent)
+                    .thenReturn(page);
+            })
             .flatMap(page -> contributorFinder.getContributor(page.getSpec().getOwner())
                 .doOnNext(page::setOwner)
                 .thenReturn(page)
             );
-    }
-
-    Mono<SinglePageVo> populateContent(SinglePageVo singlePageVo, String snapshotName) {
-        Assert.notNull(singlePageVo, "Single page vo must not be null");
-        Assert.hasText(snapshotName, "Snapshot name must not be empty");
-        return singlePageService.getContent(snapshotName, singlePageVo.getSpec().getBaseSnapshot())
-            .map(contentWrapper -> ContentVo.builder()
-                .content(contentWrapper.getContent())
-                .raw(contentWrapper.getRaw())
-                .build()
-            )
-            .doOnNext(singlePageVo::setContent)
-            .thenReturn(singlePageVo);
     }
 
     <T extends ListedSinglePageVo> Mono<T> populateStats(T pageVo) {

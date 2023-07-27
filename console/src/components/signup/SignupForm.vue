@@ -125,7 +125,10 @@ const inputClasses = {
       :validation-label="$t('core.signup.fields.password.placeholder')"
       :classes="inputClasses"
       type="password"
-      validation="required|length:0,100"
+      validation="required:trim|length:5,100|matches:/^\S.*\S$/"
+      :validation-messages="{
+        matches: $t('core.formkit.validation.trim'),
+      }"
     >
     </FormKit>
     <FormKit
@@ -134,7 +137,10 @@ const inputClasses = {
       :validation-label="$t('core.signup.fields.password_confirm.placeholder')"
       :classes="inputClasses"
       type="password"
-      validation="required|confirm|length:0,100"
+      validation="confirm|required:trim|length:5,100|matches:/^\S.*\S$/"
+      :validation-messages="{
+        matches: $t('core.formkit.validation.trim'),
+      }"
     >
     </FormKit>
   </FormKit>

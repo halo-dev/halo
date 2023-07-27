@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -57,6 +59,9 @@ public class HaloProperties implements Validator {
 
     @Valid
     private final AttachmentProperties attachment = new AttachmentProperties();
+
+    @Valid
+    private final Map<String, CacheProperties> caches = new LinkedHashMap<>();
 
     @Override
     public boolean supports(Class<?> clazz) {

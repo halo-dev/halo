@@ -218,6 +218,7 @@ export const StorageHaloRunV1alpha1PolicyApiAxiosParamCreator = function (
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -226,6 +227,7 @@ export const StorageHaloRunV1alpha1PolicyApiAxiosParamCreator = function (
       labelSelector?: Array<string>,
       page?: number,
       size?: number,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/storage.halo.run/v1alpha1/policies`;
@@ -266,6 +268,10 @@ export const StorageHaloRunV1alpha1PolicyApiAxiosParamCreator = function (
 
       if (size !== undefined) {
         localVarQueryParameter["size"] = size;
+      }
+
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -436,6 +442,7 @@ export const StorageHaloRunV1alpha1PolicyApiFp = function (
      * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
@@ -444,6 +451,7 @@ export const StorageHaloRunV1alpha1PolicyApiFp = function (
       labelSelector?: Array<string>,
       page?: number,
       size?: number,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<PolicyList>
@@ -454,6 +462,7 @@ export const StorageHaloRunV1alpha1PolicyApiFp = function (
           labelSelector,
           page,
           size,
+          sort,
           options
         );
       return createRequestFunction(
@@ -562,6 +571,7 @@ export const StorageHaloRunV1alpha1PolicyApiFactory = function (
           requestParameters.labelSelector,
           requestParameters.page,
           requestParameters.size,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -662,6 +672,13 @@ export interface StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1Policy
    * @memberof StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1Policy
    */
   readonly size?: number;
+
+  /**
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
+   * @type {Array<string>}
+   * @memberof StorageHaloRunV1alpha1PolicyApiListstorageHaloRunV1alpha1Policy
+   */
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -757,6 +774,7 @@ export class StorageHaloRunV1alpha1PolicyApi extends BaseAPI {
         requestParameters.labelSelector,
         requestParameters.page,
         requestParameters.size,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));

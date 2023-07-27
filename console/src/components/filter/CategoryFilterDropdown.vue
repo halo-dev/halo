@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import type { Category } from "@halo-dev/api-client";
-import { VEntity, VEntityField, VDropdown } from "@halo-dev/components";
+import {
+  VEntity,
+  VEntityField,
+  VDropdown,
+  IconArrowDown,
+} from "@halo-dev/components";
 import { setFocus } from "@/formkit/utils/focus";
 import { computed, ref, watch } from "vue";
 import Fuse from "fuse.js";
@@ -8,37 +13,35 @@ import { usePostCategory } from "@/modules/contents/posts/categories/composables
 
 const props = withDefaults(
   defineProps<{
-    selected?: Category;
+    label: string;
+    modelValue?: string;
   }>(),
   {
-    selected: undefined,
+    modelValue: undefined,
   }
 );
 
 const emit = defineEmits<{
-  (event: "update:selected", category?: Category): void;
-  (event: "select", category?: Category): void;
+  (event: "update:modelValue", value?: string): void;
 }>();
 
 const { categories } = usePostCategory();
 
+const dropdown = ref();
+
 const handleSelect = (category: Category) => {
-  if (
-    props.selected &&
-    category.metadata.name === props.selected.metadata.name
-  ) {
-    emit("update:selected", undefined);
-    emit("select", undefined);
-    return;
+  if (category.metadata.name === props.modelValue) {
+    emit("update:modelValue", undefined);
+  } else {
+    emit("update:modelValue", category.metadata.name);
   }
 
-  emit("update:selected", category);
-  emit("select", category);
+  dropdown.value.hide();
 };
 
 function onDropdownShow() {
   setTimeout(() => {
-    setFocus("categoryDropdownSelectorInput");
+    setFocus("categoryFilterDropdownInput");
   }, 200);
 }
 
@@ -68,16 +71,35 @@ const searchResults = computed(() => {
 
   return fuse?.search(keyword.value).map((item) => item.item);
 });
+
+const selectedCategory = computed(() => {
+  return categories.value?.find(
+    (category) => category.metadata.name === props.modelValue
+  );
+});
 </script>
 
 <template>
-  <VDropdown :classes="['!p-0']" @show="onDropdownShow">
-    <slot />
+  <VDropdown ref="dropdown" :classes="['!p-0']" @show="onDropdownShow">
+    <div
+      class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
+      :class="{ 'font-semibold text-gray-700': modelValue !== undefined }"
+    >
+      <span v-if="!selectedCategory" class="mr-0.5">
+        {{ label }}
+      </span>
+      <span v-else class="mr-0.5">
+        {{ label }}：{{ selectedCategory.spec.displayName }}
+      </span>
+      <span>
+        <IconArrowDown />
+      </span>
+    </div>
     <template #popper>
       <div class="h-96 w-80">
         <div class="border-b border-b-gray-100 bg-white p-4">
           <FormKit
-            id="categoryDropdownSelectorInput"
+            id="categoryFilterDropdownInput"
             v-model="keyword"
             :placeholder="$t('core.common.placeholder.search')"
             type="text"
@@ -91,14 +113,9 @@ const searchResults = computed(() => {
             <li
               v-for="(category, index) in searchResults"
               :key="index"
-              v-close-popper
               @click="handleSelect(category)"
             >
-              <VEntity
-                :is-selected="
-                  selected?.metadata.name === category.metadata.name
-                "
-              >
+              <VEntity :is-selected="modelValue === category.metadata.name">
                 <template #start>
                   <VEntityField
                     :title="category.spec.displayName"

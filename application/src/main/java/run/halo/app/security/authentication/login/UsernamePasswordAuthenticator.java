@@ -1,6 +1,5 @@
 package run.halo.app.security.authentication.login;
 
-import static org.springframework.http.HttpStatus.TOO_MANY_REQUESTS;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static run.halo.app.infra.exception.Exceptions.createErrorResponse;
@@ -39,7 +38,9 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.utils.IpAddressUtils;
+import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.security.AdditionalWebFilter;
 
 /**
@@ -71,11 +72,14 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
     private final RateLimiterRegistry rateLimiterRegistry;
     private final MessageSource messageSource;
 
+    private final ExtensionGetter extensionGetter;
+
     public UsernamePasswordAuthenticator(ServerResponse.Context context,
         ObservationRegistry observationRegistry, ReactiveUserDetailsService userDetailsService,
         ReactiveUserDetailsPasswordService passwordService, PasswordEncoder passwordEncoder,
         ServerSecurityContextRepository securityContextRepository, CryptoService cryptoService,
-        RateLimiterRegistry rateLimiterRegistry, MessageSource messageSource) {
+        RateLimiterRegistry rateLimiterRegistry, MessageSource messageSource,
+        ExtensionGetter extensionGetter) {
         this.context = context;
         this.observationRegistry = observationRegistry;
         this.userDetailsService = userDetailsService;
@@ -85,6 +89,7 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         this.cryptoService = cryptoService;
         this.rateLimiterRegistry = rateLimiterRegistry;
         this.messageSource = messageSource;
+        this.extensionGetter = extensionGetter;
 
         this.authenticationWebFilter =
             new UsernamePasswordAuthenticationWebFilter(authenticationManager());
@@ -113,12 +118,17 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
     }
 
     ReactiveAuthenticationManager authenticationManager() {
-        var manager = new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
-        manager.setPasswordEncoder(passwordEncoder);
-        manager.setUserDetailsPasswordService(passwordService);
+        var manager = new UsernamePasswordDelegatingAuthenticationManager(extensionGetter,
+            defaultAuthenticationManager());
         return new ObservationReactiveAuthenticationManager(observationRegistry, manager);
     }
 
+    ReactiveAuthenticationManager defaultAuthenticationManager() {
+        var manager = new UserDetailsRepositoryReactiveAuthenticationManager(userDetailsService);
+        manager.setPasswordEncoder(passwordEncoder);
+        manager.setUserDetailsPasswordService(passwordService);
+        return manager;
+    }
 
     private <T> RateLimiterOperator<T> createIPBasedRateLimiter(ServerWebExchange exchange) {
         var clientIp = IpAddressUtils.getClientIp(exchange.getRequest());
@@ -136,9 +146,9 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
         return RateLimiterOperator.of(rateLimiter);
     }
 
-    private Mono<Void> handleRequestNotPermitted(RequestNotPermitted e,
+    private Mono<Void> handleRateLimitExceededException(RateLimitExceededException e,
         ServerWebExchange exchange) {
-        var errorResponse = createErrorResponse(e, TOO_MANY_REQUESTS, exchange, messageSource);
+        var errorResponse = createErrorResponse(e, null, exchange, messageSource);
         return writeErrorResponse(errorResponse, exchange);
     }
 
@@ -168,8 +178,9 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
             WebFilterExchange webFilterExchange) {
             return super.onAuthenticationSuccess(authentication, webFilterExchange)
                 .transformDeferred(createIPBasedRateLimiter(webFilterExchange.getExchange()))
-                .onErrorResume(RequestNotPermitted.class,
-                    e -> handleRequestNotPermitted(e, webFilterExchange.getExchange()));
+                .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new)
+                .onErrorResume(RateLimitExceededException.class,
+                    e -> handleRateLimitExceededException(e, webFilterExchange.getExchange()));
         }
     }
 
@@ -230,8 +241,9 @@ public class UsernamePasswordAuthenticator implements AdditionalWebFilter {
                 )
                 .flatMap(matchResult -> handleAuthenticationException(exception, exchange))
                 .transformDeferred(createIPBasedRateLimiter(exchange))
-                .onErrorResume(RequestNotPermitted.class,
-                    e -> handleRequestNotPermitted(e, exchange));
+                .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new)
+                .onErrorResume(RateLimitExceededException.class,
+                    e -> handleRateLimitExceededException(e, exchange));
         }
 
     }

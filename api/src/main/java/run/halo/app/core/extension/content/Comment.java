@@ -45,6 +45,7 @@ public class Comment extends AbstractExtension {
     }
 
     @Data
+    @ToString(callSuper = true)
     @EqualsAndHashCode(callSuper = true)
     public static class CommentSpec extends BaseCommentSpec {
 

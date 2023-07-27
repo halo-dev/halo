@@ -2,6 +2,7 @@ package run.halo.app.infra.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.server.ServerRequest;
 
 /**
@@ -14,6 +15,7 @@ public class IpAddressUtils {
 
     private static final String[] IP_HEADER_NAMES = {
         "X-Forwarded-For",
+        "X-Real-IP",
         "Proxy-Client-IP",
         "WL-Proxy-Client-IP",
         "CF-Connecting-IP",
@@ -36,17 +38,18 @@ public class IpAddressUtils {
     public static String getClientIp(ServerHttpRequest request) {
         for (String header : IP_HEADER_NAMES) {
             String ipList = request.getHeaders().getFirst(header);
-            if (ipList != null && ipList.length() != 0 && !"unknown".equalsIgnoreCase(ipList)) {
+            if (StringUtils.hasText(ipList) && !UNKNOWN.equalsIgnoreCase(ipList)) {
                 String[] ips = ipList.trim().split("[,;]");
                 for (String ip : ips) {
-                    if (ip != null && ip.length() != 0 && !"unknown".equalsIgnoreCase(ip)) {
+                    if (StringUtils.hasText(ip) && !UNKNOWN.equalsIgnoreCase(ip)) {
                         return ip;
                     }
                 }
             }
         }
         var remoteAddress = request.getRemoteAddress();
-        return remoteAddress == null ? UNKNOWN : remoteAddress.getAddress().getHostAddress();
+        return remoteAddress == null || remoteAddress.isUnresolved()
+            ? UNKNOWN : remoteAddress.getAddress().getHostAddress();
     }
 
 

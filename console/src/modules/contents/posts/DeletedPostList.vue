@@ -25,8 +25,6 @@ import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import cloneDeep from "lodash.clonedeep";
-import { getNode } from "@formkit/core";
-import FilterTag from "@/components/filter/FilterTag.vue";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 
@@ -65,7 +63,7 @@ const {
       (post) =>
         !!post.post.metadata.deletionTimestamp || !post.post.spec.deleted
     );
-    return deletingPosts?.length ? 3000 : false;
+    return deletingPosts?.length ? 1000 : false;
   },
 });
 
@@ -191,18 +189,12 @@ watch(selectedPostNames, (newValue) => {
   checkedAll.value = newValue.length === posts.value?.length;
 });
 
-function handleKeywordChange() {
-  const keywordNode = getNode("keywordInput");
-  if (keywordNode) {
-    keyword.value = keywordNode._value as string;
+watch(
+  () => keyword.value,
+  () => {
+    page.value = 1;
   }
-  page.value = 1;
-}
-
-function handleClearKeyword() {
-  keyword.value = "";
-  page.value = 1;
-}
+);
 </script>
 <template>
   <VPageHeader :title="$t('core.deleted_post.title')">
@@ -247,28 +239,7 @@ function handleClearKeyword() {
               />
             </div>
             <div class="flex w-full flex-1 items-center sm:w-auto">
-              <div
-                v-if="!selectedPostNames.length"
-                class="flex items-center gap-2"
-              >
-                <FormKit
-                  id="keywordInput"
-                  outer-class="!p-0"
-                  :placeholder="$t('core.common.placeholder.search')"
-                  type="text"
-                  name="keyword"
-                  :model-value="keyword"
-                  @keyup.enter="handleKeywordChange"
-                ></FormKit>
-
-                <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  {{
-                    $t("core.common.filters.results.keyword", {
-                      keyword: keyword,
-                    })
-                  }}
-                </FilterTag>
-              </div>
+              <SearchInput v-if="!selectedPostNames.length" v-model="keyword" />
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeletePermanentlyInBatch">
                   {{ $t("core.common.buttons.delete_permanently") }}

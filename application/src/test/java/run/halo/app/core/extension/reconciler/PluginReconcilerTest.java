@@ -79,6 +79,7 @@ class PluginReconcilerTest {
     @BeforeEach
     void setUp() {
         pluginReconciler = new PluginReconciler(extensionClient, haloPluginManager, eventPublisher);
+        lenient().when(haloPluginManager.getPluginsRoot()).thenReturn(Paths.get("plugins"));
         lenient().when(haloPluginManager.validatePluginVersion(any())).thenReturn(true);
         lenient().when(haloPluginManager.getSystemVersion()).thenReturn("0.0.0");
         lenient().when(haloPluginManager.getPlugin(any())).thenReturn(pluginWrapper);
@@ -114,11 +115,7 @@ class PluginReconcilerTest {
 
         // mock start plugin failed
         when(extensionClient.fetch(eq(Plugin.class), eq("apples"))).thenReturn(Optional.of(plugin));
-        when(haloPluginManager.startPlugin(any())).thenAnswer((Answer<PluginState>) invocation -> {
-            // mock plugin real state is started
-            when(pluginWrapper.getPluginState()).thenReturn(PluginState.FAILED);
-            return PluginState.FAILED;
-        });
+        when(haloPluginManager.startPlugin(any())).thenReturn(PluginState.FAILED);
 
         // mock plugin real state is started
         when(pluginWrapper.getPluginState()).thenReturn(PluginState.STOPPED);
@@ -378,10 +375,10 @@ class PluginReconcilerTest {
     @Test
     void resolvePluginPathAnnotation() {
         when(haloPluginManager.getPluginsRoot()).thenReturn(Paths.get("/tmp/plugins"));
-        String path = pluginReconciler.resolvePluginPathAnnotation("/tmp/plugins/sitemap-1.0.jar");
+        String path = pluginReconciler.resolvePluginPathForAnno("/tmp/plugins/sitemap-1.0.jar");
         assertThat(path).isEqualTo("sitemap-1.0.jar");
 
-        path = pluginReconciler.resolvePluginPathAnnotation("/abc/plugins/sitemap-1.0.jar");
+        path = pluginReconciler.resolvePluginPathForAnno("/abc/plugins/sitemap-1.0.jar");
         assertThat(path).isEqualTo("/abc/plugins/sitemap-1.0.jar");
     }
 
@@ -494,6 +491,29 @@ class PluginReconcilerTest {
             URI uri = pluginReconciler.toUri("/path/to/file");
             Assertions.assertEquals("file:///path/to/file", uri.toString());
         }
+    }
+
+    @Test
+    void persistenceFailureStatus() {
+        String name = "fake-plugin";
+        Plugin plugin = new Plugin();
+        Plugin.PluginStatus status = new Plugin.PluginStatus();
+        plugin.setStatus(status);
+        when(extensionClient.fetch(eq(Plugin.class), eq(name)))
+            .thenReturn(Optional.of(plugin));
+        PluginWrapper pluginWrapper = mock(PluginWrapper.class);
+        when(haloPluginManager.getPlugin(eq(name)))
+            .thenReturn(pluginWrapper);
+        Throwable error = mock(Throwable.class);
+        pluginReconciler.persistenceFailureStatus(name, error);
+
+        assertThat(status.getPhase()).isEqualTo(PluginState.FAILED);
+        assertThat(status.getConditions()).hasSize(1);
+        assertThat(status.getConditions().peek().getType())
+            .isEqualTo(PluginState.FAILED.toString());
+
+        verify(pluginWrapper).setPluginState(eq(PluginState.FAILED));
+        verify(pluginWrapper).setFailedException(eq(error));
     }
 
     private ArgumentCaptor<Plugin> doReconcileNeedRequeue() {

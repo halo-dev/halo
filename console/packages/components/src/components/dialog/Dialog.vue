@@ -19,6 +19,7 @@ const props = withDefaults(
     description?: string;
     confirmText?: string;
     confirmType?: ButtonType;
+    showCancel?: boolean;
     cancelText?: string;
     visible?: boolean;
     onConfirm?: () => void;
@@ -30,6 +31,7 @@ const props = withDefaults(
     description: "",
     confirmText: "确定",
     confirmType: "primary",
+    showCancel: true,
     cancelText: "取消",
     visible: false,
     onConfirm: () => {
@@ -126,7 +128,9 @@ const handleClose = () => {
         <VButton :loading="loading" :type="confirmType" @click="handleConfirm">
           {{ confirmText }}
         </VButton>
-        <VButton @click="handleCancel">{{ cancelText }}</VButton>
+        <VButton v-if="showCancel" @click="handleCancel">
+          {{ cancelText }}
+        </VButton>
       </div>
     </template>
   </VModal>

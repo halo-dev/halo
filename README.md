@@ -30,7 +30,7 @@ docker run \
   --name halo \
   -p 8090:8090 \
   -v ~/.halo2:/root/.halo2 \
-  halohub/halo:2.6 \
+  halohub/halo:2.7 \
   --halo.security.initializer.superadminusername=admin \
   --halo.security.initializer.superadminpassword=P@88w0rd
 ```
@@ -54,6 +54,16 @@ docker run \
 [![license](https://img.shields.io/github/license/halo-dev/halo.svg?style=flat-square)](https://github.com/halo-dev/halo/blob/master/LICENSE)
 
 Halo 使用 GPL-v3.0 协议开源，请遵守开源协议。
+
+## 赞助
+
+如果 Halo 对你有帮助，欢迎[赞助我们](https://afdian.net/a/halo-dev)，感谢以下赞助者对 Halo 项目的支持：
+
+<p align="center">
+  <a target="_blank" href="https://afdian.net/a/halo-dev">
+    <img alt="sponsors" src="https://github.com/halo-sigs/sponsor-images/blob/main/sponsorkit/sponsors.svg?raw=true">
+  </a>
+</p>
 
 ## 贡献
 

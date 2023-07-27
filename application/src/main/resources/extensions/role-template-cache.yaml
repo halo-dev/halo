@@ -1,0 +1,15 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-cache
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Cache Management"
+    rbac.authorization.halo.run/display-name: "Cache Manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:caches:manage"]
+rules:
+  - apiGroups: ["api.console.halo.run"]
+    resources: ["caches"]
+    verbs: ["delete"]

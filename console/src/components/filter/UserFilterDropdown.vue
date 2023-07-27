@@ -2,6 +2,7 @@
 import type { User } from "@halo-dev/api-client";
 import { useUserFetch } from "@/modules/system/users/composables/use-user";
 import {
+  IconArrowDown,
   VAvatar,
   VDropdown,
   VEntity,
@@ -13,35 +14,35 @@ import Fuse from "fuse.js";
 
 const props = withDefaults(
   defineProps<{
-    selected?: User;
+    label: string;
+    modelValue?: string;
   }>(),
   {
-    selected: undefined,
+    modelValue: undefined,
   }
 );
 
 const emit = defineEmits<{
-  (event: "update:selected", user?: User): void;
-  (event: "select", user?: User): void;
+  (event: "update:modelValue", value?: string): void;
 }>();
 
-const { users, handleFetchUsers } = useUserFetch();
+const { users } = useUserFetch({ fetchOnMounted: true });
+
+const dropdown = ref();
 
 const handleSelect = (user: User) => {
-  if (props.selected && user.metadata.name === props.selected.metadata.name) {
-    emit("update:selected", undefined);
-    emit("select", undefined);
-    return;
+  if (user.metadata.name === props.modelValue) {
+    emit("update:modelValue", undefined);
+  } else {
+    emit("update:modelValue", user.metadata.name);
   }
 
-  emit("update:selected", user);
-  emit("select", user);
+  dropdown.value.hide();
 };
 
 function onDropdownShow() {
-  handleFetchUsers();
   setTimeout(() => {
-    setFocus("userDropdownSelectorInput");
+    setFocus("userFilterDropdownInput");
   }, 200);
 }
 
@@ -68,16 +69,33 @@ const searchResults = computed(() => {
 
   return fuse?.search(keyword.value).map((item) => item.item);
 });
+
+const selectedUser = computed(() => {
+  return users.value.find((user) => user.metadata.name === props.modelValue);
+});
 </script>
 
 <template>
-  <VDropdown :classes="['!p-0']" @show="onDropdownShow">
-    <slot />
+  <VDropdown ref="dropdown" :classes="['!p-0']" @show="onDropdownShow">
+    <div
+      class="flex cursor-pointer select-none items-center text-sm text-gray-700 hover:text-black"
+      :class="{ 'font-semibold text-gray-700': modelValue !== undefined }"
+    >
+      <span v-if="!selectedUser" class="mr-0.5">
+        {{ label }}
+      </span>
+      <span v-else class="mr-0.5">
+        {{ label }}：{{ selectedUser.spec.displayName }}
+      </span>
+      <span>
+        <IconArrowDown />
+      </span>
+    </div>
     <template #popper>
       <div class="h-96 w-80">
         <div class="border-b border-b-gray-100 bg-white p-4">
           <FormKit
-            id="userDropdownSelectorInput"
+            id="userFilterDropdownInput"
             v-model="keyword"
             :placeholder="$t('core.common.placeholder.search')"
             type="text"
@@ -91,12 +109,9 @@ const searchResults = computed(() => {
             <li
               v-for="(user, index) in searchResults"
               :key="index"
-              v-close-popper
               @click="handleSelect(user)"
             >
-              <VEntity
-                :is-selected="selected?.metadata.name === user.metadata.name"
-              >
+              <VEntity :is-selected="modelValue === user.metadata.name">
                 <template #start>
                   <VEntityField>
                     <template #description>

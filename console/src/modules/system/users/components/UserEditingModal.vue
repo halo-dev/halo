@@ -42,7 +42,6 @@ const emit = defineEmits<{
 const initialFormState: User = {
   spec: {
     displayName: "",
-    avatar: "",
     email: "",
     phone: "",
     password: "",
@@ -159,19 +158,6 @@ const handleUpdateUser = async () => {
               :label="$t('core.user.editing_modal.fields.username.label')"
               type="text"
               name="name"
-              :validation="[
-                ['required'],
-                ['length:0,63'],
-                [
-                  'matches',
-                  /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/,
-                ],
-              ]"
-              :validation-messages="{
-                matches: $t(
-                  'core.user.editing_modal.fields.username.validation'
-                ),
-              }"
             ></FormKit>
             <FormKit
               id="displayNameInput"
@@ -194,14 +180,6 @@ const handleUpdateUser = async () => {
               type="text"
               name="phone"
               validation="length:0,20"
-            ></FormKit>
-            <FormKit
-              v-model="formState.spec.avatar"
-              :label="$t('core.user.editing_modal.fields.avatar.label')"
-              type="attachment"
-              name="avatar"
-              :accepts="['image/*']"
-              validation="length:0,1024"
             ></FormKit>
             <FormKit
               v-model="formState.spec.bio"

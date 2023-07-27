@@ -69,6 +69,7 @@ core:
         users: 用戶
         settings: 設置
         actuator: 概覽
+        backup: 備份
     operations:
       logout:
         button: 登出
@@ -124,6 +125,11 @@ core:
               dialog_title: 確定要刷新搜尋引擎索引嗎？
               dialog_content: 此操作會對所有已發布的文章重新創建搜尋引擎索引。
               success_message: 刷新成功
+            evict_page_cache:
+              title: 重新整理頁面快取
+              dialog_title: 確定要重新整理頁面快取嗎？
+              dialog_content: 這個操作會清空所有頁面的快取。
+              success_message: 刷新成功
         user_stats:
           title: 用戶
         comment_stats:
@@ -149,14 +155,12 @@ core:
     filters:
       status:
         items:
-          all: 全部
           published: 已發布
           draft: 未發布
       visible:
         label: 可見性
         result: "可見性：{visible}"
         items:
-          all: 全部
           public: 公開
           private: 私有
       category:
@@ -319,14 +323,12 @@ core:
     filters:
       status:
         items:
-          all: 全部
           published: 已發布
           draft: 未發布
       visible:
         label: 可見性
         result: "可見性：{visible}"
         items:
-          all: 全部
           public: 公開
           private: 私有
       author:
@@ -423,7 +425,6 @@ core:
     filters:
       status:
         items:
-          all: 全部
           approved: 已審核
           pending_review: 待審核
       owner:
@@ -743,7 +744,6 @@ core:
     filters:
       status:
         items:
-          all: 全部
           active: 已啟用
           inactive: 未啟用
       sort:
@@ -783,8 +783,6 @@ core:
         license: 協議
         role_templates: 權限模板
         last_starttime: 最近一次啟動
-    settings:
-      title: 插件設置
     loader:
       toast:
         entry_load_failed: "{name}：讀取插件入口文件失敗"
@@ -877,6 +875,21 @@ core:
         bio: 描述
         creation_time: 註冊時間
         identity_authentication: 登入方式
+      avatar:
+        title: 頭像
+        toast_upload_failed: 上傳頭像失敗
+        toast_remove_failed: 刪除頭像失敗
+        cropper_modal:
+          title: 裁剪頭像
+        remove:
+          title: 確定要刪除頭像嗎？
+        tooltips:
+          upload: 上傳
+          zoom_in: 放大
+          zoom_out: 縮小
+          flip_horizontal: 水平翻轉
+          flip_vertical: 垂直翻轉
+          reset: 重置
   role:
     title: 角色
     common:
@@ -970,6 +983,45 @@ core:
       os: 操作系統：{os}
     alert:
       external_url_invalid: 檢測到外部訪問地址與當前訪問地址不一致，可能會導致部分連結無法正常跳轉，請檢查外部訪問地址設置。
+  backup:
+    title: 備份與還原
+    tabs:
+      backup_list: 備份
+      restore: 還原
+    empty:
+      title: 沒有備份
+      message: 目前沒有已建立的備份，您可以點擊重新整理或建立新的備份。
+      actions:
+        create: 建立備份
+    operations:
+      create:
+        button: 建立備份
+        title: 建立備份
+        description: 確定要建立備份嗎？此操作可能需要較長時間。
+        toast_success: 已請求建立備份
+      delete:
+        title: 刪除備份
+        description: 確定要刪除此備份嗎？
+      restore:
+        title: 還原成功
+        description: 還原成功後，需要重新啟動 Halo 才能正常載入系統資源，點擊確定後我們會自動停止運行 Halo。
+      shutdown:
+        toast_success: 已請求停止運行
+    list:
+      phases:
+        pending: 準備中
+        running: 備份中
+        succeeded: 備份完成
+        failed: 備份失敗
+      fields:
+        expiresAt: "{expiresAt}失效"
+    restore:
+      tips:
+        first: 1. 還原過程可能需要較長時間，期間請勿重新整理頁面。
+        second: 2. 在還原過程中，雖然已有的資料不會被清除，但若有衝突的資料將被覆蓋。
+        third: 3. 還原完成後會提示停止運行 Halo，停止後可能需要手動啟動。
+        complete: 恢復完成，等待重啟...
+      start: 開始還原
   exception:
     not_found:
       message: 沒有找到該頁面
@@ -1042,6 +1094,8 @@ core:
     Users Management: 用戶
     User manage: 用戶管理
     User View: 用戶查看
+    Migration Management: 備份與還原
+    Migration Manage: 備份與還原管理
     role-template-view-users: 用戶查看
     role-template-change-password: 修改密碼
   components:
@@ -1069,8 +1123,8 @@ core:
         placeholder:
           options:
             placeholder: "輸入 / 以選擇輸入類型"
-      toolbar:
-        attachment: 插入附件
+      toolbox:
+        attachment: 選擇附件
       upload_attachment:
         toast:
           no_available_policy: 目前沒有可用的存儲策略
@@ -1104,6 +1158,8 @@ core:
       creation_label: 創建 {text} 分類
     tag_select:
       creation_label: 創建 {text} 標籤
+    validation:
+      trim: 不能以空格開頭或結尾
   common:
     buttons:
       save: 保存
@@ -1163,13 +1219,10 @@ core:
       save_failed_and_retry: 保存失敗，請重試
       publish_failed_and_retry: 發布失敗，請重試
       network_error: 網絡錯誤，請檢查網絡連接
-      request_parameter_error: 請求參數錯誤：{title}
       login_expired: 登入已過期，請重新登入
       forbidden: 無權限訪問
       not_found: 資源不存在
-      server_internal_error_with_title: 伺服器內部錯誤：{title}
       server_internal_error: 伺服器內部錯誤
-      unknown_error_with_title: 未知錯誤：{title}
       unknown_error: 未知錯誤
     dialog:
       titles:
@@ -1186,6 +1239,9 @@ core:
       labels:
         sort: 排序
         status: 狀態
+      item_labels:
+        all: 全部
+        default: 預設
     status:
       deleting: 刪除中
       loading: 加載中

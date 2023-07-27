@@ -74,7 +74,7 @@ onMounted(() => {
 });
 
 // copy system information to clipboard
-const { copy, isSupported } = useClipboard();
+const { copy, isSupported } = useClipboard({ legacy: true });
 
 const handleCopy = () => {
   if (!isSupported.value) {
