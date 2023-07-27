@@ -190,7 +190,7 @@ const handlePublish = async () => {
       if (returnToView.value === "true" && permalink) {
         window.location.href = permalink;
       } else {
-        router.push({ name: "Posts" });
+        router.back();
       }
     } else {
       const { data } = await apiClient.post.draftPost({
@@ -269,11 +269,8 @@ const handleFetchContent = async () => {
           raw_type: data.rawType,
         }),
         confirmText: t("core.common.buttons.confirm"),
-        cancelText: t("core.common.buttons.cancel"),
+        showCancel: false,
         onConfirm: () => {
-          router.back();
-        },
-        onCancel: () => {
           router.back();
         },
       });

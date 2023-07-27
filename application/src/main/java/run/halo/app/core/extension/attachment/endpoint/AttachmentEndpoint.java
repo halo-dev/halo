@@ -37,10 +37,12 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.attachment.Attachment;
+import run.halo.app.core.extension.attachment.Group;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.endpoint.SortResolver;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.extension.Comparators;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
@@ -104,12 +106,30 @@ public class AttachmentEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> search(ServerRequest request) {
         var searchRequest = new SearchRequest(request);
-        return client.list(Attachment.class,
-                searchRequest.toPredicate(), searchRequest.toComparator(),
-                searchRequest.getPage(), searchRequest.getSize())
-            .flatMap(listResult -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(listResult));
+        return client.list(Group.class, group -> MetadataUtil.nullSafeLabels(group)
+                .containsKey(Group.HIDDEN_LABEL), null)
+            .map(group -> group.getMetadata().getName())
+            .collectList()
+            .defaultIfEmpty(List.of())
+            .flatMap(groups -> client.list(Attachment.class,
+                    searchRequest.toPredicate().and(visibleGroupPredicate(groups)),
+                    searchRequest.toComparator(),
+                    searchRequest.getPage(), searchRequest.getSize())
+                .flatMap(listResult -> ServerResponse.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(listResult)
+                )
+            );
+
+    }
+
+    static Predicate<Attachment> visibleGroupPredicate(List<String> hiddenGroups) {
+        return attachment -> {
+            if (!StringUtils.hasText(attachment.getSpec().getGroupName())) {
+                return true;
+            }
+            return !hiddenGroups.contains(attachment.getSpec().getGroupName());
+        };
     }
 
     public interface ISearchRequest extends IListRequest {

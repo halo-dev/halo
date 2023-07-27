@@ -1,6 +1,7 @@
 package run.halo.app.theme.endpoint;
 
 import org.springframework.web.server.ServerWebExchange;
+import run.halo.app.extension.router.SortableRequest;
 
 /**
  * Query parameters for post public APIs.

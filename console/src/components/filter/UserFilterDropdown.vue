@@ -26,7 +26,7 @@ const emit = defineEmits<{
   (event: "update:modelValue", value?: string): void;
 }>();
 
-const { users, handleFetchUsers } = useUserFetch();
+const { users } = useUserFetch({ fetchOnMounted: true });
 
 const dropdown = ref();
 
@@ -41,7 +41,6 @@ const handleSelect = (user: User) => {
 };
 
 function onDropdownShow() {
-  handleFetchUsers();
   setTimeout(() => {
     setFocus("userFilterDropdownInput");
   }, 200);

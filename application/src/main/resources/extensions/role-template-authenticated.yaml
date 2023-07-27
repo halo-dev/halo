@@ -35,6 +35,10 @@ rules:
     resources: [ "users" ]
     resourceNames: [ "-" ]
     verbs: [ "get", "update" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "users/avatar" ]
+    resourceNames: [ "-" ]
+    verbs: [ "create", "delete" ]
 ---
 apiVersion: v1alpha1
 kind: "Role"

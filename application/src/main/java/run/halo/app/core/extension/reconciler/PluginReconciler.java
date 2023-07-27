@@ -320,11 +320,12 @@ public class PluginReconciler implements Reconciler<Request> {
             Plugin.PluginStatus status = plugin.statusNonNull();
 
             PluginWrapper pluginWrapper = haloPluginManager.getPlugin(pluginName);
-            PluginState pluginState = Optional.ofNullable(pluginWrapper)
-                .map(PluginWrapper::getPluginState)
-                .orElse(PluginState.FAILED);
+            if (pluginWrapper != null) {
+                pluginWrapper.setPluginState(PluginState.FAILED);
+                pluginWrapper.setFailedException(e);
+            }
 
-            status.setPhase(pluginState);
+            status.setPhase(PluginState.FAILED);
 
             Plugin.PluginStatus oldStatus = JsonUtils.deepCopy(status);
             Condition condition = Condition.builder()
@@ -712,22 +713,8 @@ public class PluginReconciler implements Reconciler<Request> {
         if (pluginWrapper != null) {
             // pluginWrapper must not be null in below code
             // stop and unload plugin, see also PluginBeforeStopSyncListener
-            if (!haloPluginManager.unloadPlugin(name)) {
-                throw new IllegalStateException("Failed to unload plugin: " + name);
-            }
-        }
-
-        // delete plugin resources
-        Path pluginPath = Optional.ofNullable(plugin.statusNonNull().getLoadLocation())
-            .map(URI::getPath)
-            .map(Paths::get)
-            .orElse(null);
-        if (pluginPath != null && isJarFile(pluginPath)) {
-            // delete plugin file
-            try {
-                Files.deleteIfExists(pluginPath);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            if (!haloPluginManager.deletePlugin(name)) {
+                throw new IllegalStateException("Failed to delete plugin: " + name);
             }
         }
     }

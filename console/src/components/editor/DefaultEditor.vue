@@ -32,11 +32,12 @@ import {
   ExtensionVideo,
   ExtensionAudio,
   ExtensionCodeBlock,
-  ToolbarItem,
+  ExtensionFontSize,
+  ExtensionColor,
   lowlight,
   type AnyExtension,
   Editor,
-  ToolbarSubItem,
+  ToolboxItem,
 } from "@halo-dev/richtext-editor";
 import {
   IconCalendar,
@@ -50,10 +51,6 @@ import {
 } from "@halo-dev/components";
 import AttachmentSelectorModal from "@/modules/contents/attachments/components/AttachmentSelectorModal.vue";
 import ExtensionCharacterCount from "@tiptap/extension-character-count";
-import MdiFileImageBox from "~icons/mdi/file-image-box";
-import MdiVideoPlusOutline from "~icons/mdi/video-plus-outline";
-import MdiImagePlusOutline from "~icons/mdi/image-plus-outline";
-import MdiVolume from "~icons/mdi/volume";
 import MdiFormatHeader1 from "~icons/mdi/format-header-1";
 import MdiFormatHeader2 from "~icons/mdi/format-header-2";
 import MdiFormatHeader3 from "~icons/mdi/format-header-3";
@@ -197,6 +194,8 @@ onMounted(() => {
       ExtensionVideo,
       ExtensionAudio,
       ExtensionCharacterCount,
+      ExtensionFontSize,
+      ExtensionColor,
       ...extensionsFromPlugins,
       Extension.create({
         addGlobalAttributes() {
@@ -215,79 +214,21 @@ onMounted(() => {
       Extension.create({
         addOptions() {
           return {
-            getToolbarItems: ({ editor }: { editor: Editor }) => {
-              return {
-                priority: 220,
-                component: ToolbarItem,
-                props: {
-                  editor,
-                  isActive: false,
-                  icon: markRaw(MdiFileImageBox),
-                  title: i18n.global.t(
-                    "core.components.default_editor.toolbar.attachment"
-                  ),
+            getToolboxItems({ editor }: { editor: Editor }) {
+              return [
+                {
+                  priority: 0,
+                  component: markRaw(ToolboxItem),
+                  props: {
+                    editor,
+                    icon: markRaw(IconFolder),
+                    title: i18n.global.t(
+                      "core.components.default_editor.toolbox.attachment"
+                    ),
+                    action: () => (attachmentSelectorModal.value = true),
+                  },
                 },
-                children: [
-                  {
-                    priority: 10,
-                    component: ToolbarSubItem,
-                    props: {
-                      editor,
-                      isActive: false,
-                      icon: markRaw(IconFolder),
-                      title: i18n.global.t(
-                        "core.components.default_editor.toolbar.select_attachment"
-                      ),
-                      action: () => (attachmentSelectorModal.value = true),
-                    },
-                  },
-                  {
-                    priority: 20,
-                    component: ToolbarSubItem,
-                    props: {
-                      editor,
-                      isActive: false,
-                      icon: markRaw(MdiImagePlusOutline),
-                      title: i18n.global.t(
-                        "core.components.default_editor.toolbar.insert_image"
-                      ),
-                      action: () => {
-                        editor.chain().focus().setImage({ src: "" }).run();
-                      },
-                    },
-                  },
-                  {
-                    priority: 30,
-                    component: ToolbarSubItem,
-                    props: {
-                      editor,
-                      isActive: false,
-                      icon: markRaw(MdiVideoPlusOutline),
-                      title: i18n.global.t(
-                        "core.components.default_editor.toolbar.insert_video"
-                      ),
-                      action: () => {
-                        editor.chain().focus().setVideo({ src: "" }).run();
-                      },
-                    },
-                  },
-                  {
-                    priority: 40,
-                    component: ToolbarSubItem,
-                    props: {
-                      editor,
-                      isActive: false,
-                      icon: markRaw(MdiVolume),
-                      title: i18n.global.t(
-                        "core.components.default_editor.toolbar.insert_audio"
-                      ),
-                      action: () => {
-                        editor.chain().focus().setAudio({ src: "" }).run();
-                      },
-                    },
-                  },
-                ],
-              };
+              ];
             },
           };
         },
@@ -516,6 +457,13 @@ watch(
     immediate: true,
   }
 );
+
+// fixme: temporary solution
+const currentLocale = i18n.global.locale.value as
+  | "zh-CN"
+  | "en"
+  | "zh"
+  | "en-US";
 </script>
 
 <template>
@@ -526,7 +474,7 @@ watch(
   <RichTextEditor
     v-if="editor"
     :editor="editor"
-    :locale="i18n.global.locale.value"
+    :locale="currentLocale"
     :content-styles="{
       width: 'calc(100% - 18rem)',
     }"

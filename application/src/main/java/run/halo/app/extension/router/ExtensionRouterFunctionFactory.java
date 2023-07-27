@@ -13,7 +13,6 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
-import run.halo.app.extension.router.IListRequest.QueryListRequest;
 
 public class ExtensionRouterFunctionFactory {
 
@@ -55,7 +54,7 @@ public class ExtensionRouterFunctionFactory {
                         .response(responseBuilder().responseCode("200")
                             .description("Response " + scheme.plural())
                             .implementation(ListResult.generateGenericClass(scheme)));
-                    QueryParamBuildUtil.buildParametersFromType(builder, QueryListRequest.class);
+                    QueryParamBuildUtil.buildParametersFromType(builder, SortableRequest.class);
                 })
             .POST(createHandler.pathPattern(), createHandler,
                 builder -> builder.operationId("Create" + gvk)
