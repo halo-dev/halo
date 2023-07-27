@@ -429,7 +429,7 @@ public class UserEndpoint implements CustomEndpoint {
     }
 
     record ChangePasswordRequest(
-        @Schema(description = "New password.", required = true, minLength = 6)
+        @Schema(description = "New password.", requiredMode = REQUIRED, minLength = 6)
         String password) {
     }
 
@@ -522,8 +522,8 @@ public class UserEndpoint implements CustomEndpoint {
             .flatMapIterable(Function.identity());
     }
 
-    record UserPermission(@Schema(required = true) Set<Role> roles,
-                          @Schema(required = true) Set<String> uiPermissions) {
+    record UserPermission(@Schema(requiredMode = REQUIRED) Set<Role> roles,
+                          @Schema(requiredMode = REQUIRED) Set<String> uiPermissions) {
     }
 
     public class ListRequest extends IListRequest.QueryListRequest {

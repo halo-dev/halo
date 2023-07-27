@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.attachment;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static run.halo.app.core.extension.attachment.Attachment.KIND;
 
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -20,7 +21,7 @@ public class Attachment extends AbstractExtension {
 
     public static final String KIND = "Attachment";
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private AttachmentSpec spec;
 
     private AttachmentStatus status;

@@ -61,8 +61,9 @@ public class WebServerSecurityConfig {
 
         http.securityMatcher(pathMatchers("/api/**", "/apis/**", "/oauth2/**",
                 "/login/**", "/logout", "/actuator/**"))
-            .authorizeExchange().anyExchange()
-            .access(new RequestInfoAuthorizationManager(roleService)).and()
+            .authorizeExchange(spec -> {
+                spec.anyExchange().access(new RequestInfoAuthorizationManager(roleService));
+            })
             .anonymous(spec -> {
                 spec.authorities(AnonymousUserConst.Role);
                 spec.principal(AnonymousUserConst.PRINCIPAL);
@@ -85,19 +86,24 @@ public class WebServerSecurityConfig {
         var mediaTypeMatcher = new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML);
         mediaTypeMatcher.setIgnoredMediaTypes(Set.of(MediaType.ALL));
         http.securityMatcher(new AndServerWebExchangeMatcher(pathMatcher, mediaTypeMatcher))
-            .authorizeExchange().anyExchange().permitAll().and()
             .securityContextRepository(securityContextRepository)
-            .headers()
-            .frameOptions(spec -> {
-                var frameOptions = haloProperties.getSecurity().getFrameOptions();
-                spec.mode(frameOptions.getMode());
-                if (frameOptions.isDisabled()) {
-                    spec.disable();
-                }
+            .authorizeExchange(spec -> {
+                spec.anyExchange().permitAll();
             })
-            .referrerPolicy(
-                spec -> spec.policy(haloProperties.getSecurity().getReferrerOptions().getPolicy()))
-            .cache().disable().and()
+            .headers(headerSpec -> headerSpec
+                .frameOptions(frameSpec -> {
+                    var frameOptions = haloProperties.getSecurity().getFrameOptions();
+                    frameSpec.mode(frameOptions.getMode());
+                    if (frameOptions.isDisabled()) {
+                        frameSpec.disable();
+                    }
+                })
+                .referrerPolicy(referrerPolicySpec -> {
+                    referrerPolicySpec.policy(
+                        haloProperties.getSecurity().getReferrerOptions().getPolicy());
+                })
+                .cache(ServerHttpSecurity.HeaderSpec.CacheSpec::disable)
+            )
             .anonymous(spec -> spec.authenticationFilter(
                 new HaloAnonymousAuthenticationWebFilter("portal", AnonymousUserConst.PRINCIPAL,
                     AuthorityUtils.createAuthorityList(AnonymousUserConst.Role),

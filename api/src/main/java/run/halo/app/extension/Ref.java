@@ -1,5 +1,7 @@
 package run.halo.app.extension;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Objects;
 import lombok.Data;
@@ -17,7 +19,7 @@ public class Ref {
     @Schema(description = "Extension kind")
     private String kind;
 
-    @Schema(required = true, description = "Extension name. This field is mandatory")
+    @Schema(requiredMode = REQUIRED, description = "Extension name. This field is mandatory")
     private String name;
 
     public static Ref of(String name) {
