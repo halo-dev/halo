@@ -88,8 +88,19 @@ watch(
           }}
         </span>
       </div>
+      <div class="flex justify-center pt-3.5">
+        <a
+          class="inline-flex items-center gap-0.5 text-xs text-gray-600 hover:text-gray-900"
+          href="/"
+        >
+          <MdiKeyboardBackspace class="!h-3.5 !w-3.5" />
+          <span> {{ $t("core.login.operations.return_site") }} </span>
+        </a>
+      </div>
     </div>
-    <div class="bottom-0 mb-2 mt-auto flex items-center justify-center gap-2.5">
+    <div
+      class="bottom-0 mb-10 mt-auto flex items-center justify-center gap-2.5"
+    >
       <label
         for="locale"
         class="block flex-shrink-0 text-sm font-medium text-gray-600"
@@ -107,15 +118,6 @@ watch(
           </option>
         </template>
       </select>
-    </div>
-    <div class="bottom-0 mb-6">
-      <a
-        class="inline-flex cursor-pointer items-center gap-0.5 text-xs text-gray-600 hover:text-gray-900"
-        href="/"
-      >
-        <MdiKeyboardBackspace class="!h-3.5 !w-3.5" />
-        <span> 返回到前台 </span>
-      </a>
     </div>
   </div>
 </template>

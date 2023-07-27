@@ -17,6 +17,7 @@ core:
       return_login:
         label: 已有账号
         button: 立即登录
+      return_site: 返回到首页
     button: 登录
     modal:
       title: 重新登录

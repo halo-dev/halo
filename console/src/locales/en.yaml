@@ -17,6 +17,7 @@ core:
       return_login:
         label: Already have an account
         button: Sign in
+      return_site: Return to site
     button: Login
     modal:
       title: Re-login
