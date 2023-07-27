@@ -883,6 +883,13 @@ core:
           title: Crop Avatar
         remove:
           title: Are you sure you want to delete the avatar?
+        tooltips:
+          upload: Upload
+          zoom_in: ZoomIn
+          zoom_out: ZoomOut
+          flip_horizontal: FlipHorizontal
+          flip_vertical: FlipVertical
+          reset: Reset
   role:
     title: Roles
     common:
