@@ -1149,6 +1149,7 @@ core:
     pagination:
       page_label: page
       size_label: items per page
+      total_label: Total {total} items
     social_auth_providers:
       title: Third-party login
     app_download_alert:
