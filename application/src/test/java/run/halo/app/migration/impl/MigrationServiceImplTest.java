@@ -31,6 +31,7 @@ import reactor.test.StepVerifier;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreRepository;
+import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.migration.Backup;
@@ -165,7 +166,16 @@ class MigrationServiceImplTest {
                 }
             })
             .verifyComplete();
+    }
 
+    @Test
+    void downloadBackupWhichDoesNotExist() {
+        var backup = createSucceededBackup("fake-backup", "backup.zip");
+        when(haloProperties.getWorkDir()).thenReturn(tempDir.resolve("workdir"));
+
+        StepVerifier.create(migrationService.download(backup))
+            .expectError(NotFoundException.class)
+            .verify();
     }
 
     Backup createSucceededBackup(String name, String filename) {
