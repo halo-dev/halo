@@ -1151,6 +1151,11 @@ core:
       size_label: items per page
     social_auth_providers:
       title: Third-party login
+    app_download_alert:
+      description: "Themes and plugins for Halo can be downloaded at the following addresses:"
+      sources:
+        app_store: "Official App Store: {url}"
+        github: "GitHub: {url}"
   composables:
     content_cache:
       toast_recovered: Recovered unsaved content from cache
