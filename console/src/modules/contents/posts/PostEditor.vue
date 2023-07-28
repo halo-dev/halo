@@ -153,6 +153,9 @@ const handleSave = async (options?: { mute?: boolean }) => {
       });
       formState.value.post = data;
       name.value = data.metadata.name;
+
+      // Clear new post content cache
+      handleClearCache();
     }
 
     if (!options?.mute) {
@@ -200,6 +203,9 @@ const handlePublish = async () => {
       await apiClient.post.publishPost({
         name: data.metadata.name,
       });
+
+      // Clear new post content cache
+      handleClearCache();
 
       router.push({ name: "Posts" });
     }

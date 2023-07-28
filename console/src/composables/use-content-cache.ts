@@ -12,7 +12,7 @@ import { useI18n } from "vue-i18n";
 interface useContentCacheReturn {
   handleResetCache: () => void;
   handleSetContentCache: () => void;
-  handleClearCache: (name: string) => void;
+  handleClearCache: (name?: string) => void;
 }
 
 export function useContentCache(
@@ -71,7 +71,7 @@ export function useContentCache(
     }
   }, 500);
 
-  const handleClearCache = (name: string) => {
+  const handleClearCache = (name?: string) => {
     if (name) {
       const index = content_caches.value.findIndex(
         (c: ContentCache) => c.name === name
