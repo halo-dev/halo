@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/console",
-  "version": "2.8.0-rc.1",
+  "version": "2.8.0-rc.2",
   "scripts": {
     "prepare": "cd .. && husky install console/.husky",
     "dev": "vite --host",
