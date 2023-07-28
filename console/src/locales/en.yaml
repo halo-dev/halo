@@ -992,8 +992,6 @@ core:
     empty:
       title: No backups have been created yet
       message: You can click the button below to create a backup
-      actions:
-        create: Create backup
     operations:
       create:
         button: Create backup

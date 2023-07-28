@@ -992,8 +992,6 @@ core:
     empty:
       title: 沒有備份
       message: 目前沒有已建立的備份，您可以點擊重新整理或建立新的備份。
-      actions:
-        create: 建立備份
     operations:
       create:
         button: 建立備份
