@@ -97,7 +97,7 @@ export function useAttachmentControl(filterOptions: {
       return;
     }
 
-    if (index === 0 && hasPrevious) {
+    if (index === 0 && hasPrevious.value) {
       page.value--;
       await refetch();
       selectedAttachment.value = data.value[data.value.length - 1];
@@ -119,7 +119,7 @@ export function useAttachmentControl(filterOptions: {
       return;
     }
 
-    if (index === data.value.length - 1 && hasNext) {
+    if (index === data.value.length - 1 && hasNext.value) {
       page.value++;
       await refetch();
       selectedAttachment.value = data.value[0];
