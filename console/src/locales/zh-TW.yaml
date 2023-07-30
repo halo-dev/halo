@@ -124,7 +124,7 @@ core:
             refresh_search_engine:
               title: 刷新搜尋引擎
               dialog_title: 確定要刷新搜尋引擎索引嗎？
-              dialog_content: 此操作會對所有已發布的文章重新創建搜尋引擎索引。
+              dialog_content: 此操作會對所有已發佈的文章重新創建本地搜尋引擎的索引。
               success_message: 刷新成功
             evict_page_cache:
               title: 重新整理頁面快取
