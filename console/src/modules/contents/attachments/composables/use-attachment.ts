@@ -1,5 +1,5 @@
 import type { Attachment, Group, Policy } from "@halo-dev/api-client";
-import { computed, type Ref } from "vue";
+import { computed, nextTick, type Ref } from "vue";
 import { ref, watch } from "vue";
 import type { AttachmentLike } from "@halo-dev/console-shared";
 import { apiClient } from "@/utils/api-client";
@@ -99,6 +99,7 @@ export function useAttachmentControl(filterOptions: {
 
     if (index === 0 && hasPrevious.value) {
       page.value--;
+      await nextTick();
       await refetch();
       selectedAttachment.value = data.value[data.value.length - 1];
     }
@@ -121,6 +122,7 @@ export function useAttachmentControl(filterOptions: {
 
     if (index === data.value.length - 1 && hasNext.value) {
       page.value++;
+      await nextTick();
       await refetch();
       selectedAttachment.value = data.value[0];
     }
