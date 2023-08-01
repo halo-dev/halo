@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/components",
-  "version": "1.7.0-rc.2",
+  "version": "1.7.0",
   "description": "",
   "files": [
     "dist"
