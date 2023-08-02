@@ -30,7 +30,7 @@ docker run \
   --name halo \
   -p 8090:8090 \
   -v ~/.halo2:/root/.halo2 \
-  halohub/halo:2.7 \
+  halohub/halo:2.8 \
   --halo.security.initializer.superadminusername=admin \
   --halo.security.initializer.superadminpassword=P@88w0rd
 ```
@@ -46,7 +46,7 @@ docker run \
 
 ## 生态
 
-可访问 [awesome-halo](https://github.com/halo-sigs/awesome-halo) 查看已经适用于 Halo 2.0 的主题和插件，以及适用于 Halo
+可访问 [awesome-halo](https://github.com/halo-sigs/awesome-halo) 查看已经适用于 Halo 2.x 的主题和插件，以及适用于 Halo
 1.x 的相关仓库。
 
 ## 许可证
