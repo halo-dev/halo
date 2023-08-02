@@ -25,7 +25,7 @@ const onUploaded = () => {
 };
 
 async function handleShutdown() {
-  await axios.post(`/actuator/shutdown`);
+  await axios.post(`/actuator/restart`);
   Toast.success(t("core.backup.operations.shutdown.toast_success"));
 
   setTimeout(() => {
