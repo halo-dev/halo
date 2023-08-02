@@ -147,7 +147,7 @@
     "tailwindcss-themer": "^2.0.3",
     "typescript": "~5.0.4",
     "unplugin-icons": "^0.14.15",
-    "vite": "^4.0.4",
+    "vite": "^4.0.5",
     "vite-plugin-externals": "^0.6.2",
     "vite-plugin-html": "^3.2.0",
     "vite-plugin-pwa": "^0.13.3",
