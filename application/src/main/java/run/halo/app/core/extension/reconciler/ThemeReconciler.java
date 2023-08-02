@@ -3,7 +3,6 @@ package run.halo.app.core.extension.reconciler;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -28,11 +27,10 @@ import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.SystemVersionSupplier;
+import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.exception.ThemeUninstallException;
-import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.VersionUtils;
-import run.halo.app.theme.ThemePathPolicy;
 
 /**
  * Reconciler for theme.
@@ -45,7 +43,8 @@ public class ThemeReconciler implements Reconciler<Request> {
     private static final String FINALIZER_NAME = "theme-protection";
 
     private final ExtensionClient client;
-    private final ThemePathPolicy themePathPolicy;
+
+    private final ThemeRootGetter themeRoot;
     private final SystemVersionSupplier systemVersionSupplier;
 
     private final RetryTemplate retryTemplate = RetryTemplate.builder()
@@ -54,10 +53,10 @@ public class ThemeReconciler implements Reconciler<Request> {
         .retryOn(IllegalStateException.class)
         .build();
 
-    public ThemeReconciler(ExtensionClient client, HaloProperties haloProperties,
+    public ThemeReconciler(ExtensionClient client, ThemeRootGetter themeRoot,
         SystemVersionSupplier systemVersionSupplier) {
         this.client = client;
-        themePathPolicy = new ThemePathPolicy(haloProperties.getWorkDir());
+        this.themeRoot = themeRoot;
         this.systemVersionSupplier = systemVersionSupplier;
     }
 
@@ -90,7 +89,7 @@ public class ThemeReconciler implements Reconciler<Request> {
             final Theme.ThemeStatus oldStatus = JsonUtils.deepCopy(status);
             theme.setStatus(status);
 
-            Path themePath = themePathPolicy.generate(theme);
+            var themePath = themeRoot.get().resolve(name);
             status.setLocation(themePath.toAbsolutePath().toString());
 
             status.setPhase(Theme.ThemePhase.READY);
@@ -216,7 +215,7 @@ public class ThemeReconciler implements Reconciler<Request> {
     }
 
     private void deleteThemeFiles(Theme theme) {
-        Path themeDir = themePathPolicy.generate(theme);
+        var themeDir = themeRoot.get().resolve(theme.getMetadata().getName());
         try {
             FileSystemUtils.deleteRecursively(themeDir);
         } catch (IOException e) {

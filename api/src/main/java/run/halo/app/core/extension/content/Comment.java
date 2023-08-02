@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.content;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -30,7 +31,7 @@ public class Comment extends AbstractExtension {
 
     public static final String KIND = "Comment";
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private CommentSpec spec;
 
     @Schema
@@ -49,7 +50,7 @@ public class Comment extends AbstractExtension {
     @EqualsAndHashCode(callSuper = true)
     public static class CommentSpec extends BaseCommentSpec {
 
-        @Schema(required = true)
+        @Schema(requiredMode = REQUIRED)
         private Ref subjectRef;
 
         private Instant lastReadTime;
@@ -58,13 +59,13 @@ public class Comment extends AbstractExtension {
     @Data
     public static class BaseCommentSpec {
 
-        @Schema(required = true, minLength = 1)
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String raw;
 
-        @Schema(required = true, minLength = 1)
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String content;
 
-        @Schema(required = true)
+        @Schema(requiredMode = REQUIRED)
         private CommentOwner owner;
 
         private String userAgent;
@@ -78,19 +79,19 @@ public class Comment extends AbstractExtension {
          */
         private Instant creationTime;
 
-        @Schema(required = true, defaultValue = "0")
+        @Schema(requiredMode = REQUIRED, defaultValue = "0")
         private Integer priority;
 
-        @Schema(required = true, defaultValue = "false")
+        @Schema(requiredMode = REQUIRED, defaultValue = "false")
         private Boolean top;
 
-        @Schema(required = true, defaultValue = "true")
+        @Schema(requiredMode = REQUIRED, defaultValue = "true")
         private Boolean allowNotification;
 
-        @Schema(required = true, defaultValue = "false")
+        @Schema(requiredMode = REQUIRED, defaultValue = "false")
         private Boolean approved;
 
-        @Schema(required = true, defaultValue = "false")
+        @Schema(requiredMode = REQUIRED, defaultValue = "false")
         private Boolean hidden;
     }
 
@@ -100,10 +101,10 @@ public class Comment extends AbstractExtension {
         public static final String AVATAR_ANNO = "avatar";
         public static final String WEBSITE_ANNO = "website";
 
-        @Schema(required = true, minLength = 1)
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String kind;
 
-        @Schema(required = true, maxLength = 64)
+        @Schema(requiredMode = REQUIRED, maxLength = 64)
         private String name;
 
         private String displayName;

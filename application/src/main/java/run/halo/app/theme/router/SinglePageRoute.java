@@ -101,15 +101,21 @@ public class SinglePageRoute
     public Result reconcile(Request request) {
         client.fetch(SinglePage.class, request.name())
             .ifPresent(page -> {
-                if (ExtensionOperator.isDeleted(page)
-                    || BooleanUtils.isTrue(page.getSpec().getDeleted())) {
-                    quickRouteMap.remove(NameSlugPair.from(page));
+                var nameSlugPair = NameSlugPair.from(page);
+                if (ExtensionOperator.isDeleted(page)) {
+                    quickRouteMap.remove(nameSlugPair);
                     return;
                 }
-                // put new one
-                quickRouteMap.entrySet()
-                    .removeIf(entry -> entry.getKey().name().equals(request.name()));
-                quickRouteMap.put(NameSlugPair.from(page), handlerFunction(request.name()));
+                if (BooleanUtils.isTrue(page.getSpec().getDeleted())) {
+                    quickRouteMap.remove(nameSlugPair);
+                } else {
+                    // put new one
+                    if (page.isPublished()) {
+                        quickRouteMap.put(nameSlugPair, handlerFunction(request.name()));
+                    } else {
+                        quickRouteMap.remove(nameSlugPair);
+                    }
+                }
             });
         return new Result(false, null);
     }

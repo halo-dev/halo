@@ -3,33 +3,19 @@ package run.halo.app.security.authorization;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.springframework.mock.http.server.reactive.MockServerHttpRequest.method;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
-import run.halo.app.core.extension.Role;
-import run.halo.app.core.extension.Role.PolicyRule;
-import run.halo.app.core.extension.service.RoleService;
-import run.halo.app.extension.Metadata;
 
 /**
  * Tests for {@link RequestInfoFactory}.
  *
  * @author guqing
- * @see RbacRequestEvaluation
  * @see RequestInfo
- * @see DefaultRuleResolver
  * @since 2.0.0
  */
 public class RequestInfoResolverTest {
@@ -173,7 +159,7 @@ public class RequestInfoResolverTest {
             List.of(new ErrorCases("api resource has name and no subresource but post",
                     "/api/version/themes/install"),
                 new ErrorCases("apis resource has name and no subresource but post",
-                "/apis/api.halo.run/v1alpha1/themes/install"));
+                    "/apis/api.halo.run/v1alpha1/themes/install"));
         for (ErrorCases errorCase : postCases) {
             var request =
                 method(HttpMethod.POST, errorCase.url).build();
@@ -185,96 +171,13 @@ public class RequestInfoResolverTest {
         }
     }
 
-    @Test
-    public void defaultRuleResolverTest() {
-        var roleService = mock(RoleService.class);
-        var ruleResolver = new DefaultRuleResolver(roleService);
-
-        Role role = new Role();
-        List<PolicyRule> rules = List.of(
-            new PolicyRule.Builder().apiGroups("").resources("posts").verbs("list", "get")
-                .build(),
-            new PolicyRule.Builder().apiGroups("").resources("categories").verbs("*").build(),
-            new PolicyRule.Builder().apiGroups("api.plugin.halo.run").resources("plugins/users")
-                .resourceNames("foo/bar").verbs("*").build(),
-            new PolicyRule.Builder().apiGroups("api.plugin.halo.run").resources("plugins/users")
-                .resourceNames("foo").verbs("*").build(),
-            new PolicyRule.Builder().nonResourceURLs("/healthy").verbs("get", "post", "head")
-                .build());
-        role.setRules(rules);
-        Metadata metadata = new Metadata();
-        metadata.setName("ruleReadPost");
-        role.setMetadata(metadata);
-
-        when(roleService.getRole(anyString())).thenReturn(role);
-
-        // list bound role names
-        ruleResolver.setRoleBindingService(
-            (Collection<? extends GrantedAuthority> authorities) -> Set.of("ruleReadPost"));
-
-        User user = new User("admin", "123456", AuthorityUtils.createAuthorityList("ruleReadPost"));
-
-        // resolve user rules
-        List<PolicyRule> resolvedRules = ruleResolver.rulesFor(user);
-        assertThat(resolvedRules).isNotNull();
-
-        RbacRequestEvaluation rbacRequestEvaluation = new RbacRequestEvaluation();
-        for (RequestResolveCase requestResolveCase : getRequestResolveCases()) {
-            var request =
-                method(HttpMethod.valueOf(requestResolveCase.method),
-                    requestResolveCase.url).build();
-            RequestInfo requestInfo = RequestInfoFactory.INSTANCE.newRequestInfo(request);
-
-            AttributesRecord attributes = new AttributesRecord(user, requestInfo);
-            boolean allowed = rbacRequestEvaluation.rulesAllow(attributes, resolvedRules);
-            assertThat(allowed).isEqualTo(requestResolveCase.expected);
-        }
-    }
-
     public record NonApiCase(String url, boolean expected) {
     }
 
     public record ErrorCases(String desc, String url) {
     }
 
-    List<RequestResolveCase> getRequestResolveCases() {
-        return List.of(new RequestResolveCase("/api/v1/tags", "GET", false),
-            new RequestResolveCase("/api/v1/tags/tagName", "GET", false),
 
-            new RequestResolveCase("/api/v1/categories/aName", "GET", true),
-            new RequestResolveCase("/api/v1//categories", "POST", true),
-            new RequestResolveCase("/api/v1/categories", "DELETE", true),
-            new RequestResolveCase("/api/v1/posts", "GET", true),
-            new RequestResolveCase("/api/v1/posts/aName", "GET", true),
-
-            new RequestResolveCase("/api/v1/posts", "DELETE", false),
-            new RequestResolveCase("/api/v1/posts/aName", "UPDATE", false),
-
-            // group resource url
-            new RequestResolveCase("/apis/group/v1/posts", "GET", false),
-
-            // plugin custom resource url
-            new RequestResolveCase("/apis/api.plugin.halo.run/v1alpha1/plugins/foo/users", "GET",
-                true),
-            new RequestResolveCase("/apis/api.plugin.halo.run/v1alpha1/plugins/foo/users/bar",
-                "GET", true),
-            new RequestResolveCase("/apis/api.plugin.halo.run/v1alpha1/plugins/foo/posts/bar",
-                "GET", false),
-
-            // non resource url
-            new RequestResolveCase("/healthy", "GET", true),
-            new RequestResolveCase("/healthy", "POST", true),
-            new RequestResolveCase("/healthy", "HEAD", true),
-            new RequestResolveCase("//healthy", "GET", false),
-            new RequestResolveCase("/healthy/name", "GET", false),
-            new RequestResolveCase("/healthy1", "GET", false),
-
-            new RequestResolveCase("//healthy//name", "GET", false),
-            new RequestResolveCase("/", "GET", false));
-    }
-
-    public record RequestResolveCase(String url, String method, boolean expected) {
-    }
 
     public record SuccessCase(String method, String url, String expectedVerb,
                               String expectedAPIPrefix, String expectedAPIGroup,

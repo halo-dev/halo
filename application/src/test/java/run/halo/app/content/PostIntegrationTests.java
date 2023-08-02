@@ -17,13 +17,11 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataOperator;
-import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.utils.JsonUtils;
 
 /**
@@ -44,9 +42,6 @@ public class PostIntegrationTests {
     @MockBean
     RoleService roleService;
 
-    @Autowired
-    ReactiveExtensionClient client;
-
     @BeforeEach
     void setUp() {
         var rule = new Role.PolicyRule.Builder()
@@ -58,7 +53,6 @@ public class PostIntegrationTests {
         role.setMetadata(new Metadata());
         role.getMetadata().setName("super-role");
         role.setRules(List.of(rule));
-        when(roleService.getMonoRole("authenticated")).thenReturn(Mono.just(role));
         when(roleService.listDependenciesFlux(anySet())).thenReturn(Flux.just(role));
         webTestClient = webTestClient.mutateWith(csrf());
     }

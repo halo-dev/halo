@@ -29,7 +29,6 @@ import { formatDatetime } from "@/utils/date";
 import { useFetchRole } from "@/modules/system/roles/composables/use-role";
 
 // libs
-import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import Fuse from "fuse.js";
 import { usePermission } from "@/utils/permission";
@@ -97,13 +96,22 @@ const onEditingModalClose = () => {
 };
 
 const handleCloneRole = async (role: Role) => {
-  const roleToCreate = cloneDeep<Role>(role);
-  roleToCreate.metadata.name = "";
-  roleToCreate.metadata.generateName = "role-";
-  roleToCreate.metadata.creationTimestamp = undefined;
-
-  // 移除系统保留标识
-  delete roleToCreate.metadata.labels?.[roleLabels.SYSTEM_RESERVED];
+  const roleToCreate: Role = {
+    apiVersion: "v1alpha1",
+    kind: "Role",
+    metadata: {
+      name: "",
+      generateName: "role-",
+      labels: {},
+      annotations: {
+        [rbacAnnotations.DEPENDENCIES]:
+          role.metadata.annotations?.[rbacAnnotations.DEPENDENCIES] || "",
+        [rbacAnnotations.DISPLAY_NAME]:
+          role.metadata.annotations?.[rbacAnnotations.DISPLAY_NAME] || "",
+      },
+    },
+    rules: [],
+  };
 
   // 如果是超级管理员角色，那么需要获取到所有角色模板并填充到表单
   if (role.metadata.name === SUPER_ROLE_NAME) {

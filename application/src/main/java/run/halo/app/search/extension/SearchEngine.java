@@ -1,5 +1,7 @@
 package run.halo.app.search.extension;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,7 +17,7 @@ import run.halo.app.extension.Ref;
     plural = "searchengines", singular = "searchengine")
 public class SearchEngine extends AbstractExtension {
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private SearchEngineSpec spec;
 
     @Data
@@ -25,7 +27,7 @@ public class SearchEngine extends AbstractExtension {
 
         private String website;
 
-        @Schema(required = true)
+        @Schema(requiredMode = REQUIRED)
         private String displayName;
 
         private String description;

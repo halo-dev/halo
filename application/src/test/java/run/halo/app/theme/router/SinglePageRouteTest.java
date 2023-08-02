@@ -2,16 +2,24 @@ package run.halo.app.theme.router;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -31,8 +39,10 @@ import org.springframework.web.util.UriUtils;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.core.extension.content.SinglePage;
+import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.Metadata;
+import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.SinglePageFinder;
 import run.halo.app.theme.finders.vo.SinglePageVo;
@@ -48,16 +58,19 @@ import run.halo.app.theme.router.SinglePageRoute.NameSlugPair;
 class SinglePageRouteTest {
 
     @Mock
-    private ViewNameResolver viewNameResolver;
+    ViewNameResolver viewNameResolver;
 
     @Mock
-    private SinglePageFinder singlePageFinder;
+    SinglePageFinder singlePageFinder;
 
     @Mock
-    protected ViewResolver viewResolver;
+    ViewResolver viewResolver;
+
+    @Mock
+    ExtensionClient client;
 
     @InjectMocks
-    private SinglePageRoute singlePageRoute;
+    SinglePageRoute singlePageRoute;
 
     @Test
     void handlerFunction() {
@@ -130,4 +143,102 @@ class SinglePageRouteTest {
             .verifyComplete();
     }
 
+    @Nested
+    class SinglePageReconcilerTest {
+
+        @Test
+        void shouldRemoveRouteIfSinglePageUnpublished() {
+            var name = "fake-single-page";
+            var page = newSinglePage(name, false);
+            when(client.fetch(SinglePage.class, name)).thenReturn(
+                Optional.of(page));
+
+            var routeMap = Mockito.<Map<NameSlugPair, HandlerFunction<ServerResponse>>>mock(
+                invocation -> new HashMap<NameSlugPair, HandlerFunction<ServerResponse>>());
+            singlePageRoute.setQuickRouteMap(routeMap);
+            var result = singlePageRoute.reconcile(new Reconciler.Request(name));
+            assertNotNull(result);
+            assertFalse(result.reEnqueue());
+            verify(client).fetch(SinglePage.class, name);
+            verify(routeMap).remove(NameSlugPair.from(page));
+        }
+
+        @Test
+        void shouldAddRouteIfSinglePagePublished() {
+            var name = "fake-single-page";
+            var page = newSinglePage(name, true);
+            when(client.fetch(SinglePage.class, name)).thenReturn(
+                Optional.of(page));
+
+            var routeMap = Mockito.<Map<NameSlugPair, HandlerFunction<ServerResponse>>>mock(
+                invocation -> new HashMap<NameSlugPair, HandlerFunction<ServerResponse>>());
+            singlePageRoute.setQuickRouteMap(routeMap);
+            var result = singlePageRoute.reconcile(new Reconciler.Request(name));
+            assertNotNull(result);
+            assertFalse(result.reEnqueue());
+            verify(client).fetch(SinglePage.class, name);
+            verify(routeMap).put(eq(NameSlugPair.from(page)), any());
+        }
+
+        @Test
+        void shouldRemoveRouteIfSinglePageDeleted() {
+            var name = "fake-single-page";
+            var page = newDeletedSinglePage(name);
+            when(client.fetch(SinglePage.class, name)).thenReturn(
+                Optional.of(page));
+
+            var routeMap = Mockito.<Map<NameSlugPair, HandlerFunction<ServerResponse>>>mock(
+                invocation -> new HashMap<NameSlugPair, HandlerFunction<ServerResponse>>());
+            singlePageRoute.setQuickRouteMap(routeMap);
+            var result = singlePageRoute.reconcile(new Reconciler.Request(name));
+            assertNotNull(result);
+            assertFalse(result.reEnqueue());
+            verify(client).fetch(SinglePage.class, name);
+            verify(routeMap).remove(NameSlugPair.from(page));
+        }
+
+        @Test
+        void shouldRemoveRouteIfSinglePageRecycled() {
+            var name = "fake-single-page";
+            var page = newRecycledSinglePage(name);
+            when(client.fetch(SinglePage.class, name)).thenReturn(
+                Optional.of(page));
+
+            var routeMap = Mockito.<Map<NameSlugPair, HandlerFunction<ServerResponse>>>mock(
+                invocation -> new HashMap<NameSlugPair, HandlerFunction<ServerResponse>>());
+            singlePageRoute.setQuickRouteMap(routeMap);
+            var result = singlePageRoute.reconcile(new Reconciler.Request(name));
+            assertNotNull(result);
+            assertFalse(result.reEnqueue());
+            verify(client).fetch(SinglePage.class, name);
+            verify(routeMap).remove(NameSlugPair.from(page));
+        }
+
+
+        SinglePage newSinglePage(String name, boolean published) {
+            var metadata = new Metadata();
+            metadata.setName(name);
+            var page = new SinglePage();
+            page.setMetadata(metadata);
+            var spec = new SinglePage.SinglePageSpec();
+            spec.setSlug("/fake-slug");
+            page.setSpec(spec);
+            var status = new SinglePage.SinglePageStatus();
+            page.setStatus(status);
+            SinglePage.changePublishedState(page, published);
+            return page;
+        }
+
+        SinglePage newDeletedSinglePage(String name) {
+            var page = newSinglePage(name, true);
+            page.getMetadata().setDeletionTimestamp(Instant.now());
+            return page;
+        }
+
+        SinglePage newRecycledSinglePage(String name) {
+            var page = newSinglePage(name, true);
+            page.getSpec().setDeleted(true);
+            return page;
+        }
+    }
 }

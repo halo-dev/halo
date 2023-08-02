@@ -1,5 +1,6 @@
 package run.halo.app.core.extension;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static run.halo.app.core.extension.User.GROUP;
 import static run.halo.app.core.extension.User.KIND;
 import static run.halo.app.core.extension.User.VERSION;
@@ -41,7 +42,7 @@ public class User extends AbstractExtension {
 
     public static final String HIDDEN_USER_LABEL = "halo.run/hidden-user";
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private UserSpec spec;
 
     private UserStatus status;
@@ -49,12 +50,12 @@ public class User extends AbstractExtension {
     @Data
     public static class UserSpec {
 
-        @Schema(required = true)
+        @Schema(requiredMode = REQUIRED)
         private String displayName;
 
         private String avatar;
 
-        @Schema(required = true)
+        @Schema(requiredMode = REQUIRED)
         private String email;
 
         private String phone;
@@ -87,16 +88,16 @@ public class User extends AbstractExtension {
     @Data
     public static class LoginHistory {
 
-        @Schema(required = true)
+        @Schema(requiredMode = REQUIRED)
         private Instant loginAt;
 
-        @Schema(required = true)
+        @Schema(requiredMode = REQUIRED)
         private String sourceIp;
 
-        @Schema(required = true)
+        @Schema(requiredMode = REQUIRED)
         private String userAgent;
 
-        @Schema(required = true)
+        @Schema(requiredMode = REQUIRED)
         private Boolean successful;
 
         private String reason;

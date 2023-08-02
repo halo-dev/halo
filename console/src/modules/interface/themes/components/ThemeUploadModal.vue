@@ -17,6 +17,7 @@ import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { submitForm } from "@formkit/core";
 import type { ErrorResponse, UppyFile } from "@uppy/core";
+import AppDownloadAlert from "@/components/common/AppDownloadAlert.vue";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -234,6 +235,9 @@ watch(
   >
     <VTabs v-model:active-id="activeTabId" type="outline" class="!rounded-none">
       <VTabItem id="local" :label="$t('core.theme.upload_modal.tabs.local')">
+        <div class="pb-3">
+          <AppDownloadAlert />
+        </div>
         <UppyUpload
           v-if="uploadVisible"
           :restrictions="{

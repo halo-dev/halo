@@ -19,11 +19,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.json.JSONException;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
@@ -40,9 +41,8 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.SystemVersionSupplier;
-import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.infra.ThemeRootGetter;
 import run.halo.app.infra.utils.JsonUtils;
-import run.halo.app.theme.ThemePathPolicy;
 
 /**
  * Tests for {@link ThemeReconciler}.
@@ -57,37 +57,31 @@ class ThemeReconcilerTest {
     private ExtensionClient extensionClient;
 
     @Mock
-    private HaloProperties haloProperties;
+    private SystemVersionSupplier systemVersionSupplier;
 
     @Mock
-    private SystemVersionSupplier systemVersionSupplier;
+    ThemeRootGetter themeRoot;
 
     @Mock
     private File defaultTheme;
 
+    @InjectMocks
+    ThemeReconciler themeReconciler;
+
+    @TempDir
     private Path tempDirectory;
 
     @BeforeEach
     void setUp() throws IOException {
-        tempDirectory = Files.createTempDirectory("halo-theme-");
         defaultTheme = ResourceUtils.getFile("classpath:themes/default");
         lenient().when(systemVersionSupplier.get()).thenReturn(Version.valueOf("0.0.0"));
-    }
-
-    @AfterEach
-    void tearDown() throws IOException {
-        FileSystemUtils.deleteRecursively(tempDirectory);
     }
 
     @Test
     void reconcileDelete() throws IOException {
         Path testWorkDir = tempDirectory.resolve("reconcile-delete");
         Files.createDirectory(testWorkDir);
-        when(haloProperties.getWorkDir()).thenReturn(testWorkDir);
-
-        final ThemeReconciler themeReconciler =
-            new ThemeReconciler(extensionClient, haloProperties, systemVersionSupplier);
-        final ThemePathPolicy themePathPolicy = new ThemePathPolicy(testWorkDir);
+        when(themeRoot.get()).thenReturn(testWorkDir);
 
         Theme theme = new Theme();
         Metadata metadata = new Metadata();
@@ -100,7 +94,7 @@ class ThemeReconcilerTest {
         themeSpec.setSettingName("theme-test-setting");
         theme.setSpec(themeSpec);
 
-        Path defaultThemePath = themePathPolicy.generate(theme);
+        Path defaultThemePath = testWorkDir.resolve("theme-test");
 
         // copy to temp directory
         FileSystemUtils.copyRecursively(defaultTheme.toPath(), defaultThemePath);
@@ -130,10 +124,10 @@ class ThemeReconcilerTest {
         final MetadataOperator metadata = theme.getMetadata();
 
         Path testWorkDir = tempDirectory.resolve("reconcile-delete");
-        when(haloProperties.getWorkDir()).thenReturn(testWorkDir);
+        when(themeRoot.get()).thenReturn(testWorkDir);
 
         final ThemeReconciler themeReconciler =
-            new ThemeReconciler(extensionClient, haloProperties, systemVersionSupplier);
+            new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier);
 
         final int[] retryFlags = {0, 0};
         when(extensionClient.fetch(eq(Setting.class), eq("theme-test-setting")))
@@ -169,10 +163,10 @@ class ThemeReconcilerTest {
         Theme theme = fakeTheme();
 
         Path testWorkDir = tempDirectory.resolve("reconcile-delete");
-        when(haloProperties.getWorkDir()).thenReturn(testWorkDir);
+        when(themeRoot.get()).thenReturn(testWorkDir);
 
         final ThemeReconciler themeReconciler =
-            new ThemeReconciler(extensionClient, haloProperties, systemVersionSupplier);
+            new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier);
 
         final int[] retryFlags = {0};
         when(extensionClient.fetch(eq(Setting.class), eq("theme-test-setting")))
@@ -198,10 +192,10 @@ class ThemeReconcilerTest {
     void reconcileStatus() {
         when(systemVersionSupplier.get()).thenReturn(Version.valueOf("2.3.0"));
         Path testWorkDir = tempDirectory.resolve("reconcile-delete");
-        when(haloProperties.getWorkDir()).thenReturn(testWorkDir);
+        when(themeRoot.get()).thenReturn(testWorkDir);
 
         final ThemeReconciler themeReconciler =
-            new ThemeReconciler(extensionClient, haloProperties, systemVersionSupplier);
+            new ThemeReconciler(extensionClient, themeRoot, systemVersionSupplier);
         Theme theme = fakeTheme();
         theme.setStatus(null);
         theme.getSpec().setRequires(">2.3.0");
@@ -246,10 +240,7 @@ class ThemeReconcilerTest {
     void themeSettingDefaultValue() throws IOException, JSONException {
         Path testWorkDir = tempDirectory.resolve("reconcile-setting-value");
         Files.createDirectory(testWorkDir);
-        when(haloProperties.getWorkDir()).thenReturn(testWorkDir);
-
-        final ThemeReconciler themeReconciler =
-            new ThemeReconciler(extensionClient, haloProperties, systemVersionSupplier);
+        when(themeRoot.get()).thenReturn(testWorkDir);
 
         Theme theme = new Theme();
         Metadata metadata = new Metadata();

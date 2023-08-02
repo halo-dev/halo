@@ -81,17 +81,8 @@ class UserEndpointTest {
     @BeforeEach
     void setUp() {
         // disable authorization
-        var rule = new Role.PolicyRule.Builder()
-            .apiGroups("*")
-            .resources("*")
-            .verbs("*")
-            .build();
-        var role = new Role();
-        role.setRules(List.of(rule));
-        when(roleService.getMonoRole("authenticated")).thenReturn(Mono.just(role));
-        webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
-            .build();
-        webClient = webClient.mutateWith(csrf());
+        webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint()).build()
+            .mutateWith(csrf());
     }
 
     @Nested

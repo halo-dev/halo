@@ -15,6 +15,9 @@ import { onMounted } from "vue";
 import { computed } from "vue";
 import type { Component } from "vue";
 import { markRaw } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 export type ToolbarName =
   | "upload"
@@ -26,6 +29,7 @@ export type ToolbarName =
 
 export interface ToolbarItem {
   name: ToolbarName;
+  title?: string;
   icon: Component;
   onClick: () => void;
 }
@@ -60,6 +64,7 @@ const defaultToolbars: ToolbarItem[] = [
     onClick: () => {
       emit("changeFile");
     },
+    title: t("core.user.detail.avatar.tooltips.upload"),
   },
   {
     name: "zoomIn",
@@ -67,6 +72,7 @@ const defaultToolbars: ToolbarItem[] = [
     onClick: () => {
       cropper.value?.zoom(0.1);
     },
+    title: t("core.user.detail.avatar.tooltips.zoom_in"),
   },
   {
     name: "zoomOut",
@@ -74,6 +80,7 @@ const defaultToolbars: ToolbarItem[] = [
     onClick: () => {
       cropper.value?.zoom(-0.1);
     },
+    title: t("core.user.detail.avatar.tooltips.zoom_out"),
   },
   {
     name: "flipHorizontal",
@@ -81,6 +88,7 @@ const defaultToolbars: ToolbarItem[] = [
     onClick: () => {
       cropper.value?.scaleX(-cropper.value?.getData().scaleX || -1);
     },
+    title: t("core.user.detail.avatar.tooltips.flip_horizontal"),
   },
   {
     name: "flipVertical",
@@ -88,6 +96,7 @@ const defaultToolbars: ToolbarItem[] = [
     onClick: () => {
       cropper.value?.scaleY(-cropper.value?.getData().scaleY || -1);
     },
+    title: t("core.user.detail.avatar.tooltips.flip_vertical"),
   },
   {
     name: "reset",
@@ -95,6 +104,7 @@ const defaultToolbars: ToolbarItem[] = [
     onClick: () => {
       cropper.value?.reset();
     },
+    title: t("core.user.detail.avatar.tooltips.reset"),
   },
 ];
 const previewElement = ref<HTMLElement>();
@@ -210,7 +220,7 @@ defineExpose({
           <li
             v-for="toolbar in toolbarItems"
             :key="toolbar.name"
-            :title="toolbar.name"
+            :title="toolbar.title"
           >
             <button
               type="button"

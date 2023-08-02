@@ -17,6 +17,7 @@ core:
       return_login:
         label: 已有账号
         button: 立即登录
+      return_site: 返回到首页
     button: 登录
     modal:
       title: 重新登录
@@ -123,7 +124,7 @@ core:
             refresh_search_engine:
               title: 刷新搜索引擎
               dialog_title: 确定要刷新搜索引擎索引吗？
-              dialog_content: 此操作会对所有已发布的文章重新创建搜索引擎索引。
+              dialog_content: 此操作会对所有已发布的文章重新创建本地搜索引擎的索引。
               success_message: 刷新成功
             evict_page_cache:
               title: 刷新页面缓存
@@ -883,6 +884,13 @@ core:
           title: 裁剪头像
         remove:
           title: 确定要删除头像吗？
+        tooltips:
+          upload: 上传
+          zoom_in: 放大
+          zoom_out: 缩小
+          flip_horizontal: 水平翻转
+          flip_vertical: 垂直翻转
+          reset: 重置
   role:
     title: 角色
     common:
@@ -984,8 +992,6 @@ core:
     empty:
       title: 没有备份
       message: 当前没有已创建的备份，你可以点击刷新或者创建新的备份
-      actions:
-        create: 创建备份
     operations:
       create:
         button: 创建备份
@@ -1013,6 +1019,7 @@ core:
         first: 1. 恢复过程可能会持续较长时间，期间请勿刷新页面。
         second: 2. 在恢复的过程中，虽然已有的数据不会被清理掉，但如果有冲突的数据将被覆盖。
         third: 3. 恢复完成之后会提示停止运行 Halo，停止之后可能需要手动运行。
+        complete: 恢复完成，等待重启...
       start: 开始恢复
   exception:
     not_found:
@@ -1140,8 +1147,14 @@ core:
     pagination:
       page_label: 页
       size_label: 条 / 页
+      total_label: 共 {total} 项数据
     social_auth_providers:
       title: 三方登录
+    app_download_alert:
+      description: Halo 的主题和插件可以在以下地址下载：
+      sources:
+        app_store: "官方应用市场：{url}"
+        github: "GitHub：{url}"
   composables:
     content_cache:
       toast_recovered: 已从缓存中恢复未保存的内容

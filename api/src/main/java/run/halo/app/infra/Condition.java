@@ -1,5 +1,7 @@
 package run.halo.app.infra;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
@@ -28,7 +30,7 @@ public class Condition {
      * example: Ready, Initialized.
      * maxLength: 316.
      */
-    @Schema(required = true, maxLength = 316,
+    @Schema(requiredMode = REQUIRED, maxLength = 316,
         pattern = "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?("
             + "([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$")
     private String type;
@@ -36,26 +38,26 @@ public class Condition {
     /**
      * Status is the status of the condition. Can be True, False, Unknown.
      */
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private ConditionStatus status;
 
     /**
      * Last time the condition transitioned from one status to another.
      */
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private Instant lastTransitionTime;
 
     /**
      * Human-readable message indicating details about last transition.
      * This may be an empty string.
      */
-    @Schema(required = true, maxLength = 32768)
+    @Schema(requiredMode = REQUIRED, maxLength = 32768)
     private String message;
 
     /**
      * Unique, one-word, CamelCase reason for the condition's last transition.
      */
-    @Schema(required = true, maxLength = 1024,
+    @Schema(requiredMode = REQUIRED, maxLength = 1024,
         pattern = "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$")
     private String reason;
 }

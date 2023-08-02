@@ -483,16 +483,17 @@ watch(selectedPostNames, (newValue) => {
       </Transition>
 
       <template #footer>
-        <div class="bg-white sm:flex sm:items-center sm:justify-end">
-          <VPagination
-            v-model:page="page"
-            v-model:size="size"
-            :page-label="$t('core.components.pagination.page_label')"
-            :size-label="$t('core.components.pagination.size_label')"
-            :total="total"
-            :size-options="[20, 30, 50, 100]"
-          />
-        </div>
+        <VPagination
+          v-model:page="page"
+          v-model:size="size"
+          :page-label="$t('core.components.pagination.page_label')"
+          :size-label="$t('core.components.pagination.size_label')"
+          :total-label="
+            $t('core.components.pagination.total_label', { total: total })
+          "
+          :total="total"
+          :size-options="[20, 30, 50, 100]"
+        />
       </template>
     </VCard>
   </div>

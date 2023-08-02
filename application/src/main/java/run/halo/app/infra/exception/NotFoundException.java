@@ -24,4 +24,8 @@ public class NotFoundException extends ResponseStatusException {
     public NotFoundException(@Nullable Throwable cause) {
         this(cause == null ? "" : cause.getMessage(), cause);
     }
+
+    public NotFoundException(String messageDetailCode, Object[] messageDetailArgs, String reason) {
+        super(HttpStatus.NOT_FOUND, reason, null, messageDetailCode, messageDetailArgs);
+    }
 }

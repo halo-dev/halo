@@ -1,5 +1,7 @@
 package run.halo.app.content;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
@@ -15,15 +17,15 @@ import run.halo.app.core.extension.content.SinglePage;
 @Data
 public class ListedSinglePage {
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private SinglePage page;
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private List<Contributor> contributors;
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private Contributor owner;
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private Stats stats;
 }

@@ -1,5 +1,7 @@
 package run.halo.app.extension;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
@@ -16,17 +18,17 @@ import run.halo.app.infra.utils.GenericClassUtils;
 public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
 
     @Schema(description = "Page number, starts from 1. If not set or equal to 0, it means no "
-        + "pagination.", required = true)
+        + "pagination.", requiredMode = REQUIRED)
     private final int page;
 
     @Schema(description = "Size of each page. If not set or equal to 0, it means no pagination.",
-        required = true)
+        requiredMode = REQUIRED)
     private final int size;
 
-    @Schema(description = "Total elements.", required = true)
+    @Schema(description = "Total elements.", requiredMode = REQUIRED)
     private final long total;
 
-    @Schema(description = "A chunk of items.", required = true)
+    @Schema(description = "A chunk of items.", requiredMode = REQUIRED)
     private final List<T> items;
 
     public ListResult(int page, int size, long total, List<T> items) {
@@ -50,17 +52,20 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
         this(0, 0, items.size(), items);
     }
 
-    @Schema(description = "Indicates whether current page is the first page.", required = true)
+    @Schema(description = "Indicates whether current page is the first page.",
+        requiredMode = REQUIRED)
     public boolean isFirst() {
         return !hasPrevious();
     }
 
-    @Schema(description = "Indicates whether current page is the last page.", required = true)
+    @Schema(description = "Indicates whether current page is the last page.",
+        requiredMode = REQUIRED)
     public boolean isLast() {
         return !hasNext();
     }
 
-    @Schema(description = "Indicates whether current page has previous page.", required = true)
+    @Schema(description = "Indicates whether current page has previous page.",
+        requiredMode = REQUIRED)
     @JsonProperty("hasNext")
     public boolean hasNext() {
         if (page <= 0) {
@@ -69,7 +74,8 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
         return page < getTotalPages();
     }
 
-    @Schema(description = "Indicates whether current page has previous page.", required = true)
+    @Schema(description = "Indicates whether current page has previous page.",
+        requiredMode = REQUIRED)
     @JsonProperty("hasPrevious")
     public boolean hasPrevious() {
         return page > 1;
@@ -80,7 +86,7 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
         return items.iterator();
     }
 
-    @Schema(description = "Indicates total pages.", required = true)
+    @Schema(description = "Indicates total pages.", requiredMode = REQUIRED)
     @JsonProperty("totalPages")
     public long getTotalPages() {
         return size == 0 ? 1 : (total + size - 1) / size;

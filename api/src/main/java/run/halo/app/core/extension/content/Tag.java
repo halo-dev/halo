@@ -1,5 +1,7 @@
 package run.halo.app.core.extension.content;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -25,7 +27,7 @@ public class Tag extends AbstractExtension {
 
     public static final GroupVersionKind GVK = GroupVersionKind.fromExtension(Tag.class);
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private TagSpec spec;
 
     @Schema
@@ -34,10 +36,10 @@ public class Tag extends AbstractExtension {
     @Data
     public static class TagSpec {
 
-        @Schema(required = true, minLength = 1)
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String displayName;
 
-        @Schema(required = true, minLength = 1)
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String slug;
 
         /**

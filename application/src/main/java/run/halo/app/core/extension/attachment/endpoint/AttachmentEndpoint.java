@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.attachment.endpoint;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static java.util.Comparator.comparing;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
@@ -274,10 +275,10 @@ public class AttachmentEndpoint implements CustomEndpoint {
 
     public interface IUploadRequest {
 
-        @Schema(required = true, description = "Attachment file")
+        @Schema(requiredMode = REQUIRED, description = "Attachment file")
         FilePart getFile();
 
-        @Schema(required = true, description = "Storage policy name")
+        @Schema(requiredMode = REQUIRED, description = "Storage policy name")
         String getPolicyName();
 
         @Schema(description = "The name of the group to which the attachment belongs")

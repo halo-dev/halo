@@ -196,12 +196,15 @@ const isDisabled = (attachment: Attachment) => {
       </div>
     </VCard>
   </div>
-  <div class="mt-4 bg-white sm:flex sm:items-center sm:justify-end">
+  <div class="mt-4">
     <VPagination
       v-model:page="page"
       v-model:size="size"
       :page-label="$t('core.components.pagination.page_label')"
       :size-label="$t('core.components.pagination.size_label')"
+      :total-label="
+        $t('core.components.pagination.total_label', { total: total })
+      "
       :total="total"
       :size-options="[60, 120, 200]"
     />

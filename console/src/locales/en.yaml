@@ -17,6 +17,7 @@ core:
       return_login:
         label: Already have an account
         button: Sign in
+      return_site: Return to site
     button: Login
     modal:
       title: Re-login
@@ -883,6 +884,13 @@ core:
           title: Crop Avatar
         remove:
           title: Are you sure you want to delete the avatar?
+        tooltips:
+          upload: Upload
+          zoom_in: Zoom In
+          zoom_out: Zoom Out
+          flip_horizontal: Flip Horizontal
+          flip_vertical: Flip Vertical
+          reset: Reset
   role:
     title: Roles
     common:
@@ -984,8 +992,6 @@ core:
     empty:
       title: No backups have been created yet
       message: You can click the button below to create a backup
-      actions:
-        create: Create backup
     operations:
       create:
         button: Create backup
@@ -1013,6 +1019,7 @@ core:
         first: 1. The restore process may last for a long time, please do not refresh the page during this period.
         second: 2. During the restore process, although the existing data will not be cleaned up, if there is a conflict, the data will be overwritten.
         third: 3. After the restore is completed, you will be prompted to stop running Halo, and you may need to run it manually after stopping.
+        complete: Restore completed, waiting for restart...
       start: Start restore
   exception:
     not_found:
@@ -1140,8 +1147,14 @@ core:
     pagination:
       page_label: page
       size_label: items per page
+      total_label: Total {total} items
     social_auth_providers:
       title: Third-party login
+    app_download_alert:
+      description: "Themes and plugins for Halo can be downloaded at the following addresses:"
+      sources:
+        app_store: "Official App Store: {url}"
+        github: "GitHub: {url}"
   composables:
     content_cache:
       toast_recovered: Recovered unsaved content from cache
