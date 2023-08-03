@@ -1,19 +1,19 @@
 import { fileURLToPath, URL } from "url";
 import fs from "fs";
 import path from "path";
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig, loadEnv, Plugin } from "vite";
 import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
-import Compression from "vite-compression-plugin";
 import { VitePWA } from "vite-plugin-pwa";
 import Icons from "unplugin-icons/vite";
 import { setupLibraryExternal } from "./src/build/library-external";
 import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
+import GzipPlugin from "rollup-plugin-gzip";
 
 export const sharedPlugins = [
   Vue(),
   VueJsx(),
-  Compression(),
+  GzipPlugin() as Plugin,
   Icons({
     compiler: "vue3",
     customCollections: {
