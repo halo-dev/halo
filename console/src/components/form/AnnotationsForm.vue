@@ -73,7 +73,6 @@ const customAnnotationsState = ref<{ key: string; value: string }[]>([]);
 const customAnnotationsDuplicateKey = computed(() => {
   const keys = customAnnotationsState.value.map((item) => item.key);
   const uniqueKeys = new Set(keys);
-  console.log(keys.length !== uniqueKeys.size);
   return keys.length !== uniqueKeys.size;
 });
 
