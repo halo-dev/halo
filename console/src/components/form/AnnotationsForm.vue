@@ -12,6 +12,7 @@ import type { AnnotationSetting } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { getValidationMessages } from "@formkit/validation";
 import { useThemeStore } from "@/stores/theme";
+import { randomUUID } from "@/utils/id";
 
 const themeStore = useThemeStore();
 
@@ -62,6 +63,7 @@ const handleFetchAnnotationSettings = async () => {
   }
 };
 
+const uuid = ref();
 const annotations = ref<{
   [key: string]: string;
 }>({});
@@ -126,6 +128,7 @@ const handleProcessCustomAnnotations = () => {
 };
 
 onMounted(async () => {
+  uuid.value = randomUUID();
   annotations.value = cloneDeep(props.value) || {};
   await handleFetchAnnotationSettings();
   handleProcessCustomAnnotations();
@@ -134,8 +137,8 @@ onMounted(async () => {
 watch(
   () => props.value,
   (value) => {
-    reset("specForm");
-    reset("customForm");
+    reset(`${uuid.value}-specForm`);
+    reset(`${uuid.value}-customForm`);
     annotations.value = cloneDeep(props.value) || {};
     if (value) {
       handleProcessCustomAnnotations();
@@ -150,11 +153,11 @@ const customFormInvalid = ref(true);
 
 const handleSubmit = async () => {
   if (avaliableAnnotationSettings.value.length) {
-    submitForm("specForm");
+    submitForm(`${uuid.value}-specForm`);
   } else {
     specFormInvalid.value = false;
   }
-  submitForm("customForm");
+  submitForm(`${uuid.value}-customForm`);
   await nextTick();
 };
 
@@ -187,7 +190,7 @@ defineExpose({
   <div class="flex flex-col gap-3 divide-y divide-gray-100">
     <FormKit
       v-if="annotations && avaliableAnnotationSettings.length > 0"
-      id="specForm"
+      :id="`${uuid}-specForm`"
       v-model="annotations"
       type="form"
       :preserve="true"
@@ -206,7 +209,7 @@ defineExpose({
     </FormKit>
     <FormKit
       v-if="annotations"
-      id="customForm"
+      :id="`${uuid}-customForm`"
       type="form"
       :preserve="true"
       :form-class="`${avaliableAnnotationSettings.length ? 'py-4' : ''}`"
