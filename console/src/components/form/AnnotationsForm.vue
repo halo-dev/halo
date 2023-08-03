@@ -63,7 +63,8 @@ const handleFetchAnnotationSettings = async () => {
   }
 };
 
-const uuid = randomUUID();
+const specFormId = `${randomUUID()}-specForm`;
+const customFormId = `${randomUUID()}-customForm`;
 const annotations = ref<{
   [key: string]: string;
 }>({});
@@ -136,8 +137,8 @@ onMounted(async () => {
 watch(
   () => props.value,
   (value) => {
-    reset(`${uuid}-specForm`);
-    reset(`${uuid}-customForm`);
+    reset(specFormId);
+    reset(customFormId);
     annotations.value = cloneDeep(props.value) || {};
     if (value) {
       handleProcessCustomAnnotations();
@@ -152,11 +153,11 @@ const customFormInvalid = ref(true);
 
 const handleSubmit = async () => {
   if (avaliableAnnotationSettings.value.length) {
-    submitForm(`${uuid}-specForm`);
+    submitForm(specFormId);
   } else {
     specFormInvalid.value = false;
   }
-  submitForm(`${uuid}-customForm`);
+  submitForm(customFormId);
   await nextTick();
 };
 
@@ -189,7 +190,7 @@ defineExpose({
   <div class="flex flex-col gap-3 divide-y divide-gray-100">
     <FormKit
       v-if="annotations && avaliableAnnotationSettings.length > 0"
-      :id="`${uuid}-specForm`"
+      :id="specFormId"
       v-model="annotations"
       type="form"
       :preserve="true"
@@ -208,7 +209,7 @@ defineExpose({
     </FormKit>
     <FormKit
       v-if="annotations"
-      :id="`${uuid}-customForm`"
+      :id="customFormId"
       type="form"
       :preserve="true"
       :form-class="`${avaliableAnnotationSettings.length ? 'py-4' : ''}`"
