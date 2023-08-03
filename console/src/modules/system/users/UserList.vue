@@ -172,7 +172,11 @@ const handleDeleteInBatch = async () => {
 };
 
 watch(selectedUserNames, (newValue) => {
-  checkedAll.value = newValue.length === users.value?.length;
+  checkedAll.value =
+    newValue.length ===
+    users.value?.filter(
+      (user) => user.user.metadata.name !== userStore.currentUser?.metadata.name
+    ).length;
 });
 
 const checkSelection = (user: User) => {
@@ -187,9 +191,15 @@ const handleCheckAllChange = (e: Event) => {
 
   if (checked) {
     selectedUserNames.value =
-      users.value?.map((user) => {
-        return user.user.metadata.name;
-      }) || [];
+      users.value
+        ?.filter((user) => {
+          return (
+            user.user.metadata.name !== userStore.currentUser?.metadata.name
+          );
+        })
+        .map((user) => {
+          return user.user.metadata.name;
+        }) || [];
   } else {
     selectedUserNames.value.length = 0;
   }
@@ -407,6 +417,10 @@ onMounted(() => {
                   class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                   name="post-checkbox"
                   type="checkbox"
+                  :disabled="
+                    user.user.metadata.name ===
+                    userStore.currentUser?.metadata.name
+                  "
                 />
               </template>
               <template #start>
