@@ -136,8 +136,8 @@ onMounted(async () => {
 watch(
   () => props.value,
   (value) => {
-    reset(`${uuid.value}-specForm`);
-    reset(`${uuid.value}-customForm`);
+    reset(`${uuid}-specForm`);
+    reset(`${uuid}-customForm`);
     annotations.value = cloneDeep(props.value) || {};
     if (value) {
       handleProcessCustomAnnotations();
@@ -152,11 +152,11 @@ const customFormInvalid = ref(true);
 
 const handleSubmit = async () => {
   if (avaliableAnnotationSettings.value.length) {
-    submitForm(`${uuid.value}-specForm`);
+    submitForm(`${uuid}-specForm`);
   } else {
     specFormInvalid.value = false;
   }
-  submitForm(`${uuid.value}-customForm`);
+  submitForm(`${uuid}-customForm`);
   await nextTick();
 };
 
