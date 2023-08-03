@@ -63,7 +63,7 @@ const handleFetchAnnotationSettings = async () => {
   }
 };
 
-const uuid = ref();
+const uuid = randomUUID();
 const annotations = ref<{
   [key: string]: string;
 }>({});
@@ -128,7 +128,6 @@ const handleProcessCustomAnnotations = () => {
 };
 
 onMounted(async () => {
-  uuid.value = randomUUID();
   annotations.value = cloneDeep(props.value) || {};
   await handleFetchAnnotationSettings();
   handleProcessCustomAnnotations();
