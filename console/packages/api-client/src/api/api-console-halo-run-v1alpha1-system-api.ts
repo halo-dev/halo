@@ -37,6 +37,8 @@ import {
   BaseAPI,
   RequiredError,
 } from "../base";
+// @ts-ignore
+import { SystemInitializationRequest } from "../models";
 /**
  * ApiConsoleHaloRunV1alpha1SystemApi - axios parameter creator
  * @export
@@ -47,10 +49,12 @@ export const ApiConsoleHaloRunV1alpha1SystemApiAxiosParamCreator = function (
   return {
     /**
      * Initialize system
+     * @param {SystemInitializationRequest} [systemInitializationRequest]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     initialize: async (
+      systemInitializationRequest?: SystemInitializationRequest,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/api.console.halo.run/v1alpha1/system/initialize`;
@@ -77,6 +81,8 @@ export const ApiConsoleHaloRunV1alpha1SystemApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+      localVarHeaderParameter["Content-Type"] = "application/json";
+
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions =
         baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -85,6 +91,11 @@ export const ApiConsoleHaloRunV1alpha1SystemApiAxiosParamCreator = function (
         ...headersFromBaseOptions,
         ...options.headers,
       };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        systemInitializationRequest,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
@@ -106,15 +117,18 @@ export const ApiConsoleHaloRunV1alpha1SystemApiFp = function (
   return {
     /**
      * Initialize system
+     * @param {SystemInitializationRequest} [systemInitializationRequest]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async initialize(
+      systemInitializationRequest?: SystemInitializationRequest,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.initialize(
+        systemInitializationRequest,
         options
       );
       return createRequestFunction(
@@ -140,16 +154,34 @@ export const ApiConsoleHaloRunV1alpha1SystemApiFactory = function (
   return {
     /**
      * Initialize system
+     * @param {ApiConsoleHaloRunV1alpha1SystemApiInitializeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    initialize(options?: AxiosRequestConfig): AxiosPromise<boolean> {
+    initialize(
+      requestParameters: ApiConsoleHaloRunV1alpha1SystemApiInitializeRequest = {},
+      options?: AxiosRequestConfig
+    ): AxiosPromise<boolean> {
       return localVarFp
-        .initialize(options)
+        .initialize(requestParameters.systemInitializationRequest, options)
         .then((request) => request(axios, basePath));
     },
   };
 };
+
+/**
+ * Request parameters for initialize operation in ApiConsoleHaloRunV1alpha1SystemApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1SystemApiInitializeRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1SystemApiInitializeRequest {
+  /**
+   *
+   * @type {SystemInitializationRequest}
+   * @memberof ApiConsoleHaloRunV1alpha1SystemApiInitialize
+   */
+  readonly systemInitializationRequest?: SystemInitializationRequest;
+}
 
 /**
  * ApiConsoleHaloRunV1alpha1SystemApi - object-oriented interface
@@ -160,13 +192,17 @@ export const ApiConsoleHaloRunV1alpha1SystemApiFactory = function (
 export class ApiConsoleHaloRunV1alpha1SystemApi extends BaseAPI {
   /**
    * Initialize system
+   * @param {ApiConsoleHaloRunV1alpha1SystemApiInitializeRequest} requestParameters Request parameters.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof ApiConsoleHaloRunV1alpha1SystemApi
    */
-  public initialize(options?: AxiosRequestConfig) {
+  public initialize(
+    requestParameters: ApiConsoleHaloRunV1alpha1SystemApiInitializeRequest = {},
+    options?: AxiosRequestConfig
+  ) {
     return ApiConsoleHaloRunV1alpha1SystemApiFp(this.configuration)
-      .initialize(options)
+      .initialize(requestParameters.systemInitializationRequest, options)
       .then((request) => request(this.axios, this.basePath));
   }
 }

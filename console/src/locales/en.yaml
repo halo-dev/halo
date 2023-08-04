@@ -1038,6 +1038,9 @@ core:
       site_title:
         placeholder: Site title
         validation: Please enter the site title
+      email:
+        placeholder: Email
+        validation: Please enter the email
       username:
         placeholder: Username
         validation: Please enter the username

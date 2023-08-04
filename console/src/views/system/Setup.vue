@@ -17,6 +17,7 @@ import type {
   Plugin,
   PostRequest,
   SinglePageRequest,
+  SystemInitializationRequest,
   Tag,
 } from "@halo-dev/api-client";
 import { useThemeStore } from "@/stores/theme";
@@ -26,15 +27,19 @@ import { useI18n } from "vue-i18n";
 const router = useRouter();
 const { t } = useI18n();
 
-const {
-  configMapFormData,
-  handleSaveConfigMap,
-  handleFetchSettings,
-  handleFetchConfigMap,
-} = useSettingForm(ref("system"), ref("system"));
+const { handleFetchSettings, handleFetchConfigMap } = useSettingForm(
+  ref("system"),
+  ref("system")
+);
 
-const siteTitle = ref("");
 const loading = ref(false);
+
+const formState = ref<SystemInitializationRequest>({
+  siteTitle: "",
+  username: "",
+  password: "",
+  email: "",
+});
 
 const { mutate: pluginInstallMutate } = useMutation({
   mutationKey: ["plugin-install"],
@@ -85,11 +90,9 @@ const handleSubmit = async () => {
   try {
     loading.value = true;
 
-    // Set site title
-    if (configMapFormData.value) {
-      configMapFormData.value["basic"].title = siteTitle.value;
-      await handleSaveConfigMap();
-    }
+    await apiClient.system.initialize({
+      systemInitializationRequest: formState.value,
+    });
 
     // Create category / tag / post
     await apiClient.extension.category.createcontentHaloRunV1alpha1Category({
@@ -182,6 +185,7 @@ const inputClasses = {
     <div class="flex w-72 flex-col">
       <FormKit
         id="setup-form"
+        v-model="formState"
         name="setup-form"
         :actions="false"
         :classes="{
@@ -192,7 +196,7 @@ const inputClasses = {
         @keyup.enter="$formkit.submit('setup-form')"
       >
         <FormKit
-          v-model="siteTitle"
+          name="siteTitle"
           :classes="inputClasses"
           :autofocus="true"
           :validation-messages="{
@@ -203,7 +207,17 @@ const inputClasses = {
           validation="required|length:0,100"
         ></FormKit>
         <FormKit
-          v-model="siteTitle"
+          name="email"
+          :classes="inputClasses"
+          :validation-messages="{
+            required: $t('core.setup.fields.email.validation'),
+          }"
+          type="text"
+          :placeholder="$t('core.setup.fields.email.placeholder')"
+          validation="required|length:0,100"
+        ></FormKit>
+        <FormKit
+          name="username"
           :classes="inputClasses"
           :validation-messages="{
             required: $t('core.setup.fields.username.validation'),
@@ -213,7 +227,7 @@ const inputClasses = {
           validation="required|length:0,100"
         ></FormKit>
         <FormKit
-          v-model="siteTitle"
+          name="password"
           :classes="inputClasses"
           :validation-messages="{
             required: $t('core.setup.fields.password.validation'),

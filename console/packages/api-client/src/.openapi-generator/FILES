@@ -220,6 +220,7 @@ models/snapshot.ts
 models/stats-vo.ts
 models/stats.ts
 models/subject.ts
+models/system-initialization-request.ts
 models/tag-list.ts
 models/tag-spec.ts
 models/tag-status.ts

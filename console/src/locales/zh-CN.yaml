@@ -1038,6 +1038,9 @@ core:
       site_title:
         placeholder: 站点名称
         validation: 请输入站点名称
+      email:
+        placeholder: 邮箱
+        validation: 请输入邮箱
       username:
         placeholder: 用户名
         validation: 请输入用户名
