@@ -14,6 +14,7 @@ import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
 import org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint;
 import org.springframework.stereotype.Component;
 import run.halo.app.extension.ConfigMap;
+import run.halo.app.infra.SetupStateCache;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.SystemSetting.Basic;
@@ -33,6 +34,8 @@ public class GlobalInfoEndpoint {
 
     private final AuthProviderService authProviderService;
 
+    private final SetupStateCache setupStateCache;
+
     @ReadOperation
     public GlobalInfo globalInfo() {
         final var info = new GlobalInfo();
@@ -40,6 +43,7 @@ public class GlobalInfoEndpoint {
         info.setUseAbsolutePermalink(haloProperties.isUseAbsolutePermalink());
         info.setLocale(Locale.getDefault());
         info.setTimeZone(TimeZone.getDefault());
+        info.setInitialized(setupStateCache.get());
         handleSocialAuthProvider(info);
         systemConfigFetcher.ifAvailable(fetcher -> fetcher.getConfigMapBlocking()
             .ifPresent(configMap -> {
@@ -69,6 +73,8 @@ public class GlobalInfoEndpoint {
         private boolean allowRegistration;
 
         private String favicon;
+
+        private boolean initialized;
 
         private List<SocialAuthProvider> socialAuthProviders;
     }

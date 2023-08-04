@@ -1,15 +1,18 @@
 package run.halo.app.core.extension.endpoint;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
+import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static run.halo.app.infra.SetupStateCache.SYSTEM_STATES_CONFIGMAP;
 
-import io.micrometer.common.util.StringUtils;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
@@ -52,6 +55,7 @@ public class SystemInitializationEndpoint implements CustomEndpoint {
                 builder -> builder.operationId("initialize")
                     .description("Initialize system")
                     .tag(tag)
+                    .requestBody(requestBodyBuilder().implementation(SystemInitializationRequest.class))
                     .response(responseBuilder().implementation(Boolean.class))
             )
             .build();
@@ -117,9 +121,15 @@ public class SystemInitializationEndpoint implements CustomEndpoint {
 
     @Data
     public static class SystemInitializationRequest {
+
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String username;
+
+        @Schema(requiredMode = REQUIRED, minLength = 3)
         private String password;
+
         private String email;
+
         private String siteTitle;
     }
 }
