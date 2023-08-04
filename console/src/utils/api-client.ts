@@ -10,6 +10,7 @@ import {
   ApiConsoleHaloRunV1alpha1AttachmentApi,
   ApiConsoleHaloRunV1alpha1IndicesApi,
   ApiConsoleHaloRunV1alpha1AuthProviderApi,
+  ApiConsoleHaloRunV1alpha1SystemApi,
   ContentHaloRunV1alpha1CategoryApi,
   ContentHaloRunV1alpha1CommentApi,
   ContentHaloRunV1alpha1PostApi,
@@ -218,6 +219,7 @@ function setupApiClient(axios: AxiosInstance) {
       baseURL,
       axios
     ),
+    system: new ApiConsoleHaloRunV1alpha1SystemApi(undefined, baseURL, axios),
   };
 }
 

@@ -170,22 +170,31 @@ onMounted(async () => {
   handleFetchSettings();
   handleFetchConfigMap();
 });
+
+const inputClasses = {
+  outer: "!py-3 first:!pt-0 last:!pb-0",
+};
 </script>
 
 <template>
-  <div class="flex h-screen flex-col items-center justify-center">
+  <div class="flex h-screen flex-col items-center bg-white/90 pt-[30vh]">
     <IconLogo class="mb-8" />
-    <div class="flex w-72 flex-col gap-4">
+    <div class="flex w-72 flex-col">
       <FormKit
         id="setup-form"
         name="setup-form"
         :actions="false"
+        :classes="{
+          form: '!divide-none',
+        }"
         type="form"
         @submit="handleSubmit"
         @keyup.enter="$formkit.submit('setup-form')"
       >
         <FormKit
           v-model="siteTitle"
+          :classes="inputClasses"
+          :autofocus="true"
           :validation-messages="{
             required: $t('core.setup.fields.site_title.validation'),
           }"
@@ -193,9 +202,30 @@ onMounted(async () => {
           :placeholder="$t('core.setup.fields.site_title.placeholder')"
           validation="required|length:0,100"
         ></FormKit>
+        <FormKit
+          v-model="siteTitle"
+          :classes="inputClasses"
+          :validation-messages="{
+            required: $t('core.setup.fields.username.validation'),
+          }"
+          type="text"
+          :placeholder="$t('core.setup.fields.username.placeholder')"
+          validation="required|length:0,100"
+        ></FormKit>
+        <FormKit
+          v-model="siteTitle"
+          :classes="inputClasses"
+          :validation-messages="{
+            required: $t('core.setup.fields.password.validation'),
+          }"
+          type="text"
+          :placeholder="$t('core.setup.fields.password.placeholder')"
+          validation="required|length:0,100"
+        ></FormKit>
       </FormKit>
       <VButton
         block
+        class="mt-8"
         type="secondary"
         :loading="loading"
         @click="$formkit.submit('setup-form')"

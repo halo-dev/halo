@@ -1038,6 +1038,12 @@ core:
       site_title:
         placeholder: Site title
         validation: Please enter the site title
+      username:
+        placeholder: Username
+        validation: Please enter the username
+      password:
+        placeholder: Password
+        validation: Please enter the password
   rbac:
     Attachments Management: Attachments
     Attachment Manage: Attachment Manage

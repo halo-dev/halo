@@ -1038,6 +1038,12 @@ core:
       site_title:
         placeholder: 站點名稱
         validation: 請輸入站點名稱
+      username:
+        placeholder: 用戶名
+        validation: 請輸入用戶名
+      password:
+        placeholder: 密碼
+        validation: 請輸入密碼
   rbac:
     Attachments Management: 附件
     Attachment Manage: 附件管理
