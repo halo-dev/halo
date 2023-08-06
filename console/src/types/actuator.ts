@@ -7,6 +7,8 @@ export interface GlobalInfo {
   allowRegistration: boolean;
   socialAuthProviders: SocialAuthProvider[];
   useAbsolutePermalink: boolean;
+  initialized: boolean;
+  favicon?: string;
 }
 
 export interface Info {

@@ -1,7 +1,7 @@
-import { useSystemStatesStore } from "@/stores/system-states";
+import { useGlobalInfoStore } from "@/stores/global-info";
 import type { Router } from "vue-router";
 
-const whiteList = ["Setup", "Login", "Binding"];
+const whiteList = ["Setup"];
 
 export function setupCheckStatesGuard(router: Router) {
   router.beforeEach(async (to, from, next) => {
@@ -10,9 +10,9 @@ export function setupCheckStatesGuard(router: Router) {
       return;
     }
 
-    const systemStateStore = useSystemStatesStore();
+    const globalInfoStore = useGlobalInfoStore();
 
-    if (!systemStateStore.states.isSetup) {
+    if (!globalInfoStore.globalInfo?.initialized) {
       next({ name: "Setup" });
       return;
     }

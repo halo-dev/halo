@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
-import { useSettingForm } from "@/composables/use-setting-form";
-import { useSystemStatesStore } from "@/stores/system-states";
 import { apiClient } from "@/utils/api-client";
 import { Toast, VButton } from "@halo-dev/components";
 import { onMounted, ref } from "vue";
@@ -23,14 +21,10 @@ import type {
 import { useThemeStore } from "@/stores/theme";
 import { useMutation } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import { useGlobalInfoStore } from "@/stores/global-info";
 
 const router = useRouter();
 const { t } = useI18n();
-
-const { handleFetchSettings, handleFetchConfigMap } = useSettingForm(
-  ref("system"),
-  ref("system")
-);
 
 const loading = ref(false);
 
@@ -136,22 +130,8 @@ const handleSubmit = async () => {
     console.error("Failed to initialize preset data", error);
   }
 
-  // Create system-states ConfigMap
-  await apiClient.extension.configMap.createv1alpha1ConfigMap({
-    configMap: {
-      metadata: {
-        name: "system-states",
-      },
-      kind: "ConfigMap",
-      apiVersion: "v1alpha1",
-      data: {
-        states: JSON.stringify({ isSetup: true }),
-      },
-    },
-  });
-
-  const systemStateStore = useSystemStatesStore();
-  await systemStateStore.fetchSystemStates();
+  const globalInfoStore = useGlobalInfoStore();
+  await globalInfoStore.fetchGlobalInfo();
   const themeStore = useThemeStore();
   await themeStore.fetchActivatedTheme();
 
@@ -163,15 +143,12 @@ const handleSubmit = async () => {
 };
 
 onMounted(async () => {
-  const systemStatesStore = useSystemStatesStore();
+  const globalInfoStore = useGlobalInfoStore();
 
-  if (systemStatesStore.states.isSetup) {
+  if (globalInfoStore.globalInfo?.initialized) {
     router.push({ name: "Dashboard" });
     return;
   }
-
-  handleFetchSettings();
-  handleFetchConfigMap();
 });
 
 const inputClasses = {
@@ -191,6 +168,7 @@ const inputClasses = {
         :classes="{
           form: '!divide-none',
         }"
+        :config="{ validationVisibility: 'submit' }"
         type="form"
         @submit="handleSubmit"
         @keyup.enter="$formkit.submit('setup-form')"
@@ -214,7 +192,7 @@ const inputClasses = {
           }"
           type="text"
           :placeholder="$t('core.setup.fields.email.placeholder')"
-          validation="required|length:0,100"
+          validation="required|email|length:0,100"
         ></FormKit>
         <FormKit
           name="username"
@@ -224,17 +202,26 @@ const inputClasses = {
           }"
           type="text"
           :placeholder="$t('core.setup.fields.username.placeholder')"
-          validation="required|length:0,100"
+          :validation="[
+            ['required'],
+            ['length:0,63'],
+            [
+              'matches',
+              /^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$/,
+            ],
+          ]"
         ></FormKit>
         <FormKit
           name="password"
           :classes="inputClasses"
-          :validation-messages="{
-            required: $t('core.setup.fields.password.validation'),
-          }"
           type="text"
           :placeholder="$t('core.setup.fields.password.placeholder')"
-          validation="required|length:0,100"
+          validation="required:trim|length:5,100|matches:/^\S.*\S$/"
+          :validation-messages="{
+            required: $t('core.setup.fields.password.validation'),
+            matches: $t('core.formkit.validation.trim'),
+          }"
+          autocomplete="current-password"
         ></FormKit>
       </FormKit>
       <VButton
