@@ -1003,9 +1003,9 @@ core:
         description: 確定要刪除此備份嗎？
       restore:
         title: 還原成功
-        description: 還原成功後，需要重新啟動 Halo 才能正常載入系統資源，點擊確定後我們會自動停止運行 Halo。
-      shutdown:
-        toast_success: 已請求停止運行
+        description: 還原成功後，需要重新啟動 Halo 才能正常載入系統資源，點擊確定之後，我們會自動重啟 Halo。
+      restart:
+        toast_success: 已請求重啟
     list:
       phases:
         pending: 準備中
@@ -1018,7 +1018,7 @@ core:
       tips:
         first: 1. 還原過程可能需要較長時間，期間請勿重新整理頁面。
         second: 2. 在還原過程中，雖然已有的資料不會被清除，但若有衝突的資料將被覆蓋。
-        third: 3. 還原完成後會提示停止運行 Halo，停止後可能需要手動啟動。
+        third: 3. 還原完成後需要重新啟動 Halo 才能正常載入系統資源。
         complete: 恢復完成，等待重啟...
       start: 開始還原
   exception:
