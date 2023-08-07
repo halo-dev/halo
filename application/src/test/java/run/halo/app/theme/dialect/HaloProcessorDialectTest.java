@@ -104,6 +104,11 @@ class HaloProcessorDialectTest {
 
         lenient().when(extensionComponentsFinder.getExtensions(eq(TemplateHeadProcessor.class)))
             .thenReturn(new ArrayList<>(map.values()));
+
+        lenient().when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
+            .thenReturn(fetcher);
+        lenient().when(fetcher.fetchComment())
+            .thenReturn(Mono.just(new SystemSetting.Comment()));
     }
 
     @Test
