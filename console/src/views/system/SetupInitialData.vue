@@ -17,8 +17,12 @@ import singlePage from "./setup-data/singlePage.json";
 import menu from "./setup-data/menu.json";
 import menuItems from "./setup-data/menu-items.json";
 import { useRouter } from "vue-router";
+import { useGlobalInfoStore } from "@/stores/global-info";
+import { ref } from "vue";
+import { useUserStore } from "@/stores/user";
 
 const router = useRouter();
+const globalInfoStore = useGlobalInfoStore();
 
 const { mutate: pluginInstallMutate } = useMutation({
   mutationKey: ["plugin-install"],
@@ -65,66 +69,97 @@ const { mutate: pluginStartMutate } = useMutation({
   retryDelay: 1000,
 });
 
+const processing = ref(false);
+
 async function setupInitialData() {
-  // Create category / tag / post
-  await apiClient.extension.category.createcontentHaloRunV1alpha1Category({
-    category: category as Category,
-  });
-  await apiClient.extension.tag.createcontentHaloRunV1alpha1Tag({
-    tag: tag as Tag,
-  });
-  const { data: postData } = await apiClient.post.draftPost({
-    postRequest: post as PostRequest,
-  });
-  await apiClient.post.publishPost({ name: postData.metadata.name });
+  try {
+    processing.value = true;
 
-  // Create singlePage
-  const { data: singlePageData } = await apiClient.singlePage.draftSinglePage({
-    singlePageRequest: singlePage as SinglePageRequest,
-  });
-
-  await apiClient.singlePage.publishSinglePage({
-    name: singlePageData.metadata.name,
-  });
-
-  // Create menu and menu items
-  const menuItemPromises = menuItems.map((item) => {
-    return apiClient.extension.menuItem.createv1alpha1MenuItem({
-      menuItem: item,
+    // Create category / tag / post
+    await apiClient.extension.category.createcontentHaloRunV1alpha1Category({
+      category: category as Category,
     });
-  });
-  await Promise.all(menuItemPromises);
-  await apiClient.extension.menu.createv1alpha1Menu({ menu: menu });
+    await apiClient.extension.tag.createcontentHaloRunV1alpha1Tag({
+      tag: tag as Tag,
+    });
+    const { data: postData } = await apiClient.post.draftPost({
+      postRequest: post as PostRequest,
+    });
+    await apiClient.post.publishPost({ name: postData.metadata.name });
 
-  // Install preset plugins
-  const { data: presetPlugins } = await apiClient.plugin.listPluginPresets();
+    // Create singlePage
+    const { data: singlePageData } = await apiClient.singlePage.draftSinglePage(
+      {
+        singlePageRequest: singlePage as SinglePageRequest,
+      }
+    );
 
-  for (let i = 0; i < presetPlugins.length; i++) {
-    pluginInstallMutate(presetPlugins[i]);
+    await apiClient.singlePage.publishSinglePage({
+      name: singlePageData.metadata.name,
+    });
+
+    // Create menu and menu items
+    const menuItemPromises = menuItems.map((item) => {
+      return apiClient.extension.menuItem.createv1alpha1MenuItem({
+        menuItem: item,
+      });
+    });
+    await Promise.all(menuItemPromises);
+    await apiClient.extension.menu.createv1alpha1Menu({ menu: menu });
+
+    // Install preset plugins
+    const { data: presetPlugins } = await apiClient.plugin.listPluginPresets();
+
+    for (let i = 0; i < presetPlugins.length; i++) {
+      pluginInstallMutate(presetPlugins[i]);
+    }
+
+    await apiClient.extension.configMap.createv1alpha1ConfigMap({
+      configMap: {
+        metadata: {
+          name: "system-states",
+        },
+        kind: "ConfigMap",
+        apiVersion: "v1alpha1",
+        data: {
+          states: JSON.stringify({ isSetup: true }),
+        },
+      },
+    });
+  } catch (error) {
+    console.error(error);
+  } finally {
+    processing.value = false;
   }
 
-  await apiClient.extension.configMap.createv1alpha1ConfigMap({
-    configMap: {
-      metadata: {
-        name: "system-states",
-      },
-      kind: "ConfigMap",
-      apiVersion: "v1alpha1",
-      data: {
-        states: JSON.stringify({ isSetup: true }),
-      },
-    },
-  });
+  await globalInfoStore.fetchGlobalInfo();
 
   router.push({ name: "Dashboard" });
 }
 
-onMounted(setupInitialData);
+const userStore = useUserStore();
+
+onMounted(async () => {
+  await globalInfoStore.fetchGlobalInfo();
+
+  if (
+    globalInfoStore.globalInfo &&
+    globalInfoStore.globalInfo.dataInitialized === false &&
+    !userStore.isAnonymous
+  ) {
+    setupInitialData();
+    return;
+  }
+
+  router.push({ name: "Dashboard" });
+});
 </script>
 
 <template>
   <div class="flex h-screen flex-col items-center justify-center">
     <VLoading />
-    <div class="text-xs text-gray-600">正在初始化数据，请稍后...</div>
+    <div v-if="processing" class="text-xs text-gray-600">
+      正在初始化数据，请稍后...
+    </div>
   </div>
 </template>

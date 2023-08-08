@@ -100,7 +100,7 @@ const inputClasses = {
         <FormKit
           name="password"
           :classes="inputClasses"
-          type="text"
+          type="password"
           :placeholder="$t('core.setup.fields.password.placeholder')"
           validation="required:trim|length:5,100|matches:/^\S.*\S$/"
           :validation-messages="{
