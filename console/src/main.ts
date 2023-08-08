@@ -267,7 +267,7 @@ async function initApp() {
     const systemConfigMapStore = useSystemConfigMapStore();
     await systemConfigMapStore.fetchSystemConfigMap();
 
-    if (globalInfoStore.globalInfo?.initialized) {
+    if (globalInfoStore.globalInfo?.userInitialized) {
       await loadActivatedTheme();
     }
   } catch (e) {
