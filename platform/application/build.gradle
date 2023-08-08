@@ -18,7 +18,7 @@ ext {
     guava = "32.0.1-jre"
     jsoup = '1.15.3'
     jsonPatch = "1.13"
-    springDocOpenAPI = "2.1.0"
+    springDocOpenAPI = "2.2.0"
     lucene = "9.5.0"
     resilience4jVersion = "2.0.2"
 }

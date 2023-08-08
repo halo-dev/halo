@@ -33,6 +33,7 @@ logging:
 springdoc:
   api-docs:
     enabled: true
+    version: OPENAPI_3_1
   swagger-ui:
     enabled: true
   show-actuator: true
