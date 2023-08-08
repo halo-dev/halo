@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,7 +11,6 @@ import static org.springframework.web.reactive.function.BodyInserters.fromMultip
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,15 +22,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.reactivestreams.Publisher;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.server.ServerWebInputException;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.Theme;
@@ -70,7 +67,7 @@ class ThemeEndpointTest {
     private SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     @Mock
-    private ReactiveUrlDataBufferFetcher reactiveUrlDataBufferFetcher;
+    private ReactiveUrlDataBufferFetcher urlDataBufferFetcher;
 
     @InjectMocks
     ThemeEndpoint themeEndpoint;
@@ -105,7 +102,7 @@ class ThemeEndpointTest {
             bodyBuilder.part("file", new FileSystemResource(defaultTheme))
                 .contentType(MediaType.MULTIPART_FORM_DATA);
 
-            when(themeService.upgrade(eq("invalid-missing-manifest"), isA(InputStream.class)))
+            when(themeService.upgrade(eq("invalid-missing-manifest"), isA(Publisher.class)))
                 .thenReturn(
                     Mono.error(() -> new ServerWebInputException("Failed to upgrade theme")));
 
@@ -115,7 +112,7 @@ class ThemeEndpointTest {
                 .exchange()
                 .expectStatus().isBadRequest();
 
-            verify(themeService).upgrade(eq("invalid-missing-manifest"), isA(InputStream.class));
+            verify(themeService).upgrade(eq("invalid-missing-manifest"), isA(Publisher.class));
         }
 
         @Test
@@ -129,7 +126,7 @@ class ThemeEndpointTest {
             var newTheme = new Theme();
             newTheme.setMetadata(metadata);
 
-            when(themeService.upgrade(eq("default"), isA(InputStream.class)))
+            when(themeService.upgrade(eq("default"), isA(Publisher.class)))
                 .thenReturn(Mono.just(newTheme));
 
             when(templateEngineManager.clearCache(eq("default")))
@@ -141,22 +138,20 @@ class ThemeEndpointTest {
                 .exchange()
                 .expectStatus().isOk();
 
-            verify(themeService).upgrade(eq("default"), isA(InputStream.class));
+            verify(themeService).upgrade(eq("default"), isA(Publisher.class));
 
             verify(templateEngineManager, times(1)).clearCache(eq("default"));
         }
 
         @Test
         void upgradeFromUri() {
-            final URI uri = URI.create("https://example.com/test-theme.zip");
-            Theme fakeTheme = mock(Theme.class);
-            Metadata metadata = new Metadata();
+            var uri = URI.create("https://example.com/test-theme.zip");
+            var metadata = new Metadata();
             metadata.setName("default");
-            when(fakeTheme.getMetadata()).thenReturn(metadata);
-            when(themeService.upgrade(eq("default"), isA(InputStream.class)))
+            var fakeTheme = new Theme();
+            fakeTheme.setMetadata(metadata);
+            when(themeService.upgrade(eq("default"), any()))
                 .thenReturn(Mono.just(fakeTheme));
-            when(reactiveUrlDataBufferFetcher.fetch(eq(uri)))
-                .thenReturn(Flux.just(mock(DataBuffer.class)));
             when(templateEngineManager.clearCache(eq("default")))
                 .thenReturn(Mono.empty());
             var body = new ThemeEndpoint.UpgradeFromUriRequest(uri);
@@ -164,13 +159,12 @@ class ThemeEndpointTest {
                 .uri("/themes/default/upgrade-from-uri")
                 .bodyValue(body)
                 .exchange()
-                .expectStatus().isOk();
+                .expectStatus().isOk()
+                .expectBody(Theme.class).isEqualTo(fakeTheme);
 
-            verify(themeService).upgrade(eq("default"), isA(InputStream.class));
+            verify(themeService).upgrade(eq("default"), any());
 
             verify(templateEngineManager, times(1)).clearCache(eq("default"));
-
-            verify(reactiveUrlDataBufferFetcher).fetch(eq(uri));
         }
     }
 
@@ -210,20 +204,21 @@ class ThemeEndpointTest {
     @Test
     void installFromUri() {
         final URI uri = URI.create("https://example.com/test-theme.zip");
-        Theme fakeTheme = mock(Theme.class);
-        when(themeService.install(isA(InputStream.class)))
-            .thenReturn(Mono.just(fakeTheme));
-        when(reactiveUrlDataBufferFetcher.fetch(eq(uri)))
-            .thenReturn(Flux.just(mock(DataBuffer.class)));
+        var metadata = new Metadata();
+        metadata.setName("fake-theme");
+        var theme = new Theme();
+        theme.setMetadata(metadata);
+
+        when(themeService.install(any())).thenReturn(Mono.just(theme));
         var body = new ThemeEndpoint.UpgradeFromUriRequest(uri);
         webTestClient.post()
             .uri("/themes/-/install-from-uri")
             .bodyValue(body)
             .exchange()
-            .expectStatus().isOk();
+            .expectStatus().isOk()
+            .expectBody(Theme.class).isEqualTo(theme);
 
-        verify(themeService).install(isA(InputStream.class));
-        verify(reactiveUrlDataBufferFetcher).fetch(eq(uri));
+        verify(themeService).install(any());
     }
 
     @Test
