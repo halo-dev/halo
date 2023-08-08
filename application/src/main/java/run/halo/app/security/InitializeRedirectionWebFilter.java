@@ -1,6 +1,7 @@
 package run.halo.app.security;
 
 import java.net.URI;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
@@ -31,6 +32,7 @@ public class InitializeRedirectionWebFilter implements WebFilter {
 
     private final SetupStateCache setupStateCache;
 
+    @Getter
     private ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
 
     @Override
@@ -44,10 +46,6 @@ public class InitializeRedirectionWebFilter implements WebFilter {
                 // Redirect to set up page if system is not initialized.
                 return redirectStrategy.sendRedirect(exchange, location);
             });
-    }
-
-    public ServerRedirectStrategy getRedirectStrategy() {
-        return redirectStrategy;
     }
 
     public void setRedirectStrategy(ServerRedirectStrategy redirectStrategy) {

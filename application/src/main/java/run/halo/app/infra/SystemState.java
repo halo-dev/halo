@@ -20,6 +20,8 @@ import run.halo.app.infra.utils.JsonUtils;
  */
 @Data
 public class SystemState {
+    public static final String SYSTEM_STATES_CONFIGMAP = "system-states";
+
     static final String GROUP = "states";
 
     private Boolean isSetup;

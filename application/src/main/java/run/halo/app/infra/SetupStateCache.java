@@ -1,10 +1,9 @@
 package run.halo.app.infra;
 
-import io.micrometer.common.util.StringUtils;
-import java.util.Optional;
+import static org.apache.commons.lang3.BooleanUtils.isTrue;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
-import lombok.Data;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import run.halo.app.extension.ConfigMap;
@@ -12,7 +11,6 @@ import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.infra.utils.JsonUtils;
 
 /**
  * <p>A cache that caches system setup state.</p>
@@ -23,7 +21,6 @@ import run.halo.app.infra.utils.JsonUtils;
  */
 @Component
 public class SetupStateCache implements Reconciler<Reconciler.Request>, Supplier<Boolean> {
-    public static final String SYSTEM_STATES_CONFIGMAP = "system-states";
     private final ExtensionClient client;
 
     private final InternalValueCache valueCache = new InternalValueCache();
@@ -46,10 +43,10 @@ public class SetupStateCache implements Reconciler<Reconciler.Request>, Supplier
 
     @Override
     public Result reconcile(Request request) {
-        if (!SYSTEM_STATES_CONFIGMAP.equals(request.name())) {
+        if (!SystemState.SYSTEM_STATES_CONFIGMAP.equals(request.name())) {
             return Result.doNotRetry();
         }
-        valueCache.cache(isInitialized());
+        valueCache.cache(isInitializedSync());
         return Result.doNotRetry();
     }
 
@@ -65,21 +62,13 @@ public class SetupStateCache implements Reconciler<Reconciler.Request>, Supplier
      *
      * @return <code>true</code> if system is initialized, <code>false</code> otherwise.
      */
-    private boolean isInitialized() {
-        return client.fetch(ConfigMap.class, SYSTEM_STATES_CONFIGMAP)
-            .filter(configMap -> configMap.getData() != null)
-            .map(ConfigMap::getData)
-            .flatMap(map -> Optional.ofNullable(map.get(SystemStates.GROUP))
-                .filter(StringUtils::isNotBlank)
-                .map(value -> JsonUtils.jsonToObject(value, SystemStates.class).getIsSetup())
-            )
+    public boolean isInitializedSync() {
+        return client.fetch(ConfigMap.class, SystemState.SYSTEM_STATES_CONFIGMAP)
+            .map(config -> {
+                SystemState systemState = SystemState.deserialize(config);
+                return isTrue(systemState.getIsSetup());
+            })
             .orElse(false);
-    }
-
-    @Data
-    static class SystemStates {
-        static final String GROUP = "states";
-        Boolean isSetup;
     }
 
     static class InternalValueCache {
