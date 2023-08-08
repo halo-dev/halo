@@ -1,13 +1,11 @@
 package run.halo.app.core.extension.endpoint;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
-import static org.apache.commons.lang3.BooleanUtils.isTrue;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.Data;
@@ -25,10 +23,9 @@ import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.extension.ConfigMap;
-import run.halo.app.extension.Metadata;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.InitializationStateGetter;
 import run.halo.app.infra.SystemSetting;
-import run.halo.app.infra.SystemState;
 import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.UnsatisfiedAttributeValueException;
 import run.halo.app.infra.utils.JsonUtils;
@@ -46,6 +43,7 @@ public class SystemInitializationEndpoint implements CustomEndpoint {
 
     private final ReactiveExtensionClient client;
     private final SuperAdminInitializer superAdminInitializer;
+    private final InitializationStateGetter initializationStateSupplier;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -80,36 +78,16 @@ public class SystemInitializationEndpoint implements CustomEndpoint {
                         "problemDetail.user.password.unsatisfied", null);
                 }
             })
-            .flatMap(requestBody -> client.fetch(ConfigMap.class,
-                    SystemState.SYSTEM_STATES_CONFIGMAP)
-                .switchIfEmpty(Mono.defer(
-                    () -> {
-                        ConfigMap configMap = new ConfigMap();
-                        configMap.setMetadata(new Metadata());
-                        configMap.getMetadata()
-                            .setName(SystemState.SYSTEM_STATES_CONFIGMAP);
-                        configMap.setData(new HashMap<>());
-                        return client.create(configMap);
-                    })
-                )
-                .flatMap(config -> {
-                    SystemState systemState = SystemState.deserialize(config);
-                    if (isTrue(systemState.getIsSetup())) {
+            .flatMap(requestBody -> initializationStateSupplier.userInitialized()
+                .flatMap(result -> {
+                    if (result) {
                         return Mono.error(new ResponseStatusException(HttpStatus.CONFLICT,
                             "System has been initialized"));
                     }
-                    return initializeSystem(requestBody)
-                        .then(Mono.defer(() -> {
-                            systemState.setIsSetup(true);
-                            SystemState.update(systemState, config);
-                            return client.update(config);
-                        }));
+                    return initializeSystem(requestBody);
                 })
             )
-            .flatMap(config -> {
-                SystemState systemState = SystemState.deserialize(config);
-                return ServerResponse.ok().bodyValue(isTrue(systemState.getIsSetup()));
-            });
+            .then(ServerResponse.ok().bodyValue(true));
     }
 
     private Mono<Void> initializeSystem(SystemInitializationRequest requestBody) {

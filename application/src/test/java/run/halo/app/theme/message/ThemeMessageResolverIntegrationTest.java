@@ -24,7 +24,7 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.SetupStateCache;
+import run.halo.app.infra.InitializationStateGetter;
 import run.halo.app.theme.ThemeContext;
 import run.halo.app.theme.ThemeResolver;
 
@@ -46,14 +46,14 @@ public class ThemeMessageResolverIntegrationTest {
     private URL otherThemeUrl;
 
     @SpyBean
-    private SetupStateCache setupStateCache;
+    private InitializationStateGetter initializationStateGetter;
 
     @Autowired
     private WebTestClient webTestClient;
 
     @BeforeEach
     void setUp() throws FileNotFoundException, URISyntaxException {
-        when(setupStateCache.get()).thenReturn(true);
+        when(initializationStateGetter.userInitialized()).thenReturn(Mono.just(true));
         defaultThemeUrl = ResourceUtils.getURL("classpath:themes/default");
         otherThemeUrl = ResourceUtils.getURL("classpath:themes/other");
 
