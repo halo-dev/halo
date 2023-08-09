@@ -92,9 +92,11 @@ public class SystemInitializationEndpoint implements CustomEndpoint {
 
     private Mono<Void> initializeSystem(SystemInitializationRequest requestBody) {
         Mono<Void> initializeAdminUser = superAdminInitializer.initialize(
-            requestBody.getUsername(),
-            requestBody.getPassword(),
-            requestBody.getEmail());
+            SuperAdminInitializer.InitializationParam.builder()
+                .username(requestBody.getUsername())
+                .password(requestBody.getPassword())
+                .email(requestBody.getEmail())
+                .build());
 
         Mono<Void> siteSetting =
             Mono.defer(() -> client.get(ConfigMap.class, SystemSetting.SYSTEM_CONFIG)
