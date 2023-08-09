@@ -9,10 +9,8 @@ import { useGlobalInfoFetch } from "@/composables/use-global-info";
 import { useTitle } from "@vueuse/core";
 import { useI18n } from "vue-i18n";
 import { AppName } from "@/constants/app";
-import { locales, getBrowserLanguage, i18n } from "@/locales";
-import MdiTranslate from "~icons/mdi/translate";
-import { useLocalStorage } from "@vueuse/core";
 import MdiKeyboardBackspace from "~icons/mdi/keyboard-backspace";
+import LocaleChange from "@/components/common/LocaleChange.vue";
 
 const { globalInfo } = useGlobalInfoFetch();
 const { t } = useI18n();
@@ -40,22 +38,6 @@ watch(
       `core.${value === SIGNUP_TYPE ? SIGNUP_TYPE : "login"}.title`
     );
     title.value = [routeTitle, AppName].join(" - ");
-  }
-);
-
-// setup locale
-const currentLocale = useLocalStorage(
-  "locale",
-  getBrowserLanguage() || locales[0].code
-);
-
-watch(
-  () => currentLocale.value,
-  (value) => {
-    i18n.global.locale.value = value;
-  },
-  {
-    immediate: true,
   }
 );
 </script>
@@ -101,23 +83,7 @@ watch(
     <div
       class="bottom-0 mb-10 mt-auto flex items-center justify-center gap-2.5"
     >
-      <label
-        for="locale"
-        class="block flex-shrink-0 text-sm font-medium text-gray-600"
-      >
-        <MdiTranslate />
-      </label>
-      <select
-        id="locale"
-        v-model="currentLocale"
-        class="block appearance-none rounded-md border-0 py-1.5 pl-3 pr-10 text-sm text-gray-800 outline-none ring-1 ring-inset ring-gray-200 focus:ring-primary"
-      >
-        <template v-for="locale in locales">
-          <option v-if="locale.name" :key="locale.code" :value="locale.code">
-            {{ locale.name }}
-          </option>
-        </template>
-      </select>
+      <LocaleChange />
     </div>
   </div>
 </template>

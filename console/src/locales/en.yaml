@@ -1034,19 +1034,19 @@ core:
       submit:
         button: Setup
         toast_success: Setup successfully
+      setup_initial_data:
+        loading: Initializing data, please wait...
     fields:
       site_title:
-        placeholder: Site title
-        validation: Please enter the site title
+        label: Site title
       email:
-        placeholder: Email
-        validation: Please enter the email
+        label: Email
       username:
-        placeholder: Username
-        validation: Please enter the username
+        label: Username
       password:
-        placeholder: Password
-        validation: Please enter the password
+        label: Password
+      confirm_password:
+        label: Confirm password
   rbac:
     Attachments Management: Attachments
     Attachment Manage: Attachment Manage

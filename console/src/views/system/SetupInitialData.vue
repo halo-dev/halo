@@ -159,7 +159,7 @@ onMounted(async () => {
   <div class="flex h-screen flex-col items-center justify-center">
     <VLoading />
     <div v-if="processing" class="text-xs text-gray-600">
-      正在初始化数据，请稍后...
+      {{ $t("core.setup.operations.setup_initial_data.loading") }}
     </div>
   </div>
 </template>

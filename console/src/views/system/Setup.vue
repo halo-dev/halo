@@ -7,6 +7,7 @@ import { useRouter } from "vue-router";
 import type { SystemInitializationRequest } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { useGlobalInfoStore } from "@/stores/global-info";
+import LocaleChange from "@/components/common/LocaleChange.vue";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -63,31 +64,25 @@ const inputClasses = {
           name="siteTitle"
           :classes="inputClasses"
           :autofocus="true"
-          :validation-messages="{
-            required: $t('core.setup.fields.site_title.validation'),
-          }"
           type="text"
-          :placeholder="$t('core.setup.fields.site_title.placeholder')"
+          :validation-label="$t('core.setup.fields.site_title.label')"
+          :placeholder="$t('core.setup.fields.site_title.label')"
           validation="required|length:0,100"
         ></FormKit>
         <FormKit
           name="email"
           :classes="inputClasses"
-          :validation-messages="{
-            required: $t('core.setup.fields.email.validation'),
-          }"
           type="text"
-          :placeholder="$t('core.setup.fields.email.placeholder')"
+          :validation-label="$t('core.setup.fields.email.label')"
+          :placeholder="$t('core.setup.fields.email.label')"
           validation="required|email|length:0,100"
         ></FormKit>
         <FormKit
           name="username"
           :classes="inputClasses"
-          :validation-messages="{
-            required: $t('core.setup.fields.username.validation'),
-          }"
           type="text"
-          :placeholder="$t('core.setup.fields.username.placeholder')"
+          :validation-label="$t('core.setup.fields.username.label')"
+          :placeholder="$t('core.setup.fields.username.label')"
           :validation="[
             ['required'],
             ['length:0,63'],
@@ -101,12 +96,18 @@ const inputClasses = {
           name="password"
           :classes="inputClasses"
           type="password"
-          :placeholder="$t('core.setup.fields.password.placeholder')"
+          :validation-label="$t('core.setup.fields.password.label')"
+          :placeholder="$t('core.setup.fields.password.label')"
           validation="required:trim|length:5,100|matches:/^\S.*\S$/"
-          :validation-messages="{
-            required: $t('core.setup.fields.password.validation'),
-            matches: $t('core.formkit.validation.trim'),
-          }"
+          autocomplete="current-password"
+        ></FormKit>
+        <FormKit
+          name="password_confirm"
+          :classes="inputClasses"
+          type="password"
+          :validation-label="$t('core.setup.fields.confirm_password.label')"
+          :placeholder="$t('core.setup.fields.confirm_password.label')"
+          validation="confirm|required:trim|length:5,100|matches:/^\S.*\S$/"
           autocomplete="current-password"
         ></FormKit>
       </FormKit>
@@ -119,6 +120,11 @@ const inputClasses = {
       >
         {{ $t("core.setup.operations.submit.button") }}
       </VButton>
+    </div>
+    <div
+      class="bottom-0 mb-10 mt-auto flex items-center justify-center gap-2.5"
+    >
+      <LocaleChange />
     </div>
   </div>
 </template>
