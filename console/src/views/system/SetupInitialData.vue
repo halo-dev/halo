@@ -24,7 +24,7 @@ import { useUserStore } from "@/stores/user";
 const router = useRouter();
 const globalInfoStore = useGlobalInfoStore();
 
-const { mutateAsync: pluginInstallMutate } = useMutation({
+const { mutate: pluginInstallMutate } = useMutation({
   mutationKey: ["plugin-install"],
   mutationFn: async (plugin: Plugin) => {
     const { data } = await apiClient.plugin.installPlugin(
@@ -40,12 +40,12 @@ const { mutateAsync: pluginInstallMutate } = useMutation({
   },
   retry: 3,
   retryDelay: 1000,
-  async onSuccess(data) {
-    await pluginStartMutate(data);
+  onSuccess(data) {
+    pluginStartMutate(data);
   },
 });
 
-const { mutateAsync: pluginStartMutate } = useMutation({
+const { mutate: pluginStartMutate } = useMutation({
   mutationKey: ["plugin-start"],
   mutationFn: async (plugin: Plugin) => {
     const { data: pluginToUpdate } =
@@ -111,7 +111,7 @@ async function setupInitialData() {
     const { data: presetPlugins } = await apiClient.plugin.listPluginPresets();
 
     for (let i = 0; i < presetPlugins.length; i++) {
-      await pluginInstallMutate(presetPlugins[i]);
+      pluginInstallMutate(presetPlugins[i]);
     }
 
     await apiClient.extension.configMap.createv1alpha1ConfigMap({
