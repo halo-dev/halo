@@ -17,7 +17,10 @@ import { randomUUID } from "@/utils/id";
 const themeStore = useThemeStore();
 
 function keyValidationRule(node: FormKitNode) {
-  return !annotations?.[node.value as string];
+  return (
+    !annotations.value?.[node.value as string] &&
+    !customAnnotationsDuplicateKey.value
+  );
 }
 
 const props = withDefaults(
@@ -69,6 +72,12 @@ const annotations = ref<{
   [key: string]: string;
 }>({});
 const customAnnotationsState = ref<{ key: string; value: string }[]>([]);
+
+const customAnnotationsDuplicateKey = computed(() => {
+  const keys = customAnnotationsState.value.map((item) => item.key);
+  const uniqueKeys = new Set(keys);
+  return keys.length !== uniqueKeys.size;
+});
 
 const customAnnotations = computed(() => {
   return customAnnotationsState.value.reduce((acc, cur) => {
