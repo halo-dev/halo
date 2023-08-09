@@ -24,6 +24,8 @@ public interface CommentPublicQueryService {
     Mono<ListResult<CommentVo>> list(Ref ref, @Nullable Integer page,
         @Nullable Integer size, @Nullable Comparator<Comment> comparator);
 
+    Mono<ListResult<CommentVo>> listRecent(Integer page, Integer size);
+
     Mono<ListResult<ReplyVo>> listReply(String commentName, @Nullable Integer page,
         @Nullable Integer size);
 

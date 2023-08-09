@@ -118,6 +118,15 @@ public class CommentFinderEndpoint implements CustomEndpoint {
                     );
                 QueryParamBuildUtil.buildParametersFromType(builder, CommentQuery.class);
             })
+            .GET("comments/recent", this::listRecentComments, builder -> {
+                builder.operationId("ListRecentComments")
+                    .description("List recent comments.")
+                    .tag(tag)
+                    .response(responseBuilder()
+                        .implementation(ListResult.generateGenericClass(CommentVo.class))
+                    );
+                QueryParamBuildUtil.buildParametersFromType(builder, CommentQuery.class);
+            })
             .GET("comments/{name}", this::getComment, builder -> {
                 builder.operationId("GetComment")
                     .description("Get a comment.")
@@ -216,6 +225,12 @@ public class CommentFinderEndpoint implements CustomEndpoint {
         var comparator = commentQuery.toComparator();
         return commentPublicQueryService.list(commentQuery.toRef(), commentQuery.getPage(),
                 commentQuery.getSize(), comparator)
+            .flatMap(list -> ServerResponse.ok().bodyValue(list));
+    }
+
+    Mono<ServerResponse> listRecentComments(ServerRequest request) {
+        CommentQuery commentQuery = new CommentQuery(request);
+        return commentPublicQueryService.listRecent(commentQuery.getPage(), commentQuery.getSize())
             .flatMap(list -> ServerResponse.ok().bodyValue(list));
     }
 

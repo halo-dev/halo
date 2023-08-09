@@ -86,6 +86,26 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     }
 
     @Override
+    public Mono<ListResult<CommentVo>> listRecent(Integer page, Integer size) {
+        final Comparator<Comment> commentComparator = defaultRecentComparator();
+        return fixedRecentCommentPredicate()
+            .flatMap(fixedPredicate ->
+                client.list(Comment.class, fixedPredicate,
+                        commentComparator,
+                        pageNullSafe(page), sizeNullSafe(size))
+                    .flatMap(list -> Flux.fromStream(list.get().map(this::toCommentVo))
+                        .concatMap(Function.identity())
+                        .collectList()
+                        .map(commentVos -> new ListResult<>(list.getPage(), list.getSize(),
+                            list.getTotal(),
+                            commentVos)
+                        )
+                    )
+                    .defaultIfEmpty(new ListResult<>(page, size, 0L, List.of()))
+            );
+    }
+
+    @Override
     public Mono<ListResult<ReplyVo>> listReply(String commentName, Integer page, Integer size) {
         return listReply(commentName, page, size, ReplyService.creationTimeAscComparator());
     }
@@ -215,6 +235,26 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             .map(basePredicate::and);
     }
 
+    private Mono<Predicate<Comment>> fixedRecentCommentPredicate() {
+        Predicate<Comment> basePredicate =
+            comment -> comment.getMetadata().getDeletionTimestamp() == null;
+
+        // is approved and not hidden
+        Predicate<Comment> approvedPredicate =
+            comment -> BooleanUtils.isFalse(comment.getSpec().getHidden())
+                && BooleanUtils.isTrue(comment.getSpec().getApproved());
+        return getCurrentUserWithoutAnonymous()
+            .map(username -> {
+                Predicate<Comment> isOwner = comment -> {
+                    Comment.CommentOwner owner = comment.getSpec().getOwner();
+                    return owner != null && StringUtils.equals(username, owner.getName());
+                };
+                return approvedPredicate.or(isOwner);
+            })
+            .defaultIfEmpty(approvedPredicate)
+            .map(basePredicate::and);
+    }
+
     private Mono<Predicate<Reply>> fixedReplyPredicate(String commentName) {
         Assert.notNull(commentName, "The commentName must not be null");
         // The comment name must be equal to the comment name of the reply
@@ -249,6 +289,10 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         return new CommentComparator();
     }
 
+    static Comparator<Comment> defaultRecentComparator() {
+        return new CommentRecentComparator();
+    }
+
     static class CommentComparator implements Comparator<Comment> {
         @Override
         public int compare(Comment c1, Comment c2) {
@@ -275,6 +319,18 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                 // 只有c2置顶, c2排在前面
                 return 1;
             }
+        }
+    }
+
+    static class CommentRecentComparator implements Comparator<Comment> {
+        @Override
+        public int compare(Comment c1, Comment c2) {
+            // 根据 creationTime 降序排列
+            return Comparator.comparing(
+                    (Comment comment) -> comment.getSpec().getCreationTime(),
+                    Comparators.nullsLow())
+                .thenComparing((Comment comment) -> comment.getMetadata().getName())
+                .compare(c2, c1);
         }
     }
 

@@ -33,6 +33,11 @@ public class CommentFinderImpl implements CommentFinder {
     }
 
     @Override
+    public Mono<ListResult<CommentVo>> listRecent(Integer page, Integer size) {
+        return commentPublicQueryService.listRecent(page, size);
+    }
+
+    @Override
     public Mono<ListResult<ReplyVo>> listReply(String commentName, Integer page, Integer size) {
         return commentPublicQueryService.listReply(commentName, page, size);
     }

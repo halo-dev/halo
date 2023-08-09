@@ -21,6 +21,8 @@ public interface CommentFinder {
     Mono<ListResult<CommentVo>> list(@Nullable Ref ref, @Nullable Integer page,
         @Nullable Integer size);
 
+    Mono<ListResult<CommentVo>> listRecent(Integer page, Integer size);
+
     Mono<ListResult<ReplyVo>> listReply(String commentName, @Nullable Integer page,
         @Nullable Integer size);
 }
