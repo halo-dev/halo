@@ -67,7 +67,7 @@ const inputClasses = {
           type="text"
           :validation-label="$t('core.setup.fields.site_title.label')"
           :placeholder="$t('core.setup.fields.site_title.label')"
-          validation="required|length:0,100"
+          validation="required:trim|length:0,100"
         ></FormKit>
         <FormKit
           name="email"
