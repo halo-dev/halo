@@ -1003,9 +1003,9 @@ core:
         description: Are you sure you want to delete the backup?
       restore:
         title: Restore successfully
-        description: After successful restore, you need to restart Halo to load the system resources normally. After clicking OK, we will automatically stop running Halo.
-      shutdown:
-        toast_success: Requested to shutdown operation
+        description: After successful restore, you need to restart Halo to load the system resources normally. After clicking OK, we will automatically restart Halo.
+      restart:
+        toast_success: Requested to restart
     list:
       phases:
         pending: Pending
@@ -1018,7 +1018,7 @@ core:
       tips:
         first: 1. The restore process may last for a long time, please do not refresh the page during this period.
         second: 2. During the restore process, although the existing data will not be cleaned up, if there is a conflict, the data will be overwritten.
-        third: 3. After the restore is completed, you will be prompted to stop running Halo, and you may need to run it manually after stopping.
+        third: 3. After the restore is completed, you need to restart Halo to load the system resources normally.
         complete: Restore completed, waiting for restart...
       start: Start restore
   exception:

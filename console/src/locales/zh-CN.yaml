@@ -1003,9 +1003,9 @@ core:
         description: 确定要删除该备份吗？
       restore:
         title: 恢复成功
-        description: 恢复成功之后，需要重启一下 Halo 才能够正常加载系统资源，点击确定之后我们会自动停止运行 Halo
-      shutdown:
-        toast_success: 已请求停止运行
+        description: 恢复成功之后，需要重启一下 Halo 才能够正常加载系统资源，点击确定之后我们会自动重启 Halo。
+      restart:
+        toast_success: 已请求重启
     list:
       phases:
         pending: 准备中
@@ -1018,7 +1018,7 @@ core:
       tips:
         first: 1. 恢复过程可能会持续较长时间，期间请勿刷新页面。
         second: 2. 在恢复的过程中，虽然已有的数据不会被清理掉，但如果有冲突的数据将被覆盖。
-        third: 3. 恢复完成之后会提示停止运行 Halo，停止之后可能需要手动运行。
+        third: 3. 恢复完成之后需要重启 Halo 才能够正常加载系统资源。
         complete: 恢复完成，等待重启...
       start: 开始恢复
   exception:
