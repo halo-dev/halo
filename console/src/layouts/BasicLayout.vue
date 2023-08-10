@@ -12,6 +12,9 @@ import {
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
+import IconArrowCollapseLeft from "~icons/mdi/arrow-collapse-left";
+import IconArrowCollapseRight from "~icons/mdi/arrow-collapse-right";
+
 import {
   RouterView,
   useRoute,
@@ -219,6 +222,12 @@ const reactiveParams = reactive<UseOverlayScrollbarsParams>({
   },
 });
 const [initialize] = useOverlayScrollbars(reactiveParams);
+
+// aside collapse or expand
+const isCollapse = ref<boolean>(false);
+const handleCollapse = () => {
+  isCollapse.value = !isCollapse.value;
+};
 onMounted(() => {
   if (navbarScroller.value) {
     initialize({ target: navbarScroller.value });
@@ -227,10 +236,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex h-full">
+  <div class="flex h-full" :class="{ isCollapse: isCollapse }">
     <aside
       class="navbar fixed hidden h-full overflow-y-auto md:flex md:flex-col"
     >
+      <span @click="handleCollapse">
+        <IconArrowCollapseLeft v-if="!isCollapse" class="float-right mr-2" />
+        <iconArrowCollapseRight v-else class="float-right mr-2" />
+      </span>
       <div class="logo flex justify-center pb-7 pt-5">
         <a
           href="/"
@@ -238,6 +251,7 @@ onMounted(() => {
           :title="$t('core.sidebar.operations.visit_homepage.title')"
         >
           <IconLogo
+            :class="{ ' h-[1rem]': isCollapse }"
             class="cursor-pointer select-none transition-all hover:brightness-125"
           />
         </a>
@@ -251,10 +265,12 @@ onMounted(() => {
             <span class="mr-3">
               <IconSearch />
             </span>
-            <span class="flex-1 select-none text-base font-normal">
+            <span
+              class="search-placeholder flex-1 select-none text-base font-normal"
+            >
               {{ $t("core.sidebar.search.placeholder") }}
             </span>
-            <div class="text-sm">
+            <div class="search-shoutCut text-sm">
               {{ `${isMac ? "⌘" : "Ctrl"}+K` }}
             </div>
           </div>
@@ -271,7 +287,7 @@ onMounted(() => {
               circle
             ></VAvatar>
           </div>
-          <div class="profile-name">
+          <div v-if="!isCollapse" class="profile-name">
             <div class="flex text-sm font-medium">
               {{ currentUser?.spec.displayName }}
             </div>
@@ -406,8 +422,9 @@ onMounted(() => {
   @apply w-64;
   @apply bg-white;
   @apply shadow;
+  @apply overflow-x-hidden;
+  transition-duration: 0.5s;
   z-index: 999;
-
   .profile-placeholder {
     height: 70px;
 
@@ -447,5 +464,34 @@ onMounted(() => {
   flex-col
   overflow-x-hidden
   md:ml-64;
+}
+
+.isCollapse {
+  .navbar {
+    @apply w-14;
+    .menu-container {
+      .menu-item {
+        &-title {
+        }
+        .menu-title {
+          display: none;
+        }
+      }
+    }
+    .search-placeholder {
+      display: none;
+    }
+    .search-shoutCut {
+      display: none;
+    }
+    .profile-placeholder {
+      .current-profile {
+        @apply w-14;
+      }
+    }
+  }
+  .content {
+    @apply ml-14;
+  }
 }
 </style>
