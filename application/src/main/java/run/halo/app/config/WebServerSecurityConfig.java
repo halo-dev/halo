@@ -6,7 +6,6 @@ import static org.springframework.security.web.server.util.matcher.ServerWebExch
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -27,13 +26,11 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
-import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.security.DefaultUserDetailService;
 import run.halo.app.security.DynamicMatcherSecurityWebFilterChain;
-import run.halo.app.security.SuperAdminInitializer;
 import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authentication.login.CryptoService;
 import run.halo.app.security.authentication.login.PublicKeyRouteBuilder;
@@ -125,16 +122,6 @@ public class WebServerSecurityConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-    @Bean
-    @ConditionalOnProperty(name = "halo.security.initializer.disabled",
-        havingValue = "false",
-        matchIfMissing = true)
-    SuperAdminInitializer superAdminInitializer(ReactiveExtensionClient client,
-        HaloProperties halo) {
-        return new SuperAdminInitializer(client, passwordEncoder(),
-            halo.getSecurity().getInitializer());
     }
 
     @Bean

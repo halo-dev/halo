@@ -23,6 +23,8 @@ rules:
     verbs: [ "create" ]
   - nonResourceURLs: [ "/actuator/globalinfo", "/actuator/health", "/actuator/health/*", "/login/public-key" ]
     verbs: [ "get" ]
+  - nonResourceURLs: [ "/apis/api.console.halo.run/v1alpha1/system/initialize" ]
+    verbs: [ "create" ]
 ---
 apiVersion: v1alpha1
 kind: "Role"

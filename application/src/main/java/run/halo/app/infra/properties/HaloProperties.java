@@ -75,7 +75,5 @@ public class HaloProperties implements Validator {
             errors.rejectValue("externalUrl", "external-url.required.when-using-absolute-permalink",
                 "External URL is required when property `use-absolute-permalink` is set to true.");
         }
-        SecurityProperties.Initializer.validateUsername(props.getSecurity().getInitializer(),
-            errors);
     }
 }

@@ -1,6 +1,7 @@
 package run.halo.app.security;
 
 import java.net.URI;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.lang.NonNull;
@@ -14,7 +15,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.SetupStateCache;
+import run.halo.app.infra.InitializationStateGetter;
 
 /**
  * A web filter that will redirect user to set up page if system is not initialized.
@@ -29,8 +30,9 @@ public class InitializeRedirectionWebFilter implements WebFilter {
     private final ServerWebExchangeMatcher redirectMatcher =
         new PathPatternParserServerWebExchangeMatcher("/", HttpMethod.GET);
 
-    private final SetupStateCache setupStateCache;
+    private final InitializationStateGetter initializationStateGetter;
 
+    @Getter
     private ServerRedirectStrategy redirectStrategy = new DefaultServerRedirectStrategy();
 
     @Override
@@ -38,16 +40,19 @@ public class InitializeRedirectionWebFilter implements WebFilter {
     public Mono<Void> filter(@NonNull ServerWebExchange exchange, @NonNull WebFilterChain chain) {
         return redirectMatcher.matches(exchange)
             .flatMap(matched -> {
-                if (!matched.isMatch() || setupStateCache.get()) {
+                if (!matched.isMatch()) {
                     return chain.filter(exchange);
                 }
-                // Redirect to set up page if system is not initialized.
-                return redirectStrategy.sendRedirect(exchange, location);
+                return initializationStateGetter.userInitialized()
+                    .defaultIfEmpty(false)
+                    .flatMap(initialized -> {
+                        if (initialized) {
+                            return chain.filter(exchange);
+                        }
+                        // Redirect to set up page if system is not initialized.
+                        return redirectStrategy.sendRedirect(exchange, location);
+                    });
             });
-    }
-
-    public ServerRedirectStrategy getRedirectStrategy() {
-        return redirectStrategy;
     }
 
     public void setRedirectStrategy(ServerRedirectStrategy redirectStrategy) {
