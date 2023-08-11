@@ -8,12 +8,12 @@ import {
   Dialog,
   VDropdown,
   VDropdownItem,
+  IconArrowLeft,
+  IconArrowRight,
 } from "@halo-dev/components";
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
-import IconArrowCollapseLeft from "~icons/mdi/arrow-collapse-left";
-import IconArrowCollapseRight from "~icons/mdi/arrow-collapse-right";
 
 import {
   RouterView,
@@ -37,6 +37,7 @@ import {
   useOverlayScrollbars,
   type UseOverlayScrollbarsParams,
 } from "overlayscrollbars-vue";
+import { useLocalStorage } from "@vueuse/core";
 
 const route = useRoute();
 const router = useRouter();
@@ -46,7 +47,6 @@ const moreMenuVisible = ref(false);
 const moreMenuRootVisible = ref(false);
 
 const userStore = useUserStore();
-
 const { currentRoles, currentUser } = storeToRefs(userStore);
 
 const handleLogout = () => {
@@ -224,7 +224,7 @@ const reactiveParams = reactive<UseOverlayScrollbarsParams>({
 const [initialize] = useOverlayScrollbars(reactiveParams);
 
 // aside collapse or expand
-const isCollapse = ref<boolean>(false);
+const isCollapse = useLocalStorage("halo-isCollapse", false);
 const handleCollapse = () => {
   isCollapse.value = !isCollapse.value;
 };
@@ -238,11 +238,11 @@ onMounted(() => {
 <template>
   <div class="flex h-full" :class="{ isCollapse: isCollapse }">
     <aside
-      class="navbar fixed hidden h-full overflow-y-auto md:flex md:flex-col"
+      class="navbar group fixed hidden h-full overflow-y-auto md:flex md:flex-col"
     >
-      <span @click="handleCollapse">
-        <IconArrowCollapseLeft v-if="!isCollapse" class="float-right mr-2" />
-        <iconArrowCollapseRight v-else class="float-right mr-2" />
+      <span class="folder hidden group-hover:block" @click="handleCollapse">
+        <IconArrowLeft v-if="!isCollapse" class="float-right mr-2" />
+        <IconArrowRight v-else class="float-right mr-2" />
       </span>
       <div class="logo flex justify-center pb-7 pt-5">
         <a
@@ -251,7 +251,7 @@ onMounted(() => {
           :title="$t('core.sidebar.operations.visit_homepage.title')"
         >
           <IconLogo
-            :class="{ ' h-[1rem]': isCollapse }"
+            :class="{ ' w-[3rem]': isCollapse }"
             class="cursor-pointer select-none transition-all hover:brightness-125"
           />
         </a>
@@ -259,10 +259,10 @@ onMounted(() => {
       <div ref="navbarScroller" class="flex-1 overflow-y-hidden">
         <div class="px-3">
           <div
-            class="flex cursor-pointer items-center rounded bg-gray-100 p-2 text-gray-400 transition-all hover:text-gray-900"
+            class="search-container flex cursor-pointer items-center rounded bg-gray-100 p-2 text-gray-400 transition-all hover:text-gray-900"
             @click="globalSearchVisible = true"
           >
-            <span class="mr-3">
+            <span class="search mr-3">
               <IconSearch />
             </span>
             <span
@@ -287,7 +287,7 @@ onMounted(() => {
               circle
             ></VAvatar>
           </div>
-          <div v-if="!isCollapse" class="profile-name">
+          <div v-show="!isCollapse" class="profile-name">
             <div class="flex text-sm font-medium">
               {{ currentUser?.spec.displayName }}
             </div>
@@ -423,11 +423,14 @@ onMounted(() => {
   @apply bg-white;
   @apply shadow;
   @apply overflow-x-hidden;
-  transition-duration: 0.5s;
+  transition-duration: 0.3s;
   z-index: 999;
+  .folder {
+    @apply absolute -right-6 top-1/2 h-8 w-8 -translate-x-1/2 rounded-full text-xl;
+    z-index: 999;
+  }
   .profile-placeholder {
     height: 70px;
-
     .current-profile {
       height: 70px;
       @apply fixed
@@ -446,6 +449,7 @@ onMounted(() => {
       }
 
       .profile-name {
+        transition-duration: 0.3s;
         @apply flex-1
         self-center;
       }
@@ -468,30 +472,42 @@ onMounted(() => {
 
 .isCollapse {
   .navbar {
-    @apply w-14;
+    @apply w-20;
     .menu-container {
+      .menu-label {
+        @apply block truncate;
+      }
       .menu-item {
-        &-title {
-        }
         .menu-title {
           display: none;
         }
+        &-title {
+          justify-content: center;
+          .menu-icon {
+            margin-right: 0;
+          }
+        }
       }
     }
-    .search-placeholder {
-      display: none;
-    }
-    .search-shoutCut {
-      display: none;
+    .search-container {
+      @apply justify-center;
+      .search {
+        @apply mr-0;
+      }
+      .search-placeholder,
+      .search-shoutCut {
+        display: none;
+      }
     }
     .profile-placeholder {
       .current-profile {
-        @apply w-14;
+        @apply w-20 justify-center;
       }
     }
   }
   .content {
-    @apply ml-14;
+    transition-duration: 0.3s;
+    @apply ml-20;
   }
 }
 </style>
