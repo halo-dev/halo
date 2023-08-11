@@ -20,7 +20,7 @@ import org.springframework.security.web.server.ServerRedirectStrategy;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.infra.SetupStateCache;
+import run.halo.app.infra.InitializationStateGetter;
 
 /**
  * Tests for {@link InitializeRedirectionWebFilter}.
@@ -32,7 +32,7 @@ import run.halo.app.infra.SetupStateCache;
 class InitializeRedirectionWebFilterTest {
 
     @Mock
-    private SetupStateCache setupStateCache;
+    private InitializationStateGetter initializationStateGetter;
 
     @Mock
     private ServerRedirectStrategy serverRedirectStrategy;
@@ -47,7 +47,7 @@ class InitializeRedirectionWebFilterTest {
 
     @Test
     void shouldRedirectWhenSystemNotInitialized() {
-        when(setupStateCache.get()).thenReturn(false);
+        when(initializationStateGetter.userInitialized()).thenReturn(Mono.just(false));
 
         WebFilterChain chain = mock(WebFilterChain.class);
 
@@ -69,7 +69,7 @@ class InitializeRedirectionWebFilterTest {
 
     @Test
     void shouldNotRedirectWhenSystemInitialized() {
-        when(setupStateCache.get()).thenReturn(true);
+        when(initializationStateGetter.userInitialized()).thenReturn(Mono.just(true));
 
         WebFilterChain chain = mock(WebFilterChain.class);
 

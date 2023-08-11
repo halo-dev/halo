@@ -21,6 +21,7 @@ export * from "./api/api-console-halo-run-v1alpha1-post-api";
 export * from "./api/api-console-halo-run-v1alpha1-reply-api";
 export * from "./api/api-console-halo-run-v1alpha1-single-page-api";
 export * from "./api/api-console-halo-run-v1alpha1-stats-api";
+export * from "./api/api-console-halo-run-v1alpha1-system-api";
 export * from "./api/api-console-halo-run-v1alpha1-theme-api";
 export * from "./api/api-console-halo-run-v1alpha1-user-api";
 export * from "./api/api-console-migration-halo-run-v1alpha1-migration-api";

@@ -1,19 +1,34 @@
-import { useSystemStatesStore } from "@/stores/system-states";
+import { useGlobalInfoStore } from "@/stores/global-info";
+import { useUserStore } from "@/stores/user";
 import type { Router } from "vue-router";
-
-const whiteList = ["Setup", "Login", "Binding"];
 
 export function setupCheckStatesGuard(router: Router) {
   router.beforeEach(async (to, from, next) => {
-    if (whiteList.includes(to.name as string)) {
-      next();
+    const userStore = useUserStore();
+    const { globalInfo } = useGlobalInfoStore();
+    const { userInitialized, dataInitialized } = globalInfo || {};
+
+    if (to.name === "Setup" && userInitialized) {
+      next({ name: "Dashboard" });
       return;
     }
 
-    const systemStateStore = useSystemStatesStore();
+    if (to.name === "SetupInitialData" && dataInitialized) {
+      next({ name: "Dashboard" });
+      return;
+    }
 
-    if (!systemStateStore.states.isSetup) {
+    if (userInitialized === false && to.name !== "Setup") {
       next({ name: "Setup" });
+      return;
+    }
+
+    if (
+      dataInitialized === false &&
+      !userStore.isAnonymous &&
+      to.name !== "SetupInitialData"
+    ) {
+      next({ name: "SetupInitialData" });
       return;
     }
 
