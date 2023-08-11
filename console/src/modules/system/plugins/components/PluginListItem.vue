@@ -11,8 +11,7 @@ import {
   VDropdown,
   VDropdownDivider,
 } from "@halo-dev/components";
-import PluginUploadModal from "./PluginUploadModal.vue";
-import { ref, toRefs } from "vue";
+import { toRefs } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 import type { Plugin } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
@@ -32,9 +31,11 @@ const props = withDefaults(
   }
 );
 
-const { plugin } = toRefs(props);
+const emit = defineEmits<{
+  (event: "open-upgrade-modal", plugin?: Plugin): void;
+}>();
 
-const upgradeModal = ref(false);
+const { plugin } = toRefs(props);
 
 const { getFailedMessage, changeStatus, uninstall } =
   usePluginLifeCycle(plugin);
@@ -65,7 +66,6 @@ const handleResetSettingConfig = async () => {
 };
 </script>
 <template>
-  <PluginUploadModal v-model:visible="upgradeModal" :upgrade-plugin="plugin" />
   <VEntity>
     <template #start>
       <VEntityField>
@@ -145,7 +145,7 @@ const handleResetSettingConfig = async () => {
       >
         {{ $t("core.common.buttons.detail") }}
       </VDropdownItem>
-      <VDropdownItem @click="upgradeModal = true">
+      <VDropdownItem @click="emit('open-upgrade-modal', plugin)">
         {{ $t("core.common.buttons.upgrade") }}
       </VDropdownItem>
       <VDropdownDivider />
