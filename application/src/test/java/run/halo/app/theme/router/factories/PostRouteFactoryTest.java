@@ -25,8 +25,10 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.router.DefaultQueryPostPredicateResolver;
 import run.halo.app.theme.router.EmptyView;
 import run.halo.app.theme.router.ModelConst;
+import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
 import run.halo.app.theme.router.ViewNameResolver;
 
 /**
@@ -47,6 +49,9 @@ class PostRouteFactoryTest extends RouteFactoryTestSuite {
     @Mock
     private ReactiveExtensionClient client;
 
+    @Mock
+    private ReactiveQueryPostPredicateResolver predicateResolver;
+
     @InjectMocks
     private PostRouteFactory postRouteFactory;
 
@@ -64,6 +69,8 @@ class PostRouteFactoryTest extends RouteFactoryTestSuite {
 
         when(viewNameResolver.resolveViewNameOrDefault(any(), any(), any()))
             .thenReturn(Mono.just(DefaultTemplateEnum.POST.getValue()));
+        when(predicateResolver.getPredicate())
+            .thenReturn(new DefaultQueryPostPredicateResolver().getPredicate());
 
         RouterFunction<ServerResponse> routerFunction = postRouteFactory.create("/archives/{name}");
         WebTestClient webTestClient = getWebTestClient(routerFunction);

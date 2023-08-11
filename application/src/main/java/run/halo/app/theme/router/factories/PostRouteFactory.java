@@ -2,7 +2,6 @@ package run.halo.app.theme.router.factories;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
-import static run.halo.app.theme.finders.PostPublicQueryService.FIXED_PREDICATE;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -14,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
@@ -37,6 +37,7 @@ import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.router.ModelMapUtils;
+import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
 import run.halo.app.theme.router.ViewNameResolver;
 
 /**
@@ -56,6 +57,8 @@ public class PostRouteFactory implements RouteFactory {
 
     private final ReactiveExtensionClient client;
 
+    private final ReactiveQueryPostPredicateResolver queryPostPredicateResolver;
+
     @Override
     public RouterFunction<ServerResponse> create(String pattern) {
         PatternParser postParamPredicate =
@@ -73,7 +76,7 @@ public class PostRouteFactory implements RouteFactory {
         return request -> {
             Map<String, String> variables = mergedVariables(request);
             PostPatternVariable patternVariable = new PostPatternVariable();
-            Optional.ofNullable(variables.get(paramPredicate.getQueryParamName()))
+            Optional.ofNullable(variables.get(paramPredicate.getParamName()))
                 .ifPresent(value -> {
                     switch (paramPredicate.getPlaceholderName()) {
                         case "name" -> patternVariable.setName(value);
@@ -133,16 +136,19 @@ public class PostRouteFactory implements RouteFactory {
     }
 
     private Flux<Post> fetchPostsByName(String name) {
-        return client.fetch(Post.class, name)
-            .filter(FIXED_PREDICATE)
+        return queryPostPredicateResolver.getPredicate()
+            .flatMap(predicate -> client.fetch(Post.class, name)
+                .filter(predicate)
+            )
             .flux();
     }
 
     private Flux<Post> fetchPostsBySlug(String slug) {
-        return client.list(Post.class,
-            post -> FIXED_PREDICATE.test(post)
-                && matchIfPresent(slug, post.getSpec().getSlug()),
-            null);
+        return queryPostPredicateResolver.getPredicate()
+            .flatMapMany(predicate -> client.list(Post.class,
+                predicate.and(post -> matchIfPresent(slug, post.getSpec().getSlug())),
+                null)
+            );
     }
 
     private boolean matchIfPresent(String variable, String target) {
@@ -175,6 +181,7 @@ public class PostRouteFactory implements RouteFactory {
         return mergedVariables;
     }
 
+    @Getter
     static class PatternParser {
         private static final Pattern PATTERN_COMPILE = Pattern.compile("([^&?]*)=\\{(.*?)\\}(&|$)");
         private static final Cache<String, Matcher> MATCHER_CACHE = CacheBuilder.newBuilder()
@@ -212,18 +219,6 @@ public class PostRouteFactory implements RouteFactory {
             }
 
             return RequestPredicates.queryParam(paramName, value -> true);
-        }
-
-        public String getPlaceholderName() {
-            return this.placeholderName;
-        }
-
-        public String getQueryParamName() {
-            return this.paramName;
-        }
-
-        public boolean isQueryParamPattern() {
-            return isQueryParamPattern;
         }
     }
 }
