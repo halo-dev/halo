@@ -34,6 +34,7 @@ import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreRepository;
+import run.halo.app.infra.BackupRootGetter;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
@@ -47,6 +48,8 @@ public class MigrationServiceImpl implements MigrationService {
     private final ExtensionStoreRepository repository;
 
     private final HaloProperties haloProperties;
+
+    private final BackupRootGetter backupRoot;
 
     private final ObjectMapper objectMapper;
 
@@ -69,9 +72,10 @@ public class MigrationServiceImpl implements MigrationService {
     private final Scheduler scheduler = Schedulers.boundedElastic();
 
     public MigrationServiceImpl(ExtensionStoreRepository repository,
-        HaloProperties haloProperties) {
+        HaloProperties haloProperties, BackupRootGetter backupRoot) {
         this.repository = repository;
         this.haloProperties = haloProperties;
+        this.backupRoot = backupRoot;
         this.objectMapper = JsonMapper.builder()
             .defaultPrettyPrinter(new MinimalPrettyPrinter())
             .build();
@@ -90,7 +94,7 @@ public class MigrationServiceImpl implements MigrationService {
     }
 
     Path getBackupsRoot() {
-        return haloProperties.getWorkDir().resolve("backups");
+        return backupRoot.get();
     }
 
     @Override
