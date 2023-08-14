@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { SocialAuthProvider } from "@/modules/system/actuator/types";
+import type { SocialAuthProvider } from "@/types";
 import { useRouteQuery } from "@vueuse/router";
 import { inject, ref } from "vue";
 import type { Ref } from "vue";

@@ -19,10 +19,6 @@ halo:
     proxy:
       endpoint: http://localhost:3000/
       enabled: true
-  security:
-    initializer:
-      super-admin-username: admin
-      super-admin-password: admin
   plugin:
     runtime-mode: development # development, deployment
   work-dir: ${user.home}/halo2-dev

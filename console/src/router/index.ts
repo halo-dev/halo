@@ -22,8 +22,8 @@ const router = createRouter({
   },
 });
 
+setupCheckStatesGuard(router);
 setupAuthCheckGuard(router);
 setupPermissionGuard(router);
-setupCheckStatesGuard(router);
 
 export default router;

@@ -1034,10 +1034,19 @@ core:
       submit:
         button: 初始化
         toast_success: 初始化成功
+      setup_initial_data:
+        loading: 正在初始化資料，請稍後...
     fields:
       site_title:
-        placeholder: 站點名稱
-        validation: 請輸入站點名稱
+        label: 站點名稱
+      email:
+        label: 電子郵箱
+      username:
+        label: 用戶名
+      password:
+        label: 密碼
+      confirm_password:
+        label: 確認密碼
   rbac:
     Attachments Management: 附件
     Attachment Manage: 附件管理

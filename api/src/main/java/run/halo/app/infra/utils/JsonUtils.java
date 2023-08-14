@@ -22,6 +22,10 @@ public class JsonUtils {
     private JsonUtils() {
     }
 
+    public static ObjectMapper mapper() {
+        return DEFAULT_JSON_MAPPER;
+    }
+
     /**
      * Converts a map to the object specified type.
      *
