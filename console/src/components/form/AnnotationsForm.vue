@@ -234,7 +234,7 @@ defineExpose({
           type="text"
           label="Key"
           name="key"
-          validation="required|keyValidationRule"
+          validation="required:trim|keyValidationRule"
           :validation-rules="{ keyValidationRule }"
           :validation-messages="{
             keyValidationRule: $t(
@@ -242,12 +242,7 @@ defineExpose({
             ),
           }"
         ></FormKit>
-        <FormKit
-          type="text"
-          label="Value"
-          name="value"
-          validation="required"
-        ></FormKit>
+        <FormKit type="text" label="Value" name="value" value=""></FormKit>
       </FormKit>
     </FormKit>
   </div>
