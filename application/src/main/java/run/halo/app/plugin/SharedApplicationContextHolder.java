@@ -8,6 +8,7 @@ import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.BackupRootGetter;
 import run.halo.app.infra.ExternalUrlSupplier;
 
 /**
@@ -70,6 +71,8 @@ public class SharedApplicationContextHolder {
             rootApplicationContext.getBean(ServerSecurityContextRepository.class));
         beanFactory.registerSingleton("attachmentService",
             rootApplicationContext.getBean(AttachmentService.class));
+        beanFactory.registerSingleton("backupRootGetter",
+            rootApplicationContext.getBean(BackupRootGetter.class));
         // TODO add more shared instance here
 
         return sharedApplicationContext;
