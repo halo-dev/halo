@@ -71,15 +71,25 @@ const uppy = computed(() => {
     method: props.method,
     limit: 5,
     timeout: 0,
-    getResponseError: (responseText) => {
-      const response = JSON.parse(responseText);
-      const { title, detail } = (response || {}) as ProblemDetail;
-      const message = [title, detail].filter(Boolean).join(": ");
+    getResponseError: (responseText: string, response: unknown) => {
+      try {
+        const response = JSON.parse(responseText);
+        if (typeof response === "object" && response && response) {
+          const { title, detail } = (response || {}) as ProblemDetail;
+          const message = [title, detail].filter(Boolean).join(": ");
 
-      if (message) {
-        Toast.error(message, { duration: 5000 });
+          if (message) {
+            Toast.error(message, { duration: 5000 });
 
-        return new Error(message);
+            return new Error(message);
+          }
+        }
+      } catch (e) {
+        const responseBody = response as XMLHttpRequest;
+        const { status, statusText } = responseBody;
+        const defaultMessage = [status, statusText].join(": ");
+        Toast.error(defaultMessage, { duration: 5000 });
+        return new Error(defaultMessage);
       }
       return new Error("Internal Server Error");
     },
