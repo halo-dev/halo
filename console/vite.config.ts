@@ -9,7 +9,6 @@ import Icons from "unplugin-icons/vite";
 import { setupLibraryExternal } from "./src/build/library-external";
 import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
 import GzipPlugin from "rollup-plugin-gzip";
-import Inspect from "vite-plugin-inspect";
 
 export const sharedPlugins = [
   Vue(),
@@ -35,7 +34,6 @@ export const sharedPlugins = [
   VueI18nPlugin({
     include: [path.resolve(__dirname, "./src/locales/*.yaml")],
   }),
-  Inspect(),
 ];
 
 export default ({ mode }: { mode: string }) => {

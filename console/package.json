@@ -150,7 +150,6 @@
     "vite": "^4.2.3",
     "vite-plugin-externals": "^0.6.2",
     "vite-plugin-html": "^3.2.0",
-    "vite-plugin-inspect": "^0.7.38",
     "vite-plugin-pwa": "^0.16.4",
     "vite-plugin-static-copy": "^0.17.0",
     "vitest": "^0.34.1",
