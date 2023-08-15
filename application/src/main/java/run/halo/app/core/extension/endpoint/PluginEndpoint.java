@@ -9,16 +9,16 @@ import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.boot.convert.ApplicationConversionService.getSharedInstance;
+import static org.springframework.core.io.buffer.DataBufferUtils.write;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 import static run.halo.app.extension.ListResult.generateGenericClass;
 import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
+import static run.halo.app.infra.utils.FileUtils.deleteFileSilently;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,7 +33,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.reactivestreams.Publisher;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
@@ -41,7 +43,6 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FormFieldPart;
 import org.springframework.http.codec.multipart.Part;
 import org.springframework.stereotype.Component;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -50,6 +51,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Plugin;
@@ -61,9 +63,6 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
 import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
-import run.halo.app.infra.exception.ThemeInstallationException;
-import run.halo.app.infra.exception.ThemeUpgradeException;
-import run.halo.app.infra.utils.DataBufferUtils;
 import run.halo.app.plugin.PluginNotFoundException;
 
 @Slf4j
@@ -76,6 +75,8 @@ public class PluginEndpoint implements CustomEndpoint {
     private final PluginService pluginService;
 
     private final ReactiveUrlDataBufferFetcher reactiveUrlDataBufferFetcher;
+
+    private final Scheduler scheduler = Schedulers.boundedElastic();
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -221,48 +222,29 @@ public class PluginEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> upgradeFromUri(ServerRequest request) {
-        final var name = request.pathVariable("name");
-        return request.bodyToMono(UpgradeFromUriRequest.class)
-            .flatMap(upgradeRequest -> Mono.fromCallable(() -> DataBufferUtils.toInputStream(
-                reactiveUrlDataBufferFetcher.fetch(upgradeRequest.uri())))
-            )
-            .subscribeOn(Schedulers.boundedElastic())
-            .onErrorMap(throwable -> {
-                log.error("Failed to fetch plugin file from uri.", throwable);
-                return new ThemeUpgradeException("Failed to fetch plugin file from uri.", null,
-                    null);
-            })
-            .flatMap(inputStream -> Mono.usingWhen(
-                transferToTemp(inputStream),
-                (path) -> pluginService.upgrade(name, path),
+        var name = request.pathVariable("name");
+        var content = request.bodyToMono(UpgradeFromUriRequest.class)
+            .map(UpgradeFromUriRequest::uri)
+            .flatMapMany(reactiveUrlDataBufferFetcher::fetch);
+
+        return Mono.usingWhen(
+                writeToTempFile(content),
+                path -> pluginService.upgrade(name, path),
                 this::deleteFileIfExists)
-            )
-            .flatMap(theme -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(theme)
-            );
+            .flatMap(upgradedPlugin -> ServerResponse.ok().bodyValue(upgradedPlugin));
     }
 
     private Mono<ServerResponse> installFromUri(ServerRequest request) {
-        return request.bodyToMono(InstallFromUriRequest.class)
-            .flatMap(installRequest -> Mono.fromCallable(() -> DataBufferUtils.toInputStream(
-                reactiveUrlDataBufferFetcher.fetch(installRequest.uri())))
-            )
-            .subscribeOn(Schedulers.boundedElastic())
-            .doOnError(throwable -> {
-                log.error("Failed to fetch plugin file from uri.", throwable);
-                throw new ThemeInstallationException("Failed to fetch plugin file from uri.", null,
-                    null);
-            })
-            .flatMap(inputStream -> Mono.usingWhen(
-                transferToTemp(inputStream),
+        var content = request.bodyToMono(InstallFromUriRequest.class)
+            .map(InstallFromUriRequest::uri)
+            .flatMapMany(reactiveUrlDataBufferFetcher::fetch);
+
+        return Mono.usingWhen(
+                writeToTempFile(content),
                 pluginService::install,
-                this::deleteFileIfExists)
+                this::deleteFileIfExists
             )
-            .flatMap(theme -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(theme)
-            );
+            .flatMap(newPlugin -> ServerResponse.ok().bodyValue(newPlugin));
     }
 
     public record InstallFromUriRequest(@Schema(requiredMode = REQUIRED) URI uri) {
@@ -402,10 +384,12 @@ public class PluginEndpoint implements CustomEndpoint {
                 .bodyValue(upgradedPlugin));
     }
 
-    private Mono<Plugin> installFromFile(Mono<FilePart> filePartMono,
+    private Mono<Plugin> installFromFile(FilePart filePart,
         Function<Path, Mono<Plugin>> resourceClosure) {
-        var pathMono = filePartMono.flatMap(this::transferToTemp);
-        return Mono.usingWhen(pathMono, resourceClosure, this::deleteFileIfExists);
+        return Mono.usingWhen(
+            writeToTempFile(filePart.content()),
+            resourceClosure,
+            this::deleteFileIfExists);
     }
 
     private Mono<Plugin> installFromPreset(Mono<String> presetNameMono,
@@ -529,19 +513,18 @@ public class PluginEndpoint implements CustomEndpoint {
         }
 
         @Schema(requiredMode = NOT_REQUIRED, description = "Plugin Jar file.")
-        public Mono<FilePart> getFile() {
+        public FilePart getFile() {
             var part = multipartData.getFirst("file");
             if (part == null) {
-                return Mono.error(new ServerWebInputException("Form field file is required"));
+                throw new ServerWebInputException("Form field file is required");
             }
             if (!(part instanceof FilePart file)) {
-                return Mono.error(new ServerWebInputException("Invalid parameter of file"));
+                throw new ServerWebInputException("Invalid parameter of file");
             }
             if (!Paths.get(file.filename()).toString().endsWith(".jar")) {
-                return Mono.error(
-                    new ServerWebInputException("Invalid file type, only jar is supported"));
+                throw new ServerWebInputException("Invalid file type, only jar is supported");
             }
-            return Mono.just(file);
+            return file;
         }
 
         @Schema(requiredMode = NOT_REQUIRED,
@@ -584,29 +567,13 @@ public class PluginEndpoint implements CustomEndpoint {
     }
 
     Mono<Void> deleteFileIfExists(Path path) {
-        return Mono.fromRunnable(() -> {
-            try {
-                Files.deleteIfExists(path);
-            } catch (IOException e) {
-                // ignore this error
-                log.warn("Failed to delete temporary jar file: {}", path, e);
-            }
-        }).subscribeOn(Schedulers.boundedElastic()).then();
+        return deleteFileSilently(path, this.scheduler).then();
     }
 
-    private Mono<Path> transferToTemp(FilePart filePart) {
-        return Mono.fromCallable(() -> Files.createTempFile("halo-plugins", ".jar"))
-            .subscribeOn(Schedulers.boundedElastic())
-            .flatMap(path -> filePart.transferTo(path)
-                .thenReturn(path)
-            );
+    private Mono<Path> writeToTempFile(Publisher<DataBuffer> content) {
+        return Mono.fromCallable(() -> Files.createTempFile("halo-plugin-", ".jar"))
+            .flatMap(path -> write(content, path).thenReturn(path))
+            .subscribeOn(this.scheduler);
     }
 
-    private Mono<Path> transferToTemp(InputStream inputStream) {
-        return Mono.fromCallable(() -> {
-            Path tempFile = Files.createTempFile("halo-plugins", ".jar");
-            FileCopyUtils.copy(inputStream, Files.newOutputStream(tempFile));
-            return tempFile;
-        }).subscribeOn(Schedulers.boundedElastic());
-    }
 }
