@@ -4097,7 +4097,7 @@ packages:
       grapheme-splitter: 1.0.4
       ignore: 5.2.0
       natural-compare-lite: 1.4.0
-      semver: 7.5.2
+      semver: 7.5.4
       tsutils: 3.21.0(typescript@5.0.4)
       typescript: 5.0.4
     transitivePeerDependencies:
@@ -11565,7 +11565,7 @@ packages:
       espree: 9.5.2
       esquery: 1.5.0
       lodash: 4.17.21
-      semver: 7.5.2
+      semver: 7.5.4
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -11660,7 +11660,7 @@ packages:
     dependencies:
       '@vue/language-core': 1.8.8(typescript@5.0.4)
       '@vue/typescript': 1.8.8(typescript@5.0.4)
-      semver: 7.5.2
+      semver: 7.5.4
       typescript: 5.0.4
     dev: true
 
