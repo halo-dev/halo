@@ -16,3 +16,8 @@
 .fade-leave-to {
   @apply opacity-0;
 }
+
+/* https://learn.microsoft.com/en-us/microsoft-edge/web-platform/password-reveal#remove-the-password-reveal-control */
+::-ms-reveal {
+  display: none;
+}
