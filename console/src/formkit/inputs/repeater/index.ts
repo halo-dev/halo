@@ -12,6 +12,16 @@ import {
 } from "@formkit/inputs";
 import { repeaterItems } from "./sections";
 import Repeater from "./Repeater.vue";
+import type { FormKitInputs } from "@formkit/inputs";
+
+declare module "@formkit/inputs" {
+  interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    repeater: {
+      type: "repeater";
+      value?: Record<string, unknown>[];
+    };
+  }
+}
 
 export const repeater: FormKitTypeDefinition = {
   schema: outer(
