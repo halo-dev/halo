@@ -4,6 +4,16 @@ import { apiClient } from "@/utils/api-client";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import { select, selects, defaultIcon } from "@formkit/inputs";
 import { i18n } from "@/locales";
+import type { FormKitInputs } from "@formkit/inputs";
+
+declare module "@formkit/inputs" {
+  interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    roleSelect: {
+      type: "roleSelect";
+      value?: string;
+    };
+  }
+}
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
