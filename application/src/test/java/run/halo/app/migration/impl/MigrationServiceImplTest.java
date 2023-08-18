@@ -4,7 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -31,6 +31,7 @@ import reactor.test.StepVerifier;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreRepository;
+import run.halo.app.infra.BackupRootGetter;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.infra.utils.FileUtils;
@@ -45,6 +46,9 @@ class MigrationServiceImplTest {
     @Mock
     HaloProperties haloProperties;
 
+    @Mock
+    BackupRootGetter backupRoot;
+
     @InjectMocks
     MigrationServiceImpl migrationService;
 
@@ -53,21 +57,23 @@ class MigrationServiceImplTest {
 
     @Test
     void backupTest() throws IOException {
-        var startTimestamp = Instant.now();
-        var backup = createRunningBackup("fake-backup", startTimestamp);
         Files.writeString(tempDir.resolve("fake-file"), "halo", StandardOpenOption.CREATE_NEW);
         var extensionStores = List.of(
             createExtensionStore("fake-extension-store", "fake-data")
         );
         when(repository.findAll()).thenReturn(Flux.fromIterable(extensionStores));
         when(haloProperties.getWorkDir()).thenReturn(tempDir);
+        when(backupRoot.get()).thenReturn(tempDir.resolve("backups"));
+        var startTimestamp = Instant.now();
+        var backup = createRunningBackup("fake-backup", startTimestamp);
         StepVerifier.create(migrationService.backup(backup))
             .verifyComplete();
 
         verify(repository).findAll();
         // 1. backup workdir
         // 2. package backup
-        verify(haloProperties, times(2)).getWorkDir();
+        verify(haloProperties).getWorkDir();
+        verify(backupRoot).get();
 
         var status = backup.getStatus();
         var datetimePart = migrationService.getDateTimeFormatter().format(startTimestamp);
@@ -134,26 +140,26 @@ class MigrationServiceImplTest {
 
     @Test
     void cleanupBackupTest() throws IOException {
-        var backup = createSucceededBackup("fake-backup", "backup.zip");
-
         var backupFile = tempDir.resolve("workdir").resolve("backups").resolve("backup.zip");
         Files.createDirectories(backupFile.getParent());
         Files.createFile(backupFile);
 
-        when(haloProperties.getWorkDir()).thenReturn(tempDir.resolve("workdir"));
+        when(backupRoot.get()).thenReturn(tempDir.resolve("workdir").resolve("backups"));
+        var backup = createSucceededBackup("fake-backup", "backup.zip");
         StepVerifier.create(migrationService.cleanup(backup))
             .verifyComplete();
-        verify(haloProperties).getWorkDir();
+        verify(haloProperties, never()).getWorkDir();
+        verify(backupRoot).get();
         assertTrue(Files.notExists(backupFile));
     }
 
     @Test
     void downloadBackupTest() throws IOException {
-        var backup = createSucceededBackup("fake-backup", "backup.zip");
         var backupFile = tempDir.resolve("workdir").resolve("backups").resolve("backup.zip");
         Files.createDirectories(backupFile.getParent());
         Files.writeString(backupFile, "this is a backup file.", StandardOpenOption.CREATE_NEW);
-        when(haloProperties.getWorkDir()).thenReturn(tempDir.resolve("workdir"));
+        when(backupRoot.get()).thenReturn(tempDir.resolve("workdir").resolve("backups"));
+        var backup = createSucceededBackup("fake-backup", "backup.zip");
 
         StepVerifier.create(migrationService.download(backup))
             .assertNext(resource -> {
@@ -166,16 +172,21 @@ class MigrationServiceImplTest {
                 }
             })
             .verifyComplete();
+
+        verify(haloProperties, never()).getWorkDir();
+        verify(backupRoot).get();
     }
 
     @Test
     void downloadBackupWhichDoesNotExist() {
         var backup = createSucceededBackup("fake-backup", "backup.zip");
-        when(haloProperties.getWorkDir()).thenReturn(tempDir.resolve("workdir"));
+        when(backupRoot.get()).thenReturn(tempDir.resolve("workdir").resolve("backups"));
 
         StepVerifier.create(migrationService.download(backup))
             .expectError(NotFoundException.class)
             .verify();
+        verify(haloProperties, never()).getWorkDir();
+        verify(backupRoot).get();
     }
 
     Backup createSucceededBackup(String name, String filename) {

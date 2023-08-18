@@ -1,6 +1,8 @@
 package run.halo.app.theme;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -24,6 +26,8 @@ import org.thymeleaf.templateresource.ITemplateResource;
 import org.thymeleaf.templateresource.StringTemplateResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
+import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.dialect.HaloProcessorDialect;
 
@@ -40,6 +44,9 @@ public class ReactiveFinderExpressionParserTests {
     @Mock
     private ApplicationContext applicationContext;
 
+    @Mock
+    private SystemConfigurableEnvironmentFetcher environmentFetcher;
+
     private TemplateEngine templateEngine;
 
     @BeforeEach
@@ -53,6 +60,10 @@ public class ReactiveFinderExpressionParserTests {
             }
         }));
         templateEngine.addTemplateResolver(new TestTemplateResolver());
+        lenient().when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
+            .thenReturn(environmentFetcher);
+        lenient().when(environmentFetcher.fetchComment())
+            .thenReturn(Mono.just(new SystemSetting.Comment()));
     }
 
     @Test
