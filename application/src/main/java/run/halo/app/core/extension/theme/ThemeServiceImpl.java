@@ -1,34 +1,33 @@
 package run.halo.app.core.extension.theme;
 
-import static java.nio.file.Files.createTempDirectory;
 import static org.springframework.util.FileSystemUtils.copyRecursively;
 import static run.halo.app.core.extension.theme.ThemeUtils.loadThemeManifest;
 import static run.halo.app.core.extension.theme.ThemeUtils.locateThemeManifest;
+import static run.halo.app.core.extension.theme.ThemeUtils.unzipThemeTo;
+import static run.halo.app.infra.utils.FileUtils.createTempDir;
 import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
 import static run.halo.app.infra.utils.FileUtils.unzip;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
-import java.util.zip.ZipInputStream;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.reactivestreams.Publisher;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.retry.RetryException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.server.ServerErrorException;
 import org.springframework.web.server.ServerWebInputException;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.AnnotationSetting;
@@ -55,76 +54,60 @@ public class ThemeServiceImpl implements ThemeService {
 
     private final SystemVersionSupplier systemVersionSupplier;
 
+    private final Scheduler scheduler = Schedulers.boundedElastic();
+
     @Override
-    public Mono<Theme> install(InputStream is) {
+    public Mono<Theme> install(Publisher<DataBuffer> content) {
         var themeRoot = this.themeRoot.get();
-        return ThemeUtils.unzipThemeTo(is, themeRoot)
+        return unzipThemeTo(content, themeRoot, scheduler)
             .flatMap(this::persistent);
     }
 
     @Override
-    public Mono<Theme> upgrade(String themeName, InputStream is) {
-        var tempDir = new AtomicReference<Path>();
-        var tempThemeRoot = new AtomicReference<Path>();
-        return client.fetch(Theme.class, themeName)
+    public Mono<Theme> upgrade(String themeName, Publisher<DataBuffer> content) {
+        var checkTheme = client.fetch(Theme.class, themeName)
             .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
-                "The given theme with name " + themeName + " did not exist")))
-            .publishOn(Schedulers.boundedElastic())
-            .doFirst(() -> {
-                try {
-                    tempDir.set(createTempDirectory("halo-theme-"));
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
-                }
-            })
-            .flatMap(oldTheme -> {
-                try (var zis = new ZipInputStream(is)) {
-                    unzip(zis, tempDir.get());
-                    return locateThemeManifest(tempDir.get()).switchIfEmpty(Mono.error(
-                        () -> new ThemeUpgradeException(
-                            "Missing theme manifest file: theme.yaml or theme.yml",
-                            "problemDetail.theme.upgrade.missingManifest", null)));
-                } catch (IOException e) {
-                    return Mono.error(e);
-                }
-            })
-            .doOnNext(themeManifest -> {
-                if (log.isDebugEnabled()) {
-                    log.debug("Found theme manifest file: {}", themeManifest);
-                }
-                tempThemeRoot.set(themeManifest.getParent());
-            })
-            .map(ThemeUtils::loadThemeManifest)
-            .doOnNext(newTheme -> {
-                if (!Objects.equals(themeName, newTheme.getMetadata().getName())) {
-                    if (log.isDebugEnabled()) {
-                        log.error("Want theme name: {}, but provided: {}", themeName,
-                            newTheme.getMetadata().getName());
-                    }
-                    throw new ThemeUpgradeException("Please make sure the theme name is correct",
-                        "problemDetail.theme.upgrade.nameMismatch",
-                        new Object[] {newTheme.getMetadata().getName(), themeName});
-                }
-            })
-            .flatMap(newTheme -> {
-                // Remove the theme before upgrading
-                return deleteThemeAndWaitForComplete(newTheme.getMetadata().getName())
-                    .thenReturn(newTheme);
-            })
-            .doOnNext(newTheme -> {
-                // prepare the theme
-                var themePath = themeRoot.get().resolve(newTheme.getMetadata().getName());
-                try {
-                    copyRecursively(tempThemeRoot.get(), themePath);
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
-                }
-            })
-            .flatMap(this::persistent)
-            .doFinally(signalType -> {
-                // clear the temporary folder
-                deleteRecursivelyAndSilently(tempDir.get());
-            });
+                "The given theme with name " + themeName + " did not exist")));
+        var upgradeTheme = Mono.usingWhen(
+            createTempDir("halo-theme-", scheduler),
+            tempDir -> {
+                var locateThemeManifest = Mono.fromCallable(() -> locateThemeManifest(tempDir)
+                    .orElseThrow(() -> new ThemeUpgradeException(
+                        "Missing theme manifest file: theme.yaml or theme.yml",
+                        "problemDetail.theme.upgrade.missingManifest", null)));
+                return unzip(content, tempDir, scheduler)
+                    .then(locateThemeManifest)
+                    .flatMap(themeManifest -> {
+                        if (log.isDebugEnabled()) {
+                            log.debug("Found theme manifest file: {}", themeManifest);
+                        }
+                        var newTheme = loadThemeManifest(themeManifest);
+                        if (!Objects.equals(themeName, newTheme.getMetadata().getName())) {
+                            if (log.isDebugEnabled()) {
+                                log.error("Want theme name: {}, but provided: {}", themeName,
+                                    newTheme.getMetadata().getName());
+                            }
+                            return Mono.error(new ThemeUpgradeException(
+                                "Please make sure the theme name is correct",
+                                "problemDetail.theme.upgrade.nameMismatch",
+                                new Object[] {newTheme.getMetadata().getName(), themeName}));
+                        }
+
+                        var copyTheme = Mono.fromCallable(() -> {
+                            var themePath = themeRoot.get().resolve(themeName);
+                            copyRecursively(themeManifest.getParent(), themePath);
+                            return themePath;
+                        });
+
+                        return deleteThemeAndWaitForComplete(themeName)
+                            .then(copyTheme)
+                            .then(this.persistent(newTheme));
+                    });
+            },
+            tempDir -> deleteRecursivelyAndSilently(tempDir, scheduler)
+        );
+
+        return checkTheme.then(upgradeTheme);
     }
 
     /**

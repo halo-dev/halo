@@ -1,12 +1,11 @@
 package run.halo.app.core.extension.theme;
 
-import static java.nio.file.Files.createTempDirectory;
 import static org.springframework.util.FileSystemUtils.copyRecursively;
+import static run.halo.app.infra.utils.FileUtils.createTempDir;
 import static run.halo.app.infra.utils.FileUtils.deleteRecursivelyAndSilently;
 import static run.halo.app.infra.utils.FileUtils.unzip;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -15,13 +14,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.BaseStream;
 import java.util.stream.Stream;
-import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
+import org.reactivestreams.Publisher;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,6 +28,7 @@ import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.Unstructured;
@@ -101,64 +101,51 @@ class ThemeUtils {
         }
     }
 
-    static Mono<Unstructured> unzipThemeTo(InputStream inputStream, Path themeWorkDir) {
-        return unzipThemeTo(inputStream, themeWorkDir, false)
+    static Mono<Unstructured> unzipThemeTo(Publisher<DataBuffer> content, Path themeWorkDir,
+        Scheduler scheduler) {
+        return unzipThemeTo(content, themeWorkDir, false, scheduler)
             .onErrorMap(e -> !(e instanceof ResponseStatusException), e -> {
                 log.error("Failed to unzip theme", e);
                 throw new ServerWebInputException("Failed to unzip theme");
             });
     }
 
-    static Mono<Unstructured> unzipThemeTo(InputStream inputStream, Path themeWorkDir,
-        boolean override) {
-        var tempDir = new AtomicReference<Path>();
-        return Mono.just(inputStream)
-            .publishOn(Schedulers.boundedElastic())
-            .doFirst(() -> {
-                try {
-                    tempDir.set(createTempDirectory(THEME_TMP_PREFIX));
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
-                }
-            })
-            .doOnNext(is -> {
-                try (var zipIs = new ZipInputStream(is)) {
-                    // unzip input stream into temporary directory
-                    unzip(zipIs, tempDir.get());
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
-                }
-            })
-            .flatMap(is -> ThemeUtils.locateThemeManifest(tempDir.get()))
-            .switchIfEmpty(
-                Mono.error(() -> new ThemeInstallationException("Missing theme manifest",
-                    "problemDetail.theme.install.missingManifest", null)))
-            .map(themeManifestPath -> {
-                var theme = loadThemeManifest(themeManifestPath);
-                var themeName = theme.getMetadata().getName();
-                var themeTargetPath = themeWorkDir.resolve(themeName);
-                try {
-                    if (!override && !FileUtils.isEmpty(themeTargetPath)) {
-                        throw new ThemeAlreadyExistsException(themeName);
-                    }
-                    // install theme to theme work dir
-                    copyRecursively(themeManifestPath.getParent(), themeTargetPath);
-                    return theme;
-                } catch (IOException e) {
-                    deleteRecursivelyAndSilently(themeTargetPath);
-                    throw Exceptions.propagate(e);
-                }
-            })
-            .doFinally(signalType -> {
-                FileUtils.closeQuietly(inputStream);
-                deleteRecursivelyAndSilently(tempDir.get());
-            });
+    static Mono<Unstructured> unzipThemeTo(Publisher<DataBuffer> content, Path themeWorkDir,
+        boolean override, Scheduler scheduler) {
+        return Mono.usingWhen(
+            createTempDir(THEME_TMP_PREFIX, scheduler),
+            tempDir -> {
+                var locateThemeManifest = Mono.fromCallable(() -> locateThemeManifest(tempDir)
+                    .orElseThrow(() -> new ThemeInstallationException("Missing theme manifest",
+                        "problemDetail.theme.install.missingManifest", null)));
+                return unzip(content, tempDir, scheduler)
+                    .then(locateThemeManifest)
+                    .<Unstructured>handle((themeManifestPath, sink) -> {
+                        var theme = loadThemeManifest(themeManifestPath);
+                        var themeName = theme.getMetadata().getName();
+                        var themeTargetPath = themeWorkDir.resolve(themeName);
+                        try {
+                            if (!override && !FileUtils.isEmpty(themeTargetPath)) {
+                                sink.error(new ThemeAlreadyExistsException(themeName));
+                                return;
+                            }
+                            // install theme to theme work dir
+                            copyRecursively(themeManifestPath.getParent(), themeTargetPath);
+                            sink.next(theme);
+                        } catch (IOException e) {
+                            deleteRecursivelyAndSilently(themeTargetPath);
+                            sink.error(e);
+                        }
+                    })
+                    .subscribeOn(scheduler);
+            },
+            tempDir -> FileUtils.deleteRecursivelyAndSilently(tempDir, scheduler)
+        );
     }
 
     static Unstructured loadThemeManifest(Path themeManifestPath) {
-        List<Unstructured> unstructureds =
-            new YamlUnstructuredLoader(new FileSystemResource(themeManifestPath))
-                .load();
+        var unstructureds = new YamlUnstructuredLoader(new FileSystemResource(themeManifestPath))
+            .load();
         if (CollectionUtils.isEmpty(unstructureds)) {
             throw new ThemeInstallationException("Missing theme manifest",
                 "problemDetail.theme.install.missingManifest", null);
@@ -177,37 +164,35 @@ class ThemeUtils {
         return null;
     }
 
-    static Mono<Path> locateThemeManifest(Path dir) {
-        return Mono.justOrEmpty(dir)
-            .filter(Files::isDirectory)
-            .publishOn(Schedulers.boundedElastic())
-            .mapNotNull(path -> {
-                var queue = new LinkedList<Path>();
-                queue.add(dir);
-                var manifest = Optional.<Path>empty();
-                while (!queue.isEmpty()) {
-                    var current = queue.pop();
-                    try (Stream<Path> subPaths = Files.list(current)) {
-                        manifest = subPaths.filter(Files::isReadable)
-                            .filter(subPath -> {
-                                if (Files.isDirectory(subPath)) {
-                                    queue.add(subPath);
-                                    return false;
-                                }
-                                return true;
-                            })
-                            .filter(Files::isRegularFile)
-                            .filter(ThemeUtils::isManifest)
-                            .findFirst();
-                    } catch (IOException e) {
-                        throw Exceptions.propagate(e);
-                    }
-                    if (manifest.isPresent()) {
-                        break;
-                    }
-                }
-                return manifest.orElse(null);
-            });
+    static Optional<Path> locateThemeManifest(Path path) {
+        if (!Files.isDirectory(path)) {
+            return Optional.empty();
+        }
+        var queue = new LinkedList<Path>();
+        queue.add(path);
+        var manifest = Optional.<Path>empty();
+        while (!queue.isEmpty()) {
+            var current = queue.pop();
+            try (Stream<Path> subPaths = Files.list(current)) {
+                manifest = subPaths.filter(Files::isReadable)
+                    .filter(subPath -> {
+                        if (Files.isDirectory(subPath)) {
+                            queue.add(subPath);
+                            return false;
+                        }
+                        return true;
+                    })
+                    .filter(Files::isRegularFile)
+                    .filter(ThemeUtils::isManifest)
+                    .findFirst();
+            } catch (IOException e) {
+                throw Exceptions.propagate(e);
+            }
+            if (manifest.isPresent()) {
+                break;
+            }
+        }
+        return manifest;
     }
 
     static boolean isManifest(Path file) {

@@ -32,7 +32,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.util.ResourceUtils;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -112,6 +116,13 @@ class ThemeServiceImplTest {
         return Unstructured.OBJECT_MAPPER.convertValue(theme, Unstructured.class);
     }
 
+    Flux<DataBuffer> content(Path path) {
+        return DataBufferUtils.read(
+            path,
+            DefaultDataBufferFactory.sharedInstance,
+            StreamUtils.BUFFER_SIZE);
+    }
+
     @Nested
     class UpgradeTest {
 
@@ -119,10 +130,8 @@ class ThemeServiceImplTest {
         void shouldFailIfThemeNotInstalledBefore() throws IOException, URISyntaxException {
             var themeZipPath = prepareTheme("other");
             when(client.fetch(Theme.class, "default")).thenReturn(Mono.empty());
-            try (var is = Files.newInputStream(themeZipPath)) {
-                StepVerifier.create(themeService.upgrade("default", is))
-                    .verifyError(ServerWebInputException.class);
-            }
+            StepVerifier.create(themeService.upgrade("default", content(themeZipPath)))
+                .verifyError(ServerWebInputException.class);
 
             verify(client).fetch(Theme.class, "default");
         }
@@ -144,14 +153,12 @@ class ThemeServiceImplTest {
             when(client.create(isA(Unstructured.class))).thenReturn(
                 Mono.just(convert(createTheme(t -> t.getSpec().setDisplayName("New fake theme")))));
 
-            try (var is = Files.newInputStream(themeZipPath)) {
-                StepVerifier.create(themeService.upgrade("default", is))
-                    .consumeNextWith(newTheme -> {
-                        assertEquals("default", newTheme.getMetadata().getName());
-                        assertEquals("New fake theme", newTheme.getSpec().getDisplayName());
-                    })
-                    .verifyComplete();
-            }
+            StepVerifier.create(themeService.upgrade("default", content(themeZipPath)))
+                .consumeNextWith(newTheme -> {
+                    assertEquals("default", newTheme.getMetadata().getName());
+                    assertEquals("New fake theme", newTheme.getSpec().getDisplayName());
+                })
+                .verifyComplete();
 
             verify(client, times(3)).fetch(Theme.class, "default");
             verify(client).delete(oldTheme);
@@ -168,14 +175,12 @@ class ThemeServiceImplTest {
             var defaultThemeZipPath = prepareTheme("default");
             when(client.create(isA(Unstructured.class))).thenReturn(
                 Mono.just(convert(createTheme())));
-            try (var is = Files.newInputStream(defaultThemeZipPath)) {
-                StepVerifier.create(themeService.install(is))
-                    .consumeNextWith(theme -> {
-                        assertEquals("default", theme.getMetadata().getName());
-                        assertEquals("Default", theme.getSpec().getDisplayName());
-                    })
-                    .verifyComplete();
-            }
+            StepVerifier.create(themeService.install(content(defaultThemeZipPath)))
+                .consumeNextWith(theme -> {
+                    assertEquals("default", theme.getMetadata().getName());
+                    assertEquals("Default", theme.getSpec().getDisplayName());
+                })
+                .verifyComplete();
         }
 
         @Test
@@ -183,19 +188,15 @@ class ThemeServiceImplTest {
             var defaultThemeZipPath = prepareTheme("default");
             when(client.create(isA(Unstructured.class))).thenReturn(
                 Mono.error(() -> new ExtensionException("Failed to create the extension")));
-            try (var is = Files.newInputStream(defaultThemeZipPath)) {
-                StepVerifier.create(themeService.install(is))
-                    .verifyError(ExtensionException.class);
-            }
+            StepVerifier.create(themeService.install(content(defaultThemeZipPath)))
+                .verifyError(ExtensionException.class);
         }
 
         @Test
         void shouldFailWhenThemeManifestIsInvalid() throws IOException, URISyntaxException {
             var defaultThemeZipPath = prepareTheme("invalid-missing-manifest");
-            try (var is = Files.newInputStream(defaultThemeZipPath)) {
-                StepVerifier.create(themeService.install(is))
-                    .verifyError(ThemeInstallationException.class);
-            }
+            StepVerifier.create(themeService.install(content(defaultThemeZipPath)))
+                .verifyError(ThemeInstallationException.class);
         }
     }
 
