@@ -230,10 +230,10 @@ public class PluginEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> fetchJsBundle(ServerRequest request) {
-        Optional<String> versionOption = request.queryParam("version");
+        Optional<String> versionOption = request.queryParam("v");
         if (versionOption.isEmpty()) {
             var uri = "/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.js?v=";
-            pluginService.generateJsBundleVersion()
+            return pluginService.generateJsBundleVersion()
                 .flatMap(v -> ServerResponse.temporaryRedirect(URI.create(uri + v)).build());
         }
         return pluginService.uglifyJsBundle()
