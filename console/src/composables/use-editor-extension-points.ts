@@ -1,6 +1,8 @@
 import { usePluginModuleStore } from "@/stores/plugin";
-import type { EditorProvider as EditorProviderRaw } from "@halo-dev/console-shared";
-import type { PluginModule } from "@/stores/plugin";
+import type {
+  EditorProvider as EditorProviderRaw,
+  PluginModule,
+} from "@halo-dev/console-shared";
 import { onMounted, ref, type Ref, defineAsyncComponent } from "vue";
 import { VLoading } from "@halo-dev/components";
 import Logo from "@/assets/logo.png";
@@ -42,14 +44,7 @@ export function useEditorExtensionPoints(): useEditorExtensionPointsReturn {
 
       const providers = extensionPoints["editor:create"]() as EditorProvider[];
 
-      if (providers) {
-        providers.forEach((provider) => {
-          editorProviders.value.push({
-            ...provider,
-            logo: pluginModule.extension.status?.logo,
-          });
-        });
-      }
+      editorProviders.value.push(...providers);
     });
   });
 

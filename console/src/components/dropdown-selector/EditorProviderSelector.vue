@@ -51,7 +51,7 @@ const { editorProviders } = useEditorExtensionPoints();
         "
         @click="emit('select', editorProvider)"
       >
-        <template #prefix-icon>
+        <template v-if="editorProvider.logo" #prefix-icon>
           <VAvatar :src="editorProvider.logo" size="xs"></VAvatar>
         </template>
         {{ editorProvider.displayName }}

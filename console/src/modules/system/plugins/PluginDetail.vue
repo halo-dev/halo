@@ -17,7 +17,6 @@ import { usePermission } from "@/utils/permission";
 import { useI18n } from "vue-i18n";
 import { useQuery } from "@tanstack/vue-query";
 import type { PluginTab } from "@halo-dev/console-shared";
-import { usePluginModuleStore } from "@/stores/plugin";
 import { markRaw } from "vue";
 import DetailTab from "./tabs/Detail.vue";
 import SettingTab from "./tabs/Setting.vue";
@@ -89,10 +88,7 @@ const { data: setting } = useQuery({
 provide<Ref<Setting | undefined>>("setting", setting);
 
 onMounted(() => {
-  const { pluginModules } = usePluginModuleStore();
-  const currentPluginModule = pluginModules.find(
-    (item) => item.extension.metadata.name === route.params.name
-  );
+  const currentPluginModule = window[route.params.name as string];
 
   if (!currentPluginModule) {
     return;

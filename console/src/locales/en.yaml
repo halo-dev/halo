@@ -786,8 +786,8 @@ core:
         last_starttime: Last Start Time
     loader:
       toast:
-        entry_load_failed: "{name}: Failed to load plugin entry file"
-        style_load_failed: "{name}: Failed to load plugin stylesheet file"
+        entry_load_failed: "Failed to load plugins entry file"
+        style_load_failed: "Failed to load plugins stylesheet file"
     extension_points:
       editor:
         providers:
