@@ -237,8 +237,11 @@ public class PluginEndpoint implements CustomEndpoint {
                 .flatMap(v -> ServerResponse.temporaryRedirect(URI.create(uri + v)).build());
         }
         return pluginService.uglifyJsBundle()
-            .flatMap(bundle -> ServerResponse.ok().bodyValue(bundle))
-            .switchIfEmpty(ServerResponse.ok().bodyValue(""));
+            .defaultIfEmpty("")
+            .flatMap(bundle -> ServerResponse.ok()
+                .contentType(MediaType.valueOf("text/javascript"))
+                .bodyValue(bundle)
+            );
     }
 
     private Mono<ServerResponse> upgradeFromUri(ServerRequest request) {
