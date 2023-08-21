@@ -29,6 +29,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
@@ -219,7 +220,7 @@ public class PluginEndpoint implements CustomEndpoint {
                     .tag(tag)
                     .response(responseBuilder().implementationArray(Plugin.class))
             )
-            .GET("plugins/bundle.js", this::fetchJsBundle,
+            .GET("plugins/-/bundle.js", this::fetchJsBundle,
                 builder -> builder.operationId("fetchJsBundle")
                     .description("Merge all bundles of enabled plugins into one.")
                     .tag(tag)
@@ -229,6 +230,12 @@ public class PluginEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> fetchJsBundle(ServerRequest request) {
+        Optional<String> versionOption = request.queryParam("version");
+        if (versionOption.isEmpty()) {
+            var uri = "/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.js?v=";
+            pluginService.generateJsBundleVersion()
+                .flatMap(v -> ServerResponse.temporaryRedirect(URI.create(uri + v)).build());
+        }
         return pluginService.uglifyJsBundle()
             .flatMap(bundle -> ServerResponse.ok().bodyValue(bundle))
             .switchIfEmpty(ServerResponse.ok().bodyValue(""));

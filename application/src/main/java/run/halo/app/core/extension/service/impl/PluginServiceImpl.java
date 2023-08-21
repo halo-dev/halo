@@ -3,13 +3,18 @@ package run.halo.app.core.extension.service.impl;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import com.github.zafarkhaja.semver.Version;
+import com.google.common.hash.Hashing;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
@@ -132,8 +137,10 @@ public class PluginServiceImpl implements PluginService {
             () -> {
                 StringBuilder jsBundle = new StringBuilder();
                 StringBuilder cssBundle = new StringBuilder();
+                List<String> pluginNames = new ArrayList<>();
                 for (PluginWrapper pluginWrapper : pluginManager.getStartedPlugins()) {
                     String pluginName = pluginWrapper.getPluginId();
+                    pluginNames.add(pluginName);
                     Resource jsBundleResource =
                         BundleResourceUtils.getJsBundleResource(pluginManager, pluginName,
                             BundleResourceUtils.JS_BUNDLE);
@@ -160,12 +167,26 @@ public class PluginServiceImpl implements PluginService {
                     }
                 }
                 String cssBundleString = """
-                    const pluginCssBundle = function() {
-                        return `%s`;
-                    };
+                    this.pluginCssBundle = %s;
                     """.formatted(cssBundle.toString());
-                return Mono.just(jsBundle + cssBundleString);
+
+                String plugins = """
+                    this.enabledPluginNames = [%s];
+                    """.formatted(String.join(",", pluginNames));
+                return Mono.just(jsBundle + plugins + cssBundleString);
             });
+    }
+
+    @Override
+    public Mono<String> generateJsBundleVersion() {
+        return Mono.fromSupplier(() -> {
+            var compactVersion = pluginManager.getStartedPlugins()
+                .stream()
+                .sorted(Comparator.comparing(PluginWrapper::getPluginId))
+                .map(pluginWrapper -> pluginWrapper.getDescriptor().getVersion())
+                .collect(Collectors.joining());
+            return Hashing.sha256().hashUnencodedChars(compactVersion).toString();
+        });
     }
 
     Mono<Plugin> findPluginManifest(Path path) {

@@ -42,4 +42,12 @@ public interface PluginService {
     Mono<Plugin> reload(String name);
 
     Mono<String> uglifyJsBundle();
+
+    /**
+     * <p>Generate js bundle version for cache control.</p>
+     * This method will list all enabled plugins version and sign it to a string.
+     *
+     * @return signed js bundle version by all enabled plugins version.
+     */
+    Mono<String> generateJsBundleVersion();
 }
