@@ -149,12 +149,29 @@ public class PluginReconciler implements Reconciler<Request> {
                     // It is possible that the in-memory plugin has successfully started,
                     // but the status update of the database has failed.
                     // The status in the database will prevail
-                    getPluginWrapper(name).setPluginState(status.getPhase());
+                    PluginWrapper pluginWrapper = getPluginWrapper(name);
+                    pluginWrapper.setPluginState(status.getPhase());
+                    updatePluginStartedStateCacheInManager(pluginWrapper);
                     return status;
                 });
                 return false;
             })
             .orElse(false);
+    }
+
+    void updatePluginStartedStateCacheInManager(PluginWrapper pluginWrapper) {
+        if (pluginWrapper == null) {
+            return;
+        }
+        PluginState pluginState = pluginWrapper.getPluginState();
+        if (PluginState.STARTED.equals(pluginState)) {
+            if (!haloPluginManager.getStartedPlugins().contains(pluginWrapper)) {
+                haloPluginManager.getStartedPlugins().add(pluginWrapper);
+            }
+        } else {
+            // stopped or failed
+            haloPluginManager.getStartedPlugins().remove(pluginWrapper);
+        }
     }
 
     String generateAccessibleLogoUrl(Plugin plugin) {
@@ -325,6 +342,7 @@ public class PluginReconciler implements Reconciler<Request> {
             if (pluginWrapper != null) {
                 pluginWrapper.setPluginState(PluginState.FAILED);
                 pluginWrapper.setFailedException(e);
+                updatePluginStartedStateCacheInManager(pluginWrapper);
             }
 
             status.setPhase(PluginState.FAILED);
