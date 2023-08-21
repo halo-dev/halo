@@ -218,18 +218,20 @@ export const PluginHaloRunV1alpha1SearchEngineApiAxiosParamCreator = function (
     },
     /**
      * List plugin.halo.run/v1alpha1/SearchEngine
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listpluginHaloRunV1alpha1SearchEngine: async (
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/plugin.halo.run/v1alpha1/searchengines`;
@@ -256,6 +258,14 @@ export const PluginHaloRunV1alpha1SearchEngineApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
+      }
+
+      if (labelSelector) {
+        localVarQueryParameter["labelSelector"] = labelSelector;
+      }
+
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
       }
@@ -264,12 +274,8 @@ export const PluginHaloRunV1alpha1SearchEngineApiAxiosParamCreator = function (
         localVarQueryParameter["size"] = size;
       }
 
-      if (labelSelector) {
-        localVarQueryParameter["labelSelector"] = labelSelector;
-      }
-
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -440,18 +446,20 @@ export const PluginHaloRunV1alpha1SearchEngineApiFp = function (
     },
     /**
      * List plugin.halo.run/v1alpha1/SearchEngine
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listpluginHaloRunV1alpha1SearchEngine(
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -461,10 +469,11 @@ export const PluginHaloRunV1alpha1SearchEngineApiFp = function (
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listpluginHaloRunV1alpha1SearchEngine(
+          fieldSelector,
+          labelSelector,
           page,
           size,
-          labelSelector,
-          fieldSelector,
+          sort,
           options
         );
       return createRequestFunction(
@@ -575,10 +584,11 @@ export const PluginHaloRunV1alpha1SearchEngineApiFactory = function (
     ): AxiosPromise<SearchEngineList> {
       return localVarFp
         .listpluginHaloRunV1alpha1SearchEngine(
+          requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
           requestParameters.size,
-          requestParameters.labelSelector,
-          requestParameters.fieldSelector,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -653,6 +663,20 @@ export interface PluginHaloRunV1alpha1SearchEngineApiGetpluginHaloRunV1alpha1Sea
  */
 export interface PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngineRequest {
   /**
+   * Field selector for filtering.
+   * @type {Array<string>}
+   * @memberof PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngine
+   */
+  readonly fieldSelector?: Array<string>;
+
+  /**
+   * Label selector for filtering.
+   * @type {Array<string>}
+   * @memberof PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngine
+   */
+  readonly labelSelector?: Array<string>;
+
+  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngine
@@ -667,18 +691,11 @@ export interface PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1Se
   readonly size?: number;
 
   /**
-   * Label selector for filtering.
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
    * @type {Array<string>}
    * @memberof PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngine
    */
-  readonly labelSelector?: Array<string>;
-
-  /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof PluginHaloRunV1alpha1SearchEngineApiListpluginHaloRunV1alpha1SearchEngine
-   */
-  readonly fieldSelector?: Array<string>;
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -773,10 +790,11 @@ export class PluginHaloRunV1alpha1SearchEngineApi extends BaseAPI {
   ) {
     return PluginHaloRunV1alpha1SearchEngineApiFp(this.configuration)
       .listpluginHaloRunV1alpha1SearchEngine(
+        requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
         requestParameters.size,
-        requestParameters.labelSelector,
-        requestParameters.fieldSelector,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));

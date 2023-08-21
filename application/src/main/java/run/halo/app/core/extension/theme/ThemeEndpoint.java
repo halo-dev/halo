@@ -1,16 +1,16 @@
 package run.halo.app.core.extension.theme;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 import static org.springdoc.core.fn.builders.schema.Builder.schemaBuilder;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
-import static run.halo.app.infra.utils.DataBufferUtils.toInputStream;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -27,12 +27,10 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.reactive.function.BodyExtractors;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebInputException;
-import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Setting;
@@ -43,6 +41,7 @@ import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.QueryParamBuildUtil;
+import run.halo.app.infra.ReactiveUrlDataBufferFetcher;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ThemeRootGetter;
@@ -71,6 +70,8 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     private final SystemConfigurableEnvironmentFetcher systemEnvironmentFetcher;
 
+    private final ReactiveUrlDataBufferFetcher urlDataBufferFetcher;
+
     @Override
     public RouterFunction<ServerResponse> endpoint() {
         final var tag = "api.console.halo.run/v1alpha1/Theme";
@@ -85,6 +86,39 @@ public class ThemeEndpoint implements CustomEndpoint {
                             .mediaType(MediaType.MULTIPART_FORM_DATA_VALUE)
                             .schema(schemaBuilder()
                                 .implementation(InstallRequest.class))
+                        ))
+                    .response(responseBuilder()
+                        .implementation(Theme.class))
+            )
+            .POST("themes/-/install-from-uri", this::installFromUri,
+                builder -> builder.operationId("InstallThemeFromUri")
+                    .description("Install a theme from uri.")
+                    .tag(tag)
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(schemaBuilder()
+                                .implementation(InstallFromUriRequest.class))
+                        ))
+                    .response(responseBuilder()
+                        .implementation(Theme.class))
+            )
+            .POST("themes/{name}/upgrade-from-uri", this::upgradeFromUri,
+                builder -> builder.operationId("UpgradeThemeFromUri")
+                    .description("Upgrade a theme from uri.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .in(ParameterIn.PATH)
+                        .name("name")
+                        .required(true)
+                    )
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(schemaBuilder()
+                                .implementation(UpgradeFromUriRequest.class))
                         ))
                     .response(responseBuilder()
                         .implementation(Theme.class))
@@ -200,6 +234,29 @@ public class ThemeEndpoint implements CustomEndpoint {
             .build();
     }
 
+    private Mono<ServerResponse> upgradeFromUri(ServerRequest request) {
+        final var name = request.pathVariable("name");
+        var content = request.bodyToMono(UpgradeFromUriRequest.class)
+            .map(UpgradeFromUriRequest::uri)
+            .flatMapMany(urlDataBufferFetcher::fetch);
+
+        return themeService.upgrade(name, content)
+            .flatMap((updatedTheme) ->
+                templateEngineManager.clearCache(updatedTheme.getMetadata().getName())
+                    .thenReturn(updatedTheme)
+            )
+            .flatMap(theme -> ServerResponse.ok().bodyValue(theme));
+    }
+
+    private Mono<ServerResponse> installFromUri(ServerRequest request) {
+        var content = request.bodyToMono(InstallFromUriRequest.class)
+            .map(InstallFromUriRequest::uri)
+            .flatMapMany(urlDataBufferFetcher::fetch);
+
+        return themeService.install(content)
+            .flatMap(theme -> ServerResponse.ok().bodyValue(theme));
+    }
+
     private Mono<ServerResponse> activateTheme(ServerRequest request) {
         final var activatedThemeName = request.pathVariable("name");
         return client.fetch(Theme.class, activatedThemeName)
@@ -245,7 +302,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                         if (!configMapName.equals(configMapNameToUpdate)) {
                             throw new ServerWebInputException(
                                 "The name from the request body does not match the theme "
-                                    + "configMapName name.");
+                                + "configMapName name.");
                         }
                     })
                     .flatMap(configMapToUpdate -> client.fetch(ConfigMap.class, configMapName)
@@ -327,9 +384,12 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     public interface IUpgradeRequest {
 
-        @Schema(required = true, description = "Theme zip file.")
+        @Schema(requiredMode = REQUIRED, description = "Theme zip file.")
         FilePart getFile();
 
+    }
+
+    public record UpgradeFromUriRequest(@Schema(requiredMode = REQUIRED) URI uri) {
     }
 
     public static class UpgradeRequest implements IUpgradeRequest {
@@ -356,22 +416,15 @@ public class ThemeEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> upgrade(ServerRequest request) {
         // validate the theme first
-        var themeNameInPath = request.pathVariable("name");
+        var name = request.pathVariable("name");
         return request.multipartData()
             .map(UpgradeRequest::new)
             .map(UpgradeRequest::getFile)
-            .flatMap(file -> {
-                try {
-                    return themeService.upgrade(themeNameInPath, toInputStream(file.content()));
-                } catch (IOException e) {
-                    return Mono.error(e);
-                }
-            })
-            .flatMap((updatedTheme) -> templateEngineManager.clearCache(
-                    updatedTheme.getMetadata().getName())
-                .thenReturn(updatedTheme))
-            .flatMap(updatedTheme -> ServerResponse.ok()
-                .bodyValue(updatedTheme));
+            .flatMap(filePart -> themeService.upgrade(name, filePart.content()))
+            .flatMap((updatedTheme) ->
+                templateEngineManager.clearCache(updatedTheme.getMetadata().getName())
+                    .thenReturn(updatedTheme))
+            .flatMap(updatedTheme -> ServerResponse.ok().bodyValue(updatedTheme));
     }
 
     Mono<ListResult<Theme>> listUninstalled(ThemeQuery query) {
@@ -414,36 +467,39 @@ public class ThemeEndpoint implements CustomEndpoint {
     }
 
     @Schema(name = "ThemeInstallRequest")
-    public record InstallRequest(
-        @Schema(required = true, description = "Theme zip file.") FilePart file) {
+    public static class InstallRequest {
+
+        @Schema(hidden = true)
+        private final MultiValueMap<String, Part> multipartData;
+
+        public InstallRequest(MultiValueMap<String, Part> multipartData) {
+            this.multipartData = multipartData;
+        }
+
+        @Schema(requiredMode = REQUIRED, description = "Theme zip file.")
+        FilePart getFile() {
+            Part part = multipartData.getFirst("file");
+            if (!(part instanceof FilePart file)) {
+                throw new ServerWebInputException(
+                    "Invalid parameter of file, binary data is required");
+            }
+            if (!Paths.get(file.filename()).toString().endsWith(".zip")) {
+                throw new ServerWebInputException(
+                    "Invalid file type, only zip format is supported");
+            }
+            return file;
+        }
+    }
+
+    public record InstallFromUriRequest(@Schema(requiredMode = REQUIRED) URI uri) {
     }
 
     Mono<ServerResponse> install(ServerRequest request) {
-        return request.body(BodyExtractors.toMultipartData())
-            .flatMap(this::getZipFilePart)
-            .flatMap(file -> {
-                try {
-                    return themeService.install(toInputStream(file.content()));
-                } catch (IOException e) {
-                    return Mono.error(Exceptions.propagate(e));
-                }
-            })
-            .flatMap(theme -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(theme));
-    }
-
-    Mono<FilePart> getZipFilePart(MultiValueMap<String, Part> formData) {
-        Part part = formData.getFirst("file");
-        if (!(part instanceof FilePart file)) {
-            return Mono.error(new ServerWebInputException(
-                "Invalid parameter of file, binary data is required"));
-        }
-        if (!Paths.get(file.filename()).toString().endsWith(".zip")) {
-            return Mono.error(new ServerWebInputException(
-                "Invalid file type, only zip format is supported"));
-        }
-        return Mono.just(file);
+        return request.multipartData()
+            .map(InstallRequest::new)
+            .map(InstallRequest::getFile)
+            .flatMap(filePart -> themeService.install(filePart.content()))
+            .flatMap(theme -> ServerResponse.ok().bodyValue(theme));
     }
 
 }

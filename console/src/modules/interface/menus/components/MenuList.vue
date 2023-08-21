@@ -69,7 +69,7 @@ const {
     const deletingMenus = data?.filter(
       (menu) => !!menu.metadata.deletionTimestamp
     );
-    return deletingMenus?.length ? 3000 : false;
+    return deletingMenus?.length ? 1000 : false;
   },
 });
 

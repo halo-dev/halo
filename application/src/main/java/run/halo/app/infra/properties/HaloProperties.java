@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -58,6 +60,9 @@ public class HaloProperties implements Validator {
     @Valid
     private final AttachmentProperties attachment = new AttachmentProperties();
 
+    @Valid
+    private final Map<String, CacheProperties> caches = new LinkedHashMap<>();
+
     @Override
     public boolean supports(Class<?> clazz) {
         return HaloProperties.class.isAssignableFrom(clazz);
@@ -70,7 +75,5 @@ public class HaloProperties implements Validator {
             errors.rejectValue("externalUrl", "external-url.required.when-using-absolute-permalink",
                 "External URL is required when property `use-absolute-permalink` is set to true.");
         }
-        SecurityProperties.Initializer.validateUsername(props.getSecurity().getInitializer(),
-            errors);
     }
 }

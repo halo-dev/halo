@@ -214,18 +214,20 @@ export const AuthHaloRunV1alpha1AuthProviderApiAxiosParamCreator = function (
     },
     /**
      * List auth.halo.run/v1alpha1/AuthProvider
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listauthHaloRunV1alpha1AuthProvider: async (
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/auth.halo.run/v1alpha1/authproviders`;
@@ -252,6 +254,14 @@ export const AuthHaloRunV1alpha1AuthProviderApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
+      }
+
+      if (labelSelector) {
+        localVarQueryParameter["labelSelector"] = labelSelector;
+      }
+
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
       }
@@ -260,12 +270,8 @@ export const AuthHaloRunV1alpha1AuthProviderApiAxiosParamCreator = function (
         localVarQueryParameter["size"] = size;
       }
 
-      if (labelSelector) {
-        localVarQueryParameter["labelSelector"] = labelSelector;
-      }
-
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -432,18 +438,20 @@ export const AuthHaloRunV1alpha1AuthProviderApiFp = function (
     },
     /**
      * List auth.halo.run/v1alpha1/AuthProvider
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listauthHaloRunV1alpha1AuthProvider(
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -453,10 +461,11 @@ export const AuthHaloRunV1alpha1AuthProviderApiFp = function (
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listauthHaloRunV1alpha1AuthProvider(
+          fieldSelector,
+          labelSelector,
           page,
           size,
-          labelSelector,
-          fieldSelector,
+          sort,
           options
         );
       return createRequestFunction(
@@ -564,10 +573,11 @@ export const AuthHaloRunV1alpha1AuthProviderApiFactory = function (
     ): AxiosPromise<AuthProviderList> {
       return localVarFp
         .listauthHaloRunV1alpha1AuthProvider(
+          requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
           requestParameters.size,
-          requestParameters.labelSelector,
-          requestParameters.fieldSelector,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -642,6 +652,20 @@ export interface AuthHaloRunV1alpha1AuthProviderApiGetauthHaloRunV1alpha1AuthPro
  */
 export interface AuthHaloRunV1alpha1AuthProviderApiListauthHaloRunV1alpha1AuthProviderRequest {
   /**
+   * Field selector for filtering.
+   * @type {Array<string>}
+   * @memberof AuthHaloRunV1alpha1AuthProviderApiListauthHaloRunV1alpha1AuthProvider
+   */
+  readonly fieldSelector?: Array<string>;
+
+  /**
+   * Label selector for filtering.
+   * @type {Array<string>}
+   * @memberof AuthHaloRunV1alpha1AuthProviderApiListauthHaloRunV1alpha1AuthProvider
+   */
+  readonly labelSelector?: Array<string>;
+
+  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof AuthHaloRunV1alpha1AuthProviderApiListauthHaloRunV1alpha1AuthProvider
@@ -656,18 +680,11 @@ export interface AuthHaloRunV1alpha1AuthProviderApiListauthHaloRunV1alpha1AuthPr
   readonly size?: number;
 
   /**
-   * Label selector for filtering.
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
    * @type {Array<string>}
    * @memberof AuthHaloRunV1alpha1AuthProviderApiListauthHaloRunV1alpha1AuthProvider
    */
-  readonly labelSelector?: Array<string>;
-
-  /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof AuthHaloRunV1alpha1AuthProviderApiListauthHaloRunV1alpha1AuthProvider
-   */
-  readonly fieldSelector?: Array<string>;
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -762,10 +779,11 @@ export class AuthHaloRunV1alpha1AuthProviderApi extends BaseAPI {
   ) {
     return AuthHaloRunV1alpha1AuthProviderApiFp(this.configuration)
       .listauthHaloRunV1alpha1AuthProvider(
+        requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
         requestParameters.size,
-        requestParameters.labelSelector,
-        requestParameters.fieldSelector,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));

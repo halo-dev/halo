@@ -17,11 +17,15 @@ import { categorySelect } from "./inputs/category-select";
 import { categoryCheckbox } from "./inputs/category-checkbox";
 import { tagCheckbox } from "./inputs/tag-checkbox";
 import { roleSelect } from "./inputs/role-select";
+import { attachmentPolicySelect } from "./inputs/attachment-policy-select";
+import { attachmentGroupSelect } from "./inputs/attachment-group-select";
+import { password } from "./inputs/password";
 
 import radioAlt from "./plugins/radio-alt";
 import stopImplicitSubmission from "./plugins/stop-implicit-submission";
 import passwordPreventAutocomplete from "./plugins/password-prevent-autocomplete";
 import requiredAsterisk from "./plugins/required-asterisk";
+import autoScrollToErrors from "./plugins/auto-scroll-to-errors";
 
 const config: DefaultConfigOptions = {
   config: {
@@ -32,9 +36,11 @@ const config: DefaultConfigOptions = {
     stopImplicitSubmission,
     passwordPreventAutocomplete,
     requiredAsterisk,
+    autoScrollToErrors,
   ],
   inputs: {
     form,
+    password,
     group,
     attachment,
     code,
@@ -49,6 +55,8 @@ const config: DefaultConfigOptions = {
     categoryCheckbox,
     tagCheckbox,
     roleSelect,
+    attachmentPolicySelect,
+    attachmentGroupSelect,
   },
   locales: { zh, en },
   locale: "zh",

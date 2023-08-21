@@ -248,9 +248,10 @@ const iframeClasses = computed(() => {
     @update:visible="onVisibleChange"
   >
     <template #center>
+      <!-- TODO: Reactor VTabbar component to support icon prop -->
       <VTabbar
         v-model:active-id="deviceActiveId"
-        :items="mockDevices"
+        :items="mockDevices as any"
         type="outline"
       ></VTabbar>
     </template>

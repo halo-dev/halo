@@ -55,6 +55,7 @@ class PluginCompositeRouterFunctionTest {
     @SuppressWarnings("unchecked")
     void setUp() {
         var fakeContext = mock(PluginApplicationContext.class);
+        when(fakeContext.isActive()).thenReturn(true);
         ExtensionContextRegistry.getInstance().register("fake-plugin", fakeContext);
 
         when(rawRouterFunctionsProvider.orderedStream()).thenReturn(Stream.empty());

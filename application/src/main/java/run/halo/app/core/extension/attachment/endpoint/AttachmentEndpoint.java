@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.attachment.endpoint;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static java.util.Comparator.comparing;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
@@ -37,10 +38,12 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.attachment.Attachment;
+import run.halo.app.core.extension.attachment.Group;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.endpoint.SortResolver;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.extension.Comparators;
+import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.extension.router.IListRequest.QueryListRequest;
@@ -104,12 +107,30 @@ public class AttachmentEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> search(ServerRequest request) {
         var searchRequest = new SearchRequest(request);
-        return client.list(Attachment.class,
-                searchRequest.toPredicate(), searchRequest.toComparator(),
-                searchRequest.getPage(), searchRequest.getSize())
-            .flatMap(listResult -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(listResult));
+        return client.list(Group.class, group -> MetadataUtil.nullSafeLabels(group)
+                .containsKey(Group.HIDDEN_LABEL), null)
+            .map(group -> group.getMetadata().getName())
+            .collectList()
+            .defaultIfEmpty(List.of())
+            .flatMap(groups -> client.list(Attachment.class,
+                    searchRequest.toPredicate().and(visibleGroupPredicate(groups)),
+                    searchRequest.toComparator(),
+                    searchRequest.getPage(), searchRequest.getSize())
+                .flatMap(listResult -> ServerResponse.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(listResult)
+                )
+            );
+
+    }
+
+    static Predicate<Attachment> visibleGroupPredicate(List<String> hiddenGroups) {
+        return attachment -> {
+            if (!StringUtils.hasText(attachment.getSpec().getGroupName())) {
+                return true;
+            }
+            return !hiddenGroups.contains(attachment.getSpec().getGroupName());
+        };
     }
 
     public interface ISearchRequest extends IListRequest {
@@ -254,10 +275,10 @@ public class AttachmentEndpoint implements CustomEndpoint {
 
     public interface IUploadRequest {
 
-        @Schema(required = true, description = "Attachment file")
+        @Schema(requiredMode = REQUIRED, description = "Attachment file")
         FilePart getFile();
 
-        @Schema(required = true, description = "Storage policy name")
+        @Schema(requiredMode = REQUIRED, description = "Storage policy name")
         String getPolicyName();
 
         @Schema(description = "The name of the group to which the attachment belongs")

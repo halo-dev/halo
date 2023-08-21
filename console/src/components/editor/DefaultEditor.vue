@@ -2,7 +2,6 @@
 import {
   Extension,
   RichTextEditor,
-  useEditor,
   ExtensionBlockquote,
   ExtensionBold,
   ExtensionBulletList,
@@ -15,14 +14,11 @@ import {
   ExtensionHistory,
   ExtensionHorizontalRule,
   ExtensionItalic,
-  ExtensionListItem,
   ExtensionOrderedList,
-  ExtensionParagraph,
   ExtensionStrike,
   ExtensionText,
   ExtensionImage,
   ExtensionTaskList,
-  ExtensionTaskItem,
   ExtensionLink,
   ExtensionTextAlign,
   ExtensionUnderline,
@@ -35,50 +31,18 @@ import {
   ExtensionIframe,
   ExtensionVideo,
   ExtensionAudio,
-  CommandsSuggestion,
-  CommentParagraph,
-  CommandHeader1,
-  CommandHeader2,
-  CommandHeader3,
-  CommandHeader4,
-  CommandHeader5,
-  CommandHeader6,
-  CommandCodeBlock,
-  CommandIframe,
-  CommandVideo,
-  CommandAudio,
-  CommandTable,
-  CommandBulletList,
-  CommandOrderedList,
-  CommandTaskList,
   ExtensionCodeBlock,
+  ExtensionFontSize,
+  ExtensionColor,
   lowlight,
-  UndoMenuItem,
-  RedoMenuItem,
-  BoldMenuItem,
-  ItalicMenuItem,
-  UnderlineMenuItem,
-  StrikeMenuItem,
-  QuoteMenuItem,
-  CodeMenuItem,
-  SuperScriptMenuItem,
-  SubScriptMenuItem,
-  CodeBlockMenuItem,
-  HeadingMenuItem,
-  AlignLeftMenuItem,
-  AlignCenterMenuItem,
-  AlignRightMenuItem,
-  AlignJustifyMenuItem,
-  TableMenuItem,
-  BulletListMenuItem,
-  OrderedListMenuItem,
-  TaskListMenuItem,
-  HighlightMenuItem,
-  Separator,
+  type AnyExtension,
+  Editor,
+  ToolboxItem,
 } from "@halo-dev/richtext-editor";
 import {
   IconCalendar,
   IconCharacterRecognition,
+  IconFolder,
   IconLink,
   IconUserFollow,
   Toast,
@@ -87,7 +51,6 @@ import {
 } from "@halo-dev/components";
 import AttachmentSelectorModal from "@/modules/contents/attachments/components/AttachmentSelectorModal.vue";
 import ExtensionCharacterCount from "@tiptap/extension-character-count";
-import MdiFileImageBox from "~icons/mdi/file-image-box";
 import MdiFormatHeader1 from "~icons/mdi/format-header-1";
 import MdiFormatHeader2 from "~icons/mdi/format-header-2";
 import MdiFormatHeader3 from "~icons/mdi/format-header-3";
@@ -95,12 +58,13 @@ import MdiFormatHeader4 from "~icons/mdi/format-header-4";
 import MdiFormatHeader5 from "~icons/mdi/format-header-5";
 import MdiFormatHeader6 from "~icons/mdi/format-header-6";
 import {
-  computed,
   inject,
   markRaw,
   nextTick,
   ref,
   watch,
+  onMounted,
+  shallowRef,
   type ComputedRef,
 } from "vue";
 import { formatDatetime } from "@/utils/date";
@@ -113,6 +77,8 @@ import { useFetchAttachmentPolicy } from "@/modules/contents/attachments/composa
 import { useI18n } from "vue-i18n";
 import { i18n } from "@/locales";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+import { usePluginModuleStore, type PluginModule } from "@/stores/plugin";
+import { useDebounceFn } from "@vueuse/core";
 
 const { t } = useI18n();
 
@@ -157,119 +123,190 @@ const selectedHeadingNode = ref<HeadingNode>();
 const extraActiveId = ref("toc");
 const attachmentSelectorModal = ref(false);
 
-const editor = useEditor({
-  content: props.raw,
-  extensions: [
-    ExtensionBlockquote,
-    ExtensionBold,
-    ExtensionBulletList,
-    ExtensionCode,
-    ExtensionDocument,
-    ExtensionDropcursor,
-    ExtensionGapcursor,
-    ExtensionHardBreak,
-    ExtensionHeading,
-    ExtensionHistory,
-    ExtensionHorizontalRule,
-    ExtensionItalic,
-    ExtensionListItem,
-    ExtensionOrderedList,
-    ExtensionParagraph,
-    ExtensionStrike,
-    ExtensionText,
-    ExtensionImage.configure({
-      inline: true,
-      allowBase64: false,
-      HTMLAttributes: {
-        loading: "lazy",
-      },
-    }),
-    ExtensionTaskList,
-    ExtensionTaskItem,
-    ExtensionLink.configure({
-      autolink: true,
-      openOnClick: false,
-    }),
-    ExtensionTextAlign.configure({
-      types: ["heading", "paragraph"],
-    }),
-    ExtensionUnderline,
-    ExtensionTable.configure({
-      resizable: true,
-    }),
-    ExtensionSubscript,
-    ExtensionSuperscript,
-    ExtensionPlaceholder.configure({
-      placeholder: t(
-        "core.components.default_editor.extensions.placeholder.options.placeholder"
-      ),
-    }),
-    ExtensionHighlight,
-    ExtensionCommands.configure({
-      suggestion: {
-        ...CommandsSuggestion,
-        items: ({ query }: { query: string }) => {
-          return [
-            CommentParagraph,
-            CommandHeader1,
-            CommandHeader2,
-            CommandHeader3,
-            CommandHeader4,
-            CommandHeader5,
-            CommandHeader6,
-            CommandCodeBlock,
-            CommandTable,
-            CommandBulletList,
-            CommandOrderedList,
-            CommandTaskList,
-            CommandIframe,
-            CommandVideo,
-            CommandAudio,
-          ].filter((item) =>
-            [...item.keywords, item.title].some((keyword) =>
-              keyword.includes(query)
-            )
-          );
+const editor = shallowRef<Editor>();
+
+const { pluginModules } = usePluginModuleStore();
+
+onMounted(() => {
+  const extensionsFromPlugins: AnyExtension[] = [];
+  pluginModules.forEach((pluginModule: PluginModule) => {
+    const { extensionPoints } = pluginModule;
+    if (!extensionPoints?.["default:editor:extension:create"]) {
+      return;
+    }
+
+    const extensions = extensionPoints[
+      "default:editor:extension:create"
+    ]() as [];
+
+    extensionsFromPlugins.push(...extensions);
+  });
+
+  // debounce OnUpdate
+  const debounceOnUpdate = useDebounceFn(() => {
+    const html = editor.value?.getHTML() + "";
+    emit("update:raw", html);
+    emit("update:content", html);
+    emit("update", html);
+  }, 250);
+
+  editor.value = new Editor({
+    content: props.raw,
+    extensions: [
+      ExtensionBlockquote,
+      ExtensionBold,
+      ExtensionBulletList,
+      ExtensionCode,
+      ExtensionDocument,
+      ExtensionDropcursor,
+      ExtensionGapcursor,
+      ExtensionHardBreak,
+      ExtensionHeading,
+      ExtensionHistory,
+      ExtensionHorizontalRule,
+      ExtensionItalic,
+      ExtensionOrderedList,
+      ExtensionStrike,
+      ExtensionText,
+      ExtensionImage.configure({
+        inline: true,
+        allowBase64: false,
+        HTMLAttributes: {
+          loading: "lazy",
         },
-      },
-    }),
-    ExtensionCodeBlock.configure({
-      lowlight,
-    }),
-    ExtensionIframe,
-    ExtensionVideo,
-    ExtensionAudio,
-    ExtensionCharacterCount,
-    Extension.create({
-      addGlobalAttributes() {
-        return [
-          {
-            types: ["heading"],
-            attributes: {
-              id: {
-                default: null,
+      }),
+      ExtensionTaskList,
+      ExtensionLink.configure({
+        autolink: true,
+        openOnClick: false,
+      }),
+      ExtensionTextAlign.configure({
+        types: ["heading", "paragraph"],
+      }),
+      ExtensionUnderline,
+      ExtensionTable.configure({
+        resizable: true,
+      }),
+      ExtensionSubscript,
+      ExtensionSuperscript,
+      ExtensionPlaceholder.configure({
+        placeholder: t(
+          "core.components.default_editor.extensions.placeholder.options.placeholder"
+        ),
+      }),
+      ExtensionHighlight,
+      ExtensionCommands,
+      ExtensionCodeBlock.configure({
+        lowlight,
+      }),
+      ExtensionIframe,
+      ExtensionVideo,
+      ExtensionAudio,
+      ExtensionCharacterCount,
+      ExtensionFontSize,
+      ExtensionColor,
+      ...extensionsFromPlugins,
+      Extension.create({
+        addGlobalAttributes() {
+          return [
+            {
+              types: ["heading"],
+              attributes: {
+                id: {
+                  default: null,
+                },
               },
             },
-          },
-        ];
+          ];
+        },
+      }),
+      Extension.create({
+        addOptions() {
+          return {
+            getToolboxItems({ editor }: { editor: Editor }) {
+              return [
+                {
+                  priority: 0,
+                  component: markRaw(ToolboxItem),
+                  props: {
+                    editor,
+                    icon: markRaw(IconFolder),
+                    title: i18n.global.t(
+                      "core.components.default_editor.toolbox.attachment"
+                    ),
+                    action: () => (attachmentSelectorModal.value = true),
+                  },
+                },
+              ];
+            },
+          };
+        },
+      }),
+    ],
+    autofocus: "start",
+    onUpdate: () => {
+      debounceOnUpdate();
+      nextTick(() => {
+        handleGenerateTableOfContent();
+      });
+    },
+    editorProps: {
+      handleDrop: (view, event: DragEvent, _, moved) => {
+        if (!moved && event.dataTransfer && event.dataTransfer.files) {
+          const images = Array.from(event.dataTransfer.files).filter((file) =>
+            file.type.startsWith("image/")
+          ) as File[];
+
+          if (images.length === 0) {
+            return;
+          }
+
+          event.preventDefault();
+
+          images.forEach((file, index) => {
+            uploadQueue.push({
+              file,
+              process: (url: string) => {
+                const { schema } = view.state;
+                const coordinates = view.posAtCoords({
+                  left: event.clientX,
+                  top: event.clientY,
+                });
+
+                if (!coordinates) return;
+
+                const node = schema.nodes.image.create({
+                  src: url,
+                });
+
+                const transaction = view.state.tr.insert(
+                  coordinates.pos + index,
+                  node
+                );
+
+                editor.value?.view.dispatch(transaction);
+              },
+            });
+          });
+
+          return true;
+        }
+        return false;
       },
-    }),
-  ],
-  autofocus: "start",
-  onUpdate: () => {
-    emit("update:raw", editor.value?.getHTML() + "");
-    emit("update:content", editor.value?.getHTML() + "");
-    emit("update", editor.value?.getHTML() + "");
-    nextTick(() => {
-      handleGenerateTableOfContent();
-    });
-  },
-  editorProps: {
-    handleDrop: (view, event: DragEvent, _, moved) => {
-      if (!moved && event.dataTransfer && event.dataTransfer.files) {
-        const images = Array.from(event.dataTransfer.files).filter((file) =>
-          file.type.startsWith("image/")
-        ) as File[];
+      handlePaste: (view, event: ClipboardEvent) => {
+        const types = Array.from(event.clipboardData?.types || []);
+
+        if (["text/plain", "text/html"].includes(types[0])) {
+          return;
+        }
+
+        const images = Array.from(event.clipboardData?.items || [])
+          .map((item) => {
+            return item.getAsFile();
+          })
+          .filter((file) => {
+            return file && file.type.startsWith("image/");
+          }) as File[];
 
         if (images.length === 0) {
           return;
@@ -277,78 +314,28 @@ const editor = useEditor({
 
         event.preventDefault();
 
-        images.forEach((file, index) => {
+        images.forEach((file) => {
           uploadQueue.push({
             file,
             process: (url: string) => {
-              const { schema } = view.state;
-              const coordinates = view.posAtCoords({
-                left: event.clientX,
-                top: event.clientY,
-              });
-
-              if (!coordinates) return;
-
-              const node = schema.nodes.image.create({
-                src: url,
-              });
-
-              const transaction = view.state.tr.insert(
-                coordinates.pos + index,
-                node
-              );
-
-              editor.value?.view.dispatch(transaction);
+              editor.value
+                ?.chain()
+                .focus()
+                .insertContent([
+                  {
+                    type: "image",
+                    attrs: {
+                      src: url,
+                    },
+                  },
+                ])
+                .run();
             },
           });
         });
-
-        return true;
-      }
-      return false;
+      },
     },
-    handlePaste: (view, event: ClipboardEvent) => {
-      const types = Array.from(event.clipboardData?.types || []);
-
-      if (["text/plain", "text/html"].includes(types[0])) {
-        return;
-      }
-
-      const images = Array.from(event.clipboardData?.items || [])
-        .map((item) => {
-          return item.getAsFile();
-        })
-        .filter((file) => {
-          return file && file.type.startsWith("image/");
-        }) as File[];
-
-      if (images.length === 0) {
-        return;
-      }
-
-      event.preventDefault();
-
-      images.forEach((file) => {
-        uploadQueue.push({
-          file,
-          process: (url: string) => {
-            editor.value
-              ?.chain()
-              .focus()
-              .insertContent([
-                {
-                  type: "image",
-                  attrs: {
-                    src: url,
-                  },
-                },
-              ])
-              .run();
-          },
-        });
-      });
-    },
-  },
+  });
 });
 
 // image drag and paste upload
@@ -417,65 +404,6 @@ const handleFetchPermalink = async (
   });
 };
 
-const toolbarMenuItems = computed(() => {
-  if (!editor.value) return [];
-  return [
-    UndoMenuItem(editor.value),
-    RedoMenuItem(editor.value),
-    Separator(),
-    HeadingMenuItem(editor.value),
-    BoldMenuItem(editor.value),
-    ItalicMenuItem(editor.value),
-    UnderlineMenuItem(editor.value),
-    StrikeMenuItem(editor.value),
-    HighlightMenuItem(editor.value),
-    Separator(),
-    QuoteMenuItem(editor.value),
-    CodeMenuItem(editor.value),
-    SuperScriptMenuItem(editor.value),
-    SubScriptMenuItem(editor.value),
-    Separator(),
-    BulletListMenuItem(editor.value),
-    OrderedListMenuItem(editor.value),
-    TaskListMenuItem(editor.value),
-    Separator(),
-    CodeBlockMenuItem(editor.value),
-    TableMenuItem(editor.value),
-    Separator(),
-    AlignLeftMenuItem(editor.value),
-    AlignCenterMenuItem(editor.value),
-    AlignRightMenuItem(editor.value),
-    AlignJustifyMenuItem(editor.value),
-    {
-      type: "button",
-      icon: markRaw(MdiFileImageBox),
-      title: t("core.components.default_editor.toolbar.attachment"),
-      action: () => (attachmentSelectorModal.value = true),
-      isActive: () => false,
-    },
-  ];
-});
-
-const bubbleMenuItems = computed(() => {
-  if (!editor.value) return [];
-  return [
-    BoldMenuItem(editor.value),
-    ItalicMenuItem(editor.value),
-    UnderlineMenuItem(editor.value),
-    StrikeMenuItem(editor.value),
-    HighlightMenuItem(editor.value),
-    QuoteMenuItem(editor.value),
-    CodeMenuItem(editor.value),
-    CodeBlockMenuItem(editor.value),
-    SuperScriptMenuItem(editor.value),
-    SubScriptMenuItem(editor.value),
-    AlignLeftMenuItem(editor.value),
-    AlignCenterMenuItem(editor.value),
-    AlignRightMenuItem(editor.value),
-    AlignJustifyMenuItem(editor.value),
-  ];
-});
-
 const handleGenerateTableOfContent = () => {
   if (!editor.value) {
     return;
@@ -536,6 +464,13 @@ watch(
     immediate: true,
   }
 );
+
+// fixme: temporary solution
+const currentLocale = i18n.global.locale.value as
+  | "zh-CN"
+  | "en"
+  | "zh"
+  | "en-US";
 </script>
 
 <template>
@@ -546,9 +481,7 @@ watch(
   <RichTextEditor
     v-if="editor"
     :editor="editor"
-    :toolbar-menu-items="toolbarMenuItems"
-    :locale="i18n.global.locale.value"
-    :bubble-menu-items="bubbleMenuItems"
+    :locale="currentLocale"
     :content-styles="{
       width: 'calc(100% - 18rem)',
     }"

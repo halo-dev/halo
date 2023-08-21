@@ -1,21 +1,17 @@
 package run.halo.app.theme.dialect;
 
-import java.util.List;
-import org.springframework.context.ApplicationContext;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IProcessableElementTag;
 import org.thymeleaf.processor.element.AbstractElementTagProcessor;
 import org.thymeleaf.processor.element.IElementTagStructureHandler;
-import org.thymeleaf.spring6.context.SpringContextUtils;
 import org.thymeleaf.templatemode.TemplateMode;
-import run.halo.app.plugin.ExtensionComponentsFinder;
-
 
 /**
  * <p>Comment element tag processor.</p>
  * <p>Replace the comment tag <code>&#x3C;halo:comment /&#x3E;</code> with the given content.</p>
  *
  * @author guqing
+ * @see CommentEnabledVariableProcessor
  * @since 2.0.0
  */
 public class CommentElementTagProcessor extends AbstractElementTagProcessor {
@@ -43,16 +39,12 @@ public class CommentElementTagProcessor extends AbstractElementTagProcessor {
     @Override
     protected void doProcess(ITemplateContext context, IProcessableElementTag tag,
         IElementTagStructureHandler structureHandler) {
-        final ApplicationContext appCtx = SpringContextUtils.getApplicationContext(context);
-        ExtensionComponentsFinder componentsFinder =
-            appCtx.getBean(ExtensionComponentsFinder.class);
-        List<CommentWidget> commentWidgets = componentsFinder.getExtensions(CommentWidget.class);
-        if (commentWidgets.isEmpty()) {
+        var commentWidget = (CommentWidget) context.getVariable(
+            CommentEnabledVariableProcessor.COMMENT_WIDGET_OBJECT_VARIABLE);
+        if (commentWidget == null) {
             structureHandler.replaceWith("", false);
             return;
         }
-        // TODO if find more than one comment widget, query CommentWidget setting to decide which
-        //  one to use.
-        commentWidgets.get(0).render(context, tag, structureHandler);
+        commentWidget.render(context, tag, structureHandler);
     }
 }

@@ -1,4 +1,4 @@
-import type { GlobalInfo } from "@/modules/system/actuator/types";
+import type { GlobalInfo } from "@/types";
 import { useQuery } from "@tanstack/vue-query";
 import axios from "axios";
 

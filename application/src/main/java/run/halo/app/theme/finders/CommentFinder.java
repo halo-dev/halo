@@ -18,7 +18,7 @@ public interface CommentFinder {
 
     Mono<CommentVo> getByName(String name);
 
-    Mono<ListResult<CommentVo>> list(Ref ref, @Nullable Integer page,
+    Mono<ListResult<CommentVo>> list(@Nullable Ref ref, @Nullable Integer page,
         @Nullable Integer size);
 
     Mono<ListResult<ReplyVo>> listReply(String commentName, @Nullable Integer page,

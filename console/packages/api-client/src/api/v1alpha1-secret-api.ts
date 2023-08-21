@@ -212,18 +212,20 @@ export const V1alpha1SecretApiAxiosParamCreator = function (
     },
     /**
      * List v1alpha1/Secret
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listv1alpha1Secret: async (
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/api/v1alpha1/secrets`;
@@ -250,20 +252,24 @@ export const V1alpha1SecretApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (size !== undefined) {
-        localVarQueryParameter["size"] = size;
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
       if (labelSelector) {
         localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
-      }
-
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
+      }
+
+      if (size !== undefined) {
+        localVarQueryParameter["size"] = size;
+      }
+
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -418,28 +424,31 @@ export const V1alpha1SecretApiFp = function (configuration?: Configuration) {
     },
     /**
      * List v1alpha1/Secret
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listv1alpha1Secret(
-      size?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
+      size?: number,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<SecretList>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listv1alpha1Secret(
-          size,
-          labelSelector,
           fieldSelector,
+          labelSelector,
           page,
+          size,
+          sort,
           options
         );
       return createRequestFunction(
@@ -544,10 +553,11 @@ export const V1alpha1SecretApiFactory = function (
     ): AxiosPromise<SecretList> {
       return localVarFp
         .listv1alpha1Secret(
-          requestParameters.size,
-          requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
+          requestParameters.size,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -622,11 +632,11 @@ export interface V1alpha1SecretApiGetv1alpha1SecretRequest {
  */
 export interface V1alpha1SecretApiListv1alpha1SecretRequest {
   /**
-   * Size of one page. Zero indicates no limit.
-   * @type {number}
+   * Field selector for filtering.
+   * @type {Array<string>}
    * @memberof V1alpha1SecretApiListv1alpha1Secret
    */
-  readonly size?: number;
+  readonly fieldSelector?: Array<string>;
 
   /**
    * Label selector for filtering.
@@ -636,18 +646,25 @@ export interface V1alpha1SecretApiListv1alpha1SecretRequest {
   readonly labelSelector?: Array<string>;
 
   /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof V1alpha1SecretApiListv1alpha1Secret
-   */
-  readonly fieldSelector?: Array<string>;
-
-  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof V1alpha1SecretApiListv1alpha1Secret
    */
   readonly page?: number;
+
+  /**
+   * Size of one page. Zero indicates no limit.
+   * @type {number}
+   * @memberof V1alpha1SecretApiListv1alpha1Secret
+   */
+  readonly size?: number;
+
+  /**
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
+   * @type {Array<string>}
+   * @memberof V1alpha1SecretApiListv1alpha1Secret
+   */
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -739,10 +756,11 @@ export class V1alpha1SecretApi extends BaseAPI {
   ) {
     return V1alpha1SecretApiFp(this.configuration)
       .listv1alpha1Secret(
-        requestParameters.size,
-        requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
+        requestParameters.size,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));

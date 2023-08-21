@@ -38,7 +38,7 @@ import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.SinglePageFinder;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.finders.vo.UserVo;
-import run.halo.app.theme.router.factories.ModelConst;
+import run.halo.app.theme.router.ModelConst;
 
 /**
  * Tests for {@link HaloProcessorDialect}.
@@ -104,6 +104,11 @@ class HaloProcessorDialectTest {
 
         lenient().when(extensionComponentsFinder.getExtensions(eq(TemplateHeadProcessor.class)))
             .thenReturn(new ArrayList<>(map.values()));
+
+        lenient().when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
+            .thenReturn(fetcher);
+        lenient().when(fetcher.fetchComment())
+            .thenReturn(Mono.just(new SystemSetting.Comment()));
     }
 
     @Test
@@ -167,11 +172,11 @@ class HaloProcessorDialectTest {
               <head>
                 <meta charset="UTF-8" />
                 <title>Post</title>
-              <meta content="post-meta-V1" name="post-meta-V1" />
+              <meta name="global-head-test" content="test" />
+            <meta name="content-head-test" content="test" />
+            <meta content="post-meta-V1" name="post-meta-V1" />
             <meta content="post-meta-V2" name="post-meta-V2" />
             <meta name="description" content="" />
-            <meta name="global-head-test" content="test" />
-            <meta name="content-head-test" content="test" />
             </head>
               <body>
                 <p>post</p>
@@ -203,9 +208,9 @@ class HaloProcessorDialectTest {
               <head>
                 <meta charset="UTF-8" />
                 <title>Seo Test</title>
-              <meta name="global-head-test" content="test" />
+              <meta name="robots" content="noindex" />
+            <meta name="global-head-test" content="test" />
             <link rel="icon" href="favicon.ico" />
-            <meta name="robots" content="noindex" />
             </head>
               <body>
                 seo setting test.
@@ -234,10 +239,10 @@ class HaloProcessorDialectTest {
               <head>
                 <meta charset="UTF-8" />
                 <title>Seo Test</title>
-              <meta name="global-head-test" content="test" />
-            <link rel="icon" href="favicon.ico" />
-            <meta name="keywords" content="K1, K2, K3" />
+              <meta name="keywords" content="K1, K2, K3" />
             <meta name="description" content="This is a description." />
+            <meta name="global-head-test" content="test" />
+            <link rel="icon" href="favicon.ico" />
             </head>
               <body>
                 seo setting test.

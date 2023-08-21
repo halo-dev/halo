@@ -9,6 +9,7 @@ import {
   IconSave,
   Toast,
   Dialog,
+  IconEye,
 } from "@halo-dev/components";
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import type { SinglePage, SinglePageRequest } from "@halo-dev/api-client";
@@ -34,22 +35,32 @@ import {
 import { useLocalStorage } from "@vueuse/core";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
 import { useI18n } from "vue-i18n";
+import UrlPreviewModal from "@/components/preview/UrlPreviewModal.vue";
+import { contentAnnotations } from "@/constants/annotations";
+import { usePageUpdateMutate } from "./composables/use-page-update-mutate";
 
 const router = useRouter();
 const { t } = useI18n();
+const { mutateAsync: singlePageUpdateMutate } = usePageUpdateMutate();
 
 // Editor providers
 const { editorProviders } = useEditorExtensionPoints();
 const currentEditorProvider = ref<EditorProvider>();
 const storedEditorProviderName = useLocalStorage("editor-provider-name", "");
 
-const handleChangeEditorProvider = (provider: EditorProvider) => {
+const handleChangeEditorProvider = async (provider: EditorProvider) => {
   currentEditorProvider.value = provider;
   storedEditorProviderName.value = provider.name;
   formState.value.page.metadata.annotations = {
-    "content.halo.run/preferred-editor": provider.name,
+    ...formState.value.page.metadata.annotations,
+    [contentAnnotations.PREFERRED_EDITOR]: provider.name,
   };
   formState.value.content.rawType = provider.rawType;
+
+  if (isUpdateMode.value) {
+    const { data } = await singlePageUpdateMutate(formState.value.page);
+    formState.value.page = data;
+  }
 };
 
 // SinglePage form
@@ -112,9 +123,11 @@ provide<ComputedRef<string | undefined>>(
 
 const routeQueryName = useRouteQuery<string>("name");
 
-const handleSave = async () => {
+const handleSave = async (options?: { mute?: boolean }) => {
   try {
-    saving.value = true;
+    if (!options?.mute) {
+      saving.value = true;
+    }
 
     //Set default title and slug
     if (!formState.value.page.spec.title) {
@@ -137,9 +150,14 @@ const handleSave = async () => {
       });
       formState.value.page = data;
       routeQueryName.value = data.metadata.name;
+
+      // Clear new page content cache
+      handleClearCache();
     }
 
-    Toast.success(t("core.common.toast.save_success"));
+    if (!options?.mute) {
+      Toast.success(t("core.common.toast.save_success"));
+    }
 
     handleClearCache(routeQueryName.value as string);
     await handleFetchContent();
@@ -173,13 +191,17 @@ const handlePublish = async () => {
       if (returnToView.value && permalink) {
         window.location.href = permalink;
       } else {
-        router.push({ name: "SinglePages" });
+        router.back();
       }
     } else {
       formState.value.page.spec.publish = true;
       await apiClient.singlePage.draftSinglePage({
         singlePageRequest: formState.value,
       });
+
+      // Clear new page content cache
+      handleClearCache();
+
       router.push({ name: "SinglePages" });
     }
 
@@ -217,7 +239,7 @@ const handleFetchContent = async () => {
       (provider) =>
         provider.name ===
         formState.value.page.metadata.annotations?.[
-          "content.halo.run/preferred-editor"
+          contentAnnotations.PREFERRED_EDITOR
         ]
     );
     const provider =
@@ -229,16 +251,10 @@ const handleFetchContent = async () => {
       currentEditorProvider.value = provider;
       formState.value.page.metadata.annotations = {
         ...formState.value.page.metadata.annotations,
-        "content.halo.run/preferred-editor": provider.name,
+        [contentAnnotations.PREFERRED_EDITOR]: provider.name,
       };
 
-      const { data } =
-        await apiClient.extension.singlePage.updatecontentHaloRunV1alpha1SinglePage(
-          {
-            name: formState.value.page.metadata.name,
-            singlePage: formState.value.page,
-          }
-        );
+      const { data } = await singlePageUpdateMutate(formState.value.page);
 
       formState.value.page = data;
     } else {
@@ -248,7 +264,7 @@ const handleFetchContent = async () => {
           raw_type: data.rawType,
         }),
         confirmText: t("core.common.buttons.confirm"),
-        cancelText: t("core.common.buttons.cancel"),
+        showCancel: false,
         onConfirm: () => {
           router.back();
         },
@@ -309,7 +325,7 @@ onMounted(async () => {
       formState.value.content.rawType = provider.rawType;
     }
     formState.value.page.metadata.annotations = {
-      "content.halo.run/preferred-editor": provider.name,
+      [contentAnnotations.PREFERRED_EDITOR]: provider.name,
     };
   }
 
@@ -323,6 +339,17 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     routeQueryName,
     toRef(formState.value.content, "raw")
   );
+
+// SinglePage preview
+const previewModal = ref(false);
+const previewPending = ref(false);
+
+const handlePreview = async () => {
+  previewPending.value = true;
+  await handleSave({ mute: true });
+  previewModal.value = true;
+  previewPending.value = false;
+};
 </script>
 
 <template>
@@ -334,6 +361,14 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     @saved="onSettingSaved"
     @published="onSettingPublished"
   />
+
+  <UrlPreviewModal
+    v-if="isUpdateMode"
+    v-model:visible="previewModal"
+    :title="formState.page.spec.title"
+    :url="`/preview/singlepages/${formState.page.metadata.name}`"
+  />
+
   <VPageHeader :title="$t('core.page.title')">
     <template #icon>
       <IconPages class="mr-2 self-center" />
@@ -341,10 +376,22 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     <template #actions>
       <VSpace>
         <EditorProviderSelector
-          v-if="editorProviders.length > 1 && !isUpdateMode"
+          v-if="editorProviders.length > 1"
           :provider="currentEditorProvider"
+          :allow-forced-select="!isUpdateMode"
           @select="handleChangeEditorProvider"
         />
+        <VButton
+          size="sm"
+          type="default"
+          :loading="previewPending"
+          @click="handlePreview"
+        >
+          <template #icon>
+            <IconEye class="h-full w-full" />
+          </template>
+          {{ $t("core.common.buttons.preview") }}
+        </VButton>
         <VButton :loading="saving" size="sm" type="default" @click="handleSave">
           <template #icon>
             <IconSave class="h-full w-full" />

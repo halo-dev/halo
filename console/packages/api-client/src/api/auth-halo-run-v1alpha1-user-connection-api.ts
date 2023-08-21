@@ -218,18 +218,20 @@ export const AuthHaloRunV1alpha1UserConnectionApiAxiosParamCreator = function (
     },
     /**
      * List auth.halo.run/v1alpha1/UserConnection
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listauthHaloRunV1alpha1UserConnection: async (
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/auth.halo.run/v1alpha1/userconnections`;
@@ -256,6 +258,14 @@ export const AuthHaloRunV1alpha1UserConnectionApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
+      }
+
+      if (labelSelector) {
+        localVarQueryParameter["labelSelector"] = labelSelector;
+      }
+
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
       }
@@ -264,12 +274,8 @@ export const AuthHaloRunV1alpha1UserConnectionApiAxiosParamCreator = function (
         localVarQueryParameter["size"] = size;
       }
 
-      if (labelSelector) {
-        localVarQueryParameter["labelSelector"] = labelSelector;
-      }
-
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -440,18 +446,20 @@ export const AuthHaloRunV1alpha1UserConnectionApiFp = function (
     },
     /**
      * List auth.halo.run/v1alpha1/UserConnection
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listauthHaloRunV1alpha1UserConnection(
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -461,10 +469,11 @@ export const AuthHaloRunV1alpha1UserConnectionApiFp = function (
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listauthHaloRunV1alpha1UserConnection(
+          fieldSelector,
+          labelSelector,
           page,
           size,
-          labelSelector,
-          fieldSelector,
+          sort,
           options
         );
       return createRequestFunction(
@@ -575,10 +584,11 @@ export const AuthHaloRunV1alpha1UserConnectionApiFactory = function (
     ): AxiosPromise<UserConnectionList> {
       return localVarFp
         .listauthHaloRunV1alpha1UserConnection(
+          requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
           requestParameters.size,
-          requestParameters.labelSelector,
-          requestParameters.fieldSelector,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -653,6 +663,20 @@ export interface AuthHaloRunV1alpha1UserConnectionApiGetauthHaloRunV1alpha1UserC
  */
 export interface AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnectionRequest {
   /**
+   * Field selector for filtering.
+   * @type {Array<string>}
+   * @memberof AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnection
+   */
+  readonly fieldSelector?: Array<string>;
+
+  /**
+   * Label selector for filtering.
+   * @type {Array<string>}
+   * @memberof AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnection
+   */
+  readonly labelSelector?: Array<string>;
+
+  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnection
@@ -667,18 +691,11 @@ export interface AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1User
   readonly size?: number;
 
   /**
-   * Label selector for filtering.
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
    * @type {Array<string>}
    * @memberof AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnection
    */
-  readonly labelSelector?: Array<string>;
-
-  /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof AuthHaloRunV1alpha1UserConnectionApiListauthHaloRunV1alpha1UserConnection
-   */
-  readonly fieldSelector?: Array<string>;
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -773,10 +790,11 @@ export class AuthHaloRunV1alpha1UserConnectionApi extends BaseAPI {
   ) {
     return AuthHaloRunV1alpha1UserConnectionApiFp(this.configuration)
       .listauthHaloRunV1alpha1UserConnection(
+        requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
         requestParameters.size,
-        requestParameters.labelSelector,
-        requestParameters.fieldSelector,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));

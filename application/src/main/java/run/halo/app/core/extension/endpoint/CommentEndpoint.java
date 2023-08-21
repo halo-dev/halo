@@ -96,7 +96,7 @@ public class CommentEndpoint implements CustomEndpoint {
     }
 
     Mono<ServerResponse> listComments(ServerRequest request) {
-        CommentQuery commentQuery = new CommentQuery(request.queryParams());
+        CommentQuery commentQuery = new CommentQuery(request);
         return commentService.listComment(commentQuery)
             .flatMap(listedComments -> ServerResponse.ok().bodyValue(listedComments));
     }

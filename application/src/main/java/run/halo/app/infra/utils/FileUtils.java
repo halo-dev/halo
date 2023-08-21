@@ -1,6 +1,8 @@
 package run.halo.app.infra.utils;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.springframework.util.FileSystemUtils.deleteRecursively;
+import static run.halo.app.infra.utils.DataBufferUtils.toInputStream;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -12,7 +14,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.stream.Stream;
@@ -20,8 +24,14 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import lombok.extern.slf4j.Slf4j;
+import org.reactivestreams.Publisher;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.lang.NonNull;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.Assert;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 import run.halo.app.infra.exception.AccessDeniedException;
 
 /**
@@ -32,6 +42,26 @@ import run.halo.app.infra.exception.AccessDeniedException;
 public abstract class FileUtils {
 
     private FileUtils() {
+    }
+
+    public static Mono<Void> unzip(Publisher<DataBuffer> content, @NonNull Path targetPath) {
+        return unzip(content, targetPath, Schedulers.boundedElastic());
+    }
+
+    public static Mono<Void> unzip(Publisher<DataBuffer> content, @NonNull Path targetPath,
+        Scheduler scheduler) {
+        return Mono.usingWhen(
+            toInputStream(content, scheduler),
+            is -> {
+                try (var zis = new ZipInputStream(is)) {
+                    unzip(zis, targetPath);
+                    return Mono.empty();
+                } catch (IOException e) {
+                    return Mono.error(e);
+                }
+            },
+            is -> Mono.fromRunnable(() -> closeQuietly(is))
+        );
     }
 
     public static void unzip(@NonNull ZipInputStream zis, @NonNull Path targetPath)
@@ -164,7 +194,7 @@ public abstract class FileUtils {
      * the given {@code consumer}.
      *
      * @param closeable The resource to close, may be null.
-     * @param consumer Consumes the IOException thrown by {@link Closeable#close()}.
+     * @param consumer  Consumes the IOException thrown by {@link Closeable#close()}.
      */
     public static void closeQuietly(final Closeable closeable,
         final Consumer<IOException> consumer) {
@@ -182,7 +212,7 @@ public abstract class FileUtils {
     /**
      * Checks directory traversal vulnerability.
      *
-     * @param parentPath parent path must not be null.
+     * @param parentPath  parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
     public static void checkDirectoryTraversal(@NonNull Path parentPath,
@@ -201,7 +231,7 @@ public abstract class FileUtils {
     /**
      * Checks directory traversal vulnerability.
      *
-     * @param parentPath parent path must not be null.
+     * @param parentPath  parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
     public static void checkDirectoryTraversal(@NonNull String parentPath,
@@ -212,7 +242,7 @@ public abstract class FileUtils {
     /**
      * Checks directory traversal vulnerability.
      *
-     * @param parentPath parent path must not be null.
+     * @param parentPath  parent path must not be null.
      * @param pathToCheck path to check must not be null
      */
     public static void checkDirectoryTraversal(@NonNull Path parentPath,
@@ -231,12 +261,39 @@ public abstract class FileUtils {
             if (log.isDebugEnabled()) {
                 log.debug("Delete {} result: {}", root, deleted);
             }
-        } catch (IOException e) {
+        } catch (IOException ignored) {
             // Ignore this error
-            if (log.isTraceEnabled()) {
-                log.trace("Failed to delete {} recursively", root);
-            }
         }
+    }
+
+    public static Mono<Boolean> deleteRecursivelyAndSilently(Path root, Scheduler scheduler) {
+        return Mono.fromSupplier(() -> {
+            try {
+                return deleteRecursively(root);
+            } catch (IOException ignored) {
+                return false;
+            }
+        }).subscribeOn(scheduler);
+    }
+
+
+    public static Mono<Boolean> deleteFileSilently(Path file) {
+        return deleteFileSilently(file, Schedulers.boundedElastic());
+    }
+
+    public static Mono<Boolean> deleteFileSilently(Path file, Scheduler scheduler) {
+        return Mono.fromSupplier(
+                () -> {
+                    if (file == null || !Files.isRegularFile(file)) {
+                        return false;
+                    }
+                    try {
+                        return Files.deleteIfExists(file);
+                    } catch (IOException ignored) {
+                        return false;
+                    }
+                })
+            .subscribeOn(scheduler);
     }
 
     public static void copy(Path source, Path dest, CopyOption... options) {
@@ -245,5 +302,36 @@ public abstract class FileUtils {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static void copyRecursively(Path src, Path target, Set<String> excludes)
+        throws IOException {
+        var pathMatcher = new AntPathMatcher();
+        Predicate<Path> shouldExclude = path -> excludes.stream()
+            .anyMatch(pattern -> pathMatcher.match(pattern, path.toString()));
+        Files.walkFileTree(src, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                throws IOException {
+                if (!shouldExclude.test(src.relativize(file))) {
+                    Files.copy(file, target.resolve(src.relativize(file)), REPLACE_EXISTING);
+                }
+                return super.visitFile(file, attrs);
+            }
+
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
+                throws IOException {
+                if (shouldExclude.test(src.relativize(dir))) {
+                    return FileVisitResult.SKIP_SUBTREE;
+                }
+                Files.createDirectories(target.resolve(src.relativize(dir)));
+                return super.preVisitDirectory(dir, attrs);
+            }
+        });
+    }
+
+    public static Mono<Path> createTempDir(String prefix, Scheduler scheduler) {
+        return Mono.fromCallable(() -> Files.createTempDirectory(prefix)).subscribeOn(scheduler);
     }
 }

@@ -214,18 +214,20 @@ export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (
     },
     /**
      * List storage.halo.run/v1alpha1/Attachment
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     liststorageHaloRunV1alpha1Attachment: async (
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/storage.halo.run/v1alpha1/attachments`;
@@ -252,6 +254,14 @@ export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
+      }
+
+      if (labelSelector) {
+        localVarQueryParameter["labelSelector"] = labelSelector;
+      }
+
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
       }
@@ -260,12 +270,8 @@ export const StorageHaloRunV1alpha1AttachmentApiAxiosParamCreator = function (
         localVarQueryParameter["size"] = size;
       }
 
-      if (labelSelector) {
-        localVarQueryParameter["labelSelector"] = labelSelector;
-      }
-
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -432,28 +438,31 @@ export const StorageHaloRunV1alpha1AttachmentApiFp = function (
     },
     /**
      * List storage.halo.run/v1alpha1/Attachment
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async liststorageHaloRunV1alpha1Attachment(
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<AttachmentList>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.liststorageHaloRunV1alpha1Attachment(
+          fieldSelector,
+          labelSelector,
           page,
           size,
-          labelSelector,
-          fieldSelector,
+          sort,
           options
         );
       return createRequestFunction(
@@ -561,10 +570,11 @@ export const StorageHaloRunV1alpha1AttachmentApiFactory = function (
     ): AxiosPromise<AttachmentList> {
       return localVarFp
         .liststorageHaloRunV1alpha1Attachment(
+          requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
           requestParameters.size,
-          requestParameters.labelSelector,
-          requestParameters.fieldSelector,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -639,6 +649,20 @@ export interface StorageHaloRunV1alpha1AttachmentApiGetstorageHaloRunV1alpha1Att
  */
 export interface StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1AttachmentRequest {
   /**
+   * Field selector for filtering.
+   * @type {Array<string>}
+   * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
+   */
+  readonly fieldSelector?: Array<string>;
+
+  /**
+   * Label selector for filtering.
+   * @type {Array<string>}
+   * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
+   */
+  readonly labelSelector?: Array<string>;
+
+  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
@@ -653,18 +677,11 @@ export interface StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1At
   readonly size?: number;
 
   /**
-   * Label selector for filtering.
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
    * @type {Array<string>}
    * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
    */
-  readonly labelSelector?: Array<string>;
-
-  /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof StorageHaloRunV1alpha1AttachmentApiListstorageHaloRunV1alpha1Attachment
-   */
-  readonly fieldSelector?: Array<string>;
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -759,10 +776,11 @@ export class StorageHaloRunV1alpha1AttachmentApi extends BaseAPI {
   ) {
     return StorageHaloRunV1alpha1AttachmentApiFp(this.configuration)
       .liststorageHaloRunV1alpha1Attachment(
+        requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
         requestParameters.size,
-        requestParameters.labelSelector,
-        requestParameters.fieldSelector,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));

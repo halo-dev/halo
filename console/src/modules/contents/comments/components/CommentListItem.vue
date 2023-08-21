@@ -24,17 +24,22 @@ import type {
   SinglePage,
 } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
-import { computed, provide, ref, type Ref } from "vue";
+import { computed, provide, ref, onMounted, type Ref } from "vue";
 import ReplyListItem from "./ReplyListItem.vue";
 import { apiClient } from "@/utils/api-client";
-import type { RouteLocationRaw } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
-import { useQuery } from "@tanstack/vue-query";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import { usePluginModuleStore, type PluginModule } from "@/stores/plugin";
+import type {
+  CommentSubjectRefProvider,
+  CommentSubjectRefResult,
+} from "packages/shared/dist";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
+const queryClient = useQueryClient();
 
 const props = withDefaults(
   defineProps<{
@@ -46,10 +51,6 @@ const props = withDefaults(
     isSelected: false,
   }
 );
-
-const emit = defineEmits<{
-  (event: "reload"): void;
-}>();
 
 const selectedReply = ref<ListedReply>();
 const hoveredReply = ref<ListedReply>();
@@ -75,7 +76,7 @@ const handleDelete = async () => {
       } catch (error) {
         console.error("Failed to delete comment", error);
       } finally {
-        emit("reload");
+        queryClient.invalidateQueries({ queryKey: ["comments"] });
       }
     },
   });
@@ -132,7 +133,7 @@ const handleApprove = async () => {
   } catch (error) {
     console.error("Failed to approve comment", error);
   } finally {
-    emit("reload");
+    queryClient.invalidateQueries({ queryKey: ["comments"] });
   }
 };
 
@@ -158,7 +159,7 @@ const {
     const deletingReplies = data?.filter(
       (reply) => !!reply.reply.metadata.deletionTimestamp
     );
-    return deletingReplies?.length ? 3000 : false;
+    return deletingReplies?.length ? 1000 : false;
   },
   enabled: computed(() => showReplies.value),
 });
@@ -176,7 +177,7 @@ const handleToggleShowReplies = async () => {
       });
     }
   } else {
-    emit("reload");
+    queryClient.invalidateQueries({ queryKey: ["comments"] });
   }
 };
 
@@ -191,22 +192,20 @@ const onTriggerReply = (reply: ListedReply) => {
 
 const onReplyCreationModalClose = () => {
   selectedReply.value = undefined;
-  refetch();
+
+  queryClient.invalidateQueries({ queryKey: ["comments"] });
+
+  if (showReplies.value) {
+    refetch();
+  }
 };
 
 // Subject ref processing
-interface SubjectRefResult {
-  label: string;
-  title: string;
-  route?: RouteLocationRaw;
-  externalUrl?: string;
-}
-
-const SubjectRefProvider = ref<
-  Record<string, (subject: Extension) => SubjectRefResult>[]
->([
+const SubjectRefProviders = ref<CommentSubjectRefProvider[]>([
   {
-    Post: (subject: Extension): SubjectRefResult => {
+    kind: "Post",
+    group: "content.halo.run",
+    resolve: (subject: Extension): CommentSubjectRefResult => {
       const post = subject as Post;
       return {
         label: t("core.comment.subject_refs.post"),
@@ -222,7 +221,9 @@ const SubjectRefProvider = ref<
     },
   },
   {
-    SinglePage: (subject: Extension): SubjectRefResult => {
+    kind: "SinglePage",
+    group: "content.halo.run",
+    resolve: (subject: Extension): CommentSubjectRefResult => {
       const singlePage = subject as SinglePage;
       return {
         label: t("core.comment.subject_refs.page"),
@@ -239,6 +240,27 @@ const SubjectRefProvider = ref<
   },
 ]);
 
+onMounted(() => {
+  const { pluginModules } = usePluginModuleStore();
+
+  pluginModules.forEach((pluginModule: PluginModule) => {
+    const { extensionPoints } = pluginModule;
+    if (!extensionPoints?.["comment:subject-ref:create"]) {
+      return;
+    }
+
+    const providers = extensionPoints[
+      "comment:subject-ref:create"
+    ]() as CommentSubjectRefProvider[];
+
+    if (providers) {
+      providers.forEach((provider) => {
+        SubjectRefProviders.value.push(provider);
+      });
+    }
+  });
+});
+
 const subjectRefResult = computed(() => {
   const { subject } = props.comment;
   if (!subject) {
@@ -247,8 +269,10 @@ const subjectRefResult = computed(() => {
       title: t("core.comment.subject_refs.unknown"),
     };
   }
-  const subjectRef = SubjectRefProvider.value.find((provider) =>
-    Object.keys(provider).includes(subject.kind)
+  const subjectRef = SubjectRefProviders.value.find(
+    (provider) =>
+      provider.kind === subject.kind &&
+      subject.apiVersion.startsWith(provider.group)
   );
   if (!subjectRef) {
     return {
@@ -256,7 +280,7 @@ const subjectRefResult = computed(() => {
       title: t("core.comment.subject_refs.unknown"),
     };
   }
-  return subjectRef[subject.kind](subject);
+  return subjectRef.resolve(subject);
 });
 </script>
 
@@ -304,7 +328,7 @@ const subjectRefResult = computed(() => {
               <VTag>{{ subjectRefResult.label }}</VTag>
               <RouterLink
                 :to="subjectRefResult.route || $route"
-                class="truncate text-sm font-medium text-gray-900 hover:text-gray-600"
+                class="line-clamp-2 inline-block text-sm font-medium text-gray-900 hover:text-gray-600"
               >
                 {{ subjectRefResult.title }}
               </RouterLink>
@@ -332,7 +356,7 @@ const subjectRefResult = computed(() => {
                 }}
               </span>
               <VStatusDot
-                v-if="comment?.comment?.status?.unreadReplyCount || 0 > 0"
+                v-show="(comment?.comment?.status?.unreadReplyCount || 0) > 0"
                 v-tooltip="$t('core.comment.list.fields.has_new_replies')"
                 state="success"
                 animate
@@ -434,7 +458,6 @@ const subjectRefResult = computed(() => {
               :class="{ 'hover:bg-white': showReplies }"
               :reply="reply"
               :replies="replies"
-              @reload="refetch()"
               @reply="onTriggerReply"
             ></ReplyListItem>
           </div>

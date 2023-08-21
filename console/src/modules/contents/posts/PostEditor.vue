@@ -9,6 +9,7 @@ import {
   VSpace,
   Toast,
   Dialog,
+  IconEye,
 } from "@halo-dev/components";
 import PostSettingModal from "./components/PostSettingModal.vue";
 import type { Post, PostRequest } from "@halo-dev/api-client";
@@ -34,22 +35,34 @@ import {
 import { useLocalStorage } from "@vueuse/core";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
 import { useI18n } from "vue-i18n";
+import UrlPreviewModal from "@/components/preview/UrlPreviewModal.vue";
+import { usePostUpdateMutate } from "./composables/use-post-update-mutate";
+import { contentAnnotations } from "@/constants/annotations";
 
 const router = useRouter();
 const { t } = useI18n();
+const { mutateAsync: postUpdateMutate } = usePostUpdateMutate();
 
 // Editor providers
 const { editorProviders } = useEditorExtensionPoints();
 const currentEditorProvider = ref<EditorProvider>();
 const storedEditorProviderName = useLocalStorage("editor-provider-name", "");
 
-const handleChangeEditorProvider = (provider: EditorProvider) => {
+const handleChangeEditorProvider = async (provider: EditorProvider) => {
   currentEditorProvider.value = provider;
   storedEditorProviderName.value = provider.name;
+
   formState.value.post.metadata.annotations = {
-    "content.halo.run/preferred-editor": provider.name,
+    ...formState.value.post.metadata.annotations,
+    [contentAnnotations.PREFERRED_EDITOR]: provider.name,
   };
+
   formState.value.content.rawType = provider.rawType;
+
+  if (isUpdateMode.value) {
+    const { data } = await postUpdateMutate(formState.value.post);
+    formState.value.post = data;
+  }
 };
 
 // Post form
@@ -112,9 +125,11 @@ provide<ComputedRef<string | undefined>>(
   computed(() => formState.value.post.status?.permalink)
 );
 
-const handleSave = async () => {
+const handleSave = async (options?: { mute?: boolean }) => {
   try {
-    saving.value = true;
+    if (!options?.mute) {
+      saving.value = true;
+    }
 
     // Set default title and slug
     if (!formState.value.post.spec.title) {
@@ -138,9 +153,14 @@ const handleSave = async () => {
       });
       formState.value.post = data;
       name.value = data.metadata.name;
+
+      // Clear new post content cache
+      handleClearCache();
     }
 
-    Toast.success(t("core.common.toast.save_success"));
+    if (!options?.mute) {
+      Toast.success(t("core.common.toast.save_success"));
+    }
     handleClearCache(name.value as string);
     await handleFetchContent();
   } catch (e) {
@@ -173,7 +193,7 @@ const handlePublish = async () => {
       if (returnToView.value === "true" && permalink) {
         window.location.href = permalink;
       } else {
-        router.push({ name: "Posts" });
+        router.back();
       }
     } else {
       const { data } = await apiClient.post.draftPost({
@@ -183,6 +203,9 @@ const handlePublish = async () => {
       await apiClient.post.publishPost({
         name: data.metadata.name,
       });
+
+      // Clear new post content cache
+      handleClearCache();
 
       router.push({ name: "Posts" });
     }
@@ -224,7 +247,7 @@ const handleFetchContent = async () => {
       (provider) =>
         provider.name ===
         formState.value.post.metadata.annotations?.[
-          "content.halo.run/preferred-editor"
+          contentAnnotations.PREFERRED_EDITOR
         ]
     );
 
@@ -239,14 +262,10 @@ const handleFetchContent = async () => {
 
       formState.value.post.metadata.annotations = {
         ...formState.value.post.metadata.annotations,
-        "content.halo.run/preferred-editor": provider.name,
+        [contentAnnotations.PREFERRED_EDITOR]: provider.name,
       };
 
-      const { data } =
-        await apiClient.extension.post.updatecontentHaloRunV1alpha1Post({
-          name: formState.value.post.metadata.name,
-          post: formState.value.post,
-        });
+      const { data } = await postUpdateMutate(formState.value.post);
 
       formState.value.post = data;
     } else {
@@ -256,7 +275,7 @@ const handleFetchContent = async () => {
           raw_type: data.rawType,
         }),
         confirmText: t("core.common.buttons.confirm"),
-        cancelText: t("core.common.buttons.cancel"),
+        showCancel: false,
         onConfirm: () => {
           router.back();
         },
@@ -323,7 +342,7 @@ onMounted(async () => {
     }
 
     formState.value.post.metadata.annotations = {
-      "content.halo.run/preferred-editor": provider.name,
+      [contentAnnotations.PREFERRED_EDITOR]: provider.name,
     };
   }
   handleResetCache();
@@ -336,6 +355,17 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     name,
     toRef(formState.value.content, "raw")
   );
+
+// Post preview
+const previewModal = ref(false);
+const previewPending = ref(false);
+
+const handlePreview = async () => {
+  previewPending.value = true;
+  await handleSave({ mute: true });
+  previewModal.value = true;
+  previewPending.value = false;
+};
 </script>
 
 <template>
@@ -347,6 +377,14 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     @saved="onSettingSaved"
     @published="onSettingPublished"
   />
+
+  <UrlPreviewModal
+    v-if="isUpdateMode"
+    v-model:visible="previewModal"
+    :title="formState.post.spec.title"
+    :url="`/preview/posts/${formState.post.metadata.name}`"
+  />
+
   <VPageHeader :title="$t('core.post.title')">
     <template #icon>
       <IconBookRead class="mr-2 self-center" />
@@ -354,10 +392,22 @@ const { handleSetContentCache, handleResetCache, handleClearCache } =
     <template #actions>
       <VSpace>
         <EditorProviderSelector
-          v-if="editorProviders.length > 1 && !isUpdateMode"
+          v-if="editorProviders.length > 1"
           :provider="currentEditorProvider"
+          :allow-forced-select="!isUpdateMode"
           @select="handleChangeEditorProvider"
         />
+        <VButton
+          size="sm"
+          type="default"
+          :loading="previewPending"
+          @click="handlePreview"
+        >
+          <template #icon>
+            <IconEye class="h-full w-full" />
+          </template>
+          {{ $t("core.common.buttons.preview") }}
+        </VButton>
         <VButton :loading="saving" size="sm" type="default" @click="handleSave">
           <template #icon>
             <IconSave class="h-full w-full" />

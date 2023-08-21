@@ -9,6 +9,7 @@ description = 'API of halo project, connecting by other projects.'
 
 repositories {
     mavenCentral()
+    maven { url 'https://repo.spring.io/milestone' }
 }
 
 dependencies {
@@ -27,6 +28,10 @@ dependencies {
     api 'org.springframework.security:spring-security-oauth2-jose'
     api 'org.springframework.security:spring-security-oauth2-client'
     api 'org.springframework.security:spring-security-oauth2-resource-server'
+
+    // Cache
+    api "org.springframework.boot:spring-boot-starter-cache"
+    api "com.github.ben-manes.caffeine:caffeine"
 
     api "org.springdoc:springdoc-openapi-starter-webflux-ui"
     api 'org.openapi4j:openapi-schema-validator'
@@ -49,11 +54,14 @@ dependencies {
     api "com.github.java-json-tools:json-patch"
     api "org.thymeleaf.extras:thymeleaf-extras-springsecurity6"
 
+    api "io.github.resilience4j:resilience4j-spring-boot3"
+    api "io.github.resilience4j:resilience4j-reactor"
+
     runtimeOnly 'io.r2dbc:r2dbc-h2'
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'org.postgresql:r2dbc-postgresql'
     runtimeOnly 'org.mariadb:r2dbc-mariadb'
-    runtimeOnly 'com.github.jasync-sql:jasync-r2dbc-mysql'
+    runtimeOnly 'io.asyncer:r2dbc-mysql'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'

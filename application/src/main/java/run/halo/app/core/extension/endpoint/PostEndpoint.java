@@ -12,7 +12,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.MediaType;
 import org.springframework.retry.RetryException;
@@ -30,8 +29,6 @@ import run.halo.app.content.PostQuery;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
-import run.halo.app.event.post.PostRecycledEvent;
-import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -50,8 +47,6 @@ public class PostEndpoint implements CustomEndpoint {
 
     private final PostService postService;
     private final ReactiveExtensionClient client;
-
-    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -262,9 +257,6 @@ public class PostEndpoint implements CustomEndpoint {
                 .flatMap(client::update))
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 .filter(t -> t instanceof OptimisticLockingFailureException))
-            // TODO Fire unpublished event in reconciler in the future
-            .doOnNext(post -> eventPublisher.publishEvent(
-                new PostUnpublishedEvent(this, post.getMetadata().getName())))
             .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }
 
@@ -278,14 +270,11 @@ public class PostEndpoint implements CustomEndpoint {
                 .flatMap(client::update))
             .retryWhen(Retry.backoff(3, Duration.ofMillis(100))
                 .filter(t -> t instanceof OptimisticLockingFailureException))
-            // TODO Fire recycled event in reconciler in the future
-            .doOnNext(post -> eventPublisher.publishEvent(
-                new PostRecycledEvent(this, post.getMetadata().getName())))
             .flatMap(post -> ServerResponse.ok().bodyValue(post));
     }
 
     Mono<ServerResponse> listPost(ServerRequest request) {
-        PostQuery postQuery = new PostQuery(request.queryParams());
+        PostQuery postQuery = new PostQuery(request);
         return postService.listPost(postQuery)
             .flatMap(listedPosts -> ServerResponse.ok().bodyValue(listedPosts));
     }

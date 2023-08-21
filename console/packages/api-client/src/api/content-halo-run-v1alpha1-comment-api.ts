@@ -214,18 +214,20 @@ export const ContentHaloRunV1alpha1CommentApiAxiosParamCreator = function (
     },
     /**
      * List content.halo.run/v1alpha1/Comment
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listcontentHaloRunV1alpha1Comment: async (
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/content.halo.run/v1alpha1/comments`;
@@ -252,6 +254,14 @@ export const ContentHaloRunV1alpha1CommentApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
+      }
+
+      if (labelSelector) {
+        localVarQueryParameter["labelSelector"] = labelSelector;
+      }
+
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
       }
@@ -260,12 +270,8 @@ export const ContentHaloRunV1alpha1CommentApiAxiosParamCreator = function (
         localVarQueryParameter["size"] = size;
       }
 
-      if (labelSelector) {
-        localVarQueryParameter["labelSelector"] = labelSelector;
-      }
-
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -432,28 +438,31 @@ export const ContentHaloRunV1alpha1CommentApiFp = function (
     },
     /**
      * List content.halo.run/v1alpha1/Comment
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listcontentHaloRunV1alpha1Comment(
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<CommentList>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listcontentHaloRunV1alpha1Comment(
+          fieldSelector,
+          labelSelector,
           page,
           size,
-          labelSelector,
-          fieldSelector,
+          sort,
           options
         );
       return createRequestFunction(
@@ -558,10 +567,11 @@ export const ContentHaloRunV1alpha1CommentApiFactory = function (
     ): AxiosPromise<CommentList> {
       return localVarFp
         .listcontentHaloRunV1alpha1Comment(
+          requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
           requestParameters.size,
-          requestParameters.labelSelector,
-          requestParameters.fieldSelector,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -636,6 +646,20 @@ export interface ContentHaloRunV1alpha1CommentApiGetcontentHaloRunV1alpha1Commen
  */
 export interface ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1CommentRequest {
   /**
+   * Field selector for filtering.
+   * @type {Array<string>}
+   * @memberof ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1Comment
+   */
+  readonly fieldSelector?: Array<string>;
+
+  /**
+   * Label selector for filtering.
+   * @type {Array<string>}
+   * @memberof ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1Comment
+   */
+  readonly labelSelector?: Array<string>;
+
+  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1Comment
@@ -650,18 +674,11 @@ export interface ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1Comme
   readonly size?: number;
 
   /**
-   * Label selector for filtering.
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
    * @type {Array<string>}
    * @memberof ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1Comment
    */
-  readonly labelSelector?: Array<string>;
-
-  /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof ContentHaloRunV1alpha1CommentApiListcontentHaloRunV1alpha1Comment
-   */
-  readonly fieldSelector?: Array<string>;
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -753,10 +770,11 @@ export class ContentHaloRunV1alpha1CommentApi extends BaseAPI {
   ) {
     return ContentHaloRunV1alpha1CommentApiFp(this.configuration)
       .listcontentHaloRunV1alpha1Comment(
+        requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
         requestParameters.size,
-        requestParameters.labelSelector,
-        requestParameters.fieldSelector,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));

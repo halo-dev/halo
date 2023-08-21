@@ -3,7 +3,6 @@ package run.halo.app.theme.finders.impl;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static run.halo.app.theme.finders.PostPublicQueryService.FIXED_PREDICATE;
 
@@ -20,7 +19,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
-import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
@@ -31,7 +29,6 @@ import run.halo.app.theme.finders.CategoryFinder;
 import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.TagFinder;
-import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.PostArchiveVo;
 import run.halo.app.theme.finders.vo.PostArchiveYearMonthVo;
@@ -68,23 +65,6 @@ class PostFinderImplTest {
 
     @InjectMocks
     private PostFinderImpl postFinder;
-
-    @Test
-    void content() {
-        Post post = post(1);
-        post.getSpec().setReleaseSnapshot("release-snapshot");
-        ContentWrapper contentWrapper = ContentWrapper.builder()
-            .snapshotName("snapshot")
-            .raw("raw")
-            .content("content")
-            .rawType("rawType")
-            .build();
-        when(postService.getReleaseContent(eq(post.getMetadata().getName())))
-            .thenReturn(Mono.just(contentWrapper));
-        ContentVo content = postFinder.content("post-1").block();
-        assertThat(content.getContent()).isEqualTo(contentWrapper.getContent());
-        assertThat(content.getRaw()).isEqualTo(contentWrapper.getRaw());
-    }
 
     @Test
     void compare() {

@@ -221,18 +221,20 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiAxiosParamCreator =
       },
       /**
        * List plugin.halo.run/v1alpha1/ExtensionDefinition
+       * @param {Array<string>} [fieldSelector] Field selector for filtering.
+       * @param {Array<string>} [labelSelector] Label selector for filtering.
        * @param {number} [page] The page number. Zero indicates no page.
        * @param {number} [size] Size of one page. Zero indicates no limit.
-       * @param {Array<string>} [labelSelector] Label selector for filtering.
-       * @param {Array<string>} [fieldSelector] Field selector for filtering.
+       * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
        * @param {*} [options] Override http request option.
        * @throws {RequiredError}
        */
       listpluginHaloRunV1alpha1ExtensionDefinition: async (
+        fieldSelector?: Array<string>,
+        labelSelector?: Array<string>,
         page?: number,
         size?: number,
-        labelSelector?: Array<string>,
-        fieldSelector?: Array<string>,
+        sort?: Array<string>,
         options: AxiosRequestConfig = {}
       ): Promise<RequestArgs> => {
         const localVarPath = `/apis/plugin.halo.run/v1alpha1/extensiondefinitions`;
@@ -259,6 +261,14 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiAxiosParamCreator =
         // http bearer authentication required
         await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+        if (fieldSelector) {
+          localVarQueryParameter["fieldSelector"] = fieldSelector;
+        }
+
+        if (labelSelector) {
+          localVarQueryParameter["labelSelector"] = labelSelector;
+        }
+
         if (page !== undefined) {
           localVarQueryParameter["page"] = page;
         }
@@ -267,12 +277,8 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiAxiosParamCreator =
           localVarQueryParameter["size"] = size;
         }
 
-        if (labelSelector) {
-          localVarQueryParameter["labelSelector"] = labelSelector;
-        }
-
-        if (fieldSelector) {
-          localVarQueryParameter["fieldSelector"] = fieldSelector;
+        if (sort) {
+          localVarQueryParameter["sort"] = Array.from(sort);
         }
 
         setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -449,18 +455,20 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiFp = function (
     },
     /**
      * List plugin.halo.run/v1alpha1/ExtensionDefinition
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listpluginHaloRunV1alpha1ExtensionDefinition(
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -470,10 +478,11 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiFp = function (
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listpluginHaloRunV1alpha1ExtensionDefinition(
+          fieldSelector,
+          labelSelector,
           page,
           size,
-          labelSelector,
-          fieldSelector,
+          sort,
           options
         );
       return createRequestFunction(
@@ -591,10 +600,11 @@ export const PluginHaloRunV1alpha1ExtensionDefinitionApiFactory = function (
     ): AxiosPromise<ExtensionDefinitionList> {
       return localVarFp
         .listpluginHaloRunV1alpha1ExtensionDefinition(
+          requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
           requestParameters.size,
-          requestParameters.labelSelector,
-          requestParameters.fieldSelector,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -669,6 +679,20 @@ export interface PluginHaloRunV1alpha1ExtensionDefinitionApiGetpluginHaloRunV1al
  */
 export interface PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinitionRequest {
   /**
+   * Field selector for filtering.
+   * @type {Array<string>}
+   * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinition
+   */
+  readonly fieldSelector?: Array<string>;
+
+  /**
+   * Label selector for filtering.
+   * @type {Array<string>}
+   * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinition
+   */
+  readonly labelSelector?: Array<string>;
+
+  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinition
@@ -683,18 +707,11 @@ export interface PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1a
   readonly size?: number;
 
   /**
-   * Label selector for filtering.
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
    * @type {Array<string>}
    * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinition
    */
-  readonly labelSelector?: Array<string>;
-
-  /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof PluginHaloRunV1alpha1ExtensionDefinitionApiListpluginHaloRunV1alpha1ExtensionDefinition
-   */
-  readonly fieldSelector?: Array<string>;
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -795,10 +812,11 @@ export class PluginHaloRunV1alpha1ExtensionDefinitionApi extends BaseAPI {
   ) {
     return PluginHaloRunV1alpha1ExtensionDefinitionApiFp(this.configuration)
       .listpluginHaloRunV1alpha1ExtensionDefinition(
+        requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
         requestParameters.size,
-        requestParameters.labelSelector,
-        requestParameters.fieldSelector,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));

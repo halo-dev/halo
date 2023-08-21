@@ -10,23 +10,18 @@ import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.lang.Nullable;
-import org.springframework.util.CollectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.content.SinglePageService;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
-import run.halo.app.metrics.CounterService;
-import run.halo.app.metrics.MeterUtils;
-import run.halo.app.theme.finders.ContributorFinder;
 import run.halo.app.theme.finders.Finder;
+import run.halo.app.theme.finders.SinglePageConversionService;
 import run.halo.app.theme.finders.SinglePageFinder;
 import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.ListedSinglePageVo;
 import run.halo.app.theme.finders.vo.SinglePageVo;
-import run.halo.app.theme.finders.vo.StatsVo;
 
 /**
  * A default implementation of {@link SinglePage}.
@@ -44,42 +39,18 @@ public class SinglePageFinderImpl implements SinglePageFinder {
 
     private final ReactiveExtensionClient client;
 
-    private final SinglePageService singlePageService;
-
-    private final ContributorFinder contributorFinder;
-
-    private final CounterService counterService;
+    private final SinglePageConversionService singlePagePublicQueryService;
 
     @Override
     public Mono<SinglePageVo> getByName(String pageName) {
         return client.get(SinglePage.class, pageName)
             .filter(FIXED_PREDICATE)
-            .map(page -> {
-                SinglePageVo pageVo = SinglePageVo.from(page);
-                pageVo.setContributors(List.of());
-                pageVo.setContent(ContentVo.empty());
-                return pageVo;
-            })
-            .flatMap(singlePageVo -> fetchStats(singlePageVo)
-                .doOnNext(singlePageVo::setStats)
-                .thenReturn(singlePageVo)
-            )
-            .flatMap(this::populateContributors)
-            .flatMap(page -> content(pageName)
-                .doOnNext(page::setContent)
-                .thenReturn(page)
-            )
-            .flatMap(page -> contributorFinder.getContributor(page.getSpec().getOwner())
-                .doOnNext(page::setOwner)
-                .thenReturn(page)
-            );
+            .flatMap(singlePagePublicQueryService::convertToVo);
     }
 
     @Override
     public Mono<ContentVo> content(String pageName) {
-        return singlePageService.getReleaseContent(pageName)
-            .map(wrapper -> ContentVo.builder().content(wrapper.getContent())
-                .raw(wrapper.getRaw()).build());
+        return singlePagePublicQueryService.getContent(pageName);
     }
 
     @Override
@@ -98,42 +69,13 @@ public class SinglePageFinderImpl implements SinglePageFinder {
         return client.list(SinglePage.class, predicateToUse,
                 comparatorToUse, pageNullSafe(page), sizeNullSafe(size))
             .flatMap(list -> Flux.fromStream(list.get())
-                .map(singlePage -> {
-                    ListedSinglePageVo pageVo = ListedSinglePageVo.from(singlePage);
-                    pageVo.setContributors(List.of());
-                    return pageVo;
-                })
-                .flatMap(lp -> fetchStats(lp).doOnNext(lp::setStats).thenReturn(lp))
-                .concatMap(this::populateContributors)
+                .concatMap(singlePagePublicQueryService::convertToListedVo)
                 .collectList()
                 .map(pageVos -> new ListResult<>(list.getPage(), list.getSize(), list.getTotal(),
                     pageVos)
                 )
             )
             .defaultIfEmpty(new ListResult<>(0, 0, 0, List.of()));
-    }
-
-    <T extends ListedSinglePageVo> Mono<StatsVo> fetchStats(T pageVo) {
-        String name = pageVo.getMetadata().getName();
-        return counterService.getByName(MeterUtils.nameOf(SinglePage.class, name))
-            .map(counter -> StatsVo.builder()
-                .visit(counter.getVisit())
-                .upvote(counter.getUpvote())
-                .comment(counter.getApprovedComment())
-                .build()
-            )
-            .defaultIfEmpty(StatsVo.empty());
-    }
-
-    <T extends ListedSinglePageVo> Mono<T> populateContributors(T pageVo) {
-        List<String> names = pageVo.getStatus().getContributors();
-        if (CollectionUtils.isEmpty(names)) {
-            return Mono.just(pageVo);
-        }
-        return contributorFinder.getContributors(names)
-            .collectList()
-            .doOnNext(pageVo::setContributors)
-            .thenReturn(pageVo);
     }
 
     static Comparator<SinglePage> defaultComparator() {

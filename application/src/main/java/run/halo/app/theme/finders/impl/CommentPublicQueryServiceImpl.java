@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
@@ -44,6 +45,7 @@ import run.halo.app.theme.finders.vo.ReplyVo;
 @Component
 @RequiredArgsConstructor
 public class CommentPublicQueryServiceImpl implements CommentPublicQueryService {
+    private static final int DEFAULT_SIZE = 10;
 
     private final ReactiveExtensionClient client;
     private final UserService userService;
@@ -107,7 +109,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             );
     }
 
-    private Mono<CommentVo> toCommentVo(Comment comment) {
+    Mono<CommentVo> toCommentVo(Comment comment) {
         Comment.CommentOwner owner = comment.getSpec().getOwner();
         return Mono.just(CommentVo.from(comment))
             .flatMap(commentVo -> populateStats(Comment.class, commentVo)
@@ -116,11 +118,31 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             .flatMap(commentVo -> getOwnerInfo(owner)
                 .doOnNext(commentVo::setOwner)
                 .thenReturn(commentVo)
-            );
+            )
+            .flatMap(this::filterCommentSensitiveData);
     }
 
-    private <E extends AbstractExtension, T extends ExtensionVoOperator> Mono<CommentStatsVo>
-        populateStats(Class<E> clazz, T vo) {
+    private Mono<? extends CommentVo> filterCommentSensitiveData(CommentVo commentVo) {
+        var owner = commentVo.getOwner();
+        commentVo.setOwner(OwnerInfo
+            .builder()
+            .displayName(owner.getDisplayName())
+            .avatar(owner.getAvatar())
+            .kind(owner.getKind())
+            .build());
+
+        commentVo.getSpec().setIpAddress("");
+        var specOwner = commentVo.getSpec().getOwner();
+        specOwner.setName("");
+        if (specOwner.getAnnotations() != null) {
+            specOwner.getAnnotations().remove("Email");
+        }
+        return Mono.just(commentVo);
+    }
+
+    // @formatter:off
+    private <E extends AbstractExtension, T extends ExtensionVoOperator>
+        Mono<CommentStatsVo> populateStats(Class<E> clazz, T vo) {
         return counterService.getByName(MeterUtils.nameOf(clazz, vo.getMetadata()
                 .getName()))
             .map(counter -> CommentStatsVo.builder()
@@ -129,8 +151,9 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             )
             .defaultIfEmpty(CommentStatsVo.empty());
     }
+    // @formatter:on
 
-    private Mono<ReplyVo> toReplyVo(Reply reply) {
+    Mono<ReplyVo> toReplyVo(Reply reply) {
         return Mono.just(ReplyVo.from(reply))
             .flatMap(replyVo -> populateStats(Reply.class, replyVo)
                 .doOnNext(replyVo::setStats)
@@ -138,7 +161,26 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             .flatMap(replyVo -> getOwnerInfo(reply.getSpec().getOwner())
                 .doOnNext(replyVo::setOwner)
                 .thenReturn(replyVo)
-            );
+            )
+            .flatMap(this::filterReplySensitiveData);
+    }
+
+    private Mono<? extends ReplyVo> filterReplySensitiveData(ReplyVo replyVo) {
+        var owner = replyVo.getOwner();
+        replyVo.setOwner(OwnerInfo
+            .builder()
+            .displayName(owner.getDisplayName())
+            .avatar(owner.getAvatar())
+            .kind(owner.getKind())
+            .build());
+
+        replyVo.getSpec().setIpAddress("");
+        var specOwner = replyVo.getSpec().getOwner();
+        specOwner.setName("");
+        if (specOwner.getAnnotations() != null) {
+            specOwner.getAnnotations().remove("Email");
+        }
+        return Mono.just(replyVo);
     }
 
     private Mono<OwnerInfo> getOwnerInfo(Comment.CommentOwner owner) {
@@ -149,11 +191,13 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
             .map(OwnerInfo::from);
     }
 
-    private Mono<Predicate<Comment>> fixedCommentPredicate(Ref ref) {
-        Assert.notNull(ref, "Comment subject reference must not be null");
-        // Ref must be equal to the comment subject
-        Predicate<Comment> refPredicate = comment -> comment.getSpec().getSubjectRef().equals(ref)
-            && comment.getMetadata().getDeletionTimestamp() == null;
+    private Mono<Predicate<Comment>> fixedCommentPredicate(@Nullable Ref ref) {
+        Predicate<Comment> basePredicate =
+            comment -> comment.getMetadata().getDeletionTimestamp() == null;
+        if (ref != null) {
+            basePredicate = basePredicate
+                .and(comment -> comment.getSpec().getSubjectRef().equals(ref));
+        }
 
         // is approved and not hidden
         Predicate<Comment> approvedPredicate =
@@ -168,7 +212,7 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
                 return approvedPredicate.or(isOwner);
             })
             .defaultIfEmpty(approvedPredicate)
-            .map(refPredicate::and);
+            .map(basePredicate::and);
     }
 
     private Mono<Predicate<Reply>> fixedReplyPredicate(String commentName) {
@@ -239,6 +283,6 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
     }
 
     int sizeNullSafe(Integer size) {
-        return ObjectUtils.defaultIfNull(size, 10);
+        return ObjectUtils.defaultIfNull(size, DEFAULT_SIZE);
     }
 }

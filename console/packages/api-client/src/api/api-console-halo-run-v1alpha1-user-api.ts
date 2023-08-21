@@ -186,6 +186,60 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (
       };
     },
     /**
+     * delete user avatar
+     * @param {string} name User name
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    deleteUserAvatar: async (
+      name: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'name' is not null or undefined
+      assertParamExists("deleteUserAvatar", "name", name);
+      const localVarPath =
+        `/apis/api.console.halo.run/v1alpha1/users/{name}/avatar`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "DELETE",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
      * Get current user detail
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -406,24 +460,24 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (
     },
     /**
      * List users
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
-     * @param {string} [role]
-     * @param {string} [keyword]
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {number} [page] The page number. Zero indicates no page.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {string} [keyword]
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
+     * @param {string} [role]
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listUsers: async (
-      sort?: Array<string>,
-      role?: string,
-      keyword?: string,
-      size?: number,
-      page?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      keyword?: string,
+      labelSelector?: Array<string>,
+      page?: number,
+      role?: string,
+      size?: number,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/apis/api.console.halo.run/v1alpha1/users`;
@@ -450,32 +504,32 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (sort) {
-        localVarQueryParameter["sort"] = Array.from(sort);
-      }
-
-      if (role !== undefined) {
-        localVarQueryParameter["role"] = role;
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
       }
 
       if (keyword !== undefined) {
         localVarQueryParameter["keyword"] = keyword;
       }
 
-      if (size !== undefined) {
-        localVarQueryParameter["size"] = size;
+      if (labelSelector) {
+        localVarQueryParameter["labelSelector"] = labelSelector;
       }
 
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
       }
 
-      if (labelSelector) {
-        localVarQueryParameter["labelSelector"] = labelSelector;
+      if (role !== undefined) {
+        localVarQueryParameter["role"] = role;
       }
 
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
+      if (size !== undefined) {
+        localVarQueryParameter["size"] = size;
+      }
+
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -549,6 +603,74 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (
         options: localVarRequestOptions,
       };
     },
+    /**
+     * upload user avatar
+     * @param {string} name User name
+     * @param {File} file
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    uploadUserAvatar: async (
+      name: string,
+      file: File,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'name' is not null or undefined
+      assertParamExists("uploadUserAvatar", "name", name);
+      // verify required parameter 'file' is not null or undefined
+      assertParamExists("uploadUserAvatar", "file", file);
+      const localVarPath =
+        `/apis/api.console.halo.run/v1alpha1/users/{name}/avatar`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+      const localVarFormParams = new ((configuration &&
+        configuration.formDataCtor) ||
+        FormData)();
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      if (file !== undefined) {
+        localVarFormParams.append("file", file as any);
+      }
+
+      localVarHeaderParameter["Content-Type"] = "multipart/form-data";
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = localVarFormParams;
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
   };
 };
 
@@ -604,6 +726,27 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (
         createUserRequest,
         options
       );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
+     * delete user avatar
+     * @param {string} name User name
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async deleteUserAvatar(
+      name: string,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.deleteUserAvatar(name, options);
       return createRequestFunction(
         localVarAxiosArgs,
         globalAxios,
@@ -704,24 +847,24 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (
     },
     /**
      * List users
-     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
-     * @param {string} [role]
-     * @param {string} [keyword]
-     * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {number} [page] The page number. Zero indicates no page.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {string} [keyword]
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
+     * @param {number} [page] The page number. Zero indicates no page.
+     * @param {string} [role]
+     * @param {number} [size] Size of one page. Zero indicates no limit.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Supported fields: creationTimestamp
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listUsers(
-      sort?: Array<string>,
-      role?: string,
-      keyword?: string,
-      size?: number,
-      page?: number,
-      labelSelector?: Array<string>,
       fieldSelector?: Array<string>,
+      keyword?: string,
+      labelSelector?: Array<string>,
+      page?: number,
+      role?: string,
+      size?: number,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -730,13 +873,13 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (
       ) => AxiosPromise<UserEndpointListedUserList>
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.listUsers(
-        sort,
-        role,
-        keyword,
-        size,
-        page,
-        labelSelector,
         fieldSelector,
+        keyword,
+        labelSelector,
+        page,
+        role,
+        size,
+        sort,
         options
       );
       return createRequestFunction(
@@ -760,6 +903,29 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.updateCurrentUser(user, options);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
+     * upload user avatar
+     * @param {string} name User name
+     * @param {File} file
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async uploadUserAvatar(
+      name: string,
+      file: File,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.uploadUserAvatar(name, file, options);
       return createRequestFunction(
         localVarAxiosArgs,
         globalAxios,
@@ -811,6 +977,20 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
     ): AxiosPromise<User> {
       return localVarFp
         .createUser(requestParameters.createUserRequest, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     * delete user avatar
+     * @param {ApiConsoleHaloRunV1alpha1UserApiDeleteUserAvatarRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    deleteUserAvatar(
+      requestParameters: ApiConsoleHaloRunV1alpha1UserApiDeleteUserAvatarRequest,
+      options?: AxiosRequestConfig
+    ): AxiosPromise<User> {
+      return localVarFp
+        .deleteUserAvatar(requestParameters.name, options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -883,13 +1063,13 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
     ): AxiosPromise<UserEndpointListedUserList> {
       return localVarFp
         .listUsers(
-          requestParameters.sort,
-          requestParameters.role,
-          requestParameters.keyword,
-          requestParameters.size,
-          requestParameters.page,
-          requestParameters.labelSelector,
           requestParameters.fieldSelector,
+          requestParameters.keyword,
+          requestParameters.labelSelector,
+          requestParameters.page,
+          requestParameters.role,
+          requestParameters.size,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -906,6 +1086,24 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
     ): AxiosPromise<User> {
       return localVarFp
         .updateCurrentUser(requestParameters.user, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     * upload user avatar
+     * @param {ApiConsoleHaloRunV1alpha1UserApiUploadUserAvatarRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    uploadUserAvatar(
+      requestParameters: ApiConsoleHaloRunV1alpha1UserApiUploadUserAvatarRequest,
+      options?: AxiosRequestConfig
+    ): AxiosPromise<User> {
+      return localVarFp
+        .uploadUserAvatar(
+          requestParameters.name,
+          requestParameters.file,
+          options
+        )
         .then((request) => request(axios, basePath));
     },
   };
@@ -944,6 +1142,20 @@ export interface ApiConsoleHaloRunV1alpha1UserApiCreateUserRequest {
    * @memberof ApiConsoleHaloRunV1alpha1UserApiCreateUser
    */
   readonly createUserRequest: CreateUserRequest;
+}
+
+/**
+ * Request parameters for deleteUserAvatar operation in ApiConsoleHaloRunV1alpha1UserApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1UserApiDeleteUserAvatarRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1UserApiDeleteUserAvatarRequest {
+  /**
+   * User name
+   * @type {string}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiDeleteUserAvatar
+   */
+  readonly name: string;
 }
 
 /**
@@ -1002,18 +1214,11 @@ export interface ApiConsoleHaloRunV1alpha1UserApiGrantPermissionRequest {
  */
 export interface ApiConsoleHaloRunV1alpha1UserApiListUsersRequest {
   /**
-   * Sort property and direction of the list result. Supported fields: creationTimestamp
+   * Field selector for filtering.
    * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly sort?: Array<string>;
-
-  /**
-   *
-   * @type {string}
-   * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
-   */
-  readonly role?: string;
+  readonly fieldSelector?: Array<string>;
 
   /**
    *
@@ -1023,11 +1228,11 @@ export interface ApiConsoleHaloRunV1alpha1UserApiListUsersRequest {
   readonly keyword?: string;
 
   /**
-   * Size of one page. Zero indicates no limit.
-   * @type {number}
+   * Label selector for filtering.
+   * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly size?: number;
+  readonly labelSelector?: Array<string>;
 
   /**
    * The page number. Zero indicates no page.
@@ -1037,18 +1242,25 @@ export interface ApiConsoleHaloRunV1alpha1UserApiListUsersRequest {
   readonly page?: number;
 
   /**
-   * Label selector for filtering.
-   * @type {Array<string>}
+   *
+   * @type {string}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly labelSelector?: Array<string>;
+  readonly role?: string;
 
   /**
-   * Field selector for filtering.
+   * Size of one page. Zero indicates no limit.
+   * @type {number}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
+   */
+  readonly size?: number;
+
+  /**
+   * Sort property and direction of the list result. Supported fields: creationTimestamp
    * @type {Array<string>}
    * @memberof ApiConsoleHaloRunV1alpha1UserApiListUsers
    */
-  readonly fieldSelector?: Array<string>;
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -1063,6 +1275,27 @@ export interface ApiConsoleHaloRunV1alpha1UserApiUpdateCurrentUserRequest {
    * @memberof ApiConsoleHaloRunV1alpha1UserApiUpdateCurrentUser
    */
   readonly user: User;
+}
+
+/**
+ * Request parameters for uploadUserAvatar operation in ApiConsoleHaloRunV1alpha1UserApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1UserApiUploadUserAvatarRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1UserApiUploadUserAvatarRequest {
+  /**
+   * User name
+   * @type {string}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiUploadUserAvatar
+   */
+  readonly name: string;
+
+  /**
+   *
+   * @type {File}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiUploadUserAvatar
+   */
+  readonly file: File;
 }
 
 /**
@@ -1105,6 +1338,22 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
   ) {
     return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
       .createUser(requestParameters.createUserRequest, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   * delete user avatar
+   * @param {ApiConsoleHaloRunV1alpha1UserApiDeleteUserAvatarRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApi
+   */
+  public deleteUserAvatar(
+    requestParameters: ApiConsoleHaloRunV1alpha1UserApiDeleteUserAvatarRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
+      .deleteUserAvatar(requestParameters.name, options)
       .then((request) => request(this.axios, this.basePath));
   }
 
@@ -1185,13 +1434,13 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
   ) {
     return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
       .listUsers(
-        requestParameters.sort,
-        requestParameters.role,
-        requestParameters.keyword,
-        requestParameters.size,
-        requestParameters.page,
-        requestParameters.labelSelector,
         requestParameters.fieldSelector,
+        requestParameters.keyword,
+        requestParameters.labelSelector,
+        requestParameters.page,
+        requestParameters.role,
+        requestParameters.size,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));
@@ -1210,6 +1459,22 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
   ) {
     return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
       .updateCurrentUser(requestParameters.user, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   * upload user avatar
+   * @param {ApiConsoleHaloRunV1alpha1UserApiUploadUserAvatarRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApi
+   */
+  public uploadUserAvatar(
+    requestParameters: ApiConsoleHaloRunV1alpha1UserApiUploadUserAvatarRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
+      .uploadUserAvatar(requestParameters.name, requestParameters.file, options)
       .then((request) => request(this.axios, this.basePath));
   }
 }

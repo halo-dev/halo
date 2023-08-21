@@ -11,7 +11,7 @@ import {
   VDescriptionItem,
 } from "@halo-dev/components";
 import { computed, onMounted, ref } from "vue";
-import type { Info, GlobalInfo, Startup } from "./types";
+import type { Info, GlobalInfo, Startup } from "@/types";
 import axios from "axios";
 import { formatDatetime } from "@/utils/date";
 import { useClipboard } from "@vueuse/core";
@@ -74,7 +74,7 @@ onMounted(() => {
 });
 
 // copy system information to clipboard
-const { copy, isSupported } = useClipboard();
+const { copy, isSupported } = useClipboard({ legacy: true });
 
 const handleCopy = () => {
   if (!isSupported.value) {

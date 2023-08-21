@@ -212,18 +212,20 @@ export const V1alpha1RoleBindingApiAxiosParamCreator = function (
     },
     /**
      * List v1alpha1/RoleBinding
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     listv1alpha1RoleBinding: async (
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
+      sort?: Array<string>,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       const localVarPath = `/api/v1alpha1/rolebindings`;
@@ -250,6 +252,14 @@ export const V1alpha1RoleBindingApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+      if (fieldSelector) {
+        localVarQueryParameter["fieldSelector"] = fieldSelector;
+      }
+
+      if (labelSelector) {
+        localVarQueryParameter["labelSelector"] = labelSelector;
+      }
+
       if (page !== undefined) {
         localVarQueryParameter["page"] = page;
       }
@@ -258,12 +268,8 @@ export const V1alpha1RoleBindingApiAxiosParamCreator = function (
         localVarQueryParameter["size"] = size;
       }
 
-      if (labelSelector) {
-        localVarQueryParameter["labelSelector"] = labelSelector;
-      }
-
-      if (fieldSelector) {
-        localVarQueryParameter["fieldSelector"] = fieldSelector;
+      if (sort) {
+        localVarQueryParameter["sort"] = Array.from(sort);
       }
 
       setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -426,18 +432,20 @@ export const V1alpha1RoleBindingApiFp = function (
     },
     /**
      * List v1alpha1/RoleBinding
+     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [labelSelector] Label selector for filtering.
      * @param {number} [page] The page number. Zero indicates no page.
      * @param {number} [size] Size of one page. Zero indicates no limit.
-     * @param {Array<string>} [labelSelector] Label selector for filtering.
-     * @param {Array<string>} [fieldSelector] Field selector for filtering.
+     * @param {Array<string>} [sort] Sort property and direction of the list result. Support sorting based on attribute name path.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async listv1alpha1RoleBinding(
+      fieldSelector?: Array<string>,
+      labelSelector?: Array<string>,
       page?: number,
       size?: number,
-      labelSelector?: Array<string>,
-      fieldSelector?: Array<string>,
+      sort?: Array<string>,
       options?: AxiosRequestConfig
     ): Promise<
       (
@@ -447,10 +455,11 @@ export const V1alpha1RoleBindingApiFp = function (
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listv1alpha1RoleBinding(
+          fieldSelector,
+          labelSelector,
           page,
           size,
-          labelSelector,
-          fieldSelector,
+          sort,
           options
         );
       return createRequestFunction(
@@ -555,10 +564,11 @@ export const V1alpha1RoleBindingApiFactory = function (
     ): AxiosPromise<RoleBindingList> {
       return localVarFp
         .listv1alpha1RoleBinding(
+          requestParameters.fieldSelector,
+          requestParameters.labelSelector,
           requestParameters.page,
           requestParameters.size,
-          requestParameters.labelSelector,
-          requestParameters.fieldSelector,
+          requestParameters.sort,
           options
         )
         .then((request) => request(axios, basePath));
@@ -633,6 +643,20 @@ export interface V1alpha1RoleBindingApiGetv1alpha1RoleBindingRequest {
  */
 export interface V1alpha1RoleBindingApiListv1alpha1RoleBindingRequest {
   /**
+   * Field selector for filtering.
+   * @type {Array<string>}
+   * @memberof V1alpha1RoleBindingApiListv1alpha1RoleBinding
+   */
+  readonly fieldSelector?: Array<string>;
+
+  /**
+   * Label selector for filtering.
+   * @type {Array<string>}
+   * @memberof V1alpha1RoleBindingApiListv1alpha1RoleBinding
+   */
+  readonly labelSelector?: Array<string>;
+
+  /**
    * The page number. Zero indicates no page.
    * @type {number}
    * @memberof V1alpha1RoleBindingApiListv1alpha1RoleBinding
@@ -647,18 +671,11 @@ export interface V1alpha1RoleBindingApiListv1alpha1RoleBindingRequest {
   readonly size?: number;
 
   /**
-   * Label selector for filtering.
+   * Sort property and direction of the list result. Support sorting based on attribute name path.
    * @type {Array<string>}
    * @memberof V1alpha1RoleBindingApiListv1alpha1RoleBinding
    */
-  readonly labelSelector?: Array<string>;
-
-  /**
-   * Field selector for filtering.
-   * @type {Array<string>}
-   * @memberof V1alpha1RoleBindingApiListv1alpha1RoleBinding
-   */
-  readonly fieldSelector?: Array<string>;
+  readonly sort?: Array<string>;
 }
 
 /**
@@ -750,10 +767,11 @@ export class V1alpha1RoleBindingApi extends BaseAPI {
   ) {
     return V1alpha1RoleBindingApiFp(this.configuration)
       .listv1alpha1RoleBinding(
+        requestParameters.fieldSelector,
+        requestParameters.labelSelector,
         requestParameters.page,
         requestParameters.size,
-        requestParameters.labelSelector,
-        requestParameters.fieldSelector,
+        requestParameters.sort,
         options
       )
       .then((request) => request(this.axios, this.basePath));

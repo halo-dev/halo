@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/components",
-  "version": "1.4.0",
+  "version": "1.8.0",
   "description": "",
   "files": [
     "dist"
@@ -48,11 +48,11 @@
     "@iconify-json/ri": "^1.1.4",
     "histoire": "^0.11.7",
     "unplugin-icons": "^0.14.14",
-    "vite-plugin-dts": "^1.7.3"
+    "vite-plugin-dts": "^2.3.0"
   },
   "peerDependencies": {
-    "vue": "^3.2.37",
-    "vue-router": "^4.0.16"
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.4"
   },
   "exports": {
     ".": {
@@ -62,16 +62,6 @@
     "./dist/style.css": "./dist/style.css"
   },
   "dependencies": {
-    "@codemirror/commands": "^6.1.2",
-    "@codemirror/lang-css": "^6.0.1",
-    "@codemirror/lang-html": "^6.2.0",
-    "@codemirror/lang-javascript": "^6.1.1",
-    "@codemirror/lang-json": "^6.0.1",
-    "@codemirror/language": "^6.3.1",
-    "@codemirror/legacy-modes": "^6.3.0",
-    "@codemirror/state": "^6.1.4",
-    "@codemirror/view": "^6.5.1",
-    "codemirror": "^6.0.1",
     "floating-vue": "2.0.0-beta.20"
   }
 }

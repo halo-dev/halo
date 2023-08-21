@@ -1,0 +1,18 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-migration
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Migration Management"
+    rbac.authorization.halo.run/display-name: "Migration Manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:migrations:manage"]
+rules:
+  - apiGroups: ["api.console.migration.halo.run"]
+    resources: ["restorations"]
+    verbs: ["create"]
+  - apiGroups: ["migration.halo.run"]
+    resources: ["backups"]
+    verbs: ["list", "get", "create", "update", "delete"]

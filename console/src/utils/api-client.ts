@@ -10,6 +10,7 @@ import {
   ApiConsoleHaloRunV1alpha1AttachmentApi,
   ApiConsoleHaloRunV1alpha1IndicesApi,
   ApiConsoleHaloRunV1alpha1AuthProviderApi,
+  ApiConsoleHaloRunV1alpha1SystemApi,
   ContentHaloRunV1alpha1CategoryApi,
   ContentHaloRunV1alpha1CommentApi,
   ContentHaloRunV1alpha1PostApi,
@@ -33,10 +34,13 @@ import {
   V1alpha1SettingApi,
   V1alpha1UserApi,
   V1alpha1AnnotationSettingApi,
+  V1alpha1CacheApi,
   LoginApi,
   AuthHaloRunV1alpha1AuthProviderApi,
   AuthHaloRunV1alpha1UserConnectionApi,
   ApiHaloRunV1alpha1UserApi,
+  MigrationHaloRunV1alpha1BackupApi,
+  ApiConsoleMigrationHaloRunV1alpha1MigrationApi,
 } from "@halo-dev/api-client";
 import type { AxiosError, AxiosInstance } from "axios";
 import axios from "axios";
@@ -77,39 +81,29 @@ axiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    const { status } = errorResponse;
-
-    const { title } = errorResponse.data;
-
     // Don't show error toast
     // see https://github.com/halo-dev/halo/issues/2836
     if (errorResponse.config.mute) {
       return Promise.reject(error);
     }
 
-    if (status === 400) {
-      Toast.error(
-        i18n.global.t("core.common.toast.request_parameter_error", { title })
-      );
-    } else if (status === 401) {
+    const { status } = errorResponse;
+    const { title, detail } = errorResponse.data;
+
+    if (status === 401) {
       const userStore = useUserStore();
       userStore.loginModalVisible = true;
       Toast.warning(i18n.global.t("core.common.toast.login_expired"));
-    } else if (status === 403) {
-      Toast.error(i18n.global.t("core.common.toast.forbidden"));
-    } else if (status === 404) {
-      Toast.error(i18n.global.t("core.common.toast.not_found"));
-    } else if (status === 500) {
-      Toast.error(
-        i18n.global.t("core.common.toast.server_internal_error_with_title")
-      );
-    } else {
-      Toast.error(
-        i18n.global.t("core.common.toast.unknown_error_with_title", {
-          title,
-        })
-      );
+
+      return Promise.reject(error);
     }
+
+    if (title || detail) {
+      Toast.error(detail || title);
+      return Promise.reject(error);
+    }
+
+    Toast.error(i18n.global.t("core.common.toast.unknown_error"));
 
     return Promise.reject(error);
   }
@@ -189,6 +183,7 @@ function setupApiClient(axios: AxiosInstance) {
         baseURL,
         axios
       ),
+      backup: new MigrationHaloRunV1alpha1BackupApi(undefined, baseURL, axios),
     },
     // custom endpoints
     user: new ApiConsoleHaloRunV1alpha1UserApi(undefined, baseURL, axios),
@@ -218,6 +213,13 @@ function setupApiClient(axios: AxiosInstance) {
     common: {
       user: new ApiHaloRunV1alpha1UserApi(undefined, baseURL, axios),
     },
+    cache: new V1alpha1CacheApi(undefined, baseURL, axios),
+    migration: new ApiConsoleMigrationHaloRunV1alpha1MigrationApi(
+      undefined,
+      baseURL,
+      axios
+    ),
+    system: new ApiConsoleHaloRunV1alpha1SystemApi(undefined, baseURL, axios),
   };
 }
 

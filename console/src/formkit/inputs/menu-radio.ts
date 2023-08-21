@@ -1,6 +1,16 @@
 import { apiClient } from "@/utils/api-client";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import { radio, radios, defaultIcon } from "@formkit/inputs";
+import type { FormKitInputs } from "@formkit/inputs";
+
+declare module "@formkit/inputs" {
+  interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    menuRadio: {
+      type: "menuRadio";
+      value?: string;
+    };
+  }
+}
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {

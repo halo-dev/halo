@@ -17,6 +17,7 @@ core:
       return_login:
         label: 已有账号
         button: 立即登录
+      return_site: 返回到首页
     button: 登录
     modal:
       title: 重新登录
@@ -69,6 +70,7 @@ core:
         users: 用户
         settings: 设置
         actuator: 概览
+        backup: 备份
     operations:
       logout:
         button: 退出登录
@@ -122,7 +124,12 @@ core:
             refresh_search_engine:
               title: 刷新搜索引擎
               dialog_title: 确定要刷新搜索引擎索引吗？
-              dialog_content: 此操作会对所有已发布的文章重新创建搜索引擎索引。
+              dialog_content: 此操作会对所有已发布的文章重新创建本地搜索引擎的索引。
+              success_message: 刷新成功
+            evict_page_cache:
+              title: 刷新页面缓存
+              dialog_title: 确定要刷新页面缓存吗？
+              dialog_content: 此操作会清空所有页面的缓存。
               success_message: 刷新成功
         user_stats:
           title: 用户
@@ -149,14 +156,12 @@ core:
     filters:
       status:
         items:
-          all: 全部
           published: 已发布
           draft: 未发布
       visible:
         label: 可见性
         result: "可见性：{visible}"
         items:
-          all: 全部
           public: 公开
           private: 私有
       category:
@@ -276,6 +281,8 @@ core:
       delete:
         title: 确定要删除该分类吗？
         description: 删除此分类之后，对应文章的关联将被解除。该操作不可恢复。
+      add_sub_category:
+        button: 新增子分类
     editing_modal:
       titles:
         update: 编辑文章分类
@@ -284,6 +291,8 @@ core:
         general: 常规
         annotations: 元数据
       fields:
+        parent:
+          label: 上级分类
         display_name:
           label: 名称
         slug:
@@ -315,14 +324,12 @@ core:
     filters:
       status:
         items:
-          all: 全部
           published: 已发布
           draft: 未发布
       visible:
         label: 可见性
         result: "可见性：{visible}"
         items:
-          all: 全部
           public: 公开
           private: 私有
       author:
@@ -419,7 +426,6 @@ core:
     filters:
       status:
         items:
-          all: 全部
           approved: 已审核
           pending_review: 待审核
       owner:
@@ -427,10 +433,12 @@ core:
         result: "评论者：{owner}"
       sort:
         items:
-          default: 默认
-          last_reply_time: 最后回复时间
-          reply_count: 回复数
-          creation_time: 创建时间
+          last_reply_time_desc: 较近回复
+          last_reply_time_asc: 较早回复
+          reply_count_desc: 较多回复数
+          reply_count_asc: 较少回复数
+          create_time_desc: 较近创建
+          create_time_asc: 较早创建
     list:
       fields:
         reply_count: "{count} 条回复"
@@ -597,10 +605,23 @@ core:
       uninstall_and_delete_config:
         button: 卸载并删除配置
         title: 确定要卸载该主题以及对应的配置吗？
+      remote_download:
+        title: 检测到了远程下载地址，是否需要下载？
+        description: 请仔细鉴别此地址是否可信：{url}
     upload_modal:
       titles:
         install: 安装主题
         upgrade: 升级主题（{display_name}）
+      operations:
+        existed_during_installation:
+          title: 主题已存在
+          description: 当前安装的主题已存在，是否升级？
+      tabs:
+        local: 本地上传
+        remote:
+          title: 远程下载
+          fields:
+            url: 下载地址
     list_modal:
       titles:
         installed_themes: 已安装的主题
@@ -718,10 +739,12 @@ core:
       change_status:
         active_title: 确定要启用该插件吗？
         inactive_title: 确定要停用该插件吗？
+      remote_download:
+        title: 检测到了远程下载地址，是否需要下载？
+        description: 请仔细鉴别此地址是否可信：{url}
     filters:
       status:
         items:
-          all: 全部
           active: 已启用
           inactive: 未启用
       sort:
@@ -735,6 +758,12 @@ core:
       titles:
         install: 安装插件
         upgrade: 升级插件（{display_name}）
+      tabs:
+        local: 本地上传
+        remote:
+          title: 远程下载
+          fields:
+            url: 下载地址
       operations:
         active_after_install:
           title: 安装成功
@@ -755,8 +784,6 @@ core:
         license: 协议
         role_templates: 权限模板
         last_starttime: 最近一次启动
-    settings:
-      title: 插件设置
     loader:
       toast:
         entry_load_failed: "{name}：加载插件入口文件失败"
@@ -849,6 +876,21 @@ core:
         bio: 描述
         creation_time: 注册时间
         identity_authentication: 登录方式
+      avatar:
+        title: 头像
+        toast_upload_failed: 上传头像失败
+        toast_remove_failed: 删除头像失败
+        cropper_modal:
+          title: 裁剪头像
+        remove:
+          title: 确定要删除头像吗？
+        tooltips:
+          upload: 上传
+          zoom_in: 放大
+          zoom_out: 缩小
+          flip_horizontal: 水平翻转
+          flip_vertical: 垂直翻转
+          reset: 重置
   role:
     title: 角色
     common:
@@ -942,6 +984,43 @@ core:
       os: 操作系统：{os}
     alert:
       external_url_invalid: 检测到外部访问地址与当前访问地址不一致，可能会导致部分链接无法正常跳转，请检查外部访问地址设置。
+  backup:
+    title: 备份与恢复
+    tabs:
+      backup_list: 备份
+      restore: 恢复
+    empty:
+      title: 没有备份
+      message: 当前没有已创建的备份，你可以点击刷新或者创建新的备份
+    operations:
+      create:
+        button: 创建备份
+        title: 创建备份
+        description: 确定要创建备份吗，此操作可能会持续较长时间。
+        toast_success: 已请求创建备份
+      delete:
+        title: 删除备份
+        description: 确定要删除该备份吗？
+      restore:
+        title: 恢复成功
+        description: 恢复成功之后，需要重启一下 Halo 才能够正常加载系统资源，点击确定之后我们会自动重启 Halo。
+      restart:
+        toast_success: 已请求重启
+    list:
+      phases:
+        pending: 准备中
+        running: 备份中
+        succeeded: 备份完成
+        failed: 备份失败
+      fields:
+        expiresAt: "{expiresAt}失效"
+    restore:
+      tips:
+        first: 1. 恢复过程可能会持续较长时间，期间请勿刷新页面。
+        second: 2. 在恢复的过程中，虽然已有的数据不会被清理掉，但如果有冲突的数据将被覆盖。
+        third: 3. 恢复完成之后需要重启 Halo 才能够正常加载系统资源。
+        complete: 恢复完成，等待重启...
+      start: 开始恢复
   exception:
     not_found:
       message: 没有找到该页面
@@ -955,10 +1034,19 @@ core:
       submit:
         button: 初始化
         toast_success: 初始化成功
+      setup_initial_data:
+        loading: 正在初始化数据，请稍后...
     fields:
       site_title:
-        placeholder: 站点名称
-        validation: 请输入站点名称
+        label: 站点名称
+      email:
+        label: 邮箱
+      username:
+        label: 用户名
+      password:
+        label: 密码
+      confirm_password:
+        label: 确认密码
   rbac:
     Attachments Management: 附件
     Attachment Manage: 附件管理
@@ -1014,6 +1102,8 @@ core:
     Users Management: 用户
     User manage: 用户管理
     User View: 用户查看
+    Migration Management: 备份与恢复
+    Migration Manage: 备份与恢复管理
     role-template-view-users: 用户查看
     role-template-change-password: 修改密码
   components:
@@ -1041,8 +1131,8 @@ core:
         placeholder:
           options:
             placeholder: "输入 / 以选择输入类型"
-      toolbar:
-        attachment: 插入附件
+      toolbox:
+        attachment: 选择附件
       upload_attachment:
         toast:
           no_available_policy: 目前没有可用的存储策略
@@ -1066,8 +1156,14 @@ core:
     pagination:
       page_label: 页
       size_label: 条 / 页
+      total_label: 共 {total} 项数据
     social_auth_providers:
       title: 三方登录
+    app_download_alert:
+      description: Halo 的主题和插件可以在以下地址下载：
+      sources:
+        app_store: "官方应用市场：{url}"
+        github: "GitHub：{url}"
   composables:
     content_cache:
       toast_recovered: 已从缓存中恢复未保存的内容
@@ -1076,6 +1172,8 @@ core:
       creation_label: 创建 {text} 分类
     tag_select:
       creation_label: 创建 {text} 标签
+    validation:
+      trim: 不能以空格开头或结尾
   common:
     buttons:
       save: 保存
@@ -1107,6 +1205,7 @@ core:
       upload: 上传
       add: 添加
       submit: 提交
+      detail: 详情
     radio:
       "yes": 是
       "no": 否
@@ -1134,13 +1233,10 @@ core:
       save_failed_and_retry: 保存失败，请重试
       publish_failed_and_retry: 发布失败，请重试
       network_error: 网络错误，请检查网络连接
-      request_parameter_error: 请求参数错误：{title}
       login_expired: 登录已过期，请重新登录
       forbidden: 无权限访问
       not_found: 资源不存在
-      server_internal_error_with_title: 服务器内部错误：{title}
       server_internal_error: 服务器内部错误
-      unknown_error_with_title: 未知错误：{title}
       unknown_error: 未知错误
     dialog:
       titles:
@@ -1157,6 +1253,9 @@ core:
       labels:
         sort: 排序
         status: 状态
+      item_labels:
+        all: 全部
+        default: 默认
     status:
       deleting: 删除中
       loading: 加载中

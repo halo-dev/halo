@@ -1,6 +1,8 @@
 package run.halo.app.theme.dialect;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
@@ -10,14 +12,16 @@ import reactor.core.publisher.Mono;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.DefaultTemplateEnum;
-import run.halo.app.theme.router.factories.ModelConst;
+import run.halo.app.theme.router.ModelConst;
 
 /**
  * <p>Global custom head snippet injection for theme global setting.</p>
+ * <p>Globally injected head snippet can be overridden by content template.</p>
  *
  * @author guqing
  * @since 2.0.0
  */
+@Order(Ordered.HIGHEST_PRECEDENCE + 2)
 @Component
 public class TemplateGlobalHeadProcessor implements TemplateHeadProcessor {
 

@@ -46,7 +46,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     public <E extends Extension> Flux<E> list(Class<E> type, Predicate<E> predicate,
         Comparator<E> comparator) {
         var scheme = schemeManager.get(type);
-        var prefix = ExtensionUtil.buildStoreNamePrefix(scheme);
+        var prefix = ExtensionStoreUtil.buildStoreNamePrefix(scheme);
 
         return client.listByNamePrefix(prefix)
             .map(extensionStore -> converter.convertFrom(type, extensionStore))
@@ -75,14 +75,14 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
 
     @Override
     public <E extends Extension> Mono<E> fetch(Class<E> type, String name) {
-        var storeName = ExtensionUtil.buildStoreName(schemeManager.get(type), name);
+        var storeName = ExtensionStoreUtil.buildStoreName(schemeManager.get(type), name);
         return client.fetchByName(storeName)
             .map(extensionStore -> converter.convertFrom(type, extensionStore));
     }
 
     @Override
     public Mono<Unstructured> fetch(GroupVersionKind gvk, String name) {
-        var storeName = ExtensionUtil.buildStoreName(schemeManager.get(gvk), name);
+        var storeName = ExtensionStoreUtil.buildStoreName(schemeManager.get(gvk), name);
         return client.fetchByName(storeName)
             .map(extensionStore -> converter.convertFrom(Unstructured.class, extensionStore));
     }
@@ -102,6 +102,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <E extends Extension> Mono<E> create(E extension) {
         return Mono.just(extension)
             .doOnNext(ext -> {
@@ -133,6 +134,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <E extends Extension> Mono<E> update(E extension) {
         // Refactor the atomic reference if we have a better solution.
         final var statusChangeOnly = new AtomicBoolean(false);
@@ -181,6 +183,7 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <E extends Extension> Mono<E> delete(E extension) {
         // set deletionTimestamp
         extension.getMetadata().setDeletionTimestamp(Instant.now());

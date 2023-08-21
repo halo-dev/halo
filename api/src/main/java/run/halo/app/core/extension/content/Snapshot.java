@@ -1,5 +1,7 @@
 package run.halo.app.core.extension.content;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 import java.util.LinkedHashSet;
@@ -26,19 +28,19 @@ public class Snapshot extends AbstractExtension {
     public static final String KIND = "Snapshot";
     public static final String KEEP_RAW_ANNO = "content.halo.run/keep-raw";
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private SnapShotSpec spec;
 
     @Data
     public static class SnapShotSpec {
 
-        @Schema(required = true)
+        @Schema(requiredMode = REQUIRED)
         private Ref subjectRef;
 
         /**
          * such as: markdown | html | json | asciidoc | latex.
          */
-        @Schema(required = true, minLength = 1, maxLength = 50)
+        @Schema(requiredMode = REQUIRED, minLength = 1, maxLength = 50)
         private String rawType;
 
         private String rawPatch;
@@ -49,7 +51,7 @@ public class Snapshot extends AbstractExtension {
 
         private Instant lastModifyTime;
 
-        @Schema(required = true, minLength = 1)
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String owner;
 
         private Set<String> contributors;

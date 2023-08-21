@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.attachment;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static run.halo.app.core.extension.attachment.Group.KIND;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,8 +19,9 @@ import run.halo.app.extension.GVK;
 public class Group extends AbstractExtension {
 
     public static final String KIND = "Group";
+    public static final String HIDDEN_LABEL = "halo.run/hidden";
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private GroupSpec spec;
 
     private GroupStatus status;
@@ -27,7 +29,7 @@ public class Group extends AbstractExtension {
     @Data
     public static class GroupSpec {
 
-        @Schema(required = true, description = "Display name of group")
+        @Schema(requiredMode = REQUIRED, description = "Display name of group")
         private String displayName;
 
     }

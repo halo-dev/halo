@@ -1,5 +1,7 @@
 package run.halo.app.core.extension;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import lombok.Data;
@@ -21,25 +23,25 @@ public class Setting extends AbstractExtension {
 
     public static final String KIND = "Setting";
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private SettingSpec spec;
 
     @Data
     public static class SettingSpec {
 
-        @Schema(required = true, minLength = 1)
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private List<SettingForm> forms;
     }
 
     @Data
     public static class SettingForm {
 
-        @Schema(required = true)
+        @Schema(requiredMode = REQUIRED)
         private String group;
 
         private String label;
 
-        @Schema(required = true)
+        @Schema(requiredMode = REQUIRED)
         private List<Object> formSchema;
     }
 }

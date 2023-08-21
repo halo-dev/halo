@@ -30,8 +30,7 @@ docker run \
   --name halo \
   -p 8090:8090 \
   -v ~/.halo2:/root/.halo2 \
-  halohub/halo:2.4 \
-  --halo.external-url=http://localhost:8090/ \
+  halohub/halo:2.8 \
   --halo.security.initializer.superadminusername=admin \
   --halo.security.initializer.superadminpassword=P@88w0rd
 ```
@@ -47,7 +46,7 @@ docker run \
 
 ## 生态
 
-可访问 [awesome-halo](https://github.com/halo-sigs/awesome-halo) 查看已经适用于 Halo 2.0 的主题和插件，以及适用于 Halo
+可访问 [官方应用市场](https://halo.run/store/apps) 或 [awesome-halo 仓库](https://github.com/halo-sigs/awesome-halo) 查看已经适用于 Halo 2.x 的主题和插件，以及适用于 Halo
 1.x 的相关仓库。
 
 ## 许可证
@@ -55,6 +54,16 @@ docker run \
 [![license](https://img.shields.io/github/license/halo-dev/halo.svg?style=flat-square)](https://github.com/halo-dev/halo/blob/master/LICENSE)
 
 Halo 使用 GPL-v3.0 协议开源，请遵守开源协议。
+
+## 赞助
+
+如果 Halo 对你有帮助，欢迎[赞助我们](https://afdian.net/a/halo-dev)，感谢以下赞助者对 Halo 项目的支持：
+
+<p align="center">
+  <a target="_blank" href="https://afdian.net/a/halo-dev">
+    <img alt="sponsors" src="https://github.com/halo-sigs/sponsor-images/blob/main/sponsorkit/sponsors.svg?raw=true">
+  </a>
+</p>
 
 ## 贡献
 

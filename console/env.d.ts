@@ -1,8 +1,10 @@
 /// <reference types="vite/client" />
+/// <reference types="unplugin-icons/types/vue" />
 
 export {};
 
 import type { CoreMenuGroupId } from "@halo-dev/console-shared";
+import type { FormKitInputs } from "@formkit/inputs";
 
 import "vue-router";
 
@@ -34,5 +36,14 @@ declare module "vue-router" {
 declare module "axios" {
   export interface AxiosRequestConfig {
     mute?: boolean;
+  }
+}
+
+declare module "@formkit/inputs" {
+  export interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    "datetime-local": {
+      type: "datetime-local";
+      value?: string;
+    };
   }
 }

@@ -3,7 +3,6 @@ package run.halo.app.search.post;
 import static org.apache.commons.lang3.StringUtils.stripToEmpty;
 import static org.apache.lucene.document.Field.Store.NO;
 import static org.apache.lucene.document.Field.Store.YES;
-import static org.apache.lucene.index.IndexWriterConfig.OpenMode.APPEND;
 import static org.apache.lucene.index.IndexWriterConfig.OpenMode.CREATE_OR_APPEND;
 
 import java.io.IOException;
@@ -116,13 +115,22 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
     @Override
     public void removeDocuments(Set<String> postNames) throws IOException {
         var writeConfig = new IndexWriterConfig(analyzer);
-        writeConfig.setOpenMode(APPEND);
+        writeConfig.setOpenMode(CREATE_OR_APPEND);
         try (var writer = new IndexWriter(postIndexDir, writeConfig)) {
             var terms = postNames.stream()
                 .map(postName -> new Term(PostDoc.ID_FIELD, postName))
                 .toArray(Term[]::new);
             long seqNum = writer.deleteDocuments(terms);
             log.debug("Deleted documents({}) with sequence number {}", terms.length, seqNum);
+        }
+    }
+
+    @Override
+    public void removeAllDocuments() throws Exception {
+        var writeConfig = new IndexWriterConfig(analyzer);
+        writeConfig.setOpenMode(CREATE_OR_APPEND);
+        try (var writer = new IndexWriter(postIndexDir, writeConfig)) {
+            writer.deleteAll();
         }
     }
 
@@ -145,11 +153,19 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
         doc.add(new StringField("name", post.name(), YES));
         doc.add(new StoredField("title", post.title()));
 
-        var content = Jsoup.clean(stripToEmpty(post.excerpt()) + stripToEmpty(post.content()),
-            Safelist.none());
+        var cleanExcerpt = Jsoup.clean(stripToEmpty(post.excerpt()), Safelist.none());
+        var cleanContent = Jsoup.clean(stripToEmpty(post.content()), Safelist.none());
+
+        var contentBuilder = new StringBuilder(cleanExcerpt);
+        if (!contentBuilder.isEmpty()) {
+            contentBuilder.append(' ');
+        }
+        contentBuilder.append(cleanContent);
+
+        var content = contentBuilder.toString();
 
         doc.add(new StoredField("content", content));
-        doc.add(new TextField("searchable", post.title() + content, NO));
+        doc.add(new TextField("searchable", post.title() + " " + content, NO));
 
         long publishTimestamp = post.publishTimestamp().toEpochMilli();
         doc.add(new LongPoint("publishTimestamp", publishTimestamp));

@@ -266,15 +266,10 @@ onMounted(async () => {
               {{ $t("core.common.buttons.delete") }}
             </VDropdownItem>
             <template #popper>
-              <VDropdownItem
-                v-close-popper.all
-                type="danger"
-                @click="handleDelete(group)"
-              >
+              <VDropdownItem type="danger" @click="handleDelete(group)">
                 {{ $t("core.attachment.group_list.operations.delete.button") }}
               </VDropdownItem>
               <VDropdownItem
-                v-close-popper.all
                 type="danger"
                 @click="handleDeleteWithAttachments(group)"
               >

@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.Exceptions;
 import run.halo.app.event.post.PostEvent;
 import run.halo.app.event.post.PostPublishedEvent;
-import run.halo.app.event.post.PostRecycledEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
+import run.halo.app.event.post.PostUpdatedEvent;
 import run.halo.app.event.post.PostVisibleChangedEvent;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
@@ -52,11 +52,10 @@ public class PostEventReconciler implements Reconciler<PostEvent>, SmartLifecycl
 
     @Override
     public Result reconcile(PostEvent postEvent) {
-        if (postEvent instanceof PostPublishedEvent) {
+        if (postEvent instanceof PostPublishedEvent || postEvent instanceof PostUpdatedEvent) {
             addPostDoc(postEvent.getName());
         }
-        if (postEvent instanceof PostUnpublishedEvent
-            || postEvent instanceof PostRecycledEvent) {
+        if (postEvent instanceof PostUnpublishedEvent) {
             deletePostDoc(postEvent.getName());
         }
         if (postEvent instanceof PostVisibleChangedEvent visibleChangedEvent) {
@@ -81,29 +80,13 @@ public class PostEventReconciler implements Reconciler<PostEvent>, SmartLifecycl
         );
     }
 
-    @EventListener(PostPublishedEvent.class)
-    public void handlePostPublished(PostPublishedEvent publishedEvent) {
-        postEventQueue.addImmediately(publishedEvent);
-    }
-
-    @EventListener(PostUnpublishedEvent.class)
-    public void handlePostUnpublished(PostUnpublishedEvent unpublishedEvent) {
-        postEventQueue.addImmediately(unpublishedEvent);
-    }
-
-    @EventListener(PostRecycledEvent.class)
-    public void handlePostRecycled(PostRecycledEvent recycledEvent) {
-        postEventQueue.addImmediately(recycledEvent);
-    }
-
-    @EventListener(PostVisibleChangedEvent.class)
-    public void handlePostVisibleChanged(PostVisibleChangedEvent event) {
+    @EventListener(PostEvent.class)
+    public void handlePostEvent(PostEvent event) {
         postEventQueue.addImmediately(event);
     }
 
     void addPostDoc(String postName) {
         postFinder.getByName(postName)
-            .filter(postVo -> PUBLIC.equals(postVo.getSpec().getVisible()))
             .map(PostDocUtils::from)
             .flatMap(postDoc -> extensionGetter.getEnabledExtension(PostSearchService.class)
                 .doOnNext(searchService -> {

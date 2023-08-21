@@ -4,6 +4,9 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
@@ -22,6 +25,8 @@ import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.GroupVersion;
+import run.halo.app.infra.exception.RateLimitExceededException;
+import run.halo.app.infra.utils.IpAddressUtils;
 
 /**
  * User endpoint for unauthenticated user.
@@ -35,6 +40,7 @@ public class PublicUserEndpoint implements CustomEndpoint {
     private final UserService userService;
     private final ServerSecurityContextRepository securityContextRepository;
     private final ReactiveUserDetailsService reactiveUserDetailsService;
+    private final RateLimiterRegistry rateLimiterRegistry;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -68,7 +74,16 @@ public class PublicUserEndpoint implements CustomEndpoint {
             .flatMap(user -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(user)
-            );
+            )
+            .transformDeferred(getRateLimiterForSignUp(request.exchange()))
+            .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
+    }
+
+    private <T> RateLimiterOperator<T> getRateLimiterForSignUp(ServerWebExchange exchange) {
+        var clientIp = IpAddressUtils.getClientIp(exchange.getRequest());
+        var rateLimiter = rateLimiterRegistry.rateLimiter("signup-from-ip-" + clientIp,
+            "signup");
+        return RateLimiterOperator.of(rateLimiter);
     }
 
     private Mono<Void> authenticate(String username, ServerWebExchange exchange) {

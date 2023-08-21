@@ -24,6 +24,7 @@ import {
   VSpace,
   VTabbar,
   VLoading,
+  Dialog,
 } from "@halo-dev/components";
 import ThemeListModal from "../components/ThemeListModal.vue";
 import ThemePreviewModal from "../components/preview/ThemePreviewModal.vue";
@@ -34,6 +35,7 @@ import { storeToRefs } from "pinia";
 import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
 import { useQuery } from "@tanstack/vue-query";
+import { useRouteQuery } from "@vueuse/router";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -64,6 +66,7 @@ const selectedTheme = ref<Theme>();
 const themesModal = ref(false);
 const previewModal = ref(false);
 const activeTab = ref(tabs.value[0].id);
+provide<Ref<string>>("activeTab", activeTab);
 
 const { loading, isActivated, handleActiveTheme } =
   useThemeLifeCycle(selectedTheme);
@@ -157,6 +160,27 @@ onMounted(() => {
 watch([() => route.name, () => route.params], async () => {
   handleTriggerTabChange();
 });
+
+// handle remote download url from route
+const remoteDownloadUrl = useRouteQuery<string | null>("remote-download-url");
+onMounted(() => {
+  if (remoteDownloadUrl.value) {
+    Dialog.warning({
+      title: t("core.theme.operations.remote_download.title"),
+      description: t("core.theme.operations.remote_download.description", {
+        url: remoteDownloadUrl.value,
+      }),
+      confirmText: t("core.common.buttons.download"),
+      cancelText: t("core.common.buttons.cancel"),
+      onConfirm() {
+        themesModal.value = true;
+      },
+      onCancel() {
+        remoteDownloadUrl.value = null;
+      },
+    });
+  }
+});
 </script>
 <template>
   <BasicLayout>
@@ -172,7 +196,7 @@ watch([() => route.name, () => route.params], async () => {
       <template #actions>
         <VSpace>
           <VButton
-            v-if="!isActivated"
+            v-show="!isActivated"
             v-permission="['system:themes:manage']"
             size="sm"
             type="primary"
@@ -222,7 +246,7 @@ watch([() => route.name, () => route.params], async () => {
           <template #header>
             <VTabbar
               v-model:active-id="activeTab"
-              :items="tabs"
+              :items="tabs.map((item) => ({ id: item.id, label: item.label }))"
               class="w-full !rounded-none"
               type="outline"
               @change="handleTabChange"

@@ -17,6 +17,7 @@ core:
       return_login:
         label: Already have an account
         button: Sign in
+      return_site: Return to site
     button: Login
     modal:
       title: Re-login
@@ -69,6 +70,7 @@ core:
         users: Users
         settings: Settings
         actuator: Actuator
+        backup: Backup
     operations:
       logout:
         button: Logout
@@ -124,6 +126,11 @@ core:
               dialog_title: Do you want to refresh the search engine index?
               dialog_content: This operation will recreate search engine indexes for all published posts.
               success_message: Refresh search engine index successfully.
+            evict_page_cache:
+              title: Refresh Page Cache
+              dialog_title: Do you want to refresh the page cache?
+              dialog_content: This operation will clear the cache for all pages.
+              success_message: Refresh page cache successfully.
         user_stats:
           title: Users
         comment_stats:
@@ -149,14 +156,12 @@ core:
     filters:
       status:
         items:
-          all: All
           published: Published
           draft: Draft
       visible:
         label: Visible
         result: "Visible: {visible}"
         items:
-          all: All
           public: Public
           private: Private
       category:
@@ -276,6 +281,8 @@ core:
       delete:
         title: Are you sure you want to delete this category?
         description: After deleting this category, the association with corresponding articles will be removed. This operation cannot be undone.
+      add_sub_category:
+        button: Add sub category
     editing_modal:
       titles:
         update: Update post category
@@ -284,6 +291,8 @@ core:
         general: General
         annotations: Annotations
       fields:
+        parent:
+          label: Parent
         display_name:
           label: Display name
         slug:
@@ -315,14 +324,12 @@ core:
     filters:
       status:
         items:
-          all: All
           published: Published
           draft: Draft
       visible:
         label: Visible
         result: "Visible: {visible}"
         items:
-          all: All
           public: Public
           private: Private
       author:
@@ -419,7 +426,6 @@ core:
     filters:
       status:
         items:
-          all: All
           approved: Approved
           pending_review: Pending Review
       owner:
@@ -427,10 +433,12 @@ core:
         result: "Owner: {owner}"
       sort:
         items:
-          default: Default
-          last_reply_time: Last reply time
-          reply_count: Reply count
-          creation_time: Creation time
+          last_reply_time_desc: Recent reply
+          last_reply_time_asc: Earlier reply
+          reply_count_desc: More replies
+          reply_count_asc: Fewer replies
+          create_time_desc: Latest Created
+          create_time_asc: Earliest Created
     list:
       fields:
         reply_count: "{count} Replies"
@@ -597,10 +605,23 @@ core:
       uninstall_and_delete_config:
         button: Uninstall and delete config
         title: Are you sure you want to uninstall this theme and its corresponding settings?
+      remote_download:
+        title: Remote download address detected, do you want to download?
+        description: "Please carefully verify whether this address can be trusted: {url}"
     upload_modal:
       titles:
         install: Install theme
         upgrade: Upgrade theme ({display_name})
+      operations:
+        existed_during_installation:
+          title: The theme already exists.
+          description: The currently installed theme already exists, do you want to upgrade?
+      tabs:
+        local: Local
+        remote:
+          title: Remote
+          fields:
+            url: Remote URL
     list_modal:
       titles:
         installed_themes: Installed Themes
@@ -718,10 +739,12 @@ core:
       change_status:
         active_title: Are you sure you want to active this plugin?
         inactive_title: Are you sure you want to inactive this plugin?
+      remote_download:
+        title: Remote download address detected, do you want to download?
+        description: "Please carefully verify whether this address can be trusted: {url}"
     filters:
       status:
         items:
-          all: All
           active: Active
           inactive: Inactive
       sort:
@@ -735,6 +758,12 @@ core:
       titles:
         install: Install plugin
         upgrade: Upgrade plugin ({display_name})
+      tabs:
+        local: Local
+        remote:
+          title: Remote
+          fields:
+            url: Remote URL
       operations:
         active_after_install:
           title: Install successful
@@ -755,8 +784,6 @@ core:
         license: License
         role_templates: Role Templates
         last_starttime: Last Start Time
-    settings:
-      title: Plugin settings
     loader:
       toast:
         entry_load_failed: "{name}: Failed to load plugin entry file"
@@ -849,6 +876,21 @@ core:
         bio: Bio
         creation_time: Creation time
         identity_authentication: Identity authentication
+      avatar:
+        title: Avatar
+        toast_upload_failed: Failed to upload avatar
+        toast_remove_failed: Failed to delete avatar
+        cropper_modal:
+          title: Crop Avatar
+        remove:
+          title: Are you sure you want to delete the avatar?
+        tooltips:
+          upload: Upload
+          zoom_in: Zoom In
+          zoom_out: Zoom Out
+          flip_horizontal: Flip Horizontal
+          flip_vertical: Flip Vertical
+          reset: Reset
   role:
     title: Roles
     common:
@@ -942,6 +984,43 @@ core:
       os: "Operating system: {os}"
     alert:
       external_url_invalid: The external access url detected is inconsistent with the current access url, which may cause some links to fail to redirect properly. Please check the external access url settings.
+  backup:
+    title: Backup and Restore
+    tabs:
+      backup_list: Backups
+      restore: Restore
+    empty:
+      title: No backups have been created yet
+      message: You can click the button below to create a backup
+    operations:
+      create:
+        button: Create backup
+        title: Create backup
+        description: Are you sure you want to create a backup? This operation may last for a long time.
+        toast_success: Requested to create a backup
+      delete:
+        title: Delete the backup
+        description: Are you sure you want to delete the backup?
+      restore:
+        title: Restore successfully
+        description: After successful restore, you need to restart Halo to load the system resources normally. After clicking OK, we will automatically restart Halo.
+      restart:
+        toast_success: Requested to restart
+    list:
+      phases:
+        pending: Pending
+        running: Running
+        succeeded: Succeeded
+        failed: Failed
+      fields:
+        expiresAt: Expires {expiresAt}
+    restore:
+      tips:
+        first: 1. The restore process may last for a long time, please do not refresh the page during this period.
+        second: 2. During the restore process, although the existing data will not be cleaned up, if there is a conflict, the data will be overwritten.
+        third: 3. After the restore is completed, you need to restart Halo to load the system resources normally.
+        complete: Restore completed, waiting for restart...
+      start: Start restore
   exception:
     not_found:
       message: Page not found
@@ -955,10 +1034,19 @@ core:
       submit:
         button: Setup
         toast_success: Setup successfully
+      setup_initial_data:
+        loading: Initializing data, please wait...
     fields:
       site_title:
-        placeholder: Site title
-        validation: Please enter the site title
+        label: Site title
+      email:
+        label: Email
+      username:
+        label: Username
+      password:
+        label: Password
+      confirm_password:
+        label: Confirm password
   rbac:
     Attachments Management: Attachments
     Attachment Manage: Attachment Manage
@@ -1014,6 +1102,8 @@ core:
     Users Management: Users
     User manage: User Manage
     User View: User View
+    Migration Management: Backup and Restore
+    Migration Manage: Backup and Restore Manage
     role-template-view-users: User View
     role-template-change-password: Change Password
   components:
@@ -1041,8 +1131,8 @@ core:
         placeholder:
           options:
             placeholder: "Enter / to select input type."
-      toolbar:
-        attachment: Insert attachment
+      toolbox:
+        attachment: Attachment
       upload_attachment:
         toast:
           no_available_policy: There is currently no available storage policy
@@ -1066,8 +1156,14 @@ core:
     pagination:
       page_label: page
       size_label: items per page
+      total_label: Total {total} items
     social_auth_providers:
       title: Third-party login
+    app_download_alert:
+      description: "Themes and plugins for Halo can be downloaded at the following addresses:"
+      sources:
+        app_store: "Official App Store: {url}"
+        github: "GitHub: {url}"
   composables:
     content_cache:
       toast_recovered: Recovered unsaved content from cache
@@ -1076,6 +1172,8 @@ core:
       creation_label: "Create {text} category"
     tag_select:
       creation_label: "Create {text} tag"
+    validation:
+      trim: Please remove the leading and trailing spaces
   common:
     buttons:
       save: Save
@@ -1107,6 +1205,7 @@ core:
       upload: Upload
       add: Add
       submit: Submit
+      detail: Detail
     radio:
       "yes": Yes
       "no": No
@@ -1134,13 +1233,10 @@ core:
       save_failed_and_retry: "Failed to save, please retry"
       publish_failed_and_retry: "Failed to publish, please retry"
       network_error: "Network error, please check your connection"
-      request_parameter_error: "Request parameter error: {title}"
       login_expired: "Login expired, please log in again"
       forbidden: Access denied
       not_found: Resource not found
-      server_internal_error_with_title: "Internal server error: {title}"
       server_internal_error: Internal server error
-      unknown_error_with_title: "Unknown error: {title}"
       unknown_error: Unknown error
     dialog:
       titles:
@@ -1157,6 +1253,9 @@ core:
       labels:
         sort: Sort
         status: Status
+      item_labels:
+        all: All
+        default: Default
     status:
       deleting: Deleting
       loading: Loading

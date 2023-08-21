@@ -1,5 +1,7 @@
 package run.halo.app.search;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -17,7 +19,7 @@ public class SearchParam {
         this.query = query;
     }
 
-    @Schema(name = "keyword", required = true)
+    @Schema(name = "keyword", requiredMode = REQUIRED)
     public String getKeyword() {
         var keyword = query.getFirst("keyword");
         if (!StringUtils.hasText(keyword)) {

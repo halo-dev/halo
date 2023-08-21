@@ -25,8 +25,6 @@ import { formatDatetime } from "@/utils/date";
 import { RouterLink } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
-import { getNode } from "@formkit/core";
-import FilterTag from "@/components/filter/FilterTag.vue";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 
@@ -66,7 +64,7 @@ const {
         !!singlePage.page.metadata.deletionTimestamp ||
         !singlePage.page.spec.deleted
     );
-    return deletedSinglePages?.length ? 3000 : false;
+    return deletedSinglePages?.length ? 1000 : false;
   },
 });
 
@@ -199,19 +197,12 @@ watch(selectedPageNames, (newValue) => {
   checkedAll.value = newValue.length === singlePages.value?.length;
 });
 
-// Filters
-function handleKeywordChange() {
-  const keywordNode = getNode("keywordInput");
-  if (keywordNode) {
-    keyword.value = keywordNode._value as string;
+watch(
+  () => keyword.value,
+  () => {
+    page.value = 1;
   }
-  page.value = 1;
-}
-
-function handleClearKeyword() {
-  keyword.value = "";
-  page.value = 1;
-}
+);
 </script>
 
 <template>
@@ -256,28 +247,7 @@ function handleClearKeyword() {
               />
             </div>
             <div class="flex w-full flex-1 items-center sm:w-auto">
-              <div
-                v-if="!selectedPageNames.length"
-                class="flex items-center gap-2"
-              >
-                <FormKit
-                  id="keywordInput"
-                  outer-class="!p-0"
-                  :placeholder="$t('core.common.placeholder.search')"
-                  type="text"
-                  name="keyword"
-                  :model-value="keyword"
-                  @keyup.enter="handleKeywordChange"
-                ></FormKit>
-
-                <FilterTag v-if="keyword" @close="handleClearKeyword()">
-                  {{
-                    $t("core.common.filters.results.keyword", {
-                      keyword: keyword,
-                    })
-                  }}
-                </FilterTag>
-              </div>
+              <SearchInput v-if="!selectedPageNames.length" v-model="keyword" />
               <VSpace v-else>
                 <VButton type="danger" @click="handleDeletePermanentlyInBatch">
                   {{ $t("core.common.buttons.delete_permanently") }}
@@ -439,16 +409,17 @@ function handleClearKeyword() {
       </Transition>
 
       <template #footer>
-        <div class="bg-white sm:flex sm:items-center sm:justify-end">
-          <VPagination
-            v-model:page="page"
-            v-model:size="size"
-            :page-label="$t('core.components.pagination.page_label')"
-            :size-label="$t('core.components.pagination.size_label')"
-            :total="total"
-            :size-options="[20, 30, 50, 100]"
-          />
-        </div>
+        <VPagination
+          v-model:page="page"
+          v-model:size="size"
+          :page-label="$t('core.components.pagination.page_label')"
+          :size-label="$t('core.components.pagination.size_label')"
+          :total-label="
+            $t('core.components.pagination.total_label', { total: total })
+          "
+          :total="total"
+          :size-options="[20, 30, 50, 100]"
+        />
       </template>
     </VCard>
   </div>

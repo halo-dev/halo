@@ -5,6 +5,8 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
+import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.plugin.HaloPluginManager;
 import run.halo.app.plugin.PluginConst;
@@ -71,7 +73,9 @@ public abstract class BundleResourceUtils {
             return null;
         }
         String path = PathUtils.combinePath(CONSOLE_BUNDLE_LOCATION, bundleName);
-        Resource resource = resourceLoader.getResource(path);
+        String simplifyPath = StringUtils.cleanPath(path);
+        FileUtils.checkDirectoryTraversal("/" + CONSOLE_BUNDLE_LOCATION, simplifyPath);
+        Resource resource = resourceLoader.getResource(simplifyPath);
         return resource.exists() ? resource : null;
     }
 
