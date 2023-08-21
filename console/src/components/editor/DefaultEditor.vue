@@ -78,6 +78,7 @@ import { useI18n } from "vue-i18n";
 import { i18n } from "@/locales";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { usePluginModuleStore, type PluginModule } from "@/stores/plugin";
+import { useDebounceFn } from "@vueuse/core";
 
 const { t } = useI18n();
 
@@ -140,6 +141,14 @@ onMounted(() => {
 
     extensionsFromPlugins.push(...extensions);
   });
+
+  // debounce OnUpdate
+  const debounceOnUpdate = useDebounceFn(() => {
+    const html = editor.value?.getHTML() + "";
+    emit("update:raw", html);
+    emit("update:content", html);
+    emit("update", html);
+  }, 250);
 
   editor.value = new Editor({
     content: props.raw,
@@ -236,9 +245,7 @@ onMounted(() => {
     ],
     autofocus: "start",
     onUpdate: () => {
-      emit("update:raw", editor.value?.getHTML() + "");
-      emit("update:content", editor.value?.getHTML() + "");
-      emit("update", editor.value?.getHTML() + "");
+      debounceOnUpdate();
       nextTick(() => {
         handleGenerateTableOfContent();
       });
