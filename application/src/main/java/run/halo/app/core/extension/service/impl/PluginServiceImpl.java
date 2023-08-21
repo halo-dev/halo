@@ -167,7 +167,7 @@ public class PluginServiceImpl implements PluginService {
                     }
                 }
                 String cssBundleString = """
-                    this.pluginCssBundle = '%s';
+                    this.pluginCssBundle = `%s`;
                     """.formatted(cssBundle.toString());
 
                 String plugins = """
