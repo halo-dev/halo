@@ -568,6 +568,17 @@ public class UserEndpoint implements CustomEndpoint {
                 }
                 return displayName.toLowerCase().contains(keyword.trim().toLowerCase());
             };
+            Predicate<User> namePredicate = user -> {
+                var keyword = getKeyword();
+                if (!org.springframework.util.StringUtils.hasText(keyword)) {
+                    return true;
+                }
+                var name = user.getMetadata().getName();
+                if (!org.springframework.util.StringUtils.hasText(name)) {
+                    return false;
+                }
+                return name.toLowerCase().contains(keyword.trim().toLowerCase());
+            };
             Predicate<User> rolePredicate = user -> {
                 var role = getRole();
                 if (role == null) {
@@ -587,6 +598,7 @@ public class UserEndpoint implements CustomEndpoint {
                 }
             };
             return displayNamePredicate
+                .or(namePredicate)
                 .and(rolePredicate)
                 .and(labelAndFieldSelectorToPredicate(getLabelSelector(), getFieldSelector()));
         }
