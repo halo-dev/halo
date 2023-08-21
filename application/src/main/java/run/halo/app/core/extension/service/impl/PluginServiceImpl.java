@@ -133,49 +133,54 @@ public class PluginServiceImpl implements PluginService {
 
     @Override
     public Mono<String> uglifyJsBundle() {
-        return Mono.defer(
-            () -> {
-                StringBuilder jsBundle = new StringBuilder();
-                StringBuilder cssBundle = new StringBuilder();
-                List<String> pluginNames = new ArrayList<>();
-                for (PluginWrapper pluginWrapper : pluginManager.getStartedPlugins()) {
-                    String pluginName = pluginWrapper.getPluginId();
-                    pluginNames.add(pluginName);
-                    Resource jsBundleResource =
-                        BundleResourceUtils.getJsBundleResource(pluginManager, pluginName,
-                            BundleResourceUtils.JS_BUNDLE);
-                    if (jsBundleResource != null) {
-                        try {
-                            jsBundle.append(
-                                jsBundleResource.getContentAsString(StandardCharsets.UTF_8));
-                            jsBundle.append("\n");
-                        } catch (IOException e) {
-                            log.error("Failed to read js bundle of plugin [{}]", pluginName, e);
-                        }
-                    }
-                    Resource cssBundleResource =
-                        BundleResourceUtils.getJsBundleResource(pluginManager, pluginName,
-                            BundleResourceUtils.CSS_BUNDLE);
-                    if (cssBundleResource != null) {
-                        try {
-                            cssBundle.append(
-                                cssBundleResource.getContentAsString(StandardCharsets.UTF_8));
-                            jsBundle.append("\n");
-                        } catch (IOException e) {
-                            log.error("Failed to read css bundle of plugin [{}]", pluginName, e);
-                        }
+        return Mono.fromSupplier(() -> {
+            StringBuilder jsBundle = new StringBuilder();
+            List<String> pluginNames = new ArrayList<>();
+            for (PluginWrapper pluginWrapper : pluginManager.getStartedPlugins()) {
+                String pluginName = pluginWrapper.getPluginId();
+                pluginNames.add(pluginName);
+                Resource jsBundleResource =
+                    BundleResourceUtils.getJsBundleResource(pluginManager, pluginName,
+                        BundleResourceUtils.JS_BUNDLE);
+                if (jsBundleResource != null) {
+                    try {
+                        jsBundle.append(
+                            jsBundleResource.getContentAsString(StandardCharsets.UTF_8));
+                        jsBundle.append("\n");
+                    } catch (IOException e) {
+                        log.error("Failed to read js bundle of plugin [{}]", pluginName, e);
                     }
                 }
-                String cssBundleString = """
-                    this.pluginCssBundle = `%s`;
-                    """.formatted(cssBundle.toString());
+            }
 
-                String plugins = """
-                    this.enabledPluginNames = [%s];
-                    """.formatted(pluginNames.stream()
-                    .collect(Collectors.joining("','", "'", "'")));
-                return Mono.just(jsBundle + plugins + cssBundleString);
-            });
+            String plugins = """
+                this.enabledPluginNames = [%s];
+                """.formatted(pluginNames.stream()
+                .collect(Collectors.joining("','", "'", "'")));
+            return jsBundle + plugins;
+        });
+    }
+
+    @Override
+    public Mono<String> uglifyCssBundle() {
+        return Mono.fromSupplier(() -> {
+            StringBuilder cssBundle = new StringBuilder();
+            for (PluginWrapper pluginWrapper : pluginManager.getStartedPlugins()) {
+                String pluginName = pluginWrapper.getPluginId();
+                Resource cssBundleResource =
+                    BundleResourceUtils.getJsBundleResource(pluginManager, pluginName,
+                        BundleResourceUtils.CSS_BUNDLE);
+                if (cssBundleResource != null) {
+                    try {
+                        cssBundle.append(
+                            cssBundleResource.getContentAsString(StandardCharsets.UTF_8));
+                    } catch (IOException e) {
+                        log.error("Failed to read css bundle of plugin [{}]", pluginName, e);
+                    }
+                }
+            }
+            return cssBundle.toString();
+        });
     }
 
     @Override

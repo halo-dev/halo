@@ -41,7 +41,19 @@ public interface PluginService {
      */
     Mono<Plugin> reload(String name);
 
+    /**
+     * Uglify js bundle from all enabled plugins to a single js bundle string.
+     *
+     * @return uglified js bundle
+     */
     Mono<String> uglifyJsBundle();
+
+    /**
+     * Uglify css bundle from all enabled plugins to a single css bundle string.
+     *
+     * @return uglified css bundle
+     */
+    Mono<String> uglifyCssBundle();
 
     /**
      * <p>Generate js bundle version for cache control.</p>

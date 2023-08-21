@@ -23,7 +23,7 @@ rules:
     resources: [ "auth-providers" ]
     verbs: [ "list" ]
   - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "plugins/bundle.js" ]
+    resources: [ "plugins/bundle.js", "plugins/bundle.css" ]
     resourceNames: [ "-" ]
     verbs: [ "get" ]
 ---

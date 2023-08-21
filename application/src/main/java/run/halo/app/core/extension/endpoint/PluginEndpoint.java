@@ -222,7 +222,13 @@ public class PluginEndpoint implements CustomEndpoint {
             )
             .GET("plugins/-/bundle.js", this::fetchJsBundle,
                 builder -> builder.operationId("fetchJsBundle")
-                    .description("Merge all bundles of enabled plugins into one.")
+                    .description("Merge all JS bundles of enabled plugins into one.")
+                    .tag(tag)
+                    .response(responseBuilder().implementation(String.class))
+            )
+            .GET("plugins/-/bundle.css", this::fetchCssBundle,
+                builder -> builder.operationId("fetchCssBundle")
+                    .description("Merge all CSS bundles of enabled plugins into one.")
                     .tag(tag)
                     .response(responseBuilder().implementation(String.class))
             )
@@ -232,9 +238,11 @@ public class PluginEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> fetchJsBundle(ServerRequest request) {
         Optional<String> versionOption = request.queryParam("v");
         if (versionOption.isEmpty()) {
-            var uri = "/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.js?v=";
             return pluginService.generateJsBundleVersion()
-                .flatMap(v -> ServerResponse.temporaryRedirect(URI.create(uri + v)).build());
+                .flatMap(v -> ServerResponse
+                    .temporaryRedirect(buildJsBundleUri("js", v))
+                    .build()
+                );
         }
         return pluginService.uglifyJsBundle()
             .defaultIfEmpty("")
@@ -242,6 +250,27 @@ public class PluginEndpoint implements CustomEndpoint {
                 .contentType(MediaType.valueOf("text/javascript"))
                 .bodyValue(bundle)
             );
+    }
+
+    private Mono<ServerResponse> fetchCssBundle(ServerRequest request) {
+        Optional<String> versionOption = request.queryParam("v");
+        if (versionOption.isEmpty()) {
+            return pluginService.generateJsBundleVersion()
+                .flatMap(v -> ServerResponse
+                    .temporaryRedirect(buildJsBundleUri("css", v))
+                    .build()
+                );
+        }
+        return pluginService.uglifyCssBundle()
+            .flatMap(bundle -> ServerResponse.ok()
+                .contentType(MediaType.valueOf("text/css"))
+                .bodyValue(bundle)
+            );
+    }
+
+    URI buildJsBundleUri(String type, String version) {
+        return URI.create(
+            "/apis/api.console.halo.run/v1alpha1/plugins/-/bundle." + type + "?v=" + version);
     }
 
     private Mono<ServerResponse> upgradeFromUri(ServerRequest request) {

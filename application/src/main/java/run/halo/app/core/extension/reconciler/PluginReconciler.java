@@ -151,7 +151,7 @@ public class PluginReconciler implements Reconciler<Request> {
                     // The status in the database will prevail
                     PluginWrapper pluginWrapper = getPluginWrapper(name);
                     pluginWrapper.setPluginState(status.getPhase());
-                    updatePluginStartedStateCacheInManager(pluginWrapper);
+                    applyPluginStateToPluginManager(pluginWrapper);
                     return status;
                 });
                 return false;
@@ -159,7 +159,7 @@ public class PluginReconciler implements Reconciler<Request> {
             .orElse(false);
     }
 
-    void updatePluginStartedStateCacheInManager(PluginWrapper pluginWrapper) {
+    void applyPluginStateToPluginManager(PluginWrapper pluginWrapper) {
         if (pluginWrapper == null) {
             return;
         }
@@ -342,7 +342,7 @@ public class PluginReconciler implements Reconciler<Request> {
             if (pluginWrapper != null) {
                 pluginWrapper.setPluginState(PluginState.FAILED);
                 pluginWrapper.setFailedException(e);
-                updatePluginStartedStateCacheInManager(pluginWrapper);
+                applyPluginStateToPluginManager(pluginWrapper);
             }
 
             status.setPhase(PluginState.FAILED);
