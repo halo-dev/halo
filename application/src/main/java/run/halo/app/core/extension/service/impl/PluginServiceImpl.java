@@ -172,7 +172,8 @@ public class PluginServiceImpl implements PluginService {
 
                 String plugins = """
                     this.enabledPluginNames = [%s];
-                    """.formatted(String.join(",", pluginNames));
+                    """.formatted(pluginNames.stream()
+                    .collect(Collectors.joining("','", "'", "'")));
                 return Mono.just(jsBundle + plugins + cssBundleString);
             });
     }
