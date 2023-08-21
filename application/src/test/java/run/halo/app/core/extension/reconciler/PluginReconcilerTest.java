@@ -496,6 +496,7 @@ class PluginReconcilerTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void persistenceFailureStatus() {
         String name = "fake-plugin";
         Plugin plugin = new Plugin();
@@ -509,6 +510,9 @@ class PluginReconcilerTest {
         when(pluginWrapper.getPluginPath()).thenReturn(Paths.get("/path/to/plugin.jar"));
         when(haloPluginManager.getPlugin(eq(name)))
             .thenReturn(pluginWrapper);
+        when(pluginWrapper.getPluginState()).thenReturn(PluginState.FAILED);
+        List<PluginWrapper> startedPlugins = (List<PluginWrapper>) mock(List.class);
+        when(haloPluginManager.getStartedPlugins()).thenReturn(startedPlugins);
         Throwable error = mock(Throwable.class);
         pluginReconciler.persistenceFailureStatus(name, error);
 
@@ -519,6 +523,24 @@ class PluginReconcilerTest {
 
         verify(pluginWrapper).setPluginState(eq(PluginState.FAILED));
         verify(pluginWrapper).setFailedException(eq(error));
+        verify(startedPlugins).remove(eq(pluginWrapper));
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void applyPluginStateToPluginManager() {
+        PluginWrapper pluginWrapper = mock(PluginWrapper.class);
+        when(pluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
+        List<PluginWrapper> startedPlugins = (List<PluginWrapper>) mock(List.class);
+        when(haloPluginManager.getStartedPlugins()).thenReturn(startedPlugins);
+
+        when(startedPlugins.contains(eq(pluginWrapper))).thenReturn(true);
+        pluginReconciler.applyPluginStateToPluginManager(pluginWrapper);
+        verify(startedPlugins, times(0)).add(eq(pluginWrapper));
+
+        when(startedPlugins.contains(eq(pluginWrapper))).thenReturn(false);
+        pluginReconciler.applyPluginStateToPluginManager(pluginWrapper);
+        verify(startedPlugins).add(eq(pluginWrapper));
     }
 
     @Test
