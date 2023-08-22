@@ -33,7 +33,7 @@ export async function setupPluginModules(app: App) {
 
       if (module) {
         registerModule(app, module, false);
-        pluginModuleStore.registerPluginModule(module);
+        pluginModuleStore.registerPluginModule(name, module);
       }
     });
   } catch (e) {

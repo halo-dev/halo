@@ -21,6 +21,7 @@ import { markRaw } from "vue";
 import DetailTab from "./tabs/Detail.vue";
 import SettingTab from "./tabs/Setting.vue";
 import { useRouteQuery } from "@vueuse/router";
+import { usePluginModuleStore } from "@/stores/plugin";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -88,7 +89,9 @@ const { data: setting } = useQuery({
 provide<Ref<Setting | undefined>>("setting", setting);
 
 onMounted(() => {
-  const currentPluginModule = window[route.params.name as string];
+  const { pluginModuleMap } = usePluginModuleStore();
+
+  const currentPluginModule = pluginModuleMap[route.params.name as string];
 
   if (!currentPluginModule) {
     return;
