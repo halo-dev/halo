@@ -4,9 +4,11 @@ import static org.apache.lucene.document.Field.Store.YES;
 import static org.apache.lucene.index.IndexWriterConfig.OpenMode.CREATE_OR_APPEND;
 
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.Analyzer;
@@ -23,8 +25,9 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.queryparser.flexible.core.QueryNodeException;
+import org.apache.lucene.queryparser.flexible.standard.StandardQueryParser;
+import org.apache.lucene.queryparser.flexible.standard.config.PointsConfig;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -98,7 +101,7 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
             post.setTitle(title);
             post.setContent(content);
             var publishTimestamp = doc.getField("publishTimestamp").numericValue().longValue();
-            post.setPublishTimestamp(Instant.ofEpochMilli(publishTimestamp));
+            post.setPublishTimestamp(Instant.ofEpochSecond(publishTimestamp));
             post.setPermalink(doc.get("permalink"));
             hits.add(post);
         }
@@ -162,11 +165,15 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
     }
 
 
-    private Query buildQuery(String keyword) throws ParseException {
+    private Query buildQuery(String keyword) throws QueryNodeException {
         if (log.isDebugEnabled()) {
             log.debug("Trying to search for keyword: {}", keyword);
         }
-        return new QueryParser("content", analyzer).parse(keyword);
+        var parser = new StandardQueryParser(analyzer);
+        parser.setPointsConfigMap(Map.of(
+            "publishTimestamp", new PointsConfig(NumberFormat.getNumberInstance(), Long.class)
+        ));
+        return parser.parse(keyword, "content");
     }
 
     private Document convert(PostDoc post) {
@@ -176,7 +183,7 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
         doc.add(new TextField("excerpt", post.excerpt(), YES));
         doc.add(new TextField("content", post.content(), YES));
 
-        var publishTimestamp = post.publishTimestamp().toEpochMilli();
+        var publishTimestamp = post.publishTimestamp().getEpochSecond();
         doc.add(new LongPoint("publishTimestamp", publishTimestamp));
         doc.add(new StoredField("publishTimestamp", publishTimestamp));
         doc.add(new StoredField("permalink", post.permalink()));
