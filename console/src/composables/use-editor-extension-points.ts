@@ -1,16 +1,9 @@
 import { usePluginModuleStore } from "@/stores/plugin";
-import type {
-  EditorProvider as EditorProviderRaw,
-  PluginModule,
-} from "@halo-dev/console-shared";
+import type { EditorProvider, PluginModule } from "@halo-dev/console-shared";
 import { onMounted, ref, type Ref, defineAsyncComponent } from "vue";
 import { VLoading } from "@halo-dev/components";
 import Logo from "@/assets/logo.png";
 import { useI18n } from "vue-i18n";
-
-export interface EditorProvider extends EditorProviderRaw {
-  logo?: string;
-}
 
 interface useEditorExtensionPointsReturn {
   editorProviders: Ref<EditorProvider[]>;

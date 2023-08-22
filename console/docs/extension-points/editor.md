@@ -12,6 +12,7 @@ export default definePlugin({
         {
           name: "markdown-editor",
           displayName: "Markdown",
+          logo: "logo.png"
           component: markRaw(MarkdownEditor),
           rawType: "markdown",
         },
