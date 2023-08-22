@@ -39,7 +39,7 @@ dependencies {
         api "org.apache.lucene:lucene-queryparser:$lucene"
         api "org.apache.lucene:lucene-highlighter:$lucene"
         api "org.apache.lucene:lucene-backward-codecs:$lucene"
-        api 'cn.shenyanchao.ik-analyzer:ik-analyzer:9.0.0'
+        api "org.apache.lucene:lucene-analysis-common:$lucene"
 
         api "org.apache.commons:commons-lang3:$commonsLang3"
         api "io.seruco.encoding:base62:$base62"

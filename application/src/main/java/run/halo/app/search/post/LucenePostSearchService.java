@@ -1,7 +1,5 @@
 package run.halo.app.search.post;
 
-import static org.apache.commons.lang3.StringUtils.stripToEmpty;
-import static org.apache.lucene.document.Field.Store.NO;
 import static org.apache.lucene.document.Field.Store.YES;
 import static org.apache.lucene.index.IndexWriterConfig.OpenMode.CREATE_OR_APPEND;
 
@@ -11,8 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.charfilter.HTMLStripCharFilterFactory;
+import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.custom.CustomAnalyzer;
+import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.document.StoredField;
@@ -27,19 +28,15 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.highlight.DefaultEncoder;
 import org.apache.lucene.search.highlight.Highlighter;
-import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
 import org.apache.lucene.search.highlight.QueryScorer;
-import org.apache.lucene.search.highlight.SimpleFragmenter;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.jsoup.Jsoup;
-import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
-import org.wltea.analyzer.lucene.IKAnalyzer;
 import reactor.core.Exceptions;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.search.SearchParam;
@@ -49,15 +46,18 @@ import run.halo.app.search.SearchResult;
 @Slf4j
 public class LucenePostSearchService implements PostSearchService, DisposableBean {
 
-    public static final int MAX_FRAGMENT_SIZE = 100;
-
     private final Analyzer analyzer;
 
     private final Directory postIndexDir;
 
     public LucenePostSearchService(HaloProperties haloProperties)
         throws IOException {
-        analyzer = new IKAnalyzer(true);
+        analyzer = CustomAnalyzer.builder()
+            .withTokenizer(StandardTokenizerFactory.class)
+            .addCharFilter(HTMLStripCharFilterFactory.NAME)
+            .addTokenFilter(LowerCaseFilterFactory.NAME)
+            .build();
+
         var postIdxPath = haloProperties.getWorkDir().resolve("indices/posts");
         postIndexDir = FSDirectory.open(postIdxPath);
     }
@@ -72,14 +72,35 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
         var query = buildQuery(keyword);
         var topDocs = searcher.search(query, param.getLimit(), Sort.RELEVANCE);
         watch.stop();
-        var highlighter = new Highlighter(
-            new SimpleHTMLFormatter(param.getHighlightPreTag(), param.getHighlightPostTag()),
-            new QueryScorer(query));
-        highlighter.setTextFragmenter(new SimpleFragmenter(MAX_FRAGMENT_SIZE));
 
+        var formatter =
+            new SimpleHTMLFormatter(param.getHighlightPreTag(), param.getHighlightPostTag());
+        var scorer = new QueryScorer(query);
+        var highlighter = new Highlighter(formatter, new DefaultEncoder(), scorer);
         var hits = new ArrayList<PostHit>(topDocs.scoreDocs.length);
         for (var scoreDoc : topDocs.scoreDocs) {
-            hits.add(convert(searcher.storedFields().document(scoreDoc.doc), highlighter));
+            var doc = searcher.storedFields().document(scoreDoc.doc);
+
+            var title = doc.get("title");
+            var titleFragment = highlighter.getBestFragment(analyzer, "title", title);
+            if (titleFragment != null) {
+                title = titleFragment;
+            }
+
+            var content = doc.get("content");
+            var contentFragment = highlighter.getBestFragment(analyzer, "content", content);
+            if (contentFragment != null) {
+                content = contentFragment;
+            }
+
+            var post = new PostHit();
+            post.setName(doc.get("name"));
+            post.setTitle(title);
+            post.setContent(content);
+            var publishTimestamp = doc.getField("publishTimestamp").numericValue().longValue();
+            post.setPublishTimestamp(Instant.ofEpochMilli(publishTimestamp));
+            post.setPermalink(doc.get("permalink"));
+            hits.add(post);
         }
 
         var result = new SearchResult<PostHit>();
@@ -145,68 +166,21 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
         if (log.isDebugEnabled()) {
             log.debug("Trying to search for keyword: {}", keyword);
         }
-        return new QueryParser("searchable", analyzer).parse(keyword);
+        return new QueryParser("content", analyzer).parse(keyword);
     }
 
     private Document convert(PostDoc post) {
         var doc = new Document();
         doc.add(new StringField("name", post.name(), YES));
-        doc.add(new StoredField("title", post.title()));
+        doc.add(new TextField("title", post.title(), YES));
+        doc.add(new TextField("excerpt", post.excerpt(), YES));
+        doc.add(new TextField("content", post.content(), YES));
 
-        var cleanExcerpt = Jsoup.clean(stripToEmpty(post.excerpt()), Safelist.none());
-        var cleanContent = Jsoup.clean(stripToEmpty(post.content()), Safelist.none());
-
-        var contentBuilder = new StringBuilder(cleanExcerpt);
-        if (!contentBuilder.isEmpty()) {
-            contentBuilder.append(' ');
-        }
-        contentBuilder.append(cleanContent);
-
-        var content = contentBuilder.toString();
-
-        doc.add(new StoredField("content", content));
-        doc.add(new TextField("searchable", post.title() + " " + content, NO));
-
-        long publishTimestamp = post.publishTimestamp().toEpochMilli();
+        var publishTimestamp = post.publishTimestamp().toEpochMilli();
         doc.add(new LongPoint("publishTimestamp", publishTimestamp));
         doc.add(new StoredField("publishTimestamp", publishTimestamp));
         doc.add(new StoredField("permalink", post.permalink()));
         return doc;
     }
 
-    private PostHit convert(Document doc, Highlighter highlighter)
-        throws IOException, InvalidTokenOffsetsException {
-        var post = new PostHit();
-        post.setName(doc.get("name"));
-
-        var title = getHighlightedText(doc, "title", highlighter, MAX_FRAGMENT_SIZE);
-        post.setTitle(title);
-
-        var content = getHighlightedText(doc, "content", highlighter, MAX_FRAGMENT_SIZE);
-        post.setContent(content);
-
-        var publishTimestamp = doc.getField("publishTimestamp").numericValue().longValue();
-        post.setPublishTimestamp(Instant.ofEpochMilli(publishTimestamp));
-        post.setPermalink(doc.get("permalink"));
-        return post;
-    }
-
-    private String getHighlightedText(Document doc, String field, Highlighter highlighter,
-        int maxLength)
-        throws InvalidTokenOffsetsException, IOException {
-        try {
-            var highlightedText = highlighter.getBestFragment(analyzer, field, doc.get(field));
-            if (highlightedText != null) {
-                return highlightedText;
-            }
-        } catch (IllegalArgumentException iae) {
-            // TODO we have to ignore the error currently due to no solution about the error.
-            if (!"boost must be a positive float, got -1.0".equals(iae.getMessage())) {
-                throw iae;
-            }
-        }
-        // handle if there is not highlighted text
-        var fieldValue = doc.get(field);
-        return StringUtils.substring(fieldValue, 0, maxLength);
-    }
 }
