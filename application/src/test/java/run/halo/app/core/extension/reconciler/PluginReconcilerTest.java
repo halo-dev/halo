@@ -125,8 +125,6 @@ class PluginReconcilerTest {
         // mock plugin real state is started
         when(pluginWrapper.getPluginState()).thenReturn(PluginState.STOPPED);
         var pluginDescriptor = mock(PluginDescriptor.class);
-        when(pluginWrapper.getDescriptor()).thenReturn(pluginDescriptor);
-        when(pluginDescriptor.getVersion()).thenReturn("1.0.0");
 
         PluginStartingError pluginStartingError =
             PluginStartingError.of("apples", "error message", "dev message");
@@ -202,7 +200,7 @@ class PluginReconcilerTest {
         when(pluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
 
         ArgumentCaptor<Plugin> pluginCaptor = doReconcileWithoutRequeue();
-        verify(extensionClient, times(3)).update(any(Plugin.class));
+        verify(extensionClient, times(4)).update(any(Plugin.class));
 
         Plugin updateArgs = pluginCaptor.getValue();
         assertThat(updateArgs).isNotNull();
