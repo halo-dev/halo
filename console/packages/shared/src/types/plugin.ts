@@ -6,6 +6,7 @@ import type { EditorProvider, PluginTab } from "..";
 import type { AnyExtension } from "@tiptap/vue-3";
 import type { CommentSubjectRefProvider } from "@/states/comment-subject-ref";
 import type { BackupTab } from "@/states/backup";
+import type { PluginInstallationTab } from "@/states/plugin-installation-tabs";
 
 export interface RouteRecordAppend {
   parentName: RouteRecordName;
@@ -31,6 +32,10 @@ export interface ExtensionPoint {
   "comment:subject-ref:create"?: () => CommentSubjectRefProvider[];
 
   "backup:tabs:create"?: () => BackupTab[] | Promise<BackupTab[]>;
+
+  "plugin:installation:tabs:create"?: () =>
+    | PluginInstallationTab[]
+    | Promise<PluginInstallationTab[]>;
 }
 
 export interface PluginModule {
