@@ -111,6 +111,9 @@ public class PluginReconciler implements Reconciler<Request> {
             log.error("Failed to reconcile plugin: [{}]", request.name(), e);
             persistenceFailureStatus(request.name(), e);
             return Result.doNotRetry();
+        } catch (Exception e) {
+            persistenceFailureStatus(request.name(), e);
+            throw e;
         }
     }
 
@@ -144,12 +147,16 @@ public class PluginReconciler implements Reconciler<Request> {
                     String logoUrl = generateAccessibleLogoUrl(plugin);
                     status.setLogo(logoUrl);
 
-                    // Synchronize to plugin state in manager based on the phase of database
-                    // to avoid the plugin state in manager is inconsistent with the database
-                    // It is possible that the in-memory plugin has successfully started,
-                    // but the status update of the database has failed.
-                    // The status in the database will prevail
-                    getPluginWrapper(name).setPluginState(status.getPhase());
+                    // If phase in status is not equal to plugin state, then reset plugin to
+                    // stopped state and keep the state in memory consistent with the database
+                    PluginState pluginState = getPluginWrapper(name).getPluginState();
+                    status.setPhase(pluginState);
+                    if (!Objects.equals(status.getPhase(), pluginState)) {
+                        // stop and set phase
+                        status.setPhase(haloPluginManager.stopPlugin(name));
+                        status.setEntry(StringUtils.EMPTY);
+                        status.setStylesheet(StringUtils.EMPTY);
+                    }
                     return status;
                 });
                 return false;
@@ -323,6 +330,7 @@ public class PluginReconciler implements Reconciler<Request> {
         updateStatus(pluginName, status -> {
             PluginWrapper pluginWrapper = haloPluginManager.getPlugin(pluginName);
             if (pluginWrapper != null) {
+                haloPluginManager.stopPlugin(pluginName);
                 pluginWrapper.setPluginState(PluginState.FAILED);
                 pluginWrapper.setFailedException(e);
             }
@@ -372,6 +380,25 @@ public class PluginReconciler implements Reconciler<Request> {
     }
 
     void updateStatus(String name, UnaryOperator<Plugin.PluginStatus> operator) {
+        try {
+            retryTemplate.execute(callback -> {
+                try {
+                    doUpdateStatus(name, operator);
+                } catch (Exception e) {
+                    // trigger retry
+                    throw new IllegalStateException(e);
+                }
+                return null;
+            });
+        } catch (Exception e) {
+            haloPluginManager.stopPlugin(name);
+            PluginWrapper pluginWrapper = haloPluginManager.getPlugin(name);
+            pluginWrapper.setPluginState(PluginState.FAILED);
+            throw e;
+        }
+    }
+
+    void doUpdateStatus(String name, UnaryOperator<Plugin.PluginStatus> operator) {
         client.fetch(Plugin.class, name).ifPresent(plugin -> {
             Plugin.PluginStatus oldStatus = JsonUtils.deepCopy(plugin.statusNonNull());
             Plugin.PluginStatus newStatus =
@@ -412,17 +439,17 @@ public class PluginReconciler implements Reconciler<Request> {
                 "The plugin is disabled for some reason and cannot be started.");
         }
 
+        PluginState currentState = haloPluginManager.startPlugin(name);
+        if (!PluginState.STARTED.equals(currentState)) {
+            PluginStartingError staringErrorInfo = getStaringErrorInfo(name);
+            log.debug("Failed to start plugin: " + staringErrorInfo.getDevMessage(),
+                pluginWrapper.getFailedException());
+            throw new IllegalStateException(staringErrorInfo.getMessage(),
+                pluginWrapper.getFailedException());
+        }
+
         String pluginVersion = pluginWrapper.getDescriptor().getVersion();
         updateStatus(name, status -> {
-            PluginState currentState = haloPluginManager.startPlugin(name);
-            if (!PluginState.STARTED.equals(currentState)) {
-                PluginStartingError staringErrorInfo = getStaringErrorInfo(name);
-                log.debug("Failed to start plugin: " + staringErrorInfo.getDevMessage(),
-                    pluginWrapper.getFailedException());
-                throw new IllegalStateException(staringErrorInfo.getMessage(),
-                    pluginWrapper.getFailedException());
-            }
-
             status.setLastStartTime(Instant.now());
 
             String jsBundlePath =
@@ -468,11 +495,11 @@ public class PluginReconciler implements Reconciler<Request> {
     }
 
     void doStop(String name) {
+        PluginState currentState = haloPluginManager.stopPlugin(name);
+        if (!PluginState.STOPPED.equals(currentState)) {
+            throw new IllegalStateException("Failed to stop plugin: " + name);
+        }
         updateStatus(name, status -> {
-            PluginState currentState = haloPluginManager.stopPlugin(name);
-            if (!PluginState.STOPPED.equals(currentState)) {
-                throw new IllegalStateException("Failed to stop plugin: " + name);
-            }
             status.setPhase(currentState);
             // reset js bundle path
             status.setStylesheet(StringUtils.EMPTY);
@@ -569,17 +596,17 @@ public class PluginReconciler implements Reconciler<Request> {
     }
 
     /**
-     * Returns absolute plugin path.
-     * if plugin path is absolute, use it directly in development mode.
-     * otherwise, combine plugin path with plugin root path.
-     * Note: plugin location without scheme
+     * Returns an absolute plugin path.
+     * if a plugin path is absolute, use it directly in development mode.
+     * otherwise, combine a plugin path with a plugin root path.
+     * Note: plugin location without a scheme
      */
     String buildPluginLocation(String name, String pluginPathString) {
         Assert.notNull(name, "Plugin name must not be null");
         Assert.notNull(pluginPathString, "Plugin path must not be null");
         Path pluginsRoot = toPath(haloPluginManager.getPluginsRoot().toString());
         Path pluginPath = toPath(pluginPathString);
-        // if plugin path is absolute, use it directly in development mode
+        // if a plugin path is absolute, use it directly in development mode
         if (pluginPath.isAbsolute()) {
             if (!isDevelopmentMode(name) && !pluginPath.startsWith(pluginsRoot)) {
                 throw new DoNotRetryException(
@@ -638,7 +665,7 @@ public class PluginReconciler implements Reconciler<Request> {
         if (BooleanUtils.isNotTrue(plugin.getSpec().getEnabled())) {
             return false;
         }
-        // phase is not started or plugin state is not started should start
+        // phase is not started, or plugin state is not started should start
         return !PluginState.STARTED.equals(plugin.statusNonNull().getPhase())
             || !PluginState.STARTED.equals(pluginWrapper.getPluginState());
     }
@@ -648,7 +675,7 @@ public class PluginReconciler implements Reconciler<Request> {
         if (BooleanUtils.isNotFalse(plugin.getSpec().getEnabled())) {
             return false;
         }
-        // phase is not stopped or plugin state is not stopped should stop
+        // phase is not stopped, or plugin state is not stopped should stop
         return !PluginState.STOPPED.equals(plugin.statusNonNull().getPhase())
             || !PluginState.STOPPED.equals(pluginWrapper.getPluginState());
     }
