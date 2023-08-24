@@ -11,24 +11,25 @@ import {
   VDropdown,
   VDropdownDivider,
 } from "@halo-dev/components";
-import { toRefs } from "vue";
+import { inject, toRefs } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 import type { Plugin } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
 import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
+import type { Ref } from "vue";
+import { ref } from "vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
-    plugin?: Plugin;
+    plugin: Plugin;
+    isSelected?: boolean;
   }>(),
-  {
-    plugin: undefined,
-  }
+  { isSelected: false }
 );
 
 const emit = defineEmits<{
@@ -36,6 +37,8 @@ const emit = defineEmits<{
 }>();
 
 const { plugin } = toRefs(props);
+
+const selectedNames = inject<Ref<string[]>>("selectedNames", ref([]));
 
 const { getFailedMessage, changeStatus, uninstall } =
   usePluginLifeCycle(plugin);
@@ -66,33 +69,45 @@ const handleResetSettingConfig = async () => {
 };
 </script>
 <template>
-  <VEntity>
+  <VEntity :is-selected="isSelected">
+    <template
+      v-if="currentUserHasPermission(['system:plugins:manage'])"
+      #checkbox
+    >
+      <input
+        v-model="selectedNames"
+        :value="plugin.metadata.name"
+        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+        name="post-checkbox"
+        type="checkbox"
+      />
+    </template>
     <template #start>
       <VEntityField>
         <template #description>
           <VAvatar
-            :alt="plugin?.spec.displayName"
-            :src="plugin?.status?.logo"
+            :alt="plugin.spec.displayName"
+            :src="plugin.status?.logo"
             size="md"
           ></VAvatar>
         </template>
       </VEntityField>
       <VEntityField
-        :title="plugin?.spec.displayName"
-        :description="plugin?.spec.description"
+        :title="plugin.spec.displayName"
+        :description="plugin.spec.description"
         :route="{
           name: 'PluginDetail',
-          params: { name: plugin?.metadata.name },
+          params: { name: plugin.metadata.name },
         }"
       />
     </template>
     <template #end>
-      <VEntityField v-if="plugin?.status?.phase === 'FAILED'">
+      <VEntityField v-if="plugin.status?.phase === 'FAILED'">
         <template #description>
           <VStatusDot v-tooltip="getFailedMessage()" state="error" animate />
         </template>
       </VEntityField>
-      <VEntityField v-if="plugin?.metadata.deletionTimestamp">
+      <VEntityField v-if="plugin.metadata.deletionTimestamp">
         <template #description>
           <VStatusDot
             v-tooltip="$t('core.common.status.deleting')"
@@ -101,32 +116,29 @@ const handleResetSettingConfig = async () => {
           />
         </template>
       </VEntityField>
-      <VEntityField v-if="plugin?.spec.author">
+      <VEntityField v-if="plugin.spec.author">
         <template #description>
           <a
-            :href="plugin?.spec.author.website"
+            :href="plugin.spec.author.website"
             class="hidden text-sm text-gray-500 hover:text-gray-900 sm:block"
             target="_blank"
           >
-            @{{ plugin?.spec.author.name }}
+            @{{ plugin.spec.author.name }}
           </a>
         </template>
       </VEntityField>
-      <VEntityField :description="plugin?.spec.version" />
-      <VEntityField v-if="plugin?.metadata.creationTimestamp">
+      <VEntityField :description="plugin.spec.version" />
+      <VEntityField v-if="plugin.metadata.creationTimestamp">
         <template #description>
           <span class="truncate text-xs tabular-nums text-gray-500">
-            {{ formatDatetime(plugin?.metadata.creationTimestamp) }}
+            {{ formatDatetime(plugin.metadata.creationTimestamp) }}
           </span>
         </template>
       </VEntityField>
       <VEntityField v-permission="['system:plugins:manage']">
         <template #description>
           <div class="flex items-center">
-            <VSwitch
-              :model-value="plugin?.spec.enabled"
-              @click="changeStatus"
-            />
+            <VSwitch :model-value="plugin.spec.enabled" @click="changeStatus" />
           </div>
         </template>
       </VEntityField>
@@ -139,7 +151,7 @@ const handleResetSettingConfig = async () => {
         @click="
           $router.push({
             name: 'PluginDetail',
-            params: { name: plugin?.metadata.name },
+            params: { name: plugin.metadata.name },
           })
         "
       >
