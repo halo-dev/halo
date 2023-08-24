@@ -37,7 +37,7 @@ const emit = defineEmits<{
 
 const { plugin } = toRefs(props);
 
-const { getFailedMessage, changeStatus, uninstall } =
+const { getFailedMessage, changeStatus, changingStatus, uninstall } =
   usePluginLifeCycle(plugin);
 
 const handleResetSettingConfig = async () => {
@@ -125,6 +125,7 @@ const handleResetSettingConfig = async () => {
           <div class="flex items-center">
             <VSwitch
               :model-value="plugin?.spec.enabled"
+              :disabled="changingStatus"
               @click="changeStatus"
             />
           </div>
