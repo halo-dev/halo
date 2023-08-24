@@ -197,7 +197,7 @@ const viewTypes = [
   },
 ];
 
-const viewType = useLocalStorage("halo-attachment-viewType", "list");
+const viewType = useLocalStorage("attachment-view-type", "list");
 
 // Route query action
 const routeQueryAction = useRouteQuery<string | undefined>("action");
