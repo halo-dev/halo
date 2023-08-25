@@ -182,6 +182,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
   <MenuItemEditingModal
     v-model:visible="menuItemEditingModal"
     :menu-item="selectedMenuItem"
+    :menu-tree-items="menuTreeItems"
     :parent-menu-item="selectedParentMenuItem"
     :menu="selectedMenu"
     @close="onMenuItemEditingModalClose"

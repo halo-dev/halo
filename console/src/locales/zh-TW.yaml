@@ -706,6 +706,7 @@ core:
             tag: 標籤
         display_name:
           label: 名稱
+          warning: 當前選單存在相同的名字的另一個連結
         href:
           label: 連結地址
         target:
