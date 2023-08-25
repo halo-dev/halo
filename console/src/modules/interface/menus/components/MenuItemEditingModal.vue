@@ -4,7 +4,7 @@ import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { setFocus } from "@/formkit/utils/focus";
 import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
-import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
+import type { Menu, MenuItem, MenuItemStatus, Ref } from "@halo-dev/api-client";
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import cloneDeep from "lodash.clonedeep";
 import { computed, nextTick, ref, watch } from "vue";
