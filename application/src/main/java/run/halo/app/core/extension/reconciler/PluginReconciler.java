@@ -183,13 +183,6 @@ public class PluginReconciler implements Reconciler<Request> {
         Assert.notNull(name, "Plugin name must not be null");
         Assert.notNull(settingName, "Setting name must not be null");
         PluginWrapper pluginWrapper = getPluginWrapper(name);
-        // If it already exists, do not look for setting
-        if (RuntimeMode.DEPLOYMENT.equals(pluginWrapper.getRuntimeMode())) {
-            Optional<Setting> existing = client.fetch(Setting.class, settingName);
-            if (existing.isPresent()) {
-                return existing;
-            }
-        }
 
         var resourceLoader =
             new DefaultResourceLoader(pluginWrapper.getPluginClassLoader());

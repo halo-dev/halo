@@ -166,12 +166,23 @@ public class ThemeServiceImpl implements ThemeService {
                     })
                     .doOnNext(unstructured ->
                         populateThemeNameLabel(unstructured, theme.getMetadata().getName()))
-                    .flatMap(unstructured -> client.create(unstructured)
-                        .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
-                            .filter(OptimisticLockingFailureException.class::isInstance))
-                    )
+                    .flatMap(this::createOrUpdate)
                     .then(Mono.just(theme));
             });
+    }
+
+    Mono<Unstructured> createOrUpdate(Unstructured unstructured) {
+        return Mono.defer(() -> client.fetch(unstructured.groupVersionKind(),
+                    unstructured.getMetadata().getName())
+                .flatMap(existUnstructured -> {
+                    existUnstructured.getMetadata()
+                        .setVersion(unstructured.getMetadata().getVersion());
+                    return client.update(existUnstructured);
+                })
+                .switchIfEmpty(Mono.defer(() -> client.create(unstructured)))
+            )
+            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
+                .filter(OptimisticLockingFailureException.class::isInstance));
     }
 
     @Override
