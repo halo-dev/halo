@@ -69,7 +69,7 @@ const handleResetSettingConfig = async () => {
 };
 
 const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
-  "plugin:list-item:create",
+  "plugin:list-item:operation:create",
   [
     {
       priority: 10,

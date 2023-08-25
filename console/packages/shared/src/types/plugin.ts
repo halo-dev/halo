@@ -34,11 +34,11 @@ export interface ExtensionPoint {
 
   "backup:tabs:create"?: () => BackupTab[] | Promise<BackupTab[]>;
 
-  "post:list-item:create"?: () =>
+  "post:list-item:operation:create"?: () =>
     | EntityDropdownItem<ListedPost>[]
     | Promise<EntityDropdownItem<ListedPost>[]>;
 
-  "plugin:list-item:create"?: () =>
+  "plugin:list-item:operation:create"?: () =>
     | EntityDropdownItem<Plugin>[]
     | Promise<EntityDropdownItem<Plugin>[]>;
 }
