@@ -43,7 +43,8 @@ watch(
     selectedUser.value,
     keyword.value,
   ],
-  ([user]) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ([approvedStatus, sort, user]) => {
     // TODO: email users are not supported at the moment.
     selectedUserKind.value = user ? "User" : undefined;
     page.value = 1;
