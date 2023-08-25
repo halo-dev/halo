@@ -102,6 +102,7 @@ core:
           title: 最近文章
           visits: "訪問量 {visits}"
           comments: "留言 {comments}"
+          publishTime: "發佈日期 {publishTime}"
         quicklink:
           title: 快捷訪問
           actions:

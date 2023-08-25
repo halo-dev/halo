@@ -70,6 +70,18 @@ const { data } = useQuery<ListedPost[]>({
                         )
                       }}
                     </span>
+                    <span class="truncate text-xs tabular-nums text-gray-500">
+                      {{
+                        $t(
+                          "core.dashboard.widgets.presets.recent_published.publishTime",
+                          {
+                            publishTime: formatDatetime(
+                              post.post.spec.publishTime
+                            ),
+                          }
+                        )
+                      }}
+                    </span>
                   </VSpace>
                 </template>
                 <template #extra>
@@ -82,15 +94,6 @@ const { data } = useQuery<ListedPost[]>({
                   >
                     <IconExternalLinkLine class="h-3.5 w-3.5" />
                   </a>
-                </template>
-              </VEntityField>
-            </template>
-            <template #end>
-              <VEntityField>
-                <template #description>
-                  <span class="truncate text-xs tabular-nums text-gray-500">
-                    {{ formatDatetime(post.post.spec.publishTime) }}
-                  </span>
                 </template>
               </VEntityField>
             </template>

@@ -102,6 +102,7 @@ core:
           title: Recent Posts
           visits: "{visits} Visits"
           comments: "{comments} Comments"
+          publishTime: "Publish Time {publishTime}"
         quicklink:
           title: Quick Link
           actions:
