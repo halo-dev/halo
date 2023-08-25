@@ -34,7 +34,6 @@ const selectedApprovedStatus = useRouteQuery<string | undefined>(
 );
 const selectedSort = useRouteQuery<string | undefined>("sort");
 const selectedUser = useRouteQuery<string | undefined>("user");
-const selectedUserKind = useRouteQuery<string | undefined>("kind");
 
 watch(
   () => [
@@ -43,10 +42,7 @@ watch(
     selectedUser.value,
     keyword.value,
   ],
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ([approvedStatus, sort, user]) => {
-    // TODO: email users are not supported at the moment.
-    selectedUserKind.value = user ? "User" : undefined;
+  () => {
     page.value = 1;
   }
 );
@@ -55,8 +51,7 @@ const hasFilters = computed(() => {
   return (
     selectedApprovedStatus.value !== undefined ||
     selectedSort.value ||
-    selectedUser.value ||
-    selectedUserKind.value
+    selectedUser.value
   );
 });
 
@@ -64,7 +59,6 @@ function handleClearFilters() {
   selectedApprovedStatus.value = undefined;
   selectedSort.value = undefined;
   selectedUser.value = undefined;
-  selectedUserKind.value = undefined;
 }
 
 const page = useRouteQuery<number>("page", 1, {
@@ -88,7 +82,6 @@ const {
     selectedApprovedStatus,
     selectedSort,
     selectedUser,
-    selectedUserKind,
     keyword,
   ],
   queryFn: async () => {
@@ -102,7 +95,8 @@ const {
       sort: [selectedSort.value].filter(Boolean) as string[],
       keyword: keyword.value,
       ownerName: selectedUser.value,
-      ownerKind: selectedUserKind.value,
+      // TODO: email users are not supported at the moment.
+      ownerKind: selectedUser.value ? "User" : undefined,
     });
 
     total.value = data.total;
