@@ -291,7 +291,10 @@ const compareMenuItemsWitchDisplayName = (
   displayName: string
 ): boolean => {
   for (const menu of childrens) {
-    if (displayName && menu.status.displayName === displayName) {
+    if (
+      displayName &&
+      (menu.status as MenuItemStatus).displayName === displayName
+    ) {
       return true;
     }
   }
