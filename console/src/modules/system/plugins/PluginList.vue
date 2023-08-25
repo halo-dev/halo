@@ -7,7 +7,6 @@ import {
   VCard,
   VEmpty,
   VPageHeader,
-  VPagination,
   VSpace,
   VLoading,
   Dialog,
@@ -29,7 +28,6 @@ import type { Ref } from "vue";
 import { usePluginBatchOperations } from "./composables/use-plugin";
 
 const { t } = useI18n();
-
 const { currentUserHasPermission } = usePermission();
 
 const pluginInstallationModal = ref(false);
@@ -41,9 +39,6 @@ function handleOpenUploadModal(plugin?: Plugin) {
 }
 
 const keyword = ref("");
-const page = ref(1);
-const size = ref(20);
-const total = ref(0);
 
 const selectedEnabledValue = ref();
 const selectedSortValue = ref();
@@ -57,33 +52,16 @@ function handleClearFilters() {
   selectedEnabledValue.value = undefined;
 }
 
-watch(
-  () => [selectedEnabledValue.value, selectedSortValue.value, keyword.value],
-  () => {
-    page.value = 1;
-  }
-);
-
 const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
-  queryKey: [
-    "plugins",
-    page,
-    size,
-    keyword,
-    selectedEnabledValue,
-    selectedSortValue,
-  ],
+  queryKey: ["plugins", keyword, selectedEnabledValue, selectedSortValue],
   queryFn: async () => {
     const { data } = await apiClient.plugin.listPlugins({
-      page: page.value,
-      size: size.value,
+      page: 0,
+      size: 0,
       keyword: keyword.value,
       enabled: selectedEnabledValue.value,
       sort: [selectedSortValue.value].filter(Boolean) as string[],
     });
-
-    total.value = data.total;
-
     return data.items;
   },
   keepPreviousData: true,
@@ -326,20 +304,6 @@ onMounted(() => {
           </li>
         </ul>
       </Transition>
-
-      <template #footer>
-        <VPagination
-          v-model:page="page"
-          v-model:size="size"
-          :page-label="$t('core.components.pagination.page_label')"
-          :size-label="$t('core.components.pagination.size_label')"
-          :total-label="
-            $t('core.components.pagination.total_label', { total: total })
-          "
-          :total="total"
-          :size-options="[10, 20, 30, 50, 100]"
-        />
-      </template>
     </VCard>
   </div>
 </template>
