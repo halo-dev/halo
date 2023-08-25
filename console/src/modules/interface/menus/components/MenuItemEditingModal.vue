@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import { computed, nextTick, ref, watch } from "vue";
-import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
+import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import { setFocus } from "@/formkit/utils/focus";
 import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
+import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import cloneDeep from "lodash.clonedeep";
-import { setFocus } from "@/formkit/utils/focus";
-import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import type { MenuTreeItem } from "../utils";
 
@@ -286,18 +286,18 @@ const findParentMenuItemChidrensByName = (value: string) => {
   })[0].spec.children;
 };
 
-const compareMenuItemsWitchDisplayname = (
+const compareMenuItemsWitchDisplayName = (
   childrens: MenuTreeItem[],
   displayName: string
 ): boolean => {
   for (const menu of childrens) {
-    if (displayName && menu.spec.displayName === displayName) {
+    if (displayName && menu.status.displayName === displayName) {
       return true;
     }
   }
   return false;
 };
-const warnnig = ref<boolean>(false);
+const warning = ref<boolean>(false);
 watch(
   () => formState.value,
   (n) => {
@@ -306,12 +306,12 @@ watch(
         const childrens = findParentMenuItemChidrensByName(
           selectedParentMenuItem.value
         );
-        warnnig.value = compareMenuItemsWitchDisplayname(
+        warning.value = compareMenuItemsWitchDisplayName(
           childrens,
           n.spec.displayName as string
         );
       } else {
-        warnnig.value = compareMenuItemsWitchDisplayname(
+        warning.value = compareMenuItemsWitchDisplayName(
           menuTreeItemsCopy.value,
           n.spec.displayName as string
         );
@@ -388,7 +388,7 @@ watch(
               validation="required|length:0,100"
             >
               <template #help>
-                <span v-show="warnnig" class="mt-4 text-xs text-red-500">
+                <span v-show="warning" class="text-xs text-red-500">
                   {{
                     t(
                       "core.menu.menu_item_editing_modal.fields.display_name.warning"

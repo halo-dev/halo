@@ -684,6 +684,7 @@ core:
       fields:
         display_name:
           label: Display name
+          warning: There is a menu with the same name
     menu_item_editing_modal:
       titles:
         create: Create menu item

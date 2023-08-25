@@ -684,6 +684,7 @@ core:
       fields:
         display_name:
           label: 菜单名称
+          warning: 存在相同名字的菜单
     menu_item_editing_modal:
       titles:
         create: 新增菜单项

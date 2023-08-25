@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import type { Menu } from "@halo-dev/api-client";
-import { computed, ref, watch } from "vue";
+import { setFocus } from "@/formkit/utils/focus";
 import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
+import type { Menu } from "@halo-dev/api-client";
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import cloneDeep from "lodash.clonedeep";
-import { setFocus } from "@/formkit/utils/focus";
+import { computed, ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
@@ -120,15 +120,25 @@ watch(
     menusCopy.value = n as Menu[];
   }
 );
-
+const warning = ref<boolean>(false);
+const compareMenusWitchDisplayName = (
+  menus: Menu[],
+  displayName: string
+): boolean => {
+  for (const menu of menus) {
+    if (displayName && menu.spec.displayName === displayName) {
+      return true;
+    }
+  }
+  return false;
+};
 watch(
   formState,
   (n) => {
-    menusCopy.value.forEach((menu) => {
-      if (n.spec.displayName && n.spec.displayName === menu.spec.displayName) {
-        console.log(1);
-      }
-    });
+    warning.value = compareMenusWitchDisplayName(
+      menusCopy.value,
+      n.spec.displayName
+    );
   },
   { deep: true }
 );
@@ -154,7 +164,13 @@ watch(
         type="text"
         name="displayName"
         validation="required|length:0,100"
-      ></FormKit>
+      >
+        <template #help>
+          <span v-show="warning" class="text-xs text-red-500">
+            {{ t("core.menu.menu_editing_modal.fields.display_name.warning") }}
+          </span>
+        </template>
+      </FormKit>
     </FormKit>
     <template #footer>
       <VSpace>
