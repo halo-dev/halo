@@ -40,4 +40,26 @@ public interface PluginService {
      * @see run.halo.app.plugin.HaloPluginManager#reloadPlugin(String)
      */
     Mono<Plugin> reload(String name);
+
+    /**
+     * Uglify js bundle from all enabled plugins to a single js bundle string.
+     *
+     * @return uglified js bundle
+     */
+    Mono<String> uglifyJsBundle();
+
+    /**
+     * Uglify css bundle from all enabled plugins to a single css bundle string.
+     *
+     * @return uglified css bundle
+     */
+    Mono<String> uglifyCssBundle();
+
+    /**
+     * <p>Generate js bundle version for cache control.</p>
+     * This method will list all enabled plugins version and sign it to a string.
+     *
+     * @return signed js bundle version by all enabled plugins version.
+     */
+    Mono<String> generateJsBundleVersion();
 }

@@ -95,6 +95,8 @@ const {
       sort: [selectedSort.value].filter(Boolean) as string[],
       keyword: keyword.value,
       ownerName: selectedUser.value,
+      // TODO: email users are not supported at the moment.
+      ownerKind: selectedUser.value ? "User" : undefined,
     });
 
     total.value = data.total;
