@@ -471,6 +471,7 @@ onMounted(() => {
   flex-col
   overflow-x-hidden
   md:ml-64;
+  transition-duration: 0.3s;
 }
 
 .isCollapse {
@@ -509,7 +510,6 @@ onMounted(() => {
     }
   }
   .content {
-    transition-duration: 0.3s;
     @apply md:ml-20;
   }
 }
