@@ -13,10 +13,12 @@ const props = withDefaults(
   defineProps<{
     visible: boolean;
     menu?: Menu;
+    menus?: Menu[];
   }>(),
   {
     visible: false,
     menu: undefined,
+    menus: undefined,
   }
 );
 
@@ -110,6 +112,25 @@ watch(
       handleResetForm();
     }
   }
+);
+const menusCopy = ref<Menu[]>([]);
+watch(
+  () => props.menus,
+  (n) => {
+    menusCopy.value = n as Menu[];
+  }
+);
+
+watch(
+  formState,
+  (n) => {
+    menusCopy.value.forEach((menu) => {
+      if (n.spec.displayName && n.spec.displayName === menu.spec.displayName) {
+        console.log(1);
+      }
+    });
+  },
+  { deep: true }
 );
 </script>
 <template>

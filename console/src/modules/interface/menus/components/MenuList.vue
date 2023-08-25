@@ -178,6 +178,7 @@ const handleSetPrimaryMenu = async (menu: Menu) => {
 <template>
   <MenuEditingModal
     v-model:visible="menuEditingModal"
+    :menus="menus"
     :menu="selectedMenuToUpdate"
     @close="refetch()"
     @created="handleSelect"

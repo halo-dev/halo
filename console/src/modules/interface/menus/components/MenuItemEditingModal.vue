@@ -9,6 +9,7 @@ import cloneDeep from "lodash.clonedeep";
 import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { useI18n } from "vue-i18n";
+import type { MenuTreeItem } from "../utils";
 
 const props = withDefaults(
   defineProps<{
@@ -16,12 +17,14 @@ const props = withDefaults(
     menu?: Menu;
     parentMenuItem: MenuItem;
     menuItem?: MenuItem;
+    menuTreeItems?: MenuTreeItem[];
   }>(),
   {
     visible: false,
     menu: undefined,
     parentMenuItem: undefined,
     menuItem: undefined,
+    menuTreeItems: undefined,
   }
 );
 
@@ -268,6 +271,57 @@ const selectedRefName = ref<string>("");
 const onMenuItemSourceChange = () => {
   selectedRefName.value = "";
 };
+
+const menuTreeItemsCopy = ref<MenuTreeItem[]>([]);
+watch(
+  () => props.menuTreeItems,
+  (n) => {
+    menuTreeItemsCopy.value = n as MenuTreeItem[];
+  }
+);
+
+const findParentMenuItemChidrensByName = (value: string) => {
+  return menuTreeItemsCopy.value.filter((item) => {
+    return item.metadata.name === value;
+  })[0].spec.children;
+};
+
+const compareMenuItemsWitchDisplayname = (
+  childrens: MenuTreeItem[],
+  displayName: string
+): boolean => {
+  for (const menu of childrens) {
+    if (displayName && menu.spec.displayName === displayName) {
+      return true;
+    }
+  }
+  return false;
+};
+const warnnig = ref<boolean>(false);
+watch(
+  () => formState.value,
+  (n) => {
+    if (selectedRef.value?.inputType === undefined) {
+      if (selectedParentMenuItem.value != undefined) {
+        const childrens = findParentMenuItemChidrensByName(
+          selectedParentMenuItem.value
+        );
+        warnnig.value = compareMenuItemsWitchDisplayname(
+          childrens,
+          n.spec.displayName as string
+        );
+      } else {
+        warnnig.value = compareMenuItemsWitchDisplayname(
+          menuTreeItemsCopy.value,
+          n.spec.displayName as string
+        );
+      }
+    }
+  },
+  {
+    deep: true,
+  }
+);
 </script>
 <template>
   <VModal
@@ -332,7 +386,17 @@ const onMenuItemSourceChange = () => {
               type="text"
               name="displayName"
               validation="required|length:0,100"
-            />
+            >
+              <template #help>
+                <span v-show="warnnig" class="mt-4 text-xs text-red-500">
+                  {{
+                    t(
+                      "core.menu.menu_item_editing_modal.fields.display_name.warning"
+                    )
+                  }}</span
+                >
+              </template>
+            </FormKit>
 
             <FormKit
               v-if="!selectedRefKind"
