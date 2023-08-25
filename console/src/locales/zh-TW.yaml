@@ -786,8 +786,8 @@ core:
         last_starttime: 最近一次啟動
     loader:
       toast:
-        entry_load_failed: "{name}：讀取插件入口文件失敗"
-        style_load_failed: "{name}：讀取插件樣式文件失敗"
+        entry_load_failed: "讀取插件入口文件失敗"
+        style_load_failed: "讀取插件樣式文件失敗"
     extension_points:
       editor:
         providers:

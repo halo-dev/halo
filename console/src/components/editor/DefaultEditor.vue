@@ -77,7 +77,8 @@ import { useFetchAttachmentPolicy } from "@/modules/contents/attachments/composa
 import { useI18n } from "vue-i18n";
 import { i18n } from "@/locales";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
-import { usePluginModuleStore, type PluginModule } from "@/stores/plugin";
+import { usePluginModuleStore } from "@/stores/plugin";
+import type { PluginModule } from "@halo-dev/console-shared";
 import { useDebounceFn } from "@vueuse/core";
 
 const { t } = useI18n();

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import type { Direction, Type } from "./interface";
 
 const props = withDefaults(
@@ -34,10 +34,35 @@ const handleChange = (id: number | string) => {
   emit("update:activeId", id);
   emit("change", id);
 };
+
+const tabbarItemsRef = ref<HTMLElement | undefined>();
+
+function handleHorizontalWheel(event: WheelEvent) {
+  if (!tabbarItemsRef.value) {
+    return;
+  }
+  const { scrollLeft, scrollWidth, clientWidth } = tabbarItemsRef.value;
+  const toLeft = event.deltaY < 0 && scrollLeft > 0;
+  const toRight = event.deltaY > 0 && scrollLeft < scrollWidth - clientWidth;
+
+  if (toLeft || toRight) {
+    event.preventDefault();
+    event.stopPropagation();
+    tabbarItemsRef.value.scrollBy({ left: event.deltaY });
+  }
+}
+
+onMounted(() => {
+  tabbarItemsRef.value?.addEventListener("wheel", handleHorizontalWheel);
+});
+
+onUnmounted(() => {
+  tabbarItemsRef.value?.removeEventListener("wheel", handleHorizontalWheel);
+});
 </script>
 <template>
   <div :class="classes" class="tabbar-wrapper">
-    <div class="tabbar-items">
+    <div ref="tabbarItemsRef" class="tabbar-items">
       <div
         v-for="(item, index) in items"
         :key="index"
