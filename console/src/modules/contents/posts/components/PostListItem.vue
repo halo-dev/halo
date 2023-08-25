@@ -25,10 +25,15 @@ import { inject } from "vue";
 import type { Ref } from "vue";
 import { ref } from "vue";
 import { computed } from "vue";
+import { markRaw } from "vue";
+import { useRouter } from "vue-router";
+import { useEntityDropdownItemExtensionPoint } from "@/composables/use-entity-extension-points";
+import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 const queryClient = useQueryClient();
+const router = useRouter();
 
 const props = withDefaults(
   defineProps<{
@@ -113,6 +118,51 @@ const handleDelete = async () => {
     },
   });
 };
+
+const { dropdownItems } = useEntityDropdownItemExtensionPoint<ListedPost>(
+  "post:list-item:operation:create",
+  [
+    {
+      priority: 10,
+      component: markRaw(VDropdownItem),
+      label: t("core.common.buttons.edit"),
+      visible: true,
+      permissions: [],
+      action: () => {
+        router.push({
+          name: "PostEditor",
+          query: { name: props.post.post.metadata.name },
+        });
+      },
+    },
+    {
+      priority: 20,
+      component: markRaw(VDropdownItem),
+      label: t("core.common.buttons.setting"),
+      visible: true,
+      permissions: [],
+      action: () => {
+        emit("open-setting-modal", props.post.post);
+      },
+    },
+    {
+      priority: 30,
+      component: markRaw(VDropdownDivider),
+      visible: true,
+    },
+    {
+      priority: 40,
+      component: markRaw(VDropdownItem),
+      props: {
+        type: "danger",
+      },
+      label: t("core.common.buttons.delete"),
+      visible: true,
+      permissions: [],
+      action: handleDelete,
+    },
+  ]
+);
 </script>
 
 <template>
@@ -273,23 +323,7 @@ const handleDelete = async () => {
       v-if="currentUserHasPermission(['system:posts:manage'])"
       #dropdownItems
     >
-      <VDropdownItem
-        @click="
-          $router.push({
-            name: 'PostEditor',
-            query: { name: post.post.metadata.name },
-          })
-        "
-      >
-        {{ $t("core.common.buttons.edit") }}
-      </VDropdownItem>
-      <VDropdownItem @click="emit('open-setting-modal', post.post)">
-        {{ $t("core.common.buttons.setting") }}
-      </VDropdownItem>
-      <VDropdownDivider />
-      <VDropdownItem type="danger" @click="handleDelete">
-        {{ $t("core.common.buttons.delete") }}
-      </VDropdownItem>
+      <EntityDropdownItems :dropdown-items="dropdownItems" :item="post" />
     </template>
   </VEntity>
 </template>
