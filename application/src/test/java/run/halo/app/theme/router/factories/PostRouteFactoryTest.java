@@ -5,17 +5,20 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import java.util.Locale;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.i18n.SimpleLocaleContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.i18n.LocaleContextResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.TestPost;
 import run.halo.app.core.extension.content.Post;
@@ -29,6 +32,7 @@ import run.halo.app.theme.router.DefaultQueryPostPredicateResolver;
 import run.halo.app.theme.router.EmptyView;
 import run.halo.app.theme.router.ModelConst;
 import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
+import run.halo.app.theme.router.TitleVisibilityIdentifyCalculator;
 import run.halo.app.theme.router.ViewNameResolver;
 
 /**
@@ -51,6 +55,12 @@ class PostRouteFactoryTest extends RouteFactoryTestSuite {
 
     @Mock
     private ReactiveQueryPostPredicateResolver predicateResolver;
+
+    @Mock
+    private LocaleContextResolver localeContextResolver;
+
+    @Mock
+    private TitleVisibilityIdentifyCalculator titleVisibilityIdentifyCalculator;
 
     @InjectMocks
     private PostRouteFactory postRouteFactory;
@@ -75,6 +85,8 @@ class PostRouteFactoryTest extends RouteFactoryTestSuite {
         RouterFunction<ServerResponse> routerFunction = postRouteFactory.create("/archives/{name}");
         WebTestClient webTestClient = getWebTestClient(routerFunction);
 
+        when(localeContextResolver.resolveLocaleContext(any()))
+            .thenReturn(new SimpleLocaleContext(Locale.getDefault()));
         when(viewResolver.resolveViewName(any(), any()))
             .thenReturn(Mono.just(new EmptyView() {
                 @Override

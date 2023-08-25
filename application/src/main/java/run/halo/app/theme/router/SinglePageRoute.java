@@ -23,6 +23,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.i18n.LocaleContextResolver;
 import org.springframework.web.util.UriUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -54,6 +55,10 @@ public class SinglePageRoute
     private final SinglePageFinder singlePageFinder;
 
     private final ViewNameResolver viewNameResolver;
+
+    private final TitleVisibilityIdentifyCalculator titleVisibilityIdentifyCalculator;
+
+    private final LocaleContextResolver localeContextResolver;
 
     @Override
     @NonNull
@@ -144,6 +149,14 @@ public class SinglePageRoute
 
     HandlerFunction<ServerResponse> handlerFunction(String name) {
         return request -> singlePageFinder.getByName(name)
+            .doOnNext(singlePageVo -> {
+                titleVisibilityIdentifyCalculator.calculateTitle(
+                    singlePageVo.getSpec().getTitle(),
+                    singlePageVo.getSpec().getVisible(),
+                    localeContextResolver.resolveLocaleContext(request.exchange())
+                        .getLocale()
+                );
+            })
             .flatMap(singlePageVo -> {
                 Map<String, Object> model = ModelMapUtils.singlePageModel(singlePageVo);
                 String template = singlePageVo.getSpec().getTemplate();

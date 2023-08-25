@@ -26,6 +26,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.i18n.LocaleContextResolver;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
@@ -38,6 +39,7 @@ import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.router.ModelMapUtils;
 import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
+import run.halo.app.theme.router.TitleVisibilityIdentifyCalculator;
 import run.halo.app.theme.router.ViewNameResolver;
 
 /**
@@ -58,6 +60,10 @@ public class PostRouteFactory implements RouteFactory {
     private final ReactiveExtensionClient client;
 
     private final ReactiveQueryPostPredicateResolver queryPostPredicateResolver;
+
+    private final TitleVisibilityIdentifyCalculator titleVisibilityIdentifyCalculator;
+
+    private final LocaleContextResolver localeContextResolver;
 
     @Override
     public RouterFunction<ServerResponse> create(String pattern) {
@@ -101,6 +107,15 @@ public class PostRouteFactory implements RouteFactory {
         PostPatternVariable patternVariable) {
         Mono<PostVo> postVoMono = bestMatchPost(patternVariable);
         return postVoMono
+            .doOnNext(postVo -> {
+                postVo.getSpec().setTitle(
+                    titleVisibilityIdentifyCalculator.calculateTitle(
+                        postVo.getSpec().getTitle(),
+                        postVo.getSpec().getVisible(),
+                        localeContextResolver.resolveLocaleContext(request.exchange())
+                            .getLocale())
+                );
+            })
             .flatMap(postVo -> {
                 Map<String, Object> model = ModelMapUtils.postModel(postVo);
                 String template = postVo.getSpec().getTemplate();

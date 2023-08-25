@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.i18n.LocaleContextResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -27,6 +28,7 @@ import run.halo.app.theme.finders.vo.CategoryVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.router.ModelConst;
 import run.halo.app.theme.router.PageUrlUtils;
+import run.halo.app.theme.router.TitleVisibilityIdentifyCalculator;
 import run.halo.app.theme.router.UrlContextListResult;
 import run.halo.app.theme.router.ViewNameResolver;
 
@@ -46,6 +48,10 @@ public class CategoryPostRouteFactory implements RouteFactory {
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
     private final ReactiveExtensionClient client;
     private final ViewNameResolver viewNameResolver;
+
+    private final TitleVisibilityIdentifyCalculator titleVisibilityIdentifyCalculator;
+
+    private final LocaleContextResolver localeContextResolver;
 
     @Override
     public RouterFunction<ServerResponse> create(String prefix) {
@@ -87,6 +93,15 @@ public class CategoryPostRouteFactory implements RouteFactory {
         int pageNum = pageNumInPathVariable(request);
         return configuredPageSize(environmentFetcher, SystemSetting.Post::getCategoryPageSize)
             .flatMap(pageSize -> postFinder.listByCategory(pageNum, pageSize, name))
+            .doOnNext(list -> list.forEach(postVo -> postVo.getSpec().setTitle(
+                    titleVisibilityIdentifyCalculator.calculateTitle(
+                        postVo.getSpec().getTitle(),
+                        postVo.getSpec().getVisible(),
+                        localeContextResolver.resolveLocaleContext(request.exchange())
+                            .getLocale()
+                    )
+                )
+            ))
             .map(list -> new UrlContextListResult.Builder<ListedPostVo>()
                 .listResult(list)
                 .nextUrl(PageUrlUtils.nextPageUrl(path, totalPage(list)))
