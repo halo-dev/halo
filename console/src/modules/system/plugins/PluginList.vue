@@ -11,6 +11,8 @@ import {
   VSpace,
   VLoading,
   Dialog,
+  VDropdown,
+  VDropdownItem,
 } from "@halo-dev/components";
 import PluginListItem from "./components/PluginListItem.vue";
 import PluginUploadModal from "./components/PluginUploadModal.vue";
@@ -24,6 +26,7 @@ import { useRouteQuery } from "@vueuse/router";
 import { watch } from "vue";
 import { provide } from "vue";
 import type { Ref } from "vue";
+import { usePluginBatchOperations } from "./composables/use-plugin";
 
 const { t } = useI18n();
 
@@ -117,6 +120,9 @@ const handleCheckAllChange = (e: Event) => {
   }
 };
 
+const { handleChangeStatusInBatch, handleUninstallInBatch } =
+  usePluginBatchOperations(selectedNames);
+
 // handle remote download url from route
 const routeRemoteDownloadUrl = useRouteQuery<string | null>(
   "remote-download-url"
@@ -186,9 +192,35 @@ onMounted(() => {
             <div class="flex w-full flex-1 items-center gap-2 sm:w-auto">
               <SearchInput v-if="!selectedNames.length" v-model="keyword" />
               <VSpace v-else>
-                <VButton>启用</VButton>
-                <VButton>禁用</VButton>
-                <VButton type="danger">卸载</VButton>
+                <VButton @click="handleChangeStatusInBatch(true)">
+                  {{ $t("core.common.buttons.activate") }}
+                </VButton>
+                <VButton @click="handleChangeStatusInBatch(false)">
+                  {{ $t("core.common.buttons.inactivate") }}
+                </VButton>
+                <VDropdown>
+                  <VButton type="danger">
+                    {{ $t("core.common.buttons.uninstall") }}
+                  </VButton>
+                  <template #popper>
+                    <VDropdownItem
+                      type="danger"
+                      @click="handleUninstallInBatch(false)"
+                    >
+                      {{ $t("core.common.buttons.uninstall") }}
+                    </VDropdownItem>
+                    <VDropdownItem
+                      type="danger"
+                      @click="handleUninstallInBatch(true)"
+                    >
+                      {{
+                        $t(
+                          "core.plugin.operations.uninstall_and_delete_config.button"
+                        )
+                      }}
+                    </VDropdownItem>
+                  </template>
+                </VDropdown>
               </VSpace>
             </div>
             <div class="mt-4 flex sm:mt-0">
