@@ -126,17 +126,15 @@ class UserEndpointTest {
         }
 
         @Test
-        void shouldFilterUsersWhenKeywordProvided() {
+        void shouldFilterUsersWhenDisplayNameKeywordProvided() {
             var expectUser =
                 createUser("fake-user-2", "expected display name");
-            var expectUser2 =
+            var unexpectedUser1 =
                 createUser("fake-user-1", "first fake display name");
             var unexpectedUser2 =
                 createUser("fake-user-3", "second fake display name");
             var users = List.of(
-                expectUser,
-                expectUser2,
-                unexpectedUser2
+                expectUser
             );
             var expectResult = new ListResult<>(users);
             when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
@@ -151,20 +149,39 @@ class UserEndpointTest {
 
             verify(client).list(same(User.class), argThat(
                     predicate -> predicate.test(expectUser)
-                        && !predicate.test(expectUser2)
+                        && !predicate.test(unexpectedUser1)
                         && !predicate.test(unexpectedUser2)),
                 any(), anyInt(), anyInt());
+        }
+
+        @Test
+        void shouldFilterUsersWhenUserNameKeywordProvided() {
+            var fakeUser1 =
+                createUser("fake-user", "first fake display name");
+            var fakeUser2 =
+                createUser("fake-user-2", "second fake display name");
+            var fakeUser3 =
+                createUser("fake-user-3", "third fake display name");
+            var users = List.of(
+                fakeUser1,
+                fakeUser2,
+                fakeUser3
+            );
+            var expectResult = new ListResult<>(users);
+            when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
+                .thenReturn(Mono.just(expectResult));
+            when(roleService.list(anySet())).thenReturn(Flux.empty());
 
             bindToRouterFunction(endpoint.endpoint())
                 .build()
-                .get().uri("/users?keyword=fake-user-1")
+                .get().uri("/users?keyword=fake-user")
                 .exchange()
                 .expectStatus().isOk();
 
             verify(client).list(same(User.class), argThat(
-                    predicate -> predicate.test(expectUser2)
-                        && !predicate.test(expectUser)
-                        && !predicate.test(unexpectedUser2)),
+                    predicate -> predicate.test(fakeUser1)
+                        && !predicate.test(fakeUser2)
+                        && !predicate.test(fakeUser3)),
                 any(), anyInt(), anyInt());
         }
 
