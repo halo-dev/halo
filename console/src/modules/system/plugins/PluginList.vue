@@ -13,7 +13,7 @@ import {
   Dialog,
 } from "@halo-dev/components";
 import PluginListItem from "./components/PluginListItem.vue";
-import PluginUploadModal from "./components/PluginUploadModal.vue";
+import PluginInstallationModal from "./components/PluginInstallationModal.vue";
 import { computed, ref, onMounted } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
@@ -27,12 +27,12 @@ const { t } = useI18n();
 
 const { currentUserHasPermission } = usePermission();
 
-const pluginUploadModal = ref(false);
+const pluginInstallationModal = ref(false);
 const pluginToUpgrade = ref<Plugin>();
 
 function handleOpenUploadModal(plugin?: Plugin) {
   pluginToUpgrade.value = plugin;
-  pluginUploadModal.value = true;
+  pluginInstallationModal.value = true;
 }
 
 const keyword = ref("");
@@ -115,10 +115,10 @@ onMounted(() => {
 });
 </script>
 <template>
-  <PluginUploadModal
+  <PluginInstallationModal
     v-if="currentUserHasPermission(['system:plugins:manage'])"
-    v-model:visible="pluginUploadModal"
-    :upgrade-plugin="pluginToUpgrade"
+    v-model:visible="pluginInstallationModal"
+    :plugin-to-upgrade="pluginToUpgrade"
   />
 
   <VPageHeader :title="$t('core.plugin.title')">
