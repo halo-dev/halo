@@ -1,5 +1,5 @@
 import type { ComputedRef, Ref } from "vue";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import type { Plugin } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
@@ -10,6 +10,7 @@ interface usePluginLifeCycleReturn {
   isStarted: ComputedRef<boolean | undefined>;
   getFailedMessage: () => string | undefined;
   changeStatus: () => void;
+  changingStatus: Ref<boolean>;
   uninstall: (deleteExtensions?: boolean) => void;
 }
 
@@ -36,37 +37,25 @@ export function usePluginLifeCycle(
     }
   };
 
-  const changeStatus = () => {
+  const changingStatus = ref(false);
+
+  const changeStatus = async () => {
     if (!plugin?.value) return;
 
-    const pluginToUpdate = cloneDeep(plugin.value);
+    try {
+      changingStatus.value = true;
+      const pluginToUpdate = cloneDeep(plugin.value);
+      pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
+      await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin({
+        name: pluginToUpdate.metadata.name,
+        plugin: pluginToUpdate,
+      });
 
-    Dialog.info({
-      title: pluginToUpdate.spec.enabled
-        ? t("core.plugin.operations.change_status.inactive_title")
-        : t("core.plugin.operations.change_status.active_title"),
-      confirmText: t("core.common.buttons.confirm"),
-      cancelText: t("core.common.buttons.cancel"),
-      onConfirm: async () => {
-        try {
-          pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
-          await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin({
-            name: pluginToUpdate.metadata.name,
-            plugin: pluginToUpdate,
-          });
-
-          Toast.success(
-            pluginToUpdate.spec.enabled
-              ? t("core.common.toast.active_success")
-              : t("core.common.toast.inactive_success")
-          );
-        } catch (e) {
-          console.error(e);
-        } finally {
-          window.location.reload();
-        }
-      },
-    });
+      window.location.reload();
+    } catch (e) {
+      console.error(e);
+      changingStatus.value = false;
+    }
   };
 
   const uninstall = (deleteExtensions?: boolean) => {
@@ -150,6 +139,7 @@ export function usePluginLifeCycle(
     isStarted,
     getFailedMessage,
     changeStatus,
+    changingStatus,
     uninstall,
   };
 }

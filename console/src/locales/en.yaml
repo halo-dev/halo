@@ -736,9 +736,6 @@ core:
       uninstall_when_enabled:
         confirm_text: Stop running and uninstall
         description: The current plugin is still in the enabled state and will be uninstalled after it stops running. This operation cannot be undone.
-      change_status:
-        active_title: Are you sure you want to active this plugin?
-        inactive_title: Are you sure you want to inactive this plugin?
       remote_download:
         title: Remote download address detected, do you want to download?
         description: "Please carefully verify whether this address can be trusted: {url}"

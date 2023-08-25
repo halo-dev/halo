@@ -736,9 +736,6 @@ core:
       uninstall_when_enabled:
         confirm_text: 停止運行並卸載
         description: 當前插件還在啟用狀態，將在停止運行後卸載，該操作不可恢復。
-      change_status:
-        active_title: 確定要啟用該插件嗎？
-        inactive_title: 確定要停用該插件嗎？
       remote_download:
         title: 偵測到遠端下載地址，是否需要下載？
         description: 請仔細鑑別此地址是否可信：{url}
