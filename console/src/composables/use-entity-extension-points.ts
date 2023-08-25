@@ -1,5 +1,8 @@
-import { usePluginModuleStore, type PluginModule } from "@/stores/plugin";
-import type { EntityDropdownItem } from "@halo-dev/console-shared";
+import { usePluginModuleStore } from "@/stores/plugin";
+import type {
+  EntityDropdownItem,
+  PluginModule,
+} from "@halo-dev/console-shared";
 import { onMounted, ref } from "vue";
 
 export function useEntityDropdownItemExtensionPoint<T>(
