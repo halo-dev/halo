@@ -34,6 +34,7 @@ import {
   ExtensionCodeBlock,
   ExtensionFontSize,
   ExtensionColor,
+  ExtensionIndent,
   lowlight,
   type AnyExtension,
   Editor,
@@ -206,6 +207,7 @@ onMounted(() => {
       ExtensionCharacterCount,
       ExtensionFontSize,
       ExtensionColor,
+      ExtensionIndent,
       ...extensionsFromPlugins,
       Extension.create({
         addGlobalAttributes() {
@@ -479,19 +481,12 @@ const currentLocale = i18n.global.locale.value as
     v-model:visible="attachmentSelectorModal"
     @select="onAttachmentSelect"
   />
-  <RichTextEditor
-    v-if="editor"
-    :editor="editor"
-    :locale="currentLocale"
-    :content-styles="{
-      width: 'calc(100% - 18rem)',
-    }"
-  >
+  <RichTextEditor v-if="editor" :editor="editor" :locale="currentLocale">
     <template #extra>
       <OverlayScrollbarsComponent
         element="div"
         :options="{ scrollbars: { autoHide: 'scroll' } }"
-        class="h-full w-72 border-l bg-white"
+        class="h-full border-l bg-white"
         defer
       >
         <VTabs v-model:active-id="extraActiveId" type="outline">
