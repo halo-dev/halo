@@ -13,6 +13,11 @@ const RoutesMenu = defineComponent({
       type: Object as PropType<MenuGroupType[]>,
       required: true,
     },
+    showTooltip: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   emits: ["select"],
   setup(props, { emit }) {
@@ -44,6 +49,11 @@ const RoutesMenu = defineComponent({
               <VMenuItem
                 key={item.path}
                 id={item.path}
+                v-tooltip={{
+                  content: t(item.name, item.name),
+                  disabled: !props.showTooltip,
+                  placement: "right",
+                }}
                 title={t(item.name, item.name)}
                 v-slots={{
                   icon: () => renderIcon(item.icon),
@@ -54,6 +64,11 @@ const RoutesMenu = defineComponent({
             ) : (
               <VMenuItem
                 key={item.path}
+                v-tooltip={{
+                  content: t(item.name, item.name),
+                  disabled: !props.showTooltip,
+                  placement: "right",
+                }}
                 id={item.path}
                 title={t(item.name, item.name)}
                 v-slots={{

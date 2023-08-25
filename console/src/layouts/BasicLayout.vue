@@ -240,7 +240,10 @@ onMounted(() => {
     <aside
       class="navbar group fixed hidden h-full overflow-y-auto md:flex md:flex-col"
     >
-      <span class="folder hidden group-hover:block" @click="handleCollapse">
+      <span
+        class="folder hidden cursor-pointer group-hover:block"
+        @click="handleCollapse"
+      >
         <IconArrowLeft v-if="!isCollapse" class="float-right mr-2" />
         <IconArrowRight v-else class="float-right mr-2" />
       </span>
@@ -275,7 +278,7 @@ onMounted(() => {
             </div>
           </div>
         </div>
-        <RoutesMenu :menus="menus" />
+        <RoutesMenu :menus="menus" :show-tooltip="isCollapse" />
       </div>
       <div class="profile-placeholder">
         <div class="current-profile">
@@ -507,7 +510,7 @@ onMounted(() => {
   }
   .content {
     transition-duration: 0.3s;
-    @apply ml-20;
+    @apply md:ml-20;
   }
 }
 </style>
