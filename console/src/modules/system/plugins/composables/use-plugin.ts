@@ -222,8 +222,8 @@ export function usePluginBatchOperations(names: Ref<string[]>) {
   function handleChangeStatusInBatch(enabled: boolean) {
     Dialog.info({
       title: enabled
-        ? t("core.plugin.operations.change_status_in_batch.inactivate_title")
-        : t("core.plugin.operations.change_status_in_batch.activate_title"),
+        ? t("core.plugin.operations.change_status_in_batch.activate_title")
+        : t("core.plugin.operations.change_status_in_batch.inactivate_title"),
       confirmText: t("core.common.buttons.confirm"),
       cancelText: t("core.common.buttons.cancel"),
       onConfirm: async () => {
