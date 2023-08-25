@@ -102,17 +102,19 @@ export const ApiConsoleMigrationHaloRunV1alpha1MigrationApiAxiosParamCreator =
         };
       },
       /**
-       *
-       * @param {File} file
+       * Restore backup by uploading file or providing download link or backup name.
+       * @param {string} [backupName] Backup metadata name.
+       * @param {string} [downloadUrl] Remote backup HTTP URL.
+       * @param {File} [file]
        * @param {*} [options] Override http request option.
        * @throws {RequiredError}
        */
       restoreBackup: async (
-        file: File,
+        backupName?: string,
+        downloadUrl?: string,
+        file?: File,
         options: AxiosRequestConfig = {}
       ): Promise<RequestArgs> => {
-        // verify required parameter 'file' is not null or undefined
-        assertParamExists("restoreBackup", "file", file);
         const localVarPath = `/apis/api.console.migration.halo.run/v1alpha1/restorations`;
         // use dummy base URL string because the URL constructor only accepts absolute URLs.
         const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -139,6 +141,14 @@ export const ApiConsoleMigrationHaloRunV1alpha1MigrationApiAxiosParamCreator =
         // authentication BearerAuth required
         // http bearer authentication required
         await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+        if (backupName !== undefined) {
+          localVarFormParams.append("backupName", backupName as any);
+        }
+
+        if (downloadUrl !== undefined) {
+          localVarFormParams.append("downloadUrl", downloadUrl as any);
+        }
 
         if (file !== undefined) {
           localVarFormParams.append("file", file as any);
@@ -203,18 +213,24 @@ export const ApiConsoleMigrationHaloRunV1alpha1MigrationApiFp = function (
       );
     },
     /**
-     *
-     * @param {File} file
+     * Restore backup by uploading file or providing download link or backup name.
+     * @param {string} [backupName] Backup metadata name.
+     * @param {string} [downloadUrl] Remote backup HTTP URL.
+     * @param {File} [file]
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async restoreBackup(
-      file: File,
+      backupName?: string,
+      downloadUrl?: string,
+      file?: File,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.restoreBackup(
+        backupName,
+        downloadUrl,
         file,
         options
       );
@@ -259,17 +275,22 @@ export const ApiConsoleMigrationHaloRunV1alpha1MigrationApiFactory = function (
         .then((request) => request(axios, basePath));
     },
     /**
-     *
+     * Restore backup by uploading file or providing download link or backup name.
      * @param {ApiConsoleMigrationHaloRunV1alpha1MigrationApiRestoreBackupRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     restoreBackup(
-      requestParameters: ApiConsoleMigrationHaloRunV1alpha1MigrationApiRestoreBackupRequest,
+      requestParameters: ApiConsoleMigrationHaloRunV1alpha1MigrationApiRestoreBackupRequest = {},
       options?: AxiosRequestConfig
     ): AxiosPromise<void> {
       return localVarFp
-        .restoreBackup(requestParameters.file, options)
+        .restoreBackup(
+          requestParameters.backupName,
+          requestParameters.downloadUrl,
+          requestParameters.file,
+          options
+        )
         .then((request) => request(axios, basePath));
     },
   };
@@ -303,11 +324,25 @@ export interface ApiConsoleMigrationHaloRunV1alpha1MigrationApiDownloadBackupsRe
  */
 export interface ApiConsoleMigrationHaloRunV1alpha1MigrationApiRestoreBackupRequest {
   /**
+   * Backup metadata name.
+   * @type {string}
+   * @memberof ApiConsoleMigrationHaloRunV1alpha1MigrationApiRestoreBackup
+   */
+  readonly backupName?: string;
+
+  /**
+   * Remote backup HTTP URL.
+   * @type {string}
+   * @memberof ApiConsoleMigrationHaloRunV1alpha1MigrationApiRestoreBackup
+   */
+  readonly downloadUrl?: string;
+
+  /**
    *
    * @type {File}
    * @memberof ApiConsoleMigrationHaloRunV1alpha1MigrationApiRestoreBackup
    */
-  readonly file: File;
+  readonly file?: File;
 }
 
 /**
@@ -338,18 +373,23 @@ export class ApiConsoleMigrationHaloRunV1alpha1MigrationApi extends BaseAPI {
   }
 
   /**
-   *
+   * Restore backup by uploading file or providing download link or backup name.
    * @param {ApiConsoleMigrationHaloRunV1alpha1MigrationApiRestoreBackupRequest} requestParameters Request parameters.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof ApiConsoleMigrationHaloRunV1alpha1MigrationApi
    */
   public restoreBackup(
-    requestParameters: ApiConsoleMigrationHaloRunV1alpha1MigrationApiRestoreBackupRequest,
+    requestParameters: ApiConsoleMigrationHaloRunV1alpha1MigrationApiRestoreBackupRequest = {},
     options?: AxiosRequestConfig
   ) {
     return ApiConsoleMigrationHaloRunV1alpha1MigrationApiFp(this.configuration)
-      .restoreBackup(requestParameters.file, options)
+      .restoreBackup(
+        requestParameters.backupName,
+        requestParameters.downloadUrl,
+        requestParameters.file,
+        options
+      )
       .then((request) => request(this.axios, this.basePath));
   }
 }
