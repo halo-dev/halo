@@ -194,7 +194,7 @@ const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
       #dropdownItems
     >
       <VDropdownItem v-if="!isActivated" @click="handleActiveTheme(true)">
-        {{ $t("core.common.buttons.active") }}
+        {{ $t("core.common.buttons.activate") }}
       </VDropdownItem>
       <VDropdownItem @click="emit('upgrade')">
         {{ $t("core.common.buttons.upgrade") }}
