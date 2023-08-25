@@ -31,7 +31,8 @@ import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
-import { usePluginModuleStore, type PluginModule } from "@/stores/plugin";
+import { usePluginModuleStore } from "@/stores/plugin";
+import type { PluginModule } from "@halo-dev/console-shared";
 import type {
   CommentSubjectRefProvider,
   CommentSubjectRefResult,

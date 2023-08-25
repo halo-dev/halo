@@ -154,6 +154,15 @@ class MigrationServiceImplTest {
     }
 
     @Test
+    void cleanupBackupWithNoFilename() {
+        var backup = createSucceededBackup("fake-backup", null);
+        StepVerifier.create(migrationService.cleanup(backup))
+            .verifyComplete();
+        verify(haloProperties, never()).getWorkDir();
+        verify(backupRoot, never()).get();
+    }
+
+    @Test
     void downloadBackupTest() throws IOException {
         var backupFile = tempDir.resolve("workdir").resolve("backups").resolve("backup.zip");
         Files.createDirectories(backupFile.getParent());

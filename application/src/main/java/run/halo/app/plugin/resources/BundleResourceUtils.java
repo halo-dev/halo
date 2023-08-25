@@ -19,8 +19,8 @@ import run.halo.app.plugin.PluginConst;
  */
 public abstract class BundleResourceUtils {
     private static final String CONSOLE_BUNDLE_LOCATION = "console";
-    private static final String JS_BUNDLE = "main.js";
-    private static final String CSS_BUNDLE = "style.css";
+    public static final String JS_BUNDLE = "main.js";
+    public static final String CSS_BUNDLE = "style.css";
 
     /**
      * Gets plugin css bundle resource path relative to the plugin classpath if exists.

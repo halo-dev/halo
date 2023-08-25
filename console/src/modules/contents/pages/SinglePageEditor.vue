@@ -28,10 +28,8 @@ import cloneDeep from "lodash.clonedeep";
 import { useRouter } from "vue-router";
 import { randomUUID } from "@/utils/id";
 import { useContentCache } from "@/composables/use-content-cache";
-import {
-  useEditorExtensionPoints,
-  type EditorProvider,
-} from "@/composables/use-editor-extension-points";
+import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
+import type { EditorProvider } from "@halo-dev/console-shared";
 import { useLocalStorage } from "@vueuse/core";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
 import { useI18n } from "vue-i18n";

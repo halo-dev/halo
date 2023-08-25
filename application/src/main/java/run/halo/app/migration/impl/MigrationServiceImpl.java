@@ -26,6 +26,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
@@ -145,7 +146,8 @@ public class MigrationServiceImpl implements MigrationService {
     public Mono<Void> cleanup(Backup backup) {
         return Mono.<Void>create(sink -> {
             var status = backup.getStatus();
-            if (status == null || status.getFilename() == null) {
+            if (status == null || !StringUtils.hasText(status.getFilename())) {
+                sink.success();
                 return;
             }
             var filename = status.getFilename();

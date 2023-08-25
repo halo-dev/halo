@@ -10,8 +10,7 @@ import {
   VDropdownItem,
   VDropdownDivider,
 } from "@halo-dev/components";
-import PluginUploadModal from "./PluginUploadModal.vue";
-import { markRaw, ref, toRefs } from "vue";
+import { markRaw, toRefs } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 import type { Plugin } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
@@ -35,9 +34,11 @@ const props = withDefaults(
   }
 );
 
-const { plugin } = toRefs(props);
+const emit = defineEmits<{
+  (event: "open-upgrade-modal", plugin?: Plugin): void;
+}>();
 
-const upgradeModal = ref(false);
+const { plugin } = toRefs(props);
 
 const { getFailedMessage, changeStatus, uninstall } =
   usePluginLifeCycle(plugin);
@@ -90,7 +91,7 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
       visible: true,
       permissions: [],
       action: () => {
-        upgradeModal.value = true;
+        emit("open-upgrade-modal", props.plugin);
       },
     },
     {
@@ -145,7 +146,6 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
 );
 </script>
 <template>
-  <PluginUploadModal v-model:visible="upgradeModal" :upgrade-plugin="plugin" />
   <VEntity>
     <template #start>
       <VEntityField>

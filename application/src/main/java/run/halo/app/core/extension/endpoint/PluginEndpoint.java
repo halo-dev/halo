@@ -29,6 +29,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
@@ -217,8 +218,59 @@ public class PluginEndpoint implements CustomEndpoint {
                 builder -> builder.operationId("ListPluginPresets")
                     .description("List all plugin presets in the system.")
                     .tag(tag)
-                    .response(responseBuilder().implementationArray(Plugin.class)))
+                    .response(responseBuilder().implementationArray(Plugin.class))
+            )
+            .GET("plugins/-/bundle.js", this::fetchJsBundle,
+                builder -> builder.operationId("fetchJsBundle")
+                    .description("Merge all JS bundles of enabled plugins into one.")
+                    .tag(tag)
+                    .response(responseBuilder().implementation(String.class))
+            )
+            .GET("plugins/-/bundle.css", this::fetchCssBundle,
+                builder -> builder.operationId("fetchCssBundle")
+                    .description("Merge all CSS bundles of enabled plugins into one.")
+                    .tag(tag)
+                    .response(responseBuilder().implementation(String.class))
+            )
             .build();
+    }
+
+    private Mono<ServerResponse> fetchJsBundle(ServerRequest request) {
+        Optional<String> versionOption = request.queryParam("v");
+        if (versionOption.isEmpty()) {
+            return pluginService.generateJsBundleVersion()
+                .flatMap(v -> ServerResponse
+                    .temporaryRedirect(buildJsBundleUri("js", v))
+                    .build()
+                );
+        }
+        return pluginService.uglifyJsBundle()
+            .defaultIfEmpty("")
+            .flatMap(bundle -> ServerResponse.ok()
+                .contentType(MediaType.valueOf("text/javascript"))
+                .bodyValue(bundle)
+            );
+    }
+
+    private Mono<ServerResponse> fetchCssBundle(ServerRequest request) {
+        Optional<String> versionOption = request.queryParam("v");
+        if (versionOption.isEmpty()) {
+            return pluginService.generateJsBundleVersion()
+                .flatMap(v -> ServerResponse
+                    .temporaryRedirect(buildJsBundleUri("css", v))
+                    .build()
+                );
+        }
+        return pluginService.uglifyCssBundle()
+            .flatMap(bundle -> ServerResponse.ok()
+                .contentType(MediaType.valueOf("text/css"))
+                .bodyValue(bundle)
+            );
+    }
+
+    URI buildJsBundleUri(String type, String version) {
+        return URI.create(
+            "/apis/api.console.halo.run/v1alpha1/plugins/-/bundle." + type + "?v=" + version);
     }
 
     private Mono<ServerResponse> upgradeFromUri(ServerRequest request) {

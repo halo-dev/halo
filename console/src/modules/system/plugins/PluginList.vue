@@ -27,7 +27,13 @@ const { t } = useI18n();
 
 const { currentUserHasPermission } = usePermission();
 
-const pluginInstall = ref(false);
+const pluginUploadModal = ref(false);
+const pluginToUpgrade = ref<Plugin>();
+
+function handleOpenUploadModal(plugin?: Plugin) {
+  pluginToUpgrade.value = plugin;
+  pluginUploadModal.value = true;
+}
 
 const keyword = ref("");
 const page = ref(1);
@@ -99,7 +105,7 @@ onMounted(() => {
       confirmText: t("core.common.buttons.download"),
       cancelText: t("core.common.buttons.cancel"),
       onConfirm() {
-        pluginInstall.value = true;
+        handleOpenUploadModal();
       },
       onCancel() {
         routeRemoteDownloadUrl.value = null;
@@ -111,7 +117,8 @@ onMounted(() => {
 <template>
   <PluginUploadModal
     v-if="currentUserHasPermission(['system:plugins:manage'])"
-    v-model:visible="pluginInstall"
+    v-model:visible="pluginUploadModal"
+    :upgrade-plugin="pluginToUpgrade"
   />
 
   <VPageHeader :title="$t('core.plugin.title')">
@@ -122,7 +129,7 @@ onMounted(() => {
       <VButton
         v-permission="['system:plugins:manage']"
         type="secondary"
-        @click="pluginInstall = true"
+        @click="handleOpenUploadModal()"
       >
         <template #icon>
           <IconAddCircle class="h-full w-full" />
@@ -219,7 +226,7 @@ onMounted(() => {
               <VButton
                 v-permission="['system:plugins:manage']"
                 type="secondary"
-                @click="pluginInstall = true"
+                @click="handleOpenUploadModal"
               >
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
@@ -237,7 +244,10 @@ onMounted(() => {
           role="list"
         >
           <li v-for="plugin in data" :key="plugin.metadata.name">
-            <PluginListItem :plugin="plugin" />
+            <PluginListItem
+              :plugin="plugin"
+              @open-upgrade-modal="handleOpenUploadModal"
+            />
           </li>
         </ul>
       </Transition>
