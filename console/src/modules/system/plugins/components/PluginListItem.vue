@@ -8,10 +8,9 @@ import {
   Dialog,
   Toast,
   VDropdownItem,
-  VDropdown,
   VDropdownDivider,
 } from "@halo-dev/components";
-import { inject, toRefs } from "vue";
+import { inject, toRefs, markRaw } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 import type { Plugin } from "@halo-dev/api-client";
 import { formatDatetime } from "@/utils/date";
@@ -20,9 +19,13 @@ import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
 import type { Ref } from "vue";
 import { ref } from "vue";
+import { useEntityDropdownItemExtensionPoint } from "@/composables/use-entity-extension-points";
+import { useRouter } from "vue-router";
+import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
+const router = useRouter();
 
 const props = withDefaults(
   defineProps<{
@@ -40,7 +43,7 @@ const { plugin } = toRefs(props);
 
 const selectedNames = inject<Ref<string[]>>("selectedNames", ref([]));
 
-const { getFailedMessage, changeStatus, uninstall } =
+const { getFailedMessage, changeStatus, changingStatus, uninstall } =
   usePluginLifeCycle(plugin);
 
 const handleResetSettingConfig = async () => {
@@ -67,6 +70,83 @@ const handleResetSettingConfig = async () => {
     },
   });
 };
+
+const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
+  "plugin:list-item:operation:create",
+  [
+    {
+      priority: 10,
+      component: markRaw(VDropdownItem),
+      label: t("core.common.buttons.detail"),
+      visible: true,
+      permissions: [],
+      action: () => {
+        router.push({
+          name: "PluginDetail",
+          params: { name: props.plugin?.metadata.name },
+        });
+      },
+    },
+    {
+      priority: 20,
+      component: markRaw(VDropdownItem),
+      label: t("core.common.buttons.upgrade"),
+      visible: true,
+      permissions: [],
+      action: () => {
+        emit("open-upgrade-modal", props.plugin);
+      },
+    },
+    {
+      priority: 30,
+      component: markRaw(VDropdownDivider),
+      visible: true,
+    },
+    {
+      priority: 40,
+      component: markRaw(VDropdownItem),
+      props: {
+        type: "danger",
+      },
+      label: t("core.common.buttons.uninstall"),
+      visible: true,
+      children: [
+        {
+          priority: 10,
+          component: markRaw(VDropdownItem),
+          props: {
+            type: "danger",
+          },
+          label: t("core.common.buttons.uninstall"),
+          visible: true,
+          action: () => uninstall(),
+        },
+        {
+          priority: 20,
+          component: markRaw(VDropdownItem),
+          props: {
+            type: "danger",
+          },
+          label: t("core.plugin.operations.uninstall_and_delete_config.button"),
+          visible: true,
+          action: () => uninstall(true),
+        },
+      ],
+    },
+    {
+      priority: 50,
+      component: markRaw(VDropdownItem),
+      props: {
+        type: "danger",
+      },
+      label: t("core.common.buttons.reset"),
+      visible: true,
+      action: () => {
+        handleResetSettingConfig();
+      },
+    },
+  ]
+);
 </script>
 <template>
   <VEntity :is-selected="isSelected">
@@ -138,7 +218,11 @@ const handleResetSettingConfig = async () => {
       <VEntityField v-permission="['system:plugins:manage']">
         <template #description>
           <div class="flex items-center">
-            <VSwitch :model-value="plugin.spec.enabled" @click="changeStatus" />
+            <VSwitch
+              :model-value="plugin.spec.enabled"
+              :disabled="changingStatus"
+              @click="changeStatus"
+            />
           </div>
         </template>
       </VEntityField>
@@ -147,38 +231,7 @@ const handleResetSettingConfig = async () => {
       v-if="currentUserHasPermission(['system:plugins:manage'])"
       #dropdownItems
     >
-      <VDropdownItem
-        @click="
-          $router.push({
-            name: 'PluginDetail',
-            params: { name: plugin.metadata.name },
-          })
-        "
-      >
-        {{ $t("core.common.buttons.detail") }}
-      </VDropdownItem>
-      <VDropdownItem @click="emit('open-upgrade-modal', plugin)">
-        {{ $t("core.common.buttons.upgrade") }}
-      </VDropdownItem>
-      <VDropdownDivider />
-      <VDropdown placement="left" :triggers="['click']">
-        <VDropdownItem type="danger">
-          {{ $t("core.common.buttons.uninstall") }}
-        </VDropdownItem>
-        <template #popper>
-          <VDropdownItem type="danger" @click="uninstall">
-            {{ $t("core.common.buttons.uninstall") }}
-          </VDropdownItem>
-          <VDropdownItem type="danger" @click="uninstall(true)">
-            {{
-              $t("core.plugin.operations.uninstall_and_delete_config.button")
-            }}
-          </VDropdownItem>
-        </template>
-      </VDropdown>
-      <VDropdownItem type="danger" @click="handleResetSettingConfig">
-        {{ $t("core.common.buttons.reset") }}
-      </VDropdownItem>
+      <EntityDropdownItems :dropdown-items="dropdownItems" :item="plugin" />
     </template>
   </VEntity>
 </template>

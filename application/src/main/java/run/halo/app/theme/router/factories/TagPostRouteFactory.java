@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.i18n.LocaleContextResolver;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.ReactiveExtensionClient;
@@ -25,6 +26,7 @@ import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.TagVo;
 import run.halo.app.theme.router.PageUrlUtils;
+import run.halo.app.theme.router.TitleVisibilityIdentifyCalculator;
 import run.halo.app.theme.router.UrlContextListResult;
 
 /**
@@ -43,6 +45,10 @@ public class TagPostRouteFactory implements RouteFactory {
     private final TagFinder tagFinder;
     private final PostFinder postFinder;
 
+    private final TitleVisibilityIdentifyCalculator titleVisibilityIdentifyCalculator;
+
+    private final LocaleContextResolver localeContextResolver;
+
     @Override
     public RouterFunction<ServerResponse> create(String prefix) {
         return RouterFunctions
@@ -56,7 +62,17 @@ public class TagPostRouteFactory implements RouteFactory {
             .flatMap(tagVo -> {
                 int pageNum = pageNumInPathVariable(request);
                 String path = request.path();
-                var postList = postList(tagVo.getMetadata().getName(), pageNum, path);
+                var postList = postList(tagVo.getMetadata().getName(), pageNum, path)
+                    .doOnNext(list -> list.forEach(postVo ->
+                        postVo.getSpec().setTitle(
+                            titleVisibilityIdentifyCalculator.calculateTitle(
+                                postVo.getSpec().getTitle(),
+                                postVo.getSpec().getVisible(),
+                                localeContextResolver.resolveLocaleContext(request.exchange())
+                                    .getLocale()
+                            )
+                        )
+                    ));
                 return ServerResponse.ok()
                     .render(DefaultTemplateEnum.TAG.getValue(),
                         Map.of("name", tagVo.getMetadata().getName(),

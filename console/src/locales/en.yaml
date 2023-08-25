@@ -102,6 +102,7 @@ core:
           title: Recent Posts
           visits: "{visits} Visits"
           comments: "{comments} Comments"
+          publishTime: "Publish Time {publishTime}"
         quicklink:
           title: Quick Link
           actions:
@@ -742,9 +743,6 @@ core:
       uninstall_when_enabled:
         confirm_text: Stop running and uninstall
         description: The current plugin is still in the enabled state and will be uninstalled after it stops running. This operation cannot be undone.
-      change_status:
-        active_title: Are you sure you want to active this plugin?
-        inactive_title: Are you sure you want to inactive this plugin?
       change_status_in_batch:
         activate_title: Are you sure you want to activate these plugins?
         inactivate_title: Are you sure you want to inactivate these plugins?
@@ -792,8 +790,8 @@ core:
         last_starttime: Last Start Time
     loader:
       toast:
-        entry_load_failed: "{name}: Failed to load plugin entry file"
-        style_load_failed: "{name}: Failed to load plugin stylesheet file"
+        entry_load_failed: "Failed to load plugins entry file"
+        style_load_failed: "Failed to load plugins stylesheet file"
     extension_points:
       editor:
         providers:

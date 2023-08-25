@@ -113,7 +113,9 @@ async function setupInitialData() {
     for (let i = 0; i < presetPlugins.length; i++) {
       pluginInstallMutate(presetPlugins[i]);
     }
-
+  } catch (error) {
+    console.error(error);
+  } finally {
     await apiClient.extension.configMap.createv1alpha1ConfigMap({
       configMap: {
         metadata: {
@@ -126,9 +128,6 @@ async function setupInitialData() {
         },
       },
     });
-  } catch (error) {
-    console.error(error);
-  } finally {
     processing.value = false;
   }
 

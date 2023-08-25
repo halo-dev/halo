@@ -102,6 +102,7 @@ core:
           title: 最近文章
           visits: "访问量 {visits}"
           comments: "评论 {comments}"
+          publishTime: "发布日期 {publishTime}"
         quicklink:
           title: 快捷访问
           actions:
@@ -742,9 +743,6 @@ core:
       uninstall_when_enabled:
         confirm_text: 停止运行并卸载
         description: 当前插件还在启用状态，将在停止运行后卸载，该操作不可恢复。
-      change_status:
-        active_title: 确定要启用该插件吗？
-        inactive_title: 确定要停用该插件吗？
       change_status_in_batch:
         activate_title: 确定要启用所选插件吗？
         inactivate_title: 确定要停用所选插件吗？
@@ -792,8 +790,8 @@ core:
         last_starttime: 最近一次启动
     loader:
       toast:
-        entry_load_failed: "{name}：加载插件入口文件失败"
-        style_load_failed: "{name}：加载插件样式文件失败"
+        entry_load_failed: "加载插件入口文件失败"
+        style_load_failed: "加载插件样式文件失败"
     extension_points:
       editor:
         providers:
