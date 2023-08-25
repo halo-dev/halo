@@ -129,12 +129,14 @@ class UserEndpointTest {
         void shouldFilterUsersWhenKeywordProvided() {
             var expectUser =
                 createUser("fake-user-2", "expected display name");
-            var unexpectedUser1 =
+            var expectUser2 =
                 createUser("fake-user-1", "first fake display name");
             var unexpectedUser2 =
                 createUser("fake-user-3", "second fake display name");
             var users = List.of(
-                expectUser
+                expectUser,
+                expectUser2,
+                unexpectedUser2
             );
             var expectResult = new ListResult<>(users);
             when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
@@ -149,7 +151,19 @@ class UserEndpointTest {
 
             verify(client).list(same(User.class), argThat(
                     predicate -> predicate.test(expectUser)
-                        && !predicate.test(unexpectedUser1)
+                        && !predicate.test(expectUser2)
+                        && !predicate.test(unexpectedUser2)),
+                any(), anyInt(), anyInt());
+
+            bindToRouterFunction(endpoint.endpoint())
+                .build()
+                .get().uri("/users?keyword=fake-user-1")
+                .exchange()
+                .expectStatus().isOk();
+
+            verify(client).list(same(User.class), argThat(
+                    predicate -> predicate.test(expectUser2)
+                        && !predicate.test(expectUser)
                         && !predicate.test(unexpectedUser2)),
                 any(), anyInt(), anyInt());
         }

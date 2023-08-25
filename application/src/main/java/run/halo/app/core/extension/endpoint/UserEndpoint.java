@@ -568,7 +568,7 @@ public class UserEndpoint implements CustomEndpoint {
                 var username = user.getMetadata().getName();
                 var displayName = user.getSpec().getDisplayName();
                 return StringUtils.containsIgnoreCase(displayName, keyword)
-                    || StringUtils.containsIgnoreCase(username, keyword);
+                    || keyword.equalsIgnoreCase(username);
             };
 
             Predicate<User> rolePredicate = user -> {
