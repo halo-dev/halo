@@ -1,10 +1,8 @@
 package run.halo.app.infra.utils;
 
-import java.io.IOException;
 import java.util.function.Supplier;
 import net.bytebuddy.ByteBuddy;
 import net.bytebuddy.description.type.TypeDescription;
-import reactor.core.Exceptions;
 
 public enum GenericClassUtils {
     ;
@@ -40,9 +38,6 @@ public enum GenericClassUtils {
             .name(nameGenerator.get())
             .make()) {
             return unloaded.load(parameterType.getClassLoader()).getLoaded();
-        } catch (IOException e) {
-            // Should never happen
-            throw Exceptions.propagate(e);
         }
     }
 }
