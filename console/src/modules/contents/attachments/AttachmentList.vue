@@ -42,6 +42,7 @@ import { useRouteQuery } from "@vueuse/router";
 import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
 import { usePermission } from "@/utils/permission";
 import { useI18n } from "vue-i18n";
+import { useLocalStorage } from "@vueuse/core";
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 
 const { currentUserHasPermission } = usePermission();
@@ -196,7 +197,7 @@ const viewTypes = [
   },
 ];
 
-const viewType = useRouteQuery<string>("view", "list");
+const viewType = useLocalStorage("attachment-view-type", "list");
 
 // Route query action
 const routeQueryAction = useRouteQuery<string | undefined>("action");
