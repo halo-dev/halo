@@ -108,6 +108,10 @@ class ContentTemplateHeadProcessorIntegrationTest {
 
         lenient().when(extensionComponentsFinder.getExtensions(eq(TemplateHeadProcessor.class)))
             .thenReturn(new ArrayList<>(map.values()));
+
+        lenient().when(applicationContext.getBean(eq(SystemConfigurableEnvironmentFetcher.class)))
+            .thenReturn(fetcher);
+        lenient().when(fetcher.fetchComment()).thenReturn(Mono.just(new SystemSetting.Comment()));
     }
 
 
@@ -137,19 +141,19 @@ class ContentTemplateHeadProcessorIntegrationTest {
             3. but global head meta is not overridden by global seo meta
          */
         assertThat(Jsoup.parse(result).html()).isEqualTo("""
-           <!doctype html>
-           <html lang="en">
-            <head>
-             <meta charset="UTF-8">
-             <title>Post detail</title>
-             <meta name="description" content="post-description">
-             <meta name="keyword" content="postK1,postK2">
-             <meta name="other" content="post-other-meta">
-            </head>
-            <body>
-             this is body
-            </body>
-           </html>""");
+            <!doctype html>
+            <html lang="en">
+             <head>
+              <meta charset="UTF-8">
+              <title>Post detail</title>
+              <meta name="description" content="post-description">
+              <meta name="keyword" content="postK1,postK2">
+              <meta name="other" content="post-other-meta">
+             </head>
+             <body>
+              this is body
+             </body>
+            </html>""");
     }
 
     Map<String, String> mutableMetaMap(String nameValue, String contentValue) {

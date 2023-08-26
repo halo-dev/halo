@@ -1,5 +1,7 @@
 package run.halo.app.core.extension.content;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -21,14 +23,14 @@ public class Reply extends AbstractExtension {
 
     public static final String KIND = "Reply";
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private ReplySpec spec;
 
     @Data
     @EqualsAndHashCode(callSuper = true)
     public static class ReplySpec extends Comment.BaseCommentSpec {
 
-        @Schema(required = true, minLength = 1)
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String commentName;
 
         private String quoteReply;

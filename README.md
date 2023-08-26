@@ -12,6 +12,7 @@
 <a href="https://github.com/halo-dev/halo/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/halo-dev/halo.svg?style=flat-square" /></a>
 <a href="https://github.com/halo-dev/halo/actions"><img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/halo-dev/halo/halo.yaml?branch=main&style=flat-square" /></a>
 <a href="https://codecov.io/gh/halo-dev/halo"><img alt="Codecov percentage" src="https://img.shields.io/codecov/c/github/halo-dev/halo/main?style=flat-square&token=YsRUg9fall"/></a>
+<a href="https://www.producthunt.com/posts/halo-6b401e75-bb58-4dff-9fe9-2ada3323c874?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-halo&#0045;6b401e75&#0045;bb58&#0045;4dff&#0045;9fe9&#0045;2ada3323c874" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=407442&theme=light" alt="Halo - Powerful&#0032;and&#0032;easy&#0045;to&#0045;use&#0032;Open&#0045;Source&#0032;website&#0032;building&#0032;tool | Product Hunt" style="height: 20px;" height="20px" /></a>
 <br />
 <a href="https://halo.run">官网</a>
 <a href="https://docs.halo.run">文档</a>
@@ -30,7 +31,7 @@ docker run \
   --name halo \
   -p 8090:8090 \
   -v ~/.halo2:/root/.halo2 \
-  halohub/halo:2.7 \
+  halohub/halo:2.8 \
   --halo.security.initializer.superadminusername=admin \
   --halo.security.initializer.superadminpassword=P@88w0rd
 ```
@@ -46,7 +47,7 @@ docker run \
 
 ## 生态
 
-可访问 [awesome-halo](https://github.com/halo-sigs/awesome-halo) 查看已经适用于 Halo 2.0 的主题和插件，以及适用于 Halo
+可访问 [官方应用市场](https://halo.run/store/apps) 或 [awesome-halo 仓库](https://github.com/halo-sigs/awesome-halo) 查看已经适用于 Halo 2.x 的主题和插件，以及适用于 Halo
 1.x 的相关仓库。
 
 ## 许可证

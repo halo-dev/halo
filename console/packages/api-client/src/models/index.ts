@@ -154,6 +154,7 @@ export * from "./snapshot-list";
 export * from "./stats";
 export * from "./stats-vo";
 export * from "./subject";
+export * from "./system-initialization-request";
 export * from "./tag";
 export * from "./tag-list";
 export * from "./tag-spec";

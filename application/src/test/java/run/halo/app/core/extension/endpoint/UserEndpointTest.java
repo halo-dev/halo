@@ -81,17 +81,8 @@ class UserEndpointTest {
     @BeforeEach
     void setUp() {
         // disable authorization
-        var rule = new Role.PolicyRule.Builder()
-            .apiGroups("*")
-            .resources("*")
-            .verbs("*")
-            .build();
-        var role = new Role();
-        role.setRules(List.of(rule));
-        when(roleService.getMonoRole("authenticated")).thenReturn(Mono.just(role));
-        webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint())
-            .build();
-        webClient = webClient.mutateWith(csrf());
+        webClient = WebTestClient.bindToRouterFunction(endpoint.endpoint()).build()
+            .mutateWith(csrf());
     }
 
     @Nested
@@ -132,35 +123,6 @@ class UserEndpointTest {
                 .expectBody()
                 .jsonPath("$.items.length()").isEqualTo(3)
                 .jsonPath("$.total").isEqualTo(3);
-        }
-
-        @Test
-        void shouldFilterUsersWhenKeywordProvided() {
-            var expectUser =
-                createUser("fake-user-2", "expected display name");
-            var unexpectedUser1 =
-                createUser("fake-user-1", "first fake display name");
-            var unexpectedUser2 =
-                createUser("fake-user-3", "second fake display name");
-            var users = List.of(
-                expectUser
-            );
-            var expectResult = new ListResult<>(users);
-            when(client.list(same(User.class), any(), any(), anyInt(), anyInt()))
-                .thenReturn(Mono.just(expectResult));
-            when(roleService.list(anySet())).thenReturn(Flux.empty());
-
-            bindToRouterFunction(endpoint.endpoint())
-                .build()
-                .get().uri("/users?keyword=Expected")
-                .exchange()
-                .expectStatus().isOk();
-
-            verify(client).list(same(User.class), argThat(
-                    predicate -> predicate.test(expectUser)
-                        && !predicate.test(unexpectedUser1)
-                        && !predicate.test(unexpectedUser2)),
-                any(), anyInt(), anyInt());
         }
 
         @Test

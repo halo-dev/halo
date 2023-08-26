@@ -5,6 +5,7 @@ import BasicLayout from "@/layouts/BasicLayout.vue";
 import Setup from "@/views/system/Setup.vue";
 import Redirect from "@/views/system/Redirect.vue";
 import type { MenuGroupType } from "@halo-dev/console-shared";
+import SetupInitialData from "@/views/system/SetupInitialData.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -27,6 +28,14 @@ export const routes: Array<RouteRecordRaw> = [
     path: "/setup",
     name: "Setup",
     component: Setup,
+    meta: {
+      title: "core.setup.title",
+    },
+  },
+  {
+    path: "/setup-initial-data",
+    name: "SetupInitialData",
+    component: SetupInitialData,
     meta: {
       title: "core.setup.title",
     },

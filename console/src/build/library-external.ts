@@ -5,6 +5,7 @@ import {
 } from "vite-plugin-static-copy";
 import { createHtmlPlugin as VitePluginHtml } from "vite-plugin-html";
 import randomstring from "randomstring";
+import type { HtmlTagDescriptor } from "vite";
 
 /**
  * It copies the external libraries to the `assets` folder, and injects the script tags into the HTML
@@ -74,15 +75,18 @@ export const setupLibraryExternal = (
     },
   ];
 
-  const injectScript = staticTargets
+  const injectTags = staticTargets
     .map((target) => {
-      return `<script src="${isProduction ? baseUrl : "/"}${target.dest}/${
-        target.rename
-      }"></script>`;
+      return {
+        injectTo: "head",
+        tag: "script",
+        attrs: {
+          src: `${isProduction ? baseUrl : "/"}${target.dest}/${target.rename}`,
+          type: "text/javascript",
+        },
+      };
     })
-    .join("\n");
-
-  console.log(injectScript);
+    .filter(Boolean) as HtmlTagDescriptor[];
 
   return [
     ViteExternals({
@@ -101,9 +105,7 @@ export const setupLibraryExternal = (
     VitePluginHtml({
       minify: false,
       inject: {
-        data: {
-          injectScript,
-        },
+        tags: injectTags,
       },
     }),
   ];

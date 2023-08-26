@@ -6,7 +6,6 @@ import static org.springframework.security.web.server.util.matcher.ServerWebExch
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -27,13 +26,11 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
-import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
 import run.halo.app.security.DefaultUserDetailService;
 import run.halo.app.security.DynamicMatcherSecurityWebFilterChain;
-import run.halo.app.security.SuperAdminInitializer;
 import run.halo.app.security.authentication.SecurityConfigurer;
 import run.halo.app.security.authentication.login.CryptoService;
 import run.halo.app.security.authentication.login.PublicKeyRouteBuilder;
@@ -61,8 +58,9 @@ public class WebServerSecurityConfig {
 
         http.securityMatcher(pathMatchers("/api/**", "/apis/**", "/oauth2/**",
                 "/login/**", "/logout", "/actuator/**"))
-            .authorizeExchange().anyExchange()
-            .access(new RequestInfoAuthorizationManager(roleService)).and()
+            .authorizeExchange(spec -> {
+                spec.anyExchange().access(new RequestInfoAuthorizationManager(roleService));
+            })
             .anonymous(spec -> {
                 spec.authorities(AnonymousUserConst.Role);
                 spec.principal(AnonymousUserConst.PRINCIPAL);
@@ -85,19 +83,24 @@ public class WebServerSecurityConfig {
         var mediaTypeMatcher = new MediaTypeServerWebExchangeMatcher(MediaType.TEXT_HTML);
         mediaTypeMatcher.setIgnoredMediaTypes(Set.of(MediaType.ALL));
         http.securityMatcher(new AndServerWebExchangeMatcher(pathMatcher, mediaTypeMatcher))
-            .authorizeExchange().anyExchange().permitAll().and()
             .securityContextRepository(securityContextRepository)
-            .headers()
-            .frameOptions(spec -> {
-                var frameOptions = haloProperties.getSecurity().getFrameOptions();
-                spec.mode(frameOptions.getMode());
-                if (frameOptions.isDisabled()) {
-                    spec.disable();
-                }
+            .authorizeExchange(spec -> {
+                spec.anyExchange().permitAll();
             })
-            .referrerPolicy(
-                spec -> spec.policy(haloProperties.getSecurity().getReferrerOptions().getPolicy()))
-            .cache().disable().and()
+            .headers(headerSpec -> headerSpec
+                .frameOptions(frameSpec -> {
+                    var frameOptions = haloProperties.getSecurity().getFrameOptions();
+                    frameSpec.mode(frameOptions.getMode());
+                    if (frameOptions.isDisabled()) {
+                        frameSpec.disable();
+                    }
+                })
+                .referrerPolicy(referrerPolicySpec -> {
+                    referrerPolicySpec.policy(
+                        haloProperties.getSecurity().getReferrerOptions().getPolicy());
+                })
+                .cache(ServerHttpSecurity.HeaderSpec.CacheSpec::disable)
+            )
             .anonymous(spec -> spec.authenticationFilter(
                 new HaloAnonymousAuthenticationWebFilter("portal", AnonymousUserConst.PRINCIPAL,
                     AuthorityUtils.createAuthorityList(AnonymousUserConst.Role),
@@ -119,16 +122,6 @@ public class WebServerSecurityConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
-    @Bean
-    @ConditionalOnProperty(name = "halo.security.initializer.disabled",
-        havingValue = "false",
-        matchIfMissing = true)
-    SuperAdminInitializer superAdminInitializer(ReactiveExtensionClient client,
-        HaloProperties halo) {
-        return new SuperAdminInitializer(client, passwordEncoder(),
-            halo.getSecurity().getInitializer());
     }
 
     @Bean

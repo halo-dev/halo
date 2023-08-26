@@ -2,15 +2,8 @@
 import { apiClient } from "@/utils/api-client";
 import { useQuery } from "@tanstack/vue-query";
 import { BackupStatusPhaseEnum } from "@halo-dev/api-client";
-import {
-  IconAddCircle,
-  VButton,
-  VEmpty,
-  VLoading,
-  VSpace,
-} from "@halo-dev/components";
+import { VButton, VEmpty, VLoading } from "@halo-dev/components";
 import BackupListItem from "../components/BackupListItem.vue";
-import { useBackup } from "../composables/use-backup";
 
 const {
   data: backups,
@@ -49,8 +42,6 @@ const {
     return false;
   },
 });
-
-const { handleCreate } = useBackup();
 </script>
 
 <template>
@@ -61,17 +52,9 @@ const { handleCreate } = useBackup();
       :title="$t('core.backup.empty.title')"
     >
       <template #actions>
-        <VSpace>
-          <VButton :loading="isFetching" @click="refetch()">
-            {{ $t("core.common.buttons.refresh") }}
-          </VButton>
-          <VButton type="secondary" @click="handleCreate">
-            <template #icon>
-              <IconAddCircle class="h-full w-full" />
-            </template>
-            {{ $t("core.backup.empty.actions.create") }}
-          </VButton>
-        </VSpace>
+        <VButton :loading="isFetching" @click="refetch()">
+          {{ $t("core.common.buttons.refresh") }}
+        </VButton>
       </template>
     </VEmpty>
   </Transition>

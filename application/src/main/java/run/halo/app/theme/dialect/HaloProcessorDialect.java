@@ -35,6 +35,7 @@ public class HaloProcessorDialect extends AbstractProcessorDialect implements
         processors.add(new TemplateFooterElementTagProcessor(dialectPrefix));
         processors.add(new JsonNodePropertyAccessorBoundariesProcessor());
         processors.add(new CommentElementTagProcessor(dialectPrefix));
+        processors.add(new CommentEnabledVariableProcessor());
         return processors;
     }
 

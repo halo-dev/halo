@@ -28,16 +28,16 @@ import { useRouteQuery } from "@vueuse/router";
 import { useRouter } from "vue-router";
 import { randomUUID } from "@/utils/id";
 import { useContentCache } from "@/composables/use-content-cache";
-import {
-  useEditorExtensionPoints,
-  type EditorProvider,
-} from "@/composables/use-editor-extension-points";
+import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
+import type { EditorProvider } from "@halo-dev/console-shared";
 import { useLocalStorage } from "@vueuse/core";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
 import { useI18n } from "vue-i18n";
 import UrlPreviewModal from "@/components/preview/UrlPreviewModal.vue";
 import { usePostUpdateMutate } from "./composables/use-post-update-mutate";
 import { contentAnnotations } from "@/constants/annotations";
+import { useAutoSaveContent } from "@/composables/use-auto-save-content";
+import { useContentSnapshot } from "@/composables/use-content-snapshot";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -148,6 +148,8 @@ const handleSave = async (options?: { mute?: boolean }) => {
 
       formState.value.post = data;
     } else {
+      // Clear new post content cache
+      handleClearCache();
       const { data } = await apiClient.post.draftPost({
         postRequest: formState.value,
       });
@@ -158,8 +160,9 @@ const handleSave = async (options?: { mute?: boolean }) => {
     if (!options?.mute) {
       Toast.success(t("core.common.toast.save_success"));
     }
-    handleClearCache(name.value as string);
+    handleClearCache(formState.value.post.metadata.name as string);
     await handleFetchContent();
+    await handleFetchSnapshot();
   } catch (e) {
     console.error("Failed to save post", e);
     Toast.error(t("core.common.toast.save_failed_and_retry"));
@@ -200,6 +203,9 @@ const handlePublish = async () => {
       await apiClient.post.publishPost({
         name: data.metadata.name,
       });
+
+      // Clear new post content cache
+      handleClearCache();
 
       router.push({ name: "Posts" });
     }
@@ -342,13 +348,28 @@ onMounted(async () => {
   handleResetCache();
 });
 
+const headSnapshot = computed(() => {
+  return formState.value.post.spec.headSnapshot;
+});
+
+const { version, handleFetchSnapshot } = useContentSnapshot(headSnapshot);
+
 // Post content cache
-const { handleSetContentCache, handleResetCache, handleClearCache } =
-  useContentCache(
-    "post-content-cache",
-    name,
-    toRef(formState.value.content, "raw")
-  );
+const {
+  currentCache,
+  handleSetContentCache,
+  handleResetCache,
+  handleClearCache,
+} = useContentCache(
+  "post-content-cache",
+  name,
+  toRef(formState.value.content, "raw"),
+  version
+);
+
+useAutoSaveContent(currentCache, toRef(formState.value.content, "raw"), () => {
+  handleSave({ mute: true });
+});
 
 // Post preview
 const previewModal = ref(false);

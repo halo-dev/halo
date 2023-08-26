@@ -5,7 +5,7 @@ const route = useRoute();
 const router = useRouter();
 
 if (allowRedirect()) {
-  window.location.href = route.query.redirect_uri as string;
+  window.location.href = decodeURIComponent(route.query.redirect_uri as string);
 } else {
   router.push({
     name: "Dashboard",
@@ -13,7 +13,7 @@ if (allowRedirect()) {
 }
 
 function allowRedirect() {
-  const redirect_uri = route.query.redirect_uri as string;
+  const redirect_uri = decodeURIComponent(route.query.redirect_uri as string);
 
   if (!redirect_uri || redirect_uri === window.location.href) {
     return false;

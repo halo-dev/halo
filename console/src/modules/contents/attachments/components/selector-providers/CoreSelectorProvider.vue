@@ -19,7 +19,6 @@ import LazyImage from "@/components/image/LazyImage.vue";
 import type { AttachmentLike } from "@halo-dev/console-shared";
 import type { Attachment, Group } from "@halo-dev/api-client";
 import AttachmentUploadModal from "../AttachmentUploadModal.vue";
-import AttachmentFileTypeIcon from "../AttachmentFileTypeIcon.vue";
 import AttachmentDetailModal from "../AttachmentDetailModal.vue";
 import AttachmentGroupList from "../AttachmentGroupList.vue";
 import { matchMediaTypes } from "@/utils/media-type";
@@ -196,12 +195,15 @@ const isDisabled = (attachment: Attachment) => {
       </div>
     </VCard>
   </div>
-  <div class="mt-4 bg-white sm:flex sm:items-center sm:justify-end">
+  <div class="mt-4">
     <VPagination
       v-model:page="page"
       v-model:size="size"
       :page-label="$t('core.components.pagination.page_label')"
       :size-label="$t('core.components.pagination.size_label')"
+      :total-label="
+        $t('core.components.pagination.total_label', { total: total })
+      "
       :total="total"
       :size-options="[60, 120, 200]"
     />

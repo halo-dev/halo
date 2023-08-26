@@ -1,9 +1,9 @@
 package run.halo.app.security;
 
+import static org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository.withHttpOnlyFalse;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
 import org.springframework.security.config.web.server.ServerHttpSecurity;
-import org.springframework.security.web.server.csrf.CookieServerCsrfTokenRepository;
 import org.springframework.security.web.server.csrf.CsrfWebFilter;
 import org.springframework.security.web.server.csrf.ServerCsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.server.util.matcher.AndServerWebExchangeMatcher;
@@ -20,12 +20,12 @@ public class CsrfConfigurer implements SecurityConfigurer {
             CsrfWebFilter.DEFAULT_CSRF_MATCHER,
             new NegatedServerWebExchangeMatcher(pathMatchers("/api/**", "/apis/**")
             ));
-
-        http.csrf().csrfTokenRepository(CookieServerCsrfTokenRepository.withHttpOnlyFalse())
+        http.csrf(csrfSpec -> csrfSpec
+            .csrfTokenRepository(withHttpOnlyFalse())
             // TODO Use XorServerCsrfTokenRequestAttributeHandler instead when console implements
             // the algorithm
             .csrfTokenRequestHandler(new ServerCsrfTokenRequestAttributeHandler())
-            .requireCsrfProtectionMatcher(csrfMatcher);
+            .requireCsrfProtectionMatcher(csrfMatcher));
     }
 
 }

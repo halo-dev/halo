@@ -12,11 +12,15 @@ import type { AnnotationSetting } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { getValidationMessages } from "@formkit/validation";
 import { useThemeStore } from "@/stores/theme";
+import { randomUUID } from "@/utils/id";
 
 const themeStore = useThemeStore();
 
 function keyValidationRule(node: FormKitNode) {
-  return !annotations?.[node.value as string];
+  return (
+    !annotations.value?.[node.value as string] &&
+    !customAnnotationsDuplicateKey.value
+  );
 }
 
 const props = withDefaults(
@@ -62,10 +66,18 @@ const handleFetchAnnotationSettings = async () => {
   }
 };
 
+const specFormId = `${randomUUID()}-specForm`;
+const customFormId = `${randomUUID()}-customForm`;
 const annotations = ref<{
   [key: string]: string;
 }>({});
 const customAnnotationsState = ref<{ key: string; value: string }[]>([]);
+
+const customAnnotationsDuplicateKey = computed(() => {
+  const keys = customAnnotationsState.value.map((item) => item.key);
+  const uniqueKeys = new Set(keys);
+  return keys.length !== uniqueKeys.size;
+});
 
 const customAnnotations = computed(() => {
   return customAnnotationsState.value.reduce((acc, cur) => {
@@ -134,8 +146,8 @@ onMounted(async () => {
 watch(
   () => props.value,
   (value) => {
-    reset("specForm");
-    reset("customForm");
+    reset(specFormId);
+    reset(customFormId);
     annotations.value = cloneDeep(props.value) || {};
     if (value) {
       handleProcessCustomAnnotations();
@@ -150,11 +162,11 @@ const customFormInvalid = ref(true);
 
 const handleSubmit = async () => {
   if (avaliableAnnotationSettings.value.length) {
-    submitForm("specForm");
+    submitForm(specFormId);
   } else {
     specFormInvalid.value = false;
   }
-  submitForm("customForm");
+  submitForm(customFormId);
   await nextTick();
 };
 
@@ -187,7 +199,7 @@ defineExpose({
   <div class="flex flex-col gap-3 divide-y divide-gray-100">
     <FormKit
       v-if="annotations && avaliableAnnotationSettings.length > 0"
-      id="specForm"
+      :id="specFormId"
       v-model="annotations"
       type="form"
       :preserve="true"
@@ -206,7 +218,7 @@ defineExpose({
     </FormKit>
     <FormKit
       v-if="annotations"
-      id="customForm"
+      :id="customFormId"
       type="form"
       :preserve="true"
       :form-class="`${avaliableAnnotationSettings.length ? 'py-4' : ''}`"
@@ -222,7 +234,7 @@ defineExpose({
           type="text"
           label="Key"
           name="key"
-          validation="required|keyValidationRule"
+          validation="required:trim|keyValidationRule"
           :validation-rules="{ keyValidationRule }"
           :validation-messages="{
             keyValidationRule: $t(
@@ -230,12 +242,7 @@ defineExpose({
             ),
           }"
         ></FormKit>
-        <FormKit
-          type="text"
-          label="Value"
-          name="value"
-          validation="required"
-        ></FormKit>
+        <FormKit type="text" label="Value" name="value" value=""></FormKit>
       </FormKit>
     </FormKit>
   </div>

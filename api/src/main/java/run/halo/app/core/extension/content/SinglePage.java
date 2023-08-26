@@ -1,5 +1,7 @@
 package run.halo.app.core.extension.content;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
@@ -36,7 +38,7 @@ public class SinglePage extends AbstractExtension {
     public static final String OWNER_LABEL = "content.halo.run/owner";
     public static final String VISIBLE_LABEL = "content.halo.run/visible";
 
-    @Schema(required = true)
+    @Schema(requiredMode = REQUIRED)
     private SinglePageSpec spec;
 
     @Schema
@@ -58,10 +60,10 @@ public class SinglePage extends AbstractExtension {
 
     @Data
     public static class SinglePageSpec {
-        @Schema(required = true, minLength = 1)
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String title;
 
-        @Schema(required = true, minLength = 1)
+        @Schema(requiredMode = REQUIRED, minLength = 1)
         private String slug;
 
         /**
@@ -79,27 +81,27 @@ public class SinglePage extends AbstractExtension {
 
         private String cover;
 
-        @Schema(required = true, defaultValue = "false")
+        @Schema(requiredMode = REQUIRED, defaultValue = "false")
         private Boolean deleted;
 
-        @Schema(required = true, defaultValue = "false")
+        @Schema(requiredMode = REQUIRED, defaultValue = "false")
         private Boolean publish;
 
         private Instant publishTime;
 
-        @Schema(required = true, defaultValue = "false")
+        @Schema(requiredMode = REQUIRED, defaultValue = "false")
         private Boolean pinned;
 
-        @Schema(required = true, defaultValue = "true")
+        @Schema(requiredMode = REQUIRED, defaultValue = "true")
         private Boolean allowComment;
 
-        @Schema(required = true, defaultValue = "PUBLIC")
+        @Schema(requiredMode = REQUIRED, defaultValue = "PUBLIC")
         private Post.VisibleEnum visible;
 
-        @Schema(required = true, defaultValue = "0")
+        @Schema(requiredMode = REQUIRED, defaultValue = "0")
         private Integer priority;
 
-        @Schema(required = true)
+        @Schema(requiredMode = REQUIRED)
         private Post.Excerpt excerpt;
 
         private List<Map<String, String>> htmlMetas;

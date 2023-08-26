@@ -1,5 +1,7 @@
 package run.halo.app.content.comment;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.UUID;
 import lombok.Data;
@@ -15,10 +17,10 @@ import run.halo.app.extension.Metadata;
 @Data
 public class ReplyRequest {
 
-    @Schema(required = true, minLength = 1)
+    @Schema(requiredMode = REQUIRED, minLength = 1)
     private String raw;
 
-    @Schema(required = true, minLength = 1)
+    @Schema(requiredMode = REQUIRED, minLength = 1)
     private String content;
 
     @Schema(defaultValue = "false")

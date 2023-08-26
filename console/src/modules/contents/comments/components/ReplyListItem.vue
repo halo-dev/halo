@@ -16,8 +16,10 @@ import { apiClient } from "@/utils/api-client";
 import { computed, inject, type Ref } from "vue";
 import cloneDeep from "lodash.clonedeep";
 import { useI18n } from "vue-i18n";
+import { useQueryClient } from "@tanstack/vue-query";
 
 const { t } = useI18n();
+const queryClient = useQueryClient();
 
 const props = withDefaults(
   defineProps<{
@@ -31,7 +33,6 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (event: "reload"): void;
   (event: "reply", reply: ListedReply): void;
 }>();
 
@@ -64,7 +65,7 @@ const handleDelete = async () => {
       } catch (error) {
         console.error("Failed to delete comment reply", error);
       } finally {
-        emit("reload");
+        queryClient.invalidateQueries({ queryKey: ["comment-replies"] });
       }
     },
   });
@@ -85,7 +86,7 @@ const handleApprove = async () => {
   } catch (error) {
     console.error("Failed to approve comment reply", error);
   } finally {
-    emit("reload");
+    queryClient.invalidateQueries({ queryKey: ["comment-replies"] });
   }
 };
 

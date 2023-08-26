@@ -34,6 +34,7 @@ import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { useFileDialog } from "@vueuse/core";
 import { rbacAnnotations } from "@/constants/annotations";
+import { onBeforeRouteUpdate } from "vue-router";
 
 const UserAvatarCropper = defineAsyncComponent(
   () => import("../components/UserAvatarCropper.vue")
@@ -69,6 +70,17 @@ const editingModal = ref(false);
 const passwordChangeModal = ref(false);
 
 const { params } = useRoute();
+const name = ref();
+
+onMounted(() => {
+  name.value = params.name;
+});
+
+// Update name when route change
+onBeforeRouteUpdate((to, _, next) => {
+  name.value = to.params.name;
+  next();
+});
 
 const {
   data: user,
@@ -76,14 +88,14 @@ const {
   isLoading,
   refetch,
 } = useQuery({
-  queryKey: ["user-detail", params.name],
+  queryKey: ["user-detail", name],
   queryFn: async () => {
-    if (params.name === "-") {
+    if (name.value === "-") {
       const { data } = await apiClient.user.getCurrentUserDetail();
       return data;
     } else {
       const { data } = await apiClient.user.getUserDetail({
-        name: params.name as string,
+        name: name.value,
       });
       return data;
     }
@@ -95,10 +107,11 @@ const {
       ? 1000
       : false;
   },
+  enabled: computed(() => !!name.value),
 });
 
 const isCurrentUser = computed(() => {
-  if (params.name === "-") {
+  if (name.value === "-") {
     return true;
   }
   return (
@@ -155,7 +168,7 @@ const handleUploadAvatar = () => {
     uploadSaving.value = true;
     apiClient.user
       .uploadUserAvatar({
-        name: params.name as string,
+        name: name.value,
         file: file,
       })
       .then(() => {
@@ -181,7 +194,7 @@ const handleRemoveCurrentAvatar = () => {
     onConfirm: async () => {
       apiClient.user
         .deleteUserAvatar({
-          name: params.name as string,
+          name: name.value as string,
         })
         .then(() => {
           refetch();

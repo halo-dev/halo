@@ -23,6 +23,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.server.i18n.LocaleContextResolver;
 import org.springframework.web.util.UriUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -54,6 +55,10 @@ public class SinglePageRoute
     private final SinglePageFinder singlePageFinder;
 
     private final ViewNameResolver viewNameResolver;
+
+    private final TitleVisibilityIdentifyCalculator titleVisibilityIdentifyCalculator;
+
+    private final LocaleContextResolver localeContextResolver;
 
     @Override
     @NonNull
@@ -101,15 +106,21 @@ public class SinglePageRoute
     public Result reconcile(Request request) {
         client.fetch(SinglePage.class, request.name())
             .ifPresent(page -> {
-                if (ExtensionOperator.isDeleted(page)
-                    || BooleanUtils.isTrue(page.getSpec().getDeleted())) {
-                    quickRouteMap.remove(NameSlugPair.from(page));
+                var nameSlugPair = NameSlugPair.from(page);
+                if (ExtensionOperator.isDeleted(page)) {
+                    quickRouteMap.remove(nameSlugPair);
                     return;
                 }
-                // put new one
-                quickRouteMap.entrySet()
-                    .removeIf(entry -> entry.getKey().name().equals(request.name()));
-                quickRouteMap.put(NameSlugPair.from(page), handlerFunction(request.name()));
+                if (BooleanUtils.isTrue(page.getSpec().getDeleted())) {
+                    quickRouteMap.remove(nameSlugPair);
+                } else {
+                    // put new one
+                    if (page.isPublished()) {
+                        quickRouteMap.put(nameSlugPair, handlerFunction(request.name()));
+                    } else {
+                        quickRouteMap.remove(nameSlugPair);
+                    }
+                }
             });
         return new Result(false, null);
     }
@@ -138,6 +149,14 @@ public class SinglePageRoute
 
     HandlerFunction<ServerResponse> handlerFunction(String name) {
         return request -> singlePageFinder.getByName(name)
+            .doOnNext(singlePageVo -> {
+                titleVisibilityIdentifyCalculator.calculateTitle(
+                    singlePageVo.getSpec().getTitle(),
+                    singlePageVo.getSpec().getVisible(),
+                    localeContextResolver.resolveLocaleContext(request.exchange())
+                        .getLocale()
+                );
+            })
             .flatMap(singlePageVo -> {
                 Map<String, Object> model = ModelMapUtils.singlePageModel(singlePageVo);
                 String template = singlePageVo.getSpec().getTemplate();

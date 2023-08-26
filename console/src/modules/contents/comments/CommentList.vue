@@ -95,6 +95,8 @@ const {
       sort: [selectedSort.value].filter(Boolean) as string[],
       keyword: keyword.value,
       ownerName: selectedUser.value,
+      // TODO: email users are not supported at the moment.
+      ownerKind: selectedUser.value ? "User" : undefined,
     });
 
     total.value = data.total;
@@ -371,7 +373,6 @@ const handleApproveInBatch = async () => {
             <CommentListItem
               :comment="comment"
               :is-selected="checkSelection(comment)"
-              @reload="refetch()"
             >
               <template #checkbox>
                 <input
@@ -388,16 +389,17 @@ const handleApproveInBatch = async () => {
       </Transition>
 
       <template #footer>
-        <div class="bg-white sm:flex sm:items-center sm:justify-end">
-          <VPagination
-            v-model:page="page"
-            v-model:size="size"
-            :page-label="$t('core.components.pagination.page_label')"
-            :size-label="$t('core.components.pagination.size_label')"
-            :total="total"
-            :size-options="[20, 30, 50, 100]"
-          />
-        </div>
+        <VPagination
+          v-model:page="page"
+          v-model:size="size"
+          :page-label="$t('core.components.pagination.page_label')"
+          :size-label="$t('core.components.pagination.size_label')"
+          :total-label="
+            $t('core.components.pagination.total_label', { total: total })
+          "
+          :total="total"
+          :size-options="[20, 30, 50, 100]"
+        />
       </template>
     </VCard>
   </div>

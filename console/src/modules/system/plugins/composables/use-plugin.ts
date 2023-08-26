@@ -1,5 +1,5 @@
 import type { ComputedRef, Ref } from "vue";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import type { Plugin } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
@@ -10,6 +10,7 @@ interface usePluginLifeCycleReturn {
   isStarted: ComputedRef<boolean | undefined>;
   getFailedMessage: () => string | undefined;
   changeStatus: () => void;
+  changingStatus: Ref<boolean>;
   uninstall: (deleteExtensions?: boolean) => void;
 }
 
@@ -36,37 +37,25 @@ export function usePluginLifeCycle(
     }
   };
 
-  const changeStatus = () => {
+  const changingStatus = ref(false);
+
+  const changeStatus = async () => {
     if (!plugin?.value) return;
 
-    const pluginToUpdate = cloneDeep(plugin.value);
+    try {
+      changingStatus.value = true;
+      const pluginToUpdate = cloneDeep(plugin.value);
+      pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
+      await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin({
+        name: pluginToUpdate.metadata.name,
+        plugin: pluginToUpdate,
+      });
 
-    Dialog.info({
-      title: pluginToUpdate.spec.enabled
-        ? t("core.plugin.operations.change_status.inactive_title")
-        : t("core.plugin.operations.change_status.active_title"),
-      confirmText: t("core.common.buttons.confirm"),
-      cancelText: t("core.common.buttons.cancel"),
-      onConfirm: async () => {
-        try {
-          pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
-          await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin({
-            name: pluginToUpdate.metadata.name,
-            plugin: pluginToUpdate,
-          });
-
-          Toast.success(
-            pluginToUpdate.spec.enabled
-              ? t("core.common.toast.active_success")
-              : t("core.common.toast.inactive_success")
-          );
-        } catch (e) {
-          console.error(e);
-        } finally {
-          window.location.reload();
-        }
-      },
-    });
+      window.location.reload();
+    } catch (e) {
+      console.error(e);
+      changingStatus.value = false;
+    }
   };
 
   const uninstall = (deleteExtensions?: boolean) => {
@@ -150,6 +139,105 @@ export function usePluginLifeCycle(
     isStarted,
     getFailedMessage,
     changeStatus,
+    changingStatus,
     uninstall,
   };
+}
+
+export function usePluginBatchOperations(names: Ref<string[]>) {
+  const { t } = useI18n();
+
+  function handleUninstallInBatch(deleteExtensions: boolean) {
+    Dialog.warning({
+      title: `${
+        deleteExtensions
+          ? t(
+              "core.plugin.operations.uninstall_and_delete_config_in_batch.title"
+            )
+          : t("core.plugin.operations.uninstall_in_batch.title")
+      }`,
+      description: t("core.common.dialog.descriptions.cannot_be_recovered"),
+      confirmType: "danger",
+      confirmText: t("core.common.buttons.uninstall"),
+      cancelText: t("core.common.buttons.cancel"),
+      onConfirm: async () => {
+        try {
+          for (let i = 0; i < names.value.length; i++) {
+            await apiClient.extension.plugin.deletepluginHaloRunV1alpha1Plugin({
+              name: names.value[i],
+            });
+
+            if (deleteExtensions) {
+              const { data: plugin } =
+                await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin(
+                  {
+                    name: names.value[i],
+                  }
+                );
+
+              const { settingName, configMapName } = plugin.spec;
+
+              if (settingName) {
+                await apiClient.extension.setting.deletev1alpha1Setting(
+                  {
+                    name: settingName,
+                  },
+                  {
+                    mute: true,
+                  }
+                );
+              }
+
+              if (configMapName) {
+                await apiClient.extension.configMap.deletev1alpha1ConfigMap(
+                  {
+                    name: configMapName,
+                  },
+                  {
+                    mute: true,
+                  }
+                );
+              }
+            }
+          }
+
+          window.location.reload();
+        } catch (e) {
+          console.error("Failed to uninstall plugin in batch", e);
+        }
+      },
+    });
+  }
+
+  function handleChangeStatusInBatch(enabled: boolean) {
+    Dialog.info({
+      title: enabled
+        ? t("core.plugin.operations.change_status_in_batch.activate_title")
+        : t("core.plugin.operations.change_status_in_batch.inactivate_title"),
+      confirmText: t("core.common.buttons.confirm"),
+      cancelText: t("core.common.buttons.cancel"),
+      onConfirm: async () => {
+        try {
+          for (let i = 0; i < names.value.length; i++) {
+            const { data: pluginToUpdate } =
+              await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin({
+                name: names.value[i],
+              });
+
+            pluginToUpdate.spec.enabled = enabled;
+            await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin({
+              name: pluginToUpdate.metadata.name,
+              plugin: pluginToUpdate,
+            });
+          }
+
+          window.location.reload();
+        } catch (e) {
+          console.error("Failed to change plugin status in batch", e);
+        }
+      },
+    });
+  }
+
+  return { handleUninstallInBatch, handleChangeStatusInBatch };
 }

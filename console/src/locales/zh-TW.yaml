@@ -17,6 +17,7 @@ core:
       return_login:
         label: 已有帳號
         button: 立即登入
+      return_site: 返回到首頁
     button: 登入
     modal:
       title: 重新登入
@@ -101,6 +102,7 @@ core:
           title: 最近文章
           visits: "訪問量 {visits}"
           comments: "留言 {comments}"
+          publishTime: "發佈日期 {publishTime}"
         quicklink:
           title: 快捷訪問
           actions:
@@ -123,7 +125,7 @@ core:
             refresh_search_engine:
               title: 刷新搜尋引擎
               dialog_title: 確定要刷新搜尋引擎索引嗎？
-              dialog_content: 此操作會對所有已發布的文章重新創建搜尋引擎索引。
+              dialog_content: 此操作會對所有已發佈的文章重新創建本地搜尋引擎的索引。
               success_message: 刷新成功
             evict_page_cache:
               title: 重新整理頁面快取
@@ -730,14 +732,20 @@ core:
         toast_success: 重置配置成功
       uninstall:
         title: 確定要卸載該插件嗎？
+      uninstall_in_batch:
+        title: 確定要卸載所選插件嗎？
       uninstall_and_delete_config:
+        button: 卸載並刪除配置
         title: 確定要卸載該插件以及對應的配置嗎？
+      uninstall_and_delete_config_in_batch:
+        button: 卸載並刪除配置
+        title: 確定要卸載所選插件以及對應的配置嗎？
       uninstall_when_enabled:
         confirm_text: 停止運行並卸載
         description: 當前插件還在啟用狀態，將在停止運行後卸載，該操作不可恢復。
-      change_status:
-        active_title: 確定要啟用該插件嗎？
-        inactive_title: 確定要停用該插件嗎？
+      change_status_in_batch:
+        activate_title: 確定要啟用所選插件嗎？
+        inactivate_title: 確定要停用所選插件嗎？
       remote_download:
         title: 偵測到遠端下載地址，是否需要下載？
         description: 請仔細鑑別此地址是否可信：{url}
@@ -750,9 +758,6 @@ core:
         items:
           create_time_desc: 較近安裝
           create_time_asc: 較早安裝
-    list:
-      actions:
-        uninstall_and_delete_config: 卸載並刪除配置
     upload_modal:
       titles:
         install: 安裝插件
@@ -785,8 +790,8 @@ core:
         last_starttime: 最近一次啟動
     loader:
       toast:
-        entry_load_failed: "{name}：讀取插件入口文件失敗"
-        style_load_failed: "{name}：讀取插件樣式文件失敗"
+        entry_load_failed: "讀取插件入口文件失敗"
+        style_load_failed: "讀取插件樣式文件失敗"
     extension_points:
       editor:
         providers:
@@ -991,8 +996,6 @@ core:
     empty:
       title: 沒有備份
       message: 目前沒有已建立的備份，您可以點擊重新整理或建立新的備份。
-      actions:
-        create: 建立備份
     operations:
       create:
         button: 建立備份
@@ -1004,9 +1007,9 @@ core:
         description: 確定要刪除此備份嗎？
       restore:
         title: 還原成功
-        description: 還原成功後，需要重新啟動 Halo 才能正常載入系統資源，點擊確定後我們會自動停止運行 Halo。
-      shutdown:
-        toast_success: 已請求停止運行
+        description: 還原成功後，需要重新啟動 Halo 才能正常載入系統資源，點擊確定之後，我們會自動重啟 Halo。
+      restart:
+        toast_success: 已請求重啟
     list:
       phases:
         pending: 準備中
@@ -1019,7 +1022,7 @@ core:
       tips:
         first: 1. 還原過程可能需要較長時間，期間請勿重新整理頁面。
         second: 2. 在還原過程中，雖然已有的資料不會被清除，但若有衝突的資料將被覆蓋。
-        third: 3. 還原完成後會提示停止運行 Halo，停止後可能需要手動啟動。
+        third: 3. 還原完成後需要重新啟動 Halo 才能正常載入系統資源。
         complete: 恢復完成，等待重啟...
       start: 開始還原
   exception:
@@ -1035,10 +1038,19 @@ core:
       submit:
         button: 初始化
         toast_success: 初始化成功
+      setup_initial_data:
+        loading: 正在初始化資料，請稍後...
     fields:
       site_title:
-        placeholder: 站點名稱
-        validation: 請輸入站點名稱
+        label: 站點名稱
+      email:
+        label: 電子郵箱
+      username:
+        label: 用戶名
+      password:
+        label: 密碼
+      confirm_password:
+        label: 確認密碼
   rbac:
     Attachments Management: 附件
     Attachment Manage: 附件管理
@@ -1148,8 +1160,14 @@ core:
     pagination:
       page_label: 頁
       size_label: 條 / 頁
+      total_label: 共 {total} 項資料
     social_auth_providers:
       title: 三方登入
+    app_download_alert:
+      description: Halo 的主題和插件可以在以下地址下載：
+      sources:
+        app_store: "官方應用市場：{url}"
+        github: "GitHub：{url}"
   composables:
     content_cache:
       toast_recovered: 已從緩存中恢復未保存的內容
@@ -1185,7 +1203,8 @@ core:
       preview: 預覽
       recovery: 恢復
       delete_permanently: 永久刪除
-      active: 啟用
+      activate: 啟用
+      inactivate: 停用
       download: 下載
       copy: 複製
       upload: 上傳
