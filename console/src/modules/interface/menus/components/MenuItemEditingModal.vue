@@ -2,7 +2,7 @@
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { computed, nextTick, ref, watch } from "vue";
-import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
+import type { Menu, MenuItem, MenuItemStatus, Ref } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
