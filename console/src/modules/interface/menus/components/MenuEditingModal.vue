@@ -1,12 +1,12 @@
 <script lang="ts" setup>
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import { setFocus } from "@/formkit/utils/focus";
+import type { Menu } from "@halo-dev/api-client";
+import { computed, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
-import type { Menu } from "@halo-dev/api-client";
-import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import cloneDeep from "lodash.clonedeep";
-import { computed, ref, watch } from "vue";
+import { setFocus } from "@/formkit/utils/focus";
 import { useI18n } from "vue-i18n";
 
 const props = withDefaults(
@@ -113,35 +113,16 @@ watch(
     }
   }
 );
-const menusCopy = ref<Menu[]>([]);
-watch(
-  () => props.menus,
-  (n) => {
-    menusCopy.value = n as Menu[];
-  }
-);
-const warning = ref<boolean>(false);
-const compareMenusWitchDisplayName = (
-  menus: Menu[],
-  displayName: string
-): boolean => {
-  for (const menu of menus) {
-    if (displayName && menu.spec.displayName === displayName) {
-      return true;
+const warning = computed(() => {
+  if (props.menus) {
+    for (const menu of props.menus as Menu[]) {
+      if (menu.spec.displayName === formState.value.spec.displayName) {
+        return true;
+      }
     }
   }
   return false;
-};
-watch(
-  formState,
-  (n) => {
-    warning.value = compareMenusWitchDisplayName(
-      menusCopy.value,
-      n.spec.displayName
-    );
-  },
-  { deep: true }
-);
+});
 </script>
 <template>
   <VModal

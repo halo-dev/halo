@@ -1,13 +1,13 @@
 <script lang="ts" setup>
+import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
-import { setFocus } from "@/formkit/utils/focus";
+import { computed, nextTick, ref, watch } from "vue";
+import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
-import type { Menu, MenuItem, MenuItemStatus, Ref } from "@halo-dev/api-client";
-import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import cloneDeep from "lodash.clonedeep";
-import { computed, nextTick, ref, watch } from "vue";
+import { setFocus } from "@/formkit/utils/focus";
+import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { useI18n } from "vue-i18n";
 import type { MenuTreeItem } from "../utils";
 
@@ -272,18 +272,20 @@ const onMenuItemSourceChange = () => {
   selectedRefName.value = "";
 };
 
-const menuTreeItemsCopy = ref<MenuTreeItem[]>([]);
-watch(
-  () => props.menuTreeItems,
-  (n) => {
-    menuTreeItemsCopy.value = n as MenuTreeItem[];
+const findChildrensByName = (
+  value: string,
+  menuTreeItems: MenuTreeItem[] = props.menuTreeItems as MenuTreeItem[]
+) => {
+  if (menuTreeItems.length === 0 || !value) {
+    return [];
   }
-);
-
-const findParentMenuItemChidrensByName = (value: string) => {
-  return menuTreeItemsCopy.value.filter((item) => {
-    return item.metadata.name === value;
-  })[0].spec.children;
+  for (let index = 0; index < menuTreeItems.length; index++) {
+    const element = menuTreeItems[index];
+    if (element.metadata.name === value) return element.spec.children;
+    if (element.spec.children.length != 0)
+      return findChildrensByName(value, element.spec.children);
+  }
+  return [];
 };
 
 const compareMenuItemsWitchDisplayName = (
@@ -300,31 +302,22 @@ const compareMenuItemsWitchDisplayName = (
   }
   return false;
 };
-const warning = ref<boolean>(false);
-watch(
-  () => formState.value,
-  (n) => {
-    if (selectedRef.value?.inputType === undefined) {
-      if (selectedParentMenuItem.value != undefined) {
-        const childrens = findParentMenuItemChidrensByName(
-          selectedParentMenuItem.value
-        );
-        warning.value = compareMenuItemsWitchDisplayName(
-          childrens,
-          n.spec.displayName as string
-        );
-      } else {
-        warning.value = compareMenuItemsWitchDisplayName(
-          menuTreeItemsCopy.value,
-          n.spec.displayName as string
-        );
-      }
-    }
-  },
-  {
-    deep: true,
+
+const warning = computed(() => {
+  if (props.menuTreeItems === undefined) return false;
+  if (selectedRef.value?.inputType != undefined) return false;
+  if (selectedParentMenuItem.value) {
+    const childrens = findChildrensByName(selectedParentMenuItem.value);
+    return compareMenuItemsWitchDisplayName(
+      childrens,
+      formState.value.spec.displayName as string
+    );
   }
-);
+  return compareMenuItemsWitchDisplayName(
+    props.menuTreeItems,
+    formState.value.spec.displayName as string
+  );
+});
 </script>
 <template>
   <VModal
