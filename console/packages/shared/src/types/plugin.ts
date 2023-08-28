@@ -9,6 +9,7 @@ import type { BackupTab } from "@/states/backup";
 import type { PluginInstallationTab } from "@/states/plugin-installation-tabs";
 import type { EntityDropdownItem } from "@/states/entity";
 import type { ListedPost, Plugin } from "@halo-dev/api-client";
+import type { ThemeListTab } from "@/states/theme-list-tabs";
 
 export interface RouteRecordAppend {
   parentName: RouteRecordName;
@@ -46,6 +47,8 @@ export interface ExtensionPoint {
   "plugin:list-item:operation:create"?: () =>
     | EntityDropdownItem<Plugin>[]
     | Promise<EntityDropdownItem<Plugin>[]>;
+
+  "theme:list:tabs:create"?: () => ThemeListTab[] | Promise<ThemeListTab[]>;
 }
 
 export interface PluginModule {

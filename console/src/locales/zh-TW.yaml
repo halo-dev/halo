@@ -629,7 +629,7 @@ core:
         not_installed_themes: 未安裝的主題
       tabs:
         installed: 已安裝
-        not_installed: 未安裝
+        not_installed: 本地未安裝
       empty:
         title: 當前沒有已安裝的主題
         message: 當前沒有已安裝的主題，你可以嘗試刷新或者安裝新主題
