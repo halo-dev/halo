@@ -113,16 +113,6 @@ watch(
     }
   }
 );
-const warning = computed(() => {
-  if (props.menus) {
-    for (const menu of props.menus as Menu[]) {
-      if (menu.spec.displayName === formState.value.spec.displayName) {
-        return true;
-      }
-    }
-  }
-  return false;
-});
 </script>
 <template>
   <VModal
@@ -146,11 +136,6 @@ const warning = computed(() => {
         name="displayName"
         validation="required|length:0,100"
       >
-        <template #help>
-          <span v-show="warning" class="text-xs text-red-500">
-            {{ t("core.menu.menu_editing_modal.fields.display_name.warning") }}
-          </span>
-        </template>
       </FormKit>
     </FormKit>
     <template #footer>

@@ -2,14 +2,13 @@
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { computed, nextTick, ref, watch } from "vue";
-import type { Menu, MenuItem, MenuItemStatus, Ref } from "@halo-dev/api-client";
+import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
 import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { useI18n } from "vue-i18n";
-import type { MenuTreeItem } from "../utils";
 
 const props = withDefaults(
   defineProps<{
@@ -17,14 +16,14 @@ const props = withDefaults(
     menu?: Menu;
     parentMenuItem: MenuItem;
     menuItem?: MenuItem;
-    menuTreeItems?: MenuTreeItem[];
+    menuOriginItems?: MenuItem[];
   }>(),
   {
     visible: false,
     menu: undefined,
     parentMenuItem: undefined,
     menuItem: undefined,
-    menuTreeItems: undefined,
+    menuOriginItems: undefined,
   }
 );
 
@@ -271,52 +270,24 @@ const selectedRefName = ref<string>("");
 const onMenuItemSourceChange = () => {
   selectedRefName.value = "";
 };
-
-const findChildrensByName = (
-  value: string,
-  menuTreeItems: MenuTreeItem[] = props.menuTreeItems as MenuTreeItem[]
-) => {
-  if (menuTreeItems.length === 0 || !value) {
-    return [];
+const OriginHref = ref<string>();
+watch(isUpdateMode, (n, o) => {
+  if (n === true && o === false) {
+    OriginHref.value = formState.value.spec.href;
+    return;
   }
-  for (let index = 0; index < menuTreeItems.length; index++) {
-    const element = menuTreeItems[index];
-    if (element.metadata.name === value) return element.spec.children;
-    if (element.spec.children.length != 0)
-      return findChildrensByName(value, element.spec.children);
-  }
-  return [];
-};
-
-const compareMenuItemsWitchDisplayName = (
-  childrens: MenuTreeItem[],
-  displayName: string
-): boolean => {
-  for (const menu of childrens) {
-    if (
-      displayName &&
-      (menu.status as MenuItemStatus).displayName === displayName
-    ) {
-      return true;
-    }
-  }
-  return false;
-};
-
+  OriginHref.value = undefined;
+});
 const warning = computed(() => {
-  if (props.menuTreeItems === undefined) return false;
-  if (selectedRef.value?.inputType != undefined) return false;
-  if (selectedParentMenuItem.value) {
-    const childrens = findChildrensByName(selectedParentMenuItem.value);
-    return compareMenuItemsWitchDisplayName(
-      childrens,
-      formState.value.spec.displayName as string
-    );
+  if (!props.menuOriginItems) return false;
+  if (!formState.value.spec.href) return false;
+  let menus = props.menuOriginItems;
+  if (OriginHref.value) {
+    menus = props.menuOriginItems.filter((item) => {
+      return item.spec.href != OriginHref.value;
+    });
   }
-  return compareMenuItemsWitchDisplayName(
-    props.menuTreeItems,
-    formState.value.spec.displayName as string
-  );
+  return menus.some((item) => item.spec.href === formState.value.spec.href);
 });
 </script>
 <template>
@@ -382,17 +353,7 @@ const warning = computed(() => {
               type="text"
               name="displayName"
               validation="required|length:0,100"
-            >
-              <template #help>
-                <span v-show="warning" class="text-xs text-red-500">
-                  {{
-                    t(
-                      "core.menu.menu_item_editing_modal.fields.display_name.warning"
-                    )
-                  }}</span
-                >
-              </template>
-            </FormKit>
+            />
 
             <FormKit
               v-if="!selectedRefKind"
@@ -401,7 +362,17 @@ const warning = computed(() => {
               type="text"
               name="href"
               validation="required|length:0,1024"
-            />
+            >
+              <template #help>
+                <span v-show="warning" class="text-xs text-orange-600">
+                  {{
+                    t(
+                      "core.menu.menu_item_editing_modal.fields.display_name.warning"
+                    )
+                  }}</span
+                >
+              </template>
+            </FormKit>
 
             <FormKit
               v-if="selectedRef?.ref"

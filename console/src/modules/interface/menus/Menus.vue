@@ -38,7 +38,7 @@ const selectedMenu = ref<Menu>();
 const selectedMenuItem = ref<MenuItem>();
 const selectedParentMenuItem = ref<MenuItem>();
 const menuItemEditingModal = ref();
-
+const menuOriginItems = ref<MenuItem[]>();
 const {
   data: menuItems,
   isLoading,
@@ -60,6 +60,7 @@ const {
     return data.items;
   },
   onSuccess(data) {
+    menuOriginItems.value = data;
     menuTreeItems.value = buildMenuItemsTree(data);
   },
   refetchInterval(data) {
@@ -182,7 +183,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
   <MenuItemEditingModal
     v-model:visible="menuItemEditingModal"
     :menu-item="selectedMenuItem"
-    :menu-tree-items="menuTreeItems"
+    :menu-origin-items="menuOriginItems"
     :parent-menu-item="selectedParentMenuItem"
     :menu="selectedMenu"
     @close="onMenuItemEditingModalClose"

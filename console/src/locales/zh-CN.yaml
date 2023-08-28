@@ -707,7 +707,7 @@ core:
             tag: 标签
         display_name:
           label: 名称
-          warning: 当前菜单存在相同的名字的另一个链接
+          warning: 有另一个链接具有相同的地址的链接
         href:
           label: 链接地址
         target:
