@@ -88,10 +88,9 @@ const {
     const { data } = await apiClient.comment.listComments({
       page: page.value,
       size: size.value,
-      approved:
-        selectedApprovedStatus.value !== undefined
-          ? Boolean(selectedApprovedStatus.value)
-          : undefined,
+      approved: selectedApprovedStatus.value
+        ? selectedApprovedStatus.value === "true"
+        : undefined,
       sort: [selectedSort.value].filter(Boolean) as string[],
       keyword: keyword.value,
       ownerName: selectedUser.value,
