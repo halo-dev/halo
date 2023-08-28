@@ -12,8 +12,12 @@ import { ref, inject, type Ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { useQuery } from "@tanstack/vue-query";
+import { useThemeStore } from "@/stores/theme";
+
+const themeStore = useThemeStore();
 
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme", ref());
+const activeTabId = inject<Ref<string>>("activeTabId", ref(""));
 
 function handleSelectTheme(theme: Theme) {
   selectedTheme.value = theme;
@@ -32,7 +36,16 @@ const {
       size: 0,
       uninstalled: false,
     });
-    return data.items;
+    return data.items.sort((a, b) => {
+      const activatedThemeName = themeStore.activatedTheme?.metadata.name;
+      if (a.metadata.name === activatedThemeName) {
+        return -1;
+      }
+      if (b.metadata.name === activatedThemeName) {
+        return 1;
+      }
+      return 0;
+    });
   },
   refetchInterval(data) {
     const deletingThemes = data?.filter(
@@ -66,8 +79,11 @@ const handleOpenPreview = (theme: Theme) => {
             <VButton :loading="isFetching" @click="refetch()">
               {{ $t("core.common.buttons.refresh") }}
             </VButton>
-            <!-- TODO: change tab -->
-            <VButton v-permission="['system:themes:manage']" type="primary">
+            <VButton
+              v-permission="['system:themes:manage']"
+              type="primary"
+              @click="activeTabId = 'local-upload'"
+            >
               <template #icon>
                 <IconAddCircle class="h-full w-full" />
               </template>
