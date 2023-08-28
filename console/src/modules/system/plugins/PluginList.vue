@@ -52,6 +52,8 @@ function handleClearFilters() {
   selectedEnabledValue.value = undefined;
 }
 
+const total = ref(0);
+
 const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
   queryKey: ["plugins", keyword, selectedEnabledValue, selectedSortValue],
   queryFn: async () => {
@@ -62,6 +64,9 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
       enabled: selectedEnabledValue.value,
       sort: [selectedSortValue.value].filter(Boolean) as string[],
     });
+
+    total.value = data.total;
+
     return data.items;
   },
   keepPreviousData: true,
@@ -304,6 +309,14 @@ onMounted(() => {
           </li>
         </ul>
       </Transition>
+
+      <template #footer>
+        <div class="flex h-8 items-center">
+          <span class="text-sm text-gray-500">
+            {{ $t("core.components.pagination.total_label", { total: total }) }}
+          </span>
+        </div>
+      </template>
     </VCard>
   </div>
 </template>

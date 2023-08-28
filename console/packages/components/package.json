@@ -35,13 +35,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/halo-dev/console.git",
-    "directory": "packages/components"
+    "url": "https://github.com/halo-dev/halo.git",
+    "directory": "console/packages/components"
   },
   "bugs": {
     "url": "https://github.com/halo-dev/halo/issues"
   },
-  "homepage": "https://github.com/halo-dev/console/tree/main/packages/components#readme",
+  "homepage": "https://github.com/halo-dev/halo/tree/main/console/packages/components#readme",
   "license": "MIT",
   "devDependencies": {
     "@histoire/plugin-vue": "^0.11.7",
