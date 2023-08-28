@@ -224,7 +224,9 @@ const handleCreateTheme = async () => {
             >
               {{ $t("core.common.buttons.activate") }}
             </VButton>
-            <VButton size="sm" @click="emit('select', theme)">选择</VButton>
+            <VButton size="sm" @click="emit('select', theme)">
+              {{ $t("core.common.buttons.select") }}
+            </VButton>
             <VDropdown
               v-if="currentUserHasPermission(['system:themes:manage'])"
             >

@@ -1202,6 +1202,7 @@ core:
       add: 添加
       submit: 提交
       detail: 詳情
+      select: 選擇
     radio:
       "yes": 是
       "no": 否
