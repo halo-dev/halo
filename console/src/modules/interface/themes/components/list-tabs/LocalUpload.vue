@@ -44,11 +44,9 @@ const handleCatchExistsException = async (
   file?: File
 ) => {
   Dialog.info({
-    title: t(
-      "core.theme.upload_modal.operations.existed_during_installation.title"
-    ),
+    title: t("core.theme.operations.existed_during_installation.title"),
     description: t(
-      "core.theme.upload_modal.operations.existed_during_installation.description"
+      "core.theme.operations.existed_during_installation.description"
     ),
     confirmText: t("core.common.buttons.confirm"),
     cancelText: t("core.common.buttons.cancel"),
