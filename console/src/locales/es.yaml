@@ -93,50 +93,50 @@ core:
         comment: Comentario
         user: Usuario
         other: Otros
-    presets:
-      post_stats:
-        title: Publicaciones
-      page_stats:
-        title: Páginas
-      recent_published:
-        title: Publicaciones Recientes
-        visits: "{visits} Visitas"
-        comments: "{comments} Comentarios"
-      quicklink:
-        title: Enlace Rápido
-        actions:
-          user_profile:
-            title: Perfil de Usuario
-          view_site:
-            title: Ver Sitio
-          new_post:
-            title: Nueva Publicación
-          new_page:
-            title: Nueva Página
-          upload_attachment:
-            title: Subir Archivo Adjunto
-          theme_manage:
-            title: Administrar Temas
-          plugin_manage:
-            title: Administrar Complementos
-          new_user:
-            title: Nuevo Usuario
-          refresh_search_engine:
-            title: Actualizar Motor de Búsqueda
-            dialog_title: ¿Deseas actualizar el índice del motor de búsqueda?
-            dialog_content: Esta operación recreará los índices del motor de búsqueda para todas las publicaciones publicadas.
-            success_message: Índice del motor de búsqueda actualizado exitosamente.
-          evict_page_cache:
-            title: Actualizar Caché de Página
-            dialog_title: ¿Deseas actualizar el caché de las páginas?
-            dialog_content: Esta operación borrará la caché de todas las páginas.
-            success_message: Caché de página actualizada exitosamente.
-      user_stats:
-        title: Usuarios
-      comment_stats:
-        title: Comentarios
-      views_stats:
-        title: Visitas
+      presets:
+        post_stats:
+          title: Publicaciones
+        page_stats:
+          title: Páginas
+        recent_published:
+          title: Publicaciones Recientes
+          visits: "{visits} Visitas"
+          comments: "{comments} Comentarios"
+        quicklink:
+          title: Enlace Rápido
+          actions:
+            user_profile:
+              title: Perfil de Usuario
+            view_site:
+              title: Ver Sitio
+            new_post:
+              title: Nueva Publicación
+            new_page:
+              title: Nueva Página
+            upload_attachment:
+              title: Subir Archivo Adjunto
+            theme_manage:
+              title: Administrar Temas
+            plugin_manage:
+              title: Administrar Complementos
+            new_user:
+              title: Nuevo Usuario
+            refresh_search_engine:
+              title: Actualizar Motor de Búsqueda
+              dialog_title: ¿Deseas actualizar el índice del motor de búsqueda?
+              dialog_content: Esta operación recreará los índices del motor de búsqueda para todas las publicaciones publicadas.
+              success_message: Índice del motor de búsqueda actualizado exitosamente.
+            evict_page_cache:
+              title: Actualizar Caché de Página
+              dialog_title: ¿Deseas actualizar el caché de las páginas?
+              dialog_content: Esta operación borrará la caché de todas las páginas.
+              success_message: Caché de página actualizada exitosamente.
+        user_stats:
+          title: Usuarios
+        comment_stats:
+          title: Comentarios
+        views_stats:
+          title: Visitas
   post:
     title: Publicaciones
     actions:
@@ -439,23 +439,23 @@ core:
           reply_count_asc: Menos Respuestas
           create_time_desc: Creado más reciente
           create_time_asc: Creado más antiguo
-      list:
-        fields:
-          reply_count: "{count} Respuestas"
-          has_new_replies: Nuevas respuestas
-          pending_review: Pendiente de revisión
-      subject_refs:
-        post: Publicación
-        page: Página
-        unknown: Desconocido
-      reply_modal:
-        title: Respuesta
-        fields:
-          content:
-            label: Contenido
-        operations:
-          submit:
-            toast_success: Respuesta enviada exitosamente
+    list:
+      fields:
+        reply_count: "{count} Respuestas"
+        has_new_replies: Nuevas respuestas
+        pending_review: Pendiente de revisión
+    subject_refs:
+      post: Publicación
+      page: Página
+      unknown: Desconocido
+    reply_modal:
+      title: Respuesta
+      fields:
+        content:
+          label: Contenido
+      operations:
+        submit:
+          toast_success: Respuesta enviada exitosamente
   attachment:
     title: Adjuntos
     common:
@@ -565,6 +565,14 @@ core:
             title: Sin política de almacenamiento
             description: Antes de cargar, es necesario crear una nueva política de almacenamiento.
           not_select: Por favor, selecciona una política de almacenamiento primero
+    select_modal:
+      title: Seleccionar adjunto
+      providers:
+        default:
+          label: Adjuntos
+      operations:
+        select:
+          result: "({count} elementos seleccionados)"
   theme:
     title: Temas
     common:
@@ -1156,16 +1164,16 @@ core:
       sources:
         app_store: "Tienda de aplicaciones oficial: {url}"
         github: "GitHub: {url}"
-    composables:
-      content_cache:
-        toast_recovered: Contenido no guardado recuperado de la caché
-    formkit:
-      category_select:
-        creation_label: "Crear categoría {text}"
-      tag_select:
-        creation_label: "Crear etiqueta {text}"
-      validation:
-        trim: Por favor, elimina los espacios al inicio y al final
+  composables:
+    content_cache:
+      toast_recovered: Contenido no guardado recuperado de la caché
+  formkit:
+    category_select:
+      creation_label: "Crear categoría {text}"
+    tag_select:
+      creation_label: "Crear etiqueta {text}"
+    validation:
+      trim: Por favor, elimina los espacios al inicio y al final
   common:
     buttons:
       save: Guardar
