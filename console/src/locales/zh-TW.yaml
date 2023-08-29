@@ -1029,7 +1029,7 @@ core:
       start: 開始還原
       tabs:
         local:
-          label: 本地上傳
+          label: 上傳
         remote:
           label: 遠程恢復
           fields:

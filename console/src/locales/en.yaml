@@ -1029,7 +1029,7 @@ core:
       start: Start restore
       tabs:
         local:
-          label: Local
+          label: Upload
         remote:
           label: Remote
           fields:

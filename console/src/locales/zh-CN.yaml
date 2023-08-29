@@ -1029,7 +1029,7 @@ core:
       start: 开始恢复
       tabs:
         local:
-          label: 本地上传
+          label: 上传
         remote:
           label: 远程恢复
           fields:
