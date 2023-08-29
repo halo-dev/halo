@@ -383,13 +383,15 @@ const handlePreview = async () => {
 };
 const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
 
-const handleSaveKeybinding = (e: KeyboardEvent) => {
+const handleSaveKeybinding = async (e: KeyboardEvent) => {
   const { key, ctrlKey, metaKey } = e;
   if (isMac && metaKey && key === "s") {
     e.preventDefault();
+    await nextTick();
     handleSave();
   } else if (!isMac && ctrlKey && key === "s") {
     e.preventDefault();
+    await nextTick();
     handleSave();
   }
 };
