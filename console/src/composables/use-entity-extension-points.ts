@@ -61,13 +61,18 @@ export function useEntityFieldItemExtensionPoint<T>(
       itemsFromPlugins.push(...items);
     });
 
-    const allItems = [...presets, ...itemsFromPlugins].map((item) => {
-      return {
-        ...item,
-        visible:
-          item.visible !== false && currentUserHasPermission(item.permissions),
-      };
-    });
+    const allItems = [...presets, ...itemsFromPlugins]
+      .sort((a, b) => {
+        return a.priority - b.priority;
+      })
+      .map((item) => {
+        return {
+          ...item,
+          visible:
+            item.visible !== false &&
+            currentUserHasPermission(item.permissions),
+        };
+      });
 
     startFields.value = allItems.filter((item) => item.position === "start");
     endFields.value = allItems.filter((item) => item.position === "end");
