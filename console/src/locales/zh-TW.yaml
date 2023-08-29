@@ -1010,6 +1010,8 @@ core:
         description: 還原成功後，需要重新啟動 Halo 才能正常載入系統資源，點擊確定之後，我們會自動重啟 Halo。
       restart:
         toast_success: 已請求重啟
+      remote_download:
+        button: 下載並還原
     list:
       phases:
         pending: 準備中
@@ -1025,6 +1027,13 @@ core:
         third: 3. 還原完成後需要重新啟動 Halo 才能正常載入系統資源。
         complete: 恢復完成，等待重啟...
       start: 開始還原
+      tabs:
+        local:
+          label: 上傳
+        remote:
+          label: 遠程恢復
+          fields:
+            url: 下載地址
   exception:
     not_found:
       message: 沒有找到該頁面
