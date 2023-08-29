@@ -39,17 +39,19 @@ export interface ExtensionPoint {
     | PluginInstallationTab[]
     | Promise<PluginInstallationTab[]>;
 
-  "post:list-item:operation:create"?: () =>
+  "post:list-item:operation:create"?: (
+    post: ListedPost
+  ) =>
     | EntityDropdownItem<ListedPost>[]
     | Promise<EntityDropdownItem<ListedPost>[]>;
 
-  "plugin:list-item:operation:create"?: () =>
-    | EntityDropdownItem<Plugin>[]
-    | Promise<EntityDropdownItem<Plugin>[]>;
+  "plugin:list-item:operation:create"?: (
+    plugin: Plugin
+  ) => EntityDropdownItem<Plugin>[] | Promise<EntityDropdownItem<Plugin>[]>;
 
-  "backup:list-item:operation:create"?: () =>
-    | EntityDropdownItem<Backup>[]
-    | Promise<EntityDropdownItem<Backup>[]>;
+  "backup:list-item:operation:create"?: (
+    backup: Backup
+  ) => EntityDropdownItem<Backup>[] | Promise<EntityDropdownItem<Backup>[]>;
 }
 
 export interface PluginModule {

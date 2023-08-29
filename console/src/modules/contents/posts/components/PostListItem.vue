@@ -121,6 +121,7 @@ const handleDelete = async () => {
 
 const { dropdownItems } = useEntityDropdownItemExtensionPoint<ListedPost>(
   "post:list-item:operation:create",
+  props.post,
   [
     {
       priority: 10,

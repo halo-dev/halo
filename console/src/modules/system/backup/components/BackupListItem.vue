@@ -99,6 +99,7 @@ function handleDelete() {
 
 const { dropdownItems } = useEntityDropdownItemExtensionPoint<Backup>(
   "backup:list-item:operation:create",
+  props.backup,
   [
     {
       priority: 10,

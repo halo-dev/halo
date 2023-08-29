@@ -7,6 +7,7 @@ import { onMounted, ref } from "vue";
 
 export function useEntityDropdownItemExtensionPoint<T>(
   extensionPointName: string,
+  entity: T,
   presets: EntityDropdownItem<T>[]
 ) {
   const { pluginModules } = usePluginModuleStore();
@@ -20,9 +21,9 @@ export function useEntityDropdownItemExtensionPoint<T>(
         return;
       }
 
-      const items = extensionPoints[
-        extensionPointName
-      ]() as EntityDropdownItem<T>[];
+      const items = extensionPoints[extensionPointName](
+        entity
+      ) as EntityDropdownItem<T>[];
 
       dropdownItems.value.push(...items);
     });

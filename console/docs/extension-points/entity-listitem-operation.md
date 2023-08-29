@@ -8,9 +8,9 @@
 
 目前支持扩展的数据列表：
 
-- 文章：`"post:list-item:operation:create"?: () => | EntityDropdownItem<ListedPost>[] | Promise<EntityDropdownItem<ListedPost>[]>`
-- 插件：`"plugin:list-item:operation:create"?: () => | EntityDropdownItem<Plugin>[] | Promise<EntityDropdownItem<Plugin>[]>`
-- 备份：`"backup:list-item:operation:create"?: () => | EntityDropdownItem<Backup>[] | Promise<EntityDropdownItem<Backup>[]>`
+- 文章：`"post:list-item:operation:create"?: (post: ListedPost) => | EntityDropdownItem<ListedPost>[] | Promise<EntityDropdownItem<ListedPost>[]>`
+- 插件：`"plugin:list-item:operation:create"?: (plugin: Plugin) => | EntityDropdownItem<Plugin>[] | Promise<EntityDropdownItem<Plugin>[]>`
+- 备份：`"backup:list-item:operation:create"?: (backup: Backup) => | EntityDropdownItem<Backup>[] | Promise<EntityDropdownItem<Backup>[]>`
 
 示例：
 
