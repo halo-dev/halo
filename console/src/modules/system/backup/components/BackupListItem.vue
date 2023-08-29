@@ -21,9 +21,15 @@ import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 const queryClient = useQueryClient();
 const { t } = useI18n();
 
-const props = defineProps<{
-  backup: Backup;
-}>();
+const props = withDefaults(
+  defineProps<{
+    backup: Backup;
+    showOperations: boolean;
+  }>(),
+  {
+    showOperations: true,
+  }
+);
 
 type Phase = {
   text: string;
@@ -103,13 +109,23 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Backup>(
     {
       priority: 10,
       component: markRaw(VDropdownItem),
+      label: "恢复",
+      visible: props.backup.status?.phase === "SUCCEEDED",
+      permissions: [],
+      action: () => {
+        // TODO
+      },
+    },
+    {
+      priority: 20,
+      component: markRaw(VDropdownItem),
       label: t("core.common.buttons.download"),
       visible: props.backup.status?.phase === "SUCCEEDED",
       permissions: [],
       action: () => handleDownload(),
     },
     {
-      priority: 20,
+      priority: 30,
       component: markRaw(VDropdownItem),
       props: {
         type: "danger",
@@ -181,8 +197,9 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Backup>(
           </span>
         </template>
       </VEntityField>
+      <slot name="end"></slot>
     </template>
-    <template #dropdownItems>
+    <template v-if="showOperations" #dropdownItems>
       <EntityDropdownItems :dropdown-items="dropdownItems" :item="backup" />
     </template>
   </VEntity>

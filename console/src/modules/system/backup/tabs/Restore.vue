@@ -6,6 +6,7 @@ import {
   Toast,
   VAlert,
   VButton,
+  VEntityField,
   VLoading,
   VTabItem,
   VTabs,
@@ -15,8 +16,12 @@ import axios from "axios";
 import { computed } from "vue";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
+import { useBackupFetch } from "../composables/use-backup";
+import BackupListItem from "../components/BackupListItem.vue";
+import type { Backup } from "packages/api-client/dist";
 
 const { t } = useI18n();
+const { data: backups } = useBackupFetch();
 
 const complete = ref(false);
 const showUploader = ref(false);
@@ -57,6 +62,22 @@ const { isLoading: downloading, mutate: handleRemoteDownload } = useMutation({
     onProcessCompleted();
   },
 });
+
+function handleRestoreFromBackup(backup: Backup) {
+  Dialog.info({
+    title: "确认要从此备份进行恢复吗？",
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
+    async onConfirm() {
+      await apiClient.migration.restoreBackup({
+        backupName: backup.metadata.name,
+      });
+      setTimeout(() => {
+        onProcessCompleted();
+      }, 200);
+    },
+  });
+}
 
 useQuery({
   queryKey: ["check-health"],
@@ -141,6 +162,29 @@ useQuery({
               {{ $t("core.backup.operations.remote_download.button") }}
             </VButton>
           </div>
+        </VTabItem>
+        <VTabItem id="backups" label="从备份恢复">
+          <ul
+            class="box-border h-full w-full divide-y divide-gray-100 overflow-hidden rounded-base"
+            role="list"
+          >
+            <li v-for="(backup, index) in backups?.items" :key="index">
+              <BackupListItem :show-operations="false" :backup="backup">
+                <template v-if="backup.status?.phase === 'SUCCEEDED'" #end>
+                  <VEntityField v-permission="['system:themes:manage']">
+                    <template #description>
+                      <VButton
+                        size="sm"
+                        @click="handleRestoreFromBackup(backup)"
+                      >
+                        恢复
+                      </VButton>
+                    </template>
+                  </VEntityField>
+                </template>
+              </BackupListItem>
+            </li>
+          </ul>
         </VTabItem>
       </VTabs>
     </div>
