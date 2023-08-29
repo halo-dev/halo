@@ -1,6 +1,8 @@
 import { usePluginModuleStore } from "@/stores/plugin";
+import { usePermission } from "@/utils/permission";
 import type {
   EntityDropdownItem,
+  EntityFieldItem,
   PluginModule,
 } from "@halo-dev/console-shared";
 import { onMounted, ref } from "vue";
@@ -33,4 +35,43 @@ export function useEntityDropdownItemExtensionPoint<T>(
   });
 
   return { dropdownItems };
+}
+
+export function useEntityFieldItemExtensionPoint<T>(
+  extensionPointName: string,
+  item: T,
+  presets: EntityFieldItem[]
+) {
+  const { pluginModules } = usePluginModuleStore();
+  const { currentUserHasPermission } = usePermission();
+
+  const startFields = ref<EntityFieldItem[]>([]);
+  const endFields = ref<EntityFieldItem[]>([]);
+
+  onMounted(() => {
+    const itemsFromPlugins: EntityFieldItem[] = [];
+    pluginModules.forEach((pluginModule: PluginModule) => {
+      const { extensionPoints } = pluginModule;
+      if (!extensionPoints?.[extensionPointName]) {
+        return;
+      }
+      const items = extensionPoints[extensionPointName](
+        item
+      ) as EntityFieldItem[];
+      itemsFromPlugins.push(...items);
+    });
+
+    const allItems = [...presets, ...itemsFromPlugins].map((item) => {
+      return {
+        ...item,
+        visible:
+          item.visible !== false && currentUserHasPermission(item.permissions),
+      };
+    });
+
+    startFields.value = allItems.filter((item) => item.position === "start");
+    endFields.value = allItems.filter((item) => item.position === "end");
+  });
+
+  return { startFields, endFields };
 }
