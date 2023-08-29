@@ -28,16 +28,16 @@ import cloneDeep from "lodash.clonedeep";
 import { useRouter } from "vue-router";
 import { randomUUID } from "@/utils/id";
 import { useContentCache } from "@/composables/use-content-cache";
-import {
-  useEditorExtensionPoints,
-  type EditorProvider,
-} from "@/composables/use-editor-extension-points";
+import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
+import type { EditorProvider } from "@halo-dev/console-shared";
 import { useLocalStorage } from "@vueuse/core";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
 import { useI18n } from "vue-i18n";
 import UrlPreviewModal from "@/components/preview/UrlPreviewModal.vue";
 import { contentAnnotations } from "@/constants/annotations";
 import { usePageUpdateMutate } from "./composables/use-page-update-mutate";
+import { useAutoSaveContent } from "@/composables/use-auto-save-content";
+import { useContentSnapshot } from "@/composables/use-content-snapshot";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -145,22 +145,22 @@ const handleSave = async (options?: { mute?: boolean }) => {
 
       formState.value.page = data;
     } else {
+      // Clear new page content cache
+      handleClearCache();
       const { data } = await apiClient.singlePage.draftSinglePage({
         singlePageRequest: formState.value,
       });
       formState.value.page = data;
       routeQueryName.value = data.metadata.name;
-
-      // Clear new page content cache
-      handleClearCache();
     }
 
     if (!options?.mute) {
       Toast.success(t("core.common.toast.save_success"));
     }
 
-    handleClearCache(routeQueryName.value as string);
+    handleClearCache(formState.value.page.metadata.name as string);
     await handleFetchContent();
+    await handleFetchSnapshot();
   } catch (error) {
     console.error("Failed to save single page", error);
     Toast.error(t("core.common.toast.save_failed_and_retry"));
@@ -332,13 +332,28 @@ onMounted(async () => {
   handleResetCache();
 });
 
+const headSnapshot = computed(() => {
+  return formState.value.page.spec.headSnapshot;
+});
+
+const { version, handleFetchSnapshot } = useContentSnapshot(headSnapshot);
+
 // SinglePage content cache
-const { handleSetContentCache, handleResetCache, handleClearCache } =
-  useContentCache(
-    "singlePage-content-cache",
-    routeQueryName,
-    toRef(formState.value.content, "raw")
-  );
+const {
+  currentCache,
+  handleSetContentCache,
+  handleResetCache,
+  handleClearCache,
+} = useContentCache(
+  "singlePage-content-cache",
+  routeQueryName,
+  toRef(formState.value.content, "raw"),
+  version
+);
+
+useAutoSaveContent(currentCache, toRef(formState.value.content, "raw"), () => {
+  handleSave({ mute: true });
+});
 
 // SinglePage preview
 const previewModal = ref(false);

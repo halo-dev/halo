@@ -4,13 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
-import static run.halo.app.theme.finders.PostPublicQueryService.FIXED_PREDICATE;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.Test;
@@ -32,6 +32,7 @@ import run.halo.app.theme.finders.TagFinder;
 import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.PostArchiveVo;
 import run.halo.app.theme.finders.vo.PostArchiveYearMonthVo;
+import run.halo.app.theme.router.DefaultQueryPostPredicateResolver;
 
 /**
  * Tests for {@link PostFinderImpl}.
@@ -77,7 +78,10 @@ class PostFinderImplTest {
 
     @Test
     void predicate() {
-        List<String> strings = posts().stream().filter(FIXED_PREDICATE)
+        Predicate<Post> predicate = new DefaultQueryPostPredicateResolver().getPredicate().block();
+        assertThat(predicate).isNotNull();
+
+        List<String> strings = posts().stream().filter(predicate)
             .map(post -> post.getMetadata().getName())
             .toList();
         assertThat(strings).isEqualTo(List.of("post-1", "post-2", "post-6"));

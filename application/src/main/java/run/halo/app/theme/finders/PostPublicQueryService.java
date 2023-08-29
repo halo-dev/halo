@@ -1,7 +1,6 @@
 package run.halo.app.theme.finders;
 
 import java.util.Comparator;
-import java.util.Objects;
 import java.util.function.Predicate;
 import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
@@ -13,10 +12,6 @@ import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.PostVo;
 
 public interface PostPublicQueryService {
-    Predicate<Post> FIXED_PREDICATE = post -> post.isPublished()
-        && Objects.equals(false, post.getSpec().getDeleted())
-        && Post.VisibleEnum.PUBLIC.equals(post.getSpec().getVisible());
-
 
     /**
      * Lists posts page by predicate and comparator.

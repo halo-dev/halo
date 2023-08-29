@@ -22,6 +22,10 @@ rules:
   - apiGroups: [ "api.console.halo.run" ]
     resources: [ "auth-providers" ]
     verbs: [ "list" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "plugins/bundle.js", "plugins/bundle.css" ]
+    resourceNames: [ "-" ]
+    verbs: [ "get" ]
 ---
 apiVersion: v1alpha1
 kind: "Role"

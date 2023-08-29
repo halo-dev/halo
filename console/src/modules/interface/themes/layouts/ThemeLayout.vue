@@ -202,7 +202,7 @@ onMounted(() => {
             type="primary"
             @click="handleActiveTheme()"
           >
-            {{ $t("core.common.buttons.active") }}
+            {{ $t("core.common.buttons.activate") }}
           </VButton>
           <VButton type="secondary" size="sm" @click="previewModal = true">
             <template #icon>

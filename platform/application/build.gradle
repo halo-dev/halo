@@ -1,7 +1,7 @@
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 plugins {
-    id 'org.springframework.boot' version '3.1.2' apply false
+    id 'org.springframework.boot' version '3.1.3' apply false
     id 'java-platform'
     id 'halo.publish'
     id 'signing'
@@ -19,7 +19,7 @@ ext {
     jsoup = '1.15.3'
     jsonPatch = "1.13"
     springDocOpenAPI = "2.2.0"
-    lucene = "9.5.0"
+    lucene = "9.7.0"
     resilience4jVersion = "2.0.2"
 }
 
@@ -39,7 +39,7 @@ dependencies {
         api "org.apache.lucene:lucene-queryparser:$lucene"
         api "org.apache.lucene:lucene-highlighter:$lucene"
         api "org.apache.lucene:lucene-backward-codecs:$lucene"
-        api 'cn.shenyanchao.ik-analyzer:ik-analyzer:9.0.0'
+        api "org.apache.lucene:lucene-analysis-common:$lucene"
 
         api "org.apache.commons:commons-lang3:$commonsLang3"
         api "io.seruco.encoding:base62:$base62"

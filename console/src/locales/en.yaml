@@ -102,6 +102,7 @@ core:
           title: Recent Posts
           visits: "{visits} Visits"
           comments: "{comments} Comments"
+          publishTime: "Publish Time {publishTime}"
         quicklink:
           title: Quick Link
           actions:
@@ -731,14 +732,20 @@ core:
         toast_success: Reset configuration successfully
       uninstall:
         title: Are you sure you want to uninstall this plugin?
+      uninstall_in_batch:
+        title: Are you sure you want to uninstall these plugin?
       uninstall_and_delete_config:
+        button: Uninstall and delete config
         title: Are you sure you want to uninstall this plugin and its corresponding configuration?
+      uninstall_and_delete_config_in_batch:
+        button: Uninstall and delete config
+        title: Are you sure you want to uninstall these plugin and its corresponding configuration?
       uninstall_when_enabled:
         confirm_text: Stop running and uninstall
         description: The current plugin is still in the enabled state and will be uninstalled after it stops running. This operation cannot be undone.
-      change_status:
-        active_title: Are you sure you want to active this plugin?
-        inactive_title: Are you sure you want to inactive this plugin?
+      change_status_in_batch:
+        activate_title: Are you sure you want to activate these plugins?
+        inactivate_title: Are you sure you want to inactivate these plugins?
       remote_download:
         title: Remote download address detected, do you want to download?
         description: "Please carefully verify whether this address can be trusted: {url}"
@@ -751,9 +758,6 @@ core:
         items:
           create_time_desc: Latest Installed
           create_time_asc: Earliest Installed
-    list:
-      actions:
-        uninstall_and_delete_config: Uninstall and delete config
     upload_modal:
       titles:
         install: Install plugin
@@ -786,8 +790,8 @@ core:
         last_starttime: Last Start Time
     loader:
       toast:
-        entry_load_failed: "{name}: Failed to load plugin entry file"
-        style_load_failed: "{name}: Failed to load plugin stylesheet file"
+        entry_load_failed: "Failed to load plugins entry file"
+        style_load_failed: "Failed to load plugins stylesheet file"
     extension_points:
       editor:
         providers:
@@ -1199,7 +1203,8 @@ core:
       preview: Preview
       recovery: Recovery
       delete_permanently: Delete Permanently
-      active: Active
+      activate: Activate
+      inactivate: Inactivate
       download: Download
       copy: Copy
       upload: Upload

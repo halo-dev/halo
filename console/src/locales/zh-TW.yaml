@@ -102,6 +102,7 @@ core:
           title: 最近文章
           visits: "訪問量 {visits}"
           comments: "留言 {comments}"
+          publishTime: "發佈日期 {publishTime}"
         quicklink:
           title: 快捷訪問
           actions:
@@ -731,14 +732,20 @@ core:
         toast_success: 重置配置成功
       uninstall:
         title: 確定要卸載該插件嗎？
+      uninstall_in_batch:
+        title: 確定要卸載所選插件嗎？
       uninstall_and_delete_config:
+        button: 卸載並刪除配置
         title: 確定要卸載該插件以及對應的配置嗎？
+      uninstall_and_delete_config_in_batch:
+        button: 卸載並刪除配置
+        title: 確定要卸載所選插件以及對應的配置嗎？
       uninstall_when_enabled:
         confirm_text: 停止運行並卸載
         description: 當前插件還在啟用狀態，將在停止運行後卸載，該操作不可恢復。
-      change_status:
-        active_title: 確定要啟用該插件嗎？
-        inactive_title: 確定要停用該插件嗎？
+      change_status_in_batch:
+        activate_title: 確定要啟用所選插件嗎？
+        inactivate_title: 確定要停用所選插件嗎？
       remote_download:
         title: 偵測到遠端下載地址，是否需要下載？
         description: 請仔細鑑別此地址是否可信：{url}
@@ -751,9 +758,6 @@ core:
         items:
           create_time_desc: 較近安裝
           create_time_asc: 較早安裝
-    list:
-      actions:
-        uninstall_and_delete_config: 卸載並刪除配置
     upload_modal:
       titles:
         install: 安裝插件
@@ -786,8 +790,8 @@ core:
         last_starttime: 最近一次啟動
     loader:
       toast:
-        entry_load_failed: "{name}：讀取插件入口文件失敗"
-        style_load_failed: "{name}：讀取插件樣式文件失敗"
+        entry_load_failed: "讀取插件入口文件失敗"
+        style_load_failed: "讀取插件樣式文件失敗"
     extension_points:
       editor:
         providers:
@@ -1199,7 +1203,8 @@ core:
       preview: 預覽
       recovery: 恢復
       delete_permanently: 永久刪除
-      active: 啟用
+      activate: 啟用
+      inactivate: 停用
       download: 下載
       copy: 複製
       upload: 上傳

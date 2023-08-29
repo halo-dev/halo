@@ -1,8 +1,6 @@
 <script lang="ts" setup>
-import {
-  useEditorExtensionPoints,
-  type EditorProvider,
-} from "@/composables/use-editor-extension-points";
+import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
+import type { EditorProvider } from "@halo-dev/console-shared";
 import {
   VAvatar,
   IconExchange,
@@ -51,7 +49,7 @@ const { editorProviders } = useEditorExtensionPoints();
         "
         @click="emit('select', editorProvider)"
       >
-        <template #prefix-icon>
+        <template v-if="editorProvider.logo" #prefix-icon>
           <VAvatar :src="editorProvider.logo" size="xs"></VAvatar>
         </template>
         {{ editorProvider.displayName }}

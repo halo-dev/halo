@@ -58,6 +58,98 @@ export const ApiConsoleHaloRunV1alpha1PluginApiAxiosParamCreator = function (
 ) {
   return {
     /**
+     * Merge all CSS bundles of enabled plugins into one.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    fetchCssBundle: async (
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.css`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     * Merge all JS bundles of enabled plugins into one.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    fetchJsBundle: async (
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.js`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "GET",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
      * Fetch configMap of plugin by configured configMapName.
      * @param {string} name
      * @param {*} [options] Override http request option.
@@ -764,6 +856,46 @@ export const ApiConsoleHaloRunV1alpha1PluginApiFp = function (
     ApiConsoleHaloRunV1alpha1PluginApiAxiosParamCreator(configuration);
   return {
     /**
+     * Merge all CSS bundles of enabled plugins into one.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async fetchCssBundle(
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.fetchCssBundle(
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
+     * Merge all JS bundles of enabled plugins into one.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async fetchJsBundle(
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<string>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.fetchJsBundle(
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
      * Fetch configMap of plugin by configured configMapName.
      * @param {string} name
      * @param {*} [options] Override http request option.
@@ -1062,6 +1194,26 @@ export const ApiConsoleHaloRunV1alpha1PluginApiFactory = function (
 ) {
   const localVarFp = ApiConsoleHaloRunV1alpha1PluginApiFp(configuration);
   return {
+    /**
+     * Merge all CSS bundles of enabled plugins into one.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    fetchCssBundle(options?: AxiosRequestConfig): AxiosPromise<string> {
+      return localVarFp
+        .fetchCssBundle(options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     * Merge all JS bundles of enabled plugins into one.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    fetchJsBundle(options?: AxiosRequestConfig): AxiosPromise<string> {
+      return localVarFp
+        .fetchJsBundle(options)
+        .then((request) => request(axios, basePath));
+    },
     /**
      * Fetch configMap of plugin by configured configMapName.
      * @param {ApiConsoleHaloRunV1alpha1PluginApiFetchPluginConfigRequest} requestParameters Request parameters.
@@ -1483,6 +1635,30 @@ export interface ApiConsoleHaloRunV1alpha1PluginApiUpgradePluginFromUriRequest {
  * @extends {BaseAPI}
  */
 export class ApiConsoleHaloRunV1alpha1PluginApi extends BaseAPI {
+  /**
+   * Merge all CSS bundles of enabled plugins into one.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApi
+   */
+  public fetchCssBundle(options?: AxiosRequestConfig) {
+    return ApiConsoleHaloRunV1alpha1PluginApiFp(this.configuration)
+      .fetchCssBundle(options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   * Merge all JS bundles of enabled plugins into one.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApi
+   */
+  public fetchJsBundle(options?: AxiosRequestConfig) {
+    return ApiConsoleHaloRunV1alpha1PluginApiFp(this.configuration)
+      .fetchJsBundle(options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
   /**
    * Fetch configMap of plugin by configured configMapName.
    * @param {ApiConsoleHaloRunV1alpha1PluginApiFetchPluginConfigRequest} requestParameters Request parameters.
