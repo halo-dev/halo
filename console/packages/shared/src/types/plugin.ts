@@ -8,7 +8,7 @@ import type { CommentSubjectRefProvider } from "@/states/comment-subject-ref";
 import type { BackupTab } from "@/states/backup";
 import type { PluginInstallationTab } from "@/states/plugin-installation-tabs";
 import type { EntityDropdownItem } from "@/states/entity";
-import type { ListedPost, Plugin } from "@halo-dev/api-client";
+import type { Backup, ListedPost, Plugin } from "@halo-dev/api-client";
 
 export interface RouteRecordAppend {
   parentName: RouteRecordName;
@@ -46,6 +46,10 @@ export interface ExtensionPoint {
   "plugin:list-item:operation:create"?: () =>
     | EntityDropdownItem<Plugin>[]
     | Promise<EntityDropdownItem<Plugin>[]>;
+
+  "backup:list-item:operation:create"?: () =>
+    | EntityDropdownItem<Backup>[]
+    | Promise<EntityDropdownItem<Backup>[]>;
 }
 
 export interface PluginModule {
