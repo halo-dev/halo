@@ -381,6 +381,22 @@ const handlePreview = async () => {
   previewModal.value = true;
   previewPending.value = false;
 };
+const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
+
+const handleSaveKeybinding = (e: KeyboardEvent) => {
+  const { key, ctrlKey, metaKey } = e;
+  if (isMac && metaKey && key === "s") {
+    e.preventDefault();
+    handleSave();
+  } else if (!isMac && ctrlKey && key === "s") {
+    e.preventDefault();
+    handleSave();
+  }
+};
+
+onMounted(() => {
+  window.addEventListener("keydown", handleSaveKeybinding);
+});
 </script>
 
 <template>
