@@ -1,10 +1,11 @@
 import type { ComputedRef, Ref } from "vue";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import type { Plugin } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useI18n } from "vue-i18n";
+import { useMutation } from "@tanstack/vue-query";
 
 interface usePluginLifeCycleReturn {
   isStarted: ComputedRef<boolean | undefined>;
@@ -37,26 +38,28 @@ export function usePluginLifeCycle(
     }
   };
 
-  const changingStatus = ref(false);
+  const { isLoading: changingStatus, mutate: changeStatus } = useMutation({
+    mutationKey: ["change-plugin-status"],
+    mutationFn: async () => {
+      if (!plugin?.value) return;
 
-  const changeStatus = async () => {
-    if (!plugin?.value) return;
+      const { data: pluginToUpdate } =
+        await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin({
+          name: plugin.value.metadata.name,
+        });
 
-    try {
-      changingStatus.value = true;
-      const pluginToUpdate = cloneDeep(plugin.value);
       pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
       await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin({
         name: pluginToUpdate.metadata.name,
         plugin: pluginToUpdate,
       });
-
+    },
+    retry: 3,
+    retryDelay: 1000,
+    onSuccess() {
       window.location.reload();
-    } catch (e) {
-      console.error(e);
-      changingStatus.value = false;
-    }
-  };
+    },
+  });
 
   const uninstall = (deleteExtensions?: boolean) => {
     if (!plugin?.value) return;

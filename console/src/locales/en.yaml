@@ -609,27 +609,18 @@ core:
       remote_download:
         title: Remote download address detected, do you want to download?
         description: "Please carefully verify whether this address can be trusted: {url}"
-    upload_modal:
-      titles:
-        install: Install theme
-        upgrade: Upgrade theme ({display_name})
-      operations:
-        existed_during_installation:
-          title: The theme already exists.
-          description: The currently installed theme already exists, do you want to upgrade?
-      tabs:
-        local: Local
-        remote:
-          title: Remote
-          fields:
-            url: Remote URL
+      existed_during_installation:
+        title: The theme already exists.
+        description: The currently installed theme already exists, do you want to upgrade?
     list_modal:
-      titles:
-        installed_themes: Installed Themes
-        not_installed_themes: Not installed Themes
       tabs:
         installed: Installed
         not_installed: Not installed
+        local_upload: Local install / upgrade
+        remote_download:
+          title: Remote
+          fields:
+            url: Remote URL
       empty:
         title: There are no installed themes currently.
         message: There are currently no installed themes, you can try refreshing or installing a new theme.
@@ -1220,6 +1211,7 @@ core:
       add: Add
       submit: Submit
       detail: Detail
+      select: Select
     radio:
       "yes": Yes
       "no": No
