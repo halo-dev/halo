@@ -41,6 +41,7 @@ defineExpose({
     ref="dropdownRef"
     :placement="placement"
     :triggers="triggers"
+    :dispose-timeout="null"
     @show="emit('show')"
   >
     <slot />
