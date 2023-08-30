@@ -1010,6 +1010,8 @@ core:
         description: 恢复成功之后，需要重启一下 Halo 才能够正常加载系统资源，点击确定之后我们会自动重启 Halo。
       restart:
         toast_success: 已请求重启
+      remote_download:
+        button: 下载并恢复
     list:
       phases:
         pending: 准备中
@@ -1025,6 +1027,13 @@ core:
         third: 3. 恢复完成之后需要重启 Halo 才能够正常加载系统资源。
         complete: 恢复完成，等待重启...
       start: 开始恢复
+      tabs:
+        local:
+          label: 上传
+        remote:
+          label: 远程恢复
+          fields:
+            url: 下载地址
   exception:
     not_found:
       message: 没有找到该页面
