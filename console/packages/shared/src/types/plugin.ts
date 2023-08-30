@@ -1,4 +1,4 @@
-import type { Component } from "vue";
+import type { Component, Ref } from "vue";
 import type { RouteRecordRaw, RouteRecordName } from "vue-router";
 import type { FunctionalPage } from "../states/pages";
 import type { AttachmentSelectProvider } from "../states/attachment-selector";
@@ -52,7 +52,7 @@ export interface ExtensionPoint {
     | Promise<EntityDropdownItem<Backup>[]>;
 
   "plugin:list-item:field:create"?: (
-    item: Plugin
+    item: Ref<Plugin>
   ) => EntityFieldItem[] | Promise<EntityFieldItem[]>;
 }
 
