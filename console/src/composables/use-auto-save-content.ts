@@ -11,7 +11,9 @@ export function useAutoSaveContent(
 ) {
   // TODO it may be necessary to know the latest version before saving, otherwise it will overwrite the latest version
   const handleAutoSave = () => {
-    callback();
+    if (currentCache.value) {
+      callback();
+    }
   };
 
   onBeforeRouteLeave(() => {
@@ -19,7 +21,7 @@ export function useAutoSaveContent(
   });
 
   watch(useWindowFocus(), (newFocus) => {
-    if (!newFocus && currentCache.value) {
+    if (!newFocus) {
       handleAutoSave();
     }
   });
