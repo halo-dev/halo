@@ -35,6 +35,9 @@ springBoot {
     buildInfo()
 }
 
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+
 bootJar {
     manifest {
         attributes "Implementation-Title": "Halo Application",
