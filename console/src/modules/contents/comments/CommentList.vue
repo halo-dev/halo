@@ -28,10 +28,14 @@ const selectedComment = ref<ListedComment>();
 const selectedCommentNames = ref<string[]>([]);
 
 const keyword = useRouteQuery<string>("keyword", "");
-const selectedApprovedStatus = useRouteQuery<string | undefined>(
-  "approved",
-  undefined
-);
+const selectedApprovedStatus = useRouteQuery<
+  string | undefined,
+  boolean | undefined
+>("approved", undefined, {
+  transform: (value) => {
+    return value ? value === "true" : undefined;
+  },
+});
 const selectedSort = useRouteQuery<string | undefined>("sort");
 const selectedUser = useRouteQuery<string | undefined>("user");
 
@@ -88,10 +92,7 @@ const {
     const { data } = await apiClient.comment.listComments({
       page: page.value,
       size: size.value,
-      approved:
-        selectedApprovedStatus.value !== undefined
-          ? Boolean(selectedApprovedStatus.value)
-          : undefined,
+      approved: selectedApprovedStatus.value,
       sort: [selectedSort.value].filter(Boolean) as string[],
       keyword: keyword.value,
       ownerName: selectedUser.value,
