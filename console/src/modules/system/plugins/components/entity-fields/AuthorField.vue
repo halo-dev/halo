@@ -10,7 +10,6 @@ withDefaults(
 </script>
 
 <template>
-  <div></div>
   <VEntityField v-if="plugin.spec.author">
     <template #description>
       <a
