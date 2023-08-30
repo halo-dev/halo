@@ -22,6 +22,7 @@ import { ref } from "vue";
 import { useEntityDropdownItemExtensionPoint } from "@/composables/use-entity-extension-points";
 import { useRouter } from "vue-router";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
+import { computed } from "vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -73,8 +74,8 @@ const handleResetSettingConfig = async () => {
 
 const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
   "plugin:list-item:operation:create",
-  props.plugin,
-  [
+  plugin,
+  computed(() => [
     {
       priority: 10,
       component: markRaw(VDropdownItem),
@@ -146,7 +147,7 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
         handleResetSettingConfig();
       },
     },
-  ]
+  ])
 );
 </script>
 <template>
