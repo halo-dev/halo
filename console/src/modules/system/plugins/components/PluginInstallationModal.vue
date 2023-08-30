@@ -135,7 +135,9 @@ onMounted(() => {
       </template>
     </div>
     <template #footer>
-      <VButton @click="handleVisibleChange(false)">关闭</VButton>
+      <VButton @click="handleVisibleChange(false)">
+        {{ $t("core.common.buttons.close") }}
+      </VButton>
     </template>
   </VModal>
 </template>
