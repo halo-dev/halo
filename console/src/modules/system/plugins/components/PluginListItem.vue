@@ -27,6 +27,7 @@ import LogoField from "./entity-fields/LogoField.vue";
 import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
 import AuthorField from "./entity-fields/AuthorField.vue";
 import SwitchField from "./entity-fields/SwitchField.vue";
+import { computed } from "vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -154,8 +155,8 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
 
 const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
   "plugin:list-item:field:create",
-  props.plugin,
-  [
+  plugin,
+  computed(() => [
     {
       position: "start",
       priority: 10,
@@ -234,7 +235,7 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
       },
       permissions: ["system:plugins:manage"],
     },
-  ]
+  ])
 );
 </script>
 <template>

@@ -5,7 +5,7 @@ import type {
   EntityFieldItem,
   PluginModule,
 } from "@halo-dev/console-shared";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, type Ref, computed, type ComputedRef } from "vue";
 
 export function useEntityDropdownItemExtensionPoint<T>(
   extensionPointName: string,
@@ -39,43 +39,51 @@ export function useEntityDropdownItemExtensionPoint<T>(
 
 export function useEntityFieldItemExtensionPoint<T>(
   extensionPointName: string,
-  item: T,
-  presets: EntityFieldItem[]
+  entity: Ref<T>,
+  presets: ComputedRef<EntityFieldItem[]>
 ) {
+  console.log(presets);
   const { pluginModules } = usePluginModuleStore();
   const { currentUserHasPermission } = usePermission();
+  const itemsFromPlugins = ref<EntityFieldItem[]>([]);
 
-  const startFields = ref<EntityFieldItem[]>([]);
-  const endFields = ref<EntityFieldItem[]>([]);
+  const allItems = computed(() => {
+    return [...presets.value, ...itemsFromPlugins.value].map((item) => {
+      return {
+        ...item,
+        visible:
+          item.visible !== false && currentUserHasPermission(item.permissions),
+      };
+    });
+  });
 
   onMounted(() => {
-    const itemsFromPlugins: EntityFieldItem[] = [];
     pluginModules.forEach((pluginModule: PluginModule) => {
       const { extensionPoints } = pluginModule;
       if (!extensionPoints?.[extensionPointName]) {
         return;
       }
       const items = extensionPoints[extensionPointName](
-        item
+        entity
       ) as EntityFieldItem[];
-      itemsFromPlugins.push(...items);
+      itemsFromPlugins.value.push(...items);
     });
+  });
 
-    const allItems = [...presets, ...itemsFromPlugins]
+  const startFields = computed(() => {
+    return allItems.value
+      .filter((item) => item.position === "start")
       .sort((a, b) => {
         return a.priority - b.priority;
-      })
-      .map((item) => {
-        return {
-          ...item,
-          visible:
-            item.visible !== false &&
-            currentUserHasPermission(item.permissions),
-        };
       });
+  });
 
-    startFields.value = allItems.filter((item) => item.position === "start");
-    endFields.value = allItems.filter((item) => item.position === "end");
+  const endFields = computed(() => {
+    return allItems.value
+      .filter((item) => item.position === "end")
+      .sort((a, b) => {
+        return a.priority - b.priority;
+      });
   });
 
   return { startFields, endFields };
