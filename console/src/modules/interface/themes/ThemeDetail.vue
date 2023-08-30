@@ -17,7 +17,6 @@ import {
   VDescription,
   VDescriptionItem,
 } from "@halo-dev/components";
-import ThemeUploadModal from "./components/ThemeUploadModal.vue";
 
 // types
 import type { Ref } from "vue";
@@ -29,7 +28,7 @@ import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 
 const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme", ref());
-const upgradeModal = ref(false);
+const themesModal = inject<Ref<boolean>>("themesModal");
 
 const { isActivated, getFailedMessage, handleResetSettingConfig } =
   useThemeLifeCycle(selectedTheme);
@@ -58,12 +57,6 @@ const handleReloadTheme = async () => {
       }
     },
   });
-};
-
-const onUpgradeModalClose = () => {
-  setTimeout(() => {
-    window.location.reload();
-  }, 200);
 };
 </script>
 
@@ -110,7 +103,7 @@ const onUpgradeModalClose = () => {
               <IconMore />
             </div>
             <template #popper>
-              <VDropdownItem @click="upgradeModal = true">
+              <VDropdownItem @click="themesModal = true">
                 {{ $t("core.common.buttons.upgrade") }}
               </VDropdownItem>
               <VDropdownDivider />
@@ -168,9 +161,4 @@ const onUpgradeModalClose = () => {
       </div>
     </div>
   </Transition>
-  <ThemeUploadModal
-    v-model:visible="upgradeModal"
-    :upgrade-theme="selectedTheme"
-    @close="onUpgradeModalClose"
-  />
 </template>
