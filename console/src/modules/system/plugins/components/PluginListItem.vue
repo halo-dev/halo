@@ -26,7 +26,7 @@ import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
 import AuthorField from "./entity-fields/AuthorField.vue";
 import SwitchField from "./entity-fields/SwitchField.vue";
 import { computed } from "vue";
-import type { EntityFieldItem, OperationItem } from "packages/shared/dist";
+import type { EntityFieldItem, OperationItem } from "@halo-dev/console-shared";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
