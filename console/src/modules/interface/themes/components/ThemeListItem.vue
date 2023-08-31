@@ -21,6 +21,7 @@ import { useEntityDropdownItemExtensionPoint } from "@/composables/use-entity-ex
 import { markRaw } from "vue";
 import { defineComponent } from "vue";
 import UninstallOperationItem from "./operation/UninstallOperationItem.vue";
+import { computed } from "vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -82,9 +83,10 @@ const handleCreateTheme = async () => {
   }
 };
 
-const { dropdownItems } = useEntityDropdownItemExtensionPoint(
+const { dropdownItems } = useEntityDropdownItemExtensionPoint<Theme>(
   "theme:list-item:operation:create",
-  [
+  theme,
+  computed(() => [
     {
       priority: 10,
       component: markRaw(VButton),
@@ -151,7 +153,7 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint(
         },
       ],
     },
-  ]
+  ])
 );
 </script>
 
@@ -241,6 +243,7 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint(
                 <component
                   :is="item.component"
                   v-if="item.visible !== false"
+                  v-permission="item.permissions"
                   v-bind="item.props"
                   @click="item.action?.(theme)"
                 >
@@ -248,7 +251,10 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint(
                 </component>
               </template>
               <template v-else>
-                <VDropdown v-if="item.visible !== false">
+                <VDropdown
+                  v-if="item.visible !== false"
+                  v-permission="item.permissions"
+                >
                   <component
                     :is="item.component"
                     v-bind="item.props"
@@ -264,6 +270,7 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint(
                       <component
                         :is="childItem.component"
                         v-if="childItem.visible !== false"
+                        v-permission="childItem.permissions"
                         v-bind="childItem.props"
                         @click="childItem.action?.(theme)"
                       >

@@ -60,9 +60,9 @@ export interface ExtensionPoint {
 
   "theme:list:tabs:create"?: () => ThemeListTab[] | Promise<ThemeListTab[]>;
 
-  "theme:list-item:operation:create"?: () =>
-    | EntityDropdownItem<Theme>[]
-    | Promise<EntityDropdownItem<Theme>[]>;
+  "theme:list-item:operation:create"?: (
+    theme: Ref<Theme>
+  ) => EntityDropdownItem<Theme>[] | Promise<EntityDropdownItem<Theme>[]>;
 }
 
 export interface PluginModule {
