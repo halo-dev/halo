@@ -12,8 +12,9 @@ export function useSaveKeybinding(fn: () => void) {
     if (isMac ? e.metaKey : e.ctrlKey) {
       if (e.key === "s") {
         e.preventDefault();
-        nextTick();
-        debouncedFn();
+        nextTick(() => {
+          debouncedFn();
+        });
       }
     }
   });
