@@ -609,27 +609,18 @@ core:
       remote_download:
         title: 检测到了远程下载地址，是否需要下载？
         description: 请仔细鉴别此地址是否可信：{url}
-    upload_modal:
-      titles:
-        install: 安装主题
-        upgrade: 升级主题（{display_name}）
-      operations:
-        existed_during_installation:
-          title: 主题已存在
-          description: 当前安装的主题已存在，是否升级？
-      tabs:
-        local: 本地上传
-        remote:
-          title: 远程下载
-          fields:
-            url: 下载地址
+      existed_during_installation:
+        title: 主题已存在
+        description: 当前安装的主题已存在，是否升级？
     list_modal:
-      titles:
-        installed_themes: 已安装的主题
-        not_installed_themes: 未安装的主题
       tabs:
         installed: 已安装
-        not_installed: 未安装
+        not_installed: 本地未安装
+        local_upload: 上传安装 / 升级
+        remote_download:
+          label: 远程下载
+          fields:
+            url: 下载地址
       empty:
         title: 当前没有已安装的主题
         message: 当前没有已安装的主题，你可以尝试刷新或者安装新主题
@@ -1220,6 +1211,7 @@ core:
       add: 添加
       submit: 提交
       detail: 详情
+      select: 选择
     radio:
       "yes": 是
       "no": 否
