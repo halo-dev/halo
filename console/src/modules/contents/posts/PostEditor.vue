@@ -38,6 +38,7 @@ import { usePostUpdateMutate } from "./composables/use-post-update-mutate";
 import { contentAnnotations } from "@/constants/annotations";
 import { useAutoSaveContent } from "@/composables/use-auto-save-content";
 import { useContentSnapshot } from "@/composables/use-content-snapshot";
+import { useSaveKeybinding } from "@/composables/use-save-keybinding";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -381,24 +382,8 @@ const handlePreview = async () => {
   previewModal.value = true;
   previewPending.value = false;
 };
-const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
 
-const handleSaveKeybinding = async (e: KeyboardEvent) => {
-  const { key, ctrlKey, metaKey } = e;
-  if (isMac && metaKey && key === "s") {
-    e.preventDefault();
-    await nextTick();
-    handleSave();
-  } else if (!isMac && ctrlKey && key === "s") {
-    e.preventDefault();
-    await nextTick();
-    handleSave();
-  }
-};
-
-onMounted(() => {
-  window.addEventListener("keydown", handleSaveKeybinding);
-});
+useSaveKeybinding(handleSave);
 </script>
 
 <template>
