@@ -49,6 +49,6 @@ export interface EntityFieldItem {
   component: Raw<Component>;            // 字段组件，可以使用 `@halo-dev/components` 中提供的 `VEntityField`，也可以自定义
   props?: Record<string, unknown>;      // 组件的 props
   permissions?: string[];               // 权限设置
-  visible?: boolean;                    // 是否可见
+  hidden?: boolean;                     // 是否隐藏
 }
 ```

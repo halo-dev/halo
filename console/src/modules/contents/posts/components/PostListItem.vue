@@ -13,19 +13,13 @@ import { useI18n } from "vue-i18n";
 import { usePermission } from "@/utils/permission";
 import { apiClient } from "@/utils/api-client";
 import { useQueryClient } from "@tanstack/vue-query";
-import { inject } from "vue";
 import type { Ref } from "vue";
-import { ref } from "vue";
-import { computed } from "vue";
-import { markRaw } from "vue";
+import { computed, toRefs, markRaw, ref, inject } from "vue";
 import { useRouter } from "vue-router";
-import {
-  useEntityDropdownItemExtensionPoint,
-  useEntityFieldItemExtensionPoint,
-} from "@/composables/use-entity-extension-points";
+import { useEntityFieldItemExtensionPoint } from "@/composables/use-entity-extension-points";
+import { useOperationItemExtensionPoint } from "@/composables/use-operation-extension-points";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
-import { toRefs } from "vue";
-import type { EntityFieldItem } from "packages/shared/dist";
+import type { EntityFieldItem, OperationItem } from "@halo-dev/console-shared";
 import TitleField from "./entity-fields/TitleField.vue";
 import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
 import ContributorsField from "./entity-fields/ContributorsField.vue";
@@ -74,15 +68,14 @@ const handleDelete = async () => {
   });
 };
 
-const { dropdownItems } = useEntityDropdownItemExtensionPoint<ListedPost>(
+const { operationItems } = useOperationItemExtensionPoint<ListedPost>(
   "post:list-item:operation:create",
   post,
-  computed(() => [
+  computed((): OperationItem<ListedPost>[] => [
     {
       priority: 10,
       component: markRaw(VDropdownItem),
       label: t("core.common.buttons.edit"),
-      visible: true,
       permissions: [],
       action: () => {
         router.push({
@@ -95,7 +88,6 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<ListedPost>(
       priority: 20,
       component: markRaw(VDropdownItem),
       label: t("core.common.buttons.setting"),
-      visible: true,
       permissions: [],
       action: () => {
         emit("open-setting-modal", props.post.post);
@@ -104,7 +96,6 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<ListedPost>(
     {
       priority: 30,
       component: markRaw(VDropdownDivider),
-      visible: true,
     },
     {
       priority: 40,
@@ -113,7 +104,6 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<ListedPost>(
         type: "danger",
       },
       label: t("core.common.buttons.delete"),
-      visible: true,
       permissions: [],
       action: handleDelete,
     },
@@ -165,7 +155,7 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<ListedPost>(
         state: "warning",
         animate: true,
       },
-      visible: props.post.post.spec.deleted,
+      hidden: !props.post.post.spec.deleted,
     },
     {
       priority: 50,
@@ -203,7 +193,7 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<ListedPost>(
       v-if="currentUserHasPermission(['system:posts:manage'])"
       #dropdownItems
     >
-      <EntityDropdownItems :dropdown-items="dropdownItems" :item="post" />
+      <EntityDropdownItems :dropdown-items="operationItems" :item="post" />
     </template>
   </VEntity>
 </template>

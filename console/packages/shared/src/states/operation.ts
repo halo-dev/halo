@@ -1,10 +1,12 @@
 import type { Component, Raw } from "vue";
 
-export interface EntityFieldItem {
+export interface OperationItem<T> {
   priority: number;
-  position: "start" | "end";
   component: Raw<Component>;
   props?: Record<string, unknown>;
-  permissions?: string[];
+  action?: (item?: T) => void;
+  label?: string;
   hidden?: boolean;
+  permissions?: string[];
+  children?: OperationItem<T>[];
 }

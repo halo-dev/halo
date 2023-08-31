@@ -7,7 +7,8 @@ import type { AnyExtension } from "@tiptap/vue-3";
 import type { CommentSubjectRefProvider } from "@/states/comment-subject-ref";
 import type { BackupTab } from "@/states/backup";
 import type { PluginInstallationTab } from "@/states/plugin-installation-tabs";
-import type { EntityDropdownItem, EntityFieldItem } from "@/states/entity";
+import type { EntityFieldItem } from "@/states/entity";
+import type { OperationItem } from "@/states/operation";
 import type { ThemeListTab } from "@/states/theme-list-tabs";
 import type { Backup, ListedPost, Plugin, Theme } from "@halo-dev/api-client";
 
@@ -42,17 +43,15 @@ export interface ExtensionPoint {
 
   "post:list-item:operation:create"?: (
     post: Ref<ListedPost>
-  ) =>
-    | EntityDropdownItem<ListedPost>[]
-    | Promise<EntityDropdownItem<ListedPost>[]>;
+  ) => OperationItem<ListedPost>[] | Promise<OperationItem<ListedPost>[]>;
 
   "plugin:list-item:operation:create"?: (
     plugin: Ref<Plugin>
-  ) => EntityDropdownItem<Plugin>[] | Promise<EntityDropdownItem<Plugin>[]>;
+  ) => OperationItem<Plugin>[] | Promise<OperationItem<Plugin>[]>;
 
   "backup:list-item:operation:create"?: (
     backup: Ref<Backup>
-  ) => EntityDropdownItem<Backup>[] | Promise<EntityDropdownItem<Backup>[]>;
+  ) => OperationItem<Backup>[] | Promise<OperationItem<Backup>[]>;
 
   "plugin:list-item:field:create"?: (
     plugin: Ref<Plugin>
@@ -66,7 +65,7 @@ export interface ExtensionPoint {
 
   "theme:list-item:operation:create"?: (
     theme: Ref<Theme>
-  ) => EntityDropdownItem<Theme>[] | Promise<EntityDropdownItem<Theme>[]>;
+  ) => OperationItem<Theme>[] | Promise<OperationItem<Theme>[]>;
 }
 
 export interface PluginModule {
