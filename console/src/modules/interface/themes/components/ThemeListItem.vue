@@ -17,11 +17,12 @@ import { useThemeLifeCycle } from "../composables/use-theme";
 import { usePermission } from "@/utils/permission";
 import { useI18n } from "vue-i18n";
 import { useQueryClient } from "@tanstack/vue-query";
-import { useEntityDropdownItemExtensionPoint } from "@/composables/use-entity-extension-points";
+import { useOperationItemExtensionPoint } from "@/composables/use-operation-extension-points";
 import { markRaw } from "vue";
 import { defineComponent } from "vue";
 import UninstallOperationItem from "./operation/UninstallOperationItem.vue";
 import { computed } from "vue";
+import type { OperationItem } from "packages/shared/dist";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -83,10 +84,10 @@ const handleCreateTheme = async () => {
   }
 };
 
-const { dropdownItems } = useEntityDropdownItemExtensionPoint<Theme>(
+const { operationItems } = useOperationItemExtensionPoint<Theme>(
   "theme:list-item:operation:create",
   theme,
-  computed(() => [
+  computed((): OperationItem<Theme>[] => [
     {
       priority: 10,
       component: markRaw(VButton),
@@ -95,9 +96,8 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Theme>(
       },
       action: () => handleActiveTheme(true),
       label: t("core.common.buttons.activate"),
-      visible:
-        !isActivated.value &&
-        currentUserHasPermission(["system:themes:manage"]),
+      hidden: isActivated.value,
+      permissions: ["system:themes:manage"],
     },
     {
       priority: 20,
@@ -121,7 +121,7 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Theme>(
           template: `<VButton size="sm"><IconMore /></VButton>`,
         })
       ),
-      visible: currentUserHasPermission(["system:themes:manage"]),
+      permissions: ["system:themes:manage"],
       children: [
         {
           priority: 10,
@@ -238,12 +238,13 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Theme>(
         </div>
         <div>
           <VSpace v-if="installed">
-            <template v-for="(item, index) in dropdownItems" :key="index">
+            <template v-for="(item, index) in operationItems" :key="index">
               <template v-if="!item.children?.length">
                 <component
                   :is="item.component"
-                  v-if="item.visible !== false"
-                  v-permission="item.permissions"
+                  v-if="
+                    !item.hidden && currentUserHasPermission(item.permissions)
+                  "
                   v-bind="item.props"
                   @click="item.action?.(theme)"
                 >
@@ -252,8 +253,9 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Theme>(
               </template>
               <template v-else>
                 <VDropdown
-                  v-if="item.visible !== false"
-                  v-permission="item.permissions"
+                  v-if="
+                    !item.hidden && currentUserHasPermission(item.permissions)
+                  "
                 >
                   <component
                     :is="item.component"
@@ -269,8 +271,10 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Theme>(
                     >
                       <component
                         :is="childItem.component"
-                        v-if="childItem.visible !== false"
-                        v-permission="childItem.permissions"
+                        v-if="
+                          !childItem.hidden &&
+                          currentUserHasPermission(childItem.permissions)
+                        "
                         v-bind="childItem.props"
                         @click="childItem.action?.(theme)"
                       >

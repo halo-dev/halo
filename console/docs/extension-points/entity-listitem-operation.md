@@ -8,10 +8,10 @@
 
 目前支持扩展的数据列表：
 
-- 文章：`"post:list-item:operation:create"?: (post: Ref<ListedPost>) => | EntityDropdownItem<ListedPost>[] | Promise<EntityDropdownItem<ListedPost>[]>`
-- 插件：`"plugin:list-item:operation:create"?: (plugin: Ref<Plugin>) => | EntityDropdownItem<Plugin>[] | Promise<EntityDropdownItem<Plugin>[]>`
-- 备份：`"backup:list-item:operation:create"?: (backup: Ref<Backup>) => | EntityDropdownItem<Backup>[] | Promise<EntityDropdownItem<Backup>[]>`
-- 主题：`"theme:list-item:operation:create"?: (theme: Ref<Theme>) => | EntityDropdownItem<Theme>[] | Promise<EntityDropdownItem<Theme>[]>`
+- 文章：`"post:list-item:operation:create"?: (post: Ref<ListedPost>) => | OperationItem<ListedPost>[] | Promise<OperationItem<ListedPost>[]>`
+- 插件：`"plugin:list-item:operation:create"?: (plugin: Ref<Plugin>) => | OperationItem<Plugin>[] | Promise<OperationItem<Plugin>[]>`
+- 备份：`"backup:list-item:operation:create"?: (backup: Ref<Backup>) => | OperationItem<Backup>[] | Promise<OperationItem<Backup>[]>`
+- 主题：`"theme:list-item:operation:create"?: (theme: Ref<Theme>) => | OperationItem<Theme>[] | Promise<OperationItem<Theme>[]>`
 
 示例：
 
@@ -32,7 +32,6 @@ export default definePlugin({
           priority: 21,
           component: markRaw(VDropdownItem),
           label: "导出为 Markdown 文档",
-          visible: true,
           permissions: [],
           action: async (post: ListedPost) => {
             const { data } = await axios.get(
@@ -54,17 +53,17 @@ export default definePlugin({
 });
 ```
 
-`EntityDropdownItem` 类型：
+`OperationItem` 类型：
 
 ```ts
-export interface EntityDropdownItem<T> {
+export interface OperationItem<T> {
   priority: number;                     // 优先级，越小越靠前
   component: Raw<Component>;            // 菜单项组件，可以使用 `@halo-dev/components` 中提供的 `VDropdownItem`，也可以自定义
   props?: Record<string, unknown>;      // 组件的 props
   action?: (item?: T) => void;          // 点击事件
   label?: string;                       // 菜单项名称
-  visible?: boolean;                    // 是否可见
+  hidden?: boolean;                     // 是否隐藏
   permissions?: string[];               // 权限
-  children?: EntityDropdownItem<T>[];   // 子菜单
+  children?: OperationItem<T>[];        // 子菜单
 }
 ```
