@@ -9,6 +9,7 @@
 目前支持扩展的数据列表：
 
 - 插件：`"plugin:list-item:field:create"?: (plugin: Ref<Plugin>) => | EntityFieldItem[] | Promise<EntityFieldItem[]>`
+- 文章：`"post:list-item:field:create"?: (post: Ref<ListedPost>) => | EntityFieldItem[] | Promise<EntityFieldItem[]>`
 
 示例：
 
