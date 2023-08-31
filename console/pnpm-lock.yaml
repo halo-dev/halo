@@ -141,8 +141,8 @@ importers:
         specifier: ^1.15.0
         version: 1.15.0
       floating-vue:
-        specifier: 2.0.0-beta.20
-        version: 2.0.0-beta.20(vue@3.3.4)
+        specifier: 2.0.0-beta.24
+        version: 2.0.0-beta.24(vue@3.3.4)
       fuse.js:
         specifier: ^6.6.2
         version: 6.6.2
@@ -391,8 +391,8 @@ importers:
   packages/components:
     dependencies:
       floating-vue:
-        specifier: 2.0.0-beta.20
-        version: 2.0.0-beta.20(vue@3.3.4)
+        specifier: 2.0.0-beta.24
+        version: 2.0.0-beta.24(vue@3.3.4)
       vue:
         specifier: ^3.3.4
         version: 3.3.4
@@ -2273,10 +2273,26 @@ packages:
     resolution: {integrity: sha512-ensKY7Ub59u16qsVIFEo2hwTCqZ/r9oZZFh51ivcLGHfUwTn8l1Xzng8RJUe91H/UP8PeqeBronAGx0qmzwk2g==}
     dev: false
 
+  /@floating-ui/core@1.4.1:
+    resolution: {integrity: sha512-jk3WqquEJRlcyu7997NtR5PibI+y5bi+LS3hPmguVClypenMsCY3CBa3LAQnozRCtCrYWSEtAdiskpamuJRFOQ==}
+    dependencies:
+      '@floating-ui/utils': 0.1.1
+    dev: false
+
   /@floating-ui/dom@0.1.10:
     resolution: {integrity: sha512-4kAVoogvQm2N0XE0G6APQJuCNuErjOfPW8Ux7DFxh8+AfugWflwVJ5LDlHOwrwut7z/30NUvdtHzQ3zSip4EzQ==}
     dependencies:
       '@floating-ui/core': 0.3.1
+    dev: false
+
+  /@floating-ui/dom@1.1.1:
+    resolution: {integrity: sha512-TpIO93+DIujg3g7SykEAGZMDtbJRrmnYRCNYSjJlvIbGhBjRSNTLVbNeDQBrzy9qDgUbiWdc7KA0uZHZ2tJmiw==}
+    dependencies:
+      '@floating-ui/core': 1.4.1
+    dev: false
+
+  /@floating-ui/utils@0.1.1:
+    resolution: {integrity: sha512-m0G6wlnhm/AX0H12IOWtK8gASEMffnX08RtKkCgTdHb9JpHKGloI7icFfLg9ZmQeavcvR0PKmzxClyuFPSjKWw==}
     dev: false
 
   /@formkit/core@0.18.1:
@@ -7066,6 +7082,20 @@ packages:
       vue: ^3.2.0
     dependencies:
       '@floating-ui/dom': 0.1.10
+      vue: 3.3.4
+      vue-resize: 2.0.0-alpha.1(vue@3.3.4)
+    dev: false
+
+  /floating-vue@2.0.0-beta.24(vue@3.3.4):
+    resolution: {integrity: sha512-URSzP6YXaF4u1oZ9XGL8Sn8puuM7ivp5jkOUrpy5Q1mfo9BfGppJOn+ierTmsSUfJEeHBae8KT7r5DeI3vQIEw==}
+    peerDependencies:
+      '@nuxt/kit': ^3.2.0
+      vue: ^3.2.0
+    peerDependenciesMeta:
+      '@nuxt/kit':
+        optional: true
+    dependencies:
+      '@floating-ui/dom': 1.1.1
       vue: 3.3.4
       vue-resize: 2.0.0-alpha.1(vue@3.3.4)
     dev: false

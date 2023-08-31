@@ -62,6 +62,6 @@
     "./dist/style.css": "./dist/style.css"
   },
   "dependencies": {
-    "floating-vue": "2.0.0-beta.20"
+    "floating-vue": "2.0.0-beta.24"
   }
 }
