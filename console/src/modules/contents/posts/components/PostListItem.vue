@@ -29,6 +29,7 @@ import { markRaw } from "vue";
 import { useRouter } from "vue-router";
 import { useEntityDropdownItemExtensionPoint } from "@/composables/use-entity-extension-points";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
+import { toRefs } from "vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -44,6 +45,8 @@ const props = withDefaults(
     isSelected: false,
   }
 );
+
+const { post } = toRefs(props);
 
 const emit = defineEmits<{
   (event: "open-setting-modal", post: Post): void;
@@ -121,7 +124,8 @@ const handleDelete = async () => {
 
 const { dropdownItems } = useEntityDropdownItemExtensionPoint<ListedPost>(
   "post:list-item:operation:create",
-  [
+  post,
+  computed(() => [
     {
       priority: 10,
       component: markRaw(VDropdownItem),
@@ -161,7 +165,7 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<ListedPost>(
       permissions: [],
       action: handleDelete,
     },
-  ]
+  ])
 );
 </script>
 
