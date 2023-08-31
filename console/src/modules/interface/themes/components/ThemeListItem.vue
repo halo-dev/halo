@@ -2,7 +2,6 @@
 import {
   VTag,
   VStatusDot,
-  Dialog,
   Toast,
   VDropdownItem,
   VDropdown,
@@ -18,6 +17,12 @@ import { useThemeLifeCycle } from "../composables/use-theme";
 import { usePermission } from "@/utils/permission";
 import { useI18n } from "vue-i18n";
 import { useQueryClient } from "@tanstack/vue-query";
+import { useOperationItemExtensionPoint } from "@/composables/use-operation-extension-points";
+import { markRaw } from "vue";
+import { defineComponent } from "vue";
+import UninstallOperationItem from "./operation/UninstallOperationItem.vue";
+import { computed } from "vue";
+import type { OperationItem } from "packages/shared/dist";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -52,59 +57,6 @@ const {
   handleResetSettingConfig,
 } = useThemeLifeCycle(theme);
 
-const handleUninstall = async (theme: Theme, deleteExtensions?: boolean) => {
-  Dialog.warning({
-    title: `${
-      deleteExtensions
-        ? t("core.theme.operations.uninstall_and_delete_config.title")
-        : t("core.theme.operations.uninstall.title")
-    }`,
-    description: t("core.common.dialog.descriptions.cannot_be_recovered"),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
-    onConfirm: async () => {
-      try {
-        await apiClient.extension.theme.deletethemeHaloRunV1alpha1Theme({
-          name: theme.metadata.name,
-        });
-
-        // delete theme setting and configMap
-        if (deleteExtensions) {
-          const { settingName, configMapName } = theme.spec;
-
-          if (settingName) {
-            await apiClient.extension.setting.deletev1alpha1Setting(
-              {
-                name: settingName,
-              },
-              {
-                mute: true,
-              }
-            );
-          }
-
-          if (configMapName) {
-            await apiClient.extension.configMap.deletev1alpha1ConfigMap(
-              {
-                name: configMapName,
-              },
-              {
-                mute: true,
-              }
-            );
-          }
-        }
-
-        Toast.success(t("core.common.toast.uninstall_success"));
-      } catch (e) {
-        console.error("Failed to uninstall theme", e);
-      } finally {
-        queryClient.invalidateQueries({ queryKey: ["installed-themes"] });
-      }
-    },
-  });
-};
-
 // Creating theme
 const creating = ref(false);
 
@@ -131,6 +83,78 @@ const handleCreateTheme = async () => {
     queryClient.invalidateQueries({ queryKey: ["not-installed-themes"] });
   }
 };
+
+const { operationItems } = useOperationItemExtensionPoint<Theme>(
+  "theme:list-item:operation:create",
+  theme,
+  computed((): OperationItem<Theme>[] => [
+    {
+      priority: 10,
+      component: markRaw(VButton),
+      props: {
+        size: "sm",
+      },
+      action: () => handleActiveTheme(true),
+      label: t("core.common.buttons.activate"),
+      hidden: isActivated.value,
+      permissions: ["system:themes:manage"],
+    },
+    {
+      priority: 20,
+      component: markRaw(VButton),
+      props: {
+        size: "sm",
+      },
+      action: () => {
+        emit("select", props.theme);
+      },
+      label: t("core.common.buttons.select"),
+    },
+    {
+      priority: 30,
+      component: markRaw(
+        defineComponent({
+          components: {
+            VButton,
+            IconMore,
+          },
+          template: `<VButton size="sm"><IconMore /></VButton>`,
+        })
+      ),
+      permissions: ["system:themes:manage"],
+      children: [
+        {
+          priority: 10,
+          component: markRaw(VDropdownItem),
+          action: () => {
+            emit("preview");
+          },
+          label: t("core.common.buttons.preview"),
+        },
+        {
+          priority: 20,
+          component: markRaw(VDropdownDivider),
+        },
+        {
+          priority: 30,
+          component: markRaw(UninstallOperationItem),
+          props: {
+            theme: props.theme,
+          },
+        },
+        {
+          priority: 40,
+          component: markRaw(VDropdownItem),
+          props: {
+            type: "danger",
+          },
+          action: () => handleResetSettingConfig(),
+          label: t("core.common.buttons.reset"),
+        },
+      ],
+    },
+  ])
+);
 </script>
 
 <template>
@@ -214,58 +238,53 @@ const handleCreateTheme = async () => {
         </div>
         <div>
           <VSpace v-if="installed">
-            <VButton
-              v-if="
-                !isActivated &&
-                currentUserHasPermission(['system:themes:manage'])
-              "
-              size="sm"
-              @click="handleActiveTheme(true)"
-            >
-              {{ $t("core.common.buttons.activate") }}
-            </VButton>
-            <VButton size="sm" @click="emit('select', theme)">
-              {{ $t("core.common.buttons.select") }}
-            </VButton>
-            <VDropdown
-              v-if="currentUserHasPermission(['system:themes:manage'])"
-            >
-              <VButton size="sm">
-                <IconMore />
-              </VButton>
-              <template #popper>
-                <VDropdownItem @click="emit('preview')">
-                  {{ $t("core.common.buttons.preview") }}
-                </VDropdownItem>
-                <VDropdownDivider />
-                <VDropdown placement="right" :triggers="['click']">
-                  <VDropdownItem type="danger">
-                    {{ $t("core.common.buttons.uninstall") }}
-                  </VDropdownItem>
+            <template v-for="(item, index) in operationItems" :key="index">
+              <template v-if="!item.children?.length">
+                <component
+                  :is="item.component"
+                  v-if="
+                    !item.hidden && currentUserHasPermission(item.permissions)
+                  "
+                  v-bind="item.props"
+                  @click="item.action?.(theme)"
+                >
+                  {{ item.label }}
+                </component>
+              </template>
+              <template v-else>
+                <VDropdown
+                  v-if="
+                    !item.hidden && currentUserHasPermission(item.permissions)
+                  "
+                >
+                  <component
+                    :is="item.component"
+                    v-bind="item.props"
+                    @click="item.action?.(theme)"
+                  >
+                    {{ item.label }}
+                  </component>
                   <template #popper>
-                    <VDropdownItem
-                      type="danger"
-                      @click="handleUninstall(theme)"
+                    <template
+                      v-for="(childItem, childIndex) in item.children"
+                      :key="`child-${childIndex}`"
                     >
-                      {{ $t("core.common.buttons.uninstall") }}
-                    </VDropdownItem>
-                    <VDropdownItem
-                      type="danger"
-                      @click="handleUninstall(theme, true)"
-                    >
-                      {{
-                        $t(
-                          "core.theme.operations.uninstall_and_delete_config.button"
-                        )
-                      }}
-                    </VDropdownItem>
+                      <component
+                        :is="childItem.component"
+                        v-if="
+                          !childItem.hidden &&
+                          currentUserHasPermission(childItem.permissions)
+                        "
+                        v-bind="childItem.props"
+                        @click="childItem.action?.(theme)"
+                      >
+                        {{ childItem.label }}
+                      </component>
+                    </template>
                   </template>
                 </VDropdown>
-                <VDropdownItem type="danger" @click="handleResetSettingConfig">
-                  {{ $t("core.common.buttons.reset") }}
-                </VDropdownItem>
               </template>
-            </VDropdown>
+            </template>
           </VSpace>
           <VButton
             v-if="

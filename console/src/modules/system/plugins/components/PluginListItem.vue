@@ -16,10 +16,8 @@ import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
 import type { Ref } from "vue";
 import { ref } from "vue";
-import {
-  useEntityDropdownItemExtensionPoint,
-  useEntityFieldItemExtensionPoint,
-} from "@/composables/use-entity-extension-points";
+import { useEntityFieldItemExtensionPoint } from "@/composables/use-entity-extension-points";
+import { useOperationItemExtensionPoint } from "@/composables/use-operation-extension-points";
 import { useRouter } from "vue-router";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import EntityFieldItems from "@/components/entity-fields/EntityFieldItems.vue";
@@ -28,6 +26,7 @@ import StatusDotField from "@/components/entity-fields/StatusDotField.vue";
 import AuthorField from "./entity-fields/AuthorField.vue";
 import SwitchField from "./entity-fields/SwitchField.vue";
 import { computed } from "vue";
+import type { EntityFieldItem, OperationItem } from "packages/shared/dist";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -76,15 +75,14 @@ const handleResetSettingConfig = async () => {
   });
 };
 
-const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
+const { operationItems } = useOperationItemExtensionPoint<Plugin>(
   "plugin:list-item:operation:create",
   plugin,
-  computed(() => [
+  computed((): OperationItem<Plugin>[] => [
     {
       priority: 10,
       component: markRaw(VDropdownItem),
       label: t("core.common.buttons.detail"),
-      visible: true,
       permissions: [],
       action: () => {
         router.push({
@@ -97,7 +95,6 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
       priority: 20,
       component: markRaw(VDropdownItem),
       label: t("core.common.buttons.upgrade"),
-      visible: true,
       permissions: [],
       action: () => {
         emit("open-upgrade-modal", props.plugin);
@@ -106,7 +103,6 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
     {
       priority: 30,
       component: markRaw(VDropdownDivider),
-      visible: true,
     },
     {
       priority: 40,
@@ -115,7 +111,6 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
         type: "danger",
       },
       label: t("core.common.buttons.uninstall"),
-      visible: true,
       children: [
         {
           priority: 10,
@@ -124,7 +119,6 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
             type: "danger",
           },
           label: t("core.common.buttons.uninstall"),
-          visible: true,
           action: () => uninstall(),
         },
         {
@@ -134,7 +128,6 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
             type: "danger",
           },
           label: t("core.plugin.operations.uninstall_and_delete_config.button"),
-          visible: true,
           action: () => uninstall(true),
         },
       ],
@@ -146,7 +139,6 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
         type: "danger",
       },
       label: t("core.common.buttons.reset"),
-      visible: true,
       action: () => {
         handleResetSettingConfig();
       },
@@ -157,7 +149,7 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
 const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
   "plugin:list-item:field:create",
   plugin,
-  computed(() => [
+  computed((): EntityFieldItem[] => [
     {
       position: "start",
       priority: 10,
@@ -188,7 +180,7 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
         state: "error",
         animate: true,
       },
-      visible: props.plugin.status?.phase === "FAILED",
+      hidden: props.plugin.status?.phase !== "FAILED",
     },
     {
       position: "end",
@@ -199,7 +191,7 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
         state: "warning",
         animate: true,
       },
-      visible: !!props.plugin.metadata.deletionTimestamp,
+      hidden: !props.plugin.metadata.deletionTimestamp,
     },
     {
       position: "end",
@@ -208,7 +200,7 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
       props: {
         plugin: props.plugin,
       },
-      visible: !!props.plugin.spec.author,
+      hidden: !props.plugin.spec.author,
     },
     {
       position: "end",
@@ -225,7 +217,7 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
       props: {
         description: formatDatetime(props.plugin.metadata.creationTimestamp),
       },
-      visible: !!props.plugin.metadata.creationTimestamp,
+      hidden: !props.plugin.metadata.creationTimestamp,
     },
     {
       position: "end",
@@ -263,7 +255,7 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
       v-if="currentUserHasPermission(['system:plugins:manage'])"
       #dropdownItems
     >
-      <EntityDropdownItems :dropdown-items="dropdownItems" :item="plugin" />
+      <EntityDropdownItems :dropdown-items="operationItems" :item="plugin" />
     </template>
   </VEntity>
 </template>
