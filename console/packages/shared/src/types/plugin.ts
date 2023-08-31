@@ -58,6 +58,10 @@ export interface ExtensionPoint {
     plugin: Ref<Plugin>
   ) => EntityFieldItem[] | Promise<EntityFieldItem[]>;
 
+  "post:list-item:field:create"?: (
+    post: Ref<ListedPost>
+  ) => EntityFieldItem[] | Promise<EntityFieldItem[]>;
+
   "theme:list:tabs:create"?: () => ThemeListTab[] | Promise<ThemeListTab[]>;
 }
 
