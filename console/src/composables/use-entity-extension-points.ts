@@ -42,7 +42,6 @@ export function useEntityFieldItemExtensionPoint<T>(
   entity: Ref<T>,
   presets: ComputedRef<EntityFieldItem[]>
 ) {
-  console.log(presets);
   const { pluginModules } = usePluginModuleStore();
   const { currentUserHasPermission } = usePermission();
   const itemsFromPlugins = ref<EntityFieldItem[]>([]);
