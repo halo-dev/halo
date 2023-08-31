@@ -53,7 +53,7 @@ export interface ExtensionPoint {
     | Promise<EntityDropdownItem<Backup>[]>;
 
   "plugin:list-item:field:create"?: (
-    item: Ref<Plugin>
+    plugin: Ref<Plugin>
   ) => EntityFieldItem[] | Promise<EntityFieldItem[]>;
 
   "theme:list:tabs:create"?: () => ThemeListTab[] | Promise<ThemeListTab[]>;
