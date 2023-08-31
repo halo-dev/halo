@@ -1,10 +1,13 @@
 <script setup lang="ts" generic="T">
-import type { EntityDropdownItem } from "@halo-dev/console-shared";
+import type { OperationItem } from "@halo-dev/console-shared";
 import { VDropdown } from "@halo-dev/components";
+import { usePermission } from "@/utils/permission";
+
+const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
-    dropdownItems: EntityDropdownItem<T>[];
+    dropdownItems: OperationItem<T>[];
     item?: T;
   }>(),
   {
@@ -12,7 +15,7 @@ const props = withDefaults(
   }
 );
 
-function action(dropdownItem: EntityDropdownItem<T>) {
+function action(dropdownItem: OperationItem<T>) {
   if (!dropdownItem.action) {
     return;
   }
@@ -22,11 +25,15 @@ function action(dropdownItem: EntityDropdownItem<T>) {
 
 <template>
   <template v-for="(dropdownItem, index) in dropdownItems">
-    <template v-if="dropdownItem.visible">
+    <template
+      v-if="
+        !dropdownItem.hidden &&
+        currentUserHasPermission(dropdownItem.permissions)
+      "
+    >
       <VDropdown
         v-if="dropdownItem.children?.length"
         :key="`dropdown-children-items-${index}`"
-        v-permission="dropdownItem.permissions"
         :triggers="['click']"
       >
         <component
@@ -40,10 +47,12 @@ function action(dropdownItem: EntityDropdownItem<T>) {
           <template v-for="(childItem, childIndex) in dropdownItem.children">
             <component
               :is="childItem.component"
-              v-if="childItem.visible"
+              v-if="
+                !childItem.hidden &&
+                currentUserHasPermission(childItem.permissions)
+              "
               v-bind="childItem.props"
               :key="`dropdown-child-item-${childIndex}`"
-              v-permission="childItem.permissions"
               @click="action(childItem)"
             >
               {{ childItem.label }}
@@ -56,7 +65,6 @@ function action(dropdownItem: EntityDropdownItem<T>) {
         v-else
         v-bind="dropdownItem.props"
         :key="`dropdown-item-${index}`"
-        v-permission="dropdownItem.permissions"
         @click="action(dropdownItem)"
       >
         {{ dropdownItem.label }}

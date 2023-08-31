@@ -15,9 +15,10 @@ import { apiClient } from "@/utils/api-client";
 import { useQueryClient } from "@tanstack/vue-query";
 import prettyBytes from "pretty-bytes";
 import { useI18n } from "vue-i18n";
-import { useEntityDropdownItemExtensionPoint } from "@/composables/use-entity-extension-points";
+import { useOperationItemExtensionPoint } from "@/composables/use-operation-extension-points";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { toRefs } from "vue";
+import type { OperationItem } from "packages/shared/dist";
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
@@ -100,15 +101,15 @@ function handleDelete() {
   });
 }
 
-const { dropdownItems } = useEntityDropdownItemExtensionPoint<Backup>(
+const { operationItems } = useOperationItemExtensionPoint<Backup>(
   "backup:list-item:operation:create",
   backup,
-  computed(() => [
+  computed((): OperationItem<Backup>[] => [
     {
       priority: 10,
       component: markRaw(VDropdownItem),
       label: t("core.common.buttons.download"),
-      visible: props.backup.status?.phase === "SUCCEEDED",
+      hidden: props.backup.status?.phase !== "SUCCEEDED",
       permissions: [],
       action: () => handleDownload(),
     },
@@ -119,7 +120,6 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Backup>(
         type: "danger",
       },
       label: t("core.common.buttons.delete"),
-      visible: true,
       action: () => handleDelete(),
     },
   ])
@@ -187,7 +187,7 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Backup>(
       </VEntityField>
     </template>
     <template #dropdownItems>
-      <EntityDropdownItems :dropdown-items="dropdownItems" :item="backup" />
+      <EntityDropdownItems :dropdown-items="operationItems" :item="backup" />
     </template>
   </VEntity>
 </template>
