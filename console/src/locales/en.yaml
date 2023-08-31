@@ -1003,6 +1003,9 @@ core:
         toast_success: Requested to restart
       remote_download:
         button: Download and restore
+      restore_by_backup:
+        button: Restore
+        title: Are you sure you want to restore from this backup?
     list:
       phases:
         pending: Pending
@@ -1025,6 +1028,8 @@ core:
           label: Remote
           fields:
             url: Remote URL
+        backup:
+          label: Restore from backup
   exception:
     not_found:
       message: Page not found

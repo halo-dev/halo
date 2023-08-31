@@ -1003,6 +1003,9 @@ core:
         toast_success: 已请求重启
       remote_download:
         button: 下载并恢复
+      restore_by_backup:
+        button: 恢复
+        title: 确认要从此备份进行恢复吗？
     list:
       phases:
         pending: 准备中
@@ -1025,6 +1028,8 @@ core:
           label: 远程恢复
           fields:
             url: 下载地址
+        backup:
+          label: 从备份恢复
   exception:
     not_found:
       message: 没有找到该页面

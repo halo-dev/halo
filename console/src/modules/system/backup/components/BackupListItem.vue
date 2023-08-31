@@ -113,23 +113,13 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Backup>(
     {
       priority: 10,
       component: markRaw(VDropdownItem),
-      label: "恢复",
-      visible: props.backup.status?.phase === "SUCCEEDED",
-      permissions: [],
-      action: () => {
-        // TODO
-      },
-    },
-    {
-      priority: 20,
-      component: markRaw(VDropdownItem),
       label: t("core.common.buttons.download"),
       visible: props.backup.status?.phase === "SUCCEEDED",
       permissions: [],
       action: () => handleDownload(),
     },
     {
-      priority: 30,
+      priority: 20,
       component: markRaw(VDropdownItem),
       props: {
         type: "danger",
