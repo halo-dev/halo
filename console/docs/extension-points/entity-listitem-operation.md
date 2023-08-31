@@ -11,6 +11,7 @@
 - 文章：`"post:list-item:operation:create"?: (post: Ref<ListedPost>) => | EntityDropdownItem<ListedPost>[] | Promise<EntityDropdownItem<ListedPost>[]>`
 - 插件：`"plugin:list-item:operation:create"?: (plugin: Ref<Plugin>) => | EntityDropdownItem<Plugin>[] | Promise<EntityDropdownItem<Plugin>[]>`
 - 备份：`"backup:list-item:operation:create"?: (backup: Ref<Backup>) => | EntityDropdownItem<Backup>[] | Promise<EntityDropdownItem<Backup>[]>`
+- 主题：`"theme:list-item:operation:create"?: (theme: Ref<Theme>) => | EntityDropdownItem<Theme>[] | Promise<EntityDropdownItem<Theme>[]>`
 
 示例：
 
