@@ -27,9 +27,10 @@ import { ref } from "vue";
 import { computed } from "vue";
 import { markRaw } from "vue";
 import { useRouter } from "vue-router";
-import { useEntityDropdownItemExtensionPoint } from "@/composables/use-entity-extension-points";
+import { useOperationItemExtensionPoint } from "@/composables/use-operation-extension-points";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { toRefs } from "vue";
+import type { OperationItem } from "packages/shared/dist";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -122,15 +123,14 @@ const handleDelete = async () => {
   });
 };
 
-const { dropdownItems } = useEntityDropdownItemExtensionPoint<ListedPost>(
+const { operationItems } = useOperationItemExtensionPoint<ListedPost>(
   "post:list-item:operation:create",
   post,
-  computed(() => [
+  computed((): OperationItem<ListedPost>[] => [
     {
       priority: 10,
       component: markRaw(VDropdownItem),
       label: t("core.common.buttons.edit"),
-      visible: true,
       permissions: [],
       action: () => {
         router.push({
@@ -143,7 +143,6 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<ListedPost>(
       priority: 20,
       component: markRaw(VDropdownItem),
       label: t("core.common.buttons.setting"),
-      visible: true,
       permissions: [],
       action: () => {
         emit("open-setting-modal", props.post.post);
@@ -152,7 +151,6 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<ListedPost>(
     {
       priority: 30,
       component: markRaw(VDropdownDivider),
-      visible: true,
     },
     {
       priority: 40,
@@ -161,7 +159,6 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<ListedPost>(
         type: "danger",
       },
       label: t("core.common.buttons.delete"),
-      visible: true,
       permissions: [],
       action: handleDelete,
     },
@@ -327,7 +324,7 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<ListedPost>(
       v-if="currentUserHasPermission(['system:posts:manage'])"
       #dropdownItems
     >
-      <EntityDropdownItems :dropdown-items="dropdownItems" :item="post" />
+      <EntityDropdownItems :dropdown-items="operationItems" :item="post" />
     </template>
   </VEntity>
 </template>
