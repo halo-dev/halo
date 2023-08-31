@@ -25,6 +25,7 @@ import {
   VTabbar,
   VLoading,
   Dialog,
+  IconListSettings,
 } from "@halo-dev/components";
 import ThemeListModal from "../components/ThemeListModal.vue";
 import ThemePreviewModal from "../components/preview/ThemePreviewModal.vue";
@@ -67,6 +68,7 @@ const themesModal = ref(false);
 const previewModal = ref(false);
 const activeTab = ref(tabs.value[0].id);
 provide<Ref<string>>("activeTab", activeTab);
+provide<Ref<boolean>>("themesModal", themesModal);
 
 const { loading, isActivated, handleActiveTheme } =
   useThemeLifeCycle(selectedTheme);
@@ -184,11 +186,6 @@ onMounted(() => {
 </script>
 <template>
   <BasicLayout>
-    <ThemeListModal
-      v-model:selected-theme="selectedTheme"
-      v-model:visible="themesModal"
-      @select="onSelectTheme"
-    />
     <VPageHeader :title="selectedTheme?.spec.displayName">
       <template #icon>
         <IconPalette class="mr-2 self-center" />
@@ -204,15 +201,15 @@ onMounted(() => {
           >
             {{ $t("core.common.buttons.activate") }}
           </VButton>
-          <VButton type="secondary" size="sm" @click="previewModal = true">
+          <VButton type="default" size="sm" @click="previewModal = true">
             <template #icon>
               <IconEye class="h-full w-full" />
             </template>
             {{ $t("core.common.buttons.preview") }}
           </VButton>
-          <VButton size="sm" type="default" @click="themesModal = true">
+          <VButton type="secondary" @click="themesModal = true">
             <template #icon>
-              <IconExchange class="h-full w-full" />
+              <IconListSettings class="h-full w-full" />
             </template>
             {{ $t("core.theme.actions.management") }}
           </VButton>
@@ -271,6 +268,7 @@ onMounted(() => {
       </div>
     </div>
 
+    <ThemeListModal v-model:visible="themesModal" @select="onSelectTheme" />
     <ThemePreviewModal v-model:visible="previewModal" :theme="selectedTheme" />
   </BasicLayout>
 </template>
