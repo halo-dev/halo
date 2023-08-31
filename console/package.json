@@ -78,7 +78,7 @@
     "dayjs": "^1.11.7",
     "emoji-mart": "^5.3.3",
     "fastq": "^1.15.0",
-    "floating-vue": "2.0.0-beta.20",
+    "floating-vue": "2.0.0-beta.24",
     "fuse.js": "^6.6.2",
     "jsencrypt": "^3.3.2",
     "lodash.clonedeep": "^4.5.0",

@@ -1,4 +1,4 @@
-import type { Component } from "vue";
+import type { Component, Ref } from "vue";
 import type { RouteRecordRaw, RouteRecordName } from "vue-router";
 import type { FunctionalPage } from "../states/pages";
 import type { AttachmentSelectProvider } from "../states/attachment-selector";
@@ -7,7 +7,7 @@ import type { AnyExtension } from "@tiptap/vue-3";
 import type { CommentSubjectRefProvider } from "@/states/comment-subject-ref";
 import type { BackupTab } from "@/states/backup";
 import type { PluginInstallationTab } from "@/states/plugin-installation-tabs";
-import type { EntityDropdownItem } from "@/states/entity";
+import type { EntityDropdownItem, EntityFieldItem } from "@/states/entity";
 import type { ThemeListTab } from "@/states/theme-list-tabs";
 import type { Backup, ListedPost, Plugin } from "@halo-dev/api-client";
 
@@ -40,17 +40,23 @@ export interface ExtensionPoint {
     | PluginInstallationTab[]
     | Promise<PluginInstallationTab[]>;
 
-  "post:list-item:operation:create"?: () =>
+  "post:list-item:operation:create"?: (
+    post: Ref<ListedPost>
+  ) =>
     | EntityDropdownItem<ListedPost>[]
     | Promise<EntityDropdownItem<ListedPost>[]>;
 
-  "plugin:list-item:operation:create"?: () =>
-    | EntityDropdownItem<Plugin>[]
-    | Promise<EntityDropdownItem<Plugin>[]>;
+  "plugin:list-item:operation:create"?: (
+    plugin: Ref<Plugin>
+  ) => EntityDropdownItem<Plugin>[] | Promise<EntityDropdownItem<Plugin>[]>;
 
-  "backup:list-item:operation:create"?: () =>
-    | EntityDropdownItem<Backup>[]
-    | Promise<EntityDropdownItem<Backup>[]>;
+  "backup:list-item:operation:create"?: (
+    backup: Ref<Backup>
+  ) => EntityDropdownItem<Backup>[] | Promise<EntityDropdownItem<Backup>[]>;
+
+  "plugin:list-item:field:create"?: (
+    plugin: Ref<Plugin>
+  ) => EntityFieldItem[] | Promise<EntityFieldItem[]>;
 
   "theme:list:tabs:create"?: () => ThemeListTab[] | Promise<ThemeListTab[]>;
 }

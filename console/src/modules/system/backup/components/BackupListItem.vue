@@ -17,6 +17,7 @@ import prettyBytes from "pretty-bytes";
 import { useI18n } from "vue-i18n";
 import { useEntityDropdownItemExtensionPoint } from "@/composables/use-entity-extension-points";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
+import { toRefs } from "vue";
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
@@ -30,6 +31,8 @@ const props = withDefaults(
     showOperations: true,
   }
 );
+
+const { backup } = toRefs(props);
 
 type Phase = {
   text: string;
@@ -105,7 +108,8 @@ function handleDelete() {
 
 const { dropdownItems } = useEntityDropdownItemExtensionPoint<Backup>(
   "backup:list-item:operation:create",
-  [
+  backup,
+  computed(() => [
     {
       priority: 10,
       component: markRaw(VDropdownItem),
@@ -134,7 +138,7 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Backup>(
       visible: true,
       action: () => handleDelete(),
     },
-  ]
+  ])
 );
 </script>
 
