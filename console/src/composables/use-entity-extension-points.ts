@@ -5,15 +5,16 @@ import type {
   EntityFieldItem,
   PluginModule,
 } from "@halo-dev/console-shared";
-import { onMounted, ref, type Ref, computed, type ComputedRef } from "vue";
+import { onMounted, ref, type ComputedRef, type Ref, computed } from "vue";
 
 export function useEntityDropdownItemExtensionPoint<T>(
   extensionPointName: string,
-  presets: EntityDropdownItem<T>[]
+  entity: Ref<T>,
+  presets: ComputedRef<EntityDropdownItem<T>[]>
 ) {
   const { pluginModules } = usePluginModuleStore();
 
-  const dropdownItems = ref<EntityDropdownItem<T>[]>(presets);
+  const itemsFromPlugins = ref<EntityDropdownItem<T>[]>([]);
 
   onMounted(() => {
     pluginModules.forEach((pluginModule: PluginModule) => {
@@ -22,14 +23,16 @@ export function useEntityDropdownItemExtensionPoint<T>(
         return;
       }
 
-      const items = extensionPoints[
-        extensionPointName
-      ]() as EntityDropdownItem<T>[];
+      const items = extensionPoints[extensionPointName](
+        entity
+      ) as EntityDropdownItem<T>[];
 
-      dropdownItems.value.push(...items);
+      itemsFromPlugins.value.push(...items);
     });
+  });
 
-    dropdownItems.value.sort((a, b) => {
+  const dropdownItems = computed(() => {
+    return [...presets.value, ...itemsFromPlugins.value].sort((a, b) => {
       return a.priority - b.priority;
     });
   });

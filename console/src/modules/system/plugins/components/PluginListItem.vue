@@ -78,7 +78,8 @@ const handleResetSettingConfig = async () => {
 
 const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
   "plugin:list-item:operation:create",
-  [
+  plugin,
+  computed(() => [
     {
       priority: 10,
       component: markRaw(VDropdownItem),
@@ -150,7 +151,7 @@ const { dropdownItems } = useEntityDropdownItemExtensionPoint<Plugin>(
         handleResetSettingConfig();
       },
     },
-  ]
+  ])
 );
 
 const { startFields, endFields } = useEntityFieldItemExtensionPoint<Plugin>(
