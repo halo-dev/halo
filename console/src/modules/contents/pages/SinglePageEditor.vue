@@ -38,6 +38,7 @@ import { contentAnnotations } from "@/constants/annotations";
 import { usePageUpdateMutate } from "./composables/use-page-update-mutate";
 import { useAutoSaveContent } from "@/composables/use-auto-save-content";
 import { useContentSnapshot } from "@/composables/use-content-snapshot";
+import { useSaveKeybinding } from "@/composables/use-save-keybinding";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -365,6 +366,8 @@ const handlePreview = async () => {
   previewModal.value = true;
   previewPending.value = false;
 };
+
+useSaveKeybinding(handleSave);
 </script>
 
 <template>

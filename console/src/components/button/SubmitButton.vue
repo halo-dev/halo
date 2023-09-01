@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { isMac } from "@/utils/device";
 import { VButton } from "@halo-dev/components";
 import { useMagicKeys } from "@vueuse/core";
 import { computed, useAttrs, watchEffect } from "vue";
@@ -18,8 +19,6 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: "submit"): void;
 }>();
-
-const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
 
 const attrs = useAttrs();
 
