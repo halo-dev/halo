@@ -26,14 +26,7 @@
 ## 快速开始
 
 ```bash
-docker run \
-  -it -d \
-  --name halo \
-  -p 8090:8090 \
-  -v ~/.halo2:/root/.halo2 \
-  halohub/halo:2.8 \
-  --halo.security.initializer.superadminusername=admin \
-  --halo.security.initializer.superadminpassword=P@88w0rd
+docker run -it -d --name halo -p 8090:8090 -v ~/.halo2:/root/.halo2 halohub/halo:2.9
 ```
 
 以上仅作为体验使用，详细部署文档请查阅：<https://docs.halo.run/getting-started/install/docker-compose>
