@@ -73,7 +73,7 @@ function handleRestoreFromBackup(backup: Backup) {
   Dialog.info({
     title: t("core.backup.operations.restore_by_backup.title"),
     confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
+    showCancel: false,
     async onConfirm() {
       await apiClient.migration.restoreBackup({
         backupName: backup.metadata.name,
