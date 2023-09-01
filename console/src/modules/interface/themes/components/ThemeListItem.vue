@@ -22,7 +22,7 @@ import { markRaw } from "vue";
 import { defineComponent } from "vue";
 import UninstallOperationItem from "./operation/UninstallOperationItem.vue";
 import { computed } from "vue";
-import type { OperationItem } from "packages/shared/dist";
+import type { OperationItem } from "@halo-dev/console-shared";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();

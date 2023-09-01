@@ -32,11 +32,11 @@ import { usePermission } from "@/utils/permission";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { usePluginModuleStore } from "@/stores/plugin";
-import type { PluginModule } from "@halo-dev/console-shared";
 import type {
+  PluginModule,
   CommentSubjectRefProvider,
   CommentSubjectRefResult,
-} from "packages/shared/dist";
+} from "@halo-dev/console-shared";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();

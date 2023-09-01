@@ -18,7 +18,7 @@ import { useI18n } from "vue-i18n";
 import { useOperationItemExtensionPoint } from "@/composables/use-operation-extension-points";
 import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
 import { toRefs } from "vue";
-import type { OperationItem } from "packages/shared/dist";
+import type { OperationItem } from "@halo-dev/console-shared";
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
