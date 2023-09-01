@@ -23,9 +23,15 @@ import type { OperationItem } from "packages/shared/dist";
 const queryClient = useQueryClient();
 const { t } = useI18n();
 
-const props = defineProps<{
-  backup: Backup;
-}>();
+const props = withDefaults(
+  defineProps<{
+    backup: Backup;
+    showOperations: boolean;
+  }>(),
+  {
+    showOperations: true,
+  }
+);
 
 const { backup } = toRefs(props);
 
@@ -185,8 +191,9 @@ const { operationItems } = useOperationItemExtensionPoint<Backup>(
           </span>
         </template>
       </VEntityField>
+      <slot name="end"></slot>
     </template>
-    <template #dropdownItems>
+    <template v-if="showOperations" #dropdownItems>
       <EntityDropdownItems :dropdown-items="operationItems" :item="backup" />
     </template>
   </VEntity>

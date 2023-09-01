@@ -1003,6 +1003,9 @@ core:
         toast_success: 已請求重啟
       remote_download:
         button: 下載並還原
+      restore_by_backup:
+        button: 還原
+        title: 確認要從此備份進行還原嗎？
     list:
       phases:
         pending: 準備中
@@ -1016,15 +1019,17 @@ core:
         first: 1. 還原過程可能需要較長時間，期間請勿重新整理頁面。
         second: 2. 在還原過程中，雖然已有的資料不會被清除，但若有衝突的資料將被覆蓋。
         third: 3. 還原完成後需要重新啟動 Halo 才能正常載入系統資源。
-        complete: 恢復完成，等待重啟...
+        complete: 還原完成，等待重啟...
       start: 開始還原
       tabs:
         local:
           label: 上傳
         remote:
-          label: 遠程恢復
+          label: 遠程還原
           fields:
             url: 下載地址
+        backup:
+          label: 從備份還原
   exception:
     not_found:
       message: 沒有找到該頁面
