@@ -1,0 +1,13 @@
+lockfileVersion: '6.0'
+
+dependencies:
+  short-unique-id:
+    specifier: ^4.4.4
+    version: 4.4.4
+
+packages:
+
+  /short-unique-id@4.4.4:
+    resolution: {integrity: sha512-oLF1NCmtbiTWl2SqdXZQbo5KM1b7axdp0RgQLq8qCBBLoq+o3A5wmLrNM6bZIh54/a8BJ3l69kTXuxwZ+XCYuw==}
+    hasBin: true
+    dev: false
