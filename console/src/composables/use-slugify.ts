@@ -7,20 +7,23 @@ const Strategy = {
   generateByTitle: (value: string) => {
     return slugify(value, { trim: true });
   },
-  shortUUID: () => {
+  shortUUID: (value: string) => {
+    if (!value) return;
     const uid = new ShortUniqueId({ length: 8 });
     return uid();
   },
-  UUID: () => {
+  UUID: (value: string) => {
+    if (!value) return;
     const uid = new ShortUniqueId({ length: 18 });
     return uid();
   },
-  timestamp: () => {
+  timestamp: (value: string) => {
+    if (!value) return;
     const uid = new ShortUniqueId();
     return uid.stamp(32);
   },
 };
-
+const onceList = ["shortUUID", "UUID", "timestamp"];
 export default function useSlugify(
   source: Ref<string>,
   target: Ref<string>,
@@ -35,14 +38,16 @@ export default function useSlugify(
     }
   );
 
-  const handleGenerateSlug = () => {
+  const handleGenerateSlug = (forceUpdate = false) => {
     // const globalInfo = useGlobalInfoStore().globalInfo;
     // TODO: change mock to globalinfoOption
-    const mode = "UUID";
-    if (!source.value) {
+    const mode = "generateByTitle";
+    if (forceUpdate) {
+      target.value = Strategy[mode](source.value);
       return;
     }
-    target.value = Strategy[mode]();
+    if (onceList.includes(mode) && target.value) return;
+    target.value = Strategy[mode](source.value);
   };
 
   return {
