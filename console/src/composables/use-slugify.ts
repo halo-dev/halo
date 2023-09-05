@@ -1,28 +1,28 @@
 import { slugify } from "transliteration";
 import { watch, type Ref } from "vue";
 import ShortUniqueId from "short-unique-id";
+import type { ModeType } from "@/types/slug";
 // import { useGlobalInfoStore } from "@/stores/global-info";
+const uid = new ShortUniqueId();
 
 const Strategy = {
   generateByTitle: (value: string) => {
     return slugify(value, { trim: true });
   },
   shortUUID: (value: string) => {
-    if (!value) return;
-    const uid = new ShortUniqueId({ length: 8 });
-    return uid();
+    if (!value) return "";
+    return uid.randomUUID(8);
   },
   UUID: (value: string) => {
-    if (!value) return;
-    const uid = new ShortUniqueId({ length: 18 });
-    return uid();
+    if (!value) return "";
+    return uid.randomUUID(16);
   },
   timestamp: (value: string) => {
-    if (!value) return;
-    const uid = new ShortUniqueId();
+    if (!value) return "";
     return uid.stamp(32);
   },
 };
+
 const onceList = ["shortUUID", "UUID", "timestamp"];
 export default function useSlugify(
   source: Ref<string>,
@@ -41,11 +41,12 @@ export default function useSlugify(
   const handleGenerateSlug = (forceUpdate = false) => {
     // const globalInfo = useGlobalInfoStore().globalInfo;
     // TODO: change mock to globalinfoOption
-    const mode = "generateByTitle";
+    const mode: ModeType = "timestamp";
     if (forceUpdate) {
       target.value = Strategy[mode](source.value);
       return;
     }
+
     if (onceList.includes(mode) && target.value) return;
     target.value = Strategy[mode](source.value);
   };
