@@ -12,6 +12,7 @@ import type { ConfigMap, Setting } from "@halo-dev/api-client";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
+import { useGlobalInfoStore } from "@/stores/global-info";
 
 const SYSTEM_CONFIGMAP_NAME = "system";
 
@@ -58,7 +59,7 @@ const handleSaveConfigMap = async () => {
   Toast.success(t("core.common.toast.save_success"));
 
   queryClient.invalidateQueries({ queryKey: ["system-configMap"] });
-
+  await useGlobalInfoStore().fetchGlobalInfo();
   systemConfigMapStore.configMap = data;
 
   saving.value = false;
