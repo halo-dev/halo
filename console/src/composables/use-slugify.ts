@@ -5,8 +5,6 @@ import type { ModeType } from "@/types/slug";
 import { useGlobalInfoStore } from "@/stores/global-info";
 const uid = new ShortUniqueId();
 
-const globalInfoStore = useGlobalInfoStore();
-
 const Strategy = {
   generateByTitle: (value: string) => {
     return slugify(value, { trim: true });
@@ -41,8 +39,10 @@ export default function useSlugify(
   );
 
   const handleGenerateSlug = (forceUpdate = false) => {
-    const mode: ModeType =
-      globalInfoStore.globalInfo.postSlugGenerationStrategy;
+    const globalInfoStore = useGlobalInfoStore();
+    const mode: ModeType = globalInfoStore.globalInfo
+      ?.postSlugGenerationStrategy as ModeType;
+
     if (forceUpdate) {
       target.value = Strategy[mode](source.value);
       return;
