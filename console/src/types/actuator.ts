@@ -12,7 +12,7 @@ export interface GlobalInfo {
   userInitialized: boolean;
   dataInitialized: boolean;
   favicon?: string;
-  gSlugMode: ModeType;
+  postSlugGenerationStrategy: ModeType;
 }
 
 export interface Info {

@@ -2,8 +2,10 @@ import { slugify } from "transliteration";
 import { watch, type Ref } from "vue";
 import ShortUniqueId from "short-unique-id";
 import type { ModeType } from "@/types/slug";
-// import { useGlobalInfoStore } from "@/stores/global-info";
+import { useGlobalInfoStore } from "@/stores/global-info";
 const uid = new ShortUniqueId();
+
+const globalInfoStore = useGlobalInfoStore();
 
 const Strategy = {
   generateByTitle: (value: string) => {
@@ -39,9 +41,8 @@ export default function useSlugify(
   );
 
   const handleGenerateSlug = (forceUpdate = false) => {
-    // const globalInfo = useGlobalInfoStore().globalInfo;
-    // TODO: change mock to globalinfoOption
-    const mode: ModeType = "timestamp";
+    const mode: ModeType =
+      globalInfoStore.globalInfo.postSlugGenerationStrategy;
     if (forceUpdate) {
       target.value = Strategy[mode](source.value);
       return;
