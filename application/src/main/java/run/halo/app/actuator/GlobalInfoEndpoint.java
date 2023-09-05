@@ -130,8 +130,6 @@ public class GlobalInfoEndpoint {
         var post = SystemSetting.get(configMap, SystemSetting.Post.GROUP, SystemSetting.Post.class);
         if (post != null) {
             info.setPostSlugGenerationStrategy(post.getSlugGenerationStrategy());
-        } else {
-            info.setPostSlugGenerationStrategy(StringUtils.EMPTY);
         }
     }
 
