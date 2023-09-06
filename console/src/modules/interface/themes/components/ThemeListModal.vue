@@ -1,148 +1,96 @@
 <script lang="ts" setup>
+import { VButton, VModal, VTabbar } from "@halo-dev/components";
 import {
-  IconAddCircle,
-  IconGitHub,
-  VButton,
-  VEmpty,
-  VModal,
-  VSpace,
-  VEntity,
-  VEntityField,
-  VTabItem,
-  VTabs,
-  VLoading,
-  Toast,
-} from "@halo-dev/components";
-import LazyImage from "@/components/image/LazyImage.vue";
-import ThemePreviewModal from "./preview/ThemePreviewModal.vue";
-import ThemeUploadModal from "./ThemeUploadModal.vue";
-import ThemeListItem from "./components/ThemeListItem.vue";
-import { computed, ref, nextTick, watch } from "vue";
+  computed,
+  ref,
+  watch,
+  provide,
+  inject,
+  markRaw,
+  nextTick,
+  onMounted,
+  type Ref,
+} from "vue";
 import type { Theme } from "@halo-dev/api-client";
-import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
-import { useQuery } from "@tanstack/vue-query";
 import { useRouteQuery } from "@vueuse/router";
+import InstalledThemes from "./list-tabs/InstalledThemes.vue";
+import NotInstalledThemes from "./list-tabs/NotInstalledThemes.vue";
+import LocalUpload from "./list-tabs/LocalUpload.vue";
+import RemoteDownload from "./list-tabs/RemoteDownload.vue";
+import { usePluginModuleStore } from "@/stores/plugin";
+import type { PluginModule, ThemeListTab } from "@halo-dev/console-shared";
 
 const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
     visible: boolean;
-    selectedTheme?: Theme;
   }>(),
   {
     visible: false,
-    selectedTheme: undefined,
+  }
+);
+
+const selectedTheme = inject<Ref<Theme | undefined>>("selectedTheme", ref());
+
+watch(
+  () => selectedTheme.value,
+  (value, oldValue) => {
+    if (value && oldValue) {
+      emit("select", value);
+      onVisibleChange(false);
+    }
   }
 );
 
 const emit = defineEmits<{
   (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
-  (event: "update:selectedTheme", theme?: Theme): void;
-  (event: "select", theme: Theme | null): void;
+  (event: "select", theme: Theme | undefined): void;
 }>();
 
-const activeTab = ref("installed");
-const themeUploadVisible = ref(false);
-const creating = ref(false);
+const tabs = ref<ThemeListTab[]>([
+  {
+    id: "installed",
+    label: t("core.theme.list_modal.tabs.installed"),
+    component: markRaw(InstalledThemes),
+    priority: 10,
+  },
+  {
+    id: "local-upload",
+    label: t("core.theme.list_modal.tabs.local_upload"),
+    component: markRaw(LocalUpload),
+    priority: 20,
+  },
+  {
+    id: "remote-download",
+    label: t("core.theme.list_modal.tabs.remote_download.label"),
+    component: markRaw(RemoteDownload),
+    priority: 30,
+  },
+  {
+    id: "not_installed",
+    label: t("core.theme.list_modal.tabs.not_installed"),
+    component: markRaw(NotInstalledThemes),
+    priority: 40,
+  },
+]);
+
+const activeTabId = ref();
+
+provide<Ref<string>>("activeTabId", activeTabId);
 
 const modalTitle = computed(() => {
-  return activeTab.value === "installed"
-    ? t("core.theme.list_modal.titles.installed_themes")
-    : t("core.theme.list_modal.titles.not_installed_themes");
+  const tab = tabs.value.find((tab) => tab.id === activeTabId.value);
+  return tab?.label;
 });
-
-const {
-  data: themes,
-  isLoading,
-  isFetching,
-  refetch,
-} = useQuery<Theme[]>({
-  queryKey: ["themes", activeTab],
-  queryFn: async () => {
-    const { data } = await apiClient.theme.listThemes({
-      page: 0,
-      size: 0,
-      uninstalled: activeTab.value !== "installed",
-    });
-    return data.items;
-  },
-  refetchInterval(data) {
-    if (activeTab.value !== "installed") {
-      return false;
-    }
-
-    const deletingThemes = data?.filter(
-      (theme) => !!theme.metadata.deletionTimestamp
-    );
-
-    return deletingThemes?.length ? 1000 : false;
-  },
-  enabled: computed(() => props.visible),
-});
-
-const handleCreateTheme = async (theme: Theme) => {
-  try {
-    creating.value = true;
-
-    const { data } =
-      await apiClient.extension.theme.createthemeHaloRunV1alpha1Theme({
-        theme,
-      });
-
-    // create theme settings
-    apiClient.theme.reload({ name: data.metadata.name });
-
-    activeTab.value = "installed";
-
-    Toast.success(t("core.common.toast.install_success"));
-  } catch (error) {
-    console.error("Failed to create theme", error);
-  } finally {
-    creating.value = false;
-    refetch();
-  }
-};
 
 const onVisibleChange = (visible: boolean) => {
   emit("update:visible", visible);
   if (!visible) {
     emit("close");
   }
-};
-
-const handleSelectTheme = (theme: Theme) => {
-  emit("update:selectedTheme", theme);
-  emit("select", theme);
-  onVisibleChange(false);
-};
-
-defineExpose({
-  handleFetchThemes: refetch,
-});
-
-// preview
-const previewVisible = ref(false);
-const selectedPreviewTheme = ref<Theme>();
-
-const handleOpenPreview = (theme: Theme) => {
-  selectedPreviewTheme.value = theme;
-  previewVisible.value = true;
-};
-
-// upgrade
-const themeToUpgrade = ref<Theme>();
-
-const handleOpenUpgradeModal = (theme: Theme) => {
-  themeToUpgrade.value = theme;
-  themeUploadVisible.value = true;
-};
-
-const handleOpenInstallModal = () => {
-  themeToUpgrade.value = undefined;
-  themeUploadVisible.value = true;
 };
 
 // handle remote wordpress url from route
@@ -152,215 +100,64 @@ watch(
   (visible) => {
     if (visible && remoteDownloadUrl.value) {
       nextTick(() => {
-        handleOpenInstallModal();
+        activeTabId.value = "remote-download";
       });
     }
   }
 );
+
+const { pluginModules } = usePluginModuleStore();
+onMounted(() => {
+  const tabsFromPlugins: ThemeListTab[] = [];
+  pluginModules.forEach((pluginModule: PluginModule) => {
+    const { extensionPoints } = pluginModule;
+    if (!extensionPoints?.["theme:list:tabs:create"]) {
+      return;
+    }
+
+    const items = extensionPoints["theme:list:tabs:create"]() as ThemeListTab[];
+    tabsFromPlugins.push(...items);
+  });
+
+  tabs.value = tabs.value.concat(tabsFromPlugins).sort((a, b) => {
+    return a.priority - b.priority;
+  });
+
+  activeTabId.value = tabs.value[0].id;
+});
 </script>
 <template>
   <VModal
-    :body-class="['!p-0']"
     :visible="visible"
-    :width="888"
+    :width="920"
     height="calc(100vh - 20px)"
     :title="modalTitle"
     @update:visible="onVisibleChange"
   >
-    <VTabs
-      v-model:active-id="activeTab"
+    <VTabbar
+      v-model:active-id="activeTabId"
+      :items="
+        tabs.map((tab) => {
+          return { label: tab.label, id: tab.id };
+        })
+      "
       type="outline"
-      class="mx-[16px] my-[12px]"
-    >
-      <VTabItem
-        id="installed"
-        :label="$t('core.theme.list_modal.tabs.installed')"
-        class="-mx-[16px]"
-      >
-        <VLoading v-if="isLoading" />
-        <Transition v-else-if="!themes?.length" appear name="fade">
-          <VEmpty
-            :message="$t('core.theme.list_modal.empty.message')"
-            :title="$t('core.theme.list_modal.empty.title')"
-          >
-            <template #actions>
-              <VSpace>
-                <VButton :loading="isFetching" @click="refetch()">
-                  {{ $t("core.common.buttons.refresh") }}
-                </VButton>
-                <VButton
-                  v-permission="['system:themes:manage']"
-                  type="primary"
-                  @click="handleOpenInstallModal()"
-                >
-                  <template #icon>
-                    <IconAddCircle class="h-full w-full" />
-                  </template>
-                  {{ $t("core.theme.common.buttons.install") }}
-                </VButton>
-              </VSpace>
-            </template>
-          </VEmpty>
-        </Transition>
-        <Transition v-else appear name="fade">
-          <ul
-            class="box-border h-full w-full divide-y divide-gray-100"
-            role="list"
-          >
-            <li
-              v-for="(theme, index) in themes"
-              :key="index"
-              @click="handleSelectTheme(theme)"
-            >
-              <ThemeListItem
-                :theme="theme"
-                :is-selected="
-                  theme.metadata.name === selectedTheme?.metadata?.name
-                "
-                @reload="refetch"
-                @preview="handleOpenPreview(theme)"
-                @upgrade="handleOpenUpgradeModal(theme)"
-              />
-            </li>
-          </ul>
-        </Transition>
-      </VTabItem>
-      <VTabItem
-        id="uninstalled"
-        :label="$t('core.theme.list_modal.tabs.not_installed')"
-        class="-mx-[16px]"
-      >
-        <VLoading v-if="isLoading" />
-        <Transition v-else-if="!themes?.length" appear name="fade">
-          <VEmpty
-            :title="$t('core.theme.list_modal.not_installed_empty.title')"
-          >
-            <template #actions>
-              <VSpace>
-                <VButton :loading="isFetching" @click="refetch">
-                  {{ $t("core.common.buttons.refresh") }}
-                </VButton>
-              </VSpace>
-            </template>
-          </VEmpty>
-        </Transition>
-        <Transition v-else appear name="fade">
-          <ul
-            class="box-border h-full w-full divide-y divide-gray-100"
-            role="list"
-          >
-            <li v-for="(theme, index) in themes" :key="index">
-              <VEntity>
-                <template #start>
-                  <VEntityField>
-                    <template #description>
-                      <div class="w-32">
-                        <div
-                          class="group aspect-h-3 aspect-w-4 block w-full overflow-hidden rounded border bg-gray-100"
-                        >
-                          <LazyImage
-                            :key="theme.metadata.name"
-                            :src="theme.spec.logo"
-                            :alt="theme.spec.displayName"
-                            classes="pointer-events-none object-cover group-hover:opacity-75"
-                          >
-                            <template #loading>
-                              <div
-                                class="flex h-full items-center justify-center object-cover"
-                              >
-                                <span class="text-xs text-gray-400">
-                                  {{ $t("core.common.status.loading") }}...
-                                </span>
-                              </div>
-                            </template>
-                            <template #error>
-                              <div
-                                class="flex h-full items-center justify-center object-cover"
-                              >
-                                <span class="text-xs text-red-400">
-                                  {{ $t("core.common.status.loading_error") }}
-                                </span>
-                              </div>
-                            </template>
-                          </LazyImage>
-                        </div>
-                      </div>
-                    </template>
-                  </VEntityField>
-                  <VEntityField
-                    :title="theme.spec.displayName"
-                    :description="theme.spec.version"
-                  >
-                  </VEntityField>
-                </template>
-                <template #end>
-                  <VEntityField>
-                    <template #description>
-                      <a
-                        class="text-sm text-gray-400 hover:text-blue-600"
-                        :href="theme.spec.author.website"
-                        target="_blank"
-                        @click.stop
-                      >
-                        {{ theme.spec.author.name }}
-                      </a>
-                    </template>
-                  </VEntityField>
-                  <VEntityField>
-                    <template #description>
-                      <a
-                        :href="theme.spec.repo"
-                        class="text-gray-900 hover:text-blue-600"
-                        target="_blank"
-                      >
-                        <IconGitHub />
-                      </a>
-                    </template>
-                  </VEntityField>
-                  <VEntityField v-permission="['system:themes:manage']">
-                    <template #description>
-                      <VButton
-                        size="sm"
-                        :disabled="creating"
-                        @click="handleCreateTheme(theme)"
-                      >
-                        {{ $t("core.common.buttons.install") }}
-                      </VButton>
-                    </template>
-                  </VEntityField>
-                </template>
-              </VEntity>
-            </li>
-          </ul>
-        </Transition>
-      </VTabItem>
-    </VTabs>
+    />
+
+    <div class="mt-2">
+      <template v-for="tab in tabs" :key="tab.id">
+        <component
+          :is="tab.component"
+          v-bind="tab.props"
+          v-if="tab.id === activeTabId"
+        />
+      </template>
+    </div>
 
     <template #footer>
-      <VSpace>
-        <VButton
-          v-permission="['system:themes:manage']"
-          type="secondary"
-          @click="handleOpenInstallModal()"
-        >
-          {{ $t("core.theme.common.buttons.install") }}
-        </VButton>
-        <VButton @click="onVisibleChange(false)">
-          {{ $t("core.common.buttons.close") }}
-        </VButton>
-      </VSpace>
+      <VButton @click="onVisibleChange(false)">
+        {{ $t("core.common.buttons.close") }}
+      </VButton>
     </template>
   </VModal>
-
-  <ThemeUploadModal
-    v-if="visible"
-    v-model:visible="themeUploadVisible"
-    :upgrade-theme="themeToUpgrade"
-  />
-
-  <ThemePreviewModal
-    v-if="visible"
-    v-model:visible="previewVisible"
-    :theme="selectedPreviewTheme"
-  />
 </template>

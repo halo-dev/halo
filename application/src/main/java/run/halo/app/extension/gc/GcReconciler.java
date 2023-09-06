@@ -10,6 +10,7 @@ import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionConverter;
 import run.halo.app.extension.SchemeManager;
+import run.halo.app.extension.SchemeWatcherManager;
 import run.halo.app.extension.controller.Controller;
 import run.halo.app.extension.controller.ControllerBuilder;
 import run.halo.app.extension.controller.DefaultController;
@@ -29,12 +30,18 @@ class GcReconciler implements Reconciler<GcRequest> {
 
     private final SchemeManager schemeManager;
 
-    GcReconciler(ExtensionClient client, ExtensionStoreClient storeClient,
-        ExtensionConverter converter, SchemeManager schemeManager) {
+    private final SchemeWatcherManager schemeWatcherManager;
+
+    GcReconciler(ExtensionClient client,
+        ExtensionStoreClient storeClient,
+        ExtensionConverter converter,
+        SchemeManager schemeManager,
+        SchemeWatcherManager schemeWatcherManager) {
         this.client = client;
         this.storeClient = storeClient;
         this.converter = converter;
         this.schemeManager = schemeManager;
+        this.schemeWatcherManager = schemeWatcherManager;
     }
 
 
@@ -56,7 +63,7 @@ class GcReconciler implements Reconciler<GcRequest> {
     @Override
     public Controller setupWith(ControllerBuilder builder) {
         var queue = new DefaultQueue<GcRequest>(Instant::now, Duration.ofMillis(500));
-        var synchronizer = new GcSynchronizer(client, queue, schemeManager);
+        var synchronizer = new GcSynchronizer(client, queue, schemeManager, schemeWatcherManager);
         return new DefaultController<>(
             "garbage-collector-controller",
             this,

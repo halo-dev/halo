@@ -10,18 +10,30 @@ import {
 } from "@halo-dev/components";
 import type { Backup } from "@halo-dev/api-client";
 import { relativeTimeTo, formatDatetime } from "@/utils/date";
-import { computed } from "vue";
+import { computed, markRaw } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { useQueryClient } from "@tanstack/vue-query";
 import prettyBytes from "pretty-bytes";
 import { useI18n } from "vue-i18n";
+import { useOperationItemExtensionPoint } from "@/composables/use-operation-extension-points";
+import EntityDropdownItems from "@/components/entity/EntityDropdownItems.vue";
+import { toRefs } from "vue";
+import type { OperationItem } from "@halo-dev/console-shared";
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
 
-const props = defineProps<{
-  backup: Backup;
-}>();
+const props = withDefaults(
+  defineProps<{
+    backup: Backup;
+    showOperations: boolean;
+  }>(),
+  {
+    showOperations: true,
+  }
+);
+
+const { backup } = toRefs(props);
 
 type Phase = {
   text: string;
@@ -94,6 +106,30 @@ function handleDelete() {
     },
   });
 }
+
+const { operationItems } = useOperationItemExtensionPoint<Backup>(
+  "backup:list-item:operation:create",
+  backup,
+  computed((): OperationItem<Backup>[] => [
+    {
+      priority: 10,
+      component: markRaw(VDropdownItem),
+      label: t("core.common.buttons.download"),
+      hidden: props.backup.status?.phase !== "SUCCEEDED",
+      permissions: [],
+      action: () => handleDownload(),
+    },
+    {
+      priority: 20,
+      component: markRaw(VDropdownItem),
+      props: {
+        type: "danger",
+      },
+      label: t("core.common.buttons.delete"),
+      action: () => handleDelete(),
+    },
+  ])
+);
 </script>
 
 <template>
@@ -155,17 +191,10 @@ function handleDelete() {
           </span>
         </template>
       </VEntityField>
+      <slot name="end"></slot>
     </template>
-    <template #dropdownItems>
-      <VDropdownItem
-        v-if="backup.status?.phase === 'SUCCEEDED'"
-        @click="handleDownload"
-      >
-        {{ $t("core.common.buttons.download") }}
-      </VDropdownItem>
-      <VDropdownItem type="danger" @click="handleDelete">
-        {{ $t("core.common.buttons.delete") }}
-      </VDropdownItem>
+    <template v-if="showOperations" #dropdownItems>
+      <EntityDropdownItems :dropdown-items="operationItems" :item="backup" />
     </template>
   </VEntity>
 </template>

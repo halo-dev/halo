@@ -55,6 +55,7 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.extension.controller.Reconciler.Request;
 import run.halo.app.infra.Condition;
 import run.halo.app.infra.ConditionStatus;
+import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
@@ -183,13 +184,6 @@ public class PluginReconciler implements Reconciler<Request> {
         Assert.notNull(name, "Plugin name must not be null");
         Assert.notNull(settingName, "Setting name must not be null");
         PluginWrapper pluginWrapper = getPluginWrapper(name);
-        // If it already exists, do not look for setting
-        if (RuntimeMode.DEPLOYMENT.equals(pluginWrapper.getRuntimeMode())) {
-            Optional<Setting> existing = client.fetch(Setting.class, settingName);
-            if (existing.isPresent()) {
-                return existing;
-            }
-        }
 
         var resourceLoader =
             new DefaultResourceLoader(pluginWrapper.getPluginClassLoader());
@@ -391,9 +385,11 @@ public class PluginReconciler implements Reconciler<Request> {
                 return null;
             });
         } catch (Exception e) {
-            haloPluginManager.stopPlugin(name);
             PluginWrapper pluginWrapper = haloPluginManager.getPlugin(name);
-            pluginWrapper.setPluginState(PluginState.FAILED);
+            if (pluginWrapper != null) {
+                haloPluginManager.stopPlugin(name);
+                pluginWrapper.setPluginState(PluginState.FAILED);
+            }
             throw e;
         }
     }
@@ -614,7 +610,11 @@ public class PluginReconciler implements Reconciler<Request> {
             }
             return pluginPath.toString();
         }
-        return PathUtils.combinePath(pluginsRoot.toString(), pluginPath.toString());
+        var result = pluginsRoot.resolve(pluginPath);
+        if (!isDevelopmentMode(name)) {
+            FileUtils.checkDirectoryTraversal(pluginsRoot, result);
+        }
+        return result.toString();
     }
 
     boolean shouldDeleteFile(String newPluginPath, URI oldPluginLocation) {

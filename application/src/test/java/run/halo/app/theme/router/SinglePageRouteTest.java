@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import java.net.URI;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;
@@ -21,6 +22,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.i18n.SimpleLocaleContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -35,6 +37,7 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.i18n.LocaleContextResolver;
 import org.springframework.web.util.UriUtils;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -68,6 +71,12 @@ class SinglePageRouteTest {
 
     @Mock
     ExtensionClient client;
+
+    @Mock
+    LocaleContextResolver localeContextResolver;
+
+    @Mock
+    TitleVisibilityIdentifyCalculator titleVisibilityIdentifyCalculator;
 
     @InjectMocks
     SinglePageRoute singlePageRoute;
@@ -115,6 +124,8 @@ class SinglePageRouteTest {
                 .build())
             .build();
 
+        when(localeContextResolver.resolveLocaleContext(any()))
+            .thenReturn(new SimpleLocaleContext(Locale.getDefault()));
         webTestClient.get()
             .uri("/archives/fake-name")
             .exchange()

@@ -33,8 +33,6 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.requestbody.Builder;
@@ -556,37 +554,39 @@ public class UserEndpoint implements CustomEndpoint {
             return SortResolver.defaultInstance.resolve(exchange);
         }
 
+        /**
+         * Converts query parameters to user predicate.
+         *
+         * @return user predicate to filter users
+         */
         public Predicate<User> toPredicate() {
-            Predicate<User> displayNamePredicate = user -> {
+            Predicate<User> keywordPredicate = user -> {
                 var keyword = getKeyword();
-                if (!org.springframework.util.StringUtils.hasText(keyword)) {
+                if (StringUtils.isBlank(keyword)) {
                     return true;
                 }
+                var username = user.getMetadata().getName();
                 var displayName = user.getSpec().getDisplayName();
-                if (!org.springframework.util.StringUtils.hasText(displayName)) {
-                    return false;
-                }
-                return displayName.toLowerCase().contains(keyword.trim().toLowerCase());
+                return StringUtils.containsIgnoreCase(displayName, keyword)
+                    || keyword.equalsIgnoreCase(username);
             };
+
             Predicate<User> rolePredicate = user -> {
-                var role = getRole();
-                if (role == null) {
+                var roleName = getRole();
+                if (StringUtils.isBlank(roleName)) {
                     return true;
                 }
-                var annotations = user.getMetadata().getAnnotations();
-                if (annotations == null || !annotations.containsKey(User.ROLE_NAMES_ANNO)) {
+                var roleNamesAnno = MetadataUtil.nullSafeAnnotations(user)
+                    .get(User.ROLE_NAMES_ANNO);
+                if (StringUtils.isBlank(roleNamesAnno)) {
                     return false;
-                } else {
-                    Pattern pattern = Pattern.compile("\\[\"([^\"]*)\"\\]");
-                    Matcher matcher = pattern.matcher(annotations.get(User.ROLE_NAMES_ANNO));
-                    if (matcher.find()) {
-                        return matcher.group(1).equals(role);
-                    } else {
-                        return false;
-                    }
                 }
+                Set<String> roleNames = JsonUtils.jsonToObject(roleNamesAnno,
+                    new TypeReference<>() {
+                    });
+                return roleNames.contains(roleName);
             };
-            return displayNamePredicate
+            return keywordPredicate
                 .and(rolePredicate)
                 .and(labelAndFieldSelectorToPredicate(getLabelSelector(), getFieldSelector()));
         }
