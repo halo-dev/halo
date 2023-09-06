@@ -8,7 +8,6 @@ import {
   VDropdownDivider,
   VButton,
   VSpace,
-  IconMore,
 } from "@halo-dev/components";
 import type { Theme } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
@@ -19,10 +18,10 @@ import { useI18n } from "vue-i18n";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useOperationItemExtensionPoint } from "@/composables/use-operation-extension-points";
 import { markRaw } from "vue";
-import { defineComponent } from "vue";
 import UninstallOperationItem from "./operation/UninstallOperationItem.vue";
 import { computed } from "vue";
 import type { OperationItem } from "@halo-dev/console-shared";
+import MoreOperationItem from "./operation/MoreOperationItem.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -112,15 +111,7 @@ const { operationItems } = useOperationItemExtensionPoint<Theme>(
     },
     {
       priority: 30,
-      component: markRaw(
-        defineComponent({
-          components: {
-            VButton,
-            IconMore,
-          },
-          template: `<VButton size="sm"><IconMore /></VButton>`,
-        })
-      ),
+      component: markRaw(MoreOperationItem),
       permissions: ["system:themes:manage"],
       children: [
         {
@@ -238,13 +229,14 @@ const { operationItems } = useOperationItemExtensionPoint<Theme>(
         </div>
         <div>
           <VSpace v-if="installed">
-            <template v-for="(item, index) in operationItems" :key="index">
+            <template v-for="item in operationItems">
               <template v-if="!item.children?.length">
                 <component
                   :is="item.component"
                   v-if="
                     !item.hidden && currentUserHasPermission(item.permissions)
                   "
+                  :key="`${theme.metadata.name}-${item.label}-${item.priority}`"
                   v-bind="item.props"
                   @click="item.action?.(theme)"
                 >
@@ -256,6 +248,7 @@ const { operationItems } = useOperationItemExtensionPoint<Theme>(
                   v-if="
                     !item.hidden && currentUserHasPermission(item.permissions)
                   "
+                  :key="`${theme.metadata.name}-${item.label}-${item.priority}`"
                 >
                   <component
                     :is="item.component"
@@ -265,16 +258,14 @@ const { operationItems } = useOperationItemExtensionPoint<Theme>(
                     {{ item.label }}
                   </component>
                   <template #popper>
-                    <template
-                      v-for="(childItem, childIndex) in item.children"
-                      :key="`child-${childIndex}`"
-                    >
+                    <template v-for="childItem in item.children">
                       <component
                         :is="childItem.component"
                         v-if="
                           !childItem.hidden &&
                           currentUserHasPermission(childItem.permissions)
                         "
+                        :key="`${theme.metadata.name}-${childItem.label}-${childItem.priority}`"
                         v-bind="childItem.props"
                         @click="childItem.action?.(theme)"
                       >
