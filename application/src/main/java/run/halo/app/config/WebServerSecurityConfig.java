@@ -29,6 +29,7 @@ import run.halo.app.core.extension.service.UserService;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
+import run.halo.app.security.DefaultServerAuthenticationEntryPoint;
 import run.halo.app.security.DefaultUserDetailService;
 import run.halo.app.security.DynamicMatcherSecurityWebFilterChain;
 import run.halo.app.security.authentication.SecurityConfigurer;
@@ -66,7 +67,9 @@ public class WebServerSecurityConfig {
                 spec.principal(AnonymousUserConst.PRINCIPAL);
             })
             .securityContextRepository(securityContextRepository)
-            .httpBasic(withDefaults());
+            .httpBasic(withDefaults())
+            .exceptionHandling(
+                spec -> spec.authenticationEntryPoint(new DefaultServerAuthenticationEntryPoint()));
 
         // Integrate with other configurers separately
         securityConfigurers.orderedStream()
