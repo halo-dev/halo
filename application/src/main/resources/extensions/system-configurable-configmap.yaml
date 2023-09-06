@@ -6,7 +6,8 @@ data:
   user: |
     {
       "allowRegistration": false,
-      "defaultRole": ""
+      "defaultRole": "",
+      "avatarPolicy": "default-policy"
     }
   theme: |
     {
@@ -26,7 +27,17 @@ data:
     }
   post: |
     {
-      "review": false
+      "review": false,
+      "postPageSize": 10,
+      "archivePageSize": 10,
+      "categoryPageSize": 10,
+      "tagPageSize": 10
+    }
+  comment: |
+    {
+      "enable": true,
+      "requireReviewForNew": true,
+      "systemUserOnly": true
     }
   menu: |
     {
