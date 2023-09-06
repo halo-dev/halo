@@ -49,10 +49,18 @@ export function usePluginLifeCycle(
         });
 
       pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
-      await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin({
-        name: pluginToUpdate.metadata.name,
-        plugin: pluginToUpdate,
-      });
+
+      const { data: newPlugin } =
+        await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin({
+          name: pluginToUpdate.metadata.name,
+          plugin: pluginToUpdate,
+        });
+
+      if (newPlugin.spec.enabled) {
+        await checkStartedStatus(newPlugin);
+      }
+
+      return newPlugin;
     },
     retry: 3,
     retryDelay: 1000,
@@ -60,6 +68,33 @@ export function usePluginLifeCycle(
       window.location.reload();
     },
   });
+
+  function checkStartedStatus(plugin: Plugin) {
+    const maxRetry = 5;
+    let retryCount = 0;
+    return new Promise((resolve, reject) => {
+      const check = () => {
+        if (retryCount >= maxRetry) {
+          reject(false);
+          return;
+        }
+        apiClient.extension.plugin
+          .getpluginHaloRunV1alpha1Plugin({ name: plugin.metadata.name })
+          .then((response) => {
+            if (response.data.status?.phase === "STARTED") {
+              resolve(true);
+            } else {
+              setTimeout(check, 1000);
+              retryCount++;
+            }
+          })
+          .catch(() => {
+            reject(false);
+          });
+      };
+      check();
+    });
+  }
 
   const uninstall = (deleteExtensions?: boolean) => {
     if (!plugin?.value) return;
