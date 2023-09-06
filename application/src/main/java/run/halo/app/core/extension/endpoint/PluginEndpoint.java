@@ -249,7 +249,7 @@ public class PluginEndpoint implements CustomEndpoint {
         return pluginService.uglifyJsBundle()
             .defaultIfEmpty("")
             .flatMap(bundle -> ServerResponse.ok()
-                .cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS))
+                .cacheControl(CacheControl.maxAge(7, TimeUnit.DAYS))
                 .contentType(MediaType.valueOf("text/javascript"))
                 .bodyValue(bundle)
             );
@@ -266,7 +266,7 @@ public class PluginEndpoint implements CustomEndpoint {
         }
         return pluginService.uglifyCssBundle()
             .flatMap(bundle -> ServerResponse.ok()
-                .cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS))
+                .cacheControl(CacheControl.maxAge(7, TimeUnit.DAYS))
                 .contentType(MediaType.valueOf("text/css"))
                 .bodyValue(bundle)
             );
