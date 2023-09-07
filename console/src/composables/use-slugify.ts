@@ -19,7 +19,7 @@ const Strategy = {
   },
   timestamp: (value: string) => {
     if (!value) return "";
-    return uid.stamp(32);
+    return new Date().getTime().toString();
   },
 };
 
