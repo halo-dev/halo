@@ -369,6 +369,10 @@ const {
 );
 
 useAutoSaveContent(currentCache, toRef(formState.value.content, "raw"), () => {
+  // Do not save when the setting modal is open
+  if (settingModal.value) {
+    return;
+  }
   handleSave({ mute: true });
 });
 
