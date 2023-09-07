@@ -56,9 +56,7 @@ export function usePluginLifeCycle(
           plugin: pluginToUpdate,
         });
 
-      if (newPlugin.spec.enabled) {
-        await checkStartedStatus(newPlugin);
-      }
+      await checkStatus(newPlugin);
 
       return newPlugin;
     },
@@ -69,7 +67,7 @@ export function usePluginLifeCycle(
     },
   });
 
-  function checkStartedStatus(plugin: Plugin) {
+  function checkStatus(plugin: Plugin) {
     const maxRetry = 5;
     let retryCount = 0;
     return new Promise((resolve, reject) => {
@@ -81,7 +79,12 @@ export function usePluginLifeCycle(
         apiClient.extension.plugin
           .getpluginHaloRunV1alpha1Plugin({ name: plugin.metadata.name })
           .then((response) => {
-            if (response.data.status?.phase === "STARTED") {
+            const { enabled } = response.data.spec;
+            const { phase } = response.data.status || {};
+            if (
+              (enabled && phase === "STARTED") ||
+              (!enabled && phase !== "STARTED")
+            ) {
               resolve(true);
             } else {
               setTimeout(check, 1000);
