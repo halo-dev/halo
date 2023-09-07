@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
@@ -39,6 +40,7 @@ import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.CacheControl;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FormFieldPart;
@@ -70,6 +72,7 @@ import run.halo.app.plugin.PluginNotFoundException;
 @Component
 @AllArgsConstructor
 public class PluginEndpoint implements CustomEndpoint {
+    private static final CacheControl MAX_CACHE_CONTROL = CacheControl.maxAge(365, TimeUnit.DAYS);
 
     private final ReactiveExtensionClient client;
 
@@ -247,6 +250,7 @@ public class PluginEndpoint implements CustomEndpoint {
         return pluginService.uglifyJsBundle()
             .defaultIfEmpty("")
             .flatMap(bundle -> ServerResponse.ok()
+                .cacheControl(MAX_CACHE_CONTROL)
                 .contentType(MediaType.valueOf("text/javascript"))
                 .bodyValue(bundle)
             );
@@ -263,6 +267,7 @@ public class PluginEndpoint implements CustomEndpoint {
         }
         return pluginService.uglifyCssBundle()
             .flatMap(bundle -> ServerResponse.ok()
+                .cacheControl(MAX_CACHE_CONTROL)
                 .contentType(MediaType.valueOf("text/css"))
                 .bodyValue(bundle)
             );
