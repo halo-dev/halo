@@ -294,7 +294,7 @@ const { handleGenerateSlug } = useSlugify(
                     $t('core.post.settings.fields.slug.refresh_message')
                   "
                   class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
-                  @click="handleGenerateSlug(true)"
+                  @click="handleGenerateSlug(true, 'POSTS')"
                 >
                   <IconRefreshLine
                     class="h-4 w-4 text-gray-500 group-hover:text-gray-700"

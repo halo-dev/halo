@@ -22,8 +22,10 @@ const Strategy = {
     return new Date().getTime().toString();
   },
 };
-type FormType = "TAGS" | "CATEGORIES" | "POSTS";
+type FormType = "TAGS" | "CATEGORIES" | "POSTS" | "SINGLEPAGES";
 const onceList = ["shortUUID", "UUID", "timestamp"];
+
+const onlyGenerateNameBytileList = ["TAGS", "CATEGORIES", "SINGLEPAGES"];
 export default function useSlugify(
   source: Ref<string>,
   target: Ref<string>,
@@ -34,26 +36,24 @@ export default function useSlugify(
     () => source.value,
     () => {
       if (auto.value) {
-        if (formType != "POSTS") {
-          handleGenerateSlug(false, true);
-        } else {
-          handleGenerateSlug();
-        }
+        handleGenerateSlug(false, formType);
       }
     }
   );
-
-  const handleGenerateSlug = (
-    forceUpdate = false,
-    onlyGenerateBytitle = false
-  ) => {
+  const isOnlyGenerateBytile = (formType: FormType) => {
+    return onlyGenerateNameBytileList.includes(formType);
+  };
+  const handleGenerateSlug = (forceUpdate = false, formType: FormType) => {
     const globalInfoStore = useGlobalInfoStore();
     const mode: ModeType = globalInfoStore.globalInfo
       ?.postSlugGenerationStrategy as ModeType;
-    if (onlyGenerateBytitle) {
+    const flag = isOnlyGenerateBytile(formType);
+
+    if (flag) {
       target.value = Strategy["generateByTitle"](source.value);
+      return;
     }
-    if (forceUpdate && !onlyGenerateBytitle) {
+    if (forceUpdate) {
       target.value = Strategy[mode](source.value);
       return;
     }
