@@ -72,6 +72,7 @@ import run.halo.app.plugin.PluginNotFoundException;
 @Component
 @AllArgsConstructor
 public class PluginEndpoint implements CustomEndpoint {
+    private static final CacheControl MAX_CACHE_CONTROL = CacheControl.maxAge(365, TimeUnit.DAYS);
 
     private final ReactiveExtensionClient client;
 
@@ -249,7 +250,7 @@ public class PluginEndpoint implements CustomEndpoint {
         return pluginService.uglifyJsBundle()
             .defaultIfEmpty("")
             .flatMap(bundle -> ServerResponse.ok()
-                .cacheControl(CacheControl.maxAge(7, TimeUnit.DAYS))
+                .cacheControl(MAX_CACHE_CONTROL)
                 .contentType(MediaType.valueOf("text/javascript"))
                 .bodyValue(bundle)
             );
@@ -266,7 +267,7 @@ public class PluginEndpoint implements CustomEndpoint {
         }
         return pluginService.uglifyCssBundle()
             .flatMap(bundle -> ServerResponse.ok()
-                .cacheControl(CacheControl.maxAge(7, TimeUnit.DAYS))
+                .cacheControl(MAX_CACHE_CONTROL)
                 .contentType(MediaType.valueOf("text/css"))
                 .bodyValue(bundle)
             );
