@@ -95,7 +95,7 @@ const handleOpenPreview = (theme: Theme) => {
     </Transition>
     <Transition v-else appear name="fade">
       <ul class="box-border h-full w-full space-y-3" role="list">
-        <li v-for="(theme, index) in themes" :key="index">
+        <li v-for="theme in themes" :key="theme.metadata.name">
           <ThemeListItem
             :theme="theme"
             :is-selected="theme.metadata.name === selectedTheme?.metadata?.name"
