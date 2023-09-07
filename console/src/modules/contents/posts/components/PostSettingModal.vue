@@ -240,7 +240,8 @@ const { handleGenerateSlug } = useSlugify(
       formState.value.spec.slug = value;
     },
   }),
-  computed(() => !isUpdateMode.value)
+  computed(() => !isUpdateMode.value),
+  "POSTS"
 );
 </script>
 <template>

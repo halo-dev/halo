@@ -4,9 +4,9 @@ import ShortUniqueId from "short-unique-id";
 import type { ModeType } from "@/types/slug";
 import { useGlobalInfoStore } from "@/stores/global-info";
 const uid = new ShortUniqueId();
-
 const Strategy = {
   generateByTitle: (value: string) => {
+    if (!value) return "";
     return slugify(value, { trim: true });
   },
   shortUUID: (value: string) => {
@@ -22,32 +22,41 @@ const Strategy = {
     return new Date().getTime().toString();
   },
 };
-
+type FormType = "TAGS" | "CATEGORIES" | "POSTS";
 const onceList = ["shortUUID", "UUID", "timestamp"];
 export default function useSlugify(
   source: Ref<string>,
   target: Ref<string>,
-  auto: Ref<boolean>
+  auto: Ref<boolean>,
+  formType: FormType
 ) {
   watch(
     () => source.value,
     () => {
       if (auto.value) {
-        handleGenerateSlug();
+        if (formType != "POSTS") {
+          handleGenerateSlug(false, true);
+        } else {
+          handleGenerateSlug();
+        }
       }
     }
   );
 
-  const handleGenerateSlug = (forceUpdate = false) => {
+  const handleGenerateSlug = (
+    forceUpdate = false,
+    onlyGenerateBytitle = false
+  ) => {
     const globalInfoStore = useGlobalInfoStore();
     const mode: ModeType = globalInfoStore.globalInfo
       ?.postSlugGenerationStrategy as ModeType;
-
-    if (forceUpdate) {
+    if (onlyGenerateBytitle) {
+      target.value = Strategy["generateByTitle"](source.value);
+    }
+    if (forceUpdate && !onlyGenerateBytitle) {
       target.value = Strategy[mode](source.value);
       return;
     }
-
     if (onceList.includes(mode) && target.value) return;
     target.value = Strategy[mode](source.value);
   };
