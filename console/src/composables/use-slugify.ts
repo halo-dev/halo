@@ -1,7 +1,7 @@
 import { slugify } from "transliteration";
 import { watch, type Ref } from "vue";
 import ShortUniqueId from "short-unique-id";
-import type { FormType, ModeType } from "@/types/slug";
+import { FormType, type ModeType } from "@/types/slug";
 import { useGlobalInfoStore } from "@/stores/global-info";
 const uid = new ShortUniqueId();
 const Strategy = {
@@ -44,7 +44,7 @@ export default function useSlugify(
     const globalInfoStore = useGlobalInfoStore();
     const mode: ModeType = globalInfoStore.globalInfo
       ?.postSlugGenerationStrategy as ModeType;
-    if (formType != "Post") {
+    if (formType != FormType.POST) {
       target.value = Strategy["generateByTitle"](source.value);
       return;
     }
