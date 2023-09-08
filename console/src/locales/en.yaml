@@ -618,7 +618,7 @@ core:
         not_installed: Not installed
         local_upload: Local install / upgrade
         remote_download:
-          title: Remote
+          label: Remote
           fields:
             url: Remote URL
       empty:
