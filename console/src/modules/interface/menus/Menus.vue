@@ -29,6 +29,7 @@ import {
 import { useDebounceFn } from "@vueuse/core";
 import { useI18n } from "vue-i18n";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import { provide, type Ref } from "vue";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -38,7 +39,6 @@ const selectedMenu = ref<Menu>();
 const selectedMenuItem = ref<MenuItem>();
 const selectedParentMenuItem = ref<MenuItem>();
 const menuItemEditingModal = ref();
-const menuOriginItems = ref<MenuItem[]>();
 const {
   data: menuItems,
   isLoading,
@@ -60,7 +60,6 @@ const {
     return data.items;
   },
   onSuccess(data) {
-    menuOriginItems.value = data;
     menuTreeItems.value = buildMenuItemsTree(data);
   },
   refetchInterval(data) {
@@ -71,6 +70,8 @@ const {
   },
   enabled: computed(() => !!selectedMenu.value),
 });
+
+provide<Ref<MenuItem[] | undefined>>("menuItems", menuItems);
 
 const handleOpenEditingModal = (menuItem: MenuTreeItem) => {
   apiClient.extension.menuItem
@@ -183,7 +184,6 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
   <MenuItemEditingModal
     v-model:visible="menuItemEditingModal"
     :menu-item="selectedMenuItem"
-    :menu-origin-items="menuOriginItems"
     :parent-menu-item="selectedParentMenuItem"
     :menu="selectedMenu"
     @close="onMenuItemEditingModalClose"

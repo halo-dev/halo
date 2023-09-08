@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import { computed, nextTick, ref, watch } from "vue";
-import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
+import { computed, inject, nextTick, ref, watch, type Ref } from "vue";
+import type { Menu, MenuItem, Ref as ExtensionRef } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
@@ -16,14 +16,12 @@ const props = withDefaults(
     menu?: Menu;
     parentMenuItem: MenuItem;
     menuItem?: MenuItem;
-    menuOriginItems?: MenuItem[];
   }>(),
   {
     visible: false,
     menu: undefined,
     parentMenuItem: undefined,
     menuItem: undefined,
-    menuOriginItems: undefined,
   }
 );
 
@@ -198,10 +196,10 @@ watch(
 interface MenuItemRef {
   label: string;
   inputType?: string;
-  ref?: Ref;
+  ref?: ExtensionRef;
 }
 
-const baseRef: Ref = {
+const baseRef: ExtensionRef = {
   group: "content.halo.run",
   version: "v1alpha1",
   name: "",
@@ -270,6 +268,8 @@ const selectedRefName = ref<string>("");
 const onMenuItemSourceChange = () => {
   selectedRefName.value = "";
 };
+
+const menuOriginItems = inject<Ref<MenuItem[] | undefined>>("menuItems", ref());
 const OriginHref = ref<string>();
 watch(isUpdateMode, (n, o) => {
   if (n === true && o === false) {
@@ -279,11 +279,11 @@ watch(isUpdateMode, (n, o) => {
   OriginHref.value = undefined;
 });
 const warning = computed(() => {
-  if (!props.menuOriginItems) return false;
+  if (!menuOriginItems.value) return false;
   if (!formState.value.spec.href) return false;
-  let menus = props.menuOriginItems;
+  let menus = menuOriginItems.value;
   if (OriginHref.value) {
-    menus = props.menuOriginItems.filter((item) => {
+    menus = menuOriginItems.value.filter((item) => {
       return item.spec.href != OriginHref.value;
     });
   }

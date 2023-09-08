@@ -13,12 +13,10 @@ const props = withDefaults(
   defineProps<{
     visible: boolean;
     menu?: Menu;
-    menus?: Menu[];
   }>(),
   {
     visible: false,
     menu: undefined,
-    menus: undefined,
   }
 );
 
