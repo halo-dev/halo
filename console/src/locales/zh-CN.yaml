@@ -707,9 +707,9 @@ core:
             tag: 标签
         display_name:
           label: 名称
-          warning: 有另一个链接具有相同的地址的链接
         href:
           label: 链接地址
+          exist_warning: 有另一个链接具有相同的地址的链接
         target:
           label: 打开方式
           options:

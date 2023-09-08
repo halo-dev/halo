@@ -707,9 +707,9 @@ core:
             tag: Tag
         display_name:
           label: Display name
-          warning: There is another link with the same href
         href:
           label: Link address
+          exist_warning: There is another link with the same href
         target:
           label: Target
           options:

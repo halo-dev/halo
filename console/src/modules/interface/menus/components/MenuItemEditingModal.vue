@@ -278,7 +278,7 @@ watch(isUpdateMode, (n, o) => {
   }
   OriginHref.value = undefined;
 });
-const warning = computed(() => {
+const hasExistHref = computed(() => {
   if (!menuOriginItems.value) return false;
   if (!formState.value.spec.href) return false;
   let menus = menuOriginItems.value;
@@ -364,10 +364,10 @@ const warning = computed(() => {
               validation="required|length:0,1024"
             >
               <template #help>
-                <span v-show="warning" class="text-xs text-orange-600">
+                <span v-show="hasExistHref" class="text-xs text-orange-600">
                   {{
                     t(
-                      "core.menu.menu_item_editing_modal.fields.display_name.warning"
+                      "core.menu.menu_item_editing_modal.fields.href.exist_warning"
                     )
                   }}</span
                 >
