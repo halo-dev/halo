@@ -41,7 +41,7 @@ export default function useSlugify(
     }
   );
   const isOnlyGenerateBytile = (formType: FormType) => {
-    return onlyGenerateNameBytileList.includes(formType);
+    return onlyGenerateNameByTileList.includes(formType);
   };
   const handleGenerateSlug = (forceUpdate = false, formType: FormType) => {
     const globalInfoStore = useGlobalInfoStore();
