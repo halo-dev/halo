@@ -3,6 +3,7 @@ import { watch, type Ref } from "vue";
 import ShortUniqueId from "short-unique-id";
 import { FormType, type ModeType } from "@/types/slug";
 import { useGlobalInfoStore } from "@/stores/global-info";
+import { randomUUID } from "@/utils/id";
 const uid = new ShortUniqueId();
 const Strategy = {
   generateByTitle: (value: string) => {
@@ -15,7 +16,7 @@ const Strategy = {
   },
   UUID: (value: string) => {
     if (!value) return "";
-    return uid.randomUUID(16);
+    return randomUUID();
   },
   timestamp: (value: string) => {
     if (!value) return "";
