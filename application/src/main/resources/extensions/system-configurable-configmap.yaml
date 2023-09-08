@@ -31,14 +31,14 @@ data:
       "postPageSize": 10,
       "archivePageSize": 10,
       "categoryPageSize": 10,
-      "tagPageSize": 10
+      "tagPageSize": 10,
+      "slugGenerationStrategy": "generateByTitle"
     }
   comment: |
     {
       "enable": true,
       "requireReviewForNew": true,
-      "systemUserOnly": true,
-      "slugGenerationStrategy": "generateByTitle"
+      "systemUserOnly": true
     }
   menu: |
     {
