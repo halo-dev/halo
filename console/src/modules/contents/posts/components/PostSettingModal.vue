@@ -19,6 +19,7 @@ import { submitForm } from "@formkit/core";
 import useSlugify from "@/composables/use-slugify";
 import { useI18n } from "vue-i18n";
 import { usePostUpdateMutate } from "../composables/use-post-update-mutate";
+import { FormType } from "@/types/slug";
 
 const initialFormState: Post = {
   spec: {
@@ -241,7 +242,7 @@ const { handleGenerateSlug } = useSlugify(
     },
   }),
   computed(() => !isUpdateMode.value),
-  "POSTS"
+  FormType.POST
 );
 </script>
 <template>
@@ -294,7 +295,7 @@ const { handleGenerateSlug } = useSlugify(
                     $t('core.post.settings.fields.slug.refresh_message')
                   "
                   class="group flex h-full cursor-pointer items-center border-l px-3 transition-all hover:bg-gray-100"
-                  @click="handleGenerateSlug(true, 'POSTS')"
+                  @click="handleGenerateSlug(true, FormType.POST)"
                 >
                   <IconRefreshLine
                     class="h-4 w-4 text-gray-500 group-hover:text-gray-700"

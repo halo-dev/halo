@@ -1,7 +1,7 @@
 import { slugify } from "transliteration";
 import { watch, type Ref } from "vue";
 import ShortUniqueId from "short-unique-id";
-import type { ModeType } from "@/types/slug";
+import type { FormType, ModeType } from "@/types/slug";
 import { useGlobalInfoStore } from "@/stores/global-info";
 const uid = new ShortUniqueId();
 const Strategy = {
@@ -22,10 +22,9 @@ const Strategy = {
     return new Date().getTime().toString();
   },
 };
-type FormType = "TAGS" | "CATEGORIES" | "POSTS" | "SINGLEPAGES";
+
 const onceList = ["shortUUID", "UUID", "timestamp"];
 
-const onlyGenerateNameByTileList = ["TAGS", "CATEGORIES", "SINGLEPAGES"];
 export default function useSlugify(
   source: Ref<string>,
   target: Ref<string>,
@@ -40,16 +39,12 @@ export default function useSlugify(
       }
     }
   );
-  const isOnlyGenerateBytile = (formType: FormType) => {
-    return onlyGenerateNameByTileList.includes(formType);
-  };
+
   const handleGenerateSlug = (forceUpdate = false, formType: FormType) => {
     const globalInfoStore = useGlobalInfoStore();
     const mode: ModeType = globalInfoStore.globalInfo
       ?.postSlugGenerationStrategy as ModeType;
-    const flag = isOnlyGenerateBytile(formType);
-
-    if (flag) {
+    if (formType != "Post") {
       target.value = Strategy["generateByTitle"](source.value);
       return;
     }
