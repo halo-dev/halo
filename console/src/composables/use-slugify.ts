@@ -25,7 +25,7 @@ const Strategy = {
 type FormType = "TAGS" | "CATEGORIES" | "POSTS" | "SINGLEPAGES";
 const onceList = ["shortUUID", "UUID", "timestamp"];
 
-const onlyGenerateNameBytileList = ["TAGS", "CATEGORIES", "SINGLEPAGES"];
+const onlyGenerateNameByTileList = ["TAGS", "CATEGORIES", "SINGLEPAGES"];
 export default function useSlugify(
   source: Ref<string>,
   target: Ref<string>,
