@@ -3,6 +3,8 @@ import { createI18n } from "vue-i18n";
 // @ts-ignore
 import en from "./en.yaml";
 // @ts-ignore
+import es from "./es.yaml";
+// @ts-ignore
 import zhCN from "./zh-CN.yaml";
 // @ts-ignore
 import zhTW from "./zh-TW.yaml";
@@ -17,6 +19,11 @@ export const locales = [
     name: "English",
     code: "en-US",
     package: en,
+  },
+  {
+    name: "Español",
+    code: "es",
+    package: es,
   },
   {
     name: "简体中文",

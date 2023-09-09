@@ -3,12 +3,18 @@ package run.halo.app.core.extension.service.impl;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 import com.github.zafarkhaja.semver.Version;
+import com.google.common.hash.Hashing;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
@@ -37,6 +43,7 @@ import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginProperties;
 import run.halo.app.plugin.PluginUtils;
 import run.halo.app.plugin.YamlPluginFinder;
+import run.halo.app.plugin.resources.BundleResourceUtils;
 
 @Slf4j
 @Component
@@ -122,6 +129,70 @@ public class PluginServiceImpl implements PluginService {
                 "The given plugin with name " + name + " was not found."));
         }
         return updateReloadAnno(name, pluginWrapper.getPluginPath());
+    }
+
+    @Override
+    public Mono<String> uglifyJsBundle() {
+        return Mono.fromSupplier(() -> {
+            StringBuilder jsBundle = new StringBuilder();
+            List<String> pluginNames = new ArrayList<>();
+            for (PluginWrapper pluginWrapper : pluginManager.getStartedPlugins()) {
+                String pluginName = pluginWrapper.getPluginId();
+                pluginNames.add(pluginName);
+                Resource jsBundleResource =
+                    BundleResourceUtils.getJsBundleResource(pluginManager, pluginName,
+                        BundleResourceUtils.JS_BUNDLE);
+                if (jsBundleResource != null) {
+                    try {
+                        jsBundle.append(
+                            jsBundleResource.getContentAsString(StandardCharsets.UTF_8));
+                        jsBundle.append("\n");
+                    } catch (IOException e) {
+                        log.error("Failed to read js bundle of plugin [{}]", pluginName, e);
+                    }
+                }
+            }
+
+            String plugins = """
+                this.enabledPluginNames = [%s];
+                """.formatted(pluginNames.stream()
+                .collect(Collectors.joining("','", "'", "'")));
+            return jsBundle + plugins;
+        });
+    }
+
+    @Override
+    public Mono<String> uglifyCssBundle() {
+        return Mono.fromSupplier(() -> {
+            StringBuilder cssBundle = new StringBuilder();
+            for (PluginWrapper pluginWrapper : pluginManager.getStartedPlugins()) {
+                String pluginName = pluginWrapper.getPluginId();
+                Resource cssBundleResource =
+                    BundleResourceUtils.getJsBundleResource(pluginManager, pluginName,
+                        BundleResourceUtils.CSS_BUNDLE);
+                if (cssBundleResource != null) {
+                    try {
+                        cssBundle.append(
+                            cssBundleResource.getContentAsString(StandardCharsets.UTF_8));
+                    } catch (IOException e) {
+                        log.error("Failed to read css bundle of plugin [{}]", pluginName, e);
+                    }
+                }
+            }
+            return cssBundle.toString();
+        });
+    }
+
+    @Override
+    public Mono<String> generateJsBundleVersion() {
+        return Mono.fromSupplier(() -> {
+            var compactVersion = pluginManager.getStartedPlugins()
+                .stream()
+                .sorted(Comparator.comparing(PluginWrapper::getPluginId))
+                .map(pluginWrapper -> pluginWrapper.getDescriptor().getVersion())
+                .collect(Collectors.joining());
+            return Hashing.sha256().hashUnencodedChars(compactVersion).toString();
+        });
     }
 
     Mono<Plugin> findPluginManifest(Path path) {

@@ -41,13 +41,14 @@ public class DefaultUserDetailService
             .onErrorMap(UserNotFoundException.class,
                 e -> new BadCredentialsException("Invalid Credentials"))
             .flatMap(user -> {
-                var subject = new Subject(KIND, username, GROUP);
+                var name = user.getMetadata().getName();
+                var subject = new Subject(KIND, name, GROUP);
                 return roleService.listRoleRefs(subject)
                     .filter(this::isRoleRef)
                     .map(RoleRef::getName)
                     .collectList()
                     .map(roleNames -> User.builder()
-                        .username(username)
+                        .username(name)
                         .password(user.getSpec().getPassword())
                         .roles(roleNames.toArray(new String[0]))
                         .build());

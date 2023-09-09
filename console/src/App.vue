@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import { RouterView, useRoute } from "vue-router";
-import { computed, watch, ref, reactive, onMounted, inject } from "vue";
+import { computed, watch, reactive, onMounted, inject } from "vue";
 import { useTitle } from "@vueuse/core";
 import { useFavicon } from "@vueuse/core";
 import { useSystemConfigMapStore } from "./stores/system-configmap";
 import { storeToRefs } from "pinia";
-import axios from "axios";
 import { useI18n } from "vue-i18n";
 import {
   useOverlayScrollbars,
@@ -14,10 +13,12 @@ import {
 import type { FormKitConfig } from "@formkit/core";
 import { i18n } from "./locales";
 import { AppName } from "./constants/app";
+import { useGlobalInfoStore } from "./stores/global-info";
 
 const { t } = useI18n();
 
 const { configMap } = storeToRefs(useSystemConfigMapStore());
+const globalInfoStore = useGlobalInfoStore();
 
 const route = useRoute();
 const title = useTitle();
@@ -36,19 +37,6 @@ watch(
 
 // Favicon
 const defaultFavicon = "/console/favicon.ico";
-const globalInfoFavicon = ref("");
-
-(async () => {
-  const { data } = await axios.get(
-    `${import.meta.env.VITE_API_URL}/actuator/globalinfo`,
-    {
-      withCredentials: true,
-    }
-  );
-  if (data?.favicon) {
-    globalInfoFavicon.value = data.favicon;
-  }
-})();
 
 const favicon = computed(() => {
   if (configMap?.value?.data?.["basic"]) {
@@ -59,8 +47,8 @@ const favicon = computed(() => {
     }
   }
 
-  if (globalInfoFavicon.value) {
-    return globalInfoFavicon.value;
+  if (globalInfoStore.globalInfo?.favicon) {
+    return globalInfoStore.globalInfo.favicon;
   }
 
   return defaultFavicon;

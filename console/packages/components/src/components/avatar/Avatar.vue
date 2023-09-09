@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { IconErrorWarning } from "../../icons/icons";
 import type { Size } from "./interface";
 
@@ -24,21 +24,9 @@ const props = withDefaults(
 
 const isLoading = ref(false);
 const error = ref(false);
+let init = true;
 
-const loadImage = async () => {
-  if (!props.src) {
-    return Promise.reject();
-  }
-
-  const image = new Image();
-  image.src = props.src;
-  return new Promise((resolve, reject) => {
-    image.onload = () => resolve(image);
-    image.onerror = (err) => reject(err);
-  });
-};
-
-onMounted(async () => {
+const loadImage = async (isInit: boolean) => {
   if (!props.src) {
     error.value = true;
     return;
@@ -46,12 +34,34 @@ onMounted(async () => {
 
   isLoading.value = true;
   try {
-    await loadImage();
+    if (!props.src) {
+      error.value = true;
+      return Promise.reject();
+    }
+    if (!isInit) {
+      error.value = false;
+    }
+    const image = new Image();
+    image.src = props.src;
+    return new Promise((resolve, reject) => {
+      image.onload = () => resolve(image);
+      image.onerror = (err) => {
+        error.value = true;
+        reject(err);
+      };
+    });
   } catch (e) {
     error.value = true;
   } finally {
     isLoading.value = false;
   }
+};
+
+watch([() => props.alt, () => props.src], async () => loadImage(init));
+
+onMounted(async () => {
+  loadImage(init);
+  init = false;
 });
 
 const classes = computed(() => {

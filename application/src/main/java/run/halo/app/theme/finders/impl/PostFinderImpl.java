@@ -1,7 +1,5 @@
 package run.halo.app.theme.finders.impl;
 
-import static run.halo.app.theme.finders.PostPublicQueryService.FIXED_PREDICATE;
-
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -32,6 +30,7 @@ import run.halo.app.theme.finders.vo.NavigationPostVo;
 import run.halo.app.theme.finders.vo.PostArchiveVo;
 import run.halo.app.theme.finders.vo.PostArchiveYearMonthVo;
 import run.halo.app.theme.finders.vo.PostVo;
+import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
 
 /**
  * A finder for {@link Post}.
@@ -43,17 +42,20 @@ import run.halo.app.theme.finders.vo.PostVo;
 @AllArgsConstructor
 public class PostFinderImpl implements PostFinder {
 
-
     private final ReactiveExtensionClient client;
 
     private final PostPublicQueryService postPublicQueryService;
 
+    private final ReactiveQueryPostPredicateResolver postPredicateResolver;
+
     @Override
     public Mono<PostVo> getByName(String postName) {
-        return client.get(Post.class, postName)
-            .filter(FIXED_PREDICATE)
-            .flatMap(post -> postPublicQueryService.convertToVo(post,
-                post.getSpec().getReleaseSnapshot())
+        return postPredicateResolver.getPredicate()
+            .flatMap(predicate -> client.get(Post.class, postName)
+                .filter(predicate)
+                .flatMap(post -> postPublicQueryService.convertToVo(post,
+                    post.getSpec().getReleaseSnapshot())
+                )
             );
     }
 
@@ -65,7 +67,10 @@ public class PostFinderImpl implements PostFinder {
     @Override
     public Mono<NavigationPostVo> cursor(String currentName) {
         // TODO Optimize the post names query here
-        return client.list(Post.class, FIXED_PREDICATE, defaultComparator())
+        return postPredicateResolver.getPredicate()
+            .flatMapMany(postPredicate ->
+                client.list(Post.class, postPredicate, defaultComparator())
+            )
             .map(post -> post.getMetadata().getName())
             .collectList()
             .flatMap(postNames -> Mono.just(NavigationPostVo.builder())
@@ -98,7 +103,8 @@ public class PostFinderImpl implements PostFinder {
 
     @Override
     public Flux<ListedPostVo> listAll() {
-        return client.list(Post.class, FIXED_PREDICATE, defaultComparator())
+        return postPredicateResolver.getPredicate()
+            .flatMapMany(predicate -> client.list(Post.class, predicate, defaultComparator()))
             .concatMap(postPublicQueryService::convertToListedVo);
     }
 

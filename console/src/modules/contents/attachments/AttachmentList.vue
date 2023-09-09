@@ -34,7 +34,6 @@ import { formatDatetime } from "@/utils/date";
 import prettyBytes from "pretty-bytes";
 import { useFetchAttachmentPolicy } from "./composables/use-attachment-policy";
 import { useAttachmentControl } from "./composables/use-attachment";
-import AttachmentFileTypeIcon from "./components/AttachmentFileTypeIcon.vue";
 import { apiClient } from "@/utils/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { isImage } from "@/utils/image";
@@ -42,6 +41,7 @@ import { useRouteQuery } from "@vueuse/router";
 import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
 import { usePermission } from "@/utils/permission";
 import { useI18n } from "vue-i18n";
+import { useLocalStorage } from "@vueuse/core";
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
 
 const { currentUserHasPermission } = usePermission();
@@ -196,7 +196,7 @@ const viewTypes = [
   },
 ];
 
-const viewType = useRouteQuery<string>("view", "list");
+const viewType = useLocalStorage("attachment-view-type", "list");
 
 // Route query action
 const routeQueryAction = useRouteQuery<string | undefined>("action");

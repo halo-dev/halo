@@ -1,0 +1,1276 @@
+core:
+  login:
+    title: Inicio de sesión
+    fields:
+      username:
+        placeholder: Usuario
+      password:
+        placeholder: Contraseña
+    operations:
+      submit:
+        toast_success: Inicio de sesión exitoso
+        toast_failed: Error en el inicio de sesión, nombre de usuario o contraseña incorrectos
+        toast_csrf: Token CSRF no válido, por favor inténtalo de nuevo
+      signup:
+        label: No tienes una cuenta
+        button: Registrarse ahora
+      return_login:
+        label: Ya tienes una cuenta
+        button: Iniciar sesión ahora
+      return_site: Volver a la página de inicio
+    button: Iniciar sesión
+    modal:
+      title: Volver a iniciar sesión
+  signup:
+    title: Registrarse
+    fields:
+      username:
+        placeholder: Nombre de usuario
+      display_name:
+        placeholder: Nombre para mostrar
+      password:
+        placeholder: Contraseña
+      password_confirm:
+        placeholder: Confirmar contraseña
+    operations:
+      submit:
+        button: Registrarse
+        toast_success: Registrado exitosamente
+  binding:
+    title: Vinculación de cuentas
+    common:
+      toast:
+        mounted: El método de inicio de sesión actual no está vinculado a una cuenta. Por favor, vincula o registra una nueva cuenta primero.
+    operations:
+      login_and_bind:
+        button: Iniciar sesión y vincular
+      signup_and_bind:
+        button: Registrarse y vincular
+      bind:
+        toast_success: Vinculación exitosa
+        toast_failed: Vinculación fallida, no se encontró ningún método de inicio de sesión habilitado.
+  sidebar:
+    search:
+      placeholder: Buscar
+    menu:
+      groups:
+        content: Contenido
+        interface: Interfaz
+        system: Sistema
+        tool: Herramienta
+      items:
+        dashboard: Panel de control
+        posts: Publicaciones
+        single_pages: Páginas
+        comments: Comentarios
+        attachments: Archivos adjuntos
+        themes: Temas
+        menus: Menús
+        plugins: Complementos
+        users: Usuarios
+        settings: Configuraciones
+        actuator: Actuador
+        backup: Respaldo
+    operations:
+      logout:
+        button: Cerrar sesión
+        title: ¿Estás seguro de que deseas cerrar sesión?
+      profile:
+        button: Perfil
+      visit_homepage:
+        title: Visitar página de inicio
+  dashboard:
+    title: Panel de control
+    actions:
+      setting: Configuración
+      done: Hecho
+      add_widget: Agregar Widget
+    widgets:
+      modal_title: Widgets
+      groups:
+        post: Publicación
+        page: Página
+        comment: Comentario
+        user: Usuario
+        other: Otros
+      presets:
+        post_stats:
+          title: Publicaciones
+        page_stats:
+          title: Páginas
+        recent_published:
+          title: Publicaciones Recientes
+          visits: "{visits} Visitas"
+          comments: "{comments} Comentarios"
+        quicklink:
+          title: Enlace Rápido
+          actions:
+            user_profile:
+              title: Perfil de Usuario
+            view_site:
+              title: Ver Sitio
+            new_post:
+              title: Nueva Publicación
+            new_page:
+              title: Nueva Página
+            upload_attachment:
+              title: Subir Archivo Adjunto
+            theme_manage:
+              title: Administrar Temas
+            plugin_manage:
+              title: Administrar Complementos
+            new_user:
+              title: Nuevo Usuario
+            refresh_search_engine:
+              title: Actualizar Motor de Búsqueda
+              dialog_title: ¿Deseas actualizar el índice del motor de búsqueda?
+              dialog_content: Esta operación recreará los índices del motor de búsqueda para todas las publicaciones publicadas.
+              success_message: Índice del motor de búsqueda actualizado exitosamente.
+            evict_page_cache:
+              title: Actualizar Caché de Página
+              dialog_title: ¿Deseas actualizar el caché de las páginas?
+              dialog_content: Esta operación borrará la caché de todas las páginas.
+              success_message: Caché de página actualizada exitosamente.
+        user_stats:
+          title: Usuarios
+        comment_stats:
+          title: Comentarios
+        views_stats:
+          title: Visitas
+  post:
+    title: Publicaciones
+    actions:
+      categories: Categorías
+      tags: Etiquetas
+      recycle_bin: Papelera de reciclaje
+    empty:
+      title: No hay publicaciones actualmente.
+      message: Puedes intentar actualizar o crear una nueva publicación.
+    operations:
+      delete:
+        title: ¿Estás seguro de que deseas eliminar esta publicación?
+        description: Esta operación moverá la publicación a la papelera de reciclaje, y podrá ser restaurada desde la papelera de reciclaje posteriormente.
+      delete_in_batch:
+        title: ¿Estás seguro de que deseas eliminar las publicaciones seleccionadas?
+        description: Esta operación moverá las publicaciones a la papelera de reciclaje, y podrán ser restauradas desde la papelera de reciclaje posteriormente.
+    filters:
+      status:
+        items:
+          published: Publicado
+          draft: Borrador
+      visible:
+        label: Visible
+        result: "Visible: {visible}"
+        items:
+          public: Público
+          private: Privado
+      category:
+        label: Categoría
+        result: "Categoría: {category}"
+      tag:
+        label: Etiqueta
+        result: "Etiqueta: {tag}"
+      author:
+        label: Autor
+        result: "Autor: {author}"
+      sort:
+        items:
+          publish_time_desc: Publicado más reciente
+          publish_time_asc: Publicado más antiguo
+          create_time_desc: Creado más reciente
+          create_time_asc: Creado más antiguo
+    list:
+      fields:
+        categories: "Categorías:"
+        visits: "{visits} Visitas"
+        comments: "{comments} Comentarios"
+        pinned: Fijado
+    settings:
+      title: Configuraciones
+      groups:
+        general: General
+        advanced: Avanzado
+        annotations: Anotaciones
+      fields:
+        title:
+          label: Título
+        slug:
+          label: Slug
+          help: Usualmente usado para generar el enlace permanente a las publicaciones
+          refresh_message: Regenerar slug basado en el título.
+        categories:
+          label: Categorías
+        tags:
+          label: Etiquetas
+        auto_generate_excerpt:
+          label: Generar Extracto Automáticamente
+        raw_excerpt:
+          label: Extracto
+        allow_comment:
+          label: Permitir Comentarios
+        pinned:
+          label: Fijado
+        visible:
+          label: Visible
+        publish_time:
+          label: Hora de Publicación
+        template:
+          label: Plantilla
+        cover:
+          label: Portada
+  deleted_post:
+    title: Publicaciones eliminadas
+    empty:
+      title: No se han colocado publicaciones en la papelera de reciclaje.
+      message: Puedes intentar actualizar o volver a la página anterior.
+    operations:
+      delete:
+        title: ¿Estás seguro de que deseas eliminar permanentemente esta publicación?
+        description: Después de la eliminación, no será posible recuperarla.
+      delete_in_batch:
+        title: ¿Estás seguro de que deseas eliminar permanentemente las publicaciones seleccionadas?
+        description: Después de la eliminación, no será posible recuperarlas.
+      recovery:
+        title: ¿Quieres restaurar esta publicación?
+        description: Esta operación restaurará la publicación a su estado antes de la eliminación.
+      recovery_in_batch:
+        title: ¿Estás seguro de que deseas restaurar las publicaciones seleccionadas?
+        description: Esta operación restaurará las publicaciones a su estado antes de la eliminación.
+  post_editor:
+    title: Edición de publicación
+    untitled: Publicación sin título
+  post_tag:
+    title: Etiquetas de publicación
+    header:
+      title: "{count} Etiquetas"
+    empty:
+      title: No hay etiquetas actualmente.
+      message: Puedes intentar actualizar o crear una nueva etiqueta.
+    operations:
+      delete:
+        title: ¿Estás seguro de que deseas eliminar esta etiqueta?
+        description: Después de eliminar esta etiqueta, se eliminará la asociación con el artículo correspondiente. Esta operación no se puede deshacer.
+    editing_modal:
+      titles:
+        update: Actualizar etiqueta de publicación
+        create: Crear etiqueta de publicación
+      groups:
+        general: General
+        annotations: Anotaciones
+      fields:
+        display_name:
+          label: Nombre para mostrar
+        slug:
+          label: Slug
+          help: Usualmente utilizado para generar el enlace permanente de las etiquetas
+          refresh_message: Regenerar slug basado en el nombre para mostrar.
+        color:
+          label: Color
+          help: Se requiere adaptación del tema para ser compatible
+        cover:
+          label: Portada
+          help: Se requiere adaptación del tema para ser compatible
+  post_category:
+    title: Categorías de publicación
+    header:
+      title: "{count} Categorías"
+    empty:
+      title: No hay categorías actualmente.
+      message: Puedes intentar actualizar o crear una nueva categoría.
+    operations:
+      delete:
+        title: ¿Estás seguro de que deseas eliminar esta categoría?
+        description: Después de eliminar esta categoría, se eliminará la asociación con los artículos correspondientes. Esta operación no se puede deshacer.
+      add_sub_category:
+        button: Agregar subcategoría
+    editing_modal:
+      titles:
+        update: Actualizar categoría de publicación
+        create: Crear categoría de publicación
+      groups:
+        general: General
+        annotations: Anotaciones
+      fields:
+        parent:
+          label: Padre
+        display_name:
+          label: Nombre para mostrar
+        slug:
+          label: Slug
+          help: Usualmente utilizado para generar el enlace permanente de las categorías
+          refresh_message: Regenerar slug basado en el nombre para mostrar.
+        template:
+          label: Plantilla personalizada
+        cover:
+          label: Portada
+          help: Se requiere adaptación del tema para ser compatible
+        description:
+          label: Descripción
+          help: Se requiere adaptación del tema para ser compatible
+  page:
+    title: Páginas
+    actions:
+      recycle_bin: Papelera de reciclaje
+    empty:
+      title: No hay páginas actualmente.
+      message: Puedes intentar actualizar o crear una nueva página.
+    operations:
+      delete:
+        title: ¿Estás seguro de que deseas eliminar esta página?
+        description: Esta operación moverá la página a la papelera de reciclaje, y podrá ser restaurada desde la papelera de reciclaje posteriormente.
+      delete_in_batch:
+        title: ¿Estás seguro de que deseas eliminar las páginas seleccionadas?
+        description: Esta operación moverá las páginas a la papelera de reciclaje, y podrá ser restaurada desde la papelera de reciclaje posteriormente.
+    filters:
+      status:
+        items:
+          published: Publicado
+          draft: Borrador
+      visible:
+        label: Visible
+        result: "Visible: {visible}"
+        items:
+          public: Público
+          private: Privado
+      author:
+        label: Autor
+        result: "Autor: {author}"
+      sort:
+        items:
+          publish_time_desc: Publicado más reciente
+          publish_time_asc: Publicado más antiguo
+          create_time_desc: Creado más reciente
+          create_time_asc: Creado más antiguo
+    list:
+      fields:
+        visits: "{visits} Visitas"
+        comments: "{comments} Comentarios"
+    settings:
+      title: Configuraciones
+      groups:
+        general: General
+        advanced: Avanzado
+        annotations: Anotaciones
+      fields:
+        title:
+          label: Título
+        slug:
+          label: Slug
+          help: Usualmente utilizado para generar el enlace permanente de las páginas
+          refresh_message: Regenerar slug basado en el título.
+        auto_generate_excerpt:
+          label: Generar Extracto Automáticamente
+        raw_excerpt:
+          label: Extracto
+        allow_comment:
+          label: Permitir Comentarios
+        pinned:
+          label: Fijado
+        visible:
+          label: Visible
+        publish_time:
+          label: Hora de Publicación
+        template:
+          label: Plantilla
+        cover:
+          label: Portada
+  deleted_page:
+    title: Páginas Eliminadas
+    empty:
+      title: No hay páginas en la papelera de reciclaje.
+      message: Puedes intentar actualizar o volver a la página anterior.
+    operations:
+      delete:
+        title: ¿Estás seguro de que deseas eliminar permanentemente esta página?
+        description: Después de la eliminación, no será posible recuperarla.
+      delete_in_batch:
+        title: ¿Estás seguro de que deseas eliminar permanentemente las páginas seleccionadas?
+        description: Después de la eliminación, no será posible recuperarlas.
+      recovery:
+        title: ¿Quieres restaurar esta página?
+        description: Esta operación restaurará la página a su estado antes de la eliminación.
+      recovery_in_batch:
+        title: ¿Estás seguro de que deseas restaurar las páginas seleccionadas?
+        description: Esta operación restaurará las páginas a su estado antes de la eliminación.
+  page_editor:
+    title: Edición de Página
+    untitled: Página Sin Título
+  comment:
+    title: Comentarios
+    empty:
+      title: No hay comentarios actualmente.
+      message: Puedes intentar actualizar o modificar los criterios de filtrado.
+    reply_empty:
+      title: No hay respuestas actualmente.
+      message: Puedes intentar actualizar o crear una nueva respuesta.
+      new: Nueva Respuesta
+    operations:
+      delete_comment:
+        title: ¿Estás seguro de que deseas eliminar este comentario?
+        description: Todas las respuestas bajo los comentarios se eliminarán al mismo tiempo, y esta operación no se puede deshacer.
+      delete_comment_in_batch:
+        title: ¿Estás seguro de que deseas eliminar los comentarios seleccionados?
+        description: Todas las respuestas bajo los comentarios se eliminarán al mismo tiempo, y esta operación no se puede deshacer.
+      approve_comment_in_batch:
+        button: Aprobar
+        title: ¿Estás seguro de que deseas aprobar los comentarios seleccionados para su revisión?
+      approve_applies_in_batch:
+        button: Aprobar todas las respuestas
+        title: ¿Estás seguro de que deseas aprobar todas las respuestas a este comentario para su revisión?
+      delete_reply:
+        title: ¿Estás seguro de que deseas eliminar esta respuesta?
+      approve_reply:
+        button: Aprobar
+      reply:
+        button: Responder
+    filters:
+      status:
+        items:
+          approved: Aprobado
+          pending_review: Pendiente de Revisión
+      owner:
+        label: Propietario
+        result: "Propietario: {owner}"
+      sort:
+        items:
+          last_reply_time_desc: Respuesta Reciente
+          last_reply_time_asc: Respuesta Antigua
+          reply_count_desc: Más Respuestas
+          reply_count_asc: Menos Respuestas
+          create_time_desc: Creado más reciente
+          create_time_asc: Creado más antiguo
+    list:
+      fields:
+        reply_count: "{count} Respuestas"
+        has_new_replies: Nuevas respuestas
+        pending_review: Pendiente de revisión
+    subject_refs:
+      post: Publicación
+      page: Página
+      unknown: Desconocido
+    reply_modal:
+      title: Respuesta
+      fields:
+        content:
+          label: Contenido
+      operations:
+        submit:
+          toast_success: Respuesta enviada exitosamente
+  attachment:
+    title: Adjuntos
+    common:
+      text:
+        ungrouped: Sin grupo
+    actions:
+      storage_policies: Políticas de Almacenamiento
+    empty:
+      title: No hay adjuntos en el grupo actual.
+      message: El grupo actual no tiene adjuntos, puedes intentar actualizar o cargar adjuntos.
+      actions:
+        upload: Cargar Adjunto
+    operations:
+      delete:
+        title: ¿Estás seguro de que deseas eliminar este adjunto?
+      delete_in_batch:
+        title: ¿Estás seguro de que deseas eliminar los adjuntos seleccionados?
+      deselect_items:
+        button: Deseleccionar ítems
+      move:
+        button: Mover
+        toast_success: Movimiento exitoso
+    filters:
+      storage_policy:
+        label: Política de Almacenamiento
+        result: "Política de Almacenamiento: {storage_policy}"
+      owner:
+        label: Propietario
+        result: "Propietario: {owner}"
+      sort:
+        items:
+          create_time_desc: Cargado más reciente
+          create_time_asc: Cargado más antiguo
+          size_desc: Ordenar por tamaño descendente
+          size_asc: Ordenar por tamaño ascendente
+      view_type:
+        items:
+          grid: Modo Cuadrícula
+          list: Modo Lista
+    detail_modal:
+      title: "Adjunto: {display_name}"
+      fields:
+        preview: Vista Previa
+        storage_policy: Política de Almacenamiento
+        group: Grupo
+        display_name: Nombre para Mostrar
+        media_type: Tipo de Medio
+        size: Tamaño
+        owner: Propietario
+        creation_time: Hora de Creación
+        permalink: Enlace Permanente
+      preview:
+        click_to_exit: Haz clic para salir de la vista previa
+        video_not_support: El navegador actual no admite la reproducción de video.
+        audio_not_support: El navegador actual no admite la reproducción de audio.
+        not_support: Este archivo no admite la vista previa.
+    group_editing_modal:
+      titles:
+        create: Crear grupo de adjuntos
+        update: Actualizar grupo de adjuntos
+      fields:
+        display_name:
+          label: Nombre para Mostrar
+    group_list:
+      internal_groups:
+        all: Todo
+      operations:
+        rename:
+          button: Cambiar nombre
+        delete:
+          button: Y mover adjunto a sin grupo
+          title: ¿Estás seguro de que deseas eliminar este grupo?
+          description: El grupo se eliminará, y los adjuntos bajo el grupo se moverán a sin grupo. Esta operación no se puede deshacer.
+          toast_success: Eliminación exitosa, {total} adjuntos se han movido a sin grupo
+        delete_with_attachments:
+          button: También eliminar adjuntos
+          title: ¿Estás seguro de que deseas eliminar este grupo?
+          description: Al eliminar el grupo y todos los adjuntos dentro de él, esta acción no se puede deshacer.
+          toast_success: Eliminación exitosa, {total} adjuntos se han eliminado simultáneamente
+    policies_modal:
+      title: Políticas de Almacenamiento
+      empty:
+        title: Actualmente no hay estrategias de almacenamiento disponibles.
+        message: No hay políticas de almacenamiento disponibles en este momento. Puedes intentar actualizar o crear una nueva política.
+      operations:
+        delete:
+          title: ¿Estás seguro de que deseas eliminar esta política?
+          description: No hay adjuntos cargados bajo la política actual.
+        can_not_delete:
+          title: Fallo en la eliminación
+          description: Hay adjuntos bajo esta política, que no se pueden eliminar.
+    policy_editing_modal:
+      titles:
+        create: "Nueva política: {policy_template}"
+        update: "Editar política: {policy}"
+      fields:
+        display_name:
+          label: Nombre para Mostrar
+    upload_modal:
+      title: Cargar adjunto
+      filters:
+        group:
+          label: "Seleccionar grupo:"
+        policy:
+          label: "Seleccionar política de almacenamiento:"
+          empty:
+            title: Sin política de almacenamiento
+            description: Antes de cargar, es necesario crear una nueva política de almacenamiento.
+          not_select: Por favor, selecciona una política de almacenamiento primero
+    select_modal:
+      title: Seleccionar adjunto
+      providers:
+        default:
+          label: Adjuntos
+      operations:
+        select:
+          result: "({count} elementos seleccionados)"
+  theme:
+    title: Temas
+    common:
+      buttons:
+        install: Instalar Tema
+    tabs:
+      detail: Detalles
+    actions:
+      management: Gestión de Temas
+    empty:
+      title: No hay temas activados o seleccionados actualmente.
+      message: Puedes cambiar de tema o instalar nuevos.
+      actions:
+        switch: Cambiar de Tema
+    operations:
+      active:
+        title: ¿Estás seguro de activar el tema actual?
+        toast_success: Tema activado exitosamente
+      reset:
+        title: ¿Estás seguro de que deseas restablecer todas las configuraciones del tema?
+        description: Esta operación eliminará la configuración guardada y la restablecerá a los ajustes predeterminados.
+        toast_success: Configuración restablecida exitosamente
+      reload:
+        button: Recargar
+        title: ¿Estás seguro de que deseas recargar todas las configuraciones del tema?
+        description: Esta operación solo recargará la configuración del tema y la definición del formulario de ajustes, y no eliminará ninguna configuración guardada.
+        toast_success: Recarga de configuración exitosa
+      uninstall:
+        title: ¿Estás seguro de que deseas desinstalar este tema?
+      uninstall_and_delete_config:
+        button: Desinstalar y eliminar configuración
+        title: ¿Estás seguro de que deseas desinstalar este tema y su configuración correspondiente?
+      remote_download:
+        title: Se ha detectado una dirección de descarga remota, ¿deseas descargar?
+        description: "Por favor, verifica cuidadosamente si esta dirección es confiable: {url}"
+    upload_modal:
+      titles:
+        install: Instalar tema
+        upgrade: Actualizar tema ({display_name})
+      operations:
+        existed_during_installation:
+          title: El tema ya existe.
+          description: El tema instalado actualmente ya existe, deseas actualizarlo?
+      tabs:
+        local: Local
+        remote:
+          title: Remoto
+          fields:
+            url: URL Remota
+    list_modal:
+      titles:
+        installed_themes: Temas Instalados
+        not_installed_themes: Temas no Instalados
+      tabs:
+        installed: Instalados
+        not_installed: No Instalados
+      empty:
+        title: No hay temas instalados actualmente.
+        message: No hay temas instalados actualmente, puedes intentar actualizar o instalar un nuevo tema.
+      not_installed_empty:
+        title: No hay temas actualmente no instalados.
+    preview_model:
+      title: "Vista Previa del Tema: {display_name}"
+      actions:
+        switch: Cambiar de tema
+        setting: Ajustes
+        open: Abrir
+    detail:
+      fields:
+        author: Autor
+        website: Sitio Web
+        repo: Repositorio Fuente
+        version: Versión
+        requires: Requiere
+        storage_location: Ubicación de Almacenamiento
+        plugin_requires: Requiere Plugin
+    settings:
+      title: Ajustes del Tema
+    custom_templates:
+      default: Predeterminado
+  menu:
+    title: Menús
+    empty:
+      title: Actualmente no hay menús.
+      message: Puedes intentar actualizar o crear un nuevo menú.
+    menu_item_empty:
+      title: Actualmente no hay elementos de menú.
+      message: Puedes intentar actualizar o crear un nuevo elemento de menú.
+    operations:
+      set_primary:
+        button: Establecer como menú principal
+        toast_success: Configuración exitosa
+      delete_menu:
+        title: "¿Estás seguro de que deseas eliminar este menú?"
+        description: Todos los elementos de menú de este menú se eliminarán al mismo tiempo y esta operación no se puede deshacer.
+      delete_menu_item:
+        title: "¿Estás seguro de que deseas eliminar este elemento de menú?"
+        description: Todos los subelementos de menú se eliminarán al mismo tiempo y no se pueden restaurar después de la eliminación.
+      add_sub_menu_item:
+        button: Agregar subelemento de menú
+    list:
+      fields:
+        primary: Principal
+        items_count: "{count} elementos"
+    menu_editing_modal:
+      titles:
+        create: Crear menú
+        update: Actualizar menú
+      fields:
+        display_name:
+          label: Nombre para mostrar
+    menu_item_editing_modal:
+      titles:
+        create: Crear elemento de menú
+        update: Actualizar elemento de menú
+      groups:
+        general: General
+        annotations: Anotaciones
+      fields:
+        parent:
+          label: Padre
+          placeholder: Selecciona el elemento de menú padre
+        ref_kind:
+          label: Tipo
+          placeholder: "Por favor selecciona {label}"
+          options:
+            custom: Personalizado
+            post: Publicación
+            single_page: Página
+            category: Categoría
+            tag: Etiqueta
+        display_name:
+          label: Nombre para mostrar
+        href:
+          label: Dirección del enlace
+        target:
+          label: Destino
+          options:
+            self: _self
+            blank: _blank
+            parent: _parent
+            top: _top
+  plugin:
+    title: Plugins
+    tabs:
+      detail: Detail
+    empty:
+      title: There are no installed plugins currently.
+      message: There are no installed plugins currently, you can try refreshing or installing new plugins.
+      actions:
+        install: Install Plugin
+    operations:
+      reset:
+        title: Are you sure you want to reset all configurations of the plugin?
+        description: This operation will delete the saved configuration and reset it to default settings.
+        toast_success: Reset configuration successfully
+      uninstall:
+        title: Are you sure you want to uninstall this plugin?
+      uninstall_and_delete_config:
+        title: Are you sure you want to uninstall this plugin and its corresponding configuration?
+      uninstall_when_enabled:
+        confirm_text: Stop running and uninstall
+        description: The current plugin is still in the enabled state and will be uninstalled after it stops running. This operation cannot be undone.
+      change_status:
+        active_title: Are you sure you want to active this plugin?
+        inactive_title: Are you sure you want to inactive this plugin?
+      remote_download:
+        title: Remote download address detected, do you want to download?
+        description: "Please carefully verify whether this address can be trusted: {url}"
+    filters:
+      status:
+        items:
+          active: Active
+          inactive: Inactive
+      sort:
+        items:
+          create_time_desc: Latest Installed
+          create_time_asc: Earliest Installed
+    list:
+      actions:
+        uninstall_and_delete_config: Uninstall and delete config
+    upload_modal:
+      titles:
+        install: Install plugin
+        upgrade: Upgrade plugin ({display_name})
+      tabs:
+        local: Local
+        remote:
+          title: Remote
+          fields:
+            url: Remote URL
+      operations:
+        active_after_install:
+          title: Install successful
+          description: Would you like to activate the currently installed plugin?
+        existed_during_installation:
+          title: The plugin already exists.
+          description: The currently installed plugin already exists, do you want to upgrade?
+    detail:
+      title: Plugin detail
+      header:
+        title: Plugin information
+      fields:
+        display_name: Display Name
+        description: Description
+        version: Version
+        requires: Requires
+        author: Author
+        license: License
+        role_templates: Role Templates
+        last_starttime: Last Start Time
+    loader:
+      toast:
+        entry_load_failed: "{name}: Failed to load plugin entry file"
+        style_load_failed: "{name}: Failed to load plugin stylesheet file"
+    extension_points:
+      editor:
+        providers:
+          default: Default Editor
+  user:
+    title: Usuarios
+    actions:
+      roles: Roles
+      identity_authentication: Autenticación de Identidad
+    empty:
+      title: Actualmente no hay usuarios que cumplan con los criterios de filtrado.
+      message: No hay usuarios que coincidan con los criterios de filtrado en este momento. Puedes intentar actualizar o crear un nuevo usuario.
+    operations:
+      delete:
+        title: ¿Estás seguro de que deseas eliminar a este usuario?
+      delete_in_batch:
+        title: ¿Estás seguro de que deseas eliminar a los usuarios seleccionados?
+      update_profile:
+        title: Actualizar perfil
+      change_password:
+        title: Cambiar contraseña
+      grant_permission:
+        title: Conceder permiso
+    filters:
+      role:
+        label: Rol
+        result: "Rol: {role}"
+      sort:
+        items:
+          create_time_desc: Últimos creados
+          create_time_asc: Más antiguos creados
+    editing_modal:
+      titles:
+        update: Editar usuario
+        create: Crear usuario
+      groups:
+        general: General
+        annotations: Anotaciones
+      fields:
+        username:
+          label: Nombre de usuario
+          validation: Por favor, introduce un nombre de usuario válido.
+        display_name:
+          label: Nombre para mostrar
+        email:
+          label: Correo electrónico
+        phone:
+          label: Teléfono
+        avatar:
+          label: Avatar
+        bio:
+          label: Biografía
+    change_password_modal:
+      title: Cambiar contraseña
+      fields:
+        new_password:
+          label: Nueva contraseña
+        confirm_password:
+          label: Confirmar contraseña
+    grant_permission_modal:
+      title: Conceder permiso
+      fields:
+        role:
+          label: Rol
+          placeholder: Por favor, selecciona un rol
+    detail:
+      title: Detalles del usuario
+      tabs:
+        detail: Detalle
+      actions:
+        update_profile:
+          title: Actualizar perfil
+        change_password:
+          title: Cambiar contraseña
+      operations:
+        bind:
+          button: Vincular
+        unbind:
+          button: Desvincular
+          title: ¿Estás seguro de que deseas desvincular el método de inicio de sesión para {display_name}?
+      fields:
+        display_name: Nombre para mostrar
+        username: Nombre de usuario
+        email: Correo electrónico
+        roles: Roles
+        bio: Biografía
+        creation_time: Fecha de creación
+        identity_authentication: Autenticación de identidad
+      avatar:
+        title: Avatar
+        toast_upload_failed: No se pudo cargar el avatar
+        toast_remove_failed: No se pudo eliminar el avatar
+        cropper_modal:
+          title: Recortar Avatar
+        remove:
+          title: ¿Estás seguro de que deseas eliminar el avatar?
+        tooltips:
+          upload: Cargar
+          zoom_in: Acercar
+          zoom_out: Alejar
+          flip_horizontal: Voltear Horizontalmente
+          flip_vertical: Voltear Verticalmente
+          reset: Restablecer
+  role:
+    title: Roles
+    common:
+      text:
+        contains_all_permissions: Contiene todos los permisos
+        contains_n_permissions: Contiene {count} permisos
+        system_reserved: Reservado del Sistema
+        custom: Personalizado
+        dependent_on: Dependiente de {roles}
+        provided_by_plugin: Proporcionado por {plugin}
+    operations:
+      delete:
+        title: ¿Estás seguro de que deseas eliminar este rol?
+        description: Una vez eliminado el rol, se eliminarán las asignaciones de rol de los usuarios asociados y esta operación no se puede deshacer.
+      create_based_on_this_role:
+        button: Crear basado en este rol
+    detail:
+      title: Detalle del rol
+      header:
+        title: Información del rol
+      tabs:
+        detail: Detalle
+        permissions: Permisos
+      fields:
+        display_name: Nombre para mostrar
+        name: Nombre
+        type: Tipo
+        creation_time: Fecha de creación
+    permissions_detail:
+      system_reserved_alert:
+        description: El rol reservado del sistema no admite modificaciones. Se recomienda crear un nuevo rol basado en este.
+    editing_modal:
+      titles:
+        create: Crear rol
+        update: Actualizar rol
+      groups:
+        general: General
+        permissions: Permisos
+      fields:
+        display_name: Nombre para mostrar
+  identity_authentication:
+    title: Autenticación de Identidad
+    tabs:
+      detail: Detalle
+      setting: Configuración
+    operations:
+      enable:
+        title: ¿Estás seguro de que deseas habilitar este método de autenticación de identidad?
+      disable:
+        title: ¿Estás seguro de que deseas deshabilitar este método de autenticación de identidad?
+      disable_privileged:
+        tooltip: El método de autenticación reservado por el sistema no se puede deshabilitar
+    detail:
+      title: Detalle de la autenticación de identidad
+      fields:
+        display_name: Nombre para mostrar
+        description: Descripción
+        website: Sitio web
+        help_page: Página de ayuda
+        authentication_url: URL de inicio de sesión
+  setting:
+    title: Configuraciones
+  actuator:
+    title: Actuador
+    actions:
+      copy:
+        toast_browser_not_supported: El navegador actual no admite la función de copiado
+    header:
+      titles:
+        general: Información general
+        environment: Información del entorno
+    fields:
+      external_url: URL externa
+      start_time: Hora de inicio
+      timezone: Zona horaria
+      locale: Idioma
+      version: Versión
+      build_time: Fecha de compilación
+      database: Base de datos
+      os: Sistema operativo
+      log: Registro del sistema
+    fields_values:
+      external_url:
+        not_setup: No configurado
+    copy_results:
+      external_url: "URL externa: {external_url}"
+      start_time: "Hora de inicio: {start_time}"
+      version: "Versión: {version}"
+      build_time: "Fecha de compilación: {build_time}"
+      database: "Base de datos: {database}"
+      os: "Sistema operativo: {os}"
+    alert:
+      external_url_invalid: La URL de acceso externo detectada no coincide con la URL de acceso actual, lo que podría causar que algunos enlaces no se redirijan correctamente. Por favor, verifica la configuración de la URL de acceso externo.
+  backup:
+    title: Copia de Seguridad y Restauración
+    tabs:
+      backup_list: Copias de Seguridad
+      restore: Restaurar
+    empty:
+      title: Aún no se han creado copias de seguridad
+      message: Puedes hacer clic en el botón debajo para crear una copia de seguridad
+    operations:
+      create:
+        button: Crear copia de seguridad
+        title: Crear copia de seguridad
+        description: ¿Estás seguro de que deseas crear una copia de seguridad? Esta operación puede tomar un tiempo.
+        toast_success: Solicitud de creación de copia de seguridad realizada
+      delete:
+        title: Eliminar copia de seguridad
+        description: ¿Estás seguro de que deseas eliminar esta copia de seguridad?
+      restore:
+        title: Restauración exitosa
+        description: Después de una restauración exitosa, necesitas reiniciar Halo para cargar los recursos del sistema normalmente. Después de hacer clic en OK, reiniciaremos automáticamente Halo.
+      restart:
+        toast_success: Solicitud de reinicio realizada
+    list:
+      phases:
+        pending: Pendiente
+        running: En Progreso
+        succeeded: Exitosa
+        failed: Fallida
+      fields:
+        expiresAt: Expira el {expiresAt}
+    restore:
+      tips:
+        first: 1. El proceso de restauración puede tomar un tiempo, por favor no actualices la página durante este período.
+        second: 2. Durante el proceso de restauración, aunque los datos existentes no se eliminarán, si hay un conflicto, los datos se sobrescribirán.
+        third: 3. Después de completar la restauración, necesitas reiniciar Halo para cargar los recursos del sistema normalmente.
+        complete: Restauración completada, esperando reinicio...
+      start: Iniciar Restauración
+  exception:
+    not_found:
+      message: Página no encontrada
+    forbidden:
+      message: Acceso no autorizado a esta página
+    actions:
+      dashboard: Tablero
+  setup:
+    title: Configuración
+    operations:
+      submit:
+        button: Configurar
+        toast_success: Configuración exitosa
+      setup_initial_data:
+        loading: Inicializando datos, por favor espera...
+    fields:
+      site_title:
+        label: Título del Sitio
+      email:
+        label: Correo Electrónico
+      username:
+        label: Nombre de Usuario
+      password:
+        label: Contraseña
+      confirm_password:
+        label: Confirmar Contraseña
+  rbac:
+    Attachments Management: Gestión de archivos adjuntos
+    Attachment Manage: Gestor de adjuntos
+    Attachment View: Vista de adjuntos
+    role-template-view-attachments: Vista de adjuntos
+    Comments Management: Comentarios
+    Comment Manage: Gestor de comentarios
+    Comment View: Vista de comentarios
+    role-template-view-comments: Vista de comentarios
+    ConfigMaps Management: ConfigMaps
+    ConfigMap Manage: Gestor de ConfigMaps
+    ConfigMap View: Vista de ConfigMaps
+    role-template-view-configmaps: Vista de ConfigMaps
+    Menus Management: Menús
+    Menu Manage: Gestor de menús
+    Menu View: Vista de menús
+    role-template-view-menus: Vista de menús
+    Permissions Management: Permisos
+    Permissions Manage: Gestor de permisos
+    Permissions View: Vista de permisos
+    role-template-view-permissions: Vista de permisos
+    role-template-manage-permissions: Gestor de permisos
+    Plugins Management: Plugins
+    Plugin Manage: Gestor de plugins
+    Plugin View: Vista de plugins
+    role-template-view-plugins: Vista de plugins
+    Posts Management: Publicaciones
+    Post Manage: Gestor de publicaciones
+    Post View: Vista de publicaciones
+    role-template-view-posts: Vista de publicaciones
+    role-template-manage-snapshots: Gestor de snapshots
+    role-template-view-snapshots: Vista de snapshots
+    role-template-manage-tags: Gestor de etiquetas
+    role-template-view-tags: Vista de etiquetas
+    role-template-manage-categories: Gestor de categorías
+    role-template-view-categories: Vista de categorías
+    Roles Management: Roles
+    Role Manage: Gestor de roles
+    Role View: Vista de roles
+    role-template-view-roles: Vista de roles
+    Settings Management: Configuración
+    Setting Manage: Gestor de configuración
+    Setting View: Vista de configuración
+    role-template-view-settings: Vista de configuración
+    SinglePages Management: SinglePages
+    SinglePage Manage: Gestor de SinglePages
+    SinglePage View: Vista de SinglePages
+    role-template-view-singlepages: Vista de SinglePages
+    Themes Management: Temas
+    Theme Manage: Gestor de temas
+    Theme View: Vista de temas
+    role-template-view-themes: Vista de temas
+    Users Management: Usuarios
+    User manage: Gestor de usuarios
+    User View: Vista de usuarios
+    Migration Management: Copia de seguridad y restauración
+    Migration Manage: Gestor de copia de seguridad y restauración
+    role-template-view-users: Vista de usuarios
+    role-template-change-password: Cambiar contraseña
+  components:
+    submit_button:
+      computed_text: "{text} ({shortcut})"
+    annotations_form:
+      custom_fields:
+        label: Personalizado
+        validation: La clave actual ya está en uso
+    default_editor:
+      tabs:
+        toc:
+          title: Índice
+          empty: No hay índice disponible
+        detail:
+          title: Detalle
+          fields:
+            character_count: Conteo de caracteres
+            word_count: Conteo de palabras
+            publish_time: Hora de publicación
+            draft: Borrador
+            owner: Propietario
+            permalink: Enlace permanente
+      extensions:
+        placeholder:
+          options:
+            placeholder: "Ingresa / para seleccionar el tipo de entrada."
+      toolbox:
+        attachment: Adjunto
+      upload_attachment:
+        toast:
+          no_available_policy: Actualmente no hay una política de almacenamiento disponible
+          failed_fetch_permalink: "Error al obtener el enlace permanente del adjunto: {display_name}"
+    global_search:
+      placeholder: Ingresa palabras clave para buscar
+      no_results: Sin resultados de búsqueda
+      buttons:
+        select: Seleccionar
+      groups:
+        console: Página de la consola
+        user: Usuario
+        plugin: Plugin
+        post: Publicación
+        category: Categoría
+        tag: Etiqueta
+        page: Página
+        attachment: Adjunto
+        setting: Configuración
+        theme_setting: Configuración del tema
+    pagination:
+      page_label: página
+      size_label: elementos por página
+      total_label: Total de {total} elementos
+    social_auth_providers:
+      title: Inicio de sesión de terceros
+    app_download_alert:
+      description: "Los temas y complementos para Halo se pueden descargar en las siguientes direcciones:"
+      sources:
+        app_store: "Tienda de aplicaciones oficial: {url}"
+        github: "GitHub: {url}"
+  composables:
+    content_cache:
+      toast_recovered: Contenido no guardado recuperado de la caché
+  formkit:
+    category_select:
+      creation_label: "Crear categoría {text}"
+    tag_select:
+      creation_label: "Crear etiqueta {text}"
+    validation:
+      trim: Por favor, elimina los espacios al inicio y al final
+  common:
+    buttons:
+      save: Guardar
+      close: Cerrar
+      close_and_shortcut: Cerrar (Esc)
+      delete: Borrar
+      setting: Configuración
+      confirm: Confirmar
+      cancel: Cancelar
+      cancel_and_shortcut: Cancelar (Esc)
+      new: Nuevo
+      edit: Editar
+      back: Volver
+      refresh: Actualizar
+      publish: Publicar
+      cancel_publish: Cancelar Publicación
+      next: Siguiente
+      previous: Anterior
+      install: Instalar
+      uninstall: Desinstalar
+      upgrade: Actualizar
+      reset: Reiniciar
+      preview: Vista previa
+      recovery: Recuperar
+      delete_permanently: Borrar permanentemente
+      active: Activar
+      download: Descargar
+      copy: Copiar
+      upload: Subir
+      add: Agregar
+      submit: Enviar
+      detail: Detalle
+    radio:
+      "yes": Sí
+      "no": No
+    select:
+      public: Público
+      private: Privado
+    placeholder:
+      search: Ingresa palabras clave para buscar
+    toast:
+      operation_success: Operación realizada con éxito
+      delete_success: Eliminado exitosamente
+      save_success: Guardado exitosamente
+      publish_success: Publicado exitosamente
+      cancel_publish_success: Publicación cancelada exitosamente
+      recovery_success: Recuperado exitosamente
+      uninstall_success: Desinstalado exitosamente
+      active_success: Activado exitosamente
+      inactive_success: Desactivado exitosamente
+      upgrade_success: Actualizado exitosamente
+      install_success: Instalado exitosamente
+      download_success: Descargado exitosamente
+      copy_success: Copiado exitosamente
+      operation_failed: Fallo en la operación
+      download_failed: Fallo en la descarga
+      save_failed_and_retry: "Fallo al guardar, por favor intenta nuevamente"
+      publish_failed_and_retry: "Fallo al publicar, por favor intenta nuevamente"
+      network_error: "Error de red, por favor verifica tu conexión"
+      login_expired: "Sesión expirada, por favor inicia sesión nuevamente"
+      forbidden: Acceso denegado
+      not_found: Recurso no encontrado
+      server_internal_error: Error interno del servidor
+      unknown_error: Error desconocido
+    dialog:
+      titles:
+        tip: Consejo
+        warning: Advertencia
+      descriptions:
+        cannot_be_recovered: Esta operación es irreversible.
+        editor_not_found: No se encontró ningún editor que coincida con el formato {raw_type}. Por favor verifica si el complemento del editor ha sido instalado.
+    filters:
+      results:
+        keyword: "Palabra clave: {keyword}"
+        sort: "Ordenar: {sort}"
+        status: "Estado: {status}"
+      labels:
+        sort: Ordenar
+        status: Estado
+      item_labels:
+        all: Todo
+        default: Por defecto
+    status:
+      deleting: Borrando
+      loading: Cargando
+      loading_error: Error al cargar
+      activated: Activado
+      not_activated: No activado
+      installed: Instalado
+      not_installed: No instalado
+    text:
+      none: Ninguno
+      tip: Consejo
+      warning: Advertencia
+    tooltips:
+      unpublished_content_tip: Hay contenido que ha sido guardado pero aún no ha sido publicado.
+      publishing: Publicando
+      recovering: Recuperando
+    fields:
+      post_count: "{count} Publicaciones"

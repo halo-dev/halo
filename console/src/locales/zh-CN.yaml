@@ -102,6 +102,7 @@ core:
           title: 最近文章
           visits: "访问量 {visits}"
           comments: "评论 {comments}"
+          publishTime: "发布日期 {publishTime}"
         quicklink:
           title: 快捷访问
           actions:
@@ -608,27 +609,18 @@ core:
       remote_download:
         title: 检测到了远程下载地址，是否需要下载？
         description: 请仔细鉴别此地址是否可信：{url}
-    upload_modal:
-      titles:
-        install: 安装主题
-        upgrade: 升级主题（{display_name}）
-      operations:
-        existed_during_installation:
-          title: 主题已存在
-          description: 当前安装的主题已存在，是否升级？
-      tabs:
-        local: 本地上传
-        remote:
-          title: 远程下载
-          fields:
-            url: 下载地址
+      existed_during_installation:
+        title: 主题已存在
+        description: 当前安装的主题已存在，是否升级？
     list_modal:
-      titles:
-        installed_themes: 已安装的主题
-        not_installed_themes: 未安装的主题
       tabs:
         installed: 已安装
-        not_installed: 未安装
+        not_installed: 本地未安装
+        local_upload: 上传安装 / 升级
+        remote_download:
+          label: 远程下载
+          fields:
+            url: 下载地址
       empty:
         title: 当前没有已安装的主题
         message: 当前没有已安装的主题，你可以尝试刷新或者安装新主题
@@ -731,14 +723,20 @@ core:
         toast_success: 重置配置成功
       uninstall:
         title: 确定要卸载该插件吗？
+      uninstall_in_batch:
+        title: 确定要卸载所选插件吗？
       uninstall_and_delete_config:
+        button: 卸载并删除配置
         title: 确定要卸载该插件以及对应的配置吗？
+      uninstall_and_delete_config_in_batch:
+        button: 卸载并删除配置
+        title: 确定要卸载所选插件以及对应的配置吗？
       uninstall_when_enabled:
         confirm_text: 停止运行并卸载
         description: 当前插件还在启用状态，将在停止运行后卸载，该操作不可恢复。
-      change_status:
-        active_title: 确定要启用该插件吗？
-        inactive_title: 确定要停用该插件吗？
+      change_status_in_batch:
+        activate_title: 确定要启用所选插件吗？
+        inactivate_title: 确定要停用所选插件吗？
       remote_download:
         title: 检测到了远程下载地址，是否需要下载？
         description: 请仔细鉴别此地址是否可信：{url}
@@ -751,9 +749,6 @@ core:
         items:
           create_time_desc: 较近安装
           create_time_asc: 较早安装
-    list:
-      actions:
-        uninstall_and_delete_config: 卸载并删除配置
     upload_modal:
       titles:
         install: 安装插件
@@ -786,8 +781,8 @@ core:
         last_starttime: 最近一次启动
     loader:
       toast:
-        entry_load_failed: "{name}：加载插件入口文件失败"
-        style_load_failed: "{name}：加载插件样式文件失败"
+        entry_load_failed: "加载插件入口文件失败"
+        style_load_failed: "加载插件样式文件失败"
     extension_points:
       editor:
         providers:
@@ -1006,6 +1001,11 @@ core:
         description: 恢复成功之后，需要重启一下 Halo 才能够正常加载系统资源，点击确定之后我们会自动重启 Halo。
       restart:
         toast_success: 已请求重启
+      remote_download:
+        button: 下载并恢复
+      restore_by_backup:
+        button: 恢复
+        title: 确认要从此备份进行恢复吗？
     list:
       phases:
         pending: 准备中
@@ -1021,6 +1021,15 @@ core:
         third: 3. 恢复完成之后需要重启 Halo 才能够正常加载系统资源。
         complete: 恢复完成，等待重启...
       start: 开始恢复
+      tabs:
+        local:
+          label: 上传
+        remote:
+          label: 远程恢复
+          fields:
+            url: 下载地址
+        backup:
+          label: 从备份恢复
   exception:
     not_found:
       message: 没有找到该页面
@@ -1034,10 +1043,19 @@ core:
       submit:
         button: 初始化
         toast_success: 初始化成功
+      setup_initial_data:
+        loading: 正在初始化数据，请稍后...
     fields:
       site_title:
-        placeholder: 站点名称
-        validation: 请输入站点名称
+        label: 站点名称
+      email:
+        label: 邮箱
+      username:
+        label: 用户名
+      password:
+        label: 密码
+      confirm_password:
+        label: 确认密码
   rbac:
     Attachments Management: 附件
     Attachment Manage: 附件管理
@@ -1190,13 +1208,15 @@ core:
       preview: 预览
       recovery: 恢复
       delete_permanently: 永久删除
-      active: 启用
+      activate: 启用
+      inactivate: 停用
       download: 下载
       copy: 复制
       upload: 上传
       add: 添加
       submit: 提交
       detail: 详情
+      select: 选择
     radio:
       "yes": 是
       "no": 否

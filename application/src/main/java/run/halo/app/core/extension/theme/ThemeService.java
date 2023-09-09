@@ -1,15 +1,16 @@
 package run.halo.app.core.extension.theme;
 
-import java.io.InputStream;
+import org.reactivestreams.Publisher;
+import org.springframework.core.io.buffer.DataBuffer;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Theme;
 import run.halo.app.extension.ConfigMap;
 
 public interface ThemeService {
 
-    Mono<Theme> install(InputStream is);
+    Mono<Theme> install(Publisher<DataBuffer> content);
 
-    Mono<Theme> upgrade(String themeName, InputStream is);
+    Mono<Theme> upgrade(String themeName, Publisher<DataBuffer> content);
 
     Mono<Theme> reloadTheme(String name);
 

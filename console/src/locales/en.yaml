@@ -102,6 +102,7 @@ core:
           title: Recent Posts
           visits: "{visits} Visits"
           comments: "{comments} Comments"
+          publishTime: "Publish Time {publishTime}"
         quicklink:
           title: Quick Link
           actions:
@@ -608,27 +609,18 @@ core:
       remote_download:
         title: Remote download address detected, do you want to download?
         description: "Please carefully verify whether this address can be trusted: {url}"
-    upload_modal:
-      titles:
-        install: Install theme
-        upgrade: Upgrade theme ({display_name})
-      operations:
-        existed_during_installation:
-          title: The theme already exists.
-          description: The currently installed theme already exists, do you want to upgrade?
-      tabs:
-        local: Local
-        remote:
-          title: Remote
-          fields:
-            url: Remote URL
+      existed_during_installation:
+        title: The theme already exists.
+        description: The currently installed theme already exists, do you want to upgrade?
     list_modal:
-      titles:
-        installed_themes: Installed Themes
-        not_installed_themes: Not installed Themes
       tabs:
         installed: Installed
         not_installed: Not installed
+        local_upload: Local install / upgrade
+        remote_download:
+          label: Remote
+          fields:
+            url: Remote URL
       empty:
         title: There are no installed themes currently.
         message: There are currently no installed themes, you can try refreshing or installing a new theme.
@@ -731,14 +723,20 @@ core:
         toast_success: Reset configuration successfully
       uninstall:
         title: Are you sure you want to uninstall this plugin?
+      uninstall_in_batch:
+        title: Are you sure you want to uninstall these plugin?
       uninstall_and_delete_config:
+        button: Uninstall and delete config
         title: Are you sure you want to uninstall this plugin and its corresponding configuration?
+      uninstall_and_delete_config_in_batch:
+        button: Uninstall and delete config
+        title: Are you sure you want to uninstall these plugin and its corresponding configuration?
       uninstall_when_enabled:
         confirm_text: Stop running and uninstall
         description: The current plugin is still in the enabled state and will be uninstalled after it stops running. This operation cannot be undone.
-      change_status:
-        active_title: Are you sure you want to active this plugin?
-        inactive_title: Are you sure you want to inactive this plugin?
+      change_status_in_batch:
+        activate_title: Are you sure you want to activate these plugins?
+        inactivate_title: Are you sure you want to inactivate these plugins?
       remote_download:
         title: Remote download address detected, do you want to download?
         description: "Please carefully verify whether this address can be trusted: {url}"
@@ -751,9 +749,6 @@ core:
         items:
           create_time_desc: Latest Installed
           create_time_asc: Earliest Installed
-    list:
-      actions:
-        uninstall_and_delete_config: Uninstall and delete config
     upload_modal:
       titles:
         install: Install plugin
@@ -786,8 +781,8 @@ core:
         last_starttime: Last Start Time
     loader:
       toast:
-        entry_load_failed: "{name}: Failed to load plugin entry file"
-        style_load_failed: "{name}: Failed to load plugin stylesheet file"
+        entry_load_failed: "Failed to load plugins entry file"
+        style_load_failed: "Failed to load plugins stylesheet file"
     extension_points:
       editor:
         providers:
@@ -1006,6 +1001,11 @@ core:
         description: After successful restore, you need to restart Halo to load the system resources normally. After clicking OK, we will automatically restart Halo.
       restart:
         toast_success: Requested to restart
+      remote_download:
+        button: Download and restore
+      restore_by_backup:
+        button: Restore
+        title: Are you sure you want to restore from this backup?
     list:
       phases:
         pending: Pending
@@ -1021,6 +1021,15 @@ core:
         third: 3. After the restore is completed, you need to restart Halo to load the system resources normally.
         complete: Restore completed, waiting for restart...
       start: Start restore
+      tabs:
+        local:
+          label: Upload
+        remote:
+          label: Remote
+          fields:
+            url: Remote URL
+        backup:
+          label: Restore from backup
   exception:
     not_found:
       message: Page not found
@@ -1034,10 +1043,19 @@ core:
       submit:
         button: Setup
         toast_success: Setup successfully
+      setup_initial_data:
+        loading: Initializing data, please wait...
     fields:
       site_title:
-        placeholder: Site title
-        validation: Please enter the site title
+        label: Site title
+      email:
+        label: Email
+      username:
+        label: Username
+      password:
+        label: Password
+      confirm_password:
+        label: Confirm password
   rbac:
     Attachments Management: Attachments
     Attachment Manage: Attachment Manage
@@ -1190,13 +1208,15 @@ core:
       preview: Preview
       recovery: Recovery
       delete_permanently: Delete Permanently
-      active: Active
+      activate: Activate
+      inactivate: Inactivate
       download: Download
       copy: Copy
       upload: Upload
       add: Add
       submit: Submit
       detail: Detail
+      select: Select
     radio:
       "yes": Yes
       "no": No

@@ -29,6 +29,7 @@ import run.halo.app.theme.finders.vo.ContentVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.finders.vo.StatsVo;
+import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
 
 @Component
 @RequiredArgsConstructor
@@ -48,13 +49,16 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
 
     private final ExtensionGetter extensionGetter;
 
+    private final ReactiveQueryPostPredicateResolver postPredicateResolver;
+
     @Override
     public Mono<ListResult<ListedPostVo>> list(Integer page, Integer size,
         Predicate<Post> postPredicate, Comparator<Post> comparator) {
-        Predicate<Post> predicate = FIXED_PREDICATE
-            .and(postPredicate == null ? post -> true : postPredicate);
-        return client.list(Post.class, predicate,
+        return postPredicateResolver.getPredicate()
+            .map(predicate -> predicate.and(postPredicate == null ? post -> true : postPredicate))
+            .flatMap(predicate -> client.list(Post.class, predicate,
                 comparator, pageNullSafe(page), sizeNullSafe(size))
+            )
             .flatMap(list -> Flux.fromStream(list.get())
                 .concatMap(post -> convertToListedVo(post)
                     .flatMap(postVo -> populateStats(postVo)
@@ -118,7 +122,6 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
 
     @Override
     public Mono<PostVo> convertToVo(Post post, String snapshotName) {
-        final String postName = post.getMetadata().getName();
         final String baseSnapshotName = post.getSpec().getBaseSnapshot();
         return convertToListedVo(post)
             .map(PostVo::from)
@@ -131,8 +134,10 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
 
     @Override
     public Mono<ContentVo> getContent(String postName) {
-        return client.get(Post.class, postName)
-            .filter(FIXED_PREDICATE)
+        return postPredicateResolver.getPredicate()
+            .flatMap(predicate -> client.get(Post.class, postName)
+                .filter(predicate)
+            )
             .flatMap(post -> {
                 String releaseSnapshot = post.getSpec().getReleaseSnapshot();
                 return postService.getContent(releaseSnapshot, post.getSpec().getBaseSnapshot())

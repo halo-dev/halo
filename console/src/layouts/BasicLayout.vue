@@ -37,6 +37,7 @@ import {
   useOverlayScrollbars,
   type UseOverlayScrollbarsParams,
 } from "overlayscrollbars-vue";
+import { isMac } from "@/utils/device";
 import { useLocalStorage } from "@vueuse/core";
 
 const route = useRoute();
@@ -72,8 +73,6 @@ const handleLogout = () => {
 
 // Global Search
 const globalSearchVisible = ref(false);
-
-const isMac = /macintosh|mac os x/i.test(navigator.userAgent);
 
 const handleGlobalSearchKeybinding = (e: KeyboardEvent) => {
   const { key, ctrlKey, metaKey } = e;

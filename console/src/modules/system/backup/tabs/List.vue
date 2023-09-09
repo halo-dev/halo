@@ -1,47 +1,9 @@
 <script lang="ts" setup>
-import { apiClient } from "@/utils/api-client";
-import { useQuery } from "@tanstack/vue-query";
-import { BackupStatusPhaseEnum } from "@halo-dev/api-client";
 import { VButton, VEmpty, VLoading } from "@halo-dev/components";
 import BackupListItem from "../components/BackupListItem.vue";
+import { useBackupFetch } from "../composables/use-backup";
 
-const {
-  data: backups,
-  isLoading,
-  isFetching,
-  refetch,
-} = useQuery({
-  queryKey: ["backups"],
-  queryFn: async () => {
-    const { data } =
-      await apiClient.extension.backup.listmigrationHaloRunV1alpha1Backup({
-        sort: ["metadata.creationTimestamp,desc"],
-      });
-    return data;
-  },
-  refetchInterval(data) {
-    const deletingBackups = data?.items.filter((backup) => {
-      return !!backup.metadata.deletionTimestamp;
-    });
-
-    if (deletingBackups?.length) {
-      return 1000;
-    }
-
-    const pendingBackups = data?.items.filter((backup) => {
-      return (
-        backup.status?.phase === BackupStatusPhaseEnum.Pending ||
-        backup.status?.phase === BackupStatusPhaseEnum.Running
-      );
-    });
-
-    if (pendingBackups?.length) {
-      return 3000;
-    }
-
-    return false;
-  },
-});
+const { data: backups, isLoading, isFetching, refetch } = useBackupFetch();
 </script>
 
 <template>

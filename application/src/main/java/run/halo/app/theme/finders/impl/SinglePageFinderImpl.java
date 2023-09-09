@@ -1,5 +1,6 @@
 package run.halo.app.theme.finders.impl;
 
+import java.security.Principal;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
@@ -10,12 +11,15 @@ import java.util.function.Predicate;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.lang.Nullable;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.theme.finders.Finder;
 import run.halo.app.theme.finders.SinglePageConversionService;
 import run.halo.app.theme.finders.SinglePageFinder;
@@ -44,7 +48,7 @@ public class SinglePageFinderImpl implements SinglePageFinder {
     @Override
     public Mono<SinglePageVo> getByName(String pageName) {
         return client.get(SinglePage.class, pageName)
-            .filter(FIXED_PREDICATE)
+            .filterWhen(page -> queryPredicate().map(predicate -> predicate.test(page)))
             .flatMap(singlePagePublicQueryService::convertToVo);
     }
 
@@ -76,6 +80,25 @@ public class SinglePageFinderImpl implements SinglePageFinder {
                 )
             )
             .defaultIfEmpty(new ListResult<>(0, 0, 0, List.of()));
+    }
+
+    Mono<Predicate<SinglePage>> queryPredicate() {
+        Predicate<SinglePage> predicate = page -> page.isPublished()
+            && Objects.equals(false, page.getSpec().getDeleted());
+        Predicate<SinglePage> visiblePredicate =
+            page -> Post.VisibleEnum.PUBLIC.equals(page.getSpec().getVisible());
+        return currentUserName()
+            .map(username -> predicate.and(
+                visiblePredicate.or(page -> username.equals(page.getSpec().getOwner())))
+            )
+            .defaultIfEmpty(predicate.and(visiblePredicate));
+    }
+
+    Mono<String> currentUserName() {
+        return ReactiveSecurityContextHolder.getContext()
+            .map(SecurityContext::getAuthentication)
+            .map(Principal::getName)
+            .filter(name -> !AnonymousUserConst.isAnonymousUser(name));
     }
 
     static Comparator<SinglePage> defaultComparator() {

@@ -267,16 +267,12 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator = function (
     },
     /**
      * Install a theme by uploading a zip file.
-     * @param {File} file
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     installTheme: async (
-      file: File,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
-      // verify required parameter 'file' is not null or undefined
-      assertParamExists("installTheme", "file", file);
       const localVarPath = `/apis/api.console.halo.run/v1alpha1/themes/install`;
       // use dummy base URL string because the URL constructor only accepts absolute URLs.
       const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -292,9 +288,6 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator = function (
       };
       const localVarHeaderParameter = {} as any;
       const localVarQueryParameter = {} as any;
-      const localVarFormParams = new ((configuration &&
-        configuration.formDataCtor) ||
-        FormData)();
 
       // authentication BasicAuth required
       // http basic authentication required
@@ -304,12 +297,6 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
-      if (file !== undefined) {
-        localVarFormParams.append("file", file as any);
-      }
-
-      localVarHeaderParameter["Content-Type"] = "multipart/form-data";
-
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions =
         baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -318,7 +305,6 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiAxiosParamCreator = function (
         ...headersFromBaseOptions,
         ...options.headers,
       };
-      localVarRequestOptions.data = localVarFormParams;
 
       return {
         url: toPathString(localVarUrlObj),
@@ -873,18 +859,15 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFp = function (
     },
     /**
      * Install a theme by uploading a zip file.
-     * @param {File} file
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async installTheme(
-      file: File,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.installTheme(
-        file,
         options
       );
       return createRequestFunction(
@@ -1145,16 +1128,12 @@ export const ApiConsoleHaloRunV1alpha1ThemeApiFactory = function (
     },
     /**
      * Install a theme by uploading a zip file.
-     * @param {ApiConsoleHaloRunV1alpha1ThemeApiInstallThemeRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    installTheme(
-      requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiInstallThemeRequest,
-      options?: AxiosRequestConfig
-    ): AxiosPromise<Theme> {
+    installTheme(options?: AxiosRequestConfig): AxiosPromise<Theme> {
       return localVarFp
-        .installTheme(requestParameters.file, options)
+        .installTheme(options)
         .then((request) => request(axios, basePath));
     },
     /**
@@ -1313,20 +1292,6 @@ export interface ApiConsoleHaloRunV1alpha1ThemeApiFetchThemeSettingRequest {
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApiFetchThemeSetting
    */
   readonly name: string;
-}
-
-/**
- * Request parameters for installTheme operation in ApiConsoleHaloRunV1alpha1ThemeApi.
- * @export
- * @interface ApiConsoleHaloRunV1alpha1ThemeApiInstallThemeRequest
- */
-export interface ApiConsoleHaloRunV1alpha1ThemeApiInstallThemeRequest {
-  /**
-   *
-   * @type {File}
-   * @memberof ApiConsoleHaloRunV1alpha1ThemeApiInstallTheme
-   */
-  readonly file: File;
 }
 
 /**
@@ -1545,17 +1510,13 @@ export class ApiConsoleHaloRunV1alpha1ThemeApi extends BaseAPI {
 
   /**
    * Install a theme by uploading a zip file.
-   * @param {ApiConsoleHaloRunV1alpha1ThemeApiInstallThemeRequest} requestParameters Request parameters.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof ApiConsoleHaloRunV1alpha1ThemeApi
    */
-  public installTheme(
-    requestParameters: ApiConsoleHaloRunV1alpha1ThemeApiInstallThemeRequest,
-    options?: AxiosRequestConfig
-  ) {
+  public installTheme(options?: AxiosRequestConfig) {
     return ApiConsoleHaloRunV1alpha1ThemeApiFp(this.configuration)
-      .installTheme(requestParameters.file, options)
+      .installTheme(options)
       .then((request) => request(this.axios, this.basePath));
   }
 

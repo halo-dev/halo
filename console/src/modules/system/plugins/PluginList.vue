@@ -7,13 +7,14 @@ import {
   VCard,
   VEmpty,
   VPageHeader,
-  VPagination,
   VSpace,
   VLoading,
   Dialog,
+  VDropdown,
+  VDropdownItem,
 } from "@halo-dev/components";
 import PluginListItem from "./components/PluginListItem.vue";
-import PluginUploadModal from "./components/PluginUploadModal.vue";
+import PluginInstallationModal from "./components/PluginInstallationModal.vue";
 import { computed, ref, onMounted } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
@@ -22,17 +23,22 @@ import type { Plugin } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
 import { useRouteQuery } from "@vueuse/router";
 import { watch } from "vue";
+import { provide } from "vue";
+import type { Ref } from "vue";
+import { usePluginBatchOperations } from "./composables/use-plugin";
 
 const { t } = useI18n();
-
 const { currentUserHasPermission } = usePermission();
 
-const pluginInstall = ref(false);
+const pluginInstallationModal = ref(false);
+const pluginToUpgrade = ref<Plugin>();
+
+function handleOpenUploadModal(plugin?: Plugin) {
+  pluginToUpgrade.value = plugin;
+  pluginInstallationModal.value = true;
+}
 
 const keyword = ref("");
-const page = ref(1);
-const size = ref(20);
-const total = ref(0);
 
 const selectedEnabledValue = ref();
 const selectedSortValue = ref();
@@ -46,26 +52,14 @@ function handleClearFilters() {
   selectedEnabledValue.value = undefined;
 }
 
-watch(
-  () => [selectedEnabledValue.value, selectedSortValue.value, keyword.value],
-  () => {
-    page.value = 1;
-  }
-);
+const total = ref(0);
 
 const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
-  queryKey: [
-    "plugins",
-    page,
-    size,
-    keyword,
-    selectedEnabledValue,
-    selectedSortValue,
-  ],
+  queryKey: ["plugins", keyword, selectedEnabledValue, selectedSortValue],
   queryFn: async () => {
     const { data } = await apiClient.plugin.listPlugins({
-      page: page.value,
-      size: size.value,
+      page: 0,
+      size: 0,
       keyword: keyword.value,
       enabled: selectedEnabledValue.value,
       sort: [selectedSortValue.value].filter(Boolean) as string[],
@@ -85,6 +79,33 @@ const { data, isLoading, isFetching, refetch } = useQuery<Plugin[]>({
   },
 });
 
+// selection
+const selectedNames = ref<string[]>([]);
+provide<Ref<string[]>>("selectedNames", selectedNames);
+const checkedAll = ref(false);
+
+watch(
+  () => selectedNames.value,
+  (value) => {
+    checkedAll.value = value.length === data.value?.length;
+  }
+);
+
+const handleCheckAllChange = (e: Event) => {
+  const { checked } = e.target as HTMLInputElement;
+  if (checked) {
+    selectedNames.value =
+      data.value?.map((plugin) => {
+        return plugin.metadata.name;
+      }) || [];
+  } else {
+    selectedNames.value.length = 0;
+  }
+};
+
+const { handleChangeStatusInBatch, handleUninstallInBatch } =
+  usePluginBatchOperations(selectedNames);
+
 // handle remote download url from route
 const routeRemoteDownloadUrl = useRouteQuery<string | null>(
   "remote-download-url"
@@ -99,7 +120,7 @@ onMounted(() => {
       confirmText: t("core.common.buttons.download"),
       cancelText: t("core.common.buttons.cancel"),
       onConfirm() {
-        pluginInstall.value = true;
+        handleOpenUploadModal();
       },
       onCancel() {
         routeRemoteDownloadUrl.value = null;
@@ -109,9 +130,10 @@ onMounted(() => {
 });
 </script>
 <template>
-  <PluginUploadModal
+  <PluginInstallationModal
     v-if="currentUserHasPermission(['system:plugins:manage'])"
-    v-model:visible="pluginInstall"
+    v-model:visible="pluginInstallationModal"
+    :plugin-to-upgrade="pluginToUpgrade"
   />
 
   <VPageHeader :title="$t('core.plugin.title')">
@@ -122,7 +144,7 @@ onMounted(() => {
       <VButton
         v-permission="['system:plugins:manage']"
         type="secondary"
-        @click="pluginInstall = true"
+        @click="handleOpenUploadModal()"
       >
         <template #icon>
           <IconAddCircle class="h-full w-full" />
@@ -139,8 +161,50 @@ onMounted(() => {
           <div
             class="relative flex flex-col items-start sm:flex-row sm:items-center"
           >
+            <div
+              v-permission="['system:posts:manage']"
+              class="mr-4 hidden items-center sm:flex"
+            >
+              <input
+                v-model="checkedAll"
+                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                type="checkbox"
+                @change="handleCheckAllChange"
+              />
+            </div>
             <div class="flex w-full flex-1 items-center gap-2 sm:w-auto">
-              <SearchInput v-model="keyword" />
+              <SearchInput v-if="!selectedNames.length" v-model="keyword" />
+              <VSpace v-else>
+                <VButton @click="handleChangeStatusInBatch(true)">
+                  {{ $t("core.common.buttons.activate") }}
+                </VButton>
+                <VButton @click="handleChangeStatusInBatch(false)">
+                  {{ $t("core.common.buttons.inactivate") }}
+                </VButton>
+                <VDropdown>
+                  <VButton type="danger">
+                    {{ $t("core.common.buttons.uninstall") }}
+                  </VButton>
+                  <template #popper>
+                    <VDropdownItem
+                      type="danger"
+                      @click="handleUninstallInBatch(false)"
+                    >
+                      {{ $t("core.common.buttons.uninstall") }}
+                    </VDropdownItem>
+                    <VDropdownItem
+                      type="danger"
+                      @click="handleUninstallInBatch(true)"
+                    >
+                      {{
+                        $t(
+                          "core.plugin.operations.uninstall_and_delete_config.button"
+                        )
+                      }}
+                    </VDropdownItem>
+                  </template>
+                </VDropdown>
+              </VSpace>
             </div>
             <div class="mt-4 flex sm:mt-0">
               <VSpace spacing="lg">
@@ -219,7 +283,7 @@ onMounted(() => {
               <VButton
                 v-permission="['system:plugins:manage']"
                 type="secondary"
-                @click="pluginInstall = true"
+                @click="handleOpenUploadModal"
               >
                 <template #icon>
                   <IconAddCircle class="h-full w-full" />
@@ -237,23 +301,21 @@ onMounted(() => {
           role="list"
         >
           <li v-for="plugin in data" :key="plugin.metadata.name">
-            <PluginListItem :plugin="plugin" />
+            <PluginListItem
+              :plugin="plugin"
+              :is-selected="selectedNames.includes(plugin.metadata.name)"
+              @open-upgrade-modal="handleOpenUploadModal"
+            />
           </li>
         </ul>
       </Transition>
 
       <template #footer>
-        <VPagination
-          v-model:page="page"
-          v-model:size="size"
-          :page-label="$t('core.components.pagination.page_label')"
-          :size-label="$t('core.components.pagination.size_label')"
-          :total-label="
-            $t('core.components.pagination.total_label', { total: total })
-          "
-          :total="total"
-          :size-options="[10, 20, 30, 50, 100]"
-        />
+        <div class="flex h-8 items-center">
+          <span class="text-sm text-gray-500">
+            {{ $t("core.components.pagination.total_label", { total: total }) }}
+          </span>
+        </div>
       </template>
     </VCard>
   </div>

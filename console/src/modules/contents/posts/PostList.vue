@@ -472,7 +472,7 @@ watch(selectedPostNames, (newValue) => {
           class="box-border h-full w-full divide-y divide-gray-100"
           role="list"
         >
-          <li v-for="(post, index) in posts" :key="index">
+          <li v-for="post in posts" :key="post.post.metadata.name">
             <PostListItem
               :post="post"
               :is-selected="checkSelection(post.post)"

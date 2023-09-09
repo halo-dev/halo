@@ -1,8 +1,44 @@
 import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
-import { useQueryClient } from "@tanstack/vue-query";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import dayjs from "dayjs";
+import { BackupStatusPhaseEnum } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
+
+export function useBackupFetch() {
+  return useQuery({
+    queryKey: ["backups"],
+    queryFn: async () => {
+      const { data } =
+        await apiClient.extension.backup.listmigrationHaloRunV1alpha1Backup({
+          sort: ["metadata.creationTimestamp,desc"],
+        });
+      return data;
+    },
+    refetchInterval(data) {
+      const deletingBackups = data?.items.filter((backup) => {
+        return !!backup.metadata.deletionTimestamp;
+      });
+
+      if (deletingBackups?.length) {
+        return 1000;
+      }
+
+      const pendingBackups = data?.items.filter((backup) => {
+        return (
+          backup.status?.phase === BackupStatusPhaseEnum.Pending ||
+          backup.status?.phase === BackupStatusPhaseEnum.Running
+        );
+      });
+
+      if (pendingBackups?.length) {
+        return 3000;
+      }
+
+      return false;
+    },
+  });
+}
 
 export function useBackup() {
   const { t } = useI18n();

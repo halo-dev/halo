@@ -1,6 +1,16 @@
 import { apiClient } from "@/utils/api-client";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import { checkbox, checkboxes, defaultIcon } from "@formkit/inputs";
+import type { FormKitInputs } from "@formkit/inputs";
+
+declare module "@formkit/inputs" {
+  interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    tagCheckbox: {
+      type: "tagCheckbox";
+      value?: string[];
+    };
+  }
+}
 
 function optionsHandler(node: FormKitNode) {
   node.on("created", async () => {
