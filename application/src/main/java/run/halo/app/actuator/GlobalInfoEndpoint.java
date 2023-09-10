@@ -53,6 +53,7 @@ public class GlobalInfoEndpoint {
                 handleCommentSetting(info, configMap);
                 handleUserSetting(info, configMap);
                 handleBasicSetting(info, configMap);
+                handlePostSlugGenerationStrategy(info, configMap);
             }));
 
         return info;
@@ -80,6 +81,8 @@ public class GlobalInfoEndpoint {
         private boolean userInitialized;
 
         private boolean dataInitialized;
+
+        private String postSlugGenerationStrategy;
 
         private List<SocialAuthProvider> socialAuthProviders;
     }
@@ -120,6 +123,13 @@ public class GlobalInfoEndpoint {
         } else {
             info.setAllowRegistration(
                 user.getAllowRegistration() != null && user.getAllowRegistration());
+        }
+    }
+
+    private void handlePostSlugGenerationStrategy(GlobalInfo info, ConfigMap configMap) {
+        var post = SystemSetting.get(configMap, SystemSetting.Post.GROUP, SystemSetting.Post.class);
+        if (post != null) {
+            info.setPostSlugGenerationStrategy(post.getSlugGenerationStrategy());
         }
     }
 

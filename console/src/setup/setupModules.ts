@@ -30,7 +30,6 @@ export async function setupPluginModules(app: App) {
 
     enabledPluginNames.forEach((name) => {
       const module = window[name];
-
       if (module) {
         registerModule(app, module, false);
         pluginModuleStore.registerPluginModule(name, module);

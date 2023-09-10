@@ -1,3 +1,5 @@
+import type { ModeType } from "./slug";
+
 export interface GlobalInfo {
   externalUrl: string;
   timeZone: string;
@@ -10,6 +12,7 @@ export interface GlobalInfo {
   userInitialized: boolean;
   dataInitialized: boolean;
   favicon?: string;
+  postSlugGenerationStrategy: ModeType;
 }
 
 export interface Info {
