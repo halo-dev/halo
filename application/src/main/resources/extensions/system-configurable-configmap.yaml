@@ -31,7 +31,8 @@ data:
       "postPageSize": 10,
       "archivePageSize": 10,
       "categoryPageSize": 10,
-      "tagPageSize": 10
+      "tagPageSize": 10,
+      "slugGenerationStrategy": "generateByTitle"
     }
   comment: |
     {

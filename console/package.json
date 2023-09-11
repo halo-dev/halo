@@ -92,6 +92,7 @@
     "pinia": "^2.1.6",
     "pretty-bytes": "^6.0.0",
     "qs": "^6.11.1",
+    "short-unique-id": "^5.0.2",
     "transliteration": "^2.3.5",
     "vue": "^3.3.4",
     "vue-demi": "^0.14.5",
