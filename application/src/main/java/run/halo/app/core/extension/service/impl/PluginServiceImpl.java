@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.Validate;
 import org.pf4j.PluginWrapper;
+import org.pf4j.RuntimeMode;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
@@ -186,10 +187,15 @@ public class PluginServiceImpl implements PluginService {
     @Override
     public Mono<String> generateJsBundleVersion() {
         return Mono.fromSupplier(() -> {
+            if (RuntimeMode.DEVELOPMENT.equals(pluginManager.getRuntimeMode())) {
+                return String.valueOf(System.currentTimeMillis());
+            }
             var compactVersion = pluginManager.getStartedPlugins()
                 .stream()
                 .sorted(Comparator.comparing(PluginWrapper::getPluginId))
-                .map(pluginWrapper -> pluginWrapper.getDescriptor().getVersion())
+                .map(pluginWrapper -> pluginWrapper.getPluginId() + ":"
+                    + pluginWrapper.getDescriptor().getVersion()
+                )
                 .collect(Collectors.joining());
             return Hashing.sha256().hashUnencodedChars(compactVersion).toString();
         });
