@@ -23,13 +23,17 @@ public class BasePluginFactory implements PluginFactory {
         return getPluginContext(pluginWrapper)
             .map(context -> {
                 try {
-                    return context.getBean(BasePlugin.class);
+                    var basePlugin = context.getBean(BasePlugin.class);
+                    var pluginContext = context.getBean(PluginContext.class);
+                    basePlugin.setContext(pluginContext);
+                    return basePlugin;
                 } catch (NoSuchBeanDefinitionException e) {
                     log.info(
                         "No bean named 'basePlugin' found in the context create default instance");
                     DefaultListableBeanFactory beanFactory =
                         context.getDefaultListableBeanFactory();
-                    BasePlugin pluginInstance = new BasePlugin();
+                    var pluginContext = beanFactory.getBean(PluginContext.class);
+                    BasePlugin pluginInstance = new BasePlugin(pluginContext);
                     beanFactory.registerSingleton(Plugin.class.getName(), pluginInstance);
                     return pluginInstance;
                 }

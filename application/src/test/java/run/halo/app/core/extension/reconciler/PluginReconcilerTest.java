@@ -51,6 +51,7 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.plugin.HaloPluginManager;
+import run.halo.app.plugin.HaloPluginWrapper;
 import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginStartingError;
 
@@ -70,7 +71,7 @@ class PluginReconcilerTest {
     ExtensionClient extensionClient;
 
     @Mock
-    PluginWrapper pluginWrapper;
+    HaloPluginWrapper pluginWrapper;
 
     @Mock
     ApplicationEventPublisher eventPublisher;
