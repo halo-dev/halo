@@ -49,7 +49,7 @@ public class BasePlugin extends Plugin {
      *
      * @param context plugin context must not be null.
      */
-    void setContext(PluginContext context) {
+    final void setContext(PluginContext context) {
         Assert.notNull(context, "Plugin context must not be null");
         this.context = context;
     }
