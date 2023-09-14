@@ -16,13 +16,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.content.SinglePageService;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.content.Snapshot;
+import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ExtensionOperator;
+import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Ref;
 import run.halo.app.extension.controller.Controller;
@@ -35,6 +38,7 @@ import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
+import run.halo.app.notification.NotificationCenter;
 
 /**
  * <p>Reconciler for {@link SinglePage}.</p>
@@ -59,16 +63,22 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
     private final ExternalUrlSupplier externalUrlSupplier;
 
+    private final NotificationCenter notificationCenter;
+
     @Override
     public Result reconcile(Request request) {
         client.fetch(SinglePage.class, request.name())
             .ifPresent(singlePage -> {
-                SinglePage oldPage = JsonUtils.deepCopy(singlePage);
                 if (ExtensionOperator.isDeleted(singlePage)) {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
                     return;
                 }
-                addFinalizerIfNecessary(oldPage);
+
+                if (ExtensionUtil.addFinalizers(singlePage.getMetadata(), Set.of(FINALIZER_NAME))) {
+                    client.update(singlePage);
+                }
+
+                subscribeNewCommentNotification(singlePage);
 
                 // reconcile spec first
                 reconcileSpec(request.name());
@@ -84,6 +94,20 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
         return builder
             .extension(new SinglePage())
             .build();
+    }
+
+    void subscribeNewCommentNotification(SinglePage page) {
+        var subscriber = new Subscription.Subscriber();
+        subscriber.setName(page.getSpec().getOwner());
+
+        var interestReason = new Subscription.InterestReason();
+        interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_PAGE);
+        interestReason.setSubject(Subscription.ReasonSubject.builder()
+            .apiVersion(page.getApiVersion())
+            .kind(page.getKind())
+            .name(page.getMetadata().getName())
+            .build());
+        notificationCenter.subscribe(subscriber, interestReason).block();
     }
 
     private void reconcileSpec(String name) {
@@ -210,23 +234,6 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
                 client.update(page);
             }
         });
-    }
-
-    private void addFinalizerIfNecessary(SinglePage oldSinglePage) {
-        Set<String> finalizers = oldSinglePage.getMetadata().getFinalizers();
-        if (finalizers != null && finalizers.contains(FINALIZER_NAME)) {
-            return;
-        }
-        client.fetch(SinglePage.class, oldSinglePage.getMetadata().getName())
-            .ifPresent(singlePage -> {
-                Set<String> newFinalizers = singlePage.getMetadata().getFinalizers();
-                if (newFinalizers == null) {
-                    newFinalizers = new HashSet<>();
-                    singlePage.getMetadata().setFinalizers(newFinalizers);
-                }
-                newFinalizers.add(FINALIZER_NAME);
-                client.update(singlePage);
-            });
     }
 
     private void cleanUpResources(SinglePage singlePage) {

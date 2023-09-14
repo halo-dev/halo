@@ -72,4 +72,9 @@ public class AttributesRecord implements Attributes {
     public String getSubName() {
         return requestInfo.getSubName();
     }
+
+    @Override
+    public String getUserSpace() {
+        return requestInfo.getUserspace();
+    }
 }

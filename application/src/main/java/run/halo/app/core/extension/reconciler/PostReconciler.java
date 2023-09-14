@@ -19,6 +19,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.ContentWrapper;
+import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.content.PostService;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.core.extension.content.Comment;
@@ -27,6 +28,7 @@ import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Post.PostPhase;
 import run.halo.app.core.extension.content.Post.VisibleEnum;
 import run.halo.app.core.extension.content.Snapshot;
+import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.event.post.PostUnpublishedEvent;
 import run.halo.app.event.post.PostUpdatedEvent;
@@ -42,6 +44,7 @@ import run.halo.app.infra.ConditionStatus;
 import run.halo.app.infra.utils.HaloUtils;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
+import run.halo.app.notification.NotificationCenter;
 
 /**
  * <p>Reconciler for {@link Post}.</p>
@@ -65,6 +68,7 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
     private final CounterService counterService;
 
     private final ApplicationEventPublisher eventPublisher;
+    private final NotificationCenter notificationCenter;
 
     @Override
     public Result reconcile(Request request) {
@@ -81,7 +85,10 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                     events.forEach(eventPublisher::publishEvent);
                     return;
                 }
+
                 addFinalizers(post.getMetadata(), Set.of(FINALIZER_NAME));
+
+                subscribeNewCommentNotification(post);
 
                 var labels = post.getMetadata().getLabels();
                 if (labels == null) {
@@ -205,6 +212,20 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
             // TODO Make it configurable
             .workerCount(1)
             .build();
+    }
+
+    void subscribeNewCommentNotification(Post post) {
+        var subscriber = new Subscription.Subscriber();
+        subscriber.setName(post.getSpec().getOwner());
+
+        var interestReason = new Subscription.InterestReason();
+        interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_POST);
+        interestReason.setSubject(Subscription.ReasonSubject.builder()
+            .apiVersion(post.getApiVersion())
+            .kind(post.getKind())
+            .name(post.getMetadata().getName())
+            .build());
+        notificationCenter.subscribe(subscriber, interestReason).block();
     }
 
     private void publishPost(Post post, Set<ApplicationEvent> events) {

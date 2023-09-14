@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
@@ -41,6 +42,18 @@ public class DefaultRuleResolver implements AuthorizationRuleResolver {
 
         var record = new AttributesRecord(user, requestInfo);
         var visitor = new AuthorizingVisitor(record);
+
+        // If the request is an userspace scoped request,
+        // then we should check whether the user is the owner of the userspace.
+        if (StringUtils.isNotBlank(requestInfo.getUserspace())) {
+            if (!user.getUsername().equals(requestInfo.getUserspace())) {
+                return Mono.fromSupplier(() -> {
+                    visitor.visit(null, null, null);
+                    return visitor;
+                });
+            }
+        }
+
         var stopVisiting = new AtomicBoolean(false);
         return roleService.listDependenciesFlux(roleNames)
             .filter(role -> !CollectionUtils.isEmpty(role.getRules()))

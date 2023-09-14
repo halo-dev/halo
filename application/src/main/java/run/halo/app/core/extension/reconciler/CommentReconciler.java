@@ -1,21 +1,25 @@
 package run.halo.app.core.extension.reconciler;
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static run.halo.app.extension.ExtensionUtil.addFinalizers;
 
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import run.halo.app.content.comment.ReplyNotificationSubscriptionHelper;
 import run.halo.app.content.comment.ReplyService;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.content.Comment;
 import run.halo.app.core.extension.content.Constant;
 import run.halo.app.core.extension.content.Reply;
+import run.halo.app.event.post.CommentCreatedEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.MetadataUtil;
@@ -34,15 +38,14 @@ import run.halo.app.metrics.MeterUtils;
  * @since 2.0.0
  */
 @Component
+@RequiredArgsConstructor
 public class CommentReconciler implements Reconciler<Reconciler.Request> {
     public static final String FINALIZER_NAME = "comment-protection";
     private final ExtensionClient client;
     private final SchemeManager schemeManager;
+    private final ApplicationEventPublisher eventPublisher;
 
-    public CommentReconciler(ExtensionClient client, SchemeManager schemeManager) {
-        this.client = client;
-        this.schemeManager = schemeManager;
-    }
+    private final ReplyNotificationSubscriptionHelper replyNotificationSubscriptionHelper;
 
     @Override
     public Result reconcile(Request request) {
@@ -52,7 +55,13 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
                     cleanUpResourcesAndRemoveFinalizer(request.name());
                     return;
                 }
-                addFinalizerIfNecessary(comment);
+                if (addFinalizers(comment.getMetadata(), Set.of(FINALIZER_NAME))) {
+                    client.update(comment);
+                    eventPublisher.publishEvent(new CommentCreatedEvent(this, comment));
+                }
+
+                replyNotificationSubscriptionHelper.subscribeNewReplyReasonForComment(comment);
+
                 compatibleCreationTime(request.name());
                 reconcileStatus(request.name());
                 updateSameSubjectRefCommentCounter(comment.getSpec().getSubjectRef());
@@ -91,23 +100,6 @@ public class CommentReconciler implements Reconciler<Reconciler.Request> {
 
     private boolean isDeleted(Comment comment) {
         return comment.getMetadata().getDeletionTimestamp() != null;
-    }
-
-    private void addFinalizerIfNecessary(Comment oldComment) {
-        Set<String> finalizers = oldComment.getMetadata().getFinalizers();
-        if (finalizers != null && finalizers.contains(FINALIZER_NAME)) {
-            return;
-        }
-        client.fetch(Comment.class, oldComment.getMetadata().getName())
-            .ifPresent(comment -> {
-                Set<String> newFinalizers = comment.getMetadata().getFinalizers();
-                if (newFinalizers == null) {
-                    newFinalizers = new HashSet<>();
-                    comment.getMetadata().setFinalizers(newFinalizers);
-                }
-                newFinalizers.add(FINALIZER_NAME);
-                client.update(comment);
-            });
     }
 
     private void reconcileStatus(String name) {

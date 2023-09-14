@@ -1,0 +1,126 @@
+apiVersion: notification.halo.run/v1alpha1
+kind: NotificationTemplate
+metadata:
+  name: template-new-comment-on-post
+spec:
+  reasonSelector:
+    reasonType: new-comment-on-post
+    language: default
+  template:
+    title: "[(${commenter})] 评论了您的文章《[(${postTitle})]》"
+    rawBody: |
+      [(${subscriber.displayName})] 你好：
+      
+        [(${commenter})] 评论了您的文章 《[(${postTitle})]》，以下是评论的具体内容：
+      
+        [(${content})]
+      
+      --- 
+      如果您不想再收到此类通知，点击链接退订: [(${unsubscribeUrl})]
+      
+      [(${site.title})]
+    htmlBody: |
+      <div class="head">
+      <p class="honorific" th:text="|${subscriber.displayName} 你好：|"></p>
+      </div>
+      <div class="body" style="text-indent: 2em">
+        <p><span th:text="${commenter}"></span> 评论了您的文章
+        <a th:href="${postUrl}" th:text="|《${postTitle}》|"></a>，以下是评论的具体内容：</p>
+        <p class="content" th:text="${content}"></p>
+      </div>
+      <div>
+      <a th:href="${site.url}" th:text="${site.title}"></a>
+      </div>
+      <div class="footer" style="font-size: 12px; color: #666">
+      <p class="unsubscribe">
+      &mdash;<br />请勿直接回复此回邮件，
+      <a th:href="|${site.url}/console|">查看通知</a>
+      或
+      <a th:href="${unsubscribeUrl}">取消订阅</a>。
+      </p>
+      </div>
+---
+apiVersion: notification.halo.run/v1alpha1
+kind: NotificationTemplate
+metadata:
+  name: template-new-comment-on-single-page
+spec:
+  reasonSelector:
+    reasonType: new-comment-on-single-page
+    language: default
+  template:
+    title: "[(${commenter})] 评论了您的页面《[(${pageTitle})]》"
+    rawBody: |
+      [(${subscriber.displayName})] 你好：
+      
+        [(${commenter})] 评论了您的页面 《[(${pageTitle})]》，以下是评论的具体内容：
+      
+        [(${content})]
+      
+      --- 
+      如果您不想再收到此类通知，点击链接退订: [(${unsubscribeUrl})]
+      
+      [(${site.title})]
+    htmlBody: |
+      <div class="head">
+      <p class="honorific" th:text="|${subscriber.displayName} 你好：|"></p>
+      </div>
+      <div class="body" style="text-indent: 2em">
+        <p><span th:text="${commenter}"></span> 评论了您的页面
+        <a th:href="${pageUrl}" th:text="|《${pageTitle}》|"></a>，以下是评论的具体内容：</p>
+        <p class="content" th:text="${content}"></p>
+      </div>
+      <div>
+      <a th:href="${site.url}" th:text="${site.title}"></a>
+      </div>
+      <div class="footer" style="font-size: 12px; color: #666">
+      <p class="unsubscribe">
+      &mdash;<br />请勿直接回复此回邮件，
+      <a th:href="|${site.url}/console|">查看通知</a>
+      或
+      <a th:href="${unsubscribeUrl}">取消订阅</a>。
+      </p>
+      </div>
+---
+apiVersion: notification.halo.run/v1alpha1
+kind: NotificationTemplate
+metadata:
+  name: template-someone-replied-to-you
+spec:
+  reasonSelector:
+    reasonType: someone-replied-to-you
+    language: default
+  template:
+    title: "[(${replier})] 在评论中回复了您"
+    rawBody: |
+      [(${subscriber.displayName})] 你好：
+
+        [(${replier})] 在评论“[(${isQuoteReply ? quoteContent : commentContent})]”中回复了您，以下是回复的具体内容：
+
+        [(${content})]
+
+      --- 
+      如果您不想再收到此类通知，点击链接退订: [(${unsubscribeUrl})]
+      
+      [(${site.title})]
+    htmlBody: |
+      <div class="head">
+        <p class="honorific" th:text="|${subscriber.displayName} 你好：|"></p>
+      </div>
+      <div class="body" style="text-indent: 2em">
+        <p><span th:text="${replier}"></span> 在评论
+        <a th:href="${commentSubjectUrl}" th:text="|”${isQuoteReply ? quoteContent : commentContent}”|"></a>
+        中回复了您，以下是回复的具体内容：
+        <p class="content" th:text="${content}"></p>
+      </div>
+      <div>
+      <a th:href="${site.url}" th:text="${site.title}"></a>
+      </div>
+      <div class="footer" style="font-size: 12px; color: #666">
+      <p class="unsubscribe">
+        &mdash;<br />请勿直接回复此回邮件，
+        <a th:href="|${site.url}/console|">查看通知</a>
+        或
+        <a th:href="${unsubscribeUrl}">取消订阅</a>。
+      </p>
+      </div>

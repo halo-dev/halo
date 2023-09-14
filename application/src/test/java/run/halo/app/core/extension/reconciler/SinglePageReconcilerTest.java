@@ -2,7 +2,9 @@ package run.halo.app.core.extension.reconciler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,6 +15,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,16 +26,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentWrapper;
+import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.content.SinglePageService;
 import run.halo.app.content.TestPost;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.content.Snapshot;
+import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.ExternalUrlSupplier;
 import run.halo.app.metrics.CounterService;
+import run.halo.app.notification.NotificationCenter;
 
 /**
  * Tests for {@link SinglePageReconciler}.
@@ -57,8 +63,16 @@ class SinglePageReconcilerTest {
     @Mock
     private ExternalUrlSupplier externalUrlSupplier;
 
+    @Mock
+    NotificationCenter notificationCenter;
+
     @InjectMocks
     private SinglePageReconciler singlePageReconciler;
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(notificationCenter.subscribe(any(), any())).thenReturn(Mono.empty());
+    }
 
     @Test
     void reconcile() {
@@ -203,5 +217,27 @@ class SinglePageReconcilerTest {
         spec.setReleaseSnapshot(null);
 
         return page;
+    }
+
+
+    @Test
+    void subscribeNewCommentNotificationTest() {
+        var page = pageV1();
+
+        singlePageReconciler.subscribeNewCommentNotification(page);
+
+        verify(notificationCenter).subscribe(
+            assertArg(subscriber -> assertThat(subscriber.getName())
+                .isEqualTo(page.getSpec().getOwner())),
+            assertArg(argReason -> {
+                var interestReason = new Subscription.InterestReason();
+                interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_PAGE);
+                interestReason.setSubject(Subscription.ReasonSubject.builder()
+                    .apiVersion(page.getApiVersion())
+                    .kind(page.getKind())
+                    .name(page.getMetadata().getName())
+                    .build());
+                assertThat(argReason).isEqualTo(interestReason);
+            }));
     }
 }

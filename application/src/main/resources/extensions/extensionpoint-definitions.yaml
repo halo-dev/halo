@@ -52,3 +52,14 @@ spec:
   displayName: Username password authentication manager
   type: SINGLETON
   description: "Provides a way to extend the username password authentication."
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: reactive-notifier
+spec:
+  className: run.halo.app.notification.ReactiveNotifier
+  displayName: Notifier
+  type: MULTI_INSTANCE
+  description: "Provides a way to extend the notifier to send notifications to users."
