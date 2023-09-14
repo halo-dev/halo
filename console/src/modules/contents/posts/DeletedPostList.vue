@@ -225,11 +225,11 @@ watch(
       <template #header>
         <div class="block w-full bg-gray-50 px-4 py-3">
           <div
-            class="relative flex flex-col items-start sm:flex-row sm:items-center"
+            class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
           >
             <div
               v-permission="['system:posts:manage']"
-              class="mr-4 hidden items-center sm:flex"
+              class="hidden items-center sm:flex"
             >
               <input
                 v-model="checkedAll"
@@ -249,21 +249,19 @@ watch(
                 </VButton>
               </VSpace>
             </div>
-            <div class="mt-4 flex sm:mt-0">
-              <VSpace spacing="lg">
-                <div class="flex flex-row gap-2">
-                  <div
-                    class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                    @click="refetch()"
-                  >
-                    <IconRefreshLine
-                      :class="{ 'animate-spin text-gray-900': isFetching }"
-                      class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                    />
-                  </div>
+            <VSpace spacing="lg" class="flex-wrap">
+              <div class="flex flex-row gap-2">
+                <div
+                  class="group cursor-pointer rounded p-1 hover:bg-gray-200"
+                  @click="refetch()"
+                >
+                  <IconRefreshLine
+                    :class="{ 'animate-spin text-gray-900': isFetching }"
+                    class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
+                  />
                 </div>
-              </VSpace>
-            </div>
+              </div>
+            </VSpace>
           </div>
         </div>
       </template>
