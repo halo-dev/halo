@@ -317,11 +317,11 @@ watch(selectedPageNames, (newValue) => {
       <template #header>
         <div class="block w-full bg-gray-50 px-4 py-3">
           <div
-            class="relative flex flex-col items-start sm:flex-row sm:items-center"
+            class="relative flex flex-col flex-wrap items-start gap-4 sm:flex-row sm:items-center"
           >
             <div
               v-permission="['system:singlepages:manage']"
-              class="mr-4 hidden items-center sm:flex"
+              class="hidden items-center sm:flex"
             >
               <input
                 v-model="checkedAll"
@@ -338,93 +338,89 @@ watch(selectedPageNames, (newValue) => {
                 </VButton>
               </VSpace>
             </div>
-            <div class="mt-4 flex sm:mt-0">
-              <VSpace spacing="lg">
-                <FilterCleanButton
-                  v-if="hasFilters"
-                  @click="handleClearFilters"
-                />
-                <FilterDropdown
-                  v-model="selectedPublishStatus"
-                  :label="$t('core.common.filters.labels.status')"
-                  :items="[
-                    {
-                      label: t('core.common.filters.item_labels.all'),
-                      value: undefined,
-                    },
-                    {
-                      label: t('core.page.filters.status.items.published'),
-                      value: 'true',
-                    },
-                    {
-                      label: t('core.page.filters.status.items.draft'),
-                      value: 'false',
-                    },
-                  ]"
-                />
-                <FilterDropdown
-                  v-model="selectedVisible"
-                  :label="$t('core.page.filters.visible.label')"
-                  :items="[
-                    {
-                      label: t('core.common.filters.item_labels.all'),
-                      value: undefined,
-                    },
-                    {
-                      label: t('core.page.filters.visible.items.public'),
-                      value: 'PUBLIC',
-                    },
-                    {
-                      label: t('core.page.filters.visible.items.private'),
-                      value: 'PRIVATE',
-                    },
-                  ]"
-                />
-                <UserFilterDropdown
-                  v-model="selectedContributor"
-                  :label="$t('core.page.filters.author.label')"
-                />
-                <FilterDropdown
-                  v-model="selectedSort"
-                  :label="$t('core.common.filters.labels.sort')"
-                  :items="[
-                    {
-                      label: t('core.common.filters.item_labels.default'),
-                    },
-                    {
-                      label: t(
-                        'core.page.filters.sort.items.publish_time_desc'
-                      ),
-                      value: 'publishTime,desc',
-                    },
-                    {
-                      label: t('core.page.filters.sort.items.publish_time_asc'),
-                      value: 'publishTime,asc',
-                    },
-                    {
-                      label: t('core.page.filters.sort.items.create_time_desc'),
-                      value: 'creationTimestamp,desc',
-                    },
-                    {
-                      label: t('core.page.filters.sort.items.create_time_asc'),
-                      value: 'creationTimestamp,asc',
-                    },
-                  ]"
-                />
-                <div class="flex flex-row gap-2">
-                  <div
-                    class="group cursor-pointer rounded p-1 hover:bg-gray-200"
-                    @click="refetch()"
-                  >
-                    <IconRefreshLine
-                      v-tooltip="$t('core.common.buttons.refresh')"
-                      :class="{ 'animate-spin text-gray-900': isFetching }"
-                      class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                    />
-                  </div>
+            <VSpace spacing="lg" class="flex-wrap">
+              <FilterCleanButton
+                v-if="hasFilters"
+                @click="handleClearFilters"
+              />
+              <FilterDropdown
+                v-model="selectedPublishStatus"
+                :label="$t('core.common.filters.labels.status')"
+                :items="[
+                  {
+                    label: t('core.common.filters.item_labels.all'),
+                    value: undefined,
+                  },
+                  {
+                    label: t('core.page.filters.status.items.published'),
+                    value: 'true',
+                  },
+                  {
+                    label: t('core.page.filters.status.items.draft'),
+                    value: 'false',
+                  },
+                ]"
+              />
+              <FilterDropdown
+                v-model="selectedVisible"
+                :label="$t('core.page.filters.visible.label')"
+                :items="[
+                  {
+                    label: t('core.common.filters.item_labels.all'),
+                    value: undefined,
+                  },
+                  {
+                    label: t('core.page.filters.visible.items.public'),
+                    value: 'PUBLIC',
+                  },
+                  {
+                    label: t('core.page.filters.visible.items.private'),
+                    value: 'PRIVATE',
+                  },
+                ]"
+              />
+              <UserFilterDropdown
+                v-model="selectedContributor"
+                :label="$t('core.page.filters.author.label')"
+              />
+              <FilterDropdown
+                v-model="selectedSort"
+                :label="$t('core.common.filters.labels.sort')"
+                :items="[
+                  {
+                    label: t('core.common.filters.item_labels.default'),
+                  },
+                  {
+                    label: t('core.page.filters.sort.items.publish_time_desc'),
+                    value: 'publishTime,desc',
+                  },
+                  {
+                    label: t('core.page.filters.sort.items.publish_time_asc'),
+                    value: 'publishTime,asc',
+                  },
+                  {
+                    label: t('core.page.filters.sort.items.create_time_desc'),
+                    value: 'creationTimestamp,desc',
+                  },
+                  {
+                    label: t('core.page.filters.sort.items.create_time_asc'),
+                    value: 'creationTimestamp,asc',
+                  },
+                ]"
+              />
+              <div class="flex flex-row gap-2">
+                <div
+                  class="group cursor-pointer rounded p-1 hover:bg-gray-200"
+                  @click="refetch()"
+                >
+                  <IconRefreshLine
+                    v-tooltip="$t('core.common.buttons.refresh')"
+                    :class="{ 'animate-spin text-gray-900': isFetching }"
+                    class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
+                  />
                 </div>
-              </VSpace>
-            </div>
+              </div>
+            </VSpace>
           </div>
         </div>
       </template>
