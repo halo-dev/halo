@@ -35,7 +35,6 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (event: "select", menu: Menu): void;
   (event: "update:selectedMenu", menu: Menu): void;
 }>();
 
@@ -76,7 +75,6 @@ const {
 const menuQuery = useRouteQuery("menu");
 const handleSelect = (menu: Menu) => {
   emit("update:selectedMenu", menu);
-  emit("select", menu);
   menuQuery.value = menu.metadata.name;
 };
 
