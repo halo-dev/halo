@@ -356,10 +356,12 @@ onMounted(() => {
                       }) || []),
                     ]"
                   />
-                  <UserFilterDropdown
-                    v-model="selectedUser"
-                    :label="$t('core.attachment.filters.owner.label')"
-                  />
+                  <HasPermission :permissions="['system:users:view']">
+                    <UserFilterDropdown
+                      v-model="selectedUser"
+                      :label="$t('core.attachment.filters.owner.label')"
+                    />
+                  </HasPermission>
                   <FilterDropdown
                     v-model="selectedSort"
                     :label="$t('core.common.filters.labels.sort')"
