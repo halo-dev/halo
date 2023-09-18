@@ -612,6 +612,11 @@ onMounted(() => {
                               },
                             }"
                             class="text-xs text-gray-500"
+                            :class="{
+                              'pointer-events-none': !currentUserHasPermission([
+                                'system:users:view',
+                              ]),
+                            }"
                           >
                             {{ attachment.spec.ownerName }}
                           </RouterLink>
