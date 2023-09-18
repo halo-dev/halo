@@ -74,10 +74,10 @@ tasks.register('downloadPluginPresets', Download) {
         delete 'src/main/resources/presets/plugins'
     }
     src([
-            'https://github.com/halo-sigs/plugin-comment-widget/releases/download/v1.7.0/plugin-comment-widget-1.7.0.jar',
-            'https://github.com/halo-sigs/plugin-search-widget/releases/download/v1.1.0/plugin-search-widget-1.1.0.jar',
-            'https://github.com/halo-sigs/plugin-sitemap/releases/download/v1.0.2/plugin-sitemap-1.0.2.jar',
-            'https://github.com/halo-sigs/plugin-feed/releases/download/v1.1.1/plugin-feed-1.1.1.jar'
+            'https://github.com/halo-dev/plugin-comment-widget/releases/download/v1.7.0/plugin-comment-widget-1.7.0.jar',
+            'https://github.com/halo-dev/plugin-search-widget/releases/download/v1.1.0/plugin-search-widget-1.1.0.jar',
+            'https://github.com/halo-dev/plugin-sitemap/releases/download/v1.0.2/plugin-sitemap-1.0.2.jar',
+            'https://github.com/halo-dev/plugin-feed/releases/download/v1.1.1/plugin-feed-1.1.1.jar'
     ])
     dest 'src/main/resources/presets/plugins'
 }
