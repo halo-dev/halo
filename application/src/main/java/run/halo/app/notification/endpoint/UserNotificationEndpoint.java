@@ -3,8 +3,10 @@ package run.halo.app.notification.endpoint;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
+import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import java.util.List;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.fn.builders.schema.Builder;
@@ -40,12 +42,6 @@ public class UserNotificationEndpoint implements CustomEndpoint {
         return SpringdocRouteBuilder.route()
             .nest(RequestPredicates.path("/userspaces/{username}"), userspaceScopedApis(),
                 builder -> {
-                    builder.parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("username")
-                        .description("Username")
-                        .required(true)
-                    );
                 })
             .build();
     }
@@ -58,6 +54,12 @@ public class UserNotificationEndpoint implements CustomEndpoint {
                     builder.operationId("ListUserNotifications")
                         .description("List notifications for the authenticated user.")
                         .tag(tag)
+                        .parameter(parameterBuilder()
+                            .in(ParameterIn.PATH)
+                            .name("username")
+                            .description("Username")
+                            .required(true)
+                        )
                         .response(responseBuilder()
                             .implementation(ListResult.generateGenericClass(Notification.class))
                         );
@@ -69,6 +71,18 @@ public class UserNotificationEndpoint implements CustomEndpoint {
                 builder -> builder.operationId("MarkNotificationAsRead")
                     .description("Mark the specified notification as read.")
                     .tag(tag)
+                    .parameter(parameterBuilder()
+                        .in(ParameterIn.PATH)
+                        .name("username")
+                        .description("Username")
+                        .required(true)
+                    )
+                    .parameter(parameterBuilder()
+                        .in(ParameterIn.PATH)
+                        .name("name")
+                        .description("Notification name")
+                        .required(true)
+                    )
                     .response(responseBuilder().implementation(Notification.class))
             )
             .PUT("/notifications/-/mark-specified-as-read", this::markNotificationsAsRead,
@@ -76,16 +90,25 @@ public class UserNotificationEndpoint implements CustomEndpoint {
                     .description("Mark the specified notifications as read.")
                     .tag(tag)
                     .parameter(parameterBuilder()
+                        .in(ParameterIn.PATH)
+                        .name("username")
+                        .description("Username")
+                        .required(true)
+                    )
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
                         .content(contentBuilder()
                             .mediaType(MediaType.APPLICATION_JSON_VALUE)
                             .schema(Builder.schemaBuilder()
-                                .implementation(String[].class)
-                            )
+                                .implementation(MarkSpecifiedRequest.class))
                         )
                     )
                     .response(responseBuilder().implementationArray(String.class))
             )
             .build();
+    }
+
+    record MarkSpecifiedRequest(List<String> names) {
     }
 
     private Mono<ServerResponse> listNotification(ServerRequest request) {
@@ -104,9 +127,9 @@ public class UserNotificationEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> markNotificationsAsRead(ServerRequest request) {
         var username = request.pathVariable("username");
-        return request.bodyToFlux(String.class)
-            .collectList()
-            .flatMapMany(names -> notificationService.markSpecifiedAsRead(username, names))
+        return request.bodyToMono(MarkSpecifiedRequest.class)
+            .flatMapMany(
+                requestBody -> notificationService.markSpecifiedAsRead(username, requestBody.names))
             .collectList()
             .flatMap(names -> ServerResponse.ok().bodyValue(names));
     }

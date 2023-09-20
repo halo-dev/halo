@@ -3,6 +3,7 @@ package run.halo.app.notification.endpoint;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
+import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -68,6 +69,9 @@ public class NotifierEndpoint implements CustomEndpoint {
                         .name("name")
                         .description("Notifier name")
                         .required(true)
+                    )
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
                         .content(contentBuilder()
                             .mediaType(MediaType.APPLICATION_JSON_VALUE)
                             .schema(Builder.schemaBuilder()
@@ -84,6 +88,9 @@ public class NotifierEndpoint implements CustomEndpoint {
                         .in(ParameterIn.PATH)
                         .name("name")
                         .description("Notifier name")
+                        .required(true)
+                    )
+                    .requestBody(requestBodyBuilder()
                         .required(true)
                         .content(contentBuilder()
                             .mediaType(MediaType.APPLICATION_JSON_VALUE)
