@@ -11,6 +11,8 @@ import {
   ApiConsoleHaloRunV1alpha1IndicesApi,
   ApiConsoleHaloRunV1alpha1AuthProviderApi,
   ApiConsoleHaloRunV1alpha1SystemApi,
+  ApiConsoleHaloRunV1alpha1NotifierApi,
+  ApiConsoleHaloRunV1alpha1NotificationApi,
   ContentHaloRunV1alpha1CategoryApi,
   ContentHaloRunV1alpha1CommentApi,
   ContentHaloRunV1alpha1PostApi,
@@ -41,6 +43,7 @@ import {
   ApiHaloRunV1alpha1UserApi,
   MigrationHaloRunV1alpha1BackupApi,
   ApiConsoleMigrationHaloRunV1alpha1MigrationApi,
+  NotificationHaloRunV1alpha1NotifierDescriptorApi,
 } from "@halo-dev/api-client";
 import type { AxiosError, AxiosInstance } from "axios";
 import axios from "axios";
@@ -184,6 +187,11 @@ function setupApiClient(axios: AxiosInstance) {
         axios
       ),
       backup: new MigrationHaloRunV1alpha1BackupApi(undefined, baseURL, axios),
+      notifierDescriptors: new NotificationHaloRunV1alpha1NotifierDescriptorApi(
+        undefined,
+        baseURL,
+        axios
+      ),
     },
     // custom endpoints
     user: new ApiConsoleHaloRunV1alpha1UserApi(undefined, baseURL, axios),
@@ -220,6 +228,16 @@ function setupApiClient(axios: AxiosInstance) {
       axios
     ),
     system: new ApiConsoleHaloRunV1alpha1SystemApi(undefined, baseURL, axios),
+    notifier: new ApiConsoleHaloRunV1alpha1NotifierApi(
+      undefined,
+      baseURL,
+      axios
+    ),
+    notification: new ApiConsoleHaloRunV1alpha1NotificationApi(
+      undefined,
+      baseURL,
+      axios
+    ),
   };
 }
 

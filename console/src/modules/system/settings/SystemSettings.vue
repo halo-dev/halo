@@ -18,6 +18,7 @@ import type { Component } from "vue";
 import { markRaw } from "vue";
 import SettingTab from "./tabs/Setting.vue";
 import { useRouteQuery } from "@vueuse/router";
+import NotificationsTab from "./tabs/Notifications.vue";
 
 const { t } = useI18n();
 
@@ -60,6 +61,13 @@ const { data: setting } = useQuery({
       if (!activeTab.value) {
         activeTab.value = tabs.value[0].id;
       }
+
+      // TODO: use integrations center to refactor this
+      tabs.value.push({
+        id: "notification",
+        label: "通知设置",
+        component: markRaw(NotificationsTab),
+      });
     }
   },
 });
