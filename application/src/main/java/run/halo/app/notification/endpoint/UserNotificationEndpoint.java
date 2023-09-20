@@ -1,12 +1,15 @@
 package run.halo.app.notification.endpoint;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
+import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import java.util.function.Supplier;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -72,6 +75,14 @@ public class UserNotificationEndpoint implements CustomEndpoint {
                 builder -> builder.operationId("MarkNotificationsAsRead")
                     .description("Mark the specified notifications as read.")
                     .tag(tag)
+                    .parameter(parameterBuilder()
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(Builder.schemaBuilder()
+                                .implementation(String[].class)
+                            )
+                        )
+                    )
                     .response(responseBuilder().implementationArray(String.class))
             )
             .build();

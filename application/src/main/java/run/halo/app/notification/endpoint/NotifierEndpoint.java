@@ -1,12 +1,15 @@
 package run.halo.app.notification.endpoint;
 
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
+import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.fn.builders.schema.Builder;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -65,6 +68,11 @@ public class NotifierEndpoint implements CustomEndpoint {
                         .name("name")
                         .description("Notifier name")
                         .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(Builder.schemaBuilder()
+                                .implementation(ObjectNode.class))
+                        )
                     )
                     .response(responseBuilder().implementation(Void.class))
             )
@@ -77,6 +85,11 @@ public class NotifierEndpoint implements CustomEndpoint {
                         .name("name")
                         .description("Notifier name")
                         .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(Builder.schemaBuilder()
+                                .implementation(ObjectNode.class))
+                        )
                     )
                     .response(responseBuilder().implementation(Void.class))
             )
