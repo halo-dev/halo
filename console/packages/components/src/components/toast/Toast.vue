@@ -1,6 +1,13 @@
 <script lang="ts" setup>
 import type { Type } from "./interface";
-import { computed, onMounted, ref, watchEffect } from "vue";
+import {
+  onMounted,
+  ref,
+  watchEffect,
+  type Raw,
+  type Component,
+  markRaw,
+} from "vue";
 import {
   IconCheckboxCircle,
   IconErrorWarning,
@@ -36,26 +43,24 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const icons = {
+const icons: Record<Type, { icon: Raw<Component>; color: string }> = {
   success: {
-    icon: IconCheckboxCircle,
+    icon: markRaw(IconCheckboxCircle),
     color: "text-green-500",
   },
   info: {
-    icon: IconInformation,
+    icon: markRaw(IconInformation),
     color: "text-sky-500",
   },
   warning: {
-    icon: IconErrorWarning,
+    icon: markRaw(IconErrorWarning),
     color: "text-orange-500",
   },
   error: {
-    icon: IconForbidLine,
+    icon: markRaw(IconForbidLine),
     color: "text-red-500",
   },
 };
-
-const icon = computed(() => icons[props.type]);
 
 const createTimer = () => {
   if (props.duration < 0) return;
@@ -115,7 +120,7 @@ defineExpose({ close });
     >
       <div class="toast-body">
         <div class="toast-icon">
-          <component :is="icon.icon" :class="[icon.color]" />
+          <component :is="icons[type].icon" :class="icons[type].color" />
         </div>
         <div class="toast-content">
           <div class="toast-description">

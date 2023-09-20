@@ -14,11 +14,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.github.zafarkhaja.semver.Version;
+import com.google.common.hash.Hashing;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -27,8 +29,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
+import org.pf4j.RuntimeMode;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -225,5 +229,60 @@ class PluginServiceImplTest {
             })
         );
         verify(pluginWrapper, times(1)).getPluginPath();
+    }
+
+    @Test
+    void generateJsBundleVersionTest() {
+        when(pluginManager.getRuntimeMode()).thenReturn(RuntimeMode.DEVELOPMENT);
+
+        pluginService.generateJsBundleVersion()
+            .as(StepVerifier::create)
+            .consumeNextWith(version -> assertThat(version).isNotNull())
+            .verifyComplete();
+
+        when(pluginManager.getRuntimeMode()).thenReturn(RuntimeMode.DEPLOYMENT);
+        var plugin1 = mock(PluginWrapper.class);
+        var plugin2 = mock(PluginWrapper.class);
+        var plugin3 = mock(PluginWrapper.class);
+        when(pluginManager.getStartedPlugins()).thenReturn(List.of(plugin1, plugin2, plugin3));
+
+        var descriptor1 = mock(PluginDescriptor.class);
+        var descriptor2 = mock(PluginDescriptor.class);
+        var descriptor3 = mock(PluginDescriptor.class);
+        when(plugin1.getDescriptor()).thenReturn(descriptor1);
+        when(plugin2.getDescriptor()).thenReturn(descriptor2);
+        when(plugin3.getDescriptor()).thenReturn(descriptor3);
+
+        when(plugin1.getPluginId()).thenReturn("fake-1");
+        when(plugin2.getPluginId()).thenReturn("fake-2");
+        when(plugin3.getPluginId()).thenReturn("fake-3");
+
+        when(descriptor1.getVersion()).thenReturn("1.0.0");
+        when(descriptor2.getVersion()).thenReturn("2.0.0");
+        when(descriptor3.getVersion()).thenReturn("3.0.0");
+
+        var str = "fake-1:1.0.0fake-2:2.0.0fake-3:3.0.0";
+        var result = Hashing.sha256().hashUnencodedChars(str).toString();
+        assertThat(result.length()).isEqualTo(64);
+
+        pluginService.generateJsBundleVersion()
+            .as(StepVerifier::create)
+            .consumeNextWith(version -> assertThat(version).isEqualTo(result))
+            .verifyComplete();
+
+        var plugin4 = mock(PluginWrapper.class);
+        var descriptor4 = mock(PluginDescriptor.class);
+        when(plugin4.getDescriptor()).thenReturn(descriptor4);
+        when(plugin4.getPluginId()).thenReturn("fake-4");
+        when(descriptor4.getVersion()).thenReturn("3.0.0");
+        var str2 = "fake-1:1.0.0fake-2:2.0.0fake-4:3.0.0";
+        var result2 = Hashing.sha256().hashUnencodedChars(str2).toString();
+        when(pluginManager.getStartedPlugins()).thenReturn(List.of(plugin1, plugin2, plugin4));
+        pluginService.generateJsBundleVersion()
+            .as(StepVerifier::create)
+            .consumeNextWith(version -> assertThat(version).isEqualTo(result2))
+            .verifyComplete();
+
+        assertThat(result).isNotEqualTo(result2);
     }
 }

@@ -8,7 +8,7 @@ import {
   IconForbidLine,
   IconInformation,
 } from "../../icons/icons";
-import { computed, ref } from "vue";
+import { ref, type Component, markRaw, type Raw } from "vue";
 import type { Type } from "@/components/dialog/interface";
 import type { Type as ButtonType } from "@/components/button/interface";
 
@@ -48,25 +48,24 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-const icons = {
+const icons: Record<Type, { icon: Raw<Component>; color: string }> = {
   success: {
-    icon: IconCheckboxCircle,
+    icon: markRaw(IconCheckboxCircle),
     color: "green",
   },
   info: {
-    icon: IconInformation,
+    icon: markRaw(IconInformation),
     color: "blue",
   },
   warning: {
-    icon: IconErrorWarning,
+    icon: markRaw(IconErrorWarning),
     color: "orange",
   },
   error: {
-    icon: IconForbidLine,
+    icon: markRaw(IconForbidLine),
     color: "red",
   },
 };
-const icon = computed(() => icons[props.type]);
 
 const loading = ref(false);
 
@@ -108,8 +107,8 @@ const handleClose = () => {
     <div class="flex justify-between items-start py-2 mb-2">
       <div class="flex flex-row items-center gap-3">
         <component
-          :is="icon.icon"
-          :class="`text-${icon.color}-500`"
+          :is="icons[type].icon"
+          :class="`text-${icons[type].color}-500`"
           class="w-6 h-6"
         ></component>
         <div class="text-base text-gray-900 font-bold">{{ title }}</div>
