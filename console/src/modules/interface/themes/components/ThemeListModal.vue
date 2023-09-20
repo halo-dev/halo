@@ -20,8 +20,10 @@ import LocalUpload from "./list-tabs/LocalUpload.vue";
 import RemoteDownload from "./list-tabs/RemoteDownload.vue";
 import { usePluginModuleStore } from "@/stores/plugin";
 import type { PluginModule, ThemeListTab } from "@halo-dev/console-shared";
+import { usePermission } from "@/utils/permission";
 
 const { t } = useI18n();
+const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
@@ -115,7 +117,12 @@ onMounted(() => {
       return;
     }
 
-    const items = extensionPoints["theme:list:tabs:create"]() as ThemeListTab[];
+    let items = extensionPoints["theme:list:tabs:create"]() as ThemeListTab[];
+
+    items = items.filter((item) => {
+      return currentUserHasPermission(item.permissions);
+    });
+
     tabsFromPlugins.push(...items);
   });
 
