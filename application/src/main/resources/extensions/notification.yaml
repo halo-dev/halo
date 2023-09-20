@@ -23,7 +23,7 @@ spec:
           label: "用户名"
           name: username
           validation: required
-        - $formkit: text
+        - $formkit: password
           label: "密码"
           name: password
           validation: required
@@ -31,7 +31,7 @@ spec:
           label: "显示名称"
           name: displayName
         - $formkit: text
-          label: "SMTP服务器地址"
+          label: "SMTP 服务器地址"
           name: host
           validation: required
         - $formkit: text
