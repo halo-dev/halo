@@ -1,5 +1,7 @@
 package run.halo.app.notification;
 
+import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
@@ -33,6 +35,7 @@ import run.halo.app.infra.utils.JsonUtils;
 public class EmailNotifier implements ReactiveNotifier {
 
     private final SubscriberEmailResolver subscriberEmailResolver;
+    private final NotificationTemplateRender notificationTemplateRender;
     private final AtomicReference<Pair<EmailSenderConfig, JavaMailSenderImpl>>
         emailSenderConfigPairRef = new AtomicReference<>();
 
@@ -47,19 +50,45 @@ public class EmailNotifier implements ReactiveNotifier {
         String recipient = context.getMessage().getRecipient();
         var subscriber = new Subscription.Subscriber();
         subscriber.setName(recipient);
+        var payload = context.getMessage().getPayload();
         return subscriberEmailResolver.resolve(subscriber)
-            .map(toEmail -> (MimeMessagePreparator) mimeMessage -> {
-                MimeMessageHelper helper =
-                    new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
-                helper.setFrom(emailSenderConfig.getUsername(), emailSenderConfig.getDisplayName());
-                var payload = context.getMessage().getPayload();
-                helper.setSubject(payload.getTitle());
-                helper.setText(payload.getRawBody(), payload.getHtmlBody());
-                helper.setTo(toEmail);
+            .flatMap(toEmail -> {
+                if (isNotTrue(emailSenderConfig.getAppendFooter())) {
+                    return Mono.just(toEmail);
+                }
+                var htmlMono = appendHtmlBodyFooter(payload.getAttributes())
+                    .doOnNext(footer -> {
+                        if (StringUtils.isNotBlank(payload.getRawBody())) {
+                            payload.setHtmlBody(payload.getHtmlBody() + footer);
+                        }
+                    });
+                var rawMono = appendRawBodyFooter(payload.getAttributes())
+                    .doOnNext(footer -> {
+                        if (StringUtils.isNotBlank(payload.getHtmlBody())) {
+                            payload.setRawBody(payload.getRawBody() + footer);
+                        }
+                    });
+                return Mono.when(htmlMono, rawMono)
+                    .thenReturn(toEmail);
             })
+            .map(toEmail -> getMimeMessagePreparator(toEmail, emailSenderConfig, payload))
             .publishOn(Schedulers.boundedElastic())
             .doOnNext(javaMailSender::send)
             .then();
+    }
+
+    @NonNull
+    private static MimeMessagePreparator getMimeMessagePreparator(String toEmail,
+        EmailSenderConfig emailSenderConfig, NotificationContext.MessagePayload payload) {
+        return mimeMessage -> {
+            MimeMessageHelper helper =
+                new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
+            helper.setFrom(emailSenderConfig.getUsername(), emailSenderConfig.getDisplayName());
+
+            helper.setSubject(payload.getTitle());
+            helper.setText(payload.getRawBody(), payload.getHtmlBody());
+            helper.setTo(toEmail);
+        };
     }
 
     @NonNull
@@ -89,6 +118,29 @@ public class EmailNotifier implements ReactiveNotifier {
         }).getSecond();
     }
 
+    Mono<String> appendRawBodyFooter(ReasonAttributes attributes) {
+        return notificationTemplateRender.render("""
+            ---
+            如果您不想再收到此类通知，点击链接退订: [(${unsubscribeUrl})]
+            [(${site.title})]
+            """, attributes);
+    }
+
+    Mono<String> appendHtmlBodyFooter(ReasonAttributes attributes) {
+        return notificationTemplateRender.render("""
+            ---
+            <div class="footer" style="font-size: 12px; color: #666">
+            <a th:href="${site.url}" th:text="${site.title}"></a>
+            <p class="unsubscribe">
+            &mdash;<br />请勿直接回复此回邮件，
+            <a th:href="|${site.url}/console|">查看通知</a>
+            或
+            <a th:href="${unsubscribeUrl}">取消订阅</a>。
+            </p>
+            </div>
+            """, attributes);
+    }
+
     @Data
     static class EmailSenderConfig {
         private String displayName;
@@ -96,6 +148,7 @@ public class EmailNotifier implements ReactiveNotifier {
         private String password;
         private String host;
         private Integer port;
+        private Boolean appendFooter;
 
         /**
          * Gets email display name.

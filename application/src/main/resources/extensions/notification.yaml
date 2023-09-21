@@ -38,6 +38,10 @@ spec:
           label: "端口号"
           name: port
           validation: required
+        - $formkit: appendFooter
+          label: "邮件内容追加页脚"
+          name: appendFooter
+          value: true
 ---
 apiVersion: notification.halo.run/v1alpha1
 kind: ReasonType

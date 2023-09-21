@@ -14,11 +14,6 @@ spec:
         [(${commenter})] 评论了您的文章 《[(${postTitle})]》，以下是评论的具体内容：
       
         [(${content})]
-      
-      --- 
-      如果您不想再收到此类通知，点击链接退订: [(${unsubscribeUrl})]
-      
-      [(${site.title})]
     htmlBody: |
       <div class="head">
       <p class="honorific" th:text="|${subscriber.displayName} 你好：|"></p>
@@ -29,15 +24,6 @@ spec:
         <p class="content" th:text="${content}"></p>
       </div>
       <div>
-      <a th:href="${site.url}" th:text="${site.title}"></a>
-      </div>
-      <div class="footer" style="font-size: 12px; color: #666">
-      <p class="unsubscribe">
-      &mdash;<br />请勿直接回复此回邮件，
-      <a th:href="|${site.url}/console|">查看通知</a>
-      或
-      <a th:href="${unsubscribeUrl}">取消订阅</a>。
-      </p>
       </div>
 ---
 apiVersion: notification.halo.run/v1alpha1
@@ -56,11 +42,6 @@ spec:
         [(${commenter})] 评论了您的页面 《[(${pageTitle})]》，以下是评论的具体内容：
       
         [(${content})]
-      
-      --- 
-      如果您不想再收到此类通知，点击链接退订: [(${unsubscribeUrl})]
-      
-      [(${site.title})]
     htmlBody: |
       <div class="head">
       <p class="honorific" th:text="|${subscriber.displayName} 你好：|"></p>
@@ -71,15 +52,6 @@ spec:
         <p class="content" th:text="${content}"></p>
       </div>
       <div>
-      <a th:href="${site.url}" th:text="${site.title}"></a>
-      </div>
-      <div class="footer" style="font-size: 12px; color: #666">
-      <p class="unsubscribe">
-      &mdash;<br />请勿直接回复此回邮件，
-      <a th:href="|${site.url}/console|">查看通知</a>
-      或
-      <a th:href="${unsubscribeUrl}">取消订阅</a>。
-      </p>
       </div>
 ---
 apiVersion: notification.halo.run/v1alpha1
@@ -98,11 +70,6 @@ spec:
         [(${replier})] 在评论“[(${isQuoteReply ? quoteContent : commentContent})]”中回复了您，以下是回复的具体内容：
 
         [(${content})]
-
-      --- 
-      如果您不想再收到此类通知，点击链接退订: [(${unsubscribeUrl})]
-      
-      [(${site.title})]
     htmlBody: |
       <div class="head">
         <p class="honorific" th:text="|${subscriber.displayName} 你好：|"></p>
@@ -114,13 +81,4 @@ spec:
         <p class="content" th:text="${content}"></p>
       </div>
       <div>
-      <a th:href="${site.url}" th:text="${site.title}"></a>
-      </div>
-      <div class="footer" style="font-size: 12px; color: #666">
-      <p class="unsubscribe">
-        &mdash;<br />请勿直接回复此回邮件，
-        <a th:href="|${site.url}/console|">查看通知</a>
-        或
-        <a th:href="${unsubscribeUrl}">取消订阅</a>。
-      </p>
       </div>
