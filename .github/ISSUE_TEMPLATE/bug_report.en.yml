@@ -30,15 +30,16 @@ body:
         - MariaDB
         - Other
   - type: dropdown
-    id: deployment-method
+    id: operation-method
     validations:
       required: true
     attributes:
-      label: "What is your deployment method?"
+      label: "What is the project operation method?"
       options:
         - Docker
         - Docker Compose
         - Fat Jar
+        - Source Code
   - type: input
     id: site-url
     attributes:
@@ -55,7 +56,7 @@ body:
     id: what-happened
     attributes:
       label: "What happened?"
-      description: "Also tell us, what did you expect to happen?"
+      description: "For ease of management, please do not report multiple unrelated issues under the same issue."
     validations:
       required: true
   - type: textarea
