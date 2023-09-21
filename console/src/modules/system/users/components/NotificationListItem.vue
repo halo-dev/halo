@@ -3,9 +3,11 @@ import { useUserStore } from "@/stores/user";
 import { apiClient } from "@/utils/api-client";
 import { relativeTimeTo } from "@/utils/date";
 import type { Notification } from "@halo-dev/api-client";
-import { VButton } from "@halo-dev/components";
-import { useMutation } from "@tanstack/vue-query";
+import { useMutation, useQueryClient } from "@tanstack/vue-query";
+import { watch } from "vue";
 import { ref } from "vue";
+
+const queryClient = useQueryClient();
 
 const props = withDefaults(
   defineProps<{
@@ -21,16 +23,34 @@ const isRead = ref();
 
 const { mutate: handleMarkAsRead } = useMutation({
   mutationKey: ["notification-mark-as-read"],
-  mutationFn: async () => {
-    apiClient.notification.markNotificationAsRead({
+  mutationFn: async ({ refetch }: { refetch: boolean }) => {
+    const { data } = await apiClient.notification.markNotificationAsRead({
       name: props.notification.metadata.name,
       username: currentUser?.metadata.name as string,
     });
+
+    if (refetch) {
+      await queryClient.invalidateQueries({ queryKey: ["user-notifications"] });
+    }
+
+    return data;
   },
   onSuccess() {
     isRead.value = true;
   },
 });
+
+watch(
+  () => props.isSelected,
+  (value) => {
+    if (value) {
+      handleMarkAsRead({ refetch: false });
+    }
+  },
+  {
+    immediate: true,
+  }
+);
 </script>
 <template>
   <div
@@ -52,13 +72,12 @@ const { mutate: handleMarkAsRead } = useMutation({
         {{ relativeTimeTo(notification.metadata.creationTimestamp) }}
       </div>
       <div class="hidden group-hover:block">
-        <VButton
+        <span
           v-if="notification.spec?.unread && !isRead"
-          size="sm"
-          @click="handleMarkAsRead"
+          @click.stop="handleMarkAsRead({ refetch: true })"
         >
           标记为已读
-        </VButton>
+        </span>
       </div>
     </div>
   </div>

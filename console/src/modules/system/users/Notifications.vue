@@ -53,9 +53,11 @@ const selectedNotification = computed(() => {
         :body-class="['h-full', '!p-0']"
       >
         <div
-          class="grid h-full grid-cols-1 divide-y sm:grid-cols-6 sm:divide-x sm:divide-y-0"
+          class="grid h-full grid-cols-12 divide-y sm:divide-x sm:divide-y-0"
         >
-          <div class="relative col-span-2 h-full overflow-auto">
+          <div
+            class="relative col-span-12 h-full overflow-auto sm:col-span-6 lg:col-span-5 xl:col-span-3"
+          >
             <VTabbar
               v-model:active-id="activeTab"
               class="sticky top-0 z-10 !rounded-none"
@@ -73,9 +75,7 @@ const selectedNotification = computed(() => {
               <li
                 v-for="notification in notifications?.items"
                 :key="notification.metadata.name"
-                @click.stop="
-                  selectedNotificationName = notification.metadata.name
-                "
+                @click="selectedNotificationName = notification.metadata.name"
               >
                 <NotificationListItem
                   :notification="notification"
@@ -86,7 +86,7 @@ const selectedNotification = computed(() => {
               </li>
             </ul>
           </div>
-          <div class="col-span-4">
+          <div class="col-span-12 sm:col-span-6 lg:col-span-7 xl:col-span-9">
             <div
               class="p-2"
               v-html="selectedNotification?.spec?.htmlContent"
