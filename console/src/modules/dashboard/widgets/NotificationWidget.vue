@@ -1,0 +1,63 @@
+<script lang="ts" setup>
+import { useUserStore } from "@/stores/user";
+import { apiClient } from "@/utils/api-client";
+import { relativeTimeTo } from "@/utils/date";
+import { VCard, VEntity, VEntityField } from "@halo-dev/components";
+import { useQuery } from "@tanstack/vue-query";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+
+const { currentUser } = useUserStore();
+
+const { data: notifications } = useQuery({
+  queryKey: ["user-notifications"],
+  queryFn: async () => {
+    const { data } = await apiClient.notification.listUserNotifications({
+      username: currentUser?.metadata.name as string,
+      page: 1,
+      size: 20,
+      unRead: true,
+    });
+
+    return data.items;
+  },
+});
+</script>
+
+<template>
+  <VCard
+    :body-class="['h-full', '@container', '!p-0', '!overflow-auto']"
+    class="h-full"
+    title="消息"
+  >
+    <OverlayScrollbarsComponent
+      element="div"
+      :options="{ scrollbars: { autoHide: 'scroll' } }"
+      class="h-full w-full"
+      defer
+    >
+      <VEntity
+        v-for="notification in notifications"
+        :key="notification.metadata.name"
+      >
+        <template #start>
+          <VEntityField
+            :title="notification.spec?.title"
+            :route="{
+              name: 'UserNotifications',
+              query: { name: notification.metadata.name },
+            }"
+          />
+        </template>
+        <template #end>
+          <VEntityField>
+            <template #description>
+              <span class="truncate text-xs tabular-nums text-gray-500">
+                {{ relativeTimeTo(notification.metadata.creationTimestamp) }}
+              </span>
+            </template>
+          </VEntityField>
+        </template>
+      </VEntity>
+    </OverlayScrollbarsComponent>
+  </VCard>
+</template>

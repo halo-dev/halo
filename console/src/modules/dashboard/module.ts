@@ -5,12 +5,14 @@ import { IconDashboard } from "@halo-dev/components";
 
 import QuickLinkWidget from "./widgets/QuickLinkWidget.vue";
 import ViewsStatsWidget from "./widgets/ViewsStatsWidget.vue";
+import NotificationWidget from "./widgets/NotificationWidget.vue";
 import { markRaw } from "vue";
 
 export default definePlugin({
   components: {
     QuickLinkWidget,
     ViewsStatsWidget,
+    NotificationWidget,
   },
   routes: [
     {

@@ -10,6 +10,7 @@ import Login from "./Login.vue";
 import { IconUserSettings } from "@halo-dev/components";
 import { markRaw } from "vue";
 import Binding from "./Binding.vue";
+import Notifications from "./Notifications.vue";
 
 export default definePlugin({
   components: {
@@ -78,6 +79,20 @@ export default definePlugin({
               component: PersonalAccessTokens,
               meta: {
                 title: "个人令牌",
+              },
+            },
+          ],
+        },
+        {
+          path: "-/notifications",
+          component: BasicLayout,
+          children: [
+            {
+              path: "",
+              name: "UserNotifications",
+              component: Notifications,
+              meta: {
+                title: "消息",
               },
             },
           ],
