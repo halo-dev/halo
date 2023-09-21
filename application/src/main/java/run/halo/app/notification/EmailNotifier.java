@@ -58,14 +58,14 @@ public class EmailNotifier implements ReactiveNotifier {
                 }
                 var htmlMono = appendHtmlBodyFooter(payload.getAttributes())
                     .doOnNext(footer -> {
-                        if (StringUtils.isNotBlank(payload.getRawBody())) {
-                            payload.setHtmlBody(payload.getHtmlBody() + footer);
+                        if (StringUtils.isNotBlank(payload.getHtmlBody())) {
+                            payload.setHtmlBody(payload.getHtmlBody() + "\n" + footer);
                         }
                     });
                 var rawMono = appendRawBodyFooter(payload.getAttributes())
                     .doOnNext(footer -> {
-                        if (StringUtils.isNotBlank(payload.getHtmlBody())) {
-                            payload.setRawBody(payload.getRawBody() + footer);
+                        if (StringUtils.isNotBlank(payload.getRawBody())) {
+                            payload.setRawBody(payload.getRawBody() + "\n" + footer);
                         }
                     });
                 return Mono.when(htmlMono, rawMono)
