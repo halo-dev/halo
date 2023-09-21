@@ -3,6 +3,7 @@ package run.halo.app.core.extension.endpoint;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static java.util.Comparator.comparing;
+import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.content.Builder.contentBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
@@ -19,11 +20,14 @@ import static run.halo.app.infra.utils.FileUtils.deleteFileSilently;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -33,10 +37,14 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Sort;
@@ -45,9 +53,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.codec.multipart.FormFieldPart;
 import org.springframework.http.codec.multipart.Part;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -81,6 +93,8 @@ public class PluginEndpoint implements CustomEndpoint {
     private final ReactiveUrlDataBufferFetcher reactiveUrlDataBufferFetcher;
 
     private final Scheduler scheduler = Schedulers.boundedElastic();
+
+    private final BufferedPluginBundleResource bufferedPluginBundleResource;
 
     @Override
     public RouterFunction<ServerResponse> endpoint() {
@@ -240,36 +254,59 @@ public class PluginEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> fetchJsBundle(ServerRequest request) {
         Optional<String> versionOption = request.queryParam("v");
-        if (versionOption.isEmpty()) {
-            return pluginService.generateJsBundleVersion()
+        return versionOption.map(s ->
+                Mono.fromCallable(() -> bufferedPluginBundleResource
+                    .jsBundleResource(s, () -> pluginService.uglifyJsBundle().block())
+                ).flatMap(fsRes -> {
+                    var bodyBuilder = ServerResponse.ok()
+                        .cacheControl(MAX_CACHE_CONTROL)
+                        .contentType(MediaType.valueOf("text/javascript"));
+                    try {
+                        Instant lastModified = Instant.ofEpochMilli(fsRes.lastModified());
+                        return request.checkNotModified(lastModified)
+                            .switchIfEmpty(Mono.defer(() ->
+                                bodyBuilder.lastModified(lastModified)
+                                    .body(BodyInserters.fromResource(fsRes)))
+                            );
+                    } catch (IOException e) {
+                        return Mono.error(e);
+                    }
+                })
+            )
+            .orElseGet(() -> pluginService.generateJsBundleVersion()
                 .flatMap(v -> ServerResponse
                     .temporaryRedirect(buildJsBundleUri("js", v))
                     .build()
-                );
-        }
-        return pluginService.uglifyJsBundle()
-            .defaultIfEmpty("")
-            .flatMap(bundle -> ServerResponse.ok()
-                .cacheControl(MAX_CACHE_CONTROL)
-                .contentType(MediaType.valueOf("text/javascript"))
-                .bodyValue(bundle)
+                )
             );
     }
 
     private Mono<ServerResponse> fetchCssBundle(ServerRequest request) {
         Optional<String> versionOption = request.queryParam("v");
-        if (versionOption.isEmpty()) {
-            return pluginService.generateJsBundleVersion()
+        return versionOption.map(s ->
+                Mono.fromCallable(() -> bufferedPluginBundleResource.cssBundleResource(s,
+                    () -> pluginService.uglifyCssBundle().block())
+                ).flatMap(fsRes -> {
+                    var bodyBuilder = ServerResponse.ok()
+                        .cacheControl(MAX_CACHE_CONTROL)
+                        .contentType(MediaType.valueOf("text/css"));
+                    try {
+                        Instant lastModified = Instant.ofEpochMilli(fsRes.lastModified());
+                        return request.checkNotModified(lastModified)
+                            .switchIfEmpty(Mono.defer(() ->
+                                bodyBuilder.lastModified(lastModified)
+                                    .body(BodyInserters.fromResource(fsRes)))
+                            );
+                    } catch (IOException e) {
+                        return Mono.error(e);
+                    }
+                })
+            )
+            .orElseGet(() -> pluginService.generateJsBundleVersion()
                 .flatMap(v -> ServerResponse
                     .temporaryRedirect(buildJsBundleUri("css", v))
                     .build()
-                );
-        }
-        return pluginService.uglifyCssBundle()
-            .flatMap(bundle -> ServerResponse.ok()
-                .cacheControl(MAX_CACHE_CONTROL)
-                .contentType(MediaType.valueOf("text/css"))
-                .bodyValue(bundle)
+                )
             );
     }
 
@@ -353,7 +390,7 @@ public class PluginEndpoint implements CustomEndpoint {
                         if (!configMapName.equals(configMapNameToUpdate)) {
                             throw new ServerWebInputException(
                                 "The name from the request body does not match the plugin "
-                                + "configMapName name.");
+                                    + "configMapName name.");
                         }
                     })
                     .flatMap(configMapToUpdate -> client.fetch(ConfigMap.class, configMapName)
@@ -482,7 +519,7 @@ public class PluginEndpoint implements CustomEndpoint {
         @ArraySchema(uniqueItems = true,
             arraySchema = @Schema(name = "sort",
                 description = "Sort property and direction of the list result. Supported fields: "
-                              + "creationTimestamp"),
+                    + "creationTimestamp"),
             schema = @Schema(description = "like field,asc or field,desc",
                 implementation = String.class,
                 example = "creationTimestamp,desc"))
@@ -633,4 +670,93 @@ public class PluginEndpoint implements CustomEndpoint {
             .subscribeOn(this.scheduler);
     }
 
+    @Component
+    static class BufferedPluginBundleResource implements DisposableBean {
+        private final Object jsBundleLock = new Object();
+        private final Object cssBundleLock = new Object();
+
+        private FileSystemResource jsBundleResource;
+        private FileSystemResource cssBundleResource;
+        private Path tempDir;
+
+        public FileSystemResource jsBundleResource(String v, Supplier<String> bundleSupplier) {
+            synchronized (jsBundleLock) {
+                var jsResource = writeAndGetBundleResource(jsBundleResource,
+                    tempFileName(v, ".js"), bundleSupplier);
+                this.jsBundleResource = jsResource;
+                return jsResource;
+            }
+        }
+
+        public FileSystemResource cssBundleResource(String v, Supplier<String> bundleSupplier) {
+            synchronized (cssBundleLock) {
+                var cssResource = writeAndGetBundleResource(cssBundleResource,
+                    tempFileName(v, ".css"), bundleSupplier);
+                this.cssBundleResource = cssResource;
+                return cssResource;
+            }
+        }
+
+        FileSystemResource writeAndGetBundleResource(FileSystemResource resource, String fileName,
+            Supplier<String> bundleSupplier) {
+            if (resourceDoesNotExist(resource)) {
+                return createAndWriteContent(fileName, bundleSupplier, null);
+            }
+            if (fileName.equals(resource.getFilename())) {
+                return resource;
+            }
+            return createAndWriteContent(fileName, bundleSupplier, resource);
+        }
+
+        FileSystemResource createAndWriteContent(String fileName, Supplier<String> bundleSupplier,
+            @Nullable FileSystemResource fileResource) {
+            try {
+                if (fileResource != null) {
+                    Files.deleteIfExists(fileResource.getFile().toPath());
+                }
+                var filePath = generateStorePath(fileName);
+                var newResource = new FileSystemResource(filePath);
+
+                String content = defaultString(bundleSupplier.get());
+                Files.writeString(filePath, content, StandardCharsets.UTF_8);
+                return newResource;
+            } catch (IOException e) {
+                throw new ServerWebInputException("Failed to write bundle file.", null, e);
+            }
+        }
+
+        Path generateStorePath(String fileName) {
+            try {
+                if (tempDirDoesNotExist()) {
+                    this.tempDir = Files.createTempDirectory("halo-plugin-bundle");
+                }
+                return Files.createFile(tempDir.resolve(fileName));
+            } catch (IOException e) {
+                throw new ServerWebInputException("Failed to create temp file.", null, e);
+            }
+        }
+
+        boolean tempDirDoesNotExist() {
+            return tempDir == null || !Files.exists(tempDir);
+        }
+
+        String tempFileName(String v, String suffix) {
+            Assert.notNull(v, "Version must not be null");
+            Assert.notNull(suffix, "Suffix must not be null");
+            return v + suffix;
+        }
+
+        boolean resourceDoesNotExist(Resource resource) {
+            return resource == null || !resource.exists();
+        }
+
+        @Override
+        public void destroy() throws Exception {
+            if (!tempDirDoesNotExist()) {
+                FileSystemUtils.deleteRecursively(tempDir);
+            }
+            this.jsBundleResource = null;
+            this.cssBundleResource = null;
+        }
+    }
 }

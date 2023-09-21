@@ -1,6 +1,7 @@
 package run.halo.app.core.extension.endpoint;
 
 import static java.util.Objects.requireNonNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -16,6 +17,7 @@ import static org.springframework.web.reactive.function.BodyInserters.fromMultip
 import com.github.zafarkhaja.semver.Version;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -130,8 +132,8 @@ class PluginEndpointTest {
 
             verify(client).list(same(Plugin.class), argThat(
                     predicate -> predicate.test(expectPlugin)
-                                 && !predicate.test(unexpectedPlugin1)
-                                 && !predicate.test(unexpectedPlugin2)),
+                        && !predicate.test(unexpectedPlugin1)
+                        && !predicate.test(unexpectedPlugin2)),
                 any(), anyInt(), anyInt());
         }
 
@@ -158,8 +160,8 @@ class PluginEndpointTest {
 
             verify(client).list(same(Plugin.class), argThat(
                     predicate -> predicate.test(expectPlugin)
-                                 && !predicate.test(unexpectedPlugin1)
-                                 && !predicate.test(unexpectedPlugin2)),
+                        && !predicate.test(unexpectedPlugin1)
+                        && !predicate.test(unexpectedPlugin2)),
                 any(), anyInt(), anyInt());
         }
 
@@ -381,5 +383,31 @@ class PluginEndpointTest {
         plugin.setMetadata(metadata);
         plugin.setSpec(spec);
         return plugin;
+    }
+
+    @Nested
+    class BufferedPluginBundleResourceTest {
+        private final PluginEndpoint.BufferedPluginBundleResource bufferedPluginBundleResource =
+            new PluginEndpoint.BufferedPluginBundleResource();
+
+        @Test
+        void writeAndGetResourceTest() throws IOException {
+            var resource =
+                bufferedPluginBundleResource.jsBundleResource("1", () -> "first line\nnext line");
+            var content = resource.getContentAsString(StandardCharsets.UTF_8);
+            assertThat(content).isEqualTo("first line\nnext line");
+
+            // version is matched, should return cached content
+            resource =
+                bufferedPluginBundleResource.jsBundleResource("1", () -> "first line\nnext line-1");
+            content = resource.getContentAsString(StandardCharsets.UTF_8);
+            assertThat(content).isEqualTo("first line\nnext line");
+
+            // new version should return new content
+            resource =
+                bufferedPluginBundleResource.jsBundleResource("2", () -> "first line\nnext line-2");
+            content = resource.getContentAsString(StandardCharsets.UTF_8);
+            assertThat(content).isEqualTo("first line\nnext line-2");
+        }
     }
 }
