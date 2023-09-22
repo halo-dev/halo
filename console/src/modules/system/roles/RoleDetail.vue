@@ -22,14 +22,27 @@ import {
 import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { useI18n } from "vue-i18n";
 import { formatDatetime } from "@/utils/date";
+import { useQuery } from "@tanstack/vue-query";
 
 const route = useRoute();
 const { t } = useI18n();
 
 const tabActiveId = ref("detail");
 
+const { data: roleTemplates } = useQuery({
+  queryKey: ["role-templates"],
+  queryFn: async () => {
+    const { data } = await apiClient.extension.role.listv1alpha1Role({
+      page: 0,
+      size: 0,
+      labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
+    });
+    return data.items;
+  },
+});
+
 const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
-  useRoleTemplateSelection();
+  useRoleTemplateSelection(roleTemplates);
 
 const { formState, saving, handleCreateOrUpdate } = useRoleForm();
 

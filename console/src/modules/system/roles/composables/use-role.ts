@@ -43,7 +43,6 @@ interface useRoleFormReturn {
 
 interface useRoleTemplateSelectionReturn {
   selectedRoleTemplates: Ref<Set<string>>;
-  roleTemplates: Ref<Role[]>;
   roleTemplateGroups: ComputedRef<RoleTemplateGroup[]>;
   handleRoleTemplateSelect: (e: Event) => void;
 }
@@ -157,8 +156,9 @@ export function useRoleForm(): useRoleFormReturn {
  *
  * @returns {useRoleTemplateSelectionReturn}
  */
-export function useRoleTemplateSelection(): useRoleTemplateSelectionReturn {
-  const roleTemplates = ref<Role[]>([] as Role[]);
+export function useRoleTemplateSelection(
+  roleTemplates: Ref<Role[] | undefined>
+): useRoleTemplateSelectionReturn {
   const selectedRoleTemplates = ref<Set<string>>(new Set());
 
   /**
@@ -246,7 +246,7 @@ export function useRoleTemplateSelection(): useRoleTemplateSelectionReturn {
    */
   const roleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
     const groups: RoleTemplateGroup[] = [];
-    roleTemplates.value.forEach((role) => {
+    roleTemplates.value?.forEach((role) => {
       const group = groups.find(
         (group) =>
           group.module === role.metadata.annotations?.[rbacAnnotations.MODULE]
@@ -263,28 +263,12 @@ export function useRoleTemplateSelection(): useRoleTemplateSelectionReturn {
     return groups;
   });
 
-  /**
-   * Get all role templates based on the condition that `metadata.labels.[halo.run/role-template] = 'true'` and `!halo.run/hidden`
-   */
-  const handleFetchRoles = async () => {
-    try {
-      const { data } = await apiClient.extension.role.listv1alpha1Role({
-        page: 0,
-        size: 0,
-        labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
-      });
-      roleTemplates.value = data.items;
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
   const handleRoleTemplateSelect = async (e: Event) => {
     const { checked, value } = e.target as HTMLInputElement;
     if (!checked) {
       return;
     }
-    const role = roleTemplates.value.find(
+    const role = roleTemplates.value?.find(
       (role) => role.metadata.name === value
     );
     const dependencies =
@@ -298,11 +282,8 @@ export function useRoleTemplateSelection(): useRoleTemplateSelectionReturn {
     });
   };
 
-  onMounted(handleFetchRoles);
-
   return {
     selectedRoleTemplates,
-    roleTemplates,
     roleTemplateGroups,
     handleRoleTemplateSelect,
   };
