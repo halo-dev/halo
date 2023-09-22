@@ -67,6 +67,12 @@ watch(
     >
       {{ notification.spec?.title }}
     </div>
+    <div
+      v-if="notification.spec?.rawContent"
+      class="truncate text-xs text-gray-600"
+    >
+      {{ notification.spec.rawContent }}
+    </div>
     <div class="flex h-7 items-end justify-between">
       <div class="text-xs text-gray-600">
         {{ relativeTimeTo(notification.metadata.creationTimestamp) }}

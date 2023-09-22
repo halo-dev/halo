@@ -45,29 +45,36 @@ const { data: notifications } = useQuery({
       class="h-full w-full"
       defer
     >
-      <VEntity
-        v-for="notification in notifications"
-        :key="notification.metadata.name"
-      >
-        <template #start>
-          <VEntityField
-            :title="notification.spec?.title"
-            :route="{
-              name: 'UserNotifications',
-              query: { name: notification.metadata.name },
-            }"
-          />
-        </template>
-        <template #end>
-          <VEntityField>
-            <template #description>
-              <span class="truncate text-xs tabular-nums text-gray-500">
-                {{ relativeTimeTo(notification.metadata.creationTimestamp) }}
-              </span>
+      <ul class="box-border h-full w-full divide-y divide-gray-100" role="list">
+        <li
+          v-for="notification in notifications"
+          :key="notification.metadata.name"
+        >
+          <VEntity>
+            <template #start>
+              <VEntityField
+                :title="notification.spec?.title"
+                :route="{
+                  name: 'UserNotifications',
+                  query: { name: notification.metadata.name },
+                }"
+                :description="notification.spec?.rawContent"
+              />
             </template>
-          </VEntityField>
-        </template>
-      </VEntity>
+            <template #end>
+              <VEntityField>
+                <template #description>
+                  <span class="truncate text-xs tabular-nums text-gray-500">
+                    {{
+                      relativeTimeTo(notification.metadata.creationTimestamp)
+                    }}
+                  </span>
+                </template>
+              </VEntityField>
+            </template>
+          </VEntity>
+        </li>
+      </ul>
     </OverlayScrollbarsComponent>
   </VCard>
 </template>

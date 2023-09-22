@@ -66,7 +66,7 @@ import IconZoomOutLine from "~icons/ri/zoom-out-line";
 import IconArrowLeftRightLine from "~icons/ri/arrow-left-right-line";
 import IconArrowUpDownLine from "~icons/ri/arrow-up-down-line";
 import IconRiUpload2Fill from "~icons/ri/upload-2-fill";
-import IconNotification2Line from "~icons/ri/notification-2-line";
+import IconNotificationBadgeLine from "~icons/ri/notification-badge-line";
 
 export {
   IconDashboard,
@@ -137,5 +137,5 @@ export {
   IconArrowLeftRightLine,
   IconArrowUpDownLine,
   IconRiUpload2Fill,
-  IconNotification2Line,
+  IconNotificationBadgeLine,
 };

@@ -2,7 +2,7 @@
 import { useUserStore } from "@/stores/user";
 import { apiClient } from "@/utils/api-client";
 import {
-  IconNotification2Line,
+  IconNotificationBadgeLine,
   VCard,
   VLoading,
   VPageHeader,
@@ -43,7 +43,7 @@ const selectedNotification = computed(() => {
 <template>
   <VPageHeader title="消息">
     <template #icon>
-      <IconNotification2Line class="mr-2 self-center" />
+      <IconNotificationBadgeLine class="mr-2 self-center" />
     </template>
   </VPageHeader>
   <div class="m-0 md:m-4">
