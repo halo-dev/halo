@@ -60,5 +60,5 @@ jobs:
           ghcr-token: ${{ secrets.GHCR_TOKEN }}
           dockerhub-user: ${{ secrets.DOCKER_USERNAME }}
           dockerhub-token: ${{ secrets.DOCKER_TOKEN }}
-          push: ${{ github.event_name == 'push' || github.event_name == 'release' }} # we only push to GHCR if the push is to the next branch
+          push: ${{ github.event_name == 'pull_request' || github.event_name == 'push' || github.event_name == 'release' }}
           console-ref: ${{ github.event_name == 'release' &&  github.ref || 'main' }}
