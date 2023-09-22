@@ -29,6 +29,16 @@ const { data: notifications } = useQuery({
     class="h-full"
     title="消息"
   >
+    <template #actions>
+      <div style="padding: 12px 16px">
+        <RouterLink
+          class="text-sm text-gray-600 hover:text-gray-900"
+          :to="{ name: 'UserNotifications' }"
+        >
+          查看全部
+        </RouterLink>
+      </div>
+    </template>
     <OverlayScrollbarsComponent
       element="div"
       :options="{ scrollbars: { autoHide: 'scroll' } }"

@@ -58,39 +58,46 @@ const selectedNotification = computed(() => {
           <div
             class="relative col-span-12 h-full overflow-auto sm:col-span-6 lg:col-span-5 xl:col-span-3"
           >
-            <VTabbar
-              v-model:active-id="activeTab"
-              class="sticky top-0 z-10 !rounded-none"
-              :items="[
-                { id: 'unread', label: '未读' },
-                { id: 'read', label: '已读' },
-              ]"
-              type="outline"
-              @change="selectedNotificationName = undefined"
-            ></VTabbar>
-            <ul
-              class="box-border h-full w-full divide-y divide-gray-100"
-              role="list"
+            <OverlayScrollbarsComponent
+              element="div"
+              :options="{ scrollbars: { autoHide: 'scroll' } }"
+              class="h-full w-full"
+              defer
             >
-              <li
-                v-for="notification in notifications?.items"
-                :key="notification.metadata.name"
-                @click="selectedNotificationName = notification.metadata.name"
+              <VTabbar
+                v-model:active-id="activeTab"
+                class="sticky top-0 z-10 !rounded-none"
+                :items="[
+                  { id: 'unread', label: '未读' },
+                  { id: 'read', label: '已读' },
+                ]"
+                type="outline"
+                @change="selectedNotificationName = undefined"
+              ></VTabbar>
+              <ul
+                class="box-border h-full w-full divide-y divide-gray-100"
+                role="list"
               >
-                <NotificationListItem
-                  :notification="notification"
-                  :is-selected="
-                    selectedNotificationName === notification.metadata.name
-                  "
-                />
-              </li>
-            </ul>
+                <li
+                  v-for="notification in notifications?.items"
+                  :key="notification.metadata.name"
+                  @click="selectedNotificationName = notification.metadata.name"
+                >
+                  <NotificationListItem
+                    :notification="notification"
+                    :is-selected="
+                      selectedNotificationName === notification.metadata.name
+                    "
+                  />
+                </li>
+              </ul>
+            </OverlayScrollbarsComponent>
           </div>
           <div class="col-span-12 sm:col-span-6 lg:col-span-7 xl:col-span-9">
-            <div
-              class="p-2"
-              v-html="selectedNotification?.spec?.htmlContent"
-            ></div>
+            <iframe
+              class="h-full w-full p-2"
+              :srcdoc="selectedNotification?.spec?.htmlContent"
+            ></iframe>
           </div>
         </div>
       </VCard>

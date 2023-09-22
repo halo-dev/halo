@@ -74,6 +74,7 @@ watch(
       <div class="hidden group-hover:block">
         <span
           v-if="notification.spec?.unread && !isRead"
+          class="text-sm text-gray-600 hover:text-gray-900"
           @click.stop="handleMarkAsRead({ refetch: true })"
         >
           标记为已读
