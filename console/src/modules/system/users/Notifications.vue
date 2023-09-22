@@ -9,14 +9,15 @@ import {
   VTabbar,
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
-import { ref } from "vue";
 import { computed } from "vue";
 import { useRouteQuery } from "@vueuse/router";
 import NotificationListItem from "./components/NotificationListItem.vue";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+import NotificationContent from "./components/NotificationContent.vue";
 
 const { currentUser } = useUserStore();
 
-const activeTab = ref("unread");
+const activeTab = useRouteQuery("tab", "unread");
 
 const { data: notifications, isLoading } = useQuery({
   queryKey: ["user-notifications", activeTab],
@@ -46,34 +47,32 @@ const selectedNotification = computed(() => {
     </template>
   </VPageHeader>
   <div class="m-0 md:m-4">
-    <VLoading v-if="isLoading" />
-    <Transition v-else appear name="fade">
-      <VCard
-        style="height: calc(100vh - 5.5rem)"
-        :body-class="['h-full', '!p-0']"
-      >
+    <VCard
+      style="height: calc(100vh - 5.5rem)"
+      :body-class="['h-full', '!p-0']"
+    >
+      <div class="grid h-full grid-cols-12 divide-y sm:divide-x sm:divide-y-0">
         <div
-          class="grid h-full grid-cols-12 divide-y sm:divide-x sm:divide-y-0"
+          class="relative col-span-12 h-full overflow-auto sm:col-span-6 lg:col-span-5 xl:col-span-3"
         >
-          <div
-            class="relative col-span-12 h-full overflow-auto sm:col-span-6 lg:col-span-5 xl:col-span-3"
+          <OverlayScrollbarsComponent
+            element="div"
+            :options="{ scrollbars: { autoHide: 'scroll' } }"
+            class="h-full w-full"
+            defer
           >
-            <OverlayScrollbarsComponent
-              element="div"
-              :options="{ scrollbars: { autoHide: 'scroll' } }"
-              class="h-full w-full"
-              defer
-            >
-              <VTabbar
-                v-model:active-id="activeTab"
-                class="sticky top-0 z-10 !rounded-none"
-                :items="[
-                  { id: 'unread', label: '未读' },
-                  { id: 'read', label: '已读' },
-                ]"
-                type="outline"
-                @change="selectedNotificationName = undefined"
-              ></VTabbar>
+            <VTabbar
+              v-model:active-id="activeTab"
+              class="sticky top-0 z-10 !rounded-none"
+              :items="[
+                { id: 'unread', label: '未读' },
+                { id: 'read', label: '已读' },
+              ]"
+              type="outline"
+              @change="selectedNotificationName = undefined"
+            ></VTabbar>
+            <VLoading v-if="isLoading" />
+            <Transition v-else appear name="fade">
               <ul
                 class="box-border h-full w-full divide-y divide-gray-100"
                 role="list"
@@ -91,16 +90,13 @@ const selectedNotification = computed(() => {
                   />
                 </li>
               </ul>
-            </OverlayScrollbarsComponent>
-          </div>
-          <div class="col-span-12 sm:col-span-6 lg:col-span-7 xl:col-span-9">
-            <iframe
-              class="h-full w-full p-2"
-              :srcdoc="selectedNotification?.spec?.htmlContent"
-            ></iframe>
-          </div>
+            </Transition>
+          </OverlayScrollbarsComponent>
         </div>
-      </VCard>
-    </Transition>
+        <div class="col-span-12 sm:col-span-6 lg:col-span-7 xl:col-span-9">
+          <NotificationContent :notification="selectedNotification" />
+        </div>
+      </div>
+    </VCard>
   </div>
 </template>

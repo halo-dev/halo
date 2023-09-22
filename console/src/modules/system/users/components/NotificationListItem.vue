@@ -43,7 +43,7 @@ const { mutate: handleMarkAsRead } = useMutation({
 watch(
   () => props.isSelected,
   (value) => {
-    if (value) {
+    if (value && props.notification.spec?.unread) {
       handleMarkAsRead({ refetch: false });
     }
   },
