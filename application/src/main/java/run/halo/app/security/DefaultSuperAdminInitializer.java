@@ -21,8 +21,6 @@ import run.halo.app.extension.ReactiveExtensionClient;
 @RequiredArgsConstructor
 public class DefaultSuperAdminInitializer implements SuperAdminInitializer {
 
-    private static final String SUPER_ROLE_NAME = "super-role";
-
     private final ReactiveExtensionClient client;
     private final PasswordEncoder passwordEncoder;
 

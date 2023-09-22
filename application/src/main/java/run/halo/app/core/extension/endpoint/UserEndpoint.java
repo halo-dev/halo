@@ -13,6 +13,7 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static run.halo.app.extension.ListResult.generateGenericClass;
 import static run.halo.app.extension.router.QueryParamBuildUtil.buildParametersFromType;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
+import static run.halo.app.security.authorization.AuthorityUtils.authoritiesToRoles;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.io.Files;
@@ -21,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,8 +33,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.fn.builders.requestbody.Builder;
@@ -483,45 +486,86 @@ public class UserEndpoint implements CustomEndpoint {
 
     @NonNull
     private Mono<ServerResponse> getUserPermission(ServerRequest request) {
-        String name = request.pathVariable("name");
-        return ReactiveSecurityContextHolder.getContext()
-            .map(ctx -> SELF_USER.equals(name) ? ctx.getAuthentication().getName() : name)
-            .flatMapMany(userService::listRoles)
-            .reduce(new LinkedHashSet<Role>(), (list, role) -> {
-                list.add(role);
-                return list;
-            })
-            .flatMap(roles -> uiPermissions(roles)
-                .collectList()
-                .map(uiPermissions -> new UserPermission(roles, Set.copyOf(uiPermissions)))
-                .defaultIfEmpty(new UserPermission(roles, Set.of()))
-            )
-            .flatMap(result -> ServerResponse.ok()
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(result)
-            );
+        var name = request.pathVariable("name");
+        Mono<UserPermission> userPermission;
+        if (SELF_USER.equals(name)) {
+            userPermission = ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .flatMap(auth -> {
+                    var roleNames = authoritiesToRoles(auth.getAuthorities());
+                    var up = new UserPermission();
+                    var roles = roleService.list(roleNames)
+                        .collect(Collectors.toSet())
+                        .doOnNext(up::setRoles)
+                        .then();
+                    var permissions = roleService.listPermissions(roleNames)
+                        .distinct()
+                        .collectList()
+                        .doOnNext(up::setPermissions)
+                        .doOnNext(perms -> {
+                            var uiPermissions = uiPermissions(new HashSet<>(perms));
+                            up.setUiPermissions(uiPermissions);
+                        })
+                        .then();
+                    return roles.and(permissions).thenReturn(up);
+                });
+        } else {
+            // get roles from username
+            userPermission = userService.listRoles(name)
+                .collect(Collectors.toSet())
+                .flatMap(roles -> {
+                    var up = new UserPermission();
+                    var setRoles = Mono.fromRunnable(() -> up.setRoles(roles)).then();
+                    var roleNames = roles.stream()
+                        .map(role -> role.getMetadata().getName())
+                        .collect(Collectors.toSet());
+                    var setPermissions = roleService.listPermissions(roleNames)
+                        .distinct()
+                        .collectList()
+                        .doOnNext(up::setPermissions)
+                        .doOnNext(perms -> {
+                            var uiPermissions = uiPermissions(new HashSet<>(perms));
+                            up.setUiPermissions(uiPermissions);
+                        })
+                        .then();
+                    return setRoles.and(setPermissions).thenReturn(up);
+                });
+        }
+
+        return ServerResponse.ok().body(userPermission, UserPermission.class);
     }
 
-    private Flux<String> uiPermissions(Set<Role> roles) {
-        return Flux.fromIterable(roles)
-            .map(role -> role.getMetadata().getName())
-            .collectList()
-            .flatMapMany(roleNames -> roleService.listDependenciesFlux(Set.copyOf(roleNames)))
-            .map(role -> {
-                Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(role);
-                String uiPermissionStr = annotations.get(Role.UI_PERMISSIONS_ANNO);
-                if (StringUtils.isBlank(uiPermissionStr)) {
-                    return new HashSet<String>();
+    private Set<String> uiPermissions(Set<Role> roles) {
+        if (CollectionUtils.isEmpty(roles)) {
+            return Collections.emptySet();
+        }
+        return roles.stream()
+            .<Set<String>>map(role -> {
+                var annotations = role.getMetadata().getAnnotations();
+                if (annotations == null) {
+                    return Set.of();
                 }
-                return JsonUtils.jsonToObject(uiPermissionStr,
+                var uiPermissionsJson = annotations.get(Role.UI_PERMISSIONS_ANNO);
+                if (StringUtils.isBlank(uiPermissionsJson)) {
+                    return Set.of();
+                }
+                return JsonUtils.jsonToObject(uiPermissionsJson,
                     new TypeReference<LinkedHashSet<String>>() {
                     });
             })
-            .flatMapIterable(Function.identity());
+            .flatMap(Set::stream)
+            .collect(Collectors.toSet());
     }
 
-    record UserPermission(@Schema(requiredMode = REQUIRED) Set<Role> roles,
-                          @Schema(requiredMode = REQUIRED) Set<String> uiPermissions) {
+    @Data
+    public static class UserPermission {
+        @Schema(requiredMode = REQUIRED)
+        private Set<Role> roles;
+        @Schema(requiredMode = REQUIRED)
+        private List<Role> permissions;
+        @Schema(requiredMode = REQUIRED)
+        private Set<String> uiPermissions;
+
     }
 
     public class ListRequest extends IListRequest.QueryListRequest {
