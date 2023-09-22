@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
 import run.halo.app.theme.ThemeResolver;
@@ -43,9 +44,7 @@ public class ViewNameResolver {
     }
 
     String computeResourceName(String name) {
-        if (StringUtils.isBlank(name)) {
-            return name;
-        }
+        Assert.notNull(name, "Name must not be null");
         return StringUtils.endsWith(name, thymeleafProperties.getSuffix())
             ? name : name + thymeleafProperties.getSuffix();
     }
