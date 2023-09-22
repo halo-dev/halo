@@ -16,8 +16,10 @@ import type {
 } from "@halo-dev/console-shared";
 import { usePluginModuleStore } from "@/stores/plugin";
 import { onMounted } from "vue";
+import { usePermission } from "@/utils/permission";
 
 const { t } = useI18n();
+const { currentUserHasPermission } = usePermission();
 
 const props = withDefaults(
   defineProps<{
@@ -92,9 +94,13 @@ onMounted(() => {
       return;
     }
 
-    const items = extensionPoints[
+    let items = extensionPoints[
       "plugin:installation:tabs:create"
     ]() as PluginInstallationTab[];
+
+    items = items.filter((item) => {
+      return currentUserHasPermission(item.permissions);
+    });
 
     tabs.value.push(...items);
   });
