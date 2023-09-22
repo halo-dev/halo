@@ -1,14 +1,14 @@
 package run.halo.app.theme.router;
 
-import java.util.Locale;
+import java.nio.file.Files;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
-import run.halo.app.theme.HaloViewResolver;
+import run.halo.app.theme.ThemeResolver;
 
 /**
  * The {@link ViewNameResolver} is used to resolve view name.
@@ -19,7 +19,8 @@ import run.halo.app.theme.HaloViewResolver;
 @Component
 @AllArgsConstructor
 public class ViewNameResolver {
-    private final HaloViewResolver haloViewResolver;
+    private static final String TEMPLATES = "templates";
+    private final ThemeResolver themeResolver;
     private final ThymeleafProperties thymeleafProperties;
 
     /**
@@ -29,20 +30,22 @@ public class ViewNameResolver {
     public Mono<String> resolveViewNameOrDefault(ServerRequest request, String name,
         String defaultName) {
         if (StringUtils.isBlank(name)) {
-            return Mono.just(defaultName);
+            return Mono.justOrEmpty(defaultName);
         }
-        final String nameToUse = processName(name);
-        Locale locale = LocaleContextHolder.getLocale(request.exchange().getLocaleContext());
-        return haloViewResolver.resolveViewName(nameToUse, locale)
-            .map(view -> nameToUse)
-            .switchIfEmpty(Mono.just(defaultName));
+        return themeResolver.getTheme(request.exchange())
+            .mapNotNull(themeContext -> {
+                String templateResourceName = computeResourceName(name);
+                var resourcePath = themeContext.getPath()
+                    .resolve(TEMPLATES)
+                    .resolve(templateResourceName);
+                return Files.exists(resourcePath) ? name : defaultName;
+            })
+            .switchIfEmpty(Mono.justOrEmpty(defaultName));
     }
 
-    String processName(String name) {
-        String nameToLookup = name;
-        if (StringUtils.endsWith(name, thymeleafProperties.getSuffix())) {
-            nameToLookup = StringUtils.substringBeforeLast(name, thymeleafProperties.getSuffix());
-        }
-        return nameToLookup;
+    String computeResourceName(String name) {
+        Assert.notNull(name, "Name must not be null");
+        return StringUtils.endsWith(name, thymeleafProperties.getSuffix())
+            ? name : name + thymeleafProperties.getSuffix();
     }
 }

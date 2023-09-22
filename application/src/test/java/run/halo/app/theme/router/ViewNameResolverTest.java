@@ -1,15 +1,19 @@
 package run.halo.app.theme.router;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -17,11 +21,11 @@ import org.springframework.boot.autoconfigure.thymeleaf.ThymeleafProperties;
 import org.springframework.http.HttpMethod;
 import org.springframework.mock.web.reactive.function.server.MockServerRequest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.reactive.result.view.View;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.theme.HaloViewResolver;
+import run.halo.app.theme.ThemeContext;
+import run.halo.app.theme.ThemeResolver;
 
 /**
  * Tests for {@link ViewNameResolver}.
@@ -33,7 +37,7 @@ import run.halo.app.theme.HaloViewResolver;
 class ViewNameResolverTest {
 
     @Mock
-    private HaloViewResolver haloViewResolver;
+    private ThemeResolver themeResolver;
 
     @Mock
     private ThymeleafProperties thymeleafProperties;
@@ -41,17 +45,27 @@ class ViewNameResolverTest {
     @InjectMocks
     private ViewNameResolver viewNameResolver;
 
+    @TempDir
+    private File themePath;
+
     @BeforeEach
-    void setUp() {
+    void setUp() throws IOException {
         when(thymeleafProperties.getSuffix()).thenReturn(ThymeleafProperties.DEFAULT_SUFFIX);
 
-        when(haloViewResolver.resolveViewName(eq("post_news"), any()))
-            .thenReturn(Mono.just(Mockito.mock(View.class)));
-        when(haloViewResolver.resolveViewName(eq("post_docs"), any()))
-            .thenReturn(Mono.just(new EmptyView()));
+        var templatesPath = themePath.toPath().resolve("templates");
+        if (!Files.exists(templatesPath)) {
+            Files.createDirectory(templatesPath);
+        }
+        Files.createFile(templatesPath.resolve("post_news.html"));
+        Files.createFile(templatesPath.resolve("post_docs.html"));
 
-        when(haloViewResolver.resolveViewName(eq("post_nothing"), any()))
-            .thenReturn(Mono.empty());
+        when(themeResolver.getTheme(any()))
+            .thenReturn(Mono.fromSupplier(() -> ThemeContext.builder()
+                .name("fake-theme")
+                .path(themePath.toPath())
+                .active(true)
+                .build())
+            );
     }
 
     @Test
@@ -71,7 +85,7 @@ class ViewNameResolverTest {
         String viewName = "post_docs" + thymeleafProperties.getSuffix();
         viewNameResolver.resolveViewNameOrDefault(request, viewName, "post")
             .as(StepVerifier::create)
-            .expectNext("post_docs")
+            .expectNext(viewName)
             .verifyComplete();
 
         viewNameResolver.resolveViewNameOrDefault(request, "post_nothing", "post")
@@ -82,11 +96,17 @@ class ViewNameResolverTest {
 
     @Test
     void processName() {
-        assertThat(viewNameResolver.processName("post_news")).isEqualTo("post_news");
-        assertThat(viewNameResolver.processName("post_news" + thymeleafProperties.getSuffix()))
-            .isEqualTo("post_news");
-        assertThat(viewNameResolver.processName("post_news.test"))
-            .isEqualTo("post_news.test");
-        assertThat(viewNameResolver.processName(null)).isNull();
+        var suffix = thymeleafProperties.getSuffix();
+        assertThat(viewNameResolver.computeResourceName("post_news"))
+            .isEqualTo("post_news" + suffix);
+        assertThat(
+            viewNameResolver.computeResourceName("post_news" + suffix))
+            .isEqualTo("post_news" + suffix);
+        assertThat(viewNameResolver.computeResourceName("post_news.test"))
+            .isEqualTo("post_news.test" + suffix);
+
+        assertThatThrownBy(() -> viewNameResolver.computeResourceName(null))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Name must not be null");
     }
 }
