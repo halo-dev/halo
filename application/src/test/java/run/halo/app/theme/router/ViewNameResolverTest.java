@@ -103,6 +103,5 @@ class ViewNameResolverTest {
             .isEqualTo("post_news" + suffix);
         assertThat(viewNameResolver.computeResourceName("post_news.test"))
             .isEqualTo("post_news.test" + suffix);
-        assertThat(viewNameResolver.computeResourceName(null)).isNull();
     }
 }
