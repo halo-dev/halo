@@ -1,6 +1,7 @@
 package run.halo.app.theme.router;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -103,5 +104,9 @@ class ViewNameResolverTest {
             .isEqualTo("post_news" + suffix);
         assertThat(viewNameResolver.computeResourceName("post_news.test"))
             .isEqualTo("post_news.test" + suffix);
+
+        assertThatThrownBy(() -> viewNameResolver.computeResourceName(null))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Name must not be null");
     }
 }
