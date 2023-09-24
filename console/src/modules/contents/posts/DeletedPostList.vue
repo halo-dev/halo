@@ -10,7 +10,6 @@ import {
   VPageHeader,
   VPagination,
   VSpace,
-  VAvatar,
   VStatusDot,
   VEntity,
   VEntityField,
@@ -27,6 +26,7 @@ import { usePermission } from "@/utils/permission";
 import cloneDeep from "lodash.clonedeep";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import ContributorList from "../_components/ContributorList.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -353,25 +353,7 @@ watch(
               <template #end>
                 <VEntityField>
                   <template #description>
-                    <RouterLink
-                      v-for="(
-                        contributor, contributorIndex
-                      ) in post.contributors"
-                      :key="contributorIndex"
-                      :to="{
-                        name: 'UserDetail',
-                        params: { name: contributor.name },
-                      }"
-                      class="flex items-center"
-                    >
-                      <VAvatar
-                        v-tooltip="contributor.displayName"
-                        size="xs"
-                        :src="contributor.avatar"
-                        :alt="contributor.displayName"
-                        circle
-                      ></VAvatar>
-                    </RouterLink>
+                    <ContributorList :contributors="post.contributors" />
                   </template>
                 </VEntityField>
                 <VEntityField v-if="!post?.post?.spec.deleted">

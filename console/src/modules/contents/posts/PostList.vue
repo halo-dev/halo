@@ -393,10 +393,12 @@ watch(selectedPostNames, (newValue) => {
                 v-model="selectedTag"
                 :label="$t('core.post.filters.tag.label')"
               />
-              <UserFilterDropdown
-                v-model="selectedContributor"
-                :label="$t('core.post.filters.author.label')"
-              />
+              <HasPermission :permissions="['system:users:view']">
+                <UserFilterDropdown
+                  v-model="selectedContributor"
+                  :label="$t('core.post.filters.author.label')"
+                />
+              </HasPermission>
               <FilterDropdown
                 v-model="selectedSort"
                 :label="$t('core.common.filters.labels.sort')"
