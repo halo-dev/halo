@@ -2,13 +2,25 @@
 import { useUserStore } from "@/stores/user";
 import { apiClient } from "@/utils/api-client";
 import { relativeTimeTo } from "@/utils/date";
-import { VCard, VEntity, VEntityField } from "@halo-dev/components";
+import {
+  VButton,
+  VCard,
+  VEmpty,
+  VEntity,
+  VEntityField,
+  VLoading,
+} from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 
 const { currentUser } = useUserStore();
 
-const { data: notifications } = useQuery({
+const {
+  data: notifications,
+  isLoading,
+  refetch,
+  isFetching,
+} = useQuery({
   queryKey: ["user-notifications"],
   queryFn: async () => {
     const { data } = await apiClient.notification.listUserNotifications({
@@ -39,7 +51,14 @@ const { data: notifications } = useQuery({
         </RouterLink>
       </div>
     </template>
+    <VLoading v-if="isLoading" />
+    <VEmpty v-else-if="!notifications?.length" title="当前没有未读的消息">
+      <template #actions>
+        <VButton :loading="isFetching" @click="refetch">刷新</VButton>
+      </template>
+    </VEmpty>
     <OverlayScrollbarsComponent
+      v-else
       element="div"
       :options="{ scrollbars: { autoHide: 'scroll' } }"
       class="h-full w-full"

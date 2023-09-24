@@ -302,6 +302,15 @@ onMounted(() => {
               >
                 {{ $t("core.sidebar.operations.profile.button") }}
               </VDropdownItem>
+              <VDropdownItem
+                @click="
+                  $router.push({
+                    name: 'UserNotifications',
+                  })
+                "
+              >
+                我的消息
+              </VDropdownItem>
               <VDropdownItem @click="handleLogout">
                 {{ $t("core.sidebar.operations.logout.button") }}
               </VDropdownItem>

@@ -3,7 +3,9 @@ import { useUserStore } from "@/stores/user";
 import { apiClient } from "@/utils/api-client";
 import {
   IconNotificationBadgeLine,
+  VButton,
   VCard,
+  VEmpty,
   VLoading,
   VPageHeader,
   VTabbar,
@@ -19,7 +21,12 @@ const { currentUser } = useUserStore();
 
 const activeTab = useRouteQuery("tab", "unread");
 
-const { data: notifications, isLoading } = useQuery({
+const {
+  data: notifications,
+  isLoading,
+  refetch,
+  isFetching,
+} = useQuery({
   queryKey: ["user-notifications", activeTab],
   queryFn: async () => {
     const { data } = await apiClient.notification.listUserNotifications({
@@ -29,6 +36,7 @@ const { data: notifications, isLoading } = useQuery({
 
     return data;
   },
+  cacheTime: 0,
 });
 
 const selectedNotificationName = useRouteQuery<string | undefined>("name");
@@ -72,6 +80,25 @@ const selectedNotification = computed(() => {
               @change="selectedNotificationName = undefined"
             ></VTabbar>
             <VLoading v-if="isLoading" />
+            <Transition
+              v-else-if="!notifications?.items.length"
+              appear
+              name="fade"
+            >
+              <VEmpty
+                :title="`${
+                  activeTab === 'unread'
+                    ? '当前没有未读的消息'
+                    : '当前没有已读的消息'
+                }`"
+              >
+                <template #actions>
+                  <VButton :loading="isFetching && !isLoading" @click="refetch">
+                    刷新
+                  </VButton>
+                </template>
+              </VEmpty>
+            </Transition>
             <Transition v-else appear name="fade">
               <ul
                 class="box-border h-full w-full divide-y divide-gray-100"
