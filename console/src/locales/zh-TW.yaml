@@ -852,6 +852,7 @@ core:
       title: 用戶詳情
       tabs:
         detail: 詳情
+        pat: 個人令牌
       actions:
         update_profile:
           title: 修改資料
@@ -886,6 +887,46 @@ core:
           flip_horizontal: 水平翻轉
           flip_vertical: 垂直翻轉
           reset: 重置
+    pat:
+      operations:
+        delete:
+          title: 刪除個人令牌
+          description: 您確定要刪除此個人令牌嗎？
+        revoke:
+          button: 撤銷
+          title: 撤銷個人令牌
+          description: 您確定要撤銷此個人令牌嗎？
+          toast_success: 撤銷成功
+        copy:
+          title: 請立即複製並保存，令牌僅顯示一次。
+        restore:
+          button: 還原
+          toast_success: 還原成功
+      list:
+        empty:
+          title: 目前尚未建立個人令牌
+          message: 您可以嘗試重新整理或建立新的個人令牌
+        fields:
+          expiresAt:
+            dynamic: "到期於 {expiresAt}"
+            forever: 永久有效
+          status:
+            normal: 正常
+            revoked: 已撤銷
+            expired: 已過期
+      creation_modal:
+        title: 建立個人令牌
+        groups:
+          general: 基本資訊
+          permissions: 權限
+        fields:
+          name:
+            label: 名稱
+          expiresAt:
+            label: 到期時間
+            help: 留空代表永不過期
+          description:
+            label: 描述
   role:
     title: 角色
     common:

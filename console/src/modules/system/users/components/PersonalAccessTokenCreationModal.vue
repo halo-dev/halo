@@ -1,173 +1,161 @@
 <script lang="ts" setup>
-import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import { computed, watch } from "vue";
-import { rbacAnnotations } from "@/constants/annotations";
-import type { Role } from "@halo-dev/api-client";
-import {
-  useRoleForm,
-  useRoleTemplateSelection,
-} from "@/modules/system/roles/composables/use-role";
-import cloneDeep from "lodash.clonedeep";
-import { reset } from "@formkit/core";
-import { setFocus } from "@/formkit/utils/focus";
-import { pluginLabels, roleLabels } from "@/constants/labels";
-import { useI18n } from "vue-i18n";
+import { patAnnotations, rbacAnnotations } from "@/constants/annotations";
+import { pluginLabels } from "@/constants/labels";
 import { apiClient } from "@/utils/api-client";
-import { useQuery } from "@tanstack/vue-query";
+import { toISOString } from "@/utils/date";
+import { Dialog, Toast, VButton, VModal, VSpace } from "@halo-dev/components";
+import { useMutation, useQueryClient } from "@tanstack/vue-query";
+import { useClipboard } from "@vueuse/core";
+import type { PatSpec, PersonalAccessToken } from "@halo-dev/api-client";
+import { computed } from "vue";
+import { ref } from "vue";
+import { useRoleTemplateSelection } from "../../roles/composables/use-role";
+import { useRoleStore } from "@/stores/role";
+import { toRefs } from "vue";
+import { useI18n } from "vue-i18n";
 
+const queryClient = useQueryClient();
 const { t } = useI18n();
-
-const props = withDefaults(
-  defineProps<{
-    visible: boolean;
-    role?: Role;
-  }>(),
-  {
-    visible: false,
-    role: undefined,
-  }
-);
+const visible = defineModel({ type: Boolean, default: false });
 
 const emit = defineEmits<{
-  (event: "update:visible", visible: boolean): void;
   (event: "close"): void;
 }>();
 
-const { data: roleTemplates } = useQuery({
-  queryKey: ["role-templates"],
-  queryFn: async () => {
-    const { data } = await apiClient.extension.role.listv1alpha1Role({
-      page: 0,
-      size: 0,
-      labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
-    });
-    return data.items;
+const formState = ref<
+  Omit<PersonalAccessToken, "spec"> & {
+    spec: PatSpec;
+  }
+>({
+  kind: "PersonalAccessToken",
+  apiVersion: "security.halo.run/v1alpha1",
+  metadata: {
+    generateName: "pat-",
+    name: "",
+  },
+  spec: {
+    description: "",
+    expiresAt: "",
+    name: "",
+    roles: [],
+    tokenId: "",
+    username: "",
   },
 });
 
+const { permissions } = useRoleStore();
+
 const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
-  useRoleTemplateSelection(roleTemplates);
+  useRoleTemplateSelection(toRefs(permissions).permissions);
 
 const {
-  formState,
-  isUpdateMode,
-  initialFormState,
-  saving,
-  handleCreateOrUpdate,
-} = useRoleForm();
-
-watch(
-  () => selectedRoleTemplates.value,
-  (newValue) => {
-    if (formState.value.metadata.annotations) {
-      formState.value.metadata.annotations[rbacAnnotations.DEPENDENCIES] =
-        JSON.stringify(Array.from(newValue));
+  mutate,
+  isLoading,
+  data: token,
+} = useMutation({
+  mutationKey: ["pat-creation"],
+  mutationFn: async () => {
+    if (formState.value.spec?.expiresAt) {
+      formState.value.spec.expiresAt = toISOString(
+        formState.value.spec.expiresAt
+      );
     }
-  }
-);
+    formState.value.spec = {
+      ...formState.value.spec,
+      roles: Array.from(selectedRoleTemplates.value),
+    };
+    const { data } = await apiClient.pat.generatePat({
+      personalAccessToken: formState.value,
+    });
+    return data;
+  },
+  onSuccess(data) {
+    queryClient.invalidateQueries({ queryKey: ["personal-access-tokens"] });
+    visible.value = false;
+    emit("close");
 
-watch(
-  () => props.visible,
-  (visible) => {
-    if (visible) {
-      setFocus("displayNameInput");
-    } else {
-      handleResetForm();
-    }
-  }
-);
-
-watch(
-  () => props.role,
-  (role) => {
-    if (role) {
-      formState.value = cloneDeep(role);
-      const dependencies =
-        role.metadata.annotations?.[rbacAnnotations.DEPENDENCIES];
-      if (dependencies) {
-        selectedRoleTemplates.value = new Set(JSON.parse(dependencies));
-      }
-    } else {
-      handleResetForm();
-    }
-  }
-);
-
-const editingModalTitle = computed(() => {
-  return isUpdateMode.value
-    ? t("core.role.editing_modal.titles.update")
-    : t("core.role.editing_modal.titles.create");
+    setTimeout(() => {
+      Dialog.info({
+        title: t("core.user.pat.operations.copy.title"),
+        description: data.metadata.annotations?.[patAnnotations.ACCESS_TOKEN],
+        confirmType: "secondary",
+        confirmText: t("core.common.buttons.copy"),
+        showCancel: false,
+        onConfirm: () => {
+          copy();
+          Toast.success(t("core.common.toast.copy_success"));
+        },
+      });
+    });
+  },
 });
 
-const handleCreateOrUpdateRole = async () => {
-  try {
-    await handleCreateOrUpdate();
-    onVisibleChange(false);
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-const onVisibleChange = (visible: boolean) => {
-  emit("update:visible", visible);
-  if (!visible) {
-    emit("close");
-  }
-};
-
-const handleResetForm = () => {
-  formState.value = cloneDeep(initialFormState);
-  selectedRoleTemplates.value.clear();
-  reset("role-form");
-};
+const { copy } = useClipboard({
+  source: computed(
+    () => token.value?.metadata.annotations?.[patAnnotations.ACCESS_TOKEN] || ""
+  ),
+  legacy: true,
+});
 </script>
+
 <template>
   <VModal
-    :title="editingModalTitle"
-    :visible="visible"
+    v-model:visible="visible"
     :width="700"
-    @update:visible="onVisibleChange"
+    :title="$t('core.user.pat.creation_modal.title')"
+    @close="emit('close')"
   >
     <div>
       <div class="md:grid md:grid-cols-4 md:gap-6">
         <div class="md:col-span-1">
           <div class="sticky top-0">
             <span class="text-base font-medium text-gray-900">
-              {{ $t("core.role.editing_modal.groups.general") }}
+              {{ $t("core.user.pat.creation_modal.groups.general") }}
             </span>
           </div>
         </div>
         <div class="mt-5 divide-y divide-gray-100 md:col-span-3 md:mt-0">
           <FormKit
-            v-if="formState.metadata.annotations"
-            id="role-form"
-            name="role-form"
-            :actions="false"
+            id="pat-creation-form"
+            v-model="formState.spec"
             type="form"
-            :config="{ validationVisibility: 'submit' }"
-            @submit="handleCreateOrUpdateRole"
+            name="pat-creation-form"
+            @submit="mutate()"
           >
             <FormKit
-              id="displayNameInput"
-              v-model="
-                formState.metadata.annotations[rbacAnnotations.DISPLAY_NAME]
-              "
-              :label="$t('core.role.editing_modal.fields.display_name')"
+              validation="required"
               type="text"
-              validation="required|length:0,50"
+              name="name"
+              :label="$t('core.user.pat.creation_modal.fields.name.label')"
+            ></FormKit>
+            <FormKit
+              type="datetime-local"
+              name="expiresAt"
+              :label="$t('core.user.pat.creation_modal.fields.expiresAt.label')"
+              :help="$t('core.user.pat.creation_modal.fields.expiresAt.help')"
+            ></FormKit>
+            <FormKit
+              type="textarea"
+              name="description"
+              :label="
+                $t('core.user.pat.creation_modal.fields.description.label')
+              "
             ></FormKit>
           </FormKit>
         </div>
       </div>
-      <div class="py-5">
+      <div v-if="roleTemplateGroups.length" class="py-5">
         <div class="border-t border-gray-200"></div>
       </div>
-      <div class="md:grid md:grid-cols-4 md:gap-6">
+      <div
+        v-if="roleTemplateGroups.length"
+        class="md:grid md:grid-cols-4 md:gap-6"
+      >
         <div class="md:col-span-1">
           <div class="sticky top-0">
             <span class="text-base font-medium text-gray-900">
-              {{ $t("core.role.editing_modal.groups.permissions") }}
+              {{ $t("core.user.pat.creation_modal.groups.permissions") }}
             </span>
           </div>
         </div>
@@ -273,17 +261,16 @@ const handleResetForm = () => {
         </div>
       </div>
     </div>
+
     <template #footer>
       <VSpace>
         <SubmitButton
-          v-if="visible"
-          :loading="saving"
+          :loading="isLoading"
           type="secondary"
           :text="$t('core.common.buttons.submit')"
-          @submit="$formkit.submit('role-form')"
-        >
-        </SubmitButton>
-        <VButton @click="onVisibleChange(false)">
+          @submit="$formkit.submit('pat-creation-form')"
+        />
+        <VButton @click="visible = false">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>

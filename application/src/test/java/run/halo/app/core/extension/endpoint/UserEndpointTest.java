@@ -1,5 +1,6 @@
 package run.halo.app.core.extension.endpoint;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anySet;
@@ -436,6 +437,7 @@ class UserEndpointTest {
                     "rules": []
                 }
                 """, Role.class);
+            when(roleService.listPermissions(eq(Set.of("test-A")))).thenReturn(Flux.just(roleA));
             when(userService.listRoles(eq("fake-user"))).thenReturn(
                 Flux.fromIterable(List.of(roleA)));
             when(roleService.listDependenciesFlux(anySet())).thenReturn(Flux.just(roleA));
@@ -444,25 +446,12 @@ class UserEndpointTest {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody()
-                .json("""
-                        {  "roles": [{
-                               "rules": [],
-                               "apiVersion": "v1alpha1",
-                               "kind": "Role",
-                               "metadata": {
-                                   "name": "test-A",
-                                   "annotations": {
-                                       "rbac.authorization.halo.run/ui-permissions":
-                                        "[\\"permission-A\\"]"
-                                   }
-                               }
-                           }],
-                            "uiPermissions": [
-                               "permission-A"
-                            ]
-                        }
-                    """);
+                .expectBody(UserEndpoint.UserPermission.class)
+                .value(userPermission -> {
+                    assertEquals(Set.of(roleA), userPermission.getRoles());
+                    assertEquals(List.of(roleA), userPermission.getPermissions());
+                    assertEquals(Set.of("permission-A"), userPermission.getUiPermissions());
+                });
 
             verify(userService, times(1)).listRoles(eq("fake-user"));
         }

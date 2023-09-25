@@ -17,7 +17,7 @@
 import { Metadata } from "./metadata";
 // May contain unused imports in some cases
 // @ts-ignore
-import { PersonalAccessTokenSpec } from "./personal-access-token-spec";
+import { PatSpec } from "./pat-spec";
 
 /**
  *
@@ -45,8 +45,8 @@ export interface PersonalAccessToken {
   metadata: Metadata;
   /**
    *
-   * @type {PersonalAccessTokenSpec}
+   * @type {PatSpec}
    * @memberof PersonalAccessToken
    */
-  spec?: PersonalAccessTokenSpec;
+  spec?: PatSpec;
 }
