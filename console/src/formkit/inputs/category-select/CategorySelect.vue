@@ -293,6 +293,7 @@ const handleDelete = () => {
           v-if="text.trim() && !searchResults?.length"
           v-permission="['system:posts:manage']"
           class="group flex cursor-pointer items-center justify-between rounded bg-gray-100 p-2"
+          @click="handleCreateCategory"
         >
           <span class="text-xs text-gray-700 group-hover:text-gray-900">
             {{
