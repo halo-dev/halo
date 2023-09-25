@@ -18,3 +18,8 @@ export enum rbacAnnotations {
 export enum contentAnnotations {
   PREFERRED_EDITOR = "content.halo.run/preferred-editor",
 }
+
+// pat
+export enum patAnnotations {
+  ACCESS_TOKEN = "security.halo.run/access-token",
+}

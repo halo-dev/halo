@@ -38,6 +38,8 @@ public class Role extends AbstractExtension {
 
     public static final String SYSTEM_RESERVED_LABELS =
         "rbac.authorization.halo.run/system-reserved";
+    public static final String HIDDEN_LABEL_NAME = "halo.run/hidden";
+    public static final String TEMPLATE_LABEL_NAME = "halo.run/role-template";
     public static final String UI_PERMISSIONS_AGGREGATED_ANNO =
         "rbac.authorization.halo.run/ui-permissions-aggregated";
 
