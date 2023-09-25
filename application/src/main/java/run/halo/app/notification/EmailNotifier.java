@@ -1,7 +1,5 @@
 package run.halo.app.notification;
 
-import static org.apache.commons.lang3.BooleanUtils.isNotTrue;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
@@ -53,9 +51,6 @@ public class EmailNotifier implements ReactiveNotifier {
         var payload = context.getMessage().getPayload();
         return subscriberEmailResolver.resolve(subscriber)
             .flatMap(toEmail -> {
-                if (isNotTrue(emailSenderConfig.getAppendFooter())) {
-                    return Mono.just(toEmail);
-                }
                 var htmlMono = appendHtmlBodyFooter(payload.getAttributes())
                     .doOnNext(footer -> {
                         if (StringUtils.isNotBlank(payload.getHtmlBody())) {
@@ -148,7 +143,6 @@ public class EmailNotifier implements ReactiveNotifier {
         private String password;
         private String host;
         private Integer port;
-        private Boolean appendFooter;
 
         /**
          * Gets email display name.
