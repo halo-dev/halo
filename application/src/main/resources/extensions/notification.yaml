@@ -38,7 +38,7 @@ spec:
           label: "端口号"
           name: port
           validation: required
-        - $formkit: appendFooter
+        - $formkit: checkbox
           label: "邮件内容追加页脚"
           name: appendFooter
           value: true
@@ -100,7 +100,7 @@ metadata:
   name: someone-replied-to-you
 spec:
   displayName: "有人回复了我"
-  description: "如果有其他用户回复了你的帖子或者留言，你将会收到一条通知，告诉你有人回复了你。"
+  description: "如果有其他用户回复了你的评论，你将会收到一条通知，告诉你有人回复了你。"
   properties:
     - name: commentName
       type: string
