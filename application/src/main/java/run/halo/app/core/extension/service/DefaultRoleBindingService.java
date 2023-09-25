@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+import run.halo.app.security.authorization.AuthorityUtils;
 
 /**
  * <p>Obtain the authorities from the authenticated authentication and construct it as a RoleBinding
@@ -21,8 +22,8 @@ import org.springframework.security.web.authentication.AnonymousAuthenticationFi
  */
 @Slf4j
 public class DefaultRoleBindingService implements RoleBindingService {
-    private static final String SCOPE_AUTHORITY_PREFIX = "SCOPE_";
-    private static final String ROLE_AUTHORITY_PREFIX = "ROLE_";
+    private static final String SCOPE_AUTHORITY_PREFIX = AuthorityUtils.SCOPE_PREFIX;
+    private static final String ROLE_AUTHORITY_PREFIX = AuthorityUtils.ROLE_PREFIX;
 
     @Override
     public Set<String> listBoundRoleNames(Collection<? extends GrantedAuthority> authorities) {

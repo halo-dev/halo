@@ -53,18 +53,13 @@ const { currentUserHasPermission } = usePermission();
 const userStore = useUserStore();
 const { t } = useI18n();
 
-const tabs = [
+const tabs = ref([
   {
     id: "detail",
     label: t("core.user.detail.tabs.detail"),
     routeName: "UserDetail",
   },
-  // {
-  //   id: "tokens",
-  //   label: "个人令牌",
-  //   routeName: "PersonalAccessTokens",
-  // },
-];
+]);
 
 const editingModal = ref(false);
 const passwordChangeModal = ref(false);
@@ -122,6 +117,20 @@ const isCurrentUser = computed(() => {
 provide<Ref<DetailedUser | undefined>>("user", user);
 provide<ComputedRef<boolean>>("isCurrentUser", isCurrentUser);
 
+// fixme: refactor this component to simplify the logic
+watch(
+  () => isCurrentUser.value,
+  (value) => {
+    if (value) {
+      tabs.value.push({
+        id: "tokens",
+        label: t("core.user.detail.tabs.pat"),
+        routeName: "PersonalAccessTokens",
+      });
+    }
+  }
+);
+
 const activeTab = ref();
 
 const route = useRoute();
@@ -129,20 +138,20 @@ const router = useRouter();
 
 // set default active tab
 onMounted(() => {
-  const tab = tabs.find((tab) => tab.routeName === route.name);
-  activeTab.value = tab ? tab.id : tabs[0].id;
+  const tab = tabs.value.find((tab) => tab.routeName === route.name);
+  activeTab.value = tab ? tab.id : tabs.value[0].id;
 });
 
 watch(
   () => route.name,
   async (newRouteName) => {
-    const tab = tabs.find((tab) => tab.routeName === newRouteName);
-    activeTab.value = tab ? tab.id : tabs[0].id;
+    const tab = tabs.value.find((tab) => tab.routeName === newRouteName);
+    activeTab.value = tab ? tab.id : tabs.value[0].id;
   }
 );
 
 const handleTabChange = (id: string) => {
-  const tab = tabs.find((tab) => tab.id === id);
+  const tab = tabs.value.find((tab) => tab.id === id);
   if (tab) {
     router.push({ name: tab.routeName });
   }

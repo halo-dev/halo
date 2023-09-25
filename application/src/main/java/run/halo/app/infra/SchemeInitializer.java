@@ -36,7 +36,7 @@ import run.halo.app.migration.Backup;
 import run.halo.app.plugin.extensionpoint.ExtensionDefinition;
 import run.halo.app.plugin.extensionpoint.ExtensionPointDefinition;
 import run.halo.app.search.extension.SearchEngine;
-import run.halo.app.security.authentication.pat.PersonalAccessToken;
+import run.halo.app.security.PersonalAccessToken;
 
 @Component
 public class SchemeInitializer implements ApplicationListener<ApplicationStartedEvent> {
@@ -54,7 +54,6 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
     @Override
     public void onApplicationEvent(@NonNull ApplicationStartedEvent event) {
         schemeManager.register(Role.class);
-        schemeManager.register(PersonalAccessToken.class);
 
         // plugin.halo.run
         schemeManager.register(Plugin.class);
@@ -89,6 +88,9 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
         // auth.halo.run
         schemeManager.register(AuthProvider.class);
         schemeManager.register(UserConnection.class);
+
+        // security.halo.run
+        schemeManager.register(PersonalAccessToken.class);
 
         // migration.halo.run
         schemeManager.register(Backup.class);

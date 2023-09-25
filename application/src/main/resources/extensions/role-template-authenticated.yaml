@@ -12,7 +12,8 @@ metadata:
         "role-template-own-permissions",
         "role-template-change-own-password",
         "role-template-stats",
-        "role-template-annotation-setting"
+        "role-template-annotation-setting",
+        "role-template-manage-own-pat"
       ]
 rules:
   - apiGroups: [ "" ]
@@ -94,3 +95,21 @@ rules:
   - apiGroups: [ "" ]
     resources: [ "annotationsettings" ]
     verbs: [ "get", "list" ]
+
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-own-pat
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+rules:
+  - apiGroups: [ "api.console.security.halo.run" ]
+    resources: [ "users/personalaccesstokens" ]
+    resourceNames: [ "-" ]
+    verbs: [ "*" ]
+  - apiGroups: [ "api.console.security.halo.run" ]
+    resources: [ "users/personalaccesstokens/actions" ]
+    resourceNames: [ "-" ]
+    verbs: [ "update" ]

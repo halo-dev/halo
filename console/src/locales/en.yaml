@@ -852,6 +852,7 @@ core:
       title: User detail
       tabs:
         detail: Detail
+        pat: Personal Access Tokens
       actions:
         update_profile:
           title: Update profile
@@ -886,6 +887,46 @@ core:
           flip_horizontal: Flip Horizontal
           flip_vertical: Flip Vertical
           reset: Reset
+    pat:
+      operations:
+        delete:
+          title: Delete Personal Access Token
+          description: Are you sure you want to delete this personal access token?
+        revoke:
+          button: Revoke
+          title: Revoke Personal Access Token
+          description: Are you sure you want to revoke this personal access token?
+          toast_success: Revocation succeeded
+        copy:
+          title: Please copy and save immediately, Token will only be displayed once.
+        restore:
+          button: Restore
+          toast_success: Restore successfully
+      list:
+        empty:
+          title: No personal access tokens have been created
+          message: You can try refreshing or creating a new personal access token
+        fields:
+          expiresAt:
+            dynamic: "Expires on {expiresAt}"
+            forever: Never expires
+          status:
+            normal: Normal
+            revoked: Revoked
+            expired: Expired
+      creation_modal:
+        title: Create Personal Access Token
+        groups:
+          general: General
+          permissions: Permissions
+        fields:
+          name:
+            label: Name
+          expiresAt:
+            label: Expiration Time
+            help: Leave empty for no expiration
+          description:
+            label: Description
   role:
     title: Roles
     common:

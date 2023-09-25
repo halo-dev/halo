@@ -1,6 +1,7 @@
 package run.halo.app.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
+import static org.springframework.security.web.server.authentication.ServerWebExchangeDelegatingReactiveAuthenticationManagerResolver.builder;
 import static org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers;
 
 import java.util.Set;
@@ -26,6 +27,7 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
+import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
@@ -37,6 +39,9 @@ import run.halo.app.security.authentication.login.CryptoService;
 import run.halo.app.security.authentication.login.PublicKeyRouteBuilder;
 import run.halo.app.security.authentication.login.RsaKeyScheduledGenerator;
 import run.halo.app.security.authentication.login.impl.RsaKeyService;
+import run.halo.app.security.authentication.pat.PatAuthenticationManager;
+import run.halo.app.security.authentication.pat.PatJwkSupplier;
+import run.halo.app.security.authentication.pat.PatServerWebExchangeMatcher;
 import run.halo.app.security.authorization.RequestInfoAuthorizationManager;
 
 /**
@@ -55,7 +60,9 @@ public class WebServerSecurityConfig {
         RoleService roleService,
         ObjectProvider<SecurityConfigurer> securityConfigurers,
         ServerSecurityContextRepository securityContextRepository,
-        ExtensionGetter extensionGetter) {
+        ExtensionGetter extensionGetter,
+        ReactiveExtensionClient client,
+        PatJwkSupplier patJwkSupplier) {
 
         http.securityMatcher(pathMatchers("/api/**", "/apis/**", "/oauth2/**",
                 "/login/**", "/logout", "/actuator/**"))
@@ -68,6 +75,14 @@ public class WebServerSecurityConfig {
             })
             .securityContextRepository(securityContextRepository)
             .httpBasic(withDefaults())
+            .oauth2ResourceServer(oauth2 -> {
+                var authManagerResolver = builder().add(
+                        new PatServerWebExchangeMatcher(),
+                        new PatAuthenticationManager(client, patJwkSupplier))
+                    // TODO Add other authentication mangers here. e.g.: JwtAuthentiationManager.
+                    .build();
+                oauth2.authenticationManagerResolver(authManagerResolver);
+            })
             .exceptionHandling(
                 spec -> spec.authenticationEntryPoint(new DefaultServerAuthenticationEntryPoint()));
 
