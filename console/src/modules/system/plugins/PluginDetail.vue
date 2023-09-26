@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 // core libs
-import { provide, ref, computed, onMounted } from "vue";
+import { provide, ref, computed } from "vue";
 import { useRoute } from "vue-router";
 import { apiClient } from "@/utils/api-client";
 
@@ -50,6 +50,11 @@ const { data: plugin } = useQuery({
       });
     return data;
   },
+  onSuccess(data) {
+    if (!data.spec.settingName) {
+      tabs.value = [...initialTabs.value, ...getTabsFromExtensions()];
+    }
+  },
 });
 
 provide<Ref<Plugin | undefined>>("plugin", plugin);
@@ -74,6 +79,7 @@ const { data: setting } = useQuery({
       const { forms } = data.spec;
       tabs.value = [
         ...initialTabs.value,
+        ...getTabsFromExtensions(),
         ...forms.map((item: SettingForm) => {
           return {
             id: item.group,
@@ -88,29 +94,29 @@ const { data: setting } = useQuery({
 
 provide<Ref<Setting | undefined>>("setting", setting);
 
-onMounted(() => {
+function getTabsFromExtensions(): PluginTab[] {
   const { pluginModuleMap } = usePluginModuleStore();
 
   const currentPluginModule = pluginModuleMap[route.params.name as string];
 
   if (!currentPluginModule) {
-    return;
+    return [];
   }
 
   const { extensionPoints } = currentPluginModule;
 
   if (!extensionPoints?.["plugin:self:tabs:create"]) {
-    return;
+    return [];
   }
 
-  const extraTabs = extensionPoints["plugin:self:tabs:create"]() as PluginTab[];
+  const pluginTabs = extensionPoints[
+    "plugin:self:tabs:create"
+  ]() as PluginTab[];
 
-  extraTabs.forEach((tab) => {
-    if (currentUserHasPermission(tab.permissions)) {
-      initialTabs.value.push(tab);
-    }
+  return pluginTabs.filter((tab) => {
+    return currentUserHasPermission(tab.permissions);
   });
-});
+}
 </script>
 <template>
   <VPageHeader :title="plugin?.spec?.displayName">
