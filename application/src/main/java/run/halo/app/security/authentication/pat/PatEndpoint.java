@@ -26,7 +26,7 @@ public class PatEndpoint implements CustomEndpoint {
     @Override
     public RouterFunction<ServerResponse> endpoint() {
         var tag = groupVersion().toString() + "/" + PersonalAccessToken.KIND;
-        return route().nest(path("/users/-/personalaccesstokens"),
+        return route().nest(path("/personalaccesstokens"),
                 () -> route()
                     .POST(patHandler::create,
                         builder -> builder

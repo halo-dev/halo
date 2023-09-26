@@ -105,11 +105,9 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "api.console.security.halo.run" ]
-    resources: [ "users/personalaccesstokens" ]
-    resourceNames: [ "-" ]
+  - apiGroups: [ "api.security.halo.run" ]
+    resources: [ "personalaccesstokens" ]
     verbs: [ "*" ]
-  - apiGroups: [ "api.console.security.halo.run" ]
-    resources: [ "users/personalaccesstokens/actions" ]
-    resourceNames: [ "-" ]
+  - apiGroups: [ "api.security.halo.run" ]
+    resources: [ "personalaccesstokens/actions" ]
     verbs: [ "update" ]
