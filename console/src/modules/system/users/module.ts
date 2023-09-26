@@ -1,11 +1,9 @@
 import { definePlugin } from "@halo-dev/console-shared";
 import BasicLayout from "@/layouts/BasicLayout.vue";
 import BlankLayout from "@/layouts/BlankLayout.vue";
-import UserProfileLayout from "./layouts/UserProfileLayout.vue";
 import UserStatsWidget from "./widgets/UserStatsWidget.vue";
 import UserList from "./UserList.vue";
 import UserDetail from "./UserDetail.vue";
-import PersonalAccessTokens from "./PersonalAccessTokens.vue";
 import Login from "./Login.vue";
 import { IconUserSettings } from "@halo-dev/components";
 import { markRaw } from "vue";
@@ -61,23 +59,15 @@ export default definePlugin({
         },
         {
           path: ":name",
-          component: UserProfileLayout,
+          component: BasicLayout,
           name: "User",
           children: [
             {
-              path: "detail",
+              path: "",
               name: "UserDetail",
               component: UserDetail,
               meta: {
                 title: "core.user.detail.title",
-              },
-            },
-            {
-              path: "tokens",
-              name: "PersonalAccessTokens",
-              component: PersonalAccessTokens,
-              meta: {
-                title: "个人令牌",
               },
             },
           ],
