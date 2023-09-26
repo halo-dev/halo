@@ -59,7 +59,7 @@ export const ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCreator =
         // verify required parameter 'name' is not null or undefined
         assertParamExists("deletePat", "name", name);
         const localVarPath =
-          `/apis/api.security.halo.run/v1alpha1/users/-/personalaccesstokens/{name}`.replace(
+          `/apis/api.security.halo.run/v1alpha1/personalaccesstokens/{name}`.replace(
             `{${"name"}}`,
             encodeURIComponent(String(name))
           );
@@ -116,7 +116,7 @@ export const ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCreator =
           "personalAccessToken",
           personalAccessToken
         );
-        const localVarPath = `/apis/api.security.halo.run/v1alpha1/users/-/personalaccesstokens`;
+        const localVarPath = `/apis/api.security.halo.run/v1alpha1/personalaccesstokens`;
         // use dummy base URL string because the URL constructor only accepts absolute URLs.
         const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
         let baseOptions;
@@ -174,7 +174,7 @@ export const ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCreator =
         // verify required parameter 'name' is not null or undefined
         assertParamExists("obtainPat", "name", name);
         const localVarPath =
-          `/apis/api.security.halo.run/v1alpha1/users/-/personalaccesstokens/{name}`.replace(
+          `/apis/api.security.halo.run/v1alpha1/personalaccesstokens/{name}`.replace(
             `{${"name"}}`,
             encodeURIComponent(String(name))
           );
@@ -223,7 +223,7 @@ export const ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCreator =
       obtainPats: async (
         options: AxiosRequestConfig = {}
       ): Promise<RequestArgs> => {
-        const localVarPath = `/apis/api.security.halo.run/v1alpha1/users/-/personalaccesstokens`;
+        const localVarPath = `/apis/api.security.halo.run/v1alpha1/personalaccesstokens`;
         // use dummy base URL string because the URL constructor only accepts absolute URLs.
         const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
         let baseOptions;
@@ -274,7 +274,7 @@ export const ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCreator =
         // verify required parameter 'name' is not null or undefined
         assertParamExists("restorePat", "name", name);
         const localVarPath =
-          `/apis/api.security.halo.run/v1alpha1/users/-/personalaccesstokens/{name}/actions/restoration`.replace(
+          `/apis/api.security.halo.run/v1alpha1/personalaccesstokens/{name}/actions/restoration`.replace(
             `{${"name"}}`,
             encodeURIComponent(String(name))
           );
@@ -328,7 +328,7 @@ export const ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCreator =
         // verify required parameter 'name' is not null or undefined
         assertParamExists("revokePat", "name", name);
         const localVarPath =
-          `/apis/api.security.halo.run/v1alpha1/users/-/personalaccesstokens/{name}/actions/revocation`.replace(
+          `/apis/api.security.halo.run/v1alpha1/personalaccesstokens/{name}/actions/revocation`.replace(
             `{${"name"}}`,
             encodeURIComponent(String(name))
           );
