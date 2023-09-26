@@ -174,9 +174,10 @@ spec:
 个人中心通知自定义 APIs:
 
 1. 获取个人中心获取用户通知列表的 APIs 规则：
-   `GET /apis/api.console.halo.run/v1alpha1/userspaces/{username}/notifications`
-2. 将通知标记为已读：`PUT /apis/api.console.halo.run/v1alpha1/userspaces/{username}/notifications/mark-as-read`
-3. 批量将通知标记为已读：`PUT /apis/api.console.halo.run/v1alpha1/userspaces/{username}/notifications/mark-specified-as-read`
+   `GET /apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications`
+2. 将通知标记为已读：`PUT /apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications/mark-as-read`
+3.
+批量将通知标记为已读：`PUT /apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notifications/mark-specified-as-read`
 
 #### 通知模板
 
@@ -252,8 +253,8 @@ spec:
 
 个人中心用户获取和保存对应通知器接收消息配置的 APIs:
 
-1. 获取通知器接收消息配置：`GET /apis/api.console.halo.run/v1alpha1/notifiers/{name}/receiverConfig`
-2. 获取通知器接收消息配置：`POST /apis/api.console.halo.run/v1alpha1/notifiers/{name}/receiverConfig`
+1. 获取通知器接收消息配置：`GET /apis/api.notification.halo.run/v1alpha1/notifiers/{name}/receiverConfig`
+2. 获取通知器接收消息配置：`POST /apis/api.notification.halo.run/v1alpha1/notifiers/{name}/receiverConfig`
 
 通知器扩展点用于实现发送通知的方式：
 

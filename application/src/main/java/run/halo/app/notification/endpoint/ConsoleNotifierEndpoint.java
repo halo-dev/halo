@@ -28,7 +28,7 @@ import run.halo.app.notification.NotifierConfigStore;
  */
 @Component
 @RequiredArgsConstructor
-public class NotifierEndpoint implements CustomEndpoint {
+public class ConsoleNotifierEndpoint implements CustomEndpoint {
 
     private final NotifierConfigStore notifierConfigStore;
 
@@ -39,18 +39,6 @@ public class NotifierEndpoint implements CustomEndpoint {
             .GET("/notifiers/{name}/senderConfig", this::fetchSenderConfig,
                 builder -> builder.operationId("FetchSenderConfig")
                     .description("Fetch sender config of notifier")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .description("Notifier name")
-                        .required(true)
-                    )
-                    .response(responseBuilder().implementation(ObjectNode.class))
-            )
-            .GET("/notifiers/{name}/receiverConfig", this::fetchReceiverConfig,
-                builder -> builder.operationId("FetchReceiverConfig")
-                    .description("Fetch receiver config of notifier")
                     .tag(tag)
                     .parameter(parameterBuilder()
                         .in(ParameterIn.PATH)
@@ -80,49 +68,13 @@ public class NotifierEndpoint implements CustomEndpoint {
                     )
                     .response(responseBuilder().implementation(Void.class))
             )
-            .POST("/notifiers/{name}/receiverConfig", this::saveReceiverConfig,
-                builder -> builder.operationId("SaveReceiverConfig")
-                    .description("Save receiver config of notifier")
-                    .tag(tag)
-                    .parameter(parameterBuilder()
-                        .in(ParameterIn.PATH)
-                        .name("name")
-                        .description("Notifier name")
-                        .required(true)
-                    )
-                    .requestBody(requestBodyBuilder()
-                        .required(true)
-                        .content(contentBuilder()
-                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
-                            .schema(Builder.schemaBuilder()
-                                .implementation(ObjectNode.class))
-                        )
-                    )
-                    .response(responseBuilder().implementation(Void.class))
-            )
             .build();
-    }
-
-    private Mono<ServerResponse> fetchReceiverConfig(ServerRequest request) {
-        var name = request.pathVariable("name");
-        return notifierConfigStore.fetchReceiverConfig(name)
-            .flatMap(config -> ServerResponse.ok().bodyValue(config));
     }
 
     private Mono<ServerResponse> fetchSenderConfig(ServerRequest request) {
         var name = request.pathVariable("name");
         return notifierConfigStore.fetchSenderConfig(name)
             .flatMap(config -> ServerResponse.ok().bodyValue(config));
-    }
-
-    private Mono<ServerResponse> saveReceiverConfig(ServerRequest request) {
-        var name = request.pathVariable("name");
-        return request.bodyToMono(ObjectNode.class)
-            .switchIfEmpty(Mono.error(
-                () -> new ServerWebInputException("Request body must not be empty."))
-            )
-            .flatMap(jsonNode -> notifierConfigStore.saveReceiverConfig(name, jsonNode))
-            .then(ServerResponse.ok().build());
     }
 
     private Mono<ServerResponse> saveSenderConfig(ServerRequest request) {

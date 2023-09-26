@@ -20,6 +20,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.notification.Notification;
+import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.router.QueryParamBuildUtil;
 import run.halo.app.notification.UserNotificationQuery;
@@ -47,7 +48,7 @@ public class UserNotificationEndpoint implements CustomEndpoint {
     }
 
     Supplier<RouterFunction<ServerResponse>> userspaceScopedApis() {
-        var tag = "api.console.halo.run/v1alpha1/Notification";
+        var tag = "api.notification.halo.run/v1alpha1/Notification";
         return () -> SpringdocRouteBuilder.route()
             .GET("/notifications", this::listNotification,
                 builder -> {
@@ -106,6 +107,11 @@ public class UserNotificationEndpoint implements CustomEndpoint {
                     .response(responseBuilder().implementationArray(String.class))
             )
             .build();
+    }
+
+    @Override
+    public GroupVersion groupVersion() {
+        return GroupVersion.parseAPIVersion("api.notification.halo.run/v1alpha1");
     }
 
     record MarkSpecifiedRequest(List<String> names) {

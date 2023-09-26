@@ -122,12 +122,12 @@ metadata:
     halo.run/role-template: "true"
     halo.run/hidden: "true"
 rules:
-  - apiGroups: [ "api.console.halo.run" ]
+  - apiGroups: [ "api.notification.halo.run" ]
     resources: [ "notifications" ]
     verbs: [ "get", "list" ]
-  - apiGroups: [ "api.console.halo.run" ]
+  - apiGroups: [ "api.notification.halo.run" ]
     resources: [ "notifications/mark-as-read", "notifications/mark-specified-as-read" ]
     verbs: [ "update" ]
-  - apiGroups: [ "api.console.halo.run" ]
+  - apiGroups: [ "api.notification.halo.run" ]
     resources: [ "notifiers/receiverConfig" ]
     verbs: [ "get", "update" ]
