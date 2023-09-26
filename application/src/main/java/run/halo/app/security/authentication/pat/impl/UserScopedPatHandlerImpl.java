@@ -1,6 +1,5 @@
 package run.halo.app.security.authentication.pat.impl;
 
-import static org.apache.commons.lang3.StringUtils.startsWith;
 import static run.halo.app.extension.Comparators.compareCreationTimestamp;
 import static run.halo.app.security.authentication.pat.PatServerWebExchangeMatcher.PAT_TOKEN_PREFIX;
 
@@ -12,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -47,8 +45,6 @@ import run.halo.app.security.authorization.AuthorityUtils;
 
 @Service
 public class UserScopedPatHandlerImpl implements UserScopedPatHandler {
-
-    private static final String ROLE_PREFIX = AuthorityUtils.ROLE_PREFIX;
 
     private static final String ACCESS_TOKEN_ANNO_NAME = "security.halo.run/access-token";
 
@@ -255,22 +251,6 @@ public class UserScopedPatHandlerImpl implements UserScopedPatHandler {
         }
         var grantedRoles = AuthorityUtils.authoritiesToRoles(grantedAuthorities);
         return roleService.contains(grantedRoles, requestRoles);
-    }
-
-    private static boolean containsIllegalRoles(
-        Collection<? extends GrantedAuthority> grantedAuthorities,
-        List<String> roles) {
-        if (CollectionUtils.isEmpty(roles)) {
-            return false;
-        }
-        var roleSet = roles.stream()
-            .map(role -> ROLE_PREFIX + role)
-            .collect(Collectors.toSet());
-        var grantedRoleSet = grantedAuthorities.stream()
-            .map(GrantedAuthority::getAuthority)
-            .filter(authority -> startsWith(authority, ROLE_PREFIX))
-            .collect(Collectors.toSet());
-        return !grantedRoleSet.containsAll(roleSet);
     }
 
     private Mono<PersonalAccessToken> getPat(String name, String username) {

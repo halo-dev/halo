@@ -14,7 +14,6 @@ api/api-console-halo-run-v1alpha1-system-api.ts
 api/api-console-halo-run-v1alpha1-theme-api.ts
 api/api-console-halo-run-v1alpha1-user-api.ts
 api/api-console-migration-halo-run-v1alpha1-migration-api.ts
-api/api-console-security-halo-run-v1alpha1-personal-access-token-api.ts
 api/api-content-halo-run-v1alpha1-category-api.ts
 api/api-content-halo-run-v1alpha1-post-api.ts
 api/api-content-halo-run-v1alpha1-single-page-api.ts
@@ -26,6 +25,7 @@ api/api-halo-run-v1alpha1-stats-api.ts
 api/api-halo-run-v1alpha1-tracker-api.ts
 api/api-halo-run-v1alpha1-user-api.ts
 api/api-plugin-halo-run-v1alpha1-plugin-api.ts
+api/api-security-halo-run-v1alpha1-personal-access-token-api.ts
 api/auth-halo-run-v1alpha1-auth-provider-api.ts
 api/auth-halo-run-v1alpha1-user-connection-api.ts
 api/content-halo-run-v1alpha1-category-api.ts

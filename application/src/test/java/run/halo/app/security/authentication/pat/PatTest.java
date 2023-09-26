@@ -26,7 +26,7 @@ class PatTest {
         spec.setRoles(List.of("super-role"));
         spec.setName("Fake PAT");
         webClient.post()
-            .uri("/apis/api.security.halo.run/v1alpha1/users/-/personalaccesstokens")
+            .uri("/apis/api.security.halo.run/v1alpha1/personalaccesstokens")
             .bodyValue(requestPat)
             .exchange()
             .expectStatus().isOk()
