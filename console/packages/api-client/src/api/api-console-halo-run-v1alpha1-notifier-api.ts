@@ -46,60 +46,6 @@ export const ApiConsoleHaloRunV1alpha1NotifierApiAxiosParamCreator = function (
 ) {
   return {
     /**
-     * Fetch receiver config of notifier
-     * @param {string} name Notifier name
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    fetchReceiverConfig: async (
-      name: string,
-      options: AxiosRequestConfig = {}
-    ): Promise<RequestArgs> => {
-      // verify required parameter 'name' is not null or undefined
-      assertParamExists("fetchReceiverConfig", "name", name);
-      const localVarPath =
-        `/apis/api.console.halo.run/v1alpha1/notifiers/{name}/receiverConfig`.replace(
-          `{${"name"}}`,
-          encodeURIComponent(String(name))
-        );
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-      let baseOptions;
-      if (configuration) {
-        baseOptions = configuration.baseOptions;
-      }
-
-      const localVarRequestOptions = {
-        method: "GET",
-        ...baseOptions,
-        ...options,
-      };
-      const localVarHeaderParameter = {} as any;
-      const localVarQueryParameter = {} as any;
-
-      // authentication BasicAuth required
-      // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration);
-
-      // authentication BearerAuth required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
-
-      setSearchParams(localVarUrlObj, localVarQueryParameter);
-      let headersFromBaseOptions =
-        baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = {
-        ...localVarHeaderParameter,
-        ...headersFromBaseOptions,
-        ...options.headers,
-      };
-
-      return {
-        url: toPathString(localVarUrlObj),
-        options: localVarRequestOptions,
-      };
-    },
-    /**
      * Fetch sender config of notifier
      * @param {string} name Notifier name
      * @param {*} [options] Override http request option.
@@ -147,71 +93,6 @@ export const ApiConsoleHaloRunV1alpha1NotifierApiAxiosParamCreator = function (
         ...headersFromBaseOptions,
         ...options.headers,
       };
-
-      return {
-        url: toPathString(localVarUrlObj),
-        options: localVarRequestOptions,
-      };
-    },
-    /**
-     * Save receiver config of notifier
-     * @param {string} name Notifier name
-     * @param {object} body
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    saveReceiverConfig: async (
-      name: string,
-      body: object,
-      options: AxiosRequestConfig = {}
-    ): Promise<RequestArgs> => {
-      // verify required parameter 'name' is not null or undefined
-      assertParamExists("saveReceiverConfig", "name", name);
-      // verify required parameter 'body' is not null or undefined
-      assertParamExists("saveReceiverConfig", "body", body);
-      const localVarPath =
-        `/apis/api.console.halo.run/v1alpha1/notifiers/{name}/receiverConfig`.replace(
-          `{${"name"}}`,
-          encodeURIComponent(String(name))
-        );
-      // use dummy base URL string because the URL constructor only accepts absolute URLs.
-      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-      let baseOptions;
-      if (configuration) {
-        baseOptions = configuration.baseOptions;
-      }
-
-      const localVarRequestOptions = {
-        method: "POST",
-        ...baseOptions,
-        ...options,
-      };
-      const localVarHeaderParameter = {} as any;
-      const localVarQueryParameter = {} as any;
-
-      // authentication BasicAuth required
-      // http basic authentication required
-      setBasicAuthToObject(localVarRequestOptions, configuration);
-
-      // authentication BearerAuth required
-      // http bearer authentication required
-      await setBearerAuthToObject(localVarHeaderParameter, configuration);
-
-      localVarHeaderParameter["Content-Type"] = "application/json";
-
-      setSearchParams(localVarUrlObj, localVarQueryParameter);
-      let headersFromBaseOptions =
-        baseOptions && baseOptions.headers ? baseOptions.headers : {};
-      localVarRequestOptions.headers = {
-        ...localVarHeaderParameter,
-        ...headersFromBaseOptions,
-        ...options.headers,
-      };
-      localVarRequestOptions.data = serializeDataIfNeeded(
-        body,
-        localVarRequestOptions,
-        configuration
-      );
 
       return {
         url: toPathString(localVarUrlObj),
@@ -297,27 +178,6 @@ export const ApiConsoleHaloRunV1alpha1NotifierApiFp = function (
     ApiConsoleHaloRunV1alpha1NotifierApiAxiosParamCreator(configuration);
   return {
     /**
-     * Fetch receiver config of notifier
-     * @param {string} name Notifier name
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    async fetchReceiverConfig(
-      name: string,
-      options?: AxiosRequestConfig
-    ): Promise<
-      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<object>
-    > {
-      const localVarAxiosArgs =
-        await localVarAxiosParamCreator.fetchReceiverConfig(name, options);
-      return createRequestFunction(
-        localVarAxiosArgs,
-        globalAxios,
-        BASE_PATH,
-        configuration
-      );
-    },
-    /**
      * Fetch sender config of notifier
      * @param {string} name Notifier name
      * @param {*} [options] Override http request option.
@@ -331,29 +191,6 @@ export const ApiConsoleHaloRunV1alpha1NotifierApiFp = function (
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.fetchSenderConfig(name, options);
-      return createRequestFunction(
-        localVarAxiosArgs,
-        globalAxios,
-        BASE_PATH,
-        configuration
-      );
-    },
-    /**
-     * Save receiver config of notifier
-     * @param {string} name Notifier name
-     * @param {object} body
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    async saveReceiverConfig(
-      name: string,
-      body: object,
-      options?: AxiosRequestConfig
-    ): Promise<
-      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
-    > {
-      const localVarAxiosArgs =
-        await localVarAxiosParamCreator.saveReceiverConfig(name, body, options);
       return createRequestFunction(
         localVarAxiosArgs,
         globalAxios,
@@ -399,20 +236,6 @@ export const ApiConsoleHaloRunV1alpha1NotifierApiFactory = function (
   const localVarFp = ApiConsoleHaloRunV1alpha1NotifierApiFp(configuration);
   return {
     /**
-     * Fetch receiver config of notifier
-     * @param {ApiConsoleHaloRunV1alpha1NotifierApiFetchReceiverConfigRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    fetchReceiverConfig(
-      requestParameters: ApiConsoleHaloRunV1alpha1NotifierApiFetchReceiverConfigRequest,
-      options?: AxiosRequestConfig
-    ): AxiosPromise<object> {
-      return localVarFp
-        .fetchReceiverConfig(requestParameters.name, options)
-        .then((request) => request(axios, basePath));
-    },
-    /**
      * Fetch sender config of notifier
      * @param {ApiConsoleHaloRunV1alpha1NotifierApiFetchSenderConfigRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -424,24 +247,6 @@ export const ApiConsoleHaloRunV1alpha1NotifierApiFactory = function (
     ): AxiosPromise<object> {
       return localVarFp
         .fetchSenderConfig(requestParameters.name, options)
-        .then((request) => request(axios, basePath));
-    },
-    /**
-     * Save receiver config of notifier
-     * @param {ApiConsoleHaloRunV1alpha1NotifierApiSaveReceiverConfigRequest} requestParameters Request parameters.
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     */
-    saveReceiverConfig(
-      requestParameters: ApiConsoleHaloRunV1alpha1NotifierApiSaveReceiverConfigRequest,
-      options?: AxiosRequestConfig
-    ): AxiosPromise<void> {
-      return localVarFp
-        .saveReceiverConfig(
-          requestParameters.name,
-          requestParameters.body,
-          options
-        )
         .then((request) => request(axios, basePath));
     },
     /**
@@ -466,20 +271,6 @@ export const ApiConsoleHaloRunV1alpha1NotifierApiFactory = function (
 };
 
 /**
- * Request parameters for fetchReceiverConfig operation in ApiConsoleHaloRunV1alpha1NotifierApi.
- * @export
- * @interface ApiConsoleHaloRunV1alpha1NotifierApiFetchReceiverConfigRequest
- */
-export interface ApiConsoleHaloRunV1alpha1NotifierApiFetchReceiverConfigRequest {
-  /**
-   * Notifier name
-   * @type {string}
-   * @memberof ApiConsoleHaloRunV1alpha1NotifierApiFetchReceiverConfig
-   */
-  readonly name: string;
-}
-
-/**
  * Request parameters for fetchSenderConfig operation in ApiConsoleHaloRunV1alpha1NotifierApi.
  * @export
  * @interface ApiConsoleHaloRunV1alpha1NotifierApiFetchSenderConfigRequest
@@ -491,27 +282,6 @@ export interface ApiConsoleHaloRunV1alpha1NotifierApiFetchSenderConfigRequest {
    * @memberof ApiConsoleHaloRunV1alpha1NotifierApiFetchSenderConfig
    */
   readonly name: string;
-}
-
-/**
- * Request parameters for saveReceiverConfig operation in ApiConsoleHaloRunV1alpha1NotifierApi.
- * @export
- * @interface ApiConsoleHaloRunV1alpha1NotifierApiSaveReceiverConfigRequest
- */
-export interface ApiConsoleHaloRunV1alpha1NotifierApiSaveReceiverConfigRequest {
-  /**
-   * Notifier name
-   * @type {string}
-   * @memberof ApiConsoleHaloRunV1alpha1NotifierApiSaveReceiverConfig
-   */
-  readonly name: string;
-
-  /**
-   *
-   * @type {object}
-   * @memberof ApiConsoleHaloRunV1alpha1NotifierApiSaveReceiverConfig
-   */
-  readonly body: object;
 }
 
 /**
@@ -543,22 +313,6 @@ export interface ApiConsoleHaloRunV1alpha1NotifierApiSaveSenderConfigRequest {
  */
 export class ApiConsoleHaloRunV1alpha1NotifierApi extends BaseAPI {
   /**
-   * Fetch receiver config of notifier
-   * @param {ApiConsoleHaloRunV1alpha1NotifierApiFetchReceiverConfigRequest} requestParameters Request parameters.
-   * @param {*} [options] Override http request option.
-   * @throws {RequiredError}
-   * @memberof ApiConsoleHaloRunV1alpha1NotifierApi
-   */
-  public fetchReceiverConfig(
-    requestParameters: ApiConsoleHaloRunV1alpha1NotifierApiFetchReceiverConfigRequest,
-    options?: AxiosRequestConfig
-  ) {
-    return ApiConsoleHaloRunV1alpha1NotifierApiFp(this.configuration)
-      .fetchReceiverConfig(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath));
-  }
-
-  /**
    * Fetch sender config of notifier
    * @param {ApiConsoleHaloRunV1alpha1NotifierApiFetchSenderConfigRequest} requestParameters Request parameters.
    * @param {*} [options] Override http request option.
@@ -571,26 +325,6 @@ export class ApiConsoleHaloRunV1alpha1NotifierApi extends BaseAPI {
   ) {
     return ApiConsoleHaloRunV1alpha1NotifierApiFp(this.configuration)
       .fetchSenderConfig(requestParameters.name, options)
-      .then((request) => request(this.axios, this.basePath));
-  }
-
-  /**
-   * Save receiver config of notifier
-   * @param {ApiConsoleHaloRunV1alpha1NotifierApiSaveReceiverConfigRequest} requestParameters Request parameters.
-   * @param {*} [options] Override http request option.
-   * @throws {RequiredError}
-   * @memberof ApiConsoleHaloRunV1alpha1NotifierApi
-   */
-  public saveReceiverConfig(
-    requestParameters: ApiConsoleHaloRunV1alpha1NotifierApiSaveReceiverConfigRequest,
-    options?: AxiosRequestConfig
-  ) {
-    return ApiConsoleHaloRunV1alpha1NotifierApiFp(this.configuration)
-      .saveReceiverConfig(
-        requestParameters.name,
-        requestParameters.body,
-        options
-      )
       .then((request) => request(this.axios, this.basePath));
   }
 
