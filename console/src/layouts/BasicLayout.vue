@@ -309,7 +309,7 @@ onMounted(() => {
                   })
                 "
               >
-                我的消息
+                {{ $t("core.sidebar.operations.notifications.button") }}
               </VDropdownItem>
               <VDropdownItem @click="handleLogout">
                 {{ $t("core.sidebar.operations.logout.button") }}

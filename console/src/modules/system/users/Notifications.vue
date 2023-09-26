@@ -49,7 +49,7 @@ const selectedNotification = computed(() => {
 </script>
 
 <template>
-  <VPageHeader title="消息">
+  <VPageHeader :title="$t('core.notification.title')">
     <template #icon>
       <IconNotificationBadgeLine class="mr-2 self-center" />
     </template>
@@ -73,8 +73,8 @@ const selectedNotification = computed(() => {
               v-model:active-id="activeTab"
               class="sticky top-0 z-10 !rounded-none"
               :items="[
-                { id: 'unread', label: '未读' },
-                { id: 'read', label: '已读' },
+                { id: 'unread', label: $t('core.notification.tabs.unread') },
+                { id: 'read', label: $t('core.notification.tabs.read') },
               ]"
               type="outline"
               @change="selectedNotificationName = undefined"
@@ -88,13 +88,13 @@ const selectedNotification = computed(() => {
               <VEmpty
                 :title="`${
                   activeTab === 'unread'
-                    ? '当前没有未读的消息'
-                    : '当前没有已读的消息'
+                    ? $t('core.notification.empty.titles.unread')
+                    : $t('core.notification.empty.titles.read')
                 }`"
               >
                 <template #actions>
                   <VButton :loading="isFetching && !isLoading" @click="refetch">
-                    刷新
+                    {{ $t("core.common.buttons.refresh") }}
                   </VButton>
                 </template>
               </VEmpty>

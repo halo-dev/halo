@@ -79,6 +79,8 @@ core:
         button: 个人资料
       visit_homepage:
         title: 访问首页
+      notifications:
+        button: 我的消息
   dashboard:
     title: 仪表板
     actions:
@@ -987,6 +989,18 @@ core:
         website: 网站
         help_page: 帮助页面
         authentication_url: 登录入口
+  notification:
+    title: 消息
+    tabs:
+      unread: 未读
+      read: 已读
+    empty:
+      titles:
+        unread: 当前没有未读的消息
+        read: 当前没有已读的消息
+    operations:
+      mark_as_read:
+        button: 标记为已读
   setting:
     title: 设置
   actuator:
@@ -1258,6 +1272,7 @@ core:
       submit: 提交
       detail: 详情
       select: 选择
+      view_all: 查看全部
     radio:
       "yes": 是
       "no": 否

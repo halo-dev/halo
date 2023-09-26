@@ -73,7 +73,7 @@ watch(
     >
       {{ notification.spec.rawContent }}
     </div>
-    <div class="flex h-7 items-end justify-between">
+    <div class="flex h-6 items-end justify-between">
       <div class="text-xs text-gray-600">
         {{ relativeTimeTo(notification.metadata.creationTimestamp) }}
       </div>
@@ -83,7 +83,7 @@ watch(
           class="text-sm text-gray-600 hover:text-gray-900"
           @click.stop="handleMarkAsRead({ refetch: true })"
         >
-          标记为已读
+          {{ $t("core.notification.operations.mark_as_read.button") }}
         </span>
       </div>
     </div>

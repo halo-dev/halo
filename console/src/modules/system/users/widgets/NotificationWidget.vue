@@ -39,7 +39,7 @@ const {
   <VCard
     :body-class="['h-full', '@container', '!p-0', '!overflow-auto']"
     class="h-full"
-    title="消息"
+    :title="$t('core.notification.title')"
   >
     <template #actions>
       <div style="padding: 12px 16px">
@@ -47,14 +47,19 @@ const {
           class="text-sm text-gray-600 hover:text-gray-900"
           :to="{ name: 'UserNotifications' }"
         >
-          查看全部
+          {{ $t("core.common.buttons.view_all") }}
         </RouterLink>
       </div>
     </template>
     <VLoading v-if="isLoading" />
-    <VEmpty v-else-if="!notifications?.length" title="当前没有未读的消息">
+    <VEmpty
+      v-else-if="!notifications?.length"
+      :title="$t('core.notification.empty.titles.unread')"
+    >
       <template #actions>
-        <VButton :loading="isFetching" @click="refetch">刷新</VButton>
+        <VButton :loading="isFetching" @click="refetch">
+          {{ $t("core.common.buttons.refresh") }}
+        </VButton>
       </template>
     </VEmpty>
     <OverlayScrollbarsComponent

@@ -9,8 +9,10 @@ import { apiClient } from "@/utils/api-client";
 import { computed } from "vue";
 import { toRaw } from "vue";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
+import { useI18n } from "vue-i18n";
 
 const queryClient = useQueryClient();
+const { t } = useI18n();
 
 const notifierDescriptor = inject<Ref<NotifierDescriptor | undefined>>(
   "notifierDescriptor",
@@ -66,7 +68,7 @@ const { isLoading: isMutating, mutate } = useMutation({
   },
   onSuccess() {
     queryClient.invalidateQueries({ queryKey: ["notifier-configMap"] });
-    Toast.success("保存成功");
+    Toast.success(t("core.common.toast.save_success"));
   },
 });
 </script>

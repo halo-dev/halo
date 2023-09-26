@@ -11,10 +11,12 @@ import { IconUserSettings } from "@halo-dev/components";
 import { markRaw } from "vue";
 import Binding from "./Binding.vue";
 import Notifications from "./Notifications.vue";
+import NotificationWidget from "./widgets/NotificationWidget.vue";
 
 export default definePlugin({
   components: {
     UserStatsWidget,
+    NotificationWidget,
   },
   routes: [
     {
@@ -92,7 +94,7 @@ export default definePlugin({
               name: "UserNotifications",
               component: Notifications,
               meta: {
-                title: "消息",
+                title: "core.notification.title",
               },
             },
           ],

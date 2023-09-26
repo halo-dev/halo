@@ -243,8 +243,7 @@ const layout = useStorage("widgets", [
     w: 6,
     h: 12,
     i: 5,
-    widget: "RecentPublishedWidget",
-    permissions: ["system:posts:view"],
+    widget: "NotificationWidget",
   },
 ]);
 
