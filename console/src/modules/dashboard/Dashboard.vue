@@ -244,6 +244,7 @@ const layout = useStorage("widgets", [
     h: 12,
     i: 5,
     widget: "NotificationWidget",
+    permissions: [],
   },
 ]);
 
