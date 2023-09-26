@@ -27,6 +27,12 @@ export interface UserPermission {
    * @type {Array<Role>}
    * @memberof UserPermission
    */
+  permissions: Array<Role>;
+  /**
+   *
+   * @type {Array<Role>}
+   * @memberof UserPermission
+   */
   roles: Array<Role>;
   /**
    *

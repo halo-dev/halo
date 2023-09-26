@@ -379,10 +379,12 @@ watch(selectedPageNames, (newValue) => {
                   },
                 ]"
               />
-              <UserFilterDropdown
-                v-model="selectedContributor"
-                :label="$t('core.page.filters.author.label')"
-              />
+              <HasPermission :permissions="['system:users:view']">
+                <UserFilterDropdown
+                  v-model="selectedContributor"
+                  :label="$t('core.page.filters.author.label')"
+                />
+              </HasPermission>
               <FilterDropdown
                 v-model="selectedSort"
                 :label="$t('core.common.filters.labels.sort')"

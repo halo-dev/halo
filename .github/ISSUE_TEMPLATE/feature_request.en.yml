@@ -21,6 +21,7 @@ body:
     id: description
     attributes:
       label: "Describe this feature"
+      description: "For ease of management, please do not submit multiple unrelated features under the same issue."
     validations:
       required: true
   - type: textarea

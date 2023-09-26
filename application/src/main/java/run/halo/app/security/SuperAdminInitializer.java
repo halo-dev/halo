@@ -3,6 +3,7 @@ package run.halo.app.security;
 import lombok.Builder;
 import lombok.Data;
 import reactor.core.publisher.Mono;
+import run.halo.app.security.authorization.AuthorityUtils;
 
 /**
  * Super admin initializer.
@@ -11,6 +12,8 @@ import reactor.core.publisher.Mono;
  * @since 2.9.0
  */
 public interface SuperAdminInitializer {
+
+    String SUPER_ROLE_NAME = AuthorityUtils.SUPER_ROLE_NAME;
 
     /**
      * Initialize super admin.

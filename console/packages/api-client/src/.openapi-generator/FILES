@@ -14,6 +14,7 @@ api/api-console-halo-run-v1alpha1-system-api.ts
 api/api-console-halo-run-v1alpha1-theme-api.ts
 api/api-console-halo-run-v1alpha1-user-api.ts
 api/api-console-migration-halo-run-v1alpha1-migration-api.ts
+api/api-console-security-halo-run-v1alpha1-personal-access-token-api.ts
 api/api-content-halo-run-v1alpha1-category-api.ts
 api/api-content-halo-run-v1alpha1-post-api.ts
 api/api-content-halo-run-v1alpha1-single-page-api.ts
@@ -42,6 +43,7 @@ api/plugin-halo-run-v1alpha1-extension-point-definition-api.ts
 api/plugin-halo-run-v1alpha1-plugin-api.ts
 api/plugin-halo-run-v1alpha1-reverse-proxy-api.ts
 api/plugin-halo-run-v1alpha1-search-engine-api.ts
+api/security-halo-run-v1alpha1-personal-access-token-api.ts
 api/storage-halo-run-v1alpha1-attachment-api.ts
 api/storage-halo-run-v1alpha1-group-api.ts
 api/storage-halo-run-v1alpha1-policy-api.ts
@@ -52,7 +54,6 @@ api/v1alpha1-cache-api.ts
 api/v1alpha1-config-map-api.ts
 api/v1alpha1-menu-api.ts
 api/v1alpha1-menu-item-api.ts
-api/v1alpha1-personal-access-token-api.ts
 api/v1alpha1-role-api.ts
 api/v1alpha1-role-binding-api.ts
 api/v1alpha1-secret-api.ts
@@ -157,8 +158,8 @@ models/menu.ts
 models/metadata.ts
 models/navigation-post-vo.ts
 models/owner-info.ts
+models/pat-spec.ts
 models/personal-access-token-list.ts
-models/personal-access-token-spec.ts
 models/personal-access-token.ts
 models/plugin-author.ts
 models/plugin-list.ts

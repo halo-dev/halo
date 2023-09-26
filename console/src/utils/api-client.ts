@@ -28,7 +28,6 @@ import {
   V1alpha1ConfigMapApi,
   V1alpha1MenuApi,
   V1alpha1MenuItemApi,
-  V1alpha1PersonalAccessTokenApi,
   V1alpha1RoleApi,
   V1alpha1RoleBindingApi,
   V1alpha1SettingApi,
@@ -41,6 +40,8 @@ import {
   ApiHaloRunV1alpha1UserApi,
   MigrationHaloRunV1alpha1BackupApi,
   ApiConsoleMigrationHaloRunV1alpha1MigrationApi,
+  ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi,
+  SecurityHaloRunV1alpha1PersonalAccessTokenApi,
 } from "@halo-dev/api-client";
 import type { AxiosError, AxiosInstance } from "axios";
 import axios from "axios";
@@ -117,11 +118,6 @@ function setupApiClient(axios: AxiosInstance) {
   return {
     extension: {
       configMap: new V1alpha1ConfigMapApi(undefined, baseURL, axios),
-      personalAccessToken: new V1alpha1PersonalAccessTokenApi(
-        undefined,
-        baseURL,
-        axios
-      ),
       roleBinding: new V1alpha1RoleBindingApi(undefined, baseURL, axios),
       role: new V1alpha1RoleApi(undefined, baseURL, axios),
       setting: new V1alpha1SettingApi(undefined, baseURL, axios),
@@ -184,6 +180,11 @@ function setupApiClient(axios: AxiosInstance) {
         axios
       ),
       backup: new MigrationHaloRunV1alpha1BackupApi(undefined, baseURL, axios),
+      pat: new SecurityHaloRunV1alpha1PersonalAccessTokenApi(
+        undefined,
+        baseURL,
+        axios
+      ),
     },
     // custom endpoints
     user: new ApiConsoleHaloRunV1alpha1UserApi(undefined, baseURL, axios),
@@ -220,6 +221,11 @@ function setupApiClient(axios: AxiosInstance) {
       axios
     ),
     system: new ApiConsoleHaloRunV1alpha1SystemApi(undefined, baseURL, axios),
+    pat: new ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi(
+      undefined,
+      baseURL,
+      axios
+    ),
   };
 }
 

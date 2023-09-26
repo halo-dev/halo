@@ -5,7 +5,6 @@ import {
   IconExternalLinkLine,
   VSpace,
   Dialog,
-  VAvatar,
   VStatusDot,
   VEntity,
   VEntityField,
@@ -25,6 +24,7 @@ import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { inject } from "vue";
 import type { Ref } from "vue";
+import ContributorList from "../../_components/ContributorList.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -189,23 +189,7 @@ const handleDelete = async () => {
     <template #end>
       <VEntityField>
         <template #description>
-          <RouterLink
-            v-for="(contributor, contributorIndex) in singlePage.contributors"
-            :key="contributorIndex"
-            :to="{
-              name: 'UserDetail',
-              params: { name: contributor.name },
-            }"
-            class="flex items-center"
-          >
-            <VAvatar
-              v-tooltip="contributor.displayName"
-              size="xs"
-              :src="contributor.avatar"
-              :alt="contributor.displayName"
-              circle
-            ></VAvatar>
-          </RouterLink>
+          <ContributorList :contributors="singlePage.contributors" />
         </template>
       </VEntityField>
       <VEntityField :description="publishStatus">

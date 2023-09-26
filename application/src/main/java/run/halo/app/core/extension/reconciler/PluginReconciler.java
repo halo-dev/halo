@@ -142,7 +142,7 @@ public class PluginReconciler implements Reconciler<Request> {
                 if (waitForSettingCreation(plugin)) {
                     return true;
                 }
-                createInitialReverseProxyIfNotPresent(plugin);
+                recreateDefaultReverseProxy(plugin);
 
                 updateStatus(name, status -> {
                     String logoUrl = generateAccessibleLogoUrl(plugin);
@@ -764,7 +764,7 @@ public class PluginReconciler implements Reconciler<Request> {
         return Paths.get(pluginLocation);
     }
 
-    void createInitialReverseProxyIfNotPresent(Plugin plugin) {
+    void recreateDefaultReverseProxy(Plugin plugin) {
         String pluginName = plugin.getMetadata().getName();
         String reverseProxyName = initialReverseProxyName(pluginName);
         ReverseProxy reverseProxy = new ReverseProxy();
@@ -785,11 +785,9 @@ public class PluginReconciler implements Reconciler<Request> {
 
         client.fetch(ReverseProxy.class, reverseProxyName)
             .ifPresentOrElse(persisted -> {
-                if (isDevelopmentMode(pluginName)) {
-                    reverseProxy.getMetadata()
-                        .setVersion(persisted.getMetadata().getVersion());
-                    client.update(reverseProxy);
-                }
+                reverseProxy.getMetadata()
+                    .setVersion(persisted.getMetadata().getVersion());
+                client.update(reverseProxy);
             }, () -> client.create(reverseProxy));
     }
 

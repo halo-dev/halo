@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { VAvatar, VEntityField } from "@halo-dev/components";
+import { VEntityField } from "@halo-dev/components";
 import type { ListedPost } from "@halo-dev/api-client";
+import ContributorList from "@/modules/contents/_components/ContributorList.vue";
 
 withDefaults(
   defineProps<{
@@ -13,23 +14,7 @@ withDefaults(
 <template>
   <VEntityField>
     <template #description>
-      <RouterLink
-        v-for="(contributor, contributorIndex) in post.contributors"
-        :key="contributorIndex"
-        :to="{
-          name: 'UserDetail',
-          params: { name: contributor.name },
-        }"
-        class="flex items-center"
-      >
-        <VAvatar
-          v-tooltip="contributor.displayName"
-          size="xs"
-          :src="contributor.avatar"
-          :alt="contributor.displayName"
-          circle
-        ></VAvatar>
-      </RouterLink>
+      <ContributorList :contributors="post.contributors" />
     </template>
   </VEntityField>
 </template>
