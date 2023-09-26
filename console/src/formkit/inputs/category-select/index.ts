@@ -44,4 +44,5 @@ export const categorySelect: FormKitTypeDefinition = {
   library: {
     CategorySelect: CategorySelect,
   },
+  schemaMemoKey: "custom-category-select",
 };
