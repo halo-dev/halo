@@ -44,4 +44,5 @@ export const tagSelect: FormKitTypeDefinition = {
   library: {
     TagSelect: TagSelect,
   },
+  schemaMemoKey: "custom-tag-select",
 };
