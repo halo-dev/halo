@@ -1,6 +1,7 @@
 package run.halo.app.core.extension.service;
 
 import java.nio.file.Path;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -46,14 +47,14 @@ public interface PluginService {
      *
      * @return uglified js bundle
      */
-    Mono<String> uglifyJsBundle();
+    Flux<DataBuffer> uglifyJsBundle();
 
     /**
      * Uglify css bundle from all enabled plugins to a single css bundle string.
      *
      * @return uglified css bundle
      */
-    Mono<String> uglifyCssBundle();
+    Flux<DataBuffer> uglifyCssBundle();
 
     /**
      * <p>Generate js bundle version for cache control.</p>

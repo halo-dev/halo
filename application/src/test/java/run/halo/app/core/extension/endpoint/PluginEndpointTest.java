@@ -35,11 +35,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.server.ServerWebInputException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.service.PluginService;
@@ -390,24 +394,54 @@ class PluginEndpointTest {
         private final PluginEndpoint.BufferedPluginBundleResource bufferedPluginBundleResource =
             new PluginEndpoint.BufferedPluginBundleResource();
 
+        private static Flux<DataBuffer> getDataBufferFlux(String x) {
+            var buffer = DefaultDataBufferFactory.sharedInstance
+                .wrap(x.getBytes(StandardCharsets.UTF_8));
+            return Flux.just(buffer);
+        }
+
         @Test
-        void writeAndGetResourceTest() throws IOException {
-            var resource =
-                bufferedPluginBundleResource.jsBundleResource("1", () -> "first line\nnext line");
-            var content = resource.getContentAsString(StandardCharsets.UTF_8);
-            assertThat(content).isEqualTo("first line\nnext line");
+        void writeAndGetResourceTest() {
+            bufferedPluginBundleResource.getJsBundle("1",
+                    () -> getDataBufferFlux("first line\nnext line"))
+                .as(StepVerifier::create)
+                .consumeNextWith(resource -> {
+                    try {
+                        String content = resource.getContentAsString(StandardCharsets.UTF_8);
+                        assertThat(content).isEqualTo("first line\nnext line");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
 
             // version is matched, should return cached content
-            resource =
-                bufferedPluginBundleResource.jsBundleResource("1", () -> "first line\nnext line-1");
-            content = resource.getContentAsString(StandardCharsets.UTF_8);
-            assertThat(content).isEqualTo("first line\nnext line");
+            bufferedPluginBundleResource.getJsBundle("1",
+                    () -> getDataBufferFlux("first line\nnext line-1"))
+                .as(StepVerifier::create)
+                .consumeNextWith(resource -> {
+                    try {
+                        String content = resource.getContentAsString(StandardCharsets.UTF_8);
+                        assertThat(content).isEqualTo("first line\nnext line");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
 
             // new version should return new content
-            resource =
-                bufferedPluginBundleResource.jsBundleResource("2", () -> "first line\nnext line-2");
-            content = resource.getContentAsString(StandardCharsets.UTF_8);
-            assertThat(content).isEqualTo("first line\nnext line-2");
+            bufferedPluginBundleResource.getJsBundle("2",
+                    () -> getDataBufferFlux("first line\nnext line-2"))
+                .as(StepVerifier::create)
+                .consumeNextWith(resource -> {
+                    try {
+                        String content = resource.getContentAsString(StandardCharsets.UTF_8);
+                        assertThat(content).isEqualTo("first line\nnext line-2");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
         }
     }
 }
