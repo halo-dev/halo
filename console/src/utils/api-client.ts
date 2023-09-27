@@ -40,7 +40,7 @@ import {
   ApiHaloRunV1alpha1UserApi,
   MigrationHaloRunV1alpha1BackupApi,
   ApiConsoleMigrationHaloRunV1alpha1MigrationApi,
-  ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi,
+  ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi,
   SecurityHaloRunV1alpha1PersonalAccessTokenApi,
 } from "@halo-dev/api-client";
 import type { AxiosError, AxiosInstance } from "axios";
@@ -221,7 +221,7 @@ function setupApiClient(axios: AxiosInstance) {
       axios
     ),
     system: new ApiConsoleHaloRunV1alpha1SystemApi(undefined, baseURL, axios),
-    pat: new ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi(
+    pat: new ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi(
       undefined,
       baseURL,
       axios

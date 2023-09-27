@@ -1,7 +1,7 @@
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 plugins {
-    id 'org.springframework.boot' version '3.1.3' apply false
+    id 'org.springframework.boot' version '3.1.4' apply false
     id 'java-platform'
     id 'halo.publish'
     id 'signing'
@@ -13,7 +13,7 @@ description = 'Platform of application.'
 ext {
     commonsLang3 = "3.12.0"
     base62 = "0.1.3"
-    pf4j = '3.9.0'
+    pf4j = '3.10.0'
     javaDiffUtils = "4.12"
     guava = "32.0.1-jre"
     jsoup = '1.15.3'

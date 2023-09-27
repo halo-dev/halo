@@ -60,6 +60,7 @@ import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
 import run.halo.app.plugin.HaloPluginManager;
+import run.halo.app.plugin.HaloPluginWrapper;
 import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginExtensionLoaderUtils;
 import run.halo.app.plugin.PluginStartingError;
@@ -184,11 +185,12 @@ public class PluginReconciler implements Reconciler<Request> {
         Assert.notNull(name, "Plugin name must not be null");
         Assert.notNull(settingName, "Setting name must not be null");
         PluginWrapper pluginWrapper = getPluginWrapper(name);
+        var runtimeMode = getRuntimeMode(name);
 
         var resourceLoader =
             new DefaultResourceLoader(pluginWrapper.getPluginClassLoader());
         return PluginExtensionLoaderUtils.lookupExtensions(pluginWrapper.getPluginPath(),
-                pluginWrapper.getRuntimeMode())
+                runtimeMode)
             .stream()
             .map(resourceLoader::getResource)
             .filter(Resource::exists)
@@ -215,6 +217,7 @@ public class PluginReconciler implements Reconciler<Request> {
             return false;
         }
 
+        var runtimeMode = getRuntimeMode(pluginName);
         Optional<Setting> settingOption = lookupPluginSetting(pluginName, settingName)
             .map(setting -> {
                 // This annotation is added to prevent it from being deleted when stopped.
@@ -802,11 +805,19 @@ public class PluginReconciler implements Reconciler<Request> {
     }
 
     private boolean isDevelopmentMode(String name) {
-        PluginWrapper pluginWrapper = haloPluginManager.getPlugin(name);
-        RuntimeMode runtimeMode = haloPluginManager.getRuntimeMode();
-        if (pluginWrapper != null) {
-            runtimeMode = pluginWrapper.getRuntimeMode();
+        return RuntimeMode.DEVELOPMENT.equals(getRuntimeMode(name));
+    }
+
+    private RuntimeMode getRuntimeMode(String name) {
+        var pluginWrapper = haloPluginManager.getPlugin(name);
+        if (pluginWrapper == null) {
+            return haloPluginManager.getRuntimeMode();
         }
-        return RuntimeMode.DEVELOPMENT.equals(runtimeMode);
+        if (pluginWrapper instanceof HaloPluginWrapper haloPluginWrapper) {
+            return haloPluginWrapper.getRuntimeMode();
+        }
+        return Files.isDirectory(pluginWrapper.getPluginPath())
+            ? RuntimeMode.DEVELOPMENT
+            : RuntimeMode.DEPLOYMENT;
     }
 }

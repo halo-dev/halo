@@ -109,6 +109,17 @@ public class HaloPluginManager extends DefaultPluginManager
     }
 
     @Override
+    protected PluginWrapper createPluginWrapper(PluginDescriptor pluginDescriptor, Path pluginPath,
+        ClassLoader pluginClassLoader) {
+        // create the plugin wrapper
+        log.debug("Creating wrapper for plugin '{}'", pluginPath);
+        HaloPluginWrapper pluginWrapper =
+            new HaloPluginWrapper(this, pluginDescriptor, pluginPath, pluginClassLoader);
+        pluginWrapper.setPluginFactory(getPluginFactory());
+        return pluginWrapper;
+    }
+
+    @Override
     protected void firePluginStateEvent(PluginStateEvent event) {
         rootApplicationContext.publishEvent(
             new HaloPluginStateChangedEvent(this, event.getPlugin(), event.getOldState()));

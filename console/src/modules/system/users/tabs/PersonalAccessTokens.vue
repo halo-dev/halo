@@ -10,9 +10,9 @@ import { ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { PersonalAccessToken } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
-import PersonalAccessTokenCreationModal from "./components/PersonalAccessTokenCreationModal.vue";
+import PersonalAccessTokenCreationModal from "../components/PersonalAccessTokenCreationModal.vue";
 import { nextTick } from "vue";
-import PersonalAccessTokenListItem from "./components/PersonalAccessTokenListItem.vue";
+import PersonalAccessTokenListItem from "../components/PersonalAccessTokenListItem.vue";
 
 const {
   data: pats,

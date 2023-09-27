@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
+import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginWrapper;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.env.PropertySourceLoader;
@@ -88,6 +89,8 @@ public class PluginApplicationInitializer {
         AnnotationConfigUtils.registerAnnotationConfigProcessors(beanFactory);
         stopWatch.stop();
 
+        beanFactory.registerSingleton("pluginContext", createPluginContext(plugin));
+        // TODO deprecated
         beanFactory.registerSingleton("pluginWrapper", haloPluginManager.getPlugin(pluginId));
 
         populateSettingFetcher(pluginId, beanFactory);
@@ -129,6 +132,15 @@ public class PluginApplicationInitializer {
 
         log.debug("initApplicationContext total millis: {} ms -> {}",
             stopWatch.getTotalTimeMillis(), stopWatch.prettyPrint());
+    }
+
+    PluginContext createPluginContext(PluginWrapper pluginWrapper) {
+        if (pluginWrapper instanceof HaloPluginWrapper haloPluginWrapper) {
+            return new PluginContext(haloPluginWrapper.getPluginId(),
+                pluginWrapper.getDescriptor().getVersion(),
+                haloPluginWrapper.getRuntimeMode());
+        }
+        throw new PluginRuntimeException("PluginWrapper must be instance of HaloPluginWrapper");
     }
 
     private void populateSettingFetcher(String pluginName,

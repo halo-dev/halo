@@ -40,10 +40,10 @@ import {
 // @ts-ignore
 import { PersonalAccessToken } from "../models";
 /**
- * ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi - axios parameter creator
+ * ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi - axios parameter creator
  * @export
  */
-export const ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCreator =
+export const ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCreator =
   function (configuration?: Configuration) {
     return {
       /**
@@ -59,7 +59,7 @@ export const ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCr
         // verify required parameter 'name' is not null or undefined
         assertParamExists("deletePat", "name", name);
         const localVarPath =
-          `/apis/api.security.halo.run/v1alpha1/users/-/personalaccesstokens/{name}`.replace(
+          `/apis/api.security.halo.run/v1alpha1/personalaccesstokens/{name}`.replace(
             `{${"name"}}`,
             encodeURIComponent(String(name))
           );
@@ -116,7 +116,7 @@ export const ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCr
           "personalAccessToken",
           personalAccessToken
         );
-        const localVarPath = `/apis/api.security.halo.run/v1alpha1/users/-/personalaccesstokens`;
+        const localVarPath = `/apis/api.security.halo.run/v1alpha1/personalaccesstokens`;
         // use dummy base URL string because the URL constructor only accepts absolute URLs.
         const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
         let baseOptions;
@@ -174,7 +174,7 @@ export const ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCr
         // verify required parameter 'name' is not null or undefined
         assertParamExists("obtainPat", "name", name);
         const localVarPath =
-          `/apis/api.security.halo.run/v1alpha1/users/-/personalaccesstokens/{name}`.replace(
+          `/apis/api.security.halo.run/v1alpha1/personalaccesstokens/{name}`.replace(
             `{${"name"}}`,
             encodeURIComponent(String(name))
           );
@@ -223,7 +223,7 @@ export const ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCr
       obtainPats: async (
         options: AxiosRequestConfig = {}
       ): Promise<RequestArgs> => {
-        const localVarPath = `/apis/api.security.halo.run/v1alpha1/users/-/personalaccesstokens`;
+        const localVarPath = `/apis/api.security.halo.run/v1alpha1/personalaccesstokens`;
         // use dummy base URL string because the URL constructor only accepts absolute URLs.
         const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
         let baseOptions;
@@ -274,7 +274,7 @@ export const ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCr
         // verify required parameter 'name' is not null or undefined
         assertParamExists("restorePat", "name", name);
         const localVarPath =
-          `/apis/api.security.halo.run/v1alpha1/users/-/personalaccesstokens/{name}/actions/restoration`.replace(
+          `/apis/api.security.halo.run/v1alpha1/personalaccesstokens/{name}/actions/restoration`.replace(
             `{${"name"}}`,
             encodeURIComponent(String(name))
           );
@@ -328,7 +328,7 @@ export const ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCr
         // verify required parameter 'name' is not null or undefined
         assertParamExists("revokePat", "name", name);
         const localVarPath =
-          `/apis/api.security.halo.run/v1alpha1/users/-/personalaccesstokens/{name}/actions/revocation`.replace(
+          `/apis/api.security.halo.run/v1alpha1/personalaccesstokens/{name}/actions/revocation`.replace(
             `{${"name"}}`,
             encodeURIComponent(String(name))
           );
@@ -373,181 +373,182 @@ export const ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCr
   };
 
 /**
- * ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi - functional programming interface
+ * ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi - functional programming interface
  * @export
  */
-export const ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiFp =
-  function (configuration?: Configuration) {
-    const localVarAxiosParamCreator =
-      ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCreator(
+export const ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiFp = function (
+  configuration?: Configuration
+) {
+  const localVarAxiosParamCreator =
+    ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiAxiosParamCreator(
+      configuration
+    );
+  return {
+    /**
+     * Delete a PAT
+     * @param {string} name
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async deletePat(
+      name: string,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.deletePat(
+        name,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
         configuration
       );
-    return {
-      /**
-       * Delete a PAT
-       * @param {string} name
-       * @param {*} [options] Override http request option.
-       * @throws {RequiredError}
-       */
-      async deletePat(
-        name: string,
-        options?: AxiosRequestConfig
-      ): Promise<
-        (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
-      > {
-        const localVarAxiosArgs = await localVarAxiosParamCreator.deletePat(
-          name,
-          options
-        );
-        return createRequestFunction(
-          localVarAxiosArgs,
-          globalAxios,
-          BASE_PATH,
-          configuration
-        );
-      },
-      /**
-       * Generate a PAT.
-       * @param {PersonalAccessToken} personalAccessToken
-       * @param {*} [options] Override http request option.
-       * @throws {RequiredError}
-       */
-      async generatePat(
-        personalAccessToken: PersonalAccessToken,
-        options?: AxiosRequestConfig
-      ): Promise<
-        (
-          axios?: AxiosInstance,
-          basePath?: string
-        ) => AxiosPromise<PersonalAccessToken>
-      > {
-        const localVarAxiosArgs = await localVarAxiosParamCreator.generatePat(
-          personalAccessToken,
-          options
-        );
-        return createRequestFunction(
-          localVarAxiosArgs,
-          globalAxios,
-          BASE_PATH,
-          configuration
-        );
-      },
-      /**
-       * Obtain a PAT.
-       * @param {string} name
-       * @param {*} [options] Override http request option.
-       * @throws {RequiredError}
-       */
-      async obtainPat(
-        name: string,
-        options?: AxiosRequestConfig
-      ): Promise<
-        (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
-      > {
-        const localVarAxiosArgs = await localVarAxiosParamCreator.obtainPat(
-          name,
-          options
-        );
-        return createRequestFunction(
-          localVarAxiosArgs,
-          globalAxios,
-          BASE_PATH,
-          configuration
-        );
-      },
-      /**
-       * Obtain PAT list.
-       * @param {*} [options] Override http request option.
-       * @throws {RequiredError}
-       */
-      async obtainPats(
-        options?: AxiosRequestConfig
-      ): Promise<
-        (
-          axios?: AxiosInstance,
-          basePath?: string
-        ) => AxiosPromise<Array<PersonalAccessToken>>
-      > {
-        const localVarAxiosArgs = await localVarAxiosParamCreator.obtainPats(
-          options
-        );
-        return createRequestFunction(
-          localVarAxiosArgs,
-          globalAxios,
-          BASE_PATH,
-          configuration
-        );
-      },
-      /**
-       * Restore a PAT.
-       * @param {string} name
-       * @param {*} [options] Override http request option.
-       * @throws {RequiredError}
-       */
-      async restorePat(
-        name: string,
-        options?: AxiosRequestConfig
-      ): Promise<
-        (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
-      > {
-        const localVarAxiosArgs = await localVarAxiosParamCreator.restorePat(
-          name,
-          options
-        );
-        return createRequestFunction(
-          localVarAxiosArgs,
-          globalAxios,
-          BASE_PATH,
-          configuration
-        );
-      },
-      /**
-       * Revoke a PAT
-       * @param {string} name
-       * @param {*} [options] Override http request option.
-       * @throws {RequiredError}
-       */
-      async revokePat(
-        name: string,
-        options?: AxiosRequestConfig
-      ): Promise<
-        (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
-      > {
-        const localVarAxiosArgs = await localVarAxiosParamCreator.revokePat(
-          name,
-          options
-        );
-        return createRequestFunction(
-          localVarAxiosArgs,
-          globalAxios,
-          BASE_PATH,
-          configuration
-        );
-      },
-    };
+    },
+    /**
+     * Generate a PAT.
+     * @param {PersonalAccessToken} personalAccessToken
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async generatePat(
+      personalAccessToken: PersonalAccessToken,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string
+      ) => AxiosPromise<PersonalAccessToken>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.generatePat(
+        personalAccessToken,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
+     * Obtain a PAT.
+     * @param {string} name
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async obtainPat(
+      name: string,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.obtainPat(
+        name,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
+     * Obtain PAT list.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async obtainPats(
+      options?: AxiosRequestConfig
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string
+      ) => AxiosPromise<Array<PersonalAccessToken>>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.obtainPats(
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
+     * Restore a PAT.
+     * @param {string} name
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async restorePat(
+      name: string,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.restorePat(
+        name,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
+     * Revoke a PAT
+     * @param {string} name
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async revokePat(
+      name: string,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.revokePat(
+        name,
+        options
+      );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
   };
+};
 
 /**
- * ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi - factory interface
+ * ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi - factory interface
  * @export
  */
-export const ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiFactory =
+export const ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiFactory =
   function (
     configuration?: Configuration,
     basePath?: string,
     axios?: AxiosInstance
   ) {
     const localVarFp =
-      ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiFp(configuration);
+      ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiFp(configuration);
     return {
       /**
        * Delete a PAT
-       * @param {ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiDeletePatRequest} requestParameters Request parameters.
+       * @param {ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiDeletePatRequest} requestParameters Request parameters.
        * @param {*} [options] Override http request option.
        * @throws {RequiredError}
        */
       deletePat(
-        requestParameters: ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiDeletePatRequest,
+        requestParameters: ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiDeletePatRequest,
         options?: AxiosRequestConfig
       ): AxiosPromise<void> {
         return localVarFp
@@ -556,12 +557,12 @@ export const ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiFactory =
       },
       /**
        * Generate a PAT.
-       * @param {ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiGeneratePatRequest} requestParameters Request parameters.
+       * @param {ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiGeneratePatRequest} requestParameters Request parameters.
        * @param {*} [options] Override http request option.
        * @throws {RequiredError}
        */
       generatePat(
-        requestParameters: ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiGeneratePatRequest,
+        requestParameters: ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiGeneratePatRequest,
         options?: AxiosRequestConfig
       ): AxiosPromise<PersonalAccessToken> {
         return localVarFp
@@ -570,12 +571,12 @@ export const ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiFactory =
       },
       /**
        * Obtain a PAT.
-       * @param {ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiObtainPatRequest} requestParameters Request parameters.
+       * @param {ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiObtainPatRequest} requestParameters Request parameters.
        * @param {*} [options] Override http request option.
        * @throws {RequiredError}
        */
       obtainPat(
-        requestParameters: ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiObtainPatRequest,
+        requestParameters: ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiObtainPatRequest,
         options?: AxiosRequestConfig
       ): AxiosPromise<void> {
         return localVarFp
@@ -596,12 +597,12 @@ export const ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiFactory =
       },
       /**
        * Restore a PAT.
-       * @param {ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiRestorePatRequest} requestParameters Request parameters.
+       * @param {ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiRestorePatRequest} requestParameters Request parameters.
        * @param {*} [options] Override http request option.
        * @throws {RequiredError}
        */
       restorePat(
-        requestParameters: ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiRestorePatRequest,
+        requestParameters: ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiRestorePatRequest,
         options?: AxiosRequestConfig
       ): AxiosPromise<void> {
         return localVarFp
@@ -610,12 +611,12 @@ export const ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiFactory =
       },
       /**
        * Revoke a PAT
-       * @param {ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiRevokePatRequest} requestParameters Request parameters.
+       * @param {ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiRevokePatRequest} requestParameters Request parameters.
        * @param {*} [options] Override http request option.
        * @throws {RequiredError}
        */
       revokePat(
-        requestParameters: ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiRevokePatRequest,
+        requestParameters: ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiRevokePatRequest,
         options?: AxiosRequestConfig
       ): AxiosPromise<void> {
         return localVarFp
@@ -626,94 +627,94 @@ export const ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiFactory =
   };
 
 /**
- * Request parameters for deletePat operation in ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi.
+ * Request parameters for deletePat operation in ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi.
  * @export
- * @interface ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiDeletePatRequest
+ * @interface ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiDeletePatRequest
  */
-export interface ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiDeletePatRequest {
+export interface ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiDeletePatRequest {
   /**
    *
    * @type {string}
-   * @memberof ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiDeletePat
+   * @memberof ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiDeletePat
    */
   readonly name: string;
 }
 
 /**
- * Request parameters for generatePat operation in ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi.
+ * Request parameters for generatePat operation in ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi.
  * @export
- * @interface ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiGeneratePatRequest
+ * @interface ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiGeneratePatRequest
  */
-export interface ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiGeneratePatRequest {
+export interface ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiGeneratePatRequest {
   /**
    *
    * @type {PersonalAccessToken}
-   * @memberof ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiGeneratePat
+   * @memberof ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiGeneratePat
    */
   readonly personalAccessToken: PersonalAccessToken;
 }
 
 /**
- * Request parameters for obtainPat operation in ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi.
+ * Request parameters for obtainPat operation in ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi.
  * @export
- * @interface ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiObtainPatRequest
+ * @interface ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiObtainPatRequest
  */
-export interface ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiObtainPatRequest {
+export interface ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiObtainPatRequest {
   /**
    *
    * @type {string}
-   * @memberof ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiObtainPat
+   * @memberof ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiObtainPat
    */
   readonly name: string;
 }
 
 /**
- * Request parameters for restorePat operation in ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi.
+ * Request parameters for restorePat operation in ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi.
  * @export
- * @interface ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiRestorePatRequest
+ * @interface ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiRestorePatRequest
  */
-export interface ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiRestorePatRequest {
+export interface ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiRestorePatRequest {
   /**
    *
    * @type {string}
-   * @memberof ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiRestorePat
+   * @memberof ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiRestorePat
    */
   readonly name: string;
 }
 
 /**
- * Request parameters for revokePat operation in ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi.
+ * Request parameters for revokePat operation in ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi.
  * @export
- * @interface ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiRevokePatRequest
+ * @interface ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiRevokePatRequest
  */
-export interface ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiRevokePatRequest {
+export interface ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiRevokePatRequest {
   /**
    *
    * @type {string}
-   * @memberof ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiRevokePat
+   * @memberof ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiRevokePat
    */
   readonly name: string;
 }
 
 /**
- * ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi - object-oriented interface
+ * ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi - object-oriented interface
  * @export
- * @class ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi
+ * @class ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi
  * @extends {BaseAPI}
  */
-export class ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi extends BaseAPI {
+export class ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi extends BaseAPI {
   /**
    * Delete a PAT
-   * @param {ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiDeletePatRequest} requestParameters Request parameters.
+   * @param {ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiDeletePatRequest} requestParameters Request parameters.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
-   * @memberof ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi
+   * @memberof ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi
    */
   public deletePat(
-    requestParameters: ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiDeletePatRequest,
+    requestParameters: ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiDeletePatRequest,
     options?: AxiosRequestConfig
   ) {
-    return ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiFp(
+    return ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiFp(
       this.configuration
     )
       .deletePat(requestParameters.name, options)
@@ -722,16 +723,16 @@ export class ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi extends Bas
 
   /**
    * Generate a PAT.
-   * @param {ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiGeneratePatRequest} requestParameters Request parameters.
+   * @param {ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiGeneratePatRequest} requestParameters Request parameters.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
-   * @memberof ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi
+   * @memberof ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi
    */
   public generatePat(
-    requestParameters: ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiGeneratePatRequest,
+    requestParameters: ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiGeneratePatRequest,
     options?: AxiosRequestConfig
   ) {
-    return ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiFp(
+    return ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiFp(
       this.configuration
     )
       .generatePat(requestParameters.personalAccessToken, options)
@@ -740,16 +741,16 @@ export class ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi extends Bas
 
   /**
    * Obtain a PAT.
-   * @param {ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiObtainPatRequest} requestParameters Request parameters.
+   * @param {ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiObtainPatRequest} requestParameters Request parameters.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
-   * @memberof ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi
+   * @memberof ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi
    */
   public obtainPat(
-    requestParameters: ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiObtainPatRequest,
+    requestParameters: ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiObtainPatRequest,
     options?: AxiosRequestConfig
   ) {
-    return ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiFp(
+    return ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiFp(
       this.configuration
     )
       .obtainPat(requestParameters.name, options)
@@ -760,10 +761,10 @@ export class ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi extends Bas
    * Obtain PAT list.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
-   * @memberof ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi
+   * @memberof ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi
    */
   public obtainPats(options?: AxiosRequestConfig) {
-    return ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiFp(
+    return ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiFp(
       this.configuration
     )
       .obtainPats(options)
@@ -772,16 +773,16 @@ export class ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi extends Bas
 
   /**
    * Restore a PAT.
-   * @param {ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiRestorePatRequest} requestParameters Request parameters.
+   * @param {ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiRestorePatRequest} requestParameters Request parameters.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
-   * @memberof ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi
+   * @memberof ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi
    */
   public restorePat(
-    requestParameters: ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiRestorePatRequest,
+    requestParameters: ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiRestorePatRequest,
     options?: AxiosRequestConfig
   ) {
-    return ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiFp(
+    return ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiFp(
       this.configuration
     )
       .restorePat(requestParameters.name, options)
@@ -790,16 +791,16 @@ export class ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi extends Bas
 
   /**
    * Revoke a PAT
-   * @param {ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiRevokePatRequest} requestParameters Request parameters.
+   * @param {ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiRevokePatRequest} requestParameters Request parameters.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
-   * @memberof ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApi
+   * @memberof ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi
    */
   public revokePat(
-    requestParameters: ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiRevokePatRequest,
+    requestParameters: ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiRevokePatRequest,
     options?: AxiosRequestConfig
   ) {
-    return ApiConsoleSecurityHaloRunV1alpha1PersonalAccessTokenApiFp(
+    return ApiSecurityHaloRunV1alpha1PersonalAccessTokenApiFp(
       this.configuration
     )
       .revokePat(requestParameters.name, options)

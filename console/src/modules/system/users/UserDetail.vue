@@ -1,168 +1,199 @@
 <script lang="ts" setup>
-import {
-  Dialog,
-  IconUserSettings,
-  VButton,
-  VDescription,
-  VDescriptionItem,
-  VTag,
-} from "@halo-dev/components";
-import type { ComputedRef, Ref } from "vue";
-import { inject, computed } from "vue";
-import { useRouter } from "vue-router";
-import type { DetailedUser, ListedAuthProvider } from "@halo-dev/api-client";
-import { rbacAnnotations } from "@/constants/annotations";
-import { formatDatetime } from "@/utils/date";
-import { useQuery } from "@tanstack/vue-query";
 import { apiClient } from "@/utils/api-client";
-import axios from "axios";
+import {
+  VButton,
+  VTabbar,
+  VDropdown,
+  VDropdownItem,
+  VLoading,
+} from "@halo-dev/components";
+import {
+  computed,
+  onMounted,
+  provide,
+  ref,
+  type ComputedRef,
+  type Ref,
+} from "vue";
+import { useRoute } from "vue-router";
+import type { DetailedUser } from "@halo-dev/api-client";
+import UserEditingModal from "./components/UserEditingModal.vue";
+import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
+import { usePermission } from "@/utils/permission";
+import { useUserStore } from "@/stores/user";
+import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import { rbacAnnotations } from "@/constants/annotations";
+import { onBeforeRouteUpdate } from "vue-router";
+import UserAvatar from "./components/UserAvatar.vue";
+import type { Raw } from "vue";
+import type { Component } from "vue";
+import { markRaw } from "vue";
+import DetailTab from "./tabs/Detail.vue";
+import PersonalAccessTokensTab from "./tabs/PersonalAccessTokens.vue";
+import { useRouteQuery } from "@vueuse/router";
 
-const user = inject<Ref<DetailedUser | undefined>>("user");
-const isCurrentUser = inject<ComputedRef<boolean>>("isCurrentUser");
-
-const router = useRouter();
+const { currentUserHasPermission } = usePermission();
+const userStore = useUserStore();
 const { t } = useI18n();
 
-const { data: authProviders, isFetching } = useQuery<ListedAuthProvider[]>({
-  queryKey: ["user-auth-providers"],
-  queryFn: async () => {
-    const { data } = await apiClient.authProvider.listAuthProviders();
-    return data;
-  },
-  enabled: isCurrentUser,
+interface UserTab {
+  id: string;
+  label: string;
+  component: Raw<Component>;
+  props?: Record<string, unknown>;
+  permissions?: string[];
+  priority: number;
+  hidden?: boolean;
+}
+
+const editingModal = ref(false);
+const passwordChangeModal = ref(false);
+
+const { params } = useRoute();
+const name = ref();
+
+onMounted(() => {
+  name.value = params.name;
 });
 
-const availableAuthProviders = computed(() => {
-  return authProviders.value?.filter(
-    (authProvider) => authProvider.enabled && authProvider.supportsBinding
+// Update name when route change
+onBeforeRouteUpdate((to, _, next) => {
+  name.value = to.params.name;
+  next();
+});
+
+const {
+  data: user,
+  isFetching,
+  isLoading,
+  refetch,
+} = useQuery({
+  queryKey: ["user-detail", name],
+  queryFn: async () => {
+    if (name.value === "-") {
+      const { data } = await apiClient.user.getCurrentUserDetail();
+      return data;
+    } else {
+      const { data } = await apiClient.user.getUserDetail({
+        name: name.value,
+      });
+      return data;
+    }
+  },
+  refetchInterval: (data) => {
+    const annotations = data?.user.metadata.annotations;
+    return annotations?.[rbacAnnotations.AVATAR_ATTACHMENT_NAME] !==
+      annotations?.[rbacAnnotations.LAST_AVATAR_ATTACHMENT_NAME]
+      ? 1000
+      : false;
+  },
+  enabled: computed(() => !!name.value),
+});
+
+const isCurrentUser = computed(() => {
+  if (name.value === "-") {
+    return true;
+  }
+  return (
+    user.value?.user.metadata.name === userStore.currentUser?.metadata.name
   );
 });
 
-const handleUnbindAuth = (authProvider: ListedAuthProvider) => {
-  Dialog.warning({
-    title: t("core.user.detail.operations.unbind.title", {
-      display_name: authProvider.displayName,
-    }),
-    confirmText: t("core.common.buttons.confirm"),
-    cancelText: t("core.common.buttons.cancel"),
-    onConfirm: async () => {
-      await axios.put(
-        `${import.meta.env.VITE_API_URL}${authProvider.unbindingUrl}`,
-        {
-          withCredentials: true,
-        }
-      );
+provide<Ref<DetailedUser | undefined>>("user", user);
+provide<ComputedRef<boolean>>("isCurrentUser", isCurrentUser);
 
-      window.location.reload();
+const tabs = computed((): UserTab[] => {
+  return [
+    {
+      id: "detail",
+      label: t("core.user.detail.tabs.detail"),
+      component: markRaw(DetailTab),
+      priority: 10,
     },
-  });
-};
+    {
+      id: "pat",
+      label: t("core.user.detail.tabs.pat"),
+      component: markRaw(PersonalAccessTokensTab),
+      priority: 20,
+      hidden: !isCurrentUser.value,
+    },
+  ];
+});
 
-const handleBindAuth = (authProvider: ListedAuthProvider) => {
-  if (!authProvider.bindingUrl) {
-    return;
-  }
-  window.location.href = `${
-    authProvider.bindingUrl
-  }?redirect_uri=${encodeURIComponent(window.location.href)}`;
-};
+const activeTab = useRouteQuery<string>("tab", tabs.value[0].id, {
+  mode: "push",
+});
+provide<Ref<string>>("activeTab", activeTab);
+
+const tabbarItems = computed(() => {
+  return tabs.value
+    .filter((tab) => !tab.hidden)
+    .map((tab) => ({ id: tab.id, label: tab.label }));
+});
 </script>
 <template>
-  <div class="border-t border-gray-100">
-    <VDescription>
-      <VDescriptionItem
-        :label="$t('core.user.detail.fields.display_name')"
-        :content="user?.user.spec.displayName"
-        class="!px-2"
-      />
-      <VDescriptionItem
-        :label="$t('core.user.detail.fields.username')"
-        :content="user?.user.metadata.name"
-        class="!px-2"
-      />
-      <VDescriptionItem
-        :label="$t('core.user.detail.fields.email')"
-        :content="user?.user.spec.email || $t('core.common.text.none')"
-        class="!px-2"
-      />
-      <VDescriptionItem
-        :label="$t('core.user.detail.fields.roles')"
-        class="!px-2"
-      >
-        <VTag
-          v-for="(role, index) in user?.roles"
-          :key="index"
-          @click="
-            router.push({
-              name: 'RoleDetail',
-              params: { name: role.metadata.name },
-            })
+  <UserEditingModal v-model:visible="editingModal" :user="user?.user" />
+
+  <UserPasswordChangeModal
+    v-model:visible="passwordChangeModal"
+    :user="user?.user"
+    @close="refetch"
+  />
+
+  <header class="bg-white">
+    <div class="p-4">
+      <div class="flex items-center justify-between">
+        <div class="flex flex-row items-center gap-5">
+          <div class="group relative h-20 w-20">
+            <VLoading v-if="isFetching" class="h-full w-full" />
+            <UserAvatar v-else />
+          </div>
+          <div class="block">
+            <h1 class="truncate text-lg font-bold text-gray-900">
+              {{ user?.user.spec.displayName }}
+            </h1>
+            <span v-if="!isLoading" class="text-sm text-gray-600">
+              @{{ user?.user.metadata.name }}
+            </span>
+          </div>
+        </div>
+        <div
+          v-if="
+            currentUserHasPermission(['system:users:manage']) || isCurrentUser
           "
         >
-          <template #leftIcon>
-            <IconUserSettings />
-          </template>
-          {{
-            role.metadata.annotations?.[rbacAnnotations.DISPLAY_NAME] ||
-            role.metadata.name
-          }}
-        </VTag>
-      </VDescriptionItem>
-      <VDescriptionItem
-        :label="$t('core.user.detail.fields.bio')"
-        :content="user?.user.spec?.bio || $t('core.common.text.none')"
-        class="!px-2"
-      />
-      <VDescriptionItem
-        :label="$t('core.user.detail.fields.creation_time')"
-        :content="formatDatetime(user?.user.metadata?.creationTimestamp)"
-        class="!px-2"
-      />
-      <VDescriptionItem
-        v-if="!isFetching && isCurrentUser && availableAuthProviders?.length"
-        :label="$t('core.user.detail.fields.identity_authentication')"
-        class="!px-2"
-      >
-        <ul class="space-y-2">
-          <template v-for="(authProvider, index) in authProviders">
-            <li
-              v-if="authProvider.supportsBinding && authProvider.enabled"
-              :key="index"
-            >
-              <div
-                class="flex w-full cursor-pointer flex-wrap justify-between gap-y-3 rounded border p-5 hover:border-primary sm:w-1/2"
-              >
-                <div class="inline-flex items-center gap-3">
-                  <div>
-                    <img class="h-7 w-7 rounded" :src="authProvider.logo" />
-                  </div>
-                  <div class="text-sm font-medium text-gray-900">
-                    {{ authProvider.displayName }}
-                  </div>
-                </div>
-                <div class="inline-flex items-center">
-                  <VButton
-                    v-if="authProvider.isBound"
-                    size="sm"
-                    @click="handleUnbindAuth(authProvider)"
-                  >
-                    {{ $t("core.user.detail.operations.unbind.button") }}
-                  </VButton>
-                  <VButton
-                    v-else
-                    size="sm"
-                    type="secondary"
-                    @click="handleBindAuth(authProvider)"
-                  >
-                    {{ $t("core.user.detail.operations.bind.button") }}
-                  </VButton>
-                </div>
-              </div>
-            </li>
-          </template>
-        </ul>
-      </VDescriptionItem>
-    </VDescription>
-  </div>
+          <VDropdown>
+            <VButton type="default">
+              {{ $t("core.common.buttons.edit") }}
+            </VButton>
+            <template #popper>
+              <VDropdownItem @click="editingModal = true">
+                {{ $t("core.user.detail.actions.update_profile.title") }}
+              </VDropdownItem>
+              <VDropdownItem @click="passwordChangeModal = true">
+                {{ $t("core.user.detail.actions.change_password.title") }}
+              </VDropdownItem>
+            </template>
+          </VDropdown>
+        </div>
+      </div>
+    </div>
+  </header>
+  <section class="bg-white p-4">
+    <VTabbar
+      v-model:active-id="activeTab"
+      :items="tabbarItems"
+      class="w-full"
+      type="outline"
+    ></VTabbar>
+    <div class="mt-2">
+      <template v-for="tab in tabs" :key="tab.id">
+        <component
+          :is="tab.component"
+          v-if="activeTab === tab.id && !tab.hidden"
+        />
+      </template>
+    </div>
+  </section>
 </template>

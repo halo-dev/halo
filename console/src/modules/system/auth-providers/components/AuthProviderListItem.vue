@@ -3,6 +3,7 @@ import { apiClient } from "@/utils/api-client";
 import type { ListedAuthProvider } from "@halo-dev/api-client";
 import {
   Dialog,
+  IconSettings,
   Toast,
   VAvatar,
   VEntity,
@@ -91,6 +92,19 @@ const handleChangeStatus = async () => {
               @click="handleChangeStatus"
             />
           </div>
+        </template>
+      </VEntityField>
+      <VEntityField>
+        <template #description>
+          <RouterLink
+            class="cursor-pointer rounded p-1 text-gray-600 transition-all hover:text-blue-600 group-hover:bg-gray-200/60"
+            :to="{
+              name: 'AuthProviderDetail',
+              params: { name: authProvider.name },
+            }"
+          >
+            <IconSettings />
+          </RouterLink>
         </template>
       </VEntityField>
     </template>
