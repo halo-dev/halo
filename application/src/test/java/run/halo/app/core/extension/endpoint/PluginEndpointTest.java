@@ -1,6 +1,7 @@
 package run.halo.app.core.extension.endpoint;
 
 import static java.util.Objects.requireNonNull;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -16,6 +17,7 @@ import static org.springframework.web.reactive.function.BodyInserters.fromMultip
 import com.github.zafarkhaja.semver.Version;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,11 +35,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.server.ServerWebInputException;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.Setting;
 import run.halo.app.core.extension.service.PluginService;
@@ -130,8 +136,8 @@ class PluginEndpointTest {
 
             verify(client).list(same(Plugin.class), argThat(
                     predicate -> predicate.test(expectPlugin)
-                                 && !predicate.test(unexpectedPlugin1)
-                                 && !predicate.test(unexpectedPlugin2)),
+                        && !predicate.test(unexpectedPlugin1)
+                        && !predicate.test(unexpectedPlugin2)),
                 any(), anyInt(), anyInt());
         }
 
@@ -158,8 +164,8 @@ class PluginEndpointTest {
 
             verify(client).list(same(Plugin.class), argThat(
                     predicate -> predicate.test(expectPlugin)
-                                 && !predicate.test(unexpectedPlugin1)
-                                 && !predicate.test(unexpectedPlugin2)),
+                        && !predicate.test(unexpectedPlugin1)
+                        && !predicate.test(unexpectedPlugin2)),
                 any(), anyInt(), anyInt());
         }
 
@@ -381,5 +387,91 @@ class PluginEndpointTest {
         plugin.setMetadata(metadata);
         plugin.setSpec(spec);
         return plugin;
+    }
+
+    @Nested
+    class BufferedPluginBundleResourceTest {
+        private final PluginEndpoint.BufferedPluginBundleResource bufferedPluginBundleResource =
+            new PluginEndpoint.BufferedPluginBundleResource();
+
+        private static Flux<DataBuffer> getDataBufferFlux(String x) {
+            var buffer = DefaultDataBufferFactory.sharedInstance
+                .wrap(x.getBytes(StandardCharsets.UTF_8));
+            return Flux.just(buffer);
+        }
+
+        @Test
+        void writeAndGetJsResourceTest() {
+            bufferedPluginBundleResource.getJsBundle("1",
+                    () -> getDataBufferFlux("first line\nnext line"))
+                .as(StepVerifier::create)
+                .consumeNextWith(resource -> {
+                    try {
+                        String content = resource.getContentAsString(StandardCharsets.UTF_8);
+                        assertThat(content).isEqualTo("first line\nnext line");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
+
+            // version is matched, should return cached content
+            bufferedPluginBundleResource.getJsBundle("1",
+                    () -> getDataBufferFlux("first line\nnext line-1"))
+                .as(StepVerifier::create)
+                .consumeNextWith(resource -> {
+                    try {
+                        String content = resource.getContentAsString(StandardCharsets.UTF_8);
+                        assertThat(content).isEqualTo("first line\nnext line");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
+
+            // new version should return new content
+            bufferedPluginBundleResource.getJsBundle("2",
+                    () -> getDataBufferFlux("first line\nnext line-2"))
+                .as(StepVerifier::create)
+                .consumeNextWith(resource -> {
+                    try {
+                        String content = resource.getContentAsString(StandardCharsets.UTF_8);
+                        assertThat(content).isEqualTo("first line\nnext line-2");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
+        }
+
+        @Test
+        void writeAndGetCssResourceTest() {
+            bufferedPluginBundleResource.getCssBundle("1",
+                    () -> getDataBufferFlux("first line\nnext line"))
+                .as(StepVerifier::create)
+                .consumeNextWith(resource -> {
+                    try {
+                        String content = resource.getContentAsString(StandardCharsets.UTF_8);
+                        assertThat(content).isEqualTo("first line\nnext line");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
+
+            // version is matched, should return cached content
+            bufferedPluginBundleResource.getCssBundle("1",
+                    () -> getDataBufferFlux("first line\nnext line-1"))
+                .as(StepVerifier::create)
+                .consumeNextWith(resource -> {
+                    try {
+                        String content = resource.getContentAsString(StandardCharsets.UTF_8);
+                        assertThat(content).isEqualTo("first line\nnext line");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
+        }
     }
 }
