@@ -16,7 +16,6 @@ import org.pf4j.DefaultPluginRepository;
 import org.pf4j.DevelopmentPluginLoader;
 import org.pf4j.JarPluginLoader;
 import org.pf4j.JarPluginRepository;
-import org.pf4j.PluginClassLoader;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginLoader;
 import org.pf4j.PluginManager;
@@ -110,17 +109,7 @@ public class PluginAutoConfiguration {
                     } else {
                         return new CompoundPluginLoader()
                             .add(createDevelopmentPluginLoader(this), this::isDevelopment)
-                            .add(new JarPluginLoader(this) {
-                                @Override
-                                public ClassLoader loadPlugin(Path pluginPath,
-                                    PluginDescriptor pluginDescriptor) {
-                                    PluginClassLoader pluginClassLoader =
-                                        new DefaultPluginClassLoader(pluginManager,
-                                            pluginDescriptor, getClass().getClassLoader());
-                                    pluginClassLoader.addFile(pluginPath.toFile());
-                                    return pluginClassLoader;
-                                }
-                            });
+                            .add(new JarPluginLoader(this));
                     }
                 }
 
@@ -155,12 +144,6 @@ public class PluginAutoConfiguration {
 
     DevelopmentPluginLoader createDevelopmentPluginLoader(PluginManager pluginManager) {
         return new DevelopmentPluginLoader(pluginManager) {
-            @Override
-            protected PluginClassLoader createPluginClassLoader(Path pluginPath,
-                PluginDescriptor pluginDescriptor) {
-                return new DefaultPluginClassLoader(pluginManager,
-                    pluginDescriptor, getClass().getClassLoader());
-            }
 
             @Override
             public ClassLoader loadPlugin(Path pluginPath,
