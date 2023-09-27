@@ -752,7 +752,7 @@ public class PluginEndpoint implements CustomEndpoint {
                 });
         }
 
-        private synchronized Path createTempFileToStore(String fileName) {
+        private Path createTempFileToStore(String fileName) {
             try {
                 if (tempDir == null || !Files.exists(tempDir)) {
                     this.tempDir = Files.createTempDirectory("halo-plugin-bundle");
