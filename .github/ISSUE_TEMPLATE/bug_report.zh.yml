@@ -31,15 +31,16 @@ body:
         - MariaDB
         - Other
   - type: dropdown
-    id: deployment-method
+    id: operation-method
     validations:
       required: true
     attributes:
-      label: "使用的哪种方式部署？"
+      label: "使用的哪种方式运行？"
       options:
         - Docker
         - Docker Compose
         - Fat Jar
+        - Source Code
   - type: input
     id: site-url
     attributes:
@@ -56,7 +57,7 @@ body:
     id: what-happened
     attributes:
       label: "发生了什么？"
-      description: "最好还告诉我们，你预计会发生什么。"
+      description: "为了方便我们管理，请不要在同一个 issue 下报告多个不相关的问题。"
     validations:
       required: true
   - type: textarea

@@ -40,7 +40,6 @@ import org.mockito.stubbing.Answer;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
-import org.pf4j.RuntimeMode;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.context.ApplicationEventPublisher;
 import run.halo.app.core.extension.Plugin;
@@ -51,6 +50,7 @@ import run.halo.app.extension.controller.Reconciler;
 import run.halo.app.infra.utils.FileUtils;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.plugin.HaloPluginManager;
+import run.halo.app.plugin.HaloPluginWrapper;
 import run.halo.app.plugin.PluginConst;
 import run.halo.app.plugin.PluginStartingError;
 
@@ -70,7 +70,7 @@ class PluginReconcilerTest {
     ExtensionClient extensionClient;
 
     @Mock
-    PluginWrapper pluginWrapper;
+    HaloPluginWrapper pluginWrapper;
 
     @Mock
     ApplicationEventPublisher eventPublisher;
@@ -233,14 +233,14 @@ class PluginReconcilerTest {
     }
 
     @Test
-    void createInitialReverseProxyWhenNotExistAndLogoIsPath() throws JSONException {
+    void recreateDefaultReverseProxyWhenNotExistAndLogoIsPath() throws JSONException {
         Plugin plugin = need2ReconcileForStopState();
         String reverseProxyName = initialReverseProxyName(plugin.getMetadata().getName());
         when(extensionClient.fetch(eq(ReverseProxy.class), eq(reverseProxyName)))
             .thenReturn(Optional.empty());
 
         plugin.getSpec().setLogo("/logo.png");
-        pluginReconciler.createInitialReverseProxyIfNotPresent(plugin);
+        pluginReconciler.recreateDefaultReverseProxy(plugin);
         ArgumentCaptor<ReverseProxy> captor = ArgumentCaptor.forClass(ReverseProxy.class);
         verify(extensionClient, times(1)).create(captor.capture());
         ReverseProxy value = captor.getValue();
@@ -269,14 +269,14 @@ class PluginReconcilerTest {
     }
 
     @Test
-    void createInitialReverseProxyWhenNotExistAndLogoIsAbsolute() {
+    void recreateDefaultReverseProxyWhenNotExistAndLogoIsAbsolute() {
         Plugin plugin = need2ReconcileForStopState();
         String reverseProxyName = initialReverseProxyName(plugin.getMetadata().getName());
         when(extensionClient.fetch(eq(ReverseProxy.class), eq(reverseProxyName)))
             .thenReturn(Optional.empty());
 
         plugin.getSpec().setLogo("http://example.com/logo");
-        pluginReconciler.createInitialReverseProxyIfNotPresent(plugin);
+        pluginReconciler.recreateDefaultReverseProxy(plugin);
         ArgumentCaptor<ReverseProxy> captor = ArgumentCaptor.forClass(ReverseProxy.class);
         verify(extensionClient, times(1)).create(captor.capture());
         ReverseProxy value = captor.getValue();
@@ -284,7 +284,7 @@ class PluginReconcilerTest {
     }
 
     @Test
-    void createInitialReverseProxyWhenExist() {
+    void recreateDefaultReverseProxyWhenExist() {
         Plugin plugin = need2ReconcileForStopState();
         plugin.getSpec().setLogo("/logo.png");
 
@@ -296,14 +296,9 @@ class PluginReconcilerTest {
 
         when(extensionClient.fetch(eq(ReverseProxy.class), eq(reverseProxyName)))
             .thenReturn(Optional.of(reverseProxy));
-        when(pluginWrapper.getRuntimeMode()).thenReturn(RuntimeMode.DEPLOYMENT);
 
-        pluginReconciler.createInitialReverseProxyIfNotPresent(plugin);
-        verify(extensionClient, times(0)).update(any());
-
-        when(pluginWrapper.getRuntimeMode()).thenReturn(RuntimeMode.DEVELOPMENT);
-        pluginReconciler.createInitialReverseProxyIfNotPresent(plugin);
-        verify(extensionClient, times(1)).update(any());
+        pluginReconciler.recreateDefaultReverseProxy(plugin);
+        verify(extensionClient).update(any());
     }
 
     @Nested

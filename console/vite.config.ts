@@ -11,7 +11,11 @@ import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
 import GzipPlugin from "rollup-plugin-gzip";
 
 export const sharedPlugins = [
-  Vue(),
+  Vue({
+    script: {
+      defineModel: true,
+    },
+  }),
   VueJsx(),
   GzipPlugin() as Plugin,
   Icons({

@@ -11,8 +11,10 @@ import {
 import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
-import { pluginLabels } from "@/constants/labels";
+import { pluginLabels, roleLabels } from "@/constants/labels";
 import { useI18n } from "vue-i18n";
+import { apiClient } from "@/utils/api-client";
+import { useQuery } from "@tanstack/vue-query";
 
 const { t } = useI18n();
 
@@ -32,8 +34,20 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
+const { data: roleTemplates } = useQuery({
+  queryKey: ["role-templates"],
+  queryFn: async () => {
+    const { data } = await apiClient.extension.role.listv1alpha1Role({
+      page: 0,
+      size: 0,
+      labelSelector: [`${roleLabels.TEMPLATE}=true`, "!halo.run/hidden"],
+    });
+    return data.items;
+  },
+});
+
 const { roleTemplateGroups, handleRoleTemplateSelect, selectedRoleTemplates } =
-  useRoleTemplateSelection();
+  useRoleTemplateSelection(roleTemplates);
 
 const {
   formState,

@@ -9,7 +9,6 @@ import {
   VSpace,
   Dialog,
   VEmpty,
-  VAvatar,
   VEntity,
   VEntityField,
   VPageHeader,
@@ -22,11 +21,11 @@ import { ref, watch } from "vue";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
-import { RouterLink } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
 import { usePermission } from "@/utils/permission";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
+import ContributorList from "../_components/ContributorList.vue";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
@@ -338,25 +337,7 @@ watch(
               <template #end>
                 <VEntityField>
                   <template #description>
-                    <RouterLink
-                      v-for="(
-                        contributor, contributorIndex
-                      ) in singlePage.contributors"
-                      :key="contributorIndex"
-                      :to="{
-                        name: 'UserDetail',
-                        params: { name: contributor.name },
-                      }"
-                      class="flex items-center"
-                    >
-                      <VAvatar
-                        v-tooltip="contributor.displayName"
-                        size="xs"
-                        :src="contributor.avatar"
-                        :alt="contributor.displayName"
-                        circle
-                      ></VAvatar>
-                    </RouterLink>
+                    <ContributorList :contributors="singlePage.contributors" />
                   </template>
                 </VEntityField>
                 <VEntityField v-if="!singlePage?.page?.spec.deleted">

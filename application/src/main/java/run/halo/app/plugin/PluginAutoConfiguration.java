@@ -5,6 +5,7 @@ import static run.halo.app.plugin.resources.BundleResourceUtils.getJsBundleResou
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
@@ -109,33 +110,7 @@ public class PluginAutoConfiguration {
                         }
                     } else {
                         return new CompoundPluginLoader()
-                            .add(new DevelopmentPluginLoader(this) {
-
-                                @Override
-                                protected PluginClassLoader createPluginClassLoader(Path pluginPath,
-                                    PluginDescriptor pluginDescriptor) {
-                                    return new PluginClassLoader(pluginManager, pluginDescriptor,
-                                        getClass().getClassLoader(), ClassLoadingStrategy.APD);
-                                }
-
-                                @Override
-                                public ClassLoader loadPlugin(Path pluginPath,
-                                    PluginDescriptor pluginDescriptor) {
-                                    if (pluginProperties.getClassesDirectories() != null) {
-                                        for (String classesDirectory :
-                                            pluginProperties.getClassesDirectories()) {
-                                            pluginClasspath.addClassesDirectories(classesDirectory);
-                                        }
-                                    }
-                                    if (pluginProperties.getLibDirectories() != null) {
-                                        for (String libDirectory :
-                                            pluginProperties.getLibDirectories()) {
-                                            pluginClasspath.addJarsDirectories(libDirectory);
-                                        }
-                                    }
-                                    return super.loadPlugin(pluginPath, pluginDescriptor);
-                                }
-                            }, this::isDevelopment)
+                            .add(createDevelopmentPluginLoader(this), this::isDevelopment)
                             .add(new JarPluginLoader(this) {
                                 @Override
                                 public ClassLoader loadPlugin(Path pluginPath,
@@ -145,9 +120,8 @@ public class PluginAutoConfiguration {
                                             getClass().getClassLoader(), ClassLoadingStrategy.APD);
                                     pluginClassLoader.addFile(pluginPath.toFile());
                                     return pluginClassLoader;
-
                                 }
-                            }, this::isNotDevelopment);
+                            });
                     }
                 }
 
@@ -167,9 +141,8 @@ public class PluginAutoConfiguration {
                         .setFixedPaths(pluginProperties.getFixedPluginPath());
                     return new CompoundPluginRepository()
                         .add(developmentPluginRepository, this::isDevelopment)
-                        .add(new JarPluginRepository(getPluginsRoots()), this::isNotDevelopment)
-                        .add(new DefaultPluginRepository(getPluginsRoots()),
-                            this::isNotDevelopment);
+                        .add(new JarPluginRepository(getPluginsRoots()))
+                        .add(new DefaultPluginRepository(getPluginsRoots()));
                 }
             };
 
@@ -179,6 +152,41 @@ public class PluginAutoConfiguration {
             pluginManager.setSystemVersion(getSystemVersion());
         }
         return pluginManager;
+    }
+
+    DevelopmentPluginLoader createDevelopmentPluginLoader(PluginManager pluginManager) {
+        return new DevelopmentPluginLoader(pluginManager) {
+            @Override
+            protected PluginClassLoader createPluginClassLoader(Path pluginPath,
+                PluginDescriptor pluginDescriptor) {
+                return new PluginClassLoader(pluginManager, pluginDescriptor,
+                    getClass().getClassLoader(), ClassLoadingStrategy.APD);
+            }
+
+            @Override
+            public ClassLoader loadPlugin(Path pluginPath,
+                PluginDescriptor pluginDescriptor) {
+                if (pluginProperties.getClassesDirectories() != null) {
+                    for (String classesDirectory :
+                        pluginProperties.getClassesDirectories()) {
+                        pluginClasspath.addClassesDirectories(classesDirectory);
+                    }
+                }
+                if (pluginProperties.getLibDirectories() != null) {
+                    for (String libDirectory :
+                        pluginProperties.getLibDirectories()) {
+                        pluginClasspath.addJarsDirectories(libDirectory);
+                    }
+                }
+                return super.loadPlugin(pluginPath, pluginDescriptor);
+            }
+
+            @Override
+            public boolean isApplicable(Path pluginPath) {
+                return Files.exists(pluginPath)
+                    && Files.isDirectory(pluginPath);
+            }
+        };
     }
 
     String getSystemVersion() {

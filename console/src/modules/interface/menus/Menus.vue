@@ -195,7 +195,7 @@ const handleDelete = async (menuItem: MenuTreeItem) => {
   <div class="m-0 md:m-4">
     <div class="flex flex-col gap-4 sm:flex-row">
       <div class="w-96">
-        <MenuList v-model:selected-menu="selectedMenu" @select="refetch()" />
+        <MenuList v-model:selected-menu="selectedMenu" />
       </div>
       <div class="flex-1">
         <VCard :body-class="['!p-0']">
