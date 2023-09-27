@@ -58,7 +58,7 @@ export const ApiConsoleHaloRunV1alpha1NotifierApiAxiosParamCreator = function (
       // verify required parameter 'name' is not null or undefined
       assertParamExists("fetchSenderConfig", "name", name);
       const localVarPath =
-        `/apis/api.console.halo.run/v1alpha1/notifiers/{name}/senderConfig`.replace(
+        `/apis/api.console.halo.run/v1alpha1/notifiers/{name}/sender-config`.replace(
           `{${"name"}}`,
           encodeURIComponent(String(name))
         );
@@ -116,7 +116,7 @@ export const ApiConsoleHaloRunV1alpha1NotifierApiAxiosParamCreator = function (
       // verify required parameter 'body' is not null or undefined
       assertParamExists("saveSenderConfig", "body", body);
       const localVarPath =
-        `/apis/api.console.halo.run/v1alpha1/notifiers/{name}/senderConfig`.replace(
+        `/apis/api.console.halo.run/v1alpha1/notifiers/{name}/sender-config`.replace(
           `{${"name"}}`,
           encodeURIComponent(String(name))
         );
