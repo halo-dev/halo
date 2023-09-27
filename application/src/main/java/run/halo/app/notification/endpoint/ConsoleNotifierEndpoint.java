@@ -36,7 +36,7 @@ public class ConsoleNotifierEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "api.console.halo.run/v1alpha1/Notifier";
         return SpringdocRouteBuilder.route()
-            .GET("/notifiers/{name}/senderConfig", this::fetchSenderConfig,
+            .GET("/notifiers/{name}/sender-config", this::fetchSenderConfig,
                 builder -> builder.operationId("FetchSenderConfig")
                     .description("Fetch sender config of notifier")
                     .tag(tag)
@@ -48,7 +48,7 @@ public class ConsoleNotifierEndpoint implements CustomEndpoint {
                     )
                     .response(responseBuilder().implementation(ObjectNode.class))
             )
-            .POST("/notifiers/{name}/senderConfig", this::saveSenderConfig,
+            .POST("/notifiers/{name}/sender-config", this::saveSenderConfig,
                 builder -> builder.operationId("SaveSenderConfig")
                     .description("Save sender config of notifier")
                     .tag(tag)

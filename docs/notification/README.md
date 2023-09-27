@@ -248,13 +248,13 @@ spec:
 
 管理员获取和保存通知器发送配置的 APIs:
 
-1. 获取通知器发送方配置：`GET /apis/api.console.halo.run/v1alpha1/notifiers/{name}/senderConfig`
-2. 保存通知器发送方配置：`POST /apis/api.console.halo.run/v1alpha1/notifiers/{name}/senderConfig`
+1. 获取通知器发送方配置：`GET /apis/api.console.halo.run/v1alpha1/notifiers/{name}/sender-config`
+2. 保存通知器发送方配置：`POST /apis/api.console.halo.run/v1alpha1/notifiers/{name}/sender-config`
 
 个人中心用户获取和保存对应通知器接收消息配置的 APIs:
 
-1. 获取通知器接收消息配置：`GET /apis/api.notification.halo.run/v1alpha1/notifiers/{name}/receiverConfig`
-2. 获取通知器接收消息配置：`POST /apis/api.notification.halo.run/v1alpha1/notifiers/{name}/receiverConfig`
+1. 获取通知器接收消息配置：`GET /apis/api.notification.halo.run/v1alpha1/notifiers/{name}/receiver-config`
+2. 获取通知器接收消息配置：`POST /apis/api.notification.halo.run/v1alpha1/notifiers/{name}/receiver-config`
 
 通知器扩展点用于实现发送通知的方式：
 

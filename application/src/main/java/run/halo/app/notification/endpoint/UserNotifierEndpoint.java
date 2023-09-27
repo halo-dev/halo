@@ -37,7 +37,7 @@ public class UserNotifierEndpoint implements CustomEndpoint {
     public RouterFunction<ServerResponse> endpoint() {
         var tag = "api.notification.halo.run/v1alpha1/Notifier";
         return SpringdocRouteBuilder.route()
-            .GET("/notifiers/{name}/receiverConfig", this::fetchReceiverConfig,
+            .GET("/notifiers/{name}/receiver-config", this::fetchReceiverConfig,
                 builder -> builder.operationId("FetchReceiverConfig")
                     .description("Fetch receiver config of notifier")
                     .tag(tag)
@@ -49,7 +49,7 @@ public class UserNotifierEndpoint implements CustomEndpoint {
                     )
                     .response(responseBuilder().implementation(ObjectNode.class))
             )
-            .POST("/notifiers/{name}/receiverConfig", this::saveReceiverConfig,
+            .POST("/notifiers/{name}/receiver-config", this::saveReceiverConfig,
                 builder -> builder.operationId("SaveReceiverConfig")
                     .description("Save receiver config of notifier")
                     .tag(tag)

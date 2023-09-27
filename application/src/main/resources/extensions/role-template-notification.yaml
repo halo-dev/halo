@@ -11,5 +11,5 @@ metadata:
       ["system:notifier:configuration"]
 rules:
   - apiGroups: [ "api.console.halo.run" ]
-    resources: [ "notifiers/senderConfig" ]
+    resources: [ "notifiers/sender-config" ]
     verbs: [ "get", "update" ]
