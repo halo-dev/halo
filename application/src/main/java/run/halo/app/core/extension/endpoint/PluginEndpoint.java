@@ -688,8 +688,8 @@ public class PluginEndpoint implements CustomEndpoint {
             Supplier<Flux<DataBuffer>> jsSupplier) {
             var fileName = tempFileName(version, ".js");
             return Mono.defer(() -> {
+                jsLock.readLock().lock();
                 try {
-                    jsLock.readLock().lock();
                     var jsBundleResource = jsBundle.get();
                     if (getResourceIfNotChange(fileName, jsBundleResource) != null) {
                         return Mono.just(jsBundleResource);
