@@ -702,7 +702,7 @@ public class PluginEndpoint implements CustomEndpoint {
                 try {
                     var oldJsBundle = jsBundle.get();
                     return writeBundle(fileName, jsSupplier)
-                        .doOnNext(newRes -> cssBundle.compareAndSet(oldJsBundle, newRes));
+                        .doOnNext(newRes -> jsBundle.compareAndSet(oldJsBundle, newRes));
                 } finally {
                     jsLock.writeLock().unlock();
                 }

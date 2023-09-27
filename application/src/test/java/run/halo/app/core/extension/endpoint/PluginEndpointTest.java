@@ -401,7 +401,7 @@ class PluginEndpointTest {
         }
 
         @Test
-        void writeAndGetResourceTest() {
+        void writeAndGetJsResourceTest() {
             bufferedPluginBundleResource.getJsBundle("1",
                     () -> getDataBufferFlux("first line\nnext line"))
                 .as(StepVerifier::create)
@@ -437,6 +437,36 @@ class PluginEndpointTest {
                     try {
                         String content = resource.getContentAsString(StandardCharsets.UTF_8);
                         assertThat(content).isEqualTo("first line\nnext line-2");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
+        }
+
+        @Test
+        void writeAndGetCssResourceTest() {
+            bufferedPluginBundleResource.getCssBundle("1",
+                    () -> getDataBufferFlux("first line\nnext line"))
+                .as(StepVerifier::create)
+                .consumeNextWith(resource -> {
+                    try {
+                        String content = resource.getContentAsString(StandardCharsets.UTF_8);
+                        assertThat(content).isEqualTo("first line\nnext line");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .verifyComplete();
+
+            // version is matched, should return cached content
+            bufferedPluginBundleResource.getCssBundle("1",
+                    () -> getDataBufferFlux("first line\nnext line-1"))
+                .as(StepVerifier::create)
+                .consumeNextWith(resource -> {
+                    try {
+                        String content = resource.getContentAsString(StandardCharsets.UTF_8);
+                        assertThat(content).isEqualTo("first line\nnext line");
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
