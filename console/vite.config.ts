@@ -57,6 +57,9 @@ export default ({ mode }: { mode: string }) => {
     },
     server: {
       port: 3000,
+      fs: {
+        strict: isProduction ? true : false,
+      },
     },
     build: {
       outDir: fileURLToPath(

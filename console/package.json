@@ -20,7 +20,8 @@
     "typecheck:packages": "pnpm --parallel --filter \"./packages/**\" run typecheck",
     "lint:packages": "pnpm --parallel --filter \"./packages/**\" lint",
     "prettier:packages": "pnpm --parallel --filter \"./packages/**\" prettier",
-    "test:unit:packages": "pnpm --parallel --filter \"./packages/**\" run test:unit"
+    "test:unit:packages": "pnpm --parallel --filter \"./packages/**\" run test:unit",
+    "link:editor": "pnpm link --global @halo-dev/richtext-editor"
   },
   "lint-staged": {
     "*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}": [
@@ -54,10 +55,9 @@
     "@halo-dev/api-client": "workspace:*",
     "@halo-dev/components": "workspace:*",
     "@halo-dev/console-shared": "workspace:*",
-    "@halo-dev/richtext-editor": "0.0.0-alpha.30",
+    "@halo-dev/richtext-editor": "0.0.0-alpha.32",
     "@tanstack/vue-query": "^4.29.1",
     "@tiptap/extension-character-count": "^2.0.4",
-    "@tiptap/vue-3": "^2.0.4",
     "@uppy/core": "^3.4.0",
     "@uppy/dashboard": "^3.5.1",
     "@uppy/drag-drop": "^3.0.3",

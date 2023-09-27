@@ -3,7 +3,7 @@ import type { RouteRecordRaw, RouteRecordName } from "vue-router";
 import type { FunctionalPage } from "../states/pages";
 import type { AttachmentSelectProvider } from "../states/attachment-selector";
 import type { EditorProvider, PluginTab } from "..";
-import type { AnyExtension } from "@tiptap/vue-3";
+import type { AnyExtension } from "@halo-dev/richtext-editor";
 import type { CommentSubjectRefProvider } from "@/states/comment-subject-ref";
 import type { BackupTab } from "@/states/backup";
 import type { PluginInstallationTab } from "@/states/plugin-installation-tabs";
