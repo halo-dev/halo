@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.pf4j.ClassLoadingStrategy;
 import org.pf4j.CompoundPluginLoader;
 import org.pf4j.CompoundPluginRepository;
 import org.pf4j.DefaultPluginRepository;
@@ -116,8 +115,8 @@ public class PluginAutoConfiguration {
                                 public ClassLoader loadPlugin(Path pluginPath,
                                     PluginDescriptor pluginDescriptor) {
                                     PluginClassLoader pluginClassLoader =
-                                        new PluginClassLoader(pluginManager, pluginDescriptor,
-                                            getClass().getClassLoader(), ClassLoadingStrategy.APD);
+                                        new DefaultPluginClassLoader(pluginManager,
+                                            pluginDescriptor, getClass().getClassLoader());
                                     pluginClassLoader.addFile(pluginPath.toFile());
                                     return pluginClassLoader;
                                 }
@@ -159,8 +158,8 @@ public class PluginAutoConfiguration {
             @Override
             protected PluginClassLoader createPluginClassLoader(Path pluginPath,
                 PluginDescriptor pluginDescriptor) {
-                return new PluginClassLoader(pluginManager, pluginDescriptor,
-                    getClass().getClassLoader(), ClassLoadingStrategy.APD);
+                return new DefaultPluginClassLoader(pluginManager,
+                    pluginDescriptor, getClass().getClassLoader());
             }
 
             @Override
