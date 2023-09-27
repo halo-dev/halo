@@ -39,6 +39,11 @@ import {
   type AnyExtension,
   Editor,
   ToolboxItem,
+  ExtensionDraggable,
+  ExtensionColumns,
+  ExtensionColumn,
+  ExtensionNodeSelected,
+  ExtensionTrailingNode,
 } from "@halo-dev/richtext-editor";
 import {
   IconCalendar,
@@ -160,7 +165,11 @@ onMounted(() => {
       ExtensionBulletList,
       ExtensionCode,
       ExtensionDocument,
-      ExtensionDropcursor,
+      ExtensionDropcursor.configure({
+        width: 2,
+        class: "dropcursor",
+        color: "skyblue",
+      }),
       ExtensionGapcursor,
       ExtensionHardBreak,
       ExtensionHeading,
@@ -245,6 +254,11 @@ onMounted(() => {
           };
         },
       }),
+      ExtensionDraggable,
+      ExtensionColumns,
+      ExtensionColumn,
+      ExtensionNodeSelected,
+      ExtensionTrailingNode,
     ],
     autofocus: "start",
     onUpdate: () => {
