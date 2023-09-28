@@ -57,6 +57,8 @@ public class RequestInfoFactory {
      * /api/{version}/namespaces/{namespace}
      * /api/{version}/namespaces/{namespace}/{resource}
      * /api/{version}/namespaces/{namespace}/{resource}/{resourceName}
+     * /api/{version}/userspaces/{userspace}/{resource}
+     * /api/{version}/userspaces/{userspace}/{resource}/{resourceName}
      * /api/{version}/{resource}
      * /api/{version}/{resource}/{resourceName}
      * </pre>
@@ -153,7 +155,18 @@ public class RequestInfoFactory {
                     currentParts = Arrays.copyOfRange(currentParts, 2, currentParts.length);
                 }
             }
+        } else if ("userspaces".equals(currentParts[0])) {
+            if (currentParts.length > 1) {
+                requestInfo.userspace = currentParts[1];
+
+                // if there is another step after the userspace name
+                // move currentParts to include it as a resource in its own right
+                if (currentParts.length > 2) {
+                    currentParts = Arrays.copyOfRange(currentParts, 2, currentParts.length);
+                }
+            }
         } else {
+            requestInfo.userspace = "";
             requestInfo.namespace = "";
         }
 
@@ -186,7 +199,7 @@ public class RequestInfoFactory {
 
         // if there's no name on the request and we thought it was a get before, then the actual
         // verb is a list or a watch
-        if (requestInfo.name.length() == 0 && "get".equals(requestInfo.verb)) {
+        if (requestInfo.name.isEmpty() && "get".equals(requestInfo.verb)) {
             var watch = request.getQueryParams().getFirst("watch");
             if (Boolean.parseBoolean(watch)) {
                 requestInfo.verb = "watch";

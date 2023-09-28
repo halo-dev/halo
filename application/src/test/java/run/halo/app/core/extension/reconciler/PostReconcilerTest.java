@@ -2,7 +2,9 @@ package run.halo.app.core.extension.reconciler;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,14 +25,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentWrapper;
+import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.content.PostService;
 import run.halo.app.content.TestPost;
 import run.halo.app.content.permalinks.PostPermalinkPolicy;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.core.extension.content.Snapshot;
+import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.event.post.PostPublishedEvent;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.controller.Reconciler;
+import run.halo.app.notification.NotificationCenter;
 
 /**
  * Tests for {@link PostReconciler}.
@@ -52,8 +58,16 @@ class PostReconcilerTest {
     @Mock
     private ApplicationEventPublisher eventPublisher;
 
+    @Mock
+    private NotificationCenter notificationCenter;
+
     @InjectMocks
     private PostReconciler postReconciler;
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(notificationCenter.subscribe(any(), any())).thenReturn(Mono.empty());
+    }
 
     @Test
     void reconcile() {
@@ -187,5 +201,26 @@ class PostReconcilerTest {
             Post value = captor.getValue();
             assertThat(value.getStatus().getLastModifyTime()).isNull();
         }
+    }
+
+    @Test
+    void subscribeNewCommentNotificationTest() {
+        Post post = TestPost.postV1();
+
+        postReconciler.subscribeNewCommentNotification(post);
+
+        verify(notificationCenter).subscribe(
+            assertArg(subscriber -> assertThat(subscriber.getName())
+                .isEqualTo(post.getSpec().getOwner())),
+            assertArg(argReason -> {
+                var interestReason = new Subscription.InterestReason();
+                interestReason.setReasonType(NotificationReasonConst.NEW_COMMENT_ON_POST);
+                interestReason.setSubject(Subscription.ReasonSubject.builder()
+                    .apiVersion(post.getApiVersion())
+                    .kind(post.getKind())
+                    .name(post.getMetadata().getName())
+                    .build());
+                assertThat(argReason).isEqualTo(interestReason);
+            }));
     }
 }

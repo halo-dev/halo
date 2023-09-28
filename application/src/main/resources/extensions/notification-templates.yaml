@@ -1,0 +1,101 @@
+apiVersion: notification.halo.run/v1alpha1
+kind: NotificationTemplate
+metadata:
+  name: template-new-comment-on-post
+spec:
+  reasonSelector:
+    reasonType: new-comment-on-post
+    language: default
+  template:
+    title: "[(${commenter})] 评论了您的文章《[(${postTitle})]》"
+    rawBody: |
+      [(${subscriber.displayName})] 你好：
+
+        [(${commenter})] 评论了您的文章 《[(${postTitle})]》，以下是评论的具体内容：
+
+        [(${content})]
+    htmlBody: |
+      <div class="notification-content">
+        <div class="head">
+          <p class="honorific" th:text="|${subscriber.displayName} 你好：|"></p>
+        </div>
+        <div class="body">
+          <p>
+            <span th:text="${commenter}"></span> 评论了您的文章
+            <a th:href="${postUrl}" target="_blank" th:text="|《${postTitle}》|"></a>
+            <span>，以下是评论的具体内容：</span>
+          </p>
+          <pre class="content" th:text="${content}"></pre>
+        </div>
+        <div></div>
+      </div>
+
+---
+apiVersion: notification.halo.run/v1alpha1
+kind: NotificationTemplate
+metadata:
+  name: template-new-comment-on-single-page
+spec:
+  reasonSelector:
+    reasonType: new-comment-on-single-page
+    language: default
+  template:
+    title: "[(${commenter})] 评论了您的页面《[(${pageTitle})]》"
+    rawBody: |
+      [(${subscriber.displayName})] 你好：
+
+        [(${commenter})] 评论了您的页面 《[(${pageTitle})]》，以下是评论的具体内容：
+
+        [(${content})]
+    htmlBody: |
+      <div class="notification-content">
+        <div class="head">
+          <p class="honorific" th:text="|${subscriber.displayName} 你好：|"></p>
+        </div>
+        <div class="body">
+          <p>
+            <span th:text="${commenter}"></span> 评论了您的页面
+            <a th:href="${pageUrl}" target="_blank" th:text="|《${pageTitle}》|"></a>
+            <span>，以下是评论的具体内容：</span>
+          </p>
+          <pre class="content" th:text="${content}"></pre>
+        </div>
+        <div></div>
+      </div>
+
+---
+apiVersion: notification.halo.run/v1alpha1
+kind: NotificationTemplate
+metadata:
+  name: template-someone-replied-to-you
+spec:
+  reasonSelector:
+    reasonType: someone-replied-to-you
+    language: default
+  template:
+    title: "[(${replier})] 在评论中回复了您"
+    rawBody: |
+      [(${subscriber.displayName})] 你好：
+
+        [(${replier})] 在评论“[(${isQuoteReply ? quoteContent : commentContent})]”中回复了您，以下是回复的具体内容：
+
+        [(${content})]
+    htmlBody: |
+      <div class="notification-content">
+        <div class="head">
+          <p class="honorific" th:text="|${subscriber.displayName} 你好：|"></p>
+        </div>
+        <div class="body">
+          <p>
+            <span th:text="${replier}"></span> 在评论
+            <a
+              th:href="${commentSubjectUrl}"
+              target="_blank"
+              th:text="|”${isQuoteReply ? quoteContent : commentContent}”|"
+            ></a>
+            <span>中回复了您，以下是回复的具体内容：</span>
+          </p>
+          <pre class="content" th:text="${content}"></pre>
+        </div>
+        <div></div>
+      </div>

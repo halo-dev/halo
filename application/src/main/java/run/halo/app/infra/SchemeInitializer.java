@@ -29,6 +29,12 @@ import run.halo.app.core.extension.content.Reply;
 import run.halo.app.core.extension.content.SinglePage;
 import run.halo.app.core.extension.content.Snapshot;
 import run.halo.app.core.extension.content.Tag;
+import run.halo.app.core.extension.notification.Notification;
+import run.halo.app.core.extension.notification.NotificationTemplate;
+import run.halo.app.core.extension.notification.NotifierDescriptor;
+import run.halo.app.core.extension.notification.Reason;
+import run.halo.app.core.extension.notification.ReasonType;
+import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.Secret;
@@ -94,6 +100,14 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
 
         // migration.halo.run
         schemeManager.register(Backup.class);
+
+        // notification.halo.run
+        schemeManager.register(ReasonType.class);
+        schemeManager.register(Reason.class);
+        schemeManager.register(NotificationTemplate.class);
+        schemeManager.register(Subscription.class);
+        schemeManager.register(NotifierDescriptor.class);
+        schemeManager.register(Notification.class);
 
         eventPublisher.publishEvent(new SchemeInitializedEvent(this));
     }

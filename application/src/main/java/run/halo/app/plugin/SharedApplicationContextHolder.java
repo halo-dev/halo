@@ -9,7 +9,10 @@ import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.BackupRootGetter;
+import run.halo.app.infra.ExternalLinkProcessor;
 import run.halo.app.infra.ExternalUrlSupplier;
+import run.halo.app.notification.NotificationCenter;
+import run.halo.app.notification.NotificationReasonEmitter;
 
 /**
  * <p>This {@link SharedApplicationContextHolder} class is used to hold a singleton instance of
@@ -73,6 +76,12 @@ public class SharedApplicationContextHolder {
             rootApplicationContext.getBean(AttachmentService.class));
         beanFactory.registerSingleton("backupRootGetter",
             rootApplicationContext.getBean(BackupRootGetter.class));
+        beanFactory.registerSingleton("notificationReasonEmitter",
+            rootApplicationContext.getBean(NotificationReasonEmitter.class));
+        beanFactory.registerSingleton("notificationCenter",
+            rootApplicationContext.getBean(NotificationCenter.class));
+        beanFactory.registerSingleton("externalLinkProcessor",
+            rootApplicationContext.getBean(ExternalLinkProcessor.class));
         // TODO add more shared instance here
 
         return sharedApplicationContext;

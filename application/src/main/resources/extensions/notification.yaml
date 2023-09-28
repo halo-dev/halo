@@ -1,0 +1,124 @@
+apiVersion: notification.halo.run/v1alpha1
+kind: NotifierDescriptor
+metadata:
+  name: default-email-notifier
+spec:
+  displayName: '邮件通知'
+  description: '通过邮件将通知发送给用户'
+  notifierExtName: 'halo-email-notifier'
+  senderSettingRef:
+    name: 'notifier-setting-for-email'
+    group: 'sender'
+---
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: notifier-setting-for-email
+spec:
+  forms:
+    - group: sender
+      label: 发件设置
+      formSchema:
+        - $formkit: text
+          label: "用户名"
+          name: username
+          validation: required
+        - $formkit: password
+          label: "密码"
+          name: password
+          validation: required
+        - $formkit: text
+          label: "显示名称"
+          name: displayName
+        - $formkit: text
+          label: "SMTP 服务器地址"
+          name: host
+          validation: required
+        - $formkit: text
+          label: "端口号"
+          name: port
+          validation: required
+---
+apiVersion: notification.halo.run/v1alpha1
+kind: ReasonType
+metadata:
+  name: new-comment-on-post
+spec:
+  displayName: "我的文章收到新评论"
+  description: "如果有读者在你的文章下方留下了新的评论，你将会收到一条通知，告诉你有新的评论。
+  这个通知事件可以帮助你及时了解读者对你的文章的反馈，以便你更好地与读者互动，提高文章的质量和受欢迎程度。"
+  properties:
+    - name: postName
+      type: string
+      description: "The name of the post."
+    - name: postTitle
+      type: string
+    - name: postUrl
+      type: string
+    - name: commenter
+      type: string
+      description: "The display name of the commenter."
+    - name: commentName
+      type: string
+      description: "The name of the comment."
+    - name: content
+      type: string
+      description: "The content of the comment."
+---
+apiVersion: notification.halo.run/v1alpha1
+kind: ReasonType
+metadata:
+  name: new-comment-on-single-page
+spec:
+  displayName: "我的自定义页面收到新评论"
+  description: "当你创建的自定义页面收到新评论时，你将会收到一条通知，告诉你有新的评论。"
+  properties:
+    - name: pageName
+      type: string
+      description: "The name of the single page."
+    - name: pageTitle
+      type: string
+    - name: pageUrl
+      type: string
+    - name: commenter
+      type: string
+      description: "The display name of the commenter."
+    - name: commentName
+      type: string
+      description: "The name of the comment."
+    - name: content
+      type: string
+      description: "The content of the comment."
+---
+apiVersion: notification.halo.run/v1alpha1
+kind: ReasonType
+metadata:
+  name: someone-replied-to-you
+spec:
+  displayName: "有人回复了我"
+  description: "如果有其他用户回复了你的评论，你将会收到一条通知，告诉你有人回复了你。"
+  properties:
+    - name: commentName
+      type: string
+      description: "The name of the comment."
+    - name: commentSubjectTitle
+      type: string
+    - name: commentSubjectUrl
+      type: string
+    - name: quoteContent
+      type: string
+      optional: true
+      description: "The content of quoted reply."
+    - name: isQuoteReply
+      type: boolean
+    - name: commentContent
+      type: string
+    - name: replier
+      type: string
+      description: "The display name of the replier."
+    - name: replyName
+      type: string
+      description: "The name of the reply."
+    - name: content
+      type: string
+      description: "The content of the reply."

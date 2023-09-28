@@ -7,6 +7,8 @@ import org.springframework.util.Assert;
 public enum MetadataUtil {
     ;
 
+    public static final String SYSTEM_FINALIZER = "system-protection";
+
     /**
      * Gets extension metadata labels null safe.
      *

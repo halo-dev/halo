@@ -67,4 +67,6 @@ public interface Attributes {
     String getPath();
 
     String getSubName();
+
+    String getUserSpace();
 }

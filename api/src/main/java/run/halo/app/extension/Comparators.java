@@ -17,6 +17,12 @@ public enum Comparators {
         return asc ? comparator : comparator.reversed();
     }
 
+    public static <T extends Extension> Comparator<T> defaultComparator() {
+        Comparator<T> comparator = compareCreationTimestamp(false);
+        comparator = comparator.thenComparing(compareName(true));
+        return comparator;
+    }
+
     /**
      * Get a nulls comparator.
      *

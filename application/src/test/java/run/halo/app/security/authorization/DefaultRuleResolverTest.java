@@ -52,6 +52,32 @@ class DefaultRuleResolverTest {
             Set.of("authenticated", "anonymous", "ruleReadPost"));
     }
 
+    @Test
+    void visitRulesForUserspaceScope() {
+        when(roleService.listDependenciesFlux(Set.of("authenticated", "anonymous", "ruleReadPost")))
+            .thenReturn(Flux.just(mockRole()));
+        var fakeUser = new User("admin", "123456", createAuthorityList("ruleReadPost"));
+        var cases = List.of(
+            new RequestResolveCase("/api/v1/categories", "POST", true),
+            new RequestResolveCase("/api/v1/categories", "DELETE", true),
+            new RequestResolveCase("/api/v1/userspaces/bar/categories", "DELETE", false),
+            new RequestResolveCase("/api/v1/userspaces/admin/categories", "DELETE", true),
+            new RequestResolveCase("/api/v1/posts", "GET", true),
+
+            new RequestResolveCase("/api/v1/userspaces/foo/posts", "GET", false),
+            new RequestResolveCase("/api/v1/userspaces/admin/posts", "GET", true)
+        );
+        cases.forEach(requestResolveCase -> {
+            var httpMethod = HttpMethod.valueOf(requestResolveCase.method);
+            var request = method(httpMethod, requestResolveCase.url).build();
+            var requestInfo = RequestInfoFactory.INSTANCE.newRequestInfo(request);
+            StepVerifier.create(ruleResolver.visitRules(fakeUser, requestInfo))
+                .assertNext(
+                    visitor -> assertEquals(requestResolveCase.expected, visitor.isAllowed()))
+                .verifyComplete();
+        });
+    }
+
     Role mockRole() {
         var role = new Role();
         var rules = List.of(
