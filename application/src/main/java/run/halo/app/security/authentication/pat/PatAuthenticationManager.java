@@ -6,7 +6,9 @@ import static run.halo.app.security.authentication.pat.PatServerWebExchangeMatch
 
 import com.nimbusds.jwt.JWTClaimNames;
 import java.time.Clock;
+import java.time.Duration;
 import java.util.Objects;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -17,12 +19,18 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtRea
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 import run.halo.app.extension.ExtensionUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.security.PersonalAccessToken;
 import run.halo.app.security.authentication.jwt.JwtScopesAndRolesGrantedAuthoritiesConverter;
 
 public class PatAuthenticationManager implements ReactiveAuthenticationManager {
+
+    /**
+     * Minimal duration gap of personal access token update.
+     */
+    private static final Duration MIN_UPDATE_GAP = Duration.ofMinutes(1);
 
     private final ReactiveAuthenticationManager delegate;
 
@@ -78,17 +86,33 @@ public class PatAuthenticationManager implements ReactiveAuthenticationManager {
         return client.fetch(PersonalAccessToken.class, patName)
             .switchIfEmpty(
                 Mono.error(() -> new DisabledException("Personal access token has been deleted.")))
-            .flatMap(pat -> patChecks(pat, jwtId)
-                .then(updateLastUsed(pat))
-                .then()
-            );
+            .flatMap(pat -> patChecks(pat, jwtId).and(updateLastUsed(patName)));
     }
 
-    private Mono<PersonalAccessToken> updateLastUsed(PersonalAccessToken pat) {
-        return Mono.defer(() -> {
-            pat.getSpec().setLastUsed(clock.instant());
-            return client.update(pat);
-        });
+    private Mono<Void> updateLastUsed(String patName) {
+        // we try our best to update the last used timestamp.
+
+        // the now should be outside the retry cycle because we don't want a fresh timestamp at
+        // every retry.
+        var now = clock.instant();
+        return Mono.defer(
+                // we have to obtain a fresh PAT and retry the update.
+                () -> client.fetch(PersonalAccessToken.class, patName)
+                    .filter(pat -> {
+                        var lastUsed = pat.getSpec().getLastUsed();
+                        if (lastUsed == null) {
+                            return true;
+                        }
+                        var diff = Duration.between(lastUsed, now);
+                        return !diff.minus(MIN_UPDATE_GAP).isNegative();
+                    })
+                    .doOnNext(pat -> pat.getSpec().setLastUsed(now))
+                    .flatMap(client::update)
+            )
+            .retryWhen(Retry.backoff(3, Duration.ofMillis(50))
+                .filter(OptimisticLockingFailureException.class::isInstance))
+            .onErrorComplete()
+            .then();
     }
 
     private Mono<Void> patChecks(PersonalAccessToken pat, String tokenId) {
