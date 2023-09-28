@@ -79,6 +79,8 @@ core:
         button: Profile
       visit_homepage:
         title: Visit homepage
+      notifications:
+        button: Notifications
   dashboard:
     title: Dashboard
     actions:
@@ -987,6 +989,18 @@ core:
         website: Website
         help_page: Help page
         authentication_url: Login URL
+  notification:
+    title: Notifications
+    tabs:
+      unread: Unread
+      read: Read
+    empty:
+      titles:
+        unread: No unread notifications
+        read: No read notifications
+    operations:
+      mark_as_read:
+        button: Mark as read
   setting:
     title: Settings
   actuator:
@@ -1258,6 +1272,7 @@ core:
       submit: Submit
       detail: Detail
       select: Select
+      view_all: View all
     radio:
       "yes": Yes
       "no": No

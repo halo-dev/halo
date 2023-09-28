@@ -11,6 +11,8 @@ import {
   ApiConsoleHaloRunV1alpha1IndicesApi,
   ApiConsoleHaloRunV1alpha1AuthProviderApi,
   ApiConsoleHaloRunV1alpha1SystemApi,
+  ApiConsoleHaloRunV1alpha1NotifierApi,
+  ApiNotificationHaloRunV1alpha1NotificationApi,
   ContentHaloRunV1alpha1CategoryApi,
   ContentHaloRunV1alpha1CommentApi,
   ContentHaloRunV1alpha1PostApi,
@@ -40,6 +42,7 @@ import {
   ApiHaloRunV1alpha1UserApi,
   MigrationHaloRunV1alpha1BackupApi,
   ApiConsoleMigrationHaloRunV1alpha1MigrationApi,
+  NotificationHaloRunV1alpha1NotifierDescriptorApi,
   ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi,
   SecurityHaloRunV1alpha1PersonalAccessTokenApi,
 } from "@halo-dev/api-client";
@@ -180,6 +183,11 @@ function setupApiClient(axios: AxiosInstance) {
         axios
       ),
       backup: new MigrationHaloRunV1alpha1BackupApi(undefined, baseURL, axios),
+      notifierDescriptors: new NotificationHaloRunV1alpha1NotifierDescriptorApi(
+        undefined,
+        baseURL,
+        axios
+      ),
       pat: new SecurityHaloRunV1alpha1PersonalAccessTokenApi(
         undefined,
         baseURL,
@@ -221,6 +229,16 @@ function setupApiClient(axios: AxiosInstance) {
       axios
     ),
     system: new ApiConsoleHaloRunV1alpha1SystemApi(undefined, baseURL, axios),
+    notifier: new ApiConsoleHaloRunV1alpha1NotifierApi(
+      undefined,
+      baseURL,
+      axios
+    ),
+    notification: new ApiNotificationHaloRunV1alpha1NotificationApi(
+      undefined,
+      baseURL,
+      axios
+    ),
     pat: new ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi(
       undefined,
       baseURL,

@@ -187,6 +187,7 @@ const widgetsGroup = [
     widgets: [
       { x: 0, y: 0, w: 3, h: 3, i: 0, widget: "ViewsStatsWidget" },
       { x: 0, y: 0, w: 6, h: 10, i: 1, widget: "QuickLinkWidget" },
+      { x: 0, y: 0, w: 6, h: 10, i: 2, widget: "NotificationWidget" },
     ],
   },
 ];
@@ -242,8 +243,8 @@ const layout = useStorage("widgets", [
     w: 6,
     h: 12,
     i: 5,
-    widget: "RecentPublishedWidget",
-    permissions: ["system:posts:view"],
+    widget: "NotificationWidget",
+    permissions: [],
   },
 ]);
 

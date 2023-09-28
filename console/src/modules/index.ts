@@ -1,3 +1,4 @@
+// fixme: add supports for auto import
 import dashboardModule from "./dashboard/module";
 import postModule from "./contents/posts/module";
 import pageModule from "./contents/pages/module";

@@ -79,6 +79,8 @@ core:
         button: 個人資料
       visit_homepage:
         title: 訪問首頁
+      notifications:
+        button: 我的訊息
   dashboard:
     title: 儀表板
     actions:
@@ -987,6 +989,18 @@ core:
         website: 網站
         help_page: 幫助頁面
         authentication_url: 登入入口
+  notification:
+    title: 訊息
+    tabs:
+      unread: 未讀
+      read: 已讀
+    empty:
+      titles:
+        unread: 目前沒有未讀的訊息
+        read: 目前沒有已讀的訊息
+    operations:
+      mark_as_read:
+        button: 標記為已讀
   setting:
     title: 設置
   actuator:
@@ -1258,6 +1272,7 @@ core:
       submit: 提交
       detail: 詳情
       select: 選擇
+      view_all: 查看全部
     radio:
       "yes": 是
       "no": 否
