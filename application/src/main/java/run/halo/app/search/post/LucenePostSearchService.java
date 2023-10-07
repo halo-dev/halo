@@ -1,5 +1,6 @@
 package run.halo.app.search.post;
 
+import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.lucene.document.Field.Store.YES;
 import static org.apache.lucene.index.IndexWriterConfig.OpenMode.CREATE_OR_APPEND;
 
@@ -40,7 +41,6 @@ import org.apache.lucene.store.FSDirectory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
-import reactor.core.Exceptions;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.search.SearchParam;
 import run.halo.app.search.SearchResult;
@@ -121,16 +121,17 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
         writeConfig.setOpenMode(CREATE_OR_APPEND);
         try (var writer = new IndexWriter(postIndexDir, writeConfig)) {
             posts.forEach(post -> {
-                var doc = this.convert(post);
                 try {
+                    var doc = this.convert(post);
                     var seqNum =
                         writer.updateDocument(new Term(PostDoc.ID_FIELD, post.name()), doc);
                     if (log.isDebugEnabled()) {
                         log.debug("Updated document({}) with sequence number {} returned",
                             post.name(), seqNum);
                     }
-                } catch (IOException e) {
-                    throw Exceptions.propagate(e);
+                } catch (Throwable e) {
+                    // Continue next update
+                    log.error("Failed to update document for post {}", post.name(), e);
                 }
             });
         }
@@ -180,8 +181,8 @@ public class LucenePostSearchService implements PostSearchService, DisposableBea
         var doc = new Document();
         doc.add(new StringField("name", post.name(), YES));
         doc.add(new TextField("title", post.title(), YES));
-        doc.add(new TextField("excerpt", post.excerpt(), YES));
-        doc.add(new TextField("content", post.content(), YES));
+        doc.add(new TextField("excerpt", defaultString(post.excerpt()), YES));
+        doc.add(new TextField("content", defaultString(post.content()), YES));
 
         var publishTimestamp = post.publishTimestamp().getEpochSecond();
         doc.add(new LongPoint("publishTimestamp", publishTimestamp));
