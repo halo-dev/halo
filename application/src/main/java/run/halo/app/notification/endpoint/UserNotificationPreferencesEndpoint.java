@@ -7,19 +7,24 @@ import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuil
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuples;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.notification.NotifierDescriptor;
 import run.halo.app.core.extension.notification.ReasonType;
@@ -117,51 +122,70 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
             .flatMap(matrix -> ServerResponse.ok().bodyValue(matrix));
     }
 
+    @NonNull
+    private static <T> Map<String, Integer> toNameIndexMap(List<T> collection,
+        Function<T, String> nameGetter) {
+        Map<String, Integer> indexMap = new HashMap<>();
+        for (int i = 0; i < collection.size(); i++) {
+            var item = collection.get(i);
+            indexMap.put(nameGetter.apply(item), i);
+        }
+        return indexMap;
+    }
+
     Mono<ReasonTypeNotifierMatrix> listReasonTypeNotifierMatrix(String username) {
         return client.list(ReasonType.class, null, Comparators.defaultComparator())
             .map(reasonType -> new ReasonTypeInfo(reasonType.getMetadata().getName(),
-                reasonType.getSpec().getDisplayName(), reasonType.getSpec().getDescription())
-            )
-            .flatMap(row -> client.list(NotifierDescriptor.class, null,
-                    Comparators.defaultComparator())
-                .map(notifierDescriptor ->
-                    new NotifierInfo(notifierDescriptor.getMetadata().getName(),
-                        notifierDescriptor.getSpec().getDisplayName(),
-                        notifierDescriptor.getSpec().getDescription())
-                )
-                .map(col -> {
-                    var matrixItem = new ReasonTypeNotifierMatrixItem();
-                    matrixItem.setReasonType(row);
-                    matrixItem.setNotifier(col);
-                    matrixItem.setEnabled(false);
-                    return matrixItem;
-                })
+                reasonType.getSpec().getDisplayName(),
+                reasonType.getSpec().getDescription())
             )
             .collectList()
-            .flatMap(matrix -> userNotificationPreferenceService.getByUser(username)
-                .map(preference -> {
-                    for (ReasonTypeNotifierMatrixItem item : matrix) {
-                        var notifiers = preference.getReasonTypeNotifier()
-                            .getNotifiers(item.getReasonType().name());
-                        if (notifiers.contains(item.getNotifier().name())) {
-                            item.setEnabled(true);
-                        }
-                    }
-                    return new ReasonTypeNotifierMatrix(matrix);
+            .flatMap(reasonTypes -> client.list(NotifierDescriptor.class, null,
+                    Comparators.defaultComparator())
+                .map(notifier -> new NotifierInfo(notifier.getMetadata().getName(),
+                    notifier.getSpec().getDisplayName(),
+                    notifier.getSpec().getDescription())
+                )
+                .collectList()
+                .map(notifiers -> {
+                    var matrix = new ReasonTypeNotifierMatrix()
+                        .setReasonTypes(reasonTypes)
+                        .setNotifiers(notifiers)
+                        .setStateMatrix(new boolean[reasonTypes.size()][notifiers.size()]);
+                    return Tuples.of(reasonTypes, matrix);
                 })
-            );
-    }
+            )
+            .flatMap(tuple2 -> {
+                var reasonTypes = tuple2.getT1();
+                var matrix = tuple2.getT2();
 
-    record ReasonTypeNotifierMatrix(List<ReasonTypeNotifierMatrixItem> matrix) {
+                var reasonTypeIndexMap = toNameIndexMap(reasonTypes, ReasonTypeInfo::name);
+                var notifierIndexMap = toNameIndexMap(matrix.getNotifiers(), NotifierInfo::name);
+                var stateMatrix = matrix.getStateMatrix();
 
+                return userNotificationPreferenceService.getByUser(username)
+                    .doOnNext(preference -> {
+                        var reasonTypeNotifierMap = preference.getReasonTypeNotifier();
+                        for (ReasonTypeInfo reasonType : reasonTypes) {
+                            var reasonTypeIndex = reasonTypeIndexMap.get(reasonType.name());
+                            var notifierNames =
+                                reasonTypeNotifierMap.getNotifiers(reasonType.name());
+                            for (String notifierName : notifierNames) {
+                                var notifierIndex = notifierIndexMap.get(notifierName);
+                                stateMatrix[reasonTypeIndex][notifierIndex] = true;
+                            }
+                        }
+                    })
+                    .thenReturn(matrix);
+            });
     }
 
     @Data
     @Accessors(chain = true)
-    static class ReasonTypeNotifierMatrixItem {
-        private ReasonTypeInfo reasonType;
-        private NotifierInfo notifier;
-        private boolean enabled;
+    static class ReasonTypeNotifierMatrix {
+        private List<ReasonTypeInfo> reasonTypes;
+        private List<NotifierInfo> notifiers;
+        private boolean[][] stateMatrix;
     }
 
     record ReasonTypeInfo(String name, String displayName, String description) {
