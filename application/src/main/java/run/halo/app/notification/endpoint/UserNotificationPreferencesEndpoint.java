@@ -19,9 +19,9 @@ import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
+import run.halo.app.core.extension.notification.NotifierDescriptor;
 import run.halo.app.core.extension.notification.ReasonType;
 import run.halo.app.extension.Comparators;
 import run.halo.app.extension.GroupVersion;
@@ -65,7 +65,7 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
                         .required(true)
                     )
                     .response(responseBuilder()
-                        .implementationArray(ReasonTypeNotifierMatrix.class)
+                        .implementation(ReasonTypeNotifierMatrix.class)
                     )
             )
             .POST("/notification-preferences", this::saveNotificationPreferences,
@@ -107,7 +107,6 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
                     });
             })
             .then(Mono.defer(() -> listReasonTypeNotifierMatrix(username)
-                .collectList()
                 .flatMap(result -> ServerResponse.ok().bodyValue(result)))
             );
     }
@@ -115,34 +114,60 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
     private Mono<ServerResponse> listNotificationPreferences(ServerRequest request) {
         var username = request.pathVariable("username");
         return listReasonTypeNotifierMatrix(username)
-            .collectList()
             .flatMap(matrix -> ServerResponse.ok().bodyValue(matrix));
     }
 
-    Flux<ReasonTypeNotifierMatrix> listReasonTypeNotifierMatrix(String username) {
+    Mono<ReasonTypeNotifierMatrix> listReasonTypeNotifierMatrix(String username) {
         return client.list(ReasonType.class, null, Comparators.defaultComparator())
-            .map(reasonType -> new ReasonTypeNotifierMatrix()
-                .setName(reasonType.getMetadata().getName())
-                .setDisplayName(reasonType.getSpec().getDisplayName())
-                .setDescription(reasonType.getSpec().getDescription())
+            .map(reasonType -> new ReasonTypeInfo(reasonType.getMetadata().getName(),
+                reasonType.getSpec().getDisplayName(), reasonType.getSpec().getDescription())
             )
-            .flatMap(notifierMatrix -> userNotificationPreferenceService.getByUser(username)
-                .doOnNext(preference -> {
-                    var notifiers = preference.getReasonTypeNotifier()
-                        .getNotifiers(notifierMatrix.getName());
-                    notifierMatrix.setNotifiers(List.copyOf(notifiers));
+            .flatMap(row -> client.list(NotifierDescriptor.class, null,
+                    Comparators.defaultComparator())
+                .map(notifierDescriptor ->
+                    new NotifierInfo(notifierDescriptor.getMetadata().getName(),
+                        notifierDescriptor.getSpec().getDisplayName(),
+                        notifierDescriptor.getSpec().getDescription())
+                )
+                .map(col -> {
+                    var matrixItem = new ReasonTypeNotifierMatrixItem();
+                    matrixItem.setReasonType(row);
+                    matrixItem.setNotifier(col);
+                    matrixItem.setEnabled(false);
+                    return matrixItem;
                 })
-                .thenReturn(notifierMatrix)
+            )
+            .collectList()
+            .flatMap(matrix -> userNotificationPreferenceService.getByUser(username)
+                .map(preference -> {
+                    for (ReasonTypeNotifierMatrixItem item : matrix) {
+                        var notifiers = preference.getReasonTypeNotifier()
+                            .getNotifiers(item.getReasonType().name());
+                        if (notifiers.contains(item.getNotifier().name())) {
+                            item.setEnabled(true);
+                        }
+                    }
+                    return new ReasonTypeNotifierMatrix(matrix);
+                })
             );
+    }
+
+    record ReasonTypeNotifierMatrix(List<ReasonTypeNotifierMatrixItem> matrix) {
+
     }
 
     @Data
     @Accessors(chain = true)
-    static class ReasonTypeNotifierMatrix {
-        private String name;
-        private String displayName;
-        private String description;
-        private List<String> notifiers;
+    static class ReasonTypeNotifierMatrixItem {
+        private ReasonTypeInfo reasonType;
+        private NotifierInfo notifier;
+        private boolean enabled;
+    }
+
+    record ReasonTypeInfo(String name, String displayName, String description) {
+    }
+
+    record NotifierInfo(String name, String displayName, String description) {
     }
 
     record ReasonTypeNotifierCollectionRequest(

@@ -12,8 +12,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.notification.ReasonType;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.notification.UserNotificationPreferenceService;
 
 /**
  * Tests for {@link UserNotificationPreferencesEndpoint}.
@@ -26,6 +28,9 @@ class UserNotificationPreferencesEndpointTest {
 
     @Mock
     private ReactiveExtensionClient client;
+
+    @Mock
+    private UserNotificationPreferenceService userNotificationPreferenceService;
 
     @InjectMocks
     private UserNotificationPreferencesEndpoint userNotificationPreferencesEndpoint;
@@ -42,6 +47,7 @@ class UserNotificationPreferencesEndpointTest {
     @Test
     void listNotificationPreferences() {
         when(client.list(eq(ReasonType.class), eq(null), any())).thenReturn(Flux.empty());
+        when(userNotificationPreferenceService.getByUser(any())).thenReturn(Mono.empty());
         webTestClient.post()
             .uri("/userspaces/{username}/notification-preferences", "guqing")
             .exchange()
@@ -52,6 +58,7 @@ class UserNotificationPreferencesEndpointTest {
     @Test
     void saveNotificationPreferences() {
         when(client.list(eq(ReasonType.class), eq(null), any())).thenReturn(Flux.empty());
+        when(userNotificationPreferenceService.getByUser(any())).thenReturn(Mono.empty());
         webTestClient.post()
             .uri("/userspaces/{username}/notification-preferences", "guqing")
             .exchange()
