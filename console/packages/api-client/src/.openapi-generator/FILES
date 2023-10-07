@@ -179,6 +179,7 @@ models/notification.ts
 models/notifier-descriptor-list.ts
 models/notifier-descriptor-spec.ts
 models/notifier-descriptor.ts
+models/notifier-info.ts
 models/notifier-setting-ref.ts
 models/owner-info.ts
 models/pat-spec.ts
@@ -211,8 +212,10 @@ models/reason-selector.ts
 models/reason-spec-attributes.ts
 models/reason-spec.ts
 models/reason-subject.ts
+models/reason-type-info.ts
 models/reason-type-list.ts
 models/reason-type-notifier-collection-request.ts
+models/reason-type-notifier-matrix-item.ts
 models/reason-type-notifier-matrix.ts
 models/reason-type-notifier-request.ts
 models/reason-type-spec.ts

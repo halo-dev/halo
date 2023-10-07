@@ -435,7 +435,7 @@ export const ApiNotificationHaloRunV1alpha1NotificationApiFp = function (
       (
         axios?: AxiosInstance,
         basePath?: string
-      ) => AxiosPromise<Array<ReasonTypeNotifierMatrix>>
+      ) => AxiosPromise<ReasonTypeNotifierMatrix>
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.listUserNotificationPreferences(
@@ -608,7 +608,7 @@ export const ApiNotificationHaloRunV1alpha1NotificationApiFactory = function (
     listUserNotificationPreferences(
       requestParameters: ApiNotificationHaloRunV1alpha1NotificationApiListUserNotificationPreferencesRequest,
       options?: AxiosRequestConfig
-    ): AxiosPromise<Array<ReasonTypeNotifierMatrix>> {
+    ): AxiosPromise<ReasonTypeNotifierMatrix> {
       return localVarFp
         .listUserNotificationPreferences(requestParameters.username, options)
         .then((request) => request(axios, basePath));
