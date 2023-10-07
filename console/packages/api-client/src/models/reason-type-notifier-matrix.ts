@@ -14,7 +14,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { ReasonTypeNotifierMatrixItem } from "./reason-type-notifier-matrix-item";
+import { NotifierInfo } from "./notifier-info";
+// May contain unused imports in some cases
+// @ts-ignore
+import { ReasonTypeInfo } from "./reason-type-info";
 
 /**
  *
@@ -24,8 +27,20 @@ import { ReasonTypeNotifierMatrixItem } from "./reason-type-notifier-matrix-item
 export interface ReasonTypeNotifierMatrix {
   /**
    *
-   * @type {Array<ReasonTypeNotifierMatrixItem>}
+   * @type {Array<NotifierInfo>}
    * @memberof ReasonTypeNotifierMatrix
    */
-  matrix?: Array<ReasonTypeNotifierMatrixItem>;
+  notifiers?: Array<NotifierInfo>;
+  /**
+   *
+   * @type {Array<ReasonTypeInfo>}
+   * @memberof ReasonTypeNotifierMatrix
+   */
+  reasonTypes?: Array<ReasonTypeInfo>;
+  /**
+   *
+   * @type {Array<Array<boolean>>}
+   * @memberof ReasonTypeNotifierMatrix
+   */
+  stateMatrix?: Array<Array<boolean>>;
 }

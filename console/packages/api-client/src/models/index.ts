@@ -141,7 +141,6 @@ export * from "./reason-type-info";
 export * from "./reason-type-list";
 export * from "./reason-type-notifier-collection-request";
 export * from "./reason-type-notifier-matrix";
-export * from "./reason-type-notifier-matrix-item";
 export * from "./reason-type-notifier-request";
 export * from "./reason-type-spec";
 export * from "./ref";

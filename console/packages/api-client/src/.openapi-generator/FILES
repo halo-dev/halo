@@ -215,7 +215,6 @@ models/reason-subject.ts
 models/reason-type-info.ts
 models/reason-type-list.ts
 models/reason-type-notifier-collection-request.ts
-models/reason-type-notifier-matrix-item.ts
 models/reason-type-notifier-matrix.ts
 models/reason-type-notifier-request.ts
 models/reason-type-spec.ts
