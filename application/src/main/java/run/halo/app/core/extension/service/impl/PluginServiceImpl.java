@@ -26,7 +26,6 @@ import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
@@ -179,9 +178,15 @@ public class PluginServiceImpl implements PluginService {
                 return BundleResourceUtils.getJsBundleResource(pluginManager, pluginName,
                     BundleResourceUtils.CSS_BUNDLE);
             })
-            .flatMap(resource -> DataBufferUtils.read(resource,
-                DefaultDataBufferFactory.sharedInstance, StreamUtils.BUFFER_SIZE)
-            );
+            .flatMap(resource -> {
+                try {
+                    return DataBufferUtils.read(resource, DefaultDataBufferFactory.sharedInstance,
+                        (int) resource.contentLength());
+                } catch (IOException e) {
+                    log.error("Failed to read plugin css bundle resource", e);
+                    return Flux.empty();
+                }
+            });
     }
 
     @Override
