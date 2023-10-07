@@ -212,6 +212,9 @@ models/reason-spec-attributes.ts
 models/reason-spec.ts
 models/reason-subject.ts
 models/reason-type-list.ts
+models/reason-type-notifier-collection-request.ts
+models/reason-type-notifier-matrix.ts
+models/reason-type-notifier-request.ts
 models/reason-type-spec.ts
 models/reason-type.ts
 models/reason.ts
