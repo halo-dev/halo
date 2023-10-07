@@ -23,6 +23,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.notification.ReasonType;
+import run.halo.app.extension.Comparators;
 import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.notification.UserNotificationPreference;
@@ -119,7 +120,7 @@ public class UserNotificationPreferencesEndpoint implements CustomEndpoint {
     }
 
     Flux<ReasonTypeNotifierMatrix> listReasonTypeNotifierMatrix(String username) {
-        return client.list(ReasonType.class, null, null)
+        return client.list(ReasonType.class, null, Comparators.defaultComparator())
             .map(reasonType -> new ReasonTypeNotifierMatrix()
                 .setName(reasonType.getMetadata().getName())
                 .setDisplayName(reasonType.getSpec().getDisplayName())
