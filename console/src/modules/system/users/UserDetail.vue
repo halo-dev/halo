@@ -114,7 +114,7 @@ const tabs = computed((): UserTab[] => {
     },
     {
       id: "notification-preferences",
-      label: "通知配置",
+      label: t("core.user.detail.tabs.notification-preferences"),
       component: markRaw(NotificationPreferences),
       priority: 20,
       hidden: !isCurrentUser.value,
