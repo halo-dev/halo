@@ -19,25 +19,46 @@ spec:
     - group: sender
       label: 发件设置
       formSchema:
+        - $formkit: checkbox
+          label: "启用邮件通知器"
+          value: false
+          name: enable
         - $formkit: text
+          if: "$enable"
           label: "用户名"
           name: username
           validation: required
         - $formkit: password
+          if: "$enable"
           label: "密码"
           name: password
           validation: required
         - $formkit: text
+          if: "$enable"
           label: "显示名称"
           name: displayName
         - $formkit: text
+          if: "$enable"
           label: "SMTP 服务器地址"
           name: host
           validation: required
         - $formkit: text
+          if: "$enable"
           label: "端口号"
           name: port
           validation: required
+        - $formkit: select
+          if: "$enable"
+          label: "加密方式"
+          name: encryption
+          value: "SSL"
+          options:
+            - label: "SSL"
+              value: "SSL"
+            - label: "TLS"
+              value: "TLS"
+            - label: "不加密"
+              value: "NONE"
 ---
 apiVersion: notification.halo.run/v1alpha1
 kind: ReasonType

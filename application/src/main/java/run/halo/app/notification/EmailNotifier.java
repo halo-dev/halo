@@ -43,6 +43,11 @@ public class EmailNotifier implements ReactiveNotifier {
         var emailSenderConfig =
             JsonUtils.DEFAULT_JSON_MAPPER.convertValue(senderConfig, EmailSenderConfig.class);
 
+        if (!emailSenderConfig.isEnable()) {
+            log.debug("Email notifier is disabled, skip sending email.");
+            return Mono.empty();
+        }
+
         JavaMailSenderImpl javaMailSender = getJavaMailSender(emailSenderConfig);
 
         String recipient = context.getMessage().getRecipient();
@@ -51,6 +56,11 @@ public class EmailNotifier implements ReactiveNotifier {
         var payload = context.getMessage().getPayload();
         return subscriberEmailResolver.resolve(subscriber)
             .flatMap(toEmail -> {
+                if (StringUtils.isBlank(toEmail)) {
+                    log.debug("Cannot resolve email for subscriber: [{}], skip sending email.",
+                        subscriber);
+                    return Mono.empty();
+                }
                 var htmlMono = appendHtmlBodyFooter(payload.getAttributes())
                     .doOnNext(footer -> {
                         if (StringUtils.isNotBlank(payload.getHtmlBody())) {
@@ -97,7 +107,19 @@ public class EmailNotifier implements ReactiveNotifier {
         Properties props = javaMailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
+        if ("SSL".equals(emailSenderConfig.getEncryption())) {
+            props.put("mail.smtp.ssl.enable", "true");
+        }
+
+        if ("TLS".equals(emailSenderConfig.getEncryption())) {
+            props.put("mail.smtp.starttls.enable", "true");
+        }
+
+        if ("NONE".equals(emailSenderConfig.getEncryption())) {
+            props.put("mail.smtp.ssl.enable", "false");
+            props.put("mail.smtp.starttls.enable", "false");
+        }
+
         if (log.isDebugEnabled()) {
             props.put("mail.debug", "true");
         }
@@ -138,11 +160,13 @@ public class EmailNotifier implements ReactiveNotifier {
 
     @Data
     static class EmailSenderConfig {
+        private boolean enable;
         private String displayName;
         private String username;
         private String password;
         private String host;
         private Integer port;
+        private String encryption;
 
         /**
          * Gets email display name.

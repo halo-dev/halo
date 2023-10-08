@@ -21,7 +21,7 @@ const { changingStatus, changeStatus } = usePluginLifeCycle(plugin);
       <div class="flex items-center">
         <VSwitch
           :model-value="plugin.spec.enabled"
-          :disabled="changingStatus"
+          :loading="changingStatus"
           @click="changeStatus"
         />
       </div>
