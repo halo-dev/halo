@@ -21,7 +21,6 @@ interface useAttachmentControlReturn {
   handleFetchAttachments: () => void;
   handleSelectPrevious: () => void;
   handleSelectNext: () => void;
-  handleDelete: (attachment: Attachment) => void;
   handleDeleteInBatch: () => void;
   handleCheckAll: (checkAll: boolean) => void;
   handleSelect: (attachment: Attachment | undefined) => void;
@@ -128,37 +127,6 @@ export function useAttachmentControl(filterOptions: {
     }
   };
 
-  const handleDelete = (attachment: Attachment) => {
-    Dialog.warning({
-      title: t("core.attachment.operations.delete.title"),
-      description: t("core.common.dialog.descriptions.cannot_be_recovered"),
-      confirmType: "danger",
-      confirmText: t("core.common.buttons.confirm"),
-      cancelText: t("core.common.buttons.cancel"),
-      onConfirm: async () => {
-        try {
-          await apiClient.extension.storage.attachment.deletestorageHaloRunV1alpha1Attachment(
-            {
-              name: attachment.metadata.name,
-            }
-          );
-          if (
-            selectedAttachment.value?.metadata.name === attachment.metadata.name
-          ) {
-            selectedAttachment.value = undefined;
-          }
-          selectedAttachments.value.delete(attachment);
-
-          Toast.success(t("core.common.toast.delete_success"));
-        } catch (e) {
-          console.error("Failed to delete attachment", e);
-        } finally {
-          await refetch();
-        }
-      },
-    });
-  };
-
   const handleDeleteInBatch = () => {
     Dialog.warning({
       title: t("core.attachment.operations.delete_in_batch.title"),
@@ -243,7 +211,6 @@ export function useAttachmentControl(filterOptions: {
     handleFetchAttachments: refetch,
     handleSelectPrevious,
     handleSelectNext,
-    handleDelete,
     handleDeleteInBatch,
     handleCheckAll,
     handleSelect,
