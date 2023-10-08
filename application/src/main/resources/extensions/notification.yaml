@@ -47,6 +47,18 @@ spec:
           label: "端口号"
           name: port
           validation: required
+        - $formkit: select
+          if: "$enable"
+          label: "加密方式"
+          name: encryption
+          value: "SSL"
+          options:
+            - label: "SSL"
+              value: "SSL"
+            - label: "TLS"
+              value: "TLS"
+            - label: "不加密"
+              value: "NONE"
 ---
 apiVersion: notification.halo.run/v1alpha1
 kind: ReasonType
