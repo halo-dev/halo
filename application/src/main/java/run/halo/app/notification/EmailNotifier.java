@@ -97,7 +97,19 @@ public class EmailNotifier implements ReactiveNotifier {
         Properties props = javaMailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
+        if ("SSL".equals(emailSenderConfig.getEncryption())) {
+            props.put("mail.smtp.ssl.enable", "true");
+        }
+
+        if ("TLS".equals(emailSenderConfig.getEncryption())) {
+            props.put("mail.smtp.starttls.enable", "true");
+        }
+
+        if ("NONE".equals(emailSenderConfig.getEncryption())) {
+            props.put("mail.smtp.ssl.enable", "false");
+            props.put("mail.smtp.starttls.enable", "false");
+        }
+
         if (log.isDebugEnabled()) {
             props.put("mail.debug", "true");
         }
@@ -143,6 +155,7 @@ public class EmailNotifier implements ReactiveNotifier {
         private String password;
         private String host;
         private Integer port;
+        private String encryption;
 
         /**
          * Gets email display name.
