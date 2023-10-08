@@ -10,7 +10,13 @@ import type { PluginInstallationTab } from "@/states/plugin-installation-tabs";
 import type { EntityFieldItem } from "@/states/entity";
 import type { OperationItem } from "@/states/operation";
 import type { ThemeListTab } from "@/states/theme-list-tabs";
-import type { Backup, ListedPost, Plugin, Theme } from "@halo-dev/api-client";
+import type {
+  Attachment,
+  Backup,
+  ListedPost,
+  Plugin,
+  Theme,
+} from "@halo-dev/api-client";
 
 export interface RouteRecordAppend {
   parentName: RouteRecordName;
@@ -52,6 +58,10 @@ export interface ExtensionPoint {
   "backup:list-item:operation:create"?: (
     backup: Ref<Backup>
   ) => OperationItem<Backup>[] | Promise<OperationItem<Backup>[]>;
+
+  "attachment:list-item:operation:create"?: (
+    attachment: Ref<Attachment>
+  ) => OperationItem<Attachment>[] | Promise<OperationItem<Attachment>[]>;
 
   "plugin:list-item:field:create"?: (
     plugin: Ref<Plugin>

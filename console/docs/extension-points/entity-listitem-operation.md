@@ -12,6 +12,7 @@
 - 插件：`"plugin:list-item:operation:create"?: (plugin: Ref<Plugin>) => | OperationItem<Plugin>[] | Promise<OperationItem<Plugin>[]>`
 - 备份：`"backup:list-item:operation:create"?: (backup: Ref<Backup>) => | OperationItem<Backup>[] | Promise<OperationItem<Backup>[]>`
 - 主题：`"theme:list-item:operation:create"?: (theme: Ref<Theme>) => | OperationItem<Theme>[] | Promise<OperationItem<Theme>[]>`
+- 附件：`"attachment:list-item:operation:create"?: (attachment: Ref<Attachment>) => | OperationItem<Attachment>[] | Promise<OperationItem<Attachment>[]>`
 
 示例：
 

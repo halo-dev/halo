@@ -15,9 +15,6 @@ import {
   VSpace,
   VEmpty,
   IconFolder,
-  VStatusDot,
-  VEntity,
-  VEntityField,
   VLoading,
   Toast,
   VDropdown,
@@ -30,8 +27,6 @@ import AttachmentPoliciesModal from "./components/AttachmentPoliciesModal.vue";
 import AttachmentGroupList from "./components/AttachmentGroupList.vue";
 import { computed, onMounted, ref, watch } from "vue";
 import type { Attachment, Group } from "@halo-dev/api-client";
-import { formatDatetime } from "@/utils/date";
-import prettyBytes from "pretty-bytes";
 import { useFetchAttachmentPolicy } from "./composables/use-attachment-policy";
 import { useAttachmentControl } from "./composables/use-attachment";
 import { apiClient } from "@/utils/api-client";
@@ -39,12 +34,13 @@ import cloneDeep from "lodash.clonedeep";
 import { isImage } from "@/utils/image";
 import { useRouteQuery } from "@vueuse/router";
 import { useFetchAttachmentGroup } from "./composables/use-attachment-group";
-import { usePermission } from "@/utils/permission";
 import { useI18n } from "vue-i18n";
 import { useLocalStorage } from "@vueuse/core";
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";
+import { provide } from "vue";
+import type { Ref } from "vue";
+import AttachmentListItem from "./components/AttachmentListItem.vue";
 
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 
 const policyVisible = ref(false);
@@ -101,7 +97,6 @@ const {
   handleFetchAttachments,
   handleSelectNext,
   handleSelectPrevious,
-  handleDelete,
   handleDeleteInBatch,
   handleCheckAll,
   handleSelect,
@@ -120,6 +115,8 @@ const {
   page: page,
   size: size,
 });
+
+provide<Ref<Set<Attachment>>>("selectedAttachments", selectedAttachments);
 
 const handleMove = async (group: Group) => {
   try {
@@ -175,11 +172,6 @@ const onDetailModalClose = () => {
 const onUploadModalClose = () => {
   routeQueryAction.value = undefined;
   handleFetchAttachments();
-};
-
-const getPolicyName = (name: string | undefined) => {
-  const policy = policies.value?.find((p) => p.metadata.name === name);
-  return policy?.spec.displayName;
 };
 
 // View type
@@ -468,8 +460,8 @@ onMounted(() => {
                 role="list"
               >
                 <VCard
-                  v-for="(attachment, index) in attachments"
-                  :key="index"
+                  v-for="attachment in attachments"
+                  :key="attachment.metadata.name"
                   :body-class="['!p-0']"
                   :class="{
                     'ring-1 ring-primary': isChecked(attachment),
@@ -552,118 +544,16 @@ onMounted(() => {
                 class="box-border h-full w-full divide-y divide-gray-100"
                 role="list"
               >
-                <li v-for="(attachment, index) in attachments" :key="index">
-                  <VEntity :is-selected="isChecked(attachment)">
-                    <template
-                      v-if="
-                        currentUserHasPermission(['system:attachments:manage'])
-                      "
-                      #checkbox
-                    >
-                      <input
-                        :checked="selectedAttachments.has(attachment)"
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                        type="checkbox"
-                        @click="handleSelect(attachment)"
-                      />
-                    </template>
-                    <template #start>
-                      <VEntityField>
-                        <template #description>
-                          <div
-                            class="h-10 w-10 rounded border bg-white p-1 hover:shadow-sm"
-                          >
-                            <AttachmentFileTypeIcon
-                              :display-ext="false"
-                              :file-name="attachment.spec.displayName"
-                              :width="8"
-                              :height="8"
-                            />
-                          </div>
-                        </template>
-                      </VEntityField>
-                      <VEntityField
-                        :title="attachment.spec.displayName"
-                        @click="handleClickItem(attachment)"
-                      >
-                        <template #description>
-                          <VSpace>
-                            <span class="text-xs text-gray-500">
-                              {{ attachment.spec.mediaType }}
-                            </span>
-                            <span class="text-xs text-gray-500">
-                              {{ prettyBytes(attachment.spec.size || 0) }}
-                            </span>
-                          </VSpace>
-                        </template>
-                      </VEntityField>
-                    </template>
-                    <template #end>
-                      <VEntityField
-                        :description="getPolicyName(attachment.spec.policyName)"
-                      />
-                      <VEntityField>
-                        <template #description>
-                          <RouterLink
-                            :to="{
-                              name: 'UserDetail',
-                              params: {
-                                name: attachment.spec.ownerName,
-                              },
-                            }"
-                            class="text-xs text-gray-500"
-                            :class="{
-                              'pointer-events-none': !currentUserHasPermission([
-                                'system:users:view',
-                              ]),
-                            }"
-                          >
-                            {{ attachment.spec.ownerName }}
-                          </RouterLink>
-                        </template>
-                      </VEntityField>
-                      <VEntityField
-                        v-if="attachment.metadata.deletionTimestamp"
-                      >
-                        <template #description>
-                          <VStatusDot
-                            v-tooltip="$t('core.common.status.deleting')"
-                            state="warning"
-                            animate
-                          />
-                        </template>
-                      </VEntityField>
-                      <VEntityField>
-                        <template #description>
-                          <span
-                            class="truncate text-xs tabular-nums text-gray-500"
-                          >
-                            {{
-                              formatDatetime(
-                                attachment.metadata.creationTimestamp
-                              )
-                            }}
-                          </span>
-                        </template>
-                      </VEntityField>
-                    </template>
-                    <template #dropdownItems>
-                      <VDropdownItem @click="handleClickItem(attachment)">
-                        {{ $t("core.common.buttons.detail") }}
-                      </VDropdownItem>
-                      <VDropdownItem
-                        v-if="
-                          currentUserHasPermission([
-                            'system:attachments:manage',
-                          ])
-                        "
-                        type="danger"
-                        @click="handleDelete(attachment)"
-                      >
-                        {{ $t("core.common.buttons.delete") }}
-                      </VDropdownItem>
-                    </template>
-                  </VEntity>
+                <li
+                  v-for="attachment in attachments"
+                  :key="attachment.metadata.name"
+                >
+                  <AttachmentListItem
+                    :attachment="attachment"
+                    :is-selected="isChecked(attachment)"
+                    @select="handleSelect"
+                    @open-detail="handleClickItem"
+                  />
                 </li>
               </ul>
             </Transition>
