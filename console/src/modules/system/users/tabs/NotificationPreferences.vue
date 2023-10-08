@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { apiClient } from "@/utils/api-client";
-import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import type { DetailedUser } from "@halo-dev/api-client";
 import { VLoading, VSwitch } from "@halo-dev/components";
 import type { Ref } from "vue";
@@ -30,51 +30,63 @@ const { data, isLoading } = useQuery({
   enabled: computed(() => !!user?.value),
 });
 
-async function handleChangeStateMatrix(
-  state: boolean,
-  reasonTypeIndex: number,
-  notifierIndex: number
-) {
-  const preferences = cloneDeep(data.value);
+const {
+  mutate,
+  isLoading: mutating,
+  variables,
+} = useMutation({
+  mutationKey: ["update-notification-preferences"],
+  mutationFn: async ({
+    state,
+    reasonTypeIndex,
+    notifierIndex,
+  }: {
+    state: boolean;
+    reasonTypeIndex: number;
+    notifierIndex: number;
+  }) => {
+    const preferences = cloneDeep(data.value);
 
-  if (!user?.value || !preferences) {
-    return;
-  }
+    if (!user?.value || !preferences) {
+      return;
+    }
 
-  if (!preferences.stateMatrix) {
-    preferences.stateMatrix = [];
-  }
+    if (!preferences.stateMatrix) {
+      preferences.stateMatrix = [];
+    }
 
-  preferences.stateMatrix[reasonTypeIndex][notifierIndex] = state;
+    preferences.stateMatrix[reasonTypeIndex][notifierIndex] = state;
 
-  const reasonTypeNotifiers = data.value?.reasonTypes
-    ?.map((reasonType, currentReasonTypeIndex) => {
-      return {
-        reasonType: reasonType.name,
-        notifiers: data.value?.notifiers
-          ?.map((notifier, currentNotifierIndex) => {
-            if (
-              preferences.stateMatrix?.[currentReasonTypeIndex][
-                currentNotifierIndex
-              ]
-            ) {
-              return notifier.name;
-            }
-          })
-          .filter(Boolean),
-      };
-    })
-    .filter(Boolean) as Array<ReasonTypeNotifierRequest>;
+    const reasonTypeNotifiers = data.value?.reasonTypes
+      ?.map((reasonType, currentReasonTypeIndex) => {
+        return {
+          reasonType: reasonType.name,
+          notifiers: data.value?.notifiers
+            ?.map((notifier, currentNotifierIndex) => {
+              if (
+                preferences.stateMatrix?.[currentReasonTypeIndex][
+                  currentNotifierIndex
+                ]
+              ) {
+                return notifier.name;
+              }
+            })
+            .filter(Boolean),
+        };
+      })
+      .filter(Boolean) as Array<ReasonTypeNotifierRequest>;
 
-  await apiClient.notification.saveUserNotificationPreferences({
-    username: user?.value?.user.metadata.name,
-    reasonTypeNotifierCollectionRequest: {
-      reasonTypeNotifiers,
-    },
-  });
-
-  queryClient.invalidateQueries({ queryKey: ["notification-preferences"] });
-}
+    return await apiClient.notification.saveUserNotificationPreferences({
+      username: user?.value?.user.metadata.name,
+      reasonTypeNotifierCollectionRequest: {
+        reasonTypeNotifiers,
+      },
+    });
+  },
+  onSuccess() {
+    queryClient.invalidateQueries({ queryKey: ["notification-preferences"] });
+  },
+});
 </script>
 
 <template>
@@ -113,12 +125,17 @@ async function handleChangeStateMatrix(
             >
               <VSwitch
                 :model-value="data?.stateMatrix?.[index][notifierIndex]"
+                :disabled="
+                  mutating &&
+                  variables?.reasonTypeIndex === index &&
+                  variables?.notifierIndex === notifierIndex
+                "
                 @change="
-                  handleChangeStateMatrix(
-                    !data?.stateMatrix?.[index][notifierIndex],
-                    index,
-                    notifierIndex
-                  )
+                  mutate({
+                    state: !data?.stateMatrix?.[index][notifierIndex],
+                    reasonTypeIndex: index,
+                    notifierIndex: notifierIndex,
+                  })
                 "
               />
             </td>
