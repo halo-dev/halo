@@ -130,7 +130,7 @@ const {
             >
               <VSwitch
                 :model-value="data?.stateMatrix?.[index][notifierIndex]"
-                :disabled="
+                :loading="
                   mutating &&
                   variables?.reasonTypeIndex === index &&
                   variables?.notifierIndex === notifierIndex
