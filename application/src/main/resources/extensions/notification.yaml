@@ -48,6 +48,7 @@ spec:
           name: port
           validation: required
         - $formkit: select
+          if: "$enable"
           label: "加密方式"
           name: encryption
           value: "SSL"
