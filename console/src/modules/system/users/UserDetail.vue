@@ -32,6 +32,7 @@ import { markRaw } from "vue";
 import DetailTab from "./tabs/Detail.vue";
 import PersonalAccessTokensTab from "./tabs/PersonalAccessTokens.vue";
 import { useRouteQuery } from "@vueuse/router";
+import NotificationPreferences from "./tabs/NotificationPreferences.vue";
 
 const { currentUserHasPermission } = usePermission();
 const userStore = useUserStore();
@@ -112,10 +113,17 @@ const tabs = computed((): UserTab[] => {
       priority: 10,
     },
     {
+      id: "notification-preferences",
+      label: t("core.user.detail.tabs.notification-preferences"),
+      component: markRaw(NotificationPreferences),
+      priority: 20,
+      hidden: !isCurrentUser.value,
+    },
+    {
       id: "pat",
       label: t("core.user.detail.tabs.pat"),
       component: markRaw(PersonalAccessTokensTab),
-      priority: 20,
+      priority: 30,
       hidden: !isCurrentUser.value,
     },
   ];

@@ -854,6 +854,7 @@ core:
       title: 用戶詳情
       tabs:
         detail: 詳情
+        notification-preferences: 通知配置
         pat: 個人令牌
       actions:
         update_profile:
@@ -929,6 +930,9 @@ core:
             help: 留空代表永不過期
           description:
             label: 描述
+    notification-preferences:
+      fields:
+        type: 通知類型
   role:
     title: 角色
     common:

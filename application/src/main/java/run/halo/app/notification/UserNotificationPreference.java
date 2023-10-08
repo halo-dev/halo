@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Set;
 import lombok.Data;
 import lombok.Getter;
+import org.springframework.lang.NonNull;
 
 /**
  * Notification preference of user.
@@ -28,6 +29,7 @@ public class UserNotificationPreference {
          * @return if key of reasonType not exists, return default notifier, otherwise return the
          * notifiers
          */
+        @NonNull
         public Set<String> getNotifiers(String reasonType) {
             var result = this.get(reasonType);
             return result == null ? Set.of(DEFAULT_NOTIFIER)

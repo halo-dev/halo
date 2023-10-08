@@ -854,6 +854,7 @@ core:
       title: User detail
       tabs:
         detail: Detail
+        notification-preferences: Notification Preferences
         pat: Personal Access Tokens
       actions:
         update_profile:
@@ -929,6 +930,9 @@ core:
             help: Leave empty for no expiration
           description:
             label: Description
+    notification-preferences:
+      fields:
+        type: Type
   role:
     title: Roles
     common:

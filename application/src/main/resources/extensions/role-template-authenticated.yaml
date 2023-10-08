@@ -129,3 +129,6 @@ rules:
   - apiGroups: [ "api.notification.halo.run" ]
     resources: [ "notifiers/receiver-config" ]
     verbs: [ "get", "update" ]
+  - apiGroups: [ "api.notification.halo.run" ]
+    resources: [ "notification-preferences" ]
+    verbs: [ "create", "list" ]

@@ -854,6 +854,7 @@ core:
       title: 用户详情
       tabs:
         detail: 详情
+        notification-preferences: 通知配置
         pat: 个人令牌
       actions:
         update_profile:
@@ -929,6 +930,9 @@ core:
             help: 不设置代表永不过期
           description:
             label: 描述
+    notification-preferences:
+      fields:
+        type: 通知类型
   role:
     title: 角色
     common:

@@ -43,6 +43,10 @@ import { MarkSpecifiedRequest } from "../models";
 import { Notification } from "../models";
 // @ts-ignore
 import { NotificationList } from "../models";
+// @ts-ignore
+import { ReasonTypeNotifierCollectionRequest } from "../models";
+// @ts-ignore
+import { ReasonTypeNotifierMatrix } from "../models";
 /**
  * ApiNotificationHaloRunV1alpha1NotificationApi - axios parameter creator
  * @export
@@ -50,6 +54,64 @@ import { NotificationList } from "../models";
 export const ApiNotificationHaloRunV1alpha1NotificationApiAxiosParamCreator =
   function (configuration?: Configuration) {
     return {
+      /**
+       * List notification preferences for the authenticated user.
+       * @param {string} username Username
+       * @param {*} [options] Override http request option.
+       * @throws {RequiredError}
+       */
+      listUserNotificationPreferences: async (
+        username: string,
+        options: AxiosRequestConfig = {}
+      ): Promise<RequestArgs> => {
+        // verify required parameter 'username' is not null or undefined
+        assertParamExists(
+          "listUserNotificationPreferences",
+          "username",
+          username
+        );
+        const localVarPath =
+          `/apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notification-preferences`.replace(
+            `{${"username"}}`,
+            encodeURIComponent(String(username))
+          );
+        // use dummy base URL string because the URL constructor only accepts absolute URLs.
+        const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+        let baseOptions;
+        if (configuration) {
+          baseOptions = configuration.baseOptions;
+        }
+
+        const localVarRequestOptions = {
+          method: "GET",
+          ...baseOptions,
+          ...options,
+        };
+        const localVarHeaderParameter = {} as any;
+        const localVarQueryParameter = {} as any;
+
+        // authentication BasicAuth required
+        // http basic authentication required
+        setBasicAuthToObject(localVarRequestOptions, configuration);
+
+        // authentication BearerAuth required
+        // http bearer authentication required
+        await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+        setSearchParams(localVarUrlObj, localVarQueryParameter);
+        let headersFromBaseOptions =
+          baseOptions && baseOptions.headers ? baseOptions.headers : {};
+        localVarRequestOptions.headers = {
+          ...localVarHeaderParameter,
+          ...headersFromBaseOptions,
+          ...options.headers,
+        };
+
+        return {
+          url: toPathString(localVarUrlObj),
+          options: localVarRequestOptions,
+        };
+      },
       /**
        * List notifications for the authenticated user.
        * @param {string} username Username
@@ -278,6 +340,73 @@ export const ApiNotificationHaloRunV1alpha1NotificationApiAxiosParamCreator =
           options: localVarRequestOptions,
         };
       },
+      /**
+       * Save notification preferences for the authenticated user.
+       * @param {string} username Username
+       * @param {ReasonTypeNotifierCollectionRequest} [reasonTypeNotifierCollectionRequest]
+       * @param {*} [options] Override http request option.
+       * @throws {RequiredError}
+       */
+      saveUserNotificationPreferences: async (
+        username: string,
+        reasonTypeNotifierCollectionRequest?: ReasonTypeNotifierCollectionRequest,
+        options: AxiosRequestConfig = {}
+      ): Promise<RequestArgs> => {
+        // verify required parameter 'username' is not null or undefined
+        assertParamExists(
+          "saveUserNotificationPreferences",
+          "username",
+          username
+        );
+        const localVarPath =
+          `/apis/api.notification.halo.run/v1alpha1/userspaces/{username}/notification-preferences`.replace(
+            `{${"username"}}`,
+            encodeURIComponent(String(username))
+          );
+        // use dummy base URL string because the URL constructor only accepts absolute URLs.
+        const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+        let baseOptions;
+        if (configuration) {
+          baseOptions = configuration.baseOptions;
+        }
+
+        const localVarRequestOptions = {
+          method: "POST",
+          ...baseOptions,
+          ...options,
+        };
+        const localVarHeaderParameter = {} as any;
+        const localVarQueryParameter = {} as any;
+
+        // authentication BasicAuth required
+        // http basic authentication required
+        setBasicAuthToObject(localVarRequestOptions, configuration);
+
+        // authentication BearerAuth required
+        // http bearer authentication required
+        await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+        localVarHeaderParameter["Content-Type"] = "application/json";
+
+        setSearchParams(localVarUrlObj, localVarQueryParameter);
+        let headersFromBaseOptions =
+          baseOptions && baseOptions.headers ? baseOptions.headers : {};
+        localVarRequestOptions.headers = {
+          ...localVarHeaderParameter,
+          ...headersFromBaseOptions,
+          ...options.headers,
+        };
+        localVarRequestOptions.data = serializeDataIfNeeded(
+          reasonTypeNotifierCollectionRequest,
+          localVarRequestOptions,
+          configuration
+        );
+
+        return {
+          url: toPathString(localVarUrlObj),
+          options: localVarRequestOptions,
+        };
+      },
     };
   };
 
@@ -293,6 +422,33 @@ export const ApiNotificationHaloRunV1alpha1NotificationApiFp = function (
       configuration
     );
   return {
+    /**
+     * List notification preferences for the authenticated user.
+     * @param {string} username Username
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async listUserNotificationPreferences(
+      username: string,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string
+      ) => AxiosPromise<ReasonTypeNotifierMatrix>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.listUserNotificationPreferences(
+          username,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
     /**
      * List notifications for the authenticated user.
      * @param {string} username Username
@@ -398,6 +554,36 @@ export const ApiNotificationHaloRunV1alpha1NotificationApiFp = function (
         configuration
       );
     },
+    /**
+     * Save notification preferences for the authenticated user.
+     * @param {string} username Username
+     * @param {ReasonTypeNotifierCollectionRequest} [reasonTypeNotifierCollectionRequest]
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async saveUserNotificationPreferences(
+      username: string,
+      reasonTypeNotifierCollectionRequest?: ReasonTypeNotifierCollectionRequest,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (
+        axios?: AxiosInstance,
+        basePath?: string
+      ) => AxiosPromise<ReasonTypeNotifierMatrix>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.saveUserNotificationPreferences(
+          username,
+          reasonTypeNotifierCollectionRequest,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
   };
 };
 
@@ -413,6 +599,20 @@ export const ApiNotificationHaloRunV1alpha1NotificationApiFactory = function (
   const localVarFp =
     ApiNotificationHaloRunV1alpha1NotificationApiFp(configuration);
   return {
+    /**
+     * List notification preferences for the authenticated user.
+     * @param {ApiNotificationHaloRunV1alpha1NotificationApiListUserNotificationPreferencesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    listUserNotificationPreferences(
+      requestParameters: ApiNotificationHaloRunV1alpha1NotificationApiListUserNotificationPreferencesRequest,
+      options?: AxiosRequestConfig
+    ): AxiosPromise<ReasonTypeNotifierMatrix> {
+      return localVarFp
+        .listUserNotificationPreferences(requestParameters.username, options)
+        .then((request) => request(axios, basePath));
+    },
     /**
      * List notifications for the authenticated user.
      * @param {ApiNotificationHaloRunV1alpha1NotificationApiListUserNotificationsRequest} requestParameters Request parameters.
@@ -474,8 +674,40 @@ export const ApiNotificationHaloRunV1alpha1NotificationApiFactory = function (
         )
         .then((request) => request(axios, basePath));
     },
+    /**
+     * Save notification preferences for the authenticated user.
+     * @param {ApiNotificationHaloRunV1alpha1NotificationApiSaveUserNotificationPreferencesRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    saveUserNotificationPreferences(
+      requestParameters: ApiNotificationHaloRunV1alpha1NotificationApiSaveUserNotificationPreferencesRequest,
+      options?: AxiosRequestConfig
+    ): AxiosPromise<ReasonTypeNotifierMatrix> {
+      return localVarFp
+        .saveUserNotificationPreferences(
+          requestParameters.username,
+          requestParameters.reasonTypeNotifierCollectionRequest,
+          options
+        )
+        .then((request) => request(axios, basePath));
+    },
   };
 };
+
+/**
+ * Request parameters for listUserNotificationPreferences operation in ApiNotificationHaloRunV1alpha1NotificationApi.
+ * @export
+ * @interface ApiNotificationHaloRunV1alpha1NotificationApiListUserNotificationPreferencesRequest
+ */
+export interface ApiNotificationHaloRunV1alpha1NotificationApiListUserNotificationPreferencesRequest {
+  /**
+   * Username
+   * @type {string}
+   * @memberof ApiNotificationHaloRunV1alpha1NotificationApiListUserNotificationPreferences
+   */
+  readonly username: string;
+}
 
 /**
  * Request parameters for listUserNotifications operation in ApiNotificationHaloRunV1alpha1NotificationApi.
@@ -590,12 +822,49 @@ export interface ApiNotificationHaloRunV1alpha1NotificationApiMarkNotificationsA
 }
 
 /**
+ * Request parameters for saveUserNotificationPreferences operation in ApiNotificationHaloRunV1alpha1NotificationApi.
+ * @export
+ * @interface ApiNotificationHaloRunV1alpha1NotificationApiSaveUserNotificationPreferencesRequest
+ */
+export interface ApiNotificationHaloRunV1alpha1NotificationApiSaveUserNotificationPreferencesRequest {
+  /**
+   * Username
+   * @type {string}
+   * @memberof ApiNotificationHaloRunV1alpha1NotificationApiSaveUserNotificationPreferences
+   */
+  readonly username: string;
+
+  /**
+   *
+   * @type {ReasonTypeNotifierCollectionRequest}
+   * @memberof ApiNotificationHaloRunV1alpha1NotificationApiSaveUserNotificationPreferences
+   */
+  readonly reasonTypeNotifierCollectionRequest?: ReasonTypeNotifierCollectionRequest;
+}
+
+/**
  * ApiNotificationHaloRunV1alpha1NotificationApi - object-oriented interface
  * @export
  * @class ApiNotificationHaloRunV1alpha1NotificationApi
  * @extends {BaseAPI}
  */
 export class ApiNotificationHaloRunV1alpha1NotificationApi extends BaseAPI {
+  /**
+   * List notification preferences for the authenticated user.
+   * @param {ApiNotificationHaloRunV1alpha1NotificationApiListUserNotificationPreferencesRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiNotificationHaloRunV1alpha1NotificationApi
+   */
+  public listUserNotificationPreferences(
+    requestParameters: ApiNotificationHaloRunV1alpha1NotificationApiListUserNotificationPreferencesRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return ApiNotificationHaloRunV1alpha1NotificationApiFp(this.configuration)
+      .listUserNotificationPreferences(requestParameters.username, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
   /**
    * List notifications for the authenticated user.
    * @param {ApiNotificationHaloRunV1alpha1NotificationApiListUserNotificationsRequest} requestParameters Request parameters.
@@ -658,6 +927,26 @@ export class ApiNotificationHaloRunV1alpha1NotificationApi extends BaseAPI {
       .markNotificationsAsRead(
         requestParameters.username,
         requestParameters.markSpecifiedRequest,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   * Save notification preferences for the authenticated user.
+   * @param {ApiNotificationHaloRunV1alpha1NotificationApiSaveUserNotificationPreferencesRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiNotificationHaloRunV1alpha1NotificationApi
+   */
+  public saveUserNotificationPreferences(
+    requestParameters: ApiNotificationHaloRunV1alpha1NotificationApiSaveUserNotificationPreferencesRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return ApiNotificationHaloRunV1alpha1NotificationApiFp(this.configuration)
+      .saveUserNotificationPreferences(
+        requestParameters.username,
+        requestParameters.reasonTypeNotifierCollectionRequest,
         options
       )
       .then((request) => request(this.axios, this.basePath));

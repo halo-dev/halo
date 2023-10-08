@@ -11,4 +11,7 @@ import reactor.core.publisher.Mono;
 public interface UserNotificationPreferenceService {
 
     Mono<UserNotificationPreference> getByUser(String username);
+
+    Mono<Void> saveByUser(String username,
+        UserNotificationPreference userNotificationPreference);
 }
