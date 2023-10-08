@@ -1,6 +1,8 @@
 package run.halo.app.content.comment;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import run.halo.app.content.NotificationReasonConst;
 import run.halo.app.core.extension.content.Comment;
@@ -56,13 +58,21 @@ public class ReplyNotificationSubscriptionHelper {
     void subscribeReply(Subscription.ReasonSubject reasonSubject,
         Identity identity) {
         var subscriber = createSubscriber(identity);
+        if (subscriber == null) {
+            return;
+        }
         var interestReason = new Subscription.InterestReason();
         interestReason.setReasonType(NotificationReasonConst.SOMEONE_REPLIED_TO_YOU);
         interestReason.setSubject(reasonSubject);
         notificationCenter.subscribe(subscriber, interestReason).block();
     }
 
+    @Nullable
     private Subscription.Subscriber createSubscriber(Identity author) {
+        if (StringUtils.isBlank(author.name())) {
+            return null;
+        }
+
         Subscription.Subscriber subscriber;
         if (author.isEmail()) {
             subscriber = subscriberEmailResolver.ofEmail(author.name());
