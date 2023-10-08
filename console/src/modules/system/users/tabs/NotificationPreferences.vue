@@ -1,14 +1,19 @@
 <script lang="ts" setup>
 import { apiClient } from "@/utils/api-client";
-import { useQuery } from "@tanstack/vue-query";
-import type { DetailedUser } from "packages/api-client/dist";
+import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import type { DetailedUser } from "@halo-dev/api-client";
+import { VLoading, VSwitch } from "@halo-dev/components";
 import type { Ref } from "vue";
 import { computed } from "vue";
 import { inject } from "vue";
+import cloneDeep from "lodash.clonedeep";
+import type { ReasonTypeNotifierRequest } from "@halo-dev/api-client";
+
+const queryClient = useQueryClient();
 
 const user = inject<Ref<DetailedUser | undefined>>("user");
 
-const { data } = useQuery({
+const { data, isLoading } = useQuery({
   queryKey: ["notification-preferences"],
   queryFn: async () => {
     if (!user?.value) {
@@ -24,8 +29,102 @@ const { data } = useQuery({
   },
   enabled: computed(() => !!user?.value),
 });
+
+async function handleChangeStateMatrix(
+  state: boolean,
+  reasonTypeIndex: number,
+  notifierIndex: number
+) {
+  const preferences = cloneDeep(data.value);
+
+  if (!user?.value || !preferences) {
+    return;
+  }
+
+  if (!preferences.stateMatrix) {
+    preferences.stateMatrix = [];
+  }
+
+  preferences.stateMatrix[reasonTypeIndex][notifierIndex] = state;
+
+  const reasonTypeNotifiers = data.value?.reasonTypes
+    ?.map((reasonType, currentReasonTypeIndex) => {
+      return {
+        reasonType: reasonType.name,
+        notifiers: data.value?.notifiers
+          ?.map((notifier, currentNotifierIndex) => {
+            if (
+              preferences.stateMatrix?.[currentReasonTypeIndex][
+                currentNotifierIndex
+              ]
+            ) {
+              return notifier.name;
+            }
+          })
+          .filter(Boolean),
+      };
+    })
+    .filter(Boolean) as Array<ReasonTypeNotifierRequest>;
+
+  await apiClient.notification.saveUserNotificationPreferences({
+    username: user?.value?.user.metadata.name,
+    reasonTypeNotifierCollectionRequest: {
+      reasonTypeNotifiers,
+    },
+  });
+
+  queryClient.invalidateQueries({ queryKey: ["notification-preferences"] });
+}
 </script>
 
 <template>
-  <div>{{ data }}</div>
+  <VLoading v-if="isLoading" />
+
+  <Transition v-else appear name="fade">
+    <div class="box-border h-full w-full overflow-auto rounded-base border">
+      <table class="min-w-full divide-y divide-gray-100">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="sm:w-96" scope="col"></th>
+            <th
+              v-for="notifier in data?.notifiers"
+              :key="notifier.name"
+              scope="col"
+              class="px-4 py-3 text-left text-sm font-semibold text-gray-900"
+            >
+              {{ notifier.displayName }}
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100 bg-white">
+          <tr
+            v-for="(reasonType, index) in data?.reasonTypes"
+            :key="reasonType.name"
+          >
+            <td
+              class="whitespace-nowrap px-4 py-3 text-sm font-medium text-gray-900"
+            >
+              {{ reasonType.displayName }}
+            </td>
+            <td
+              v-for="(notifier, notifierIndex) in data?.notifiers"
+              :key="notifier.name"
+              class="whitespace-nowrap px-4 py-3 text-sm text-gray-500"
+            >
+              <VSwitch
+                :model-value="data?.stateMatrix?.[index][notifierIndex]"
+                @change="
+                  handleChangeStateMatrix(
+                    !data?.stateMatrix?.[index][notifierIndex],
+                    index,
+                    notifierIndex
+                  )
+                "
+              />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </Transition>
 </template>
