@@ -19,6 +19,10 @@ spec:
     - group: sender
       label: 发件设置
       formSchema:
+        - $formkit: checkbox
+          label: "启用邮件通知器"
+          value: false
+          name: enable
         - $formkit: text
           label: "用户名"
           name: username

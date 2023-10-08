@@ -43,6 +43,11 @@ public class EmailNotifier implements ReactiveNotifier {
         var emailSenderConfig =
             JsonUtils.DEFAULT_JSON_MAPPER.convertValue(senderConfig, EmailSenderConfig.class);
 
+        if (!emailSenderConfig.isEnable()) {
+            log.debug("Email notifier is disabled, skip sending email.");
+            return Mono.empty();
+        }
+
         JavaMailSenderImpl javaMailSender = getJavaMailSender(emailSenderConfig);
 
         String recipient = context.getMessage().getRecipient();
@@ -51,6 +56,11 @@ public class EmailNotifier implements ReactiveNotifier {
         var payload = context.getMessage().getPayload();
         return subscriberEmailResolver.resolve(subscriber)
             .flatMap(toEmail -> {
+                if (StringUtils.isBlank(toEmail)) {
+                    log.debug("Cannot resolve email for subscriber: [{}], skip sending email.",
+                        subscriber);
+                    return Mono.empty();
+                }
                 var htmlMono = appendHtmlBodyFooter(payload.getAttributes())
                     .doOnNext(footer -> {
                         if (StringUtils.isNotBlank(payload.getHtmlBody())) {
@@ -138,6 +148,7 @@ public class EmailNotifier implements ReactiveNotifier {
 
     @Data
     static class EmailSenderConfig {
+        private boolean enable;
         private String displayName;
         private String username;
         private String password;
