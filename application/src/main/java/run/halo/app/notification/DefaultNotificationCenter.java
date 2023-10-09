@@ -5,7 +5,6 @@ import static org.apache.commons.lang3.StringUtils.defaultString;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -135,6 +134,7 @@ public class DefaultNotificationCenter implements NotificationCenter {
                 .subscription(subscription)
                 .reasonType(notificationContent.reasonType())
                 .notificationTitle(notificationContent.title())
+                .reasonAttributes(notificationContent.reasonAttributes())
                 .notificationRawBody(defaultString(notificationContent.rawBody()))
                 .notificationHtmlBody(defaultString(notificationContent.htmlBody()))
                 .build()
@@ -180,12 +180,13 @@ public class DefaultNotificationCenter implements NotificationCenter {
             });
     }
 
-    @Builder
-    record NotificationElement(ReasonType reasonType, Reason reason,
-                               Subscription subscription, NotifierDescriptor descriptor,
-                               String notificationTitle,
-                               String notificationRawBody,
-                               String notificationHtmlBody) {
+    private ReasonAttributes toReasonAttributes(Reason reason) {
+        var model = new ReasonAttributes();
+        var attributes = reason.getSpec().getAttributes();
+        if (attributes != null) {
+            model.putAll(attributes);
+        }
+        return model;
     }
 
     Mono<NotificationContext> notificationContextFrom(NotificationElement element) {
@@ -198,7 +199,7 @@ public class DefaultNotificationCenter implements NotificationCenter {
         messagePayload.setTitle(element.notificationTitle());
         messagePayload.setRawBody(element.notificationRawBody());
         messagePayload.setHtmlBody(element.notificationHtmlBody());
-        messagePayload.setAttributes(reason.getSpec().getAttributes());
+        messagePayload.setAttributes(element.reasonAttributes());
 
         var message = new NotificationContext.Message();
         message.setRecipient(subscription.getSpec().getSubscriber().getName());
@@ -239,11 +240,6 @@ public class DefaultNotificationCenter implements NotificationCenter {
             });
     }
 
-    @Builder
-    record NotificationContent(String title, String rawBody, String htmlBody, ReasonType reasonType,
-                               Map<String, Object> reasonProperties) {
-    }
-
     Mono<NotificationContent> inferenceTemplate(Reason reason, Subscription subscription,
         Locale locale) {
         var reasonTypeName = reason.getSpec().getReasonType();
@@ -252,7 +248,7 @@ public class DefaultNotificationCenter implements NotificationCenter {
             .flatMap(reasonType -> notificationTemplateSelector.select(reasonTypeName, locale)
                 .flatMap(template -> {
                     final var templateContent = template.getSpec().getTemplate();
-                    Map<String, Object> model = toReasonAttributes(reason);
+                    var model = toReasonAttributes(reason);
                     var identity = UserIdentity.of(subscriber.getName());
                     var subscriberInfo = new HashMap<>();
                     if (identity.isAnonymous()) {
@@ -266,7 +262,7 @@ public class DefaultNotificationCenter implements NotificationCenter {
 
                     var builder = NotificationContent.builder()
                         .reasonType(reasonType)
-                        .reasonProperties(model);
+                        .reasonAttributes(model);
 
                     var titleMono = notificationTemplateRender
                         .render(templateContent.getTitle(), model)
@@ -285,17 +281,22 @@ public class DefaultNotificationCenter implements NotificationCenter {
             );
     }
 
+    @Builder
+    record NotificationContent(String title, String rawBody, String htmlBody, ReasonType reasonType,
+                               ReasonAttributes reasonAttributes) {
+    }
+
     String getUnsubscribeUrl(Subscription subscription) {
         return subscriptionRouter.getUnsubscribeUrl(subscription);
     }
 
-    private Map<String, Object> toReasonAttributes(Reason reason) {
-        Map<String, Object> model = new HashMap<>();
-        var attributes = reason.getSpec().getAttributes();
-        if (attributes != null) {
-            model.putAll(attributes);
-        }
-        return model;
+    @Builder
+    record NotificationElement(ReasonType reasonType, Reason reason,
+                               Subscription subscription, NotifierDescriptor descriptor,
+                               String notificationTitle,
+                               String notificationRawBody,
+                               String notificationHtmlBody,
+                               ReasonAttributes reasonAttributes) {
     }
 
     Mono<ReasonType> getReasonType(String reasonTypeName) {

@@ -3,6 +3,7 @@ package run.halo.app.notification.endpoint;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.Metadata;
-import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.ExternalUrlSupplier;
 
 /**
@@ -24,17 +24,14 @@ import run.halo.app.infra.ExternalUrlSupplier;
 class SubscriptionRouterTest {
 
     @Mock
-    private ReactiveExtensionClient client;
-
-    @Mock
     private ExternalUrlSupplier externalUrlSupplier;
 
     @InjectMocks
     SubscriptionRouter subscriptionRouter;
 
     @Test
-    void getUnsubscribeUrlTest() {
-        when(externalUrlSupplier.get()).thenReturn(URI.create("https://halo.run"));
+    void getUnsubscribeUrlTest() throws MalformedURLException {
+        when(externalUrlSupplier.getRaw()).thenReturn(URI.create("https://halo.run").toURL());
         var subscription = new Subscription();
         subscription.setMetadata(new Metadata());
         subscription.getMetadata().setName("fake-subscription");
@@ -46,5 +43,4 @@ class SubscriptionRouterTest {
             + "/subscriptions/fake-subscription/unsubscribe"
             + "?token=fake-unsubscribe-token");
     }
-
 }
