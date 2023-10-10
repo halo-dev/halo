@@ -11,11 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -86,10 +86,9 @@ public class UserScopedPatHandlerImpl implements UserScopedPatHandler {
     }
 
     private static Mono<Authentication> mustBeRealUser(Mono<Authentication> authentication) {
-        return authentication.filter(auth -> auth.getPrincipal() instanceof UserDetails)
+        return authentication.filter(UsernamePasswordAuthenticationToken.class::isInstance)
             // Non-username-password authentication could not access the API at any time.
-            .switchIfEmpty(
-                Mono.defer(() -> Mono.error(new AccessDeniedException())));
+            .switchIfEmpty(Mono.error(AccessDeniedException::new));
     }
 
     @Override
