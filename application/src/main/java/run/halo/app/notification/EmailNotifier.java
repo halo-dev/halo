@@ -145,12 +145,11 @@ public class EmailNotifier implements ReactiveNotifier {
 
     Mono<String> appendHtmlBodyFooter(ReasonAttributes attributes) {
         return notificationTemplateRender.render("""
-            ---
-            <div class="footer" style="font-size: 12px; color: #666">
+            <div class="footer" style="font-size: 12px; color: #666;">
             <a th:href="${site.url}" th:text="${site.title}"></a>
             <p class="unsubscribe">
             &mdash;<br />请勿直接回复此回邮件，
-            <a th:href="|${site.url}/console|">查看通知</a>
+            <a th:href="|${site.url}/console/users/-/notifications|">查看通知</a>
             或
             <a th:href="${unsubscribeUrl}">取消订阅</a>。
             </p>

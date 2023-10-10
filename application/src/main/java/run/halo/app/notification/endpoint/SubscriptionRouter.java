@@ -1,9 +1,11 @@
 package run.halo.app.notification.endpoint;
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static org.springdoc.core.fn.builders.parameter.Builder.parameterBuilder;
 
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
@@ -82,7 +84,8 @@ public class SubscriptionRouter {
     public String getUnsubscribeUrl(Subscription subscription) {
         var name = subscription.getMetadata().getName();
         var token = subscription.getSpec().getUnsubscribeToken();
-        return UriComponentsBuilder.fromUri(externalUrlSupplier.get())
+        var externalUrl = defaultIfNull(externalUrlSupplier.getRaw(), URI.create("/"));
+        return UriComponentsBuilder.fromUriString(externalUrl.toString())
             .path(UNSUBSCRIBE_PATTERN)
             .queryParam("token", token)
             .build(name)
