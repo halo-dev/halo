@@ -78,7 +78,7 @@ tasks.register('downloadPluginPresets', Download) {
             'https://github.com/halo-dev/plugin-search-widget/releases/download/v1.2.0/plugin-search-widget-1.2.0.jar',
             'https://github.com/halo-dev/plugin-sitemap/releases/download/v1.1.1/plugin-sitemap-1.1.1.jar',
             'https://github.com/halo-dev/plugin-feed/releases/download/v1.2.0/plugin-feed-1.2.0.jar',
-            'https://github.com/halo-dev/plugin-app-store/releases/download/v1.0.0-beta.1/plugin-app-store-1.0.0-beta.1.jar'
+            'https://github.com/halo-dev/plugin-app-store/releases/download/v1.0.0-beta.2/plugin-app-store-1.0.0-beta.2.jar'
     ])
     dest 'src/main/resources/presets/plugins'
 }
