@@ -89,7 +89,10 @@ const theme: Record<string, Record<string, string>> = {
     items: "flex flex-col w-full gap-2 rounded-base",
     item: "border rounded-base grid grid-cols-12 focus-within:border-primary transition-all overflow-visible focus-within:shadow-sm",
     content: "flex-1 p-2 col-span-11 divide-y divide-gray-100",
-    controls: "bg-gray-200 col-span-1 flex items-center justify-center",
+    controls:
+      "flex flex-col items-center justify-center gap-1.5 py-2 bg-gray-200 col-span-1 flex items-center justify-center",
+    control:
+      "cursor-pointer text-gray-500 transition-all hover:text-primary disabled:!cursor-not-allowed disabled:opacity-50 disabled:hover:!text-gray-500",
   },
   group: {
     label: textClassification.label,

@@ -4,6 +4,7 @@ import { zh, en } from "@formkit/i18n";
 import type { DefaultConfigOptions } from "@formkit/vue";
 import { form } from "./inputs/form";
 import { group } from "./inputs/group";
+import { group as nativeGroup } from "@formkit/inputs";
 import { attachment } from "./inputs/attachment";
 import { code } from "./inputs/code";
 import { repeater } from "./inputs/repeater";
@@ -42,6 +43,7 @@ const config: DefaultConfigOptions = {
     form,
     password,
     group,
+    nativeGroup,
     attachment,
     code,
     repeater,
