@@ -43,6 +43,15 @@ import {
 import AddButton from "./AddButton.vue";
 import { i18n } from "@/locales";
 
+declare module "@formkit/inputs" {
+  interface FormKitInputProps<Props extends FormKitInputs<Props>> {
+    repeater: {
+      type: "repeater";
+      value?: Record<string, unknown>[];
+    };
+  }
+}
+
 /**
  * Input definition for a repeater input.
  * @public
