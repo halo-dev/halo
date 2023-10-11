@@ -3,7 +3,7 @@ import { undefine } from "@formkit/utils";
 
 export const repeats = function (node: FormKitNode) {
   node._c.sync = true;
-  node.on("created", fe.bind(null, node));
+  node.on("created", repeaterFeature.bind(null, node));
 };
 
 type FnType = (index: number) => object;
@@ -12,7 +12,7 @@ function createValue(num: number, fn: FnType) {
   return new Array(num).fill("").map((value, index) => fn(index));
 }
 
-function fe(node: FormKitNode) {
+function repeaterFeature(node: FormKitNode) {
   node.props.removeControl = node.props.removeControl ?? true;
   node.props.upControl = node.props.upControl ?? true;
   node.props.downControl = node.props.downControl ?? true;

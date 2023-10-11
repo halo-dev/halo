@@ -17,11 +17,7 @@ export function createRepeaterSection() {
     el: string | null | (() => FormKitSchemaNode),
     fragment = false
   ) => {
-    return createSection(
-      section,
-      el,
-      fragment
-    ) as FormKitSection<FormKitSchemaExtendableSection>;
+    return createSection(section, el, fragment);
   };
 }
 
@@ -69,9 +65,9 @@ function createSection(
         then: `$slots.${section}`,
         else:
           section in extensions
-            ? extendSchema(node, extensions[section])
+            ? extendSchema(node as FormKitSchemaNode, extensions[section])
             : node,
-      };
+      } as FormKitSchemaCondition;
     };
     extendable._s = section;
     return fragment ? createRoot(extendable) : extendable;
