@@ -17,7 +17,11 @@ export function createRepeaterSection() {
     el: string | null | (() => FormKitSchemaNode),
     fragment = false
   ) => {
-    return createSection(section, el, fragment);
+    return createSection(
+      section,
+      el,
+      fragment
+    ) as FormKitSection<FormKitSchemaExtendableSection>;
   };
 }
 
