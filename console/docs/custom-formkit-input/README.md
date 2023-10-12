@@ -19,6 +19,12 @@
   - 参数
     1. min: 最小数量，默认为 `0`
     2. max: 最大数量，默认为 `Infinity`，即无限制。
+    3. addLabel: 添加按钮的文本，默认为 `添加`
+    4. addButton: 是否显示添加按钮，默认为 `true`
+    5. upControl: 是否显示上移按钮，默认为 `true`
+    6. downControl: 是否显示下移按钮，默认为 `true`
+    7. insertControl: 是否显示插入按钮，默认为 `true`
+    8. removeControl: 是否显示删除按钮，默认为 `true`
 - `menuCheckbox`：选择一组菜单
 - `menuRadio`：选择一个菜单
 - `menuItemSelect`：选择菜单项
@@ -37,7 +43,7 @@
 
 ```vue
 <script lang="ts" setup>
-const postName = ref("")
+const postName = ref("");
 </script>
 
 <template>
@@ -67,12 +73,15 @@ Repeater 是一个集合类型的输入组件，可以让使用者可视化的�
 
 ```vue
 <script lang="ts" setup>
-const users = ref([])
+const users = ref([]);
 </script>
 
 <template>
   <FormKit
     v-model="users"
+    :min="1"
+    :max="3"
+    addLabel="Add User"
     type="repeater"
     label="Users"
   >
@@ -98,6 +107,9 @@ const users = ref([])
 - $formkit: repeater
   name: users
   label: Users
+  addLabel: Add User
+  min: 1
+  max: 3
   items:
     - $formkit: text
       name: full_name
