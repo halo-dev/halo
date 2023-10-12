@@ -216,7 +216,7 @@ curl -u admin:admin -X 'POST' \
 
 | 属性路径                                                | 描述                                           |
 |-----------------------------------------------------|----------------------------------------------|
-| metadata.annotations.security.halo.run/access-token | 生成好的 PAT。需要注意的是，这个 PAT 不会保存在数据库中，所以仅有一次保存机会。 |
+| security.halo.run/access-token | 生成好的 PAT。需要注意的是，这个 PAT 不会保存在数据库中，所以仅有一次保存机会。 |
 
 #### 使用 PAT
 
