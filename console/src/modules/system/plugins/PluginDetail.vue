@@ -51,7 +51,10 @@ const { data: plugin } = useQuery({
     return data;
   },
   onSuccess(data) {
-    if (!data.spec.settingName) {
+    if (
+      !data.spec.settingName ||
+      !currentUserHasPermission(["system:plugins:manage"])
+    ) {
       tabs.value = [...initialTabs.value, ...getTabsFromExtensions()];
     }
   },
