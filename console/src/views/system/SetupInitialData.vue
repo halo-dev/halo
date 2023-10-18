@@ -2,12 +2,13 @@
 import { apiClient } from "@/utils/api-client";
 import { VLoading } from "@halo-dev/components";
 import { useMutation } from "@tanstack/vue-query";
-import type {
-  Category,
-  Plugin,
-  PostRequest,
-  SinglePageRequest,
-  Tag,
+import {
+  PluginMotionStatusRequestActionEnum,
+  type Category,
+  type Plugin,
+  type PostRequest,
+  type SinglePageRequest,
+  type Tag,
 } from "@halo-dev/api-client";
 import { onMounted } from "vue";
 import category from "./setup-data/category.json";
@@ -48,22 +49,13 @@ const { mutate: pluginInstallMutate } = useMutation({
 const { mutate: pluginStartMutate } = useMutation({
   mutationKey: ["plugin-start"],
   mutationFn: async (plugin: Plugin) => {
-    const { data: pluginToUpdate } =
-      await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin({
-        name: plugin.metadata.name,
-      });
-
-    pluginToUpdate.spec.enabled = true;
-
-    return apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin(
-      {
-        name: plugin.metadata.name,
-        plugin: pluginToUpdate,
+    return await apiClient.plugin.changePluginMotionStatus({
+      name: plugin.metadata.name,
+      pluginMotionStatusRequest: {
+        action: PluginMotionStatusRequestActionEnum.Start,
+        async: true,
       },
-      {
-        mute: true,
-      }
-    );
+    });
   },
   retry: 3,
   retryDelay: 1000,

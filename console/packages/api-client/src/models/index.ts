@@ -111,6 +111,7 @@ export * from "./personal-access-token-list";
 export * from "./plugin";
 export * from "./plugin-author";
 export * from "./plugin-list";
+export * from "./plugin-motion-status-request";
 export * from "./plugin-spec";
 export * from "./plugin-status";
 export * from "./policy";

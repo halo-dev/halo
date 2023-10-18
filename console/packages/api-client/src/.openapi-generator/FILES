@@ -187,6 +187,7 @@ models/personal-access-token-list.ts
 models/personal-access-token.ts
 models/plugin-author.ts
 models/plugin-list.ts
+models/plugin-motion-status-request.ts
 models/plugin-spec.ts
 models/plugin-status.ts
 models/plugin.ts
