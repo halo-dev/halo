@@ -40,7 +40,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.pf4j.PluginState;
 import org.reactivestreams.Publisher;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.beans.factory.DisposableBean;
@@ -201,6 +203,27 @@ public class PluginEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(Plugin.class))
             )
+            .PUT("plugins/{name}/motion-status", this::changeMotionStatus,
+                builder -> builder.operationId("ChangePluginMotionStatus")
+                    .description("Change the motion status of a plugin by name.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .name("name")
+                        .in(ParameterIn.PATH)
+                        .required(true)
+                        .implementation(String.class)
+                    )
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .content(contentBuilder()
+                            .mediaType(MediaType.APPLICATION_JSON_VALUE)
+                            .schema(schemaBuilder()
+                                .implementation(MotionStatusRequest.class))
+                        )
+                    )
+                    .response(responseBuilder()
+                        .implementation(Plugin.class))
+            )
             .GET("plugins", this::list, builder -> {
                 builder.operationId("ListPlugins")
                     .tag(tag)
@@ -253,6 +276,64 @@ public class PluginEndpoint implements CustomEndpoint {
                     .response(responseBuilder().implementation(String.class))
             )
             .build();
+    }
+
+    Mono<ServerResponse> changeMotionStatus(ServerRequest request) {
+        final var name = request.pathVariable("name");
+        return request.bodyToMono(MotionStatusRequest.class)
+            .flatMap(motionStatus -> {
+                var enabled = switch (motionStatus.getAction()) {
+                    case START -> true;
+                    case STOP -> false;
+                };
+                return client.get(Plugin.class, name)
+                    .flatMap(plugin -> {
+                        plugin.getSpec().setEnabled(enabled);
+                        return client.update(plugin);
+                    })
+                    .flatMap(plugin -> {
+                        if (motionStatus.isAsync()) {
+                            return Mono.just(plugin);
+                        }
+                        return waitForPluginToMeetExpectedState(name, p -> {
+                            // when enabled = true,excepted phase = started || failed
+                            // when enabled = false,excepted phase = !started
+                            var phase = p.statusNonNull().getPhase();
+                            if (enabled) {
+                                return PluginState.STARTED.equals(phase)
+                                    || PluginState.FAILED.equals(phase);
+                            }
+                            return !PluginState.STARTED.equals(phase);
+                        });
+                    });
+            })
+            .flatMap(plugin -> ServerResponse.ok().bodyValue(plugin));
+    }
+
+    Mono<Plugin> waitForPluginToMeetExpectedState(String name, Predicate<Plugin> predicate) {
+        return Mono.defer(() -> client.get(Plugin.class, name)
+                .map(plugin -> {
+                    if (predicate.test(plugin)) {
+                        return plugin;
+                    }
+                    throw new IllegalStateException("Plugin " + name + " is not in expected state");
+                })
+            )
+            .retryWhen(Retry.backoff(10, Duration.ofMillis(100))
+                .filter(IllegalStateException.class::isInstance)
+            );
+    }
+
+    @Data
+    @Schema(name = "PluginMotionStatusRequest")
+    static class MotionStatusRequest {
+        private ExpectedAction action;
+        private boolean async;
+
+        enum ExpectedAction {
+            START,
+            STOP
+        }
     }
 
     private Mono<ServerResponse> fetchJsBundle(ServerRequest request) {
