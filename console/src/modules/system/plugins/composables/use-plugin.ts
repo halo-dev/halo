@@ -54,7 +54,6 @@ export function usePluginLifeCycle(
           action: enabled
             ? PluginMotionStatusRequestActionEnum.Stop
             : PluginMotionStatusRequestActionEnum.Start,
-          async: true,
         },
       });
     },
@@ -232,7 +231,6 @@ export function usePluginBatchOperations(names: Ref<string[]>) {
                 action: enabled
                   ? PluginMotionStatusRequestActionEnum.Start
                   : PluginMotionStatusRequestActionEnum.Stop,
-                async: true,
               },
             });
           }

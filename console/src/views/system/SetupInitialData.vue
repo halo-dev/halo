@@ -53,7 +53,6 @@ const { mutate: pluginStartMutate } = useMutation({
       name: plugin.metadata.name,
       pluginMotionStatusRequest: {
         action: PluginMotionStatusRequestActionEnum.Start,
-        async: true,
       },
     });
   },
