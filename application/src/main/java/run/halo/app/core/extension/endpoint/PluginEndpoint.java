@@ -203,9 +203,9 @@ public class PluginEndpoint implements CustomEndpoint {
                     .response(responseBuilder()
                         .implementation(Plugin.class))
             )
-            .PUT("plugins/{name}/motion-status", this::changeMotionStatus,
-                builder -> builder.operationId("ChangePluginMotionStatus")
-                    .description("Change the motion status of a plugin by name.")
+            .PUT("plugins/{name}/plugin-state", this::changePluginRunningState,
+                builder -> builder.operationId("ChangePluginRunningState")
+                    .description("Change the running state of a plugin by name.")
                     .tag(tag)
                     .parameter(parameterBuilder()
                         .name("name")
@@ -218,7 +218,7 @@ public class PluginEndpoint implements CustomEndpoint {
                         .content(contentBuilder()
                             .mediaType(MediaType.APPLICATION_JSON_VALUE)
                             .schema(schemaBuilder()
-                                .implementation(MotionStatusRequest.class))
+                                .implementation(RunningStateRequest.class))
                         )
                     )
                     .response(responseBuilder()
@@ -278,28 +278,25 @@ public class PluginEndpoint implements CustomEndpoint {
             .build();
     }
 
-    Mono<ServerResponse> changeMotionStatus(ServerRequest request) {
+    Mono<ServerResponse> changePluginRunningState(ServerRequest request) {
         final var name = request.pathVariable("name");
-        return request.bodyToMono(MotionStatusRequest.class)
-            .flatMap(motionStatus -> {
-                var enabled = switch (motionStatus.getAction()) {
-                    case START -> true;
-                    case STOP -> false;
-                };
+        return request.bodyToMono(RunningStateRequest.class)
+            .flatMap(runningState -> {
+                final var enable = runningState.isEnable();
                 return client.get(Plugin.class, name)
                     .flatMap(plugin -> {
-                        plugin.getSpec().setEnabled(enabled);
+                        plugin.getSpec().setEnabled(enable);
                         return client.update(plugin);
                     })
                     .flatMap(plugin -> {
-                        if (motionStatus.isAsync()) {
+                        if (runningState.isAsync()) {
                             return Mono.just(plugin);
                         }
                         return waitForPluginToMeetExpectedState(name, p -> {
                             // when enabled = true,excepted phase = started || failed
                             // when enabled = false,excepted phase = !started
                             var phase = p.statusNonNull().getPhase();
-                            if (enabled) {
+                            if (enable) {
                                 return PluginState.STARTED.equals(phase)
                                     || PluginState.FAILED.equals(phase);
                             }
@@ -325,15 +322,10 @@ public class PluginEndpoint implements CustomEndpoint {
     }
 
     @Data
-    @Schema(name = "PluginMotionStatusRequest")
-    static class MotionStatusRequest {
-        private ExpectedAction action;
+    @Schema(name = "PluginRunningStateRequest")
+    static class RunningStateRequest {
+        private boolean enable;
         private boolean async;
-
-        enum ExpectedAction {
-            START,
-            STOP
-        }
     }
 
     private Mono<ServerResponse> fetchJsBundle(ServerRequest request) {
