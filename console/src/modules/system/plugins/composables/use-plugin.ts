@@ -1,9 +1,6 @@
 import type { ComputedRef, Ref } from "vue";
 import { computed } from "vue";
-import {
-  PluginMotionStatusRequestActionEnum,
-  type Plugin,
-} from "@halo-dev/api-client";
+import { type Plugin } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
@@ -48,12 +45,10 @@ export function usePluginLifeCycle(
 
       const { enabled } = plugin.value.spec;
 
-      return await apiClient.plugin.changePluginMotionStatus({
+      return await apiClient.plugin.changePluginRunningState({
         name: plugin.value.metadata.name,
-        pluginMotionStatusRequest: {
-          action: enabled
-            ? PluginMotionStatusRequestActionEnum.Stop
-            : PluginMotionStatusRequestActionEnum.Start,
+        pluginRunningStateRequest: {
+          enable: !enabled,
         },
       });
     },
@@ -225,12 +220,10 @@ export function usePluginBatchOperations(names: Ref<string[]>) {
       onConfirm: async () => {
         try {
           for (let i = 0; i < names.value.length; i++) {
-            await apiClient.plugin.changePluginMotionStatus({
+            await apiClient.plugin.changePluginRunningState({
               name: names.value[i],
-              pluginMotionStatusRequest: {
-                action: enabled
-                  ? PluginMotionStatusRequestActionEnum.Start
-                  : PluginMotionStatusRequestActionEnum.Stop,
+              pluginRunningStateRequest: {
+                enable: enabled,
               },
             });
           }

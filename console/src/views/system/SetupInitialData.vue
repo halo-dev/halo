@@ -3,7 +3,6 @@ import { apiClient } from "@/utils/api-client";
 import { VLoading } from "@halo-dev/components";
 import { useMutation } from "@tanstack/vue-query";
 import {
-  PluginMotionStatusRequestActionEnum,
   type Category,
   type Plugin,
   type PostRequest,
@@ -49,10 +48,10 @@ const { mutate: pluginInstallMutate } = useMutation({
 const { mutate: pluginStartMutate } = useMutation({
   mutationKey: ["plugin-start"],
   mutationFn: async (plugin: Plugin) => {
-    return await apiClient.plugin.changePluginMotionStatus({
+    return await apiClient.plugin.changePluginRunningState({
       name: plugin.metadata.name,
-      pluginMotionStatusRequest: {
-        action: PluginMotionStatusRequestActionEnum.Start,
+      pluginRunningStateRequest: {
+        enable: true,
       },
     });
   },

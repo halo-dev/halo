@@ -46,7 +46,7 @@ import { Plugin } from "../models";
 // @ts-ignore
 import { PluginList } from "../models";
 // @ts-ignore
-import { PluginMotionStatusRequest } from "../models";
+import { PluginRunningStateRequest } from "../models";
 // @ts-ignore
 import { Setting } from "../models";
 // @ts-ignore
@@ -60,27 +60,27 @@ export const ApiConsoleHaloRunV1alpha1PluginApiAxiosParamCreator = function (
 ) {
   return {
     /**
-     * Change the motion status of a plugin by name.
+     * Change the running state of a plugin by name.
      * @param {string} name
-     * @param {PluginMotionStatusRequest} pluginMotionStatusRequest
+     * @param {PluginRunningStateRequest} pluginRunningStateRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    changePluginMotionStatus: async (
+    changePluginRunningState: async (
       name: string,
-      pluginMotionStatusRequest: PluginMotionStatusRequest,
+      pluginRunningStateRequest: PluginRunningStateRequest,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
-      assertParamExists("changePluginMotionStatus", "name", name);
-      // verify required parameter 'pluginMotionStatusRequest' is not null or undefined
+      assertParamExists("changePluginRunningState", "name", name);
+      // verify required parameter 'pluginRunningStateRequest' is not null or undefined
       assertParamExists(
-        "changePluginMotionStatus",
-        "pluginMotionStatusRequest",
-        pluginMotionStatusRequest
+        "changePluginRunningState",
+        "pluginRunningStateRequest",
+        pluginRunningStateRequest
       );
       const localVarPath =
-        `/apis/api.console.halo.run/v1alpha1/plugins/{name}/motion-status`.replace(
+        `/apis/api.console.halo.run/v1alpha1/plugins/{name}/plugin-state`.replace(
           `{${"name"}}`,
           encodeURIComponent(String(name))
         );
@@ -118,7 +118,7 @@ export const ApiConsoleHaloRunV1alpha1PluginApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = serializeDataIfNeeded(
-        pluginMotionStatusRequest,
+        pluginRunningStateRequest,
         localVarRequestOptions,
         configuration
       );
@@ -927,23 +927,23 @@ export const ApiConsoleHaloRunV1alpha1PluginApiFp = function (
     ApiConsoleHaloRunV1alpha1PluginApiAxiosParamCreator(configuration);
   return {
     /**
-     * Change the motion status of a plugin by name.
+     * Change the running state of a plugin by name.
      * @param {string} name
-     * @param {PluginMotionStatusRequest} pluginMotionStatusRequest
+     * @param {PluginRunningStateRequest} pluginRunningStateRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    async changePluginMotionStatus(
+    async changePluginRunningState(
       name: string,
-      pluginMotionStatusRequest: PluginMotionStatusRequest,
+      pluginRunningStateRequest: PluginRunningStateRequest,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Plugin>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.changePluginMotionStatus(
+        await localVarAxiosParamCreator.changePluginRunningState(
           name,
-          pluginMotionStatusRequest,
+          pluginRunningStateRequest,
           options
         );
       return createRequestFunction(
@@ -1293,19 +1293,19 @@ export const ApiConsoleHaloRunV1alpha1PluginApiFactory = function (
   const localVarFp = ApiConsoleHaloRunV1alpha1PluginApiFp(configuration);
   return {
     /**
-     * Change the motion status of a plugin by name.
-     * @param {ApiConsoleHaloRunV1alpha1PluginApiChangePluginMotionStatusRequest} requestParameters Request parameters.
+     * Change the running state of a plugin by name.
+     * @param {ApiConsoleHaloRunV1alpha1PluginApiChangePluginRunningStateRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
-    changePluginMotionStatus(
-      requestParameters: ApiConsoleHaloRunV1alpha1PluginApiChangePluginMotionStatusRequest,
+    changePluginRunningState(
+      requestParameters: ApiConsoleHaloRunV1alpha1PluginApiChangePluginRunningStateRequest,
       options?: AxiosRequestConfig
     ): AxiosPromise<Plugin> {
       return localVarFp
-        .changePluginMotionStatus(
+        .changePluginRunningState(
           requestParameters.name,
-          requestParameters.pluginMotionStatusRequest,
+          requestParameters.pluginRunningStateRequest,
           options
         )
         .then((request) => request(axios, basePath));
@@ -1514,24 +1514,24 @@ export const ApiConsoleHaloRunV1alpha1PluginApiFactory = function (
 };
 
 /**
- * Request parameters for changePluginMotionStatus operation in ApiConsoleHaloRunV1alpha1PluginApi.
+ * Request parameters for changePluginRunningState operation in ApiConsoleHaloRunV1alpha1PluginApi.
  * @export
- * @interface ApiConsoleHaloRunV1alpha1PluginApiChangePluginMotionStatusRequest
+ * @interface ApiConsoleHaloRunV1alpha1PluginApiChangePluginRunningStateRequest
  */
-export interface ApiConsoleHaloRunV1alpha1PluginApiChangePluginMotionStatusRequest {
+export interface ApiConsoleHaloRunV1alpha1PluginApiChangePluginRunningStateRequest {
   /**
    *
    * @type {string}
-   * @memberof ApiConsoleHaloRunV1alpha1PluginApiChangePluginMotionStatus
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApiChangePluginRunningState
    */
   readonly name: string;
 
   /**
    *
-   * @type {PluginMotionStatusRequest}
-   * @memberof ApiConsoleHaloRunV1alpha1PluginApiChangePluginMotionStatus
+   * @type {PluginRunningStateRequest}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApiChangePluginRunningState
    */
-  readonly pluginMotionStatusRequest: PluginMotionStatusRequest;
+  readonly pluginRunningStateRequest: PluginRunningStateRequest;
 }
 
 /**
@@ -1773,20 +1773,20 @@ export interface ApiConsoleHaloRunV1alpha1PluginApiUpgradePluginFromUriRequest {
  */
 export class ApiConsoleHaloRunV1alpha1PluginApi extends BaseAPI {
   /**
-   * Change the motion status of a plugin by name.
-   * @param {ApiConsoleHaloRunV1alpha1PluginApiChangePluginMotionStatusRequest} requestParameters Request parameters.
+   * Change the running state of a plugin by name.
+   * @param {ApiConsoleHaloRunV1alpha1PluginApiChangePluginRunningStateRequest} requestParameters Request parameters.
    * @param {*} [options] Override http request option.
    * @throws {RequiredError}
    * @memberof ApiConsoleHaloRunV1alpha1PluginApi
    */
-  public changePluginMotionStatus(
-    requestParameters: ApiConsoleHaloRunV1alpha1PluginApiChangePluginMotionStatusRequest,
+  public changePluginRunningState(
+    requestParameters: ApiConsoleHaloRunV1alpha1PluginApiChangePluginRunningStateRequest,
     options?: AxiosRequestConfig
   ) {
     return ApiConsoleHaloRunV1alpha1PluginApiFp(this.configuration)
-      .changePluginMotionStatus(
+      .changePluginRunningState(
         requestParameters.name,
-        requestParameters.pluginMotionStatusRequest,
+        requestParameters.pluginRunningStateRequest,
         options
       )
       .then((request) => request(this.axios, this.basePath));
