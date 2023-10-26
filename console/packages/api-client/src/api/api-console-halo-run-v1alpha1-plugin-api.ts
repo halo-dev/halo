@@ -46,6 +46,8 @@ import { Plugin } from "../models";
 // @ts-ignore
 import { PluginList } from "../models";
 // @ts-ignore
+import { PluginRunningStateRequest } from "../models";
+// @ts-ignore
 import { Setting } from "../models";
 // @ts-ignore
 import { UpgradeFromUriRequest } from "../models";
@@ -57,6 +59,75 @@ export const ApiConsoleHaloRunV1alpha1PluginApiAxiosParamCreator = function (
   configuration?: Configuration
 ) {
   return {
+    /**
+     * Change the running state of a plugin by name.
+     * @param {string} name
+     * @param {PluginRunningStateRequest} pluginRunningStateRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    changePluginRunningState: async (
+      name: string,
+      pluginRunningStateRequest: PluginRunningStateRequest,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'name' is not null or undefined
+      assertParamExists("changePluginRunningState", "name", name);
+      // verify required parameter 'pluginRunningStateRequest' is not null or undefined
+      assertParamExists(
+        "changePluginRunningState",
+        "pluginRunningStateRequest",
+        pluginRunningStateRequest
+      );
+      const localVarPath =
+        `/apis/api.console.halo.run/v1alpha1/plugins/{name}/plugin-state`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "PUT",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      localVarHeaderParameter["Content-Type"] = "application/json";
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        pluginRunningStateRequest,
+        localVarRequestOptions,
+        configuration
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
     /**
      * Merge all CSS bundles of enabled plugins into one.
      * @param {*} [options] Override http request option.
@@ -856,6 +927,33 @@ export const ApiConsoleHaloRunV1alpha1PluginApiFp = function (
     ApiConsoleHaloRunV1alpha1PluginApiAxiosParamCreator(configuration);
   return {
     /**
+     * Change the running state of a plugin by name.
+     * @param {string} name
+     * @param {PluginRunningStateRequest} pluginRunningStateRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async changePluginRunningState(
+      name: string,
+      pluginRunningStateRequest: PluginRunningStateRequest,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<Plugin>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.changePluginRunningState(
+          name,
+          pluginRunningStateRequest,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
      * Merge all CSS bundles of enabled plugins into one.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1195,6 +1293,24 @@ export const ApiConsoleHaloRunV1alpha1PluginApiFactory = function (
   const localVarFp = ApiConsoleHaloRunV1alpha1PluginApiFp(configuration);
   return {
     /**
+     * Change the running state of a plugin by name.
+     * @param {ApiConsoleHaloRunV1alpha1PluginApiChangePluginRunningStateRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    changePluginRunningState(
+      requestParameters: ApiConsoleHaloRunV1alpha1PluginApiChangePluginRunningStateRequest,
+      options?: AxiosRequestConfig
+    ): AxiosPromise<Plugin> {
+      return localVarFp
+        .changePluginRunningState(
+          requestParameters.name,
+          requestParameters.pluginRunningStateRequest,
+          options
+        )
+        .then((request) => request(axios, basePath));
+    },
+    /**
      * Merge all CSS bundles of enabled plugins into one.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -1396,6 +1512,27 @@ export const ApiConsoleHaloRunV1alpha1PluginApiFactory = function (
     },
   };
 };
+
+/**
+ * Request parameters for changePluginRunningState operation in ApiConsoleHaloRunV1alpha1PluginApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1PluginApiChangePluginRunningStateRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1PluginApiChangePluginRunningStateRequest {
+  /**
+   *
+   * @type {string}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApiChangePluginRunningState
+   */
+  readonly name: string;
+
+  /**
+   *
+   * @type {PluginRunningStateRequest}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApiChangePluginRunningState
+   */
+  readonly pluginRunningStateRequest: PluginRunningStateRequest;
+}
 
 /**
  * Request parameters for fetchPluginConfig operation in ApiConsoleHaloRunV1alpha1PluginApi.
@@ -1635,6 +1772,26 @@ export interface ApiConsoleHaloRunV1alpha1PluginApiUpgradePluginFromUriRequest {
  * @extends {BaseAPI}
  */
 export class ApiConsoleHaloRunV1alpha1PluginApi extends BaseAPI {
+  /**
+   * Change the running state of a plugin by name.
+   * @param {ApiConsoleHaloRunV1alpha1PluginApiChangePluginRunningStateRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiConsoleHaloRunV1alpha1PluginApi
+   */
+  public changePluginRunningState(
+    requestParameters: ApiConsoleHaloRunV1alpha1PluginApiChangePluginRunningStateRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return ApiConsoleHaloRunV1alpha1PluginApiFp(this.configuration)
+      .changePluginRunningState(
+        requestParameters.name,
+        requestParameters.pluginRunningStateRequest,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
+  }
+
   /**
    * Merge all CSS bundles of enabled plugins into one.
    * @param {*} [options] Override http request option.

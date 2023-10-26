@@ -16,7 +16,7 @@ import { formatDatetime } from "@/utils/date";
 import { useQuery } from "@tanstack/vue-query";
 
 const plugin = inject<Ref<Plugin | undefined>>("plugin");
-const { changeStatus } = usePluginLifeCycle(plugin);
+const { changeStatus, changingStatus } = usePluginLifeCycle(plugin);
 
 interface RoleTemplateGroup {
   module: string | null | undefined;
@@ -72,7 +72,11 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
           </h3>
         </div>
         <div v-permission="['system:plugins:manage']">
-          <VSwitch :model-value="plugin?.spec.enabled" @change="changeStatus" />
+          <VSwitch
+            :loading="changingStatus"
+            :model-value="plugin?.spec.enabled"
+            @change="changeStatus"
+          />
         </div>
       </div>
       <div

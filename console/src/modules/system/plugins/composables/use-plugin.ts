@@ -1,6 +1,6 @@
 import type { ComputedRef, Ref } from "vue";
 import { computed } from "vue";
-import type { Plugin } from "@halo-dev/api-client";
+import { type Plugin } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
@@ -43,22 +43,14 @@ export function usePluginLifeCycle(
     mutationFn: async () => {
       if (!plugin?.value) return;
 
-      const { data: pluginToUpdate } =
-        await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin({
-          name: plugin.value.metadata.name,
-        });
+      const { enabled } = plugin.value.spec;
 
-      pluginToUpdate.spec.enabled = !pluginToUpdate.spec.enabled;
-
-      const { data: newPlugin } =
-        await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin({
-          name: pluginToUpdate.metadata.name,
-          plugin: pluginToUpdate,
-        });
-
-      await checkStatus(newPlugin);
-
-      return newPlugin;
+      return await apiClient.plugin.changePluginRunningState({
+        name: plugin.value.metadata.name,
+        pluginRunningStateRequest: {
+          enable: !enabled,
+        },
+      });
     },
     retry: 3,
     retryDelay: 1000,
@@ -66,38 +58,6 @@ export function usePluginLifeCycle(
       window.location.reload();
     },
   });
-
-  function checkStatus(plugin: Plugin) {
-    const maxRetry = 5;
-    let retryCount = 0;
-    return new Promise((resolve, reject) => {
-      const check = () => {
-        if (retryCount >= maxRetry) {
-          reject(false);
-          return;
-        }
-        apiClient.extension.plugin
-          .getpluginHaloRunV1alpha1Plugin({ name: plugin.metadata.name })
-          .then((response) => {
-            const { enabled } = response.data.spec;
-            const { phase } = response.data.status || {};
-            if (
-              (enabled && phase === "STARTED") ||
-              (!enabled && phase !== "STARTED")
-            ) {
-              resolve(true);
-            } else {
-              setTimeout(check, 1000);
-              retryCount++;
-            }
-          })
-          .catch(() => {
-            reject(false);
-          });
-      };
-      check();
-    });
-  }
 
   const uninstall = (deleteExtensions?: boolean) => {
     if (!plugin?.value) return;
@@ -260,15 +220,11 @@ export function usePluginBatchOperations(names: Ref<string[]>) {
       onConfirm: async () => {
         try {
           for (let i = 0; i < names.value.length; i++) {
-            const { data: pluginToUpdate } =
-              await apiClient.extension.plugin.getpluginHaloRunV1alpha1Plugin({
-                name: names.value[i],
-              });
-
-            pluginToUpdate.spec.enabled = enabled;
-            await apiClient.extension.plugin.updatepluginHaloRunV1alpha1Plugin({
-              name: pluginToUpdate.metadata.name,
-              plugin: pluginToUpdate,
+            await apiClient.plugin.changePluginRunningState({
+              name: names.value[i],
+              pluginRunningStateRequest: {
+                enable: enabled,
+              },
             });
           }
 
