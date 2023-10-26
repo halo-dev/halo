@@ -109,8 +109,15 @@ const handleProcessCustomAnnotations = () => {
           value,
         };
       }
+      return {
+        key: "",
+        value: "",
+      };
     })
-    .filter((item) => item) as { key: string; value: string }[];
+    .filter((item) => item.key)
+    .filter(
+      (item, index, self) => self.findIndex((t) => t.key === item.key) === index
+    );
 
   annotations.value = formSchemas
     .map((item) => {
