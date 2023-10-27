@@ -113,6 +113,10 @@ public class PostReconciler implements Reconciler<Reconciler.Request> {
                     post.setStatus(status);
                 }
 
+                if (post.isPublished() && post.getSpec().getPublishTime() == null) {
+                    post.getSpec().setPublishTime(Instant.now());
+                }
+
                 // calculate the sha256sum
                 var configSha256sum = Hashing.sha256().hashString(post.getSpec().toString(), UTF_8)
                         .toString();
