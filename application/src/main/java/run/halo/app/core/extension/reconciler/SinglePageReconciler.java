@@ -112,6 +112,10 @@ public class SinglePageReconciler implements Reconciler<Reconciler.Request> {
 
     private void reconcileSpec(String name) {
         client.fetch(SinglePage.class, name).ifPresent(page -> {
+            if (page.isPublished() && page.getSpec().getPublishTime() == null) {
+                page.getSpec().setPublishTime(Instant.now());
+            }
+
             // un-publish if necessary
             if (page.isPublished() && Objects.equals(false, page.getSpec().getPublish())) {
                 unPublish(name);
