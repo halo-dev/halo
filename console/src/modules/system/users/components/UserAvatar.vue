@@ -67,7 +67,7 @@ const handleUploadAvatar = () => {
 
     apiClient.user
       .uploadUserAvatar({
-        name: isCurrentUser ? "-" : user.value.user.metadata.name,
+        name: isCurrentUser?.value ? "-" : user.value.user.metadata.name,
         file: file,
       })
       .then(() => {
@@ -97,7 +97,7 @@ const handleRemoveCurrentAvatar = () => {
 
       apiClient.user
         .deleteUserAvatar({
-          name: isCurrentUser ? "-" : user.value.user.metadata.name,
+          name: isCurrentUser?.value ? "-" : user.value.user.metadata.name,
         })
         .then(() => {
           queryClient.invalidateQueries({ queryKey: ["user-detail"] });
