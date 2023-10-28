@@ -178,12 +178,12 @@ const onUploadModalClose = () => {
 const viewTypes = [
   {
     name: "list",
-    tooltip: t("core.attachment.filters.view_type.items.grid"),
+    tooltip: t("core.attachment.filters.view_type.items.list"),
     icon: IconList,
   },
   {
     name: "grid",
-    tooltip: t("core.attachment.filters.view_type.items.list"),
+    tooltip: t("core.attachment.filters.view_type.items.grid"),
     icon: IconGrid,
   },
 ];
