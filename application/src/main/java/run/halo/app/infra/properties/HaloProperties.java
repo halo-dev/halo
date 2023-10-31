@@ -55,6 +55,9 @@ public class HaloProperties implements Validator {
     private final ConsoleProperties console = new ConsoleProperties();
 
     @Valid
+    private final UcProperties uc = new UcProperties();
+
+    @Valid
     private final ThemeProperties theme = new ThemeProperties();
 
     @Valid
