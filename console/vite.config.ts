@@ -48,7 +48,7 @@ export default ({ mode }: { mode: string }) => {
     base: env.VITE_BASE_URL,
     plugins: [
       ...sharedPlugins,
-      ...setupLibraryExternal(isProduction, env.VITE_BASE_URL),
+      ...setupLibraryExternal(isProduction, env.VITE_BASE_URL, "/src/main.ts"),
     ],
     resolve: {
       alias: {

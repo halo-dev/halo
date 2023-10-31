@@ -1,6 +1,6 @@
 import { fileURLToPath, URL } from "url";
 import fs from "fs";
-import path, { resolve } from "path";
+import path from "path";
 import { defineConfig, Plugin } from "vite";
 import Vue from "@vitejs/plugin-vue";
 import VueJsx from "@vitejs/plugin-vue-jsx";
@@ -45,7 +45,10 @@ export default ({ mode }: { mode: string }) => {
 
   return defineConfig({
     base: "/uc/",
-    plugins: [...sharedPlugins, ...setupLibraryExternal(isProduction, "/uc/")],
+    plugins: [
+      ...sharedPlugins,
+      ...setupLibraryExternal(isProduction, "/uc/", "/uc-src/main.ts"),
+    ],
     resolve: {
       alias: {
         "@": fileURLToPath(new URL("./src", import.meta.url)),
@@ -58,11 +61,6 @@ export default ({ mode }: { mode: string }) => {
       },
     },
     build: {
-      rollupOptions: {
-        input: {
-          main: resolve(__dirname, "uc.html"),
-        },
-      },
       outDir: fileURLToPath(
         new URL("../application/src/main/resources/uc", import.meta.url)
       ),
