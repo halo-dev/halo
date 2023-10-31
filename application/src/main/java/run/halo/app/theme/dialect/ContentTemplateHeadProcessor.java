@@ -11,13 +11,13 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.HtmlUtils;
 import org.thymeleaf.context.ITemplateContext;
+import org.thymeleaf.model.AttributeValueQuotes;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
+import org.thymeleaf.model.IStandaloneElementTag;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
-import org.unbescape.html.HtmlEscape;
-import org.unbescape.html.HtmlEscapeLevel;
-import org.unbescape.html.HtmlEscapeType;
 import reactor.core.publisher.Mono;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
@@ -64,11 +64,7 @@ public class ContentTemplateHeadProcessor implements TemplateHeadProcessor {
         }
 
         return htmlMetasMono
-            .doOnNext(htmlMetas -> {
-                String metaHtml = headMetaBuilder(htmlMetas);
-                IModelFactory modelFactory = context.getModelFactory();
-                model.add(modelFactory.createText(metaHtml));
-            })
+            .doOnNext(htmlMetas -> headMetaBuilder(htmlMetas, context, model))
             .then();
     }
 
@@ -76,9 +72,7 @@ public class ContentTemplateHeadProcessor implements TemplateHeadProcessor {
         List<Map<String, String>> htmlMetas,
         String excerpt) {
         String excerptNullSafe = StringUtils.defaultString(excerpt);
-        final String excerptSafe = HtmlEscape.escapeHtml(excerptNullSafe,
-            HtmlEscapeType.HTML5_NAMED_REFERENCES_DEFAULT_TO_HEXA,
-            HtmlEscapeLevel.LEVEL_3_ALL_NON_ALPHANUMERIC);
+        final String excerptSafe = HtmlUtils.htmlEscape(excerptNullSafe);
         List<Map<String, String>> metas = new ArrayList<>(defaultIfNull(htmlMetas, List.of()));
         metas.stream()
             .filter(map -> Meta.DESCRIPTION.equals(map.get(Meta.NAME)))
@@ -101,19 +95,18 @@ public class ContentTemplateHeadProcessor implements TemplateHeadProcessor {
         String CONTENT = "content";
     }
 
-    private String headMetaBuilder(List<Map<String, String>> htmlMetas) {
+    private void headMetaBuilder(List<Map<String, String>> htmlMetas, ITemplateContext context,
+        IModel model) {
         if (htmlMetas == null) {
-            return StringUtils.EMPTY;
+            return;
         }
-        StringBuilder sb = new StringBuilder();
-        for (Map<String, String> htmlMeta : htmlMetas) {
-            sb.append("<meta");
-            htmlMeta.forEach((k, v) -> {
-                sb.append(" ").append(k).append("=\"").append(v).append("\"");
-            });
-            sb.append(" />\n");
-        }
-        return sb.toString();
+
+        IModelFactory modelFactory = context.getModelFactory();
+        htmlMetas.forEach(htmlMeta -> {
+            IStandaloneElementTag meta = modelFactory.createStandaloneElementTag("meta",
+                htmlMeta, AttributeValueQuotes.DOUBLE, false, true);
+            model.add(meta);
+        });
     }
 
     private boolean isPostTemplate(ITemplateContext context) {
