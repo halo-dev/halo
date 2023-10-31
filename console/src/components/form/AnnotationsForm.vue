@@ -13,6 +13,7 @@ import cloneDeep from "lodash.clonedeep";
 import { getValidationMessages } from "@formkit/validation";
 import { useThemeStore } from "@/stores/theme";
 import { randomUUID } from "@/utils/id";
+import { onUnmounted } from "vue";
 
 const themeStore = useThemeStore();
 
@@ -150,9 +151,20 @@ onMounted(async () => {
   handleProcessCustomAnnotations();
 });
 
+onUnmounted(() => {
+  cleanAnnotations();
+  annotationSettings.value = [];
+});
+
+const cleanAnnotations = () => {
+  annotations.value = {};
+  customAnnotationsState.value = [];
+};
+
 watch(
   () => props.value,
   (value) => {
+    cleanAnnotations();
     reset(specFormId);
     reset(customFormId);
     annotations.value = cloneDeep(props.value) || {};
