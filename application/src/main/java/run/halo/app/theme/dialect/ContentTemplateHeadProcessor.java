@@ -11,11 +11,13 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import org.springframework.web.util.HtmlUtils;
 import org.thymeleaf.context.ITemplateContext;
 import org.thymeleaf.model.IModel;
 import org.thymeleaf.model.IModelFactory;
 import org.thymeleaf.processor.element.IElementModelStructureHandler;
+import org.unbescape.html.HtmlEscape;
+import org.unbescape.html.HtmlEscapeLevel;
+import org.unbescape.html.HtmlEscapeType;
 import reactor.core.publisher.Mono;
 import run.halo.app.theme.DefaultTemplateEnum;
 import run.halo.app.theme.finders.PostFinder;
@@ -74,7 +76,9 @@ public class ContentTemplateHeadProcessor implements TemplateHeadProcessor {
         List<Map<String, String>> htmlMetas,
         String excerpt) {
         String excerptNullSafe = StringUtils.defaultString(excerpt);
-        final String excerptSafe = HtmlUtils.htmlEscape(excerptNullSafe);
+        final String excerptSafe = HtmlEscape.escapeHtml(excerptNullSafe,
+            HtmlEscapeType.HTML5_NAMED_REFERENCES_DEFAULT_TO_HEXA,
+            HtmlEscapeLevel.LEVEL_3_ALL_NON_ALPHANUMERIC);
         List<Map<String, String>> metas = new ArrayList<>(defaultIfNull(htmlMetas, List.of()));
         metas.stream()
             .filter(map -> Meta.DESCRIPTION.equals(map.get(Meta.NAME)))
