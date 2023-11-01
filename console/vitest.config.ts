@@ -1,7 +1,7 @@
 import { defineConfig } from "vitest/config";
 import { fileURLToPath, URL } from "url";
 
-import { sharedPlugins } from "./vite.config";
+import { sharedPlugins } from "./src/vite/config-builder";
 
 export default defineConfig({
   plugins: [sharedPlugins],
