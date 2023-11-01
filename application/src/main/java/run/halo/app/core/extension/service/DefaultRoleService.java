@@ -54,7 +54,7 @@ public class DefaultRoleService implements RoleService {
         if (source.contains(SuperAdminInitializer.SUPER_ROLE_NAME)) {
             return Mono.just(true);
         }
-        return listDependencies(new HashSet<>(source), shouldFilterHidden(true))
+        return listDependencies(new HashSet<>(source), shouldFilterHidden(false))
             .map(role -> role.getMetadata().getName())
             .collect(Collectors.toSet())
             .map(roleNames -> roleNames.containsAll(candidates));

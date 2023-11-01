@@ -13,11 +13,10 @@ import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.properties.ConsoleProperties.ProxyProperties;
-import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.infra.properties.ProxyProperties;
 
 @Slf4j
-public class ConsoleProxyFilter implements WebFilter {
+public class ProxyFilter implements WebFilter {
 
     private final ProxyProperties proxyProperties;
 
@@ -25,14 +24,15 @@ public class ConsoleProxyFilter implements WebFilter {
 
     private final WebClient webClient;
 
-    public ConsoleProxyFilter(HaloProperties haloProperties) {
-        this.proxyProperties = haloProperties.getConsole().getProxy();
-        var consoleMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.GET, "/console/**");
+    public ProxyFilter(String pattern, ProxyProperties proxyProperties) {
+        this.proxyProperties = proxyProperties;
+        var consoleMatcher = ServerWebExchangeMatchers.pathMatchers(HttpMethod.GET, pattern);
         consoleMatcher = new AndServerWebExchangeMatcher(consoleMatcher,
             new NegatedServerWebExchangeMatcher(new WebSocketServerWebExchangeMatcher()));
         this.consoleMatcher = consoleMatcher;
         this.webClient = WebClient.create(proxyProperties.getEndpoint().toString());
-        log.info("Initialized ConsoleProxyFilter to proxy console");
+        log.debug("Initialized ProxyFilter to proxy {} to endpoint {}", pattern,
+            proxyProperties.getEndpoint());
     }
 
     @Override

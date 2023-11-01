@@ -29,14 +29,13 @@ import org.springframework.web.reactive.config.ResourceHandlerRegistry;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.resource.EncodedResourceResolver;
 import org.springframework.web.reactive.resource.PathResourceResolver;
 import org.springframework.web.reactive.result.view.ViewResolutionResultHandler;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import reactor.core.publisher.Mono;
-import run.halo.app.console.ConsoleProxyFilter;
+import run.halo.app.console.ProxyFilter;
 import run.halo.app.console.WebSocketRequestPredicate;
 import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.core.extension.endpoint.CustomEndpointsBuilder;
@@ -104,11 +103,21 @@ public class WebFluxConfig implements WebFluxConfigurer {
             .and(path("/console/**").and(path("/console/assets/**").negate()))
             .and(accept(MediaType.TEXT_HTML))
             .and(new WebSocketRequestPredicate().negate());
-        return route(consolePredicate, this::serveConsoleIndex);
+        return route(consolePredicate,
+            request -> this.serveIndex(haloProp.getConsole().getLocation() + "index.html"));
     }
 
-    private Mono<ServerResponse> serveConsoleIndex(ServerRequest request) {
-        var indexLocation = haloProp.getConsole().getLocation() + "index.html";
+    @Bean
+    RouterFunction<ServerResponse> ucIndexRedirect() {
+        var consolePredicate = method(HttpMethod.GET)
+            .and(path("/uc/**").and(path("/uc/assets/**").negate()))
+            .and(accept(MediaType.TEXT_HTML))
+            .and(new WebSocketRequestPredicate().negate());
+        return route(consolePredicate,
+            request -> this.serveIndex(haloProp.getUc().getLocation() + "index.html"));
+    }
+
+    private Mono<ServerResponse> serveIndex(String indexLocation) {
         var indexResource = applicationContext.getResource(indexLocation);
         try {
             return ServerResponse.ok()
@@ -136,6 +145,15 @@ public class WebFluxConfig implements WebFluxConfigurer {
         // For console assets
         registry.addResourceHandler("/console/assets/**")
             .addResourceLocations(haloProp.getConsole().getLocation() + "assets/")
+            .setCacheControl(cacheControl)
+            .setUseLastModified(useLastModified)
+            .resourceChain(true)
+            .addResolver(new EncodedResourceResolver())
+            .addResolver(new PathResourceResolver());
+
+        // For uc assets
+        registry.addResourceHandler("/uc/assets/**")
+            .addResourceLocations(haloProp.getUc().getLocation() + "assets/")
             .setCacheControl(cacheControl)
             .setUseLastModified(useLastModified)
             .resourceChain(true)
@@ -172,7 +190,14 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
     @ConditionalOnProperty(name = "halo.console.proxy.enabled", havingValue = "true")
     @Bean
-    ConsoleProxyFilter consoleProxyFilter() {
-        return new ConsoleProxyFilter(haloProp);
+    ProxyFilter consoleProxyFilter() {
+        return new ProxyFilter("/console/**", haloProp.getConsole().getProxy());
+    }
+
+
+    @ConditionalOnProperty(name = "halo.uc.proxy.enabled", havingValue = "true")
+    @Bean
+    ProxyFilter ucProxyFilter() {
+        return new ProxyFilter("/uc/**", haloProp.getUc().getProxy());
     }
 }
