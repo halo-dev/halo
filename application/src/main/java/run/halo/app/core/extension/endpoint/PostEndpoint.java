@@ -243,7 +243,7 @@ public class PostEndpoint implements CustomEndpoint {
                 })
                 .switchIfEmpty(Mono.error(
                     () -> new RetryException("Retry to check post publish status"))))
-            .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(200))
+            .retryWhen(Retry.backoff(getMaxAttemptsWaitForPublish(), Duration.ofMillis(100))
                 .filter(t -> t instanceof RetryException));
     }
 
@@ -277,5 +277,12 @@ public class PostEndpoint implements CustomEndpoint {
         PostQuery postQuery = new PostQuery(request);
         return postService.listPost(postQuery)
             .flatMap(listedPosts -> ServerResponse.ok().bodyValue(listedPosts));
+    }
+
+    /**
+     * Convenient for testing, to avoid waiting too long for post published when testing.
+     */
+    int getMaxAttemptsWaitForPublish() {
+        return 10;
     }
 }
