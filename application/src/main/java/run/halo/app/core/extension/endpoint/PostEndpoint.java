@@ -243,7 +243,7 @@ public class PostEndpoint implements CustomEndpoint {
                 })
                 .switchIfEmpty(Mono.error(
                     () -> new RetryException("Retry to check post publish status"))))
-            .retryWhen(Retry.fixedDelay(10, Duration.ofMillis(200))
+            .retryWhen(Retry.backoff(5, Duration.ofMillis(100))
                 .filter(t -> t instanceof RetryException));
     }
 

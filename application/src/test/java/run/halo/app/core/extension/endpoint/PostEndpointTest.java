@@ -170,7 +170,7 @@ class PostEndpointTest {
             .is5xxServerError();
 
         // Verify WebClient retry behavior
-        verify(client, times(12)).get(eq(Post.class), eq("post-1"));
+        verify(client, times(7)).get(eq(Post.class), eq("post-1"));
         verify(client).update(any(Post.class));
     }
 
