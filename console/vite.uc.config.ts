@@ -52,6 +52,7 @@ export default ({ mode }: { mode: string }) => {
     resolve: {
       alias: {
         "@": fileURLToPath(new URL("./src", import.meta.url)),
+        "@uc": fileURLToPath(new URL("./uc-src", import.meta.url)),
       },
     },
     server: {

@@ -1,13 +1,20 @@
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "src/**/*.json"],
-  "exclude": ["src/**/__tests__/*", "packages/**/*"],
+  "include": ["env.d.ts", "src/**/*", "uc-src/**/*", "console-src/**/*"],
+  "exclude": [
+    "src/**/__tests__/*",
+    "uc-src/**/__tests__/*",
+    "console-src/**/__tests__/*",
+    "packages/**/*"
+  ],
   "compilerOptions": {
     "baseUrl": ".",
     "composite": true,
     "noImplicitAny": false,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@uc/*": ["./uc-src/*"],
+      "@console/*": ["./console-src/*"]
     },
     "noStrictGenericChecks": true,
     "ignoreDeprecations": "5.0",

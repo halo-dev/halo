@@ -53,6 +53,7 @@ export default ({ mode }: { mode: string }) => {
     resolve: {
       alias: {
         "@": fileURLToPath(new URL("./src", import.meta.url)),
+        "@console": fileURLToPath(new URL("./console-src", import.meta.url)),
       },
     },
     server: {
