@@ -2,7 +2,7 @@ export function loadStyle(href: string) {
   return new Promise(function (resolve, reject) {
     let shouldAppend = false;
     let el: HTMLLinkElement | null = document.querySelector(
-      'script[src="' + href + '"]'
+      'link[href="' + href + '"]'
     );
     if (!el) {
       el = document.createElement("link");
