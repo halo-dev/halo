@@ -16,7 +16,8 @@ import type { HtmlTagDescriptor } from "vite";
  */
 export const setupLibraryExternal = (
   isProduction: boolean,
-  baseUrl: string
+  baseUrl: string,
+  entry: string
 ) => {
   const staticSuffix = randomstring.generate({
     length: 8,
@@ -106,6 +107,9 @@ export const setupLibraryExternal = (
       minify: false,
       inject: {
         tags: injectTags,
+        data: {
+          entry: entry,
+        },
       },
     }),
   ];

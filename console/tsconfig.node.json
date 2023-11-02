@@ -2,9 +2,11 @@
   "extends": "@tsconfig/node18/tsconfig.json",
   "include": [
     "vite.config.*",
+    "vite.uc.config.ts",
     "vitest.config.*",
     "cypress.config.*",
-    "./src/build/library-external.ts"
+    "src/vite/library-external.ts",
+    "src/vite/config-builder.ts"
   ],
   "compilerOptions": {
     "composite": true,
