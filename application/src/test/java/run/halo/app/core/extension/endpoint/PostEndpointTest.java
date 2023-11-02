@@ -3,8 +3,6 @@ package run.halo.app.core.extension.endpoint;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -48,15 +46,13 @@ class PostEndpointTest {
     @InjectMocks
     PostEndpoint postEndpoint;
 
-    PostEndpoint spyPostEndpoint;
-
     WebTestClient webTestClient;
 
     @BeforeEach
     void setUp() {
-        spyPostEndpoint = spy(postEndpoint);
+        postEndpoint.setMaxAttemptsWaitForPublish(3);
         webTestClient = WebTestClient
-            .bindToRouterFunction(spyPostEndpoint.endpoint())
+            .bindToRouterFunction(postEndpoint.endpoint())
             .build();
     }
 
@@ -166,8 +162,6 @@ class PostEndpointTest {
 
         when(client.update(any(Post.class)))
             .thenReturn(Mono.just(post));
-
-        doReturn(3).when(spyPostEndpoint).getMaxAttemptsWaitForPublish();
 
         // Send request
         webTestClient.put()

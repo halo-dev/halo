@@ -86,6 +86,7 @@ import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { usePluginModuleStore } from "@/stores/plugin";
 import type { PluginModule } from "@halo-dev/console-shared";
 import { useDebounceFn } from "@vueuse/core";
+import { onBeforeUnmount } from "vue";
 
 const { t } = useI18n();
 
@@ -355,6 +356,10 @@ onMounted(() => {
   });
 });
 
+onBeforeUnmount(() => {
+  editor.value?.destroy();
+});
+
 // image drag and paste upload
 const { policies } = useFetchAttachmentPolicy();
 
@@ -491,203 +496,205 @@ const currentLocale = i18n.global.locale.value as
 </script>
 
 <template>
-  <AttachmentSelectorModal
-    v-model:visible="attachmentSelectorModal"
-    @select="onAttachmentSelect"
-  />
-  <RichTextEditor v-if="editor" :editor="editor" :locale="currentLocale">
-    <template #extra>
-      <OverlayScrollbarsComponent
-        element="div"
-        :options="{ scrollbars: { autoHide: 'scroll' } }"
-        class="h-full border-l bg-white"
-        defer
-      >
-        <VTabs v-model:active-id="extraActiveId" type="outline">
-          <VTabItem
-            id="toc"
-            :label="$t('core.components.default_editor.tabs.toc.title')"
-          >
-            <div class="p-1 pt-0">
-              <ul v-if="headingNodes?.length" class="space-y-1">
-                <li
-                  v-for="(node, index) in headingNodes"
-                  :key="index"
-                  :class="[
-                    { 'bg-gray-100': node.id === selectedHeadingNode?.id },
-                  ]"
-                  class="group cursor-pointer truncate rounded-base px-1.5 py-1 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                  @click="handleSelectHeadingNode(node)"
-                >
-                  <div
-                    :style="{
-                      paddingLeft: `${(node.level - 1) * 0.8}rem`,
-                    }"
-                    class="flex items-center gap-2"
+  <div>
+    <AttachmentSelectorModal
+      v-model:visible="attachmentSelectorModal"
+      @select="onAttachmentSelect"
+    />
+    <RichTextEditor v-if="editor" :editor="editor" :locale="currentLocale">
+      <template #extra>
+        <OverlayScrollbarsComponent
+          element="div"
+          :options="{ scrollbars: { autoHide: 'scroll' } }"
+          class="h-full border-l bg-white"
+          defer
+        >
+          <VTabs v-model:active-id="extraActiveId" type="outline">
+            <VTabItem
+              id="toc"
+              :label="$t('core.components.default_editor.tabs.toc.title')"
+            >
+              <div class="p-1 pt-0">
+                <ul v-if="headingNodes?.length" class="space-y-1">
+                  <li
+                    v-for="(node, index) in headingNodes"
+                    :key="index"
+                    :class="[
+                      { 'bg-gray-100': node.id === selectedHeadingNode?.id },
+                    ]"
+                    class="group cursor-pointer truncate rounded-base px-1.5 py-1 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    @click="handleSelectHeadingNode(node)"
                   >
-                    <component
-                      :is="headingIcons[node.level]"
-                      class="h-4 w-4 rounded-sm bg-gray-100 p-0.5 group-hover:bg-white"
-                      :class="[
-                        { '!bg-white': node.id === selectedHeadingNode?.id },
-                      ]"
-                    />
-                    <span class="flex-1 truncate">{{ node.text }}</span>
-                  </div>
-                </li>
-              </ul>
-              <div v-else class="flex flex-col items-center py-10">
-                <span class="text-sm text-gray-600">
-                  {{ $t("core.components.default_editor.tabs.toc.empty") }}
-                </span>
-              </div>
-            </div>
-          </VTabItem>
-          <VTabItem
-            id="information"
-            :label="$t('core.components.default_editor.tabs.detail.title')"
-          >
-            <div class="flex flex-col gap-2 p-1 pt-0">
-              <div class="grid grid-cols-2 gap-2">
-                <div
-                  class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"
-                >
-                  <div class="flex items-center justify-between">
                     <div
-                      class="text-sm text-gray-500 group-hover:text-gray-900"
+                      :style="{
+                        paddingLeft: `${(node.level - 1) * 0.8}rem`,
+                      }"
+                      class="flex items-center gap-2"
                     >
-                      {{
-                        $t(
-                          "core.components.default_editor.tabs.detail.fields.character_count"
-                        )
-                      }}
-                    </div>
-                    <div class="rounded bg-gray-200 p-0.5">
-                      <IconCharacterRecognition
-                        class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
+                      <component
+                        :is="headingIcons[node.level]"
+                        class="h-4 w-4 rounded-sm bg-gray-100 p-0.5 group-hover:bg-white"
+                        :class="[
+                          { '!bg-white': node.id === selectedHeadingNode?.id },
+                        ]"
                       />
+                      <span class="flex-1 truncate">{{ node.text }}</span>
                     </div>
-                  </div>
-                  <div class="text-base font-medium text-gray-900">
-                    {{ editor.storage.characterCount.characters() }}
-                  </div>
-                </div>
-                <div
-                  class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"
-                >
-                  <div class="flex items-center justify-between">
-                    <div
-                      class="text-sm text-gray-500 group-hover:text-gray-900"
-                    >
-                      {{
-                        $t(
-                          "core.components.default_editor.tabs.detail.fields.word_count"
-                        )
-                      }}
-                    </div>
-                    <div class="rounded bg-gray-200 p-0.5">
-                      <IconCharacterRecognition
-                        class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                      />
-                    </div>
-                  </div>
-                  <div class="text-base font-medium text-gray-900">
-                    {{ editor.storage.characterCount.words() }}
-                  </div>
+                  </li>
+                </ul>
+                <div v-else class="flex flex-col items-center py-10">
+                  <span class="text-sm text-gray-600">
+                    {{ $t("core.components.default_editor.tabs.toc.empty") }}
+                  </span>
                 </div>
               </div>
+            </VTabItem>
+            <VTabItem
+              id="information"
+              :label="$t('core.components.default_editor.tabs.detail.title')"
+            >
+              <div class="flex flex-col gap-2 p-1 pt-0">
+                <div class="grid grid-cols-2 gap-2">
+                  <div
+                    class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"
+                  >
+                    <div class="flex items-center justify-between">
+                      <div
+                        class="text-sm text-gray-500 group-hover:text-gray-900"
+                      >
+                        {{
+                          $t(
+                            "core.components.default_editor.tabs.detail.fields.character_count"
+                          )
+                        }}
+                      </div>
+                      <div class="rounded bg-gray-200 p-0.5">
+                        <IconCharacterRecognition
+                          class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
+                        />
+                      </div>
+                    </div>
+                    <div class="text-base font-medium text-gray-900">
+                      {{ editor.storage.characterCount.characters() }}
+                    </div>
+                  </div>
+                  <div
+                    class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"
+                  >
+                    <div class="flex items-center justify-between">
+                      <div
+                        class="text-sm text-gray-500 group-hover:text-gray-900"
+                      >
+                        {{
+                          $t(
+                            "core.components.default_editor.tabs.detail.fields.word_count"
+                          )
+                        }}
+                      </div>
+                      <div class="rounded bg-gray-200 p-0.5">
+                        <IconCharacterRecognition
+                          class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
+                        />
+                      </div>
+                    </div>
+                    <div class="text-base font-medium text-gray-900">
+                      {{ editor.storage.characterCount.words() }}
+                    </div>
+                  </div>
+                </div>
 
-              <div v-if="publishTime" class="grid grid-cols-1 gap-2">
-                <div
-                  class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"
-                >
-                  <div class="flex items-center justify-between">
-                    <div
-                      class="text-sm text-gray-500 group-hover:text-gray-900"
-                    >
+                <div v-if="publishTime" class="grid grid-cols-1 gap-2">
+                  <div
+                    class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"
+                  >
+                    <div class="flex items-center justify-between">
+                      <div
+                        class="text-sm text-gray-500 group-hover:text-gray-900"
+                      >
+                        {{
+                          $t(
+                            "core.components.default_editor.tabs.detail.fields.publish_time"
+                          )
+                        }}
+                      </div>
+                      <div class="rounded bg-gray-200 p-0.5">
+                        <IconCalendar
+                          class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
+                        />
+                      </div>
+                    </div>
+                    <div class="text-base font-medium text-gray-900">
                       {{
+                        formatDatetime(publishTime) ||
                         $t(
-                          "core.components.default_editor.tabs.detail.fields.publish_time"
+                          "core.components.default_editor.tabs.detail.fields.draft"
                         )
                       }}
                     </div>
-                    <div class="rounded bg-gray-200 p-0.5">
-                      <IconCalendar
-                        class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                      />
+                  </div>
+                </div>
+                <div v-if="owner" class="grid grid-cols-1 gap-2">
+                  <div
+                    class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"
+                  >
+                    <div class="flex items-center justify-between">
+                      <div
+                        class="text-sm text-gray-500 group-hover:text-gray-900"
+                      >
+                        {{
+                          $t(
+                            "core.components.default_editor.tabs.detail.fields.owner"
+                          )
+                        }}
+                      </div>
+                      <div class="rounded bg-gray-200 p-0.5">
+                        <IconUserFollow
+                          class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
+                        />
+                      </div>
+                    </div>
+                    <div class="text-base font-medium text-gray-900">
+                      {{ owner }}
                     </div>
                   </div>
-                  <div class="text-base font-medium text-gray-900">
-                    {{
-                      formatDatetime(publishTime) ||
-                      $t(
-                        "core.components.default_editor.tabs.detail.fields.draft"
-                      )
-                    }}
+                </div>
+                <div v-if="permalink" class="grid grid-cols-1 gap-2">
+                  <div
+                    class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"
+                  >
+                    <div class="flex items-center justify-between">
+                      <div
+                        class="text-sm text-gray-500 group-hover:text-gray-900"
+                      >
+                        {{
+                          $t(
+                            "core.components.default_editor.tabs.detail.fields.permalink"
+                          )
+                        }}
+                      </div>
+                      <div class="rounded bg-gray-200 p-0.5">
+                        <IconLink
+                          class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <a
+                        :href="permalink"
+                        :title="permalink"
+                        target="_blank"
+                        class="text-sm text-gray-900 hover:text-blue-600"
+                      >
+                        {{ permalink }}
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div v-if="owner" class="grid grid-cols-1 gap-2">
-                <div
-                  class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"
-                >
-                  <div class="flex items-center justify-between">
-                    <div
-                      class="text-sm text-gray-500 group-hover:text-gray-900"
-                    >
-                      {{
-                        $t(
-                          "core.components.default_editor.tabs.detail.fields.owner"
-                        )
-                      }}
-                    </div>
-                    <div class="rounded bg-gray-200 p-0.5">
-                      <IconUserFollow
-                        class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                      />
-                    </div>
-                  </div>
-                  <div class="text-base font-medium text-gray-900">
-                    {{ owner }}
-                  </div>
-                </div>
-              </div>
-              <div v-if="permalink" class="grid grid-cols-1 gap-2">
-                <div
-                  class="group flex cursor-pointer flex-col gap-y-5 rounded-md bg-gray-100 px-1.5 py-1 transition-all"
-                >
-                  <div class="flex items-center justify-between">
-                    <div
-                      class="text-sm text-gray-500 group-hover:text-gray-900"
-                    >
-                      {{
-                        $t(
-                          "core.components.default_editor.tabs.detail.fields.permalink"
-                        )
-                      }}
-                    </div>
-                    <div class="rounded bg-gray-200 p-0.5">
-                      <IconLink
-                        class="h-4 w-4 text-gray-600 group-hover:text-gray-900"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <a
-                      :href="permalink"
-                      :title="permalink"
-                      target="_blank"
-                      class="text-sm text-gray-900 hover:text-blue-600"
-                    >
-                      {{ permalink }}
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </VTabItem>
-        </VTabs>
-      </OverlayScrollbarsComponent>
-    </template>
-  </RichTextEditor>
+            </VTabItem>
+          </VTabs>
+        </OverlayScrollbarsComponent>
+      </template>
+    </RichTextEditor>
+  </div>
 </template>
