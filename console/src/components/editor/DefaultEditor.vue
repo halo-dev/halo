@@ -72,6 +72,7 @@ import {
   onMounted,
   shallowRef,
   type ComputedRef,
+  onBeforeUnmount,
 } from "vue";
 import { formatDatetime } from "@/utils/date";
 import { useAttachmentSelect } from "@/modules/contents/attachments/composables/use-attachment";
@@ -353,6 +354,10 @@ onMounted(() => {
       },
     },
   });
+});
+
+onBeforeUnmount(() => {
+  editor.value?.destroy();
 });
 
 // image drag and paste upload
