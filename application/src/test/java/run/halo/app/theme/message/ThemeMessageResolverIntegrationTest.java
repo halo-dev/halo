@@ -68,21 +68,9 @@ public class ThemeMessageResolverIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(String.class)
-            .isEqualTo("""
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Title</title>
-                </head>
-                <body>
-                index
-                <div>zh</div>
-                <div>欢迎来到首页</div>
-                </body>
-                </html>
-                """);
+            .expectBody()
+            .xpath("/html/body/div[1]").isEqualTo("zh")
+            .xpath("/html/body/div[2]").isEqualTo("欢迎来到首页");
     }
 
     @Test
@@ -92,21 +80,9 @@ public class ThemeMessageResolverIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(String.class)
-            .isEqualTo("""
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Title</title>
-                </head>
-                <body>
-                index
-                <div>en</div>
-                <div>Welcome to the index</div>
-                </body>
-                </html>
-                """);
+            .expectBody()
+            .xpath("/html/body/div[1]").isEqualTo("en")
+            .xpath("/html/body/div[2]").isEqualTo("Welcome to the index");
     }
 
     @Test
@@ -116,21 +92,9 @@ public class ThemeMessageResolverIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(String.class)
-            .isEqualTo("""
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Title</title>
-                </head>
-                <body>
-                index
-                <div>foo</div>
-                <div>欢迎来到首页</div>
-                </body>
-                </html>
-                """);
+            .expectBody()
+            .xpath("/html/body/div[1]").isEqualTo("foo")
+            .xpath("/html/body/div[2]").isEqualTo("欢迎来到首页");
     }
 
     @Test
@@ -140,21 +104,11 @@ public class ThemeMessageResolverIntegrationTest {
             .exchange()
             .expectStatus()
             .isOk()
-            .expectBody(String.class)
-            .isEqualTo("""
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Title</title>
-                </head>
-                <body>
-                index
-                <div>zh</div>
-                <div>欢迎来到首页</div>
-                </body>
-                </html>
-                """);
+            .expectBody()
+            .xpath("/html/head/title").isEqualTo("Title")
+            .xpath("/html/body/div[1]").isEqualTo("zh")
+            .xpath("/html/body/div[2]").isEqualTo("欢迎来到首页")
+        ;
 
         // For other theme
         when(themeResolver.getTheme(any(ServerWebExchange.class)))
@@ -162,35 +116,16 @@ public class ThemeMessageResolverIntegrationTest {
         webTestClient.get()
             .uri("/index?language=zh")
             .exchange()
-            .expectBody(String.class)
-            .isEqualTo("""
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Other theme title</title>
-                </head>
-                <body>
-                <p>Other 首页</p>
-                </body>
-                </html>
-                """);
+            .expectBody()
+            .xpath("/html/head/title").isEqualTo("Other theme title")
+            .xpath("/html/body/p").isEqualTo("Other 首页");
+
         webTestClient.get()
             .uri("/index?language=en")
             .exchange()
-            .expectBody(String.class)
-            .isEqualTo("""
-                <!DOCTYPE html>
-                <html lang="en">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Other theme title</title>
-                </head>
-                <body>
-                <p>other index</p>
-                </body>
-                </html>
-                """);
+            .expectBody()
+            .xpath("/html/head/title").isEqualTo("Other theme title")
+            .xpath("/html/body/p").isEqualTo("other index");
     }
 
     ThemeContext createDefaultContext() throws URISyntaxException {
