@@ -6,7 +6,7 @@ import type { User } from "@halo-dev/api-client";
 import { apiClient } from "@console/utils/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
-import { setFocus } from "@console/formkit/utils/focus";
+import { setFocus } from "@/formkit/utils/focus";
 import { useUserStore } from "@console/stores/user";
 
 const props = withDefaults(

@@ -13,7 +13,7 @@ import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
 
 // hooks
-import { setFocus } from "@console/formkit/utils/focus";
+import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { useUserStore } from "@console/stores/user";
 import { useI18n } from "vue-i18n";

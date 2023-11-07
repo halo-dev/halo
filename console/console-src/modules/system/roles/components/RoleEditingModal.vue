@@ -10,7 +10,7 @@ import {
 } from "@console/modules/system/roles/composables/use-role";
 import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
-import { setFocus } from "@console/formkit/utils/focus";
+import { setFocus } from "@/formkit/utils/focus";
 import { pluginLabels, roleLabels } from "@console/constants/labels";
 import { useI18n } from "vue-i18n";
 import { apiClient } from "@console/utils/api-client";

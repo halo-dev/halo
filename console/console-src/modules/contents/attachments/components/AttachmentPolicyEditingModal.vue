@@ -11,7 +11,7 @@ import {
   type FormKitSchemaCondition,
   type FormKitSchemaNode,
 } from "@formkit/core";
-import { setFocus } from "@console/formkit/utils/focus";
+import { setFocus } from "@/formkit/utils/focus";
 import { useI18n } from "vue-i18n";
 
 const props = withDefaults(

@@ -6,7 +6,7 @@ import type { Menu, MenuItem, Ref } from "@halo-dev/api-client";
 import { apiClient } from "@console/utils/api-client";
 import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
-import { setFocus } from "@console/formkit/utils/focus";
+import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { useI18n } from "vue-i18n";
 

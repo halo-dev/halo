@@ -19,7 +19,7 @@ import type { Category } from "@halo-dev/api-client";
 // libs
 import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
-import { setFocus } from "@console/formkit/utils/focus";
+import { setFocus } from "@/formkit/utils/focus";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import useSlugify from "@console/composables/use-slugify";

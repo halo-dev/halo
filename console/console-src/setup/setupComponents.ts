@@ -5,7 +5,7 @@ import "floating-vue/dist/style.css";
 // @ts-ignore
 import VueGridLayout from "vue-grid-layout";
 import { defaultConfig, plugin as FormKit } from "@formkit/vue";
-import FormKitConfig from "@console/formkit/formkit.config";
+import FormKitConfig from "@/formkit/formkit.config";
 import FilterDropdown from "@/components/filter/FilterDropdown.vue";
 import FilterCleanButton from "@/components/filter/FilterCleanButton.vue";
 import SearchInput from "@/components/input/SearchInput.vue";

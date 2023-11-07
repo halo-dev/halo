@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { setFocus } from "@console/formkit/utils/focus";
+import { setFocus } from "@/formkit/utils/focus";
 import { useUserStore } from "@console/stores/user";
 import { randomUUID } from "@console/utils/id";
 import axios from "axios";

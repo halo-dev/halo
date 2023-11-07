@@ -13,7 +13,7 @@ import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
 
 // hooks
-import { setFocus } from "@console/formkit/utils/focus";
+import { setFocus } from "@/formkit/utils/focus";
 import { useI18n } from "vue-i18n";
 import { useQueryClient } from "@tanstack/vue-query";
 

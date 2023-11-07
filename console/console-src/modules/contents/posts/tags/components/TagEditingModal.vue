@@ -21,7 +21,7 @@ import type { Tag } from "@halo-dev/api-client";
 // libs
 import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
-import { setFocus } from "@console/formkit/utils/focus";
+import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import useSlugify from "@console/composables/use-slugify";
 import { useI18n } from "vue-i18n";
