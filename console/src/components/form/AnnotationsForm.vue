@@ -7,12 +7,12 @@ import {
   type FormKitSchemaNode,
 } from "@formkit/core";
 import { computed, nextTick, onMounted, ref, watch } from "vue";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@console/utils/api-client";
 import type { AnnotationSetting } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { getValidationMessages } from "@formkit/validation";
-import { useThemeStore } from "@/stores/theme";
-import { randomUUID } from "@/utils/id";
+import { useThemeStore } from "@console/stores/theme";
+import { randomUUID } from "@console/utils/id";
 
 const themeStore = useThemeStore();
 

@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 import { submitForm } from "@formkit/core";
 import { Toast, VButton } from "@halo-dev/components";
-import { apiClient } from "@/utils/api-client";
+import { apiClient } from "@console/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { useI18n } from "vue-i18n";
 

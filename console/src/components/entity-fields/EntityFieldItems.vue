@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { usePermission } from "@/utils/permission";
+import { usePermission } from "@console/utils/permission";
 import type { EntityFieldItem } from "@halo-dev/console-shared";
 
 withDefaults(

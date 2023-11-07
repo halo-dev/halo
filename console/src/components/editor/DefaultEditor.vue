@@ -55,7 +55,7 @@ import {
   VTabItem,
   VTabs,
 } from "@halo-dev/components";
-import AttachmentSelectorModal from "@/modules/contents/attachments/components/AttachmentSelectorModal.vue";
+import AttachmentSelectorModal from "@console/modules/contents/attachments/components/AttachmentSelectorModal.vue";
 import ExtensionCharacterCount from "@tiptap/extension-character-count";
 import MdiFormatHeader1 from "~icons/mdi/format-header-1";
 import MdiFormatHeader2 from "~icons/mdi/format-header-2";
@@ -73,17 +73,17 @@ import {
   shallowRef,
   type ComputedRef,
 } from "vue";
-import { formatDatetime } from "@/utils/date";
-import { useAttachmentSelect } from "@/modules/contents/attachments/composables/use-attachment";
-import { apiClient } from "@/utils/api-client";
+import { formatDatetime } from "@console/utils/date";
+import { useAttachmentSelect } from "@console/modules/contents/attachments/composables/use-attachment";
+import { apiClient } from "@console/utils/api-client";
 import * as fastq from "fastq";
 import type { queueAsPromised } from "fastq";
 import type { Attachment } from "@halo-dev/api-client";
-import { useFetchAttachmentPolicy } from "@/modules/contents/attachments/composables/use-attachment-policy";
+import { useFetchAttachmentPolicy } from "@console/modules/contents/attachments/composables/use-attachment-policy";
 import { useI18n } from "vue-i18n";
-import { i18n } from "@/locales";
+import { i18n } from "@console/locales";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
-import { usePluginModuleStore } from "@/stores/plugin";
+import { usePluginModuleStore } from "@console/stores/plugin";
 import type { PluginModule } from "@halo-dev/console-shared";
 import { useDebounceFn } from "@vueuse/core";
 

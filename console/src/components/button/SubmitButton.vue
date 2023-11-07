@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { isMac } from "@/utils/device";
+import { isMac } from "@console/utils/device";
 import { VButton } from "@halo-dev/components";
 import { useMagicKeys } from "@vueuse/core";
 import { computed, useAttrs, watchEffect } from "vue";

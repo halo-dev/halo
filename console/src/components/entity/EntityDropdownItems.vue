@@ -1,7 +1,7 @@
 <script setup lang="ts" generic="T">
 import type { OperationItem } from "@halo-dev/console-shared";
 import { VDropdown } from "@halo-dev/components";
-import { usePermission } from "@/utils/permission";
+import { usePermission } from "@console/utils/permission";
 
 const { currentUserHasPermission } = usePermission();
 

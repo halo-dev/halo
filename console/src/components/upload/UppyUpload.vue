@@ -10,8 +10,8 @@ import zh_TW from "@uppy/locales/lib/zh_TW";
 import en_US from "@uppy/locales/lib/en_US";
 import { computed, onUnmounted } from "vue";
 import { Toast } from "@halo-dev/components";
-import type { ProblemDetail } from "@/utils/api-client";
-import { i18n } from "@/locales";
+import type { ProblemDetail } from "@console/utils/api-client";
+import { i18n } from "@console/locales";
 
 const props = withDefaults(
   defineProps<{

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { usePermission } from "@/utils/permission";
+import { usePermission } from "@console/utils/permission";
 
 withDefaults(
   defineProps<{

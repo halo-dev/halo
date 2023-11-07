@@ -6,11 +6,11 @@ import {
   VDropdown,
   IconArrowDown,
 } from "@halo-dev/components";
-import { setFocus } from "@/formkit/utils/focus";
+import { setFocus } from "@console/formkit/utils/focus";
 import { computed, ref, watch } from "vue";
 import Fuse from "fuse.js";
-import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
-import PostTag from "@/modules/contents/posts/tags/components/PostTag.vue";
+import { usePostTag } from "@console/modules/contents/posts/tags/composables/use-post-tag";
+import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
 
 const props = withDefaults(
   defineProps<{
