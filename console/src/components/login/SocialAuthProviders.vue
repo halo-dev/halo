@@ -3,7 +3,7 @@ import { ref, provide } from "vue";
 import type { Ref } from "vue";
 
 // auth providers
-import { useGlobalInfoFetch } from "@/composables/use-global-info";
+import { useGlobalInfoFetch } from "@console/composables/use-global-info";
 import SocialAuthProviderItem from "./SocialAuthProviderItem.vue";
 
 const { globalInfo } = useGlobalInfoFetch();

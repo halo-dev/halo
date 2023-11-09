@@ -1,6 +1,6 @@
 import { i18n } from "@/locales";
-import { coreModules } from "@/modules";
-import router from "@/router";
+import { coreModules } from "@console/modules";
+import router from "@console/router";
 import { usePluginModuleStore } from "@/stores/plugin";
 import type { PluginModule, RouteRecordAppend } from "@halo-dev/console-shared";
 import { useScriptTag } from "@vueuse/core";

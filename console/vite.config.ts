@@ -7,7 +7,7 @@ export default ({ mode }: { mode: string }) => {
   const env = loadEnv(mode, process.cwd(), "");
   return createViteConfig({
     base: env.VITE_BASE_URL,
-    entryFile: "/src/main.ts",
+    entryFile: "/console-src/main.ts",
     port: 3000,
     outDir: path.resolve("../application/src/main/resources/console"),
     mode,

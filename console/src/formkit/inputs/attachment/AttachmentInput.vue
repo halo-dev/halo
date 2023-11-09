@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { FormKitFrameworkContext } from "@formkit/core";
 import { IconFolder } from "@halo-dev/components";
-import AttachmentSelectorModal from "@/modules/contents/attachments/components/AttachmentSelectorModal.vue";
+import AttachmentSelectorModal from "@console/modules/contents/attachments/components/AttachmentSelectorModal.vue";
 import { ref, type PropType } from "vue";
 import type { AttachmentLike } from "@halo-dev/console-shared";
 

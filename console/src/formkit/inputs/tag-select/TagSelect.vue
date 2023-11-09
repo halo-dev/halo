@@ -3,7 +3,7 @@ import { apiClient } from "@/utils/api-client";
 import type { FormKitFrameworkContext } from "@formkit/core";
 import type { Tag } from "@halo-dev/api-client";
 import { computed, ref, watch, type PropType } from "vue";
-import PostTag from "@/modules/contents/posts/tags/components/PostTag.vue";
+import PostTag from "@console/modules/contents/posts/tags/components/PostTag.vue";
 import {
   IconCheckboxCircle,
   IconArrowRight,
@@ -13,7 +13,7 @@ import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
 import { usePermission } from "@/utils/permission";
 import { slugify } from "transliteration";
-import { usePostTag } from "@/modules/contents/posts/tags/composables/use-post-tag";
+import { usePostTag } from "@console/modules/contents/posts/tags/composables/use-post-tag";
 
 const { currentUserHasPermission } = usePermission();
 
