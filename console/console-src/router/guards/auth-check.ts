@@ -1,4 +1,4 @@
-import { useUserStore } from "@console/stores/user";
+import { useUserStore } from "@/stores/user";
 import type { Router } from "vue-router";
 
 const whiteList = ["Setup", "Login", "Binding"];

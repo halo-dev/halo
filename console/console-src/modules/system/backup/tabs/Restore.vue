@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import UppyUpload from "@/components/upload/UppyUpload.vue";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import {
   Dialog,
   Toast,

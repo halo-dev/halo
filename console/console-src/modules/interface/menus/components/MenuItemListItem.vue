@@ -10,7 +10,7 @@ import {
 import Draggable from "vuedraggable";
 import { ref } from "vue";
 import type { MenuTreeItem } from "@console/modules/interface/menus/utils";
-import { usePermission } from "@console/utils/permission";
+import { usePermission } from "@/utils/permission";
 import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();

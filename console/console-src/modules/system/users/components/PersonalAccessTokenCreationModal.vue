@@ -1,12 +1,9 @@
 <script lang="ts" setup>
 import SubmitButton from "@/components/button/SubmitButton.vue";
-import {
-  patAnnotations,
-  rbacAnnotations,
-} from "@console/constants/annotations";
-import { pluginLabels } from "@console/constants/labels";
-import { apiClient } from "@console/utils/api-client";
-import { toISOString } from "@console/utils/date";
+import { patAnnotations, rbacAnnotations } from "@/constants/annotations";
+import { pluginLabels } from "@/constants/labels";
+import { apiClient } from "@/utils/api-client";
+import { toISOString } from "@/utils/date";
 import { Dialog, Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { useClipboard } from "@vueuse/core";
@@ -14,7 +11,7 @@ import type { PatSpec, PersonalAccessToken } from "@halo-dev/api-client";
 import { computed } from "vue";
 import { ref } from "vue";
 import { useRoleTemplateSelection } from "../../roles/composables/use-role";
-import { useRoleStore } from "@console/stores/role";
+import { useRoleStore } from "@/stores/role";
 import { toRefs } from "vue";
 import { useI18n } from "vue-i18n";
 

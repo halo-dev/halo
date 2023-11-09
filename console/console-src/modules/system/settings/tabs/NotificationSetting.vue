@@ -5,7 +5,7 @@ import type { NotifierDescriptor, Setting } from "@halo-dev/api-client";
 import type { Ref } from "vue";
 import { inject } from "vue";
 import { ref } from "vue";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { computed } from "vue";
 import { toRaw } from "vue";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";

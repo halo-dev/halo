@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { randomUUID } from "@console/utils/id";
+import { randomUUID } from "@/utils/id";
 import { getNode, reset } from "@formkit/core";
 import { IconCloseCircle } from "@halo-dev/components";
 

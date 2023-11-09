@@ -10,7 +10,7 @@ import type { Ref } from "vue";
 import type { ConfigMap, Setting, Theme } from "@halo-dev/api-client";
 
 // hooks
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import { useI18n } from "vue-i18n";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";

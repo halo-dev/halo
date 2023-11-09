@@ -1,4 +1,4 @@
-import { useRoleStore } from "@console/stores/role";
+import { useRoleStore } from "@/stores/role";
 import isEqual from "lodash.isequal";
 
 /**

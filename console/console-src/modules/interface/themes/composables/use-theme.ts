@@ -1,7 +1,7 @@
 import type { ComputedRef, Ref } from "vue";
 import { computed, ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useThemeStore } from "@console/stores/theme";
 import { storeToRefs } from "pinia";

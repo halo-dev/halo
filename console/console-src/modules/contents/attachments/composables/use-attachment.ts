@@ -2,13 +2,13 @@ import type { Attachment, Group, Policy } from "@halo-dev/api-client";
 import { computed, nextTick, type Ref } from "vue";
 import { ref, watch } from "vue";
 import type { AttachmentLike } from "@halo-dev/console-shared";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import type { Content, Editor } from "@halo-dev/richtext-editor";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { useClipboard } from "@vueuse/core";
-import { matchMediaType } from "@console/utils/media-type";
+import { matchMediaType } from "@/utils/media-type";
 
 interface useAttachmentControlReturn {
   attachments: Ref<Attachment[] | undefined>;

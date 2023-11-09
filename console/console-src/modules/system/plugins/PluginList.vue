@@ -16,8 +16,8 @@ import {
 import PluginListItem from "./components/PluginListItem.vue";
 import PluginInstallationModal from "./components/PluginInstallationModal.vue";
 import { computed, ref, onMounted } from "vue";
-import { apiClient } from "@console/utils/api-client";
-import { usePermission } from "@console/utils/permission";
+import { apiClient } from "@/utils/api-client";
+import { usePermission } from "@/utils/permission";
 import { useQuery } from "@tanstack/vue-query";
 import type { Plugin } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";

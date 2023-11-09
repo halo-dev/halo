@@ -7,9 +7,9 @@ import {
   IconExternalLinkLine,
 } from "@halo-dev/components";
 import type { ListedPost } from "@halo-dev/api-client";
-import { apiClient } from "@console/utils/api-client";
-import { formatDatetime } from "@console/utils/date";
-import { postLabels } from "@console/constants/labels";
+import { apiClient } from "@/utils/api-client";
+import { formatDatetime } from "@/utils/date";
+import { postLabels } from "@/constants/labels";
 import { useQuery } from "@tanstack/vue-query";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 

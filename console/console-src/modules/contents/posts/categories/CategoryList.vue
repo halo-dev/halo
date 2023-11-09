@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
 import { ref } from "vue";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 
 // components
 import {

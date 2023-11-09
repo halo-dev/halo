@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
 import { computed, nextTick, ref, watch } from "vue";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 
 // components
 import {
@@ -25,7 +25,7 @@ import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import useSlugify from "@console/composables/use-slugify";
 import { useI18n } from "vue-i18n";
-import { FormType } from "@console/types/slug";
+import { FormType } from "@/types/slug";
 
 const props = withDefaults(
   defineProps<{

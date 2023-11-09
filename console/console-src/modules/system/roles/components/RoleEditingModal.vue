@@ -2,7 +2,7 @@
 import { VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { computed, watch } from "vue";
-import { rbacAnnotations } from "@console/constants/annotations";
+import { rbacAnnotations } from "@/constants/annotations";
 import type { Role } from "@halo-dev/api-client";
 import {
   useRoleForm,
@@ -11,9 +11,9 @@ import {
 import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
-import { pluginLabels, roleLabels } from "@console/constants/labels";
+import { pluginLabels, roleLabels } from "@/constants/labels";
 import { useI18n } from "vue-i18n";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { useQuery } from "@tanstack/vue-query";
 
 const { t } = useI18n();

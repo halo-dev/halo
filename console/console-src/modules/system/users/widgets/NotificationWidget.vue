@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { useUserStore } from "@console/stores/user";
-import { apiClient } from "@console/utils/api-client";
-import { relativeTimeTo } from "@console/utils/date";
+import { useUserStore } from "@/stores/user";
+import { apiClient } from "@/utils/api-client";
+import { relativeTimeTo } from "@/utils/date";
 import {
   VButton,
   VCard,

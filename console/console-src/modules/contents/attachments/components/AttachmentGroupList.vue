@@ -19,7 +19,7 @@ import type { Group } from "@halo-dev/api-client";
 
 import { useRouteQuery } from "@vueuse/router";
 import { useFetchAttachmentGroup } from "../composables/use-attachment-group";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();

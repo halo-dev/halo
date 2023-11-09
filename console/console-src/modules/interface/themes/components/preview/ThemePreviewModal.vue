@@ -2,7 +2,7 @@
 import ThemePreviewListItem from "./ThemePreviewListItem.vue";
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import { useThemeStore } from "@console/stores/theme";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import type {
   ConfigMap,
   Setting,

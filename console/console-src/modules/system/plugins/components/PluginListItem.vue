@@ -10,9 +10,9 @@ import {
 import { inject, toRefs, markRaw } from "vue";
 import { usePluginLifeCycle } from "../composables/use-plugin";
 import type { Plugin } from "@halo-dev/api-client";
-import { formatDatetime } from "@console/utils/date";
-import { usePermission } from "@console/utils/permission";
-import { apiClient } from "@console/utils/api-client";
+import { formatDatetime } from "@/utils/date";
+import { usePermission } from "@/utils/permission";
+import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
 import type { Ref } from "vue";
 import { ref } from "vue";

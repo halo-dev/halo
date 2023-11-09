@@ -14,8 +14,8 @@ import {
 } from "@halo-dev/components";
 import { computed, markRaw, ref, watch, type Component } from "vue";
 import Fuse from "fuse.js";
-import { apiClient } from "@console/utils/api-client";
-import { usePermission } from "@console/utils/permission";
+import { apiClient } from "@/utils/api-client";
+import { usePermission } from "@/utils/permission";
 import { useThemeStore } from "@console/stores/theme";
 import { storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";

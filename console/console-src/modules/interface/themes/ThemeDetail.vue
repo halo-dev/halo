@@ -22,7 +22,7 @@ import {
 import type { Ref } from "vue";
 import type { Theme } from "@halo-dev/api-client";
 
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();

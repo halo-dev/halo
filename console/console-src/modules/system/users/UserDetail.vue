@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import {
   VButton,
   VTabbar,
@@ -19,11 +19,11 @@ import { useRoute } from "vue-router";
 import type { DetailedUser } from "@halo-dev/api-client";
 import UserEditingModal from "./components/UserEditingModal.vue";
 import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
-import { usePermission } from "@console/utils/permission";
-import { useUserStore } from "@console/stores/user";
+import { usePermission } from "@/utils/permission";
+import { useUserStore } from "@/stores/user";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
-import { rbacAnnotations } from "@console/constants/annotations";
+import { rbacAnnotations } from "@/constants/annotations";
 import { onBeforeRouteUpdate } from "vue-router";
 import UserAvatar from "./components/UserAvatar.vue";
 import type { Raw } from "vue";

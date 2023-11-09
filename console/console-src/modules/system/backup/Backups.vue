@@ -15,7 +15,7 @@ import { useRouteQuery } from "@vueuse/router";
 import { markRaw } from "vue";
 import { useI18n } from "vue-i18n";
 import { useBackup } from "./composables/use-backup";
-import { usePluginModuleStore } from "@console/stores/plugin";
+import { usePluginModuleStore } from "@/stores/plugin";
 import type { BackupTab } from "@halo-dev/console-shared";
 
 const { t } = useI18n();

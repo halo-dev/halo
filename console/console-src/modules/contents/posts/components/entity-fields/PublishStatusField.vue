@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { VEntityField, VStatusDot } from "@halo-dev/components";
 import type { ListedPost } from "@halo-dev/api-client";
-import { postLabels } from "@console/constants/labels";
+import { postLabels } from "@/constants/labels";
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 

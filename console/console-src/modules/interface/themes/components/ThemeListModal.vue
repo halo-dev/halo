@@ -18,9 +18,9 @@ import InstalledThemes from "./list-tabs/InstalledThemes.vue";
 import NotInstalledThemes from "./list-tabs/NotInstalledThemes.vue";
 import LocalUpload from "./list-tabs/LocalUpload.vue";
 import RemoteDownload from "./list-tabs/RemoteDownload.vue";
-import { usePluginModuleStore } from "@console/stores/plugin";
+import { usePluginModuleStore } from "@/stores/plugin";
 import type { PluginModule, ThemeListTab } from "@halo-dev/console-shared";
-import { usePermission } from "@console/utils/permission";
+import { usePermission } from "@/utils/permission";
 
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();

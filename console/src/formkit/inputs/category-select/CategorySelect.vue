@@ -11,8 +11,8 @@ import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
 import CategoryTag from "./components/CategoryTag.vue";
 import SearchResultListItem from "./components/SearchResultListItem.vue";
-import { apiClient } from "@console/utils/api-client";
-import { usePermission } from "@console/utils/permission";
+import { apiClient } from "@/utils/api-client";
+import { usePermission } from "@/utils/permission";
 import { slugify } from "transliteration";
 
 const { currentUserHasPermission } = usePermission();

@@ -15,7 +15,7 @@ import MenuItemEditingModal from "./components/MenuItemEditingModal.vue";
 import MenuItemListItem from "./components/MenuItemListItem.vue";
 import MenuList from "./components/MenuList.vue";
 import { computed, ref } from "vue";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import type { Menu, MenuItem } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import type { MenuTreeItem } from "./utils";

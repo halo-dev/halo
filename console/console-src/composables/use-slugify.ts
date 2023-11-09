@@ -1,9 +1,9 @@
 import { slugify } from "transliteration";
 import { watch, type Ref } from "vue";
 import ShortUniqueId from "short-unique-id";
-import { FormType } from "@console/types/slug";
-import { useGlobalInfoStore } from "@console/stores/global-info";
-import { randomUUID } from "@console/utils/id";
+import { FormType } from "@/types/slug";
+import { useGlobalInfoStore } from "@/stores/global-info";
+import { randomUUID } from "@/utils/id";
 const uid = new ShortUniqueId();
 const Strategy = {
   generateByTitle: (value: string) => {

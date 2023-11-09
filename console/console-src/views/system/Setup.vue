@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { Toast, VButton } from "@halo-dev/components";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import type { SystemInitializationRequest } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
-import { useGlobalInfoStore } from "@console/stores/global-info";
+import { useGlobalInfoStore } from "@/stores/global-info";
 import LocaleChange from "@/components/common/LocaleChange.vue";
 
 const router = useRouter();

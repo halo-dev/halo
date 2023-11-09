@@ -14,9 +14,9 @@ import type {
   PluginInstallationTab,
   PluginModule,
 } from "@halo-dev/console-shared";
-import { usePluginModuleStore } from "@console/stores/plugin";
+import { usePluginModuleStore } from "@/stores/plugin";
 import { onMounted } from "vue";
-import { usePermission } from "@console/utils/permission";
+import { usePermission } from "@/utils/permission";
 
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();

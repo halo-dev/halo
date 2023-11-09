@@ -2,7 +2,7 @@
 import { computed, onBeforeMount, onMounted } from "vue";
 import router from "@console/router";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
-import { useUserStore } from "@console/stores/user";
+import { useUserStore } from "@/stores/user";
 import LoginForm from "@/components/login/LoginForm.vue";
 import { useRoute } from "vue-router";
 import { Toast } from "@halo-dev/components";

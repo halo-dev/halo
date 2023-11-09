@@ -124,10 +124,10 @@ import {
 import { onMounted, provide, ref, type Ref } from "vue";
 import { useStorage } from "@vueuse/core";
 import cloneDeep from "lodash.clonedeep";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import type { DashboardStats } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
-import { usePermission } from "@console/utils/permission";
+import { usePermission } from "@/utils/permission";
 
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();

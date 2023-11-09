@@ -1,4 +1,4 @@
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import dayjs from "dayjs";

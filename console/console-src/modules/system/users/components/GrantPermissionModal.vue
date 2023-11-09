@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import type { User } from "@halo-dev/api-client";
 import { VModal, VSpace, VButton } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";

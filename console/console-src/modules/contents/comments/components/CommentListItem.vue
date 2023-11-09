@@ -23,15 +23,15 @@ import type {
   Post,
   SinglePage,
 } from "@halo-dev/api-client";
-import { formatDatetime } from "@console/utils/date";
+import { formatDatetime } from "@/utils/date";
 import { computed, provide, ref, onMounted, type Ref } from "vue";
 import ReplyListItem from "./ReplyListItem.vue";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import cloneDeep from "lodash.clonedeep";
-import { usePermission } from "@console/utils/permission";
+import { usePermission } from "@/utils/permission";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
-import { usePluginModuleStore } from "@console/stores/plugin";
+import { usePluginModuleStore } from "@/stores/plugin";
 import type {
   PluginModule,
   CommentSubjectRefProvider,

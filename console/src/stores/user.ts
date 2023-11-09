@@ -1,4 +1,4 @@
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import type { Role, User } from "@halo-dev/api-client";
 import { defineStore } from "pinia";
 

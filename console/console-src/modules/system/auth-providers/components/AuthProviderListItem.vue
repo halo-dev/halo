@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import type { ListedAuthProvider } from "@halo-dev/api-client";
 import {
   Dialog,

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, toRaw } from "vue";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { useQuery } from "@tanstack/vue-query";
 import type { AuthProvider, Setting } from "@halo-dev/api-client";
 import { useRoute } from "vue-router";

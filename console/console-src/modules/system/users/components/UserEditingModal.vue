@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
 import { nextTick, ref, watch } from "vue";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import type { User } from "@halo-dev/api-client";
 
 // components
@@ -15,7 +15,7 @@ import { reset } from "@formkit/core";
 // hooks
 import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
-import { useUserStore } from "@console/stores/user";
+import { useUserStore } from "@/stores/user";
 import { useI18n } from "vue-i18n";
 import { useQueryClient } from "@tanstack/vue-query";
 

@@ -10,10 +10,10 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import type { Theme } from "@halo-dev/api-client";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { toRefs, ref, inject, type Ref } from "vue";
 import { useThemeLifeCycle } from "../composables/use-theme";
-import { usePermission } from "@console/utils/permission";
+import { usePermission } from "@/utils/permission";
 import { useI18n } from "vue-i18n";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useOperationItemExtensionPoint } from "@console/composables/use-operation-extension-points";

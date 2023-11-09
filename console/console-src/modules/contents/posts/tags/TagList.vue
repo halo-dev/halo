@@ -26,11 +26,11 @@ import PostTag from "./components/PostTag.vue";
 import type { Tag } from "@halo-dev/api-client";
 import { usePostTag } from "./composables/use-post-tag";
 
-import { formatDatetime } from "@console/utils/date";
+import { formatDatetime } from "@/utils/date";
 
 import { useRouteQuery } from "@vueuse/router";
-import { apiClient } from "@console/utils/api-client";
-import { usePermission } from "@console/utils/permission";
+import { apiClient } from "@/utils/api-client";
+import { usePermission } from "@/utils/permission";
 
 const { currentUserHasPermission } = usePermission();
 

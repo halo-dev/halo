@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { setFocus } from "@/formkit/utils/focus";
-import { useUserStore } from "@console/stores/user";
-import { randomUUID } from "@console/utils/id";
+import { useUserStore } from "@/stores/user";
+import { randomUUID } from "@/utils/id";
 import axios from "axios";
 import { AxiosError } from "axios";
 import { Toast, VButton } from "@halo-dev/components";
@@ -9,7 +9,7 @@ import { onMounted, ref } from "vue";
 import qs from "qs";
 import { submitForm } from "@formkit/core";
 import { JSEncrypt } from "jsencrypt";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();

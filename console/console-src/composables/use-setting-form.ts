@@ -2,7 +2,7 @@
 // types
 import { computed, watch, type ComputedRef, type Ref } from "vue";
 import { ref } from "vue";
-import { apiClient } from "../utils/api-client";
+import { apiClient } from "@/utils/api-client";
 
 // libs
 import cloneDeep from "lodash.clonedeep";

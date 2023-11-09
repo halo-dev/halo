@@ -73,17 +73,17 @@ import {
   shallowRef,
   type ComputedRef,
 } from "vue";
-import { formatDatetime } from "@console/utils/date";
+import { formatDatetime } from "@/utils/date";
 import { useAttachmentSelect } from "@console/modules/contents/attachments/composables/use-attachment";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import * as fastq from "fastq";
 import type { queueAsPromised } from "fastq";
 import type { Attachment } from "@halo-dev/api-client";
 import { useFetchAttachmentPolicy } from "@console/modules/contents/attachments/composables/use-attachment-policy";
 import { useI18n } from "vue-i18n";
-import { i18n } from "@console/locales";
+import { i18n } from "@/locales";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
-import { usePluginModuleStore } from "@console/stores/plugin";
+import { usePluginModuleStore } from "@/stores/plugin";
 import type { PluginModule } from "@halo-dev/console-shared";
 import { useDebounceFn } from "@vueuse/core";
 

@@ -1,5 +1,5 @@
-import { singlePageLabels } from "@console/constants/labels";
-import { apiClient } from "@console/utils/api-client";
+import { singlePageLabels } from "@/constants/labels";
+import { apiClient } from "@/utils/api-client";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import { select, selects, defaultIcon } from "@formkit/inputs";
 import type { FormKitInputs } from "@formkit/inputs";

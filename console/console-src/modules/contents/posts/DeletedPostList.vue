@@ -20,9 +20,9 @@ import {
 import PostTag from "./tags/components/PostTag.vue";
 import { ref, watch } from "vue";
 import type { ListedPost, Post } from "@halo-dev/api-client";
-import { apiClient } from "@console/utils/api-client";
-import { formatDatetime } from "@console/utils/date";
-import { usePermission } from "@console/utils/permission";
+import { apiClient } from "@/utils/api-client";
+import { formatDatetime } from "@/utils/date";
+import { usePermission } from "@/utils/permission";
 import cloneDeep from "lodash.clonedeep";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";

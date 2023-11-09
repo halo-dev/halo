@@ -9,8 +9,8 @@ import {
 import Draggable from "vuedraggable";
 import type { CategoryTree } from "../utils";
 import { ref } from "vue";
-import { formatDatetime } from "@console/utils/date";
-import { usePermission } from "@console/utils/permission";
+import { formatDatetime } from "@/utils/date";
+import { usePermission } from "@/utils/permission";
 
 const { currentUserHasPermission } = usePermission();
 

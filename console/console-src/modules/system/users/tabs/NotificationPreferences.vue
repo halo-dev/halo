@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import type { DetailedUser } from "@halo-dev/api-client";
 import { VLoading, VSwitch } from "@halo-dev/components";

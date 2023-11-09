@@ -13,7 +13,7 @@ export default ({ mode }: { mode: string }) => {
     mode,
     plugins: [
       VueI18nPlugin({
-        include: [path.resolve(__dirname, "./console-src/locales/*.yaml")],
+        include: [path.resolve(__dirname, "./src/locales/*.yaml")],
       }) as Plugin,
     ],
   });

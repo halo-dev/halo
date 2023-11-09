@@ -1,4 +1,4 @@
-import { isMac } from "@console/utils/device";
+import { isMac } from "@/utils/device";
 import { useEventListener } from "@vueuse/core";
 import { useDebounceFn } from "@vueuse/shared";
 import { nextTick } from "vue";

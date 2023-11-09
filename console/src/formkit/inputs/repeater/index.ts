@@ -41,7 +41,7 @@ import {
   IconArrowDownCircleLine,
 } from "@halo-dev/components";
 import AddButton from "./AddButton.vue";
-import { i18n } from "@console/locales";
+import { i18n } from "@/locales";
 
 declare module "@formkit/inputs" {
   interface FormKitInputProps<Props extends FormKitInputs<Props>> {

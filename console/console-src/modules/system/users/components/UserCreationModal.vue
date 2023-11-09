@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // core libs
 import { ref, watch } from "vue";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import type { CreateUserRequest } from "@halo-dev/api-client";
 
 // components

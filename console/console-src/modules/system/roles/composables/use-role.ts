@@ -1,9 +1,9 @@
 import type { Role } from "@halo-dev/api-client";
 import { onUnmounted, type ComputedRef, type Ref } from "vue";
 import { computed, onMounted, ref } from "vue";
-import { roleLabels } from "@console/constants/labels";
-import { rbacAnnotations } from "@console/constants/annotations";
-import { apiClient } from "@console/utils/api-client";
+import { roleLabels } from "@/constants/labels";
+import { rbacAnnotations } from "@/constants/annotations";
+import { apiClient } from "@/utils/api-client";
 import { Toast } from "@halo-dev/components";
 import { useI18n } from "vue-i18n";
 

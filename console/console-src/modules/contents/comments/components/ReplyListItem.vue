@@ -11,8 +11,8 @@ import {
   Toast,
 } from "@halo-dev/components";
 import type { ListedReply } from "@halo-dev/api-client";
-import { formatDatetime } from "@console/utils/date";
-import { apiClient } from "@console/utils/api-client";
+import { formatDatetime } from "@/utils/date";
+import { apiClient } from "@/utils/api-client";
 import { computed, inject, type Ref } from "vue";
 import cloneDeep from "lodash.clonedeep";
 import { useI18n } from "vue-i18n";

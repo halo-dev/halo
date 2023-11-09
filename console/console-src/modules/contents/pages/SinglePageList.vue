@@ -18,8 +18,8 @@ import {
 import SinglePageSettingModal from "./components/SinglePageSettingModal.vue";
 import { computed, ref, watch } from "vue";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
-import { apiClient } from "@console/utils/api-client";
-import { singlePageLabels } from "@console/constants/labels";
+import { apiClient } from "@/utils/api-client";
+import { singlePageLabels } from "@/constants/labels";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import UserFilterDropdown from "@/components/filter/UserFilterDropdown.vue";

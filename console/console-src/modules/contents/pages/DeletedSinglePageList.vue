@@ -19,10 +19,10 @@ import {
 } from "@halo-dev/components";
 import { ref, watch } from "vue";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
-import { apiClient } from "@console/utils/api-client";
-import { formatDatetime } from "@console/utils/date";
+import { apiClient } from "@/utils/api-client";
+import { formatDatetime } from "@/utils/date";
 import cloneDeep from "lodash.clonedeep";
-import { usePermission } from "@console/utils/permission";
+import { usePermission } from "@/utils/permission";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import ContributorList from "../_components/ContributorList.vue";

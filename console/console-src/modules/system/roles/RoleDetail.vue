@@ -12,16 +12,16 @@ import {
 } from "@halo-dev/components";
 import { useRoute } from "vue-router";
 import { computed, onMounted, ref, watch } from "vue";
-import { apiClient } from "@console/utils/api-client";
-import { pluginLabels, roleLabels } from "@console/constants/labels";
-import { rbacAnnotations } from "@console/constants/annotations";
+import { apiClient } from "@/utils/api-client";
+import { pluginLabels, roleLabels } from "@/constants/labels";
+import { rbacAnnotations } from "@/constants/annotations";
 import {
   useRoleForm,
   useRoleTemplateSelection,
 } from "@console/modules/system/roles/composables/use-role";
-import { SUPER_ROLE_NAME } from "@console/constants/constants";
+import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { useI18n } from "vue-i18n";
-import { formatDatetime } from "@console/utils/date";
+import { formatDatetime } from "@/utils/date";
 import { useQuery } from "@tanstack/vue-query";
 
 const route = useRoute();

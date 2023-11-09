@@ -16,12 +16,12 @@ import {
 import AttachmentPolicyEditingModal from "./AttachmentPolicyEditingModal.vue";
 import { ref } from "vue";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
-import { formatDatetime } from "@console/utils/date";
+import { formatDatetime } from "@/utils/date";
 import {
   useFetchAttachmentPolicy,
   useFetchAttachmentPolicyTemplate,
 } from "../composables/use-attachment-policy";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
 
 withDefaults(

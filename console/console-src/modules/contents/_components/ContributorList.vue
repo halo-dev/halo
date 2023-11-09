@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { usePermission } from "@console/utils/permission";
+import { usePermission } from "@/utils/permission";
 import type { Contributor } from "@halo-dev/api-client";
 import { VAvatar } from "@halo-dev/components";
 import { useRouter } from "vue-router";

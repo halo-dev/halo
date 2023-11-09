@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import type { GlobalInfo } from "@console/types";
+import type { GlobalInfo } from "@/types";
 import { ref } from "vue";
 import axios from "axios";
 

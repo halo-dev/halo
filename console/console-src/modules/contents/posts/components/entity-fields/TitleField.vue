@@ -7,7 +7,7 @@ import {
 } from "@halo-dev/components";
 import PostTag from "../../tags/components/PostTag.vue";
 import type { ListedPost } from "@halo-dev/api-client";
-import { postLabels } from "@console/constants/labels";
+import { postLabels } from "@/constants/labels";
 import { computed } from "vue";
 
 const props = withDefaults(

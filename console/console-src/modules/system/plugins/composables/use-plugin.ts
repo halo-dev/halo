@@ -2,7 +2,7 @@ import type { ComputedRef, Ref } from "vue";
 import { computed } from "vue";
 import { type Plugin } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { Dialog, Toast } from "@halo-dev/components";
 import { useI18n } from "vue-i18n";
 import { useMutation } from "@tanstack/vue-query";

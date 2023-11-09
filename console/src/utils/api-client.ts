@@ -48,9 +48,9 @@ import {
 } from "@halo-dev/api-client";
 import type { AxiosError, AxiosInstance } from "axios";
 import axios from "axios";
-import { useUserStore } from "@console/stores/user";
+import { useUserStore } from "@/stores/user";
 import { Toast } from "@halo-dev/components";
-import { i18n } from "../locales";
+import { i18n } from "@/locales";
 
 const baseURL = import.meta.env.VITE_API_URL;
 

@@ -11,9 +11,9 @@ import {
   VDescriptionItem,
 } from "@halo-dev/components";
 import { computed, onMounted, ref } from "vue";
-import type { Info, GlobalInfo, Startup } from "@console/types";
+import type { Info, GlobalInfo, Startup } from "@/types";
 import axios from "axios";
-import { formatDatetime } from "@console/utils/date";
+import { formatDatetime } from "@/utils/date";
 import { useClipboard } from "@vueuse/core";
 import { useI18n } from "vue-i18n";
 

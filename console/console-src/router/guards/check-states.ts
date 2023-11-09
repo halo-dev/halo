@@ -1,5 +1,5 @@
-import { useGlobalInfoStore } from "@console/stores/global-info";
-import { useUserStore } from "@console/stores/user";
+import { useGlobalInfoStore } from "@/stores/global-info";
+import { useUserStore } from "@/stores/user";
 import type { Router } from "vue-router";
 
 export function setupCheckStatesGuard(router: Router) {

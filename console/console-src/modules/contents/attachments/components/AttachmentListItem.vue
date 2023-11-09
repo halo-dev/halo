@@ -10,11 +10,11 @@ import {
 } from "@halo-dev/components";
 import { computed, ref } from "vue";
 import type { Attachment } from "@halo-dev/api-client";
-import { formatDatetime } from "@console/utils/date";
+import { formatDatetime } from "@/utils/date";
 import prettyBytes from "pretty-bytes";
 import { useFetchAttachmentPolicy } from "../composables/use-attachment-policy";
-import { apiClient } from "@console/utils/api-client";
-import { usePermission } from "@console/utils/permission";
+import { apiClient } from "@/utils/api-client";
+import { usePermission } from "@/utils/permission";
 import { useI18n } from "vue-i18n";
 import { inject } from "vue";
 import type { Ref } from "vue";

@@ -1,5 +1,5 @@
-import { useRoleStore } from "@console/stores/role";
-import { hasPermission } from "@console/utils/permission";
+import { useRoleStore } from "@/stores/role";
+import { hasPermission } from "@/utils/permission";
 import type { Router } from "vue-router";
 
 export function setupPermissionGuard(router: Router) {

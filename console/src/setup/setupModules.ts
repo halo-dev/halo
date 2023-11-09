@@ -1,13 +1,13 @@
-import { i18n } from "@console/locales";
+import { i18n } from "@/locales";
 import { coreModules } from "@console/modules";
 import router from "@console/router";
-import { usePluginModuleStore } from "@console/stores/plugin";
+import { usePluginModuleStore } from "@/stores/plugin";
 import type { PluginModule, RouteRecordAppend } from "@halo-dev/console-shared";
 import { useScriptTag } from "@vueuse/core";
 import { Toast } from "@halo-dev/components";
 import type { App } from "vue";
 import type { RouteRecordRaw } from "vue-router";
-import { loadStyle } from "@console/utils/load-style";
+import { loadStyle } from "@/utils/load-style";
 
 export function setupCoreModules(app: App) {
   coreModules.forEach((module) => {

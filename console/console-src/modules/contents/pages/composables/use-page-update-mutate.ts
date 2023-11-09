@@ -1,4 +1,4 @@
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { useMutation } from "@tanstack/vue-query";
 import type { SinglePage } from "@halo-dev/api-client";
 import { Toast } from "@halo-dev/components";

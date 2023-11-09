@@ -9,17 +9,17 @@ import {
 import { computed, nextTick, ref, watchEffect } from "vue";
 import type { Post } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
-import { postLabels } from "@console/constants/labels";
-import { randomUUID } from "@console/utils/id";
-import { toDatetimeLocal, toISOString } from "@console/utils/date";
+import { postLabels } from "@/constants/labels";
+import { randomUUID } from "@/utils/id";
+import { toDatetimeLocal, toISOString } from "@/utils/date";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import { submitForm } from "@formkit/core";
 import useSlugify from "@console/composables/use-slugify";
 import { useI18n } from "vue-i18n";
 import { usePostUpdateMutate } from "../composables/use-post-update-mutate";
-import { FormType } from "@console/types/slug";
+import { FormType } from "@/types/slug";
 
 const initialFormState: Post = {
   spec: {

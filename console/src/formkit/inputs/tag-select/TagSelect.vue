@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import type { FormKitFrameworkContext } from "@formkit/core";
 import type { Tag } from "@halo-dev/api-client";
 import { computed, ref, watch, type PropType } from "vue";
@@ -11,7 +11,7 @@ import {
 } from "@halo-dev/components";
 import { onClickOutside } from "@vueuse/core";
 import Fuse from "fuse.js";
-import { usePermission } from "@console/utils/permission";
+import { usePermission } from "@/utils/permission";
 import { slugify } from "transliteration";
 import { usePostTag } from "@console/modules/contents/posts/tags/composables/use-post-tag";
 

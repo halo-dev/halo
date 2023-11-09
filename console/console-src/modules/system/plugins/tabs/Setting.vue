@@ -4,7 +4,7 @@ import { inject, ref, type Ref, computed } from "vue";
 
 // hooks
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 
 // components
 import { Toast, VButton } from "@halo-dev/components";

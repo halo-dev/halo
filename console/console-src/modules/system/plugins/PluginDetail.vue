@@ -2,7 +2,7 @@
 // core libs
 import { provide, ref, computed } from "vue";
 import { useRoute } from "vue-router";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 
 // libs
 import cloneDeep from "lodash.clonedeep";
@@ -13,7 +13,7 @@ import { VCard, VPageHeader, VTabbar, VAvatar } from "@halo-dev/components";
 // types
 import type { Ref } from "vue";
 import type { Plugin, Setting, SettingForm } from "@halo-dev/api-client";
-import { usePermission } from "@console/utils/permission";
+import { usePermission } from "@/utils/permission";
 import { useI18n } from "vue-i18n";
 import { useQuery } from "@tanstack/vue-query";
 import type { PluginTab } from "@halo-dev/console-shared";
@@ -21,7 +21,7 @@ import { markRaw } from "vue";
 import DetailTab from "./tabs/Detail.vue";
 import SettingTab from "./tabs/Setting.vue";
 import { useRouteQuery } from "@vueuse/router";
-import { usePluginModuleStore } from "@console/stores/plugin";
+import { usePluginModuleStore } from "@/stores/plugin";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();

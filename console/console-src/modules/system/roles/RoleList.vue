@@ -22,18 +22,18 @@ import {
 import RoleEditingModal from "./components/RoleEditingModal.vue";
 
 // constants
-import { rbacAnnotations } from "@console/constants/annotations";
-import { formatDatetime } from "@console/utils/date";
+import { rbacAnnotations } from "@/constants/annotations";
+import { formatDatetime } from "@/utils/date";
 
 // hooks
 import { useFetchRole } from "@console/modules/system/roles/composables/use-role";
 
 // libs
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import Fuse from "fuse.js";
-import { usePermission } from "@console/utils/permission";
-import { roleLabels } from "@console/constants/labels";
-import { SUPER_ROLE_NAME } from "@console/constants/constants";
+import { usePermission } from "@/utils/permission";
+import { roleLabels } from "@/constants/labels";
+import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { useI18n } from "vue-i18n";
 
 const { currentUserHasPermission } = usePermission();

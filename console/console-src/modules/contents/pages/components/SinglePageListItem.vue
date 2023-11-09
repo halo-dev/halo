@@ -14,12 +14,12 @@ import {
 } from "@halo-dev/components";
 import { computed, ref } from "vue";
 import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
-import { apiClient } from "@console/utils/api-client";
-import { formatDatetime } from "@console/utils/date";
+import { apiClient } from "@/utils/api-client";
+import { formatDatetime } from "@/utils/date";
 import { RouterLink } from "vue-router";
 import cloneDeep from "lodash.clonedeep";
-import { usePermission } from "@console/utils/permission";
-import { singlePageLabels } from "@console/constants/labels";
+import { usePermission } from "@/utils/permission";
+import { singlePageLabels } from "@/constants/labels";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { inject } from "vue";

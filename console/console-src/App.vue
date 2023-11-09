@@ -3,7 +3,7 @@ import { RouterView, useRoute } from "vue-router";
 import { computed, watch, reactive, onMounted, inject } from "vue";
 import { useTitle } from "@vueuse/core";
 import { useFavicon } from "@vueuse/core";
-import { useSystemConfigMapStore } from "./stores/system-configmap";
+import { useSystemConfigMapStore } from "@console/stores/system-configmap";
 import { storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
 import {
@@ -11,9 +11,9 @@ import {
   type UseOverlayScrollbarsParams,
 } from "overlayscrollbars-vue";
 import type { FormKitConfig } from "@formkit/core";
-import { i18n } from "./locales";
-import { AppName } from "./constants/app";
-import { useGlobalInfoStore } from "./stores/global-info";
+import { i18n } from "@/locales";
+import { AppName } from "@/constants/app";
+import { useGlobalInfoStore } from "@/stores/global-info";
 
 const { t } = useI18n();
 

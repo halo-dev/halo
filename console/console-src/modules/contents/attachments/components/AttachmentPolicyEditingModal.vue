@@ -5,7 +5,7 @@ import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { computed, ref, toRaw, watch, watchEffect } from "vue";
 import { useSettingForm } from "@console/composables/use-setting-form";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import {
   reset,
   type FormKitSchemaCondition,

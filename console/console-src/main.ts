@@ -3,20 +3,20 @@ import type { DirectiveBinding } from "vue";
 import { createPinia } from "pinia";
 import App from "./App.vue";
 import router from "./router";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 // setup
-import "./setup/setupStyles";
-import { setupComponents } from "./setup/setupComponents";
-import { setupI18n, i18n, getBrowserLanguage } from "./locales";
+import "@/setup/setupStyles";
+import { setupComponents } from "@/setup/setupComponents";
+import { setupI18n, i18n, getBrowserLanguage } from "@/locales";
 // core modules
-import { hasPermission } from "@console/utils/permission";
-import { useRoleStore } from "@console/stores/role";
-import { useThemeStore } from "./stores/theme";
-import { useUserStore } from "./stores/user";
-import { useSystemConfigMapStore } from "./stores/system-configmap";
-import { setupVueQuery } from "./setup/setupVueQuery";
-import { useGlobalInfoStore } from "./stores/global-info";
-import { setupCoreModules, setupPluginModules } from "./setup/setupModules";
+import { hasPermission } from "@/utils/permission";
+import { useRoleStore } from "@/stores/role";
+import { useThemeStore } from "@console/stores/theme";
+import { useUserStore } from "@/stores/user";
+import { useSystemConfigMapStore } from "@console/stores/system-configmap";
+import { setupVueQuery } from "@/setup/setupVueQuery";
+import { useGlobalInfoStore } from "@/stores/global-info";
+import { setupCoreModules, setupPluginModules } from "@/setup/setupModules";
 
 const app = createApp(App);
 

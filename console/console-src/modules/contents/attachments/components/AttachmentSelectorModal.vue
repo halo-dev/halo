@@ -7,7 +7,7 @@ import type {
   AttachmentSelectProvider,
   PluginModule,
 } from "@halo-dev/console-shared";
-import { usePluginModuleStore } from "@console/stores/plugin";
+import { usePluginModuleStore } from "@/stores/plugin";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();

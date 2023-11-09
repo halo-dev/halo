@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { VLoading } from "@halo-dev/components";
 import { useMutation } from "@tanstack/vue-query";
 import {
@@ -17,9 +17,9 @@ import singlePage from "./setup-data/singlePage.json";
 import menu from "./setup-data/menu.json";
 import menuItems from "./setup-data/menu-items.json";
 import { useRouter } from "vue-router";
-import { useGlobalInfoStore } from "@console/stores/global-info";
+import { useGlobalInfoStore } from "@/stores/global-info";
 import { ref } from "vue";
-import { useUserStore } from "@console/stores/user";
+import { useUserStore } from "@/stores/user";
 
 const router = useRouter();
 const globalInfoStore = useGlobalInfoStore();

@@ -1,4 +1,4 @@
-import { usePluginModuleStore } from "@console/stores/plugin";
+import { usePluginModuleStore } from "@/stores/plugin";
 import type { EditorProvider, PluginModule } from "@halo-dev/console-shared";
 import { onMounted, ref, type Ref, defineAsyncComponent } from "vue";
 import { VLoading } from "@halo-dev/components";

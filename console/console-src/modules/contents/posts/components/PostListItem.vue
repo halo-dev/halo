@@ -7,11 +7,11 @@ import {
   VEntity,
   VEntityField,
 } from "@halo-dev/components";
-import { formatDatetime } from "@console/utils/date";
+import { formatDatetime } from "@/utils/date";
 import type { ListedPost, Post } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";
-import { usePermission } from "@console/utils/permission";
-import { apiClient } from "@console/utils/api-client";
+import { usePermission } from "@/utils/permission";
+import { apiClient } from "@/utils/api-client";
 import { useQueryClient } from "@tanstack/vue-query";
 import type { Ref } from "vue";
 import { computed, toRefs, markRaw, ref, inject } from "vue";

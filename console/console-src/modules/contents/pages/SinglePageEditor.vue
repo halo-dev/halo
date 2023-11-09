@@ -22,11 +22,11 @@ import {
   toRef,
   type ComputedRef,
 } from "vue";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import cloneDeep from "lodash.clonedeep";
 import { useRouter } from "vue-router";
-import { randomUUID } from "@console/utils/id";
+import { randomUUID } from "@/utils/id";
 import { useContentCache } from "@console/composables/use-content-cache";
 import { useEditorExtensionPoints } from "@console/composables/use-editor-extension-points";
 import type { EditorProvider } from "@halo-dev/console-shared";
@@ -34,7 +34,7 @@ import { useLocalStorage } from "@vueuse/core";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
 import { useI18n } from "vue-i18n";
 import UrlPreviewModal from "@/components/preview/UrlPreviewModal.vue";
-import { contentAnnotations } from "@console/constants/annotations";
+import { contentAnnotations } from "@/constants/annotations";
 import { usePageUpdateMutate } from "./composables/use-page-update-mutate";
 import { useAutoSaveContent } from "@console/composables/use-auto-save-content";
 import { useContentSnapshot } from "@console/composables/use-content-snapshot";

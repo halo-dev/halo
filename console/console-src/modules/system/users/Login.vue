@@ -8,7 +8,7 @@ import SocialAuthProviders from "@/components/login/SocialAuthProviders.vue";
 import { useGlobalInfoFetch } from "@console/composables/use-global-info";
 import { useTitle } from "@vueuse/core";
 import { useI18n } from "vue-i18n";
-import { AppName } from "@console/constants/app";
+import { AppName } from "@/constants/app";
 import MdiKeyboardBackspace from "~icons/mdi/keyboard-backspace";
 import LocaleChange from "@/components/common/LocaleChange.vue";
 

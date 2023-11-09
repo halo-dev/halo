@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import {
   IconRiPencilFill,
   IconAddCircle,
@@ -14,7 +14,7 @@ import {
 } from "@halo-dev/components";
 import { ref, defineAsyncComponent, type ComputedRef, type Ref } from "vue";
 import type { DetailedUser } from "@halo-dev/api-client";
-import { usePermission } from "@console/utils/permission";
+import { usePermission } from "@/utils/permission";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { useFileDialog } from "@vueuse/core";

@@ -24,17 +24,17 @@ import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue"
 import LoginModal from "@/components/login/LoginModal.vue";
 import { coreMenuGroups } from "@console/router/routes.config";
 import sortBy from "lodash.sortby";
-import { useRoleStore } from "@console/stores/role";
-import { hasPermission } from "@console/utils/permission";
-import { useUserStore } from "@console/stores/user";
-import { rbacAnnotations } from "@console/constants/annotations";
+import { useRoleStore } from "@/stores/role";
+import { hasPermission } from "@/utils/permission";
+import { useUserStore } from "@/stores/user";
+import { rbacAnnotations } from "@/constants/annotations";
 import { defineStore, storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
 import {
   useOverlayScrollbars,
   type UseOverlayScrollbarsParams,
 } from "overlayscrollbars-vue";
-import { isMac } from "@console/utils/device";
+import { isMac } from "@/utils/device";
 
 const route = useRoute();
 const router = useRouter();

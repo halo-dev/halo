@@ -7,12 +7,12 @@ import {
 } from "@halo-dev/components";
 import type { Ref } from "vue";
 import { computed, inject } from "vue";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import type { Plugin, Role } from "@halo-dev/api-client";
-import { pluginLabels, roleLabels } from "@console/constants/labels";
-import { rbacAnnotations } from "@console/constants/annotations";
+import { pluginLabels, roleLabels } from "@/constants/labels";
+import { rbacAnnotations } from "@/constants/annotations";
 import { usePluginLifeCycle } from "../composables/use-plugin";
-import { formatDatetime } from "@console/utils/date";
+import { formatDatetime } from "@/utils/date";
 import { useQuery } from "@tanstack/vue-query";
 
 const plugin = inject<Ref<Plugin | undefined>>("plugin");

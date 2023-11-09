@@ -7,7 +7,7 @@ import {
   VSpace,
 } from "@halo-dev/components";
 import { ref } from "vue";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import type { PersonalAccessToken } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
 import PersonalAccessTokenCreationModal from "../components/PersonalAccessTokenCreationModal.vue";

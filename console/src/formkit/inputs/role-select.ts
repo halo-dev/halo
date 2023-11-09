@@ -1,9 +1,9 @@
-import { rbacAnnotations } from "@console/constants/annotations";
-import { roleLabels } from "@console/constants/labels";
-import { apiClient } from "@console/utils/api-client";
+import { rbacAnnotations } from "@/constants/annotations";
+import { roleLabels } from "@/constants/labels";
+import { apiClient } from "@/utils/api-client";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import { select, selects, defaultIcon } from "@formkit/inputs";
-import { i18n } from "@console/locales";
+import { i18n } from "@/locales";
 import type { FormKitInputs } from "@formkit/inputs";
 
 declare module "@formkit/inputs" {

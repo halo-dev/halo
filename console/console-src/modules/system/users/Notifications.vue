@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { useUserStore } from "@console/stores/user";
-import { apiClient } from "@console/utils/api-client";
+import { useUserStore } from "@/stores/user";
+import { apiClient } from "@/utils/api-client";
 import {
   IconNotificationBadgeLine,
   VButton,

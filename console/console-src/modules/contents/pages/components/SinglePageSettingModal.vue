@@ -9,17 +9,17 @@ import {
 import { computed, nextTick, ref, watchEffect } from "vue";
 import type { SinglePage } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
-import { singlePageLabels } from "@console/constants/labels";
-import { randomUUID } from "@console/utils/id";
-import { toDatetimeLocal, toISOString } from "@console/utils/date";
+import { singlePageLabels } from "@/constants/labels";
+import { randomUUID } from "@/utils/id";
+import { toDatetimeLocal, toISOString } from "@/utils/date";
 import { submitForm } from "@formkit/core";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
 import useSlugify from "@console/composables/use-slugify";
 import { useI18n } from "vue-i18n";
 import { usePageUpdateMutate } from "../composables/use-page-update-mutate";
-import { FormType } from "@console/types/slug";
+import { FormType } from "@/types/slug";
 
 const initialFormState: SinglePage = {
   spec: {

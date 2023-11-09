@@ -1,4 +1,4 @@
-import { usePluginModuleStore } from "@console/stores/plugin";
+import { usePluginModuleStore } from "@/stores/plugin";
 import type { OperationItem, PluginModule } from "@halo-dev/console-shared";
 import { onMounted, ref, type ComputedRef, type Ref, computed } from "vue";
 

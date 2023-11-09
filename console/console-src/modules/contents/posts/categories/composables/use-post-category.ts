@@ -1,4 +1,4 @@
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import type { Category } from "@halo-dev/api-client";
 import type { Ref } from "vue";
 import { ref } from "vue";

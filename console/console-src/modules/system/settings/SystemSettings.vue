@@ -11,7 +11,7 @@ import {
 } from "@halo-dev/components";
 import type { Setting, SettingForm } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
 import type { Raw } from "vue";
 import type { Component } from "vue";

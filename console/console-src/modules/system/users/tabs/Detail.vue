@@ -11,10 +11,10 @@ import type { ComputedRef, Ref } from "vue";
 import { inject, computed } from "vue";
 import { useRouter } from "vue-router";
 import type { DetailedUser, ListedAuthProvider } from "@halo-dev/api-client";
-import { rbacAnnotations } from "@console/constants/annotations";
-import { formatDatetime } from "@console/utils/date";
+import { rbacAnnotations } from "@/constants/annotations";
+import { formatDatetime } from "@/utils/date";
 import { useQuery } from "@tanstack/vue-query";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import axios from "axios";
 import { useI18n } from "vue-i18n";
 

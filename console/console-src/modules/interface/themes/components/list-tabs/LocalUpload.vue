@@ -11,7 +11,7 @@ import { inject } from "vue";
 import type { Ref } from "vue";
 import { ref } from "vue";
 import { useThemeStore } from "@console/stores/theme";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import UppyUpload from "@/components/upload/UppyUpload.vue";
 
 const { t } = useI18n();

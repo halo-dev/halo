@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { apiClient } from "@console/utils/api-client";
-import { formatDatetime, relativeTimeTo } from "@console/utils/date";
+import { apiClient } from "@/utils/api-client";
+import { formatDatetime, relativeTimeTo } from "@/utils/date";
 import type { PersonalAccessToken } from "@halo-dev/api-client";
 import {
   Dialog,

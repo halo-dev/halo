@@ -1,4 +1,4 @@
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import type { FormKitNode, FormKitTypeDefinition } from "@formkit/core";
 import { radio, radios, defaultIcon } from "@formkit/inputs";
 import type { FormKitInputs } from "@formkit/inputs";

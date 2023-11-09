@@ -20,7 +20,7 @@ import { computed, nextTick, ref, watch, watchEffect } from "vue";
 import { reset } from "@formkit/core";
 import cloneDeep from "lodash.clonedeep";
 import { setFocus } from "@/formkit/utils/focus";
-import { apiClient } from "@console/utils/api-client";
+import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
