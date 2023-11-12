@@ -6,7 +6,7 @@ plugins {
     id 'java'
     id 'jacoco'
     id "de.undercouch.download" version "5.3.1"
-    id "io.freefair.lombok" version "8.0.0-rc2"
+    id "io.freefair.lombok" version "8.4"
 }
 
 group = "run.halo.app"
