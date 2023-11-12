@@ -7,6 +7,10 @@ plugins {
 group = 'run.halo.app'
 description = 'API of halo project, connecting by other projects.'
 
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+javadoc.options.encoding = "UTF-8"
+
 repositories {
     mavenCentral()
     maven { url 'https://repo.spring.io/milestone' }

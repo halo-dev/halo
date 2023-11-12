@@ -11,6 +11,8 @@ plugins {
 
 group = "run.halo.app"
 sourceCompatibility = JavaVersion.VERSION_17
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
 
 checkstyle {
     toolVersion = "9.3"
