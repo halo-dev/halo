@@ -207,8 +207,9 @@ class PluginServiceImplTest {
         String pluginName = "test-plugin";
         PluginWrapper pluginWrapper = mock(PluginWrapper.class);
         when(pluginManager.getPlugin(pluginName)).thenReturn(pluginWrapper);
+        var pluginPath = Paths.get("tmp", "plugins", "fake-plugin.jar");
         when(pluginWrapper.getPluginPath())
-            .thenReturn(Paths.get("/tmp/plugins/fake-plugin.jar"));
+            .thenReturn(pluginPath);
         Plugin plugin = new Plugin();
         plugin.setMetadata(new Metadata());
         plugin.getMetadata().setName(pluginName);
@@ -224,7 +225,7 @@ class PluginServiceImplTest {
         verify(client, times(1)).update(
             argThat(p -> {
                 String reloadPath = p.getMetadata().getAnnotations().get(PluginConst.RELOAD_ANNO);
-                assertThat(reloadPath).isEqualTo("/tmp/plugins/fake-plugin.jar");
+                assertThat(reloadPath).isEqualTo(pluginPath.toString());
                 return true;
             })
         );
