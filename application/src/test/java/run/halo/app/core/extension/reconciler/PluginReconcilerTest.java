@@ -3,7 +3,9 @@ package run.halo.app.core.extension.reconciler;
 import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -369,12 +371,15 @@ class PluginReconcilerTest {
 
     @Test
     void resolvePluginPathAnnotation() {
-        when(haloPluginManager.getPluginsRoot()).thenReturn(Paths.get("/tmp/plugins"));
-        String path = pluginReconciler.resolvePluginPathForAnno("/tmp/plugins/sitemap-1.0.jar");
+        var pluginRoot = Paths.get("tmp", "plugins");
+        when(haloPluginManager.getPluginsRoot()).thenReturn(pluginRoot);
+        var path = pluginReconciler.resolvePluginPathForAnno(
+            pluginRoot.resolve("sitemap-1.0.jar").toString());
         assertThat(path).isEqualTo("sitemap-1.0.jar");
 
-        path = pluginReconciler.resolvePluginPathForAnno("/abc/plugins/sitemap-1.0.jar");
-        assertThat(path).isEqualTo("/abc/plugins/sitemap-1.0.jar");
+        var givenPath = Paths.get("abc", "plugins", "sitemap-1.0.jar");
+        path = pluginReconciler.resolvePluginPathForAnno(givenPath.toString());
+        assertThat(path).isEqualTo(givenPath.toString());
     }
 
     @Nested
@@ -457,17 +462,18 @@ class PluginReconcilerTest {
             assertThat(pluginReconciler.toPath("")).isNull();
             assertThat(pluginReconciler.toPath(" ")).isNull();
 
-            Path path = pluginReconciler.toPath("file:///path/to/file.txt");
-            assertThat(path).isNotNull();
-            assertThat(path.toString()).isEqualTo("/path/to/file.txt");
+            final var filePath = Paths.get("path", "to", "file.txt").toAbsolutePath();
 
-            assertThat(pluginReconciler.toPath("C:\\Users\\faker\\halo\\plugins").toString())
-                .isEqualTo("C:\\Users\\faker\\halo\\plugins");
-            assertThat(pluginReconciler.toPath("C:/Users/faker/halo/plugins").toString())
-                .isEqualTo("C:/Users/faker/halo/plugins");
-            Path windowsPath = Paths.get("C:/Users/username/Documents/file.txt");
-            assertThat(pluginReconciler.toPath("file://C:/Users/username/Documents/file.txt"))
-                .isEqualTo(windowsPath);
+            // test for file:///
+            assertEquals(filePath, pluginReconciler.toPath(filePath.toUri().toString()));
+            // test for absolute path /home/xyz or C:\Windows
+            assertEquals(filePath, pluginReconciler.toPath(filePath.toString()));
+
+            var exception = assertThrows(IllegalArgumentException.class, () -> {
+                var fileUri = filePath.toUri();
+                pluginReconciler.toPath(fileUri.toString().replaceFirst("file", "http"));
+            });
+            assertTrue(exception.getMessage().contains("not reside in the file system"));
         }
 
         @Test
@@ -483,8 +489,9 @@ class PluginReconcilerTest {
             });
 
             // Test with non-empty pathString
-            URI uri = pluginReconciler.toUri("/path/to/file");
-            Assertions.assertEquals("file:///path/to/file", uri.toString());
+            var filePath = Paths.get("path", "to", "file");
+            URI uri = pluginReconciler.toUri(filePath.toString());
+            assertEquals(filePath.toUri(), uri);
         }
     }
 
