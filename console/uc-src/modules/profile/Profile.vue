@@ -8,11 +8,9 @@ import {
   VLoading,
 } from "@halo-dev/components";
 import { computed, provide, ref, type Ref } from "vue";
-import { useRoute } from "vue-router";
 import type { DetailedUser } from "@halo-dev/api-client";
-import UserEditingModal from "./components/UserEditingModal.vue";
-import UserPasswordChangeModal from "./components/UserPasswordChangeModal.vue";
-import { usePermission } from "@/utils/permission";
+import ProfileEditingModal from "./components/ProfileEditingModal.vue";
+import PasswordChangeModal from "./components/PasswordChangeModal.vue";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import { rbacAnnotations } from "@/constants/annotations";
@@ -21,9 +19,10 @@ import type { Raw } from "vue";
 import type { Component } from "vue";
 import { markRaw } from "vue";
 import DetailTab from "./tabs/Detail.vue";
+import PersonalAccessTokensTab from "./tabs/PersonalAccessTokens.vue";
 import { useRouteQuery } from "@vueuse/router";
+import NotificationPreferences from "./tabs/NotificationPreferences.vue";
 
-const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 
 interface UserTab {
@@ -39,19 +38,15 @@ interface UserTab {
 const editingModal = ref(false);
 const passwordChangeModal = ref(false);
 
-const { params } = useRoute();
-
 const {
   data: user,
   isFetching,
   isLoading,
   refetch,
 } = useQuery({
-  queryKey: ["user-detail", params.name],
+  queryKey: ["user-detail"],
   queryFn: async () => {
-    const { data } = await apiClient.user.getUserDetail({
-      name: params.name as string,
-    });
+    const { data } = await apiClient.user.getCurrentUserDetail();
     return data;
   },
   refetchInterval: (data) => {
@@ -61,7 +56,6 @@ const {
       ? 1000
       : false;
   },
-  enabled: computed(() => !!params.name),
 });
 
 provide<Ref<DetailedUser | undefined>>("user", user);
@@ -73,22 +67,32 @@ const tabs: UserTab[] = [
     component: markRaw(DetailTab),
     priority: 10,
   },
+  {
+    id: "notification-preferences",
+    label: t("core.user.detail.tabs.notification-preferences"),
+    component: markRaw(NotificationPreferences),
+    priority: 20,
+  },
+  {
+    id: "pat",
+    label: t("core.user.detail.tabs.pat"),
+    component: markRaw(PersonalAccessTokensTab),
+    priority: 30,
+  },
 ];
-
-const activeTab = useRouteQuery<string>("tab", tabs[0].id, {
-  mode: "push",
-});
-
-provide<Ref<string>>("activeTab", activeTab);
 
 const tabbarItems = computed(() => {
   return tabs.map((tab) => ({ id: tab.id, label: tab.label }));
 });
+
+const activeTab = useRouteQuery<string>("tab", tabs[0].id, {
+  mode: "push",
+});
 </script>
 <template>
-  <UserEditingModal v-model:visible="editingModal" :user="user?.user" />
+  <ProfileEditingModal v-model:visible="editingModal" :user="user?.user" />
 
-  <UserPasswordChangeModal
+  <PasswordChangeModal
     v-model:visible="passwordChangeModal"
     :user="user?.user"
     @close="refetch"
@@ -100,7 +104,7 @@ const tabbarItems = computed(() => {
         <div class="flex flex-row items-center gap-5">
           <div class="group relative h-20 w-20">
             <VLoading v-if="isFetching" class="h-full w-full" />
-            <UserAvatar v-else />
+            <UserAvatar v-else is-current-user />
           </div>
           <div class="block">
             <h1 class="truncate text-lg font-bold text-gray-900">
@@ -111,7 +115,7 @@ const tabbarItems = computed(() => {
             </span>
           </div>
         </div>
-        <div v-if="currentUserHasPermission(['system:users:manage'])">
+        <div>
           <VDropdown>
             <VButton type="default">
               {{ $t("core.common.buttons.edit") }}

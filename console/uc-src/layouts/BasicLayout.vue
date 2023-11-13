@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import {
   IconMore,
-  IconSearch,
   IconUserSettings,
   VTag,
   VAvatar,
@@ -20,7 +19,6 @@ import {
 } from "vue-router";
 import { onMounted, reactive, ref } from "vue";
 import axios from "axios";
-import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
 import LoginModal from "@/components/login/LoginModal.vue";
 import { coreMenuGroups } from "@console/router/routes.config";
 import sortBy from "lodash.sortby";
@@ -34,8 +32,6 @@ import {
   useOverlayScrollbars,
   type UseOverlayScrollbarsParams,
 } from "overlayscrollbars-vue";
-import { isMac } from "@/utils/device";
-import { useEventListener } from "@vueuse/core";
 
 const route = useRoute();
 const router = useRouter();
@@ -61,23 +57,13 @@ const handleLogout = () => {
 
         await userStore.fetchCurrentUser();
 
-        router.replace({ name: "Login" });
+        window.location.href = "/console/login";
       } catch (error) {
         console.error("Failed to logout", error);
       }
     },
   });
 };
-
-// Global Search
-const globalSearchVisible = ref(false);
-useEventListener(document, "keydown", (e: KeyboardEvent) => {
-  const { key, ctrlKey, metaKey } = e;
-  if (key === "k" && ((ctrlKey && !isMac) || metaKey)) {
-    globalSearchVisible.value = true;
-    e.preventDefault();
-  }
-});
 
 // Generate menus by routes
 const menus = ref<MenuGroupType[]>([] as MenuGroupType[]);
@@ -216,8 +202,8 @@ onMounted(() => {
   }
 });
 
-function handleRouteToUC() {
-  window.location.href = "/uc";
+function handleRouteToConsole() {
+  window.location.href = "/console";
 }
 </script>
 
@@ -238,22 +224,6 @@ function handleRouteToUC() {
         </a>
       </div>
       <div ref="navbarScroller" class="flex-1 overflow-y-hidden">
-        <div class="px-3">
-          <div
-            class="flex cursor-pointer items-center rounded bg-gray-100 p-2 text-gray-400 transition-all hover:text-gray-900"
-            @click="globalSearchVisible = true"
-          >
-            <span class="mr-3">
-              <IconSearch />
-            </span>
-            <span class="flex-1 select-none text-base font-normal">
-              {{ $t("core.sidebar.search.placeholder") }}
-            </span>
-            <div class="text-sm">
-              {{ `${isMac ? "⌘" : "Ctrl"}+K` }}
-            </div>
-          </div>
-        </div>
         <RoutesMenu :menus="menus" />
       </div>
       <div class="profile-placeholder">
@@ -288,8 +258,8 @@ function handleRouteToUC() {
           >
             <IconMore />
             <template #popper>
-              <VDropdownItem @click="handleRouteToUC">
-                {{ $t("core.sidebar.operations.profile.button") }}
+              <VDropdownItem @click="handleRouteToConsole">
+                管理控制台
               </VDropdownItem>
               <VDropdownItem @click="handleLogout">
                 {{ $t("core.sidebar.operations.logout.button") }}
@@ -385,7 +355,6 @@ function handleRouteToUC() {
       </Teleport>
     </div>
   </div>
-  <GlobalSearchModal v-model:visible="globalSearchVisible" />
   <LoginModal />
 </template>
 

@@ -32,7 +32,7 @@ import { formatDatetime } from "@/utils/date";
 import { useRouteQuery } from "@vueuse/router";
 import { usePermission } from "@/utils/permission";
 import { useUserStore } from "@/stores/user";
-import { useFetchRole } from "../roles/composables/use-role";
+import { useFetchRole } from "@/composables/use-role";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import UserCreationModal from "./components/UserCreationModal.vue";

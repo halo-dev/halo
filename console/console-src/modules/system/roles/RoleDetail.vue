@@ -15,10 +15,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { pluginLabels, roleLabels } from "@/constants/labels";
 import { rbacAnnotations } from "@/constants/annotations";
-import {
-  useRoleForm,
-  useRoleTemplateSelection,
-} from "@console/modules/system/roles/composables/use-role";
+import { useRoleForm, useRoleTemplateSelection } from "@/composables/use-role";
 import { SUPER_ROLE_NAME } from "@/constants/constants";
 import { useI18n } from "vue-i18n";
 import { formatDatetime } from "@/utils/date";

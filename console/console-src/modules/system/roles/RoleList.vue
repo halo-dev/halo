@@ -26,7 +26,7 @@ import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
 
 // hooks
-import { useFetchRole } from "@console/modules/system/roles/composables/use-role";
+import { useFetchRole } from "@/composables/use-role";
 
 // libs
 import { apiClient } from "@/utils/api-client";

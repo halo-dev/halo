@@ -12,7 +12,7 @@ import {
   Toast,
   Dialog,
 } from "@halo-dev/components";
-import { ref, defineAsyncComponent, type ComputedRef, type Ref } from "vue";
+import { ref, defineAsyncComponent, type Ref } from "vue";
 import type { DetailedUser } from "@halo-dev/api-client";
 import { usePermission } from "@/utils/permission";
 import { useQueryClient } from "@tanstack/vue-query";
@@ -21,12 +21,21 @@ import { useFileDialog } from "@vueuse/core";
 import { inject } from "vue";
 import { computed } from "vue";
 
+const props = withDefaults(
+  defineProps<{
+    isCurrentUser?: boolean;
+  }>(),
+  {
+    isCurrentUser: false,
+  }
+);
+
 const queryClient = useQueryClient();
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
 
 const UserAvatarCropper = defineAsyncComponent(
-  () => import("../components/UserAvatarCropper.vue")
+  () => import("./UserAvatarCropper.vue")
 );
 
 interface IUserAvatarCropperType
@@ -40,7 +49,6 @@ const { open, reset, onChange } = useFileDialog({
 });
 
 const user = inject<Ref<DetailedUser | undefined>>("user");
-const isCurrentUser = inject<ComputedRef<boolean>>("isCurrentUser");
 
 const userAvatarCropper = ref<IUserAvatarCropperType>();
 const visibleCropperModal = ref(false);
@@ -67,7 +75,7 @@ const handleUploadAvatar = () => {
 
     apiClient.user
       .uploadUserAvatar({
-        name: isCurrentUser?.value ? "-" : user.value.user.metadata.name,
+        name: props.isCurrentUser ? "-" : user.value.user.metadata.name,
         file: file,
       })
       .then(() => {
@@ -97,7 +105,7 @@ const handleRemoveCurrentAvatar = () => {
 
       apiClient.user
         .deleteUserAvatar({
-          name: isCurrentUser?.value ? "-" : user.value.user.metadata.name,
+          name: props.isCurrentUser ? "-" : user.value.user.metadata.name,
         })
         .then(() => {
           queryClient.invalidateQueries({ queryKey: ["user-detail"] });

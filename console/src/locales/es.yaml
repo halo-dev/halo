@@ -1027,7 +1027,7 @@ core:
     forbidden:
       message: Acceso no autorizado a esta página
     actions:
-      dashboard: Tablero
+      home: Ir a la página de inicio
   setup:
     title: Configuración
     operations:
