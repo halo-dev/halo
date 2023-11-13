@@ -42,10 +42,7 @@ const actions: Action[] = [
       "core.dashboard.widgets.presets.quicklink.actions.user_profile.title"
     ),
     action: () => {
-      router.push({
-        name: "UserDetail",
-        params: { name: "-" },
-      });
+      window.location.href = "/uc/profile";
     },
   },
   {

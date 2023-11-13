@@ -8,7 +8,6 @@ import Login from "./Login.vue";
 import { IconUserSettings } from "@halo-dev/components";
 import { markRaw } from "vue";
 import Binding from "./Binding.vue";
-import Notifications from "./Notifications.vue";
 import NotificationWidget from "./widgets/NotificationWidget.vue";
 
 export default definePlugin({
@@ -71,20 +70,6 @@ export default definePlugin({
               component: UserDetail,
               meta: {
                 title: "core.user.detail.title",
-              },
-            },
-          ],
-        },
-        {
-          path: "-/notifications",
-          component: BasicLayout,
-          children: [
-            {
-              path: "",
-              name: "UserNotifications",
-              component: Notifications,
-              meta: {
-                title: "core.notification.title",
               },
             },
           ],

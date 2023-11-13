@@ -68,7 +68,7 @@ const handleChangePassword = async () => {
     delete changePasswordRequest.password_confirm;
 
     await apiClient.user.changePassword({
-      name: props.user?.metadata.name || "",
+      name: "-",
       changePasswordRequest,
     });
 

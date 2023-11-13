@@ -79,8 +79,6 @@ core:
         button: Profile
       visit_homepage:
         title: Visit homepage
-      notifications:
-        button: Notifications
   dashboard:
     title: Dashboard
     actions:
@@ -1095,7 +1093,7 @@ core:
     forbidden:
       message: Unauthorized access to this page
     actions:
-      dashboard: Dashboard
+      home: Back to home
   setup:
     title: Setup
     operations:

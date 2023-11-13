@@ -79,8 +79,6 @@ core:
         button: 个人资料
       visit_homepage:
         title: 访问首页
-      notifications:
-        button: 我的消息
   dashboard:
     title: 仪表板
     actions:
@@ -1095,7 +1093,7 @@ core:
     forbidden:
       message: 没有权限访问此页面
     actions:
-      dashboard: 仪表盘
+      home: 返回首页
   setup:
     title: 系统初始化
     operations:

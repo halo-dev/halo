@@ -16,7 +16,10 @@ import { useUserStore } from "@/stores/user";
 import { useSystemConfigMapStore } from "@console/stores/system-configmap";
 import { setupVueQuery } from "@/setup/setupVueQuery";
 import { useGlobalInfoStore } from "@/stores/global-info";
-import { setupCoreModules, setupPluginModules } from "@/setup/setupModules";
+import {
+  setupCoreModules,
+  setupPluginModules,
+} from "@console/setup/setupModules";
 
 const app = createApp(App);
 
@@ -66,12 +69,6 @@ async function loadActivatedTheme() {
 })();
 
 async function initApp() {
-  // TODO 实验性
-  const theme = localStorage.getItem("theme");
-  if (theme) {
-    document.body.classList.add(theme);
-  }
-
   try {
     setupCoreModules(app);
 

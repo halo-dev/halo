@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import { patAnnotations, rbacAnnotations } from "@/constants/annotations";
-import { pluginLabels } from "@/constants/labels";
 import { apiClient } from "@/utils/api-client";
 import { toISOString } from "@/utils/date";
 import { Dialog, Toast, VButton, VModal, VSpace } from "@halo-dev/components";
@@ -10,7 +9,7 @@ import { useClipboard } from "@vueuse/core";
 import type { PatSpec, PersonalAccessToken } from "@halo-dev/api-client";
 import { computed } from "vue";
 import { ref } from "vue";
-import { useRoleTemplateSelection } from "../../roles/composables/use-role";
+import { useRoleTemplateSelection } from "@/composables/use-role";
 import { useRoleStore } from "@/stores/role";
 import { toRefs } from "vue";
 import { useI18n } from "vue-i18n";
@@ -169,36 +168,6 @@ const { copy } = useClipboard({
               <dt class="text-sm font-medium text-gray-900">
                 <div>
                   {{ $t(`core.rbac.${group.module}`, group.module as string) }}
-                </div>
-                <div
-                  v-if="
-                    group.roles.length &&
-                    group.roles[0].metadata.labels?.[pluginLabels.NAME]
-                  "
-                  class="mt-3 text-xs text-gray-500"
-                >
-                  <i18n-t
-                    keypath="core.role.common.text.provided_by_plugin"
-                    tag="div"
-                  >
-                    <template #plugin>
-                      <RouterLink
-                        :to="{
-                          name: 'PluginDetail',
-                          params: {
-                            name: group.roles[0].metadata.labels?.[
-                              pluginLabels.NAME
-                            ],
-                          },
-                        }"
-                        class="hover:text-blue-600"
-                      >
-                        {{
-                          group.roles[0].metadata.labels?.[pluginLabels.NAME]
-                        }}
-                      </RouterLink>
-                    </template>
-                  </i18n-t>
                 </div>
               </dt>
               <dd class="text-sm text-gray-900">

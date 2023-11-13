@@ -4,10 +4,7 @@ import SubmitButton from "@/components/button/SubmitButton.vue";
 import { computed, watch } from "vue";
 import { rbacAnnotations } from "@/constants/annotations";
 import type { Role } from "@halo-dev/api-client";
-import {
-  useRoleForm,
-  useRoleTemplateSelection,
-} from "@console/modules/system/roles/composables/use-role";
+import { useRoleForm, useRoleTemplateSelection } from "@/composables/use-role";
 import cloneDeep from "lodash.clonedeep";
 import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";

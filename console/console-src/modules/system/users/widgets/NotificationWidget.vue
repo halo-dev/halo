@@ -43,12 +43,12 @@ const {
   >
     <template #actions>
       <div style="padding: 12px 16px">
-        <RouterLink
+        <a
           class="text-sm text-gray-600 hover:text-gray-900"
-          :to="{ name: 'UserNotifications' }"
+          href="/uc/notifications"
         >
           {{ $t("core.common.buttons.view_all") }}
-        </RouterLink>
+        </a>
       </div>
     </template>
     <VLoading v-if="isLoading" />
