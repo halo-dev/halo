@@ -44,7 +44,7 @@ const {
   isLoading,
   refetch,
 } = useQuery({
-  queryKey: ["profile"],
+  queryKey: ["user-detail"],
   queryFn: async () => {
     const { data } = await apiClient.user.getCurrentUserDetail();
     return data;
