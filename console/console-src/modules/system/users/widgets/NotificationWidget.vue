@@ -12,6 +12,7 @@ import {
 } from "@halo-dev/components";
 import { useQuery } from "@tanstack/vue-query";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
+import type { Notification } from "@halo-dev/api-client";
 
 const { currentUser } = useUserStore();
 
@@ -33,6 +34,10 @@ const {
     return data.items;
   },
 });
+
+function handleRouteToNotification(notification: Notification) {
+  window.location.href = `/uc/notifications?name=${notification.metadata.name}`;
+}
 </script>
 
 <template>
@@ -78,11 +83,8 @@ const {
             <template #start>
               <VEntityField
                 :title="notification.spec?.title"
-                :route="{
-                  name: 'UserNotifications',
-                  query: { name: notification.metadata.name },
-                }"
                 :description="notification.spec?.rawContent"
+                @click="handleRouteToNotification(notification)"
               />
             </template>
             <template #end>
