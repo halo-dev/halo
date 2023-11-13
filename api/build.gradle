@@ -1,11 +1,15 @@
 plugins {
     id 'java-library'
     id 'halo.publish'
-    id "io.freefair.lombok" version "8.0.0-rc2"
+    id "io.freefair.lombok" version "8.4"
 }
 
 group = 'run.halo.app'
 description = 'API of halo project, connecting by other projects.'
+
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+javadoc.options.encoding = "UTF-8"
 
 repositories {
     mavenCentral()

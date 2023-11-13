@@ -6,11 +6,13 @@ plugins {
     id 'java'
     id 'jacoco'
     id "de.undercouch.download" version "5.3.1"
-    id "io.freefair.lombok" version "8.0.0-rc2"
+    id "io.freefair.lombok" version "8.4"
 }
 
 group = "run.halo.app"
 sourceCompatibility = JavaVersion.VERSION_17
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
 
 checkstyle {
     toolVersion = "9.3"
