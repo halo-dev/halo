@@ -1,6 +1,7 @@
 package run.halo.app.config;
 
 import java.util.List;
+import org.hamcrest.core.StringStartsWith;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,8 @@ class WebFluxConfigTest {
                 .forEach(uri -> webClient.get().uri(uri)
                     .exchange()
                     .expectStatus().isOk()
-                    .expectBody(String.class).isEqualTo("console index\n"));
+                    .expectBody(String.class).value(StringStartsWith.startsWith("console index"))
+                );
         }
 
         @Test
@@ -38,7 +40,7 @@ class WebFluxConfigTest {
             webClient.get().uri("/console/assets/fake.txt")
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(String.class).isEqualTo("fake.\n");
+                .expectBody(String.class).value(StringStartsWith.startsWith("fake."));
         }
 
         @Test

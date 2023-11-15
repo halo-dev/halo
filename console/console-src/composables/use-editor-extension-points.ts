@@ -1,6 +1,6 @@
 import { usePluginModuleStore } from "@/stores/plugin";
 import type { EditorProvider, PluginModule } from "@halo-dev/console-shared";
-import { onMounted, ref, type Ref, defineAsyncComponent } from "vue";
+import { onMounted, ref, type Ref, defineAsyncComponent, markRaw } from "vue";
 import { VLoading } from "@halo-dev/components";
 import Logo from "@/assets/logo.png";
 import { useI18n } from "vue-i18n";
@@ -18,11 +18,13 @@ export function useEditorExtensionPoints(): useEditorExtensionPointsReturn {
     {
       name: "default",
       displayName: t("core.plugin.extension_points.editor.providers.default"),
-      component: defineAsyncComponent({
-        loader: () => import("@/components/editor/DefaultEditor.vue"),
-        loadingComponent: VLoading,
-        delay: 200,
-      }),
+      component: markRaw(
+        defineAsyncComponent({
+          loader: () => import("@/components/editor/DefaultEditor.vue"),
+          loadingComponent: VLoading,
+          delay: 200,
+        })
+      ),
       rawType: "HTML",
       logo: Logo,
     },

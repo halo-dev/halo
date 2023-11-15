@@ -1,16 +1,18 @@
 plugins {
-    id 'org.springframework.boot' version '3.1.5'
+    id 'org.springframework.boot' version '3.2.0-RC2'
     id 'io.spring.dependency-management' version '1.1.0'
     id "com.gorylenko.gradle-git-properties" version "2.3.2"
     id "checkstyle"
     id 'java'
     id 'jacoco'
     id "de.undercouch.download" version "5.3.1"
-    id "io.freefair.lombok" version "8.0.0-rc2"
+    id "io.freefair.lombok" version "8.4"
 }
 
 group = "run.halo.app"
 sourceCompatibility = JavaVersion.VERSION_17
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
 
 checkstyle {
     toolVersion = "9.3"
@@ -22,6 +24,7 @@ repositories {
     mavenCentral()
 
     maven { url 'https://repo.spring.io/milestone' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots' }
 }
 
 

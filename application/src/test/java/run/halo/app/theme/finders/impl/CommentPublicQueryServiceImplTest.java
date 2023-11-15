@@ -164,7 +164,7 @@ class CommentPublicQueryServiceImplTest {
                 .map(Comment::getMetadata)
                 .map(MetadataOperator::getName)
                 .collect(Collectors.joining(", "));
-            assertThat(result).isEqualTo("1, 2, 3, 4, 5, 6, 9, 14, 10, 8, 7, 13, 12, 11");
+            assertThat(result).isEqualTo("1, 2, 4, 3, 5, 6, 10, 14, 9, 8, 7, 11, 12, 13");
         }
 
         @Test

@@ -466,7 +466,7 @@ public class ThemeEndpoint implements CustomEndpoint {
                 .bodyValue(theme));
     }
 
-    @Schema(name = "ThemeInstallRequest")
+    @Schema(name = "ThemeInstallRequest", types = "object")
     public static class InstallRequest {
 
         @Schema(hidden = true)

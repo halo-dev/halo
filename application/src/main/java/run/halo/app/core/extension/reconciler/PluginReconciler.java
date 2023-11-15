@@ -8,7 +8,10 @@ import static run.halo.app.plugin.PluginConst.PLUGIN_PATH;
 import static run.halo.app.plugin.PluginConst.RELOAD_ANNO;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,6 +43,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.ReverseProxy;
@@ -649,11 +653,19 @@ public class PluginReconciler implements Reconciler<Request> {
         if (StringUtils.isBlank(pathString)) {
             return null;
         }
-        String processedPathString = pathString;
-        if (processedPathString.startsWith("file:")) {
-            processedPathString = processedPathString.substring(7);
+        try {
+            var pathURL = new URL(pathString);
+            if (!ResourceUtils.isFileURL(pathURL)) {
+                throw new IllegalArgumentException("The path cannot be resolved to absolute file"
+                    + " path because it does not reside in the file system: "
+                    + pathString);
+            }
+            var pathURI = ResourceUtils.toURI(pathURL);
+            return Paths.get(pathURI);
+        } catch (MalformedURLException | URISyntaxException ignored) {
+            // the given path string is not a valid URL.
         }
-        return Paths.get(processedPathString);
+        return Paths.get(pathString);
     }
 
     URI toUri(String pathString) {

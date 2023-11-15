@@ -9,6 +9,11 @@ public class ThemeProperties {
     @Valid
     private final Initializer initializer = new Initializer();
 
+    /**
+     * Indicates whether the generator meta needs to be disabled.
+     */
+    private boolean generatorMetaDisabled;
+
     @Data
     public static class Initializer {
 

@@ -1,7 +1,10 @@
 package run.halo.app.theme.finders.impl;
 
 
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+
 import java.security.Principal;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -9,7 +12,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
@@ -254,35 +256,41 @@ public class CommentPublicQueryServiceImpl implements CommentPublicQueryService 
         public int compare(Comment c1, Comment c2) {
             boolean c1Top = BooleanUtils.isTrue(c1.getSpec().getTop());
             boolean c2Top = BooleanUtils.isTrue(c2.getSpec().getTop());
-            if (c1Top == c2Top) {
-                int c1Priority = ObjectUtils.defaultIfNull(c1.getSpec().getPriority(), 0);
-                int c2Priority = ObjectUtils.defaultIfNull(c2.getSpec().getPriority(), 0);
-                if (c1Top) {
-                    // 都置顶
-                    return Integer.compare(c1Priority, c2Priority);
-                }
 
-                // 两个评论不置顶根据 creationTime 降序排列
-                return Comparator.comparing(
-                        (Comment comment) -> comment.getSpec().getCreationTime(),
-                        Comparators.nullsLow())
-                    .thenComparing((Comment comment) -> comment.getMetadata().getName())
-                    .compare(c2, c1);
-            } else if (c1Top) {
-                // 只有 c1 置顶，c1 排前面
+            // c1 top = true && c2 top = false
+            if (c1Top && !c2Top) {
                 return -1;
-            } else {
-                // 只有c2置顶, c2排在前面
+            }
+
+            // c1 top = false && c2 top = true
+            if (!c1Top && c2Top) {
                 return 1;
             }
+            // c1 top = c2 top = true || c1 top = c2 top = false
+            var priorityComparator = Comparator.<Comment, Integer>comparing(
+                comment -> defaultIfNull(comment.getSpec().getPriority(), 0));
+
+            var creationTimeComparator = Comparator.<Comment, Instant>comparing(
+                comment -> comment.getSpec().getCreationTime(),
+                Comparators.nullsLow(Comparator.<Instant>reverseOrder()));
+
+            var nameComparator = Comparator.<Comment, String>comparing(
+                comment -> comment.getMetadata().getName());
+
+            if (c1Top) {
+                return priorityComparator.thenComparing(creationTimeComparator)
+                    .thenComparing(nameComparator)
+                    .compare(c1, c2);
+            }
+            return creationTimeComparator.thenComparing(nameComparator).compare(c1, c2);
         }
     }
 
     int pageNullSafe(Integer page) {
-        return ObjectUtils.defaultIfNull(page, 1);
+        return defaultIfNull(page, 1);
     }
 
     int sizeNullSafe(Integer size) {
-        return ObjectUtils.defaultIfNull(size, DEFAULT_SIZE);
+        return defaultIfNull(size, DEFAULT_SIZE);
     }
 }

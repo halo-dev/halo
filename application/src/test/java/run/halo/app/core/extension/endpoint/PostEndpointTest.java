@@ -50,6 +50,7 @@ class PostEndpointTest {
 
     @BeforeEach
     void setUp() {
+        postEndpoint.setMaxAttemptsWaitForPublish(3);
         webTestClient = WebTestClient
             .bindToRouterFunction(postEndpoint.endpoint())
             .build();
@@ -170,7 +171,7 @@ class PostEndpointTest {
             .is5xxServerError();
 
         // Verify WebClient retry behavior
-        verify(client, times(12)).get(eq(Post.class), eq("post-1"));
+        verify(client, times(5)).get(eq(Post.class), eq("post-1"));
         verify(client).update(any(Post.class));
     }
 

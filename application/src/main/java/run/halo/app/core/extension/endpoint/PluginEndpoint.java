@@ -673,7 +673,7 @@ public class PluginEndpoint implements CustomEndpoint {
             .flatMap(listResult -> ServerResponse.ok().bodyValue(listResult));
     }
 
-    @Schema(name = "PluginInstallRequest")
+    @Schema(name = "PluginInstallRequest", types = "object")
     public static class InstallRequest {
 
         private final MultiValueMap<String, Part> multipartData;
