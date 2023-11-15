@@ -33,6 +33,12 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
           java-version: 17
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
       - uses: dorny/paths-filter@v2
         id: changes
         with:
@@ -43,6 +49,11 @@ jobs:
         run: ./gradlew check
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
+      - name: Analyze code
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonar --info
       - name: Setup console environment
         if: steps.changes.outputs.console == 'true'
         uses: halo-sigs/actions/admin-env-setup@main
