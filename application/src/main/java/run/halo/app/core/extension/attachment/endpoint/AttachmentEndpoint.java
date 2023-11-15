@@ -273,6 +273,7 @@ public class AttachmentEndpoint implements CustomEndpoint {
         }
     }
 
+    @Schema(types = "object")
     public interface IUploadRequest {
 
         @Schema(requiredMode = REQUIRED, description = "Attachment file")
