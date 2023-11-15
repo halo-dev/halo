@@ -23,6 +23,7 @@ import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.PathUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.ViewNameResolver;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.CategoryVo;
 import run.halo.app.theme.finders.vo.ListedPostVo;
@@ -30,7 +31,6 @@ import run.halo.app.theme.router.ModelConst;
 import run.halo.app.theme.router.PageUrlUtils;
 import run.halo.app.theme.router.TitleVisibilityIdentifyCalculator;
 import run.halo.app.theme.router.UrlContextListResult;
-import run.halo.app.theme.router.ViewNameResolver;
 
 /**
  * The {@link CategoryPostRouteFactory} for generate {@link RouterFunction} specific to the template

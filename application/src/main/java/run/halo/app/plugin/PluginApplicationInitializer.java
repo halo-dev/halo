@@ -26,6 +26,8 @@ import org.springframework.util.StopWatch;
 import reactor.core.Exceptions;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.properties.HaloProperties;
+import run.halo.app.theme.DefaultTemplateNameResolver;
+import run.halo.app.theme.DefaultViewNameResolver;
 
 /**
  * Plugin application initializer will create plugin application context by plugin id and
@@ -90,9 +92,14 @@ public class PluginApplicationInitializer {
         stopWatch.stop();
 
         beanFactory.registerSingleton("pluginContext", createPluginContext(plugin));
+
         // TODO deprecated
         beanFactory.registerSingleton("pluginWrapper", haloPluginManager.getPlugin(pluginId));
 
+        beanFactory.registerSingleton("templateNameResolver",
+            new DefaultTemplateNameResolver(
+                rootApplicationContext.getBean(DefaultViewNameResolver.class),
+                pluginApplicationContext));
         populateSettingFetcher(pluginId, beanFactory);
 
         log.debug("Total millis: {} ms -> {}", stopWatch.getTotalTimeMillis(),

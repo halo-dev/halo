@@ -24,6 +24,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.ViewNameResolver;
 import run.halo.app.theme.finders.PostPublicQueryService;
 import run.halo.app.theme.finders.SinglePageConversionService;
 import run.halo.app.theme.finders.vo.ContributorVo;
