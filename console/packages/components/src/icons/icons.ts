@@ -67,6 +67,9 @@ import IconArrowLeftRightLine from "~icons/ri/arrow-left-right-line";
 import IconArrowUpDownLine from "~icons/ri/arrow-up-down-line";
 import IconRiUpload2Fill from "~icons/ri/upload-2-fill";
 import IconNotificationBadgeLine from "~icons/ri/notification-badge-line";
+import IconLogoutCircleRLine from "~icons/ri/logout-circle-r-line";
+import IconAccountCircleLine from "~icons/ri/account-circle-line";
+import IconSettings3Line from "~icons/ri/settings-3-line";
 
 export {
   IconDashboard,
@@ -138,4 +141,7 @@ export {
   IconArrowUpDownLine,
   IconRiUpload2Fill,
   IconNotificationBadgeLine,
+  IconLogoutCircleRLine,
+  IconAccountCircleLine,
+  IconSettings3Line,
 };

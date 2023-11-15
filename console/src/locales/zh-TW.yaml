@@ -106,8 +106,8 @@ core:
         quicklink:
           title: 快捷訪問
           actions:
-            user_profile:
-              title: 個人資料
+            user_center:
+              title: 個人中心
             view_site:
               title: 查看站點
             new_post:

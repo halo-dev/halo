@@ -9,7 +9,6 @@ import {
 } from "@halo-dev/components";
 import type { Ref } from "vue";
 import { inject, computed } from "vue";
-import { useRouter } from "vue-router";
 import type { DetailedUser, ListedAuthProvider } from "@halo-dev/api-client";
 import { rbacAnnotations } from "@/constants/annotations";
 import { formatDatetime } from "@/utils/date";
@@ -20,7 +19,6 @@ import { useI18n } from "vue-i18n";
 
 const user = inject<Ref<DetailedUser | undefined>>("user");
 
-const router = useRouter();
 const { t } = useI18n();
 
 const { data: authProviders, isFetching } = useQuery<ListedAuthProvider[]>({
@@ -88,16 +86,7 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
         :label="$t('core.user.detail.fields.roles')"
         class="!px-2"
       >
-        <VTag
-          v-for="(role, index) in user?.roles"
-          :key="index"
-          @click="
-            router.push({
-              name: 'RoleDetail',
-              params: { name: role.metadata.name },
-            })
-          "
-        >
+        <VTag v-for="role in user?.roles" :key="role.metadata.name">
           <template #leftIcon>
             <IconUserSettings />
           </template>
@@ -118,7 +107,7 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
         class="!px-2"
       />
       <VDescriptionItem
-        v-if="!isFetching && isCurrentUser && availableAuthProviders?.length"
+        v-if="!isFetching && availableAuthProviders?.length"
         :label="$t('core.user.detail.fields.identity_authentication')"
         class="!px-2"
       >

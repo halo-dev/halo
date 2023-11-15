@@ -90,7 +90,7 @@ const handleUpdateUser = async () => {
 
     onVisibleChange(false);
 
-    queryClient.invalidateQueries({ queryKey: ["profile"] });
+    queryClient.invalidateQueries({ queryKey: ["user-detail"] });
 
     Toast.success(t("core.common.toast.save_success"));
   } catch (e) {

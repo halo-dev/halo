@@ -3,29 +3,20 @@ import {
   IconMore,
   IconSearch,
   IconUserSettings,
+  IconLogoutCircleRLine,
   VTag,
   VAvatar,
   Dialog,
-  VDropdown,
-  VDropdownItem,
+  IconAccountCircleLine,
 } from "@halo-dev/components";
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
-import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
-import {
-  RouterView,
-  useRoute,
-  useRouter,
-  type RouteRecordRaw,
-} from "vue-router";
+import { RouterView, useRoute, useRouter } from "vue-router";
 import { onMounted, reactive, ref } from "vue";
 import axios from "axios";
 import GlobalSearchModal from "@/components/global-search/GlobalSearchModal.vue";
 import LoginModal from "@/components/login/LoginModal.vue";
-import { coreMenuGroups } from "@console/router/routes.config";
-import sortBy from "lodash.sortby";
-import { useRoleStore } from "@/stores/role";
-import { hasPermission } from "@/utils/permission";
+import { coreMenuGroups } from "@console/router/constant";
 import { useUserStore } from "@/stores/user";
 import { rbacAnnotations } from "@/constants/annotations";
 import { defineStore, storeToRefs } from "pinia";
@@ -36,6 +27,7 @@ import {
 } from "overlayscrollbars-vue";
 import { isMac } from "@/utils/device";
 import { useEventListener } from "@vueuse/core";
+import { useRouteMenuGenerator } from "@/composables/use-route-menu-generator";
 
 const route = useRoute();
 const router = useRouter();
@@ -79,105 +71,7 @@ useEventListener(document, "keydown", (e: KeyboardEvent) => {
   }
 });
 
-// Generate menus by routes
-const menus = ref<MenuGroupType[]>([] as MenuGroupType[]);
-const minimenus = ref<MenuItemType[]>([] as MenuItemType[]);
-
-const roleStore = useRoleStore();
-const { uiPermissions } = roleStore.permissions;
-
-const generateMenus = () => {
-  // sort by menu.priority and meta.core
-  const currentRoutes = sortBy(
-    router.getRoutes().filter((route) => {
-      const { meta } = route;
-      if (!meta?.menu) {
-        return false;
-      }
-      if (meta.permissions) {
-        return hasPermission(uiPermissions, meta.permissions as string[], true);
-      }
-      return true;
-    }),
-    [
-      (route: RouteRecordRaw) => !route.meta?.core,
-      (route: RouteRecordRaw) => route.meta?.menu?.priority || 0,
-    ]
-  );
-
-  // group by menu.group
-  menus.value = currentRoutes.reduce((acc, route) => {
-    const { menu } = route.meta;
-    if (!menu) {
-      return acc;
-    }
-    const group = acc.find((item) => item.id === menu.group);
-    const childRoute = route.children[0];
-    const childMetaMenu = childRoute?.meta?.menu;
-
-    // only support one level
-    const menuChildren = childMetaMenu
-      ? [
-          {
-            name: childMetaMenu.name,
-            path: childRoute.path,
-            icon: childMetaMenu.icon,
-          },
-        ]
-      : undefined;
-    if (group) {
-      group.items?.push({
-        name: menu.name,
-        path: route.path,
-        icon: menu.icon,
-        mobile: menu.mobile,
-        children: menuChildren,
-      });
-    } else {
-      const menuGroup = coreMenuGroups.find((item) => item.id === menu.group);
-      let name = "";
-      if (!menuGroup) {
-        name = menu.group;
-      } else if (menuGroup.name) {
-        name = menuGroup.name;
-      }
-      acc.push({
-        id: menuGroup?.id || menu.group,
-        name: name,
-        priority: menuGroup?.priority || 0,
-        items: [
-          {
-            name: menu.name,
-            path: route.path,
-            icon: menu.icon,
-            mobile: menu.mobile,
-            children: menuChildren,
-          },
-        ],
-      });
-    }
-    return acc;
-  }, [] as MenuGroupType[]);
-
-  // sort by menu.priority
-  menus.value = sortBy(menus.value, [
-    (menu: MenuGroupType) => {
-      return coreMenuGroups.findIndex((item) => item.id === menu.id) < 0;
-    },
-    (menu: MenuGroupType) => menu.priority || 0,
-  ]);
-
-  minimenus.value = menus.value
-    .reduce((acc, group) => {
-      if (group?.items) {
-        acc.push(...group.items);
-      }
-      return acc;
-    }, [] as MenuItemType[])
-    .filter((item) => item.mobile);
-};
-
-onMounted(generateMenus);
+const { menus, minimenus } = useRouteMenuGenerator(coreMenuGroups);
 
 // aside scroll
 const navbarScroller = ref();
@@ -215,10 +109,6 @@ onMounted(() => {
     initialize({ target: navbarScroller.value });
   }
 });
-
-function handleRouteToUC() {
-  window.location.href = "/uc";
-}
 </script>
 
 <template>
@@ -262,12 +152,15 @@ function handleRouteToUC() {
             <VAvatar
               :src="currentUser?.spec.avatar"
               :alt="currentUser?.spec.displayName"
-              size="md"
+              size="sm"
               circle
             ></VAvatar>
           </div>
           <div class="profile-name">
-            <div class="flex text-sm font-medium">
+            <div
+              class="flex text-sm font-medium"
+              :title="currentUser?.spec.displayName"
+            >
               {{ currentUser?.spec.displayName }}
             </div>
             <div v-if="currentRoles?.[0]" class="flex">
@@ -283,19 +176,26 @@ function handleRouteToUC() {
               </VTag>
             </div>
           </div>
-          <VDropdown
-            class="profile-control cursor-pointer rounded p-1 transition-all hover:bg-gray-100"
-          >
-            <IconMore />
-            <template #popper>
-              <VDropdownItem @click="handleRouteToUC">
-                {{ $t("core.sidebar.operations.profile.button") }}
-              </VDropdownItem>
-              <VDropdownItem @click="handleLogout">
-                {{ $t("core.sidebar.operations.logout.button") }}
-              </VDropdownItem>
-            </template>
-          </VDropdown>
+
+          <div class="flex items-center gap-1">
+            <a
+              v-tooltip="'个人中心'"
+              class="group inline-block cursor-pointer rounded-full p-1.5 transition-all hover:bg-gray-100"
+              href="/uc"
+            >
+              <IconAccountCircleLine
+                class="h-5 w-5 text-gray-600 group-hover:text-gray-900"
+              />
+            </a>
+            <div
+              class="group inline-block cursor-pointer rounded-full p-1.5 transition-all hover:bg-gray-100"
+              @click="handleLogout"
+            >
+              <IconLogoutCircleRLine
+                class="h-5 w-5 text-gray-600 group-hover:text-gray-900"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </aside>
@@ -418,11 +318,8 @@ function handleRouteToUC() {
 
       .profile-name {
         @apply flex-1
-        self-center;
-      }
-
-      .profile-control {
-        @apply self-center;
+        self-center
+        overflow-hidden;
       }
     }
   }

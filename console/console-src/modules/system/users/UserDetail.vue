@@ -22,9 +22,11 @@ import type { Component } from "vue";
 import { markRaw } from "vue";
 import DetailTab from "./tabs/Detail.vue";
 import { useRouteQuery } from "@vueuse/router";
+import { useUserStore } from "@/stores/user";
 
 const { currentUserHasPermission } = usePermission();
 const { t } = useI18n();
+const { currentUser } = useUserStore();
 
 interface UserTab {
   id: string;
@@ -84,6 +86,10 @@ provide<Ref<string>>("activeTab", activeTab);
 const tabbarItems = computed(() => {
   return tabs.map((tab) => ({ id: tab.id, label: tab.label }));
 });
+
+function handleRouteToUC() {
+  window.location.href = "/uc";
+}
 </script>
 <template>
   <UserEditingModal v-model:visible="editingModal" :user="user?.user" />
@@ -111,8 +117,15 @@ const tabbarItems = computed(() => {
             </span>
           </div>
         </div>
-        <div v-if="currentUserHasPermission(['system:users:manage'])">
-          <VDropdown>
+        <div class="inline-flex items-center gap-2">
+          <VButton
+            v-if="currentUser?.metadata.name === user?.user.metadata.name"
+            type="primary"
+            @click="handleRouteToUC"
+          >
+            个人中心
+          </VButton>
+          <VDropdown v-if="currentUserHasPermission(['system:users:manage'])">
             <VButton type="default">
               {{ $t("core.common.buttons.edit") }}
             </VButton>

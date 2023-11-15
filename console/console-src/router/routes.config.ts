@@ -4,7 +4,6 @@ import Forbidden from "@/views/exceptions/Forbidden.vue";
 import BasicLayout from "@console/layouts/BasicLayout.vue";
 import Setup from "@console/views/system/Setup.vue";
 import Redirect from "@console/views/system/Redirect.vue";
-import type { MenuGroupType } from "@halo-dev/console-shared";
 import SetupInitialData from "@console/views/system/SetupInitialData.vue";
 
 export const routes: Array<RouteRecordRaw> = [
@@ -44,34 +43,6 @@ export const routes: Array<RouteRecordRaw> = [
     path: "/redirect",
     name: "Redirect",
     component: Redirect,
-  },
-];
-
-export const coreMenuGroups: MenuGroupType[] = [
-  {
-    id: "dashboard",
-    name: undefined,
-    priority: 0,
-  },
-  {
-    id: "content",
-    name: "core.sidebar.menu.groups.content",
-    priority: 1,
-  },
-  {
-    id: "interface",
-    name: "core.sidebar.menu.groups.interface",
-    priority: 2,
-  },
-  {
-    id: "system",
-    name: "core.sidebar.menu.groups.system",
-    priority: 3,
-  },
-  {
-    id: "tool",
-    name: "core.sidebar.menu.groups.tool",
-    priority: 4,
   },
 ];
 

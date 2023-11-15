@@ -2,7 +2,6 @@ import type { RouteRecordRaw } from "vue-router";
 import NotFound from "@/views/exceptions/NotFound.vue";
 import Forbidden from "@/views/exceptions/Forbidden.vue";
 import BasicLayout from "@uc/layouts/BasicLayout.vue";
-import type { MenuGroupType } from "@halo-dev/console-shared";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -20,34 +19,6 @@ export const routes: Array<RouteRecordRaw> = [
         component: Forbidden,
       },
     ],
-  },
-];
-
-export const coreMenuGroups: MenuGroupType[] = [
-  {
-    id: "dashboard",
-    name: undefined,
-    priority: 0,
-  },
-  {
-    id: "content",
-    name: "core.sidebar.menu.groups.content",
-    priority: 1,
-  },
-  {
-    id: "interface",
-    name: "core.sidebar.menu.groups.interface",
-    priority: 2,
-  },
-  {
-    id: "system",
-    name: "core.sidebar.menu.groups.system",
-    priority: 3,
-  },
-  {
-    id: "tool",
-    name: "core.sidebar.menu.groups.tool",
-    priority: 4,
   },
 ];
 

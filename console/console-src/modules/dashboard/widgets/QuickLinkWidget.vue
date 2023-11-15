@@ -11,7 +11,7 @@ import {
   IconSearch,
   IconDatabase2Line,
   VCard,
-  IconUserLine,
+  IconAccountCircleLine,
   Dialog,
   Toast,
 } from "@halo-dev/components";
@@ -37,9 +37,9 @@ const { t } = useI18n();
 
 const actions: Action[] = [
   {
-    icon: markRaw(IconUserLine),
+    icon: markRaw(IconAccountCircleLine),
     title: t(
-      "core.dashboard.widgets.presets.quicklink.actions.user_profile.title"
+      "core.dashboard.widgets.presets.quicklink.actions.user_center.title"
     ),
     action: () => {
       window.location.href = "/uc/profile";
