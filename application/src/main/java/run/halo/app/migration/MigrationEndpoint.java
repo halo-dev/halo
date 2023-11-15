@@ -140,6 +140,7 @@ public class MigrationEndpoint implements CustomEndpoint {
             .switchIfEmpty(backupFileContent);
     }
 
+    @Schema(types = "object")
     public static class RestoreRequest {
         private final MultiValueMap<String, Part> multipart;
 

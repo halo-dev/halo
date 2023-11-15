@@ -244,6 +244,7 @@ public class UserEndpoint implements CustomEndpoint {
             .flatMap(user -> ServerResponse.ok().bodyValue(user));
     }
 
+    @Schema(types = "object")
     public interface IAvatarUploadRequest {
         @Schema(requiredMode = REQUIRED, description = "Avatar file")
         FilePart getFile();
