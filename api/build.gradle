@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'halo.publish'
+    id 'jacoco'
     id "io.freefair.lombok" version "8.4"
 }
 
@@ -80,4 +81,12 @@ java {
 
 tasks.named('test') {
     useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+tasks.named('jacocoTestReport') {
+    reports {
+        xml.required = true
+        html.required = false
+    }
 }
