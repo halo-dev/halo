@@ -2,7 +2,7 @@
 import {
   getCategoryPath,
   type CategoryTree,
-} from "@/modules/contents/posts/categories/utils";
+} from "@console/modules/contents/posts/categories/utils";
 import type { Category } from "@halo-dev/api-client";
 import { IconCheckboxCircle } from "@halo-dev/components";
 import { computed, inject, ref, type Ref } from "vue";

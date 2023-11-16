@@ -79,8 +79,6 @@ core:
         button: Profile
       visit_homepage:
         title: Visit homepage
-      notifications:
-        button: Notifications
   dashboard:
     title: Dashboard
     actions:
@@ -108,8 +106,8 @@ core:
         quicklink:
           title: Quick Link
           actions:
-            user_profile:
-              title: User Profile
+            user_center:
+              title: User Center
             view_site:
               title: View Site
             new_post:
@@ -1095,7 +1093,7 @@ core:
     forbidden:
       message: Unauthorized access to this page
     actions:
-      dashboard: Dashboard
+      home: Back to home
   setup:
     title: Setup
     operations:
