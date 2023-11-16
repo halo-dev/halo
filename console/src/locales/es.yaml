@@ -105,7 +105,7 @@ core:
         quicklink:
           title: Enlace Rápido
           actions:
-            user_profile:
+            user_center:
               title: Perfil de Usuario
             view_site:
               title: Ver Sitio
@@ -1027,7 +1027,7 @@ core:
     forbidden:
       message: Acceso no autorizado a esta página
     actions:
-      dashboard: Tablero
+      home: Ir a la página de inicio
   setup:
     title: Configuración
     operations:

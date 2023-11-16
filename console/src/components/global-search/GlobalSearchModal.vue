@@ -16,7 +16,7 @@ import { computed, markRaw, ref, watch, type Component } from "vue";
 import Fuse from "fuse.js";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
-import { useThemeStore } from "@/stores/theme";
+import { useThemeStore } from "@console/stores/theme";
 import { storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
 

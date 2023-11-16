@@ -1,4 +1,4 @@
-import router from "@/router";
+import router from "@console/router";
 import type { FormKitNode } from "@formkit/core";
 import { onMounted } from "vue";
 import { useRoute } from "vue-router";

@@ -34,8 +34,8 @@ const router = useRouter();
           <VButton @click="router.back()">
             {{ $t("core.common.buttons.back") }}
           </VButton>
-          <VButton type="secondary" :route="{ name: 'Dashboard' }">
-            {{ $t("core.exception.actions.dashboard") }}
+          <VButton type="secondary" :route="{ path: '/' }">
+            {{ $t("core.exception.actions.home") }}
           </VButton>
         </VSpace>
       </div>

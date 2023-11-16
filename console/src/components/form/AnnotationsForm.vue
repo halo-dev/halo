@@ -11,7 +11,7 @@ import { apiClient } from "@/utils/api-client";
 import type { AnnotationSetting } from "@halo-dev/api-client";
 import cloneDeep from "lodash.clonedeep";
 import { getValidationMessages } from "@formkit/validation";
-import { useThemeStore } from "@/stores/theme";
+import { useThemeStore } from "@console/stores/theme";
 import { randomUUID } from "@/utils/id";
 
 const themeStore = useThemeStore();
