@@ -9,7 +9,7 @@ import {
 import { setFocus } from "@/formkit/utils/focus";
 import { computed, ref, watch } from "vue";
 import Fuse from "fuse.js";
-import { usePostCategory } from "@/modules/contents/posts/categories/composables/use-post-category";
+import { usePostCategory } from "@console/modules/contents/posts/categories/composables/use-post-category";
 
 const props = withDefaults(
   defineProps<{

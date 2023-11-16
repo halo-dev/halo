@@ -79,8 +79,6 @@ core:
         button: 個人資料
       visit_homepage:
         title: 訪問首頁
-      notifications:
-        button: 我的訊息
   dashboard:
     title: 儀表板
     actions:
@@ -108,8 +106,8 @@ core:
         quicklink:
           title: 快捷訪問
           actions:
-            user_profile:
-              title: 個人資料
+            user_center:
+              title: 個人中心
             view_site:
               title: 查看站點
             new_post:
@@ -1095,7 +1093,7 @@ core:
     forbidden:
       message: 沒有權限訪問此頁面
     actions:
-      dashboard: 儀表盤
+      home: 返回首頁
   setup:
     title: 系統初始化
     operations:

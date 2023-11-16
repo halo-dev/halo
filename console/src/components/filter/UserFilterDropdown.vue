@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { User } from "@halo-dev/api-client";
-import { useUserFetch } from "@/modules/system/users/composables/use-user";
+import { useUserFetch } from "@console/modules/system/users/composables/use-user";
 import {
   IconArrowDown,
   VAvatar,

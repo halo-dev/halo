@@ -50,6 +50,7 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
       - name: Analyze code
+        if: ${{ github.event_name == 'push' }} # Due to inability to access secrets during PR, only the code pushed into the branch can be analyzed.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -71,5 +72,5 @@ jobs:
           ghcr-token: ${{ secrets.GHCR_TOKEN }}
           dockerhub-user: ${{ secrets.DOCKER_USERNAME }}
           dockerhub-token: ${{ secrets.DOCKER_TOKEN }}
-          push: ${{ github.event_name == 'pull_request' || github.event_name == 'push' || github.event_name == 'release' }}
+          push: ${{ github.event_name == 'push' || github.event_name == 'release' }} # we only push to GHCR if the push is to the next branch
           console-ref: ${{ github.event_name == 'release' &&  github.ref || 'main' }}

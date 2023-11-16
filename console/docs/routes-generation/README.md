@@ -15,7 +15,7 @@
 
 ```ts
 import { definePlugin } from "@halo-dev/console-shared";
-import BasicLayout from "@/layouts/BasicLayout.vue";
+import BasicLayout from "@console/layouts/BasicLayout.vue";
 import AttachmentList from "./AttachmentList.vue";
 import AttachmentSelectorModal from "./components/AttachmentSelectorModal.vue";
 import { IconFolder } from "@halo-dev/components";
