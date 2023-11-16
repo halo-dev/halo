@@ -50,6 +50,7 @@ jobs:
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
       - name: Analyze code
+        if: ${{ github.event_name == 'push' }} # Due to inability to access secrets during PR, only the code pushed into the branch can be analyzed.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
