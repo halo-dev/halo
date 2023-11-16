@@ -105,7 +105,7 @@ core:
         quicklink:
           title: Enlace Rápido
           actions:
-            user_profile:
+            user_center:
               title: Perfil de Usuario
             view_site:
               title: Ver Sitio

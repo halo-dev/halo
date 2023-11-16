@@ -5,6 +5,8 @@ import {
   type RouteLocationNormalizedLoaded,
 } from "vue-router";
 import routesConfig from "@uc/router/routes.config";
+import { setupAuthCheckGuard } from "./guards/auth-check";
+import { setupPermissionGuard } from "./guards/permission";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,5 +20,8 @@ const router = createRouter({
     }
   },
 });
+
+setupAuthCheckGuard(router);
+setupPermissionGuard(router);
 
 export default router;

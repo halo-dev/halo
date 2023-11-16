@@ -21,7 +21,7 @@ export async function setupPluginModules(app: App) {
     const { load } = useScriptTag(
       `${
         import.meta.env.VITE_API_URL
-      }/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.js`
+      }/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.js?t=${Date.now()}`
     );
 
     await load();
@@ -45,7 +45,7 @@ export async function setupPluginModules(app: App) {
     await loadStyle(
       `${
         import.meta.env.VITE_API_URL
-      }/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.css`
+      }/apis/api.console.halo.run/v1alpha1/plugins/-/bundle.css?t=${Date.now()}`
     );
   } catch (e) {
     const message = i18n.global.t("core.plugin.loader.toast.style_load_failed");

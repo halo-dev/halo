@@ -106,8 +106,8 @@ core:
         quicklink:
           title: Quick Link
           actions:
-            user_profile:
-              title: User Profile
+            user_center:
+              title: User Center
             view_site:
               title: View Site
             new_post:
