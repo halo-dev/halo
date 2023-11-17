@@ -34,6 +34,7 @@ import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.HandlerStrategies;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import org.springframework.web.server.ServerWebExchange;
@@ -85,7 +86,7 @@ class SinglePageRouteTest {
     @Test
     void handlerFunction() {
         // fix gh-3448
-        when(viewNameResolver.resolveViewNameOrDefault(any(ServerWebExchange.class), any(), any()))
+        when(viewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class), any(), any()))
             .thenReturn(Mono.just(DefaultTemplateEnum.POST.getValue()));
 
         String pageName = "fake-page";

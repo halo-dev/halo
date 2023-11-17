@@ -17,6 +17,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.HandlerStrategies;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.result.view.ViewResolver;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
@@ -100,7 +101,7 @@ class PreviewRouterFunctionTest {
         when(postPublicQueryService.convertToVo(eq(post), eq(post.getSpec().getHeadSnapshot())))
             .thenReturn(Mono.just(postVo));
 
-        when(viewNameResolver.resolveViewNameOrDefault(any(ServerWebExchange.class),
+        when(viewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class),
             eq("postTemplate"), eq("post"))).thenReturn(Mono.just("postView"));
 
         webTestClient.get().uri("/preview/posts/post1")
@@ -136,7 +137,7 @@ class PreviewRouterFunctionTest {
         when(singlePageConversionService.convertToVo(singlePage, "snapshot1"))
             .thenReturn(Mono.just(singlePageVo));
 
-        when(viewNameResolver.resolveViewNameOrDefault(any(ServerWebExchange.class),
+        when(viewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class),
             eq("pageTemplate"), eq("page"))).thenReturn(Mono.just("pageView"));
 
         webTestClient.get().uri("/preview/singlepages/page1")

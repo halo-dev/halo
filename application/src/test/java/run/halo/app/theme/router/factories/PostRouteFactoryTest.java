@@ -16,6 +16,7 @@ import org.springframework.context.i18n.SimpleLocaleContext;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.server.RouterFunction;
+import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.i18n.LocaleContextResolver;
@@ -77,7 +78,7 @@ class PostRouteFactoryTest extends RouteFactoryTestSuite {
 
         when(client.fetch(eq(Post.class), eq("fake-name"))).thenReturn(Mono.just(post));
 
-        when(viewNameResolver.resolveViewNameOrDefault(any(ServerWebExchange.class), any(), any()))
+        when(viewNameResolver.resolveViewNameOrDefault(any(ServerRequest.class), any(), any()))
             .thenReturn(Mono.just(DefaultTemplateEnum.POST.getValue()));
         when(predicateResolver.getPredicate())
             .thenReturn(new DefaultQueryPostPredicateResolver().getPredicate());
