@@ -26,7 +26,7 @@ const { t } = useI18n();
 const props = withDefaults(
   defineProps<{
     backup: Backup;
-    showOperations: boolean;
+    showOperations?: boolean;
   }>(),
   {
     showOperations: true,
