@@ -1,5 +1,5 @@
 import { defineAsyncComponent, type App } from "vue";
-import { VClosePopper, VTooltip } from "@halo-dev/components";
+import { VClosePopper, VLoading, VTooltip } from "@halo-dev/components";
 import { Dropdown } from "floating-vue";
 import "floating-vue/dist/style.css";
 // @ts-ignore
@@ -39,4 +39,11 @@ export function setupComponents(app: App) {
   app.component("AnnotationsForm", AnnotationsForm);
   app.component("AttachmentFileTypeIcon", AttachmentFileTypeIcon);
   app.component("HasPermission", HasPermission);
+  app.component(
+    "UppyUpload",
+    defineAsyncComponent({
+      loader: () => import("@/components/upload/UppyUpload.vue"),
+      loadingComponent: VLoading,
+    })
+  );
 }
