@@ -17,9 +17,13 @@ import static run.halo.app.security.authorization.AuthorityUtils.authoritiesToRo
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.io.Files;
+import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.security.Principal;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,11 +67,13 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuples;
 import reactor.util.retry.Retry;
 import run.halo.app.core.extension.Role;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.service.AttachmentService;
+import run.halo.app.core.extension.service.EmailVerificationService;
 import run.halo.app.core.extension.service.RoleService;
 import run.halo.app.core.extension.service.UserService;
 import run.halo.app.extension.Comparators;
@@ -78,6 +84,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.utils.JsonUtils;
 
 @Component
@@ -92,6 +99,8 @@ public class UserEndpoint implements CustomEndpoint {
     private final UserService userService;
     private final RoleService roleService;
     private final AttachmentService attachmentService;
+    private final EmailVerificationService emailVerificationService;
+    private final RateLimiterRegistry rateLimiterRegistry;
     private final SystemConfigurableEnvironmentFetcher environmentFetcher;
 
     @Override
@@ -201,7 +210,81 @@ public class UserEndpoint implements CustomEndpoint {
                 )
                 .response(responseBuilder().implementation(User.class))
                 .build())
+            .POST("users/-/send-email-verification-code",
+                this::sendEmailVerificationCode,
+                builder -> builder
+                    .tag(tag)
+                    .operationId("SendEmailVerificationCode")
+                    .description("Send email verification code for user")
+                    .response(responseBuilder().implementation(Void.class))
+                    .build()
+            )
+            .POST("users/-/verify-email", this::verifyEmail,
+                builder -> builder
+                    .tag(tag)
+                    .operationId("VerifyEmail")
+                    .description("Verify email for user by code.")
+                    .requestBody(requestBodyBuilder()
+                        .required(true)
+                        .implementation(VerifyEmailRequest.class))
+                    .response(responseBuilder().implementation(Void.class))
+                    .build()
+            )
             .build();
+    }
+
+    private Mono<ServerResponse> verifyEmail(ServerRequest request) {
+        return request.bodyToMono(VerifyEmailRequest.class)
+            .switchIfEmpty(Mono.error(
+                () -> new ServerWebInputException("Request body is required."))
+            )
+            .flatMap(verifyEmailRequest -> ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .map(Principal::getName)
+                .map(username -> Tuples.of(username, verifyEmailRequest.code()))
+            )
+            .flatMap(tuple2 -> {
+                var username = tuple2.getT1();
+                var code = tuple2.getT2();
+                return Mono.just(username)
+                    .transformDeferred(verificationEmailRateLimiter(username))
+                    .flatMap(name -> emailVerificationService.verify(username, code))
+                    .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
+            })
+            .then(ServerResponse.ok().build());
+    }
+
+    public record VerifyEmailRequest(@Schema(requiredMode = REQUIRED, minLength = 1) String code) {
+    }
+
+    private Mono<ServerResponse> sendEmailVerificationCode(ServerRequest request) {
+        return ReactiveSecurityContextHolder.getContext()
+            .map(SecurityContext::getAuthentication)
+            .map(Principal::getName)
+            .flatMap(username -> client.get(User.class, username))
+            .flatMap(user -> {
+                var email = user.getSpec().getEmail();
+                var username = user.getMetadata().getName();
+                return Mono.just(user)
+                    .transformDeferred(sendEmailVerificationCodeRateLimiter(username, email))
+                    .flatMap(u -> emailVerificationService.sendVerificationCode(username))
+                    .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
+            })
+            .then(ServerResponse.ok().build());
+    }
+
+    <T> RateLimiterOperator<T> verificationEmailRateLimiter(String username) {
+        String rateLimiterKey = "verify-email-" + username;
+        var rateLimiter =
+            rateLimiterRegistry.rateLimiter(rateLimiterKey, "verify-email");
+        return RateLimiterOperator.of(rateLimiter);
+    }
+
+    <T> RateLimiterOperator<T> sendEmailVerificationCodeRateLimiter(String username, String email) {
+        String rateLimiterKey = "send-email-verification-code-" + username + ":" + email;
+        var rateLimiter =
+            rateLimiterRegistry.rateLimiter(rateLimiterKey, "send-email-verification-code");
+        return RateLimiterOperator.of(rateLimiter);
     }
 
     private Mono<ServerResponse> deleteUserAvatar(ServerRequest request) {
@@ -396,6 +479,8 @@ public class UserEndpoint implements CustomEndpoint {
                             oldAnnotations.get(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO));
                         newAnnotations.put(User.AVATAR_ATTACHMENT_NAME_ANNO,
                             oldAnnotations.get(User.AVATAR_ATTACHMENT_NAME_ANNO));
+                        newAnnotations.put(User.LAST_USED_EMAIL_ANNO,
+                            oldAnnotations.get(User.LAST_USED_EMAIL_ANNO));
                         currentUser.getMetadata().setAnnotations(newAnnotations);
                     }
                     var spec = currentUser.getSpec();
@@ -405,6 +490,12 @@ public class UserEndpoint implements CustomEndpoint {
                     spec.setTwoFactorAuthEnabled(newSpec.getTwoFactorAuthEnabled());
                     spec.setEmail(newSpec.getEmail());
                     spec.setPhone(newSpec.getPhone());
+
+                    // if email changed, set email verified to false
+                    var oldEmail = oldAnnotations.get(User.LAST_USED_EMAIL_ANNO);
+                    if (StringUtils.isNotBlank(oldEmail) && !oldEmail.equals(newSpec.getEmail())) {
+                        spec.setEmailVerified(false);
+                    }
                     return currentUser;
                 })
             )

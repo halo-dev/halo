@@ -35,6 +35,8 @@ public class User extends AbstractExtension {
 
     public static final String ROLE_NAMES_ANNO = "rbac.authorization.halo.run/role-names";
 
+    public static final String LAST_USED_EMAIL_ANNO = "halo.run/last-used-email";
+
     public static final String LAST_AVATAR_ATTACHMENT_NAME_ANNO =
         "halo.run/last-avatar-attachment-name";
 
@@ -57,6 +59,8 @@ public class User extends AbstractExtension {
 
         @Schema(requiredMode = REQUIRED)
         private String email;
+
+        private boolean emailVerified;
 
         private String phone;
 

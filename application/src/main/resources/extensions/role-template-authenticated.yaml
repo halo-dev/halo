@@ -45,6 +45,10 @@ rules:
     resources: [ "users/avatar" ]
     resourceNames: [ "-" ]
     verbs: [ "create", "delete" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "users/send-email-verification-code", "users/verify-email" ]
+    resourceNames: [ "-" ]
+    verbs: [ "create" ]
 ---
 apiVersion: v1alpha1
 kind: "Role"
