@@ -81,6 +81,10 @@ public class Post extends AbstractExtension {
         return labels != null && parseBoolean(labels.getOrDefault(PUBLISHED_LABEL, "false"));
     }
 
+    public static boolean isPublic(PostSpec spec) {
+        return spec.getVisible() == null || VisibleEnum.PUBLIC.equals(spec.getVisible());
+    }
+
     @Data
     public static class PostSpec {
         @Schema(requiredMode = RequiredMode.REQUIRED, minLength = 1)
