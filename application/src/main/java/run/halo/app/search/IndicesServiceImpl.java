@@ -40,7 +40,8 @@ public class IndicesServiceImpl implements IndicesService {
 
     private Mono<Void> rebuildPostIndices(PostSearchService searchService) {
         return postFinder.listAll()
-            .filter(post -> Post.isPublished(post.getMetadata()))
+            .filter(
+                post -> Post.isPublished(post.getMetadata()) && Post.isPublic(post.getSpec()))
             .flatMap(listedPostVo -> {
                 PostVo postVo = PostVo.from(listedPostVo);
                 return postFinder.content(postVo.getMetadata().getName())
