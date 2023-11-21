@@ -2,9 +2,11 @@ package run.halo.app.core.extension.endpoint;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
+import static org.springdoc.core.fn.builders.header.Builder.headerBuilder;
 import static org.springdoc.core.fn.builders.requestbody.Builder.requestBodyBuilder;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.net.URI;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -13,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -56,7 +59,14 @@ public class SystemInitializationEndpoint implements CustomEndpoint {
                     .tag(tag)
                     .requestBody(requestBodyBuilder()
                         .implementation(SystemInitializationRequest.class))
-                    .response(responseBuilder().implementation(Boolean.class))
+                    .response(responseBuilder()
+                        .responseCode(HttpStatus.CREATED.value() + "")
+                        .description("System initialization successfully.")
+                        .header(headerBuilder()
+                            .name(HttpHeaders.LOCATION)
+                            .description("Redirect URL.")
+                        )
+                    )
             )
             .build();
     }
@@ -87,7 +97,7 @@ public class SystemInitializationEndpoint implements CustomEndpoint {
                     return initializeSystem(requestBody);
                 })
             )
-            .then(ServerResponse.ok().bodyValue(true));
+            .then(ServerResponse.created(URI.create("/console")).build());
     }
 
     private Mono<Void> initializeSystem(SystemInitializationRequest requestBody) {
