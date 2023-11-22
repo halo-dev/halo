@@ -24,7 +24,6 @@ import org.springframework.web.reactive.function.server.support.RouterFunctionMa
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.core.extension.endpoint.CustomEndpoint;
 import run.halo.app.plugin.resources.ReverseProxyRouterFunctionRegistry;
 
 /**
@@ -43,9 +42,6 @@ class PluginCompositeRouterFunctionTest {
     @Mock
     ObjectProvider<RouterFunction> rawRouterFunctionsProvider;
 
-    @Mock
-    ObjectProvider<CustomEndpoint> customEndpointsProvider;
-
     @InjectMocks
     PluginCompositeRouterFunction compositeRouterFunction;
 
@@ -59,11 +55,9 @@ class PluginCompositeRouterFunctionTest {
         ExtensionContextRegistry.getInstance().register("fake-plugin", fakeContext);
 
         when(rawRouterFunctionsProvider.orderedStream()).thenReturn(Stream.empty());
-        when(customEndpointsProvider.orderedStream()).thenReturn(Stream.empty());
 
         when(fakeContext.getBeanProvider(RouterFunction.class))
             .thenReturn(rawRouterFunctionsProvider);
-        when(fakeContext.getBeanProvider(CustomEndpoint.class)).thenReturn(customEndpointsProvider);
 
         compositeRouterFunction =
             new PluginCompositeRouterFunction(reverseProxyRouterFunctionRegistry);
@@ -93,7 +87,6 @@ class PluginCompositeRouterFunctionTest {
             .verify();
 
         verify(rawRouterFunctionsProvider).orderedStream();
-        verify(customEndpointsProvider).orderedStream();
     }
 
     private ServerWebExchange createExchange(String urlTemplate) {
