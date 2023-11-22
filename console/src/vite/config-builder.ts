@@ -1,4 +1,4 @@
-import { fileURLToPath, URL } from "url";
+import { fileURLToPath } from "url";
 import fs from "fs";
 import { defineConfig, type Plugin } from "vite";
 import Vue from "@vitejs/plugin-vue";
@@ -7,6 +7,7 @@ import { VitePWA } from "vite-plugin-pwa";
 import Icons from "unplugin-icons/vite";
 import { setupLibraryExternal } from "./library-external";
 import GzipPlugin from "rollup-plugin-gzip";
+import path from "path";
 
 interface Options {
   base: string;
@@ -49,6 +50,9 @@ export function createViteConfig(options: Options) {
 
   const { base, entryFile, port, outDir, plugins } = options;
 
+  const currentFileDir = path.dirname(fileURLToPath(import.meta.url));
+  const rootDir = path.resolve(currentFileDir, "../..");
+
   return defineConfig({
     base,
     plugins: [
@@ -58,9 +62,9 @@ export function createViteConfig(options: Options) {
     ],
     resolve: {
       alias: {
-        "@": fileURLToPath(new URL("/src", import.meta.url)),
-        "@console": fileURLToPath(new URL("/console-src", import.meta.url)),
-        "@uc": fileURLToPath(new URL("/uc-src", import.meta.url)),
+        "@": path.resolve(rootDir, "src"),
+        "@console": path.resolve(rootDir, "console-src"),
+        "@uc": path.resolve(rootDir, "uc-src"),
       },
     },
     server: {
@@ -70,7 +74,7 @@ export function createViteConfig(options: Options) {
       },
     },
     build: {
-      outDir: fileURLToPath(new URL(outDir, import.meta.url)),
+      outDir: path.resolve(rootDir, outDir),
       emptyOutDir: true,
       chunkSizeWarningLimit: 2048,
     },
