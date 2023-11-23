@@ -21,6 +21,10 @@ function onLoginSucceed() {
   window.location.reload();
 }
 
+function onSignupSucceed() {
+  window.location.href = "/uc";
+}
+
 const type = useRouteQuery<string>("type", "");
 
 function handleChangeType() {
@@ -45,7 +49,7 @@ watch(
   <div class="flex h-screen flex-col items-center bg-white/90 pt-[30vh]">
     <IconLogo class="mb-8" />
     <div class="flex w-72 flex-col">
-      <SignupForm v-if="type === 'signup'" @succeed="onLoginSucceed" />
+      <SignupForm v-if="type === 'signup'" @succeed="onSignupSucceed" />
       <LoginForm v-else @succeed="onLoginSucceed" />
       <SocialAuthProviders />
       <div
