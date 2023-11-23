@@ -28,6 +28,8 @@ core:
         placeholder: Username
       display_name:
         placeholder: Display name
+      email:
+        placeholder: Email
       password:
         placeholder: Password
       password_confirm:

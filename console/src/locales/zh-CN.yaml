@@ -28,6 +28,8 @@ core:
         placeholder: 用户名
       display_name:
         placeholder: 名称
+      email:
+        placeholder: 电子邮箱
       password:
         placeholder: 密码
       password_confirm:
