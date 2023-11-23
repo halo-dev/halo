@@ -64,7 +64,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: ["health", "info", "startup", "globalinfo", "logfile", "shutdown", "restart"]
+        include: "*"
   endpoint:
     shutdown:
       enabled: true
