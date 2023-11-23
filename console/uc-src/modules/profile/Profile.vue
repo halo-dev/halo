@@ -22,6 +22,7 @@ import DetailTab from "./tabs/Detail.vue";
 import PersonalAccessTokensTab from "./tabs/PersonalAccessTokens.vue";
 import { useRouteQuery } from "@vueuse/router";
 import NotificationPreferences from "./tabs/NotificationPreferences.vue";
+import EmailVerifyModal from "./components/EmailVerifyModal.vue";
 
 const { t } = useI18n();
 
@@ -88,15 +89,31 @@ const tabbarItems = computed(() => {
 const activeTab = useRouteQuery<string>("tab", tabs[0].id, {
   mode: "push",
 });
+
+// email verify
+const emailVerifyModal = ref(false);
+
+async function onProfileEditingModalClose() {
+  await refetch();
+
+  if (!user.value?.user.spec.emailVerified) {
+    emailVerifyModal.value = true;
+  }
+}
 </script>
 <template>
-  <ProfileEditingModal v-model:visible="editingModal" :user="user?.user" />
+  <ProfileEditingModal
+    v-model:visible="editingModal"
+    @close="onProfileEditingModalClose"
+  />
 
   <PasswordChangeModal
     v-model:visible="passwordChangeModal"
     :user="user?.user"
     @close="refetch"
   />
+
+  <EmailVerifyModal v-if="emailVerifyModal" @close="emailVerifyModal = false" />
 
   <header class="bg-white">
     <div class="p-4">

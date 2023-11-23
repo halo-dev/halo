@@ -16,18 +16,18 @@ import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 import { useI18n } from "vue-i18n";
 import { useQueryClient } from "@tanstack/vue-query";
+import { useUserStore } from "@/stores/user";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
+const userStore = useUserStore();
 
 const props = withDefaults(
   defineProps<{
     visible: boolean;
-    user?: User;
   }>(),
   {
     visible: false,
-    user: undefined,
   }
 );
 
@@ -65,7 +65,8 @@ watch(
   () => props.visible,
   (visible) => {
     if (visible) {
-      if (props.user) formState.value = cloneDeep(props.user);
+      if (userStore.currentUser)
+        formState.value = cloneDeep(userStore.currentUser);
       setFocus("displayNameInput");
     } else {
       handleResetForm();
@@ -97,6 +98,7 @@ const handleUpdateUser = async () => {
     console.error("Failed to update profile", e);
   } finally {
     saving.value = false;
+    userStore.fetchCurrentUser();
   }
 };
 </script>
