@@ -35,7 +35,7 @@ public class User extends AbstractExtension {
 
     public static final String ROLE_NAMES_ANNO = "rbac.authorization.halo.run/role-names";
 
-    public static final String LAST_USED_EMAIL_ANNO = "halo.run/last-used-email";
+    public static final String EMAIL_TO_VERIFY = "halo.run/email-to-verify";
 
     public static final String LAST_AVATAR_ATTACHMENT_NAME_ANNO =
         "halo.run/last-avatar-attachment-name";

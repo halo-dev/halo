@@ -3,8 +3,6 @@ package run.halo.app.core.extension.service.impl;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.Data;
@@ -12,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.reactivestreams.Publisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -51,32 +48,52 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     private final NotificationCenter notificationCenter;
 
     @Override
-    public Mono<Void> sendVerificationCode(String username) {
-        return client.get(User.class, username)
-            .flatMap(user -> {
-                var email = user.getSpec().getEmail();
-                if (StringUtils.isBlank(email)) {
-                    return Mono.error(
-                        () -> new ServerWebInputException("Email must not be blank."));
-                }
-                if (user.getSpec().isEmailVerified()) {
-                    return Mono.error(() -> new ServerWebInputException("Email already verified."));
-                }
-                return sendVerificationNotification(user);
-            });
+    public Mono<Void> sendVerificationCode(String username, String email) {
+        Assert.state(StringUtils.isNotBlank(username), "Username must not be blank");
+        Assert.state(StringUtils.isNotBlank(email), "Email must not be blank");
+        return Mono.defer(() -> client.get(User.class, username)
+                .flatMap(user -> {
+                    var userEmail = user.getSpec().getEmail();
+                    var isVerified = user.getSpec().isEmailVerified();
+                    if (StringUtils.equals(userEmail, email) && isVerified) {
+                        return Mono.error(
+                            () -> new ServerWebInputException("Email already verified."));
+                    }
+                    var annotations = MetadataUtil.nullSafeAnnotations(user);
+                    var oldEmailToVerify = annotations.get(User.EMAIL_TO_VERIFY);
+                    var unsubMono = unSubscribeVerificationEmailNotification(oldEmailToVerify);
+                    var updateUserAnnoMono = Mono.defer(() -> {
+                        annotations.put(User.EMAIL_TO_VERIFY, email);
+                        return client.update(user);
+                    });
+                    emailVerificationManager.removeCode(username, oldEmailToVerify);
+                    return Mono.when(unsubMono, updateUserAnnoMono);
+                })
+            )
+            .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
+                .filter(OptimisticLockingFailureException.class::isInstance))
+            .flatMap(user -> sendVerificationNotification(username, email));
     }
 
     @Override
     public Mono<Void> verify(String username, String code) {
+        Assert.state(StringUtils.isNotBlank(username), "Username must not be blank");
+        Assert.state(StringUtils.isNotBlank(code), "Code must not be blank");
         return Mono.defer(() -> client.get(User.class, username)
                 .flatMap(user -> {
-                    var email = user.getSpec().getEmail();
-                    var verified = emailVerificationManager.verifyCode(username, email, code);
+                    var annotations = MetadataUtil.nullSafeAnnotations(user);
+                    var emailToVerify = annotations.get(User.EMAIL_TO_VERIFY);
+                    if (StringUtils.isBlank(emailToVerify)) {
+                        return Mono.error(EmailVerificationFailed::new);
+                    }
+                    var verified =
+                        emailVerificationManager.verifyCode(username, emailToVerify, code);
                     if (!verified) {
                         return Mono.error(EmailVerificationFailed::new);
                     }
                     user.getSpec().setEmailVerified(true);
-                    emailVerificationManager.removeCode(username, email);
+                    user.getSpec().setEmail(emailToVerify);
+                    emailVerificationManager.removeCode(username, emailToVerify);
                     return client.update(user);
                 })
             )
@@ -85,13 +102,9 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
             .then();
     }
 
-    Mono<Void> sendVerificationNotification(User user) {
-        var email = user.getSpec().getEmail();
-        var username = user.getMetadata().getName();
-        var oldEmail = MetadataUtil.nullSafeAnnotations(user)
-            .get(User.LAST_USED_EMAIL_ANNO);
+    Mono<Void> sendVerificationNotification(String username, String email) {
         var code = emailVerificationManager.generateCode(username, email);
-        var subscribeNotification = autoSubscribeVerificationEmail(email, oldEmail);
+        var subscribeNotification = autoSubscribeVerificationEmailNotification(email);
         var interestReasonSubject = createInterestReason(email).getSubject();
         var emitReasonMono = reasonEmitter.emit(EMAIL_VERIFICATION_REASON_TYPE,
             builder -> builder.attribute("code", code)
@@ -109,21 +122,22 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         return Mono.when(subscribeNotification).then(emitReasonMono);
     }
 
-    Mono<Void> autoSubscribeVerificationEmail(String email, String oldEmail) {
-        List<Publisher<?>> publishers = new ArrayList<>(2);
-        if (StringUtils.isNotBlank(oldEmail) && !oldEmail.equals(email)) {
-            var subscriber = new Subscription.Subscriber();
-            subscriber.setName(UserIdentity.anonymousWithEmail(oldEmail).name());
-            var unsubMono = notificationCenter.unsubscribe(subscriber,
-                createInterestReason(oldEmail));
-            publishers.add(unsubMono);
-        }
+    Mono<Void> autoSubscribeVerificationEmailNotification(String email) {
         var subscriber = new Subscription.Subscriber();
         subscriber.setName(UserIdentity.anonymousWithEmail(email).name());
         var interestReason = createInterestReason(email);
-        var subMono = notificationCenter.subscribe(subscriber, interestReason);
-        publishers.add(subMono);
-        return Mono.when(publishers);
+        return notificationCenter.subscribe(subscriber, interestReason)
+            .then();
+    }
+
+    Mono<Void> unSubscribeVerificationEmailNotification(String oldEmail) {
+        if (StringUtils.isBlank(oldEmail)) {
+            return Mono.empty();
+        }
+        var subscriber = new Subscription.Subscriber();
+        subscriber.setName(UserIdentity.anonymousWithEmail(oldEmail).name());
+        return notificationCenter.unsubscribe(subscriber,
+            createInterestReason(oldEmail));
     }
 
     Subscription.InterestReason createInterestReason(String email) {

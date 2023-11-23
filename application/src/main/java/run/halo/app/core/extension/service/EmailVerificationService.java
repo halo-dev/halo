@@ -14,15 +14,16 @@ public interface EmailVerificationService {
     /**
      * Send verification code by given username.
      *
-     * @param username username to obtain email
+     * @param username username to verify email must not be blank
+     * @param email email to send must not be blank
      */
-    Mono<Void> sendVerificationCode(String username);
+    Mono<Void> sendVerificationCode(String username, String email);
 
     /**
      * Verify email by given username and code.
      *
-     * @param username username to obtain email
-     * @param code code to verify
+     * @param username username to verify email must not be blank
+     * @param code code to verify email must not be blank
      * @throws EmailVerificationFailed if send failed
      */
     Mono<Void> verify(String username, String code);

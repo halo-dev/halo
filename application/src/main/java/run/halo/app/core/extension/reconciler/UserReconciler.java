@@ -56,7 +56,7 @@ public class UserReconciler implements Reconciler<Request> {
             }
 
             addFinalizerIfNecessary(user);
-            ensureImportantAnnotation(request.name());
+            ensureRoleNamesAnno(request.name());
             updatePermalink(request.name());
             handleAvatar(request.name());
         });
@@ -100,14 +100,13 @@ public class UserReconciler implements Reconciler<Request> {
         });
     }
 
-    private void ensureImportantAnnotation(String name) {
+    private void ensureRoleNamesAnno(String name) {
         client.fetch(User.class, name).ifPresent(user -> {
             Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(user);
             Map<String, String> oldAnnotations = Map.copyOf(annotations);
 
             List<String> roleNames = listRoleNamesRef(name);
             annotations.put(User.ROLE_NAMES_ANNO, JsonUtils.objectToJson(roleNames));
-            annotations.put(User.LAST_USED_EMAIL_ANNO, user.getSpec().getEmail());
 
             if (!oldAnnotations.equals(annotations)) {
                 client.update(user);

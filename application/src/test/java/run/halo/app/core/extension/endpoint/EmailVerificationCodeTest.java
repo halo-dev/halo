@@ -75,10 +75,11 @@ class EmailVerificationCodeTest {
         user.setSpec(new User.UserSpec());
         user.getSpec().setEmail("hi@halo.run");
         when(client.get(eq(User.class), eq("fake-user"))).thenReturn(Mono.just(user));
-        when(emailVerificationService.sendVerificationCode(anyString()))
+        when(emailVerificationService.sendVerificationCode(anyString(), anyString()))
             .thenReturn(Mono.empty());
         webClient.post()
             .uri("/users/-/send-email-verification-code")
+            .bodyValue(Map.of("email", "hi@halo.run"))
             .exchange()
             .expectStatus()
             .isOk();
@@ -86,6 +87,7 @@ class EmailVerificationCodeTest {
         // request again to trigger rate limit
         webClient.post()
             .uri("/users/-/send-email-verification-code")
+            .bodyValue(Map.of("email", "hi@halo.run"))
             .exchange()
             .expectStatus()
             .isEqualTo(HttpStatus.TOO_MANY_REQUESTS);

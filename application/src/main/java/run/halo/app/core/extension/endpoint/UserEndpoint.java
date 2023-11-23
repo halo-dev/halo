@@ -84,6 +84,7 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
+import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.utils.JsonUtils;
 
@@ -215,6 +216,10 @@ public class UserEndpoint implements CustomEndpoint {
                 builder -> builder
                     .tag(tag)
                     .operationId("SendEmailVerificationCode")
+                    .requestBody(requestBodyBuilder()
+                        .implementation(EmailVerifyRequest.class)
+                        .required(true)
+                    )
                     .description("Send email verification code for user")
                     .response(responseBuilder().implementation(Void.class))
                     .build()
@@ -226,7 +231,7 @@ public class UserEndpoint implements CustomEndpoint {
                     .description("Verify email for user by code.")
                     .requestBody(requestBodyBuilder()
                         .required(true)
-                        .implementation(VerifyEmailRequest.class))
+                        .implementation(VerifyCodeRequest.class))
                     .response(responseBuilder().implementation(Void.class))
                     .build()
             )
@@ -234,7 +239,7 @@ public class UserEndpoint implements CustomEndpoint {
     }
 
     private Mono<ServerResponse> verifyEmail(ServerRequest request) {
-        return request.bodyToMono(VerifyEmailRequest.class)
+        return request.bodyToMono(VerifyCodeRequest.class)
             .switchIfEmpty(Mono.error(
                 () -> new ServerWebInputException("Request body is required."))
             )
@@ -254,20 +259,35 @@ public class UserEndpoint implements CustomEndpoint {
             .then(ServerResponse.ok().build());
     }
 
-    public record VerifyEmailRequest(@Schema(requiredMode = REQUIRED, minLength = 1) String code) {
+    public record EmailVerifyRequest(@Schema(requiredMode = REQUIRED) String email) {
+    }
+
+    public record VerifyCodeRequest(@Schema(requiredMode = REQUIRED, minLength = 1) String code) {
     }
 
     private Mono<ServerResponse> sendEmailVerificationCode(ServerRequest request) {
-        return ReactiveSecurityContextHolder.getContext()
-            .map(SecurityContext::getAuthentication)
-            .map(Principal::getName)
-            .flatMap(username -> client.get(User.class, username))
-            .flatMap(user -> {
-                var email = user.getSpec().getEmail();
-                var username = user.getMetadata().getName();
-                return Mono.just(user)
+        return request.bodyToMono(EmailVerifyRequest.class)
+            .switchIfEmpty(Mono.error(
+                () -> new ServerWebInputException("Request body is required."))
+            )
+            .doOnNext(emailRequest -> {
+                if (!ValidationUtils.isValidEmail(emailRequest.email())) {
+                    throw new ServerWebInputException("Invalid email address.");
+                }
+            })
+            .flatMap(emailRequest -> {
+                var email = emailRequest.email();
+                return ReactiveSecurityContextHolder.getContext()
+                    .map(SecurityContext::getAuthentication)
+                    .map(Principal::getName)
+                    .map(username -> Tuples.of(username, email));
+            })
+            .flatMap(tuple -> {
+                var username = tuple.getT1();
+                var email = tuple.getT2();
+                return Mono.just(username)
                     .transformDeferred(sendEmailVerificationCodeRateLimiter(username, email))
-                    .flatMap(u -> emailVerificationService.sendVerificationCode(username))
+                    .flatMap(u -> emailVerificationService.sendVerificationCode(username, email))
                     .onErrorMap(RequestNotPermitted.class, RateLimitExceededException::new);
             })
             .then(ServerResponse.ok().build());
@@ -479,8 +499,8 @@ public class UserEndpoint implements CustomEndpoint {
                             oldAnnotations.get(User.LAST_AVATAR_ATTACHMENT_NAME_ANNO));
                         newAnnotations.put(User.AVATAR_ATTACHMENT_NAME_ANNO,
                             oldAnnotations.get(User.AVATAR_ATTACHMENT_NAME_ANNO));
-                        newAnnotations.put(User.LAST_USED_EMAIL_ANNO,
-                            oldAnnotations.get(User.LAST_USED_EMAIL_ANNO));
+                        newAnnotations.put(User.EMAIL_TO_VERIFY,
+                            oldAnnotations.get(User.EMAIL_TO_VERIFY));
                         currentUser.getMetadata().setAnnotations(newAnnotations);
                     }
                     var spec = currentUser.getSpec();
@@ -488,14 +508,7 @@ public class UserEndpoint implements CustomEndpoint {
                     spec.setBio(newSpec.getBio());
                     spec.setDisplayName(newSpec.getDisplayName());
                     spec.setTwoFactorAuthEnabled(newSpec.getTwoFactorAuthEnabled());
-                    spec.setEmail(newSpec.getEmail());
                     spec.setPhone(newSpec.getPhone());
-
-                    // if email changed, set email verified to false
-                    var oldEmail = oldAnnotations.get(User.LAST_USED_EMAIL_ANNO);
-                    if (StringUtils.isNotBlank(oldEmail) && !oldEmail.equals(newSpec.getEmail())) {
-                        spec.setEmailVerified(false);
-                    }
                     return currentUser;
                 })
             )
