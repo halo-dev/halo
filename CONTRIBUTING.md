@@ -48,6 +48,10 @@ git pull upstream master
 git push
 ```
 
+### E2E
+
+Please consider adding some [e2e test cases](e2e/README.md) to make sure the APIs work as expected.
+
 ### 开发规范
 
 请参考 [https://docs.halo.run/developer-guide/core/code-style](https://docs.halo.run/developer-guide/core/code-style)，请确保所有代码格式化之后再提交。

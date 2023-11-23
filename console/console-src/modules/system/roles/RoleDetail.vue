@@ -233,18 +233,11 @@ onMounted(() => {
                         v-if="!isSuperRole"
                         v-model="selectedRoleTemplates"
                         :value="role.metadata.name"
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                         type="checkbox"
                         :disabled="isSystemReserved"
                         @change="handleRoleTemplateSelect"
                       />
-                      <input
-                        v-else
-                        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
-                        type="checkbox"
-                        checked
-                        disabled
-                      />
+                      <input v-else type="checkbox" checked disabled />
                       <div class="flex flex-1 flex-col gap-y-3">
                         <span class="font-medium text-gray-900">
                           {{

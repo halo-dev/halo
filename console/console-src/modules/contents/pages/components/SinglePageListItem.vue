@@ -130,7 +130,6 @@ const handleDelete = async () => {
       <input
         v-model="selectedPageNames"
         :value="singlePage.page.metadata.name"
-        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
         type="checkbox"
       />
     </template>
