@@ -24,7 +24,7 @@ import { useUserStore } from "@/stores/user";
 const router = useRouter();
 const globalInfoStore = useGlobalInfoStore();
 
-const { mutate: pluginInstallMutate } = useMutation({
+const { mutateAsync: pluginInstallMutate } = useMutation({
   mutationKey: ["plugin-install"],
   mutationFn: async (plugin: Plugin) => {
     const { data } = await apiClient.plugin.installPlugin(
@@ -40,20 +40,23 @@ const { mutate: pluginInstallMutate } = useMutation({
   },
   retry: 3,
   retryDelay: 1000,
-  onSuccess(data) {
-    pluginStartMutate(data);
+  async onSuccess(data) {
+    await pluginStartMutate(data);
   },
 });
 
-const { mutate: pluginStartMutate } = useMutation({
+const { mutateAsync: pluginStartMutate } = useMutation({
   mutationKey: ["plugin-start"],
   mutationFn: async (plugin: Plugin) => {
-    return await apiClient.plugin.changePluginRunningState({
-      name: plugin.metadata.name,
-      pluginRunningStateRequest: {
-        enable: true,
+    return await apiClient.plugin.changePluginRunningState(
+      {
+        name: plugin.metadata.name,
+        pluginRunningStateRequest: {
+          enable: true,
+        },
       },
-    });
+      { mute: true }
+    );
   },
   retry: 3,
   retryDelay: 1000,
@@ -101,7 +104,12 @@ async function setupInitialData() {
     const { data: presetPlugins } = await apiClient.plugin.listPluginPresets();
 
     for (let i = 0; i < presetPlugins.length; i++) {
-      pluginInstallMutate(presetPlugins[i]);
+      const presetPlugin = presetPlugins[i];
+      try {
+        await pluginInstallMutate(presetPlugin);
+      } catch (error) {
+        console.error("Failed to install plugin: ", presetPlugin.metadata.name);
+      }
     }
   } catch (error) {
     console.error(error);
@@ -123,7 +131,8 @@ async function setupInitialData() {
 
   await globalInfoStore.fetchGlobalInfo();
 
-  router.push({ name: "Dashboard" });
+  // Reload page to fetch plugin's bundle files
+  window.location.reload();
 }
 
 const userStore = useUserStore();
