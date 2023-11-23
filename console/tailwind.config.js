@@ -24,6 +24,7 @@ module.exports = {
     require("@tailwindcss/aspect-ratio"),
     require("@formkit/themes/tailwindcss"),
     require("@tailwindcss/container-queries"),
+    require("@tailwindcss/forms"),
     require("tailwindcss-themer")({
       defaultTheme: {
         extend: {
