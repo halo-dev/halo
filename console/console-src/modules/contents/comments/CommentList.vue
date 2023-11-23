@@ -236,7 +236,6 @@ const handleApproveInBatch = async () => {
             >
               <input
                 v-model="checkAll"
-                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                 type="checkbox"
                 @change="handleCheckAllChange"
               />
@@ -375,7 +374,6 @@ const handleApproveInBatch = async () => {
                 <input
                   v-model="selectedCommentNames"
                   :value="comment?.comment?.metadata.name"
-                  class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                   name="comment-checkbox"
                   type="checkbox"
                 />

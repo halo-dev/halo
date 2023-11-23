@@ -178,7 +178,6 @@ const { startFields, endFields } = useEntityFieldItemExtensionPoint<ListedPost>(
       <input
         v-model="selectedPostNames"
         :value="post.post.metadata.name"
-        class="h-4 w-4 rounded border-gray-300 text-indigo-600"
         name="post-checkbox"
         type="checkbox"
       />

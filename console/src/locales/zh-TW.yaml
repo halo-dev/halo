@@ -28,6 +28,8 @@ core:
         placeholder: 用戶名
       display_name:
         placeholder: 名稱
+      email:
+        placeholder: 電子郵箱
       password:
         placeholder: 密碼
       password_confirm:

@@ -299,7 +299,6 @@ onMounted(() => {
             >
               <input
                 v-model="checkedAll"
-                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                 type="checkbox"
                 @change="handleCheckAllChange"
               />
@@ -412,7 +411,6 @@ onMounted(() => {
                 <input
                   v-model="selectedUserNames"
                   :value="user.user.metadata.name"
-                  class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                   name="post-checkbox"
                   type="checkbox"
                   :disabled="

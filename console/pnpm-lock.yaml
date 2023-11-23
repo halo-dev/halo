@@ -225,6 +225,9 @@ importers:
       '@tailwindcss/container-queries':
         specifier: ^0.1.0
         version: 0.1.0(tailwindcss@3.3.0)
+      '@tailwindcss/forms':
+        specifier: ^0.5.7
+        version: 0.5.7(tailwindcss@3.3.0)
       '@tsconfig/node18':
         specifier: ^2.0.1
         version: 2.0.1
@@ -3419,6 +3422,15 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.2.0'
     dependencies:
+      tailwindcss: 3.3.0(postcss@8.4.21)
+    dev: true
+
+  /@tailwindcss/forms@0.5.7(tailwindcss@3.3.0):
+    resolution: {integrity: sha512-QE7X69iQI+ZXwldE+rzasvbJiyV/ju1FGHH0Qn2W3FKbuYtqp8LKcy6iSw79fVUT5/Vvf+0XgLCeYVG+UV6hOw==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || >= 3.0.0-alpha.1'
+    dependencies:
+      mini-svg-data-uri: 1.4.4
       tailwindcss: 3.3.0(postcss@8.4.21)
     dev: true
 
@@ -8796,6 +8808,11 @@ packages:
   /min-indent@1.0.1:
     resolution: {integrity: sha512-I9jwMn07Sy/IwOj3zVkVik2JTvgpaykDZEigL6Rx6N9LbMywwUSMtxET+7lVoDLLd3O3IXwJwvuuns8UB/HeAg==}
     engines: {node: '>=4'}
+    dev: true
+
+  /mini-svg-data-uri@1.4.4:
+    resolution: {integrity: sha512-r9deDe9p5FJUPZAk3A59wGH7Ii9YrjjWw0jmw/liSbHl2CHiyXj6FcDXDu2K3TjVAXqiJdaw3xxwlZZr9E6nHg==}
+    hasBin: true
     dev: true
 
   /minimatch@3.1.2:

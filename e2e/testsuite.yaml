@@ -1,0 +1,86 @@
+name: halo
+api: |
+  {{default "http://halo:8090" (env "SERVER")}}/apis
+param:
+  postName: "{{randAlpha 6}}"
+items:
+- name: init
+  request:
+    api: /api.console.halo.run/v1alpha1/system/initialize
+    method: POST
+    header:
+      Content-Type: application/json
+    body: |
+      {
+        "siteTitle": "testing",
+        "username": "admin",
+        "password": "123456",
+        "email": "testing@halo.com",
+        "password_confirm": "123456"
+      }
+  expect:
+    statusCode: 201
+- name: createPost
+  request:
+    api: /api.console.halo.run/v1alpha1/posts
+    method: POST
+    header:
+      Authorization: "Basic YWRtaW46MTIzNDU2"
+      Content-Type: application/json
+    body: |
+      {
+        "post": {
+          "spec": {
+            "title": "{{.param.postName}}",
+            "slug": "{{.param.postName}}",
+            "template": "",
+            "cover": "",
+            "deleted": false,
+            "publish": false,
+            "pinned": false,
+            "allowComment": true,
+            "visible": "PUBLIC",
+            "priority": 0,
+            "excerpt": {
+              "autoGenerate": true,
+              "raw": ""
+            },
+            "categories": [],
+            "tags": [],
+            "htmlMetas": []
+          },
+          "apiVersion": "content.halo.run/v1alpha1",
+          "kind": "Post",
+          "metadata": {
+            "name": "c31f2192-c992-47b9-86b4-f3fc0605360e",
+            "annotations": {
+              "content.halo.run/preferred-editor": "default"
+            }
+          }
+        },
+        "content": {
+          "raw": "<p>{{.param.postName}}</p>",
+          "content": "<p>{{.param.postName}}</p>",
+          "rawType": "HTML"
+        }
+      }
+- name: listPosts
+  request:
+    api: /api.console.halo.run/v1alpha1/posts?keyword={{.param.postName}}
+    header:
+      Authorization: "Basic YWRtaW46MTIzNDU2"
+  expect:
+    verify:
+      - data.total == 1
+- name: recyclePost
+  request:
+    api: /api.console.halo.run/v1alpha1/posts/{{(index .listPosts.items 0).post.metadata.name}}/recycle
+    method: PUT
+    header:
+      Authorization: "Basic YWRtaW46MTIzNDU2"
+- name: recover
+  request:
+    api: /content.halo.run/v1alpha1/posts/{{(index .listPosts.items 0).post.metadata.name}}
+    method: DELETE
+    header:
+      Authorization: "Basic YWRtaW46MTIzNDU2"
