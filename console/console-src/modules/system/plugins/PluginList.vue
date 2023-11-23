@@ -167,7 +167,6 @@ onMounted(() => {
             >
               <input
                 v-model="checkedAll"
-                class="h-4 w-4 rounded border-gray-300 text-indigo-600"
                 type="checkbox"
                 @change="handleCheckAllChange"
               />
