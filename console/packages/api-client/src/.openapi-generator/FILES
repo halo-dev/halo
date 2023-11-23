@@ -39,6 +39,7 @@ api/content-halo-run-v1alpha1-reply-api.ts
 api/content-halo-run-v1alpha1-single-page-api.ts
 api/content-halo-run-v1alpha1-snapshot-api.ts
 api/content-halo-run-v1alpha1-tag-api.ts
+api/doc-halo-run-v1alpha1-doc-tree-api.ts
 api/login-api.ts
 api/metrics-halo-run-v1alpha1-counter-api.ts
 api/migration-halo-run-v1alpha1-backup-api.ts
@@ -123,6 +124,9 @@ models/create-user-request.ts
 models/custom-templates.ts
 models/dashboard-stats.ts
 models/detailed-user.ts
+models/doc-tree-list.ts
+models/doc-tree-status.ts
+models/doc-tree.ts
 models/excerpt.ts
 models/extension-definition-list.ts
 models/extension-definition.ts
@@ -257,6 +261,7 @@ models/site-stats-vo.ts
 models/snap-shot-spec.ts
 models/snapshot-list.ts
 models/snapshot.ts
+models/spec.ts
 models/stats-vo.ts
 models/stats.ts
 models/subject.ts
@@ -287,4 +292,5 @@ models/user-permission.ts
 models/user-spec.ts
 models/user-status.ts
 models/user.ts
+models/verify-email-request.ts
 models/vote-request.ts
