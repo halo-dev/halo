@@ -90,8 +90,7 @@ public class PluginApplicationInitializer {
         AnnotationConfigUtils.registerAnnotationConfigProcessors(beanFactory);
         stopWatch.stop();
 
-        pluginApplicationContext.addBeanFactoryPostProcessor(
-            new PluginCustomEndpointBeanFactoryPostProcessor());
+        pluginApplicationContext.registerBean(AggregatedRouterFunction.class);
 
         beanFactory.registerSingleton("pluginContext", createPluginContext(plugin));
         // TODO deprecated
@@ -218,6 +217,7 @@ public class PluginApplicationInitializer {
             )
             .map(path -> resourceLoader.getResource(path.toUri().toString()))
             .forEach(resource -> {
+                log.debug("Add property source for plugin {} from {}", pluginId, resource);
                 var sources =
                     loadPropertySources("user-defined-config", resource, propertySourceLoader);
                 propertySources.addAll(sources);
@@ -230,6 +230,7 @@ public class PluginApplicationInitializer {
             )
             .map(resourceLoader::getResource)
             .forEach(resource -> {
+                log.debug("Add property source for plugin {} from {}", pluginId, resource);
                 var sources = loadPropertySources("default-config", resource, propertySourceLoader);
                 propertySources.addAll(sources);
             });
