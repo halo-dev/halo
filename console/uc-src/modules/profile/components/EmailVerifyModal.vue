@@ -11,7 +11,7 @@ import { computed } from "vue";
 
 const queryClient = useQueryClient();
 
-const { currentUser } = useUserStore();
+const { currentUser, fetchCurrentUser } = useUserStore();
 
 const emit = defineEmits<{
   (event: "close"): void;
@@ -93,6 +93,7 @@ const { mutate: verifyEmail, isLoading: isVerifying } = useMutation({
   onSuccess() {
     Toast.success("验证成功");
     queryClient.invalidateQueries({ queryKey: ["user-detail"] });
+    fetchCurrentUser();
     onClose();
   },
 });
@@ -106,7 +107,7 @@ function handleVerify(data: { code: string }) {
   <VModal
     v-if="shouldRender"
     v-model:visible="visible"
-    title="验证电子邮箱"
+    :title="currentUser?.spec.emailVerified ? '修改电子邮箱' : '绑定电子邮箱'"
     @close="onClose"
   >
     <FormKit
@@ -118,7 +119,7 @@ function handleVerify(data: { code: string }) {
       <FormKit
         v-model="email"
         type="email"
-        label="电子邮箱"
+        :label="currentUser?.spec.emailVerified ? '新电子邮箱' : '电子邮箱'"
         name="email"
         validation="required|email"
       ></FormKit>
