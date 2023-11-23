@@ -217,7 +217,6 @@ public class PluginApplicationInitializer {
             )
             .map(path -> resourceLoader.getResource(path.toUri().toString()))
             .forEach(resource -> {
-                log.debug("Add property source for plugin {} from {}", pluginId, resource);
                 var sources =
                     loadPropertySources("user-defined-config", resource, propertySourceLoader);
                 propertySources.addAll(sources);
@@ -230,7 +229,6 @@ public class PluginApplicationInitializer {
             )
             .map(resourceLoader::getResource)
             .forEach(resource -> {
-                log.debug("Add property source for plugin {} from {}", pluginId, resource);
                 var sources = loadPropertySources("default-config", resource, propertySourceLoader);
                 propertySources.addAll(sources);
             });
