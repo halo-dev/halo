@@ -279,9 +279,16 @@ const handleDownloadLogfile = () => {
               v-if="themeStore.activatedTheme"
               :label="$t('core.actuator.fields.activated_theme')"
             >
-              <RouterLink :to="{ name: 'ThemeDetail' }">
-                {{ themeStore.activatedTheme?.spec.displayName }}
-              </RouterLink>
+              <VTag @click="$router.push({ name: 'ThemeDetail' })">
+                <template v-if="themeStore.activatedTheme.spec.logo" #leftIcon>
+                  <img
+                    class="h-3.5 w-3.5 rounded-sm"
+                    :src="themeStore.activatedTheme.spec.logo"
+                    :alt="themeStore.activatedTheme.spec.displayName"
+                  />
+                </template>
+                {{ themeStore.activatedTheme.spec.displayName }}
+              </VTag>
             </VDescriptionItem>
             <VDescriptionItem
               v-permission="['system:plugins:view']"
