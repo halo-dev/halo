@@ -127,6 +127,7 @@ models/detailed-user.ts
 models/doc-tree-list.ts
 models/doc-tree-status.ts
 models/doc-tree.ts
+models/email-verify-request.ts
 models/excerpt.ts
 models/extension-definition-list.ts
 models/extension-definition.ts
@@ -292,5 +293,5 @@ models/user-permission.ts
 models/user-spec.ts
 models/user-status.ts
 models/user.ts
-models/verify-email-request.ts
+models/verify-code-request.ts
 models/vote-request.ts
