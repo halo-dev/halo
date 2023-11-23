@@ -93,6 +93,7 @@ const emailVerifyModal = ref(false);
             title="设置电子邮箱"
             description="电子邮箱地址还未设置，点击下方按钮进行设置"
             type="warning"
+            :closable="false"
           >
             <template #actions>
               <VButton size="sm" @click="emailVerifyModal = true">设置</VButton>
@@ -106,6 +107,7 @@ const emailVerifyModal = ref(false);
                 title="验证电子邮箱"
                 description="电子邮箱地址还未验证，点击下方按钮进行验证"
                 type="warning"
+                :closable="false"
               >
                 <template #actions>
                   <VButton size="sm" @click="emailVerifyModal = true">

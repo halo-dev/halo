@@ -17,6 +17,7 @@ import { setFocus } from "@/formkit/utils/focus";
 import { useI18n } from "vue-i18n";
 import { useQueryClient } from "@tanstack/vue-query";
 import { useUserStore } from "@/stores/user";
+import EmailVerifyModal from "./EmailVerifyModal.vue";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -101,6 +102,15 @@ const handleUpdateUser = async () => {
     userStore.fetchCurrentUser();
   }
 };
+
+// verify email
+const emailVerifyModal = ref(false);
+
+async function onEmailVerifyModalClose() {
+  emailVerifyModal.value = false;
+  await userStore.fetchCurrentUser();
+  if (userStore.currentUser) formState.value = cloneDeep(userStore.currentUser);
+}
 </script>
 <template>
   <VModal
@@ -147,8 +157,18 @@ const handleUpdateUser = async () => {
               :label="$t('core.user.editing_modal.fields.email.label')"
               type="email"
               name="email"
+              readonly
               validation="required|email|length:0,100"
-            ></FormKit>
+            >
+              <template #suffix>
+                <VButton
+                  class="rounded-none border-y-0 border-l border-r-0"
+                  @click="emailVerifyModal = true"
+                >
+                  修改
+                </VButton>
+              </template>
+            </FormKit>
             <FormKit
               v-model="formState.spec.phone"
               :label="$t('core.user.editing_modal.fields.phone.label')"
@@ -184,4 +204,6 @@ const handleUpdateUser = async () => {
       </VSpace>
     </template>
   </VModal>
+
+  <EmailVerifyModal v-if="emailVerifyModal" @close="onEmailVerifyModalClose" />
 </template>

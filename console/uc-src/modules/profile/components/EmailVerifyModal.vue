@@ -57,25 +57,15 @@ const email = ref(currentUser?.spec.email);
 const { mutate: sendVerifyCode, isLoading: isSending } = useMutation({
   mutationKey: ["send-verify-code"],
   mutationFn: async () => {
-    // update email
-
-    const { data: currentUserDetail } =
-      await apiClient.user.getCurrentUserDetail();
-
-    const { user: userToUpdate } = currentUserDetail;
-
     if (!email.value) {
       Toast.error("请输入电子邮箱");
       throw new Error("email is empty");
     }
-
-    userToUpdate.spec.email = email.value;
-
-    await apiClient.user.updateCurrentUser({
-      user: userToUpdate,
+    return await apiClient.user.sendEmailVerificationCode({
+      emailVerifyRequest: {
+        email: email.value,
+      },
     });
-
-    return await apiClient.user.sendEmailVerificationCode();
   },
   onSuccess() {
     Toast.success("验证码已发送");
@@ -95,7 +85,7 @@ const { mutate: verifyEmail, isLoading: isVerifying } = useMutation({
   mutationKey: ["verify-email"],
   mutationFn: async ({ code }: { code: string }) => {
     return await apiClient.user.verifyEmail({
-      verifyEmailRequest: {
+      verifyCodeRequest: {
         code: code,
       },
     });
