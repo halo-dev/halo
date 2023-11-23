@@ -90,7 +90,8 @@ public class PluginApplicationInitializer {
         AnnotationConfigUtils.registerAnnotationConfigProcessors(beanFactory);
         stopWatch.stop();
 
-        BeanPostProcessorUtils.registerBeanPostProcessors(beanFactory);
+        pluginApplicationContext.addBeanFactoryPostProcessor(
+            new PluginCustomEndpointBeanFactoryPostProcessor());
 
         beanFactory.registerSingleton("pluginContext", createPluginContext(plugin));
         // TODO deprecated
