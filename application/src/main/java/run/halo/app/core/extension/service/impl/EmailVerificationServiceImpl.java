@@ -67,7 +67,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                         return client.update(user);
                     });
                     emailVerificationManager.removeCode(username, oldEmailToVerify);
-                    return Mono.when(unsubMono, updateUserAnnoMono);
+                    return Mono.when(unsubMono, updateUserAnnoMono).thenReturn(user);
                 })
             )
             .retryWhen(Retry.backoff(8, Duration.ofMillis(100))
