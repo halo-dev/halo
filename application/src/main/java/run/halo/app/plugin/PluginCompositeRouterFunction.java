@@ -2,7 +2,7 @@ package run.halo.app.plugin;
 
 import static run.halo.app.plugin.ExtensionContextRegistry.getInstance;
 
-import java.util.ArrayList;
+import com.google.common.collect.Iterables;
 import java.util.List;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.lang.NonNull;
@@ -14,8 +14,6 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.core.extension.endpoint.CustomEndpoint;
-import run.halo.app.core.extension.endpoint.CustomEndpointsBuilder;
 import run.halo.app.plugin.resources.ReverseProxyRouterFunctionRegistry;
 
 /**
@@ -48,7 +46,7 @@ public class PluginCompositeRouterFunction implements RouterFunction<ServerRespo
     }
 
     @SuppressWarnings("unchecked")
-    private List<RouterFunction<ServerResponse>> routerFunctions() {
+    private Iterable<RouterFunction<ServerResponse>> routerFunctions() {
         getInstance().acquireReadLock();
         try {
             List<PluginApplicationContext> contexts = getInstance().getPluginApplicationContexts()
@@ -64,18 +62,7 @@ public class PluginCompositeRouterFunction implements RouterFunction<ServerRespo
                 .toList();
             var reverseProxies = reverseProxyRouterFunctionFactory.getRouterFunctions();
 
-            var endpointBuilder = new CustomEndpointsBuilder();
-            contexts.forEach(context -> context.getBeanProvider(CustomEndpoint.class)
-                .orderedStream()
-                .forEach(endpointBuilder::add));
-            var customEndpoint = endpointBuilder.build();
-
-            List<RouterFunction<ServerResponse>> routerFunctions =
-                new ArrayList<>(rawRouterFunctions.size() + reverseProxies.size() + 1);
-            routerFunctions.addAll(rawRouterFunctions);
-            routerFunctions.addAll(reverseProxies);
-            routerFunctions.add(customEndpoint);
-            return routerFunctions;
+            return Iterables.concat(rawRouterFunctions, reverseProxies);
         } finally {
             getInstance().releaseReadLock();
         }
