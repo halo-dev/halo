@@ -75,6 +75,7 @@ jobs:
           dockerhub-token: ${{ secrets.DOCKER_TOKEN }}
           push: ${{ github.event_name == 'push' || github.event_name == 'release' }} # we only push to GHCR if the push is to the next branch
           console-ref: ${{ github.event_name == 'release' &&  github.ref || 'main' }}
+          platforms: linux/amd64,linux/arm64/v8,linux/ppc64le,linux/s390x
       - uses: halo-sigs/actions/halo-next-docker-build@main
         if: github.event_name == 'pull_request'
         with:
