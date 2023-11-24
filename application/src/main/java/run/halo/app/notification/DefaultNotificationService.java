@@ -49,6 +49,12 @@ public class DefaultNotificationService implements UserNotificationService {
             .map(notification -> notification.getMetadata().getName());
     }
 
+    @Override
+    public Mono<Notification> deleteByName(String name) {
+        return client.get(Notification.class, name)
+            .flatMap(client::delete);
+    }
+
     static boolean isRecipient(Notification notification, String username) {
         Assert.notNull(notification, "Notification must not be null");
         Assert.notNull(username, "Username must not be null");

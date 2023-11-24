@@ -122,7 +122,7 @@ metadata:
 rules:
   - apiGroups: [ "api.notification.halo.run" ]
     resources: [ "notifications" ]
-    verbs: [ "get", "list" ]
+    verbs: [ "get", "list", "delete" ]
   - apiGroups: [ "api.notification.halo.run" ]
     resources: [ "notifications/mark-as-read", "notifications/mark-specified-as-read" ]
     verbs: [ "update" ]
