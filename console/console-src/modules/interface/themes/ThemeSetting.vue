@@ -14,6 +14,7 @@ import { apiClient } from "@/utils/api-client";
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import { useI18n } from "vue-i18n";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -88,8 +89,10 @@ await suspense();
           />
         </FormKit>
       </div>
-      <div v-permission="['system:themes:manage']" class="pt-5">
-        <div class="flex justify-start">
+      <StickyBlock v-permission="['system:themes:manage']" position="bottom">
+        <div
+          class="-mx-[16px] -mb-[12px] flex justify-start bg-white px-[16px] pb-5 pt-5"
+        >
           <VButton
             :loading="saving"
             type="secondary"
@@ -98,7 +101,7 @@ await suspense();
             {{ $t("core.common.buttons.save") }}
           </VButton>
         </div>
-      </div>
+      </StickyBlock>
     </div>
   </Transition>
 </template>

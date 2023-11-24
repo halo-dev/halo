@@ -32,13 +32,14 @@ defineProps<{
   flex-col
   bg-white
   shadow-sm
-  overflow-hidden
   rounded-base;
   border: 1px solid #eaecf0;
 
   .card-header {
     @apply flex
-    justify-between;
+    justify-between
+    rounded-t-base
+    overflow-hidden;
     border-bottom: 1px solid #eaecf0;
 
     .card-header-title {
@@ -58,6 +59,7 @@ defineProps<{
   }
 
   .card-footer {
+    @apply rounded-b-base overflow-hidden;
     border-top: 1px solid #eaecf0;
     padding: 12px 16px;
   }
