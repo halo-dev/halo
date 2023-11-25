@@ -15,3 +15,10 @@ Please follow these steps if you want to run the e2e testing locally.
 * Build project via `./gradlew clean build -x check` in root directory of this repository
 * Build image via `docker build . -t ghcr.io/halo-dev/halo-dev:dev`
 * Change the directory to `e2e`, then execute `./start.sh`
+
+## Run Halo only
+Please run the following command if you only want to run Halo.
+
+```shell
+TAG=latest docker-compose up halo
+```

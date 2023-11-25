@@ -10,7 +10,7 @@ services:
       halo:
         condition: service_healthy
   halo:
-    image: ghcr.io/halo-dev/halo-dev:dev
+    image: ghcr.io/halo-dev/halo-dev:${TAG:-dev}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8090/actuator/health/readiness"]
       interval: 30s
@@ -25,6 +25,8 @@ services:
       - --spring.sql.init.platform=postgresql
       # 外部访问地址，请根据实际需要修改
       # - --halo.external-url=http://localhost:8090/
+    ports:
+      - 8090:8090
     links:
       - postgresql
     depends_on:
