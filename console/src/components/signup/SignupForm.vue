@@ -113,11 +113,18 @@ const inputClasses = {
       :placeholder="$t('core.signup.fields.display_name.placeholder')"
       :validation-label="$t('core.signup.fields.display_name.placeholder')"
       :classes="inputClasses"
-      :autofocus="true"
       type="text"
       validation="required"
     >
     </FormKit>
+    <FormKit
+      v-model="formState.user.spec.email"
+      :placeholder="$t('core.signup.fields.email.placeholder')"
+      :validation-label="$t('core.signup.fields.email.placeholder')"
+      type="email"
+      name="email"
+      validation="required|email|length:0,100"
+    ></FormKit>
     <FormKit
       v-model="formState.password"
       name="password"

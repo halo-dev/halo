@@ -1,3 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* override @tailwindcss/forms styles */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="url"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"],
+input[type="time"],
+input[type="search"],
+input[type="tel"],
+input:where(:not([type])),
+select,
+textarea {
+  @apply border-none py-0 focus:outline-0 focus:ring-0;
+}
+
+input[type="checkbox"] {
+  @apply rounded-sm border-gray-500;
+}
