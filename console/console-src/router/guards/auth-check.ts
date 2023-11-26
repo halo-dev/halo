@@ -1,3 +1,4 @@
+import { rbacAnnotations } from "@/constants/annotations";
 import { useUserStore } from "@/stores/user";
 import type { Router } from "vue-router";
 
@@ -29,12 +30,26 @@ export function setupAuthCheckGuard(router: Router) {
               redirect_uri: to.query.redirect_uri,
             },
           });
-        } else {
-          next({
-            name: "Dashboard",
-          });
           return;
         }
+
+        const roleHasRedirectOnLogin = userStore.currentRoles?.find(
+          (role) =>
+            role.metadata.annotations?.[rbacAnnotations.REDIRECT_ON_LOGIN]
+        );
+
+        if (roleHasRedirectOnLogin) {
+          window.location.href =
+            roleHasRedirectOnLogin.metadata.annotations?.[
+              rbacAnnotations.REDIRECT_ON_LOGIN
+            ] || "/";
+          return;
+        }
+
+        next({
+          name: "Dashboard",
+        });
+        return;
       }
     }
 
