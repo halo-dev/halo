@@ -11,25 +11,13 @@ body:
     id: environment
     attributes:
       value: "## 环境信息"
-  - type: input
-    id: version
+  - type: textarea
+    id: system-information
+    attributes:
+      label: "系统信息"
+      description: "访问 Console 的概览页面，点击右上角的复制按钮，将信息粘贴到此处。"
     validations:
       required: true
-    attributes:
-      label: "是什么版本出现了此问题？"
-  - type: dropdown
-    id: database
-    validations:
-      required: true
-    attributes:
-      label: "使用的什么数据库？"
-      options:
-        - H2
-        - PostgreSQL
-        - MySQL 5.7
-        - MySQL 8.x
-        - MariaDB
-        - Other
   - type: dropdown
     id: operation-method
     validations:
@@ -64,7 +52,7 @@ body:
     id: logs
     attributes:
       label: "相关日志输出"
-      description: "请复制并粘贴任何相关的日志输出。 这将自动格式化为代码，因此无需反引号。"
+      description: "请复制并粘贴任何相关的日志输出。这将自动格式化为代码，因此无需反引号。"
       render: shell
   - type: textarea
     id: additional-information

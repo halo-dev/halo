@@ -10,25 +10,13 @@ body:
     id: environment
     attributes:
       value: "## Environment"
-  - type: input
-    id: version
+  - type: textarea
+    id: system-information
+    attributes:
+      label: "System information"
+      description: "Access the actuator page of the Console, click the copy button in the upper right corner, and paste the information here."
     validations:
       required: true
-    attributes:
-      label: What is version of Halo has the issue?
-  - type: dropdown
-    id: database
-    validations:
-      required: true
-    attributes:
-      label: "What database are you using?"
-      options:
-        - H2
-        - PostgreSQL
-        - MySQL 5.7
-        - MySQL 8.x
-        - MariaDB
-        - Other
   - type: dropdown
     id: operation-method
     validations:
