@@ -3,6 +3,9 @@ api: |
   {{default "http://halo:8090" (env "SERVER")}}/apis
 param:
   postName: "{{randAlpha 6}}"
+  userName: "{{randAlpha 6}}"
+  notificationName: "{{randAlpha 6}}"
+  auth: "Basic YWRtaW46MTIzNDU2"
 items:
 - name: init
   request:
@@ -84,3 +87,37 @@ items:
     method: DELETE
     header:
       Authorization: "Basic YWRtaW46MTIzNDU2"
+
+  # Notifications
+- name: createNotification
+  request:
+    api: /notification.halo.run/v1alpha1/notifications
+    method: POST
+    body: |
+      {
+        "spec": {
+          "recipient": "{{.param.userName}}",
+          "reason": "fake-reason",
+          "title": "test 评论了你的页面《关于我》",
+          "rawContent": "Fake raw content",
+          "htmlContent": "<p>Fake html content</p>",
+          "unread": true
+        },
+        "apiVersion": "notification.halo.run/v1alpha1",
+        "kind": "Notification",
+        "metadata": {
+          "name": "{{.param.notificationName}}"
+        }
+      }
+    header:
+      Content-Type: application/json
+      Authorization: "{{.param.auth}}"
+  expect:
+    statusCode: 201
+- name: deleteUserNotification
+  request:
+    api: |
+      /api.notification.halo.run/userspaces/{{.param.userName}}/v1alpha1/notifications/{{.param.notificationName}}
+    method: DELETE
+    header:
+      Authorization: "{{.param.auth}}"
