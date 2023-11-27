@@ -96,7 +96,7 @@ items:
     body: |
       {
         "spec": {
-          "recipient": "{{.param.userName}}",
+          "recipient": "admin",
           "reason": "fake-reason",
           "title": "test 评论了你的页面《关于我》",
           "rawContent": "Fake raw content",
@@ -114,10 +114,21 @@ items:
       Authorization: "{{.param.auth}}"
   expect:
     statusCode: 201
+- name: getNotificationByName
+  request:
+    api: /notification.halo.run/v1alpha1/notifications/{{.param.notificationName}}
+    method: GET
+    header:
+      Authorization: "{{.param.auth}}"
+  expect:
+    statusCode: 200
+    verify:
+      - data.spec.reason == "fake-reason"
+      - data.spec.title == "test 评论了你的页面《关于我》"
 - name: deleteUserNotification
   request:
     api: |
-      /api.notification.halo.run/userspaces/{{.param.userName}}/v1alpha1/notifications/{{.param.notificationName}}
+      /api.notification.halo.run/v1alpha1/userspaces/admin/notifications/{{.param.notificationName}}
     method: DELETE
     header:
       Authorization: "{{.param.auth}}"
