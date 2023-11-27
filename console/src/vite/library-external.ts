@@ -74,6 +74,11 @@ export const setupLibraryExternal = (
       dest: "assets/console-shared",
       rename: `halo-console-shared.iife.${staticSuffix}.js`,
     },
+    {
+      src: "./node_modules/@halo-dev/richtext-editor/dist/rich-text-editor.iife.js",
+      dest: "assets/richtext-editor",
+      rename: `halo-rich-text-editor.iife.${staticSuffix}.js`,
+    },
   ];
 
   const injectTags = staticTargets
@@ -99,6 +104,7 @@ export const setupLibraryExternal = (
       "@vueuse/components": "VueUse",
       "@vueuse/router": "VueUse",
       "vue-demi": "VueDemi",
+      "@halo-dev/richtext-editor": "RichTextEditor",
     }),
     ViteStaticCopy({
       targets: staticTargets,
