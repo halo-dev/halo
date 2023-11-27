@@ -295,7 +295,6 @@ onMounted(() => {
   flex
   flex-auto
   flex-col
-  overflow-x-hidden
   md:ml-64;
 }
 </style>

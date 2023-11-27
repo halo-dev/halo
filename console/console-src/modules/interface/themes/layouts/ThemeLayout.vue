@@ -239,7 +239,7 @@ onMounted(() => {
       </VEmpty>
 
       <div v-else>
-        <VCard :body-class="['!p-0']">
+        <VCard :body-class="['!p-0', '!overflow-visible']">
           <template #header>
             <VTabbar
               v-model:active-id="activeTab"
@@ -249,7 +249,7 @@ onMounted(() => {
               @change="handleTabChange"
             ></VTabbar>
           </template>
-          <div class="bg-white">
+          <div class="rounded-b-base bg-white">
             <RouterView
               :key="`${selectedTheme?.metadata.name}-${activeTab}`"
               v-slot="{ Component }"
