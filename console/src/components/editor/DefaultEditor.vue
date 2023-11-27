@@ -87,6 +87,7 @@ import { usePluginModuleStore } from "@/stores/plugin";
 import type { PluginModule } from "@halo-dev/console-shared";
 import { useDebounceFn } from "@vueuse/core";
 import { onBeforeUnmount } from "vue";
+import { generateAnchor } from "@/utils/anchor";
 
 const { t } = useI18n();
 
@@ -436,7 +437,7 @@ const handleGenerateTableOfContent = () => {
 
   editor.value.state.doc.descendants((node, pos) => {
     if (node.type.name === "heading") {
-      const id = `heading-${headings.length + 1}`;
+      const id = generateAnchor(node.textContent);
 
       if (node.attrs.id !== id) {
         transaction?.setNodeMarkup(pos, undefined, {
