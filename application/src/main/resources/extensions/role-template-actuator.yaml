@@ -10,5 +10,5 @@ metadata:
     rbac.authorization.halo.run/ui-permissions: |
       ["system:actuator:manage"]
 rules:
-  - nonResourceURLs: [ "/actuator/*" ]
+  - nonResourceURLs: [ "actuator", "/actuator/*" ]
     verbs: [ "get" ]
