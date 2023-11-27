@@ -1019,13 +1019,15 @@ core:
     fields:
       external_url: External url
       start_time: Start time
-      timezone: Timezone
-      locale: Locale
+      timezone: System Timezone
+      locale: System Locale
       version: Version
       build_time: Build time
       database: Database
       os: Operating system
       log: System log
+      activated_theme: Activated theme
+      enabled_plugins: Enabled plugins
     fields_values:
       external_url:
         not_setup: Not setup
