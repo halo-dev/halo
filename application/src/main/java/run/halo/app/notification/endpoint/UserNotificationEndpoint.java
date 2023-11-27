@@ -129,7 +129,8 @@ public class UserNotificationEndpoint implements CustomEndpoint {
 
     private Mono<ServerResponse> deleteNotification(ServerRequest request) {
         var name = request.pathVariable("name");
-        return notificationService.deleteByName(name)
+        var username = request.pathVariable("username");
+        return notificationService.deleteByName(username, name)
             .flatMap(notification -> ServerResponse.ok().bodyValue(notification));
     }
 

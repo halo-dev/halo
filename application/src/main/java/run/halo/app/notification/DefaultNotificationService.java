@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.notification.Notification;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.infra.exception.AccessDeniedException;
 
 /**
  * A default implementation of {@link UserNotificationService}.
@@ -50,8 +51,15 @@ public class DefaultNotificationService implements UserNotificationService {
     }
 
     @Override
-    public Mono<Notification> deleteByName(String name) {
+    public Mono<Notification> deleteByName(String username, String name) {
         return client.get(Notification.class, name)
+            .doOnNext(notification -> {
+                var recipient = notification.getSpec().getRecipient();
+                if (!username.equals(recipient)) {
+                    throw new AccessDeniedException(
+                        "You have no permission to delete this notification.");
+                }
+            })
             .flatMap(client::delete);
     }
 

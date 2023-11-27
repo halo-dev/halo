@@ -38,5 +38,5 @@ public interface UserNotificationService {
      */
     Flux<String> markSpecifiedAsRead(String username, List<String> names);
 
-    Mono<Notification> deleteByName(String name);
+    Mono<Notification> deleteByName(String username, String name);
 }
