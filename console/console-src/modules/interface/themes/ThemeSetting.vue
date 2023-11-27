@@ -70,24 +70,22 @@ await suspense();
 </script>
 <template>
   <Transition mode="out-in" name="fade">
-    <div class="bg-white p-4">
-      <div>
-        <FormKit
-          v-if="group && formSchema && configMapFormData?.[group]"
-          :id="group"
-          v-model="configMapFormData[group]"
-          :name="group"
-          :actions="false"
-          :preserve="true"
-          type="form"
-          @submit="handleSaveConfigMap"
-        >
-          <FormKitSchema
-            :schema="toRaw(formSchema)"
-            :data="configMapFormData[group]"
-          />
-        </FormKit>
-      </div>
+    <div class="p-4">
+      <FormKit
+        v-if="group && formSchema && configMapFormData?.[group]"
+        :id="group"
+        v-model="configMapFormData[group]"
+        :name="group"
+        :actions="false"
+        :preserve="true"
+        type="form"
+        @submit="handleSaveConfigMap"
+      >
+        <FormKitSchema
+          :schema="toRaw(formSchema)"
+          :data="configMapFormData[group]"
+        />
+      </FormKit>
       <div v-permission="['system:themes:manage']" class="pt-5">
         <div class="flex justify-start">
           <VButton

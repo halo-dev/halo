@@ -64,7 +64,7 @@ const pluginRoleTemplateGroups = computed<RoleTemplateGroup[]>(() => {
 
 <template>
   <Transition mode="out-in" name="fade">
-    <div>
+    <div class="overflow-hidden rounded-b-base">
       <div class="flex items-center justify-between bg-white px-4 py-4 sm:px-6">
         <div>
           <h3 class="text-lg font-medium leading-6 text-gray-900">
