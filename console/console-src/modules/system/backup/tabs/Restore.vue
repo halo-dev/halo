@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import UppyUpload from "@/components/upload/UppyUpload.vue";
 import { apiClient } from "@/utils/api-client";
 import {
   Dialog,

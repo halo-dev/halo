@@ -32,8 +32,9 @@ defineProps<{
   flex-col
   bg-white
   shadow-sm
-  rounded-base;
-  border: 1px solid #eaecf0;
+  rounded-base
+  ring-1
+  ring-[#eaecf0];
 
   .card-header {
     @apply flex
@@ -55,6 +56,7 @@ defineProps<{
   }
 
   .card-body {
+    @apply rounded-base overflow-hidden;
     padding: 12px 16px;
   }
 

@@ -5,7 +5,6 @@ import { Dialog, Toast } from "@halo-dev/components";
 import type { SuccessResponse } from "@uppy/core";
 import { useI18n } from "vue-i18n";
 import { useQueryClient } from "@tanstack/vue-query";
-import UppyUpload from "@/components/upload/UppyUpload.vue";
 import { computed } from "vue";
 import type { UppyFile } from "@uppy/core";
 import type { ErrorResponse } from "@uppy/core";

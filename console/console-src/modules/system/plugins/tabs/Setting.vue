@@ -64,7 +64,7 @@ const handleSaveConfigMap = async () => {
 </script>
 <template>
   <Transition mode="out-in" name="fade">
-    <div class="bg-white p-4">
+    <div class="rounded-b-base bg-white p-4">
       <div>
         <FormKit
           v-if="group && formSchema && configMapFormData?.[group]"

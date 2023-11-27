@@ -12,7 +12,6 @@ import type { Ref } from "vue";
 import { ref } from "vue";
 import { useThemeStore } from "@console/stores/theme";
 import { apiClient } from "@/utils/api-client";
-import UppyUpload from "@/components/upload/UppyUpload.vue";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
