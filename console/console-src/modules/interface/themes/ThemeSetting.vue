@@ -14,6 +14,7 @@ import { apiClient } from "@/utils/api-client";
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import { useI18n } from "vue-i18n";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -86,17 +87,19 @@ await suspense();
           :data="configMapFormData[group]"
         />
       </FormKit>
-      <div v-permission="['system:themes:manage']" class="pt-5">
-        <div class="flex justify-start">
-          <VButton
-            :loading="saving"
-            type="secondary"
-            @click="$formkit.submit(group || '')"
-          >
-            {{ $t("core.common.buttons.save") }}
-          </VButton>
-        </div>
-      </div>
+      <StickyBlock
+        v-permission="['system:themes:manage']"
+        class="-mx-4 -mb-4 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
+        position="bottom"
+      >
+        <VButton
+          :loading="saving"
+          type="secondary"
+          @click="$formkit.submit(group || '')"
+        >
+          {{ $t("core.common.buttons.save") }}
+        </VButton>
+      </StickyBlock>
     </div>
   </Transition>
 </template>
