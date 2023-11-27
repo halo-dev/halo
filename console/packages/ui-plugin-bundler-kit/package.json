@@ -1,0 +1,44 @@
+{
+  "name": "@halo-dev/ui-plugin-bundler-kit",
+  "version": "1.0.0",
+  "homepage": "https://github.com/halo-dev/halo/tree/main/console/packages/ui-plugin-bundler-kit#readme",
+  "bugs": {
+    "url": "https://github.com/halo-dev/halo/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/halo-dev/halo.git",
+    "directory": "console/packages/ui-plugin-bundler-kit"
+  },
+  "license": "GPL-3.0",
+  "author": "@halo-dev",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "unbuild",
+    "dev": "unbuild --stub",
+    "prepublishOnly": "pnpm run build"
+  },
+  "devDependencies": {
+    "@halo-dev/api-client": "workspace:*",
+    "@types/js-yaml": "^4.0.9",
+    "js-yaml": "^4.1.0",
+    "unbuild": "^0.7.6"
+  },
+  "peerDependencies": {
+    "vite": "^4.0.0 || ^5.0.0"
+  },
+  "engines": {
+    "node": "^18.0.0 || >=20.0.0"
+  }
+}

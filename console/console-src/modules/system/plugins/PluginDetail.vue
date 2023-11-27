@@ -135,7 +135,7 @@ function getTabsFromExtensions(): PluginTab[] {
   </VPageHeader>
 
   <div class="m-0 md:m-4">
-    <VCard :body-class="['!p-0']">
+    <VCard :body-class="['!p-0', '!overflow-visible']">
       <template #header>
         <VTabbar
           v-model:active-id="activeTab"
@@ -144,7 +144,7 @@ function getTabsFromExtensions(): PluginTab[] {
           type="outline"
         ></VTabbar>
       </template>
-      <div class="bg-white">
+      <div class="rounded-b-base bg-white">
         <template v-for="tab in tabs" :key="tab.id">
           <component :is="tab.component" v-if="activeTab === tab.id" />
         </template>

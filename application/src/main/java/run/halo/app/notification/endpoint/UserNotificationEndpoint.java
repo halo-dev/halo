@@ -106,7 +106,32 @@ public class UserNotificationEndpoint implements CustomEndpoint {
                     )
                     .response(responseBuilder().implementationArray(String.class))
             )
+            .DELETE("/notifications/{name}", this::deleteNotification,
+                builder -> builder.operationId("DeleteSpecifiedNotification")
+                    .description("Delete the specified notification.")
+                    .tag(tag)
+                    .parameter(parameterBuilder()
+                        .in(ParameterIn.PATH)
+                        .name("username")
+                        .description("Username")
+                        .required(true)
+                    )
+                    .parameter(parameterBuilder()
+                        .in(ParameterIn.PATH)
+                        .name("name")
+                        .description("Notification name")
+                        .required(true)
+                    )
+                    .response(responseBuilder().implementation(Notification.class))
+            )
             .build();
+    }
+
+    private Mono<ServerResponse> deleteNotification(ServerRequest request) {
+        var name = request.pathVariable("name");
+        var username = request.pathVariable("username");
+        return notificationService.deleteByName(username, name)
+            .flatMap(notification -> ServerResponse.ok().bodyValue(notification));
     }
 
     @Override

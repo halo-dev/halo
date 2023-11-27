@@ -1,0 +1,14 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-actuator
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Actuator Management"
+    rbac.authorization.halo.run/display-name: "Actuator Manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:actuator:manage"]
+rules:
+  - nonResourceURLs: [ "actuator", "/actuator/*" ]
+    verbs: [ "get" ]

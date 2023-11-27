@@ -36,6 +36,7 @@ import run.halo.app.infra.properties.HaloProperties;
  */
 @Slf4j
 public class PluginApplicationInitializer {
+
     protected final HaloPluginManager haloPluginManager;
 
     private final ExtensionContextRegistry contextRegistry = ExtensionContextRegistry.getInstance();
@@ -88,6 +89,8 @@ public class PluginApplicationInitializer {
         stopWatch.start("registerAnnotationConfigProcessors");
         AnnotationConfigUtils.registerAnnotationConfigProcessors(beanFactory);
         stopWatch.stop();
+
+        pluginApplicationContext.registerBean(AggregatedRouterFunction.class);
 
         beanFactory.registerSingleton("pluginContext", createPluginContext(plugin));
         // TODO deprecated

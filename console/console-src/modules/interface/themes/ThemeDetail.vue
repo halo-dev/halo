@@ -62,7 +62,7 @@ const handleReloadTheme = async () => {
 
 <template>
   <Transition mode="out-in" name="fade">
-    <div>
+    <div class="overflow-hidden rounded-b-base">
       <div class="bg-white px-4 py-4 sm:px-6">
         <div class="group flex items-center justify-between">
           <div class="flex flex-row items-center gap-3">
