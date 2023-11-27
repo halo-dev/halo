@@ -154,6 +154,15 @@ const handleResetForm = () => {
               type="text"
               validation="required|length:0,50"
             ></FormKit>
+            <FormKit
+              v-model="
+                formState.metadata.annotations[
+                  rbacAnnotations.REDIRECT_ON_LOGIN
+                ]
+              "
+              type="text"
+              label="登录之后默认跳转位置"
+            ></FormKit>
           </FormKit>
         </div>
       </div>
