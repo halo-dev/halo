@@ -10,6 +10,7 @@ import { computed } from "vue";
 import { toRaw } from "vue";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import { useI18n } from "vue-i18n";
+import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
@@ -86,17 +87,20 @@ const { isLoading: isMutating, mutate } = useMutation({
       >
         <FormKitSchema :schema="toRaw(formSchema)" :data="configMapData" />
       </FormKit>
-      <div class="pt-5">
-        <div class="flex justify-start">
-          <VButton
-            :loading="isMutating"
-            type="secondary"
-            @click="$formkit.submit(name)"
-          >
-            {{ $t("core.common.buttons.save") }}
-          </VButton>
-        </div>
-      </div>
+
+      <StickyBlock
+        v-permission="['system:configmaps:manage']"
+        class="-mx-4 -mb-4 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
+        position="bottom"
+      >
+        <VButton
+          :loading="isMutating"
+          type="secondary"
+          @click="$formkit.submit(name)"
+        >
+          {{ $t("core.common.buttons.save") }}
+        </VButton>
+      </StickyBlock>
     </div>
   </Transition>
 </template>

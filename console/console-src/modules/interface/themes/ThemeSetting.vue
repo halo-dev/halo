@@ -14,6 +14,7 @@ import { apiClient } from "@/utils/api-client";
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
 import { useI18n } from "vue-i18n";
 import { useQuery, useQueryClient } from "@tanstack/vue-query";
+import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
 
 const { t } = useI18n();
 const queryClient = useQueryClient();
@@ -70,35 +71,35 @@ await suspense();
 </script>
 <template>
   <Transition mode="out-in" name="fade">
-    <div class="bg-white p-4">
-      <div>
-        <FormKit
-          v-if="group && formSchema && configMapFormData?.[group]"
-          :id="group"
-          v-model="configMapFormData[group]"
-          :name="group"
-          :actions="false"
-          :preserve="true"
-          type="form"
-          @submit="handleSaveConfigMap"
+    <div class="p-4">
+      <FormKit
+        v-if="group && formSchema && configMapFormData?.[group]"
+        :id="group"
+        v-model="configMapFormData[group]"
+        :name="group"
+        :actions="false"
+        :preserve="true"
+        type="form"
+        @submit="handleSaveConfigMap"
+      >
+        <FormKitSchema
+          :schema="toRaw(formSchema)"
+          :data="configMapFormData[group]"
+        />
+      </FormKit>
+      <StickyBlock
+        v-permission="['system:themes:manage']"
+        class="-mx-4 -mb-4 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
+        position="bottom"
+      >
+        <VButton
+          :loading="saving"
+          type="secondary"
+          @click="$formkit.submit(group || '')"
         >
-          <FormKitSchema
-            :schema="toRaw(formSchema)"
-            :data="configMapFormData[group]"
-          />
-        </FormKit>
-      </div>
-      <div v-permission="['system:themes:manage']" class="pt-5">
-        <div class="flex justify-start">
-          <VButton
-            :loading="saving"
-            type="secondary"
-            @click="$formkit.submit(group || '')"
-          >
-            {{ $t("core.common.buttons.save") }}
-          </VButton>
-        </div>
-      </div>
+          {{ $t("core.common.buttons.save") }}
+        </VButton>
+      </StickyBlock>
     </div>
   </Transition>
 </template>
