@@ -99,3 +99,30 @@ spec:
         </div>
         <div></div>
       </div>
+---
+apiVersion: notification.halo.run/v1alpha1
+kind: NotificationTemplate
+metadata:
+  name: template-email-verification
+spec:
+  reasonSelector:
+    reasonType: email-verification
+    language: default
+  template:
+    title: "邮箱验证-[(${site.title})]"
+    rawBody: |
+      【[(${site.title})]】你的邮箱验证码是：[(${code})]，请在 [(${expirationAtMinutes})] 分钟内完成验证。
+    htmlBody: |
+      <div class="notification-content">
+        <div class="head">
+          <p class="honorific" th:text="|${username} 你好：|"></p>
+        </div>
+        <div class="body">
+          <p>使用下面的动态验证码（OTP）验证您的电子邮件地址。</p>
+          <div class="verify-code" style="font-size:24px;line-height:24px;color:#333;">
+            <b th:text="${code}"></b>
+          </div>
+          <p th:text="|动态验证码的有效期为 ${expirationAtMinutes} 分钟。|"></p>
+          <p>如果您没有尝试验证您的电子邮件地址，请忽略此电子邮件。</p>
+        </div>
+      </div>

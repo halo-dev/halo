@@ -5,6 +5,7 @@ param:
   postName: "{{randAlpha 6}}"
   userName: "{{randAlpha 6}}"
   roleName: "{{randAlpha 6}}"
+  notificationName: "{{randAlpha 6}}"
   auth: "Basic YWRtaW46MTIzNDU2"
 items:
 - name: init
@@ -242,6 +243,51 @@ items:
 - name: uninstallPlugin
   request:
     api: /plugin.halo.run/v1alpha1/plugins/PluginSitePush
+    method: DELETE
+    header:
+      Authorization: "{{.param.auth}}"
+
+  # Notifications
+- name: createNotification
+  request:
+    api: /notification.halo.run/v1alpha1/notifications
+    method: POST
+    body: |
+      {
+        "spec": {
+          "recipient": "admin",
+          "reason": "fake-reason",
+          "title": "test 评论了你的页面《关于我》",
+          "rawContent": "Fake raw content",
+          "htmlContent": "<p>Fake html content</p>",
+          "unread": true
+        },
+        "apiVersion": "notification.halo.run/v1alpha1",
+        "kind": "Notification",
+        "metadata": {
+          "name": "{{.param.notificationName}}"
+        }
+      }
+    header:
+      Content-Type: application/json
+      Authorization: "{{.param.auth}}"
+  expect:
+    statusCode: 201
+- name: getNotificationByName
+  request:
+    api: /notification.halo.run/v1alpha1/notifications/{{.param.notificationName}}
+    method: GET
+    header:
+      Authorization: "{{.param.auth}}"
+  expect:
+    statusCode: 200
+    verify:
+      - data.spec.reason == "fake-reason"
+      - data.spec.title == "test 评论了你的页面《关于我》"
+- name: deleteUserNotification
+  request:
+    api: |
+      /api.notification.halo.run/v1alpha1/userspaces/admin/notifications/{{.param.notificationName}}
     method: DELETE
     header:
       Authorization: "{{.param.auth}}"

@@ -1019,13 +1019,15 @@ core:
     fields:
       external_url: 外部訪問地址
       start_time: 啟動時間
-      timezone: 時區
-      locale: 語言
+      timezone: 系統時區
+      locale: 系統語言
       version: 版本
       build_time: 構建時間
       database: 資料庫
       os: 操作系統
       log: 運行日誌
+      activated_theme: 已啟動主題
+      enabled_plugins: 已啟動插件
     fields_values:
       external_url:
         not_setup: 未設置

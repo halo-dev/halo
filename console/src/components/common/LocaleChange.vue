@@ -31,7 +31,7 @@ watch(
   <select
     id="locale"
     v-model="currentLocale"
-    class="block appearance-none rounded-md border-0 py-1.5 pl-3 pr-10 text-sm text-gray-800 outline-none ring-1 ring-inset ring-gray-200 focus:ring-primary"
+    class="block appearance-none rounded-md border-0 py-1.5 pl-3 pr-10 text-sm text-gray-800 outline-none ring-1 ring-inset ring-gray-200 focus:!ring-1 focus:!ring-primary"
   >
     <template v-for="locale in locales">
       <option v-if="locale.name" :key="locale.code" :value="locale.code">

@@ -37,4 +37,6 @@ public interface UserNotificationService {
      * @return the names of read notification that has been marked as read
      */
     Flux<String> markSpecifiedAsRead(String username, List<String> names);
+
+    Mono<Notification> deleteByName(String username, String name);
 }

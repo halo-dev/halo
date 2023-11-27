@@ -125,7 +125,7 @@ export const ApiConsoleHaloRunV1alpha1SystemApiFp = function (
       systemInitializationRequest?: SystemInitializationRequest,
       options?: AxiosRequestConfig
     ): Promise<
-      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<boolean>
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
     > {
       const localVarAxiosArgs = await localVarAxiosParamCreator.initialize(
         systemInitializationRequest,
@@ -161,7 +161,7 @@ export const ApiConsoleHaloRunV1alpha1SystemApiFactory = function (
     initialize(
       requestParameters: ApiConsoleHaloRunV1alpha1SystemApiInitializeRequest = {},
       options?: AxiosRequestConfig
-    ): AxiosPromise<boolean> {
+    ): AxiosPromise<void> {
       return localVarFp
         .initialize(requestParameters.systemInitializationRequest, options)
         .then((request) => request(axios, basePath));

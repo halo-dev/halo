@@ -37,6 +37,13 @@ const {
     return data;
   },
   cacheTime: 0,
+  refetchInterval(data) {
+    const hasDeletingNotifications = data?.items.some(
+      (item) => item.metadata.deletionTimestamp !== undefined
+    );
+
+    return hasDeletingNotifications ? 1000 : false;
+  },
 });
 
 const selectedNotificationName = useRouteQuery<string | undefined>("name");

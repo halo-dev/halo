@@ -4,6 +4,7 @@ import { computed, ref, type Ref, inject, toRaw } from "vue";
 
 // components
 import { Toast, VButton } from "@halo-dev/components";
+import StickyBlock from "@/components/sticky-block/StickyBlock.vue";
 
 // hooks
 import { useSettingFormConvert } from "@console/composables/use-setting-form";
@@ -67,35 +68,36 @@ const handleSaveConfigMap = async () => {
 </script>
 <template>
   <Transition mode="out-in" name="fade">
-    <div class="bg-white p-4">
-      <div>
-        <FormKit
-          v-if="group && formSchema && configMapFormData?.[group]"
-          :id="group"
-          v-model="configMapFormData[group]"
-          :name="group"
-          :actions="false"
-          :preserve="true"
-          type="form"
-          @submit="handleSaveConfigMap"
+    <div class="p-4">
+      <FormKit
+        v-if="group && formSchema && configMapFormData?.[group]"
+        :id="group"
+        v-model="configMapFormData[group]"
+        :name="group"
+        :actions="false"
+        :preserve="true"
+        type="form"
+        @submit="handleSaveConfigMap"
+      >
+        <FormKitSchema
+          :schema="toRaw(formSchema)"
+          :data="configMapFormData[group]"
+        />
+      </FormKit>
+
+      <StickyBlock
+        v-permission="['system:configmaps:manage']"
+        class="-mx-4 -mb-4 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
+        position="bottom"
+      >
+        <VButton
+          :loading="saving"
+          type="secondary"
+          @click="$formkit.submit(group || '')"
         >
-          <FormKitSchema
-            :schema="toRaw(formSchema)"
-            :data="configMapFormData[group]"
-          />
-        </FormKit>
-      </div>
-      <div v-permission="['system:configmaps:manage']" class="pt-5">
-        <div class="flex justify-start">
-          <VButton
-            :loading="saving"
-            type="secondary"
-            @click="$formkit.submit(group || '')"
-          >
-            {{ $t("core.common.buttons.save") }}
-          </VButton>
-        </div>
-      </div>
+          {{ $t("core.common.buttons.save") }}
+        </VButton>
+      </StickyBlock>
     </div>
   </Transition>
 </template>
