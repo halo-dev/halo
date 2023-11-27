@@ -143,3 +143,23 @@ spec:
     - name: content
       type: string
       description: "The content of the reply."
+---
+apiVersion: notification.halo.run/v1alpha1
+kind: ReasonType
+metadata:
+  name: email-verification
+  labels:
+    halo.run/hide: "true"
+spec:
+  displayName: "邮箱验证"
+  description: "当你的邮箱被用于注册账户时，会收到一条带有验证码的邮件，你需要点击邮件中的链接来验证邮箱是否属于你。"
+  properties:
+    - name: username
+      type: string
+      description: "The username of the user."
+    - name: code
+      type: string
+      description: "The verification code."
+    - name: expirationAtMinutes
+      type: string
+      description: "The expiration minutes of the verification code, such as 5 minutes."

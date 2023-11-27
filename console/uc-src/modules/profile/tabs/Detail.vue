@@ -2,6 +2,7 @@
 import {
   Dialog,
   IconUserSettings,
+  VAlert,
   VButton,
   VDescription,
   VDescriptionItem,
@@ -16,6 +17,8 @@ import { useQuery } from "@tanstack/vue-query";
 import { apiClient } from "@/utils/api-client";
 import axios from "axios";
 import { useI18n } from "vue-i18n";
+import EmailVerifyModal from "../components/EmailVerifyModal.vue";
+import { ref } from "vue";
 
 const user = inject<Ref<DetailedUser | undefined>>("user");
 
@@ -63,6 +66,9 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
     authProvider.bindingUrl
   }?redirect_uri=${encodeURIComponent(window.location.href)}`;
 };
+
+// verify email
+const emailVerifyModal = ref(false);
 </script>
 <template>
   <div class="border-t border-gray-100">
@@ -79,9 +85,40 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
       />
       <VDescriptionItem
         :label="$t('core.user.detail.fields.email')"
-        :content="user?.user.spec.email || $t('core.common.text.none')"
         class="!px-2"
-      />
+      >
+        <div v-if="user" class="w-full xl:w-1/2">
+          <VAlert
+            v-if="!user.user.spec.email"
+            title="设置电子邮箱"
+            description="电子邮箱地址还未设置，点击下方按钮进行设置"
+            type="warning"
+            :closable="false"
+          >
+            <template #actions>
+              <VButton size="sm" @click="emailVerifyModal = true">设置</VButton>
+            </template>
+          </VAlert>
+
+          <div v-else>
+            <span>{{ user.user.spec.email }}</span>
+            <div v-if="!user.user.spec.emailVerified" class="mt-3">
+              <VAlert
+                title="验证电子邮箱"
+                description="电子邮箱地址还未验证，点击下方按钮进行验证"
+                type="warning"
+                :closable="false"
+              >
+                <template #actions>
+                  <VButton size="sm" @click="emailVerifyModal = true">
+                    验证
+                  </VButton>
+                </template>
+              </VAlert>
+            </div>
+          </div>
+        </div>
+      </VDescriptionItem>
       <VDescriptionItem
         :label="$t('core.user.detail.fields.roles')"
         class="!px-2"
@@ -151,5 +188,10 @@ const handleBindAuth = (authProvider: ListedAuthProvider) => {
         </ul>
       </VDescriptionItem>
     </VDescription>
+
+    <EmailVerifyModal
+      v-if="emailVerifyModal"
+      @close="emailVerifyModal = false"
+    />
   </div>
 </template>

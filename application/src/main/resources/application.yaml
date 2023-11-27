@@ -91,3 +91,11 @@ resilience4j.ratelimiter:
       limitForPeriod: 3
       limitRefreshPeriod: 1h
       timeoutDuration: 0s
+    send-email-verification-code:
+      limitForPeriod: 1
+      limitRefreshPeriod: 1m
+      timeoutDuration: 0s
+    verify-email:
+      limitForPeriod: 3
+      limitRefreshPeriod: 1h
+      timeoutDuration: 0s

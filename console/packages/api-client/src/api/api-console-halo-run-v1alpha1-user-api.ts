@@ -44,6 +44,8 @@ import { CreateUserRequest } from "../models";
 // @ts-ignore
 import { DetailedUser } from "../models";
 // @ts-ignore
+import { EmailVerifyRequest } from "../models";
+// @ts-ignore
 import { GrantRequest } from "../models";
 // @ts-ignore
 import { User } from "../models";
@@ -51,6 +53,8 @@ import { User } from "../models";
 import { UserEndpointListedUserList } from "../models";
 // @ts-ignore
 import { UserPermission } from "../models";
+// @ts-ignore
+import { VerifyCodeRequest } from "../models";
 /**
  * ApiConsoleHaloRunV1alpha1UserApi - axios parameter creator
  * @export
@@ -547,6 +551,67 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (
       };
     },
     /**
+     * Send email verification code for user
+     * @param {EmailVerifyRequest} emailVerifyRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    sendEmailVerificationCode: async (
+      emailVerifyRequest: EmailVerifyRequest,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'emailVerifyRequest' is not null or undefined
+      assertParamExists(
+        "sendEmailVerificationCode",
+        "emailVerifyRequest",
+        emailVerifyRequest
+      );
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/users/-/send-email-verification-code`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      localVarHeaderParameter["Content-Type"] = "application/json";
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        emailVerifyRequest,
+        localVarRequestOptions,
+        configuration
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
      * Update current user profile, but password.
      * @param {User} user
      * @param {*} [options] Override http request option.
@@ -665,6 +730,63 @@ export const ApiConsoleHaloRunV1alpha1UserApiAxiosParamCreator = function (
         ...options.headers,
       };
       localVarRequestOptions.data = localVarFormParams;
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     * Verify email for user by code.
+     * @param {VerifyCodeRequest} verifyCodeRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    verifyEmail: async (
+      verifyCodeRequest: VerifyCodeRequest,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'verifyCodeRequest' is not null or undefined
+      assertParamExists("verifyEmail", "verifyCodeRequest", verifyCodeRequest);
+      const localVarPath = `/apis/api.console.halo.run/v1alpha1/users/-/verify-email`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      localVarHeaderParameter["Content-Type"] = "application/json";
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        verifyCodeRequest,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
@@ -890,6 +1012,30 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (
       );
     },
     /**
+     * Send email verification code for user
+     * @param {EmailVerifyRequest} emailVerifyRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async sendEmailVerificationCode(
+      emailVerifyRequest: EmailVerifyRequest,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.sendEmailVerificationCode(
+          emailVerifyRequest,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
      * Update current user profile, but password.
      * @param {User} user
      * @param {*} [options] Override http request option.
@@ -926,6 +1072,29 @@ export const ApiConsoleHaloRunV1alpha1UserApiFp = function (
     > {
       const localVarAxiosArgs =
         await localVarAxiosParamCreator.uploadUserAvatar(name, file, options);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
+     * Verify email for user by code.
+     * @param {VerifyCodeRequest} verifyCodeRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async verifyEmail(
+      verifyCodeRequest: VerifyCodeRequest,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs = await localVarAxiosParamCreator.verifyEmail(
+        verifyCodeRequest,
+        options
+      );
       return createRequestFunction(
         localVarAxiosArgs,
         globalAxios,
@@ -1075,6 +1244,23 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
         .then((request) => request(axios, basePath));
     },
     /**
+     * Send email verification code for user
+     * @param {ApiConsoleHaloRunV1alpha1UserApiSendEmailVerificationCodeRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    sendEmailVerificationCode(
+      requestParameters: ApiConsoleHaloRunV1alpha1UserApiSendEmailVerificationCodeRequest,
+      options?: AxiosRequestConfig
+    ): AxiosPromise<void> {
+      return localVarFp
+        .sendEmailVerificationCode(
+          requestParameters.emailVerifyRequest,
+          options
+        )
+        .then((request) => request(axios, basePath));
+    },
+    /**
      * Update current user profile, but password.
      * @param {ApiConsoleHaloRunV1alpha1UserApiUpdateCurrentUserRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -1104,6 +1290,20 @@ export const ApiConsoleHaloRunV1alpha1UserApiFactory = function (
           requestParameters.file,
           options
         )
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     * Verify email for user by code.
+     * @param {ApiConsoleHaloRunV1alpha1UserApiVerifyEmailRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    verifyEmail(
+      requestParameters: ApiConsoleHaloRunV1alpha1UserApiVerifyEmailRequest,
+      options?: AxiosRequestConfig
+    ): AxiosPromise<void> {
+      return localVarFp
+        .verifyEmail(requestParameters.verifyCodeRequest, options)
         .then((request) => request(axios, basePath));
     },
   };
@@ -1264,6 +1464,20 @@ export interface ApiConsoleHaloRunV1alpha1UserApiListUsersRequest {
 }
 
 /**
+ * Request parameters for sendEmailVerificationCode operation in ApiConsoleHaloRunV1alpha1UserApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1UserApiSendEmailVerificationCodeRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1UserApiSendEmailVerificationCodeRequest {
+  /**
+   *
+   * @type {EmailVerifyRequest}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiSendEmailVerificationCode
+   */
+  readonly emailVerifyRequest: EmailVerifyRequest;
+}
+
+/**
  * Request parameters for updateCurrentUser operation in ApiConsoleHaloRunV1alpha1UserApi.
  * @export
  * @interface ApiConsoleHaloRunV1alpha1UserApiUpdateCurrentUserRequest
@@ -1296,6 +1510,20 @@ export interface ApiConsoleHaloRunV1alpha1UserApiUploadUserAvatarRequest {
    * @memberof ApiConsoleHaloRunV1alpha1UserApiUploadUserAvatar
    */
   readonly file: File;
+}
+
+/**
+ * Request parameters for verifyEmail operation in ApiConsoleHaloRunV1alpha1UserApi.
+ * @export
+ * @interface ApiConsoleHaloRunV1alpha1UserApiVerifyEmailRequest
+ */
+export interface ApiConsoleHaloRunV1alpha1UserApiVerifyEmailRequest {
+  /**
+   *
+   * @type {VerifyCodeRequest}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApiVerifyEmail
+   */
+  readonly verifyCodeRequest: VerifyCodeRequest;
 }
 
 /**
@@ -1447,6 +1675,22 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
   }
 
   /**
+   * Send email verification code for user
+   * @param {ApiConsoleHaloRunV1alpha1UserApiSendEmailVerificationCodeRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApi
+   */
+  public sendEmailVerificationCode(
+    requestParameters: ApiConsoleHaloRunV1alpha1UserApiSendEmailVerificationCodeRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
+      .sendEmailVerificationCode(requestParameters.emailVerifyRequest, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
    * Update current user profile, but password.
    * @param {ApiConsoleHaloRunV1alpha1UserApiUpdateCurrentUserRequest} requestParameters Request parameters.
    * @param {*} [options] Override http request option.
@@ -1475,6 +1719,22 @@ export class ApiConsoleHaloRunV1alpha1UserApi extends BaseAPI {
   ) {
     return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
       .uploadUserAvatar(requestParameters.name, requestParameters.file, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   * Verify email for user by code.
+   * @param {ApiConsoleHaloRunV1alpha1UserApiVerifyEmailRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiConsoleHaloRunV1alpha1UserApi
+   */
+  public verifyEmail(
+    requestParameters: ApiConsoleHaloRunV1alpha1UserApiVerifyEmailRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return ApiConsoleHaloRunV1alpha1UserApiFp(this.configuration)
+      .verifyEmail(requestParameters.verifyCodeRequest, options)
       .then((request) => request(this.axios, this.basePath));
   }
 }

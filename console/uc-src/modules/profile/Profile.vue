@@ -90,7 +90,7 @@ const activeTab = useRouteQuery<string>("tab", tabs[0].id, {
 });
 </script>
 <template>
-  <ProfileEditingModal v-model:visible="editingModal" :user="user?.user" />
+  <ProfileEditingModal v-model:visible="editingModal" />
 
   <PasswordChangeModal
     v-model:visible="passwordChangeModal"

@@ -50,6 +50,12 @@ export interface UserSpec {
   email: string;
   /**
    *
+   * @type {boolean}
+   * @memberof UserSpec
+   */
+  emailVerified?: boolean;
+  /**
+   *
    * @type {number}
    * @memberof UserSpec
    */
