@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useEventListener } from "@vueuse/core";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 const props = withDefaults(
   defineProps<{
@@ -14,7 +14,7 @@ const props = withDefaults(
 const stickyBlock = ref<HTMLElement | null>(null);
 const isSticky = ref(false);
 
-useEventListener("scroll", () => {
+function computeSticky() {
   if (!stickyBlock.value) return;
   const rect = stickyBlock.value?.getBoundingClientRect();
 
@@ -23,7 +23,13 @@ useEventListener("scroll", () => {
   } else {
     isSticky.value = rect.bottom >= window.innerHeight;
   }
+}
+
+onMounted(() => {
+  computeSticky();
 });
+
+useEventListener("scroll", computeSticky);
 </script>
 
 <template>
@@ -42,6 +48,6 @@ useEventListener("scroll", () => {
 }
 
 .sticky-shadow {
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px -5px 10px -5px rgba(0, 0, 0, 0.1);
 }
 </style>

@@ -87,18 +87,18 @@ await suspense();
           :data="configMapFormData[group]"
         />
       </FormKit>
-      <StickyBlock>
-        <div v-permission="['system:themes:manage']" class="pt-5">
-          <div class="flex justify-start">
-            <VButton
-              :loading="saving"
-              type="secondary"
-              @click="$formkit.submit(group || '')"
-            >
-              {{ $t("core.common.buttons.save") }}
-            </VButton>
-          </div>
-        </div>
+      <StickyBlock
+        v-permission="['system:themes:manage']"
+        class="-mx-4 -mb-4 rounded-b-base rounded-t-lg bg-white p-4 pt-5"
+        position="bottom"
+      >
+        <VButton
+          :loading="saving"
+          type="secondary"
+          @click="$formkit.submit(group || '')"
+        >
+          {{ $t("core.common.buttons.save") }}
+        </VButton>
       </StickyBlock>
     </div>
   </Transition>
