@@ -1,6 +1,6 @@
 {
   "name": "@halo-dev/components",
-  "version": "1.10.0",
+  "version": "1.8.0",
   "description": "",
   "files": [
     "dist"
@@ -18,10 +18,10 @@
     "test:unit:ui": "vitest --environment jsdom --watch --ui",
     "test:unit:coverage": "vitest run --environment jsdom --coverage",
     "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
-    "story:dev": "histoire dev --port 4000",
-    "story:build": "histoire build",
     "lint": "eslint ./src --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts",
-    "prettier": "prettier --write './src/**/*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}'"
+    "prettier": "prettier --write './src/**/*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}'",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "keywords": [
     "halo",
@@ -44,10 +44,20 @@
   "homepage": "https://github.com/halo-dev/halo/tree/main/console/packages/components#readme",
   "license": "MIT",
   "devDependencies": {
-    "@histoire/plugin-vue": "^0.11.7",
-    "@iconify-json/ri": "^1.1.4",
-    "histoire": "^0.11.7",
-    "unplugin-icons": "^0.14.14",
+    "@iconify-json/ri": "^1.1.10",
+    "@storybook/addon-essentials": "^7.1.0",
+    "@storybook/addon-interactions": "^7.1.0",
+    "@storybook/addon-links": "^7.1.0",
+    "@storybook/addon-styling": "^1.3.4",
+    "@storybook/blocks": "^7.1.0",
+    "@storybook/testing-library": "^0.0.14-next.2",
+    "@storybook/vue3": "^7.1.0",
+    "@storybook/vue3-vite": "^7.1.0",
+    "eslint-plugin-storybook": "^0.6.12",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "storybook": "^7.1.0",
+    "unplugin-icons": "^0.14.15",
     "vite-plugin-dts": "^2.3.0"
   },
   "peerDependencies": {
