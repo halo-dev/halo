@@ -1,0 +1,294 @@
+.halo-rich-text-editor {
+  $tableBorderColor: #d8d8d8;
+  $tableHeaderBgColor: #f6f8fa;
+  $tableSelectedBorderColor: rgb(0 101 255);
+  $tableSelectedCellBgColor: transparent;
+  $tableResizeHandleBgColor: #adf;
+
+  .ProseMirror {
+    .tableWrapper {
+      position: relative;
+      margin: 0.5em 0px;
+      overflow-x: auto;
+      overflow-y: hidden;
+
+      &.has-focus {
+        .scrollWrapper {
+          margin-top: -20px;
+        }
+      }
+    }
+
+    .scrollWrapper {
+      width: max-content;
+      border-left: 1px solid transparent;
+      border-right: 1px solid transparent;
+      -webkit-transition: border 250ms ease-in-out 0s;
+      transition: border 250ms ease-in-out 0s;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border-radius: 4px;
+      overflow: initial;
+      padding-left: 26px;
+      padding-top: 26px;
+
+      box-sizing: border-box;
+
+      * {
+        box-sizing: border-box;
+      }
+
+      tr {
+        position: relative;
+        border-bottom: 1px solid $tableBorderColor;
+      }
+
+      th {
+        background: $tableHeaderBgColor;
+      }
+
+      td {
+        background: #fff;
+      }
+
+      td,
+      th {
+        position: relative;
+        vertical-align: top;
+        border: 1px solid $tableBorderColor;
+        position: relative;
+        padding: 12px 8px;
+        text-align: left;
+        min-width: 100px;
+        z-index: 1;
+
+        > * {
+          margin-top: 0;
+          margin-bottom: 0;
+        }
+      }
+
+      .selectedCell {
+        position: relative;
+        border: 1px solid $tableSelectedBorderColor;
+
+        &::after {
+          box-sizing: content-box;
+          height: 100%;
+          width: 100%;
+          border: 1px solid $tableSelectedBorderColor;
+          content: "";
+          position: absolute;
+          left: -1px;
+          top: -1px;
+          bottom: 0px;
+          z-index: 12;
+          display: inline-block;
+          pointer-events: none;
+        }
+      }
+    }
+
+    .grip-column {
+      position: absolute;
+      top: -12px;
+      left: -1px;
+      width: 100%;
+
+      > div {
+        position: absolute;
+        top: -18px;
+        left: 100%;
+        transform: translateX(-8px);
+
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+
+        font-size: 0;
+        cursor: pointer;
+
+        .plus-icon {
+          font-size: inherit;
+        }
+      }
+
+      &::before {
+        content: "";
+        position: absolute;
+        left: 100%;
+        bottom: 4px;
+        transform: translateX(-1px);
+
+        width: 4px;
+        height: 4px;
+        background-color: #d8d8d8;
+        border-radius: 50%;
+        display: block;
+      }
+
+      &::after {
+        box-sizing: content-box;
+        content: "";
+        cursor: pointer;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 10px;
+        background: #f6f8fa;
+        border: 1px solid #d8d8d8;
+        display: block;
+      }
+
+      &:hover {
+        color: rgb(0 101 255);
+
+        > div {
+          font-size: 14px;
+        }
+
+        &::before {
+          display: none;
+        }
+
+        &::after {
+          background: #2584ff;
+          border-color: #2584ff;
+        }
+      }
+
+      &.last::after {
+        border-top-right-radius: 3px;
+      }
+
+      &.selected::after {
+        background: #2584ff;
+        border-color: #2584ff;
+      }
+    }
+
+    .grip-row {
+      position: absolute;
+      left: -12px;
+      top: -1px;
+      height: 100%;
+
+      > div {
+        transform: translateY(8px);
+        position: absolute;
+        left: -16px;
+        bottom: 4px;
+
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+
+        font-size: 0;
+        cursor: pointer;
+
+        .plus-icon {
+          font-size: inherit;
+        }
+      }
+
+      &::before {
+        content: "";
+        position: absolute;
+        left: -10px;
+        bottom: -2px;
+        width: 4px;
+        height: 4px;
+        background-color: #d8d8d8;
+        border-radius: 50%;
+        display: block;
+      }
+
+      &::after {
+        box-sizing: content-box;
+        content: "";
+        cursor: pointer;
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 10px;
+        background: #f6f8fa;
+        border: 1px solid #d8d8d8;
+        display: block;
+      }
+
+      &:hover {
+        color: rgb(0 101 255);
+
+        > div {
+          font-size: 14px;
+        }
+
+        &::before {
+          display: none;
+        }
+
+        &::after {
+          background: #2584ff;
+          border-color: rgb(0 101 255);
+        }
+      }
+
+      &.last::after {
+        border-bottom-left-radius: 3px;
+      }
+
+      &.selected::after {
+        background: #2584ff;
+        border-color: rgb(0 101 255);
+      }
+    }
+
+    .grip-table {
+      &::after {
+        box-sizing: content-box;
+        content: "";
+        cursor: pointer;
+        position: absolute;
+        top: -12px;
+        left: -12px;
+        display: block;
+        background: #f6f8fa;
+        width: 10px;
+        height: 10px;
+        border: 1px solid #d8d8d8;
+        border-top-left-radius: 3px;
+      }
+
+      &:hover::after {
+        background: #2584ff;
+        border-color: rgb(0 101 255);
+      }
+
+      &.selected::after {
+        background: #2584ff;
+        border-color: rgb(0 101 255);
+      }
+    }
+
+    .column-resize-handle {
+      position: absolute;
+      top: 0;
+      right: -2px;
+      bottom: -2px;
+      width: 4px;
+      pointer-events: none;
+      background-color: $tableResizeHandleBgColor;
+      z-index: 1;
+    }
+
+    &.resize-cursor {
+      cursor: ew-resize;
+      cursor: col-resize;
+    }
+  }
+}

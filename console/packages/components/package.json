@@ -47,7 +47,6 @@
     "@histoire/plugin-vue": "^0.11.7",
     "@iconify-json/ri": "^1.1.4",
     "histoire": "^0.11.7",
-    "unplugin-icons": "^0.14.14",
     "vite-plugin-dts": "^2.3.0"
   },
   "peerDependencies": {
