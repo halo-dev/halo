@@ -34,7 +34,6 @@
     "lint": "eslint ./src --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts",
     "prettier": "prettier --write './src/**/*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}'",
     "release": "release-it",
-    "test:unit": "vitest --environment jsdom --run",
     "test:unit:coverage": "vitest run --environment jsdom --coverage",
     "test:unit:ui": "vitest --environment jsdom --watch --ui",
     "test:unit:watch": "vitest --environment jsdom --watch",
