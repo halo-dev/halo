@@ -92,4 +92,4 @@ jobs:
 
           repo=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')
           docker tag ghcr.io/${repo}/halo-dev:pr-${{ github.event.number }} ghcr.io/halo-dev/halo-dev:main
-          cd e2e && ./start.sh
+          cd e2e && make all
