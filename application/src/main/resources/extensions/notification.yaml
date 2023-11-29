@@ -163,3 +163,23 @@ spec:
     - name: expirationAtMinutes
       type: string
       description: "The expiration minutes of the verification code, such as 5 minutes."
+---
+apiVersion: notification.halo.run/v1alpha1
+kind: ReasonType
+metadata:
+  name: reset-password-by-email
+  labels:
+    halo.run/hide: "true"
+spec:
+  displayName: "根据邮件地址重置密码"
+  description: "当你通过邮件地址找回密码时，会收到一条带密码重置链接的邮件，你需要点击邮件中的链接来重置密码。"
+  properties:
+    - name: username
+      type: string
+      description: "The username of the user."
+    - name: link
+      type: string
+      description: "The reset link."
+    - name: expirationAtMinutes
+      type: string
+      description: "The expiration minutes of the reset link, such as 30 minutes."
