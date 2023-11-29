@@ -166,7 +166,7 @@ onMounted(() => {
       </div>
     </aside>
 
-    <main class="content w-full pb-12 mb-safe md:pb-0">
+    <main class="content w-full pb-12 mb-safe md:w-[calc(100%-16rem)] md:pb-0">
       <slot v-if="$slots.default" />
       <RouterView v-else />
     </main>
