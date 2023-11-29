@@ -1,0 +1,96 @@
+{
+  "name": "@halo-dev/richtext-editor",
+  "version": "0.0.0-alpha.33",
+  "description": "Default editor for Halo",
+  "homepage": "https://github.com/halo-dev/halo/tree/main/console/packages/editor#readme",
+  "bugs": {
+    "url": "https://github.com/halo-dev/halo/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/halo-dev/halo.git",
+    "directory": "console/packages/editor"
+  },
+  "license": "GPL-3.0",
+  "author": "@halo-dev",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/rich-text-editor.es.js"
+    },
+    "./dist/style.css": "./dist/style.css"
+  },
+  "main": "./dist/rich-text-editor.iife.js",
+  "jsdelivr": "./dist/rich-text-editor.iife.js",
+  "unpkg": "./dist/rich-text-editor.iife.js",
+  "module": "./dist/rich-text-editor.es.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build --config ./vite.lib.config.ts",
+    "dev": "vite",
+    "lint": "eslint ./src --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts",
+    "prettier": "prettier --write './src/**/*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}'",
+    "release": "release-it",
+    "test:unit:coverage": "vitest run --environment jsdom --coverage",
+    "test:unit:ui": "vitest --environment jsdom --watch --ui",
+    "test:unit:watch": "vitest --environment jsdom --watch",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false"
+  },
+  "dependencies": {
+    "@ckpack/vue-color": "^1.5.0",
+    "@tiptap/core": "^2.1.10",
+    "@tiptap/extension-blockquote": "^2.1.10",
+    "@tiptap/extension-bold": "^2.1.10",
+    "@tiptap/extension-bullet-list": "^2.1.10",
+    "@tiptap/extension-code": "^2.1.10",
+    "@tiptap/extension-code-block": "^2.1.10",
+    "@tiptap/extension-code-block-lowlight": "^2.1.10",
+    "@tiptap/extension-color": "^2.1.10",
+    "@tiptap/extension-document": "^2.1.10",
+    "@tiptap/extension-dropcursor": "^2.1.10",
+    "@tiptap/extension-gapcursor": "^2.1.10",
+    "@tiptap/extension-hard-break": "^2.1.10",
+    "@tiptap/extension-heading": "^2.1.10",
+    "@tiptap/extension-highlight": "^2.1.10",
+    "@tiptap/extension-history": "^2.1.10",
+    "@tiptap/extension-horizontal-rule": "^2.1.10",
+    "@tiptap/extension-image": "^2.1.10",
+    "@tiptap/extension-italic": "^2.1.10",
+    "@tiptap/extension-link": "^2.1.10",
+    "@tiptap/extension-list-item": "^2.1.10",
+    "@tiptap/extension-ordered-list": "^2.1.10",
+    "@tiptap/extension-paragraph": "^2.1.10",
+    "@tiptap/extension-placeholder": "^2.1.10",
+    "@tiptap/extension-strike": "^2.1.10",
+    "@tiptap/extension-subscript": "^2.1.10",
+    "@tiptap/extension-superscript": "^2.1.10",
+    "@tiptap/extension-table": "^2.1.10",
+    "@tiptap/extension-table-row": "^2.1.10",
+    "@tiptap/extension-task-item": "^2.1.10",
+    "@tiptap/extension-task-list": "^2.1.10",
+    "@tiptap/extension-text": "^2.1.10",
+    "@tiptap/extension-text-align": "^2.1.10",
+    "@tiptap/extension-text-style": "^2.1.10",
+    "@tiptap/extension-underline": "^2.1.10",
+    "@tiptap/pm": "^2.1.10",
+    "@tiptap/suggestion": "^2.1.10",
+    "@tiptap/vue-3": "^2.1.10",
+    "floating-vue": "2.0.0-beta.24",
+    "github-markdown-css": "^5.2.0",
+    "highlight.js": "11.8.0",
+    "lowlight": "^3.0.0",
+    "scroll-into-view-if-needed": "^3.1.0",
+    "tippy.js": "^6.3.7"
+  },
+  "devDependencies": {
+    "@iconify/json": "^2.2.117",
+    "release-it": "^16.1.5",
+    "vite-plugin-dts": "^3.5.3"
+  },
+  "peerDependencies": {
+    "vue": "^3.0.0"
+  }
+}

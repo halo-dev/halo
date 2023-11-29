@@ -1,0 +1,105 @@
+.halo-rich-text-editor {
+  $editorVerticalPadding: 15px;
+  $editorHorizontalPadding: 20%;
+
+  box-sizing: border-box;
+  height: calc(100% - 48px);
+  width: 100%;
+
+  .editor-header {
+    height: 48px;
+  }
+
+  .editor-content {
+    width: 100%;
+    position: relative;
+
+    .ProseMirror {
+      outline: none !important;
+      padding: $editorVerticalPadding 20px;
+
+      p {
+        margin-top: 0.75em;
+        margin-bottom: 0;
+      }
+
+      p.is-empty::before {
+        content: attr(data-placeholder);
+        float: left;
+        color: #adb5bd;
+        pointer-events: none;
+        height: 0;
+      }
+
+      pre {
+        background: #0d0d0d;
+        padding: 0.75rem 1rem;
+        margin: 0;
+
+        code {
+          background: none;
+          font-size: 0.8rem;
+          padding: 0 !important;
+          border-radius: 0;
+        }
+      }
+
+      ul[data-type="taskList"] {
+        list-style: none;
+        padding: 0;
+
+        p {
+          margin: 0;
+        }
+
+        li {
+          display: flex;
+
+          > label {
+            flex: 0 0 auto;
+            margin-right: 0.5rem;
+            user-select: none;
+          }
+
+          > div {
+            flex: 1 1 auto;
+          }
+        }
+      }
+
+      ul {
+        @apply list-disc;
+      }
+
+      code br {
+        display: block;
+      }
+    }
+  }
+
+  @media screen {
+    .ProseMirror {
+      @media (min-width: 640px) {
+        padding: $editorVerticalPadding min($editorHorizontalPadding, 10%) !important;
+      }
+
+      @media (min-width: 1024px) {
+        padding: $editorVerticalPadding $editorHorizontalPadding !important;
+      }
+    }
+  }
+
+  .v-popper--theme-tooltip {
+    pointer-events: all;
+  }
+}
+
+.v-popper--theme-editor-block-dropdown {
+  .v-popper__inner {
+    @apply bg-white drop-shadow-md rounded-md;
+  }
+
+  .v-popper__arrow-container {
+    display: none;
+  }
+}

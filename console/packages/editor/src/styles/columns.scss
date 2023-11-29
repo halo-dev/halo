@@ -1,0 +1,13 @@
+.halo-rich-text-editor {
+  .ProseMirror {
+    .columns {
+      margin-top: 0.75em;
+
+      .column {
+        border: 1px solid #e7e9e8;
+        border-radius: 6px;
+        position: relative;
+      }
+    }
+  }
+}

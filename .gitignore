@@ -64,7 +64,6 @@ nbdist/
 
 ### VSCode
 .vscode
-.gitpod.yml
 
 ### Local file
 application-local.yml
