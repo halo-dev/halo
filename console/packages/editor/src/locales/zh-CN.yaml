@@ -1,0 +1,119 @@
+editor:
+  menus:
+    undo: 撤销
+    redo: 恢复
+    table:
+      title: 表格
+      add: 插入表格
+      add_column_before: 向前插入列
+      add_column_after: 向后插入列
+      delete_column: 删除当前列
+      add_row_before: 向上插入行
+      add_row_after: 向下插入行
+      toggle_header_column: 设置/取消首列表头
+      toggle_header_row: 设置/取消首行表头
+      toggle_header_cell: 设置/取消当前单元格为表头
+      delete_row: 删除当前行
+      merge_cells: 合并单元格
+      split_cell: 分割单元格
+      delete_table: 删除表格
+  extensions:
+    commands_menu:
+      columns: 分栏卡片
+      iframe: 嵌入网页
+      image: 图片
+      video: 视频
+      audio: 音频
+      table: 表格
+      no_results: 没有搜索结果
+      placeholder: "输入 / 以选择输入类型"
+    link:
+      add_link: 添加链接
+      edit_link: 修改链接
+      placeholder: 链接地址
+      open_in_new_window: 在新窗口中打开
+      cancel_link: 取消链接
+    audio:
+      disable_autoplay: 关闭自动播放
+      enable_autoplay: 开启自动播放
+      disable_loop: 关闭循环播放
+      enable_loop: 开启循环播放
+    iframe:
+      disable_frameborder: 取消边框
+      enable_frameborder: 设置边框
+      phone_size: 手机尺寸
+      tablet_vertical_size: 平板电脑纵向尺寸
+      tablet_horizontal_size: 平板电脑横向尺寸
+      desktop_size: 桌面电脑尺寸
+    image:
+      small_size: 小尺寸
+      medium_size: 中尺寸
+      large_size: 大尺寸
+      restore_size: 恢复原始尺寸
+      edit_link: 修改链接
+      edit_alt: 修改图片 alt 属性
+      edit_href: 修改图片跳转链接
+    video:
+      disable_controls: 隐藏控制面板
+      enable_controls: 显示控制面板
+      disable_autoplay: 关闭自动播放
+      enable_autoplay: 开启自动播放
+      disable_loop: 关闭循环播放
+      enable_loop: 开启循环播放
+      small_size: 小尺寸
+      medium_size: 中尺寸
+      large_size: 大尺寸
+    highlight:
+      unset: 移除高亮颜色
+    columns:
+      add_column_before: 向前插入列
+      add_column_after: 向后插入列
+      delete_column: 删除当前列
+  components:
+    color_picker:
+      more_color: 更多颜色
+  common:
+    align_left: 左对齐
+    align_center: 居中
+    align_right: 右对齐
+    align_justify: 两端对齐
+    bold: 粗体
+    italic: 斜体
+    underline: 下划线
+    strike: 删除线
+    quote: 引用
+    code: 行内代码
+    superscript: 上角标
+    subscript: 下角标
+    codeblock: 代码块
+    image: 图片
+    heading:
+      title: 文本类型
+      paragraph: 普通文本
+      header1: 一级标题
+      header2: 二级标题
+      header3: 三级标题
+      header4: 四级标题
+      header5: 五级标题
+      header6: 六级标题
+    bullet_list: 无序列表
+    ordered_list: 有序列表
+    task_list: 任务列表
+    highlight: 高亮
+    color: 字体颜色
+    tooltip:
+      custom_width_input: 自定义宽度，按回车键生效
+      custom_height_input: 自定义高度，按回车键生效
+      open_link: 打开链接
+    placeholder:
+      link_input: 输入链接，按回车确定
+      alt_input: 输入图片 alt 属性值，按回车确认
+      alt_href: 输入图片跳转链接，按回车确认
+    button:
+      new_line: 换行
+      delete: 删除
+      edit_link: 修改链接
+      refresh: 刷新
+      restore_default: 恢复为默认
+    text:
+      default: 默认
