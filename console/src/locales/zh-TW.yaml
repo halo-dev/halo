@@ -1203,6 +1203,7 @@ core:
             placeholder: "輸入 / 以選擇輸入類型"
       toolbox:
         attachment: 選擇附件
+        show_hide_sidebar: 顯示 / 隱藏側邊欄
       upload_attachment:
         toast:
           no_available_policy: 目前沒有可用的存儲策略

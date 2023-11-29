@@ -131,6 +131,7 @@ const Image = TiptapImage.extend<ExtensionOptions & ImageOptions>({
           shouldShow: ({ state }: { state: EditorState }): boolean => {
             return isActive(state, Image.name);
           },
+          defaultAnimation: false,
           items: [
             {
               priority: 10,

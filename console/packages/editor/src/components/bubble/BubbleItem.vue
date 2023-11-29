@@ -6,7 +6,7 @@ import { ref, type Component } from "vue";
 const props = withDefaults(
   defineProps<{
     editor: Editor;
-    isActive: ({ editor }: { editor: Editor }) => boolean;
+    isActive?: ({ editor }: { editor: Editor }) => boolean;
     visible?: ({ editor }: { editor: Editor }) => boolean;
     icon?: Component;
     iconStyle?: string;
