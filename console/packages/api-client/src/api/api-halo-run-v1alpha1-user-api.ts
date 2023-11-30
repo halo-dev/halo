@@ -38,6 +38,8 @@ import {
   RequiredError,
 } from "../base";
 // @ts-ignore
+import { PasswordResetEmailRequest } from "../models";
+// @ts-ignore
 import { SignUpRequest } from "../models";
 // @ts-ignore
 import { User } from "../models";
@@ -49,6 +51,121 @@ export const ApiHaloRunV1alpha1UserApiAxiosParamCreator = function (
   configuration?: Configuration
 ) {
   return {
+    /**
+     * Reset password by token
+     * @param {string} name The name of the user
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    resetPasswordByToken: async (
+      name: string,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'name' is not null or undefined
+      assertParamExists("resetPasswordByToken", "name", name);
+      const localVarPath =
+        `/apis/api.halo.run/v1alpha1/users/{name}/reset-password`.replace(
+          `{${"name"}}`,
+          encodeURIComponent(String(name))
+        );
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "PUT",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
+    /**
+     * Send password reset email when forgot password
+     * @param {PasswordResetEmailRequest} passwordResetEmailRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    sendPasswordResetEmail: async (
+      passwordResetEmailRequest: PasswordResetEmailRequest,
+      options: AxiosRequestConfig = {}
+    ): Promise<RequestArgs> => {
+      // verify required parameter 'passwordResetEmailRequest' is not null or undefined
+      assertParamExists(
+        "sendPasswordResetEmail",
+        "passwordResetEmailRequest",
+        passwordResetEmailRequest
+      );
+      const localVarPath = `/apis/api.halo.run/v1alpha1/users/-/send-password-reset-email`;
+      // use dummy base URL string because the URL constructor only accepts absolute URLs.
+      const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+      let baseOptions;
+      if (configuration) {
+        baseOptions = configuration.baseOptions;
+      }
+
+      const localVarRequestOptions = {
+        method: "POST",
+        ...baseOptions,
+        ...options,
+      };
+      const localVarHeaderParameter = {} as any;
+      const localVarQueryParameter = {} as any;
+
+      // authentication BasicAuth required
+      // http basic authentication required
+      setBasicAuthToObject(localVarRequestOptions, configuration);
+
+      // authentication BearerAuth required
+      // http bearer authentication required
+      await setBearerAuthToObject(localVarHeaderParameter, configuration);
+
+      localVarHeaderParameter["Content-Type"] = "application/json";
+
+      setSearchParams(localVarUrlObj, localVarQueryParameter);
+      let headersFromBaseOptions =
+        baseOptions && baseOptions.headers ? baseOptions.headers : {};
+      localVarRequestOptions.headers = {
+        ...localVarHeaderParameter,
+        ...headersFromBaseOptions,
+        ...options.headers,
+      };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        passwordResetEmailRequest,
+        localVarRequestOptions,
+        configuration
+      );
+
+      return {
+        url: toPathString(localVarUrlObj),
+        options: localVarRequestOptions,
+      };
+    },
     /**
      * Sign up a new user
      * @param {SignUpRequest} signUpRequest
@@ -120,6 +237,51 @@ export const ApiHaloRunV1alpha1UserApiFp = function (
     ApiHaloRunV1alpha1UserApiAxiosParamCreator(configuration);
   return {
     /**
+     * Reset password by token
+     * @param {string} name The name of the user
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async resetPasswordByToken(
+      name: string,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.resetPasswordByToken(name, options);
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
+     * Send password reset email when forgot password
+     * @param {PasswordResetEmailRequest} passwordResetEmailRequest
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    async sendPasswordResetEmail(
+      passwordResetEmailRequest: PasswordResetEmailRequest,
+      options?: AxiosRequestConfig
+    ): Promise<
+      (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
+    > {
+      const localVarAxiosArgs =
+        await localVarAxiosParamCreator.sendPasswordResetEmail(
+          passwordResetEmailRequest,
+          options
+        );
+      return createRequestFunction(
+        localVarAxiosArgs,
+        globalAxios,
+        BASE_PATH,
+        configuration
+      );
+    },
+    /**
      * Sign up a new user
      * @param {SignUpRequest} signUpRequest
      * @param {*} [options] Override http request option.
@@ -157,6 +319,37 @@ export const ApiHaloRunV1alpha1UserApiFactory = function (
   const localVarFp = ApiHaloRunV1alpha1UserApiFp(configuration);
   return {
     /**
+     * Reset password by token
+     * @param {ApiHaloRunV1alpha1UserApiResetPasswordByTokenRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    resetPasswordByToken(
+      requestParameters: ApiHaloRunV1alpha1UserApiResetPasswordByTokenRequest,
+      options?: AxiosRequestConfig
+    ): AxiosPromise<void> {
+      return localVarFp
+        .resetPasswordByToken(requestParameters.name, options)
+        .then((request) => request(axios, basePath));
+    },
+    /**
+     * Send password reset email when forgot password
+     * @param {ApiHaloRunV1alpha1UserApiSendPasswordResetEmailRequest} requestParameters Request parameters.
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    sendPasswordResetEmail(
+      requestParameters: ApiHaloRunV1alpha1UserApiSendPasswordResetEmailRequest,
+      options?: AxiosRequestConfig
+    ): AxiosPromise<void> {
+      return localVarFp
+        .sendPasswordResetEmail(
+          requestParameters.passwordResetEmailRequest,
+          options
+        )
+        .then((request) => request(axios, basePath));
+    },
+    /**
      * Sign up a new user
      * @param {ApiHaloRunV1alpha1UserApiSignUpRequest} requestParameters Request parameters.
      * @param {*} [options] Override http request option.
@@ -172,6 +365,34 @@ export const ApiHaloRunV1alpha1UserApiFactory = function (
     },
   };
 };
+
+/**
+ * Request parameters for resetPasswordByToken operation in ApiHaloRunV1alpha1UserApi.
+ * @export
+ * @interface ApiHaloRunV1alpha1UserApiResetPasswordByTokenRequest
+ */
+export interface ApiHaloRunV1alpha1UserApiResetPasswordByTokenRequest {
+  /**
+   * The name of the user
+   * @type {string}
+   * @memberof ApiHaloRunV1alpha1UserApiResetPasswordByToken
+   */
+  readonly name: string;
+}
+
+/**
+ * Request parameters for sendPasswordResetEmail operation in ApiHaloRunV1alpha1UserApi.
+ * @export
+ * @interface ApiHaloRunV1alpha1UserApiSendPasswordResetEmailRequest
+ */
+export interface ApiHaloRunV1alpha1UserApiSendPasswordResetEmailRequest {
+  /**
+   *
+   * @type {PasswordResetEmailRequest}
+   * @memberof ApiHaloRunV1alpha1UserApiSendPasswordResetEmail
+   */
+  readonly passwordResetEmailRequest: PasswordResetEmailRequest;
+}
 
 /**
  * Request parameters for signUp operation in ApiHaloRunV1alpha1UserApi.
@@ -194,6 +415,41 @@ export interface ApiHaloRunV1alpha1UserApiSignUpRequest {
  * @extends {BaseAPI}
  */
 export class ApiHaloRunV1alpha1UserApi extends BaseAPI {
+  /**
+   * Reset password by token
+   * @param {ApiHaloRunV1alpha1UserApiResetPasswordByTokenRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiHaloRunV1alpha1UserApi
+   */
+  public resetPasswordByToken(
+    requestParameters: ApiHaloRunV1alpha1UserApiResetPasswordByTokenRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return ApiHaloRunV1alpha1UserApiFp(this.configuration)
+      .resetPasswordByToken(requestParameters.name, options)
+      .then((request) => request(this.axios, this.basePath));
+  }
+
+  /**
+   * Send password reset email when forgot password
+   * @param {ApiHaloRunV1alpha1UserApiSendPasswordResetEmailRequest} requestParameters Request parameters.
+   * @param {*} [options] Override http request option.
+   * @throws {RequiredError}
+   * @memberof ApiHaloRunV1alpha1UserApi
+   */
+  public sendPasswordResetEmail(
+    requestParameters: ApiHaloRunV1alpha1UserApiSendPasswordResetEmailRequest,
+    options?: AxiosRequestConfig
+  ) {
+    return ApiHaloRunV1alpha1UserApiFp(this.configuration)
+      .sendPasswordResetEmail(
+        requestParameters.passwordResetEmailRequest,
+        options
+      )
+      .then((request) => request(this.axios, this.basePath));
+  }
+
   /**
    * Sign up a new user
    * @param {ApiHaloRunV1alpha1UserApiSignUpRequest} requestParameters Request parameters.
