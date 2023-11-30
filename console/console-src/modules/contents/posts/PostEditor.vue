@@ -39,6 +39,7 @@ import { contentAnnotations } from "@/constants/annotations";
 import { useAutoSaveContent } from "@console/composables/use-auto-save-content";
 import { useContentSnapshot } from "@console/composables/use-content-snapshot";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
+import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -388,6 +389,9 @@ const handlePreview = async () => {
 };
 
 useSaveKeybinding(handleSave);
+
+// Keep session alive
+useSessionKeepAlive();
 </script>
 
 <template>
