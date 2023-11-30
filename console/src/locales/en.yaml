@@ -1205,6 +1205,7 @@ core:
             placeholder: "Enter / to select input type."
       toolbox:
         attachment: Attachment
+        show_hide_sidebar: Show/Hide Sidebar
     global_search:
       placeholder: Enter keywords to search
       no_results: No search results

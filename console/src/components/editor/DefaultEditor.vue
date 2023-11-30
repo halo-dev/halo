@@ -44,6 +44,7 @@ import {
   ExtensionColumn,
   ExtensionNodeSelected,
   ExtensionTrailingNode,
+  ToolbarItem,
 } from "@halo-dev/richtext-editor";
 import {
   IconCalendar,
@@ -62,6 +63,7 @@ import MdiFormatHeader3 from "~icons/mdi/format-header-3";
 import MdiFormatHeader4 from "~icons/mdi/format-header-4";
 import MdiFormatHeader5 from "~icons/mdi/format-header-5";
 import MdiFormatHeader6 from "~icons/mdi/format-header-6";
+import RiLayoutRightLine from "~icons/ri/layout-right-line";
 import {
   inject,
   markRaw,
@@ -82,7 +84,7 @@ import { i18n } from "@/locales";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-vue";
 import { usePluginModuleStore } from "@/stores/plugin";
 import type { PluginModule } from "@halo-dev/console-shared";
-import { useDebounceFn } from "@vueuse/core";
+import { useDebounceFn, useLocalStorage } from "@vueuse/core";
 import { onBeforeUnmount } from "vue";
 import { generateAnchor } from "@/utils/anchor";
 import { usePermission } from "@/utils/permission";
@@ -136,6 +138,8 @@ const attachmentSelectorModal = ref(false);
 const editor = shallowRef<Editor>();
 
 const { pluginModules } = usePluginModuleStore();
+
+const showSidebar = useLocalStorage("halo:editor:show-sidebar", true);
 
 onMounted(() => {
   const extensionsFromPlugins: AnyExtension[] = [];
@@ -258,6 +262,23 @@ onMounted(() => {
                   },
                 },
               ];
+            },
+            getToolbarItems({ editor }: { editor: Editor }) {
+              return {
+                priority: 1000,
+                component: markRaw(ToolbarItem),
+                props: {
+                  editor,
+                  isActive: showSidebar.value,
+                  icon: markRaw(RiLayoutRightLine),
+                  title: i18n.global.t(
+                    "core.components.default_editor.toolbox.show_hide_sidebar"
+                  ),
+                  action: () => {
+                    showSidebar.value = !showSidebar.value;
+                  },
+                },
+              };
             },
           };
         },
@@ -463,7 +484,7 @@ const currentLocale = i18n.global.locale.value as
       @select="onAttachmentSelect"
     />
     <RichTextEditor v-if="editor" :editor="editor" :locale="currentLocale">
-      <template #extra>
+      <template v-if="showSidebar" #extra>
         <OverlayScrollbarsComponent
           element="div"
           :options="{ scrollbars: { autoHide: 'scroll' } }"
@@ -496,7 +517,9 @@ const currentLocale = i18n.global.locale.value as
                         :is="headingIcons[node.level]"
                         class="h-4 w-4 rounded-sm bg-gray-100 p-0.5 group-hover:bg-white"
                         :class="[
-                          { '!bg-white': node.id === selectedHeadingNode?.id },
+                          {
+                            '!bg-white': node.id === selectedHeadingNode?.id,
+                          },
                         ]"
                       />
                       <span class="flex-1 truncate">{{ node.text }}</span>

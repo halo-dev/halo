@@ -1205,6 +1205,7 @@ core:
             placeholder: "输入 / 以选择输入类型"
       toolbox:
         attachment: 选择附件
+        show_hide_sidebar: 显示 / 隐藏侧边栏
     global_search:
       placeholder: 输入关键词以搜索
       no_results: 没有搜索结果
