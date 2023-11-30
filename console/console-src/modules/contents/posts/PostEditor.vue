@@ -28,7 +28,7 @@ import { useRouteQuery } from "@vueuse/router";
 import { useRouter } from "vue-router";
 import { randomUUID } from "@/utils/id";
 import { useContentCache } from "@console/composables/use-content-cache";
-import { useEditorExtensionPoints } from "@console/composables/use-editor-extension-points";
+import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
 import type { EditorProvider } from "@halo-dev/console-shared";
 import { useLocalStorage } from "@vueuse/core";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
@@ -67,8 +67,17 @@ const handleChangeEditorProvider = async (provider: EditorProvider) => {
   }
 };
 
+// fixme: PostRequest type may be wrong
+interface PostRequestWithContent extends PostRequest {
+  content: {
+    raw: string;
+    content: string;
+    rawType: string;
+  };
+}
+
 // Post form
-const initialFormState: PostRequest = {
+const initialFormState: PostRequestWithContent = {
   post: {
     spec: {
       title: "",
@@ -104,7 +113,7 @@ const initialFormState: PostRequest = {
   },
 };
 
-const formState = ref<PostRequest>(cloneDeep(initialFormState));
+const formState = ref<PostRequestWithContent>(cloneDeep(initialFormState));
 const settingModal = ref(false);
 const saving = ref(false);
 const publishing = ref(false);
@@ -392,6 +401,20 @@ useSaveKeybinding(handleSave);
 
 // Keep session alive
 useSessionKeepAlive();
+
+// Upload image
+async function handleUploadImage(file: File) {
+  if (!isUpdateMode.value) {
+    await handleSave();
+  }
+
+  const { data } = await apiClient.uc.attachment.createAttachmentForPost({
+    file,
+    postName: formState.value.post.metadata.name,
+    waitForPermalink: true,
+  });
+  return data;
+}
 </script>
 
 <template>
@@ -470,6 +493,7 @@ useSessionKeepAlive();
       v-if="currentEditorProvider"
       v-model:raw="formState.content.raw"
       v-model:content="formState.content.content"
+      :upload-image="handleUploadImage"
       class="h-full"
       @update="handleSetContentCache"
     />

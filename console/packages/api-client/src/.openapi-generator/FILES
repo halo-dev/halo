@@ -39,7 +39,6 @@ api/content-halo-run-v1alpha1-reply-api.ts
 api/content-halo-run-v1alpha1-single-page-api.ts
 api/content-halo-run-v1alpha1-snapshot-api.ts
 api/content-halo-run-v1alpha1-tag-api.ts
-api/doc-halo-run-v1alpha1-doc-tree-api.ts
 api/login-api.ts
 api/metrics-halo-run-v1alpha1-counter-api.ts
 api/migration-halo-run-v1alpha1-backup-api.ts
@@ -60,6 +59,9 @@ api/storage-halo-run-v1alpha1-group-api.ts
 api/storage-halo-run-v1alpha1-policy-api.ts
 api/storage-halo-run-v1alpha1-policy-template-api.ts
 api/theme-halo-run-v1alpha1-theme-api.ts
+api/uc-api-content-halo-run-v1alpha1-attachment-api.ts
+api/uc-api-content-halo-run-v1alpha1-post-api.ts
+api/uc-api-content-halo-run-v1alpha1-snapshot-api.ts
 api/v1alpha1-annotation-setting-api.ts
 api/v1alpha1-cache-api.ts
 api/v1alpha1-config-map-api.ts
@@ -124,9 +126,6 @@ models/create-user-request.ts
 models/custom-templates.ts
 models/dashboard-stats.ts
 models/detailed-user.ts
-models/doc-tree-list.ts
-models/doc-tree-status.ts
-models/doc-tree.ts
 models/email-verify-request.ts
 models/excerpt.ts
 models/extension-definition-list.ts
@@ -262,7 +261,6 @@ models/site-stats-vo.ts
 models/snap-shot-spec.ts
 models/snapshot-list.ts
 models/snapshot.ts
-models/spec.ts
 models/stats-vo.ts
 models/stats.ts
 models/subject.ts
