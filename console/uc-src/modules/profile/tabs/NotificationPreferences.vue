@@ -101,7 +101,7 @@ const {
               class="px-4 py-3 text-left text-sm font-semibold text-gray-900 sm:w-96"
               scope="col"
             >
-              {{ $t("core.user.notification-preferences.fields.type") }}
+              {{ $t("core.uc_profile.notification-preferences.fields.type") }}
             </th>
             <th
               v-for="notifier in data?.notifiers"

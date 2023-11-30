@@ -85,7 +85,7 @@ const handleChangePassword = async () => {
   <VModal
     :visible="visible"
     :width="500"
-    :title="$t('core.user.change_password_modal.title')"
+    :title="$t('core.uc_profile.change_password_modal.title')"
     @update:visible="onVisibleChange"
   >
     <FormKit
@@ -99,7 +99,9 @@ const handleChangePassword = async () => {
     >
       <FormKit
         id="passwordInput"
-        :label="$t('core.user.change_password_modal.fields.new_password.label')"
+        :label="
+          $t('core.uc_profile.change_password_modal.fields.new_password.label')
+        "
         name="password"
         type="password"
         validation="required:trim|length:5,100|matches:/^\S.*\S$/"
@@ -109,7 +111,9 @@ const handleChangePassword = async () => {
       ></FormKit>
       <FormKit
         :label="
-          $t('core.user.change_password_modal.fields.confirm_password.label')
+          $t(
+            'core.uc_profile.change_password_modal.fields.confirm_password.label'
+          )
         "
         name="password_confirm"
         type="password"

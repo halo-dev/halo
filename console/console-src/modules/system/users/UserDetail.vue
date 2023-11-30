@@ -123,7 +123,7 @@ function handleRouteToUC() {
             type="primary"
             @click="handleRouteToUC"
           >
-            个人中心
+            {{ $t("core.user.detail.actions.profile.title") }}
           </VButton>
           <VDropdown v-if="currentUserHasPermission(['system:users:manage'])">
             <VButton type="default">

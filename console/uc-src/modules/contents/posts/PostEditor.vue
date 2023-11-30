@@ -419,7 +419,7 @@ useSessionKeepAlive();
 
   <PostCreationModal
     v-if="postCreationModal"
-    title="创建文章"
+    :title="$t('core.uc_post.creation_modal.title')"
     :content="content"
     @close="postCreationModal = false"
     @success="onCreatePostSuccess"
@@ -427,7 +427,7 @@ useSessionKeepAlive();
 
   <PostCreationModal
     v-if="postPublishModal"
-    title="发布文章"
+    :title="$t('core.uc_post.publish_modal.title')"
     :content="content"
     publish
     @close="postPublishModal = false"

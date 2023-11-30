@@ -76,7 +76,7 @@ const {
 
     setTimeout(() => {
       Dialog.info({
-        title: t("core.user.pat.operations.copy.title"),
+        title: t("core.uc_profile.pat.operations.copy.title"),
         description: data.metadata.annotations?.[patAnnotations.ACCESS_TOKEN],
         confirmType: "secondary",
         confirmText: t("core.common.buttons.copy"),
@@ -102,7 +102,7 @@ const { copy } = useClipboard({
   <VModal
     v-model:visible="visible"
     :width="700"
-    :title="$t('core.user.pat.creation_modal.title')"
+    :title="$t('core.uc_profile.pat.creation_modal.title')"
     @close="emit('close')"
   >
     <div>
@@ -110,7 +110,7 @@ const { copy } = useClipboard({
         <div class="md:col-span-1">
           <div class="sticky top-0">
             <span class="text-base font-medium text-gray-900">
-              {{ $t("core.user.pat.creation_modal.groups.general") }}
+              {{ $t("core.uc_profile.pat.creation_modal.groups.general") }}
             </span>
           </div>
         </div>
@@ -126,19 +126,27 @@ const { copy } = useClipboard({
               validation="required"
               type="text"
               name="name"
-              :label="$t('core.user.pat.creation_modal.fields.name.label')"
+              :label="
+                $t('core.uc_profile.pat.creation_modal.fields.name.label')
+              "
             ></FormKit>
             <FormKit
               type="datetime-local"
               name="expiresAt"
-              :label="$t('core.user.pat.creation_modal.fields.expiresAt.label')"
-              :help="$t('core.user.pat.creation_modal.fields.expiresAt.help')"
+              :label="
+                $t('core.uc_profile.pat.creation_modal.fields.expiresAt.label')
+              "
+              :help="
+                $t('core.uc_profile.pat.creation_modal.fields.expiresAt.help')
+              "
             ></FormKit>
             <FormKit
               type="textarea"
               name="description"
               :label="
-                $t('core.user.pat.creation_modal.fields.description.label')
+                $t(
+                  'core.uc_profile.pat.creation_modal.fields.description.label'
+                )
               "
             ></FormKit>
           </FormKit>
@@ -154,7 +162,7 @@ const { copy } = useClipboard({
         <div class="md:col-span-1">
           <div class="sticky top-0">
             <span class="text-base font-medium text-gray-900">
-              {{ $t("core.user.pat.creation_modal.groups.permissions") }}
+              {{ $t("core.uc_profile.pat.creation_modal.groups.permissions") }}
             </span>
           </div>
         </div>

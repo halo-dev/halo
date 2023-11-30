@@ -64,7 +64,7 @@ const defaultToolbars: ToolbarItem[] = [
     onClick: () => {
       emit("changeFile");
     },
-    title: t("core.user.detail.avatar.tooltips.upload"),
+    title: t("core.components.user_avatar.tooltips.upload"),
   },
   {
     name: "zoomIn",
@@ -72,7 +72,7 @@ const defaultToolbars: ToolbarItem[] = [
     onClick: () => {
       cropper.value?.zoom(0.1);
     },
-    title: t("core.user.detail.avatar.tooltips.zoom_in"),
+    title: t("core.components.user_avatar.tooltips.zoom_in"),
   },
   {
     name: "zoomOut",
@@ -80,7 +80,7 @@ const defaultToolbars: ToolbarItem[] = [
     onClick: () => {
       cropper.value?.zoom(-0.1);
     },
-    title: t("core.user.detail.avatar.tooltips.zoom_out"),
+    title: t("core.components.user_avatar.tooltips.zoom_out"),
   },
   {
     name: "flipHorizontal",
@@ -88,7 +88,7 @@ const defaultToolbars: ToolbarItem[] = [
     onClick: () => {
       cropper.value?.scaleX(-cropper.value?.getData().scaleX || -1);
     },
-    title: t("core.user.detail.avatar.tooltips.flip_horizontal"),
+    title: t("core.components.user_avatar.tooltips.flip_horizontal"),
   },
   {
     name: "flipVertical",
@@ -96,7 +96,7 @@ const defaultToolbars: ToolbarItem[] = [
     onClick: () => {
       cropper.value?.scaleY(-cropper.value?.getData().scaleY || -1);
     },
-    title: t("core.user.detail.avatar.tooltips.flip_vertical"),
+    title: t("core.components.user_avatar.tooltips.flip_vertical"),
   },
   {
     name: "reset",
@@ -104,7 +104,7 @@ const defaultToolbars: ToolbarItem[] = [
     onClick: () => {
       cropper.value?.reset();
     },
-    title: t("core.user.detail.avatar.tooltips.reset"),
+    title: t("core.components.user_avatar.tooltips.reset"),
   },
 ];
 const previewElement = ref<HTMLElement>();

@@ -8,8 +8,10 @@ import { apiClient } from "@/utils/api-client";
 import { useUserStore } from "@/stores/user";
 import { useIntervalFn } from "@vueuse/shared";
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 const queryClient = useQueryClient();
+const { t } = useI18n();
 
 const { currentUser, fetchCurrentUser } = useUserStore();
 
@@ -58,7 +60,11 @@ const { mutate: sendVerifyCode, isLoading: isSending } = useMutation({
   mutationKey: ["send-verify-code"],
   mutationFn: async () => {
     if (!email.value) {
-      Toast.error("请输入电子邮箱");
+      Toast.error(
+        t(
+          "core.uc_profile.email_verify_modal.operations.send_code.toast_email_empty"
+        )
+      );
       throw new Error("email is empty");
     }
     return await apiClient.user.sendEmailVerificationCode({
@@ -68,7 +74,9 @@ const { mutate: sendVerifyCode, isLoading: isSending } = useMutation({
     });
   },
   onSuccess() {
-    Toast.success("验证码已发送");
+    Toast.success(
+      t("core.uc_profile.email_verify_modal.operations.send_code.toast_success")
+    );
     timer.value = 60;
     resume();
   },
@@ -76,9 +84,16 @@ const { mutate: sendVerifyCode, isLoading: isSending } = useMutation({
 
 const sendVerifyCodeButtonText = computed(() => {
   if (isSending.value) {
-    return "发送中";
+    return t(
+      "core.uc_profile.email_verify_modal.operations.send_code.buttons.sending"
+    );
   }
-  return isActive.value ? `${timer.value} 秒后重发` : "发送验证码";
+  return isActive.value
+    ? t(
+        "core.uc_profile.email_verify_modal.operations.send_code.buttons.countdown",
+        { timer: timer.value }
+      )
+    : t("core.uc_profile.email_verify_modal.operations.send_code.buttons.send");
 });
 
 const { mutate: verifyEmail, isLoading: isVerifying } = useMutation({
@@ -91,7 +106,9 @@ const { mutate: verifyEmail, isLoading: isVerifying } = useMutation({
     });
   },
   onSuccess() {
-    Toast.success("验证成功");
+    Toast.success(
+      t("core.uc_profile.email_verify_modal.operations.verify.toast_success")
+    );
     queryClient.invalidateQueries({ queryKey: ["user-detail"] });
     fetchCurrentUser();
     onClose();
@@ -107,7 +124,11 @@ function handleVerify(data: { code: string }) {
   <VModal
     v-if="shouldRender"
     v-model:visible="visible"
-    :title="currentUser?.spec.emailVerified ? '修改电子邮箱' : '绑定电子邮箱'"
+    :title="
+      currentUser?.spec.emailVerified
+        ? $t('core.uc_profile.email_verify_modal.titles.modify')
+        : $t('core.uc_profile.email_verify_modal.titles.verify')
+    "
     @close="onClose"
   >
     <FormKit
@@ -119,11 +140,20 @@ function handleVerify(data: { code: string }) {
       <FormKit
         v-model="email"
         type="email"
-        :label="currentUser?.spec.emailVerified ? '新电子邮箱' : '电子邮箱'"
+        :label="
+          currentUser?.spec.emailVerified
+            ? $t('core.uc_profile.email_verify_modal.fields.new_email.label')
+            : $t('core.uc_profile.email_verify_modal.fields.email.label')
+        "
         name="email"
         validation="required|email"
       ></FormKit>
-      <FormKit type="number" name="code" label="验证码" validation="required">
+      <FormKit
+        type="number"
+        name="code"
+        :label="$t('core.uc_profile.email_verify_modal.fields.code.label')"
+        validation="required"
+      >
         <template #suffix>
           <VButton
             :loading="isSending"
@@ -143,9 +173,11 @@ function handleVerify(data: { code: string }) {
           type="secondary"
           @click="$formkit.submit('email-verify-form')"
         >
-          验证
+          {{ $t("core.common.buttons.verify") }}
         </VButton>
-        <VButton @click="emit('close')">取消</VButton>
+        <VButton @click="emit('close')">
+          {{ $t("core.common.buttons.close_and_shortcut") }}
+        </VButton>
       </VSpace>
     </template>
   </VModal>
