@@ -66,11 +66,9 @@ public class DefaultRoleService implements RoleService {
             // search all permissions
             return extensionClient.list(Role.class,
                     shouldFilterHidden(true),
-                    compareCreationTimestamp(true))
-                .filter(DefaultRoleService::isRoleTemplate);
+                    compareCreationTimestamp(true));
         }
-        return listDependencies(names, shouldFilterHidden(true))
-            .filter(DefaultRoleService::isRoleTemplate);
+        return listDependencies(names, shouldFilterHidden(true));
     }
 
     @Override

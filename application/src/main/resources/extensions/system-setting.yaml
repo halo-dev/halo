@@ -68,6 +68,14 @@ spec:
               value: 'shortUUID'
             - label: 'UUID'
               value: 'UUID'
+        - $formkit: attachmentPolicySelect
+          name: attachmentPolicyName
+          label: "附件存储策略"
+          value: "default-policy"
+        - $formkit: attachmentGroupSelect
+          name: attachmentGroupName
+          label: "附件存储组"
+          value: ""
     - group: seo
       label: SEO 设置
       formSchema:

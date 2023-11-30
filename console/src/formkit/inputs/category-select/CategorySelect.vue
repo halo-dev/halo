@@ -14,6 +14,7 @@ import SearchResultListItem from "./components/SearchResultListItem.vue";
 import { apiClient } from "@/utils/api-client";
 import { usePermission } from "@/utils/permission";
 import { slugify } from "transliteration";
+import HasPermission from "@/components/permission/HasPermission.vue";
 
 const { currentUserHasPermission } = usePermission();
 
@@ -289,18 +290,24 @@ const handleDelete = () => {
 
     <div v-if="dropdownVisible" :class="context.classes['dropdown-wrapper']">
       <ul class="p-1">
-        <li
+        <HasPermission
           v-if="text.trim() && !searchResults?.length"
-          v-permission="['system:posts:manage']"
-          class="group flex cursor-pointer items-center justify-between rounded bg-gray-100 p-2"
-          @click="handleCreateCategory"
+          :permissions="['system:posts:manage']"
         >
-          <span class="text-xs text-gray-700 group-hover:text-gray-900">
-            {{
-              $t("core.formkit.category_select.creation_label", { text: text })
-            }}
-          </span>
-        </li>
+          <li
+            class="group flex cursor-pointer items-center justify-between rounded bg-gray-100 p-2"
+            @click="handleCreateCategory"
+          >
+            <span class="text-xs text-gray-700 group-hover:text-gray-900">
+              {{
+                $t("core.formkit.category_select.creation_label", {
+                  text: text,
+                })
+              }}
+            </span>
+          </li>
+        </HasPermission>
+
         <template v-if="text">
           <SearchResultListItem
             v-for="category in searchResults"
