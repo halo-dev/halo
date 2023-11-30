@@ -24,7 +24,7 @@ import run.halo.app.extension.GroupVersion;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.ExternalLinkProcessor;
 import run.halo.app.infra.exception.AccessDeniedException;
-import run.halo.app.infra.exception.EmailVerificationFailed;
+import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.notification.NotificationCenter;
 import run.halo.app.notification.NotificationReasonEmitter;
 import run.halo.app.notification.UserIdentity;
@@ -142,7 +142,7 @@ public class EmailPasswordRecoveryServiceImpl implements EmailPasswordRecoverySe
     }
 
     static class ResetPasswordVerificationManager {
-        private final Cache<String, Verification> emailVerificationCodeCache =
+        private final Cache<String, Verification> userTokenCache =
             CacheBuilder.newBuilder()
                 .expireAfterWrite(LINK_EXPIRATION_MINUTES, TimeUnit.MINUTES)
                 .maximumSize(10000)
@@ -155,17 +155,14 @@ public class EmailPasswordRecoveryServiceImpl implements EmailPasswordRecoverySe
             .build();
 
         public boolean verifyToken(String username, String token) {
-            var verification = emailVerificationCodeCache.getIfPresent(username);
+            var verification = userTokenCache.getIfPresent(username);
             if (verification == null) {
                 // expired or not generated
                 return false;
             }
             if (blackListCache.getIfPresent(username) != null) {
                 // in blacklist
-                throw new EmailVerificationFailed("Too many attempts. Please try again later.",
-                    null,
-                    "problemDetail.user.email.verify.maxAttempts",
-                    null);
+                throw new RateLimitExceededException(null);
             }
             synchronized (verification) {
                 if (verification.getAttempts().get() >= MAX_ATTEMPTS) {
@@ -182,7 +179,7 @@ public class EmailPasswordRecoveryServiceImpl implements EmailPasswordRecoverySe
         }
 
         public void removeToken(String username) {
-            emailVerificationCodeCache.invalidate(username);
+            userTokenCache.invalidate(username);
         }
 
         public String generateToken(String username) {
@@ -190,8 +187,15 @@ public class EmailPasswordRecoveryServiceImpl implements EmailPasswordRecoverySe
             var verification = new Verification();
             verification.setToken(RandomStringUtils.randomAlphanumeric(20));
             verification.setAttempts(new AtomicInteger(0));
-            emailVerificationCodeCache.put(username, verification);
+            userTokenCache.put(username, verification);
             return verification.getToken();
+        }
+
+        /**
+         * Only for test.
+         */
+        boolean contains(String username) {
+            return userTokenCache.getIfPresent(username) != null;
         }
 
         @Data

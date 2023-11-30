@@ -110,7 +110,7 @@ public class PublicUserEndpoint implements CustomEndpoint {
             .switchIfEmpty(
                 Mono.error(() -> new ServerWebInputException("Request body must not be empty"))
             )
-            .map(resetReq -> {
+            .flatMap(resetReq -> {
                 var token = resetReq.token();
                 var newPassword = resetReq.newPassword();
                 return emailPasswordRecoveryService.changePassword(username, newPassword, token);

@@ -139,7 +139,34 @@ items:
     method: DELETE
     header:
       Authorization: "{{.param.auth}}"
-
+- name: sendPasswordResetEmail
+  request:
+    api: |
+      /api.halo.run/v1alpha1/users/-/send-password-reset-email
+    method: POST
+    header:
+      Content-Type: application/json
+    body: |
+      {
+        "username": "{{.param.userName}}",
+        "email": "{{.param.email}}"
+      }
+  expect:
+    statusCode: 204
+- name: resetPasswordByToken
+  request:
+    api: |
+      /api.halo.run/v1alpha1/users/{{.param.userName}}/reset-password
+    method: PUT
+    header:
+      Content-Type: application/json
+    body: |
+      {
+        "newPassword": "{{randAlpha 6}}",
+        "token": "{{randAlpha 6}}"
+      }
+  expect:
+    statusCode: 403
 ## Roles
 - name: createRole
   request:
