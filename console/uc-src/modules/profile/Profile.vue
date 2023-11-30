@@ -63,19 +63,19 @@ provide<Ref<DetailedUser | undefined>>("user", user);
 const tabs: UserTab[] = [
   {
     id: "detail",
-    label: t("core.user.detail.tabs.detail"),
+    label: t("core.uc_profile.tabs.detail"),
     component: markRaw(DetailTab),
     priority: 10,
   },
   {
     id: "notification-preferences",
-    label: t("core.user.detail.tabs.notification-preferences"),
+    label: t("core.uc_profile.tabs.notification-preferences"),
     component: markRaw(NotificationPreferences),
     priority: 20,
   },
   {
     id: "pat",
-    label: t("core.user.detail.tabs.pat"),
+    label: t("core.uc_profile.tabs.pat"),
     component: markRaw(PersonalAccessTokensTab),
     priority: 30,
   },
@@ -122,10 +122,10 @@ const activeTab = useRouteQuery<string>("tab", tabs[0].id, {
             </VButton>
             <template #popper>
               <VDropdownItem @click="editingModal = true">
-                {{ $t("core.user.detail.actions.update_profile.title") }}
+                {{ $t("core.uc_profile.actions.update_profile.title") }}
               </VDropdownItem>
               <VDropdownItem @click="passwordChangeModal = true">
-                {{ $t("core.user.detail.actions.change_password.title") }}
+                {{ $t("core.uc_profile.actions.change_password.title") }}
               </VDropdownItem>
             </template>
           </VDropdown>

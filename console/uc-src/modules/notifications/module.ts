@@ -15,10 +15,10 @@ export default definePlugin({
           name: "Notifications",
           component: Notifications,
           meta: {
-            title: "消息",
+            title: "core.uc_notification.title",
             searchable: true,
             menu: {
-              name: "消息",
+              name: "core.uc_sidebar.menu.items.notification",
               group: "dashboard",
               icon: markRaw(IconNotificationBadgeLine),
               priority: 1,

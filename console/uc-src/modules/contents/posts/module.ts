@@ -16,11 +16,11 @@ export default definePlugin({
           name: "Posts",
           component: PostList,
           meta: {
-            title: "core.post.title",
+            title: "core.uc_post.title",
             searchable: true,
             permissions: ["uc:posts:manage"],
             menu: {
-              name: "core.sidebar.menu.items.posts",
+              name: "core.uc_sidebar.menu.items.posts",
               group: "content",
               icon: markRaw(IconBookRead),
               priority: 0,
@@ -33,7 +33,7 @@ export default definePlugin({
           name: "PostEditor",
           component: PostEditor,
           meta: {
-            title: "文章编辑",
+            title: "core.post_editor.title",
             searchable: true,
             permissions: ["uc:posts:manage"],
           },

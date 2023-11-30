@@ -42,7 +42,9 @@ core:
     title: Account binding
     common:
       toast:
-        mounted: The current login method is not bound to an account, Please bind or sign up a new account first
+        mounted: >-
+          The current login method is not bound to an account, Please bind or
+          sign up a new account first
     operations:
       login_and_bind:
         button: Login and Bind
@@ -75,12 +77,21 @@ core:
         backup: Backup
     operations:
       logout:
-        button: Logout
+        tooltip: Logout
         title: Are you sure you want to log out?
       profile:
-        button: Profile
+        tooltip: Profile
       visit_homepage:
         title: Visit homepage
+  uc_sidebar:
+    menu:
+      items:
+        profile: Profile
+        notification: Notifications
+        posts: Posts
+    operations:
+      console:
+        tooltip: Console
   dashboard:
     title: Dashboard
     actions:
@@ -104,7 +115,11 @@ core:
           title: Recent Posts
           visits: "{visits} Visits"
           comments: "{comments} Comments"
-          publishTime: "Publish Time {publishTime}"
+          publishTime: Publish Time {publishTime}
+        notification:
+          title: Notifications
+          empty:
+            title: No unread notifications
         quicklink:
           title: Quick Link
           actions:
@@ -127,7 +142,9 @@ core:
             refresh_search_engine:
               title: Refresh Search Engine
               dialog_title: Do you want to refresh the search engine index?
-              dialog_content: This operation will recreate search engine indexes for all published posts.
+              dialog_content: >-
+                This operation will recreate search engine indexes for all
+                published posts.
               success_message: Refresh search engine index successfully.
             evict_page_cache:
               title: Refresh Page Cache
@@ -152,10 +169,14 @@ core:
     operations:
       delete:
         title: Are you sure you want to delete this post?
-        description: This operation will move the post to the recycle bin, and it can be restored from the recycle bin later.
+        description: >-
+          This operation will move the post to the recycle bin, and it can be
+          restored from the recycle bin later.
       delete_in_batch:
         title: Are you sure you want to delete the selected posts?
-        description: This operation will move the posts to the recycle bin, and it can be restored from the recycle bin later.
+        description: >-
+          This operation will move the posts to the recycle bin, and it can be
+          restored from the recycle bin later.
     filters:
       status:
         items:
@@ -252,7 +273,9 @@ core:
     operations:
       delete:
         title: Are you sure you want to delete this tag?
-        description: After deleting this tag, the association with the corresponding article will be removed. This operation cannot be undone.
+        description: >-
+          After deleting this tag, the association with the corresponding
+          article will be removed. This operation cannot be undone.
     editing_modal:
       titles:
         update: Update post tag
@@ -283,7 +306,9 @@ core:
     operations:
       delete:
         title: Are you sure you want to delete this category?
-        description: After deleting this category, the association with corresponding articles will be removed. This operation cannot be undone.
+        description: >-
+          After deleting this category, the association with corresponding
+          articles will be removed. This operation cannot be undone.
       add_sub_category:
         button: Add sub category
     editing_modal:
@@ -320,10 +345,14 @@ core:
     operations:
       delete:
         title: Are you sure you want to delete this page?
-        description: This operation will move the page to the recycle bin, and it can be restored from the recycle bin later.
+        description: >-
+          This operation will move the page to the recycle bin, and it can be
+          restored from the recycle bin later.
       delete_in_batch:
         title: Are you sure you want to delete the selected pages?
-        description: This operation will move the pages to the recycle bin, and it can be restored from the recycle bin later.
+        description: >-
+          This operation will move the pages to the recycle bin, and it can be
+          restored from the recycle bin later.
     filters:
       status:
         items:
@@ -410,16 +439,22 @@ core:
     operations:
       delete_comment:
         title: Are you sure you want to delete this comment?
-        description: All replies under the comments will be deleted at the same time, and this operation cannot be undone.
+        description: >-
+          All replies under the comments will be deleted at the same time, and
+          this operation cannot be undone.
       delete_comment_in_batch:
         title: Are you sure you want to delete the selected comments?
-        description: All replies under the comments will be deleted at the same time, and this operation cannot be undone.
+        description: >-
+          All replies under the comments will be deleted at the same time, and
+          this operation cannot be undone.
       approve_comment_in_batch:
         button: Approve
         title: Are you sure you want to approve the selected comments for review?
       approve_applies_in_batch:
         button: Approve all replies
-        title: Are you sure you want to approve all replies to this comment for review?
+        title: >-
+          Are you sure you want to approve all replies to this comment for
+          review?
       delete_reply:
         title: Are you sure you want to delete this reply?
       approve_reply:
@@ -468,7 +503,9 @@ core:
       storage_policies: Storage Policies
     empty:
       title: There are no attachments in the current group.
-      message: The current group has no attachments, you can try refreshing or uploading attachments.
+      message: >-
+        The current group has no attachments, you can try refreshing or
+        uploading attachments.
       actions:
         upload: Upload Attachment
     operations:
@@ -484,10 +521,10 @@ core:
     filters:
       storage_policy:
         label: Storage Policy
-        result: "Storage Policy：{storage_policy}"
+        result: Storage Policy：{storage_policy}
       owner:
         label: Owner
-        result: "Owner：{owner}"
+        result: Owner：{owner}
       sort:
         items:
           create_time_desc: Latest uploaded
@@ -531,18 +568,28 @@ core:
         delete:
           button: And move attachment to ungrouped
           title: Are you sure you want to delete this group?
-          description: The group will be deleted, and the attachments under the group will be moved to ungrouped. This operation cannot be undone.
-          toast_success: Deletion successful, {total} attachments have been moved to ungrouped
+          description: >-
+            The group will be deleted, and the attachments under the group will
+            be moved to ungrouped. This operation cannot be undone.
+          toast_success: >-
+            Deletion successful, {total} attachments have been moved to
+            ungrouped
         delete_with_attachments:
           button: Also delete attachments
           title: Are you sure you want to delete this group?
-          description: Deleting the group and all attachments within it, this action cannot be undone.
-          toast_success: Deletion successful, {total} attachments have been deleted simultaneously
+          description: >-
+            Deleting the group and all attachments within it, this action cannot
+            be undone.
+          toast_success: >-
+            Deletion successful, {total} attachments have been deleted
+            simultaneously
     policies_modal:
       title: Storage Policies
       empty:
         title: There is currently no available storage strategy.
-        message: There are no available storage policies at the moment. You can try refreshing or creating a new policy.
+        message: >-
+          There are no available storage policies at the moment. You can try
+          refreshing or creating a new policy.
       operations:
         delete:
           title: Are you sure you want to delete this policy?
@@ -575,7 +622,7 @@ core:
           label: Attachments
       operations:
         select:
-          result: "({count} items selected)"
+          result: ({count} items selected)
   theme:
     title: Themes
     common:
@@ -587,7 +634,9 @@ core:
       management: Themes
     empty:
       title: There are currently no activated or selected themes.
-      message: There are currently no activated or selected themes, you can switch themes or install new ones.
+      message: >-
+        There are currently no activated or selected themes, you can switch
+        themes or install new ones.
       actions:
         switch: Switch Theme
     operations:
@@ -596,18 +645,24 @@ core:
         toast_success: Active theme successful
       reset:
         title: Are you sure you want to reset all configurations of the theme?
-        description: This operation will delete the saved configuration and reset it to default settings.
+        description: >-
+          This operation will delete the saved configuration and reset it to
+          default settings.
         toast_success: Reset configuration successful
       reload:
         button: Reload
         title: Are you sure you want to reload all configurations of the theme?
-        description: This operation will only reload the theme configuration and settings form definition, and will not delete any saved configurations.
+        description: >-
+          This operation will only reload the theme configuration and settings
+          form definition, and will not delete any saved configurations.
         toast_success: Reload configuration successful
       uninstall:
         title: Are you sure you want to uninstall this theme?
       uninstall_and_delete_config:
         button: Uninstall and delete config
-        title: Are you sure you want to uninstall this theme and its corresponding settings?
+        title: >-
+          Are you sure you want to uninstall this theme and its corresponding
+          settings?
       remote_download:
         title: Remote download address detected, do you want to download?
         description: "Please carefully verify whether this address can be trusted: {url}"
@@ -625,7 +680,9 @@ core:
             url: Remote URL
       empty:
         title: There are no installed themes currently.
-        message: There are currently no installed themes, you can try refreshing or installing a new theme.
+        message: >-
+          There are currently no installed themes, you can try refreshing or
+          installing a new theme.
       not_installed_empty:
         title: There are no themes currently not installed.
     preview_model:
@@ -661,10 +718,14 @@ core:
         toast_success: Setting successful
       delete_menu:
         title: Are you sure you want to delete this menu?
-        description: All menu items under this menu will be deleted at the same time, and this operation cannot be undone.
+        description: >-
+          All menu items under this menu will be deleted at the same time, and
+          this operation cannot be undone.
       delete_menu_item:
         title: Are you sure you want to delete this menu item?
-        description: All sub-menu items will be deleted at the same time, and cannot be restored after deletion.
+        description: >-
+          All sub-menu items will be deleted at the same time, and cannot be
+          restored after deletion.
       add_sub_menu_item:
         button: Add sub menu item
     list:
@@ -691,7 +752,7 @@ core:
           placeholder: Select the parent menu item
         ref_kind:
           label: Type
-          placeholder: "Please select {label}"
+          placeholder: Please select {label}
           options:
             custom: Custom
             post: Post
@@ -715,13 +776,17 @@ core:
       detail: Detail
     empty:
       title: There are no installed plugins currently.
-      message: There are no installed plugins currently, you can try refreshing or installing new plugins.
+      message: >-
+        There are no installed plugins currently, you can try refreshing or
+        installing new plugins.
       actions:
         install: Install Plugin
     operations:
       reset:
         title: Are you sure you want to reset all configurations of the plugin?
-        description: This operation will delete the saved configuration and reset it to default settings.
+        description: >-
+          This operation will delete the saved configuration and reset it to
+          default settings.
         toast_success: Reset configuration successfully
       uninstall:
         title: Are you sure you want to uninstall this plugin?
@@ -729,13 +794,19 @@ core:
         title: Are you sure you want to uninstall these plugin?
       uninstall_and_delete_config:
         button: Uninstall and delete config
-        title: Are you sure you want to uninstall this plugin and its corresponding configuration?
+        title: >-
+          Are you sure you want to uninstall this plugin and its corresponding
+          configuration?
       uninstall_and_delete_config_in_batch:
         button: Uninstall and delete config
-        title: Are you sure you want to uninstall these plugin and its corresponding configuration?
+        title: >-
+          Are you sure you want to uninstall these plugin and its corresponding
+          configuration?
       uninstall_when_enabled:
         confirm_text: Stop running and uninstall
-        description: The current plugin is still in the enabled state and will be uninstalled after it stops running. This operation cannot be undone.
+        description: >-
+          The current plugin is still in the enabled state and will be
+          uninstalled after it stops running. This operation cannot be undone.
       change_status_in_batch:
         activate_title: Are you sure you want to activate these plugins?
         inactivate_title: Are you sure you want to inactivate these plugins?
@@ -767,7 +838,9 @@ core:
           description: Would you like to activate the currently installed plugin?
         existed_during_installation:
           title: The plugin already exists.
-          description: The currently installed plugin already exists, do you want to upgrade?
+          description: >-
+            The currently installed plugin already exists, do you want to
+            upgrade?
     detail:
       title: Plugin detail
       header:
@@ -783,8 +856,8 @@ core:
         last_starttime: Last Start Time
     loader:
       toast:
-        entry_load_failed: "Failed to load plugins entry file"
-        style_load_failed: "Failed to load plugins stylesheet file"
+        entry_load_failed: Failed to load plugins entry file
+        style_load_failed: Failed to load plugins stylesheet file
     extension_points:
       editor:
         providers:
@@ -796,7 +869,9 @@ core:
       identity_authentication: Identity authentication
     empty:
       title: There are no users that meet the filtering criteria currently.
-      message: There are no users that match the filtering criteria at present. You can try refreshing or creating a new user.
+      message: >-
+        There are no users that match the filtering criteria at present. You can
+        try refreshing or creating a new user.
     operations:
       delete:
         title: Are you sure you want to delete this user?
@@ -854,19 +929,13 @@ core:
       title: User detail
       tabs:
         detail: Detail
-        notification-preferences: Notification Preferences
-        pat: Personal Access Tokens
       actions:
         update_profile:
           title: Update profile
         change_password:
           title: Change password
-      operations:
-        bind:
-          button: Bind
-        unbind:
-          button: Unbind
-          title: "Are you sure you want to unbind the login method for {display_name}?"
+        profile:
+          title: Profile
       fields:
         display_name: Display name
         username: Username
@@ -875,21 +944,107 @@ core:
         bio: Bio
         creation_time: Creation time
         identity_authentication: Identity authentication
-      avatar:
-        title: Avatar
-        toast_upload_failed: Failed to upload avatar
-        toast_remove_failed: Failed to delete avatar
-        cropper_modal:
-          title: Crop Avatar
-        remove:
-          title: Are you sure you want to delete the avatar?
-        tooltips:
-          upload: Upload
-          zoom_in: Zoom In
-          zoom_out: Zoom Out
-          flip_horizontal: Flip Horizontal
-          flip_vertical: Flip Vertical
-          reset: Reset
+  role:
+    title: Roles
+    common:
+      text:
+        contains_all_permissions: Contains all permissions
+        contains_n_permissions: Contains {count} permissions
+        system_reserved: System Reserved
+        custom: Custom
+        dependent_on: Dependent on {roles}
+        provided_by_plugin: Provided by {plugin}
+    operations:
+      delete:
+        title: Are you sure you want to delete this role?
+        description: >-
+          After the role is deleted, the associated users will have their role
+          bindings removed and this operation cannot be undone.
+      create_based_on_this_role:
+        button: Create based on this role
+    detail:
+      title: Role detail
+      header:
+        title: Role information
+      tabs:
+        detail: Detail
+        permissions: Permissions
+      fields:
+        display_name: Display name
+        name: Name
+        type: Type
+        creation_time: Creation time
+    permissions_detail:
+      system_reserved_alert:
+        description: >-
+          The system reserved role does not support modification, it is
+          recommended to create a new role based on this one.
+    editing_modal:
+      titles:
+        create: Create role
+        update: Update role
+      groups:
+        general: General
+        permissions: Permissions
+      fields:
+        display_name: Display name
+        redirect_on_login: Default redirect location after logging in
+  identity_authentication:
+    title: Identity Authentication
+    tabs:
+      detail: Detail
+      setting: Settings
+    operations:
+      enable:
+        title: Are you sure you want to enable this identity authentication method?
+      disable:
+        title: Are you sure you want to disable this identity authentication method?
+      disable_privileged:
+        tooltip: The authentication method reserved by the system cannot be disabled
+    detail:
+      title: Identity authentication detail
+      fields:
+        display_name: Display name
+        description: Description
+        website: Website
+        help_page: Help page
+        authentication_url: Login URL
+  uc_profile:
+    title: Profile
+    tabs:
+      detail: Detail
+      notification-preferences: Notification Preferences
+      pat: Personal Access Tokens
+    actions:
+      update_profile:
+        title: Update profile
+      change_password:
+        title: Change password
+    detail:
+      fields:
+        display_name: Display name
+        username: Username
+        email: Email
+        roles: Roles
+        bio: Bio
+        creation_time: Creation time
+        identity_authentication: Identity authentication
+      operations:
+        bind:
+          button: Bind
+        unbind:
+          button: Unbind
+          title: Are you sure you want to unbind the login method for {display_name}?
+      email_not_set:
+        description: >-
+          Your email address has not been set yet. Click the button below to set
+          it up.
+        title: Set up email
+      email_not_verified:
+        description: >-
+          Your email address has not been verified yet, click the button below
+          to verify it
+        title: Verify email
     pat:
       operations:
         delete:
@@ -911,7 +1066,7 @@ core:
           message: You can try refreshing or creating a new personal access token
         fields:
           expiresAt:
-            dynamic: "Expires on {expiresAt}"
+            dynamic: Expires on {expiresAt}
             forever: Never expires
           status:
             normal: Normal
@@ -933,67 +1088,54 @@ core:
     notification-preferences:
       fields:
         type: Type
-  role:
-    title: Roles
-    common:
-      text:
-        contains_all_permissions: Contains all permissions
-        contains_n_permissions: Contains {count} permissions
-        system_reserved: System Reserved
-        custom: Custom
-        dependent_on: Dependent on {roles}
-        provided_by_plugin: Provided by {plugin}
-    operations:
-      delete:
-        title: Are you sure you want to delete this role?
-        description: After the role is deleted, the associated users will have their role bindings removed and this operation cannot be undone.
-      create_based_on_this_role:
-        button: Create based on this role
-    detail:
-      title: Role detail
-      header:
-        title: Role information
-      tabs:
-        detail: Detail
-        permissions: Permissions
-      fields:
-        display_name: Display name
-        name: Name
-        type: Type
-        creation_time: Creation time
-    permissions_detail:
-      system_reserved_alert:
-        description: The system reserved role does not support modification, it is recommended to create a new role based on this one.
     editing_modal:
-      titles:
-        create: Create role
-        update: Update role
+      title: Edit Profile
       groups:
         general: General
-        permissions: Permissions
+        annotations: Annotations
       fields:
-        display_name: Display name
-  identity_authentication:
-    title: Identity Authentication
-    tabs:
-      detail: Detail
-      setting: Settings
-    operations:
-      enable:
-        title: Are you sure you want to enable this identity authentication method?
-      disable:
-        title: Are you sure you want to disable this identity authentication method?
-      disable_privileged:
-        tooltip: The authentication method reserved by the system cannot be disabled
-    detail:
-      title: Identity authentication detail
+        username:
+          label: Username
+          validation: Please enter a valid username.
+        display_name:
+          label: Display name
+        email:
+          label: Email
+        phone:
+          label: Phone
+        avatar:
+          label: Avatar
+        bio:
+          label: Bio
+    change_password_modal:
+      title: Change password
       fields:
-        display_name: Display name
-        description: Description
-        website: Website
-        help_page: Help page
-        authentication_url: Login URL
-  notification:
+        new_password:
+          label: New password
+        confirm_password:
+          label: Confirm password
+    email_verify_modal:
+      fields:
+        code:
+          label: Verification code
+        email:
+          label: Email address
+        new_email:
+          label: New email address
+      operations:
+        send_code:
+          buttons:
+            countdown: Resend in {timer} seconds
+            send: Send the verification code
+            sending: sending
+          toast_email_empty: Please enter your email address
+          toast_success: Verification code sent
+        verify:
+          toast_success: Verification successful
+      titles:
+        modify: Modify email address
+        verify: Verify email
+  uc_notification:
     title: Notifications
     tabs:
       unread: Unread
@@ -1005,6 +1147,9 @@ core:
     operations:
       mark_as_read:
         button: Mark as read
+      delete:
+        description: Are you sure you want to delete this notification?
+        title: Delete
   setting:
     title: Settings
   actuator:
@@ -1039,7 +1184,10 @@ core:
       database: "Database: {database}"
       os: "Operating system: {os}"
     alert:
-      external_url_invalid: The external access url detected is inconsistent with the current access url, which may cause some links to fail to redirect properly. Please check the external access url settings.
+      external_url_invalid: >-
+        The external access url detected is inconsistent with the current access
+        url, which may cause some links to fail to redirect properly. Please
+        check the external access url settings.
   backup:
     title: Backup and Restore
     tabs:
@@ -1052,14 +1200,19 @@ core:
       create:
         button: Create backup
         title: Create backup
-        description: Are you sure you want to create a backup? This operation may last for a long time.
+        description: >-
+          Are you sure you want to create a backup? This operation may last for
+          a long time.
         toast_success: Requested to create a backup
       delete:
         title: Delete the backup
         description: Are you sure you want to delete the backup?
       restore:
         title: Restore successfully
-        description: After successful restore, you need to restart Halo to load the system resources normally. After clicking OK, we will automatically restart Halo.
+        description: >-
+          After successful restore, you need to restart Halo to load the system
+          resources normally. After clicking OK, we will automatically restart
+          Halo.
       restart:
         toast_success: Requested to restart
       remote_download:
@@ -1077,9 +1230,15 @@ core:
         expiresAt: Expires {expiresAt}
     restore:
       tips:
-        first: 1. The restore process may last for a long time, please do not refresh the page during this period.
-        second: 2. During the restore process, although the existing data will not be cleaned up, if there is a conflict, the data will be overwritten.
-        third: 3. After the restore is completed, you need to restart Halo to load the system resources normally.
+        first: >-
+          1. The restore process may last for a long time, please do not refresh
+          the page during this period.
+        second: >-
+          2. During the restore process, although the existing data will not be
+          cleaned up, if there is a conflict, the data will be overwritten.
+        third: >-
+          3. After the restore is completed, you need to restart Halo to load
+          the system resources normally.
         complete: Restore completed, waiting for restart...
       start: Start restore
       tabs:
@@ -1202,7 +1361,7 @@ core:
       extensions:
         placeholder:
           options:
-            placeholder: "Enter / to select input type."
+            placeholder: Enter / to select input type.
       toolbox:
         attachment: Attachment
         show_hide_sidebar: Show/Hide Sidebar
@@ -1229,18 +1388,35 @@ core:
     social_auth_providers:
       title: Third-party login
     app_download_alert:
-      description: "Themes and plugins for Halo can be downloaded at the following addresses:"
+      description: >-
+        Themes and plugins for Halo can be downloaded at the following
+        addresses:
       sources:
         app_store: "Official App Store: {url}"
         github: "GitHub: {url}"
+    user_avatar:
+      title: Avatar
+      toast_upload_failed: Failed to upload avatar
+      toast_remove_failed: Failed to delete avatar
+      cropper_modal:
+        title: Crop Avatar
+      remove:
+        title: Are you sure you want to delete the avatar?
+      tooltips:
+        upload: Upload
+        zoom_in: Zoom In
+        zoom_out: Zoom Out
+        flip_horizontal: Flip Horizontal
+        flip_vertical: Flip Vertical
+        reset: Reset
   composables:
     content_cache:
       toast_recovered: Recovered unsaved content from cache
   formkit:
     category_select:
-      creation_label: "Create {text} category"
+      creation_label: Create {text} category
     tag_select:
-      creation_label: "Create {text} tag"
+      creation_label: Create {text} tag
     validation:
       trim: Please remove the leading and trailing spaces
   common:
@@ -1278,9 +1454,11 @@ core:
       detail: Detail
       select: Select
       view_all: View all
+      verify: Verify
+      modify: Modify
     radio:
-      "yes": Yes
-      "no": No
+      "yes": "Yes"
+      "no": "No"
     select:
       public: Public
       private: Private
@@ -1302,10 +1480,10 @@ core:
       copy_success: Copied successfully
       operation_failed: Failed to operate
       download_failed: Failed to download
-      save_failed_and_retry: "Failed to save, please retry"
-      publish_failed_and_retry: "Failed to publish, please retry"
-      network_error: "Network error, please check your connection"
-      login_expired: "Login expired, please log in again"
+      save_failed_and_retry: Failed to save, please retry
+      publish_failed_and_retry: Failed to publish, please retry
+      network_error: Network error, please check your connection
+      login_expired: Login expired, please log in again
       forbidden: Access denied
       not_found: Resource not found
       server_internal_error: Internal server error
@@ -1316,7 +1494,9 @@ core:
         warning: Warning
       descriptions:
         cannot_be_recovered: This operation is irreversible.
-        editor_not_found: No editor found that matches the {raw_type} format. Please check if the editor plugin has been installed.
+        editor_not_found: >-
+          No editor found that matches the {raw_type} format. Please check if
+          the editor plugin has been installed.
     filters:
       results:
         keyword: "Keyword: {keyword}"
@@ -1346,3 +1526,15 @@ core:
       recovering: Recovering
     fields:
       post_count: "{count} Posts"
+  uc_post:
+    creation_modal:
+      title: Create post
+    operations:
+      cancel_publish:
+        description: Are you sure you want to cancel publishing?
+        title: Cancel publish
+    publish_modal:
+      title: Publish post
+    setting_modal:
+      title: Post settings
+    title: My posts

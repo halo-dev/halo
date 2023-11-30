@@ -88,7 +88,7 @@ function onSubmit(data: PostFormState) {
   <VModal
     v-if="shouldRender"
     v-model:visible="visible"
-    title="文章设置"
+    :title="$t('core.uc_post.setting_modal.title')"
     :width="700"
     centered
     @close="onClose"

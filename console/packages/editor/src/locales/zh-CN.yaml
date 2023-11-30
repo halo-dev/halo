@@ -26,7 +26,7 @@ editor:
       audio: 音频
       table: 表格
       no_results: 没有搜索结果
-      placeholder: "输入 / 以选择输入类型"
+      placeholder: 输入 / 以选择输入类型
     link:
       add_link: 添加链接
       edit_link: 修改链接
