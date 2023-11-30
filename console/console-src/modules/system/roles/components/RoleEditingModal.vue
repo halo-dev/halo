@@ -163,6 +163,18 @@ const handleResetForm = () => {
               type="text"
               label="登录之后默认跳转位置"
             ></FormKit>
+            <FormKit
+              v-model="
+                formState.metadata.annotations[
+                  rbacAnnotations.DISALLOW_ACCESS_CONSOLE
+                ]
+              "
+              on-value="true"
+              off-value="false"
+              type="checkbox"
+              label="禁止访问 Console"
+              help="勾选之后，该角色将无法访问 Console"
+            ></FormKit>
           </FormKit>
         </div>
       </div>

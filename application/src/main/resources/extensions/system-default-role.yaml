@@ -6,7 +6,9 @@ metadata:
     rbac.authorization.halo.run/system-reserved: "true"
   annotations:
     rbac.authorization.halo.run/display-name: "访客"
-rules: [ ]
+    rbac.authorization.halo.run/disallow-access-console: "true"
+    rbac.authorization.halo.run/redirect-on-login: "/uc"
+rules: []
 
 ---
 apiVersion: v1alpha1
