@@ -4,12 +4,13 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.springframework.util.StringUtils.hasText;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.util.Predicates;
@@ -137,42 +138,31 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
     @SuppressWarnings("unchecked")
     public <E extends Extension> Mono<E> update(E extension) {
         // Refactor the atomic reference if we have a better solution.
-        final var statusChangeOnly = new AtomicBoolean(false);
-        return getLatest(extension)
-            .map(old -> new JsonExtension(objectMapper, old))
-            .flatMap(oldJsonExt -> {
-                var newJsonExt = new JsonExtension(objectMapper, extension);
-                // reset some mandatory fields
-                var oldMetadata = oldJsonExt.getMetadata();
-                var newMetadata = newJsonExt.getMetadata();
-                newMetadata.setCreationTimestamp(oldMetadata.getCreationTimestamp());
-                newMetadata.setGenerateName(oldMetadata.getGenerateName());
+        return getLatest(extension).flatMap(old -> {
+            var oldJsonExt = new JsonExtension(objectMapper, old);
+            var newJsonExt = new JsonExtension(objectMapper, extension);
+            // reset some mandatory fields
+            var oldMetadata = oldJsonExt.getMetadata();
+            var newMetadata = newJsonExt.getMetadata();
+            newMetadata.setCreationTimestamp(oldMetadata.getCreationTimestamp());
+            newMetadata.setGenerateName(oldMetadata.getGenerateName());
 
-                var oldObjectNode = oldJsonExt.getInternal().deepCopy();
-                var newObjectNode = newJsonExt.getInternal().deepCopy();
-                if (Objects.equals(oldObjectNode, newObjectNode)) {
-                    // if no data were changed, just skip updating.
-                    return Mono.empty();
-                }
-                // check status is changed
-                oldObjectNode.remove("status");
-                newObjectNode.remove("status");
-                if (Objects.equals(oldObjectNode, newObjectNode)) {
-                    statusChangeOnly.set(true);
-                }
-                return Mono.just(newJsonExt);
-            })
-            .map(converter::convertTo)
-            .flatMap(extensionStore -> client.update(extensionStore.getName(),
-                extensionStore.getVersion(),
-                extensionStore.getData()))
-            .map(updated -> converter.convertFrom((Class<E>) extension.getClass(), updated))
-            .doOnNext(updated -> {
-                if (!statusChangeOnly.get()) {
-                    watchers.onUpdate(extension, updated);
-                }
-            })
-            .switchIfEmpty(Mono.defer(() -> Mono.just(extension)));
+            if (Objects.equals(oldJsonExt, newJsonExt)) {
+                // skip updating if not data changed.
+                return Mono.just(extension);
+            }
+
+            var onlyStatusChanged =
+                isOnlyStatusChanged(oldJsonExt.getInternal(), newJsonExt.getInternal());
+
+            var store = this.converter.convertTo(newJsonExt);
+            var updated = client.update(store.getName(), store.getVersion(), store.getData())
+                .map(ext -> converter.convertFrom((Class<E>) extension.getClass(), ext));
+            if (!onlyStatusChanged) {
+                updated = updated.doOnNext(ext -> watchers.onUpdate(old, ext));
+            }
+            return updated;
+        });
     }
 
     private Mono<? extends Extension> getLatest(Extension extension) {
@@ -199,4 +189,26 @@ public class ReactiveExtensionClientImpl implements ReactiveExtensionClient {
         this.watchers.addWatcher(watcher);
     }
 
+    private static boolean isOnlyStatusChanged(ObjectNode oldNode, ObjectNode newNode) {
+        if (Objects.equals(oldNode, newNode)) {
+            return false;
+        }
+        // WARNING!!!
+        // Do not edit the ObjectNode
+        var oldFields = new HashSet<String>();
+        var newFields = new HashSet<String>();
+        oldNode.fieldNames().forEachRemaining(oldFields::add);
+        newNode.fieldNames().forEachRemaining(newFields::add);
+        oldFields.remove("status");
+        newFields.remove("status");
+        if (!Objects.equals(oldFields, newFields)) {
+            return false;
+        }
+        for (var field : oldFields) {
+            if (!Objects.equals(oldNode.get(field), newNode.get(field))) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

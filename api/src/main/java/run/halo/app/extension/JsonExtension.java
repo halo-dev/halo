@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -115,6 +116,23 @@ class JsonExtension implements Extension {
         var metadataNode = objectMapper.createObjectNode();
         objectNode.set("metadata", metadataNode);
         return new ObjectNodeMetadata(metadataNode);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        JsonExtension that = (JsonExtension) o;
+        return Objects.equals(objectNode, that.objectNode);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(objectNode);
     }
 
     class ObjectNodeMetadata implements MetadataOperator {
