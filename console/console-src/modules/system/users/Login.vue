@@ -54,25 +54,33 @@ watch(
       <SocialAuthProviders />
       <div
         v-if="globalInfo?.allowRegistration"
-        class="flex justify-center gap-1 pt-3.5 text-xs"
+        class="flex justify-center gap-2 pt-3.5 text-xs"
       >
-        <span class="text-slate-500">
-          {{
-            isLoginType
-              ? $t("core.login.operations.signup.label")
-              : $t("core.login.operations.return_login.label")
-          }}
-        </span>
-        <span
-          class="cursor-pointer text-secondary hover:text-gray-600"
-          @click="handleChangeType"
+        <div class="space-x-0.5">
+          <span class="text-slate-500">
+            {{
+              isLoginType
+                ? $t("core.login.operations.signup.label")
+                : $t("core.login.operations.return_login.label")
+            }},
+          </span>
+          <span
+            class="cursor-pointer text-secondary hover:text-gray-600"
+            @click="handleChangeType"
+          >
+            {{
+              isLoginType
+                ? $t("core.login.operations.signup.button")
+                : $t("core.login.operations.return_login.button")
+            }}
+          </span>
+        </div>
+        <RouterLink
+          :to="{ name: 'ResetPassword' }"
+          class="text-secondary hover:text-gray-600"
         >
-          {{
-            isLoginType
-              ? $t("core.login.operations.signup.button")
-              : $t("core.login.operations.return_login.button")
-          }}
-        </span>
+          找回密码
+        </RouterLink>
       </div>
       <div class="flex justify-center pt-3.5">
         <a
