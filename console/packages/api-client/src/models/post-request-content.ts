@@ -12,29 +12,28 @@
  * Do not edit the class manually.
  */
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { Content } from "./content";
-// May contain unused imports in some cases
-// @ts-ignore
-import { Post } from "./post";
-
 /**
  *
  * @export
- * @interface PostRequest
+ * @interface PostRequestContent
  */
-export interface PostRequest {
+export interface PostRequestContent {
   /**
    *
-   * @type {Content}
-   * @memberof PostRequest
+   * @type {string}
+   * @memberof PostRequestContent
    */
-  content?: Content;
+  content?: string;
   /**
    *
-   * @type {Post}
-   * @memberof PostRequest
+   * @type {string}
+   * @memberof PostRequestContent
    */
-  post: Post;
+  raw?: string;
+  /**
+   *
+   * @type {string}
+   * @memberof PostRequestContent
+   */
+  rawType?: string;
 }

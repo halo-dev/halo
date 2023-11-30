@@ -1203,10 +1203,6 @@ core:
             placeholder: "输入 / 以选择输入类型"
       toolbox:
         attachment: 选择附件
-      upload_attachment:
-        toast:
-          no_available_policy: 目前没有可用的存储策略
-          failed_fetch_permalink: 获取附件永久链接失败：{display_name}
     global_search:
       placeholder: 输入关键词以搜索
       no_results: 没有搜索结果
@@ -1292,7 +1288,7 @@ core:
       delete_success: 删除成功
       save_success: 保存成功
       publish_success: 发布成功
-      cancel_publish_success: 发布成功
+      cancel_publish_success: 取消发布成功
       recovery_success: 恢复成功
       uninstall_success: 卸载成功
       active_success: 启用成功

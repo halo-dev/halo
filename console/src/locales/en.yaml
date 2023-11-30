@@ -1203,10 +1203,6 @@ core:
             placeholder: "Enter / to select input type."
       toolbox:
         attachment: Attachment
-      upload_attachment:
-        toast:
-          no_available_policy: There is currently no available storage policy
-          failed_fetch_permalink: "Failed to get the permalink of the attachment: {display_name}"
     global_search:
       placeholder: Enter keywords to search
       no_results: No search results

@@ -21,6 +21,7 @@ export default definePlugin({
             searchable: true,
             menu: {
               name: "我的",
+              group: "dashboard",
               icon: markRaw(IconAccountCircleLine),
               priority: 0,
               mobile: true,

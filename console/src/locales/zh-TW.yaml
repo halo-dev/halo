@@ -1203,10 +1203,6 @@ core:
             placeholder: "輸入 / 以選擇輸入類型"
       toolbox:
         attachment: 選擇附件
-      upload_attachment:
-        toast:
-          no_available_policy: 目前沒有可用的存儲策略
-          failed_fetch_permalink: 獲取附件永久連結失敗：{display_name}
     global_search:
       placeholder: 輸入關鍵字以搜尋
       no_results: 沒有搜尋結果
@@ -1292,7 +1288,7 @@ core:
       delete_success: 刪除成功
       save_success: 保存成功
       publish_success: 發布成功
-      cancel_publish_success: 發布成功
+      cancel_publish_success: 取消發布成功
       recovery_success: 恢復成功
       uninstall_success: 卸載成功
       active_success: 啟用成功
