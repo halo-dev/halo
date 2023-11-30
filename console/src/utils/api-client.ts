@@ -45,6 +45,9 @@ import {
   NotificationHaloRunV1alpha1NotifierDescriptorApi,
   ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi,
   SecurityHaloRunV1alpha1PersonalAccessTokenApi,
+  UcApiContentHaloRunV1alpha1AttachmentApi,
+  UcApiContentHaloRunV1alpha1PostApi,
+  UcApiContentHaloRunV1alpha1SnapshotApi,
 } from "@halo-dev/api-client";
 import type { AxiosError, AxiosInstance } from "axios";
 import axios from "axios";
@@ -244,6 +247,19 @@ function setupApiClient(axios: AxiosInstance) {
       baseURL,
       axios
     ),
+    uc: {
+      post: new UcApiContentHaloRunV1alpha1PostApi(undefined, baseURL, axios),
+      attachment: new UcApiContentHaloRunV1alpha1AttachmentApi(
+        undefined,
+        baseURL,
+        axios
+      ),
+      snapshot: new UcApiContentHaloRunV1alpha1SnapshotApi(
+        undefined,
+        baseURL,
+        axios
+      ),
+    },
   };
 }
 

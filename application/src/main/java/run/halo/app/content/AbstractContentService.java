@@ -51,9 +51,7 @@ public abstract class AbstractContentService {
 
     protected void checkBaseSnapshot(Snapshot snapshot) {
         Assert.notNull(snapshot, "The snapshot must not be null.");
-        String keepRawAnno =
-            MetadataUtil.nullSafeAnnotations(snapshot).get(Snapshot.KEEP_RAW_ANNO);
-        if (!StringUtils.equals(Boolean.TRUE.toString(), keepRawAnno)) {
+        if (!Snapshot.isBaseSnapshot(snapshot)) {
             throw new IllegalArgumentException(
                 String.format("The snapshot [%s] is not a base snapshot.",
                     snapshot.getMetadata().getName()));
@@ -68,7 +66,7 @@ public abstract class AbstractContentService {
         snapshot.getSpec().setParentSnapshotName(parentSnapshotName);
 
         final String baseSnapshotNameToUse =
-            StringUtils.defaultString(baseSnapshotName, snapshot.getMetadata().getName());
+            StringUtils.defaultIfBlank(baseSnapshotName, snapshot.getMetadata().getName());
         return client.fetch(Snapshot.class, baseSnapshotName)
             .doOnNext(this::checkBaseSnapshot)
             .defaultIfEmpty(snapshot)
@@ -119,7 +117,8 @@ public abstract class AbstractContentService {
             .map(baseSnapshot -> ContentWrapper.patchSnapshot(headSnapshot, baseSnapshot));
     }
 
-    protected Snapshot determineRawAndContentPatch(Snapshot snapshotToUse, Snapshot baseSnapshot,
+    protected Snapshot determineRawAndContentPatch(Snapshot snapshotToUse,
+        Snapshot baseSnapshot,
         ContentRequest contentRequest) {
         Assert.notNull(baseSnapshot, "The baseSnapshot must not be null.");
         Assert.notNull(contentRequest, "The contentRequest must not be null.");
@@ -130,7 +129,7 @@ public abstract class AbstractContentService {
 
         snapshotToUse.getSpec().setLastModifyTime(Instant.now());
         // it is the v1 snapshot, set the content directly
-        if (org.thymeleaf.util.StringUtils.equals(baseSnapshotName,
+        if (StringUtils.equals(baseSnapshotName,
             snapshotToUse.getMetadata().getName())) {
             snapshotToUse.getSpec().setRawPatch(contentRequest.raw());
             snapshotToUse.getSpec().setContentPatch(contentRequest.content());

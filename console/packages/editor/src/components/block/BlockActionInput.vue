@@ -5,9 +5,10 @@ import { VTooltip } from "floating-vue";
 const props = withDefaults(
   defineProps<{
     tooltip?: string;
-    modelValue: string;
+    modelValue?: string;
   }>(),
   {
+    modelValue: "",
     tooltip: undefined,
   }
 );

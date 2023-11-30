@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useEditorExtensionPoints } from "@console/composables/use-editor-extension-points";
+import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
 import type { EditorProvider } from "@halo-dev/console-shared";
 import {
   VAvatar,

@@ -1,0 +1,94 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: post-editor
+  annotations:
+    rbac.authorization.halo.run/module: "Posts Management"
+    rbac.authorization.halo.run/display-name: "Post Editor"
+    rbac.authorization.halo.run/dependencies: |
+      ["role-template-manage-posts", "post-author"]
+rules: [ ]
+
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: post-author
+  annotations:
+    rbac.authorization.halo.run/module: "Posts Management"
+    rbac.authorization.halo.run/display-name: "Post Author"
+    rbac.authorization.halo.run/dependencies: |
+      [ "post-contributor", "post-publisher" ]
+rules: [ ]
+
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: post-contributor
+  annotations:
+    rbac.authorization.halo.run/module: "Posts Management"
+    rbac.authorization.halo.run/display-name: "Post Contributor"
+    rbac.authorization.halo.run/dependencies: |
+      [ "role-template-view-categories", "role-template-view-tags" ]
+    rbac.authorization.halo.run/ui-permissions: |
+      [ "uc:posts:manage" ]
+rules:
+  - apiGroups: [ "uc.api.content.halo.run" ]
+    resources: [ "posts" ]
+    verbs: [ "get", "list", "create", "update", "delete" ]
+  - apiGroups: [ "uc.api.content.halo.run" ]
+    resources: [ "posts/draft" ]
+    verbs: [ "update", "get" ]
+
+---
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: post-publisher
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Posts Management"
+    rbac.authorization.halo.run/display-name: "Post Publisher"
+    rbac.authorization.halo.run/ui-permissions: |
+      [ "uc:posts:publish" ]
+rules:
+  - apiGroups: [ "uc.api.content.halo.run" ]
+    resources: [ "posts/publish", "posts/unpublish" ]
+    verbs: [ "update" ]
+---
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: post-attachment-manager
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Posts Management"
+    rbac.authorization.halo.run/display-name: "Post Attachment Manager"
+    rbac.authorization.halo.run/dependencies: |
+      [ "role-template-post-attachment-viewer" ]
+    rbac.authorization.halo.run/ui-permissions: |
+      [ "uc:attachments:manage" ]
+rules:
+  - apiGroups: [ "uc.api.content.halo.run" ]
+    resources: [ "attachments" ]
+    verbs: [ "create", "update", "delete" ]
+
+---
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: post-attachment-viewer
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Posts Management"
+    rbac.authorization.halo.run/display-name: "Post Attachment Viewer"
+    rbac.authorization.halo.run/ui-permissions: |
+      [ "uc:attachments:view" ]
+rules:
+  - apiGroups: [ "uc.api.content.halo.run" ]
+    resources: [ "attachments" ]
+    verbs: [ "get", "list" ]

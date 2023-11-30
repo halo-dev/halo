@@ -4,7 +4,7 @@ import type { Editor, Node } from "@/tiptap/vue-3";
 import { NodeViewWrapper } from "@/tiptap/vue-3";
 import type { Node as ProseMirrorNode, Decoration } from "@/tiptap/pm";
 import { computed, onMounted, ref } from "vue";
-import { useResizeObserver } from "@vueuse/core";
+import Image from "./index";
 
 const props = defineProps<{
   editor: Editor;
@@ -45,29 +45,55 @@ const href = computed({
     props.updateAttributes({ href: href });
   },
 });
+
 function handleSetFocus() {
   props.editor.commands.setNodeSelection(props.getPos());
 }
 
 const inputRef = ref();
-const resizeRef = ref();
-const init = ref(true);
+const resizeRef = ref<HTMLDivElement>();
 
 onMounted(() => {
   if (!src.value) {
     inputRef.value.focus();
-  } else {
-    useResizeObserver(resizeRef.value, (entries) => {
-      const entry = entries[0];
-      const { height } = entry.contentRect;
-      if (height == 0) {
-        return;
-      }
-      if (!props.selected && !init.value) {
-        handleSetFocus();
-      }
-      init.value = false;
-    });
+    return;
+  }
+
+  if (!resizeRef.value) return;
+
+  let startX: number, startWidth: number;
+
+  resizeRef.value.addEventListener("mousedown", function (e) {
+    startX = e.clientX;
+    startWidth = resizeRef.value?.clientWidth || 1;
+    document.documentElement.addEventListener("mousemove", doDrag, false);
+    document.documentElement.addEventListener("mouseup", stopDrag, false);
+  });
+
+  function doDrag(e: MouseEvent) {
+    if (!resizeRef.value) return;
+
+    const aspectRatio =
+      resizeRef.value.clientWidth / resizeRef.value.clientHeight;
+
+    const newWidth = Math.min(
+      startWidth + e.clientX - startX,
+      resizeRef.value.parentElement?.clientWidth || 0
+    );
+
+    const width = newWidth.toFixed(0) + "px";
+    const height = (newWidth / aspectRatio).toFixed(0) + "px";
+    props.editor
+      .chain()
+      .updateAttributes(Image.name, { width, height })
+      .setNodeSelection(props.editor.state.selection.from)
+      .focus()
+      .run();
+  }
+
+  function stopDrag() {
+    document.documentElement.removeEventListener("mousemove", doDrag, false);
+    document.documentElement.removeEventListener("mouseup", stopDrag, false);
   }
 });
 </script>
@@ -87,7 +113,7 @@ onMounted(() => {
     <div
       v-else
       ref="resizeRef"
-      class="resize-x inline-block overflow-hidden text-center relative rounded-md"
+      class="resize-x inline-block overflow-hidden text-center relative rounded-md max-w-full"
       :class="{
         'ring-2 rounded': selected,
       }"

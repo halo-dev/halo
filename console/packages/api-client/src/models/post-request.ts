@@ -30,7 +30,7 @@ export interface PostRequest {
    * @type {Content}
    * @memberof PostRequest
    */
-  content: Content;
+  content?: Content;
   /**
    *
    * @type {Post}

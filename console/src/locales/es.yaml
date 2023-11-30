@@ -1133,10 +1133,6 @@ core:
             placeholder: "Ingresa / para seleccionar el tipo de entrada."
       toolbox:
         attachment: Adjunto
-      upload_attachment:
-        toast:
-          no_available_policy: Actualmente no hay una política de almacenamiento disponible
-          failed_fetch_permalink: "Error al obtener el enlace permanente del adjunto: {display_name}"
     global_search:
       placeholder: Ingresa palabras clave para buscar
       no_results: Sin resultados de búsqueda

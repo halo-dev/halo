@@ -3,17 +3,20 @@ package run.halo.app.content;
 import static java.util.Comparator.comparing;
 import static run.halo.app.extension.router.selector.SelectorUtil.labelAndFieldSelectorToPredicate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.lang.Nullable;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.server.ServerWebExchange;
 import run.halo.app.core.extension.content.Post;
@@ -31,9 +34,22 @@ public class PostQuery extends IListRequest.QueryListRequest {
 
     private final ServerWebExchange exchange;
 
+    private final String username;
+
     public PostQuery(ServerRequest request) {
+        this(request, null);
+    }
+
+    public PostQuery(ServerRequest request, @Nullable String username) {
         super(request.queryParams());
         this.exchange = request.exchange();
+        this.username = username;
+    }
+
+    @Schema(hidden = true)
+    @JsonIgnore
+    public String getUsername() {
+        return username;
     }
 
     @Nullable
@@ -131,14 +147,27 @@ public class PostQuery extends IListRequest.QueryListRequest {
      * @return a predicate
      */
     public Predicate<Post> toPredicate() {
-        Predicate<Post> paramPredicate = post ->
-            contains(getCategories(), post.getSpec().getCategories())
-                && contains(getTags(), post.getSpec().getTags())
-                && contains(getContributors(), post.getStatusOrDefault().getContributors());
+        Predicate<Post> predicate = labelAndFieldSelectorToPredicate(getLabelSelector(),
+            getFieldSelector());
+
+        if (!CollectionUtils.isEmpty(getCategories())) {
+            predicate =
+                predicate.and(post -> contains(getCategories(), post.getSpec().getCategories()));
+        }
+        if (!CollectionUtils.isEmpty(getTags())) {
+            predicate = predicate.and(post -> contains(getTags(), post.getSpec().getTags()));
+        }
+        if (!CollectionUtils.isEmpty(getContributors())) {
+            Predicate<Post> hasStatus = post -> post.getStatus() != null;
+            var containsContributors = hasStatus.and(
+                post -> contains(getContributors(), post.getStatus().getContributors())
+            );
+            predicate = predicate.and(containsContributors);
+        }
 
         String keyword = getKeyword();
         if (keyword != null) {
-            paramPredicate = paramPredicate.and(post -> {
+            predicate = predicate.and(post -> {
                 String excerpt = post.getStatusOrDefault().getExcerpt();
                 return StringUtils.containsIgnoreCase(excerpt, keyword)
                     || StringUtils.containsIgnoreCase(post.getSpec().getSlug(), keyword)
@@ -148,7 +177,7 @@ public class PostQuery extends IListRequest.QueryListRequest {
 
         Post.PostPhase publishPhase = getPublishPhase();
         if (publishPhase != null) {
-            paramPredicate = paramPredicate.and(post -> {
+            predicate = predicate.and(post -> {
                 if (Post.PostPhase.PENDING_APPROVAL.equals(publishPhase)) {
                     return !post.isPublished()
                         && Post.PostPhase.PENDING_APPROVAL.name()
@@ -165,13 +194,15 @@ public class PostQuery extends IListRequest.QueryListRequest {
 
         Post.VisibleEnum visible = getVisible();
         if (visible != null) {
-            paramPredicate =
-                paramPredicate.and(post -> visible.equals(post.getSpec().getVisible()));
+            predicate =
+                predicate.and(post -> visible.equals(post.getSpec().getVisible()));
         }
 
-        Predicate<Post> predicate = labelAndFieldSelectorToPredicate(getLabelSelector(),
-            getFieldSelector());
-        return predicate.and(paramPredicate);
+        if (StringUtils.isNotBlank(username)) {
+            Predicate<Post> isOwner = post -> Objects.equals(username, post.getSpec().getOwner());
+            predicate = predicate.and(isOwner);
+        }
+        return predicate;
     }
 
     boolean contains(Collection<String> left, List<String> right) {

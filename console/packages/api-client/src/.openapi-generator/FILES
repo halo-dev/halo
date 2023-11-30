@@ -59,6 +59,9 @@ api/storage-halo-run-v1alpha1-group-api.ts
 api/storage-halo-run-v1alpha1-policy-api.ts
 api/storage-halo-run-v1alpha1-policy-template-api.ts
 api/theme-halo-run-v1alpha1-theme-api.ts
+api/uc-api-content-halo-run-v1alpha1-attachment-api.ts
+api/uc-api-content-halo-run-v1alpha1-post-api.ts
+api/uc-api-content-halo-run-v1alpha1-snapshot-api.ts
 api/v1alpha1-annotation-setting-api.ts
 api/v1alpha1-cache-api.ts
 api/v1alpha1-config-map-api.ts

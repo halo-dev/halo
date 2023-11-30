@@ -24,6 +24,26 @@ import run.halo.app.core.extension.content.Post;
 class PostQueryTest {
 
     @Test
+    void userScopedQueryTest() {
+        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+        MockServerRequest request = MockServerRequest.builder()
+            .queryParams(multiValueMap)
+            .exchange(mock(ServerWebExchange.class))
+            .build();
+
+        PostQuery postQuery = new PostQuery(request, "faker");
+        var spec = new Post.PostSpec();
+        var post = new Post();
+        post.setSpec(spec);
+
+        spec.setOwner("another-faker");
+        assertThat(postQuery.toPredicate().test(post)).isFalse();
+
+        spec.setOwner("faker");
+        assertThat(postQuery.toPredicate().test(post)).isTrue();
+    }
+
+    @Test
     void toPredicate() {
         MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.put("category", List.of("category1", "category2"));

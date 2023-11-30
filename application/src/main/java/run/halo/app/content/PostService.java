@@ -1,5 +1,6 @@
 package run.halo.app.content;
 
+import org.springframework.lang.NonNull;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ListResult;
@@ -18,9 +19,28 @@ public interface PostService {
 
     Mono<Post> updatePost(PostRequest postRequest);
 
+    Mono<Post> updateBy(@NonNull Post post);
+
     Mono<ContentWrapper> getHeadContent(String postName);
+
+    Mono<ContentWrapper> getHeadContent(Post post);
 
     Mono<ContentWrapper> getReleaseContent(String postName);
 
+    Mono<ContentWrapper> getReleaseContent(Post post);
+
     Mono<ContentWrapper> getContent(String snapshotName, String baseSnapshotName);
+
+    Mono<Post> publish(Post post);
+
+    Mono<Post> unpublish(Post post);
+
+    /**
+     * Get post by username.
+     *
+     * @param postName is post name.
+     * @param username is username.
+     * @return full post data or empty.
+     */
+    Mono<Post> getByUsername(String postName, String username);
 }

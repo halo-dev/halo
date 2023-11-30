@@ -53,7 +53,7 @@ onMounted(() => {
 <template>
   <node-view-wrapper as="div" class="inline-block w-full">
     <div
-      class="inline-block overflow-hidden transition-all text-center relative h-full"
+      class="inline-block overflow-hidden transition-all text-center relative h-full max-w-full"
       :style="{
         width: node.attrs.width,
       }"

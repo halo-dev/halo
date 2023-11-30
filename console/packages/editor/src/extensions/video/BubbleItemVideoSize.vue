@@ -6,7 +6,7 @@ import Video from "./index";
 import { i18n } from "@/locales";
 const props = defineProps<{
   editor: Editor;
-  isActive: ({ editor }: { editor: Editor }) => boolean;
+  isActive?: ({ editor }: { editor: Editor }) => boolean;
   visible?: ({ editor }: { editor: Editor }) => boolean;
   icon?: Component;
   title?: string;

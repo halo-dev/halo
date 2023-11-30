@@ -2,8 +2,10 @@ package run.halo.app.core.extension.service;
 
 import java.net.URI;
 import java.time.Duration;
+import java.util.function.Consumer;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
@@ -17,6 +19,25 @@ import run.halo.app.core.extension.attachment.Attachment;
  * @since 2.5.0
  */
 public interface AttachmentService {
+
+    /**
+     * Uploads the given attachment to specific storage using handlers in plugins.
+     * <p>
+     * If no handler can be found to upload the given attachment, ServerError exception will be
+     * thrown.
+     *
+     * @param policyName is attachment policy name.
+     * @param groupName is group name the attachment belongs.
+     * @param filePart contains filename, content and media type.
+     * @param beforeCreating is an attachment modifier before creating.
+     * @return attachment.
+     */
+    Mono<Attachment> upload(
+        @NonNull String username,
+        @NonNull String policyName,
+        @Nullable String groupName,
+        @NonNull FilePart filePart,
+        @Nullable Consumer<Attachment> beforeCreating);
 
     /**
      * Uploads the given attachment to specific storage using handlers in plugins. Please note

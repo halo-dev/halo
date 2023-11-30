@@ -8,6 +8,7 @@ import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
@@ -185,6 +186,9 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
             )
             .flatMap(client::create)
             .flatMap(post -> {
+                if (postRequest.content() == null) {
+                    return Mono.just(post);
+                }
                 var contentRequest =
                     new ContentRequest(Ref.of(post), post.getSpec().getHeadSnapshot(),
                         postRequest.content().raw(), postRequest.content().content(),
@@ -249,20 +253,58 @@ public class PostServiceImpl extends AbstractContentService implements PostServi
     }
 
     @Override
+    public Mono<Post> updateBy(@NonNull Post post) {
+        return client.update(post);
+    }
+
+    @Override
     public Mono<ContentWrapper> getHeadContent(String postName) {
         return client.get(Post.class, postName)
-            .flatMap(post -> {
-                String headSnapshot = post.getSpec().getHeadSnapshot();
-                return getContent(headSnapshot, post.getSpec().getBaseSnapshot());
-            });
+            .flatMap(this::getHeadContent);
+    }
+
+    @Override
+    public Mono<ContentWrapper> getHeadContent(Post post) {
+        var headSnapshot = post.getSpec().getHeadSnapshot();
+        return getContent(headSnapshot, post.getSpec().getBaseSnapshot());
     }
 
     @Override
     public Mono<ContentWrapper> getReleaseContent(String postName) {
         return client.get(Post.class, postName)
-            .flatMap(post -> {
-                String releaseSnapshot = post.getSpec().getReleaseSnapshot();
-                return getContent(releaseSnapshot, post.getSpec().getBaseSnapshot());
-            });
+            .flatMap(this::getReleaseContent);
+    }
+
+    @Override
+    public Mono<ContentWrapper> getReleaseContent(Post post) {
+        var releaseSnapshot = post.getSpec().getReleaseSnapshot();
+        return getContent(releaseSnapshot, post.getSpec().getBaseSnapshot());
+    }
+
+    @Override
+    public Mono<Post> publish(Post post) {
+        return Mono.just(post)
+            .doOnNext(p -> {
+                var spec = post.getSpec();
+                spec.setPublish(true);
+                if (spec.getHeadSnapshot() == null) {
+                    spec.setHeadSnapshot(spec.getBaseSnapshot());
+                }
+                spec.setReleaseSnapshot(spec.getHeadSnapshot());
+            }).flatMap(client::update);
+    }
+
+    @Override
+    public Mono<Post> unpublish(Post post) {
+        return Mono.just(post)
+            .doOnNext(p -> p.getSpec().setPublish(false))
+            .flatMap(client::update);
+    }
+
+    @Override
+    public Mono<Post> getByUsername(String postName, String username) {
+        return client.get(Post.class, postName)
+            .filter(post -> post.getSpec() != null)
+            .filter(post -> Objects.equals(username, post.getSpec().getOwner()));
     }
 }
