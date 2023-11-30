@@ -1176,6 +1176,8 @@ core:
     Migration Manage: Backup and Restore Manage
     role-template-view-users: User View
     role-template-change-password: Change Password
+    Actuator Management: System Information
+    Actuator Manage: Access System Information
   components:
     submit_button:
       computed_text: "{text} ({shortcut})"

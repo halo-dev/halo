@@ -1176,6 +1176,8 @@ core:
     Migration Manage: 备份与恢复管理
     role-template-view-users: 用户查看
     role-template-change-password: 修改密码
+    Actuator Management: 系统指标
+    Actuator Manage: 访问系统指标
   components:
     submit_button:
       computed_text: "{text}（{shortcut}）"
