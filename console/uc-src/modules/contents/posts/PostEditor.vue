@@ -32,6 +32,7 @@ import PostSettingEditModal from "./components/PostSettingEditModal.vue";
 import HasPermission from "@/components/permission/HasPermission.vue";
 import { provide } from "vue";
 import type { ComputedRef } from "vue";
+import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -350,6 +351,9 @@ async function handleUploadImage(file: File) {
   });
   return data;
 }
+
+// Keep session alive
+useSessionKeepAlive();
 </script>
 
 <template>
