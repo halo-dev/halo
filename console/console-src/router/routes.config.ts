@@ -50,7 +50,7 @@ export const routes: Array<RouteRecordRaw> = [
     name: "ResetPassword",
     component: ResetPassword,
     meta: {
-      title: "重置密码",
+      title: "core.reset_password.title",
     },
   },
 ];

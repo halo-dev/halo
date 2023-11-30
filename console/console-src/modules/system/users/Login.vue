@@ -52,11 +52,8 @@ watch(
       <SignupForm v-if="type === 'signup'" @succeed="onSignupSucceed" />
       <LoginForm v-else @succeed="onLoginSucceed" />
       <SocialAuthProviders />
-      <div
-        v-if="globalInfo?.allowRegistration"
-        class="flex justify-center gap-2 pt-3.5 text-xs"
-      >
-        <div class="space-x-0.5">
+      <div class="flex justify-center gap-2 pt-3.5 text-xs">
+        <div v-if="globalInfo?.allowRegistration" class="space-x-0.5">
           <span class="text-slate-500">
             {{
               isLoginType
@@ -79,7 +76,7 @@ watch(
           :to="{ name: 'ResetPassword' }"
           class="text-secondary hover:text-gray-600"
         >
-          找回密码
+          {{ $t("core.login.operations.reset_password.button") }}
         </RouterLink>
       </div>
       <div class="flex justify-center pt-3.5">

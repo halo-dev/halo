@@ -2,7 +2,10 @@
 import { apiClient } from "@/utils/api-client";
 import { Toast, VButton } from "@halo-dev/components";
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
+
+const { t } = useI18n();
 
 interface ResetPasswordForm {
   email: string;
@@ -21,9 +24,7 @@ async function onSubmit(data: ResetPasswordForm) {
       },
     });
 
-    Toast.success(
-      "如果你的用户名和邮箱地址匹配，我们将会发送一封邮件到你的邮箱。"
-    );
+    Toast.success(t("core.reset_password.operations.send.toast_success"));
   } catch (error) {
     console.error("Failed to send password reset email", error);
   } finally {
@@ -54,8 +55,8 @@ const inputClasses = {
         <FormKit
           :classes="inputClasses"
           name="username"
-          placeholder="用户名"
-          validation-label="用户名"
+          :placeholder="$t('core.reset_password.fields.username.label')"
+          :validation-label="$t('core.reset_password.fields.username.label')"
           :autofocus="true"
           type="text"
           validation="required"
@@ -63,8 +64,8 @@ const inputClasses = {
         <FormKit
           :classes="inputClasses"
           name="email"
-          placeholder="邮箱地址"
-          validation-label="邮箱地址"
+          :placeholder="$t('core.reset_password.fields.email.label')"
+          :validation-label="$t('core.reset_password.fields.email.label')"
           :autofocus="true"
           type="text"
           validation="required"
@@ -77,7 +78,7 @@ const inputClasses = {
         type="secondary"
         @click="$formkit.submit('reset-password-form')"
       >
-        发送验证邮件
+        {{ $t("core.reset_password.operations.send.label") }}
       </VButton>
     </div>
   </div>

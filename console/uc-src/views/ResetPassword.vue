@@ -3,7 +3,10 @@ import { apiClient } from "@/utils/api-client";
 import { Toast, VButton } from "@halo-dev/components";
 import { useRouteParams, useRouteQuery } from "@vueuse/router";
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
+
+const { t } = useI18n();
 
 const username = useRouteParams<string>("username");
 const token = useRouteQuery<string>("reset_password_token");
@@ -27,7 +30,7 @@ async function onSubmit(data: ResetPasswordForm) {
       },
     });
 
-    Toast.success("重置成功");
+    Toast.success(t("core.uc_reset_password.operations.reset.toast_success"));
 
     window.location.href = "/console/login";
   } catch (error) {
@@ -61,8 +64,8 @@ const inputClasses = {
           :classes="inputClasses"
           name="username"
           :model-value="username"
-          placeholder="用户名"
-          validation-label="用户名"
+          :placeholder="$t('core.uc_reset_password.fields.username.label')"
+          :validation-label="$t('core.uc_reset_password.fields.username.label')"
           :autofocus="true"
           type="text"
           disabled
@@ -72,8 +75,8 @@ const inputClasses = {
           :classes="inputClasses"
           name="password"
           type="password"
-          placeholder="新密码"
-          validation-label="新密码"
+          :placeholder="$t('core.uc_reset_password.fields.password.label')"
+          :validation-label="$t('core.uc_reset_password.fields.password.label')"
           validation="required:trim|length:5,100|matches:/^\S.*\S$/"
           :validation-messages="{
             matches: $t('core.formkit.validation.trim'),
@@ -83,8 +86,12 @@ const inputClasses = {
           :classes="inputClasses"
           name="password_confirm"
           type="password"
-          placeholder="确认密码"
-          validation-label="确认密码"
+          :placeholder="
+            $t('core.uc_reset_password.fields.password_confirm.label')
+          "
+          :validation-label="
+            $t('core.uc_reset_password.fields.password_confirm.label')
+          "
           validation="confirm|required:trim|length:5,100|matches:/^\S.*\S$/"
           :validation-messages="{
             matches: $t('core.formkit.validation.trim'),
@@ -98,7 +105,7 @@ const inputClasses = {
         type="secondary"
         @click="$formkit.submit('reset-password-form')"
       >
-        重置密码
+        {{ $t("core.uc_reset_password.operations.reset.button") }}
       </VButton>
     </div>
   </div>

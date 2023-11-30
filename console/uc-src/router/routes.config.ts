@@ -26,7 +26,7 @@ export const routes: Array<RouteRecordRaw> = [
     component: ResetPassword,
     name: "ResetPassword",
     meta: {
-      title: "重置密码",
+      title: "core.uc_reset_password.title",
     },
   },
 ];

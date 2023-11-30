@@ -18,6 +18,8 @@ core:
         label: 已有账号
         button: 立即登录
       return_site: 返回到首页
+      reset_password:
+        button: 找回密码
     button: 登录
     modal:
       title: 重新登录
@@ -1204,6 +1206,30 @@ core:
         label: 密码
       confirm_password:
         label: 确认密码
+  reset_password:
+    title: 重置密码
+    fields:
+      username:
+        label: 用户名
+      email:
+        label: 邮箱地址
+    operations:
+      send:
+        label: 发送验证邮件
+        toast_success: 如果你的用户名和邮箱地址匹配，我们将会发送一封邮件到你的邮箱。
+  uc_reset_password:
+    title: 重置密码
+    fields:
+      username:
+        label: 用户名
+      password:
+        label: 新密码
+      password_confirm:
+        label: 确认密码
+    operations:
+      reset:
+        button: 重置密码
+        toast_success: 重置成功
   rbac:
     Attachments Management: 附件
     Attachment Manage: 附件管理
