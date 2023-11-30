@@ -5,6 +5,7 @@ metadata:
   annotations:
     rbac.authorization.halo.run/module: "Posts Management"
     rbac.authorization.halo.run/display-name: "Post Editor"
+    rbac.authorization.halo.run/redirect-on-login: "/uc"
     rbac.authorization.halo.run/dependencies: |
       ["role-template-manage-posts", "post-author"]
 rules: [ ]
@@ -17,6 +18,8 @@ metadata:
   annotations:
     rbac.authorization.halo.run/module: "Posts Management"
     rbac.authorization.halo.run/display-name: "Post Author"
+    rbac.authorization.halo.run/disallow-access-console: "true"
+    rbac.authorization.halo.run/redirect-on-login: "/uc"
     rbac.authorization.halo.run/dependencies: |
       [ "post-contributor", "post-publisher" ]
 rules: [ ]
@@ -29,6 +32,8 @@ metadata:
   annotations:
     rbac.authorization.halo.run/module: "Posts Management"
     rbac.authorization.halo.run/display-name: "Post Contributor"
+    rbac.authorization.halo.run/disallow-access-console: "true"
+    rbac.authorization.halo.run/redirect-on-login: "/uc"
     rbac.authorization.halo.run/dependencies: |
       [ "role-template-view-categories", "role-template-view-tags" ]
     rbac.authorization.halo.run/ui-permissions: |
