@@ -23,6 +23,7 @@ import org.springframework.web.server.ServerErrorException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.content.Content;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.ListedPost;
 import run.halo.app.content.PostQuery;
@@ -132,7 +133,7 @@ public class PostEndpoint implements CustomEndpoint {
                         .content(contentBuilder()
                             .mediaType(MediaType.APPLICATION_JSON_VALUE)
                             .schema(Builder.schemaBuilder()
-                                .implementation(PostRequest.Content.class))
+                                .implementation(Content.class))
                         ))
                     .response(responseBuilder()
                         .implementation(Post.class))
@@ -191,7 +192,7 @@ public class PostEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> updateContent(ServerRequest request) {
         String postName = request.pathVariable("name");
-        return request.bodyToMono(PostRequest.Content.class)
+        return request.bodyToMono(Content.class)
             .flatMap(content -> client.fetch(Post.class, postName)
                 .flatMap(post -> {
                     PostRequest postRequest = new PostRequest(post, content);

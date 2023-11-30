@@ -17,10 +17,8 @@ public record SinglePageRequest(@Schema(requiredMode = REQUIRED) SinglePage page
 
     public ContentRequest contentRequest() {
         Ref subjectRef = Ref.of(page);
-        return new ContentRequest(subjectRef, page.getSpec().getHeadSnapshot(), content.raw,
-            content.content, content.rawType);
+        return new ContentRequest(subjectRef, page.getSpec().getHeadSnapshot(), content.raw(),
+            content.content(), content.rawType());
     }
 
-    public record Content(String raw, String content, String rawType) {
-    }
 }

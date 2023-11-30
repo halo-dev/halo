@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
  * @param content is binary data of the attachment file.
  * @param mediaType is media type of the attachment file.
  */
-record SimpleFilePart(
+public record SimpleFilePart(
     String filename,
     Flux<DataBuffer> content,
     MediaType mediaType

@@ -76,6 +76,15 @@ public class SwaggerConfig {
     }
 
     @Bean
+    GroupedOpenApi userCenterApi() {
+        return GroupedOpenApi.builder()
+            .group("uc.api")
+            .displayName("User center APIs.")
+            .pathsToMatch("/apis/uc.api.*/**")
+            .build();
+    }
+
+    @Bean
     GroupedOpenApi allApi() {
         return GroupedOpenApi.builder()
             .group("all-api")

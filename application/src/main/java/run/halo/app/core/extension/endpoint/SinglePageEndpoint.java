@@ -21,6 +21,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import org.thymeleaf.util.StringUtils;
 import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
+import run.halo.app.content.Content;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.ListedSinglePage;
 import run.halo.app.content.SinglePageQuery;
@@ -130,7 +131,7 @@ public class SinglePageEndpoint implements CustomEndpoint {
                         .content(contentBuilder()
                             .mediaType(MediaType.APPLICATION_JSON_VALUE)
                             .schema(Builder.schemaBuilder()
-                                .implementation(SinglePageRequest.Content.class))
+                                .implementation(Content.class))
                         ))
                     .response(responseBuilder()
                         .implementation(Post.class))
@@ -169,7 +170,7 @@ public class SinglePageEndpoint implements CustomEndpoint {
 
     Mono<ServerResponse> updateContent(ServerRequest request) {
         String pageName = request.pathVariable("name");
-        return request.bodyToMono(SinglePageRequest.Content.class)
+        return request.bodyToMono(Content.class)
             .flatMap(content -> client.fetch(SinglePage.class, pageName)
                 .flatMap(page -> {
                     SinglePageRequest pageRequest = new SinglePageRequest(page, content);

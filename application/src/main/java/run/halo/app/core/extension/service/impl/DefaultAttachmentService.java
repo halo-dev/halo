@@ -2,10 +2,12 @@ package run.halo.app.core.extension.service.impl;
 
 import java.net.URI;
 import java.time.Duration;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
@@ -22,6 +24,7 @@ import run.halo.app.core.extension.attachment.Attachment;
 import run.halo.app.core.extension.attachment.Policy;
 import run.halo.app.core.extension.attachment.endpoint.AttachmentHandler;
 import run.halo.app.core.extension.attachment.endpoint.DeleteOption;
+import run.halo.app.core.extension.attachment.endpoint.SimpleFilePart;
 import run.halo.app.core.extension.attachment.endpoint.UploadOption;
 import run.halo.app.core.extension.service.AttachmentService;
 import run.halo.app.extension.ConfigMap;
@@ -42,12 +45,13 @@ public class DefaultAttachmentService implements AttachmentService {
     }
 
     @Override
-    public Mono<Attachment> upload(@NonNull String policyName,
+    public Mono<Attachment> upload(
+        @NonNull String username,
+        @NonNull String policyName,
         @Nullable String groupName,
-        @NonNull String filename,
-        @NonNull Flux<DataBuffer> content,
-        @Nullable MediaType mediaType) {
-        return authenticationConsumer(authentication -> client.get(Policy.class, policyName)
+        @NonNull FilePart filePart,
+        @Nullable Consumer<Attachment> beforeCreating) {
+        return client.get(Policy.class, policyName)
             .flatMap(policy -> {
                 var configMapName = policy.getSpec().getConfigMapName();
                 if (!StringUtils.hasText(configMapName)) {
@@ -55,11 +59,7 @@ public class DefaultAttachmentService implements AttachmentService {
                         "ConfigMap name not found in Policy " + policyName));
                 }
                 return client.get(ConfigMap.class, configMapName)
-                    .map(configMap -> UploadOption.from(filename,
-                        content,
-                        mediaType,
-                        policy,
-                        configMap));
+                    .map(configMap -> new UploadOption(filePart, policy, configMap));
             })
             .flatMap(uploadContext -> {
                 var handlers = extensionComponentsFinder.getExtensions(AttachmentHandler.class);
@@ -75,13 +75,29 @@ public class DefaultAttachmentService implements AttachmentService {
                     spec = new Attachment.AttachmentSpec();
                     attachment.setSpec(spec);
                 }
-                spec.setOwnerName(authentication.getName());
+                spec.setOwnerName(username);
                 if (StringUtils.hasText(groupName)) {
                     spec.setGroupName(groupName);
                 }
                 spec.setPolicyName(policyName);
             })
-            .flatMap(client::create));
+            .doOnNext(attachment -> {
+                if (beforeCreating != null) {
+                    beforeCreating.accept(attachment);
+                }
+            })
+            .flatMap(client::create);
+    }
+
+    @Override
+    public Mono<Attachment> upload(@NonNull String policyName,
+        @Nullable String groupName,
+        @NonNull String filename,
+        @NonNull Flux<DataBuffer> content,
+        @Nullable MediaType mediaType) {
+        var file = new SimpleFilePart(filename, content, mediaType);
+        return authenticationConsumer(
+            authentication -> upload(authentication.getName(), policyName, groupName, file, null));
     }
 
     @Override
