@@ -4,7 +4,7 @@ metadata:
   name: post-editor
   annotations:
     rbac.authorization.halo.run/module: "Posts Management"
-    rbac.authorization.halo.run/display-name: "Post Editor"
+    rbac.authorization.halo.run/display-name: "编辑者"
     rbac.authorization.halo.run/dependencies: |
       ["role-template-manage-posts", "post-author"]
 rules: [ ]
@@ -16,7 +16,7 @@ metadata:
   name: post-author
   annotations:
     rbac.authorization.halo.run/module: "Posts Management"
-    rbac.authorization.halo.run/display-name: "Post Author"
+    rbac.authorization.halo.run/display-name: "作者"
     rbac.authorization.halo.run/dependencies: |
       [ "post-contributor", "post-publisher" ]
 rules: [ ]
@@ -28,7 +28,7 @@ metadata:
   name: post-contributor
   annotations:
     rbac.authorization.halo.run/module: "Posts Management"
-    rbac.authorization.halo.run/display-name: "Post Contributor"
+    rbac.authorization.halo.run/display-name: "投稿者"
     rbac.authorization.halo.run/dependencies: |
       [ "role-template-view-categories", "role-template-view-tags" ]
     rbac.authorization.halo.run/ui-permissions: |
@@ -75,20 +75,3 @@ rules:
   - apiGroups: [ "uc.api.content.halo.run" ]
     resources: [ "attachments" ]
     verbs: [ "create", "update", "delete" ]
-
----
-apiVersion: v1alpha1
-kind: Role
-metadata:
-  name: post-attachment-viewer
-  labels:
-    halo.run/role-template: "true"
-  annotations:
-    rbac.authorization.halo.run/module: "Posts Management"
-    rbac.authorization.halo.run/display-name: "Post Attachment Viewer"
-    rbac.authorization.halo.run/ui-permissions: |
-      [ "uc:attachments:view" ]
-rules:
-  - apiGroups: [ "uc.api.content.halo.run" ]
-    resources: [ "attachments" ]
-    verbs: [ "get", "list" ]
