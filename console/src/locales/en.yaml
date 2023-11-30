@@ -1176,6 +1176,8 @@ core:
     Migration Manage: Backup and Restore Manage
     role-template-view-users: User View
     role-template-change-password: Change Password
+    Actuator Management: System Information
+    Actuator Manage: Access System Information
   components:
     submit_button:
       computed_text: "{text} ({shortcut})"
@@ -1204,10 +1206,6 @@ core:
       toolbox:
         attachment: Attachment
         show_hide_sidebar: Show/Hide Sidebar
-      upload_attachment:
-        toast:
-          no_available_policy: There is currently no available storage policy
-          failed_fetch_permalink: "Failed to get the permalink of the attachment: {display_name}"
     global_search:
       placeholder: Enter keywords to search
       no_results: No search results

@@ -19,6 +19,7 @@ export default definePlugin({
             searchable: true,
             menu: {
               name: "消息",
+              group: "dashboard",
               icon: markRaw(IconNotificationBadgeLine),
               priority: 1,
               mobile: true,

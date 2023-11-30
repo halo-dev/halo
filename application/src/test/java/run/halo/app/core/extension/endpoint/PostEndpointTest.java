@@ -18,6 +18,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
+import run.halo.app.content.Content;
 import run.halo.app.content.PostRequest;
 import run.halo.app.content.PostService;
 import run.halo.app.content.TestPost;
@@ -176,6 +177,6 @@ class PostEndpointTest {
     }
 
     PostRequest postRequest(Post post) {
-        return new PostRequest(post, new PostRequest.Content("B", "<p>B</p>", "MARKDOWN"));
+        return new PostRequest(post, new Content("B", "<p>B</p>", "MARKDOWN"));
     }
 }

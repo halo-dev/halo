@@ -181,7 +181,6 @@ export * from "./site-stats-vo";
 export * from "./snap-shot-spec";
 export * from "./snapshot";
 export * from "./snapshot-list";
-export * from "./spec";
 export * from "./stats";
 export * from "./stats-vo";
 export * from "./subject";

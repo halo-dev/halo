@@ -1,4 +1,4 @@
-package run.halo.app.theme.router;
+package run.halo.app.theme;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -24,11 +24,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import run.halo.app.theme.ThemeContext;
-import run.halo.app.theme.ThemeResolver;
 
 /**
- * Tests for {@link ViewNameResolver}.
+ * Tests for {@link DefaultViewNameResolver}.
  *
  * @author guqing
  * @since 2.0.0
@@ -43,7 +41,7 @@ class ViewNameResolverTest {
     private ThymeleafProperties thymeleafProperties;
 
     @InjectMocks
-    private ViewNameResolver viewNameResolver;
+    private DefaultViewNameResolver viewNameResolver;
 
     @TempDir
     private File themePath;
