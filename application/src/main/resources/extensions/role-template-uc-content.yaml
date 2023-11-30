@@ -4,6 +4,7 @@ metadata:
   name: post-editor
   annotations:
     rbac.authorization.halo.run/module: "Posts Management"
+    # Currently, yaml definition does not support i18n, please see https://github.com/halo-dev/halo/issues/3573
     rbac.authorization.halo.run/display-name: "编辑者"
     rbac.authorization.halo.run/dependencies: |
       ["role-template-manage-posts", "post-author"]
@@ -16,6 +17,7 @@ metadata:
   name: post-author
   annotations:
     rbac.authorization.halo.run/module: "Posts Management"
+    # Currently, yaml definition does not support i18n, please see https://github.com/halo-dev/halo/issues/3573
     rbac.authorization.halo.run/display-name: "作者"
     rbac.authorization.halo.run/dependencies: |
       [ "post-contributor", "post-publisher" ]
@@ -28,6 +30,7 @@ metadata:
   name: post-contributor
   annotations:
     rbac.authorization.halo.run/module: "Posts Management"
+    # Currently, yaml definition does not support i18n, please see https://github.com/halo-dev/halo/issues/3573
     rbac.authorization.halo.run/display-name: "投稿者"
     rbac.authorization.halo.run/dependencies: |
       [ "role-template-view-categories", "role-template-view-tags" ]
