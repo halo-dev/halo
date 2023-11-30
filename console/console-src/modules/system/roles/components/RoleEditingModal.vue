@@ -161,7 +161,7 @@ const handleResetForm = () => {
                 ]
               "
               type="text"
-              label="登录之后默认跳转位置"
+              :label="$t('core.role.editing_modal.fields.redirect_on_login')"
             ></FormKit>
             <FormKit
               v-model="

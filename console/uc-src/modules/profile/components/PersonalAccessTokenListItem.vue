@@ -27,8 +27,8 @@ const { t } = useI18n();
 
 function handleDelete() {
   Dialog.warning({
-    title: t("core.user.pat.operations.delete.title"),
-    description: t("core.user.pat.operations.delete.description"),
+    title: t("core.uc_profile.pat.operations.delete.title"),
+    description: t("core.uc_profile.pat.operations.delete.description"),
     async onConfirm() {
       await apiClient.pat.deletePat({
         name: props.token.metadata.name,
@@ -42,14 +42,14 @@ function handleDelete() {
 
 function handleRevoke() {
   Dialog.warning({
-    title: t("core.user.pat.operations.revoke.title"),
-    description: t("core.user.pat.operations.revoke.description"),
+    title: t("core.uc_profile.pat.operations.revoke.title"),
+    description: t("core.uc_profile.pat.operations.revoke.description"),
     async onConfirm() {
       await apiClient.pat.revokePat({
         name: props.token.metadata.name,
       });
 
-      Toast.success(t("core.user.pat.operations.revoke.toast_success"));
+      Toast.success(t("core.uc_profile.pat.operations.revoke.toast_success"));
       queryClient.invalidateQueries({ queryKey: ["personal-access-tokens"] });
     },
   });
@@ -58,19 +58,19 @@ function handleRevoke() {
 async function handleRestore() {
   await apiClient.pat.restorePat({ name: props.token.metadata.name });
 
-  Toast.success(t("core.user.pat.operations.restore.toast_success"));
+  Toast.success(t("core.uc_profile.pat.operations.restore.toast_success"));
   queryClient.invalidateQueries({ queryKey: ["personal-access-tokens"] });
 }
 
 const statusText = computed(() => {
   const { expiresAt } = props.token.spec || {};
   if (expiresAt && new Date(expiresAt) < new Date()) {
-    return t("core.user.pat.list.fields.status.expired");
+    return t("core.uc_profile.pat.list.fields.status.expired");
   }
   return t(
     props.token.spec?.revoked
-      ? "core.user.pat.list.fields.status.revoked"
-      : "core.user.pat.list.fields.status.normal"
+      ? "core.uc_profile.pat.list.fields.status.revoked"
+      : "core.uc_profile.pat.list.fields.status.normal"
   );
 });
 
@@ -109,13 +109,13 @@ const statusTheme = computed(() => {
               v-tooltip="formatDatetime(token.spec.expiresAt)"
             >
               {{
-                $t("core.user.pat.list.fields.expiresAt.dynamic", {
+                $t("core.uc_profile.pat.list.fields.expiresAt.dynamic", {
                   expiresAt: relativeTimeTo(token.spec?.expiresAt),
                 })
               }}
             </span>
             <span v-else>
-              {{ $t("core.user.pat.list.fields.expiresAt.forever") }}
+              {{ $t("core.uc_profile.pat.list.fields.expiresAt.forever") }}
             </span>
           </div>
         </template>
@@ -135,10 +135,10 @@ const statusTheme = computed(() => {
         type="danger"
         @click="handleRevoke"
       >
-        {{ $t("core.user.pat.operations.revoke.button") }}
+        {{ $t("core.uc_profile.pat.operations.revoke.button") }}
       </VDropdownItem>
       <VDropdownItem v-else @click="handleRestore">
-        {{ $t("core.user.pat.operations.restore.button") }}
+        {{ $t("core.uc_profile.pat.operations.restore.button") }}
       </VDropdownItem>
       <VDropdownDivider />
       <VDropdownItem type="danger" @click="handleDelete">

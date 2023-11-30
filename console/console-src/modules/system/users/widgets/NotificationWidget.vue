@@ -44,7 +44,7 @@ function handleRouteToNotification(notification: Notification) {
   <VCard
     :body-class="['h-full', '@container', '!p-0', '!overflow-auto']"
     class="h-full"
-    :title="$t('core.notification.title')"
+    :title="$t('core.dashboard.widgets.presets.notification.title')"
   >
     <template #actions>
       <div style="padding: 12px 16px">
@@ -59,7 +59,7 @@ function handleRouteToNotification(notification: Notification) {
     <VLoading v-if="isLoading" />
     <VEmpty
       v-else-if="!notifications?.length"
-      :title="$t('core.notification.empty.titles.unread')"
+      :title="$t('core.dashboard.widgets.presets.notification.empty.title')"
     >
       <template #actions>
         <VButton :loading="isFetching" @click="refetch">

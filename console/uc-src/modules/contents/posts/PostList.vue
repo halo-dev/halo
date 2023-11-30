@@ -84,7 +84,7 @@ const {
 </script>
 
 <template>
-  <VPageHeader title="我的文章">
+  <VPageHeader :title="$t('core.uc_post.title')">
     <template #icon>
       <IconBookRead class="mr-2 self-center" />
     </template>
@@ -121,20 +121,12 @@ const {
                     value: undefined,
                   },
                   {
-                    label: '已发布',
+                    label: $t('core.post.filters.status.items.published'),
                     value: 'PUBLISHED',
                   },
                   {
-                    label: '待审核',
-                    value: 'PENDING_APPROVAL',
-                  },
-                  {
-                    label: '未发布',
+                    label: $t('core.post.filters.status.items.draft'),
                     value: 'DRAFT',
-                  },
-                  {
-                    label: '发布失败',
-                    value: 'FAILED',
                   },
                 ]"
               />

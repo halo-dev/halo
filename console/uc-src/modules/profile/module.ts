@@ -17,10 +17,10 @@ export default definePlugin({
           name: "Profile",
           component: Profile,
           meta: {
-            title: "个人资料",
+            title: "core.uc_profile.title",
             searchable: true,
             menu: {
-              name: "我的",
+              name: "core.uc_sidebar.menu.items.profile",
               group: "dashboard",
               icon: markRaw(IconAccountCircleLine),
               priority: 0,

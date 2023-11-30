@@ -65,8 +65,8 @@ function onCreationModalClose() {
 
   <Transition v-else-if="!pats?.length" appear name="fade">
     <VEmpty
-      :message="$t('core.user.pat.list.empty.message')"
-      :title="$t('core.user.pat.list.empty.title')"
+      :message="$t('core.uc_profile.pat.list.empty.message')"
+      :title="$t('core.uc_profile.pat.list.empty.title')"
     >
       <template #actions>
         <VSpace>

@@ -156,7 +156,7 @@ const disallowAccessConsole = computed(() => {
           <div class="flex items-center gap-1">
             <a
               v-if="!disallowAccessConsole"
-              v-tooltip="'管理控制台'"
+              v-tooltip="$t('core.uc_sidebar.operations.console.tooltip')"
               class="group inline-block cursor-pointer rounded-full p-1.5 transition-all hover:bg-gray-100"
               href="/console"
             >
@@ -165,6 +165,7 @@ const disallowAccessConsole = computed(() => {
               />
             </a>
             <div
+              v-tooltip="$t('core.sidebar.operations.logout.tooltip')"
               class="group inline-block cursor-pointer rounded-full p-1.5 transition-all hover:bg-gray-100"
               @click="handleLogout"
             >
