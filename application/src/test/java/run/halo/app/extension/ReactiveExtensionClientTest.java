@@ -456,6 +456,37 @@ class ReactiveExtensionClientTest {
     }
 
     @Test
+    void shouldUpdateIfExtensionStatusChangedOnly() {
+        var fake = createFakeExtension("fake", 2L);
+        fake.getStatus().setState("new-state");
+        var storeName = "/registry/fake.halo.run/fakes/fake";
+        when(converter.convertTo(any())).thenReturn(
+            createExtensionStore(storeName, 2L));
+        when(storeClient.update(any(), any(), any())).thenReturn(
+            Mono.just(createExtensionStore(storeName, 2L)));
+        when(storeClient.fetchByName(storeName)).thenReturn(
+            Mono.just(createExtensionStore(storeName, 1L)));
+
+        var oldFake = createFakeExtension("fake", 2L);
+        oldFake.getStatus().setState("old-state");
+
+        var updatedFake = createFakeExtension("fake", 3L);
+        when(converter.convertFrom(same(FakeExtension.class), any()))
+            .thenReturn(oldFake)
+            .thenReturn(updatedFake);
+
+        StepVerifier.create(client.update(fake))
+            .expectNext(updatedFake)
+            .verifyComplete();
+
+        verify(storeClient).fetchByName(storeName);
+        verify(converter).convertTo(isA(JsonExtension.class));
+        verify(converter, times(2)).convertFrom(same(FakeExtension.class), any());
+        verify(storeClient)
+            .update(eq("/registry/fake.halo.run/fakes/fake"), eq(2L), any());
+    }
+
+    @Test
     void shouldUpdateUnstructuredSuccessfully() throws JsonProcessingException {
         var fake = createUnstructured();
         var name = "/registry/fake.halo.run/fakes/fake";
@@ -535,6 +566,13 @@ class ReactiveExtensionClientTest {
         @Test
         void shouldNotWatchOnUpdateIfExtensionNotChange() {
             shouldNotUpdateIfExtensionNotChange();
+
+            verify(watcher, never()).onUpdate(any(), any());
+        }
+
+        @Test
+        void shouldNotWatchOnUpdateIfExtensionStatusChangeOnly() {
+            shouldUpdateIfExtensionStatusChangedOnly();
 
             verify(watcher, never()).onUpdate(any(), any());
         }

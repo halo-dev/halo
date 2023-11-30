@@ -179,7 +179,7 @@ onMounted(() => {
 
           <div class="flex items-center gap-1">
             <a
-              v-tooltip="'个人中心'"
+              v-tooltip="$t('core.sidebar.operations.profile.tooltip')"
               class="group inline-block cursor-pointer rounded-full p-1.5 transition-all hover:bg-gray-100"
               href="/uc"
             >
@@ -188,6 +188,7 @@ onMounted(() => {
               />
             </a>
             <div
+              v-tooltip="$t('core.sidebar.operations.logout.tooltip')"
               class="group inline-block cursor-pointer rounded-full p-1.5 transition-all hover:bg-gray-100"
               @click="handleLogout"
             >

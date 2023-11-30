@@ -67,8 +67,10 @@ async function handlePublish() {
 
 function handleUnpublish() {
   Dialog.warning({
-    title: "取消发布",
-    description: "确定要取消发布吗？",
+    title: t("core.uc_post.operations.cancel_publish.title"),
+    description: t("core.uc_post.operations.cancel_publish.description"),
+    confirmText: t("core.common.buttons.confirm"),
+    cancelText: t("core.common.buttons.cancel"),
     async onConfirm() {
       await apiClient.uc.post.unpublishMyPost({
         name: props.post.post.metadata.name,
@@ -216,17 +218,17 @@ function handleUnpublish() {
           })
         "
       >
-        编辑
+        {{ $t("core.common.buttons.edit") }}
       </VDropdownItem>
       <HasPermission :permissions="['uc:posts:publish']">
         <VDropdownItem
           v-if="post.post.metadata.labels?.[postLabels.PUBLISHED] === 'false'"
           @click="handlePublish"
         >
-          发布
+          {{ $t("core.common.buttons.publish") }}
         </VDropdownItem>
         <VDropdownItem v-else type="danger" @click="handleUnpublish">
-          取消发布
+          {{ $t("core.common.buttons.cancel_publish") }}
         </VDropdownItem>
       </HasPermission>
     </template>
