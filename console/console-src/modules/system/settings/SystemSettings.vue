@@ -19,8 +19,10 @@ import { markRaw } from "vue";
 import SettingTab from "./tabs/Setting.vue";
 import { useRouteQuery } from "@vueuse/router";
 import NotificationsTab from "./tabs/Notifications.vue";
+import { usePermission } from "@/utils/permission";
 
 const { t } = useI18n();
+const { currentUserHasPermission } = usePermission();
 
 interface Tab {
   id: string;
@@ -63,11 +65,13 @@ const { data: setting } = useQuery({
       }
 
       // TODO: use integrations center to refactor this
-      tabs.value.push({
-        id: "notification",
-        label: "通知设置",
-        component: markRaw(NotificationsTab),
-      });
+      if (currentUserHasPermission(["system:notifier:configuration"])) {
+        tabs.value.push({
+          id: "notification",
+          label: "通知设置",
+          component: markRaw(NotificationsTab),
+        });
+      }
     }
   },
 });
