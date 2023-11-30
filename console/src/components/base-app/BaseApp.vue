@@ -12,10 +12,13 @@ import type { FormKitConfig } from "@formkit/core";
 import { i18n } from "@/locales";
 import { AppName } from "@/constants/app";
 import { useGlobalInfoStore } from "@/stores/global-info";
+import { useQuery } from "@tanstack/vue-query";
+import { useUserStore } from "@/stores/user";
 
 const { t } = useI18n();
 
 const globalInfoStore = useGlobalInfoStore();
+const { isAnonymous } = useUserStore();
 
 const route = useRoute();
 const title = useTitle();
@@ -86,6 +89,15 @@ window.addEventListener(
   "resize",
   setViewportProperty(document.documentElement)
 );
+
+// keep session alive
+useQuery({
+  queryKey: ["health", "keep-session-alive"],
+  queryFn: () => fetch("/actuator/health"),
+  refetchInterval: 1000 * 60 * 5, // 5 minutes
+  refetchOnWindowFocus: true,
+  enabled: computed(() => !isAnonymous),
+});
 </script>
 
 <template>
