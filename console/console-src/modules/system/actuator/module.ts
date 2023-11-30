@@ -17,6 +17,7 @@ export default definePlugin({
           meta: {
             title: "core.actuator.title",
             searchable: true,
+            permissions: ["system:actuator:manage"],
             menu: {
               name: "core.sidebar.menu.items.actuator",
               group: "system",
