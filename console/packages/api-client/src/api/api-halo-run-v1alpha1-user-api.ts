@@ -40,6 +40,8 @@ import {
 // @ts-ignore
 import { PasswordResetEmailRequest } from "../models";
 // @ts-ignore
+import { ResetPasswordRequest } from "../models";
+// @ts-ignore
 import { SignUpRequest } from "../models";
 // @ts-ignore
 import { User } from "../models";
@@ -54,15 +56,23 @@ export const ApiHaloRunV1alpha1UserApiAxiosParamCreator = function (
     /**
      * Reset password by token
      * @param {string} name The name of the user
+     * @param {ResetPasswordRequest} resetPasswordRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     resetPasswordByToken: async (
       name: string,
+      resetPasswordRequest: ResetPasswordRequest,
       options: AxiosRequestConfig = {}
     ): Promise<RequestArgs> => {
       // verify required parameter 'name' is not null or undefined
       assertParamExists("resetPasswordByToken", "name", name);
+      // verify required parameter 'resetPasswordRequest' is not null or undefined
+      assertParamExists(
+        "resetPasswordByToken",
+        "resetPasswordRequest",
+        resetPasswordRequest
+      );
       const localVarPath =
         `/apis/api.halo.run/v1alpha1/users/{name}/reset-password`.replace(
           `{${"name"}}`,
@@ -91,6 +101,8 @@ export const ApiHaloRunV1alpha1UserApiAxiosParamCreator = function (
       // http bearer authentication required
       await setBearerAuthToObject(localVarHeaderParameter, configuration);
 
+      localVarHeaderParameter["Content-Type"] = "application/json";
+
       setSearchParams(localVarUrlObj, localVarQueryParameter);
       let headersFromBaseOptions =
         baseOptions && baseOptions.headers ? baseOptions.headers : {};
@@ -99,6 +111,11 @@ export const ApiHaloRunV1alpha1UserApiAxiosParamCreator = function (
         ...headersFromBaseOptions,
         ...options.headers,
       };
+      localVarRequestOptions.data = serializeDataIfNeeded(
+        resetPasswordRequest,
+        localVarRequestOptions,
+        configuration
+      );
 
       return {
         url: toPathString(localVarUrlObj),
@@ -239,17 +256,23 @@ export const ApiHaloRunV1alpha1UserApiFp = function (
     /**
      * Reset password by token
      * @param {string} name The name of the user
+     * @param {ResetPasswordRequest} resetPasswordRequest
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      */
     async resetPasswordByToken(
       name: string,
+      resetPasswordRequest: ResetPasswordRequest,
       options?: AxiosRequestConfig
     ): Promise<
       (axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>
     > {
       const localVarAxiosArgs =
-        await localVarAxiosParamCreator.resetPasswordByToken(name, options);
+        await localVarAxiosParamCreator.resetPasswordByToken(
+          name,
+          resetPasswordRequest,
+          options
+        );
       return createRequestFunction(
         localVarAxiosArgs,
         globalAxios,
@@ -329,7 +352,11 @@ export const ApiHaloRunV1alpha1UserApiFactory = function (
       options?: AxiosRequestConfig
     ): AxiosPromise<void> {
       return localVarFp
-        .resetPasswordByToken(requestParameters.name, options)
+        .resetPasswordByToken(
+          requestParameters.name,
+          requestParameters.resetPasswordRequest,
+          options
+        )
         .then((request) => request(axios, basePath));
     },
     /**
@@ -378,6 +405,13 @@ export interface ApiHaloRunV1alpha1UserApiResetPasswordByTokenRequest {
    * @memberof ApiHaloRunV1alpha1UserApiResetPasswordByToken
    */
   readonly name: string;
+
+  /**
+   *
+   * @type {ResetPasswordRequest}
+   * @memberof ApiHaloRunV1alpha1UserApiResetPasswordByToken
+   */
+  readonly resetPasswordRequest: ResetPasswordRequest;
 }
 
 /**
@@ -427,7 +461,11 @@ export class ApiHaloRunV1alpha1UserApi extends BaseAPI {
     options?: AxiosRequestConfig
   ) {
     return ApiHaloRunV1alpha1UserApiFp(this.configuration)
-      .resetPasswordByToken(requestParameters.name, options)
+      .resetPasswordByToken(
+        requestParameters.name,
+        requestParameters.resetPasswordRequest,
+        options
+      )
       .then((request) => request(this.axios, this.basePath));
   }
 

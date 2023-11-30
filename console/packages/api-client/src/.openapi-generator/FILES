@@ -230,6 +230,7 @@ models/reply-spec.ts
 models/reply-vo-list.ts
 models/reply-vo.ts
 models/reply.ts
+models/reset-password-request.ts
 models/reverse-proxy-list.ts
 models/reverse-proxy-rule.ts
 models/reverse-proxy.ts

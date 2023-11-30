@@ -6,11 +6,11 @@ import { ref } from "vue";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
 
 const username = useRouteParams<string>("username");
-const token = useRouteQuery<string>("token");
+const token = useRouteQuery<string>("reset_password_token");
 
 interface ResetPasswordForm {
-  email: string;
   username: string;
+  password: string;
 }
 
 const loading = ref(false);
@@ -20,14 +20,18 @@ async function onSubmit(data: ResetPasswordForm) {
     loading.value = true;
 
     await apiClient.common.user.resetPasswordByToken({
-      passwordResetEmailRequest: {},
+      name: data.username,
+      resetPasswordRequest: {
+        newPassword: data.password,
+        token: token.value,
+      },
     });
 
-    Toast.success(
-      "如果你的用户名和邮箱地址匹配，我们将会发送一封邮件到你的邮箱。"
-    );
+    Toast.success("重置成功");
+
+    window.location.href = "/console/login";
   } catch (error) {
-    console.error("Failed to send password reset email", error);
+    console.error("Failed to reset password", error);
   } finally {
     loading.value = false;
   }

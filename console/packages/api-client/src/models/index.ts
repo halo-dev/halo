@@ -153,6 +153,7 @@ export * from "./reply-request";
 export * from "./reply-spec";
 export * from "./reply-vo";
 export * from "./reply-vo-list";
+export * from "./reset-password-request";
 export * from "./reverse-proxy";
 export * from "./reverse-proxy-list";
 export * from "./reverse-proxy-rule";
