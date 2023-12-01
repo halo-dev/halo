@@ -158,7 +158,7 @@ function handleUnpublish() {
                 v-for="(tag, tagIndex) in post.tags"
                 :key="tagIndex"
                 :tag="tag"
-                route
+                :route="false"
               ></PostTag>
             </VSpace>
           </div>
