@@ -163,6 +163,26 @@ const handleResetForm = () => {
               type="text"
               :label="$t('core.role.editing_modal.fields.redirect_on_login')"
             ></FormKit>
+            <FormKit
+              v-model="
+                formState.metadata.annotations[
+                  rbacAnnotations.DISALLOW_ACCESS_CONSOLE
+                ]
+              "
+              on-value="true"
+              off-value="false"
+              type="checkbox"
+              :label="
+                $t(
+                  'core.role.editing_modal.fields.disallow_access_console.label'
+                )
+              "
+              :help="
+                $t(
+                  'core.role.editing_modal.fields.disallow_access_console.help'
+                )
+              "
+            ></FormKit>
           </FormKit>
         </div>
       </div>

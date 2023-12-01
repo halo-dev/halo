@@ -923,6 +923,9 @@ core:
       fields:
         display_name: 名稱
         redirect_on_login: 登入之後預設跳轉位置
+        disallow_access_console:
+          label: 禁止訪問 Console
+          help: 勾選之後，該角色將無法存取 Console
   identity_authentication:
     title: 身份認證
     tabs:
