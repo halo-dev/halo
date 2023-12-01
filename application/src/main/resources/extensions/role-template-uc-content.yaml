@@ -2,6 +2,8 @@ apiVersion: v1alpha1
 kind: "Role"
 metadata:
   name: post-editor
+  labels:
+    rbac.authorization.halo.run/system-reserved: "true"
   annotations:
     rbac.authorization.halo.run/module: "Posts Management"
     rbac.authorization.halo.run/display-name: "Post Editor"
@@ -14,6 +16,8 @@ apiVersion: v1alpha1
 kind: "Role"
 metadata:
   name: post-author
+  labels:
+    rbac.authorization.halo.run/system-reserved: "true"
   annotations:
     rbac.authorization.halo.run/module: "Posts Management"
     rbac.authorization.halo.run/display-name: "Post Author"
@@ -28,6 +32,8 @@ apiVersion: v1alpha1
 kind: "Role"
 metadata:
   name: post-contributor
+  labels:
+    rbac.authorization.halo.run/system-reserved: "true"
   annotations:
     rbac.authorization.halo.run/module: "Posts Management"
     rbac.authorization.halo.run/display-name: "Post Contributor"
