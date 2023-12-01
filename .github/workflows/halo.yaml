@@ -3,15 +3,13 @@ name: Halo CI
 on:
   pull_request:
     branches:
-      - main
-      - release-*
+      - release-2.11
     paths:
       - "**"
       - "!**.md"
   push:
     branches:
-      - main
-      - release-*
+      - release-2.11
     paths:
       - "**"
       - "!**.md"
@@ -57,7 +55,7 @@ jobs:
         run: ./gradlew sonar --info
       - name: Setup console environment
         if: steps.changes.outputs.console == 'true'
-        uses: halo-sigs/actions/admin-env-setup@main
+        uses: halo-sigs/actions/admin-env-setup@release-2.11
       - name: Check console
         if: steps.changes.outputs.console == 'true'
         run: make -C console check
@@ -66,7 +64,7 @@ jobs:
     needs: check
     steps:
       - uses: actions/checkout@v3
-      - uses: halo-sigs/actions/halo-next-docker-build@main # change the version to specific ref or release tag while the action is stable.
+      - uses: halo-sigs/actions/halo-next-docker-build@release-2.11 # change the version to specific ref or release tag while the action is stable.
         if: github.event_name != 'pull_request'
         with:
           image-name: ${{ github.event_name == 'release' && 'halo' || 'halo-dev' }}
@@ -76,7 +74,7 @@ jobs:
           push: ${{ github.event_name == 'push' || github.event_name == 'release' }} # we only push to GHCR if the push is to the next branch
           console-ref: ${{ github.event_name == 'release' &&  github.ref || 'main' }}
           platforms: linux/amd64,linux/arm64/v8,linux/ppc64le,linux/s390x
-      - uses: halo-sigs/actions/halo-next-docker-build@main
+      - uses: halo-sigs/actions/halo-next-docker-build@release-2.11
         if: github.event_name == 'pull_request'
         with:
           image-name: halo-dev
