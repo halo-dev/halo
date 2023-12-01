@@ -5,7 +5,6 @@ metadata:
   annotations:
     rbac.authorization.halo.run/module: "Posts Management"
     rbac.authorization.halo.run/display-name: "Post Editor"
-    rbac.authorization.halo.run/redirect-on-login: "/uc"
     rbac.authorization.halo.run/dependencies: |
       ["role-template-manage-posts", "post-author"]
 rules: [ ]
