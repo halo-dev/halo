@@ -186,6 +186,7 @@ models/notifier-descriptor.ts
 models/notifier-info.ts
 models/notifier-setting-ref.ts
 models/owner-info.ts
+models/password-reset-email-request.ts
 models/pat-spec.ts
 models/personal-access-token-list.ts
 models/personal-access-token.ts
@@ -232,6 +233,7 @@ models/reply-spec.ts
 models/reply-vo-list.ts
 models/reply-vo.ts
 models/reply.ts
+models/reset-password-request.ts
 models/reverse-proxy-list.ts
 models/reverse-proxy-rule.ts
 models/reverse-proxy.ts

@@ -5,6 +5,7 @@ import BasicLayout from "@console/layouts/BasicLayout.vue";
 import Setup from "@console/views/system/Setup.vue";
 import Redirect from "@console/views/system/Redirect.vue";
 import SetupInitialData from "@console/views/system/SetupInitialData.vue";
+import ResetPassword from "@console/views/system/ResetPassword.vue";
 
 export const routes: Array<RouteRecordRaw> = [
   {
@@ -43,6 +44,14 @@ export const routes: Array<RouteRecordRaw> = [
     path: "/redirect",
     name: "Redirect",
     component: Redirect,
+  },
+  {
+    path: "/reset-password",
+    name: "ResetPassword",
+    component: ResetPassword,
+    meta: {
+      title: "core.reset_password.title",
+    },
   },
 ];
 

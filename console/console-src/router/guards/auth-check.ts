@@ -2,7 +2,7 @@ import { rbacAnnotations } from "@/constants/annotations";
 import { useUserStore } from "@/stores/user";
 import type { Router } from "vue-router";
 
-const whiteList = ["Setup", "Login", "Binding"];
+const whiteList = ["Setup", "Login", "Binding", "ResetPassword"];
 
 export function setupAuthCheckGuard(router: Router) {
   router.beforeEach((to, from, next) => {

@@ -18,6 +18,8 @@ core:
         label: 已有帳號
         button: 立即登入
       return_site: 返回到首頁
+      reset_password:
+        button: 找回密碼
     button: 登入
     modal:
       title: 重新登入
@@ -1462,3 +1464,25 @@ core:
     setting_modal:
       title: 文章設定
     title: 我的文章
+  uc_reset_password:
+    fields:
+      username:
+        label: 用户名
+      password:
+        label: 新密碼
+      password_confirm:
+        label: 確認密碼
+    operations:
+      reset:
+        button: 重設密碼
+        toast_success: 重置成功
+  reset_password:
+    fields:
+      username:
+        label: 使用者名稱
+      email:
+        label: 郵件地址
+    operations:
+      send:
+        label: 發送驗證郵件
+        toast_success: 如果你的用戶名和郵箱地址匹配，我們將會發送一封郵件到你的郵箱。

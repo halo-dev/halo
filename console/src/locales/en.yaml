@@ -18,6 +18,8 @@ core:
         label: Already have an account
         button: Sign in
       return_site: Return to site
+      reset_password:
+        button: Retrieve password
     button: Login
     modal:
       title: Re-login
@@ -1550,3 +1552,27 @@ core:
     setting_modal:
       title: Post settings
     title: My posts
+  uc_reset_password:
+    fields:
+      username:
+        label: username
+      password:
+        label: New Password
+      password_confirm:
+        label: Confirm Password
+    operations:
+      reset:
+        button: Reset Password
+        toast_success: Reset successful
+  reset_password:
+    fields:
+      username:
+        label: Username
+      email:
+        label: email address
+    operations:
+      send:
+        label: Send verification email
+        toast_success: >-
+          If your username and email address match, we will send an email to
+          your email address.

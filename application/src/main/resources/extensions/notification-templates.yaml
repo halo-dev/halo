@@ -126,3 +126,30 @@ spec:
           <p>如果您没有尝试验证您的电子邮件地址，请忽略此电子邮件。</p>
         </div>
       </div>
+---
+apiVersion: notification.halo.run/v1alpha1
+kind: NotificationTemplate
+metadata:
+  name: template-reset-password-by-email
+spec:
+  reasonSelector:
+    reasonType: reset-password-by-email
+    language: default
+  template:
+    title: "重置密码-[(${site.title})]"
+    rawBody: |
+      【[(${site.title})]】你已经请求了重置密码，可以链接来重置密码：[(${link})]，请在 [(${expirationAtMinutes})] 分钟内完成重置。
+    htmlBody: |
+      <div class="notification-content">
+        <div class="head">
+          <p class="honorific" th:text="|${username} 你好：|"></p>
+        </div>
+        <div class="body">
+          <p>你已经请求了重置密码，可以点击下面的链接来重置密码：</p>
+          <div class="reset-link" style="line-height:24px;">
+            <span th:text="${link}"></span>
+          </div>
+          <p th:text="|链接有效期为 ${expirationAtMinutes} 分钟，请尽快完成重置。|"></p>
+          <p>如果您没有请求重置密码，请忽略此电子邮件。</p>
+        </div>
+      </div>
