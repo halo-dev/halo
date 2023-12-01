@@ -172,8 +172,16 @@ const handleResetForm = () => {
               on-value="true"
               off-value="false"
               type="checkbox"
-              label="禁止访问 Console"
-              help="勾选之后，该角色将无法访问 Console"
+              :label="
+                $t(
+                  'core.role.editing_modal.fields.disallow_access_console.label'
+                )
+              "
+              :help="
+                $t(
+                  'core.role.editing_modal.fields.disallow_access_console.help'
+                )
+              "
             ></FormKit>
           </FormKit>
         </div>
