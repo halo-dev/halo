@@ -1253,6 +1253,15 @@ core:
     role-template-change-password: 修改密碼
     Actuator Management: 系統指標
     Actuator Manage: 訪問系統指標
+    Cache Management: 緩存
+    Cache Manage: 緩存管理
+    Configure Notifier: 配置通知器
+    Notification Configuration: 通知配置
+    Post Attachment Manager: 允許在文章中上傳圖片
+    Post Author: 作者
+    Post Contributor: 投稿者
+    Post Editor: 編輯者
+    Post Publisher: 允許發布自己的文章
   components:
     submit_button:
       computed_text: "{text}（{shortcut}）"

@@ -33,9 +33,11 @@ import HasPermission from "@/components/permission/HasPermission.vue";
 import { provide } from "vue";
 import type { ComputedRef } from "vue";
 import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
+import { usePermission } from "@/utils/permission";
 
 const router = useRouter();
 const { t } = useI18n();
+const { currentUserHasPermission } = usePermission();
 
 const formState = ref<Post>({
   apiVersion: "content.halo.run/v1alpha1",
@@ -333,6 +335,9 @@ function onUpdatePostSuccess(data: Post) {
 
 // Upload image
 async function handleUploadImage(file: File) {
+  if (!currentUserHasPermission(["uc:attachments:manage"])) {
+    return;
+  }
   if (!isUpdateMode.value) {
     formState.value.metadata.annotations = {
       ...formState.value.metadata.annotations,
