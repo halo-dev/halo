@@ -1263,9 +1263,9 @@ core:
     Configure Notifier: 配置通知器
     Notification Configuration: 通知配置
     Post Attachment Manager: 允許在文章中上傳圖片
-    Post Author: 作者
-    Post Contributor: 投稿者
-    Post Editor: 編輯者
+    Post Author: 允许管理自己的文章
+    Post Contributor: 允许投稿
+    Post Editor: 允许管理所有文章
     Post Publisher: 允許發布自己的文章
   components:
     submit_button:

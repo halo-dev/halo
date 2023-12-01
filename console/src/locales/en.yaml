@@ -1347,9 +1347,9 @@ core:
     Notification Configuration: Notification Configuration
     Configure Notifier: Configure Notifier
     Post Attachment Manager: Allow images to be uploaded in posts
-    Post Author: Author
-    Post Contributor: Contributor
-    Post Editor: Editor
+    Post Author: Contributions allowed
+    Post Contributor: Allows you to manage your own posts
+    Post Editor: Allow management of all posts
     Post Publisher: Allow to publish own posts
   components:
     submit_button:
