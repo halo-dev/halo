@@ -40,10 +40,12 @@ import { useAutoSaveContent } from "@console/composables/use-auto-save-content";
 import { useContentSnapshot } from "@console/composables/use-content-snapshot";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
 import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
+import { usePermission } from "@/utils/permission";
 
 const router = useRouter();
 const { t } = useI18n();
 const { mutateAsync: postUpdateMutate } = usePostUpdateMutate();
+const { currentUserHasPermission } = usePermission();
 
 // Editor providers
 const { editorProviders } = useEditorExtensionPoints();
@@ -404,6 +406,10 @@ useSessionKeepAlive();
 
 // Upload image
 async function handleUploadImage(file: File) {
+  if (!currentUserHasPermission(["uc:attachments:manage"])) {
+    return;
+  }
+
   if (!isUpdateMode.value) {
     await handleSave();
   }

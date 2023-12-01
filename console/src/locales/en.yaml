@@ -989,6 +989,9 @@ core:
       fields:
         display_name: Display name
         redirect_on_login: Default redirect location after logging in
+        disallow_access_console:
+          label: Disable access to Console
+          help: Once checked, this role will not be able to access the Console
   identity_authentication:
     title: Identity Authentication
     tabs:
@@ -1337,6 +1340,15 @@ core:
     role-template-change-password: Change Password
     Actuator Management: System Information
     Actuator Manage: Access System Information
+    Cache Management: Cache
+    Cache Manage: Cache Manage
+    Notification Configuration: Notification Configuration
+    Configure Notifier: Configure Notifier
+    Post Attachment Manager: Allow images to be uploaded in posts
+    Post Author: Author
+    Post Contributor: Contributor
+    Post Editor: Editor
+    Post Publisher: Allow to publish own posts
   components:
     submit_button:
       computed_text: "{text} ({shortcut})"

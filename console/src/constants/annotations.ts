@@ -12,6 +12,7 @@ export enum rbacAnnotations {
   AVATAR_ATTACHMENT_NAME = "halo.run/avatar-attachment-name",
   LAST_AVATAR_ATTACHMENT_NAME = "halo.run/last-avatar-attachment-name",
   REDIRECT_ON_LOGIN = "rbac.authorization.halo.run/redirect-on-login",
+  DISALLOW_ACCESS_CONSOLE = "rbac.authorization.halo.run/disallow-access-console",
 }
 
 // content

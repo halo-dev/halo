@@ -935,6 +935,9 @@ core:
       fields:
         display_name: 名称
         redirect_on_login: 登录之后默认跳转位置
+        disallow_access_console:
+          label: 禁止访问 Console
+          help: 勾选之后，该角色将无法访问 Console
   identity_authentication:
     title: 身份认证
     tabs:
@@ -1265,6 +1268,15 @@ core:
     role-template-change-password: 修改密码
     Actuator Management: 系统指标
     Actuator Manage: 访问系统指标
+    Cache Management: 缓存
+    Cache Manage: 缓存管理
+    Notification Configuration: 通知配置
+    Configure Notifier: 配置通知器
+    Post Editor: 编辑者
+    Post Contributor: 投稿者
+    Post Author: 作者
+    Post Attachment Manager: 允许在文章中上传图片
+    Post Publisher: 允许发布自己的文章
   components:
     submit_button:
       computed_text: "{text}（{shortcut}）"
