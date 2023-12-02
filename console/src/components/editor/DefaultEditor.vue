@@ -295,7 +295,7 @@ onMounted(() => {
         addProseMirrorPlugins() {
           return [
             new Plugin({
-              key: new PluginKey("handleGenerateTableOfContent"),
+              key: new PluginKey("generate-heading-id"),
               props: {
                 decorations: (state) => {
                   const headings: HeadingNode[] = [];
