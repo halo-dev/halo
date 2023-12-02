@@ -45,6 +45,10 @@ import {
   ExtensionNodeSelected,
   ExtensionTrailingNode,
   ToolbarItem,
+  Plugin,
+  PluginKey,
+  Decoration,
+  DecorationSet,
 } from "@halo-dev/richtext-editor";
 import {
   IconCalendar,
@@ -67,7 +71,6 @@ import RiLayoutRightLine from "~icons/ri/layout-right-line";
 import {
   inject,
   markRaw,
-  nextTick,
   ref,
   watch,
   onMounted,
@@ -87,6 +90,7 @@ import type { PluginModule } from "@halo-dev/console-shared";
 import { useDebounceFn, useLocalStorage } from "@vueuse/core";
 import { onBeforeUnmount } from "vue";
 import { usePermission } from "@/utils/permission";
+import { generateAnchor } from "@/utils/anchor";
 
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();
@@ -287,13 +291,49 @@ onMounted(() => {
       ExtensionColumn,
       ExtensionNodeSelected,
       ExtensionTrailingNode,
+      Extension.create({
+        addProseMirrorPlugins() {
+          return [
+            new Plugin({
+              key: new PluginKey("handleGenerateTableOfContent"),
+              props: {
+                decorations: (state) => {
+                  const headings: HeadingNode[] = [];
+                  const { doc } = state;
+                  const decorations: Decoration[] = [];
+                  doc.descendants((node, pos) => {
+                    if (node.type.name === ExtensionHeading.name) {
+                      const id = generateAnchor(node.textContent);
+                      if (node.attrs.id !== id) {
+                        decorations.push(
+                          Decoration.node(pos, pos + node.nodeSize, {
+                            id,
+                          })
+                        );
+                      }
+
+                      headings.push({
+                        level: node.attrs.level,
+                        text: node.textContent,
+                        id,
+                      });
+                    }
+                  });
+                  headingNodes.value = headings;
+                  if (!selectedHeadingNode.value) {
+                    selectedHeadingNode.value = headings[0];
+                  }
+                  return DecorationSet.create(doc, decorations);
+                },
+              },
+            }),
+          ];
+        },
+      }),
     ],
     autofocus: "start",
     onUpdate: () => {
       debounceOnUpdate();
-      nextTick(() => {
-        handleGenerateTableOfContent();
-      });
     },
     editorProps: {
       handleDrop: (view, event: DragEvent, _, moved) => {
@@ -407,45 +447,6 @@ async function asyncWorker(arg: Task): Promise<void> {
   }
 }
 
-const handleGenerateTableOfContent = () => {
-  if (!editor.value) {
-    return;
-  }
-
-  const headings: HeadingNode[] = [];
-  const transaction = editor.value.state.tr;
-
-  editor.value.state.doc.descendants((node, pos) => {
-    if (node.type.name === "heading") {
-      const id = `heading-${headings.length + 1}`;
-
-      if (node.attrs.id !== id) {
-        transaction?.setNodeMarkup(pos, undefined, {
-          ...node.attrs,
-          id,
-        });
-      }
-
-      headings.push({
-        level: node.attrs.level,
-        text: node.textContent,
-        id,
-      });
-    }
-  });
-
-  transaction.setMeta("addToHistory", false);
-  transaction.setMeta("preventUpdate", true);
-
-  editor.value.view.dispatch(transaction);
-
-  headingNodes.value = headings;
-
-  if (!selectedHeadingNode.value) {
-    selectedHeadingNode.value = headings[0];
-  }
-};
-
 const handleSelectHeadingNode = (node: HeadingNode) => {
   selectedHeadingNode.value = node;
   document.getElementById(node.id)?.scrollIntoView({ behavior: "smooth" });
@@ -458,9 +459,6 @@ watch(
   () => {
     if (props.raw !== editor.value?.getHTML()) {
       editor.value?.commands.setContent(props.raw);
-      nextTick(() => {
-        handleGenerateTableOfContent();
-      });
     }
   },
   {
