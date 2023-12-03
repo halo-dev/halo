@@ -1,6 +1,8 @@
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted, ref } from "vue";
-import type { Direction, Type } from "./interface";
+import { computed, onMounted, onUnmounted, ref, watch } from "vue";
+import type { ArrowShow, Direction, Type } from "./interface";
+import { useElementSize } from "@vueuse/core";
+import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
 
 const props = withDefaults(
   defineProps<{
@@ -30,20 +32,39 @@ const classes = computed(() => {
   return [`tabbar-${props.type}`, `tabbar-direction-${props.direction}`];
 });
 
-const handleChange = (id: number | string) => {
+const handleChange = (id: number | string, index: number) => {
+  manualSetArrowShow(index);
   emit("update:activeId", id);
   emit("change", id);
 };
 
 const tabbarItemsRef = ref<HTMLElement | undefined>();
+const tabItemRefs = ref<HTMLElement[] | undefined>();
+const itemWidthArr = ref<number[]>([]);
+const arrowShow = ref<ArrowShow>({ left: false, right: false });
+const { width: tabbarWidth } = useElementSize(tabbarItemsRef);
+
+const scrollX = ref(0);
 
 function handleHorizontalWheel(event: WheelEvent) {
   if (!tabbarItemsRef.value) {
     return;
   }
-  const { scrollLeft, scrollWidth, clientWidth } = tabbarItemsRef.value;
+  const { scrollLeft, scrollWidth } = tabbarItemsRef.value;
+
+  if (scrollX.value + event.deltaY < 0) {
+    scrollX.value = 0;
+  } else if (scrollX.value + event.deltaY >= scrollWidth - tabbarWidth.value) {
+    scrollX.value = scrollWidth - tabbarWidth.value;
+  } else {
+    scrollX.value += event.deltaY;
+  }
+
   const toLeft = event.deltaY < 0 && scrollLeft > 0;
-  const toRight = event.deltaY > 0 && scrollLeft < scrollWidth - clientWidth;
+  const toRight =
+    event.deltaY > 0 && scrollLeft < scrollWidth - tabbarWidth.value;
+
+  handleListenArrow();
 
   if (toLeft || toRight) {
     event.preventDefault();
@@ -51,6 +72,86 @@ function handleHorizontalWheel(event: WheelEvent) {
     tabbarItemsRef.value.scrollBy({ left: event.deltaY });
   }
 }
+
+function calculateItemWidth() {
+  if (!tabbarItemsRef.value) return;
+  if (tabItemRefs.value) {
+    for (const item of tabItemRefs.value) {
+      itemWidthArr.value.push(item.offsetWidth);
+    }
+  }
+  const { scrollWidth } = tabbarItemsRef.value;
+  if (tabbarWidth.value < scrollWidth) {
+    arrowShow.value.right = true;
+  }
+}
+
+function manualSetArrowShow(
+  index: number | undefined,
+  prev: boolean | undefined = undefined
+) {
+  if (!tabbarItemsRef.value) return;
+  if (tabbarItemsRef.value.scrollWidth <= tabbarWidth.value) return;
+  if (prev || index === 0) {
+    tabbarItemsRef.value.scrollTo({ left: 0, behavior: "smooth" });
+    scrollX.value = 0;
+    arrowShow.value = {
+      left: false,
+      right: true,
+    };
+  }
+  if (
+    (prev !== undefined && !prev) ||
+    index === itemWidthArr.value.length - 1
+  ) {
+    const { scrollWidth } = tabbarItemsRef.value;
+    tabbarItemsRef.value.scrollTo({
+      left: scrollWidth - tabbarWidth.value,
+      behavior: "smooth",
+    });
+    scrollX.value = scrollWidth - tabbarWidth.value;
+    arrowShow.value = {
+      left: true,
+      right: false,
+    };
+  }
+}
+
+function handleListenArrow() {
+  if (!tabbarItemsRef.value) return;
+  const { scrollWidth } = tabbarItemsRef.value;
+  const firstItemWidth = itemWidthArr.value[0];
+  const lastItemWidth = itemWidthArr.value[itemWidthArr.value.length - 1];
+
+  if (scrollX.value >= scrollWidth - tabbarWidth.value - lastItemWidth / 2) {
+    if (arrowShow.value) arrowShow.value.right = false;
+  } else if (!arrowShow.value.right) {
+    arrowShow.value.right = true;
+  }
+
+  if (scrollX.value > firstItemWidth / 2) {
+    if (!arrowShow.value.left) arrowShow.value.left = true;
+  } else if (arrowShow.value.left) {
+    arrowShow.value.left = false;
+  }
+}
+
+// tabbar 宽度变化时，滚动指示器的显示与隐藏
+watch(tabbarWidth, () => {
+  if (!tabbarItemsRef.value) return;
+  if (tabbarItemsRef.value.scrollWidth > tabbarWidth.value) {
+    handleListenArrow();
+  } else {
+    arrowShow.value = {
+      left: false,
+      right: false,
+    };
+  }
+});
+
+watch(() => props.items, calculateItemWidth, {
+  flush: "post",
+});
 
 onMounted(() => {
   tabbarItemsRef.value?.addEventListener("wheel", handleHorizontalWheel);
@@ -62,13 +163,36 @@ onUnmounted(() => {
 </script>
 <template>
   <div :class="classes" class="tabbar-wrapper">
+    <div
+      :class="['indicator', 'left', arrowShow.left ? 'visible' : 'invisible']"
+    >
+      <div
+        title="向前"
+        class="arrow-left"
+        @click="manualSetArrowShow(undefined, true)"
+      >
+        <IconArrowLeft />
+      </div>
+    </div>
+    <div
+      :class="['indicator', 'right', arrowShow.right ? 'visible' : 'invisible']"
+    >
+      <div
+        title="向后"
+        class="arrow-right"
+        @click="manualSetArrowShow(undefined, false)"
+      >
+        <IconArrowRight />
+      </div>
+    </div>
     <div ref="tabbarItemsRef" class="tabbar-items">
       <div
         v-for="(item, index) in items"
         :key="index"
+        ref="tabItemRefs"
         :class="{ 'tabbar-item-active': item[idKey] === activeId }"
         class="tabbar-item"
-        @click="handleChange(item[idKey])"
+        @click="handleChange(item[idKey], index)"
       >
         <div v-if="item.icon" class="tabbar-item-icon">
           <component :is="item.icon" />
@@ -82,6 +206,50 @@ onUnmounted(() => {
 </template>
 <style lang="scss">
 .tabbar-wrapper {
+  @apply relative;
+  .indicator {
+    @apply absolute
+    top-0
+    z-10
+    w-20
+    h-full
+    flex
+    items-center
+    from-transparent
+    from-10%
+    via-white/80
+    via-30%
+    to-white
+    to-70%
+    pt-0.5
+    pb-1.5;
+
+    &.left {
+      @apply left-0 
+      justify-start
+      bg-gradient-to-l;
+    }
+    &.right {
+      @apply right-0 
+      justify-end 
+      bg-gradient-to-r;
+    }
+    .arrow-left,
+    .arrow-right {
+      @apply w-10
+      h-9
+      flex
+      justify-center
+      items-center
+      pointer-events-auto
+      cursor-pointer
+      py-0.5;
+      svg {
+        font-size: 1.5em;
+      }
+    }
+  }
+
   .tabbar-items {
     @apply flex
     items-center
