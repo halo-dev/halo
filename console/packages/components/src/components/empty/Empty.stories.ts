@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
 import { VEmpty } from ".";
 import { VSpace } from "../space";
-import { VButton } from "../button"
+import { VButton } from "../button";
 
 const meta: Meta<typeof VEmpty> = {
   title: "Empty",
@@ -23,8 +23,7 @@ const meta: Meta<typeof VEmpty> = {
       </VEmpty>
     `,
   }),
-  argTypes: {
-  }
+  argTypes: {},
 };
 
 export default meta;
@@ -39,6 +38,6 @@ export const Default: Story = {
         <VButton>清空搜索</VButton>
         <VButton type="primary">新建文章</VButton>
       </VSpace>
-    `
-  }
+    `,
+  },
 };

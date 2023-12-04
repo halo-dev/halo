@@ -20,7 +20,7 @@ const meta: Meta<typeof VAlert> = {
     },
     closable: {
       control: { type: "boolean" },
-    }
+    },
   },
 };
 
@@ -66,6 +66,3 @@ export const Error: Story = {
     description: "Halo",
   },
 };
-
-
-

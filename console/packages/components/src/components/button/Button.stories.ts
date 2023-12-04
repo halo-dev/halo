@@ -29,7 +29,7 @@ const meta: Meta<typeof VButton> = {
     },
   },
   args: {
-    default: "Button"
+    default: "Button",
   },
 };
 

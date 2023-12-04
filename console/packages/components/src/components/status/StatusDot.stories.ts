@@ -19,9 +19,9 @@ const meta: Meta<typeof VStatusDot> = {
   argTypes: {
     state: {
       control: { type: "select" },
-      options: ["default", "success", "warning", "error"]
-    }
-  }
+      options: ["default", "success", "warning", "error"],
+    },
+  },
 };
 
 export default meta;
@@ -30,27 +30,27 @@ type Story = StoryObj<typeof VStatusDot>;
 export const Default: Story = {
   args: {
     state: "default",
-    text: "默认"
-  }
+    text: "默认",
+  },
 };
 
 export const Success: Story = {
   args: {
     state: "success",
-    text: "成功"
-  }
+    text: "成功",
+  },
 };
 
 export const Warning: Story = {
   args: {
     state: "warning",
-    text: "警告"
-  }
+    text: "警告",
+  },
 };
 
 export const Error: Story = {
   args: {
     state: "error",
-    text: "错误"
-  }
+    text: "错误",
+  },
 };

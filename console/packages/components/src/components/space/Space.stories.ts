@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
 
 import { VSpace } from ".";
-import { VButton } from "../button"
+import { VButton } from "../button";
 
 const meta: Meta<typeof VSpace> = {
   title: "Space",
@@ -25,29 +25,27 @@ const meta: Meta<typeof VSpace> = {
   argTypes: {
     align: {
       control: { type: "select" },
-      options: ["start", "end", "center", "stretch"]
+      options: ["start", "end", "center", "stretch"],
     },
     spacing: {
       control: { type: "select" },
-      options: ["xs", "sm", "md", "lg"]
+      options: ["xs", "sm", "md", "lg"],
     },
     direction: {
       control: { type: "select" },
-      options: ["row", "column"] 
-    }
+      options: ["row", "column"],
+    },
   },
   args: {
     align: "center",
     direction: "row",
-    spacing: "xs"
-  }
+    spacing: "xs",
+  },
 };
 
 export default meta;
 type Story = StoryObj<typeof VSpace>;
 
 export const Default: Story = {
-  args: {
-
-  },
+  args: {},
 };

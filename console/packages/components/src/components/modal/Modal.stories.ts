@@ -50,8 +50,8 @@ const meta: Meta<typeof VModal> = {
     `,
   }),
   args: {
-    visible: false
-  }
+    visible: false,
+  },
 };
 
 export default meta;

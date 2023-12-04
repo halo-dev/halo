@@ -13,7 +13,7 @@ const meta: Meta<typeof VDialog> = {
     setup() {
       const showDialog = () => {
         args.visible = true;
-      }
+      };
 
       return {
         args,
@@ -30,19 +30,18 @@ const meta: Meta<typeof VDialog> = {
   argTypes: {
     type: {
       control: { type: "select" },
-      options: ["success", "info", "warning", "error"]
+      options: ["success", "info", "warning", "error"],
     },
     confirmType: {
       control: { type: "select" },
-      options: ["default", "primary", "secondary", "danger"]
-    }
-
+      options: ["default", "primary", "secondary", "danger"],
+    },
   },
   args: {
     title: "Hello",
     visible: false,
     description: "Hello World",
-  }
+  },
 };
 
 export default meta;
@@ -50,22 +49,18 @@ type Story = StoryObj<typeof VDialog>;
 
 export const Default: Story = {
   args: {
-    type: "info"
+    type: "info",
   },
 };
 
 export const Success: Story = {
   args: {
-    type: "success"
+    type: "success",
   },
 };
 
 export const Warning: Story = {
   args: {
-    type: "warning"
+    type: "warning",
   },
 };
-
-
-
-

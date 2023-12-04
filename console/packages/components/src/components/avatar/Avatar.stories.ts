@@ -17,8 +17,8 @@ const meta: Meta<typeof VAvatar> = {
     size: {
       control: { type: "select" },
       options: ["lg", "md", "sm", "xs"],
-      defaultValue: "md"
-    }
+      defaultValue: "md",
+    },
   },
 };
 

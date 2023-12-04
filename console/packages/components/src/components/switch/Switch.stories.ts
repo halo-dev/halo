@@ -8,7 +8,6 @@ const meta: Meta<typeof VSwitch> = {
   render: (args) => ({
     components: { VSwitch },
     setup() {
-
       return {
         args,
       };
@@ -17,15 +16,12 @@ const meta: Meta<typeof VSwitch> = {
         <VSwitch v-bind="args" v-model="args.modelValue" />
     `,
   }),
-  argTypes: {
-  },
+  argTypes: {},
 };
 
 export default meta;
 type Story = StoryObj<typeof VSwitch>;
 
 export const Default: Story = {
-  args: {
-
-  }
+  args: {},
 };

@@ -1,28 +1,31 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
 import { VMenu, VMenuItem, VMenuLabel } from "./index";
-import { IconBookRead, IconDashboard, IconFolder, IconMessage, IconPages } from "@/icons/icons";
-
-
+import {
+  IconBookRead,
+  IconDashboard,
+  IconFolder,
+  IconMessage,
+  IconPages,
+} from "@/icons/icons";
 
 const meta: Meta<typeof VMenu> = {
   title: "Menu",
   component: VMenu,
   tags: ["autodocs"],
   render: (args) => ({
-    components: { 
+    components: {
       VMenu,
       VMenuItem,
-      VMenuLabel, 
+      VMenuLabel,
       IconBookRead,
-      IconDashboard, 
-      IconMessage, 
+      IconDashboard,
+      IconMessage,
       IconFolder,
-      IconPages
+      IconPages,
     },
     setup() {
-
       return {
-        args
+        args,
       };
     },
     template: `
@@ -58,18 +61,12 @@ const meta: Meta<typeof VMenu> = {
       </div>
     `,
   }),
-  argTypes: {
-    
-  },
+  argTypes: {},
 };
 
 export default meta;
 type Story = StoryObj<typeof VMenu>;
 
 export const Default: Story = {
-  args: {
-  },
+  args: {},
 };
-
-
-

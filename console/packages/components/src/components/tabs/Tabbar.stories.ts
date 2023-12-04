@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/vue3";
 import { VTabbar } from ".";
-import { ref} from "vue";
+import { ref } from "vue";
 
 const meta: Meta<typeof VTabbar> = {
   title: "Tabbar",
@@ -9,20 +9,20 @@ const meta: Meta<typeof VTabbar> = {
   render: (args) => ({
     components: { VTabbar },
     setup() {
-      const activeId= ref("general");
-      const items =  [
+      const activeId = ref("general");
+      const items = [
         { label: "基本设置", id: "general" },
         { label: "文章设置", id: "post" },
         { label: "SEO 设置", id: "seo" },
         { label: "评论设置", id: "comment" },
         { label: "主题路由设置", id: "theme-route" },
         { label: "代码注入", id: "code-inject" },
-      ]
+      ];
 
       return {
         args,
         activeId,
-        items
+        items,
       };
     },
     template: `
@@ -40,13 +40,12 @@ const meta: Meta<typeof VTabbar> = {
   argTypes: {
     type: {
       control: { type: "select" },
-      options: ["default", "pills", "outline"]
+      options: ["default", "pills", "outline"],
     },
     direction: {
       control: { type: "select" },
-      options: ["row", "column"]
-    }
-
+      options: ["row", "column"],
+    },
   },
 };
 
@@ -55,18 +54,18 @@ type Story = StoryObj<typeof VTabbar>;
 
 export const Default: Story = {
   args: {
-    type: "default"
-  }
+    type: "default",
+  },
 };
 
 export const Pills: Story = {
   args: {
-    type: "pills"
-  }
+    type: "pills",
+  },
 };
 
 export const Outline: Story = {
   args: {
-    type: "outline"
-  }
+    type: "outline",
+  },
 };

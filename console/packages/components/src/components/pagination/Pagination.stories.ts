@@ -23,7 +23,7 @@ const meta: Meta<typeof VPagination> = {
     page: 1,
     size: 10,
     total: 100,
-  }
+  },
 };
 
 export default meta;

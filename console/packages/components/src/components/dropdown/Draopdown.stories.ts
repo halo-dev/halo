@@ -8,7 +8,7 @@ const meta: Meta<typeof VDropdown> = {
   component: VDropdown,
   tags: ["autodocs"],
   render: (args) => ({
-    components: { VDropdown,VDropdownItem, VDropdownDivider, VButton },
+    components: { VDropdown, VDropdownItem, VDropdownDivider, VButton },
     height: 400,
     setup() {
       return {
@@ -27,8 +27,7 @@ const meta: Meta<typeof VDropdown> = {
 
     `,
   }),
-  argTypes: {
-  }
+  argTypes: {},
 };
 
 export default meta;
@@ -42,6 +41,6 @@ export const Default: Story = {
       <VDropdownDivider></VDropdownDivider>
       <VDropdownItem>删除</VDropdownItem>
       <VDropdownItem>编辑</VDropdownItem>
-    `
-  }
+    `,
+  },
 };

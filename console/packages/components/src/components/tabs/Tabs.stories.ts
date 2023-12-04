@@ -9,7 +9,7 @@ const meta: Meta<typeof VTabs> = {
     components: { VTabs, VTabItem },
     setup() {
       return {
-        args
+        args,
       };
     },
     template: `
@@ -31,8 +31,8 @@ const meta: Meta<typeof VTabs> = {
   argTypes: {
     type: {
       control: { type: "select" },
-      options: ["default", "pills", "outline"]
-    }
+      options: ["default", "pills", "outline"],
+    },
   },
 };
 
@@ -41,21 +41,21 @@ type Story = StoryObj<typeof VTabs>;
 
 export const Default: Story = {
   args: {
-    activeId: 'ryanwang',
-    type: "default"
-  }
+    activeId: "ryanwang",
+    type: "default",
+  },
 };
 
 export const Pills: Story = {
   args: {
-    activeId: 'ryanwang',
-    type: "pills"
-  }
+    activeId: "ryanwang",
+    type: "pills",
+  },
 };
 
 export const Outline: Story = {
   args: {
-    activeId: 'ryanwang',
-    type: "outline"
-  }
+    activeId: "ryanwang",
+    type: "outline",
+  },
 };
