@@ -1,6 +1,7 @@
 import type { Preview } from "@storybook/vue3";
 
 import "../src/styles/tailwind.css";
+import "overlayscrollbars/overlayscrollbars.css";
 
 const preview: Preview = {
   parameters: {
@@ -11,7 +12,7 @@ const preview: Preview = {
         date: /Date$/,
       },
     },
-    layout: 'padded',
+    layout: "padded",
   },
 };
 
