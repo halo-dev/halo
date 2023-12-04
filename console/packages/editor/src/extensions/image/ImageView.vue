@@ -70,11 +70,11 @@ onMounted(() => {
     document.documentElement.addEventListener("mouseup", stopDrag, false);
   });
 
+  const aspectRatio =
+    resizeRef.value.clientWidth / resizeRef.value.clientHeight;
+
   function doDrag(e: MouseEvent) {
     if (!resizeRef.value) return;
-
-    const aspectRatio =
-      resizeRef.value.clientWidth / resizeRef.value.clientHeight;
 
     const newWidth = Math.min(
       startWidth + e.clientX - startX,
