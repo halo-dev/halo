@@ -179,7 +179,7 @@ onMounted(() => {
 
           <div class="flex items-center gap-1">
             <a
-              v-tooltip="'个人中心'"
+              v-tooltip="$t('core.sidebar.operations.profile.tooltip')"
               class="group inline-block cursor-pointer rounded-full p-1.5 transition-all hover:bg-gray-100"
               href="/uc"
             >
@@ -188,6 +188,7 @@ onMounted(() => {
               />
             </a>
             <div
+              v-tooltip="$t('core.sidebar.operations.logout.tooltip')"
               class="group inline-block cursor-pointer rounded-full p-1.5 transition-all hover:bg-gray-100"
               @click="handleLogout"
             >
@@ -200,7 +201,7 @@ onMounted(() => {
       </div>
     </aside>
 
-    <main class="content w-full pb-12 mb-safe md:pb-0">
+    <main class="content w-full pb-12 mb-safe md:w-[calc(100%-16rem)] md:pb-0">
       <slot v-if="$slots.default" />
       <RouterView v-else />
     </main>

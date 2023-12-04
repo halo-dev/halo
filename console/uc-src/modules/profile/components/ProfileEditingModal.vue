@@ -114,7 +114,7 @@ async function onEmailVerifyModalClose() {
 </script>
 <template>
   <VModal
-    :title="$t('core.user.editing_modal.titles.update')"
+    :title="$t('core.uc_profile.editing_modal.title')"
     :visible="visible"
     :width="700"
     @update:visible="onVisibleChange"
@@ -131,7 +131,7 @@ async function onEmailVerifyModalClose() {
           <div class="md:col-span-1">
             <div class="sticky top-0">
               <span class="text-base font-medium text-gray-900">
-                {{ $t("core.user.editing_modal.groups.general") }}
+                {{ $t("core.uc_profile.editing_modal.groups.general") }}
               </span>
             </div>
           </div>
@@ -140,21 +140,23 @@ async function onEmailVerifyModalClose() {
               id="userNameInput"
               v-model="formState.metadata.name"
               :disabled="true"
-              :label="$t('core.user.editing_modal.fields.username.label')"
+              :label="$t('core.uc_profile.editing_modal.fields.username.label')"
               type="text"
               name="name"
             ></FormKit>
             <FormKit
               id="displayNameInput"
               v-model="formState.spec.displayName"
-              :label="$t('core.user.editing_modal.fields.display_name.label')"
+              :label="
+                $t('core.uc_profile.editing_modal.fields.display_name.label')
+              "
               type="text"
               name="displayName"
               validation="required|length:0,50"
             ></FormKit>
             <FormKit
               v-model="formState.spec.email"
-              :label="$t('core.user.editing_modal.fields.email.label')"
+              :label="$t('core.uc_profile.editing_modal.fields.email.label')"
               type="email"
               name="email"
               readonly
@@ -165,20 +167,20 @@ async function onEmailVerifyModalClose() {
                   class="rounded-none border-y-0 border-l border-r-0"
                   @click="emailVerifyModal = true"
                 >
-                  修改
+                  {{ $t("core.common.buttons.modify") }}
                 </VButton>
               </template>
             </FormKit>
             <FormKit
               v-model="formState.spec.phone"
-              :label="$t('core.user.editing_modal.fields.phone.label')"
+              :label="$t('core.uc_profile.editing_modal.fields.phone.label')"
               type="text"
               name="phone"
               validation="length:0,20"
             ></FormKit>
             <FormKit
               v-model="formState.spec.bio"
-              :label="$t('core.user.editing_modal.fields.bio.label')"
+              :label="$t('core.uc_profile.editing_modal.fields.bio.label')"
               type="textarea"
               name="bio"
               validation="length:0,2048"

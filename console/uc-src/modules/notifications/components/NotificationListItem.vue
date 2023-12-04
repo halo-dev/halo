@@ -7,8 +7,10 @@ import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { Dialog, Toast, VStatusDot } from "@halo-dev/components";
 import { watch } from "vue";
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 const queryClient = useQueryClient();
+const { t } = useI18n();
 
 const props = withDefaults(
   defineProps<{
@@ -43,8 +45,8 @@ const { mutate: handleMarkAsRead } = useMutation({
 
 function handleDelete() {
   Dialog.warning({
-    title: "删除消息",
-    description: "确定要删除该消息吗？",
+    title: t("core.uc_notification.operations.delete.title"),
+    description: t("core.uc_notification.operations.delete.description"),
     async onConfirm() {
       await apiClient.notification.deleteSpecifiedNotification({
         name: props.notification.metadata.name,
@@ -53,7 +55,7 @@ function handleDelete() {
 
       await queryClient.invalidateQueries({ queryKey: ["user-notifications"] });
 
-      Toast.success("删除成功");
+      Toast.success(t("core.common.toast.delete_success"));
     },
   });
 }
@@ -109,7 +111,7 @@ watch(
           class="text-sm text-gray-600 hover:text-gray-900"
           @click.stop="handleMarkAsRead({ refetch: true })"
         >
-          {{ $t("core.notification.operations.mark_as_read.button") }}
+          {{ $t("core.uc_notification.operations.mark_as_read.button") }}
         </span>
         <span
           class="text-sm text-red-600 hover:text-red-700"

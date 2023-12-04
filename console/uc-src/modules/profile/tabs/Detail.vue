@@ -40,7 +40,7 @@ const availableAuthProviders = computed(() => {
 
 const handleUnbindAuth = (authProvider: ListedAuthProvider) => {
   Dialog.warning({
-    title: t("core.user.detail.operations.unbind.title", {
+    title: t("core.uc_profile.detail.operations.unbind.title", {
       display_name: authProvider.displayName,
     }),
     confirmText: t("core.common.buttons.confirm"),
@@ -74,29 +74,33 @@ const emailVerifyModal = ref(false);
   <div class="border-t border-gray-100">
     <VDescription>
       <VDescriptionItem
-        :label="$t('core.user.detail.fields.display_name')"
+        :label="$t('core.uc_profile.detail.fields.display_name')"
         :content="user?.user.spec.displayName"
         class="!px-2"
       />
       <VDescriptionItem
-        :label="$t('core.user.detail.fields.username')"
+        :label="$t('core.uc_profile.detail.fields.username')"
         :content="user?.user.metadata.name"
         class="!px-2"
       />
       <VDescriptionItem
-        :label="$t('core.user.detail.fields.email')"
+        :label="$t('core.uc_profile.detail.fields.email')"
         class="!px-2"
       >
         <div v-if="user" class="w-full xl:w-1/2">
           <VAlert
             v-if="!user.user.spec.email"
-            title="设置电子邮箱"
-            description="电子邮箱地址还未设置，点击下方按钮进行设置"
+            :title="$t('core.uc_profile.detail.email_not_set.title')"
+            :description="
+              $t('core.uc_profile.detail.email_not_set.description')
+            "
             type="warning"
             :closable="false"
           >
             <template #actions>
-              <VButton size="sm" @click="emailVerifyModal = true">设置</VButton>
+              <VButton size="sm" @click="emailVerifyModal = true">
+                {{ $t("core.common.buttons.setting") }}
+              </VButton>
             </template>
           </VAlert>
 
@@ -104,14 +108,16 @@ const emailVerifyModal = ref(false);
             <span>{{ user.user.spec.email }}</span>
             <div v-if="!user.user.spec.emailVerified" class="mt-3">
               <VAlert
-                title="验证电子邮箱"
-                description="电子邮箱地址还未验证，点击下方按钮进行验证"
+                :title="$t('core.uc_profile.detail.email_not_verified.title')"
+                :description="
+                  $t('core.uc_profile.detail.email_not_verified.description')
+                "
                 type="warning"
                 :closable="false"
               >
                 <template #actions>
                   <VButton size="sm" @click="emailVerifyModal = true">
-                    验证
+                    {{ $t("core.common.buttons.verify") }}
                   </VButton>
                 </template>
               </VAlert>
@@ -120,7 +126,7 @@ const emailVerifyModal = ref(false);
         </div>
       </VDescriptionItem>
       <VDescriptionItem
-        :label="$t('core.user.detail.fields.roles')"
+        :label="$t('core.uc_profile.detail.fields.roles')"
         class="!px-2"
       >
         <VTag v-for="role in user?.roles" :key="role.metadata.name">
@@ -134,18 +140,18 @@ const emailVerifyModal = ref(false);
         </VTag>
       </VDescriptionItem>
       <VDescriptionItem
-        :label="$t('core.user.detail.fields.bio')"
+        :label="$t('core.uc_profile.detail.fields.bio')"
         :content="user?.user.spec?.bio || $t('core.common.text.none')"
         class="!px-2"
       />
       <VDescriptionItem
-        :label="$t('core.user.detail.fields.creation_time')"
+        :label="$t('core.uc_profile.detail.fields.creation_time')"
         :content="formatDatetime(user?.user.metadata?.creationTimestamp)"
         class="!px-2"
       />
       <VDescriptionItem
         v-if="!isFetching && availableAuthProviders?.length"
-        :label="$t('core.user.detail.fields.identity_authentication')"
+        :label="$t('core.uc_profile.detail.fields.identity_authentication')"
         class="!px-2"
       >
         <ul class="space-y-2">
@@ -171,7 +177,7 @@ const emailVerifyModal = ref(false);
                     size="sm"
                     @click="handleUnbindAuth(authProvider)"
                   >
-                    {{ $t("core.user.detail.operations.unbind.button") }}
+                    {{ $t("core.uc_profile.detail.operations.unbind.button") }}
                   </VButton>
                   <VButton
                     v-else
@@ -179,7 +185,7 @@ const emailVerifyModal = ref(false);
                     type="secondary"
                     @click="handleBindAuth(authProvider)"
                   >
-                    {{ $t("core.user.detail.operations.bind.button") }}
+                    {{ $t("core.uc_profile.detail.operations.unbind.button") }}
                   </VButton>
                 </div>
               </div>

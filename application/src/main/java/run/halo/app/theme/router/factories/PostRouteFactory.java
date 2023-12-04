@@ -35,12 +35,12 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.exception.NotFoundException;
 import run.halo.app.infra.utils.JsonUtils;
 import run.halo.app.theme.DefaultTemplateEnum;
+import run.halo.app.theme.ViewNameResolver;
 import run.halo.app.theme.finders.PostFinder;
 import run.halo.app.theme.finders.vo.PostVo;
 import run.halo.app.theme.router.ModelMapUtils;
 import run.halo.app.theme.router.ReactiveQueryPostPredicateResolver;
 import run.halo.app.theme.router.TitleVisibilityIdentifyCalculator;
-import run.halo.app.theme.router.ViewNameResolver;
 
 /**
  * The {@link PostRouteFactory} for generate {@link RouterFunction} specific to the template

@@ -80,6 +80,9 @@ public class SystemSetting {
         Integer tagPageSize;
         Boolean review;
         String slugGenerationStrategy;
+
+        String attachmentPolicyName;
+        String attachmentGroupName;
     }
 
     @Data

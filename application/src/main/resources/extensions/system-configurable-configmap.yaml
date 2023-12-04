@@ -32,7 +32,8 @@ data:
       "archivePageSize": 10,
       "categoryPageSize": 10,
       "tagPageSize": 10,
-      "slugGenerationStrategy": "generateByTitle"
+      "slugGenerationStrategy": "generateByTitle",
+      "attachmentPolicyName": "default-policy"
     }
   comment: |
     {

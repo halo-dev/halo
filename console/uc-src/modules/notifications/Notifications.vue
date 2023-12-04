@@ -56,7 +56,7 @@ const selectedNotification = computed(() => {
 </script>
 
 <template>
-  <VPageHeader :title="$t('core.notification.title')">
+  <VPageHeader :title="$t('core.uc_notification.title')">
     <template #icon>
       <IconNotificationBadgeLine class="mr-2 self-center" />
     </template>
@@ -80,8 +80,8 @@ const selectedNotification = computed(() => {
               v-model:active-id="activeTab"
               class="sticky top-0 z-10 !rounded-none"
               :items="[
-                { id: 'unread', label: $t('core.notification.tabs.unread') },
-                { id: 'read', label: $t('core.notification.tabs.read') },
+                { id: 'unread', label: $t('core.uc_notification.tabs.unread') },
+                { id: 'read', label: $t('core.uc_notification.tabs.read') },
               ]"
               type="outline"
               @change="selectedNotificationName = undefined"
@@ -95,8 +95,8 @@ const selectedNotification = computed(() => {
               <VEmpty
                 :title="`${
                   activeTab === 'unread'
-                    ? $t('core.notification.empty.titles.unread')
-                    : $t('core.notification.empty.titles.read')
+                    ? $t('core.uc_notification.empty.titles.unread')
+                    : $t('core.uc_notification.empty.titles.read')
                 }`"
               >
                 <template #actions>

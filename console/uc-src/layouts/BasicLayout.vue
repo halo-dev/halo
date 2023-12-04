@@ -11,7 +11,7 @@ import {
 import { RoutesMenu } from "@/components/menu/RoutesMenu";
 import IconLogo from "~icons/core/logo?width=5rem&height=2rem";
 import { RouterView, useRoute, useRouter } from "vue-router";
-import { onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import axios from "axios";
 import LoginModal from "@/components/login/LoginModal.vue";
 import { coreMenuGroups } from "@console/router/constant";
@@ -95,6 +95,16 @@ onMounted(() => {
     initialize({ target: navbarScroller.value });
   }
 });
+
+const disallowAccessConsole = computed(() => {
+  const hasDisallowAccessConsoleRole = currentRoles?.value?.some((role) => {
+    return (
+      role.metadata.annotations?.[rbacAnnotations.DISALLOW_ACCESS_CONSOLE] ===
+      "true"
+    );
+  });
+  return !!hasDisallowAccessConsoleRole;
+});
 </script>
 
 <template>
@@ -145,7 +155,8 @@ onMounted(() => {
           </div>
           <div class="flex items-center gap-1">
             <a
-              v-tooltip="'管理控制台'"
+              v-if="!disallowAccessConsole"
+              v-tooltip="$t('core.uc_sidebar.operations.console.tooltip')"
               class="group inline-block cursor-pointer rounded-full p-1.5 transition-all hover:bg-gray-100"
               href="/console"
             >
@@ -154,6 +165,7 @@ onMounted(() => {
               />
             </a>
             <div
+              v-tooltip="$t('core.sidebar.operations.logout.tooltip')"
               class="group inline-block cursor-pointer rounded-full p-1.5 transition-all hover:bg-gray-100"
               @click="handleLogout"
             >
@@ -166,7 +178,7 @@ onMounted(() => {
       </div>
     </aside>
 
-    <main class="content w-full pb-12 mb-safe md:pb-0">
+    <main class="content w-full pb-12 mb-safe md:w-[calc(100%-16rem)] md:pb-0">
       <slot v-if="$slots.default" />
       <RouterView v-else />
     </main>

@@ -28,7 +28,7 @@ import cloneDeep from "lodash.clonedeep";
 import { useRouter } from "vue-router";
 import { randomUUID } from "@/utils/id";
 import { useContentCache } from "@console/composables/use-content-cache";
-import { useEditorExtensionPoints } from "@console/composables/use-editor-extension-points";
+import { useEditorExtensionPoints } from "@/composables/use-editor-extension-points";
 import type { EditorProvider } from "@halo-dev/console-shared";
 import { useLocalStorage } from "@vueuse/core";
 import EditorProviderSelector from "@/components/dropdown-selector/EditorProviderSelector.vue";
@@ -39,10 +39,13 @@ import { usePageUpdateMutate } from "./composables/use-page-update-mutate";
 import { useAutoSaveContent } from "@console/composables/use-auto-save-content";
 import { useContentSnapshot } from "@console/composables/use-content-snapshot";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
+import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
+import { usePermission } from "@/utils/permission";
 
 const router = useRouter();
 const { t } = useI18n();
 const { mutateAsync: singlePageUpdateMutate } = usePageUpdateMutate();
+const { currentUserHasPermission } = usePermission();
 
 // Editor providers
 const { editorProviders } = useEditorExtensionPoints();
@@ -372,6 +375,26 @@ const handlePreview = async () => {
 };
 
 useSaveKeybinding(handleSave);
+
+// Keep session alive
+useSessionKeepAlive();
+
+// Upload image
+async function handleUploadImage(file: File) {
+  if (!currentUserHasPermission(["uc:attachments:manage"])) {
+    return;
+  }
+  if (!isUpdateMode.value) {
+    await handleSave();
+  }
+
+  const { data } = await apiClient.uc.attachment.createAttachmentForPost({
+    file,
+    singlePageName: formState.value.page.metadata.name,
+    waitForPermalink: true,
+  });
+  return data;
+}
 </script>
 
 <template>
@@ -450,6 +473,7 @@ useSaveKeybinding(handleSave);
       v-if="currentEditorProvider"
       v-model:raw="formState.content.raw"
       v-model:content="formState.content.content"
+      :upload-image="handleUploadImage"
       class="h-full"
       @update="handleSetContentCache"
     />

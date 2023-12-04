@@ -1,0 +1,131 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: post-editor
+  labels:
+    rbac.authorization.halo.run/system-reserved: "true"
+  annotations:
+    # Currently, yaml definition does not support i18n, please see https://github.com/halo-dev/halo/issues/3573
+    rbac.authorization.halo.run/display-name: "编辑者"
+    rbac.authorization.halo.run/dependencies: |
+      ["role-template-post-editor"]
+rules: [ ]
+
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-post-editor
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Posts Management"
+    # Currently, yaml definition does not support i18n, please see https://github.com/halo-dev/halo/issues/3573
+    rbac.authorization.halo.run/display-name: "Post Editor"
+    rbac.authorization.halo.run/dependencies: |
+      ["role-template-manage-posts", "role-template-post-author"]
+rules: [ ]
+
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: post-author
+  labels:
+    rbac.authorization.halo.run/system-reserved: "true"
+  annotations:
+    # Currently, yaml definition does not support i18n, please see https://github.com/halo-dev/halo/issues/3573
+    rbac.authorization.halo.run/display-name: "作者"
+    rbac.authorization.halo.run/disallow-access-console: "true"
+    rbac.authorization.halo.run/redirect-on-login: "/uc"
+    rbac.authorization.halo.run/dependencies: |
+      [ "role-template-post-author" ]
+rules: [ ]
+
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-post-author
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Posts Management"
+    # Currently, yaml definition does not support i18n, please see https://github.com/halo-dev/halo/issues/3573
+    rbac.authorization.halo.run/display-name: "Post Author"
+    rbac.authorization.halo.run/dependencies: |
+      [ "role-template-post-contributor", "role-template-post-publisher", "role-template-post-attachment-manager" ]
+rules: [ ]
+
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: post-contributor
+  labels:
+    rbac.authorization.halo.run/system-reserved: "true"
+  annotations:
+    # Currently, yaml definition does not support i18n, please see https://github.com/halo-dev/halo/issues/3573
+    rbac.authorization.halo.run/display-name: "投稿者"
+    rbac.authorization.halo.run/disallow-access-console: "true"
+    rbac.authorization.halo.run/redirect-on-login: "/uc"
+    rbac.authorization.halo.run/dependencies: |
+      [ "role-template-post-contributor" ]
+rules: [ ]
+
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-post-contributor
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Posts Management"
+    # Currently, yaml definition does not support i18n, please see https://github.com/halo-dev/halo/issues/3573
+    rbac.authorization.halo.run/display-name: "Post Contributor"
+    rbac.authorization.halo.run/dependencies: |
+      [ "role-template-view-categories", "role-template-view-tags" ]
+    rbac.authorization.halo.run/ui-permissions: |
+      [ "uc:posts:manage" ]
+rules:
+  - apiGroups: [ "uc.api.content.halo.run" ]
+    resources: [ "posts" ]
+    verbs: [ "get", "list", "create", "update", "delete" ]
+  - apiGroups: [ "uc.api.content.halo.run" ]
+    resources: [ "posts/draft" ]
+    verbs: [ "update", "get" ]
+
+---
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: role-template-post-publisher
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Posts Management"
+    rbac.authorization.halo.run/display-name: "Post Publisher"
+    rbac.authorization.halo.run/ui-permissions: |
+      [ "uc:posts:publish" ]
+rules:
+  - apiGroups: [ "uc.api.content.halo.run" ]
+    resources: [ "posts/publish", "posts/unpublish" ]
+    verbs: [ "update" ]
+
+---
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: role-template-post-attachment-manager
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Posts Management"
+    rbac.authorization.halo.run/display-name: "Post Attachment Manager"
+    rbac.authorization.halo.run/ui-permissions: |
+      [ "uc:attachments:manage" ]
+rules:
+  - apiGroups: [ "uc.api.content.halo.run" ]
+    resources: [ "attachments" ]
+    verbs: [ "create", "update", "delete" ]

@@ -83,7 +83,7 @@ const handleUploadAvatar = () => {
         handleCloseCropperModal();
       })
       .catch(() => {
-        Toast.error(t("core.user.detail.avatar.toast_upload_failed"));
+        Toast.error(t("core.components.user_avatar.toast_upload_failed"));
       })
       .finally(() => {
         uploadSaving.value = false;
@@ -93,7 +93,7 @@ const handleUploadAvatar = () => {
 
 const handleRemoveCurrentAvatar = () => {
   Dialog.warning({
-    title: t("core.user.detail.avatar.remove.title"),
+    title: t("core.components.user_avatar.remove.title"),
     description: t("core.common.dialog.descriptions.cannot_be_recovered"),
     confirmType: "danger",
     confirmText: t("core.common.buttons.confirm"),
@@ -111,7 +111,7 @@ const handleRemoveCurrentAvatar = () => {
           queryClient.invalidateQueries({ queryKey: ["user-detail"] });
         })
         .catch(() => {
-          Toast.error(t("core.user.detail.avatar.toast_remove_failed"));
+          Toast.error(t("core.components.user_avatar.toast_remove_failed"));
         });
     },
   });
@@ -174,7 +174,7 @@ const hasAvatar = computed(() => {
   <VModal
     :visible="visibleCropperModal"
     :width="1200"
-    :title="$t('core.user.detail.avatar.cropper_modal.title')"
+    :title="$t('core.components.user_avatar.cropper_modal.title')"
     mount-to-body
     @update:visible="handleCloseCropperModal"
   >

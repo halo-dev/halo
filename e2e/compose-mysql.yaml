@@ -1,0 +1,46 @@
+version: '3.1'
+services:
+  testing:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    links:
+      - halo
+    depends_on:
+      halo:
+        condition: service_healthy
+  halo:
+    image: ghcr.io/halo-dev/halo-dev:${TAG:-main}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/actuator/health/readiness"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    command:
+      - --spring.r2dbc.url=r2dbc:pool:mysql://mysql:3306/halo
+      - --spring.r2dbc.username=root
+      - --spring.r2dbc.password=halo
+      - --spring.sql.init.platform=mysql
+    links:
+      - mysql
+    depends_on:
+      mysql:
+        condition: service_healthy
+  mysql:
+    image: mysql:8.1.0
+    container_name: mysql
+    restart: on-failure:3
+    command: 
+      - --default-authentication-plugin=caching_sha2_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_general_ci
+      - --explicit_defaults_for_timestamp=true
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "--silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      - MYSQL_ROOT_PASSWORD=halo
+      - MYSQL_DATABASE=halo
