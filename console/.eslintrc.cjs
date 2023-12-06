@@ -24,6 +24,7 @@ module.exports = {
       extends: ["plugin:cypress/recommended"],
     },
   ],
+  ignorePatterns: ["!.storybook"],
   parserOptions: {
     ecmaVersion: "latest",
   },
