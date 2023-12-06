@@ -50,8 +50,16 @@ function handleSetFocus() {
   props.editor.commands.setNodeSelection(props.getPos());
 }
 
+const aspectRatio = ref<number>(0);
 const inputRef = ref();
 const resizeRef = ref<HTMLDivElement>();
+
+function onImageLoaded() {
+  if (!resizeRef.value) return;
+
+  aspectRatio.value =
+    resizeRef.value.clientWidth / resizeRef.value.clientHeight;
+}
 
 onMounted(() => {
   if (!src.value) {
@@ -73,20 +81,17 @@ onMounted(() => {
   function doDrag(e: MouseEvent) {
     if (!resizeRef.value) return;
 
-    const aspectRatio =
-      resizeRef.value.clientWidth / resizeRef.value.clientHeight;
-
     const newWidth = Math.min(
       startWidth + e.clientX - startX,
       resizeRef.value.parentElement?.clientWidth || 0
     );
 
     const width = newWidth.toFixed(0) + "px";
-    const height = (newWidth / aspectRatio).toFixed(0) + "px";
+    const height = (newWidth / aspectRatio.value).toFixed(0) + "px";
     props.editor
       .chain()
       .updateAttributes(Image.name, { width, height })
-      .setNodeSelection(props.editor.state.selection.from)
+      .setNodeSelection(props.getPos())
       .focus()
       .run();
   }
@@ -128,6 +133,7 @@ onMounted(() => {
         :alt="alt"
         :href="href"
         class="w-full h-full"
+        @load="onImageLoaded"
       />
     </div>
   </node-view-wrapper>
