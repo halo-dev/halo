@@ -33,7 +33,7 @@ const classes = computed(() => {
 });
 
 const handleChange = (id: number | string, index: number) => {
-  manualSetArrowShow(index);
+  handleClickArrow(index);
   emit("update:activeId", id);
   emit("change", id);
 };
@@ -41,6 +41,7 @@ const handleChange = (id: number | string, index: number) => {
 const tabbarItemsRef = ref<HTMLElement | undefined>();
 const tabItemRefs = ref<HTMLElement[] | undefined>();
 const itemWidthArr = ref<number[]>([]);
+const indicatorRef = ref<HTMLElement | undefined>();
 const arrowShow = ref<ArrowShow>({ left: false, right: false });
 const { width: tabbarWidth } = useElementSize(tabbarItemsRef);
 
@@ -73,9 +74,17 @@ function handleHorizontalWheel(event: WheelEvent) {
   }
 }
 
-function calculateItemWidth() {
+function calculateItemWidth(
+  n: Record<string, string>[] | undefined,
+  o: Record<string, string>[] | undefined
+) {
   if (!tabbarItemsRef.value) return;
-  if (tabItemRefs.value) {
+  // NOTE: 疑惑。。。加入此判断 tabItemRefs.value.length ===  o?.length 才使 itemWidthArr 不会重复
+  if (
+    tabItemRefs.value &&
+    tabItemRefs.value.length === n?.length &&
+    tabItemRefs.value.length === o?.length
+  ) {
     for (const item of tabItemRefs.value) {
       itemWidthArr.value.push(item.offsetWidth);
     }
@@ -86,35 +95,114 @@ function calculateItemWidth() {
   }
 }
 
-function manualSetArrowShow(
+// 以单标签距离滚动
+function handleClickArrow(
   index: number | undefined,
   prev: boolean | undefined = undefined
 ) {
-  if (!tabbarItemsRef.value) return;
-  if (tabbarItemsRef.value.scrollWidth <= tabbarWidth.value) return;
-  if (prev || index === 0) {
+  if (!tabbarItemsRef.value || !indicatorRef.value) return;
+  if (tabbarItemsRef.value.scrollWidth <= tabbarItemsRef.value.clientWidth)
+    return;
+  const { scrollWidth, scrollLeft, clientWidth } = tabbarItemsRef.value;
+  if (index === 0) {
     tabbarItemsRef.value.scrollTo({ left: 0, behavior: "smooth" });
     scrollX.value = 0;
-    arrowShow.value = {
-      left: false,
-      right: true,
-    };
+    arrowShow.value.left = false;
+    return;
   }
-  if (
-    (prev !== undefined && !prev) ||
-    index === itemWidthArr.value.length - 1
-  ) {
-    const { scrollWidth } = tabbarItemsRef.value;
+  if (index === itemWidthArr.value.length - 1) {
     tabbarItemsRef.value.scrollTo({
-      left: scrollWidth - tabbarWidth.value,
+      left: scrollWidth - clientWidth,
       behavior: "smooth",
     });
-    scrollX.value = scrollWidth - tabbarWidth.value;
-    arrowShow.value = {
-      left: true,
-      right: false,
-    };
+    scrollX.value = scrollWidth - clientWidth;
+    arrowShow.value.right = false;
+    return;
   }
+  let hiddenNum = 0;
+  let totalWith = 0;
+  let overWidth = 0;
+  let scrollByX = 0;
+  const lastItemWidth = itemWidthArr.value[itemWidthArr.value.length - 1];
+  const firstItemWidth = itemWidthArr.value[0];
+  if (prev) {
+    if (!arrowShow.value.right) arrowShow.value.right = true;
+    overWidth = scrollLeft;
+    // 仅剩前两项待展现时，点击后直接滚动到第一项
+    if (scrollX.value - firstItemWidth - itemWidthArr.value[1] <= 0) {
+      arrowShow.value.left = false;
+      tabbarItemsRef.value.scrollTo({
+        left: 0,
+        behavior: "smooth",
+      });
+      scrollX.value = 0;
+      return;
+    }
+    for (let i = 0; i < itemWidthArr.value.length; i++) {
+      const w = itemWidthArr.value[i];
+      totalWith += w;
+      if (totalWith >= overWidth) {
+        hiddenNum = i;
+        break;
+      }
+    }
+    if (hiddenNum === 0) {
+      scrollByX = -itemWidthArr.value[0];
+      scrollX.value = 0;
+      arrowShow.value.left = false;
+    } else {
+      scrollByX = -(
+        itemWidthArr.value[hiddenNum] -
+        totalWith +
+        overWidth +
+        itemWidthArr.value[hiddenNum - 1]
+      );
+      // listen: wheel-scroll arrowshow
+      scrollX.value += scrollByX;
+    }
+  } else if (prev !== undefined && !prev) {
+    if (!arrowShow.value.left) arrowShow.value.left = true;
+    overWidth = scrollWidth - scrollLeft - clientWidth;
+    // 仅剩最后两项待展现时，点击后直接滚动到最后一项
+    if (
+      scrollX.value +
+        lastItemWidth +
+        itemWidthArr.value[itemWidthArr.value.length - 2] >=
+      scrollWidth - clientWidth
+    ) {
+      arrowShow.value.right = false;
+      tabbarItemsRef.value.scrollBy({
+        left: lastItemWidth + itemWidthArr.value[itemWidthArr.value.length - 2],
+        behavior: "smooth",
+      });
+      scrollX.value = scrollWidth - clientWidth;
+      return;
+    }
+    for (let i = itemWidthArr.value.length - 1; i >= 0; i--) {
+      const w = itemWidthArr.value[i];
+      totalWith += w;
+      if (totalWith >= overWidth) {
+        hiddenNum = i;
+        break;
+      }
+    }
+
+    if (hiddenNum === itemWidthArr.value.length - 1) {
+      scrollByX = lastItemWidth;
+      scrollX.value = scrollWidth - clientWidth;
+      arrowShow.value.right = false;
+    } else {
+      scrollByX =
+        itemWidthArr.value[hiddenNum] -
+        (totalWith - overWidth) +
+        itemWidthArr.value[hiddenNum + 1];
+      scrollX.value += scrollByX;
+    }
+  }
+  tabbarItemsRef.value.scrollBy({
+    left: scrollByX,
+    behavior: "smooth",
+  });
 }
 
 function handleListenArrow() {
@@ -146,6 +234,7 @@ watch(tabbarWidth, () => {
       left: false,
       right: false,
     };
+    scrollX.value = 0;
   }
 });
 
@@ -164,12 +253,13 @@ onUnmounted(() => {
 <template>
   <div :class="classes" class="tabbar-wrapper">
     <div
+      ref="indicatorRef"
       :class="['indicator', 'left', arrowShow.left ? 'visible' : 'invisible']"
     >
       <div
         title="向前"
         class="arrow-left"
-        @click="manualSetArrowShow(undefined, true)"
+        @click="handleClickArrow(undefined, true)"
       >
         <IconArrowLeft />
       </div>
@@ -180,7 +270,7 @@ onUnmounted(() => {
       <div
         title="向后"
         class="arrow-right"
-        @click="manualSetArrowShow(undefined, false)"
+        @click="handleClickArrow(undefined, false)"
       >
         <IconArrowRight />
       </div>
@@ -221,17 +311,17 @@ onUnmounted(() => {
     via-30%
     to-white
     to-70%
-    pt-0.5
+    pt-1
     pb-1.5;
 
     &.left {
-      @apply left-0 
+      @apply left-0
       justify-start
       bg-gradient-to-l;
     }
     &.right {
-      @apply right-0 
-      justify-end 
+      @apply right-0
+      justify-end
       bg-gradient-to-r;
     }
     .arrow-left,
@@ -243,7 +333,7 @@ onUnmounted(() => {
       items-center
       pointer-events-auto
       cursor-pointer
-      py-0.5;
+      select-none;
       svg {
         font-size: 1.5em;
       }
