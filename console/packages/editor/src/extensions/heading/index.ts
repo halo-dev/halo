@@ -1,4 +1,4 @@
-import type { Editor, Range } from "@/tiptap/vue-3";
+import { mergeAttributes, type Editor, type Range } from "@/tiptap/vue-3";
 import TiptapParagraph from "@/extensions/paragraph";
 import TiptapHeading from "@tiptap/extension-heading";
 import type { HeadingOptions } from "@tiptap/extension-heading";
@@ -15,8 +15,24 @@ import MdiFormatHeader6 from "~icons/mdi/format-header-6";
 import { markRaw } from "vue";
 import { i18n } from "@/locales";
 import type { ExtensionOptions } from "@/types";
+import { Decoration, DecorationSet, Plugin, PluginKey } from "@/tiptap";
+import { ExtensionHeading } from "..";
+import { generateAnchor } from "@/utils";
 
 const Blockquote = TiptapHeading.extend<ExtensionOptions & HeadingOptions>({
+  renderHTML({ node, HTMLAttributes }) {
+    const hasLevel = this.options.levels.includes(node.attrs.level);
+    const level = hasLevel ? node.attrs.level : this.options.levels[0];
+    const id = generateAnchor(node.textContent);
+    HTMLAttributes.id = id;
+
+    return [
+      `h${level}`,
+      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
+      0,
+    ];
+  },
+
   addOptions() {
     return {
       ...this.parent?.(),
@@ -264,6 +280,32 @@ const Blockquote = TiptapHeading.extend<ExtensionOptions & HeadingOptions>({
   },
   addExtensions() {
     return [TiptapParagraph];
+  },
+  addProseMirrorPlugins() {
+    return [
+      new Plugin({
+        key: new PluginKey("generate-heading-id"),
+        props: {
+          decorations: (state) => {
+            const { doc } = state;
+            const decorations: Decoration[] = [];
+            doc.descendants((node, pos) => {
+              if (node.type.name === ExtensionHeading.name) {
+                const id = generateAnchor(node.textContent);
+                if (node.attrs.id !== id) {
+                  decorations.push(
+                    Decoration.node(pos, pos + node.nodeSize, {
+                      id,
+                    })
+                  );
+                }
+              }
+            });
+            return DecorationSet.create(doc, decorations);
+          },
+        },
+      }),
+    ];
   },
 });
 
