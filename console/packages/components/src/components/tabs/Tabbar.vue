@@ -74,17 +74,10 @@ function handleHorizontalWheel(event: WheelEvent) {
   }
 }
 
-function calculateItemWidth(
-  n: Record<string, string>[] | undefined,
-  o: Record<string, string>[] | undefined
-) {
+// 保存每项 tab 宽度
+function calculateItemWidth(n: Record<string, string>[] | undefined) {
   if (!tabbarItemsRef.value) return;
-  // NOTE: 疑惑。。。加入此判断 tabItemRefs.value.length ===  o?.length 才使 itemWidthArr 不会重复
-  if (
-    tabItemRefs.value &&
-    tabItemRefs.value.length === n?.length &&
-    tabItemRefs.value.length === o?.length
-  ) {
+  if (tabItemRefs.value && tabItemRefs.value.length === n?.length) {
     for (const item of tabItemRefs.value) {
       itemWidthArr.value.push(item.offsetWidth);
     }
@@ -238,9 +231,7 @@ watch(tabbarWidth, () => {
   }
 });
 
-watch(() => props.items, calculateItemWidth, {
-  flush: "post",
-});
+watch(() => props.items, calculateItemWidth);
 
 onMounted(() => {
   tabbarItemsRef.value?.addEventListener("wheel", handleHorizontalWheel);
