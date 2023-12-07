@@ -12,7 +12,7 @@ public enum Operator implements Converter<String, SelectorCriteria> {
         public SelectorCriteria convert(@Nullable String selector) {
             if (preFlightCheck(selector, 3)) {
                 var i = selector.indexOf(getOperator());
-                if (i > 0 && (i + getOperator().length()) < selector.length() - 1) {
+                if (i > 0 && (i + getOperator().length()) <= selector.length() - 1) {
                     String key = selector.substring(0, i);
                     String value = selector.substring(i + getOperator().length());
                     return new SelectorCriteria(key, this, Set.of(value));
