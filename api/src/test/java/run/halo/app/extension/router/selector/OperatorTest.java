@@ -27,6 +27,8 @@ class OperatorTest {
             new TestCase("name=", Equals, null),
             new TestCase("name=value", Equals,
                 new SelectorCriteria("name", Equals, Set.of("value"))),
+            new TestCase("name=v", Equals, 
+                new SelectorCriteria("name", Equals, Set.of("v"))),
 
             new TestCase("", NotEquals, null),
             new TestCase("=", NotEquals, null),
