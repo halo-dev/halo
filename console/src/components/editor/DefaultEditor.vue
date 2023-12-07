@@ -47,7 +47,6 @@ import {
   ToolbarItem,
   Plugin,
   PluginKey,
-  Decoration,
   DecorationSet,
 } from "@halo-dev/richtext-editor";
 import {
@@ -90,7 +89,6 @@ import type { PluginModule } from "@halo-dev/console-shared";
 import { useDebounceFn, useLocalStorage } from "@vueuse/core";
 import { onBeforeUnmount } from "vue";
 import { usePermission } from "@/utils/permission";
-import { generateAnchor } from "@/utils/anchor";
 
 const { t } = useI18n();
 const { currentUserHasPermission } = usePermission();
@@ -295,27 +293,17 @@ onMounted(() => {
         addProseMirrorPlugins() {
           return [
             new Plugin({
-              key: new PluginKey("generate-heading-id"),
+              key: new PluginKey("get-heading-id"),
               props: {
                 decorations: (state) => {
                   const headings: HeadingNode[] = [];
                   const { doc } = state;
-                  const decorations: Decoration[] = [];
-                  doc.descendants((node, pos) => {
+                  doc.descendants((node) => {
                     if (node.type.name === ExtensionHeading.name) {
-                      const id = generateAnchor(node.textContent);
-                      if (node.attrs.id !== id) {
-                        decorations.push(
-                          Decoration.node(pos, pos + node.nodeSize, {
-                            id,
-                          })
-                        );
-                      }
-
                       headings.push({
                         level: node.attrs.level,
                         text: node.textContent,
-                        id,
+                        id: node.attrs.id,
                       });
                     }
                   });
@@ -323,7 +311,7 @@ onMounted(() => {
                   if (!selectedHeadingNode.value) {
                     selectedHeadingNode.value = headings[0];
                   }
-                  return DecorationSet.create(doc, decorations);
+                  return DecorationSet.empty;
                 },
               },
             }),
