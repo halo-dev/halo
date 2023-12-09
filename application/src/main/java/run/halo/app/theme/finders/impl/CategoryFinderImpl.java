@@ -86,7 +86,7 @@ public class CategoryFinderImpl implements CategoryFinder {
         return client.list(Category.class,
                 category -> category.getSpec().getChildren().contains(name),
                 defaultComparator())
-            .map(CategoryVo::from).single();
+            .next().map(CategoryVo::from).single();
     }
 
     Flux<CategoryTreeVo> toCategoryTreeVoFlux(String name) {
