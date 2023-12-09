@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import type { ArrowShow, Direction, Type } from "./interface";
+import type { ComputedRef } from "vue";
 import { useElementSize } from "@vueuse/core";
 import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
 
@@ -42,30 +43,32 @@ const tabbarItemsRef = ref<HTMLElement | undefined>();
 const tabItemRefs = ref<HTMLElement[] | undefined>();
 const itemWidthArr = ref<number[]>([]);
 const indicatorRef = ref<HTMLElement | undefined>();
-const arrowShow = ref<ArrowShow>({ left: false, right: false });
+const arrowFlag = ref(false);
 const { width: tabbarWidth } = useElementSize(tabbarItemsRef);
 
-const scrollX = ref(0);
+const arrowShow: ComputedRef<ArrowShow> = computed(() => {
+  const show: ArrowShow = { left: false, right: false };
+  if (!tabbarItemsRef.value) return show;
+  void arrowFlag.value;
+  const { scrollWidth, scrollLeft } = tabbarItemsRef.value;
+  if (scrollWidth > tabbarWidth.value) {
+    if (scrollLeft < scrollWidth - tabbarWidth.value) {
+      show.right = true;
+    }
+    if (scrollLeft > 20) {
+      show.left = true;
+    }
+  }
+  return show;
+});
 
 function handleHorizontalWheel(event: WheelEvent) {
   if (!tabbarItemsRef.value) {
     return;
   }
-  const { scrollLeft, scrollWidth } = tabbarItemsRef.value;
-
-  if (scrollX.value + event.deltaY < 0) {
-    scrollX.value = 0;
-  } else if (scrollX.value + event.deltaY >= scrollWidth - tabbarWidth.value) {
-    scrollX.value = scrollWidth - tabbarWidth.value;
-  } else {
-    scrollX.value += event.deltaY;
-  }
-
+  const { scrollLeft, scrollWidth, clientWidth } = tabbarItemsRef.value;
   const toLeft = event.deltaY < 0 && scrollLeft > 0;
-  const toRight =
-    event.deltaY > 0 && scrollLeft < scrollWidth - tabbarWidth.value;
-
-  handleListenArrow();
+  const toRight = event.deltaY > 0 && scrollLeft < scrollWidth - clientWidth;
 
   if (toLeft || toRight) {
     event.preventDefault();
@@ -75,16 +78,20 @@ function handleHorizontalWheel(event: WheelEvent) {
 }
 
 // 保存每项 tab 宽度
-function calculateItemWidth(n: Record<string, string>[] | undefined) {
+function calculateItemWidth(
+  n: Record<string, string>[] | undefined,
+  o: Record<string, string>[] | undefined
+) {
   if (!tabbarItemsRef.value) return;
-  if (tabItemRefs.value && tabItemRefs.value.length === n?.length) {
+  if (
+    tabItemRefs.value &&
+    tabItemRefs.value.length === n?.length &&
+    n?.length !== o?.length
+  ) {
     for (const item of tabItemRefs.value) {
       itemWidthArr.value.push(item.offsetWidth);
     }
-  }
-  const { scrollWidth } = tabbarItemsRef.value;
-  if (tabbarWidth.value < scrollWidth) {
-    arrowShow.value.right = true;
+    arrowFlag.value = !arrowFlag.value;
   }
 }
 
@@ -94,13 +101,10 @@ function handleClickArrow(
   prev: boolean | undefined = undefined
 ) {
   if (!tabbarItemsRef.value || !indicatorRef.value) return;
-  if (tabbarItemsRef.value.scrollWidth <= tabbarItemsRef.value.clientWidth)
-    return;
   const { scrollWidth, scrollLeft, clientWidth } = tabbarItemsRef.value;
+  if (scrollWidth <= clientWidth) return;
   if (index === 0) {
     tabbarItemsRef.value.scrollTo({ left: 0, behavior: "smooth" });
-    scrollX.value = 0;
-    arrowShow.value.left = false;
     return;
   }
   if (index === itemWidthArr.value.length - 1) {
@@ -108,8 +112,6 @@ function handleClickArrow(
       left: scrollWidth - clientWidth,
       behavior: "smooth",
     });
-    scrollX.value = scrollWidth - clientWidth;
-    arrowShow.value.right = false;
     return;
   }
   let hiddenNum = 0;
@@ -117,20 +119,8 @@ function handleClickArrow(
   let overWidth = 0;
   let scrollByX = 0;
   const lastItemWidth = itemWidthArr.value[itemWidthArr.value.length - 1];
-  const firstItemWidth = itemWidthArr.value[0];
   if (prev) {
-    if (!arrowShow.value.right) arrowShow.value.right = true;
     overWidth = scrollLeft;
-    // 仅剩前两项待展现时，点击后直接滚动到第一项
-    if (scrollX.value - firstItemWidth - itemWidthArr.value[1] <= 0) {
-      arrowShow.value.left = false;
-      tabbarItemsRef.value.scrollTo({
-        left: 0,
-        behavior: "smooth",
-      });
-      scrollX.value = 0;
-      return;
-    }
     for (let i = 0; i < itemWidthArr.value.length; i++) {
       const w = itemWidthArr.value[i];
       totalWith += w;
@@ -141,8 +131,6 @@ function handleClickArrow(
     }
     if (hiddenNum === 0) {
       scrollByX = -itemWidthArr.value[0];
-      scrollX.value = 0;
-      arrowShow.value.left = false;
     } else {
       scrollByX = -(
         itemWidthArr.value[hiddenNum] -
@@ -150,27 +138,9 @@ function handleClickArrow(
         overWidth +
         itemWidthArr.value[hiddenNum - 1]
       );
-      // listen: wheel-scroll arrowshow
-      scrollX.value += scrollByX;
     }
   } else if (prev !== undefined && !prev) {
-    if (!arrowShow.value.left) arrowShow.value.left = true;
     overWidth = scrollWidth - scrollLeft - clientWidth;
-    // 仅剩最后两项待展现时，点击后直接滚动到最后一项
-    if (
-      scrollX.value +
-        lastItemWidth +
-        itemWidthArr.value[itemWidthArr.value.length - 2] >=
-      scrollWidth - clientWidth
-    ) {
-      arrowShow.value.right = false;
-      tabbarItemsRef.value.scrollBy({
-        left: lastItemWidth + itemWidthArr.value[itemWidthArr.value.length - 2],
-        behavior: "smooth",
-      });
-      scrollX.value = scrollWidth - clientWidth;
-      return;
-    }
     for (let i = itemWidthArr.value.length - 1; i >= 0; i--) {
       const w = itemWidthArr.value[i];
       totalWith += w;
@@ -180,16 +150,17 @@ function handleClickArrow(
       }
     }
 
-    if (hiddenNum === itemWidthArr.value.length - 1) {
-      scrollByX = lastItemWidth;
-      scrollX.value = scrollWidth - clientWidth;
-      arrowShow.value.right = false;
+    if (
+      hiddenNum === itemWidthArr.value.length - 1 ||
+      hiddenNum === itemWidthArr.value.length - 2
+    ) {
+      scrollByX =
+        lastItemWidth + itemWidthArr.value[itemWidthArr.value.length - 2];
     } else {
       scrollByX =
         itemWidthArr.value[hiddenNum] -
         (totalWith - overWidth) +
         itemWidthArr.value[hiddenNum + 1];
-      scrollX.value += scrollByX;
     }
   }
   tabbarItemsRef.value.scrollBy({
@@ -198,47 +169,24 @@ function handleClickArrow(
   });
 }
 
-function handleListenArrow() {
-  if (!tabbarItemsRef.value) return;
-  const { scrollWidth } = tabbarItemsRef.value;
-  const firstItemWidth = itemWidthArr.value[0];
-  const lastItemWidth = itemWidthArr.value[itemWidthArr.value.length - 1];
+// NOTE: throttle ?
+const handleScroll = () => {
+  arrowFlag.value = !arrowFlag.value;
+};
 
-  if (scrollX.value >= scrollWidth - tabbarWidth.value - lastItemWidth / 2) {
-    if (arrowShow.value) arrowShow.value.right = false;
-  } else if (!arrowShow.value.right) {
-    arrowShow.value.right = true;
-  }
-
-  if (scrollX.value > firstItemWidth / 2) {
-    if (!arrowShow.value.left) arrowShow.value.left = true;
-  } else if (arrowShow.value.left) {
-    arrowShow.value.left = false;
-  }
-}
-
-// tabbar 宽度变化时，滚动指示器的显示与隐藏
-watch(tabbarWidth, () => {
-  if (!tabbarItemsRef.value) return;
-  if (tabbarItemsRef.value.scrollWidth > tabbarWidth.value) {
-    handleListenArrow();
-  } else {
-    arrowShow.value = {
-      left: false,
-      right: false,
-    };
-    scrollX.value = 0;
-  }
+watch(() => props.items, calculateItemWidth, {
+  flush: "post",
+  deep: true,
 });
-
-watch(() => props.items, calculateItemWidth);
 
 onMounted(() => {
   tabbarItemsRef.value?.addEventListener("wheel", handleHorizontalWheel);
+  tabbarItemsRef.value?.addEventListener("scroll", handleScroll);
 });
 
 onUnmounted(() => {
   tabbarItemsRef.value?.removeEventListener("wheel", handleHorizontalWheel);
+  tabbarItemsRef.value?.removeEventListener("scroll", handleScroll);
 });
 </script>
 <template>
