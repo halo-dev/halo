@@ -34,7 +34,7 @@ const classes = computed(() => {
 });
 
 const handleChange = (id: number | string, index: number) => {
-  handleClickArrow(index);
+  handleClickTabItem(index);
   emit("update:activeId", id);
   emit("change", id);
 };
@@ -77,28 +77,18 @@ function handleHorizontalWheel(event: WheelEvent) {
   }
 }
 
-// 保存每项 tab 宽度
-function calculateItemWidth(
-  n: Record<string, string>[] | undefined,
-  init = false
-) {
+function saveItemsWidth() {
   if (!tabbarItemsRef.value || !tabItemRefs.value) return;
-  if (tabItemRefs.value.length === n?.length || init) {
-    itemWidthArr.value = [];
-    for (const item of tabItemRefs.value) {
-      itemWidthArr.value.push(item.offsetWidth);
-    }
-    arrowFlag.value = !arrowFlag.value;
+  itemWidthArr.value = [];
+  for (const item of tabItemRefs.value) {
+    itemWidthArr.value.push(item.offsetWidth);
   }
+  arrowFlag.value = !arrowFlag.value;
 }
 
-// 以单标签距离滚动
-function handleClickArrow(
-  index: number | undefined,
-  prev: boolean | undefined = undefined
-) {
+function handleClickTabItem(index: number) {
   if (!tabbarItemsRef.value || !indicatorRef.value) return;
-  const { scrollWidth, scrollLeft, clientWidth } = tabbarItemsRef.value;
+  const { scrollWidth, clientWidth } = tabbarItemsRef.value;
   if (scrollWidth <= clientWidth) return;
   if (index === 0) {
     tabbarItemsRef.value.scrollTo({ left: 0, behavior: "smooth" });
@@ -110,6 +100,19 @@ function handleClickArrow(
       behavior: "smooth",
     });
     return;
+  }
+}
+
+function handleClickArrow(prev: boolean) {
+  if (!tabbarItemsRef.value || !indicatorRef.value || !tabItemRefs.value)
+    return;
+  const { scrollWidth, scrollLeft, clientWidth } = tabbarItemsRef.value;
+  if (scrollWidth <= clientWidth) return;
+  if (itemWidthArr.value.some((item) => !item)) {
+    itemWidthArr.value = [];
+    for (const item of tabItemRefs.value) {
+      itemWidthArr.value.push(item.offsetWidth);
+    }
   }
   let hiddenNum = 0;
   let totalWith = 0;
@@ -136,7 +139,7 @@ function handleClickArrow(
         itemWidthArr.value[hiddenNum - 1]
       );
     }
-  } else if (prev !== undefined && !prev) {
+  } else {
     overWidth = scrollWidth - scrollLeft - clientWidth;
     for (let i = itemWidthArr.value.length - 1; i >= 0; i--) {
       const w = itemWidthArr.value[i];
@@ -166,24 +169,15 @@ function handleClickArrow(
   });
 }
 
-// NOTE: throttle ?
 const handleScroll = () => {
   arrowFlag.value = !arrowFlag.value;
 };
 
-watch(
-  () => props.items,
-  (n) => calculateItemWidth(n),
-  {
-    flush: "post",
-    deep: true,
-  }
-);
+watch(() => tabItemRefs.value?.length, saveItemsWidth);
 
 onMounted(() => {
   tabbarItemsRef.value?.addEventListener("wheel", handleHorizontalWheel);
   tabbarItemsRef.value?.addEventListener("scroll", handleScroll);
-  calculateItemWidth(undefined, true);
 });
 
 onUnmounted(() => {
@@ -197,22 +191,14 @@ onUnmounted(() => {
       ref="indicatorRef"
       :class="['indicator', 'left', arrowShow.left ? 'visible' : 'invisible']"
     >
-      <div
-        title="向前"
-        class="arrow-left"
-        @click="handleClickArrow(undefined, true)"
-      >
+      <div title="向前" class="arrow-left" @click="handleClickArrow(true)">
         <IconArrowLeft />
       </div>
     </div>
     <div
       :class="['indicator', 'right', arrowShow.right ? 'visible' : 'invisible']"
     >
-      <div
-        title="向后"
-        class="arrow-right"
-        @click="handleClickArrow(undefined, false)"
-      >
+      <div title="向后" class="arrow-right" @click="handleClickArrow(false)">
         <IconArrowRight />
       </div>
     </div>
