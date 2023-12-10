@@ -50,9 +50,10 @@ const arrowShow: ComputedRef<ArrowShow> = computed(() => {
   const show: ArrowShow = { left: false, right: false };
   if (!tabbarItemsRef.value) return show;
   void arrowFlag.value;
-  const { scrollWidth, scrollLeft } = tabbarItemsRef.value;
-  if (scrollWidth > tabbarWidth.value) {
-    if (scrollLeft < scrollWidth - tabbarWidth.value) {
+  void tabbarWidth.value;
+  const { scrollWidth, scrollLeft, clientWidth } = tabbarItemsRef.value;
+  if (scrollWidth > clientWidth) {
+    if (scrollLeft < scrollWidth - clientWidth) {
       show.right = true;
     }
     if (scrollLeft > 20) {
