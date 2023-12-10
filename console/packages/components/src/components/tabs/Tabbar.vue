@@ -2,7 +2,7 @@
 import { computed, onMounted, onUnmounted, ref, watch } from "vue";
 import type { ArrowShow, Direction, Type } from "./interface";
 import type { ComputedRef } from "vue";
-import { useElementSize } from "@vueuse/core";
+import { useElementSize, useThrottleFn } from "@vueuse/core";
 import { IconArrowLeft, IconArrowRight } from "../../icons/icons";
 
 const props = withDefaults(
@@ -108,7 +108,7 @@ function handleClickArrow(prev: boolean) {
     return;
   const { scrollWidth, scrollLeft, clientWidth } = tabbarItemsRef.value;
   if (scrollWidth <= clientWidth) return;
-  if (itemWidthArr.value.some((item) => !item)) {
+  if (!itemWidthArr.value[0]) {
     itemWidthArr.value = [];
     for (const item of tabItemRefs.value) {
       itemWidthArr.value.push(item.offsetWidth);
@@ -116,15 +116,13 @@ function handleClickArrow(prev: boolean) {
   }
   let hiddenNum = 0;
   let totalWith = 0;
-  let overWidth = 0;
   let scrollByX = 0;
   const lastItemWidth = itemWidthArr.value[itemWidthArr.value.length - 1];
   if (prev) {
-    overWidth = scrollLeft;
     for (let i = 0; i < itemWidthArr.value.length; i++) {
       const w = itemWidthArr.value[i];
       totalWith += w;
-      if (totalWith >= overWidth) {
+      if (totalWith >= scrollLeft) {
         hiddenNum = i;
         break;
       }
@@ -135,12 +133,12 @@ function handleClickArrow(prev: boolean) {
       scrollByX = -(
         itemWidthArr.value[hiddenNum] -
         totalWith +
-        overWidth +
+        scrollLeft +
         itemWidthArr.value[hiddenNum - 1]
       );
     }
   } else {
-    overWidth = scrollWidth - scrollLeft - clientWidth;
+    const overWidth = scrollWidth - scrollLeft - clientWidth;
     for (let i = itemWidthArr.value.length - 1; i >= 0; i--) {
       const w = itemWidthArr.value[i];
       totalWith += w;
@@ -150,12 +148,9 @@ function handleClickArrow(prev: boolean) {
       }
     }
 
-    if (
-      hiddenNum === itemWidthArr.value.length - 1 ||
-      hiddenNum === itemWidthArr.value.length - 2
-    ) {
+    if (hiddenNum === itemWidthArr.value.length - 1) {
       scrollByX =
-        lastItemWidth + itemWidthArr.value[itemWidthArr.value.length - 2];
+        lastItemWidth + itemWidthArr.value[itemWidthArr.value.length - 1];
     } else {
       scrollByX =
         itemWidthArr.value[hiddenNum] -
@@ -169,9 +164,13 @@ function handleClickArrow(prev: boolean) {
   });
 }
 
-const handleScroll = () => {
-  arrowFlag.value = !arrowFlag.value;
-};
+const handleScroll = useThrottleFn(
+  () => {
+    arrowFlag.value = !arrowFlag.value;
+  },
+  100,
+  true
+);
 
 watch(() => tabItemRefs.value?.length, saveItemsWidth);
 
@@ -239,6 +238,7 @@ onUnmounted(() => {
     to-white
     to-70%
     pt-1
+    pointer-events-none
     pb-1.5;
 
     &.left {
