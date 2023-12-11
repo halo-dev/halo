@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEvent;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,6 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import run.halo.app.infra.SchemeInitializedEvent;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.theme.DefaultTemplateEnum;
@@ -90,10 +89,15 @@ public class ThemeCompositeRouterFunction implements RouterFunction<ServerRespon
     /**
      * Refresh the {@link #cachedRouters} when the permalink rule is changed.
      *
-     * @param event {@link SchemeInitializedEvent} or {@link PermalinkRuleChangedEvent}
+     * @param event {@link PermalinkRuleChangedEvent}
      */
-    @EventListener({SchemeInitializedEvent.class, PermalinkRuleChangedEvent.class})
-    public void onSchemeInitializedEvent(@NonNull ApplicationEvent event) {
+    @EventListener
+    public void onPermalinkRuleChanged(PermalinkRuleChangedEvent event) {
+        this.cachedRouters = routerFunctions();
+    }
+
+    @EventListener
+    public void onApplicationStarted(ApplicationStartedEvent event) {
         this.cachedRouters = routerFunctions();
     }
 

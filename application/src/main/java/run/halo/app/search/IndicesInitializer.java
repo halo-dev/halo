@@ -1,12 +1,12 @@
 package run.halo.app.search;
 
-import java.util.concurrent.CountDownLatch;
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
-import run.halo.app.infra.SchemeInitializedEvent;
 
 @Slf4j
 @Component
@@ -19,17 +19,12 @@ public class IndicesInitializer {
     }
 
     @Async
-    @EventListener(SchemeInitializedEvent.class)
-    public void whenSchemeInitialized(SchemeInitializedEvent event) throws InterruptedException {
-        var latch = new CountDownLatch(1);
+    @EventListener
+    public void whenSchemeInitialized(ApplicationStartedEvent event) {
         log.info("Initialize post indices...");
         var watch = new StopWatch("PostIndicesWatch");
         watch.start("rebuild");
-        indicesService.rebuildPostIndices()
-            .doFinally(signalType -> latch.countDown())
-            .subscribe();
-        latch.await();
-        watch.stop();
+        indicesService.rebuildPostIndices().block(Duration.ofMinutes(5));
         log.info("Initialized post indices. Usage: {}", watch);
     }
 
