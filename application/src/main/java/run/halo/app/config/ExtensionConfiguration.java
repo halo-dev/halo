@@ -5,8 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import run.halo.app.extension.DefaultSchemeManager;
-import run.halo.app.extension.DefaultSchemeWatcherManager;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.SchemeManager;
@@ -19,18 +17,8 @@ public class ExtensionConfiguration {
 
     @Bean
     RouterFunction<ServerResponse> extensionsRouterFunction(ReactiveExtensionClient client,
-        SchemeWatcherManager watcherManager) {
-        return new ExtensionCompositeRouterFunction(client, watcherManager);
-    }
-
-    @Bean
-    SchemeManager schemeManager(SchemeWatcherManager watcherManager) {
-        return new DefaultSchemeManager(watcherManager);
-    }
-
-    @Bean
-    SchemeWatcherManager schemeWatcherManager() {
-        return new DefaultSchemeWatcherManager();
+        SchemeWatcherManager watcherManager, SchemeManager schemeManager) {
+        return new ExtensionCompositeRouterFunction(client, watcherManager, schemeManager);
     }
 
     @Configuration(proxyBeanMethods = false)

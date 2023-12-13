@@ -1,7 +1,6 @@
 package run.halo.app.infra;
 
-import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.boot.context.event.ApplicationContextInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -36,7 +35,8 @@ import run.halo.app.core.extension.notification.Reason;
 import run.halo.app.core.extension.notification.ReasonType;
 import run.halo.app.core.extension.notification.Subscription;
 import run.halo.app.extension.ConfigMap;
-import run.halo.app.extension.SchemeManager;
+import run.halo.app.extension.DefaultSchemeManager;
+import run.halo.app.extension.DefaultSchemeWatcherManager;
 import run.halo.app.extension.Secret;
 import run.halo.app.migration.Backup;
 import run.halo.app.plugin.extensionpoint.ExtensionDefinition;
@@ -45,20 +45,17 @@ import run.halo.app.search.extension.SearchEngine;
 import run.halo.app.security.PersonalAccessToken;
 
 @Component
-public class SchemeInitializer implements ApplicationListener<ApplicationStartedEvent> {
-
-    private final SchemeManager schemeManager;
-
-    private final ApplicationEventPublisher eventPublisher;
-
-    public SchemeInitializer(SchemeManager schemeManager,
-        ApplicationEventPublisher eventPublisher) {
-        this.schemeManager = schemeManager;
-        this.eventPublisher = eventPublisher;
-    }
+public class SchemeInitializer implements ApplicationListener<ApplicationContextInitializedEvent> {
 
     @Override
-    public void onApplicationEvent(@NonNull ApplicationStartedEvent event) {
+    public void onApplicationEvent(@NonNull ApplicationContextInitializedEvent event) {
+        var watcherManager = new DefaultSchemeWatcherManager();
+        var schemeManager = new DefaultSchemeManager(watcherManager);
+
+        var beanFactory = event.getApplicationContext().getBeanFactory();
+        beanFactory.registerSingleton("schemeWatcherManager", watcherManager);
+        beanFactory.registerSingleton("schemeManager", schemeManager);
+
         schemeManager.register(Role.class);
 
         // plugin.halo.run
@@ -108,7 +105,5 @@ public class SchemeInitializer implements ApplicationListener<ApplicationStarted
         schemeManager.register(Subscription.class);
         schemeManager.register(NotifierDescriptor.class);
         schemeManager.register(Notification.class);
-
-        eventPublisher.publishEvent(new SchemeInitializedEvent(this));
     }
 }
