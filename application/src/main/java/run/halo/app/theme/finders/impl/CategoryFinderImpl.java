@@ -84,9 +84,22 @@ public class CategoryFinderImpl implements CategoryFinder {
     @Override
     public Mono<CategoryVo> getParentByName(String name) {
         return client.list(Category.class,
-                category -> category.getSpec().getChildren().contains(name),
+                category -> {
+                    if (StringUtils.isBlank(name)) {
+                        return false;
+                    }
+                    Category.CategorySpec spec = category.getSpec();
+                    if (spec == null) {
+                        return false;
+                    }
+                    List<String> children = spec.getChildren();
+                    if (children == null) {
+                        return false;
+                    }
+                    return children.contains(name);
+                },
                 defaultComparator())
-            .next().map(CategoryVo::from).single();
+            .next().map(CategoryVo::from);
     }
 
     Flux<CategoryTreeVo> toCategoryTreeVoFlux(String name) {
