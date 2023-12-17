@@ -1,0 +1,1490 @@
+core:
+  login:
+    title: 登录
+    fields:
+      username:
+        placeholder: 用户名
+      password:
+        placeholder: 密码
+    operations:
+      submit:
+        toast_success: 登录成功
+        toast_failed: 登录失败，用户名或密码错误
+        toast_csrf: CSRF Token 失效，请重新尝试
+      signup:
+        label: 没有账号
+        button: 立即注册
+      return_login:
+        label: 已有账号
+        button: 立即登录
+      return_site: 返回到首页
+      reset_password:
+        button: 找回密码
+    button: 登录
+    modal:
+      title: 重新登录
+  signup:
+    title: 注册
+    fields:
+      username:
+        placeholder: 用户名
+      display_name:
+        placeholder: 名称
+      email:
+        placeholder: 电子邮箱
+      password:
+        placeholder: 密码
+      password_confirm:
+        placeholder: 确认密码
+    operations:
+      submit:
+        button: 注册
+        toast_success: 注册成功
+  binding:
+    title: 账号绑定
+    common:
+      toast:
+        mounted: 当前登录方式未绑定账号，请先绑定或注册新账号
+    operations:
+      login_and_bind:
+        button: 登录并绑定
+      signup_and_bind:
+        button: 注册并绑定
+      bind:
+        toast_success: 绑定成功
+        toast_failed: 绑定失败，没有找到已启用的登录方式
+  sidebar:
+    search:
+      placeholder: 搜索
+    menu:
+      groups:
+        content: 内容
+        interface: 外观
+        system: 系统
+        tool: 工具
+      items:
+        dashboard: 仪表盘
+        posts: 文章
+        single_pages: 页面
+        comments: 评论
+        attachments: 附件
+        themes: 主题
+        menus: 菜单
+        plugins: 插件
+        users: 用户
+        settings: 设置
+        actuator: 概览
+        backup: 备份
+    operations:
+      logout:
+        tooltip: 退出登录
+        title: 确定要退出登录吗？
+      profile:
+        tooltip: 个人中心
+      visit_homepage:
+        title: 访问首页
+  uc_sidebar:
+    menu:
+      items:
+        profile: 我的
+        notification: 消息
+        posts: 文章
+    operations:
+      console:
+        tooltip: 管理控制台
+  dashboard:
+    title: 仪表板
+    actions:
+      setting: 设置
+      done: 完成
+      add_widget: 添加组件
+    widgets:
+      modal_title: 小组件
+      groups:
+        post: 文章
+        page: 页面
+        comment: 评论
+        user: 用户
+        other: 其他
+      presets:
+        post_stats:
+          title: 文章
+        page_stats:
+          title: 页面
+        recent_published:
+          title: 最近文章
+          visits: 访问量 {visits}
+          comments: 评论 {comments}
+          publishTime: 发布日期 {publishTime}
+        notification:
+          title: 通知
+          empty:
+            title: 当前没有未读的消息
+        quicklink:
+          title: 快捷访问
+          actions:
+            user_center:
+              title: 个人中心
+            view_site:
+              title: 查看站点
+            new_post:
+              title: 创建文章
+            new_page:
+              title: 创建页面
+            upload_attachment:
+              title: 附件上传
+            theme_manage:
+              title: 主题管理
+            plugin_manage:
+              title: 插件管理
+            new_user:
+              title: 新建用户
+            refresh_search_engine:
+              title: 刷新搜索引擎
+              dialog_title: 确定要刷新搜索引擎索引吗？
+              dialog_content: 此操作会对所有已发布的文章重新创建本地搜索引擎的索引。
+              success_message: 刷新成功
+            evict_page_cache:
+              title: 刷新页面缓存
+              dialog_title: 确定要刷新页面缓存吗？
+              dialog_content: 此操作会清空所有页面的缓存。
+              success_message: 刷新成功
+        user_stats:
+          title: 用户
+        comment_stats:
+          title: 评论
+        views_stats:
+          title: 浏览量
+  post:
+    title: 文章
+    actions:
+      categories: 分类
+      tags: 标签
+      recycle_bin: 回收站
+    empty:
+      title: 当前没有文章
+      message: 你可以尝试刷新或者新建文章
+    operations:
+      delete:
+        title: 确定要删除该文章吗？
+        description: 该操作会将文章放入回收站，后续可以从回收站恢复。
+      delete_in_batch:
+        title: 确定要删除选中的文章吗？
+        description: 该操作会将文章放入回收站，后续可以从回收站恢复。
+    filters:
+      status:
+        items:
+          published: 已发布
+          draft: 未发布
+      visible:
+        label: 可见性
+        result: 可见性：{visible}
+        items:
+          public: 公开
+          private: 私有
+      category:
+        label: 分类
+        result: 分类：{category}
+      tag:
+        label: 标签
+        result: 标签：{tag}
+      author:
+        label: 作者
+        result: 作者：{author}
+      sort:
+        items:
+          publish_time_desc: 较近发布
+          publish_time_asc: 较早发布
+          create_time_desc: 较近创建
+          create_time_asc: 较早创建
+    list:
+      fields:
+        categories: 分类：
+        visits: 访问量 {visits}
+        comments: 评论 {comments}
+        pinned: 已置顶
+    settings:
+      title: 文章设置
+      groups:
+        general: 常规设置
+        advanced: 高级设置
+        annotations: 元数据
+      fields:
+        title:
+          label: 标题
+        slug:
+          label: 别名
+          help: 通常用于生成文章的固定链接
+          refresh_message: 根据标题重新生成别名
+        categories:
+          label: 分类目录
+        tags:
+          label: 标签
+        auto_generate_excerpt:
+          label: 自动生成摘要
+        raw_excerpt:
+          label: 自定义摘要
+        allow_comment:
+          label: 允许评论
+        pinned:
+          label: 是否置顶
+        visible:
+          label: 可见性
+        publish_time:
+          label: 发表时间
+        template:
+          label: 自定义模板
+        cover:
+          label: 封面图
+  deleted_post:
+    title: 文章回收站
+    empty:
+      title: 没有文章被放入回收站
+      message: 你可以尝试刷新或者返回文章管理
+    operations:
+      delete:
+        title: 确定要永久删除该文章吗？
+        description: 删除之后将无法恢复。
+      delete_in_batch:
+        title: 确定要永久删除选中的文章吗？
+        description: 删除之后将无法恢复。
+      recovery:
+        title: 确定要恢复该文章吗？
+        description: 该操作会将文章恢复到被删除之前的状态。
+      recovery_in_batch:
+        title: 确定要恢复选中的文章吗？
+        description: 该操作会将文章恢复到被删除之前的状态。
+  uc_post:
+    title: 我的文章
+    setting_modal:
+      title: 文章设置
+    creation_modal:
+      title: 创建文章
+    publish_modal:
+      title: 发布文章
+    operations:
+      cancel_publish:
+        title: 取消发布
+        description: 确定要取消发布吗？
+  post_editor:
+    title: 文章编辑
+    untitled: 未命名文章
+  post_tag:
+    title: 文章标签
+    header:
+      title: "{count} 个标签"
+    empty:
+      title: 当前没有标签
+      message: 你可以尝试刷新或者新建标签
+    operations:
+      delete:
+        title: 确定要删除该标签吗？
+        description: 删除此标签之后，对应文章的关联将被解除。该操作不可恢复。
+    editing_modal:
+      titles:
+        update: 编辑文章标签
+        create: 新增文章标签
+      groups:
+        general: 常规
+        annotations: 元数据
+      fields:
+        display_name:
+          label: 名称
+        slug:
+          label: 别名
+          help: 通常用于生成分类的固定链接
+          refresh_message: 根据名称重新生成别名
+        color:
+          label: 颜色
+          help: 需要主题适配以支持
+        cover:
+          label: 封面图
+          help: 需要主题适配以支持
+  post_category:
+    title: 文章分类
+    header:
+      title: "{count} 个分类"
+    empty:
+      title: 当前没有分类
+      message: 你可以尝试刷新或者新建分类
+    operations:
+      delete:
+        title: 确定要删除该分类吗？
+        description: 删除此分类之后，对应文章的关联将被解除。该操作不可恢复。
+      add_sub_category:
+        button: 新增子分类
+    editing_modal:
+      titles:
+        update: 编辑文章分类
+        create: 新增文章分类
+      groups:
+        general: 常规
+        annotations: 元数据
+      fields:
+        parent:
+          label: 上级分类
+        display_name:
+          label: 名称
+        slug:
+          label: 别名
+          help: 通常用于生成标签的固定链接
+          refresh_message: 根据名称重新生成别名
+        template:
+          label: 自定义模板
+        cover:
+          label: 封面图
+          help: 需要主题适配以支持
+        description:
+          label: 描述
+          help: 需要主题适配以支持
+  page:
+    title: 页面
+    actions:
+      recycle_bin: 回收站
+    empty:
+      title: 当前没有页面
+      message: 你可以尝试刷新或者新建页面
+    operations:
+      delete:
+        title: 确定要删除该自定义页面吗？
+        description: 该操作会将自定义页面放入回收站，后续可以从回收站恢复。
+      delete_in_batch:
+        title: 确定要删除选中的自定义页面吗？
+        description: 该操作会将自定义页面放入回收站，后续可以从回收站恢复。
+    filters:
+      status:
+        items:
+          published: 已发布
+          draft: 未发布
+      visible:
+        label: 可见性
+        result: 可见性：{visible}
+        items:
+          public: 公开
+          private: 私有
+      author:
+        label: 作者
+        result: 作者：{author}
+      sort:
+        items:
+          publish_time_desc: 较近发布
+          publish_time_asc: 较早发布
+          create_time_desc: 较近创建
+          create_time_asc: 较早创建
+    list:
+      fields:
+        visits: 访问量 {visits}
+        comments: 评论 {comments}
+    settings:
+      title: 页面设置
+      groups:
+        general: 常规设置
+        advanced: 高级设置
+        annotations: 元数据
+      fields:
+        title:
+          label: 标题
+        slug:
+          label: 别名
+          help: 通常用于生成页面的固定链接
+          refresh_message: 根据标题重新生成别名
+        auto_generate_excerpt:
+          label: 自动生成摘要
+        raw_excerpt:
+          label: 自定义摘要
+        allow_comment:
+          label: 允许评论
+        pinned:
+          label: 是否置顶
+        visible:
+          label: 可见性
+        publish_time:
+          label: 发表时间
+        template:
+          label: 自定义模板
+        cover:
+          label: 封面图
+  deleted_page:
+    title: 自定义页面回收站
+    empty:
+      title: 没有自定义页面被放入回收站
+      message: 你可以尝试刷新或者返回自定义页面管理
+    operations:
+      delete:
+        title: 确认要永久删除该自定义页面吗？
+        description: 删除之后将无法恢复。
+      delete_in_batch:
+        title: 确定要确认永久删除选中的自定义页面吗？
+        description: 删除之后将无法恢复。
+      recovery:
+        title: 确认要恢复该自定义页面吗？
+        description: 该操作会将自定义页面恢复到被删除之前的状态。
+      recovery_in_batch:
+        title: 确认要恢复选中的自定义页面吗？
+        description: 该操作会将自定义页面恢复到被删除之前的状态。
+  page_editor:
+    title: 页面编辑
+    untitled: Untitled page
+  comment:
+    title: 评论
+    empty:
+      title: 当前没有评论
+      message: 你可以尝试刷新或者修改筛选条件
+    reply_empty:
+      title: 当前没有回复
+      message: 你可以尝试刷新或者创建新回复
+      new: 创建新回复
+    operations:
+      delete_comment:
+        title: 确认要删除该评论吗？
+        description: 将同时删除所有评论下的回复，该操作不可恢复。
+      delete_comment_in_batch:
+        title: 确定要删除所选的评论吗？
+        description: 将同时删除所有评论下的回复，该操作不可恢复。
+      approve_comment_in_batch:
+        button: 审核通过
+        title: 确定要审核通过所选的评论吗？
+      approve_applies_in_batch:
+        button: 审核通过所有回复
+        title: 确定要审核通过该评论的所有回复吗？
+      delete_reply:
+        title: 确认要删除该回复吗？
+      approve_reply:
+        button: 审核通过
+      reply:
+        button: 回复
+    filters:
+      status:
+        items:
+          approved: 已审核
+          pending_review: 待审核
+      owner:
+        label: 评论者
+        result: 评论者：{owner}
+      sort:
+        items:
+          last_reply_time_desc: 较近回复
+          last_reply_time_asc: 较早回复
+          reply_count_desc: 较多回复数
+          reply_count_asc: 较少回复数
+          create_time_desc: 较近创建
+          create_time_asc: 较早创建
+    list:
+      fields:
+        reply_count: "{count} 条回复"
+        has_new_replies: 有新的回复
+        pending_review: 待审核
+    subject_refs:
+      post: 文章
+      page: 页面
+      unknown: 未知
+    reply_modal:
+      title: 回复
+      fields:
+        content:
+          label: 内容
+      operations:
+        submit:
+          toast_success: 回复成功
+  attachment:
+    title: 附件库
+    common:
+      text:
+        ungrouped: 未分组
+    actions:
+      storage_policies: 存储策略
+    empty:
+      title: 当前分组没有附件
+      message: 当前分组没有附件，你可以尝试刷新或者上传附件
+      actions:
+        upload: 上传附件
+    operations:
+      delete:
+        title: 确定要删除该附件吗？
+      delete_in_batch:
+        title: 确定要删除所选的附件吗？
+      deselect_items:
+        button: 取消选择
+      move:
+        button: 移动
+        toast_success: 移动成功
+    filters:
+      storage_policy:
+        label: 存储策略
+        result: 存储策略：{storage_policy}
+      owner:
+        label: 上传者
+        result: 上传者：{owner}
+      sort:
+        items:
+          create_time_desc: 较近上传
+          create_time_asc: 较晚上传
+          size_desc: 文件大小降序
+          size_asc: 文件大小升序
+      view_type:
+        items:
+          grid: 网格模式
+          list: 列表模式
+    detail_modal:
+      title: 附件：{display_name}
+      fields:
+        preview: 预览
+        storage_policy: 存储策略
+        group: 所在分组
+        display_name: 文件名称
+        media_type: 文件类型
+        size: 文件大小
+        owner: 上传者
+        creation_time: 上传时间
+        permalink: 链接
+      preview:
+        click_to_exit: 点击退出预览
+        video_not_support: 当前浏览器不支持该视频播放
+        audio_not_support: 当前浏览器不支持该音频播放
+        not_support: 此文件不支持预览
+    group_editing_modal:
+      titles:
+        create: 新增附件分组
+        update: 编辑附件分组
+      fields:
+        display_name:
+          label: 名称
+    group_list:
+      internal_groups:
+        all: 全部
+      operations:
+        rename:
+          button: 重命名
+        delete:
+          button: 删除并将附件移动至未分组
+          title: 确定要删除该分组吗？
+          description: 将删除分组，并将分组下的附件移动至未分组，该操作不可恢复。
+          toast_success: 删除成功，{total} 个附件已移动至未分组
+        delete_with_attachments:
+          button: 删除并同时删除附件
+          title: 确定要删除该分组吗？
+          description: 将删除分组以及分组下的所有附件，该操作不可恢复。
+          toast_success: 删除成功，{total} 个附件已被同时删除
+    policies_modal:
+      title: 存储策略
+      empty:
+        title: 当前没有可用的存储策略
+        message: 当前没有可用的存储策略，你可以尝试刷新或者新建策略
+      operations:
+        delete:
+          title: 确定要删除该策略吗？
+          description: 当前策略下没有已上传的附件。
+        can_not_delete:
+          title: 删除失败
+          description: 该策略下存在附件，无法删除。
+    policy_editing_modal:
+      titles:
+        create: 新增策略：{policy_template}
+        update: 编辑策略：{policy}
+      fields:
+        display_name:
+          label: 名称
+    upload_modal:
+      title: 上传附件
+      filters:
+        group:
+          label: 选择分组：
+        policy:
+          label: 选择存储策略：
+          empty:
+            title: 没有存储策略
+            description: 在上传之前，需要新建一个存储策略
+          not_select: 请先选择存储策略
+    select_modal:
+      title: 选择附件
+      providers:
+        default:
+          label: 附件库
+      operations:
+        select:
+          result: （已选择 {count} 项）
+  theme:
+    title: 主题
+    common:
+      buttons:
+        install: 安装主题
+    tabs:
+      detail: 详情
+    actions:
+      management: 主题管理
+    empty:
+      title: 当前没有已激活或已选择的主题
+      message: 当前没有已激活或者选择的主题，你可以切换主题或者安装新主题
+      actions:
+        switch: 切换主题
+    operations:
+      active:
+        title: 是否确认启用当前主题
+        toast_success: 启用成功
+      reset:
+        title: 确定要重置主题的所有配置吗？
+        description: 该操作会删除已保存的配置，重置为默认配置。
+        toast_success: 重置配置成功
+      reload:
+        button: 重载主题配置
+        title: 确定要重载主题的所有配置吗？
+        description: 该操作仅会重载主题配置和设置表单定义，不会删除已保存的配置。
+        toast_success: 重载配置成功
+      uninstall:
+        title: 确定要卸载该主题吗？
+      uninstall_and_delete_config:
+        button: 卸载并删除配置
+        title: 确定要卸载该主题以及对应的配置吗？
+      remote_download:
+        title: 检测到了远程下载地址，是否需要下载？
+        description: 请仔细鉴别此地址是否可信：{url}
+      existed_during_installation:
+        title: 主题已存在
+        description: 当前安装的主题已存在，是否升级？
+    list_modal:
+      tabs:
+        installed: 已安装
+        not_installed: 本地未安装
+        local_upload: 上传安装 / 升级
+        remote_download:
+          label: 远程下载
+          fields:
+            url: 下载地址
+      empty:
+        title: 当前没有已安装的主题
+        message: 当前没有已安装的主题，你可以尝试刷新或者安装新主题
+      not_installed_empty:
+        title: 当前没有未安装的主题
+    preview_model:
+      title: 预览主题：{display_name}
+      actions:
+        switch: 切换主题
+        setting: 主题设置
+        open: 新窗口打开
+    detail:
+      fields:
+        author: 作者
+        website: 网站
+        repo: 源码仓库
+        version: 当前版本
+        requires: 版本要求
+        storage_location: 存储位置
+        plugin_requires: 插件依赖
+    settings:
+      title: 主题设置
+    custom_templates:
+      default: 默认模版
+  menu:
+    title: 菜单
+    empty:
+      title: 当前没有菜单
+      message: 你可以尝试刷新或者新建菜单
+    menu_item_empty:
+      title: 当前没有菜单项
+      message: 你可以尝试刷新或者新建菜单项
+    operations:
+      set_primary:
+        button: 设置为主菜单
+        toast_success: 设置成功
+      delete_menu:
+        title: 确定要删除该菜单吗？
+        description: 将同时删除该菜单下的所有菜单项，该操作不可恢复。
+      delete_menu_item:
+        title: 确定要删除该菜单项吗？
+        description: 将同时删除所有子菜单项，删除后将无法恢复。
+      add_sub_menu_item:
+        button: 新增子菜单项
+    list:
+      fields:
+        primary: 主菜单
+        items_count: "{count} 个菜单项"
+    menu_editing_modal:
+      titles:
+        create: 新增菜单
+        update: 编辑菜单
+      fields:
+        display_name:
+          label: 菜单名称
+    menu_item_editing_modal:
+      titles:
+        create: 新增菜单项
+        update: 编辑菜单项
+      groups:
+        general: 常规
+        annotations: 元数据
+      fields:
+        parent:
+          label: 上级菜单项
+          placeholder: 选择上级菜单项
+        ref_kind:
+          label: 类型
+          placeholder: 请选择{label}
+          options:
+            custom: 自定义链接
+            post: 文章
+            single_page: 自定义页面
+            category: 分类
+            tag: 标签
+        display_name:
+          label: 名称
+        href:
+          label: 链接地址
+        target:
+          label: 打开方式
+          options:
+            self: 当前窗口
+            blank: 新窗口
+            parent: 父窗口
+            top: 顶级窗口
+  plugin:
+    title: 插件
+    tabs:
+      detail: 详情
+    empty:
+      title: 当前没有已安装的插件
+      message: 当前没有已安装的插件，你可以尝试刷新或者安装新插件
+      actions:
+        install: 安装插件
+    operations:
+      reset:
+        title: 确定要重置插件的所有配置吗？
+        description: 该操作会删除已保存的配置，重置为默认配置。
+        toast_success: 重置配置成功
+      uninstall:
+        title: 确定要卸载该插件吗？
+      uninstall_in_batch:
+        title: 确定要卸载所选插件吗？
+      uninstall_and_delete_config:
+        button: 卸载并删除配置
+        title: 确定要卸载该插件以及对应的配置吗？
+      uninstall_and_delete_config_in_batch:
+        button: 卸载并删除配置
+        title: 确定要卸载所选插件以及对应的配置吗？
+      uninstall_when_enabled:
+        confirm_text: 停止运行并卸载
+        description: 当前插件还在启用状态，将在停止运行后卸载，该操作不可恢复。
+      change_status_in_batch:
+        activate_title: 确定要启用所选插件吗？
+        inactivate_title: 确定要停用所选插件吗？
+      remote_download:
+        title: 检测到了远程下载地址，是否需要下载？
+        description: 请仔细鉴别此地址是否可信：{url}
+    filters:
+      status:
+        items:
+          active: 已启用
+          inactive: 未启用
+      sort:
+        items:
+          create_time_desc: 较近安装
+          create_time_asc: 较早安装
+    upload_modal:
+      titles:
+        install: 安装插件
+        upgrade: 升级插件（{display_name}）
+      tabs:
+        local: 本地上传
+        remote:
+          title: 远程下载
+          fields:
+            url: 下载地址
+      operations:
+        active_after_install:
+          title: 安装成功
+          description: 是否启动当前安装的插件？
+        existed_during_installation:
+          title: 插件已存在
+          description: 当前安装的插件已存在，是否升级？
+    detail:
+      title: 插件详情
+      header:
+        title: 插件信息
+      fields:
+        display_name: 名称
+        description: 描述
+        version: 版本
+        requires: Halo 版本要求
+        author: 提供方
+        license: 协议
+        role_templates: 权限模板
+        last_starttime: 最近一次启动
+    loader:
+      toast:
+        entry_load_failed: 加载插件入口文件失败
+        style_load_failed: 加载插件样式文件失败
+    extension_points:
+      editor:
+        providers:
+          default: 默认编辑器
+  user:
+    title: 用户
+    actions:
+      roles: 角色管理
+      identity_authentication: 身份认证
+    empty:
+      title: 当前没有符合筛选条件的用户
+      message: 当前没有符合筛选条件的用户，你可以尝试刷新或者创建新用户
+    operations:
+      delete:
+        title: 确定要删除该用户吗？
+      delete_in_batch:
+        title: 确定要删除选中的用户吗？
+      update_profile:
+        title: 修改资料
+      change_password:
+        title: 修改密码
+      grant_permission:
+        title: 分配角色
+    filters:
+      role:
+        label: 角色
+        result: 角色：{role}
+      sort:
+        items:
+          create_time_desc: 较近创建
+          create_time_asc: 较早创建
+    editing_modal:
+      titles:
+        update: 编辑用户
+        create: 新增用户
+      groups:
+        general: 常规
+        annotations: 元数据
+      fields:
+        username:
+          label: 用户名
+          validation: 请输入有效的用户名
+        display_name:
+          label: 显示名称
+        email:
+          label: 电子邮箱
+        phone:
+          label: 手机号
+        avatar:
+          label: 头像
+        bio:
+          label: 描述
+    change_password_modal:
+      title: 密码修改
+      fields:
+        new_password:
+          label: 新密码
+        confirm_password:
+          label: 确认密码
+    grant_permission_modal:
+      title: 分配角色
+      fields:
+        role:
+          label: 角色
+          placeholder: 请选择角色
+    detail:
+      title: 用户详情
+      tabs:
+        detail: 详情
+      actions:
+        update_profile:
+          title: 修改资料
+        change_password:
+          title: 修改密码
+        profile:
+          title: 个人中心
+      fields:
+        display_name: 显示名称
+        username: 用户名
+        email: 电子邮箱
+        roles: 角色
+        bio: 描述
+        creation_time: 注册时间
+        identity_authentication: 登录方式
+  role:
+    title: 角色
+    common:
+      text:
+        contains_all_permissions: 包含所有权限
+        contains_n_permissions: 包含 {count} 个权限
+        system_reserved: 系统保留
+        custom: 自定义
+        dependent_on: 依赖于 {roles}
+        provided_by_plugin: 由 {plugin} 提供
+    operations:
+      delete:
+        title: 确定要删除该角色吗？
+        description: 该角色删除后，相关联的用户将被删除角色绑定，该操作不可恢复。
+      create_based_on_this_role:
+        button: 基于此角色创建
+    detail:
+      title: 角色详情
+      header:
+        title: 角色信息
+      tabs:
+        detail: 详情
+        permissions: 权限设置
+      fields:
+        display_name: 名称
+        name: 别名
+        type: 类型
+        creation_time: 创建时间
+    permissions_detail:
+      system_reserved_alert:
+        description: 系统保留的角色不支持修改，推荐基于此角色创建一个新的角色。
+    editing_modal:
+      titles:
+        create: 创建角色
+        update: 编辑角色
+      groups:
+        general: 基本信息
+        permissions: 权限
+      fields:
+        display_name: 名称
+        redirect_on_login: 登录之后默认跳转位置
+        disallow_access_console:
+          label: 禁止访问 Console
+          help: 勾选之后，该角色将无法访问 Console
+  identity_authentication:
+    title: 身份认证
+    tabs:
+      detail: 详情
+      setting: 设置
+    operations:
+      enable:
+        title: 确定要启用该身份认证方式吗？
+      disable:
+        title: 确定要停用该身份认证方式吗？
+      disable_privileged:
+        tooltip: 系统保留的认证方式，无法禁用
+    detail:
+      title: 身份认证详情
+      fields:
+        display_name: 名称
+        description: 描述
+        website: 网站
+        help_page: 帮助页面
+        authentication_url: 登录入口
+  uc_profile:
+    title: 我的
+    tabs:
+      detail: 详情
+      notification-preferences: 通知配置
+      pat: 个人令牌
+    actions:
+      update_profile:
+        title: 修改资料
+      change_password:
+        title: 修改密码
+    detail:
+      fields:
+        display_name: 显示名称
+        username: 用户名
+        email: 电子邮箱
+        roles: 角色
+        bio: 描述
+        creation_time: 注册时间
+        identity_authentication: 登录方式
+      operations:
+        bind:
+          button: 绑定
+        unbind:
+          button: 解绑
+          title: 确定要取消绑定 {display_name} 的登录方式吗？
+      email_not_set:
+        title: 设置电子邮箱
+        description: 电子邮箱地址还未设置，点击下方按钮进行设置
+      email_not_verified:
+        title: 验证电子邮箱
+        description: 电子邮箱地址还未验证，点击下方按钮进行验证
+    pat:
+      operations:
+        delete:
+          title: 删除个人令牌
+          description: 确定要删除该个人令牌吗？
+        revoke:
+          button: 撤销
+          title: 撤销个人令牌
+          description: 确定要撤销该个人令牌吗？
+          toast_success: 撤销成功
+        copy:
+          title: 请立即复制并保存，Token 将仅显示一次。
+        restore:
+          button: 恢复
+          toast_success: 恢复成功
+      list:
+        empty:
+          title: 当前没有创建个人令牌
+          message: 你可以尝试刷新或者新建个人令牌
+        fields:
+          expiresAt:
+            dynamic: "{expiresAt}失效"
+            forever: 永久有效
+          status:
+            normal: 正常
+            revoked: 已撤销
+            expired: 已过期
+      creation_modal:
+        title: 创建个人令牌
+        groups:
+          general: 基本信息
+          permissions: 权限
+        fields:
+          name:
+            label: 名称
+          expiresAt:
+            label: 过期时间
+            help: 不设置代表永不过期
+          description:
+            label: 描述
+    notification-preferences:
+      fields:
+        type: 通知类型
+    editing_modal:
+      title: 编辑资料
+      groups:
+        general: 常规
+        annotations: 元数据
+      fields:
+        username:
+          label: 用户名
+          validation: 请输入有效的用户名
+        display_name:
+          label: 显示名称
+        email:
+          label: 电子邮箱
+        phone:
+          label: 手机号
+        avatar:
+          label: 头像
+        bio:
+          label: 描述
+    change_password_modal:
+      title: 密码修改
+      fields:
+        new_password:
+          label: 新密码
+        confirm_password:
+          label: 确认密码
+    email_verify_modal:
+      titles:
+        modify: 修改电子邮箱
+        verify: 验证电子邮箱
+      fields:
+        new_email:
+          label: 新电子邮箱
+        email:
+          label: 电子邮箱
+        code:
+          label: 验证码
+      operations:
+        send_code:
+          buttons:
+            sending: 发送中
+            send: 发送验证码
+            countdown: "{timer} 秒后重发"
+          toast_success: 验证码已发送
+          toast_email_empty: 请输入电子邮箱
+        verify:
+          toast_success: 验证成功
+  uc_notification:
+    title: 消息
+    tabs:
+      unread: 未读
+      read: 已读
+    empty:
+      titles:
+        unread: 当前没有未读的消息
+        read: 当前没有已读的消息
+    operations:
+      mark_as_read:
+        button: 标记为已读
+      delete:
+        title: 删除消息
+        description: 确定要删除该消息吗？
+  setting:
+    title: 设置
+  actuator:
+    title: 系统概览
+    actions:
+      copy:
+        toast_browser_not_supported: 当前浏览器不支持复制
+    header:
+      titles:
+        general: 基本信息
+        environment: 环境信息
+    fields:
+      external_url: 外部访问地址
+      start_time: 启动时间
+      timezone: 系统时区
+      locale: 系统语言
+      version: 版本
+      build_time: 构建时间
+      database: 数据库
+      os: 操作系统
+      log: 运行日志
+      activated_theme: 已激活主题
+      enabled_plugins: 已启动插件
+    fields_values:
+      external_url:
+        not_setup: 未设置
+    copy_results:
+      external_url: 外部访问地址：{external_url}
+      start_time: 启动时间：{start_time}
+      version: Halo 版本：{version}
+      build_time: 构建时间：{build_time}
+      database: 数据库：{database}
+      os: 操作系统：{os}
+    alert:
+      external_url_invalid: 检测到外部访问地址与当前访问地址不一致，可能会导致部分链接无法正常跳转，请检查外部访问地址设置。
+  backup:
+    title: 备份与恢复
+    tabs:
+      backup_list: 备份
+      restore: 恢复
+    empty:
+      title: 没有备份
+      message: 当前没有已创建的备份，你可以点击刷新或者创建新的备份
+    operations:
+      create:
+        button: 创建备份
+        title: 创建备份
+        description: 确定要创建备份吗，此操作可能会持续较长时间。
+        toast_success: 已请求创建备份
+      delete:
+        title: 删除备份
+        description: 确定要删除该备份吗？
+      restore:
+        title: 恢复成功
+        description: 恢复成功之后，需要重启一下 Halo 才能够正常加载系统资源，点击确定之后我们会自动重启 Halo。
+      restart:
+        toast_success: 已请求重启
+      remote_download:
+        button: 下载并恢复
+      restore_by_backup:
+        button: 恢复
+        title: 确认要从此备份进行恢复吗？
+    list:
+      phases:
+        pending: 准备中
+        running: 备份中
+        succeeded: 备份完成
+        failed: 备份失败
+      fields:
+        expiresAt: "{expiresAt}失效"
+    restore:
+      tips:
+        first: 1. 恢复过程可能会持续较长时间，期间请勿刷新页面。
+        second: 2. 在恢复的过程中，虽然已有的数据不会被清理掉，但如果有冲突的数据将被覆盖。
+        third: 3. 恢复完成之后需要重启 Halo 才能够正常加载系统资源。
+        complete: 恢复完成，等待重启...
+      start: 开始恢复
+      tabs:
+        local:
+          label: 上传
+        remote:
+          label: 远程恢复
+          fields:
+            url: 下载地址
+        backup:
+          label: 从备份恢复
+  exception:
+    not_found:
+      message: 没有找到该页面
+    forbidden:
+      message: 没有权限访问此页面
+    actions:
+      home: 返回首页
+  setup:
+    title: 系统初始化
+    operations:
+      submit:
+        button: 初始化
+        toast_success: 初始化成功
+      setup_initial_data:
+        loading: 正在初始化数据，请稍后...
+    fields:
+      site_title:
+        label: 站点名称
+      email:
+        label: 邮箱
+      username:
+        label: 用户名
+      password:
+        label: 密码
+      confirm_password:
+        label: 确认密码
+  reset_password:
+    title: 重置密码
+    fields:
+      username:
+        label: 用户名
+      email:
+        label: 邮箱地址
+    operations:
+      send:
+        label: 发送验证邮件
+        toast_success: 如果你的用户名和邮箱地址匹配，我们将会发送一封邮件到你的邮箱。
+  uc_reset_password:
+    title: 重置密码
+    fields:
+      username:
+        label: 用户名
+      password:
+        label: 新密码
+      password_confirm:
+        label: 确认密码
+    operations:
+      reset:
+        button: 重置密码
+        toast_success: 重置成功
+  rbac:
+    Attachments Management: 附件
+    Attachment Manage: 附件管理
+    Attachment View: 附件查看
+    role-template-view-attachments: 附件查看
+    Comments Management: 评论
+    Comment Manage: 评论管理
+    Comment View: 评论查看
+    role-template-view-comments: 评论查看
+    ConfigMaps Management: 配置
+    ConfigMap Manage: 配置管理
+    ConfigMap View: 配置查看
+    role-template-view-configmaps: 配置查看
+    Menus Management: 菜单
+    Menu Manage: 菜单管理
+    Menu View: 菜单查看
+    role-template-view-menus: 菜单查看
+    Permissions Management: 权限
+    Permissions Manage: 权限管理
+    Permissions View: 权限查看
+    role-template-view-permissions: 权限查看
+    role-template-manage-permissions: 权限管理
+    Plugins Management: 插件
+    Plugin Manage: 插件管理
+    Plugin View: 插件查看
+    role-template-view-plugins: 插件查看
+    Posts Management: 文章
+    Post Manage: 文章管理
+    Post View: 文章查看
+    role-template-view-posts: 文章查看
+    role-template-manage-snapshots: 版本管理
+    role-template-view-snapshots: 版本查看
+    role-template-manage-tags: 标签管理
+    role-template-view-tags: 标签查看
+    role-template-manage-categories: 分类管理
+    role-template-view-categories: 分类查看
+    Roles Management: 角色
+    Role Manage: 角色管理
+    Role View: 角色查看
+    role-template-view-roles: 角色查看
+    Settings Management: 设置表单
+    Setting Manage: 设置表单管理
+    Setting View: 设置表单查看
+    role-template-view-settings: 设置表单查看
+    SinglePages Management: 页面
+    SinglePage Manage: 页面管理
+    SinglePage View: 页面查看
+    role-template-view-singlepages: 页面查看
+    Themes Management: 主题
+    Theme Manage: 主题管理
+    Theme View: 主题查看
+    role-template-view-themes: 主题查看
+    Users Management: 用户
+    User manage: 用户管理
+    User View: 用户查看
+    Migration Management: 备份与恢复
+    Migration Manage: 备份与恢复管理
+    role-template-view-users: 用户查看
+    role-template-change-password: 修改密码
+    Actuator Management: 系统指标
+    Actuator Manage: 访问系统指标
+    Cache Management: 缓存
+    Cache Manage: 缓存管理
+    Notification Configuration: 通知配置
+    Configure Notifier: 配置通知器
+    Post Editor: 允许管理所有文章
+    Post Contributor: 允许管理自己的文章
+    Post Author: 允许投稿
+    Post Attachment Manager: 允许在文章中上传图片
+    Post Publisher: 允许发布自己的文章
+  components:
+    submit_button:
+      computed_text: "{text}（{shortcut}）"
+    annotations_form:
+      custom_fields:
+        label: 自定义
+        validation: 当前 Key 已被占用
+    default_editor:
+      tabs:
+        toc:
+          title: 大纲
+          empty: 暂无大纲
+        detail:
+          title: 详情
+          fields:
+            character_count: 字符数
+            word_count: 词数
+            publish_time: 发布时间
+            draft: 未发布
+            owner: 创建者
+            permalink: 访问链接
+      extensions:
+        placeholder:
+          options:
+            placeholder: 输入 / 以选择输入类型
+      toolbox:
+        attachment: 选择附件
+        show_hide_sidebar: 显示 / 隐藏侧边栏
+    global_search:
+      placeholder: 输入关键词以搜索
+      no_results: 没有搜索结果
+      buttons:
+        select: 选择
+      groups:
+        console: 后台页面
+        user: 用户
+        plugin: 插件
+        post: 文章
+        category: 分类
+        tag: 标签
+        page: 自定义页面
+        attachment: 附件
+        setting: 设置
+        theme_setting: 主题设置
+    pagination:
+      page_label: 页
+      size_label: 条 / 页
+      total_label: 共 {total} 项数据
+    social_auth_providers:
+      title: 三方登录
+    app_download_alert:
+      description: Halo 的主题和插件可以在以下地址下载：
+      sources:
+        app_store: 官方应用市场：{url}
+        github: GitHub：{url}
+    user_avatar:
+      title: 头像
+      toast_upload_failed: 上传头像失败
+      toast_remove_failed: 删除头像失败
+      cropper_modal:
+        title: 裁剪头像
+      remove:
+        title: 确定要删除头像吗？
+      tooltips:
+        upload: 上传
+        zoom_in: 放大
+        zoom_out: 缩小
+        flip_horizontal: 水平翻转
+        flip_vertical: 垂直翻转
+        reset: 重置
+  composables:
+    content_cache:
+      toast_recovered: 已从缓存中恢复未保存的内容
+  formkit:
+    category_select:
+      creation_label: 创建 {text} 分类
+    tag_select:
+      creation_label: 创建 {text} 标签
+    validation:
+      trim: 不能以空格开头或结尾
+  common:
+    buttons:
+      save: 保存
+      close: 关闭
+      close_and_shortcut: 关闭（Esc）
+      delete: 删除
+      setting: 设置
+      confirm: 确定
+      cancel: 取消
+      cancel_and_shortcut: 取消（Esc）
+      new: 新建
+      edit: 编辑
+      back: 返回
+      refresh: 刷新
+      publish: 发布
+      cancel_publish: 取消发布
+      next: 下一项
+      previous: 上一项
+      install: 安装
+      uninstall: 卸载
+      upgrade: 升级
+      reset: 重置
+      preview: 预览
+      recovery: 恢复
+      delete_permanently: 永久删除
+      activate: 启用
+      inactivate: 停用
+      download: 下载
+      copy: 复制
+      upload: 上传
+      add: 添加
+      submit: 提交
+      detail: 详情
+      select: 选择
+      view_all: 查看全部
+      verify: 验证
+      modify: 修改
+    radio:
+      "yes": 是
+      "no": 否
+    select:
+      public: 公开
+      private: 私有
+    placeholder:
+      search: 输入关键词搜索
+    toast:
+      operation_success: 操作成功
+      delete_success: 删除成功
+      save_success: 保存成功
+      publish_success: 发布成功
+      cancel_publish_success: 取消发布成功
+      recovery_success: 恢复成功
+      uninstall_success: 卸载成功
+      active_success: 启用成功
+      inactive_success: 停用成功
+      upgrade_success: 升级成功
+      install_success: 安装成功
+      download_success: 下载成功
+      copy_success: 复制成功
+      operation_failed: 操作失败
+      download_failed: 下载失败
+      save_failed_and_retry: 保存失败，请重试
+      publish_failed_and_retry: 发布失败，请重试
+      network_error: 网络错误，请检查网络连接
+      login_expired: 登录已过期，请重新登录
+      forbidden: 无权限访问
+      not_found: 资源不存在
+      server_internal_error: 服务器内部错误
+      unknown_error: 未知错误
+    dialog:
+      titles:
+        tip: 提示
+        warning: 警告
+      descriptions:
+        cannot_be_recovered: 该操作不可恢复。
+        editor_not_found: 未找到符合 {raw_type} 格式的编辑器，请检查是否已安装编辑器插件。
+    filters:
+      results:
+        keyword: 关键词：{keyword}
+        sort: 排序：{sort}
+        status: 状态：{status}
+      labels:
+        sort: 排序
+        status: 状态
+      item_labels:
+        all: 全部
+        default: 默认
+    status:
+      deleting: 删除中
+      loading: 加载中
+      loading_error: 加载异常
+      activated: 已启用
+      not_activated: 未启用
+      installed: 已安装
+      not_installed: 未安装
+    text:
+      none: 无
+      tip: 提示
+      warning: 警告
+    tooltips:
+      unpublished_content_tip: 当前有内容已保存，但还未发布。
+      publishing: 发布中
+      recovering: 恢复中
+    fields:
+      post_count: "{count} 篇文章"

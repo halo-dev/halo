@@ -1,0 +1,15 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-notifier-config
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Notification Configuration"
+    rbac.authorization.halo.run/display-name: "Configure Notifier"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:notifier:configuration"]
+rules:
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "notifiers/sender-config" ]
+    verbs: [ "get", "update" ]

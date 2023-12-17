@@ -1,0 +1,13 @@
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: role-template-view-apples
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    halo.run/module: "Apples Management"
+    halo.run/alias-name: "Apples View"
+rules:
+  - apiGroups: [ "apples.guqing.github.com" ]
+    resources: [ "apples" ]
+    verbs: [ "get", "list" ]

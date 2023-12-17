@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Plugin
+metadata:
+  name: plugin-1
+spec:
+  # 'version' is a valid semantic version string (see semver.org).
+  version: 0.0.1
+  requires: ">=2.0.0"
+  author:
+    name: guqing
+  logo: https://guqing.xyz/avatar
+  pluginDependencies:
+    "banana": "0.0.1"
+  homepage: https://github.com/guqing/halo-plugin-1
+  displayName: "a name to show"
+  description: "Tell me more about this plugin."
+  license:
+    - name: MIT

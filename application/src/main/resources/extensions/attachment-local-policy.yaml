@@ -1,0 +1,48 @@
+apiVersion: storage.halo.run/v1alpha1
+kind: PolicyTemplate
+metadata:
+  name: local
+spec:
+  displayName: Local Storage
+  settingName: local-policy-template-setting
+---
+apiVersion: storage.halo.run/v1alpha1
+kind: Policy
+metadata:
+  name: default-policy
+spec:
+  displayName: 本地存储
+  templateName: local
+  configMapName: default-policy-config
+---
+apiVersion: v1alpha1
+kind: ConfigMap
+metadata:
+  name: default-policy-config
+data:
+  default: "{\"location\":\"\"}"
+---
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: local-policy-template-setting
+spec:
+  forms:
+    - group: default
+      label: Default
+      formSchema:
+        - $formkit: text
+          name: location
+          label: 存储位置
+          help: ~/.halo2/attachments/upload 下的子目录
+---
+apiVersion: storage.halo.run/v1alpha1
+kind: Group
+metadata:
+  name: user-avatar-group
+  labels:
+    halo.run/hidden: "true"
+  finalizers:
+    - system-protection
+spec:
+  displayName: UserAvatar

@@ -1,0 +1,9 @@
+spring:
+  r2dbc:
+    url: r2dbc:pool:mysql://localhost:3306/halo
+    username: root
+    password: openmysql
+  sql:
+    init:
+      mode: always
+      platform: mysql

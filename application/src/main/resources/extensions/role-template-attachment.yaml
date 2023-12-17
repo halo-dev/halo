@@ -1,0 +1,43 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-attachments
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-attachments\" ]"
+    rbac.authorization.halo.run/module: "Attachments Management"
+    rbac.authorization.halo.run/display-name: "Attachment Manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:attachments:manage"]
+rules:
+  - apiGroups: [ "storage.halo.run" ]
+    resources: [ "attachments", "policies", "policytemplates", "groups" ]
+    verbs: [ "*" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "attachments" ]
+    verbs: [ "*" ]
+  - apiGroups: [ "" ]
+    resources: [ "settings" ]
+    verbs: [ "get" ]
+  - nonResourceURLs: [ "/apis/api.console.halo.run/v1alpha1/attachments/upload" ]
+    verbs: [ "create" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-view-attachments
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Attachments Management"
+    rbac.authorization.halo.run/display-name: "Attachment View"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:attachments:view"]
+rules:
+  - apiGroups: [ "storage.halo.run" ]
+    resources: [ "attachments", "policies", "policytemplates", "groups" ]
+    verbs: [ "get", "list" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "attachments" ]
+    verbs: [ "get", "list" ]

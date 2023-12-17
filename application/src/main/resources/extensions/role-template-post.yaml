@@ -1,0 +1,41 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-posts
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: |
+      [ "role-template-view-posts", "role-template-manage-snapshots", "role-template-manage-tags", "role-template-manage-categories" ]
+    rbac.authorization.halo.run/module: "Posts Management"
+    rbac.authorization.halo.run/display-name: "Post Manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:posts:manage"]
+rules:
+  - apiGroups: [ "content.halo.run" ]
+    resources: [ "posts" ]
+    verbs: [ "*" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "posts", "posts/publish", "posts/unpublish", "posts/recycle", "posts/content", "indices/post" ]
+    verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-view-posts
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: |
+      [ "role-template-view-snapshots", "role-template-view-tags", "role-template-view-categories" ]
+    rbac.authorization.halo.run/module: "Posts Management"
+    rbac.authorization.halo.run/display-name: "Post View"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:posts:view"]
+rules:
+  - apiGroups: [ "content.halo.run" ]
+    resources: [ "posts" ]
+    verbs: [ "get", "list" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "posts", "posts/head-content", "posts/release-content" ]
+    verbs: [ "get", "list" ]

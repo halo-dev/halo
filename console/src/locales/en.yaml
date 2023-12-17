@@ -1,0 +1,1578 @@
+core:
+  login:
+    title: Login
+    fields:
+      username:
+        placeholder: Username
+      password:
+        placeholder: Password
+    operations:
+      submit:
+        toast_success: Login successful
+        toast_failed: Login failed, incorrect username or password
+        toast_csrf: CSRF Token expired, please try again
+      signup:
+        label: No account
+        button: Sign up
+      return_login:
+        label: Already have an account
+        button: Sign in
+      return_site: Return to site
+      reset_password:
+        button: Retrieve password
+    button: Login
+    modal:
+      title: Re-login
+  signup:
+    title: Sign up
+    fields:
+      username:
+        placeholder: Username
+      display_name:
+        placeholder: Display name
+      email:
+        placeholder: Email
+      password:
+        placeholder: Password
+      password_confirm:
+        placeholder: Confirm password
+    operations:
+      submit:
+        button: Sign up
+        toast_success: Sign up successfully
+  binding:
+    title: Account binding
+    common:
+      toast:
+        mounted: >-
+          The current login method is not bound to an account, Please bind or
+          sign up a new account first
+    operations:
+      login_and_bind:
+        button: Login and Bind
+      signup_and_bind:
+        button: Signup and Bind
+      bind:
+        toast_success: Binding successfully
+        toast_failed: Binding failed, no enabled login method found
+  sidebar:
+    search:
+      placeholder: Search
+    menu:
+      groups:
+        content: Content
+        interface: Interface
+        system: System
+        tool: Tool
+      items:
+        dashboard: Dashboard
+        posts: Posts
+        single_pages: Pages
+        comments: Comments
+        attachments: Attachments
+        themes: Themes
+        menus: Menus
+        plugins: Plugins
+        users: Users
+        settings: Settings
+        actuator: Actuator
+        backup: Backup
+    operations:
+      logout:
+        tooltip: Logout
+        title: Are you sure you want to log out?
+      profile:
+        tooltip: Profile
+      visit_homepage:
+        title: Visit homepage
+  uc_sidebar:
+    menu:
+      items:
+        profile: Profile
+        notification: Notifications
+        posts: Posts
+    operations:
+      console:
+        tooltip: Console
+  dashboard:
+    title: Dashboard
+    actions:
+      setting: Setting
+      done: Done
+      add_widget: Add Widget
+    widgets:
+      modal_title: Widgets
+      groups:
+        post: Post
+        page: Page
+        comment: Comment
+        user: User
+        other: Other
+      presets:
+        post_stats:
+          title: Posts
+        page_stats:
+          title: Pages
+        recent_published:
+          title: Recent Posts
+          visits: "{visits} Visits"
+          comments: "{comments} Comments"
+          publishTime: Publish Time {publishTime}
+        notification:
+          title: Notifications
+          empty:
+            title: No unread notifications
+        quicklink:
+          title: Quick Link
+          actions:
+            user_center:
+              title: User Center
+            view_site:
+              title: View Site
+            new_post:
+              title: New Post
+            new_page:
+              title: New Page
+            upload_attachment:
+              title: Upload Attachment
+            theme_manage:
+              title: Theme Manage
+            plugin_manage:
+              title: Plugin Manage
+            new_user:
+              title: New User
+            refresh_search_engine:
+              title: Refresh Search Engine
+              dialog_title: Do you want to refresh the search engine index?
+              dialog_content: >-
+                This operation will recreate search engine indexes for all
+                published posts.
+              success_message: Refresh search engine index successfully.
+            evict_page_cache:
+              title: Refresh Page Cache
+              dialog_title: Do you want to refresh the page cache?
+              dialog_content: This operation will clear the cache for all pages.
+              success_message: Refresh page cache successfully.
+        user_stats:
+          title: Users
+        comment_stats:
+          title: Comments
+        views_stats:
+          title: Visits
+  post:
+    title: Posts
+    actions:
+      categories: Categories
+      tags: Tags
+      recycle_bin: Recycle Bin
+    empty:
+      title: There are no posts currently.
+      message: You can try to refresh or create a new post.
+    operations:
+      delete:
+        title: Are you sure you want to delete this post?
+        description: >-
+          This operation will move the post to the recycle bin, and it can be
+          restored from the recycle bin later.
+      delete_in_batch:
+        title: Are you sure you want to delete the selected posts?
+        description: >-
+          This operation will move the posts to the recycle bin, and it can be
+          restored from the recycle bin later.
+    filters:
+      status:
+        items:
+          published: Published
+          draft: Draft
+      visible:
+        label: Visible
+        result: "Visible: {visible}"
+        items:
+          public: Public
+          private: Private
+      category:
+        label: Category
+        result: "Category: {category}"
+      tag:
+        label: Tag
+        result: "Tag: {tag}"
+      author:
+        label: Author
+        result: "Author: {author}"
+      sort:
+        items:
+          publish_time_desc: Latest Published
+          publish_time_asc: Earliest Published
+          create_time_desc: Latest Created
+          create_time_asc: Earliest Created
+    list:
+      fields:
+        categories: "Categories:"
+        visits: "{visits} Visits"
+        comments: "{comments} Comments"
+        pinned: Pinned
+    settings:
+      title: Settings
+      groups:
+        general: General
+        advanced: Advanced
+        annotations: Annotations
+      fields:
+        title:
+          label: Title
+        slug:
+          label: Slug
+          help: Usually used for generating permalink to posts
+          refresh_message: Regenerate slug based on title.
+        categories:
+          label: Categories
+        tags:
+          label: Tags
+        auto_generate_excerpt:
+          label: Auto Generate Excerpt
+        raw_excerpt:
+          label: Excerpt
+        allow_comment:
+          label: Allow Comment
+        pinned:
+          label: Pinned
+        visible:
+          label: Visible
+        publish_time:
+          label: Publish Time
+        template:
+          label: Template
+        cover:
+          label: Cover
+  deleted_post:
+    title: Deleted Posts
+    empty:
+      title: No posts have been put in the recycle bin.
+      message: You can try to refresh or go back to the previous page.
+    operations:
+      delete:
+        title: Are you sure you want to permanently delete this post?
+        description: After deletion, it will not be possible to recover.
+      delete_in_batch:
+        title: Are you sure you want to permanently delete the selected posts?
+        description: After deletion, it will not be possible to recover.
+      recovery:
+        title: Do you want to restore this post?
+        description: This operation will restore the post to its state before deletion.
+      recovery_in_batch:
+        title: Are you sure you want to restore the selected posts?
+        description: This operation will restore the posts to its state before deletion.
+  post_editor:
+    title: Post edit
+    untitled: Untitled post
+  post_tag:
+    title: Post tags
+    header:
+      title: "{count} Tags"
+    empty:
+      title: There are no tags currently.
+      message: You can try to refresh or create a new tag.
+    operations:
+      delete:
+        title: Are you sure you want to delete this tag?
+        description: >-
+          After deleting this tag, the association with the corresponding
+          article will be removed. This operation cannot be undone.
+    editing_modal:
+      titles:
+        update: Update post tag
+        create: Create post tag
+      groups:
+        general: General
+        annotations: Annotations
+      fields:
+        display_name:
+          label: Display name
+        slug:
+          label: Slug
+          help: Often used to generate permalink for tags
+          refresh_message: Regenerate slug based on display name.
+        color:
+          label: Color
+          help: Theme adaptation is required to support
+        cover:
+          label: Cover
+          help: Theme adaptation is required to support
+  post_category:
+    title: Post categories
+    header:
+      title: "{count} Categories"
+    empty:
+      title: There are no categories currently.
+      message: You can try to refresh or create a new category.
+    operations:
+      delete:
+        title: Are you sure you want to delete this category?
+        description: >-
+          After deleting this category, the association with corresponding
+          articles will be removed. This operation cannot be undone.
+      add_sub_category:
+        button: Add sub category
+    editing_modal:
+      titles:
+        update: Update post category
+        create: Create post category
+      groups:
+        general: General
+        annotations: Annotations
+      fields:
+        parent:
+          label: Parent
+        display_name:
+          label: Display name
+        slug:
+          label: Slug
+          help: Often used to generate permalink for categories
+          refresh_message: Regenerate slug based on display name.
+        template:
+          label: Custom template
+        cover:
+          label: Cover
+          help: Theme adaptation is required to support
+        description:
+          label: Description
+          help: Theme adaptation is required to support
+  page:
+    title: Pages
+    actions:
+      recycle_bin: Recycle Bin
+    empty:
+      title: There are no pages currently.
+      message: You can try to refresh or create a new page.
+    operations:
+      delete:
+        title: Are you sure you want to delete this page?
+        description: >-
+          This operation will move the page to the recycle bin, and it can be
+          restored from the recycle bin later.
+      delete_in_batch:
+        title: Are you sure you want to delete the selected pages?
+        description: >-
+          This operation will move the pages to the recycle bin, and it can be
+          restored from the recycle bin later.
+    filters:
+      status:
+        items:
+          published: Published
+          draft: Draft
+      visible:
+        label: Visible
+        result: "Visible: {visible}"
+        items:
+          public: Public
+          private: Private
+      author:
+        label: Author
+        result: "Author: {author}"
+      sort:
+        items:
+          publish_time_desc: Latest Published
+          publish_time_asc: Earliest Published
+          create_time_desc: Latest Created
+          create_time_asc: Earliest Created
+    list:
+      fields:
+        visits: "{visits} Visits"
+        comments: "{comments} Comments"
+    settings:
+      title: Settings
+      groups:
+        general: General
+        advanced: Advanced
+        annotations: Annotations
+      fields:
+        title:
+          label: Title
+        slug:
+          label: Slug
+          help: Usually used for generating permalink to pages
+          refresh_message: Regenerate slug based on title.
+        auto_generate_excerpt:
+          label: Auto Generate Excerpt
+        raw_excerpt:
+          label: Excerpt
+        allow_comment:
+          label: Allow Comment
+        pinned:
+          label: Pinned
+        visible:
+          label: Visible
+        publish_time:
+          label: Publish Time
+        template:
+          label: Template
+        cover:
+          label: Cover
+  deleted_page:
+    title: Deleted Pages
+    empty:
+      title: No pages have been put in the recycle bin.
+      message: You can try to refresh or go back to the previous page.
+    operations:
+      delete:
+        title: Are you sure you want to permanently delete this page?
+        description: After deletion, it will not be possible to recover.
+      delete_in_batch:
+        title: Are you sure you want to permanently delete the selected pages?
+        description: After deletion, it will not be possible to recover.
+      recovery:
+        title: Do you want to restore this page?
+        description: This operation will restore the page to its state before deletion.
+      recovery_in_batch:
+        title: Are you sure you want to restore the selected pages?
+        description: This operation will restore the pages to its state before deletion.
+  page_editor:
+    title: Page edit
+    untitled: Untitled page
+  comment:
+    title: Comments
+    empty:
+      title: There are no comments currently.
+      message: You can try to refresh or modify the filtering criteria.
+    reply_empty:
+      title: There are no replies currently.
+      message: You can try refreshing or creating a new reply.
+      new: New Reply
+    operations:
+      delete_comment:
+        title: Are you sure you want to delete this comment?
+        description: >-
+          All replies under the comments will be deleted at the same time, and
+          this operation cannot be undone.
+      delete_comment_in_batch:
+        title: Are you sure you want to delete the selected comments?
+        description: >-
+          All replies under the comments will be deleted at the same time, and
+          this operation cannot be undone.
+      approve_comment_in_batch:
+        button: Approve
+        title: Are you sure you want to approve the selected comments for review?
+      approve_applies_in_batch:
+        button: Approve all replies
+        title: >-
+          Are you sure you want to approve all replies to this comment for
+          review?
+      delete_reply:
+        title: Are you sure you want to delete this reply?
+      approve_reply:
+        button: Approve
+      reply:
+        button: Reply
+    filters:
+      status:
+        items:
+          approved: Approved
+          pending_review: Pending Review
+      owner:
+        label: Owner
+        result: "Owner: {owner}"
+      sort:
+        items:
+          last_reply_time_desc: Recent reply
+          last_reply_time_asc: Earlier reply
+          reply_count_desc: More replies
+          reply_count_asc: Fewer replies
+          create_time_desc: Latest Created
+          create_time_asc: Earliest Created
+    list:
+      fields:
+        reply_count: "{count} Replies"
+        has_new_replies: New replies
+        pending_review: Pending review
+    subject_refs:
+      post: Post
+      page: Page
+      unknown: Unknown
+    reply_modal:
+      title: Reply
+      fields:
+        content:
+          label: Content
+      operations:
+        submit:
+          toast_success: Reply successfully
+  attachment:
+    title: Attachments
+    common:
+      text:
+        ungrouped: Ungrouped
+    actions:
+      storage_policies: Storage Policies
+    empty:
+      title: There are no attachments in the current group.
+      message: >-
+        The current group has no attachments, you can try refreshing or
+        uploading attachments.
+      actions:
+        upload: Upload Attachment
+    operations:
+      delete:
+        title: Are you sure you want to delete this attachment?
+      delete_in_batch:
+        title: Are you sure you want to delete the selected attachments?
+      deselect_items:
+        button: Deselect items
+      move:
+        button: Move
+        toast_success: Move successful
+    filters:
+      storage_policy:
+        label: Storage Policy
+        result: Storage Policy：{storage_policy}
+      owner:
+        label: Owner
+        result: Owner：{owner}
+      sort:
+        items:
+          create_time_desc: Latest uploaded
+          create_time_asc: Earliest uploaded
+          size_desc: Descending order by file size
+          size_asc: Ascending order by file size
+      view_type:
+        items:
+          grid: Grid Mode
+          list: List Mode
+    detail_modal:
+      title: "Attachment: {display_name}"
+      fields:
+        preview: Preview
+        storage_policy: Storage policy
+        group: Group
+        display_name: Display name
+        media_type: Media type
+        size: Size
+        owner: Owner
+        creation_time: Creation time
+        permalink: Permalink
+      preview:
+        click_to_exit: Click to exit preview
+        video_not_support: The current browser does not support video playback.
+        audio_not_support: The current browser does not support audio playback.
+        not_support: This file does not support preview.
+    group_editing_modal:
+      titles:
+        create: Create attachment group
+        update: Update attachment group
+      fields:
+        display_name:
+          label: Display name
+    group_list:
+      internal_groups:
+        all: All
+      operations:
+        rename:
+          button: Rename
+        delete:
+          button: And move attachment to ungrouped
+          title: Are you sure you want to delete this group?
+          description: >-
+            The group will be deleted, and the attachments under the group will
+            be moved to ungrouped. This operation cannot be undone.
+          toast_success: >-
+            Deletion successful, {total} attachments have been moved to
+            ungrouped
+        delete_with_attachments:
+          button: Also delete attachments
+          title: Are you sure you want to delete this group?
+          description: >-
+            Deleting the group and all attachments within it, this action cannot
+            be undone.
+          toast_success: >-
+            Deletion successful, {total} attachments have been deleted
+            simultaneously
+    policies_modal:
+      title: Storage Policies
+      empty:
+        title: There is currently no available storage strategy.
+        message: >-
+          There are no available storage policies at the moment. You can try
+          refreshing or creating a new policy.
+      operations:
+        delete:
+          title: Are you sure you want to delete this policy?
+          description: There are no uploaded attachments under the current policy.
+        can_not_delete:
+          title: Deletion failed
+          description: There are attachments under this policy, which cannot be deleted.
+    policy_editing_modal:
+      titles:
+        create: "New policy: {policy_template}"
+        update: "Edit policy: {policy}"
+      fields:
+        display_name:
+          label: Display name
+    upload_modal:
+      title: Upload attachment
+      filters:
+        group:
+          label: "Select group:"
+        policy:
+          label: "Select storage policy:"
+          empty:
+            title: No storage policy
+            description: Before uploading, a new storage policy needs to be created.
+          not_select: Please select a storage policy first.
+    select_modal:
+      title: Select attachment
+      providers:
+        default:
+          label: Attachments
+      operations:
+        select:
+          result: ({count} items selected)
+  theme:
+    title: Themes
+    common:
+      buttons:
+        install: Install Theme
+    tabs:
+      detail: Detail
+    actions:
+      management: Themes
+    empty:
+      title: There are currently no activated or selected themes.
+      message: >-
+        There are currently no activated or selected themes, you can switch
+        themes or install new ones.
+      actions:
+        switch: Switch Theme
+    operations:
+      active:
+        title: Are you sure to active the current theme?
+        toast_success: Active theme successful
+      reset:
+        title: Are you sure you want to reset all configurations of the theme?
+        description: >-
+          This operation will delete the saved configuration and reset it to
+          default settings.
+        toast_success: Reset configuration successful
+      reload:
+        button: Reload
+        title: Are you sure you want to reload all configurations of the theme?
+        description: >-
+          This operation will only reload the theme configuration and settings
+          form definition, and will not delete any saved configurations.
+        toast_success: Reload configuration successful
+      uninstall:
+        title: Are you sure you want to uninstall this theme?
+      uninstall_and_delete_config:
+        button: Uninstall and delete config
+        title: >-
+          Are you sure you want to uninstall this theme and its corresponding
+          settings?
+      remote_download:
+        title: Remote download address detected, do you want to download?
+        description: "Please carefully verify whether this address can be trusted: {url}"
+      existed_during_installation:
+        title: The theme already exists.
+        description: The currently installed theme already exists, do you want to upgrade?
+    list_modal:
+      tabs:
+        installed: Installed
+        not_installed: Not installed
+        local_upload: Local install / upgrade
+        remote_download:
+          label: Remote
+          fields:
+            url: Remote URL
+      empty:
+        title: There are no installed themes currently.
+        message: >-
+          There are currently no installed themes, you can try refreshing or
+          installing a new theme.
+      not_installed_empty:
+        title: There are no themes currently not installed.
+    preview_model:
+      title: "Preview theme: {display_name}"
+      actions:
+        switch: Switch theme
+        setting: Setting
+        open: Open
+    detail:
+      fields:
+        author: Author
+        website: Website
+        repo: Source Repository
+        version: Version
+        requires: Requires
+        storage_location: Storage Location
+        plugin_requires: Plugin Requires
+    settings:
+      title: Theme settings
+    custom_templates:
+      default: Default
+  menu:
+    title: Menus
+    empty:
+      title: There is no menu currently.
+      message: You can try to refresh or create a new menu.
+    menu_item_empty:
+      title: There are no menu items currently.
+      message: You can try to refresh or create a new menu item.
+    operations:
+      set_primary:
+        button: Set as primary menu
+        toast_success: Setting successful
+      delete_menu:
+        title: Are you sure you want to delete this menu?
+        description: >-
+          All menu items under this menu will be deleted at the same time, and
+          this operation cannot be undone.
+      delete_menu_item:
+        title: Are you sure you want to delete this menu item?
+        description: >-
+          All sub-menu items will be deleted at the same time, and cannot be
+          restored after deletion.
+      add_sub_menu_item:
+        button: Add sub menu item
+    list:
+      fields:
+        primary: Primary
+        items_count: "{count} items"
+    menu_editing_modal:
+      titles:
+        create: Create menu
+        update: Update menu
+      fields:
+        display_name:
+          label: Display name
+    menu_item_editing_modal:
+      titles:
+        create: Create menu item
+        update: Update menu item
+      groups:
+        general: General
+        annotations: Annotations
+      fields:
+        parent:
+          label: Parent
+          placeholder: Select the parent menu item
+        ref_kind:
+          label: Type
+          placeholder: Please select {label}
+          options:
+            custom: Custom
+            post: Post
+            single_page: Page
+            category: Category
+            tag: Tag
+        display_name:
+          label: Display name
+        href:
+          label: Link address
+        target:
+          label: Target
+          options:
+            self: _self
+            blank: _blank
+            parent: _parent
+            top: _top
+  plugin:
+    title: Plugins
+    tabs:
+      detail: Detail
+    empty:
+      title: There are no installed plugins currently.
+      message: >-
+        There are no installed plugins currently, you can try refreshing or
+        installing new plugins.
+      actions:
+        install: Install Plugin
+    operations:
+      reset:
+        title: Are you sure you want to reset all configurations of the plugin?
+        description: >-
+          This operation will delete the saved configuration and reset it to
+          default settings.
+        toast_success: Reset configuration successfully
+      uninstall:
+        title: Are you sure you want to uninstall this plugin?
+      uninstall_in_batch:
+        title: Are you sure you want to uninstall these plugin?
+      uninstall_and_delete_config:
+        button: Uninstall and delete config
+        title: >-
+          Are you sure you want to uninstall this plugin and its corresponding
+          configuration?
+      uninstall_and_delete_config_in_batch:
+        button: Uninstall and delete config
+        title: >-
+          Are you sure you want to uninstall these plugin and its corresponding
+          configuration?
+      uninstall_when_enabled:
+        confirm_text: Stop running and uninstall
+        description: >-
+          The current plugin is still in the enabled state and will be
+          uninstalled after it stops running. This operation cannot be undone.
+      change_status_in_batch:
+        activate_title: Are you sure you want to activate these plugins?
+        inactivate_title: Are you sure you want to inactivate these plugins?
+      remote_download:
+        title: Remote download address detected, do you want to download?
+        description: "Please carefully verify whether this address can be trusted: {url}"
+    filters:
+      status:
+        items:
+          active: Active
+          inactive: Inactive
+      sort:
+        items:
+          create_time_desc: Latest Installed
+          create_time_asc: Earliest Installed
+    upload_modal:
+      titles:
+        install: Install plugin
+        upgrade: Upgrade plugin ({display_name})
+      tabs:
+        local: Local
+        remote:
+          title: Remote
+          fields:
+            url: Remote URL
+      operations:
+        active_after_install:
+          title: Install successful
+          description: Would you like to activate the currently installed plugin?
+        existed_during_installation:
+          title: The plugin already exists.
+          description: >-
+            The currently installed plugin already exists, do you want to
+            upgrade?
+    detail:
+      title: Plugin detail
+      header:
+        title: Plugin information
+      fields:
+        display_name: Display Name
+        description: Description
+        version: Version
+        requires: Requires
+        author: Author
+        license: License
+        role_templates: Role Templates
+        last_starttime: Last Start Time
+    loader:
+      toast:
+        entry_load_failed: Failed to load plugins entry file
+        style_load_failed: Failed to load plugins stylesheet file
+    extension_points:
+      editor:
+        providers:
+          default: Default Editor
+  user:
+    title: Users
+    actions:
+      roles: Roles
+      identity_authentication: Identity authentication
+    empty:
+      title: There are no users that meet the filtering criteria currently.
+      message: >-
+        There are no users that match the filtering criteria at present. You can
+        try refreshing or creating a new user.
+    operations:
+      delete:
+        title: Are you sure you want to delete this user?
+      delete_in_batch:
+        title: Are you sure you want to delete the selected users?
+      update_profile:
+        title: Update profile
+      change_password:
+        title: Change password
+      grant_permission:
+        title: Grant permission
+    filters:
+      role:
+        label: Role
+        result: "Role: {role}"
+      sort:
+        items:
+          create_time_desc: Latest Created
+          create_time_asc: Earliest Created
+    editing_modal:
+      titles:
+        update: Edit User
+        create: Create User
+      groups:
+        general: General
+        annotations: Annotations
+      fields:
+        username:
+          label: Username
+          validation: Please enter a valid username.
+        display_name:
+          label: Display name
+        email:
+          label: Email
+        phone:
+          label: Phone
+        avatar:
+          label: Avatar
+        bio:
+          label: Bio
+    change_password_modal:
+      title: Change password
+      fields:
+        new_password:
+          label: New password
+        confirm_password:
+          label: Confirm password
+    grant_permission_modal:
+      title: Grant permission
+      fields:
+        role:
+          label: Role
+          placeholder: Please select a role
+    detail:
+      title: User detail
+      tabs:
+        detail: Detail
+      actions:
+        update_profile:
+          title: Update profile
+        change_password:
+          title: Change password
+        profile:
+          title: Profile
+      fields:
+        display_name: Display name
+        username: Username
+        email: Email
+        roles: Roles
+        bio: Bio
+        creation_time: Creation time
+        identity_authentication: Identity authentication
+  role:
+    title: Roles
+    common:
+      text:
+        contains_all_permissions: Contains all permissions
+        contains_n_permissions: Contains {count} permissions
+        system_reserved: System Reserved
+        custom: Custom
+        dependent_on: Dependent on {roles}
+        provided_by_plugin: Provided by {plugin}
+    operations:
+      delete:
+        title: Are you sure you want to delete this role?
+        description: >-
+          After the role is deleted, the associated users will have their role
+          bindings removed and this operation cannot be undone.
+      create_based_on_this_role:
+        button: Create based on this role
+    detail:
+      title: Role detail
+      header:
+        title: Role information
+      tabs:
+        detail: Detail
+        permissions: Permissions
+      fields:
+        display_name: Display name
+        name: Name
+        type: Type
+        creation_time: Creation time
+    permissions_detail:
+      system_reserved_alert:
+        description: >-
+          The system reserved role does not support modification, it is
+          recommended to create a new role based on this one.
+    editing_modal:
+      titles:
+        create: Create role
+        update: Update role
+      groups:
+        general: General
+        permissions: Permissions
+      fields:
+        display_name: Display name
+        redirect_on_login: Default redirect location after logging in
+        disallow_access_console:
+          label: Disable access to Console
+          help: Once checked, this role will not be able to access the Console
+  identity_authentication:
+    title: Identity Authentication
+    tabs:
+      detail: Detail
+      setting: Settings
+    operations:
+      enable:
+        title: Are you sure you want to enable this identity authentication method?
+      disable:
+        title: Are you sure you want to disable this identity authentication method?
+      disable_privileged:
+        tooltip: The authentication method reserved by the system cannot be disabled
+    detail:
+      title: Identity authentication detail
+      fields:
+        display_name: Display name
+        description: Description
+        website: Website
+        help_page: Help page
+        authentication_url: Login URL
+  uc_profile:
+    title: Profile
+    tabs:
+      detail: Detail
+      notification-preferences: Notification Preferences
+      pat: Personal Access Tokens
+    actions:
+      update_profile:
+        title: Update profile
+      change_password:
+        title: Change password
+    detail:
+      fields:
+        display_name: Display name
+        username: Username
+        email: Email
+        roles: Roles
+        bio: Bio
+        creation_time: Creation time
+        identity_authentication: Identity authentication
+      operations:
+        bind:
+          button: Bind
+        unbind:
+          button: Unbind
+          title: Are you sure you want to unbind the login method for {display_name}?
+      email_not_set:
+        description: >-
+          Your email address has not been set yet. Click the button below to set
+          it up.
+        title: Set up email
+      email_not_verified:
+        description: >-
+          Your email address has not been verified yet, click the button below
+          to verify it
+        title: Verify email
+    pat:
+      operations:
+        delete:
+          title: Delete Personal Access Token
+          description: Are you sure you want to delete this personal access token?
+        revoke:
+          button: Revoke
+          title: Revoke Personal Access Token
+          description: Are you sure you want to revoke this personal access token?
+          toast_success: Revocation succeeded
+        copy:
+          title: Please copy and save immediately, Token will only be displayed once.
+        restore:
+          button: Restore
+          toast_success: Restore successfully
+      list:
+        empty:
+          title: No personal access tokens have been created
+          message: You can try refreshing or creating a new personal access token
+        fields:
+          expiresAt:
+            dynamic: Expires on {expiresAt}
+            forever: Never expires
+          status:
+            normal: Normal
+            revoked: Revoked
+            expired: Expired
+      creation_modal:
+        title: Create Personal Access Token
+        groups:
+          general: General
+          permissions: Permissions
+        fields:
+          name:
+            label: Name
+          expiresAt:
+            label: Expiration Time
+            help: Leave empty for no expiration
+          description:
+            label: Description
+    notification-preferences:
+      fields:
+        type: Type
+    editing_modal:
+      title: Edit Profile
+      groups:
+        general: General
+        annotations: Annotations
+      fields:
+        username:
+          label: Username
+          validation: Please enter a valid username.
+        display_name:
+          label: Display name
+        email:
+          label: Email
+        phone:
+          label: Phone
+        avatar:
+          label: Avatar
+        bio:
+          label: Bio
+    change_password_modal:
+      title: Change password
+      fields:
+        new_password:
+          label: New password
+        confirm_password:
+          label: Confirm password
+    email_verify_modal:
+      fields:
+        code:
+          label: Verification code
+        email:
+          label: Email address
+        new_email:
+          label: New email address
+      operations:
+        send_code:
+          buttons:
+            countdown: Resend in {timer} seconds
+            send: Send the verification code
+            sending: sending
+          toast_email_empty: Please enter your email address
+          toast_success: Verification code sent
+        verify:
+          toast_success: Verification successful
+      titles:
+        modify: Modify email address
+        verify: Verify email
+  uc_notification:
+    title: Notifications
+    tabs:
+      unread: Unread
+      read: Read
+    empty:
+      titles:
+        unread: No unread notifications
+        read: No read notifications
+    operations:
+      mark_as_read:
+        button: Mark as read
+      delete:
+        description: Are you sure you want to delete this notification?
+        title: Delete
+  setting:
+    title: Settings
+  actuator:
+    title: Actuator
+    actions:
+      copy:
+        toast_browser_not_supported: The current browser does not support copying
+    header:
+      titles:
+        general: General information
+        environment: Environment information
+    fields:
+      external_url: External url
+      start_time: Start time
+      timezone: System Timezone
+      locale: System Locale
+      version: Version
+      build_time: Build time
+      database: Database
+      os: Operating system
+      log: System log
+      activated_theme: Activated theme
+      enabled_plugins: Enabled plugins
+    fields_values:
+      external_url:
+        not_setup: Not setup
+    copy_results:
+      external_url: "External url: {external_url}"
+      start_time: "Start time: {start_time}"
+      version: "Version: {version}"
+      build_time: "Build time: {build_time}"
+      database: "Database: {database}"
+      os: "Operating system: {os}"
+    alert:
+      external_url_invalid: >-
+        The external access url detected is inconsistent with the current access
+        url, which may cause some links to fail to redirect properly. Please
+        check the external access url settings.
+  backup:
+    title: Backup and Restore
+    tabs:
+      backup_list: Backups
+      restore: Restore
+    empty:
+      title: No backups have been created yet
+      message: You can click the button below to create a backup
+    operations:
+      create:
+        button: Create backup
+        title: Create backup
+        description: >-
+          Are you sure you want to create a backup? This operation may last for
+          a long time.
+        toast_success: Requested to create a backup
+      delete:
+        title: Delete the backup
+        description: Are you sure you want to delete the backup?
+      restore:
+        title: Restore successfully
+        description: >-
+          After successful restore, you need to restart Halo to load the system
+          resources normally. After clicking OK, we will automatically restart
+          Halo.
+      restart:
+        toast_success: Requested to restart
+      remote_download:
+        button: Download and restore
+      restore_by_backup:
+        button: Restore
+        title: Are you sure you want to restore from this backup?
+    list:
+      phases:
+        pending: Pending
+        running: Running
+        succeeded: Succeeded
+        failed: Failed
+      fields:
+        expiresAt: Expires {expiresAt}
+    restore:
+      tips:
+        first: >-
+          1. The restore process may last for a long time, please do not refresh
+          the page during this period.
+        second: >-
+          2. During the restore process, although the existing data will not be
+          cleaned up, if there is a conflict, the data will be overwritten.
+        third: >-
+          3. After the restore is completed, you need to restart Halo to load
+          the system resources normally.
+        complete: Restore completed, waiting for restart...
+      start: Start restore
+      tabs:
+        local:
+          label: Upload
+        remote:
+          label: Remote
+          fields:
+            url: Remote URL
+        backup:
+          label: Restore from backup
+  exception:
+    not_found:
+      message: Page not found
+    forbidden:
+      message: Unauthorized access to this page
+    actions:
+      home: Back to home
+  setup:
+    title: Setup
+    operations:
+      submit:
+        button: Setup
+        toast_success: Setup successfully
+      setup_initial_data:
+        loading: Initializing data, please wait...
+    fields:
+      site_title:
+        label: Site title
+      email:
+        label: Email
+      username:
+        label: Username
+      password:
+        label: Password
+      confirm_password:
+        label: Confirm password
+  rbac:
+    Attachments Management: Attachments
+    Attachment Manage: Attachment Manage
+    Attachment View: Attachment View
+    role-template-view-attachments: Attachment View
+    Comments Management: Comments
+    Comment Manage: Comment Manage
+    Comment View: Comment View
+    role-template-view-comments: Comment View
+    ConfigMaps Management: ConfigMaps
+    ConfigMap Manage: ConfigMap Manage
+    ConfigMap View: ConfigMap View
+    role-template-view-configmaps: ConfigMap View
+    Menus Management: Menus
+    Menu Manage: Menu Manage
+    Menu View: Menu View
+    role-template-view-menus: Menu view
+    Permissions Management: Permissions
+    Permissions Manage: Permissions Manage
+    Permissions View: Permissions View
+    role-template-view-permissions: Permissions View
+    role-template-manage-permissions: Permissions Manage
+    Plugins Management: Plugins
+    Plugin Manage: Plugin Manage
+    Plugin View: Plugin View
+    role-template-view-plugins: Plugin View
+    Posts Management: Posts
+    Post Manage: Post Manage
+    Post View: Post View
+    role-template-view-posts: Post View
+    role-template-manage-snapshots: Snapshot Manage
+    role-template-view-snapshots: Snapshot View
+    role-template-manage-tags: Tag Manage
+    role-template-view-tags: Tag View
+    role-template-manage-categories: Category Manage
+    role-template-view-categories: Category View
+    Roles Management: Roles
+    Role Manage: Role Manage
+    Role View: Role View
+    role-template-view-roles: Role View
+    Settings Management: Settings
+    Setting Manage: Setting Manage
+    Setting View: Setting View
+    role-template-view-settings: Setting View
+    SinglePages Management: SinglePages
+    SinglePage Manage: SinglePage Manage
+    SinglePage View: SinglePage View
+    role-template-view-singlepages: SinglePage View
+    Themes Management: Themes
+    Theme Manage: Theme Manege
+    Theme View: Theme View
+    role-template-view-themes: Theme View
+    Users Management: Users
+    User manage: User Manage
+    User View: User View
+    Migration Management: Backup and Restore
+    Migration Manage: Backup and Restore Manage
+    role-template-view-users: User View
+    role-template-change-password: Change Password
+    Actuator Management: System Information
+    Actuator Manage: Access System Information
+    Cache Management: Cache
+    Cache Manage: Cache Manage
+    Notification Configuration: Notification Configuration
+    Configure Notifier: Configure Notifier
+    Post Attachment Manager: Allow images to be uploaded in posts
+    Post Author: Contributions allowed
+    Post Contributor: Allows you to manage your own posts
+    Post Editor: Allow management of all posts
+    Post Publisher: Allow to publish own posts
+  components:
+    submit_button:
+      computed_text: "{text} ({shortcut})"
+    annotations_form:
+      custom_fields:
+        label: Custom
+        validation: The current Key is already in use
+    default_editor:
+      tabs:
+        toc:
+          title: Toc
+          empty: No Toc available
+        detail:
+          title: Detail
+          fields:
+            character_count: Character count
+            word_count: Word count
+            publish_time: Publish time
+            draft: Draft
+            owner: Owner
+            permalink: Permalink
+      extensions:
+        placeholder:
+          options:
+            placeholder: Enter / to select input type.
+      toolbox:
+        attachment: Attachment
+        show_hide_sidebar: Show/Hide Sidebar
+    global_search:
+      placeholder: Enter keywords to search
+      no_results: No search results
+      buttons:
+        select: Select
+      groups:
+        console: Console page
+        user: User
+        plugin: Plugin
+        post: Post
+        category: Category
+        tag: Tag
+        page: Page
+        attachment: Attachment
+        setting: Setting
+        theme_setting: Theme setting
+    pagination:
+      page_label: page
+      size_label: items per page
+      total_label: Total {total} items
+    social_auth_providers:
+      title: Third-party login
+    app_download_alert:
+      description: >-
+        Themes and plugins for Halo can be downloaded at the following
+        addresses:
+      sources:
+        app_store: "Official App Store: {url}"
+        github: "GitHub: {url}"
+    user_avatar:
+      title: Avatar
+      toast_upload_failed: Failed to upload avatar
+      toast_remove_failed: Failed to delete avatar
+      cropper_modal:
+        title: Crop Avatar
+      remove:
+        title: Are you sure you want to delete the avatar?
+      tooltips:
+        upload: Upload
+        zoom_in: Zoom In
+        zoom_out: Zoom Out
+        flip_horizontal: Flip Horizontal
+        flip_vertical: Flip Vertical
+        reset: Reset
+  composables:
+    content_cache:
+      toast_recovered: Recovered unsaved content from cache
+  formkit:
+    category_select:
+      creation_label: Create {text} category
+    tag_select:
+      creation_label: Create {text} tag
+    validation:
+      trim: Please remove the leading and trailing spaces
+  common:
+    buttons:
+      save: Save
+      close: Close
+      close_and_shortcut: Close (Esc)
+      delete: Delete
+      setting: Setting
+      confirm: Confirm
+      cancel: Cancel
+      cancel_and_shortcut: Cancel (Esc)
+      new: New
+      edit: Edit
+      back: Back
+      refresh: Refresh
+      publish: Publish
+      cancel_publish: Cancel Publish
+      next: Next
+      previous: Previous
+      install: Install
+      uninstall: Uninstall
+      upgrade: Upgrade
+      reset: Reset
+      preview: Preview
+      recovery: Recovery
+      delete_permanently: Delete Permanently
+      activate: Activate
+      inactivate: Inactivate
+      download: Download
+      copy: Copy
+      upload: Upload
+      add: Add
+      submit: Submit
+      detail: Detail
+      select: Select
+      view_all: View all
+      verify: Verify
+      modify: Modify
+    radio:
+      "yes": "Yes"
+      "no": "No"
+    select:
+      public: Public
+      private: Private
+    placeholder:
+      search: Enter keywords to search
+    toast:
+      operation_success: Operated successfully
+      delete_success: Deleted successfully
+      save_success: Saved successfully
+      publish_success: Published successfully
+      cancel_publish_success: Unpublished successfully
+      recovery_success: Recovered successfully
+      uninstall_success: Uninstalled successfully
+      active_success: Activated successfully
+      inactive_success: Deactivated successfully
+      upgrade_success: Upgraded successfully
+      install_success: Installed successfully
+      download_success: Downloaded successfully
+      copy_success: Copied successfully
+      operation_failed: Failed to operate
+      download_failed: Failed to download
+      save_failed_and_retry: Failed to save, please retry
+      publish_failed_and_retry: Failed to publish, please retry
+      network_error: Network error, please check your connection
+      login_expired: Login expired, please log in again
+      forbidden: Access denied
+      not_found: Resource not found
+      server_internal_error: Internal server error
+      unknown_error: Unknown error
+    dialog:
+      titles:
+        tip: Tip
+        warning: Warning
+      descriptions:
+        cannot_be_recovered: This operation is irreversible.
+        editor_not_found: >-
+          No editor found that matches the {raw_type} format. Please check if
+          the editor plugin has been installed.
+    filters:
+      results:
+        keyword: "Keyword: {keyword}"
+        sort: "Sort: {sort}"
+        status: "Status: {status}"
+      labels:
+        sort: Sort
+        status: Status
+      item_labels:
+        all: All
+        default: Default
+    status:
+      deleting: Deleting
+      loading: Loading
+      loading_error: Loading error
+      activated: Activated
+      not_activated: Not activated
+      installed: Installed
+      not_installed: Not installed
+    text:
+      none: None
+      tip: Tip
+      warning: Warning
+    tooltips:
+      unpublished_content_tip: There is content that has been saved but not yet published.
+      publishing: Publishing
+      recovering: Recovering
+    fields:
+      post_count: "{count} Posts"
+  uc_post:
+    creation_modal:
+      title: Create post
+    operations:
+      cancel_publish:
+        description: Are you sure you want to cancel publishing?
+        title: Cancel publish
+    publish_modal:
+      title: Publish post
+    setting_modal:
+      title: Post settings
+    title: My posts
+  uc_reset_password:
+    fields:
+      username:
+        label: username
+      password:
+        label: New Password
+      password_confirm:
+        label: Confirm Password
+    operations:
+      reset:
+        button: Reset Password
+        toast_success: Reset successful
+  reset_password:
+    fields:
+      username:
+        label: Username
+      email:
+        label: email address
+    operations:
+      send:
+        label: Send verification email
+        toast_success: >-
+          If your username and email address match, we will send an email to
+          your email address.

@@ -1,0 +1,48 @@
+version: '3.1'
+services:
+  testing:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    links:
+      - halo
+    depends_on:
+      halo:
+        condition: service_healthy
+  halo:
+    image: ghcr.io/halo-dev/halo-dev:${TAG:-main}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/actuator/health/readiness"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    command:
+      - --spring.r2dbc.url=r2dbc:pool:postgresql://postgres/halo
+      - --spring.r2dbc.username=halo
+      # PostgreSQL 的密码，请保证与下方 POSTGRES_PASSWORD 的变量值一致。
+      - --spring.r2dbc.password=openpostgresql
+      - --spring.sql.init.platform=postgresql
+      # 外部访问地址，请根据实际需要修改
+      # - --halo.external-url=http://localhost:8090/
+    ports:
+      - 8090:8090
+    links:
+      - postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+  postgres:
+    image: postgres:15.4
+    container_name: postgres
+    restart: on-failure:3
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      - POSTGRES_PASSWORD=openpostgresql
+      - POSTGRES_USER=halo
+      - POSTGRES_DB=halo
+      - PGUSER=halo

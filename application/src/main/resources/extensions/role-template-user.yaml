@@ -1,0 +1,54 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-users
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: |
+      [ "role-template-view-users", "role-template-change-password" ]
+    rbac.authorization.halo.run/module: "Users Management"
+    rbac.authorization.halo.run/display-name: "User manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:users:manage"]
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "users" ]
+    verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "users", "users/permissions", "users/password", "users/avatar" ]
+    verbs: [ "*" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-view-users
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Users Management"
+    rbac.authorization.halo.run/display-name: "User View"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:users:view"]
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "users" ]
+    verbs: [ "get", "list" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "users" ]
+    verbs: [ "get", "list" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-change-password
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Users Management"
+    rbac.authorization.halo.run/display-name: "User Password Change"
+rules:
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "users/password" ]
+    verbs: [ "update" ]

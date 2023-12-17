@@ -1,0 +1,45 @@
+server:
+  port: 8090
+
+spring:
+  output:
+    ansi:
+      enabled: always
+  thymeleaf:
+    cache: false
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          no-cache: true
+        use-last-modified: false
+
+halo:
+  console:
+    proxy:
+      endpoint: http://localhost:3000/
+      enabled: true
+  uc:
+    proxy:
+      endpoint: http://localhost:4000/
+      enabled: true
+  plugin:
+    runtime-mode: development # development, deployment
+  work-dir: ${user.home}/halo2-dev
+logging:
+  level:
+    run.halo.app: DEBUG
+    org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler: DEBUG
+springdoc:
+  api-docs:
+    enabled: true
+    version: OPENAPI_3_1
+  swagger-ui:
+    enabled: true
+  show-actuator: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

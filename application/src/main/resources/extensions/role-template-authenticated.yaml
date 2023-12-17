@@ -1,0 +1,138 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: authenticated
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: |
+      [ 
+        "role-template-own-user-info",
+        "role-template-own-permissions",
+        "role-template-change-own-password",
+        "role-template-stats",
+        "role-template-annotation-setting",
+        "role-template-manage-own-pat",
+        "role-template-user-notification"
+      ]
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "configmaps" ]
+    resourceNames: [ "system-states" ]
+    verbs: [ "get" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "auth-providers" ]
+    verbs: [ "list" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "plugins/bundle.js", "plugins/bundle.css" ]
+    resourceNames: [ "-" ]
+    verbs: [ "get" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-own-user-info
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+rules:
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "users" ]
+    resourceNames: [ "-" ]
+    verbs: [ "get", "update" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "users/avatar" ]
+    resourceNames: [ "-" ]
+    verbs: [ "create", "delete" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "users/send-email-verification-code", "users/verify-email" ]
+    resourceNames: [ "-" ]
+    verbs: [ "create" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-own-permissions
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+rules:
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "users/permissions" ]
+    resourceNames: [ "-" ]
+    verbs: [ "list", "get" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-change-own-password
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+rules:
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "users/password" ]
+    resourceNames: [ "-" ]
+    verbs: [ "update" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-stats
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+rules:
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "stats" ]
+    verbs: [ "get", "list" ]
+
+---
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: role-template-annotation-setting
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "annotationsettings" ]
+    verbs: [ "get", "list" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-own-pat
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+rules:
+  - apiGroups: [ "api.security.halo.run" ]
+    resources: [ "personalaccesstokens" ]
+    verbs: [ "*" ]
+  - apiGroups: [ "api.security.halo.run" ]
+    resources: [ "personalaccesstokens/actions" ]
+    verbs: [ "update" ]
+---
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: role-template-user-notification
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+rules:
+  - apiGroups: [ "api.notification.halo.run" ]
+    resources: [ "notifications" ]
+    verbs: [ "get", "list", "delete" ]
+  - apiGroups: [ "api.notification.halo.run" ]
+    resources: [ "notifications/mark-as-read", "notifications/mark-specified-as-read" ]
+    verbs: [ "update" ]
+  - apiGroups: [ "api.notification.halo.run" ]
+    resources: [ "notifiers/receiver-config" ]
+    verbs: [ "get", "update" ]
+  - apiGroups: [ "api.notification.halo.run" ]
+    resources: [ "notification-preferences" ]
+    verbs: [ "create", "list" ]

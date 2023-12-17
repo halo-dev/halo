@@ -1,0 +1,28 @@
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: guest
+  labels:
+    rbac.authorization.halo.run/system-reserved: "true"
+  annotations:
+    rbac.authorization.halo.run/display-name: "访客"
+    rbac.authorization.halo.run/disallow-access-console: "true"
+    rbac.authorization.halo.run/redirect-on-login: "/uc"
+rules: []
+
+---
+apiVersion: v1alpha1
+kind: Role
+metadata:
+  name: super-role
+  labels:
+    rbac.authorization.halo.run/system-reserved: "true"
+  annotations:
+    rbac.authorization.halo.run/display-name: "超级管理员"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["*"]
+rules:
+  - apiGroups: ["*"]
+    resources: ["*"]
+    nonResourceURLs: ["*"]
+    verbs: ["*"]

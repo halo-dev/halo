@@ -1,0 +1,50 @@
+{
+  "name": "@halo-dev/console-shared",
+  "version": "2.12.0",
+  "description": "",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "typecheck": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
+    "lint": "eslint ./src --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts",
+    "prettier": "prettier --write './src/**/*.{vue,js,jsx,ts,tsx,css,scss,json,yml,yaml,html}'"
+  },
+  "keywords": [],
+  "author": {
+    "name": "@halo-dev",
+    "url": "https://github.com/halo-dev"
+  },
+  "main": "./dist/halo-console-shared.iife.js",
+  "module": "./dist/halo-console-shared.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/halo-console-shared.es.js"
+    },
+    "./dist/style.css": "./dist/style.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/halo-dev/halo.git",
+    "directory": "console/packages/shared"
+  },
+  "bugs": {
+    "url": "https://github.com/halo-dev/halo/issues"
+  },
+  "homepage": "https://github.com/halo-dev/halo/tree/main/console/packages/shared#readme",
+  "license": "MIT",
+  "devDependencies": {
+    "vite-plugin-dts": "^2.3.0"
+  },
+  "peerDependencies": {
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.4"
+  },
+  "dependencies": {
+    "@halo-dev/api-client": "workspace:*"
+  }
+}

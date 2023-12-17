@@ -1,0 +1,62 @@
+{
+  "name": "@halo-dev/api-client",
+  "version": "2.12.0",
+  "description": "",
+  "scripts": {
+    "build": "unbuild",
+    "dev": "unbuild --stub",
+    "lint": "eslint . --fix",
+    "prettier": "prettier --write './src/**/*.{js,jsx,ts,tsx,json,yml,yaml}'",
+    "typecheck": "tsc --noEmit",
+    "release": "bumpp",
+    "gen": "openapi-generator-cli generate -i http://localhost:8090/v3/api-docs/all-api -g typescript-axios -c ./src/.openapi_config.yaml -o ./src --type-mappings='set=Array' --skip-validate-spec && pnpm lint && pnpm prettier"
+  },
+  "keywords": [],
+  "author": "@halo-dev",
+  "contributors": [
+    {
+      "name": "Ryan Wang",
+      "url": "https://github.com/ruibaby"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/halo-dev/halo.git",
+    "directory": "console/packages/api-client"
+  },
+  "bugs": {
+    "url": "https://github.com/halo-dev/halo/issues"
+  },
+  "homepage": "https://github.com/halo-dev/halo/tree/main/console/packages/api-client#readme",
+  "license": "GPL-3.0",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*",
+        "./dist/index.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.5.2",
+    "@types/node": "^18.13.0",
+    "axios": "^0.27.2",
+    "bumpp": "^8.2.1",
+    "typescript": "^4.9.5",
+    "unbuild": "^0.7.6",
+    "vitest": "^0.18.1"
+  }
+}

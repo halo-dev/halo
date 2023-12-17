@@ -1,0 +1,105 @@
+server:
+  port: 8090
+  forward-headers-strategy: framework
+  compression:
+    enabled: true
+  error:
+    whitelabel:
+      enabled: false
+spring:
+  output:
+    ansi:
+      enabled: detect
+  r2dbc:
+    url: r2dbc:h2:file:///${halo.work-dir}/db/halo-next?MODE=MySQL&DB_CLOSE_ON_EXIT=FALSE
+    username: admin
+    password: 123456
+  sql:
+    init:
+      mode: always
+      platform: h2
+  codec:
+    max-in-memory-size: 10MB
+  messages:
+    basename: config.i18n.messages
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          max-age: 365d
+  cache:
+    type: caffeine
+    caffeine:
+      spec: expireAfterAccess=1h, maximumSize=10000
+
+halo:
+  caches:
+    page:
+      # Disable page cache by default due to experimental feature
+      disabled: true
+  work-dir: ${user.home}/.halo2
+  plugin:
+    plugins-root: ${halo.work-dir}/plugins
+  attachment:
+    resource-mappings:
+      - pathPattern: /upload/**
+        locations:
+          - migrate-from-1.x
+
+springdoc:
+  api-docs:
+    enabled: false
+  writer-with-order-by-keys: true
+
+logging:
+  file:
+    name: ${halo.work-dir}/logs/halo.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      total-size-cap: 1GB
+      max-history: 0
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      enabled: true
+    health:
+      probes:
+        enabled: true
+  info:
+    java:
+      enabled: true
+    os:
+      enabled: true
+
+resilience4j.ratelimiter:
+  configs:
+    authentication:
+      limitForPeriod: 3
+      limitRefreshPeriod: 1m
+      timeoutDuration: 0
+    comment-creation:
+      limitForPeriod: 10
+      limitRefreshPeriod: 1m
+      timeoutDuration: 0s
+    signup:
+      limitForPeriod: 3
+      limitRefreshPeriod: 1h
+      timeoutDuration: 0s
+    send-email-verification-code:
+      limitForPeriod: 1
+      limitRefreshPeriod: 1m
+      timeoutDuration: 0s
+    verify-email:
+      limitForPeriod: 3
+      limitRefreshPeriod: 1h
+      timeoutDuration: 0s
+    send-reset-password-email:
+      limitForPeriod: 2
+      limitRefreshPeriod: 1m
+      timeoutDuration: 0s

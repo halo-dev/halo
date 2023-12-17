@@ -1,0 +1,42 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-themes
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-themes\" ]"
+    rbac.authorization.halo.run/module: "Themes Management"
+    rbac.authorization.halo.run/display-name: "Theme Manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:themes:manage"]
+rules:
+  - apiGroups: [ "theme.halo.run" ]
+    resources: [ "themes" ]
+    verbs: [ "*" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "themes", "themes/reload", "themes/resetconfig", "themes/config", "themes/activation",
+                 "themes/install-from-uri", "themes/upgrade-from-uri" ]
+    verbs: [ "*" ]
+  - nonResourceURLs: [ "/apis/api.console.halo.run/themes/install" ]
+    verbs: [ "create" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-view-themes
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Themes Management"
+    rbac.authorization.halo.run/display-name: "Theme View"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:themes:view"]
+rules:
+  - apiGroups: [ "theme.halo.run" ]
+    resources: [ "themes" ]
+    verbs: [ "get", "list" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "themes", "themes/activation", "themes/setting", "themes/config" ]
+    verbs: [ "get", "list" ]
+

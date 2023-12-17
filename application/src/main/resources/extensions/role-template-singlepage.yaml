@@ -1,0 +1,39 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-singlepages
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-singlepages\", \"role-template-manage-snapshots\" ]"
+    rbac.authorization.halo.run/module: "SinglePages Management"
+    rbac.authorization.halo.run/display-name: "SinglePage Manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:singlepages:manage"]
+rules:
+  - apiGroups: [ "content.halo.run" ]
+    resources: [ "singlepages" ]
+    verbs: [ "*" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "singlepages", "singlepages/publish", "singlepages/content" ]
+    verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-view-singlepages
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-snapshots\" ]"
+    rbac.authorization.halo.run/module: "SinglePages Management"
+    rbac.authorization.halo.run/display-name: "SinglePage View"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:singlepages:view"]
+rules:
+  - apiGroups: [ "content.halo.run" ]
+    resources: [ "singlepages" ]
+    verbs: [ "get", "list" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "singlepages", "singlepages/head-content", "singlepages/release-content" ]
+    verbs: [ "get", "list" ]

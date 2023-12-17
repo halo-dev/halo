@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Plugin
+metadata:
+  name: fake-plugin
+spec:
+  # 'version' is a valid semantic version string (see semver.org).
+  version: 0.0.2
+  requires: ">=2.0.0"
+  author:
+    name: johnniang
+  logo: https://halo.run/avatar
+  homepage: https://github.com/halo-sigs/halo-plugin-1
+  displayName: "Fake Display Name"
+  description: "Fake description"
+  license:
+    - name: GPLv3

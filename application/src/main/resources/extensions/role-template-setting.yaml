@@ -1,0 +1,38 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-settings
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-settings\" ]"
+    rbac.authorization.halo.run/module: "Settings Management"
+    rbac.authorization.halo.run/display-name: "Setting Manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:settings:manage"]
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "settings" ]
+    verbs: [ "create", "patch", "update", "delete", "deletecollection" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "auth-providers/enable", "auth-providers/disable" ]
+    verbs: [ "update" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-view-settings
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Settings Management"
+    rbac.authorization.halo.run/display-name: "Setting View"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:settings:view"]
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "settings" ]
+    verbs: [ "get", "list" ]
+  - apiGroups: [ "api.console.halo.run" ]
+    resources: [ "auth-providers" ]
+    verbs: [ "get", "list" ]

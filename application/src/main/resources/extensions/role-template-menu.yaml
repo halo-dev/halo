@@ -1,0 +1,32 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-menus
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-menus\" ]"
+    rbac.authorization.halo.run/module: "Menus Management"
+    rbac.authorization.halo.run/display-name: "Menu Manage"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:menus:manage"]
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "menus", "menuitems" ]
+    verbs: [ "*" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-view-menus
+  labels:
+    halo.run/role-template: "true"
+  annotations:
+    rbac.authorization.halo.run/module: "Menus Management"
+    rbac.authorization.halo.run/display-name: "Menu View"
+    rbac.authorization.halo.run/ui-permissions: |
+      ["system:menus:view"]
+rules:
+  - apiGroups: [ "" ]
+    resources: [ "menus", "menuitems" ]
+    verbs: [ "get", "list" ]

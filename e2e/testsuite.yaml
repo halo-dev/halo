@@ -1,0 +1,320 @@
+name: halo
+api: |
+  {{default "http://halo:8090" (env "SERVER")}}/apis
+param:
+  postName: "{{randAlpha 6}}"
+  userName: "{{randAlpha 6}}"
+  roleName: "{{randAlpha 6}}"
+  notificationName: "{{randAlpha 6}}"
+  auth: "Basic YWRtaW46MTIzNDU2"
+items:
+- name: init
+  request:
+    api: /api.console.halo.run/v1alpha1/system/initialize
+    method: POST
+    header:
+      Content-Type: application/json
+    body: |
+      {
+        "siteTitle": "testing",
+        "username": "admin",
+        "password": "123456",
+        "email": "testing@halo.com",
+        "password_confirm": "123456"
+      }
+  expect:
+    statusCode: 201
+- name: createPost
+  request:
+    api: /api.console.halo.run/v1alpha1/posts
+    method: POST
+    header:
+      Authorization: "{{.param.auth}}"
+      Content-Type: application/json
+    body: |
+      {
+        "post": {
+          "spec": {
+            "title": "{{.param.postName}}",
+            "slug": "{{.param.postName}}",
+            "template": "",
+            "cover": "",
+            "deleted": false,
+            "publish": false,
+            "pinned": false,
+            "allowComment": true,
+            "visible": "PUBLIC",
+            "priority": 0,
+            "excerpt": {
+              "autoGenerate": true,
+              "raw": ""
+            },
+            "categories": [],
+            "tags": [],
+            "htmlMetas": []
+          },
+          "apiVersion": "content.halo.run/v1alpha1",
+          "kind": "Post",
+          "metadata": {
+            "name": "c31f2192-c992-47b9-86b4-f3fc0605360e",
+            "annotations": {
+              "content.halo.run/preferred-editor": "default"
+            }
+          }
+        },
+        "content": {
+          "raw": "<p>{{.param.postName}}</p>",
+          "content": "<p>{{.param.postName}}</p>",
+          "rawType": "HTML"
+        }
+      }
+- name: listPosts
+  request:
+    api: /api.console.halo.run/v1alpha1/posts?keyword={{.param.postName}}
+    header:
+      Authorization: "{{.param.auth}}"
+  expect:
+    verify:
+      - data.total == 1
+- name: recyclePost
+  request:
+    api: /api.console.halo.run/v1alpha1/posts/{{(index .listPosts.items 0).post.metadata.name}}/recycle
+    method: PUT
+    header:
+      Authorization: "{{.param.auth}}"
+- name: recover
+  request:
+    api: /content.halo.run/v1alpha1/posts/{{(index .listPosts.items 0).post.metadata.name}}
+    method: DELETE
+    header:
+      Authorization: "{{.param.auth}}"
+
+## Users
+- name: createUser
+  request:
+    api: /api.console.halo.run/v1alpha1/users
+    method: POST
+    header:
+      Authorization: "{{.param.auth}}"
+      Content-Type: application/json
+    body: |
+      {
+        "avatar": "",
+        "bio": "{{randAlpha 6}}",
+        "displayName": "{{randAlpha 6}}",
+        "email": "test@halo.com",
+        "name": "{{.param.userName}}",
+        "password": "{{randAlpha 6}}",
+        "phone": "",
+        "roles": []
+      }
+- name: updateUserPass
+  request:
+    api: /api.console.halo.run/v1alpha1/users/{{.param.userName}}/password
+    method: PUT
+    header:
+      Authorization: "{{.param.auth}}"
+      Content-Type: application/json
+    body: |
+      {
+        "password": "{{randAlpha 3}}"
+      }
+- name: grantPermission
+  request:
+    api: /api.console.halo.run/v1alpha1/users/{{.param.userName}}/permissions
+    method: POST
+    header:
+      Authorization: "{{.param.auth}}"
+      Content-Type: application/json
+    body: |
+      {
+        "roles": [
+          "guest"
+        ]
+      }
+- name: deleteUser
+  request:
+    api: |
+      {{default "http://halo:8090" (env "SERVER")}}/api/v1alpha1/users/{{.param.userName}}
+    method: DELETE
+    header:
+      Authorization: "{{.param.auth}}"
+- name: sendPasswordResetEmail
+  request:
+    api: |
+      /api.halo.run/v1alpha1/users/-/send-password-reset-email
+    method: POST
+    header:
+      Content-Type: application/json
+    body: |
+      {
+        "username": "{{.param.userName}}",
+        "email": "{{.param.email}}"
+      }
+  expect:
+    statusCode: 204
+- name: resetPasswordByToken
+  request:
+    api: |
+      /api.halo.run/v1alpha1/users/{{.param.userName}}/reset-password
+    method: PUT
+    header:
+      Content-Type: application/json
+    body: |
+      {
+        "newPassword": "{{randAlpha 6}}",
+        "token": "{{randAlpha 6}}"
+      }
+  expect:
+    statusCode: 403
+## Roles
+- name: createRole
+  request:
+    api: |
+      {{default "http://halo:8090" (env "SERVER")}}/api/v1alpha1/roles
+    method: POST
+    header:
+      Authorization: "{{.param.auth}}"
+      Content-Type: application/json
+    body: |
+      {
+        "apiVersion": "v1alpha1",
+        "kind": "Role",
+        "metadata": {
+          "name": "",
+          "generateName": "role-",
+          "labels": {},
+          "annotations": {
+            "rbac.authorization.halo.run/dependencies": "[\"role-template-manage-appstore\"]",
+            "rbac.authorization.halo.run/display-name": "{{.param.roleName}}"
+          }
+        },
+        "rules": []
+      }
+  expect:
+    statusCode: 201
+- name: listRoles
+  request:
+    api: |
+      {{default "http://halo:8090" (env "SERVER")}}/api/v1alpha1/roles
+    header:
+      Authorization: "{{.param.auth}}"
+  expect:
+    verify:
+      - data.total >= 3
+- name: deleteRole
+  request:
+    api: |
+      {{default "http://halo:8090" (env "SERVER")}}/api/v1alpha1/roles/{{(index .listRoles.items 0).metadata.name}}
+    method: DELETE
+    header:
+      Authorization: "{{.param.auth}}"
+
+## Plugins
+- name: installPlugin
+  request:
+    api: /api.console.halo.run/v1alpha1/plugins/-/install-from-uri
+    method: POST
+    header:
+      Authorization: "{{.param.auth}}"
+      Content-Type: application/json
+    body: |
+      {
+        "uri": "https://github.com/Stonewuu/halo-plugin-sitepush/releases/download/1.3.1/halo-plugin-sitepush-1.3.1.jar"
+      }
+- name: pluginList
+  request:
+    api: /api.console.halo.run/v1alpha1/plugins
+    header:
+      Authorization: "{{.param.auth}}"
+  expect:
+    verify:
+      - data.total >= 1
+- name: inActivePlugins
+  request:
+    api: /api.console.halo.run/v1alpha1/plugins?enabled=false&keyword=&page=0&size=0
+    header:
+      Authorization: "{{.param.auth}}"
+  expect:
+    verify:
+      - data.total == 1
+- name: disablePlugin
+  request:
+    api: /api.console.halo.run/v1alpha1/plugins/PluginSitePush/plugin-state
+    method: PUT
+    header:
+      Authorization: "{{.param.auth}}"
+      Content-Type: application/json
+    body: |
+      {
+        "enable": false
+      }
+- name: enablePlugin
+  request:
+    api: /api.console.halo.run/v1alpha1/plugins/PluginSitePush/plugin-state
+    method: PUT
+    header:
+      Authorization: "{{.param.auth}}"
+      Content-Type: application/json
+    body: |
+      {
+        "enable": true
+      }
+- name: resetPlugin
+  request:
+    api: /api.console.halo.run/v1alpha1/plugins/PluginSitePush/reset-config
+    method: PUT
+    header:
+      Authorization: "{{.param.auth}}"
+      Content-Type: application/json
+- name: uninstallPlugin
+  request:
+    api: /plugin.halo.run/v1alpha1/plugins/PluginSitePush
+    method: DELETE
+    header:
+      Authorization: "{{.param.auth}}"
+
+  # Notifications
+- name: createNotification
+  request:
+    api: /notification.halo.run/v1alpha1/notifications
+    method: POST
+    body: |
+      {
+        "spec": {
+          "recipient": "admin",
+          "reason": "fake-reason",
+          "title": "test 评论了你的页面《关于我》",
+          "rawContent": "Fake raw content",
+          "htmlContent": "<p>Fake html content</p>",
+          "unread": true
+        },
+        "apiVersion": "notification.halo.run/v1alpha1",
+        "kind": "Notification",
+        "metadata": {
+          "name": "{{.param.notificationName}}"
+        }
+      }
+    header:
+      Content-Type: application/json
+      Authorization: "{{.param.auth}}"
+  expect:
+    statusCode: 201
+- name: getNotificationByName
+  request:
+    api: /notification.halo.run/v1alpha1/notifications/{{.param.notificationName}}
+    method: GET
+    header:
+      Authorization: "{{.param.auth}}"
+  expect:
+    statusCode: 200
+    verify:
+      - data.spec.reason == "fake-reason"
+      - data.spec.title == "test 评论了你的页面《关于我》"
+- name: deleteUserNotification
+  request:
+    api: |
+      /api.notification.halo.run/v1alpha1/userspaces/admin/notifications/{{.param.notificationName}}
+    method: DELETE
+    header:
+      Authorization: "{{.param.auth}}"

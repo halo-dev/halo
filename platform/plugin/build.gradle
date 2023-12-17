@@ -1,0 +1,21 @@
+plugins {
+    id 'java-platform'
+    id 'halo.publish'
+}
+
+group = 'run.halo.tools.platform'
+description = 'This is the platform that other plugins depend on. ' +
+        'We can put the plugin API as a dependency at here.'
+
+javaPlatform {
+    allowDependencies()
+}
+
+dependencies {
+    api platform(project(':platform:application'))
+    constraints {
+        api project(':api')
+        // TODO other plugin API dependencies
+        // e.g.: api 'halo.run.plugin:links-api:1.1.0'
+    }
+}

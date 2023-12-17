@@ -1,0 +1,25 @@
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-manage-tags
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+  annotations:
+    rbac.authorization.halo.run/dependencies: "[ \"role-template-view-tags\" ]"
+rules:
+  - apiGroups: [ "content.halo.run" ]
+    resources: [ "tags" ]
+    verbs: [ "*" ]
+---
+apiVersion: v1alpha1
+kind: "Role"
+metadata:
+  name: role-template-view-tags
+  labels:
+    halo.run/role-template: "true"
+    halo.run/hidden: "true"
+rules:
+  - apiGroups: [ "content.halo.run" ]
+    resources: [ "tags" ]
+    verbs: [ "get", "list" ]

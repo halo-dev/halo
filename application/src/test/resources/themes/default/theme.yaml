@@ -1,0 +1,15 @@
+apiVersion: theme.halo.run/v1alpha1
+kind: Theme
+metadata:
+  name: default
+spec:
+  displayName: Default
+  author:
+    name: halo-dev
+    website: https://halo.run
+  description: Default theme for Halo 2.0
+  logo: https://halo.run/logo
+  website: https://github.com/halo-sigs/theme-default
+  repo: https://github.com/halo-sigs/theme-default.git
+  version: 1.0.0
+  require: 2.0.0

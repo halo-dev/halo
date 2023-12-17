@@ -1,0 +1,62 @@
+[
+  {
+    "spec": {
+      "displayName": "首页",
+      "href": "/",
+      "children": [],
+      "priority": 0
+    },
+    "apiVersion": "v1alpha1",
+    "kind": "MenuItem",
+    "metadata": { "name": "88c3f10b-321c-4092-86a8-70db00251b74" }
+  },
+  {
+    "spec": {
+      "children": [],
+      "priority": 1,
+      "targetRef": {
+        "group": "content.halo.run",
+        "version": "v1alpha1",
+        "kind": "Post",
+        "name": "5152aea5-c2e8-4717-8bba-2263d46e19d5"
+      }
+    },
+    "apiVersion": "v1alpha1",
+    "kind": "MenuItem",
+    "metadata": { "name": "c4c814d1-0c2c-456b-8c96-4864965fee94" }
+  },
+  {
+    "spec": {
+      "displayName": "",
+      "href": "",
+      "children": [],
+      "priority": 2,
+      "targetRef": {
+        "group": "content.halo.run",
+        "version": "v1alpha1",
+        "kind": "Tag",
+        "name": "c33ceabb-d8f1-4711-8991-bb8f5c92ad7c"
+      }
+    },
+    "apiVersion": "v1alpha1",
+    "kind": "MenuItem",
+    "metadata": { "name": "35869bd3-33b5-448b-91ee-cf6517a59644" }
+  },
+  {
+    "spec": {
+      "displayName": "",
+      "href": "",
+      "children": [],
+      "priority": 3,
+      "targetRef": {
+        "group": "content.halo.run",
+        "version": "v1alpha1",
+        "kind": "SinglePage",
+        "name": "373a5f79-f44f-441a-9df1-85a4f553ece8"
+      }
+    },
+    "apiVersion": "v1alpha1",
+    "kind": "MenuItem",
+    "metadata": { "name": "b0d041fa-dc99-48f6-a193-8604003379cf" }
+  }
+]

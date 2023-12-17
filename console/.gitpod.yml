@@ -1,0 +1,15 @@
+ports:
+  - port: 3000
+    onOpen: open-browser
+
+tasks:
+  - init: npm install -g pnpm && pnpm install && pnpm build:packages
+    command: pnpm dev
+
+vscode:
+  extensions:
+    - dbaeumer.vscode-eslint
+    - editorconfig.editorconfig
+    - esbenp.prettier-vscode
+    - vue.volar
+    - vue.vscode-typescript-vue-plugin

@@ -1,0 +1,13 @@
+{
+  "spec": {
+    "displayName": "Halo",
+    "slug": "halo",
+    "color": "#ffffff",
+    "cover": ""
+  },
+  "apiVersion": "content.halo.run/v1alpha1",
+  "kind": "Tag",
+  "metadata": {
+    "name": "c33ceabb-d8f1-4711-8991-bb8f5c92ad7c"
+  }
+}

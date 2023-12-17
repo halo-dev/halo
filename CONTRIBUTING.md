@@ -48,6 +48,21 @@ git pull upstream master
 git push
 ```
 
+### E2E
+
+Please consider adding some [e2e test cases](e2e/README.md) to make sure the APIs work as expected.
+
 ### 开发规范
 
-请参考 [https://halo.run/archives/code-style](https://halo.run/archives/code-style)，请确保所有代码格式化之后再提交。
+请参考 [https://docs.halo.run/developer-guide/core/code-style](https://docs.halo.run/developer-guide/core/code-style)，请确保所有代码格式化之后再提交。
+
+### Usage of Cherry Pick Script
+
+We can use the cherry pick script to cherry-pick commits in pull request as follows:
+
+```bash
+GITHUB_USER={your_github_user} hack/cherry_pick_pull.sh upstream/{target_branch} {pull_request_number}
+```
+
+> This script is from <https://github.com/kubernetes/kubernetes/blob/master/hack/cherry_pick_pull.sh>.
+

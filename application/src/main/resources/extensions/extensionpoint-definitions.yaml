@@ -1,0 +1,65 @@
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: additional-webfilter
+spec:
+  className: run.halo.app.security.AdditionalWebFilter
+  displayName: AdditionalWebFilter
+  type: MULTI_INSTANCE
+  description: "Contract for interception-style, chained processing of Web requests that may be used to 
+    implement cross-cutting, application-agnostic requirements such as security, timeouts, and others."
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: reactive-post-content-handler
+spec:
+  className: run.halo.app.theme.ReactivePostContentHandler
+  displayName: ReactivePostContentHandler
+  type: MULTI_INSTANCE
+  description: "Provides a way to extend the post content to be displayed on the theme-side."
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: reactive-singlepage-content-handler
+spec:
+  className: run.halo.app.theme.ReactiveSinglePageContentHandler
+  displayName: ReactiveSinglePageContentHandler
+  type: MULTI_INSTANCE
+  description: "Provides a way to extend the single page content to be displayed on the theme-side."
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: comment-widget
+spec:
+  className: run.halo.app.theme.dialect.CommentWidget
+  displayName: CommentWidget
+  type: SINGLETON
+  description: "Provides an extension point for the comment widget on the theme-side."
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: username-password-authentication-manager
+spec:
+  className: run.halo.app.security.authentication.login.UsernamePasswordAuthenticationManager
+  displayName: Username password authentication manager
+  type: SINGLETON
+  description: "Provides a way to extend the username password authentication."
+
+---
+apiVersion: plugin.halo.run/v1alpha1
+kind: ExtensionPointDefinition
+metadata:
+  name: reactive-notifier
+spec:
+  className: run.halo.app.notification.ReactiveNotifier
+  displayName: Notifier
+  type: MULTI_INSTANCE
+  description: "Provides a way to extend the notifier to send notifications to users."

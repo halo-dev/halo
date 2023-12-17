@@ -1,16 +1,26 @@
-FROM adoptopenjdk/openjdk8-openj9
-VOLUME /tmp
+FROM eclipse-temurin:17-jre as builder
 
-ARG JAR_FILE=build/libs/halo.jar
-ARG PORT=8090
-ARG TIME_ZONE=Asia/Shanghai
+WORKDIR application
+ARG JAR_FILE=application/build/libs/*.jar
+COPY ${JAR_FILE} application.jar
+RUN java -Djarmode=layertools -jar application.jar extract
 
-ENV TZ=${TIME_ZONE}
-ENV JVM_XMS="256m"
-ENV JVM_XMX="256m"
+################################
 
-COPY ${JAR_FILE} halo.jar
+FROM ibm-semeru-runtimes:open-17-jre
+MAINTAINER johnniang <johnniang@fastmail.com>
+WORKDIR application
+COPY --from=builder application/dependencies/ ./
+COPY --from=builder application/spring-boot-loader/ ./
+COPY --from=builder application/snapshot-dependencies/ ./
+COPY --from=builder application/application/ ./
 
-EXPOSE ${PORT}
+ENV JVM_OPTS="-Xmx256m -Xms256m" \
+    HALO_WORK_DIR="/root/.halo2" \
+    SPRING_CONFIG_LOCATION="optional:classpath:/;optional:file:/root/.halo2/" \
+    TZ=Asia/Shanghai
 
-ENTRYPOINT java -Xms${JVM_XMS} -Xmx${JVM_XMX} -Djava.security.egd=file:/dev/./urandom -server -jar halo.jar
+RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime \
+    && echo $TZ > /etc/timezone
+
+ENTRYPOINT ["sh", "-c", "java ${JVM_OPTS} org.springframework.boot.loader.launch.JarLauncher ${0} ${@}"]

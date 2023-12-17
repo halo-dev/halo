@@ -1,0 +1,37 @@
+server:
+  port: 8090
+spring:
+  output:
+    ansi:
+      enabled: detect
+  r2dbc:
+    name: halo-test
+    generate-unique-name: true
+  sql:
+    init:
+      mode: always
+      platform: h2
+  messages:
+      basename: config.i18n.messages
+
+halo:
+  work-dir: ${user.home}/halo-next-test
+  external-url: "http://${server.address:localhost}:${server.port}"
+  security:
+    initializer:
+      disabled: true
+    oauth2:
+      jwt:
+        public-key-location: classpath:app.pub
+        private-key-location: classpath:app.key
+  extension:
+    controller:
+      disabled: true
+
+springdoc:
+  api-docs:
+    enabled: false
+logging:
+  level:
+    run.halo.app: debug
+    org.springframework.r2dbc: DEBUG

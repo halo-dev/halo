@@ -1,0 +1,47 @@
+apiVersion: v1alpha1
+kind: "ConfigMap"
+metadata:
+  name: system-default
+data:
+  user: |
+    {
+      "allowRegistration": false,
+      "defaultRole": "",
+      "avatarPolicy": "default-policy"
+    }
+  theme: |
+    {
+      "active": "theme-earth"
+    }
+  routeRules: |
+    {
+      "categories": "categories",
+      "archives": "archives",
+      "post": "/archives/{slug}",
+      "tags": "tags"
+    }
+  codeInjection: |
+    {
+     "globalHead": "",
+     "footer": ""
+    }
+  post: |
+    {
+      "review": false,
+      "postPageSize": 10,
+      "archivePageSize": 10,
+      "categoryPageSize": 10,
+      "tagPageSize": 10,
+      "slugGenerationStrategy": "generateByTitle",
+      "attachmentPolicyName": "default-policy"
+    }
+  comment: |
+    {
+      "enable": true,
+      "requireReviewForNew": true,
+      "systemUserOnly": true
+    }
+  menu: |
+    {
+      "primary": "primary"
+    }

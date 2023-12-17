@@ -1,0 +1,56 @@
+plugins {
+    id 'maven-publish'
+}
+
+publishing {
+    publications {
+        def pubName = "${archivesBaseName}"
+        pluginManager.withPlugin('java-platform') {
+            pubName = pubName + 'Pom'
+        }
+        pluginManager.withPlugin('java') {
+            pubName = pubName + 'Library'
+        }
+        "${pubName}"(MavenPublication) {
+            pluginManager.withPlugin('java-platform') {
+                from components.javaPlatform
+            }
+            pluginManager.withPlugin('java') {
+                from components.java
+            }
+            pom {
+                licenses {
+                    license {
+                        name = 'The GNU General Public License v3.0'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.en.html'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'johnniang'
+                        name = 'JohnNiang'
+                        email = 'johnniang@foxmil.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:https://github.com/halo-dev/halo.git'
+                    developerConnection = 'scm:git:ssh://git@github.com:halo-dev/halo.git'
+                    url = 'https://github.com/halo-dev/halo'
+                }
+            }
+        }
+    }
+
+    repositories {
+        mavenLocal()
+        if (project.hasProperty("release")) {
+            maven {
+                name = 'ossrh'
+                def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+                def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+                url = version.endsWith('-SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+                credentials(PasswordCredentials)
+            }
+        }
+    }
+}

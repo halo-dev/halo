@@ -1,0 +1,11 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@2.0.1/schema.json",
+  "changelog": "@changesets/cli/changelog",
+  "commit": false,
+  "fixed": [],
+  "linked": [["@halo-dev/*"]],
+  "access": "public",
+  "baseBranch": "next",
+  "updateInternalDependencies": "patch",
+  "ignore": []
+}
