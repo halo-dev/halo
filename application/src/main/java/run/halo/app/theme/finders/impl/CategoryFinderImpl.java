@@ -83,16 +83,12 @@ public class CategoryFinderImpl implements CategoryFinder {
 
     @Override
     public Mono<CategoryVo> getParentByName(String name) {
+        if (StringUtils.isBlank(name)) {
+            return Mono.empty();
+        }
         return client.list(Category.class,
                 category -> {
-                    if (StringUtils.isBlank(name)) {
-                        return false;
-                    }
-                    Category.CategorySpec spec = category.getSpec();
-                    if (spec == null) {
-                        return false;
-                    }
-                    List<String> children = spec.getChildren();
+                    List<String> children = category.getSpec().getChildren();
                     if (children == null) {
                         return false;
                     }
