@@ -1423,6 +1423,9 @@ core:
         flip_horizontal: Flip Horizontal
         flip_vertical: Flip Vertical
         reset: Reset
+    editor_provider_selector:
+      tooltips:
+        disallow: The content format is different and cannot be switched
   composables:
     content_cache:
       toast_recovered: Recovered unsaved content from cache
