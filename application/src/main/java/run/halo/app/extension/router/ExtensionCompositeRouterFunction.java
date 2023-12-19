@@ -3,6 +3,9 @@ package run.halo.app.extension.router;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.function.server.HandlerFunction;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -13,23 +16,31 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
+import run.halo.app.extension.SchemeManager;
 import run.halo.app.extension.SchemeWatcherManager;
 import run.halo.app.extension.SchemeWatcherManager.SchemeWatcher;
 
 public class ExtensionCompositeRouterFunction implements
-    RouterFunction<ServerResponse>, SchemeWatcher {
+    RouterFunction<ServerResponse>,
+    SchemeWatcher,
+    InitializingBean,
+    ApplicationListener<ApplicationStartedEvent> {
 
     private final Map<Scheme, RouterFunction<ServerResponse>> schemeRouterFuncMapper;
 
     private final ReactiveExtensionClient client;
 
+    private final SchemeManager schemeManager;
+
+    private final SchemeWatcherManager watcherManager;
+
     public ExtensionCompositeRouterFunction(ReactiveExtensionClient client,
-        SchemeWatcherManager watcherManager) {
+        SchemeWatcherManager watcherManager,
+        SchemeManager schemeManager) {
         this.client = client;
+        this.schemeManager = schemeManager;
+        this.watcherManager = watcherManager;
         schemeRouterFuncMapper = new ConcurrentHashMap<>();
-        if (watcherManager != null) {
-            watcherManager.register(this);
-        }
     }
 
     @Override
@@ -59,5 +70,18 @@ public class ExtensionCompositeRouterFunction implements
         } else if (event instanceof SchemeWatcherManager.SchemeUnregistered unregisteredEvent) {
             this.schemeRouterFuncMapper.remove(unregisteredEvent.getDeletedScheme());
         }
+    }
+
+    @Override
+    public void onApplicationEvent(ApplicationStartedEvent event) {
+        schemeManager.schemes().forEach(scheme -> {
+            var factory = new ExtensionRouterFunctionFactory(scheme, client);
+            this.schemeRouterFuncMapper.put(scheme, factory.create());
+        });
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+        watcherManager.register(this);
     }
 }
