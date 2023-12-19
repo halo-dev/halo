@@ -1193,6 +1193,11 @@ core:
         The external access url detected is inconsistent with the current access
         url, which may cause some links to fail to redirect properly. Please
         check the external access url settings.
+      h2_warning: >-
+        H2 database is only used in development and testing environments. It is
+        not recommended to use H2 database in production environment. 
+
+        If you must use it, please back up your data on time.
   backup:
     title: Backup and Restore
     tabs:
