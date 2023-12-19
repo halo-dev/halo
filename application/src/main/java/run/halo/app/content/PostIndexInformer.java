@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.BiConsumer;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,6 @@ import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.Unstructured;
 import run.halo.app.extension.Watcher;
 import run.halo.app.extension.controller.RequestSynchronizer;
-import run.halo.app.infra.SchemeInitializedEvent;
 
 /**
  * <p>Monitor changes to {@link Post} resources and establish a local, in-memory cache in an
@@ -33,7 +33,7 @@ import run.halo.app.infra.SchemeInitializedEvent;
  * @since 2.0.0
  */
 @Component
-public class PostIndexInformer implements ApplicationListener<SchemeInitializedEvent>,
+public class PostIndexInformer implements ApplicationListener<ApplicationStartedEvent>,
     DisposableBean {
     public static final String TAG_POST_INDEXER = "tag-post-indexer";
     public static final String LABEL_INDEXER_NAME = "post-label-indexer";
@@ -71,10 +71,6 @@ public class PostIndexInformer implements ApplicationListener<SchemeInitializedE
         };
     }
 
-    public Set<String> getByIndex(String indexName, String indexKey) {
-        return postIndexer.getByIndex(indexName, indexKey);
-    }
-
     public Set<String> getByTagName(String tagName) {
         return postIndexer.getByIndex(TAG_POST_INDEXER, tagName);
     }
@@ -104,10 +100,6 @@ public class PostIndexInformer implements ApplicationListener<SchemeInitializedE
         return labelName + "=" + labelValue;
     }
 
-    public Set<String> getByLabel(String labelName, String labelValue) {
-        return postIndexer.getByIndex(LABEL_INDEXER_NAME, labelKey(labelName, labelValue));
-    }
-
     @Override
     public void destroy() throws Exception {
         if (postWatcher != null) {
@@ -119,7 +111,7 @@ public class PostIndexInformer implements ApplicationListener<SchemeInitializedE
     }
 
     @Override
-    public void onApplicationEvent(@NonNull SchemeInitializedEvent event) {
+    public void onApplicationEvent(@NonNull ApplicationStartedEvent event) {
         if (!synchronizer.isStarted()) {
             synchronizer.start();
         }

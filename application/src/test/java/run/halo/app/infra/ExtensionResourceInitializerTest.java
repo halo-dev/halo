@@ -23,10 +23,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.util.FileSystemUtils;
 import reactor.core.publisher.Mono;
-import reactor.test.StepVerifier;
 import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Unstructured;
@@ -47,7 +47,7 @@ class ExtensionResourceInitializerTest {
     @Mock
     HaloProperties haloProperties;
     @Mock
-    SchemeInitializedEvent applicationReadyEvent;
+    ApplicationStartedEvent applicationStartedEvent;
 
     @Mock
     ApplicationEventPublisher eventPublisher;
@@ -128,10 +128,7 @@ class ExtensionResourceInitializerTest {
             .thenReturn(Mono.empty());
         when(extensionClient.create(any())).thenReturn(Mono.empty());
 
-        var initializeMono = extensionResourceInitializer.initialize(applicationReadyEvent);
-        StepVerifier.create(initializeMono)
-            .verifyComplete();
-
+        extensionResourceInitializer.onApplicationEvent(applicationStartedEvent);
 
         verify(extensionClient, times(3)).create(argumentCaptor.capture());
 

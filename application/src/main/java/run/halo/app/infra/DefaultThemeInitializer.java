@@ -2,6 +2,7 @@ package run.halo.app.infra;
 
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.buffer.DataBufferUtils;
@@ -16,7 +17,7 @@ import run.halo.app.infra.utils.FileUtils;
 
 @Slf4j
 @Component
-public class DefaultThemeInitializer implements ApplicationListener<SchemeInitializedEvent> {
+public class DefaultThemeInitializer implements ApplicationListener<ApplicationStartedEvent> {
 
     private final ThemeService themeService;
 
@@ -32,7 +33,7 @@ public class DefaultThemeInitializer implements ApplicationListener<SchemeInitia
     }
 
     @Override
-    public void onApplicationEvent(SchemeInitializedEvent event) {
+    public void onApplicationEvent(ApplicationStartedEvent event) {
         if (themeProps.getInitializer().isDisabled()) {
             log.debug("Skipped initializing default theme due to disabled");
             return;
