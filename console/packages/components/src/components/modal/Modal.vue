@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, nextTick, reactive, ref, watch } from "vue";
+import { computed, nextTick, reactive, ref, watch, onMounted } from "vue";
 import { IconClose } from "../../icons/icons";
 import type { UseOverlayScrollbarsParams } from "overlayscrollbars-vue";
 import { useOverlayScrollbars } from "overlayscrollbars-vue";
@@ -17,7 +17,7 @@ const props = withDefaults(
     layerClosable?: boolean;
   }>(),
   {
-    visible: false,
+    visible: undefined,
     title: undefined,
     width: 500,
     height: undefined,
@@ -34,8 +34,22 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
+const internalVisible = ref(false);
 const rootVisible = ref(false);
 const modelWrapper = ref<HTMLElement>();
+
+watch(
+  () => props.visible,
+  () => {
+    internalVisible.value = props.visible;
+  }
+);
+
+onMounted(() => {
+  if (props.visible === undefined) {
+    internalVisible.value = true;
+  }
+});
 
 const wrapperClasses = computed(() => {
   return {
@@ -52,9 +66,16 @@ const contentStyles = computed(() => {
 });
 
 function handleClose() {
-  emit("update:visible", false);
-  emit("close");
+  internalVisible.value = false;
+  setTimeout(() => {
+    emit("update:visible", false);
+    emit("close");
+  }, 200);
 }
+
+defineExpose({
+  close: handleClose,
+});
 
 const focus = ref(false);
 
@@ -69,17 +90,6 @@ function handleClickLayer() {
   }, 300);
 }
 
-watch(
-  () => props.visible,
-  () => {
-    if (props.visible) {
-      nextTick(() => {
-        modelWrapper.value?.focus();
-      });
-    }
-  }
-);
-
 // body scroll
 const modalBody = ref(null);
 const reactiveParams = reactive<UseOverlayScrollbarsParams>({
@@ -93,10 +103,13 @@ const reactiveParams = reactive<UseOverlayScrollbarsParams>({
 });
 const [initialize, instance] = useOverlayScrollbars(reactiveParams);
 watch(
-  () => props.visible,
+  () => internalVisible.value,
   (value) => {
     if (value) {
       if (modalBody.value) initialize({ target: modalBody.value });
+      nextTick(() => {
+        modelWrapper.value?.focus();
+      });
     } else {
       instance()?.destroy();
     }
@@ -126,7 +139,7 @@ watch(
         @after-leave="rootVisible = false"
       >
         <div
-          v-show="visible"
+          v-show="internalVisible"
           class="modal-layer"
           @click.stop="handleClickLayer()"
         />
@@ -140,7 +153,7 @@ watch(
         leave-to-class="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
       >
         <div
-          v-show="visible"
+          v-show="internalVisible"
           :style="contentStyles"
           class="modal-content transform transition-all duration-300"
           :class="{ 'modal-focus': focus }"
