@@ -369,10 +369,22 @@ const handleDownloadLogfile = () => {
                 [info.java.runtime.name, info.java.runtime.version].join(' / ')
               "
             />
-            <VDescriptionItem
-              :label="$t('core.actuator.fields.database')"
-              :content="[info.database.name, info.database.version].join(' / ')"
-            />
+            <VDescriptionItem :label="$t('core.actuator.fields.database')">
+              <span>
+                {{ [info.database.name, info.database.version].join(" / ") }}
+              </span>
+              <VAlert
+                v-if="info.database.name.startsWith('H2')"
+                class="mt-3"
+                type="warning"
+                :title="$t('core.common.text.warning')"
+                :closable="false"
+              >
+                <template #description>
+                  {{ $t("core.actuator.alert.h2_warning") }}
+                </template>
+              </VAlert>
+            </VDescriptionItem>
             <VDescriptionItem :label="$t('core.actuator.fields.os')">
               {{ info.os.name }} {{ info.os.version }} / {{ info.os.arch }}
             </VDescriptionItem>
