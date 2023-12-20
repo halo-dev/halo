@@ -185,7 +185,7 @@ const emailVerifyModal = ref(false);
                     type="secondary"
                     @click="handleBindAuth(authProvider)"
                   >
-                    {{ $t("core.uc_profile.detail.operations.unbind.button") }}
+                    {{ $t("core.uc_profile.detail.operations.bind.button") }}
                   </VButton>
                 </div>
               </div>
