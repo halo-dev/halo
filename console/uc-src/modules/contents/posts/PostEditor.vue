@@ -338,6 +338,15 @@ async function handleUploadImage(file: File) {
   if (!currentUserHasPermission(["uc:attachments:manage"])) {
     return;
   }
+  
+  // Set default title and slug
+  if (!formState.value.post.spec.title) { 
+    formState.value.post.spec.title = t("core.post_editor.untitled"); 
+  } 
+  if (!formState.value.post.spec.slug) { 
+    formState.value.post.spec.slug = new Date().getTime().toString(); 
+  } 
+  
   if (!isUpdateMode.value) {
     formState.value.metadata.annotations = {
       ...formState.value.metadata.annotations,
