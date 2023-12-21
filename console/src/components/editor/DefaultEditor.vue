@@ -308,6 +308,7 @@ onMounted(() => {
                     }
                   });
                   headingNodes.value = headings;
+                  console.log("headingNodes", headingNodes);
                   if (!selectedHeadingNode.value) {
                     selectedHeadingNode.value = headings[0];
                   }
