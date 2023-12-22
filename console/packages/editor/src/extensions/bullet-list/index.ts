@@ -2,6 +2,7 @@ import type { Editor, Range } from "@/tiptap/vue-3";
 import TiptapBulletList from "@tiptap/extension-bullet-list";
 import type { BulletListOptions } from "@tiptap/extension-bullet-list";
 import ExtensionListItem from "@tiptap/extension-list-item";
+import ExtensionListKeymap from "@/extensions/list-keymap";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import MdiFormatListBulleted from "~icons/mdi/format-list-bulleted";
 import { markRaw } from "vue";
@@ -57,7 +58,7 @@ const BulletList = TiptapBulletList.extend<
     };
   },
   addExtensions() {
-    return [ExtensionListItem];
+    return [ExtensionListItem, ExtensionListKeymap];
   },
 });
 
