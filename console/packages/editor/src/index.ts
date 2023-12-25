@@ -17,3 +17,4 @@ export default plugin;
 export * from "./tiptap";
 export * from "./extensions";
 export * from "./components";
+export * from "./utils";
