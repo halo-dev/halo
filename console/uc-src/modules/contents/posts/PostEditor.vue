@@ -229,11 +229,11 @@ function handleSaveClick() {
   }
 }
 
-function onCreatePostSuccess(data: Post) {
+async function onCreatePostSuccess(data: Post) {
   formState.value = data;
   // Update route query params
   name.value = data.metadata.name;
-  handleFetchContent();
+  await handleFetchContent();
 }
 
 // Save post
@@ -344,9 +344,19 @@ async function handleUploadImage(file: File) {
       [contentAnnotations.CONTENT_JSON]: JSON.stringify(content.value),
     };
 
-    await apiClient.uc.post.createMyPost({
+    if (!formState.value.spec.title) {
+      formState.value.spec.title = t("core.post_editor.untitled");
+    }
+
+    if (!formState.value.spec.slug) {
+      formState.value.spec.slug = new Date().getTime().toString();
+    }
+
+    const { data } = await apiClient.uc.post.createMyPost({
       post: formState.value,
     });
+
+    await onCreatePostSuccess(data);
   }
 
   const { data } = await apiClient.uc.attachment.createAttachmentForPost({
