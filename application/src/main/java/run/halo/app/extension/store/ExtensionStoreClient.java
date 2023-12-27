@@ -2,6 +2,8 @@ package run.halo.app.extension.store;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * An interface to query and operate ExtensionStore.
@@ -17,6 +19,10 @@ public interface ExtensionStoreClient {
      * @return all ExtensionStores which names start with the prefix.
      */
     List<ExtensionStore> listByNamePrefix(String prefix);
+
+    Page<ExtensionStore> listByNamePrefix(String prefix, Pageable pageable);
+
+    List<ExtensionStore> listByNames(List<String> names);
 
     /**
      * Fetches an ExtensionStore by unique name.

@@ -1,10 +1,13 @@
 package run.halo.app.extension.router.selector;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Predicate;
 import org.springframework.data.util.Predicates;
 import org.springframework.web.server.ServerWebInputException;
 import run.halo.app.extension.Extension;
+import run.halo.app.extension.ListOptions;
 
 public final class SelectorUtil {
 
@@ -57,5 +60,39 @@ public final class SelectorUtil {
         List<String> labelSelectors, List<String> fieldSelectors) {
         return SelectorUtil.<E>labelSelectorsToPredicate(labelSelectors)
             .and(fieldSelectorToPredicate(fieldSelectors));
+    }
+
+    /**
+     * Convert label and field selector expressions to {@link ListOptions}.
+     *
+     * @param labelSelectorTerms label selector expressions
+     * @param fieldSelectorTerms field selector expressions
+     * @return list options(never null)
+     */
+    public static ListOptions labelAndFieldSelectorToListOptions(
+        List<String> labelSelectorTerms, List<String> fieldSelectorTerms) {
+        var selectorConverter = new SelectorConverter();
+
+        var labelConverter = new LabelSelectorConverter();
+        var labelMatchers = Optional.ofNullable(labelSelectorTerms)
+            .map(selectors -> selectors.stream()
+                .map(selectorConverter::convert)
+                .filter(Objects::nonNull)
+                .map(labelConverter::convert)
+                .toList())
+            .orElse(List.of());
+
+        var fieldConverter = new FieldSelectorConverter();
+        var fieldMatchers = Optional.ofNullable(fieldSelectorTerms)
+            .map(selectors -> selectors.stream()
+                .map(selectorConverter::convert)
+                .filter(Objects::nonNull)
+                .map(fieldConverter::convert)
+                .toList())
+            .orElse(List.of());
+
+        return new ListOptions()
+            .setLabelSelector(new LabelSelector().setMatchers(labelMatchers))
+            .setFieldSelector(new FieldSelector().setMatchers(fieldMatchers));
     }
 }

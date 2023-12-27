@@ -1,6 +1,12 @@
 package run.halo.app.extension.store;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.function.ToIntFunction;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -19,6 +25,22 @@ public class ReactiveExtensionStoreClientImpl implements ReactiveExtensionStoreC
     @Override
     public Flux<ExtensionStore> listByNamePrefix(String prefix) {
         return repository.findAllByNameStartingWith(prefix);
+    }
+
+    @Override
+    public Mono<Page<ExtensionStore>> listByNamePrefix(String prefix, Pageable pageable) {
+        return this.repository.findAllByNameStartingWith(prefix, pageable)
+            .collectList()
+            .zipWith(this.repository.countByNameStartingWith(prefix))
+            .map(p -> new PageImpl<>(p.getT1(), pageable, p.getT2()));
+    }
+
+    @Override
+    public Flux<ExtensionStore> listByNames(List<String> names) {
+        ToIntFunction<ExtensionStore> comparator =
+            store -> names.indexOf(store.getName());
+        return repository.findByNameIn(names)
+            .sort(Comparator.comparingInt(comparator));
     }
 
     @Override

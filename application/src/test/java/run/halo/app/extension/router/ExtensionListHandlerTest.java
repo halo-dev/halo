@@ -3,15 +3,11 @@ package run.halo.app.extension.router;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -25,6 +21,7 @@ import org.springframework.web.reactive.function.server.EntityResponse;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import run.halo.app.extension.FakeExtension;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.Scheme;
@@ -53,7 +50,7 @@ class ExtensionListHandlerTest {
         final var fake01 = FakeExtension.createFake("fake01");
         final var fake02 = FakeExtension.createFake("fake02");
         var fakeListResult = new ListResult<>(0, 0, 2, List.of(fake01, fake02));
-        when(client.list(same(FakeExtension.class), any(), any(), anyInt(), anyInt()))
+        when(client.listBy(same(FakeExtension.class), any(ListOptions.class), any()))
             .thenReturn(Mono.just(fakeListResult));
 
         var responseMono = listHandler.handle(serverRequest);
@@ -66,10 +63,7 @@ class ExtensionListHandlerTest {
                 assertEquals(fakeListResult, ((EntityResponse<?>) response).entity());
             })
             .verifyComplete();
-        verify(client).list(same(FakeExtension.class), any(), argThat(comp -> {
-            var sortedFakes = Stream.of(fake01, fake02).sorted(comp).toList();
-            return Objects.equals(List.of(fake02, fake01), sortedFakes);
-        }), anyInt(), anyInt());
+        verify(client).listBy(same(FakeExtension.class), any(ListOptions.class), any());
     }
 
 }

@@ -3,8 +3,13 @@ package run.halo.app.extension;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import reactor.core.Disposable;
+import run.halo.app.extension.controller.Reconciler;
 
 public interface Watcher extends Disposable {
+
+    default void onAdd(Reconciler.Request request) {
+        // Do nothing here, just for sync all on start.
+    }
 
     default void onAdd(Extension extension) {
         // Do nothing here

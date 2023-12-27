@@ -5,6 +5,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
 import run.halo.app.extension.Extension;
 
+@Deprecated(since = "2.12.0")
 public class LabelCriteriaPredicateConverter<E extends Extension>
     implements Converter<SelectorCriteria, Predicate<E>> {
 

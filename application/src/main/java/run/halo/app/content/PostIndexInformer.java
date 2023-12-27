@@ -57,7 +57,7 @@ public class PostIndexInformer implements ApplicationListener<ApplicationStarted
             client,
             new Post(),
             postWatcher,
-            this::checkExtension);
+            null);
     }
 
     private DefaultIndexer.IndexFunc<Post> labelIndexFunc() {

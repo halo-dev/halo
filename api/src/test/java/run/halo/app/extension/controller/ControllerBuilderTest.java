@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -51,9 +50,9 @@ class ControllerBuilderTest {
             .syncAllOnStart(true)
             .minDelay(Duration.ofMillis(5))
             .maxDelay(Duration.ofSeconds(1000))
-            .onAddPredicate(Objects::nonNull)
-            .onUpdatePredicate(Objects::equals)
-            .onDeletePredicate(Objects::nonNull)
+            .onAddMatcher(null)
+            .onUpdateMatcher(null)
+            .onDeleteMatcher(null)
             .build()
         );
     }
