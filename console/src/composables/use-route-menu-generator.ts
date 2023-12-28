@@ -1,7 +1,7 @@
 import { useRoleStore } from "@/stores/role";
 import type { MenuGroupType, MenuItemType } from "@halo-dev/console-shared";
 import { onMounted, ref, type Ref } from "vue";
-import sortBy from "lodash.sortby";
+import { sortBy } from "lodash-es";
 import { hasPermission } from "@/utils/permission";
 import {
   useRouter,

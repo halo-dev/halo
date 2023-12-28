@@ -123,7 +123,7 @@ import {
 } from "@halo-dev/components";
 import { onMounted, provide, ref, type Ref } from "vue";
 import { useStorage } from "@vueuse/core";
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 import { apiClient } from "@/utils/api-client";
 import type { DashboardStats } from "@halo-dev/api-client";
 import { useI18n } from "vue-i18n";

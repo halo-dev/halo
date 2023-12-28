@@ -5,7 +5,7 @@ import { provide, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 // libs
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 
 // hooks
 import { useThemeLifeCycle } from "../composables/use-theme";

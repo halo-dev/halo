@@ -19,7 +19,7 @@ import SubmitButton from "@/components/button/SubmitButton.vue";
 import type { Tag } from "@halo-dev/api-client";
 
 // libs
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 import AnnotationsForm from "@/components/form/AnnotationsForm.vue";
