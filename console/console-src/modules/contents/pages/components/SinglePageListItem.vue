@@ -17,7 +17,7 @@ import type { ListedSinglePage, SinglePage } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { RouterLink } from "vue-router";
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 import { usePermission } from "@/utils/permission";
 import { singlePageLabels } from "@/constants/labels";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";

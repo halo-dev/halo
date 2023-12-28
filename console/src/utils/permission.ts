@@ -1,5 +1,5 @@
 import { useRoleStore } from "@/stores/role";
-import isEqual from "lodash.isequal";
+import { isEqual } from "lodash-es";
 
 /**
  * It returns true if the user has all the permissions required to access a resource

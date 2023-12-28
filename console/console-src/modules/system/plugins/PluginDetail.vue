@@ -5,7 +5,7 @@ import { useRoute } from "vue-router";
 import { apiClient } from "@/utils/api-client";
 
 // libs
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 
 // components
 import { VCard, VPageHeader, VTabbar, VAvatar } from "@halo-dev/components";
