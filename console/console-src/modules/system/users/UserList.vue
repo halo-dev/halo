@@ -48,7 +48,7 @@ const grantPermissionModal = ref<boolean>(false);
 
 const selectedUserNames = ref<string[]>([]);
 const selectedUser = ref<User>();
-const keyword = ref("");
+const keyword = useRouteQuery<string>("keyword", "");
 
 const userStore = useUserStore();
 
@@ -57,8 +57,14 @@ const DELETEDUSER_NAME = "ghost";
 
 // Filters
 const { roles } = useFetchRole();
-const selectedRoleValue = ref();
-const selectedSortValue = ref();
+const page = useRouteQuery<number>("page", 1, {
+  transform: Number,
+});
+const size = useRouteQuery<number>("size", 20, {
+  transform: Number,
+});
+const selectedRoleValue = useRouteQuery<string | undefined>("role");
+const selectedSortValue = useRouteQuery<string | undefined>("sort");
 
 function handleClearFilters() {
   selectedRoleValue.value = undefined;
@@ -76,8 +82,6 @@ watch(
   }
 );
 
-const page = ref(1);
-const size = ref(20);
 const total = ref(0);
 
 const {
