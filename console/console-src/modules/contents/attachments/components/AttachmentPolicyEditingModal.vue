@@ -2,7 +2,7 @@
 import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 import type { Policy, PolicyTemplate } from "@halo-dev/api-client";
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 import { computed, ref, toRaw, watch, watchEffect } from "vue";
 import { useSettingForm } from "@console/composables/use-setting-form";
 import { apiClient } from "@/utils/api-client";

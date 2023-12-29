@@ -1,5 +1,5 @@
 import type { Category, CategorySpec } from "@halo-dev/api-client";
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 
 export interface CategoryTreeSpec extends Omit<CategorySpec, "children"> {
   children: CategoryTree[];

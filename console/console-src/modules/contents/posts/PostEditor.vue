@@ -22,7 +22,7 @@ import {
   toRef,
   type ComputedRef,
 } from "vue";
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 import { apiClient } from "@/utils/api-client";
 import { useRouteQuery } from "@vueuse/router";
 import { useRouter } from "vue-router";

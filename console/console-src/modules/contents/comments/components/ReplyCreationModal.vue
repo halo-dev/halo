@@ -18,7 +18,7 @@ import { Picker } from "emoji-mart";
 import i18n from "@emoji-mart/data/i18n/zh.json";
 import { computed, nextTick, ref, watch, watchEffect } from "vue";
 import { reset } from "@formkit/core";
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 import { setFocus } from "@/formkit/utils/focus";
 import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
