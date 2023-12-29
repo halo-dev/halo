@@ -2,7 +2,6 @@ import type { Editor, Range } from "@/tiptap/vue-3";
 import TiptapOrderedList from "@tiptap/extension-ordered-list";
 import type { OrderedListOptions } from "@tiptap/extension-ordered-list";
 import ExtensionListItem from "@tiptap/extension-list-item";
-import ExtensionListKeymap from "@/extensions/list-keymap";
 import ToolbarItem from "@/components/toolbar/ToolbarItem.vue";
 import MdiFormatListNumbered from "~icons/mdi/format-list-numbered";
 import { markRaw } from "vue";
@@ -59,7 +58,7 @@ const OrderedList = TiptapOrderedList.extend<
     };
   },
   addExtensions() {
-    return [ExtensionListItem, ExtensionListKeymap];
+    return [ExtensionListItem];
   },
 });
 
