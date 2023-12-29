@@ -5,7 +5,7 @@ import type { Menu } from "@halo-dev/api-client";
 import { computed, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import { reset } from "@formkit/core";
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 import { setFocus } from "@/formkit/utils/focus";
 import { useI18n } from "vue-i18n";
 

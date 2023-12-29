@@ -9,7 +9,7 @@ import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import SubmitButton from "@/components/button/SubmitButton.vue";
 
 // libs
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 import { reset } from "@formkit/core";
 
 // hooks

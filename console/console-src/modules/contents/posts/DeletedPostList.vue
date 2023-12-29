@@ -23,7 +23,7 @@ import type { ListedPost, Post } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
 import { formatDatetime } from "@/utils/date";
 import { usePermission } from "@/utils/permission";
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 import { useQuery } from "@tanstack/vue-query";
 import { useI18n } from "vue-i18n";
 import ContributorList from "../_components/ContributorList.vue";

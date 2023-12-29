@@ -5,7 +5,7 @@ import { computed, watch } from "vue";
 import { rbacAnnotations } from "@/constants/annotations";
 import type { Role } from "@halo-dev/api-client";
 import { useRoleForm, useRoleTemplateSelection } from "@/composables/use-role";
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 import { pluginLabels, roleLabels } from "@/constants/labels";

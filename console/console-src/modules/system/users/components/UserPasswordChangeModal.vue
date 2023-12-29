@@ -4,7 +4,7 @@ import SubmitButton from "@/components/button/SubmitButton.vue";
 import { ref, watch } from "vue";
 import type { User } from "@halo-dev/api-client";
 import { apiClient } from "@/utils/api-client";
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 import { reset } from "@formkit/core";
 import { setFocus } from "@/formkit/utils/focus";
 

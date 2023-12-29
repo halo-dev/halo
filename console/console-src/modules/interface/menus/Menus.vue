@@ -17,7 +17,7 @@ import MenuList from "./components/MenuList.vue";
 import { computed, ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { Menu, MenuItem } from "@halo-dev/api-client";
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 import type { MenuTreeItem } from "./utils";
 import {
   buildMenuItemsTree,

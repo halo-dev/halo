@@ -8,7 +8,7 @@ import {
 } from "@halo-dev/components";
 import { computed, nextTick, ref, watchEffect } from "vue";
 import type { Post } from "@halo-dev/api-client";
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 import { apiClient } from "@/utils/api-client";
 import { useThemeCustomTemplates } from "@console/modules/interface/themes/composables/use-theme";
 import { postLabels } from "@/constants/labels";
