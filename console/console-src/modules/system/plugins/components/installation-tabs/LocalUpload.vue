@@ -46,7 +46,7 @@ const onUploaded = async (response: SuccessResponse) => {
   handleShowActiveModalAfterInstall(response.body as Plugin);
 };
 
-const onError = (file: UppyFile<unknown>, response: ErrorResponse) => {
+const onError = (file: UppyFile, response: ErrorResponse) => {
   const body = response.body as PluginInstallationErrorResponse;
 
   if (body.type === PLUGIN_ALREADY_EXISTS_TYPE) {
