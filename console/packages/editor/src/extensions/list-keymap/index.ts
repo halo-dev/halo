@@ -3,6 +3,7 @@ import {
   ListKeymap,
   type ListKeymapOptions,
 } from "@tiptap/extension-list-keymap";
+import { Editor } from "@tiptap/core";
 
 /**
  *  Optimize the listKeymap extension until the issue with @tiptap/extension-list-keymap is resolved.
@@ -10,7 +11,7 @@ import {
  */
 const ExtensionListKeymap = ListKeymap.extend<ListKeymapOptions>({
   addKeyboardShortcuts() {
-    const backspaceHandle = (editor) => {
+    const backspaceHandle = (editor: Editor) => {
       let handled = false;
 
       if (!editor.state.selection.empty) {
@@ -18,19 +19,28 @@ const ExtensionListKeymap = ListKeymap.extend<ListKeymapOptions>({
         return true;
       }
 
-      this.options.listTypes.forEach(({ itemName, wrapperNames }) => {
-        if (listHelpers.handleBackspace(editor, itemName, wrapperNames)) {
-          handled = true;
+      this.options.listTypes.forEach(
+        ({
+          itemName,
+          wrapperNames,
+        }: {
+          itemName: string;
+          wrapperNames: string[];
+        }) => {
+          if (listHelpers.handleBackspace(editor, itemName, wrapperNames)) {
+            handled = true;
+          }
         }
-      });
+      );
 
       return handled;
     };
 
     return {
-      Backspace: ({ editor }) => backspaceHandle(editor),
+      Backspace: ({ editor }: { editor: Editor }) => backspaceHandle(editor),
 
-      "Mod-Backspace": ({ editor }) => backspaceHandle(editor),
+      "Mod-Backspace": ({ editor }: { editor: Editor }) =>
+        backspaceHandle(editor),
     };
   },
 });
