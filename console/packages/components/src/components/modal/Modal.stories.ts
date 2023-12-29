@@ -4,6 +4,7 @@ import { VModal } from ".";
 import { VButton } from "../button";
 import { IconArrowLeft, IconArrowRight } from "@/icons/icons";
 import { VSpace } from "../space";
+import { ref } from "vue";
 
 const meta: Meta<typeof VModal> = {
   title: "Modal",
@@ -12,16 +13,20 @@ const meta: Meta<typeof VModal> = {
   render: (args) => ({
     components: { VModal, VButton, VSpace, IconArrowLeft, IconArrowRight },
     setup() {
-      return { args };
+      const modal = ref();
+      return { args, modal };
     },
     template: `
       <VButton type="secondary" @click="args.visible = true">打开</VButton>
       <VModal
-        v-model:visible="args.visible"
+        ref="modal"
+        v-if="args.visible"
         :fullscreen="args.fullscreen"
         :title="args.title"
         :width="args.width"
         :mount-to-body="true"
+        :layerClosable="true"
+        @close="args.visible = false"
       >
         <template #actions>
           <span>
@@ -43,7 +48,7 @@ const meta: Meta<typeof VModal> = {
             <VButton loading type="primary" @click="args.visible = false"
               >确定
             </VButton>
-            <VButton @click="args.visible = false">取消</VButton>
+            <VButton @click="modal.close()">取消</VButton>
           </VSpace>
         </template>
       </VModal>
