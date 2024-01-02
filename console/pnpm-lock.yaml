@@ -496,6 +496,9 @@ importers:
       '@tiptap/extension-list-item':
         specifier: ^2.1.10
         version: 2.1.11(@tiptap/core@2.1.11)
+      '@tiptap/extension-list-keymap':
+        specifier: ^2.1.10
+        version: 2.1.13(@tiptap/core@2.1.11)
       '@tiptap/extension-ordered-list':
         specifier: ^2.1.10
         version: 2.1.11(@tiptap/core@2.1.11)
@@ -5958,6 +5961,14 @@ packages:
 
   /@tiptap/extension-list-item@2.1.11(@tiptap/core@2.1.11):
     resolution: {integrity: sha512-YhwHaPGhffsFsg/zjCu1G24//j/BTRDRZbZXmMwp77m1yEqPULcWyoWrI+gUzetQxJRD/ruAucqjLtoLLfICmQ==}
+    peerDependencies:
+      '@tiptap/core': ^2.0.0
+    dependencies:
+      '@tiptap/core': 2.1.11(@tiptap/pm@2.1.11)
+    dev: false
+
+  /@tiptap/extension-list-keymap@2.1.13(@tiptap/core@2.1.11):
+    resolution: {integrity: sha512-D/j1aPz3tehILfUWXy9lfgoZUzxO2Jmls4hnvyGDugEBiZtQGRpqPjqhJBkkcWlxa7UnQQD2AbZ2D5P0oStx5Q==}
     peerDependencies:
       '@tiptap/core': ^2.0.0
     dependencies:
