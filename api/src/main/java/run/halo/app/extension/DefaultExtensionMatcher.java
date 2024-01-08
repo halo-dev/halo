@@ -41,13 +41,8 @@ public class DefaultExtensionMatcher implements ExtensionMatcher {
         }
 
         if (fieldSelector != null) {
-            for (var matcher : fieldSelector.getMatchers()) {
-                var fieldValue = PARSER.parseRaw(matcher.getKey())
-                    .getValue(extension, String.class);
-                if (!matcher.test(fieldValue)) {
-                    return false;
-                }
-            }
+            return fieldSelector.test(key -> PARSER.parseRaw(key)
+                .getValue(extension, String.class));
         }
         return true;
     }

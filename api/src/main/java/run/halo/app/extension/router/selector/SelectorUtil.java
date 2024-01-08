@@ -88,11 +88,14 @@ public final class SelectorUtil {
                 .map(selectorConverter::convert)
                 .filter(Objects::nonNull)
                 .map(fieldConverter::convert)
-                .toList())
-            .orElse(List.of());
+                .toList()
+            )
+            .orElse(List.of())
+            .stream()
+            .reduce(AndSelectorMatcher::new);
 
         return new ListOptions()
             .setLabelSelector(new LabelSelector().setMatchers(labelMatchers))
-            .setFieldSelector(new FieldSelector().setMatchers(fieldMatchers));
+            .setFieldSelector(new FieldSelector().setMatcher(fieldMatchers.orElse(null)));
     }
 }

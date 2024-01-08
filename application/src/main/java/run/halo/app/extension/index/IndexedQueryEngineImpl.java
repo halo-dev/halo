@@ -22,7 +22,10 @@ import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
-import run.halo.app.extension.router.selector.FieldSelector;
+import run.halo.app.extension.router.selector.AndSelectorMatcher;
+import run.halo.app.extension.router.selector.AnySelectorMatcher;
+import run.halo.app.extension.router.selector.LogicalMatcher;
+import run.halo.app.extension.router.selector.OrSelectorMatcher;
 import run.halo.app.extension.router.selector.SelectorMatcher;
 
 /**
@@ -83,6 +86,12 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
             }
         }
         return intersection;
+    }
+
+    static <T> List<T> union(List<T> list1, List<T> list2) {
+        Set<T> set = new LinkedHashSet<>(list1);
+        set.addAll(list2);
+        return new ArrayList<>(set);
     }
 
     static void throwNotIndexedException(String fieldPath) {
@@ -147,25 +156,13 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
 
         stopWatch.start("retrieve matched metadata names by fields");
         Optional<List<String>> matchedByFields = Optional.ofNullable(options.getFieldSelector())
-            .filter(selector -> !CollectionUtils.isEmpty(selector.getMatchers()))
-            .map(FieldSelector::getMatchers)
-            .map(matchers -> matchers.stream()
-                .map(matcher -> {
-                    var fieldPath = matcher.getKey();
-                    if (!fieldPathEntryMap.containsKey(fieldPath)) {
-                        throwNotIndexedException(fieldPath);
-                    }
-                    var indexEntry = fieldPathEntryMap.get(fieldPath);
-                    var indexedKeys = indexEntry.indexedKeys();
-                    return indexedKeys.stream()
-                        .filter(matcher::test)
-                        .map(indexEntry::getByIndexKey)
-                        .flatMap(List::stream)
-                        .toList();
-                })
-                .reduce(IndexedQueryEngineImpl::intersection)
-                .orElse(List.of())
-            );
+            .filter(fieldSelector -> fieldSelector.getMatcher() != null)
+            .map(fieldSelector -> {
+                var values = evaluate(fieldSelector.getMatcher(), fieldPathEntryMap,
+                    allMetadataNames);
+                var uniqueValues = new LinkedHashSet<>(values);
+                return new ArrayList<>(uniqueValues);
+            });
         stopWatch.stop();
 
         stopWatch.start("merge result");
@@ -188,6 +185,34 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
         log.debug("Retrieve result from indexer, {}", stopWatch.prettyPrint());
         return result;
     }
+
+    List<String> evaluate(SelectorMatcher matcher, Map<String, IndexEntry> fieldPathEntryMap,
+        List<String> allNames) {
+        if (matcher == null) {
+            return allNames;
+        }
+        if (matcher instanceof LogicalMatcher) {
+            if (matcher instanceof AndSelectorMatcher andNode) {
+                var left = evaluate(andNode.getLeft(), fieldPathEntryMap, allNames);
+                var right = evaluate(andNode.getRight(), fieldPathEntryMap, allNames);
+                return intersection(left, right);
+            } else if (matcher instanceof OrSelectorMatcher orNode) {
+                var left = evaluate(orNode.getLeft(), fieldPathEntryMap, allNames);
+                var right = evaluate(orNode.getRight(), fieldPathEntryMap, allNames);
+                return union(left, right);
+            } else if (matcher instanceof AnySelectorMatcher) {
+                return allNames;
+            }
+        }
+        var indexEntry = getIndexEntry(matcher.getKey(), fieldPathEntryMap);
+        var indexedKeys = indexEntry.indexedKeys();
+        return indexedKeys.stream()
+            .filter(matcher::test)
+            .map(indexEntry::getByIndexKey)
+            .flatMap(List::stream)
+            .toList();
+    }
+
 
     /**
      * Sort the given list by the given {@link Sort}.
