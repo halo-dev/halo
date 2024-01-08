@@ -204,6 +204,15 @@ onMounted(() => {
     <main class="content w-full pb-12 mb-safe md:w-[calc(100%-16rem)] md:pb-0">
       <slot v-if="$slots.default" />
       <RouterView v-else />
+      <footer
+        v-if="!route.meta.hideFooter"
+        class="mt-auto p-4 text-center text-sm"
+      >
+        <span class="text-gray-600">Powered by </span>
+        <RouterLink to="/actuator" class="hover:text-gray-600">
+          Halo
+        </RouterLink>
+      </footer>
     </main>
 
     <!--bottom nav bar-->
