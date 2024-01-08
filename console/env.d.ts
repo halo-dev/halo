@@ -23,6 +23,7 @@ declare module "vue-router" {
     searchable?: boolean;
     permissions?: string[];
     core?: boolean;
+    hideFooter?: boolean;
     menu?: {
       name: string;
       group?: CoreMenuGroupId;
