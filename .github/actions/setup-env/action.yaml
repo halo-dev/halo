@@ -1,0 +1,61 @@
+name: Setup Environment
+description: Setup environment to check and build Halo, including console and core projects.
+
+inputs:
+  node-version:
+    description: Node.js version.
+    required: false
+    default: "18"
+
+  pnpm-version:
+    description: pnpm version.
+    required: false
+    default: "8"
+
+  java-version:
+    description: Java version.
+    required: false
+    default: "17"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - uses: pnpm/action-setup@v2
+      name: Setup pnpm
+      id: pnpm-install
+      with:
+        version: ${{ inputs.pnpm-version }}
+        run_install: false
+
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      shell: bash
+      run: |
+        echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+    - uses: actions/cache@v3
+      name: Setup pnpm cache
+      with:
+        path: ${{ steps.pnpm-cache.outputs.STORE_PATH}}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+
+    - name: Setup JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: "temurin"
+        cache: "gradle"
+        java-version: ${{ inputs.java-version }}
+
+    - name: Cache SonarCloud packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
