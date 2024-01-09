@@ -4,6 +4,7 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -90,7 +91,7 @@ public class IndexEntryImpl implements IndexEntry {
     public Set<String> indexedKeys() {
         readLock.lock();
         try {
-            return indexKeyObjectNamesMap.keySet();
+            return new LinkedHashSet<>(indexKeyObjectNamesMap.keySet());
         } finally {
             readLock.unlock();
         }
@@ -110,7 +111,7 @@ public class IndexEntryImpl implements IndexEntry {
     public List<String> getByIndexKey(String indexKey) {
         readLock.lock();
         try {
-            return indexKeyObjectNamesMap.get(indexKey);
+            return List.copyOf(indexKeyObjectNamesMap.get(indexKey));
         } finally {
             readLock.unlock();
         }
