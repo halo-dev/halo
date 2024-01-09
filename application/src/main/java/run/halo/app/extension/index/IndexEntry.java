@@ -90,4 +90,6 @@ public interface IndexEntry {
      * @return object names of this entry.
      */
     List<String> getByIndexKey(String indexKey);
+
+    void clear();
 }

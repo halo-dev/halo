@@ -3,6 +3,7 @@ package run.halo.app.extension.index;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -236,16 +237,18 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
                 if (indexEntry == null) {
                     throwNotIndexedException(order.getProperty());
                 }
-                var entries = new ArrayList<>(indexEntry.entries());
+                var set = new HashSet<>(list);
+                // 8w data about cost 11ms, maybe we can improve it better
+                final var objectNames = indexEntry.entries().stream()
+                    .map(Map.Entry::getValue)
+                    .filter(set::contains)
+                    .collect(Collectors.toList());
+
                 var indexOrder = indexEntry.getIndexDescriptor().getSpec().getOrder();
                 var asc = IndexSpec.OrderType.ASC.equals(indexOrder);
                 if (asc != order.isAscending()) {
-                    Collections.reverse(entries);
+                    Collections.reverse(objectNames);
                 }
-                entries.removeIf(entry -> !list.contains(entry.getValue()));
-                var objectNames = entries.stream()
-                    .map(Map.Entry::getValue)
-                    .collect(Collectors.toList());
                 sortedLists.add(objectNames);
             }
             return mergeSortedLists(sortedLists);

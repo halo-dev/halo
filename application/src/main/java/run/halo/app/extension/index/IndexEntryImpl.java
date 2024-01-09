@@ -100,7 +100,7 @@ public class IndexEntryImpl implements IndexEntry {
     public Collection<Map.Entry<String, String>> entries() {
         readLock.lock();
         try {
-            return indexKeyObjectNamesMap.entries();
+            return List.copyOf(indexKeyObjectNamesMap.entries());
         } finally {
             readLock.unlock();
         }
@@ -113,6 +113,16 @@ public class IndexEntryImpl implements IndexEntry {
             return indexKeyObjectNamesMap.get(indexKey);
         } finally {
             readLock.unlock();
+        }
+    }
+
+    @Override
+    public void clear() {
+        writeLock.lock();
+        try {
+            indexKeyObjectNamesMap.clear();
+        } finally {
+            writeLock.unlock();
         }
     }
 }

@@ -163,7 +163,7 @@ public class DefaultIndexer implements Indexer {
                 var entry = iterator.next();
                 if (BooleanUtils.isTrue(matchFn.apply(entry.getIndexDescriptor()))) {
                     iterator.remove();
-                    entry.entries().clear();
+                    entry.clear();
                     indexEntries.add(createIndexEntry(entry.getIndexDescriptor()));
                 }
             }
