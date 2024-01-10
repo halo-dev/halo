@@ -1,5 +1,10 @@
 import TiptapTable, { type TableOptions } from "@tiptap/extension-table";
-import { isActive, type Editor, type Range } from "@/tiptap/vue-3";
+import {
+  isActive,
+  type Editor,
+  type Range,
+  isNodeActive,
+} from "@/tiptap/vue-3";
 import type {
   Node as ProseMirrorNode,
   NodeView,
@@ -25,6 +30,8 @@ import { markRaw } from "vue";
 import { i18n } from "@/locales";
 import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
 import { BlockActionSeparator, ToolboxItem } from "@/components";
+import { hasTableBefore, isTableSelected } from "./util";
+import { Editor } from "@tiptap/core";
 
 function updateColumns(
   node: ProseMirrorNode,
@@ -373,6 +380,44 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
           },
         };
       },
+    };
+  },
+
+  addKeyboardShortcuts() {
+    const handleBackspace = () => {
+      const { editor } = this;
+      if (editor.commands.undoInputRule()) {
+        return true;
+      }
+
+      // the node in the current active state is not a table
+      // and the previous node is a table
+      if (
+        !isNodeActive(editor.state, Table.name) &&
+        hasTableBefore(editor.state)
+      ) {
+        editor.commands.selectNodeBackward();
+        return true;
+      }
+
+      if (!isNodeActive(editor.state, Table.name)) {
+        return false;
+      }
+
+      // If the table is currently selected,
+      // then delete the whole table
+      if (isTableSelected(editor.state.selection)) {
+        editor.commands.deleteTable();
+        return true;
+      }
+
+      return false;
+    };
+
+    return {
+      Backspace: () => handleBackspace(),
+
+      "Mod-Backspace": () => handleBackspace(),
     };
   },
 }).configure({ resizable: true });
