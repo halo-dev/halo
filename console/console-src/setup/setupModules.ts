@@ -10,7 +10,6 @@ import type { RouteRecordRaw } from "vue-router";
 import { loadStyle } from "@/utils/load-style";
 
 export function setupCoreModules(app: App) {
-  console.log(modules);
   modules.forEach((module) => {
     registerModule(app, module, true);
   });
