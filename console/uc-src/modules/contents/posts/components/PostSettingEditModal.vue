@@ -3,8 +3,7 @@ import { Toast, VButton, VModal, VSpace } from "@halo-dev/components";
 import PostSettingForm from "./PostSettingForm.vue";
 import type { PostFormState } from "../types";
 import type { Post } from "@halo-dev/api-client";
-import { onMounted } from "vue";
-import { nextTick, ref } from "vue";
+import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useMutation } from "@tanstack/vue-query";
 import { apiClient } from "@/utils/api-client";
@@ -24,22 +23,7 @@ const emit = defineEmits<{
   (event: "success", post: Post): void;
 }>();
 
-// fixme: refactor VModal component
-const shouldRender = ref(false);
-const visible = ref(false);
-onMounted(() => {
-  shouldRender.value = true;
-  nextTick(() => {
-    visible.value = true;
-  });
-});
-function onClose() {
-  visible.value = false;
-  setTimeout(() => {
-    shouldRender.value = false;
-    emit("close");
-  }, 200);
-}
+const modal = ref();
 
 const { mutate, isLoading } = useMutation({
   mutationKey: ["edit-post"],
@@ -72,7 +56,7 @@ const { mutate, isLoading } = useMutation({
   onSuccess(data) {
     Toast.success(t("core.common.toast.save_success"));
     emit("success", data);
-    emit("close");
+    modal.value.close();
   },
   onError() {
     Toast.error(t("core.common.toast.save_failed_and_retry"));
@@ -86,12 +70,11 @@ function onSubmit(data: PostFormState) {
 
 <template>
   <VModal
-    v-if="shouldRender"
-    v-model:visible="visible"
+    ref="modal"
     :title="$t('core.uc_post.setting_modal.title')"
     :width="700"
     centered
-    @close="onClose"
+    @close="emit('close')"
   >
     <PostSettingForm
       :form-state="{
@@ -122,7 +105,7 @@ function onSubmit(data: PostFormState) {
         >
           {{ $t("core.common.buttons.save") }}
         </VButton>
-        <VButton type="default" @click="onClose()">
+        <VButton type="default" @click="modal.close()">
           {{ $t("core.common.buttons.close") }}
         </VButton>
       </VSpace>
