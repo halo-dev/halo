@@ -31,7 +31,6 @@ import { i18n } from "@/locales";
 import type { ExtensionOptions, NodeBubbleMenu } from "@/types";
 import { BlockActionSeparator, ToolboxItem } from "@/components";
 import { hasTableBefore, isTableSelected } from "./util";
-import { Editor } from "@tiptap/core";
 
 function updateColumns(
   node: ProseMirrorNode,
