@@ -1,6 +1,5 @@
 import { definePlugin } from "@halo-dev/console-shared";
 import BasicLayout from "@console/layouts/BasicLayout.vue";
-import BlankLayout from "@console/layouts/BlankLayout.vue";
 import UserStatsWidget from "./widgets/UserStatsWidget.vue";
 import UserList from "./UserList.vue";
 import UserDetail from "./UserDetail.vue";
@@ -34,45 +33,32 @@ export default definePlugin({
     },
     {
       path: "/users",
-      component: BlankLayout,
+      component: BasicLayout,
       children: [
         {
           path: "",
-          component: BasicLayout,
-          children: [
-            {
-              path: "",
-              name: "Users",
-              component: UserList,
-              meta: {
-                title: "core.user.title",
-                searchable: true,
-                permissions: ["system:users:view"],
-                menu: {
-                  name: "core.sidebar.menu.items.users",
-                  group: "system",
-                  icon: markRaw(IconUserSettings),
-                  priority: 1,
-                  mobile: true,
-                },
-              },
+          name: "Users",
+          component: UserList,
+          meta: {
+            title: "core.user.title",
+            searchable: true,
+            permissions: ["system:users:view"],
+            menu: {
+              name: "core.sidebar.menu.items.users",
+              group: "system",
+              icon: markRaw(IconUserSettings),
+              priority: 1,
+              mobile: true,
             },
-          ],
+          },
         },
         {
           path: ":name",
-          component: BasicLayout,
-          name: "User",
-          children: [
-            {
-              path: "",
-              name: "UserDetail",
-              component: UserDetail,
-              meta: {
-                title: "core.user.detail.title",
-              },
-            },
-          ],
+          name: "UserDetail",
+          component: UserDetail,
+          meta: {
+            title: "core.user.detail.title",
+          },
         },
       ],
     },

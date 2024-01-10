@@ -1,5 +1,5 @@
 import { i18n } from "@/locales";
-import { coreModules } from "@console/modules";
+import modules from "@console/modules";
 import router from "@console/router";
 import { usePluginModuleStore } from "@/stores/plugin";
 import type { PluginModule, RouteRecordAppend } from "@halo-dev/console-shared";
@@ -10,7 +10,8 @@ import type { RouteRecordRaw } from "vue-router";
 import { loadStyle } from "@/utils/load-style";
 
 export function setupCoreModules(app: App) {
-  coreModules.forEach((module) => {
+  console.log(modules);
+  modules.forEach((module) => {
     registerModule(app, module, true);
   });
 }
