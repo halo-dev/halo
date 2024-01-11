@@ -16,11 +16,12 @@ import { useI18n } from "vue-i18n";
 
 const queryClient = useQueryClient();
 const { t } = useI18n();
-const visible = defineModel({ type: Boolean, default: false });
 
 const emit = defineEmits<{
   (event: "close"): void;
 }>();
+
+const modal = ref();
 
 const formState = ref<
   Omit<PersonalAccessToken, "spec"> & {
@@ -71,7 +72,6 @@ const {
   },
   onSuccess(data) {
     queryClient.invalidateQueries({ queryKey: ["personal-access-tokens"] });
-    visible.value = false;
     emit("close");
 
     setTimeout(() => {
@@ -100,7 +100,7 @@ const { copy } = useClipboard({
 
 <template>
   <VModal
-    v-model:visible="visible"
+    ref="modal"
     :width="700"
     :title="$t('core.uc_profile.pat.creation_modal.title')"
     @close="emit('close')"
@@ -246,7 +246,7 @@ const { copy } = useClipboard({
           :text="$t('core.common.buttons.submit')"
           @submit="$formkit.submit('pat-creation-form')"
         />
-        <VButton @click="visible = false">
+        <VButton @click="modal.close()">
           {{ $t("core.common.buttons.cancel_and_shortcut") }}
         </VButton>
       </VSpace>
