@@ -1,10 +1,10 @@
 package run.halo.app.extension.index;
 
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,6 +43,16 @@ public class IndexEntryImpl implements IndexEntry {
         } else {
             throw new IllegalArgumentException("Invalid order: " + order);
         }
+    }
+
+    @Override
+    public void acquireReadLock() {
+        this.rwl.readLock().lock();
+    }
+
+    @Override
+    public void releaseReadLock() {
+        this.rwl.readLock().unlock();
     }
 
     @Override
@@ -91,7 +101,7 @@ public class IndexEntryImpl implements IndexEntry {
     public Set<String> indexedKeys() {
         readLock.lock();
         try {
-            return new LinkedHashSet<>(indexKeyObjectNamesMap.keySet());
+            return indexKeyObjectNamesMap.keySet();
         } finally {
             readLock.unlock();
         }
@@ -101,7 +111,17 @@ public class IndexEntryImpl implements IndexEntry {
     public Collection<Map.Entry<String, String>> entries() {
         readLock.lock();
         try {
-            return List.copyOf(indexKeyObjectNamesMap.entries());
+            return indexKeyObjectNamesMap.entries();
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    @Override
+    public Collection<Map.Entry<String, String>> immutableEntries() {
+        readLock.lock();
+        try {
+            return ImmutableListMultimap.copyOf(indexKeyObjectNamesMap).entries();
         } finally {
             readLock.unlock();
         }
@@ -111,7 +131,7 @@ public class IndexEntryImpl implements IndexEntry {
     public List<String> getByIndexKey(String indexKey) {
         readLock.lock();
         try {
-            return List.copyOf(indexKeyObjectNamesMap.get(indexKey));
+            return indexKeyObjectNamesMap.get(indexKey);
         } finally {
             readLock.unlock();
         }

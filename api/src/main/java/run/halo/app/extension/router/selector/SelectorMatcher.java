@@ -5,9 +5,9 @@ public interface SelectorMatcher {
     String getKey();
 
     /**
-     * Returns true if a label value matches.
+     * Returns true if a field value matches.
      *
-     * @param s the label value
+     * @param s the field value
      * @return the boolean
      */
     boolean test(String s);

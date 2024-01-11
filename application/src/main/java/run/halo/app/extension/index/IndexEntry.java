@@ -34,6 +34,18 @@ import run.halo.app.extension.Metadata;
 public interface IndexEntry {
 
     /**
+     * Acquires the read lock for reading such as {@link #getByIndexKey(String)},
+     * {@link #entries()}, {@link #indexedKeys()}, because the returned result set of these
+     * methods is not immutable.
+     */
+    void acquireReadLock();
+
+    /**
+     * Releases the read lock.
+     */
+    void releaseReadLock();
+
+    /**
      * <p>Adds a new entry to this index entry.</p>
      * <p>For example, if we have a {@link Metadata} with name {@code foo} and labels {@code bar=1}
      * and {@code baz=2} and index order is {@link IndexSpec.OrderType#ASC}, then the index entry
@@ -78,11 +90,21 @@ public interface IndexEntry {
     Set<String> indexedKeys();
 
     /**
-     * Returns the entries of this entry in order.
+     * <p>Returns the entries of this entry in order.</p>
+     * <p>Note That: Any modification to the returned result will affect the original data
+     * directly.</p>
      *
      * @return entries of this entry.
      */
     Collection<Map.Entry<String, String>> entries();
+
+    /**
+     * Returns the immutable entries of this entry in order, it is safe to modify the returned
+     * result, but extra cost is made.
+     *
+     * @return immutable entries of this entry.
+     */
+    Collection<Map.Entry<String, String>> immutableEntries();
 
     /**
      * Returns the object names of this entry in order.

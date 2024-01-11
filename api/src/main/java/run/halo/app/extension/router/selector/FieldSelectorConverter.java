@@ -6,12 +6,14 @@ import java.util.Set;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.NonNull;
 import org.springframework.util.CollectionUtils;
+import run.halo.app.extension.index.query.Query;
+import run.halo.app.extension.index.query.QueryFactory;
 
-public class FieldSelectorConverter implements Converter<SelectorCriteria, SelectorMatcher> {
+public class FieldSelectorConverter implements Converter<SelectorCriteria, Query> {
 
     @NonNull
     @Override
-    public SelectorMatcher convert(@NonNull SelectorCriteria criteria) {
+    public Query convert(@NonNull SelectorCriteria criteria) {
         var key = criteria.key();
         // compatible with old field selector
         if ("name".equals(key)) {
@@ -19,16 +21,15 @@ public class FieldSelectorConverter implements Converter<SelectorCriteria, Selec
         }
         switch (criteria.operator()) {
             case Equals -> {
-                return EqualityMatcher.equal(key, getSingleValue(criteria));
+                return QueryFactory.equal(key, getSingleValue(criteria));
             }
             case NotEquals -> {
-                return EqualityMatcher.notEqual(key, getSingleValue(criteria));
+                return QueryFactory.notEqual(key, getSingleValue(criteria));
             }
             // compatible with old field selector
             case IN -> {
-                var valueArr =
-                    defaultIfNull(criteria.values(), Set.<String>of()).toArray(new String[0]);
-                return SetMatcher.in(key, valueArr);
+                var valueArr = defaultIfNull(criteria.values(), Set.<String>of());
+                return QueryFactory.in(key, valueArr);
             }
             default -> throw new IllegalArgumentException(
                 "Unsupported operator: " + criteria.operator());

@@ -8,6 +8,7 @@ import org.springframework.data.util.Predicates;
 import org.springframework.web.server.ServerWebInputException;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ListOptions;
+import run.halo.app.extension.index.query.QueryFactory;
 
 public final class SelectorUtil {
 
@@ -83,19 +84,19 @@ public final class SelectorUtil {
             .orElse(List.of());
 
         var fieldConverter = new FieldSelectorConverter();
-        var fieldMatchers = Optional.ofNullable(fieldSelectorTerms)
+        var fieldQuery = Optional.ofNullable(fieldSelectorTerms)
             .map(selectors -> selectors.stream()
                 .map(selectorConverter::convert)
                 .filter(Objects::nonNull)
                 .map(fieldConverter::convert)
                 .toList()
             )
-            .orElse(List.of())
-            .stream()
-            .reduce(AndSelectorMatcher::new);
-
-        return new ListOptions()
-            .setLabelSelector(new LabelSelector().setMatchers(labelMatchers))
-            .setFieldSelector(new FieldSelector().setMatcher(fieldMatchers.orElse(null)));
+            .orElse(List.of());
+        var listOptions = new ListOptions();
+        listOptions.setLabelSelector(new LabelSelector().setMatchers(labelMatchers));
+        if (!fieldQuery.isEmpty()) {
+            listOptions.setFieldSelector(FieldSelector.of(QueryFactory.and(fieldQuery)));
+        }
+        return listOptions;
     }
 }

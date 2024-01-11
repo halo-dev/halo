@@ -15,6 +15,7 @@ import run.halo.app.extension.SchemeWatcherManager.SchemeRegistered;
 import run.halo.app.extension.Watcher;
 import run.halo.app.extension.controller.RequestQueue;
 import run.halo.app.extension.controller.Synchronizer;
+import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.extension.router.selector.FieldSelector;
 
 class GcSynchronizer implements Synchronizer<GcRequest> {
@@ -75,9 +76,8 @@ class GcSynchronizer implements Synchronizer<GcRequest> {
 
     <E extends Extension> List<E> listDeleted(Class<E> type) {
         var options = new ListOptions()
-            .setFieldSelector(FieldSelector.builder()
-                .notEq("metadata.deletionTimestamp", null)
-                .build()
+            .setFieldSelector(
+                FieldSelector.of(QueryFactory.all("metadata.deletionTimestamp"))
             );
         return client.listAll(type, options, Sort.by("metadata.creationTimestamp"))
             .stream()

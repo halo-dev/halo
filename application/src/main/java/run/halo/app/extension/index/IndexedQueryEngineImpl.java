@@ -1,14 +1,14 @@
 package run.halo.app.extension.index;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,10 +23,10 @@ import run.halo.app.extension.GroupVersionKind;
 import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
 import run.halo.app.extension.PageRequest;
-import run.halo.app.extension.router.selector.AndSelectorMatcher;
-import run.halo.app.extension.router.selector.AnySelectorMatcher;
-import run.halo.app.extension.router.selector.LogicalMatcher;
-import run.halo.app.extension.router.selector.OrSelectorMatcher;
+import run.halo.app.extension.index.query.Query;
+import run.halo.app.extension.index.query.QueryIndexViewImpl;
+import run.halo.app.extension.router.selector.FieldSelector;
+import run.halo.app.extension.router.selector.LabelSelector;
 import run.halo.app.extension.router.selector.SelectorMatcher;
 
 /**
@@ -44,7 +44,7 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
 
     private static Map<String, IndexEntry> fieldPathIndexEntryMap(Indexer indexer) {
         // O(n) time complexity
-        Map<String, IndexEntry> indexEntryMap = new LinkedHashMap<>();
+        Map<String, IndexEntry> indexEntryMap = new HashMap<>();
         var iterator = indexer.readyIndexesIterator();
         while (iterator.hasNext()) {
             var indexEntry = iterator.next();
@@ -89,12 +89,6 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
         return intersection;
     }
 
-    static <T> List<T> union(List<T> list1, List<T> list2) {
-        Set<T> set = new LinkedHashSet<>(list1);
-        set.addAll(list2);
-        return new ArrayList<>(set);
-    }
-
     static void throwNotIndexedException(String fieldPath) {
         throw new IllegalArgumentException(
             "No index found for fieldPath: " + fieldPath
@@ -106,19 +100,25 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
         var indexEntry = getIndexEntry(LabelIndexSpecUtils.LABEL_PATH, fieldPathEntryMap);
         // O(m) time complexity, m is the number of labelMatchers
         var labelKeysToQuery = labelMatchers.stream()
+            .sorted(Comparator.comparing(SelectorMatcher::getKey))
             .map(SelectorMatcher::getKey)
             .collect(Collectors.toSet());
 
-        Map<String, Map<String, String>> objectNameLabelsMap = new LinkedHashMap<>();
-        indexEntry.entries().forEach(entry -> {
-            // key is labelKey=labelValue, value is objectName
-            var labelPair = LabelIndexSpecUtils.labelKeyValuePair(entry.getKey());
-            if (!labelKeysToQuery.contains(labelPair.getFirst())) {
-                return;
-            }
-            objectNameLabelsMap.computeIfAbsent(entry.getValue(), k -> new LinkedHashMap<>())
-                .put(labelPair.getFirst(), labelPair.getSecond());
-        });
+        Map<String, Map<String, String>> objectNameLabelsMap = new HashMap<>();
+        indexEntry.acquireReadLock();
+        try {
+            indexEntry.entries().forEach(entry -> {
+                // key is labelKey=labelValue, value is objectName
+                var labelPair = LabelIndexSpecUtils.labelKeyValuePair(entry.getKey());
+                if (!labelKeysToQuery.contains(labelPair.getFirst())) {
+                    return;
+                }
+                objectNameLabelsMap.computeIfAbsent(entry.getValue(), k -> new HashMap<>())
+                    .put(labelPair.getFirst(), labelPair.getSecond());
+            });
+        } finally {
+            indexEntry.releaseReadLock();
+        }
         // O(p * m) time complexity, p is the number of allMetadataNames
         return allMetadataNames.stream()
             .filter(objectName -> {
@@ -138,44 +138,38 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
         var primaryEntry = getIndexEntry(PrimaryKeySpecUtils.PRIMARY_INDEX_NAME, fieldPathEntryMap);
         // O(n) time complexity
         stopWatch.start("retrieve all metadata names");
-        var allMetadataNames = new ArrayList<>(primaryEntry.indexedKeys());
+        var allMetadataNames = new ArrayList<String>();
+        primaryEntry.acquireReadLock();
+        try {
+            allMetadataNames.addAll(primaryEntry.indexedKeys());
+        } finally {
+            primaryEntry.releaseReadLock();
+        }
         stopWatch.stop();
 
         stopWatch.start("retrieve matched metadata names");
-        final Optional<List<String>> matchedByLabels =
-            Optional.ofNullable(options.getLabelSelector())
-                .filter(selector -> !CollectionUtils.isEmpty(selector.getMatchers()))
-                .map(labelSelector -> labelSelector.getMatchers()
-                    .stream()
-                    .sorted(Comparator.comparing(SelectorMatcher::getKey))
-                    .toList()
-                )
-                .map(matchers -> retrieveForLabelMatchers(matchers,
-                    fieldPathEntryMap, allMetadataNames)
-                );
+        var hasLabelSelector = hasLabelSelector(options.getLabelSelector());
+        final List<String> matchedByLabels = hasLabelSelector
+            ? retrieveForLabelMatchers(options.getLabelSelector().getMatchers(), fieldPathEntryMap,
+            allMetadataNames)
+            : allMetadataNames;
         stopWatch.stop();
 
         stopWatch.start("retrieve matched metadata names by fields");
-        Optional<List<String>> matchedByFields = Optional.ofNullable(options.getFieldSelector())
-            .filter(fieldSelector -> fieldSelector.getMatcher() != null)
-            .map(fieldSelector -> {
-                var values = evaluate(fieldSelector.getMatcher(), fieldPathEntryMap,
-                    allMetadataNames);
-                var uniqueValues = new LinkedHashSet<>(values);
-                return new ArrayList<>(uniqueValues);
-            });
+        final var hasFieldSelector = hasFieldSelector(options.getFieldSelector());
+        var matchedByFields = hasFieldSelector
+            ? retrieveForFieldSelector(options.getFieldSelector().query(), fieldPathEntryMap)
+            : allMetadataNames;
         stopWatch.stop();
 
         stopWatch.start("merge result");
         List<String> foundObjectKeys;
-        if (matchedByLabels.isEmpty() && matchedByFields.isEmpty()) {
+        if (!hasLabelSelector && !hasFieldSelector) {
             foundObjectKeys = allMetadataNames;
-        } else if (matchedByLabels.isEmpty()) {
-            foundObjectKeys = matchedByFields.orElse(allMetadataNames);
+        } else if (!hasLabelSelector) {
+            foundObjectKeys = matchedByFields;
         } else {
-            foundObjectKeys = matchedByFields
-                .map(strings -> intersection(matchedByLabels.get(), strings))
-                .orElseGet(() -> matchedByLabels.orElse(allMetadataNames));
+            foundObjectKeys = intersection(matchedByFields, matchedByLabels);
         }
         stopWatch.stop();
 
@@ -183,37 +177,30 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
         ResultSorter resultSorter = new ResultSorter(fieldPathEntryMap, foundObjectKeys);
         var result = resultSorter.sortBy(sort);
         stopWatch.stop();
-        log.debug("Retrieve result from indexer, {}", stopWatch.prettyPrint());
+        if (log.isTraceEnabled()) {
+            log.trace("Retrieve result from indexer, {}", stopWatch.prettyPrint());
+        }
         return result;
     }
 
-    List<String> evaluate(SelectorMatcher matcher, Map<String, IndexEntry> fieldPathEntryMap,
-        List<String> allNames) {
-        if (matcher == null) {
-            return allNames;
-        }
-        if (matcher instanceof LogicalMatcher) {
-            if (matcher instanceof AndSelectorMatcher andNode) {
-                var left = evaluate(andNode.getLeft(), fieldPathEntryMap, allNames);
-                var right = evaluate(andNode.getRight(), fieldPathEntryMap, allNames);
-                return intersection(left, right);
-            } else if (matcher instanceof OrSelectorMatcher orNode) {
-                var left = evaluate(orNode.getLeft(), fieldPathEntryMap, allNames);
-                var right = evaluate(orNode.getRight(), fieldPathEntryMap, allNames);
-                return union(left, right);
-            } else if (matcher instanceof AnySelectorMatcher) {
-                return allNames;
-            }
-        }
-        var indexEntry = getIndexEntry(matcher.getKey(), fieldPathEntryMap);
-        var indexedKeys = indexEntry.indexedKeys();
-        return indexedKeys.stream()
-            .filter(matcher::test)
-            .map(indexEntry::getByIndexKey)
-            .flatMap(List::stream)
-            .toList();
+    boolean hasLabelSelector(LabelSelector labelSelector) {
+        return labelSelector != null && !CollectionUtils.isEmpty(labelSelector.getMatchers());
     }
 
+    boolean hasFieldSelector(FieldSelector fieldSelector) {
+        return fieldSelector != null && fieldSelector.query() != null;
+    }
+
+    List<String> retrieveForFieldSelector(Query query, Map<String, IndexEntry> fieldPathEntryMap) {
+        Map<String, Collection<Map.Entry<String, String>>> indexView = new HashMap<>();
+        for (Map.Entry<String, IndexEntry> entry : fieldPathEntryMap.entrySet()) {
+            indexView.put(entry.getKey(), entry.getValue().immutableEntries());
+        }
+        // TODO optimize build indexView time
+        var queryIndexView = new QueryIndexViewImpl(indexView);
+        var resultSet = query.matches(queryIndexView);
+        return new ArrayList<>(resultSet);
+    }
 
     /**
      * Sort the given list by the given {@link Sort}.
@@ -238,12 +225,18 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
                     throwNotIndexedException(order.getProperty());
                 }
                 var set = new HashSet<>(list);
-                // 8w data about cost 11ms, maybe we can improve it better
-                final var objectNames = indexEntry.entries().stream()
-                    .map(Map.Entry::getValue)
-                    .filter(set::contains)
-                    .collect(Collectors.toList());
-
+                var objectNames = new ArrayList<String>();
+                indexEntry.acquireReadLock();
+                try {
+                    for (var entry : indexEntry.entries()) {
+                        var objectName = entry.getValue();
+                        if (set.contains(objectName)) {
+                            objectNames.add(objectName);
+                        }
+                    }
+                } finally {
+                    indexEntry.releaseReadLock();
+                }
                 var indexOrder = indexEntry.getIndexDescriptor().getSpec().getOrder();
                 var asc = IndexSpec.OrderType.ASC.equals(indexOrder);
                 if (asc != order.isAscending()) {

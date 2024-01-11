@@ -1,12 +1,10 @@
 package run.halo.app.extension;
 
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
-
-import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.util.CollectionUtils;
+import run.halo.app.extension.index.query.QueryFactory;
 import run.halo.app.extension.router.selector.FieldSelector;
 import run.halo.app.extension.router.selector.LabelSelector;
 
@@ -14,14 +12,14 @@ import run.halo.app.extension.router.selector.LabelSelector;
 @RequiredArgsConstructor
 @Builder(builderMethodName = "internalBuilder")
 public class DefaultExtensionMatcher implements ExtensionMatcher {
-    private static final SpelExpressionParser PARSER = new SpelExpressionParser();
-
+    private final ExtensionClient client;
     private final GroupVersionKind gvk;
     private final LabelSelector labelSelector;
     private final FieldSelector fieldSelector;
 
-    public static DefaultExtensionMatcherBuilder builder(GroupVersionKind gvk) {
-        return internalBuilder().gvk(gvk);
+    public static DefaultExtensionMatcherBuilder builder(ExtensionClient client,
+        GroupVersionKind gvk) {
+        return internalBuilder().client(client).gvk(gvk);
     }
 
     /**
@@ -32,18 +30,28 @@ public class DefaultExtensionMatcher implements ExtensionMatcher {
      */
     @Override
     public boolean match(Extension extension) {
-        if (gvk != null && !gvk.equals(extension.groupVersionKind())) {
+        if (!gvk.equals(extension.groupVersionKind())) {
             return false;
         }
-        var labels = defaultIfNull(extension.getMetadata().getLabels(), Map.<String, String>of());
-        if (labelSelector != null && !labelSelector.test(labels)) {
-            return false;
+        if (!hasFieldSelector() && !hasLabelSelector()) {
+            return true;
         }
+        var listOptions = new ListOptions();
+        listOptions.setLabelSelector(labelSelector);
+        var fieldQuery = QueryFactory.all();
+        if (hasFieldSelector()) {
+            fieldQuery = QueryFactory.and(fieldQuery, fieldSelector.query());
+        }
+        listOptions.setFieldSelector(new FieldSelector(fieldQuery));
+        return client.indexedQueryEngine().retrieve(getGvk(),
+            listOptions, PageRequestImpl.ofSize(1)).getTotal() > 0;
+    }
 
-        if (fieldSelector != null) {
-            return fieldSelector.test(key -> PARSER.parseRaw(key)
-                .getValue(extension, String.class));
-        }
-        return true;
+    boolean hasFieldSelector() {
+        return fieldSelector != null && fieldSelector.query() != null;
+    }
+
+    boolean hasLabelSelector() {
+        return labelSelector != null && !CollectionUtils.isEmpty(labelSelector.getMatchers());
     }
 }

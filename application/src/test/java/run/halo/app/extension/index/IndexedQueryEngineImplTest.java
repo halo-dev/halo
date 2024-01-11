@@ -11,6 +11,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -124,8 +125,8 @@ class IndexedQueryEngineImplTest {
             .thenReturn(new IndexDescriptor(new IndexSpec()
                 .setName("slug")
                 .setOrder(IndexSpec.OrderType.ASC)));
-        when(fieldSlugEntry.indexedKeys()).thenReturn(Set.of("slug1", "slug2", "slug3"));
-        when(fieldSlugEntry.getByIndexKey(eq("slug1"))).thenReturn(List.of("object1"));
+        when((fieldSlugEntry.immutableEntries())).thenReturn(
+            List.of(Map.entry("slug1", "object1"), Map.entry("slug2", "object2")));
 
         when(labelEntry.getIndexDescriptor())
             .thenReturn(
@@ -140,8 +141,7 @@ class IndexedQueryEngineImplTest {
         var listOptions = new ListOptions();
         listOptions.setLabelSelector(LabelSelector.builder()
             .eq("key1", "value1").build());
-        listOptions.setFieldSelector(FieldSelector.builder()
-            .eq("slug", "slug1").build());
+        listOptions.setFieldSelector(FieldSelector.of(equal("slug", "slug1")));
         var result = indexedQueryEngine.doRetrieve(indexer, listOptions, Sort.unsorted());
         assertThat(result).containsExactly("object1");
     }
