@@ -2,7 +2,7 @@
 import { Toast, VButton, VSpace } from "@halo-dev/components";
 
 import { VModal } from "@halo-dev/components";
-import { nextTick, onMounted, ref } from "vue";
+import { ref } from "vue";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import { apiClient } from "@/utils/api-client";
 import { useUserStore } from "@/stores/user";
@@ -19,24 +19,7 @@ const emit = defineEmits<{
   (event: "close"): void;
 }>();
 
-// fixme: refactor VModal component
-const shouldRender = ref(false);
-const visible = ref(false);
-
-onMounted(() => {
-  shouldRender.value = true;
-  nextTick(() => {
-    visible.value = true;
-  });
-});
-
-function onClose() {
-  visible.value = false;
-  setTimeout(() => {
-    shouldRender.value = false;
-    emit("close");
-  }, 200);
-}
+const modal = ref();
 
 // count down
 const timer = ref(0);
@@ -111,7 +94,7 @@ const { mutate: verifyEmail, isLoading: isVerifying } = useMutation({
     );
     queryClient.invalidateQueries({ queryKey: ["user-detail"] });
     fetchCurrentUser();
-    onClose();
+    modal.value.close();
   },
 });
 
@@ -122,14 +105,13 @@ function handleVerify(data: { code: string }) {
 
 <template>
   <VModal
-    v-if="shouldRender"
-    v-model:visible="visible"
+    ref="modal"
     :title="
       currentUser?.spec.emailVerified
         ? $t('core.uc_profile.email_verify_modal.titles.modify')
         : $t('core.uc_profile.email_verify_modal.titles.verify')
     "
-    @close="onClose"
+    @close="emit('close')"
   >
     <FormKit
       id="email-verify-form"
@@ -175,7 +157,7 @@ function handleVerify(data: { code: string }) {
         >
           {{ $t("core.common.buttons.verify") }}
         </VButton>
-        <VButton @click="emit('close')">
+        <VButton @click="modal.close()">
           {{ $t("core.common.buttons.close_and_shortcut") }}
         </VButton>
       </VSpace>
