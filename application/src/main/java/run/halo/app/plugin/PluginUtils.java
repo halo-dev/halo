@@ -1,5 +1,6 @@
 package run.halo.app.plugin;
 
+import java.util.Objects;
 import lombok.experimental.UtilityClass;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
@@ -18,5 +19,17 @@ public class PluginUtils {
             throw new ServerWebInputException("The plugin version must not be blank.");
         }
         return String.format("%s-%s.jar", plugin.getMetadata().getName(), version);
+    }
+
+    /**
+     * Determine if the plugin is in development mode. Currently, we detect it from annotations.
+     *
+     * @param plugin is a manifest about plugin.
+     * @return true if the plugin  is in development mode; false otherwise.
+     */
+    public static boolean isDevelopmentMode(Plugin plugin) {
+        var annotations = plugin.getMetadata().getAnnotations();
+        return annotations != null
+            && Objects.equals("dev", annotations.get(PluginConst.RUNTIME_MODE_ANNO));
     }
 }
