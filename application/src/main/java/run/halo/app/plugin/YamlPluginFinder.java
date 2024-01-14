@@ -7,7 +7,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.pf4j.DevelopmentPluginClasspath;
 import org.pf4j.PluginRuntimeException;
-import org.pf4j.PluginState;
 import org.pf4j.util.FileUtils;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -65,7 +64,7 @@ public class YamlPluginFinder {
         Plugin plugin = readPluginDescriptor(pluginPath);
         if (plugin.getStatus() == null) {
             Plugin.PluginStatus pluginStatus = new Plugin.PluginStatus();
-            pluginStatus.setPhase(PluginState.RESOLVED);
+            pluginStatus.setPhase(Plugin.Phase.PENDING);
             pluginStatus.setLoadLocation(pluginPath.toUri());
             plugin.setStatus(pluginStatus);
         }
