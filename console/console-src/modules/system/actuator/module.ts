@@ -13,6 +13,7 @@ export default definePlugin({
       children: [
         {
           path: "",
+          name: "Actuator",
           component: Actuator,
           meta: {
             title: "core.actuator.title",

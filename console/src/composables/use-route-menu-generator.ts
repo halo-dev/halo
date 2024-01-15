@@ -53,16 +53,25 @@ export function useRouteMenuGenerator(
       ]
     );
 
+    console.log("currentRoutes", currentRoutes);
+
     // Flatten and filter child routes
     currentRoutes.forEach((route) => {
       if (route.children.length) {
-        route.children = route.children
-          .flatMap((child) => flattenRoutes(child))
-          .map((child) =>
-            currentRoutes.find((item) => item.name === child.name)
-          )
-          .filter(Boolean)
-          .filter((child) => isRouteValid(child));
+        // @ts-ignore
+        route.children = sortBy(
+          route.children
+            .flatMap((child) => flattenRoutes(child))
+            .map((child) =>
+              currentRoutes.find((item) => item.name === child.name)
+            )
+            .filter(Boolean)
+            .filter((child) => isRouteValid(child)),
+          [
+            (route: RouteRecordRaw) => !route.meta?.core,
+            (route: RouteRecordRaw) => route.meta?.menu?.priority || 0,
+          ]
+        );
       }
     });
 
@@ -84,9 +93,10 @@ export function useRouteMenuGenerator(
       const group = acc.find((item) => item.id === menu.group);
       const childRoute = route.children;
 
-      const menuChildren = childRoute.map((child) => {
+      // @ts-ignore
+      const menuChildren: MenuItemType[] = childRoute.map((child) => {
         return {
-          name: child.meta.menu.name,
+          name: child.meta?.menu?.name,
           path: child.path,
           icon: child.meta?.menu?.icon,
           mobile: child.meta?.menu?.mobile,

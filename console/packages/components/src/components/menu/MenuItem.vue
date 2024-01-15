@@ -122,4 +122,8 @@ function handleClick() {
   transform: translateY(-10px);
   opacity: 0;
 }
+
+.sub-menu-items {
+  @apply pl-5;
+}
 </style>
