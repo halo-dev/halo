@@ -1,6 +1,6 @@
 import { findParentNode } from "@/tiptap/vue-3";
 import { Node, CellSelection, TableMap } from "@/tiptap/pm";
-import type { Selection, Transaction } from "@/tiptap/pm";
+import type { EditorState, Selection, Transaction } from "@/tiptap/pm";
 
 export const selectTable = (tr: Transaction) => {
   const table = findTable(tr.selection);
@@ -235,4 +235,18 @@ export const isTableSelected = (selection: any) => {
   }
 
   return false;
+};
+
+export const hasTableBefore = (editorState: EditorState) => {
+  const { $anchor } = editorState.selection;
+
+  const previousNodePos = Math.max(0, $anchor.pos - 2);
+
+  const previousNode = editorState.doc.resolve(previousNodePos).node();
+
+  if (!previousNode || !(previousNode.type.name === "table")) {
+    return false;
+  }
+
+  return true;
 };

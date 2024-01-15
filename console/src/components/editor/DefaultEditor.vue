@@ -48,6 +48,7 @@ import {
   Plugin,
   PluginKey,
   DecorationSet,
+  ExtensionListKeymap,
 } from "@halo-dev/richtext-editor";
 import {
   IconCalendar,
@@ -318,6 +319,7 @@ onMounted(() => {
           ];
         },
       }),
+      ExtensionListKeymap,
     ],
     autofocus: "start",
     onUpdate: () => {

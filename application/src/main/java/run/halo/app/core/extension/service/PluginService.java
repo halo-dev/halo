@@ -38,7 +38,6 @@ public interface PluginService {
      * @return an updated plugin reloaded from plugin path
      * @throws ServerWebInputException if plugin not found by the given name
      * @see Plugin.PluginSpec#setEnabled(Boolean)
-     * @see run.halo.app.plugin.HaloPluginManager#reloadPlugin(String)
      */
     Mono<Plugin> reload(String name);
 

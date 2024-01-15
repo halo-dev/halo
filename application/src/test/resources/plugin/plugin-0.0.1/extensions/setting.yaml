@@ -1,0 +1,6 @@
+apiVersion: v1alpha1
+kind: Setting
+metadata:
+  name: fake-setting
+spec:
+  forms: [ ]

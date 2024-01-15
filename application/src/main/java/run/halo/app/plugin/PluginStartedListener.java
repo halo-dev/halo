@@ -1,17 +1,18 @@
 package run.halo.app.plugin;
 
+import static run.halo.app.plugin.PluginConst.PLUGIN_NAME_LABEL_NAME;
+import static run.halo.app.plugin.PluginExtensionLoaderUtils.isSetting;
 import static run.halo.app.plugin.PluginExtensionLoaderUtils.lookupExtensions;
 
 import java.util.HashMap;
-import org.pf4j.PluginWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
-import org.springframework.core.io.DefaultResourceLoader;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.Unstructured;
 import run.halo.app.infra.utils.YamlUnstructuredLoader;
 import run.halo.app.plugin.event.HaloPluginStartedEvent;
 
@@ -21,6 +22,7 @@ import run.halo.app.plugin.event.HaloPluginStartedEvent;
  * @author guqing
  * @since 2.0.0
  */
+@Slf4j
 @Component
 public class PluginStartedListener {
 
@@ -30,46 +32,48 @@ public class PluginStartedListener {
         this.client = extensionClient;
     }
 
+    private Mono<Unstructured> createOrUpdate(Unstructured unstructured) {
+        var name = unstructured.getMetadata().getName();
+        return client.fetch(unstructured.groupVersionKind(), name)
+            .doOnNext(old -> {
+                unstructured.getMetadata().setVersion(old.getMetadata().getVersion());
+            })
+            .flatMap(client::update)
+            .switchIfEmpty(Mono.defer(() -> client.create(unstructured)));
+    }
+
     @EventListener
     public Mono<Void> onApplicationEvent(HaloPluginStartedEvent event) {
-        PluginWrapper pluginWrapper = event.getPlugin();
-        var resourceLoader =
-            new DefaultResourceLoader(pluginWrapper.getPluginClassLoader());
+        var pluginWrapper = event.getPlugin();
         var pluginApplicationContext = ExtensionContextRegistry.getInstance()
             .getByPluginId(pluginWrapper.getPluginId());
-        return client.get(Plugin.class, pluginWrapper.getPluginId())
-            .zipWith(Mono.just(
-                lookupExtensions(pluginWrapper.getPluginPath(), pluginWrapper.getRuntimeMode())))
-            .flatMap(tuple2 -> {
-                var plugin = tuple2.getT1();
-                var extensionLocations = tuple2.getT2();
-                return Flux.fromIterable(extensionLocations)
-                    .map(resourceLoader::getResource)
-                    .filter(Resource::exists)
-                    .map(resource -> new YamlUnstructuredLoader(resource).load())
-                    .flatMapIterable(rs -> rs)
-                    .flatMap(unstructured -> {
-                        var metadata = unstructured.getMetadata();
-                        // collector plugin initialize extension resources
-                        pluginApplicationContext.addExtensionMapping(
-                            unstructured.groupVersionKind(),
-                            metadata.getName());
-                        var labels = metadata.getLabels();
-                        if (labels == null) {
-                            labels = new HashMap<>();
-                        }
-                        labels.put(PluginConst.PLUGIN_NAME_LABEL_NAME,
-                            plugin.getMetadata().getName());
-                        metadata.setLabels(labels);
 
-                        return client.fetch(unstructured.groupVersionKind(), metadata.getName())
-                            .flatMap(extension -> {
-                                unstructured.getMetadata()
-                                    .setVersion(extension.getMetadata().getVersion());
-                                return client.update(unstructured);
-                            })
-                            .switchIfEmpty(Mono.defer(() -> client.create(unstructured)));
-                    }).then();
-            }).then();
+        var pluginName = pluginWrapper.getPluginId();
+
+        return client.get(Plugin.class, pluginName)
+            .flatMap(plugin -> Flux.fromStream(
+                    () -> {
+                        log.debug("Collecting extensions for plugin {}", pluginName);
+                        var resources = lookupExtensions(pluginWrapper.getPluginClassLoader());
+                        var loader = new YamlUnstructuredLoader(resources);
+                        var settingName = plugin.getSpec().getSettingName();
+                        // TODO The load method may be over memory consumption.
+                        return loader.load()
+                            .stream()
+                            .filter(isSetting(settingName).negate());
+                    })
+                .doOnNext(unstructured -> {
+                    var name = unstructured.getMetadata().getName();
+                    pluginApplicationContext
+                        .addExtensionMapping(unstructured.groupVersionKind(), name);
+                    var labels = unstructured.getMetadata().getLabels();
+                    if (labels == null) {
+                        labels = new HashMap<>();
+                        unstructured.getMetadata().setLabels(labels);
+                    }
+                    labels.put(PLUGIN_NAME_LABEL_NAME, plugin.getMetadata().getName());
+                })
+                .flatMap(this::createOrUpdate)
+                .then());
     }
 }

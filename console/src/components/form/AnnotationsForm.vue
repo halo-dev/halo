@@ -9,7 +9,7 @@ import {
 import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { apiClient } from "@/utils/api-client";
 import type { AnnotationSetting } from "@halo-dev/api-client";
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 import { getValidationMessages } from "@formkit/validation";
 import { useThemeStore } from "@console/stores/theme";
 import { randomUUID } from "@/utils/id";

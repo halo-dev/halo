@@ -97,8 +97,10 @@ public class SpringExtensionFactory implements ExtensionFactory {
                     () -> new IllegalArgumentException("Extension class '" + nameOf(extensionClass)
                         + "' must have at least one public constructor."));
         try {
-            log.debug("Instantiate '" + nameOf(extensionClass) + "' by calling '" + constructor
-                + "'with standard Java reflection.");
+            if (log.isTraceEnabled()) {
+                log.trace("Instantiate '" + nameOf(extensionClass) + "' by calling '" + constructor
+                    + "'with standard Java reflection.");
+            }
             // Creating the instance by calling the constructor with null-parameters (if there
             // are any).
             return (T) constructor.newInstance(nullParameters(constructor));
@@ -139,19 +141,25 @@ public class SpringExtensionFactory implements ExtensionFactory {
             .map(plugin -> {
                 var pluginName = plugin.getContext().getName();
                 if (this.pluginManager instanceof HaloPluginManager haloPluginManager) {
-                    log.debug("  Extension class ' " + nameOf(extensionClass)
-                        + "' belongs to a non halo-plugin (or main application)"
-                        + " '" + nameOf(plugin)
-                        + ", but the used Halo plugin-manager is a spring-plugin-manager. Therefore"
-                        + " the extension class will be autowired by using the managers "
-                        + "application "
-                        + "contexts");
+                    if (log.isTraceEnabled()) {
+                        log.trace("  Extension class ' " + nameOf(extensionClass)
+                            + "' belongs to a non halo-plugin (or main application)"
+                            + " '" + nameOf(plugin)
+                            + ", but the used Halo plugin-manager is a spring-plugin-manager. "
+                            + "Therefore"
+                            + " the extension class will be autowired by using the managers "
+                            + "application "
+                            + "contexts");
+                    }
                     return haloPluginManager.getPluginApplicationContext(pluginName);
                 }
-                log.debug(
-                    "  Extension class ' " + nameOf(extensionClass) + "' belongs to halo-plugin '"
-                        + nameOf(plugin)
-                        + "' and will be autowired by using its application context.");
+                if (log.isTraceEnabled()) {
+                    log.trace(
+                        "  Extension class ' " + nameOf(extensionClass)
+                            + "' belongs to halo-plugin '"
+                            + nameOf(plugin)
+                            + "' and will be autowired by using its application context.");
+                }
                 return ExtensionContextRegistry.getInstance().getByPluginId(pluginName);
             });
     }

@@ -1,60 +1,61 @@
 package run.halo.app.core.extension.reconciler;
 
-import static java.util.Objects.requireNonNull;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static run.halo.app.core.extension.reconciler.PluginReconciler.initialReverseProxyName;
+import static run.halo.app.plugin.PluginConst.PLUGIN_PATH;
+import static run.halo.app.plugin.PluginConst.RELOAD_ANNO;
+import static run.halo.app.plugin.PluginConst.RUNTIME_MODE_ANNO;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import org.json.JSONException;
-import org.junit.jupiter.api.Assertions;
+import java.util.Set;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.Answer;
-import org.pf4j.PluginDescriptor;
+import org.pf4j.PluginManager;
 import org.pf4j.PluginState;
 import org.pf4j.PluginWrapper;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.springframework.context.ApplicationEventPublisher;
+import org.pf4j.RuntimeMode;
+import org.springframework.core.io.DefaultResourceLoader;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.ReverseProxy;
+import run.halo.app.core.extension.Setting;
+import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
-import run.halo.app.infra.utils.FileUtils;
-import run.halo.app.infra.utils.JsonUtils;
-import run.halo.app.plugin.HaloPluginManager;
-import run.halo.app.plugin.HaloPluginWrapper;
-import run.halo.app.plugin.PluginConst;
-import run.halo.app.plugin.PluginStartingError;
+import run.halo.app.extension.controller.Reconciler.Request;
+import run.halo.app.extension.controller.RequeueException;
+import run.halo.app.infra.ConditionStatus;
+import run.halo.app.plugin.PluginProperties;
 
 /**
  * Tests for {@link PluginReconciler}.
@@ -66,572 +67,514 @@ import run.halo.app.plugin.PluginStartingError;
 class PluginReconcilerTest {
 
     @Mock
-    HaloPluginManager haloPluginManager;
+    PluginManager pluginManager;
 
     @Mock
-    ExtensionClient extensionClient;
+    ExtensionClient client;
 
     @Mock
-    HaloPluginWrapper pluginWrapper;
+    PluginProperties pluginProperties;
 
-    @Mock
-    ApplicationEventPublisher eventPublisher;
+    @InjectMocks
+    PluginReconciler reconciler;
 
-    PluginReconciler pluginReconciler;
+    Clock clock = Clock.fixed(Instant.parse("2024-01-09T12:00:00Z"), ZoneOffset.UTC);
+
+    String finalizer = "plugin-protection";
+    String name = "fake-plugin";
+
+    String reverseProxyName = "fake-plugin-system-generated-reverse-proxy";
+
+    String settingName = "fake-setting";
+
+    String configMapName = "fake-configmap";
 
     @BeforeEach
     void setUp() {
-        pluginReconciler = new PluginReconciler(extensionClient, haloPluginManager, eventPublisher);
-        lenient().when(haloPluginManager.getPluginsRoot()).thenReturn(Paths.get("plugins"));
-        lenient().when(haloPluginManager.validatePluginVersion(any())).thenReturn(true);
-        lenient().when(haloPluginManager.getSystemVersion()).thenReturn("0.0.0");
-        lenient().when(haloPluginManager.getPlugin(any())).thenReturn(pluginWrapper);
-        lenient().when(haloPluginManager.getUnresolvedPlugins()).thenReturn(List.of());
+        reconciler.setClock(clock);
     }
 
     @Test
-    @DisplayName("Reconcile to start successfully")
-    void reconcileOkWhenPluginManagerStartSuccessfully() {
-        Plugin plugin = need2ReconcileForStartupState();
-        when(pluginWrapper.getPluginState()).thenReturn(PluginState.STOPPED);
-        var pluginDescriptor = mock(PluginDescriptor.class);
-        when(pluginWrapper.getDescriptor()).thenReturn(pluginDescriptor);
-        when(pluginDescriptor.getVersion()).thenReturn("1.0.0");
-
-        when(extensionClient.fetch(eq(Plugin.class), eq("apples"))).thenReturn(Optional.of(plugin));
-        when(haloPluginManager.startPlugin(any())).thenAnswer((Answer<PluginState>) invocation -> {
-            // mock plugin real state is started
-            when(pluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
-            return PluginState.STARTED;
-        });
-
-        ArgumentCaptor<Plugin> pluginCaptor = doReconcileWithoutRequeue();
-        verify(extensionClient, times(3)).update(isA(Plugin.class));
-
-        Plugin updateArgs = pluginCaptor.getAllValues().get(1);
-        assertThat(updateArgs).isNotNull();
-        assertThat(updateArgs.getSpec().getEnabled()).isTrue();
-        assertThat(updateArgs.getStatus().getPhase()).isEqualTo(PluginState.STARTED);
-        assertThat(updateArgs.getStatus().getLastStartTime()).isNotNull();
-    }
-
-    @Test
-    @DisplayName("Reconcile to start failed")
-    void reconcileOkWhenPluginManagerStartFailed() {
-        Plugin plugin = need2ReconcileForStartupState();
-
-        // mock start plugin failed
-        when(extensionClient.fetch(eq(Plugin.class), eq("apples"))).thenReturn(Optional.of(plugin));
-        when(haloPluginManager.startPlugin(any())).thenReturn(PluginState.FAILED);
-
-        // mock plugin real state is started
-        when(pluginWrapper.getPluginState()).thenReturn(PluginState.STOPPED);
-        var pluginDescriptor = mock(PluginDescriptor.class);
-
-        PluginStartingError pluginStartingError =
-            PluginStartingError.of("apples", "error message", "dev message");
-        when(haloPluginManager.getPluginStartingError(any())).thenReturn(pluginStartingError);
-
-        assertThatThrownBy(() -> {
-            ArgumentCaptor<Plugin> pluginCaptor = doReconcileNeedRequeue();
-
-            // Verify the state before the update plugin
-            Plugin updateArgs = pluginCaptor.getValue();
-            assertThat(updateArgs).isNotNull();
-            assertThat(updateArgs.getSpec().getEnabled()).isTrue();
-
-            Plugin.PluginStatus status = updateArgs.getStatus();
-            assertThat(status.getPhase()).isEqualTo(PluginState.FAILED);
-            assertThat(status.getConditions().peek().getReason()).isEqualTo("error message");
-            assertThat(status.getConditions().peek().getMessage()).isEqualTo("dev message");
-            assertThat(status.getLastStartTime()).isNull();
-        }).isInstanceOf(IllegalStateException.class)
-            .hasMessage("error message");
-
-    }
-
-    @Test
-    @DisplayName("Reconcile to stop successfully")
-    void shouldReconcileStopWhenEnabledIsFalseAndPhaseIsStarted() {
-        Plugin plugin = need2ReconcileForStopState();
-        when(extensionClient.fetch(eq(Plugin.class), eq("apples"))).thenReturn(Optional.of(plugin));
-        when(haloPluginManager.stopPlugin(any())).thenAnswer((Answer<PluginState>) invocation -> {
-            when(pluginWrapper.getPluginState()).thenReturn(PluginState.STOPPED);
-            return PluginState.STOPPED;
-        });
-        // mock plugin real state is started
-        when(pluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
-
-        ArgumentCaptor<Plugin> pluginCaptor = doReconcileWithoutRequeue();
-        verify(extensionClient, times(3)).update(any(Plugin.class));
-
-        Plugin updateArgs = pluginCaptor.getValue();
-        assertThat(updateArgs).isNotNull();
-        assertThat(updateArgs.getSpec().getEnabled()).isFalse();
-        assertThat(updateArgs.getStatus().getPhase()).isEqualTo(PluginState.STOPPED);
-    }
-
-    @Test
-    @DisplayName("Reconcile to stop successfully when 'spec.enabled' is inconsistent"
-        + " with 'status.phase'")
-    void shouldReconcileStopWhenEnabledIsFalseAndPhaseIsStopped() {
-        // 模拟插件的实际状态与status.phase记录的状态不一致
-        Plugin plugin = JsonUtils.jsonToObject("""
-            {
-                "apiVersion": "plugin.halo.run/v1alpha1",
-                "kind": "Plugin",
-                "metadata": {
-                    "name": "apples"
-                },
-                 "spec": {
-                    "displayName": "测试插件",
-                    "enabled": false
-                },
-                "status": {
-                    "phase": "STOPPED",
-                    "loadLocation": "/tmp/plugins/apples.jar"
-                }
-            }
-            """, Plugin.class);
-        when(extensionClient.fetch(eq(Plugin.class), eq("apples"))).thenReturn(Optional.of(plugin));
-        when(haloPluginManager.stopPlugin(any())).thenAnswer((Answer<PluginState>) invocation -> {
-            when(pluginWrapper.getPluginState()).thenReturn(PluginState.STOPPED);
-            return PluginState.STOPPED;
-        });
-        // mock plugin real state is started
-        when(pluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
-
-        ArgumentCaptor<Plugin> pluginCaptor = doReconcileWithoutRequeue();
-        verify(extensionClient, times(4)).update(any(Plugin.class));
-
-        Plugin updateArgs = pluginCaptor.getValue();
-        assertThat(updateArgs).isNotNull();
-        assertThat(updateArgs.getSpec().getEnabled()).isFalse();
-        assertThat(updateArgs.getStatus().getPhase()).isEqualTo(PluginState.STOPPED);
-    }
-
-    @Test
-    @DisplayName("Reconcile to stop failed")
-    void shouldReconcileStopWhenEnabledIsFalseAndPhaseIsStartedButStopFailed() {
-        Plugin plugin = need2ReconcileForStopState();
-        when(extensionClient.fetch(eq(Plugin.class), eq("apples"))).thenReturn(Optional.of(plugin));
-        // mock stop failed
-        when(haloPluginManager.stopPlugin(any())).thenReturn(PluginState.FAILED);
-
-        // mock plugin real state is started
-        when(pluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
-
-        assertThatThrownBy(() -> {
-            ArgumentCaptor<Plugin> pluginCaptor = doReconcileNeedRequeue();
-
-            Plugin updateArgs = pluginCaptor.getValue();
-            assertThat(updateArgs).isNotNull();
-            assertThat(updateArgs.getSpec().getEnabled()).isFalse();
-
-            Plugin.PluginStatus status = updateArgs.getStatus();
-            assertThat(status.getPhase()).isEqualTo(PluginState.FAILED);
-        }).isInstanceOf(IllegalStateException.class)
-            .hasMessage("Failed to stop plugin: apples");
-    }
-
-    @Test
-    void recreateDefaultReverseProxyWhenNotExistAndLogoIsPath() throws JSONException {
-        Plugin plugin = need2ReconcileForStopState();
-        String reverseProxyName = initialReverseProxyName(plugin.getMetadata().getName());
-        when(extensionClient.fetch(eq(ReverseProxy.class), eq(reverseProxyName)))
-            .thenReturn(Optional.empty());
-
-        plugin.getSpec().setLogo("/logo.png");
-        pluginReconciler.recreateDefaultReverseProxy(plugin);
-        ArgumentCaptor<ReverseProxy> captor = ArgumentCaptor.forClass(ReverseProxy.class);
-        verify(extensionClient, times(1)).create(captor.capture());
-        ReverseProxy value = captor.getValue();
-        JSONAssert.assertEquals("""
-                {
-                    "rules": [
-                        {
-                            "path": "/logo.png",
-                            "file": {
-                                "filename": "/logo.png"
-                            }
-                        }
-                    ],
-                    "apiVersion": "plugin.halo.run/v1alpha1",
-                    "kind": "ReverseProxy",
-                    "metadata": {
-                        "name": "apples-system-generated-reverse-proxy",
-                        "labels": {
-                            "plugin.halo.run/plugin-name": "apples"
-                        }
-                    }
-                }
-                """,
-            JsonUtils.objectToJson(value),
-            true);
-    }
-
-    @Test
-    void recreateDefaultReverseProxyWhenNotExistAndLogoIsAbsolute() {
-        Plugin plugin = need2ReconcileForStopState();
-        String reverseProxyName = initialReverseProxyName(plugin.getMetadata().getName());
-        when(extensionClient.fetch(eq(ReverseProxy.class), eq(reverseProxyName)))
-            .thenReturn(Optional.empty());
-
-        plugin.getSpec().setLogo("http://example.com/logo");
-        pluginReconciler.recreateDefaultReverseProxy(plugin);
-        ArgumentCaptor<ReverseProxy> captor = ArgumentCaptor.forClass(ReverseProxy.class);
-        verify(extensionClient, times(1)).create(captor.capture());
-        ReverseProxy value = captor.getValue();
-        assertThat(value.getRules()).isEmpty();
-    }
-
-    @Test
-    void recreateDefaultReverseProxyWhenExist() {
-        Plugin plugin = need2ReconcileForStopState();
-        plugin.getSpec().setLogo("/logo.png");
-
-        String reverseProxyName = initialReverseProxyName(plugin.getMetadata().getName());
-        ReverseProxy reverseProxy = new ReverseProxy();
-        reverseProxy.setMetadata(new Metadata());
-        reverseProxy.getMetadata().setName(reverseProxyName);
-        reverseProxy.setRules(new ArrayList<>());
-
-        when(extensionClient.fetch(eq(ReverseProxy.class), eq(reverseProxyName)))
-            .thenReturn(Optional.of(reverseProxy));
-
-        pluginReconciler.recreateDefaultReverseProxy(plugin);
-        verify(extensionClient).update(any());
+    void shouldNotRequeueIfPluginNotFound() {
+        when(client.fetch(Plugin.class, "fake-plugin")).thenReturn(Optional.empty());
+        var result = reconciler.reconcile(new Request("fake-plugin"));
+        assertFalse(result.reEnqueue());
+        verify(client).fetch(Plugin.class, "fake-plugin");
     }
 
     @Nested
-    class PluginLogoTest {
+    class WhenNotDeleting {
+
+        @TempDir
+        Path tempPath;
 
         @Test
-        void absoluteUri() {
-            Plugin plugin = new Plugin();
-            plugin.setSpec(new Plugin.PluginSpec());
-            plugin.getSpec().setLogo("https://example.com/logo.png");
-            plugin.getSpec().setVersion("1.0.0");
-            String logo = pluginReconciler.generateAccessibleLogoUrl(plugin);
-            assertThat(logo).isEqualTo("https://example.com/logo.png");
+        void shouldNotStartPluginWithDevModeInNonDevEnv() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var spec = plugin.getSpec();
+                spec.setVersion("1.2.3");
+                spec.setLogo("fake-logo.svg");
+                spec.setEnabled(true);
+                plugin.getMetadata()
+                    .setAnnotations(new HashMap<>(Map.of(RUNTIME_MODE_ANNO, "dev",
+                        PLUGIN_PATH, "fake-path")));
+            });
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+
+            var t = assertThrows(IllegalStateException.class,
+                () -> reconciler.reconcile(new Request(name)));
+            assertEquals(
+                "Cannot run the plugin fake-plugin with dev mode in non-development environment.",
+                t.getMessage());
+            verify(client).fetch(Plugin.class, name);
+            verify(pluginProperties).getRuntimeMode();
+            verify(pluginManager, never()).loadPlugin(any(Path.class));
+            verify(pluginManager, never()).startPlugin(name);
         }
 
         @Test
-        void absoluteUriWithQueryParam() {
-            Plugin plugin = new Plugin();
-            plugin.setSpec(new Plugin.PluginSpec());
-            plugin.getSpec().setLogo("https://example.com/logo.png?hello=world");
-            plugin.getSpec().setVersion("1.0.0");
-            assertThat(pluginReconciler.generateAccessibleLogoUrl(plugin))
-                .isEqualTo("https://example.com/logo.png?hello=world");
+        void shouldStartInDevMode() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var spec = plugin.getSpec();
+                spec.setVersion("1.2.3");
+                spec.setLogo("fake-logo.svg");
+                spec.setEnabled(true);
+                plugin.getMetadata()
+                    .setAnnotations(new HashMap<>(Map.of(RUNTIME_MODE_ANNO, "dev",
+                        PLUGIN_PATH, "fake-path")));
+            });
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(pluginManager.getPlugin(name))
+                .thenReturn(null)
+                .thenReturn(mockPluginWrapper(PluginState.RESOLVED));
+
+            when(pluginManager.startPlugin(name)).thenReturn(PluginState.STARTED);
+            when(pluginProperties.getRuntimeMode()).thenReturn(RuntimeMode.DEVELOPMENT);
+
+            var result = reconciler.reconcile(new Request(name));
+            assertFalse(result.reEnqueue());
+            assertEquals(Paths.get("fake-path").toUri(), fakePlugin.getStatus().getLoadLocation());
+
+            verify(pluginManager).startPlugin(name);
         }
 
         @Test
-        void logoIsNull() {
-            Plugin plugin = new Plugin();
-            plugin.setSpec(new Plugin.PluginSpec());
-            plugin.getSpec().setLogo(null);
-            plugin.getSpec().setVersion("1.0.0");
-            assertThat(pluginReconciler.generateAccessibleLogoUrl(plugin)).isNull();
+        void shouldThrowExceptionIfNoPluginPathProvidedInDevMode() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var spec = plugin.getSpec();
+                spec.setVersion("1.2.3");
+                spec.setLogo("fake-logo.svg");
+                spec.setEnabled(true);
+                plugin.getMetadata()
+                    .setAnnotations(new HashMap<>(Map.of(RUNTIME_MODE_ANNO, "dev")));
+            });
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(pluginManager.getPlugin(name))
+                // loading plugin
+                .thenReturn(null);
+            when(pluginProperties.getRuntimeMode()).thenReturn(RuntimeMode.DEVELOPMENT);
+
+            var gotException = assertThrows(IllegalArgumentException.class,
+                () -> reconciler.reconcile(new Request(name)));
+
+            assertEquals("""
+                Please set plugin path annotation "plugin.halo.run/runtime-mode" in development \
+                mode for plugin fake-plugin.""", gotException.getMessage());
         }
 
         @Test
-        void logoIsEmpty() {
-            Plugin plugin = new Plugin();
-            plugin.setSpec(new Plugin.PluginSpec());
-            plugin.getSpec().setLogo("");
-            plugin.getSpec().setVersion("1.0.0");
-            assertThat(pluginReconciler.generateAccessibleLogoUrl(plugin)).isNull();
+        void shouldUnloadIfFailedToLoad() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var spec = plugin.getSpec();
+                spec.setVersion("1.2.3");
+                spec.setLogo("fake-logo.svg");
+                spec.setEnabled(true);
+            });
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
+            when(pluginManager.getPlugin(name))
+                // before loading
+                .thenReturn(null)
+                .thenReturn(mock(PluginWrapper.class))
+            ;
+            var expectException = mock(RuntimeException.class);
+            when(expectException.getMessage()).thenReturn("Something went wrong.");
+            doThrow(expectException).when(pluginManager).loadPlugin(any(Path.class));
+
+            var gotException = assertThrows(RuntimeException.class,
+                () -> reconciler.reconcile(new Request(name)));
+
+            assertEquals(expectException, gotException);
+            var condition = fakePlugin.getStatus().getConditions().peek();
+            assertEquals("FAILED", condition.getType());
+            assertEquals(ConditionStatus.FALSE, condition.getStatus());
+            assertEquals("UnexpectedState", condition.getReason());
+            assertEquals(expectException.getMessage(), condition.getMessage());
+            assertEquals(clock.instant(), condition.getLastTransitionTime());
+            verify(pluginManager, times(3)).getPlugin(name);
+            verify(pluginManager).loadPlugin(any(Path.class));
+            verify(pluginManager).unloadPlugin(name);
         }
 
         @Test
-        void relativePath() {
-            Plugin plugin = new Plugin();
-            plugin.setSpec(new Plugin.PluginSpec());
-            plugin.setMetadata(new Metadata());
-            plugin.getMetadata().setName("fake-plugin");
-            plugin.getSpec().setLogo("/static/logo.jpg");
-            plugin.getSpec().setVersion("1.0.0");
-            assertThat(pluginReconciler.generateAccessibleLogoUrl(plugin))
-                .isEqualTo("/plugins/fake-plugin/assets/static/logo.jpg?version=1.0.0");
+        void shouldReloadIfReloadAnnotationPresent() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var spec = plugin.getSpec();
+                spec.setVersion("1.2.3");
+                spec.setLogo("fake-logo.svg");
+                spec.setEnabled(true);
+                plugin.getMetadata().setAnnotations(new HashMap<>(Map.of(RELOAD_ANNO, "true")));
+            });
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
+            when(pluginManager.getPlugin(name)).thenReturn(mock(PluginWrapper.class));
+            when(pluginManager.unloadPlugin(name)).thenReturn(true);
+            when(pluginManager.startPlugin(name)).thenReturn(PluginState.STARTED);
+
+            var result = reconciler.reconcile(new Request(name));
+            assertFalse(result.reEnqueue());
+
+            verify(pluginManager).unloadPlugin(name);
+            var loadLocation = Paths.get(fakePlugin.getStatus().getLoadLocation());
+            verify(pluginManager).loadPlugin(loadLocation);
         }
 
         @Test
-        void dataBlob() {
-            Plugin plugin = new Plugin();
-            plugin.setSpec(new Plugin.PluginSpec());
-            plugin.setMetadata(new Metadata());
-            plugin.getMetadata().setName("fake-plugin");
-            plugin.getSpec().setLogo("data:image/gif;base64,R0lGODfake");
-            plugin.getSpec().setVersion("2.0.0");
-            assertThat(pluginReconciler.generateAccessibleLogoUrl(plugin))
-                .isEqualTo("data:image/gif;base64,R0lGODfake");
+        void shouldReportIfFailedToStartPlugin() throws IOException {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var spec = plugin.getSpec();
+                spec.setVersion("1.2.3");
+                spec.setLogo("fake-logo.svg");
+                spec.setEnabled(true);
+                spec.setSettingName(settingName);
+                spec.setConfigMapName(configMapName);
+            });
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
+            when(pluginManager.getPlugin(name))
+                // loading plugin
+                .thenReturn(null)
+                // get setting extension
+                .thenReturn(mockPluginWrapperForSetting())
+                .thenReturn(mockPluginWrapperForStaticResources())
+                // before starting
+                .thenReturn(mockPluginWrapper(PluginState.RESOLVED))
+                // sync plugin state
+                .thenReturn(mockPluginWrapper(PluginState.STARTED));
+            when(pluginManager.startPlugin(name)).thenReturn(PluginState.FAILED);
+
+            var e = assertThrows(IllegalStateException.class,
+                () -> reconciler.reconcile(new Request(name)));
+            assertEquals("Failed to start plugin fake-plugin", e.getMessage());
         }
-    }
 
-    @Test
-    void resolvePluginPathAnnotation() {
-        var pluginRoot = Paths.get("tmp", "plugins");
-        when(haloPluginManager.getPluginsRoot()).thenReturn(pluginRoot);
-        var path = pluginReconciler.resolvePluginPathForAnno(
-            pluginRoot.resolve("sitemap-1.0.jar").toString());
-        assertThat(path).isEqualTo("sitemap-1.0.jar");
+        @Test
+        void shouldEnablePluginIfEnabled() throws IOException {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var spec = plugin.getSpec();
+                spec.setVersion("1.2.3");
+                spec.setLogo("fake-logo.svg");
+                spec.setEnabled(true);
+                spec.setSettingName(settingName);
+                spec.setConfigMapName(configMapName);
+            });
 
-        var givenPath = Paths.get("abc", "plugins", "sitemap-1.0.jar");
-        path = pluginReconciler.resolvePluginPathForAnno(givenPath.toString());
-        assertThat(path).isEqualTo(givenPath.toString());
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
+            when(pluginManager.getPlugin(name))
+                // loading plugin
+                .thenReturn(null)
+                // get setting extension
+                .thenReturn(mockPluginWrapperForSetting())
+                .thenReturn(mockPluginWrapperForStaticResources())
+                // before starting
+                .thenReturn(mockPluginWrapper(PluginState.RESOLVED))
+                // sync plugin state
+                .thenReturn(mockPluginWrapper(PluginState.STARTED));
+            when(pluginManager.startPlugin(name)).thenReturn(PluginState.STARTED);
+
+            var result = reconciler.reconcile(new Request(name));
+
+            assertFalse(result.reEnqueue());
+            assertTrue(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
+
+            assertEquals("fake-plugin-1.2.3.jar",
+                fakePlugin.getMetadata().getAnnotations().get(PLUGIN_PATH));
+            var loadLocation = Paths.get(fakePlugin.getStatus().getLoadLocation());
+            assertEquals(tempPath.resolve("fake-plugin-1.2.3.jar"), loadLocation);
+            assertEquals("/plugins/fake-plugin/assets/fake-logo.svg?version=1.2.3",
+                fakePlugin.getStatus().getLogo());
+            assertEquals("/plugins/fake-plugin/assets/console/main.js?version=1.2.3",
+                fakePlugin.getStatus().getEntry());
+            assertEquals("/plugins/fake-plugin/assets/console/style.css?version=1.2.3",
+                fakePlugin.getStatus().getStylesheet());
+            assertEquals(Plugin.Phase.STARTED, fakePlugin.getStatus().getPhase());
+            assertEquals(PluginState.STARTED, fakePlugin.getStatus().getLastProbeState());
+            assertNotNull(fakePlugin.getStatus().getLastStartTime());
+
+            var condition = fakePlugin.getStatus().getConditions().peek();
+            assertEquals("STARTED", condition.getType());
+            assertEquals(ConditionStatus.TRUE, condition.getStatus());
+            assertEquals(clock.instant(), condition.getLastTransitionTime());
+
+            verify(pluginManager).startPlugin(name);
+            verify(pluginManager).loadPlugin(loadLocation);
+            verify(pluginManager, times(5)).getPlugin(name);
+            verify(client).update(fakePlugin);
+            verify(client).fetch(Setting.class, settingName);
+            verify(client).create(any(Setting.class));
+            verify(client).fetch(ConfigMap.class, configMapName);
+            verify(client).create(any(ConfigMap.class));
+            verify(client).fetch(ReverseProxy.class, reverseProxyName);
+            verify(client).create(any(ReverseProxy.class));
+        }
+
+        @Test
+        void shouldDisablePluginIfDisabled() throws IOException {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var spec = plugin.getSpec();
+                spec.setVersion("1.2.3");
+                spec.setLogo("fake-logo.svg");
+                spec.setEnabled(false);
+                spec.setSettingName(settingName);
+                spec.setConfigMapName(configMapName);
+            });
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(pluginManager.getPluginsRoots()).thenReturn(List.of(tempPath));
+
+            when(pluginManager.getPlugin(name))
+                // loading plugin
+                .thenReturn(null)
+                // get setting files.
+                .thenReturn(mockPluginWrapperForSetting())
+                // resolving static resources
+                .thenReturn(mockPluginWrapperForStaticResources())
+                // before disabling plugin
+                .thenReturn(mock(PluginWrapper.class))
+                // sync plugin state
+                .thenReturn(mockPluginWrapper(PluginState.DISABLED));
+
+            var result = reconciler.reconcile(new Request("fake-plugin"));
+
+            assertFalse(result.reEnqueue());
+            assertTrue(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
+
+            assertEquals("fake-plugin-1.2.3.jar",
+                fakePlugin.getMetadata().getAnnotations().get(PLUGIN_PATH));
+            var loadLocation = Paths.get(fakePlugin.getStatus().getLoadLocation());
+            assertEquals(tempPath.resolve("fake-plugin-1.2.3.jar"), loadLocation);
+            assertEquals("/plugins/fake-plugin/assets/fake-logo.svg?version=1.2.3",
+                fakePlugin.getStatus().getLogo());
+            assertEquals("/plugins/fake-plugin/assets/console/main.js?version=1.2.3",
+                fakePlugin.getStatus().getEntry());
+            assertEquals("/plugins/fake-plugin/assets/console/style.css?version=1.2.3",
+                fakePlugin.getStatus().getStylesheet());
+            assertEquals(Plugin.Phase.DISABLED, fakePlugin.getStatus().getPhase());
+            assertEquals(PluginState.DISABLED, fakePlugin.getStatus().getLastProbeState());
+
+            verify(pluginManager).disablePlugin(name);
+            verify(pluginManager).loadPlugin(loadLocation);
+            verify(pluginManager, times(5)).getPlugin(name);
+            verify(client).update(fakePlugin);
+            verify(client).fetch(Setting.class, settingName);
+            verify(client).create(any(Setting.class));
+            verify(client).fetch(ConfigMap.class, configMapName);
+            verify(client).create(any(ConfigMap.class));
+            verify(client).fetch(ReverseProxy.class, reverseProxyName);
+            verify(client).create(any(ReverseProxy.class));
+        }
+
+        PluginWrapper mockPluginWrapperForSetting() throws IOException {
+            var pluginWrapper = mock(PluginWrapper.class);
+
+            var pluginRootResource =
+                new DefaultResourceLoader().getResource("classpath:plugin/plugin-0.0.1/");
+            var classLoader = new URLClassLoader(new URL[]{pluginRootResource.getURL()}, null);
+            when(pluginWrapper.getPluginClassLoader()).thenReturn(classLoader);
+            return pluginWrapper;
+        }
+
+        PluginWrapper mockPluginWrapperForStaticResources() {
+            // check
+            var pluginWrapper = mock(PluginWrapper.class);
+            var pluginClassLoader = mock(ClassLoader.class);
+            when(pluginClassLoader.getResource("console/main.js")).thenReturn(
+                mock(URL.class));
+            when(pluginClassLoader.getResource("console/style.css")).thenReturn(
+                mock(URL.class));
+            when(pluginWrapper.getPluginClassLoader()).thenReturn(pluginClassLoader);
+            return pluginWrapper;
+        }
+
+        PluginWrapper mockPluginWrapper(PluginState state) {
+            var pluginWrapper = mock(PluginWrapper.class);
+            when(pluginWrapper.getPluginState()).thenReturn(state);
+            return pluginWrapper;
+        }
+
     }
 
     @Nested
-    class ReloadPluginTest {
-        private static final String PLUGIN_NAME = "fake-plugin";
-        private static final Path OLD_PLUGIN_PATH = Paths.get("/path/to/old/plugin.jar");
+    class WhenDeleting {
 
         @Test
-        void reload() throws IOException, URISyntaxException {
-            var fakePluginUri = requireNonNull(
-                getClass().getClassLoader().getResource("plugin/plugin-0.0.2")).toURI();
-            Path tempDirectory = Files.createTempDirectory("halo-ut-plugin-service-impl-");
-            final Path fakePluginPath = tempDirectory.resolve("plugin-0.0.2.jar");
-            try {
-                FileUtils.jar(Paths.get(fakePluginUri), tempDirectory.resolve("plugin-0.0.2.jar"));
-                when(haloPluginManager.getPluginsRoot()).thenReturn(tempDirectory);
-                // mock plugin
-                Plugin plugin = mock(Plugin.class);
-                Metadata metadata = new Metadata();
-                metadata.setName(PLUGIN_NAME);
-                when(plugin.getMetadata()).thenReturn(metadata);
-                metadata.setAnnotations(new HashMap<>());
-                metadata.getAnnotations()
-                    .put(PluginConst.RELOAD_ANNO, fakePluginPath.toString());
-                Plugin.PluginStatus pluginStatus = mock(Plugin.PluginStatus.class);
-                when(pluginStatus.getLoadLocation()).thenReturn(OLD_PLUGIN_PATH.toUri());
-                when(plugin.statusNonNull()).thenReturn(pluginStatus);
-
-                when(extensionClient.fetch(Plugin.class, PLUGIN_NAME))
-                    .thenReturn(Optional.of(plugin));
-
-                // call reload method
-                pluginReconciler.reload(plugin);
-
-                // verify that the plugin is updated with the new plugin's spec, annotations, and
-                // labels
-                verify(plugin).setSpec(any(Plugin.PluginSpec.class));
-                verify(extensionClient).update(plugin);
-
-                // verify that the plugin's load location is updated to the new plugin path
-                verify(pluginStatus).setLoadLocation(fakePluginPath.toUri());
-
-                // verify that the new plugin is reloaded
-                verify(haloPluginManager).reloadPluginWithPath(PLUGIN_NAME, fakePluginPath);
-            } finally {
-                FileUtils.deleteRecursivelyAndSilently(tempDirectory);
-            }
-        }
-
-        @Test
-        void shouldDeleteFile() throws IOException {
-            String newPluginPath = "/path/to/new/plugin.jar";
-
-            // Case 1: oldPluginLocation is null
-            assertFalse(pluginReconciler.shouldDeleteFile(newPluginPath, null));
-
-            // Case 2: oldPluginLocation is the same as newPluginPath
-            assertFalse(pluginReconciler.shouldDeleteFile(newPluginPath,
-                pluginReconciler.toUri(newPluginPath)));
-
-            Path tempDirectory = Files.createTempDirectory("halo-ut-plugin-service-impl-");
-            try {
-                Path oldPluginPath = tempDirectory.resolve("plugin.jar");
-                final URI oldPluginLocation = oldPluginPath.toUri();
-                Files.createFile(oldPluginPath);
-                // Case 3: oldPluginLocation is different from newPluginPath and is a JAR file
-                assertTrue(pluginReconciler.shouldDeleteFile(newPluginPath, oldPluginLocation));
-            } finally {
-                FileUtils.deleteRecursivelyAndSilently(tempDirectory);
-            }
-
-            // Case 4: oldPluginLocation is different from newPluginPath and is not a JAR file
-            assertFalse(pluginReconciler.shouldDeleteFile(newPluginPath,
-                Paths.get("/path/to/old/plugin.txt").toUri()));
-        }
-
-        @Test
-        void toPath() {
-            assertThat(pluginReconciler.toPath(null)).isNull();
-            assertThat(pluginReconciler.toPath("")).isNull();
-            assertThat(pluginReconciler.toPath(" ")).isNull();
-
-            final var filePath = Paths.get("path", "to", "file.txt").toAbsolutePath();
-
-            // test for file:///
-            assertEquals(filePath, pluginReconciler.toPath(filePath.toUri().toString()));
-            // test for absolute path /home/xyz or C:\Windows
-            assertEquals(filePath, pluginReconciler.toPath(filePath.toString()));
-
-            var exception = assertThrows(IllegalArgumentException.class, () -> {
-                var fileUri = filePath.toUri();
-                pluginReconciler.toPath(fileUri.toString().replaceFirst("file", "http"));
-            });
-            assertTrue(exception.getMessage().contains("not reside in the file system"));
-        }
-
-        @Test
-        void toUri() {
-            // Test with null pathString
-            Assertions.assertThrows(IllegalArgumentException.class, () -> {
-                pluginReconciler.toUri(null);
+        void shouldDoNothingWithoutFinalizer() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var metadata = plugin.getMetadata();
+                metadata.setDeletionTimestamp(clock.instant());
             });
 
-            // Test with empty pathString
-            Assertions.assertThrows(IllegalArgumentException.class, () -> {
-                pluginReconciler.toUri("");
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+
+            var result = reconciler.reconcile(new Request(name));
+            assertFalse(result.reEnqueue());
+            verify(client).fetch(Plugin.class, name);
+            verify(client, never()).update(fakePlugin);
+            verify(pluginManager, never()).getPlugin(name);
+            verify(pluginManager, never()).deletePlugin(name);
+        }
+
+        @Test
+        void shouldCleanUpResourceFully() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var metadata = plugin.getMetadata();
+                metadata.setDeletionTimestamp(clock.instant());
+                metadata.setFinalizers(new HashSet<>(Set.of(finalizer)));
+                plugin.getStatus().setLastProbeState(PluginState.STARTED);
+                plugin.getSpec().setConfigMapName("fake-configmap");
+                plugin.getSpec().setSettingName("fake-setting");
             });
 
-            // Test with non-empty pathString
-            var filePath = Paths.get("path", "to", "file");
-            URI uri = pluginReconciler.toUri(filePath.toString());
-            assertEquals(filePath.toUri(), uri);
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(client.fetch(Setting.class, "fake-setting"))
+                .thenReturn(Optional.empty());
+            when(client.fetch(ReverseProxy.class, reverseProxyName))
+                .thenReturn(Optional.empty());
+
+            when(pluginManager.getPlugin(name))
+                .thenReturn(mock(PluginWrapper.class))
+                .thenReturn(null);
+
+            var result = reconciler.reconcile(new Request(name));
+
+            assertFalse(result.reEnqueue());
+            // make sure the finalizer is removed.
+            assertFalse(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
+            assertNull(fakePlugin.getStatus().getLastProbeState());
+            verify(pluginManager, times(2)).getPlugin(name);
+            verify(pluginManager).deletePlugin(name);
+            verify(client).fetch(Plugin.class, name);
+            verify(client).fetch(Setting.class, "fake-setting");
+            verify(client).fetch(ReverseProxy.class, reverseProxyName);
+            verify(client).update(fakePlugin);
         }
+
+        @Test
+        void shouldDeleteSettingAndRequeueIfExists() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var metadata = plugin.getMetadata();
+                metadata.setDeletionTimestamp(clock.instant());
+                metadata.setFinalizers(new HashSet<>(Set.of(finalizer)));
+                plugin.getStatus().setLastProbeState(PluginState.STARTED);
+                plugin.getSpec().setSettingName(settingName);
+            });
+
+            var fakeSetting = createSetting(settingName);
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(client.fetch(Setting.class, settingName))
+                .thenReturn(Optional.of(fakeSetting));
+            when(client.fetch(ReverseProxy.class, reverseProxyName))
+                .thenReturn(Optional.empty());
+
+            var exception = assertThrows(
+                RequeueException.class,
+                () -> reconciler.reconcile(new Request(name))
+            );
+            assertEquals(Reconciler.Result.requeue(null), exception.getResult());
+            assertEquals("Waiting for setting fake-setting to be deleted.", exception.getMessage());
+
+            // make sure the finalizer is removed.
+            assertFalse(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
+            assertEquals(PluginState.STARTED, fakePlugin.getStatus().getLastProbeState());
+            verify(pluginManager, never()).getPlugin(name);
+            verify(pluginManager, never()).deletePlugin(name);
+            verify(client).fetch(Plugin.class, name);
+            verify(client).fetch(ReverseProxy.class, reverseProxyName);
+            verify(client).fetch(Setting.class, settingName);
+            verify(client).delete(fakeSetting);
+            verify(client, never()).update(fakePlugin);
+        }
+
+        @Test
+        void shouldDeleteReverseProxyAndRequeueIfExists() {
+            var fakePlugin = createPlugin(name, plugin -> {
+                var metadata = plugin.getMetadata();
+                metadata.setDeletionTimestamp(clock.instant());
+                metadata.setFinalizers(new HashSet<>(Set.of(finalizer)));
+                plugin.getStatus().setLastProbeState(PluginState.STARTED);
+                plugin.getSpec().setSettingName(settingName);
+            });
+
+            var reverseProxy = createReverseProxy(reverseProxyName);
+
+            when(client.fetch(Plugin.class, name)).thenReturn(Optional.of(fakePlugin));
+            when(client.fetch(ReverseProxy.class, reverseProxyName))
+                .thenReturn(Optional.of(reverseProxy));
+
+            var exception = assertThrows(RequeueException.class,
+                () -> reconciler.reconcile(new Request(name)),
+                "Waiting for setting fake-setting to be deleted.");
+            assertEquals(Reconciler.Result.requeue(null), exception.getResult());
+            assertEquals("Waiting for reverse proxy " + reverseProxyName + " to be deleted.",
+                exception.getMessage());
+
+            // make sure the finalizer is removed.
+            assertFalse(fakePlugin.getMetadata().getFinalizers().contains(finalizer));
+            assertEquals(PluginState.STARTED, fakePlugin.getStatus().getLastProbeState());
+            verify(pluginManager, never()).getPlugin(name);
+            verify(pluginManager, never()).deletePlugin(name);
+            verify(client).fetch(Plugin.class, name);
+            verify(client).fetch(ReverseProxy.class, reverseProxyName);
+            verify(client).delete(reverseProxy);
+            verify(client, never()).fetch(Setting.class, settingName);
+            verify(client, never()).update(fakePlugin);
+        }
+
     }
 
-    @Test
-    void persistenceFailureStatus() {
-        String name = "fake-plugin";
-        Plugin plugin = new Plugin();
-        Plugin.PluginStatus status = new Plugin.PluginStatus();
-        plugin.setMetadata(new Metadata());
-        plugin.getMetadata().setName(name);
-        plugin.setStatus(status);
-        when(extensionClient.fetch(eq(Plugin.class), eq(name)))
-            .thenReturn(Optional.of(plugin));
-        PluginWrapper pluginWrapper = mock(PluginWrapper.class);
-        when(pluginWrapper.getPluginPath()).thenReturn(Paths.get("/path/to/plugin.jar"));
-        when(haloPluginManager.getPlugin(eq(name)))
-            .thenReturn(pluginWrapper);
-        Throwable error = mock(Throwable.class);
-        pluginReconciler.persistenceFailureStatus(name, error);
-
-        assertThat(status.getPhase()).isEqualTo(PluginState.FAILED);
-        assertThat(status.getConditions()).hasSize(1);
-        assertThat(status.getConditions().peek().getType())
-            .isEqualTo(PluginState.FAILED.toString());
-
-        verify(pluginWrapper).setPluginState(eq(PluginState.FAILED));
-        verify(pluginWrapper).setFailedException(eq(error));
+    Setting createSetting(String name) {
+        var setting = new Setting();
+        var metadata = new Metadata();
+        metadata.setName(name);
+        setting.setMetadata(metadata);
+        return setting;
     }
 
-    @Test
-    void shouldReconcileStartState() {
-        Plugin plugin = new Plugin();
-        plugin.setMetadata(new Metadata());
-        plugin.getMetadata().setName("fake-plugin");
+    ReverseProxy createReverseProxy(String name) {
+        var reverseProxy = new ReverseProxy();
+        var metadata = new Metadata();
+        metadata.setName(name);
+        reverseProxy.setMetadata(metadata);
+        return reverseProxy;
+    }
+
+    Plugin createPlugin(String name, Consumer<Plugin> pluginConsumer) {
+        var plugin = new Plugin();
+        var metadata = new Metadata();
+        plugin.setMetadata(metadata);
+        metadata.setName(name);
         plugin.setSpec(new Plugin.PluginSpec());
-
-        PluginWrapper pluginWrapper = mock(PluginWrapper.class);
-        when(haloPluginManager.getPlugin(eq("fake-plugin"))).thenReturn(pluginWrapper);
-
-        plugin.getSpec().setEnabled(false);
-        assertThat(pluginReconciler.shouldReconcileStartState(plugin)).isFalse();
-
-        plugin.getSpec().setEnabled(true);
-        plugin.statusNonNull().setPhase(PluginState.RESOLVED);
-        assertThat(pluginReconciler.shouldReconcileStartState(plugin)).isTrue();
-
-        when(pluginWrapper.getPluginState()).thenReturn(PluginState.STOPPED);
-        assertThat(pluginReconciler.shouldReconcileStartState(plugin)).isTrue();
-
-        plugin.statusNonNull().setPhase(PluginState.STARTED);
-        when(pluginWrapper.getPluginState()).thenReturn(PluginState.STARTED);
-        assertThat(pluginReconciler.shouldReconcileStartState(plugin)).isFalse();
+        plugin.setStatus(new Plugin.PluginStatus());
+        pluginConsumer.accept(plugin);
+        return plugin;
     }
 
-    @Test
-    void shouldReconcileStopState() {
-        Plugin plugin = new Plugin();
-        plugin.setMetadata(new Metadata());
-        plugin.getMetadata().setName("fake-plugin");
-        plugin.setSpec(new Plugin.PluginSpec());
-
-        PluginWrapper pluginWrapper = mock(PluginWrapper.class);
-        when(haloPluginManager.getPlugin(eq("fake-plugin"))).thenReturn(pluginWrapper);
-
-        plugin.getSpec().setEnabled(true);
-        assertThat(pluginReconciler.shouldReconcileStopState(plugin)).isFalse();
-
-        plugin.getSpec().setEnabled(false);
-        plugin.statusNonNull().setPhase(PluginState.RESOLVED);
-        assertThat(pluginReconciler.shouldReconcileStopState(plugin)).isTrue();
-
-        when(pluginWrapper.getPluginState()).thenReturn(PluginState.STOPPED);
-        assertThat(pluginReconciler.shouldReconcileStopState(plugin)).isTrue();
-
-        plugin.statusNonNull().setPhase(PluginState.STOPPED);
-        when(pluginWrapper.getPluginState()).thenReturn(PluginState.STOPPED);
-        assertThat(pluginReconciler.shouldReconcileStopState(plugin)).isFalse();
-    }
-
-    private ArgumentCaptor<Plugin> doReconcileNeedRequeue() {
-        ArgumentCaptor<Plugin> pluginCaptor = ArgumentCaptor.forClass(Plugin.class);
-        doNothing().when(extensionClient).update(pluginCaptor.capture());
-
-        // reconcile
-        Reconciler.Result result = pluginReconciler.reconcile(new Reconciler.Request("apples"));
-        assertThat(result).isNotNull();
-        assertThat(result.reEnqueue()).isEqualTo(true);
-
-        verify(extensionClient, times(2)).update(any());
-        return pluginCaptor;
-    }
-
-    private ArgumentCaptor<Plugin> doReconcileWithoutRequeue() {
-        ArgumentCaptor<Plugin> pluginCaptor = ArgumentCaptor.forClass(Plugin.class);
-        doNothing().when(extensionClient).update(pluginCaptor.capture());
-
-        // reconcile
-        Reconciler.Result result = pluginReconciler.reconcile(new Reconciler.Request("apples"));
-        assertThat(result).isNotNull();
-        assertThat(result.reEnqueue()).isEqualTo(false);
-        return pluginCaptor;
-    }
-
-    private Plugin need2ReconcileForStartupState() {
-        return JsonUtils.jsonToObject("""
-            {
-                "apiVersion": "plugin.halo.run/v1alpha1",
-                "kind": "Plugin",
-                "metadata": {
-                    "name": "apples"
-                },
-                 "spec": {
-                    "displayName": "测试插件",
-                    "enabled": true
-                },
-                "status": {
-                    "phase": "STOPPED",
-                    "loadLocation": "/tmp/plugins/apples.jar"
-                }
-            }
-            """, Plugin.class);
-    }
-
-    private Plugin need2ReconcileForStopState() {
-        return JsonUtils.jsonToObject("""
-            {
-                "apiVersion": "plugin.halo.run/v1alpha1",
-                "kind": "Plugin",
-                "metadata": {
-                    "name": "apples"
-                },
-                 "spec": {
-                    "displayName": "测试插件",
-                    "enabled": false
-                },
-                "status": {
-                    "phase": "STARTED",
-                    "loadLocation": "/tmp/plugins/apples.jar"
-                }
-            }
-            """, Plugin.class);
-    }
 }

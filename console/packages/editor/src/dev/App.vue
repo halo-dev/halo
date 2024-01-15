@@ -43,6 +43,7 @@ import {
   ExtensionColumn,
   ExtensionNodeSelected,
   ExtensionTrailingNode,
+  ExtensionListKeymap,
 } from "../index";
 
 const content = useLocalStorage("content", "");
@@ -107,6 +108,7 @@ const editor = useEditor({
     ExtensionColumn,
     ExtensionNodeSelected,
     ExtensionTrailingNode,
+    ExtensionListKeymap,
   ],
   onUpdate: () => {
     content.value = editor.value?.getHTML() + "";

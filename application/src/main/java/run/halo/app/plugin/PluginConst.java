@@ -12,20 +12,16 @@ public interface PluginConst {
      */
     String PLUGIN_NAME_LABEL_NAME = "plugin.halo.run/plugin-name";
 
-    String DELETE_STAGE = "delete-stage";
-
     String SYSTEM_PLUGIN_NAME = "system";
 
     String RELOAD_ANNO = "plugin.halo.run/reload";
 
     String PLUGIN_PATH = "plugin.halo.run/plugin-path";
 
+    String RUNTIME_MODE_ANNO = "plugin.halo.run/runtime-mode";
+
     static String assertsRoutePrefix(String pluginName) {
         return "/plugins/" + pluginName + "/assets/";
     }
 
-    enum DeleteStage {
-        STOP,
-        UNINSTALL
-    }
 }

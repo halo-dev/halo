@@ -55,6 +55,7 @@ export default definePlugin({
           meta: {
             title: "core.post_editor.title",
             searchable: true,
+            hideFooter: true,
             permissions: ["system:posts:manage"],
           },
         },

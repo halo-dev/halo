@@ -5,8 +5,7 @@ import { ref } from "vue";
 import { apiClient } from "@/utils/api-client";
 
 // libs
-import cloneDeep from "lodash.clonedeep";
-import merge from "lodash.merge";
+import { cloneDeep, merge } from "lodash-es";
 import type { ConfigMap, Setting, SettingForm } from "@halo-dev/api-client";
 import type { FormKitSchemaCondition, FormKitSchemaNode } from "@formkit/core";
 import { Toast } from "@halo-dev/components";

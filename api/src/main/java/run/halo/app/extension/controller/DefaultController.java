@@ -165,15 +165,17 @@ public class DefaultController<R> implements Controller {
                         log.debug("{} >>> Reconciled request: {} with result: {}, usage: {}",
                             this.name, entry.getEntry(), result, watch.getTotalTimeMillis());
                     } catch (Throwable t) {
+                        result = new Reconciler.Result(true, null);
                         if (t instanceof OptimisticLockingFailureException) {
                             log.warn("Optimistic locking failure when reconciling request: {}/{}",
                                 this.name, entry.getEntry());
+                        } else if (t instanceof RequeueException re) {
+                            result = re.getResult();
                         } else {
                             log.error("Reconciler in " + this.name
                                     + " aborted with an error, re-enqueuing...",
                                 t);
                         }
-                        result = new Reconciler.Result(true, null);
                     } finally {
                         queue.done(entry.getEntry());
                     }

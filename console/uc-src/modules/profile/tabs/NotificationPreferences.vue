@@ -6,7 +6,7 @@ import { VLoading, VSwitch } from "@halo-dev/components";
 import type { Ref } from "vue";
 import { computed } from "vue";
 import { inject } from "vue";
-import cloneDeep from "lodash.clonedeep";
+import { cloneDeep } from "lodash-es";
 import type { ReasonTypeNotifierRequest } from "@halo-dev/api-client";
 
 const queryClient = useQueryClient();

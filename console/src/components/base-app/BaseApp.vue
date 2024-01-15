@@ -97,6 +97,12 @@ body {
   background: #eff4f9;
 }
 
+html,
+body,
+#app {
+  height: 100%;
+}
+
 *,
 *::before,
 *::after {

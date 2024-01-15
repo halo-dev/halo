@@ -13,6 +13,7 @@ import ExtensionSubscript from "./subscript";
 import ExtensionBulletList from "./bullet-list";
 import ExtensionOrderedList from "./ordered-list";
 import ExtensionTaskList from "./task-list";
+import ExtensionListKeymap from "./list-keymap";
 import ExtensionTable from "./table";
 import ExtensionTextAlign from "./text-align";
 import ExtensionTextStyle from "@tiptap/extension-text-style";
@@ -142,4 +143,5 @@ export {
   ExtensionColumn,
   ExtensionNodeSelected,
   ExtensionTrailingNode,
+  ExtensionListKeymap,
 };

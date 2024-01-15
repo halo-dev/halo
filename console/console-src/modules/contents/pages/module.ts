@@ -49,6 +49,7 @@ export default definePlugin({
           meta: {
             title: "core.page_editor.title",
             searchable: true,
+            hideFooter: true,
             permissions: ["system:singlepages:manage"],
           },
         },

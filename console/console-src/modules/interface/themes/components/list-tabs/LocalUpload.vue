@@ -30,7 +30,7 @@ const onUploaded = () => {
   activeTabId.value = "installed";
 };
 
-const onError = (file: UppyFile<unknown>, response: ErrorResponse) => {
+const onError = (file: UppyFile, response: ErrorResponse) => {
   const body = response.body as ThemeInstallationErrorResponse;
 
   if (body.type === THEME_ALREADY_EXISTS_TYPE) {
