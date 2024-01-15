@@ -1,6 +1,7 @@
 package run.halo.app.core.extension.service.impl;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import static run.halo.app.plugin.PluginConst.RELOAD_ANNO;
 
 import com.github.zafarkhaja.semver.Version;
 import com.google.common.hash.Hashing;
@@ -10,13 +11,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.Validate;
 import org.pf4j.PluginWrapper;
 import org.pf4j.RuntimeMode;
 import org.springframework.core.io.Resource;
@@ -26,6 +26,7 @@ import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ServerWebInputException;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
@@ -33,7 +34,6 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import run.halo.app.core.extension.Plugin;
 import run.halo.app.core.extension.service.PluginService;
-import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.SystemVersionSupplier;
 import run.halo.app.infra.exception.PluginAlreadyExistsException;
@@ -106,7 +106,8 @@ public class PluginServiceImpl implements PluginService {
         return findPluginManifest(path)
             .flatMap(pluginInPath -> {
                 // pre-check the plugin in the path
-                Validate.notNull(pluginInPath.statusNonNull().getLoadLocation());
+                Assert.notNull(pluginInPath.statusNonNull().getLoadLocation(),
+                    "plugin.status.load-location must not be null");
                 satisfiesRequiresVersion(pluginInPath);
                 if (!Objects.equals(name, pluginInPath.getMetadata().getName())) {
                     return Mono.error(new ServerWebInputException(
@@ -119,19 +120,28 @@ public class PluginServiceImpl implements PluginService {
                     .switchIfEmpty(Mono.error(() -> new ServerWebInputException(
                         "The given plugin with name " + name + " was not found.")))
                     // copy plugin into plugin home
-                    .flatMap(prevPlugin -> copyToPluginHome(pluginInPath))
-                    .flatMap(pluginPath -> updateReloadAnno(name, pluginPath));
+                    .flatMap(oldPlugin -> copyToPluginHome(pluginInPath).thenReturn(oldPlugin))
+                    .doOnNext(oldPlugin -> updatePlugin(oldPlugin, pluginInPath))
+                    .flatMap(client::update);
             });
     }
 
     @Override
     public Mono<Plugin> reload(String name) {
-        PluginWrapper pluginWrapper = pluginManager.getPlugin(name);
-        if (pluginWrapper == null) {
-            return Mono.error(() -> new ServerWebInputException(
-                "The given plugin with name " + name + " was not found."));
-        }
-        return updateReloadAnno(name, pluginWrapper.getPluginPath());
+        return client.get(Plugin.class, name)
+            .flatMap(oldPlugin -> {
+                if (oldPlugin.getStatus() == null
+                    || oldPlugin.getStatus().getLoadLocation() == null) {
+                    return Mono.error(new IllegalStateException(
+                        "Load location of plugin has not been populated."));
+                }
+                var loadLocation = oldPlugin.getStatus().getLoadLocation();
+                var loadPath = Path.of(loadLocation);
+                return findPluginManifest(loadPath)
+                    .doOnNext(newPlugin -> updatePlugin(oldPlugin, newPlugin))
+                    .thenReturn(oldPlugin);
+            })
+            .flatMap(client::update);
     }
 
     @Override
@@ -217,16 +227,6 @@ public class PluginServiceImpl implements PluginService {
             );
     }
 
-    private Mono<Plugin> updateReloadAnno(String name, Path pluginPath) {
-        return client.get(Plugin.class, name)
-            .flatMap(plugin -> {
-                // add reload annotation to flag the plugin to be reloaded
-                Map<String, String> annotations = MetadataUtil.nullSafeAnnotations(plugin);
-                annotations.put(PluginConst.RELOAD_ANNO, pluginPath.toString());
-                return client.update(plugin);
-            });
-    }
-
     /**
      * Copy plugin into plugin home.
      *
@@ -251,7 +251,17 @@ public class PluginServiceImpl implements PluginService {
                     FileUtils.copy(path, pluginFilePath, REPLACE_EXISTING);
                     return pluginFilePath;
                 })
-            .subscribeOn(Schedulers.boundedElastic());
+            .subscribeOn(Schedulers.boundedElastic())
+            .doOnNext(loadLocation -> {
+                // reset load location and annotation PLUGIN_PATH
+                plugin.getStatus().setLoadLocation(loadLocation.toUri());
+                var annotations = plugin.getMetadata().getAnnotations();
+                if (annotations == null) {
+                    annotations = new HashMap<>();
+                    plugin.getMetadata().setAnnotations(annotations);
+                }
+                annotations.put(PluginConst.PLUGIN_PATH, loadLocation.toString());
+            });
     }
 
     private void satisfiesRequiresVersion(Plugin newPlugin) {
@@ -287,5 +297,39 @@ public class PluginServiceImpl implements PluginService {
         } catch (IOException e) {
             throw Exceptions.propagate(e);
         }
+    }
+
+    private static void updatePlugin(Plugin oldPlugin, Plugin newPlugin) {
+        var oldMetadata = oldPlugin.getMetadata();
+        var newMetadata = newPlugin.getMetadata();
+        // merge labels
+        if (!CollectionUtils.isEmpty(newMetadata.getLabels())) {
+            var labels = oldMetadata.getLabels();
+            if (labels == null) {
+                labels = new HashMap<>();
+                oldMetadata.setLabels(labels);
+            }
+            labels.putAll(newMetadata.getLabels());
+        }
+
+        var annotations = oldMetadata.getAnnotations();
+        if (annotations == null) {
+            annotations = new HashMap<>();
+            oldMetadata.setAnnotations(annotations);
+        }
+
+        // merge annotations
+        if (!CollectionUtils.isEmpty(newMetadata.getAnnotations())) {
+            annotations.putAll(newMetadata.getAnnotations());
+        }
+
+        // request to reload
+        annotations.put(RELOAD_ANNO,
+            newPlugin.getStatus().getLoadLocation().toString());
+
+        // apply spec and keep enabled request
+        var enabled = oldPlugin.getSpec().getEnabled();
+        oldPlugin.setSpec(newPlugin.getSpec());
+        oldPlugin.getSpec().setEnabled(enabled);
     }
 }
