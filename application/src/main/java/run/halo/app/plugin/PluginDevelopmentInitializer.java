@@ -1,5 +1,7 @@
 package run.halo.app.plugin;
 
+import static run.halo.app.extension.MetadataUtil.nullSafeAnnotations;
+
 import java.nio.file.Path;
 import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
@@ -48,9 +50,13 @@ public class PluginDevelopmentInitializer implements ApplicationListener<Applica
             extensionClient.fetch(Plugin.class, plugin.getMetadata().getName())
                 .flatMap(persistent -> {
                     plugin.getMetadata().setVersion(persistent.getMetadata().getVersion());
+                    nullSafeAnnotations(plugin).put(PluginConst.RUNTIME_MODE_ANNO, "dev");
                     return extensionClient.update(plugin);
                 })
-                .switchIfEmpty(Mono.defer(() -> extensionClient.create(plugin)))
+                .switchIfEmpty(Mono.defer(() -> {
+                    nullSafeAnnotations(plugin).put(PluginConst.RUNTIME_MODE_ANNO, "dev");
+                    return extensionClient.create(plugin);
+                }))
                 .retryWhen(Retry.backoff(10, Duration.ofMillis(100))
                     .filter(t -> t instanceof OptimisticLockingFailureException))
                 .block();

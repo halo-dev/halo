@@ -1,7 +1,6 @@
 package run.halo.app.plugin;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,12 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.pf4j.DefaultPluginManager;
 import org.pf4j.ExtensionFactory;
 import org.pf4j.ExtensionFinder;
-import org.pf4j.PluginAlreadyLoadedException;
 import org.pf4j.PluginDependency;
 import org.pf4j.PluginDescriptor;
 import org.pf4j.PluginDescriptorFinder;
 import org.pf4j.PluginFactory;
-import org.pf4j.PluginRepository;
 import org.pf4j.PluginRuntimeException;
 import org.pf4j.PluginState;
 import org.pf4j.PluginStateEvent;
@@ -27,7 +24,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
-import org.springframework.util.Assert;
 import run.halo.app.plugin.event.HaloPluginBeforeStopEvent;
 import run.halo.app.plugin.event.HaloPluginLoadedEvent;
 import run.halo.app.plugin.event.HaloPluginStartedEvent;
@@ -93,14 +89,6 @@ public class HaloPluginManager extends DefaultPluginManager
 
         this.requestMappingManager =
             rootApplicationContext.getBean(PluginRequestMappingManager.class);
-    }
-
-    public PluginStartingError getPluginStartingError(String pluginId) {
-        return startingErrors.get(pluginId);
-    }
-
-    public PluginRepository getPluginRepository() {
-        return this.pluginRepository;
     }
 
     @Override
@@ -232,11 +220,6 @@ public class HaloPluginManager extends DefaultPluginManager
         doStopPlugins();
     }
 
-    public boolean validatePluginVersion(PluginWrapper pluginWrapper) {
-        Assert.notNull(pluginWrapper, "The pluginWrapper must not be null.");
-        return isPluginValid(pluginWrapper);
-    }
-
     private PluginState doStartPlugin(String pluginId) {
         checkPluginId(pluginId);
 
@@ -339,75 +322,6 @@ public class HaloPluginManager extends DefaultPluginManager
                         pluginWrapper.getPluginId(), e.getMessage(), e.toString()));
                 }
             }
-        }
-    }
-
-    /**
-     * Unload plugin and restart.
-     *
-     * @param restartStartedOnly If true, only reload started plugin
-     */
-    public void reloadPlugins(boolean restartStartedOnly) {
-        doStopPlugins();
-        List<String> startedPluginIds = new ArrayList<>();
-        getPlugins().forEach(plugin -> {
-            if (plugin.getPluginState() == PluginState.STARTED) {
-                startedPluginIds.add(plugin.getPluginId());
-            }
-            unloadPlugin(plugin.getPluginId());
-        });
-        loadPlugins();
-        if (restartStartedOnly) {
-            startedPluginIds.forEach(pluginId -> {
-                // restart started plugin
-                if (getPlugin(pluginId) != null) {
-                    doStartPlugin(pluginId);
-                }
-            });
-        } else {
-            startPlugins();
-        }
-    }
-
-    /**
-     * <p>Reload plugin by id,it will be clean up memory resources of plugin and reload plugin from
-     * disk.</p>
-     * <p>
-     * Note: This method will not start plugin, you need to start plugin manually.
-     * this is to avoid starting plugins in different places, which will cause thread safety
-     * issues, so all of them are handed over to the
-     * {@link run.halo.app.core.extension.reconciler.PluginReconciler} to start the plugin
-     * </p>
-     *
-     * @param pluginId plugin id
-     * @return plugin startup status
-     */
-    public PluginState reloadPlugin(String pluginId) {
-        PluginWrapper plugin = getPlugin(pluginId);
-        stopPlugin(pluginId, false);
-        unloadPlugin(pluginId, false);
-        try {
-            loadPlugin(plugin.getPluginPath());
-        } catch (Exception ex) {
-            return null;
-        }
-        return getPlugin(pluginId).getPluginState();
-    }
-
-    /**
-     * Reload plugin by name and path.
-     * Note: This method will ignore {@link PluginAlreadyLoadedException}.
-     *
-     * @param pluginName plugin name
-     * @param pluginPath a new plugin path
-     */
-    public void reloadPluginWithPath(String pluginName, Path pluginPath) {
-        stopPlugin(pluginName, false);
-        unloadPlugin(pluginName, false);
-        try {
-            loadPlugin(pluginPath);
-        } catch (PluginAlreadyLoadedException ex) {
-            // ignore
         }
     }
 

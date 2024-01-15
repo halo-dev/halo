@@ -65,8 +65,8 @@ public class DefaultRoleService implements RoleService {
         if (containsSuperRole(names)) {
             // search all permissions
             return extensionClient.list(Role.class,
-                    shouldFilterHidden(true),
-                    compareCreationTimestamp(true));
+                shouldFilterHidden(true),
+                compareCreationTimestamp(true));
         }
         return listDependencies(names, shouldFilterHidden(true));
     }
@@ -118,7 +118,9 @@ public class DefaultRoleService implements RoleService {
                 if (visited.contains(name)) {
                     return Flux.empty();
                 }
-                log.debug("Expand role: {}", role.getMetadata().getName());
+                if (log.isTraceEnabled()) {
+                    log.trace("Expand role: {}", role.getMetadata().getName());
+                }
                 visited.add(name);
                 var annotations = MetadataUtil.nullSafeAnnotations(role);
                 var dependenciesJson = annotations.get(Role.ROLE_DEPENDENCIES_ANNO);

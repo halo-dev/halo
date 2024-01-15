@@ -17,7 +17,6 @@ import org.json.JSONException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.pf4j.PluginRuntimeException;
-import org.pf4j.PluginState;
 import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -48,7 +47,7 @@ class YamlPluginFinderTest {
     }
 
     @Test
-    void find() throws IOException, JSONException {
+    void find() throws IOException {
         var tempDirectory = Files.createTempDirectory("halo-test-plugin");
         try {
             var directories =
@@ -58,7 +57,7 @@ class YamlPluginFinderTest {
             var plugin = pluginFinder.find(tempDirectory);
             assertThat(plugin).isNotNull();
             var status = plugin.getStatus();
-            assertEquals(PluginState.RESOLVED, status.getPhase());
+            assertEquals(Plugin.Phase.PENDING, status.getPhase());
             assertEquals(tempDirectory.toUri(), status.getLoadLocation());
         } finally {
             FileUtils.deleteRecursivelyAndSilently(tempDirectory);

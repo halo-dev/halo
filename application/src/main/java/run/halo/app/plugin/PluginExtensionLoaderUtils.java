@@ -1,82 +1,60 @@
 package run.halo.app.plugin;
 
-import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.jar.JarFile;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
+import java.net.URLClassLoader;
+import java.util.Objects;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
-import org.pf4j.DevelopmentPluginClasspath;
-import org.pf4j.PluginRuntimeException;
-import org.pf4j.RuntimeMode;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.data.util.Predicates;
+import run.halo.app.core.extension.Setting;
+import run.halo.app.extension.Unstructured;
 
 @Slf4j
 public class PluginExtensionLoaderUtils {
-    static final String EXTENSION_LOCATION = "extensions";
-    static final DevelopmentPluginClasspath PLUGIN_CLASSPATH = new DevelopmentPluginClasspath();
+    static final String EXTENSION_LOCATION_PATTERN = "classpath:extensions/*.{ext:yaml|yml}";
 
-    public static Set<String> lookupExtensions(Path pluginPath, RuntimeMode runtimeMode) {
-        if (RuntimeMode.DEVELOPMENT.equals(runtimeMode)) {
-            return lookupFromClasses(pluginPath);
-        } else {
-            return lookupFromJar(pluginPath);
+    public static Predicate<Unstructured> isSetting(String settingName) {
+        if (StringUtils.isBlank(settingName)) {
+            return Predicates.isFalse();
         }
+        var settingGk = Setting.GVK.groupKind();
+        return unstructured -> {
+            var gk = unstructured.groupVersionKind().groupKind();
+            var name = unstructured.getMetadata().getName();
+            return Objects.equals(settingName, name) && Objects.equals(settingGk, gk);
+        };
     }
 
-    public static Set<String> lookupFromClasses(Path pluginPath) {
-        Set<String> result = new HashSet<>();
-        for (String directory : PLUGIN_CLASSPATH.getClassesDirectories()) {
-            File file = pluginPath.resolve(directory).resolve(EXTENSION_LOCATION).toFile();
-            if (file.exists() && file.isDirectory()) {
-                result.addAll(walkExtensionFiles(file.toPath()));
+    public static Resource[] lookupExtensions(ClassLoader classLoader) {
+        if (log.isDebugEnabled()) {
+            log.debug("Trying to lookup extensions from {}", classLoader);
+        }
+        if (classLoader instanceof URLClassLoader urlClassLoader) {
+            var urls = urlClassLoader.getURLs();
+            // The parent class loader must be null here because we don't want to
+            // get any resources from parent class loader.
+            classLoader = new URLClassLoader(urls, null);
+        }
+        var resolver = new PathMatchingResourcePatternResolver(classLoader);
+        try {
+            var resources = resolver.getResources(EXTENSION_LOCATION_PATTERN);
+            if (log.isDebugEnabled()) {
+                log.debug("Looked up {} resources(s) from {}", resources.length, classLoader);
             }
-        }
-        return result;
-    }
-
-    private static Set<String> walkExtensionFiles(Path location) {
-        try (Stream<Path> stream = Files.walk(location)) {
-            return stream.map(Path::normalize)
-                .filter(Files::isRegularFile)
-                .filter(path -> isYamlFile(path.getFileName().toString()))
-                .map(path -> location.getParent().relativize(path).toString())
-                .collect(Collectors.toSet());
+            return resources;
+        } catch (FileNotFoundException ignored) {
+            // Ignore the exception only if extensions folder was not found.
         } catch (IOException e) {
-            log.debug("Failed to walk extension files from [{}]", location);
-            return Collections.emptySet();
+            throw new RuntimeException(String.format("""
+                Failed to get extension resources while resolving plugin setting \
+                in class loader %s.\
+                """, classLoader), e);
         }
+        return new Resource[] {};
     }
 
-    static boolean isYamlFile(String path) {
-        return path.endsWith(".yaml") || path.endsWith(".yml");
-    }
-
-    /**
-     * <p>Lists the path of the unstructured yaml configuration file from the plugin jar.</p>
-     *
-     * @param pluginJarPath plugin jar path
-     * @return Unstructured file paths relative to plugin classpath
-     * @throws PluginRuntimeException If loading the file fails
-     */
-    static Set<String> lookupFromJar(Path pluginJarPath) {
-        try (JarFile jarFile = new JarFile(pluginJarPath.toFile())) {
-            return jarFile.stream()
-                .filter(jarEntry -> {
-                    String name = jarEntry.getName();
-                    return name.startsWith(EXTENSION_LOCATION)
-                        && !jarEntry.isDirectory()
-                        && isYamlFile(name);
-                })
-                .map(ZipEntry::getName)
-                .collect(Collectors.toSet());
-        } catch (IOException e) {
-            throw new PluginRuntimeException(e);
-        }
-    }
 }

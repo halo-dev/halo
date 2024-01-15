@@ -11,7 +11,6 @@ import { apiClient } from "@/utils/api-client";
 import type { PersonalAccessToken } from "@halo-dev/api-client";
 import { useQuery } from "@tanstack/vue-query";
 import PersonalAccessTokenCreationModal from "../components/PersonalAccessTokenCreationModal.vue";
-import { nextTick } from "vue";
 import PersonalAccessTokenListItem from "../components/PersonalAccessTokenListItem.vue";
 
 const {
@@ -32,28 +31,11 @@ const {
   },
 });
 
-// fixme: Refactor VModal component to simplify the code
-// use v-if to control the visibility of the modal
 const creationModal = ref(false);
-const creationModalVisible = ref(false);
-
-function handleOpenCreationModal() {
-  creationModal.value = true;
-  nextTick(() => {
-    creationModalVisible.value = true;
-  });
-}
-
-function onCreationModalClose() {
-  creationModalVisible.value = false;
-  setTimeout(() => {
-    creationModal.value = false;
-  }, 200);
-}
 </script>
 <template>
   <div v-if="pats?.length" class="my-5 flex justify-end">
-    <VButton type="secondary" @click="handleOpenCreationModal">
+    <VButton type="secondary" @click="creationModal = true">
       <template #icon>
         <IconAddCircle class="h-full w-full" />
       </template>
@@ -73,7 +55,7 @@ function onCreationModalClose() {
           <VButton @click="refetch">
             {{ $t("core.common.buttons.refresh") }}
           </VButton>
-          <VButton type="primary" @click="handleOpenCreationModal">
+          <VButton type="primary" @click="creationModal = true">
             <template #icon>
               <IconAddCircle class="h-full w-full" />
             </template>
@@ -97,7 +79,6 @@ function onCreationModalClose() {
 
   <PersonalAccessTokenCreationModal
     v-if="creationModal"
-    v-model="creationModalVisible"
-    @close="onCreationModalClose"
+    @close="creationModal = false"
   />
 </template>

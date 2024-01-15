@@ -42,7 +42,6 @@ import java.util.function.Supplier;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.pf4j.PluginState;
 import org.reactivestreams.Publisher;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
 import org.springframework.beans.factory.DisposableBean;
@@ -297,10 +296,10 @@ public class PluginEndpoint implements CustomEndpoint {
                             // when enabled = false,excepted phase = !started
                             var phase = p.statusNonNull().getPhase();
                             if (enable) {
-                                return PluginState.STARTED.equals(phase)
-                                    || PluginState.FAILED.equals(phase);
+                                return Plugin.Phase.STARTED.equals(phase)
+                                    || Plugin.Phase.FAILED.equals(phase);
                             }
-                            return !PluginState.STARTED.equals(phase);
+                            return !Plugin.Phase.STARTED.equals(phase);
                         });
                     });
             })
