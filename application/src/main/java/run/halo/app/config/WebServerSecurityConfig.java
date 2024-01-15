@@ -31,7 +31,6 @@ import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.properties.HaloProperties;
 import run.halo.app.plugin.extensionpoint.ExtensionGetter;
-import run.halo.app.security.DefaultServerAuthenticationEntryPoint;
 import run.halo.app.security.DefaultUserDetailService;
 import run.halo.app.security.DynamicMatcherSecurityWebFilterChain;
 import run.halo.app.security.authentication.SecurityConfigurer;
@@ -42,6 +41,7 @@ import run.halo.app.security.authentication.login.impl.RsaKeyService;
 import run.halo.app.security.authentication.pat.PatAuthenticationManager;
 import run.halo.app.security.authentication.pat.PatJwkSupplier;
 import run.halo.app.security.authentication.pat.PatServerWebExchangeMatcher;
+import run.halo.app.security.authentication.twofactor.TwoFactorAuthorizationManager;
 import run.halo.app.security.authorization.RequestInfoAuthorizationManager;
 
 /**
@@ -67,7 +67,11 @@ public class WebServerSecurityConfig {
         http.securityMatcher(pathMatchers("/api/**", "/apis/**", "/oauth2/**",
                 "/login/**", "/logout", "/actuator/**"))
             .authorizeExchange(spec -> {
-                spec.anyExchange().access(new RequestInfoAuthorizationManager(roleService));
+                spec.anyExchange().access(
+                    new TwoFactorAuthorizationManager(
+                        new RequestInfoAuthorizationManager(roleService)
+                    )
+                );
             })
             .anonymous(spec -> {
                 spec.authorities(AnonymousUserConst.Role);
@@ -79,12 +83,11 @@ public class WebServerSecurityConfig {
                 var authManagerResolver = builder().add(
                         new PatServerWebExchangeMatcher(),
                         new PatAuthenticationManager(client, patJwkSupplier))
-                    // TODO Add other authentication mangers here. e.g.: JwtAuthentiationManager.
+                    // TODO Add other authentication mangers here. e.g.: JwtAuthenticationManager.
                     .build();
                 oauth2.authenticationManagerResolver(authManagerResolver);
             })
-            .exceptionHandling(
-                spec -> spec.authenticationEntryPoint(new DefaultServerAuthenticationEntryPoint()));
+        ;
 
         // Integrate with other configurers separately
         securityConfigurers.orderedStream()

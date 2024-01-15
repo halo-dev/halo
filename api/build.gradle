@@ -63,6 +63,8 @@ dependencies {
     api "io.github.resilience4j:resilience4j-spring-boot3"
     api "io.github.resilience4j:resilience4j-reactor"
 
+    api "com.j256.two-factor-auth:two-factor-auth"
+
     runtimeOnly 'io.r2dbc:r2dbc-h2'
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'org.postgresql:r2dbc-postgresql'
