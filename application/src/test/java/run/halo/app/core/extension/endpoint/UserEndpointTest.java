@@ -532,28 +532,7 @@ class UserEndpointTest {
                 .exchange()
                 .expectStatus()
                 .isOk()
-                .expectBody()
-                .json("""
-                      {
-                              "spec":{
-                                  "displayName":"Faker",
-                                  "avatar":"fake-avatar.png",
-                                  "email":"hi@halo.run",
-                                  "password":"fake-password",
-                                  "bio":"Fake bio"
-                              },
-                              "status":null,
-                              "apiVersion":"v1alpha1",
-                              "kind":"User",
-                              "metadata":{
-                                  "name":"fake-user",
-                                  "annotations":{
-                                      "halo.run/avatar-attachment-name":
-                                      "fake-attachment"
-                                  }
-                              }
-                          }
-                    """);
+                .expectBody(User.class).isEqualTo(currentUser);
 
             verify(client).get(User.class, "fake-user");
             verify(client).update(currentUser);

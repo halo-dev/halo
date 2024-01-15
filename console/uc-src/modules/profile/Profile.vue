@@ -22,6 +22,7 @@ import DetailTab from "./tabs/Detail.vue";
 import PersonalAccessTokensTab from "./tabs/PersonalAccessTokens.vue";
 import { useRouteQuery } from "@vueuse/router";
 import NotificationPreferences from "./tabs/NotificationPreferences.vue";
+import TwoFactor from "./tabs/TwoFactor.vue";
 
 const { t } = useI18n();
 
@@ -78,6 +79,12 @@ const tabs: UserTab[] = [
     label: t("core.uc_profile.tabs.pat"),
     component: markRaw(PersonalAccessTokensTab),
     priority: 30,
+  },
+  {
+    id: "2fa",
+    label: "两步验证",
+    component: markRaw(TwoFactor),
+    priority: 40,
   },
 ];
 

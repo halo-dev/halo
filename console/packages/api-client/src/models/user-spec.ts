@@ -80,6 +80,12 @@ export interface UserSpec {
   registeredAt?: string;
   /**
    *
+   * @type {string}
+   * @memberof UserSpec
+   */
+  totpEncryptedSecret?: string;
+  /**
+   *
    * @type {boolean}
    * @memberof UserSpec
    */

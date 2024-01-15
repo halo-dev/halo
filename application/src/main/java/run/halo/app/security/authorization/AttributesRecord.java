@@ -1,6 +1,6 @@
 package run.halo.app.security.authorization;
 
-import org.springframework.security.core.userdetails.UserDetails;
+import java.security.Principal;
 
 /**
  * @author guqing
@@ -8,16 +8,16 @@ import org.springframework.security.core.userdetails.UserDetails;
  */
 public class AttributesRecord implements Attributes {
     private final RequestInfo requestInfo;
-    private final UserDetails user;
+    private final Principal principal;
 
-    public AttributesRecord(UserDetails user, RequestInfo requestInfo) {
+    public AttributesRecord(Principal principal, RequestInfo requestInfo) {
         this.requestInfo = requestInfo;
-        this.user = user;
+        this.principal = principal;
     }
 
     @Override
-    public UserDetails getUser() {
-        return this.user;
+    public Principal getPrincipal() {
+        return this.principal;
     }
 
     @Override
