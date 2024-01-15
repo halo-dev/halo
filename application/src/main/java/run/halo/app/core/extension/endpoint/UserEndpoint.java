@@ -82,11 +82,13 @@ import run.halo.app.extension.Metadata;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.extension.router.IListRequest;
+import run.halo.app.infra.AnonymousUserConst;
 import run.halo.app.infra.SystemConfigurableEnvironmentFetcher;
 import run.halo.app.infra.SystemSetting;
 import run.halo.app.infra.ValidationUtils;
 import run.halo.app.infra.exception.RateLimitExceededException;
 import run.halo.app.infra.utils.JsonUtils;
+import run.halo.app.security.authentication.twofactor.TwoFactorAuthentication;
 
 @Component
 @RequiredArgsConstructor
@@ -542,10 +544,11 @@ public class UserEndpoint implements CustomEndpoint {
     @NonNull
     Mono<ServerResponse> me(ServerRequest request) {
         return ReactiveSecurityContextHolder.getContext()
-            .flatMap(ctx -> {
-                var name = ctx.getAuthentication().getName();
-                return userService.getUser(name);
-            })
+            .map(SecurityContext::getAuthentication)
+            .filter(obj -> !(obj instanceof TwoFactorAuthentication))
+            .map(Authentication::getName)
+            .defaultIfEmpty(AnonymousUserConst.PRINCIPAL)
+            .flatMap(userService::getUser)
             .flatMap(this::toDetailedUser)
             .flatMap(user -> ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)

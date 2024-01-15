@@ -11,6 +11,8 @@ import { submitForm } from "@formkit/core";
 import { JSEncrypt } from "jsencrypt";
 import { apiClient } from "@/utils/api-client";
 import { useI18n } from "vue-i18n";
+import { ERROR_MFA_REQUIRED_TYPE } from "@/constants/error-types";
+import MfaForm from "./MfaForm.vue";
 
 const { t } = useI18n();
 
@@ -68,6 +70,7 @@ const handleLogin = async () => {
         withCredentials: true,
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
+          "X-Requested-With": "XMLHttpRequest",
         },
       }
     );
@@ -92,7 +95,16 @@ const handleLogin = async () => {
         return;
       }
 
-      const { title: errorTitle, detail: errorDetail } = e.response?.data || {};
+      const {
+        title: errorTitle,
+        detail: errorDetail,
+        type: errorType,
+      } = e.response?.data || {};
+
+      if (errorType === ERROR_MFA_REQUIRED_TYPE) {
+        mfaRequired.value = true;
+        return;
+      }
 
       if (errorTitle || errorDetail) {
         Toast.error(errorDetail || errorTitle);
@@ -117,51 +129,57 @@ onMounted(() => {
 const inputClasses = {
   outer: "!py-3 first:!pt-0 last:!pb-0",
 };
+
+// mfa
+const mfaRequired = ref(false);
 </script>
 
 <template>
-  <FormKit
-    id="login-form"
-    v-model="loginForm"
-    name="login-form"
-    :actions="false"
-    type="form"
-    :classes="{
-      form: '!divide-none',
-    }"
-    :config="{ validationVisibility: 'submit' }"
-    @submit="handleLogin"
-    @keyup.enter="submitForm('login-form')"
-  >
+  <template v-if="!mfaRequired">
     <FormKit
-      :classes="inputClasses"
-      name="username"
-      :placeholder="$t('core.login.fields.username.placeholder')"
-      :validation-label="$t('core.login.fields.username.placeholder')"
-      :autofocus="true"
-      type="text"
-      validation="required"
+      id="login-form"
+      v-model="loginForm"
+      name="login-form"
+      :actions="false"
+      type="form"
+      :classes="{
+        form: '!divide-none',
+      }"
+      :config="{ validationVisibility: 'submit' }"
+      @submit="handleLogin"
+      @keyup.enter="submitForm('login-form')"
     >
+      <FormKit
+        :classes="inputClasses"
+        name="username"
+        :placeholder="$t('core.login.fields.username.placeholder')"
+        :validation-label="$t('core.login.fields.username.placeholder')"
+        :autofocus="true"
+        type="text"
+        validation="required"
+      >
+      </FormKit>
+      <FormKit
+        id="passwordInput"
+        :classes="inputClasses"
+        name="password"
+        :placeholder="$t('core.login.fields.password.placeholder')"
+        :validation-label="$t('core.login.fields.password.placeholder')"
+        type="password"
+        validation="required"
+        autocomplete="current-password"
+      >
+      </FormKit>
     </FormKit>
-    <FormKit
-      id="passwordInput"
-      :classes="inputClasses"
-      name="password"
-      :placeholder="$t('core.login.fields.password.placeholder')"
-      :validation-label="$t('core.login.fields.password.placeholder')"
-      type="password"
-      validation="required"
-      autocomplete="current-password"
+    <VButton
+      class="mt-8"
+      block
+      :loading="loading"
+      type="secondary"
+      @click="submitForm('login-form')"
     >
-    </FormKit>
-  </FormKit>
-  <VButton
-    class="mt-8"
-    block
-    :loading="loading"
-    type="secondary"
-    @click="submitForm('login-form')"
-  >
-    {{ $t(buttonText) }}
-  </VButton>
+      {{ $t(buttonText) }}
+    </VButton>
+  </template>
+  <MfaForm v-else @succeed="$emit('succeed')" />
 </template>
