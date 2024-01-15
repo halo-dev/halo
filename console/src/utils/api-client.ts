@@ -45,6 +45,7 @@ import {
   NotificationHaloRunV1alpha1NotifierDescriptorApi,
   ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi,
   SecurityHaloRunV1alpha1PersonalAccessTokenApi,
+  ApiSecurityHaloRunV1alpha1AuthenticationTwoFactorApi,
   UcApiContentHaloRunV1alpha1AttachmentApi,
   UcApiContentHaloRunV1alpha1PostApi,
   UcApiContentHaloRunV1alpha1SnapshotApi,
@@ -243,6 +244,11 @@ function setupApiClient(axios: AxiosInstance) {
       axios
     ),
     pat: new ApiSecurityHaloRunV1alpha1PersonalAccessTokenApi(
+      undefined,
+      baseURL,
+      axios
+    ),
+    twoFactor: new ApiSecurityHaloRunV1alpha1AuthenticationTwoFactorApi(
       undefined,
       baseURL,
       axios

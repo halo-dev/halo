@@ -29,6 +29,7 @@ api/api-notification-halo-run-v1alpha1-notification-api.ts
 api/api-notification-halo-run-v1alpha1-notifier-api.ts
 api/api-notification-halo-run-v1alpha1-subscription-api.ts
 api/api-plugin-halo-run-v1alpha1-plugin-api.ts
+api/api-security-halo-run-v1alpha1-authentication-two-factor-api.ts
 api/api-security-halo-run-v1alpha1-personal-access-token-api.ts
 api/auth-halo-run-v1alpha1-auth-provider-api.ts
 api/auth-halo-run-v1alpha1-user-connection-api.ts
@@ -186,6 +187,7 @@ models/notifier-descriptor.ts
 models/notifier-info.ts
 models/notifier-setting-ref.ts
 models/owner-info.ts
+models/password-request.ts
 models/password-reset-email-request.ts
 models/pat-spec.ts
 models/personal-access-token-list.ts
@@ -283,6 +285,9 @@ models/theme-list.ts
 models/theme-spec.ts
 models/theme-status.ts
 models/theme.ts
+models/totp-auth-link-response.ts
+models/totp-request.ts
+models/two-factor-auth-settings.ts
 models/upgrade-from-uri-request.ts
 models/user-connection-list.ts
 models/user-connection-spec.ts
