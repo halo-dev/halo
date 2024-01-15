@@ -432,14 +432,18 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
     );
 
     const table: DOMOutputSpec = [
-      "table",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
-        style: tableWidth
-          ? `width: ${tableWidth}`
-          : `minWidth: ${tableMinWidth}`,
-      }),
-      colgroup,
-      ["tbody", 0],
+      "div",
+      { style: "overflow-x: auto; overflow-y: hidden;" },
+      [
+        "table",
+        mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+          style: tableWidth
+            ? `width: ${tableWidth}`
+            : `minWidth: ${tableMinWidth}`,
+        }),
+        colgroup,
+        ["tbody", 0],
+      ],
     ];
 
     return table;
