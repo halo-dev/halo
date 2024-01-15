@@ -21,6 +21,7 @@
 
       &:hover {
         &::-webkit-scrollbar {
+          display: block;
           width: 0.5rem;
           height: 0.5rem;
         }
@@ -39,6 +40,10 @@
           border-radius: 1rem;
           background-color: rgba(50, 50, 50, 0.5);
         }
+      }
+
+      &::-webkit-scrollbar {
+        display: none;
       }
     }
 
