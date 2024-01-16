@@ -1,9 +1,8 @@
 package run.halo.app.extension.index.query;
 
 import com.google.common.collect.Sets;
-import java.util.Locale;
 import java.util.NavigableSet;
-import org.thymeleaf.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class StringContains extends SimpleQuery {
     public StringContains(String fieldName, String value) {
@@ -15,7 +14,7 @@ public class StringContains extends SimpleQuery {
         var resultSet = Sets.<String>newTreeSet();
         var fieldValues = indexView.getAllValuesForField(fieldName);
         for (String val : fieldValues) {
-            if (StringUtils.containsIgnoreCase(val, value, Locale.getDefault())) {
+            if (StringUtils.containsIgnoreCase(val, value)) {
                 resultSet.addAll(indexView.getIdsForFieldValue(fieldName, val));
             }
         }

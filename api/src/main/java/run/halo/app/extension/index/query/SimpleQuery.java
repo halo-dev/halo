@@ -6,6 +6,18 @@ import org.springframework.util.Assert;
 public abstract class SimpleQuery implements Query {
     protected final String fieldName;
     protected final String value;
+    /**
+     * <p>Whether the value if a field reference.</p>
+     * <p>For example, {@code fieldName = "salary", value = "cost"} can lead to a query：
+     * <pre>
+     *     salary > cost
+     * </pre>
+     * means that we want to find all the records whose salary is greater than cost.</p>
+     *
+     * @see EqualQuery
+     * @see GreaterThanQuery
+     * @see LessThanQuery
+     */
     protected final boolean isFieldRef;
 
     protected SimpleQuery(String fieldName, String value) {

@@ -62,13 +62,13 @@ public class DefaultIndexer implements Indexer {
     @Override
     public <E extends Extension> void indexRecord(E extension) {
         writeLock.lock();
-        var txn = new IndexerTransactionImpl();
+        var transaction = new IndexerTransactionImpl();
         try {
-            txn.begin();
-            doIndexRecord(extension).forEach(txn::add);
-            txn.commit();
+            transaction.begin();
+            doIndexRecord(extension).forEach(transaction::add);
+            transaction.commit();
         } catch (Throwable e) {
-            txn.rollback();
+            transaction.rollback();
             throw e;
         } finally {
             writeLock.unlock();
@@ -78,14 +78,14 @@ public class DefaultIndexer implements Indexer {
     @Override
     public <E extends Extension> void updateRecord(E extension) {
         writeLock.lock();
-        var txn = new IndexerTransactionImpl();
+        var transaction = new IndexerTransactionImpl();
         try {
-            txn.begin();
+            transaction.begin();
             unIndexRecord(getObjectKey(extension));
             indexRecord(extension);
-            txn.commit();
+            transaction.commit();
         } catch (Throwable e) {
-            txn.rollback();
+            transaction.rollback();
             throw e;
         } finally {
             writeLock.unlock();
@@ -95,13 +95,13 @@ public class DefaultIndexer implements Indexer {
     @Override
     public void unIndexRecord(String extensionName) {
         writeLock.lock();
-        var txn = new IndexerTransactionImpl();
+        var transaction = new IndexerTransactionImpl();
         try {
-            txn.begin();
-            doUnIndexRecord(extensionName).forEach(txn::add);
-            txn.commit();
+            transaction.begin();
+            doUnIndexRecord(extensionName).forEach(transaction::add);
+            transaction.commit();
         } catch (Throwable e) {
-            txn.rollback();
+            transaction.rollback();
             throw e;
         } finally {
             writeLock.unlock();
