@@ -6,6 +6,25 @@
   $tableResizeHandleBgColor: #adf;
 
   .ProseMirror {
+    .table-container {
+      position: relative;
+
+      &.table-right-shadow {
+        &::after {
+          bottom: 15px;
+          background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.08));
+          right: 0;
+          content: " ";
+          position: absolute;
+          pointer-events: none;
+          top: 0;
+          width: 8px;
+          z-index: 2;
+          margin-top: 14px;
+        }
+      }
+    }
+
     .tableWrapper {
       position: relative;
       margin: 0.5em 0px;
@@ -17,33 +36,6 @@
         .scrollWrapper {
           margin-top: -20px;
         }
-      }
-
-      &:hover {
-        &::-webkit-scrollbar {
-          display: block;
-          width: 0.5rem;
-          height: 0.5rem;
-        }
-
-        &::-webkit-scrollbar-thumb {
-          border-radius: 1rem;
-          background-color: rgba(50, 50, 50, 0.3);
-        }
-
-        &::-webkit-scrollbar-track {
-          border-radius: 1rem;
-          background-color: rgba(50, 50, 50, 0.1);
-        }
-
-        &::-webkit-scrollbar-thumb:hover {
-          border-radius: 1rem;
-          background-color: rgba(50, 50, 50, 0.5);
-        }
-      }
-
-      &::-webkit-scrollbar {
-        display: none;
       }
     }
 

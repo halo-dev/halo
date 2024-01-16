@@ -5,10 +5,10 @@ import {
   type Range,
   isNodeActive,
 } from "@/tiptap/vue-3";
-import type {
-  Node as ProseMirrorNode,
-  NodeView,
-  EditorState,
+import {
+  type Node as ProseMirrorNode,
+  type NodeView,
+  type EditorState,
 } from "@/tiptap/pm";
 import TableCell from "./table-cell";
 import TableRow from "./table-row";
@@ -104,15 +104,24 @@ class TableView implements NodeView {
 
   contentDOM: HTMLElement;
 
+  containerDOM: HTMLElement;
+
   constructor(node: ProseMirrorNode, cellMinWidth: number) {
     this.node = node;
     this.cellMinWidth = cellMinWidth;
     this.dom = document.createElement("div");
-    this.dom.className = "tableWrapper";
+    this.dom.className = "table-container";
+
+    this.containerDOM = this.dom.appendChild(document.createElement("div"));
+
+    this.containerDOM.className = "tableWrapper";
+    this.containerDOM.addEventListener("wheel", (e) => {
+      return this.handleHorizontalWheel(this.containerDOM, e);
+    });
 
     this.scrollDom = document.createElement("div");
     this.scrollDom.className = "scrollWrapper";
-    this.dom.appendChild(this.scrollDom);
+    this.containerDOM.appendChild(this.scrollDom);
 
     this.table = this.scrollDom.appendChild(document.createElement("table"));
     this.colgroup = this.table.appendChild(document.createElement("colgroup"));
@@ -127,7 +136,6 @@ class TableView implements NodeView {
 
     this.node = node;
     updateColumns(node, this.colgroup, this.table, this.cellMinWidth);
-
     return true;
   }
 
@@ -139,6 +147,16 @@ class TableView implements NodeView {
       (mutation.target === this.table ||
         this.colgroup.contains(mutation.target))
     );
+  }
+
+  handleHorizontalWheel(dom: HTMLElement, event: WheelEvent) {
+    const { scrollWidth, clientWidth } = dom;
+    const hasScrollWidth = scrollWidth > clientWidth;
+    if (hasScrollWidth) {
+      event.stopPropagation();
+      event.preventDefault();
+      dom.scrollBy({ left: event.deltaY });
+    }
   }
 }
 
