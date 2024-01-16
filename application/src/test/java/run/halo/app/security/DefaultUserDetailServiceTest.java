@@ -5,16 +5,15 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.core.authority.AuthorityUtils.authorityListToSet;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import reactor.core.publisher.Flux;
@@ -101,11 +100,9 @@ class DefaultUserDetailServiceTest {
             .assertNext(gotUser -> {
                 assertEquals(foundUser.getMetadata().getName(), gotUser.getUsername());
                 assertEquals(foundUser.getSpec().getPassword(), gotUser.getPassword());
-                assertEquals(List.of("ROLE_fake-role"),
-                    gotUser.getAuthorities()
-                        .stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .collect(Collectors.toList()));
+                assertEquals(
+                    Set.of("ROLE_fake-role", "ROLE_authenticated", "ROLE_anonymous"),
+                    authorityListToSet(gotUser.getAuthorities()));
             })
             .verifyComplete();
     }
@@ -133,7 +130,11 @@ class DefaultUserDetailServiceTest {
             .assertNext(gotUser -> {
                 assertEquals(foundUser.getMetadata().getName(), gotUser.getUsername());
                 assertEquals(foundUser.getSpec().getPassword(), gotUser.getPassword());
-                assertEquals(0, gotUser.getAuthorities().size());
+                assertEquals(2, gotUser.getAuthorities().size());
+                assertEquals(
+                    Set.of("ROLE_anonymous", "ROLE_authenticated"),
+                    authorityListToSet(gotUser.getAuthorities())
+                );
             })
             .verifyComplete();
     }
@@ -155,7 +156,9 @@ class DefaultUserDetailServiceTest {
             .assertNext(gotUser -> {
                 assertEquals(foundUser.getMetadata().getName(), gotUser.getUsername());
                 assertEquals(foundUser.getSpec().getPassword(), gotUser.getPassword());
-                assertEquals(0, gotUser.getAuthorities().size());
+                assertEquals(
+                    Set.of("ROLE_anonymous", "ROLE_authenticated"),
+                    authorityListToSet(gotUser.getAuthorities()));
             })
             .verifyComplete();
     }
