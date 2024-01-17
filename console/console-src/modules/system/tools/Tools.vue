@@ -23,7 +23,7 @@ const routes = computed(() => {
       <div
         v-for="item in routes"
         :key="item.name"
-        class="group flex min-h-[9rem] cursor-pointer flex-col items-center justify-center space-y-2 rounded-lg border border-dashed bg-white px-4 py-3 shadow transition-all hover:border-solid hover:border-indigo-300"
+        class="group flex min-h-[9rem] cursor-pointer flex-col items-center justify-center space-y-2 rounded-lg bg-white px-4 py-3 shadow transition-all hover:ring-1"
       >
         <div
           class="inline-flex rounded-full bg-indigo-100 p-2 transition-all group-hover:p-2.5"
