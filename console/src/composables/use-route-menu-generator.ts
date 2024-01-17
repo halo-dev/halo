@@ -54,10 +54,6 @@ export function useRouteMenuGenerator(
       ]
     );
 
-    console.log("allRoutes", router.getRoutes());
-
-    console.log("currentRoutes", currentRoutes);
-
     // Flatten and filter child routes
     currentRoutes.forEach((route) => {
       if (route.children.length) {
@@ -84,9 +80,6 @@ export function useRouteMenuGenerator(
     currentRoutes = currentRoutes.filter(
       (route) => !allChildren.find((child) => child.name === route.name)
     );
-
-    console.log(allChildren);
-    console.log(currentRoutes);
 
     // group by menu.group
     menus.value = currentRoutes.reduce((acc, route) => {
