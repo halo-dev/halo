@@ -54,6 +54,8 @@ export function useRouteMenuGenerator(
       ]
     );
 
+    console.log("allRoutes", router.getRoutes());
+
     console.log("currentRoutes", currentRoutes);
 
     // Flatten and filter child routes
