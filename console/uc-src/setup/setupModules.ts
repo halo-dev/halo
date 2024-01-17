@@ -73,8 +73,6 @@ function registerModule(app: App, pluginModule: PluginModule, core: boolean) {
 
     for (const route of pluginModule.ucRoutes) {
       if ("parentName" in route) {
-        // Fuck addRoute
-        // router.addRoute(route.parentName, route.route);
         const parentRoute = router
           .getRoutes()
           .find((item) => item.name === route.parentName);
