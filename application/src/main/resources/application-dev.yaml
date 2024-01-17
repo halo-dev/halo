@@ -40,7 +40,6 @@ springdoc:
     enabled: true
   show-actuator: true
 
-
 management:
   endpoints:
     web:
