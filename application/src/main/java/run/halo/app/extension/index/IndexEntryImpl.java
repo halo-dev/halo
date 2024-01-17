@@ -38,11 +38,8 @@ public class IndexEntryImpl implements IndexEntry {
         var order = indexDescriptor.getSpec().getOrder();
         if (IndexSpec.OrderType.ASC.equals(order)) {
             return KeyComparator.INSTANCE;
-        } else if (IndexSpec.OrderType.DESC.equals(order)) {
-            return Comparator.reverseOrder();
-        } else {
-            throw new IllegalArgumentException("Invalid order: " + order);
         }
+        return KeyComparator.INSTANCE.reversed();
     }
 
     static class KeyComparator implements Comparator<String> {

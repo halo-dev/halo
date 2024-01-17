@@ -138,35 +138,35 @@ class IndexEntryImplTest {
             "moment-1011", "moment-1012", "moment-1013", "moment-1021", "moment-1022",
             "moment-1023"});
 
-        // 测试日期排序
+        // date sort
         strings =
             new String[] {"2022-01-15", "2022-02-01", "2021-12-25", "2022-01-01", "2022-01-02"};
         Arrays.sort(strings, comparator);
         assertThat(strings).isEqualTo(
             new String[] {"2021-12-25", "2022-01-01", "2022-01-02", "2022-01-15", "2022-02-01"});
 
-        // 测试字母和数字混合排序
+        // alphabet and number sort
         strings = new String[] {"abc123", "abc45", "abc9", "abc100", "abc20"};
         Arrays.sort(strings, comparator);
         assertThat(strings).isEqualTo(
             new String[] {"abc9", "abc20", "abc45", "abc100", "abc123"});
 
-        // 测试纯字母排序
+        // test for pure alphabet sort
         strings = new String[] {"xyz", "abc", "def", "abcde", "xyzabc"};
         Arrays.sort(strings, comparator);
         assertThat(strings).isEqualTo(new String[] {"abc", "abcde", "def", "xyz", "xyzabc"});
 
-        // 测试空字符串
+        // test for empty string
         strings = new String[] {"", "abc", "123", "xyz"};
         Arrays.sort(strings, comparator);
         assertThat(strings).isEqualTo(new String[] {"", "123", "abc", "xyz"});
 
-        // 测试相同字符串
+        // test for the same string
         strings = new String[] {"abc", "abc", "abc", "abc"};
         Arrays.sort(strings, comparator);
         assertThat(strings).isEqualTo(new String[] {"abc", "abc", "abc", "abc"});
 
-        // 测试 null 元素
+        // test for null element
         assertThatThrownBy(() -> Arrays.sort(new String[] {null, "abc", "123", "xyz"}, comparator))
             .isInstanceOf(NullPointerException.class);
     }
