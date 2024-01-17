@@ -15,8 +15,7 @@ const ExtensionListKeymap = ListKeymap.extend<ListKeymapOptions>({
       let handled = false;
 
       if (!editor.state.selection.empty) {
-        editor.commands.deleteSelection();
-        return true;
+        return false;
       }
 
       this.options.listTypes.forEach(

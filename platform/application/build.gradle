@@ -21,6 +21,7 @@ ext {
     springDocOpenAPI = "2.3.0"
     lucene = "9.7.0"
     resilience4jVersion = "2.0.2"
+    twoFactorAuth = "1.3"
 }
 
 javaPlatform {
@@ -52,6 +53,7 @@ dependencies {
         api "org.thymeleaf.extras:thymeleaf-extras-springsecurity6"
         api "io.github.resilience4j:resilience4j-spring-boot3:$resilience4jVersion"
         api "io.github.resilience4j:resilience4j-reactor:$resilience4jVersion"
+        api "com.j256.two-factor-auth:two-factor-auth:$twoFactorAuth"
 
         runtime 'org.mariadb:r2dbc-mariadb:1.1.4'
     }
