@@ -36,7 +36,6 @@ const hasSubmenus = computed(() => {
 function handleClick() {
   if (hasSubmenus.value) {
     open.value = !open.value;
-    return;
   }
   emit("select", props.id);
 }
@@ -83,7 +82,8 @@ function handleClick() {
   flex
   select-none
   relative
-  p-2
+  px-2
+  py-[0.4rem]
   font-normal
   rounded-base;
 
@@ -109,21 +109,21 @@ function handleClick() {
   transform: rotate(90deg);
 }
 
-.submenus-show-enter-active {
-  transition: all 0.1s ease-out;
-}
-
+.submenus-show-enter-active,
 .submenus-show-leave-active {
-  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+  transition: all 0.1s ease;
 }
 
 .submenus-show-enter-from,
 .submenus-show-enter-to {
-  transform: translateY(-10px);
   opacity: 0;
 }
 
 .sub-menu-items {
-  @apply pl-5;
+  @apply pl-5 my-1;
+
+  .menu-item-title {
+    @apply p-1.5 text-sm;
+  }
 }
 </style>

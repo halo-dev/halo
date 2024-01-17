@@ -6,6 +6,7 @@ import {
   IconFolder,
   IconMessage,
   IconPages,
+  IconAddCircle,
 } from "@/icons/icons";
 
 const meta: Meta<typeof VMenu> = {
@@ -22,6 +23,7 @@ const meta: Meta<typeof VMenu> = {
       IconMessage,
       IconFolder,
       IconPages,
+      IconAddCircle,
     },
     setup() {
       return {
@@ -41,6 +43,11 @@ const meta: Meta<typeof VMenu> = {
             <template #icon>
               <IconBookRead />
             </template>
+            <VMenuItem title="新文章">
+              <template #icon>
+                <IconBookRead />
+              </template>
+            </VMenuItem>
           </VMenuItem>
           <VMenuItem title="页面">
             <template #icon>

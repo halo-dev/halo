@@ -35,7 +35,8 @@ export function useRouteMenuGenerator(
     return routes;
   }
 
-  function isRouteValid(route) {
+  function isRouteValid(route?: RouteRecordNormalized) {
+    if (!route) return false;
     const { meta } = route;
     if (!meta?.menu) return false;
     return (
@@ -58,20 +59,21 @@ export function useRouteMenuGenerator(
     // Flatten and filter child routes
     currentRoutes.forEach((route) => {
       if (route.children.length) {
-        // @ts-ignore
-        route.children = sortBy(
-          route.children
-            .flatMap((child) => flattenRoutes(child))
-            .map((child) =>
-              currentRoutes.find((item) => item.name === child.name)
-            )
-            .filter(Boolean)
-            .filter((child) => isRouteValid(child)),
-          [
-            (route: RouteRecordRaw) => !route.meta?.core,
-            (route: RouteRecordRaw) => route.meta?.menu?.priority || 0,
-          ]
-        );
+        // Flatten and filter valid routes
+        const flattenedAndValidChildren = route.children
+          .flatMap((child) => flattenRoutes(child))
+          .map((child) =>
+            currentRoutes.find((item) => item.name === child.name)
+          )
+          .filter(Boolean) // filters out falsy values
+          .filter((child) => isRouteValid(child));
+
+        // Sorting the routes
+        // @ts-ignore children must be RouteRecordRaw[], but it is RouteRecordNormalized[]
+        route.children = sortBy(flattenedAndValidChildren, [
+          (route) => !route?.meta?.core,
+          (route) => route?.meta?.menu?.priority || 0,
+        ]);
       }
     });
 
@@ -93,15 +95,17 @@ export function useRouteMenuGenerator(
       const group = acc.find((item) => item.id === menu.group);
       const childRoute = route.children;
 
-      // @ts-ignore
-      const menuChildren: MenuItemType[] = childRoute.map((child) => {
-        return {
-          name: child.meta?.menu?.name,
-          path: child.path,
-          icon: child.meta?.menu?.icon,
-          mobile: child.meta?.menu?.mobile,
-        };
-      });
+      const menuChildren: MenuItemType[] = childRoute
+        .map((child) => {
+          if (!child.meta?.menu) return;
+          return {
+            name: child.meta.menu.name,
+            path: child.path,
+            icon: child.meta.menu.icon,
+            mobile: child.meta.menu.mobile,
+          };
+        })
+        .filter(Boolean) as MenuItemType[];
 
       if (group) {
         group.items?.push({
