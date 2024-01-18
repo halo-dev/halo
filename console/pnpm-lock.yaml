@@ -524,8 +524,8 @@ importers:
         specifier: ^2.1.15
         version: 2.1.15(@tiptap/core@2.1.15)
       '@tiptap/extension-table':
-        specifier: ^2.1.15
-        version: 2.1.15(@tiptap/core@2.1.15)(@tiptap/pm@2.1.15)
+        specifier: 2.2.0-rc.8
+        version: 2.2.0-rc.8(@tiptap/core@2.1.15)(@tiptap/pm@2.1.15)
       '@tiptap/extension-table-row':
         specifier: ^2.1.15
         version: 2.1.15(@tiptap/core@2.1.15)
@@ -6039,8 +6039,8 @@ packages:
       '@tiptap/core': 2.1.15(@tiptap/pm@2.1.15)
     dev: false
 
-  /@tiptap/extension-table@2.1.15(@tiptap/core@2.1.15)(@tiptap/pm@2.1.15):
-    resolution: {integrity: sha512-7mEytHrY7eLaJHyHNwC5l7IXHMTBF2HydCX/sF5Z3oNh63bCGWo/5NjvW6fjJd9B6KQ5yH5ec+gO7uPaf/555w==}
+  /@tiptap/extension-table@2.2.0-rc.8(@tiptap/core@2.1.15)(@tiptap/pm@2.1.15):
+    resolution: {integrity: sha512-o/w+vVG0DIXU6Aal5OXJC/GHwkfazJZ8egBV1dHKyXV2hV4FAmAYpcGQyCpixtZxMTMVq3Ck1kFrbU9v5CqUQQ==}
     peerDependencies:
       '@tiptap/core': ^2.0.0
       '@tiptap/pm': ^2.0.0
