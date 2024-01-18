@@ -57,14 +57,19 @@ export function useRouteMenuGenerator(
     // Flatten and filter child routes
     currentRoutes.forEach((route) => {
       if (route.children.length) {
-        // Flatten and filter valid routes
+        const routesMap = new Map(
+          currentRoutes.map((route) => [route.name, route])
+        );
+
         const flattenedAndValidChildren = route.children
           .flatMap((child) => flattenRoutes(child))
-          .map((child) =>
-            currentRoutes.find((item) => item.name === child.name)
-          )
-          .filter(Boolean) // filters out falsy values
-          .filter((child) => isRouteValid(child));
+          .map((flattenedChild) => {
+            const validRoute = routesMap.get(flattenedChild.name);
+            if (validRoute && isRouteValid(validRoute)) {
+              return validRoute;
+            }
+          })
+          .filter(Boolean); // filters out falsy values
 
         // Sorting the routes
         // @ts-ignore children must be RouteRecordRaw[], but it is RouteRecordNormalized[]
