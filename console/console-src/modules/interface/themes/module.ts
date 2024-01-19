@@ -10,23 +10,24 @@ export default definePlugin({
   routes: [
     {
       path: "/theme",
+      name: "ThemeRoot",
       component: ThemeLayout,
+      meta: {
+        title: "core.theme.title",
+        searchable: true,
+        permissions: ["system:themes:view"],
+        menu: {
+          name: "core.sidebar.menu.items.themes",
+          group: "interface",
+          icon: markRaw(IconPalette),
+          priority: 0,
+        },
+      },
       children: [
         {
           path: "",
           name: "ThemeDetail",
           component: ThemeDetail,
-          meta: {
-            title: "core.theme.title",
-            searchable: true,
-            permissions: ["system:themes:view"],
-            menu: {
-              name: "core.sidebar.menu.items.themes",
-              group: "interface",
-              icon: markRaw(IconPalette),
-              priority: 0,
-            },
-          },
         },
         {
           path: "settings/:group",

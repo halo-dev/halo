@@ -18,8 +18,11 @@ declare module "*.vue" {
 }
 
 declare module "vue-router" {
+  import type { Component } from "vue";
+
   interface RouteMeta {
     title?: string;
+    description?: string;
     searchable?: boolean;
     permissions?: string[];
     core?: boolean;

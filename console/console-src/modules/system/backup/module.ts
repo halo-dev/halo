@@ -9,23 +9,24 @@ export default definePlugin({
   routes: [
     {
       path: "/backup",
+      name: "BackupRoot",
       component: BasicLayout,
+      meta: {
+        title: "core.backup.title",
+        searchable: true,
+        permissions: ["system:migrations:manage"],
+        menu: {
+          name: "core.sidebar.menu.items.backup",
+          group: "system",
+          icon: markRaw(IconServerLine),
+          priority: 4,
+        },
+      },
       children: [
         {
           path: "",
           name: "Backup",
           component: Backups,
-          meta: {
-            title: "core.backup.title",
-            searchable: true,
-            permissions: ["system:migrations:manage"],
-            menu: {
-              name: "core.sidebar.menu.items.backup",
-              group: "system",
-              icon: markRaw(IconServerLine),
-              priority: 4,
-            },
-          },
         },
       ],
     },
