@@ -73,7 +73,6 @@ class ReactiveExtensionClientTest {
 
     @BeforeEach
     void setUp() {
-        client.setReady(true);
         lenient().when(schemeManager.get(eq(FakeExtension.class)))
             .thenReturn(fakeScheme);
         lenient().when(schemeManager.get(eq(fakeScheme.groupVersionKind()))).thenReturn(fakeScheme);
