@@ -42,7 +42,7 @@ export const uploadImage = ({ file, editor }: FileProps) => {
 };
 
 export interface UploadFetchResponse {
-  controller?: AbortController;
+  controller: AbortController;
   onUploadProgress: (progress: number) => void;
   onFinish: (attachment?: Attachment) => void;
   onError: (error: Error) => void;
@@ -59,55 +59,31 @@ const REQUEST_TIMEOUT_MS = 1000 * 60;
  */
 export const uploadFile = async (
   file: File,
-  upload?: (file: File, options?: AxiosRequestConfig) => Promise<Attachment>
-): Promise<UploadFetchResponse> => {
-  const controller = new AbortController();
+  upload: (file: File, options?: AxiosRequestConfig) => Promise<Attachment>,
+  uploadResponse: UploadFetchResponse
+) => {
   const requestTimeoutId = setTimeout(
-    () => controller.abort(),
+    () => uploadResponse.controller.abort(),
     REQUEST_TIMEOUT_MS
   );
-  const { signal } = controller;
+  const { signal } = uploadResponse.controller;
 
-  const response: UploadFetchResponse = {
-    controller: controller,
-    onUploadProgress: (progress) => (callback: (progress: number) => void) => {
-      callback(progress);
+  upload(file, {
+    signal,
+    onUploadProgress(progressEvent) {
+      requestTimeoutId && clearTimeout(requestTimeoutId);
+      const progress = Math.round(
+        (progressEvent.loaded * 100) / progressEvent.total
+      );
+      uploadResponse.onUploadProgress(progress);
     },
-    onFinish:
-      (attachment?: Attachment) =>
-      (callback: (attachment?: Attachment) => void) => {
-        callback(attachment);
-      },
-    onError: (error) => (callback: (error: Error) => void) => {
-      callback(error);
-    },
-  };
-
-  return new Promise((resolve, reject) => {
-    if (!upload) {
-      reject(new Error("upload function is not defined"));
-      return;
-    }
-
-    upload(file, {
-      signal,
-      onUploadProgress(progressEvent) {
-        requestTimeoutId && clearTimeout(requestTimeoutId);
-        const progress = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total
-        );
-        response.onUploadProgress(progress);
-      },
+  })
+    .then((attachment) => {
+      uploadResponse.onFinish(attachment);
     })
-      .then((attachment) => {
-        response.onFinish(attachment);
-      })
-      .catch((error) => {
-        response.onError(error);
-      });
-
-    resolve(response);
-  });
+    .catch((error) => {
+      uploadResponse.onError(error);
+    });
 };
 
 /**

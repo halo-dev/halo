@@ -125,26 +125,27 @@ const handleUploadImage = async (file: File) => {
   originalFile.value = file;
   fileBase64.value = await fileToBase64(file);
   retryFlag.value = false;
+  controller.value = new AbortController();
+  uploadFile(file, props.extension.options.uploadImage, {
+    controller: controller.value,
+    onUploadProgress: (progress) => {
+      uploadProgress.value = progress;
+    },
 
-  const result = await uploadFile(file, props.extension.options.uploadImage);
-  controller.value = result.controller;
-  result.onUploadProgress = (progress) => {
-    uploadProgress.value = progress;
-  };
+    onFinish: (attachment?: Attachment) => {
+      if (attachment) {
+        props.updateAttributes({
+          src: attachment.status?.permalink,
+        });
+      }
 
-  result.onFinish = (attachment?: Attachment) => {
-    if (attachment) {
-      props.updateAttributes({
-        src: attachment.status?.permalink,
-      });
-    }
+      resetUpload();
+    },
 
-    resetUpload();
-  };
-
-  result.onError = () => {
-    retryFlag.value = true;
-  };
+    onError: () => {
+      retryFlag.value = true;
+    },
+  });
 };
 
 const resetUpload = () => {
