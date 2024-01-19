@@ -18,3 +18,4 @@ export * from "./tiptap";
 export * from "./extensions";
 export * from "./components";
 export * from "./utils";
+// TODO: export * from "./types";

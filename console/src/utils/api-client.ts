@@ -76,6 +76,10 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   async (error: AxiosError<ProblemDetail>) => {
+    if (error.code === "ERR_CANCELED") {
+      return Promise.reject(error);
+    }
+
     if (/Network Error/.test(error.message)) {
       // @ts-ignore
       Toast.error(i18n.global.t("core.common.toast.network_error"));

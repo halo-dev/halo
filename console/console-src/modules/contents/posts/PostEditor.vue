@@ -41,6 +41,7 @@ import { useContentSnapshot } from "@console/composables/use-content-snapshot";
 import { useSaveKeybinding } from "@console/composables/use-save-keybinding";
 import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
 import { usePermission } from "@/utils/permission";
+import type { AxiosRequestConfig } from "axios";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -405,7 +406,7 @@ useSaveKeybinding(handleSave);
 useSessionKeepAlive();
 
 // Upload image
-async function handleUploadImage(file: File) {
+async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
   if (!currentUserHasPermission(["uc:attachments:manage"])) {
     return;
   }
@@ -414,11 +415,14 @@ async function handleUploadImage(file: File) {
     await handleSave();
   }
 
-  const { data } = await apiClient.uc.attachment.createAttachmentForPost({
-    file,
-    postName: formState.value.post.metadata.name,
-    waitForPermalink: true,
-  });
+  const { data } = await apiClient.uc.attachment.createAttachmentForPost(
+    {
+      file,
+      postName: formState.value.post.metadata.name,
+      waitForPermalink: true,
+    },
+    options
+  );
   return data;
 }
 </script>
