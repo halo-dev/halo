@@ -48,8 +48,6 @@ export interface UploadFetchResponse {
   onError: (error: Error) => void;
 }
 
-const REQUEST_TIMEOUT_MS = 1000 * 60;
-
 /**
  * Uploads a file with progress monitoring, cancellation support, and callbacks for completion and errors.
  *
@@ -62,16 +60,11 @@ export const uploadFile = async (
   upload: (file: File, options?: AxiosRequestConfig) => Promise<Attachment>,
   uploadResponse: UploadFetchResponse
 ) => {
-  const requestTimeoutId = setTimeout(
-    () => uploadResponse.controller.abort(),
-    REQUEST_TIMEOUT_MS
-  );
   const { signal } = uploadResponse.controller;
 
   upload(file, {
     signal,
     onUploadProgress(progressEvent) {
-      requestTimeoutId && clearTimeout(requestTimeoutId);
       const progress = Math.round(
         (progressEvent.loaded * 100) / progressEvent.total
       );
