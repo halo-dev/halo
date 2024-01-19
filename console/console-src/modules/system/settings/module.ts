@@ -9,22 +9,23 @@ export default definePlugin({
   routes: [
     {
       path: "/settings",
+      name: "SettingsRoot",
       component: BasicLayout,
+      meta: {
+        title: "core.setting.title",
+        permissions: ["system:settings:view"],
+        menu: {
+          name: "core.sidebar.menu.items.settings",
+          group: "system",
+          icon: markRaw(IconSettings),
+          priority: 2,
+        },
+      },
       children: [
         {
           path: "",
           name: "SystemSetting",
           component: SystemSettings,
-          meta: {
-            title: "core.setting.title",
-            permissions: ["system:settings:view"],
-            menu: {
-              name: "core.sidebar.menu.items.settings",
-              group: "system",
-              icon: markRaw(IconSettings),
-              priority: 2,
-            },
-          },
         },
       ],
     },

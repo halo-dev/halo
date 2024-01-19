@@ -73,7 +73,14 @@ function registerModule(app: App, pluginModule: PluginModule, core: boolean) {
 
     for (const route of pluginModule.routes) {
       if ("parentName" in route) {
-        router.addRoute(route.parentName, route.route);
+        const parentRoute = router
+          .getRoutes()
+          .find((item) => item.name === route.parentName);
+        if (parentRoute) {
+          router.removeRoute(route.parentName);
+          parentRoute.children = [...parentRoute.children, route.route];
+          router.addRoute(parentRoute);
+        }
       } else {
         router.addRoute(route);
       }
