@@ -3,12 +3,16 @@ package run.halo.app.extension;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import org.springframework.lang.NonNull;
 import run.halo.app.extension.exception.SchemeNotFoundException;
+import run.halo.app.extension.index.IndexSpecs;
 
 public interface SchemeManager {
 
     void register(@NonNull Scheme scheme);
+
+    void register(@NonNull Scheme scheme, Consumer<IndexSpecs> specsConsumer);
 
     /**
      * Registers an Extension using its type.
@@ -20,6 +24,9 @@ public interface SchemeManager {
         register(Scheme.buildFromType(type));
     }
 
+    default <T extends Extension> void register(Class<T> type, Consumer<IndexSpecs> specsConsumer) {
+        register(Scheme.buildFromType(type), specsConsumer);
+    }
 
     void unregister(@NonNull Scheme scheme);
 

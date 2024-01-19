@@ -2,6 +2,8 @@ package run.halo.app.extension.gc;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -19,6 +21,8 @@ import run.halo.app.extension.ExtensionConverter;
 import run.halo.app.extension.FakeExtension;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.Unstructured;
+import run.halo.app.extension.index.Indexer;
+import run.halo.app.extension.index.IndexerFactory;
 import run.halo.app.extension.store.ExtensionStore;
 import run.halo.app.extension.store.ExtensionStoreClient;
 
@@ -33,6 +37,9 @@ class GcReconcilerTest {
 
     @Mock
     ExtensionConverter converter;
+
+    @Mock
+    IndexerFactory indexerFactory;
 
     @InjectMocks
     GcReconciler reconciler;
@@ -91,10 +98,14 @@ class GcReconcilerTest {
 
         when(converter.convertTo(any())).thenReturn(store);
 
+        var indexer = mock(Indexer.class);
+        when(indexerFactory.getIndexer(any())).thenReturn(indexer);
+
         var result = reconciler.reconcile(createGcRequest());
         assertNull(result);
         verify(converter).convertTo(any());
         verify(storeClient).delete("fake-store-name", 1L);
+        verify(indexer).unIndexRecord(eq(fake.getMetadata().getName()));
     }
 
     GcRequest createGcRequest() {

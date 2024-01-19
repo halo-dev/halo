@@ -4,7 +4,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import run.halo.app.extension.index.IndexedQueryEngine;
 
 /**
  * DelegateExtensionClient fully delegates ReactiveExtensionClient.
@@ -33,6 +35,17 @@ public class DelegateExtensionClient implements ExtensionClient {
     }
 
     @Override
+    public <E extends Extension> List<E> listAll(Class<E> type, ListOptions options, Sort sort) {
+        return client.listAll(type, options, sort).collectList().block();
+    }
+
+    @Override
+    public <E extends Extension> ListResult<E> listBy(Class<E> type, ListOptions options,
+        PageRequest page) {
+        return client.listBy(type, options, page).block();
+    }
+
+    @Override
     public <E extends Extension> Optional<E> fetch(Class<E> type, String name) {
         return client.fetch(type, name).blockOptional();
     }
@@ -55,6 +68,11 @@ public class DelegateExtensionClient implements ExtensionClient {
     @Override
     public <E extends Extension> void delete(E extension) {
         client.delete(extension).block();
+    }
+
+    @Override
+    public IndexedQueryEngine indexedQueryEngine() {
+        return client.indexedQueryEngine();
     }
 
     @Override

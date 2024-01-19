@@ -2,13 +2,12 @@ package run.halo.app.extension.controller;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.function.BiPredicate;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import org.springframework.util.Assert;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
-import run.halo.app.extension.WatcherPredicates;
+import run.halo.app.extension.ExtensionMatcher;
+import run.halo.app.extension.WatcherExtensionMatchers;
 import run.halo.app.extension.controller.Reconciler.Request;
 
 public class ControllerBuilder {
@@ -19,17 +18,17 @@ public class ControllerBuilder {
 
     private Duration maxDelay;
 
-    private Reconciler<Request> reconciler;
+    private final Reconciler<Request> reconciler;
 
     private Supplier<Instant> nowSupplier;
 
     private Extension extension;
 
-    private Predicate<Extension> onAddPredicate;
+    private ExtensionMatcher onAddMatcher;
 
-    private Predicate<Extension> onDeletePredicate;
+    private ExtensionMatcher onDeleteMatcher;
 
-    private BiPredicate<Extension, Extension> onUpdatePredicate;
+    private ExtensionMatcher onUpdateMatcher;
 
     private final ExtensionClient client;
 
@@ -65,19 +64,18 @@ public class ControllerBuilder {
         return this;
     }
 
-    public ControllerBuilder onAddPredicate(Predicate<Extension> onAddPredicate) {
-        this.onAddPredicate = onAddPredicate;
+    public ControllerBuilder onAddMatcher(ExtensionMatcher onAddMatcher) {
+        this.onAddMatcher = onAddMatcher;
         return this;
     }
 
-    public ControllerBuilder onDeletePredicate(Predicate<Extension> onDeletePredicate) {
-        this.onDeletePredicate = onDeletePredicate;
+    public ControllerBuilder onDeleteMatcher(ExtensionMatcher onDeleteMatcher) {
+        this.onDeleteMatcher = onDeleteMatcher;
         return this;
     }
 
-    public ControllerBuilder onUpdatePredicate(
-        BiPredicate<Extension, Extension> onUpdatePredicate) {
-        this.onUpdatePredicate = onUpdatePredicate;
+    public ControllerBuilder onUpdateMatcher(ExtensionMatcher extensionMatcher) {
+        this.onUpdateMatcher = extensionMatcher;
         return this;
     }
 
@@ -107,18 +105,18 @@ public class ControllerBuilder {
         Assert.notNull(reconciler, "Reconciler must not be null");
 
         var queue = new DefaultQueue<Request>(nowSupplier, minDelay);
-        var predicates = new WatcherPredicates.Builder()
-            .withGroupVersionKind(extension.groupVersionKind())
-            .onAddPredicate(onAddPredicate)
-            .onUpdatePredicate(onUpdatePredicate)
-            .onDeletePredicate(onDeletePredicate)
+        var extensionMatchers = WatcherExtensionMatchers.builder(client,
+                extension.groupVersionKind())
+            .onAddMatcher(onAddMatcher)
+            .onUpdateMatcher(onUpdateMatcher)
+            .onDeleteMatcher(onDeleteMatcher)
             .build();
-        var watcher = new ExtensionWatcher(queue, predicates);
+        var watcher = new ExtensionWatcher(queue, extensionMatchers);
         var synchronizer = new RequestSynchronizer(syncAllOnStart,
             client,
             extension,
             watcher,
-            predicates.onAddPredicate());
+            extensionMatchers.onAddMatcher());
         return new DefaultController<>(name, reconciler, queue, synchronizer, minDelay, maxDelay,
             workerCount);
     }
