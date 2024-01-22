@@ -6,7 +6,7 @@ metadata:
     rbac.authorization.halo.run/system-reserved: "true"
   annotations:
     # Currently, yaml definition does not support i18n, please see https://github.com/halo-dev/halo/issues/3573
-    rbac.authorization.halo.run/display-name: "编辑者"
+    rbac.authorization.halo.run/display-name: "文章管理员"
     rbac.authorization.halo.run/dependencies: |
       ["role-template-post-editor"]
 rules: [ ]
