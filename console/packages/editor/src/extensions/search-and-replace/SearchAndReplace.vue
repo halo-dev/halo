@@ -96,42 +96,46 @@ watch(
 
 watch(
   () => replaceTerm.value.trim(),
-  (val, oldVal) =>
-    val === oldVal
-      ? null
-      : updateSearchReplace({
-          setReplaceTerm: val,
-        })
+  (val, oldVal) => {
+    if (val !== oldVal) {
+      updateSearchReplace({
+        setReplaceTerm: val,
+      });
+    }
+  }
 );
 
 watch(
   () => regex.value,
-  (val, oldVal) =>
-    val === oldVal
-      ? null
-      : updateSearchReplace({
-          setRegex: val,
-        })
+  (val, oldVal) => {
+    if (val !== oldVal) {
+      updateSearchReplace({
+        setRegex: val,
+      });
+    }
+  }
 );
 
 watch(
   () => caseSensitive.value,
-  (val, oldVal) =>
-    val === oldVal
-      ? null
-      : updateSearchReplace({
-          setCaseSensitive: val,
-        })
+  (val, oldVal) => {
+    if (val !== oldVal) {
+      updateSearchReplace({
+        setCaseSensitive: val,
+      });
+    }
+  }
 );
 
 watch(
   () => matchWord.value,
-  (val, oldVal) =>
-    val === oldVal
-      ? null
-      : updateSearchReplace({
-          setWholeWord: val,
-        })
+  (val, oldVal) => {
+    if (val !== oldVal) {
+      updateSearchReplace({
+        setMatchWord: val,
+      });
+    }
+  }
 );
 
 const searchInput = ref<HTMLInputElement | null>(null);
