@@ -40,7 +40,6 @@ public class ProblemDetailErrorAttributes implements ErrorAttributes {
     @Override
     public Throwable getError(ServerRequest request) {
         return (Throwable) request.attribute(ERROR_INTERNAL_ATTRIBUTE).stream()
-            .peek(error -> request.attributes().putIfAbsent(ERROR_ATTRIBUTE, error))
             .findFirst()
             .orElseThrow(() -> new IllegalStateException(
                 "Missing exception attribute in ServerWebExchange"));
