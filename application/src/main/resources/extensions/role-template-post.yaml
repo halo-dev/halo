@@ -6,7 +6,7 @@ metadata:
     halo.run/role-template: "true"
   annotations:
     rbac.authorization.halo.run/dependencies: |
-      [ "role-template-view-posts", "role-template-manage-snapshots", "role-template-manage-tags", "role-template-manage-categories" ]
+      [ "role-template-view-posts", "role-template-manage-snapshots", "role-template-manage-tags", "role-template-manage-categories", "role-template-post-author" ]
     rbac.authorization.halo.run/module: "Posts Management"
     rbac.authorization.halo.run/display-name: "Post Manage"
     rbac.authorization.halo.run/ui-permissions: |
