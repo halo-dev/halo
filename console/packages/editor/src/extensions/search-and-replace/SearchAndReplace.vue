@@ -8,8 +8,8 @@ import MdiRegex from "~icons/mdi/regex";
 import MdiArrowUp from "~icons/mdi/arrow-up";
 import MdiArrowDown from "~icons/mdi/arrow-down";
 import MdiClose from "~icons/mdi/close";
-import CodiconReplace from "~icons/codicon/replace";
-import CodiconReplaceAll from "~icons/codicon/replace-all";
+import LucideReplace from "~icons/lucide/replace";
+import LucideReplaceAll from "~icons/lucide/replace-all";
 import { i18n } from "@/locales";
 
 const props = defineProps({
@@ -164,7 +164,7 @@ watch(
               ref="searchInput"
               v-model="searchTerm"
               type="text"
-              class="block w-full p-1 ps-2 !pr-[5.5rem] bg-gray-50 rounded-sm border !border-solid !text-sm !leading-7 border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500"
+              class="block w-full p-1 ps-2 !pr-[5.5rem] bg-gray-50 rounded border !border-solid !text-sm !leading-7 border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500"
               :placeholder="
                 i18n.global.t(
                   'editor.extensions.search_and_replace.search_placeholder'
@@ -293,7 +293,7 @@ watch(
             <input
               v-model="replaceTerm"
               type="text"
-              class="block w-full p-1 ps-2 rounded-sm bg-gray-50 border !border-solid !text-sm !leading-7 border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500"
+              class="block w-full p-1 ps-2 rounded bg-gray-50 border !border-solid !text-sm !leading-7 border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500"
               :placeholder="
                 i18n.global.t(
                   'editor.extensions.search_and_replace.replace_placeholder'
@@ -303,7 +303,7 @@ watch(
               @keydown.enter.prevent="replace"
             />
           </div>
-          <div class="flex items-center mx-2">
+          <div class="flex items-center gap-2 mx-2">
             <button
               :title="
                 i18n.global.t('editor.extensions.search_and_replace.replace')
@@ -316,7 +316,7 @@ watch(
               :disabled="findState.findCount === 0"
               @click="replace"
             >
-              <CodiconReplace></CodiconReplace>
+              <LucideReplace></LucideReplace>
             </button>
             <button
               :title="
@@ -332,7 +332,7 @@ watch(
               :disabled="findState.findCount === 0"
               @click="replaceAll"
             >
-              <CodiconReplaceAll></CodiconReplaceAll>
+              <LucideReplaceAll></LucideReplaceAll>
             </button>
           </div>
         </div>
