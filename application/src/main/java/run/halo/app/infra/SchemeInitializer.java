@@ -1,5 +1,9 @@
 package run.halo.app.infra;
 
+import static run.halo.app.extension.index.IndexAttributeFactory.multiValueAttribute;
+import static run.halo.app.extension.index.IndexAttributeFactory.simpleAttribute;
+
+import java.util.Set;
 import org.springframework.boot.context.event.ApplicationContextInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
@@ -38,6 +42,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.DefaultSchemeWatcherManager;
 import run.halo.app.extension.Secret;
+import run.halo.app.extension.index.IndexSpec;
 import run.halo.app.extension.index.IndexSpecRegistryImpl;
 import run.halo.app.migration.Backup;
 import run.halo.app.plugin.extensionpoint.ExtensionDefinition;
@@ -70,10 +75,83 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
         schemeManager.register(Theme.class);
         schemeManager.register(Menu.class);
         schemeManager.register(MenuItem.class);
-        schemeManager.register(Post.class);
+        schemeManager.register(Post.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.title")
+                .setIndexFunc(simpleAttribute(Post.class, post -> post.getSpec().getTitle())));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.slug")
+                // Compatible with old data, hoping to set it to true in the future
+                .setUnique(false)
+                .setIndexFunc(simpleAttribute(Post.class, post -> post.getSpec().getSlug())));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.publishTime")
+                .setIndexFunc(simpleAttribute(Post.class, post -> {
+                    var publishTime = post.getSpec().getPublishTime();
+                    return publishTime == null ? null : publishTime.toString();
+                })));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.owner")
+                .setIndexFunc(simpleAttribute(Post.class, post -> post.getSpec().getOwner())));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.deleted")
+                .setIndexFunc(simpleAttribute(Post.class, post -> {
+                    var deleted = post.getSpec().getDeleted();
+                    return deleted == null ? "false" : deleted.toString();
+                })));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.pinned")
+                .setIndexFunc(simpleAttribute(Post.class, post -> {
+                    var pinned = post.getSpec().getPinned();
+                    return pinned == null ? "false" : pinned.toString();
+                })));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.priority")
+                .setIndexFunc(simpleAttribute(Post.class, post -> {
+                    var priority = post.getSpec().getPriority();
+                    return priority == null ? "0" : priority.toString();
+                })));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.visible")
+                .setIndexFunc(
+                    simpleAttribute(Post.class, post -> post.getSpec().getVisible().name())));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.tags")
+                .setIndexFunc(multiValueAttribute(Post.class, post -> {
+                    var tags = post.getSpec().getTags();
+                    return tags == null ? Set.of() : Set.copyOf(tags);
+                })));
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.categories")
+                .setIndexFunc(multiValueAttribute(Post.class, post -> {
+                    var categories = post.getSpec().getCategories();
+                    return categories == null ? Set.of() : Set.copyOf(categories);
+                })));
+            indexSpecs.add(new IndexSpec()
+                .setName("status.contributors")
+                .setIndexFunc(multiValueAttribute(Post.class, post -> {
+                    var contributors = post.getStatusOrDefault().getContributors();
+                    return contributors == null ? Set.of() : Set.copyOf(contributors);
+                })));
+            indexSpecs.add(new IndexSpec()
+                .setName("status.categories")
+                .setIndexFunc(
+                    simpleAttribute(Post.class, post -> post.getStatusOrDefault().getExcerpt())));
+            indexSpecs.add(new IndexSpec()
+                .setName("status.phase")
+                .setIndexFunc(
+                    simpleAttribute(Post.class, post -> post.getStatusOrDefault().getPhase())));
+        });
         schemeManager.register(Category.class);
         schemeManager.register(Tag.class);
-        schemeManager.register(Snapshot.class);
+        schemeManager.register(Snapshot.class, indexSpecs -> {
+            indexSpecs.add(new IndexSpec()
+                .setName("spec.subjectRef")
+                .setIndexFunc(simpleAttribute(Snapshot.class,
+                    snapshot -> Snapshot.toSubjectRefKey(snapshot.getSpec().getSubjectRef()))
+                )
+            );
+        });
         schemeManager.register(Comment.class);
         schemeManager.register(Reply.class);
         schemeManager.register(SinglePage.class);

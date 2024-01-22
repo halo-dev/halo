@@ -24,6 +24,22 @@ public class LabelSelector implements Predicate<Map<String, String>> {
             .allMatch(matcher -> matcher.test(labels.get(matcher.getKey())));
     }
 
+    /**
+     * Returns a new label selector that is the result of ANDing the current selector with the
+     * given selector.
+     *
+     * @param other the selector to AND with
+     * @return a new label selector
+     */
+    public LabelSelector and(LabelSelector other) {
+        var labelSelector = new LabelSelector();
+        var matchers = new ArrayList<SelectorMatcher>();
+        matchers.addAll(this.matchers);
+        matchers.addAll(other.matchers);
+        labelSelector.setMatchers(matchers);
+        return labelSelector;
+    }
+
     public static LabelSelectorBuilder builder() {
         return new LabelSelectorBuilder();
     }

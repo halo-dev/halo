@@ -2,6 +2,8 @@ package run.halo.app.core.extension.endpoint;
 
 import static java.lang.Boolean.parseBoolean;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
+import static run.halo.app.extension.index.query.QueryFactory.and;
+import static run.halo.app.extension.index.query.QueryFactory.equal;
 
 import lombok.Data;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
@@ -13,8 +15,11 @@ import reactor.core.publisher.Mono;
 import run.halo.app.core.extension.Counter;
 import run.halo.app.core.extension.User;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataUtil;
+import run.halo.app.extension.PageRequestImpl;
 import run.halo.app.extension.ReactiveExtensionClient;
+import run.halo.app.extension.router.selector.FieldSelector;
 
 /**
  * Stats endpoint.
@@ -67,13 +72,16 @@ public class StatsEndpoint implements CustomEndpoint {
                     stats.setUsers(count.intValue());
                     return stats;
                 }))
-            .flatMap(stats -> client.list(Post.class, post -> !post.isDeleted(), null)
-                .count()
-                .map(count -> {
-                    stats.setPosts(count.intValue());
-                    return stats;
-                })
-            )
+            .flatMap(stats -> {
+                var listOptions = new ListOptions();
+                listOptions.setFieldSelector(FieldSelector.of(
+                    and(equal("metadata.deletionTimestamp", null),
+                        equal("spec.deleted", "false")))
+                );
+                return client.listBy(Post.class, listOptions, PageRequestImpl.ofSize(1))
+                    .doOnNext(list -> stats.setPosts((int) list.getTotal()))
+                    .thenReturn(stats);
+            })
             .flatMap(stats -> ServerResponse.ok().bodyValue(stats));
     }
 

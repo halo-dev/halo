@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationListener;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.content.Category;
@@ -14,6 +15,7 @@ import run.halo.app.core.extension.content.Tag;
 import run.halo.app.extension.AbstractExtension;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.MetadataOperator;
 import run.halo.app.extension.MetadataUtil;
 import run.halo.app.theme.DefaultTemplateEnum;
@@ -52,7 +54,7 @@ public class ExtensionPermalinkPatternUpdater
 
     private void updatePostPermalink(String pattern) {
         log.debug("Update post permalink by new policy [{}]", pattern);
-        client.list(Post.class, null, null)
+        client.listAll(Post.class, new ListOptions(), Sort.unsorted())
             .forEach(post -> updateIfPermalinkPatternChanged(post, pattern));
     }
 

@@ -19,7 +19,7 @@ public class SnapshotServiceImpl implements SnapshotService {
 
     private final ReactiveExtensionClient client;
 
-    private Clock clock;
+    private final Clock clock;
 
     public SnapshotServiceImpl(ReactiveExtensionClient client) {
         this.client = client;

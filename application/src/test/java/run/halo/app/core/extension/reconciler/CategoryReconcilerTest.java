@@ -10,18 +10,19 @@ import static org.mockito.Mockito.verify;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
-import org.json.JSONException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import run.halo.app.content.TestPost;
 import run.halo.app.content.permalinks.CategoryPermalinkPolicy;
 import run.halo.app.core.extension.content.Category;
 import run.halo.app.core.extension.content.Post;
 import run.halo.app.extension.ExtensionClient;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.Metadata;
 import run.halo.app.extension.controller.Reconciler;
 
@@ -43,7 +44,7 @@ class CategoryReconcilerTest {
     private CategoryReconciler categoryReconciler;
 
     @Test
-    void reconcileStatusPostForCategoryA() throws JSONException {
+    void reconcileStatusPostForCategoryA() {
         reconcileStatusPostPilling("category-A");
 
         ArgumentCaptor<Category> captor = ArgumentCaptor.forClass(Category.class);
@@ -54,7 +55,7 @@ class CategoryReconcilerTest {
     }
 
     @Test
-    void reconcileStatusPostForCategoryB() throws JSONException {
+    void reconcileStatusPostForCategoryB() {
         reconcileStatusPostPilling("category-B");
         ArgumentCaptor<Category> captor = ArgumentCaptor.forClass(Category.class);
         verify(client, times(3)).update(captor.capture());
@@ -64,7 +65,7 @@ class CategoryReconcilerTest {
     }
 
     @Test
-    void reconcileStatusPostForCategoryC() throws JSONException {
+    void reconcileStatusPostForCategoryC() {
         reconcileStatusPostPilling("category-C");
         ArgumentCaptor<Category> captor = ArgumentCaptor.forClass(Category.class);
         verify(client, times(3)).update(captor.capture());
@@ -74,7 +75,7 @@ class CategoryReconcilerTest {
     }
 
     @Test
-    void reconcileStatusPostForCategoryD() throws JSONException {
+    void reconcileStatusPostForCategoryD() {
         reconcileStatusPostPilling("category-D");
         ArgumentCaptor<Category> captor = ArgumentCaptor.forClass(Category.class);
         verify(client, times(3)).update(captor.capture());
@@ -89,7 +90,7 @@ class CategoryReconcilerTest {
                 .thenReturn(Optional.of(category));
         });
 
-        lenient().when(client.list(eq(Post.class), any(), any()))
+        lenient().when(client.listAll(eq(Post.class), any(ListOptions.class), any(Sort.class)))
             .thenReturn(posts());
         lenient().when(client.list(eq(Category.class), any(), any()))
             .thenReturn(categories());

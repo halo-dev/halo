@@ -1,11 +1,8 @@
 package run.halo.app.theme.finders.impl;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -15,7 +12,9 @@ import reactor.core.publisher.Mono;
 import run.halo.app.content.ContentWrapper;
 import run.halo.app.content.PostService;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.extension.ListOptions;
 import run.halo.app.extension.ListResult;
+import run.halo.app.extension.PageRequest;
 import run.halo.app.extension.ReactiveExtensionClient;
 import run.halo.app.metrics.CounterService;
 import run.halo.app.metrics.MeterUtils;
@@ -52,13 +51,21 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
     private final ReactiveQueryPostPredicateResolver postPredicateResolver;
 
     @Override
-    public Mono<ListResult<ListedPostVo>> list(Integer page, Integer size,
-        Predicate<Post> postPredicate, Comparator<Post> comparator) {
-        return postPredicateResolver.getPredicate()
-            .map(predicate -> predicate.and(postPredicate == null ? post -> true : postPredicate))
-            .flatMap(predicate -> client.list(Post.class, predicate,
-                comparator, pageNullSafe(page), sizeNullSafe(size))
-            )
+    public Mono<ListResult<ListedPostVo>> list(ListOptions queryOptions, PageRequest page) {
+        return postPredicateResolver.getListOptions()
+            .map(option -> {
+                var fieldSelector = queryOptions.getFieldSelector();
+                if (fieldSelector != null) {
+                    option.setFieldSelector(option.getFieldSelector()
+                        .andQuery(fieldSelector.query()));
+                }
+                var labelSelector = queryOptions.getLabelSelector();
+                if (labelSelector != null) {
+                    option.setLabelSelector(option.getLabelSelector().and(labelSelector));
+                }
+                return option;
+            })
+            .flatMap(listOptions -> client.listBy(Post.class, listOptions, page))
             .flatMap(list -> Flux.fromStream(list.get())
                 .concatMap(post -> convertToListedVo(post)
                     .flatMap(postVo -> populateStats(postVo)
@@ -70,8 +77,9 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
                     postVos)
                 )
             )
-            .defaultIfEmpty(new ListResult<>(page, size, 0L, List.of()));
+            .defaultIfEmpty(ListResult.emptyResult());
     }
+
 
     @Override
     public Mono<ListedPostVo> convertToListedVo(@NonNull Post post) {
@@ -179,13 +187,5 @@ public class PostPublicQueryServiceImpl implements PostPublicQueryService {
                 .build()
             )
             .defaultIfEmpty(StatsVo.empty());
-    }
-
-    int pageNullSafe(Integer page) {
-        return ObjectUtils.defaultIfNull(page, 1);
-    }
-
-    int sizeNullSafe(Integer size) {
-        return ObjectUtils.defaultIfNull(size, 10);
     }
 }
