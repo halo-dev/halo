@@ -129,6 +129,9 @@ public class ListResult<T> implements Iterable<T>, Supplier<Stream<T>> {
      */
     public static <T> List<T> subList(List<T> list, int page, int size) {
         if (page < 1) {
+            page = 1;
+        }
+        if (size < 1) {
             return list;
         }
         List<T> listSort = new ArrayList<>();

@@ -43,4 +43,27 @@ class ListResultTest {
         listResult = new ListResult<>(1, 0, 100, List.of());
         assertEquals(1, listResult.getTotalPages());
     }
+
+    @Test
+    void subListWhenSizeIsZero() {
+        var list = List.of(1, 2, 3, 4, 5);
+        assertSubList(list);
+
+        list = List.of(1);
+        assertSubList(list);
+    }
+
+    private void assertSubList(List<Integer> list) {
+        var result = ListResult.subList(list, 0, 0);
+        assertEquals(list, result);
+
+        result = ListResult.subList(list, 0, 1);
+        assertEquals(list.subList(0, 1), result);
+
+        result = ListResult.subList(list, 0, 0);
+        assertEquals(list, result);
+
+        result = ListResult.subList(list, 1, 0);
+        assertEquals(list, result);
+    }
 }
