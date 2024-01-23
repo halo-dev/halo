@@ -394,11 +394,13 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
         return true;
       }
 
+      const { selection } = editor.state;
       // the node in the current active state is not a table
       // and the previous node is a table
       if (
         !isNodeActive(editor.state, Table.name) &&
-        hasTableBefore(editor.state)
+        hasTableBefore(editor.state) &&
+        selection.empty
       ) {
         editor.commands.selectNodeBackward();
         return true;
