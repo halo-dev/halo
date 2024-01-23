@@ -2,6 +2,7 @@ package run.halo.app.theme.router;
 
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.isNull;
 import static run.halo.app.extension.index.query.QueryFactory.or;
 
 import java.security.Principal;
@@ -48,7 +49,7 @@ public class DefaultQueryPostPredicateResolver implements ReactiveQueryPostPredi
             .eq(Post.PUBLISHED_LABEL, "true").build());
 
         var fieldQuery = and(
-            equal("metadata.deletionTimestamp", null),
+            isNull("metadata.deletionTimestamp"),
             equal("spec.deleted", "false")
         );
         var visibleQuery = equal("spec.visible", Post.VisibleEnum.PUBLIC.name());

@@ -2,6 +2,7 @@ package run.halo.app.core.extension.reconciler;
 
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.isNull;
 
 import java.time.Duration;
 import java.util.ArrayDeque;
@@ -146,7 +147,7 @@ public class CategoryReconciler implements Reconciler<Reconciler.Request> {
 
         var postListOptions = new ListOptions();
         postListOptions.setFieldSelector(FieldSelector.of(
-            and(equal("metadata.deletionTimestamp", null),
+            and(isNull("metadata.deletionTimestamp"),
                 equal("spec.deleted", "false")))
         );
         var posts = client.listAll(Post.class, postListOptions, Sort.unsorted());

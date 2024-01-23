@@ -2,6 +2,7 @@ package run.halo.app.theme.finders.impl;
 
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.isNull;
 
 import lombok.AllArgsConstructor;
 import reactor.core.publisher.Mono;
@@ -52,7 +53,7 @@ public class SiteStatsFinderImpl implements SiteStatsFinder {
             .eq(Post.PUBLISHED_LABEL, "true")
             .build());
         var fieldQuery = and(
-            equal("metadata.deletionTimestamp", null),
+            isNull("metadata.deletionTimestamp"),
             equal("spec.deleted", "false")
         );
         listOptions.setFieldSelector(FieldSelector.of(fieldQuery));

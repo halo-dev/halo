@@ -4,6 +4,7 @@ import static java.lang.Boolean.parseBoolean;
 import static org.springdoc.core.fn.builders.apiresponse.Builder.responseBuilder;
 import static run.halo.app.extension.index.query.QueryFactory.and;
 import static run.halo.app.extension.index.query.QueryFactory.equal;
+import static run.halo.app.extension.index.query.QueryFactory.isNull;
 
 import lombok.Data;
 import org.springdoc.webflux.core.fn.SpringdocRouteBuilder;
@@ -75,7 +76,7 @@ public class StatsEndpoint implements CustomEndpoint {
             .flatMap(stats -> {
                 var listOptions = new ListOptions();
                 listOptions.setFieldSelector(FieldSelector.of(
-                    and(equal("metadata.deletionTimestamp", null),
+                    and(isNull("metadata.deletionTimestamp"),
                         equal("spec.deleted", "false")))
                 );
                 return client.listBy(Post.class, listOptions, PageRequestImpl.ofSize(1))
