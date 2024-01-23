@@ -141,6 +141,10 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
                 .setName("status.phase")
                 .setIndexFunc(
                     simpleAttribute(Post.class, post -> post.getStatusOrDefault().getPhase())));
+            indexSpecs.add(new IndexSpec()
+                .setName("status.excerpt")
+                .setIndexFunc(
+                    simpleAttribute(Post.class, post -> post.getStatusOrDefault().getExcerpt())));
         });
         schemeManager.register(Category.class);
         schemeManager.register(Tag.class);
