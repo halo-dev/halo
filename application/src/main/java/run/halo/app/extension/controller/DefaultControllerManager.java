@@ -20,6 +20,8 @@ public class DefaultControllerManager
 
     private final ExtensionClient client;
 
+    private final boolean disabled;
+
     private ApplicationContext applicationContext;
 
     /**
@@ -28,12 +30,20 @@ public class DefaultControllerManager
     private final ConcurrentHashMap<String, Controller> controllers;
 
     public DefaultControllerManager(ExtensionClient client) {
+        this(client, false);
+    }
+
+    public DefaultControllerManager(ExtensionClient client, boolean disabled) {
         this.client = client;
+        this.disabled = disabled;
         controllers = new ConcurrentHashMap<>();
     }
 
     @Override
     public void start(Reconciler<Request> reconciler) {
+        if (disabled) {
+            return;
+        }
         var builder = new ControllerBuilder(reconciler, client);
         var controller = reconciler.setupWith(builder);
         controllers.put(reconciler.getClass().getName(), controller);
@@ -42,6 +52,9 @@ public class DefaultControllerManager
 
     @Override
     public void stop(Reconciler<Request> reconciler) {
+        if (disabled) {
+            return;
+        }
         var controller = controllers.remove(reconciler.getClass().getName());
         // destroy it
         disposeSilently(controller);
@@ -62,6 +75,9 @@ public class DefaultControllerManager
 
     @Override
     public void destroy() {
+        if (disabled) {
+            return;
+        }
         log.info("Shutting down {} controllers...", controllers.size());
         controllers.forEach((name, controller) -> disposeSilently(controller));
         log.info("Shutdown {} controllers.", controllers.size());
@@ -69,6 +85,9 @@ public class DefaultControllerManager
 
     @Override
     public void onApplicationEvent(ExtensionInitializedEvent event) {
+        if (disabled) {
+            return;
+        }
         // register reconcilers in system after scheme initialized
         applicationContext.<Reconciler<Request>>getBeanProvider(
                 forClassWithGenerics(Reconciler.class, Request.class))
