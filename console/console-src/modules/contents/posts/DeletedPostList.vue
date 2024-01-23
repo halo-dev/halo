@@ -59,11 +59,11 @@ const {
     return data.items;
   },
   refetchInterval: (data) => {
-    const deletingPosts = data?.filter(
+    const deletingPosts = data?.some(
       (post) =>
         !!post.post.metadata.deletionTimestamp || !post.post.spec.deleted
     );
-    return deletingPosts?.length ? 1000 : false;
+    return deletingPosts ? 1000 : false;
   },
 });
 
