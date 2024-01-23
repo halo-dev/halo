@@ -1,13 +1,11 @@
 package run.halo.app.extension.store;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,13 +16,13 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
-class ExtensionStoreClientJPAImplTest {
+class ReactiveExtensionStoreClientImplTest {
 
     @Mock
     ExtensionStoreRepository repository;
 
     @InjectMocks
-    ExtensionStoreClientJPAImpl client;
+    ReactiveExtensionStoreClientImpl client;
 
     @Test
     void listByNamePrefix() {
@@ -36,7 +34,7 @@ class ExtensionStoreClientJPAImplTest {
         when(repository.findAllByNameStartingWith("/registry/posts"))
             .thenReturn(Flux.fromIterable(expectedExtensions));
 
-        var gotExtensions = client.listByNamePrefix("/registry/posts");
+        var gotExtensions = client.listByNamePrefix("/registry/posts").collectList().block();
         assertEquals(expectedExtensions, gotExtensions);
     }
 
@@ -48,7 +46,7 @@ class ExtensionStoreClientJPAImplTest {
         when(repository.findById("/registry/posts/hello-halo"))
             .thenReturn(Mono.just(expectedExtension));
 
-        var gotExtension = client.fetchByName("/registry/posts/hello-halo");
+        var gotExtension = client.fetchByName("/registry/posts/hello-halo").blockOptional();
         assertTrue(gotExtension.isPresent());
         assertEquals(expectedExtension, gotExtension.get());
     }
@@ -62,7 +60,8 @@ class ExtensionStoreClientJPAImplTest {
             .thenReturn(Mono.just(expectedExtension));
 
         var createdExtension =
-            client.create("/registry/posts/hello-halo", "hello halo".getBytes());
+            client.create("/registry/posts/hello-halo", "hello halo".getBytes())
+                .block();
 
         assertEquals(expectedExtension, createdExtension);
     }
@@ -75,18 +74,17 @@ class ExtensionStoreClientJPAImplTest {
         when(repository.save(any())).thenReturn(Mono.just(expectedExtension));
 
         var updatedExtension =
-            client.update("/registry/posts/hello-halo", 1L, "hello halo".getBytes());
+            client.update("/registry/posts/hello-halo", 1L, "hello halo".getBytes())
+                .block();
 
         assertEquals(expectedExtension, updatedExtension);
     }
 
     @Test
-    void shouldThrowEntityNotFoundExceptionWhenDeletingNonExistExt() {
-
+    void shouldDoNotThrowExceptionWhenDeletingNonExistExt() {
         when(repository.findById(anyString())).thenReturn(Mono.empty());
 
-        assertThrows(EntityNotFoundException.class,
-            () -> client.delete("/registry/posts/hello-halo", 1L));
+        client.delete("/registry/posts/hello-halo", 1L).block();
     }
 
     @Test
@@ -97,7 +95,7 @@ class ExtensionStoreClientJPAImplTest {
         when(repository.findById(anyString())).thenReturn(Mono.just(expectedExtension));
         when(repository.delete(any())).thenReturn(Mono.empty());
 
-        var deletedExtension = client.delete("/registry/posts/hello-halo", 2L);
+        var deletedExtension = client.delete("/registry/posts/hello-halo", 2L).block();
 
         assertEquals(expectedExtension, deletedExtension);
     }

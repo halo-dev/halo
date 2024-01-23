@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -21,9 +22,13 @@ import run.halo.app.extension.SchemeWatcherManager.SchemeRegistered;
 import run.halo.app.extension.SchemeWatcherManager.SchemeUnregistered;
 import run.halo.app.extension.SchemeWatcherManager.SchemeWatcher;
 import run.halo.app.extension.exception.SchemeNotFoundException;
+import run.halo.app.extension.index.IndexSpecRegistry;
 
 @ExtendWith(MockitoExtension.class)
 class DefaultSchemeManagerTest {
+
+    @Mock
+    private IndexSpecRegistry indexSpecRegistry;
 
     @Mock
     SchemeWatcherManager watcherManager;
@@ -85,7 +90,7 @@ class DefaultSchemeManagerTest {
         schemeManager.register(FakeExtension.class);
         verify(watcherManager, times(1)).watchers();
         verify(watcher, times(1)).onChange(isA(SchemeRegistered.class));
-
+        verify(indexSpecRegistry).indexFor(any(Scheme.class));
     }
 
     @Test
@@ -105,6 +110,7 @@ class DefaultSchemeManagerTest {
         schemeManager.unregister(scheme);
         verify(watcherManager, times(2)).watchers();
         verify(watcher, times(1)).onChange(isA(SchemeUnregistered.class));
+        verify(indexSpecRegistry).indexFor(any(Scheme.class));
     }
 
     @Test

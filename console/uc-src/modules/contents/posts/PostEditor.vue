@@ -34,6 +34,7 @@ import { provide } from "vue";
 import type { ComputedRef } from "vue";
 import { useSessionKeepAlive } from "@/composables/use-session-keep-alive";
 import { usePermission } from "@/utils/permission";
+import type { AxiosRequestConfig } from "axios";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -334,7 +335,7 @@ function onUpdatePostSuccess(data: Post) {
 }
 
 // Upload image
-async function handleUploadImage(file: File) {
+async function handleUploadImage(file: File, options?: AxiosRequestConfig) {
   if (!currentUserHasPermission(["uc:attachments:manage"])) {
     return;
   }
@@ -359,11 +360,14 @@ async function handleUploadImage(file: File) {
     await onCreatePostSuccess(data);
   }
 
-  const { data } = await apiClient.uc.attachment.createAttachmentForPost({
-    file,
-    postName: formState.value.metadata.name,
-    waitForPermalink: true,
-  });
+  const { data } = await apiClient.uc.attachment.createAttachmentForPost(
+    {
+      file,
+      postName: formState.value.metadata.name,
+      waitForPermalink: true,
+    },
+    options
+  );
   return data;
 }
 

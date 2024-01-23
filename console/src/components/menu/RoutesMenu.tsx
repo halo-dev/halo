@@ -31,7 +31,7 @@ const RoutesMenu = defineComponent({
     function renderIcon(icon: Component | undefined) {
       if (!icon) return undefined;
 
-      return <icon height="20px" width="20px" />;
+      return <icon />;
     }
 
     const { t } = useI18n();
@@ -48,6 +48,8 @@ const RoutesMenu = defineComponent({
                 v-slots={{
                   icon: () => renderIcon(item.icon),
                 }}
+                onSelect={handleSelect}
+                active={openIds.value.includes(item.path)}
               >
                 {renderItems(item.children)}
               </VMenuItem>

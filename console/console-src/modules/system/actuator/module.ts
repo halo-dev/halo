@@ -9,22 +9,24 @@ export default definePlugin({
   routes: [
     {
       path: "/actuator",
+      name: "OverviewRoot", // fixme: actuator will be renamed to overview in the future
       component: BasicLayout,
+      meta: {
+        title: "core.actuator.title",
+        searchable: true,
+        permissions: ["system:actuator:manage"],
+        menu: {
+          name: "core.sidebar.menu.items.actuator",
+          group: "system",
+          icon: markRaw(IconTerminalBoxLine),
+          priority: 3,
+        },
+      },
       children: [
         {
           path: "",
+          name: "Actuator",
           component: Actuator,
-          meta: {
-            title: "core.actuator.title",
-            searchable: true,
-            permissions: ["system:actuator:manage"],
-            menu: {
-              name: "core.sidebar.menu.items.actuator",
-              group: "system",
-              icon: markRaw(IconTerminalBoxLine),
-              priority: 3,
-            },
-          },
         },
       ],
     },

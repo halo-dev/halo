@@ -38,6 +38,7 @@ import run.halo.app.extension.ConfigMap;
 import run.halo.app.extension.DefaultSchemeManager;
 import run.halo.app.extension.DefaultSchemeWatcherManager;
 import run.halo.app.extension.Secret;
+import run.halo.app.extension.index.IndexSpecRegistryImpl;
 import run.halo.app.migration.Backup;
 import run.halo.app.plugin.extensionpoint.ExtensionDefinition;
 import run.halo.app.plugin.extensionpoint.ExtensionPointDefinition;
@@ -49,12 +50,7 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
 
     @Override
     public void onApplicationEvent(@NonNull ApplicationContextInitializedEvent event) {
-        var watcherManager = new DefaultSchemeWatcherManager();
-        var schemeManager = new DefaultSchemeManager(watcherManager);
-
-        var beanFactory = event.getApplicationContext().getBeanFactory();
-        beanFactory.registerSingleton("schemeWatcherManager", watcherManager);
-        beanFactory.registerSingleton("schemeManager", schemeManager);
+        var schemeManager = createSchemeManager(event);
 
         schemeManager.register(Role.class);
 
@@ -105,5 +101,18 @@ public class SchemeInitializer implements ApplicationListener<ApplicationContext
         schemeManager.register(Subscription.class);
         schemeManager.register(NotifierDescriptor.class);
         schemeManager.register(Notification.class);
+    }
+
+    private static DefaultSchemeManager createSchemeManager(
+        ApplicationContextInitializedEvent event) {
+        var indexSpecRegistry = new IndexSpecRegistryImpl();
+        var watcherManager = new DefaultSchemeWatcherManager();
+        var schemeManager = new DefaultSchemeManager(indexSpecRegistry, watcherManager);
+
+        var beanFactory = event.getApplicationContext().getBeanFactory();
+        beanFactory.registerSingleton("indexSpecRegistry", indexSpecRegistry);
+        beanFactory.registerSingleton("schemeWatcherManager", watcherManager);
+        beanFactory.registerSingleton("schemeManager", schemeManager);
+        return schemeManager;
     }
 }

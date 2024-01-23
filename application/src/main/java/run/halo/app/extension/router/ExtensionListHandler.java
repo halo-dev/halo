@@ -25,11 +25,10 @@ class ExtensionListHandler implements ListHandler {
     @NonNull
     public Mono<ServerResponse> handle(@NonNull ServerRequest request) {
         var queryParams = new SortableRequest(request.exchange());
-        return client.list(scheme.type(),
-                queryParams.toPredicate(),
-                queryParams.toComparator(),
-                queryParams.getPage(),
-                queryParams.getSize())
+        return client.listBy(scheme.type(),
+                queryParams.toListOptions(),
+                queryParams.toPageRequest()
+            )
             .flatMap(listResult -> ServerResponse
                 .ok()
                 .contentType(MediaType.APPLICATION_JSON)

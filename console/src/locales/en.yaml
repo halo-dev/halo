@@ -1381,6 +1381,19 @@ core:
         placeholder:
           options:
             placeholder: Enter / to select input type.
+        image:
+          upload:
+            error: Upload failed
+            click_retry: Click to retry
+            loading: Loading
+          attachment:
+            title: Attachment Library
+          permalink:
+            title: Input Link
+            placeholder: Input link and press Enter to confirm
+          operations:
+            replace:
+              button: Replace
       toolbox:
         attachment: Attachment
         show_hide_sidebar: Show/Hide Sidebar

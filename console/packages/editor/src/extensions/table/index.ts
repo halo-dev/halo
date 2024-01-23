@@ -1,14 +1,19 @@
-import TiptapTable, { type TableOptions } from "@tiptap/extension-table";
+import TiptapTable, {
+  type TableOptions,
+  createColGroup,
+} from "@tiptap/extension-table";
 import {
   isActive,
   type Editor,
   type Range,
+  mergeAttributes,
   isNodeActive,
 } from "@/tiptap/vue-3";
 import {
   type Node as ProseMirrorNode,
   type NodeView,
   type EditorState,
+  type DOMOutputSpec,
 } from "@/tiptap/pm";
 import TableCell from "./table-cell";
 import TableRow from "./table-row";
@@ -436,6 +441,30 @@ const Table = TiptapTable.extend<ExtensionOptions & TableOptions>({
 
       "Mod-Backspace": () => handleBackspace(),
     };
+  },
+
+  renderHTML({ node, HTMLAttributes }) {
+    const { colgroup, tableWidth, tableMinWidth } = createColGroup(
+      node,
+      this.options.cellMinWidth
+    );
+
+    const table: DOMOutputSpec = [
+      "div",
+      { style: "overflow-x: auto; overflow-y: hidden;" },
+      [
+        "table",
+        mergeAttributes(this.options.HTMLAttributes, HTMLAttributes, {
+          style: tableWidth
+            ? `width: ${tableWidth}`
+            : `minWidth: ${tableMinWidth}`,
+        }),
+        colgroup,
+        ["tbody", 0],
+      ],
+    ];
+
+    return table;
   },
 }).configure({ resizable: true });
 

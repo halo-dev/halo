@@ -4,6 +4,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import org.springframework.data.domain.Sort;
+import run.halo.app.extension.index.IndexedQueryEngine;
 
 /**
  * ExtensionClient is an interface which contains some operations on Extension instead of
@@ -41,6 +43,11 @@ public interface ExtensionClient {
      */
     <E extends Extension> ListResult<E> list(Class<E> type, Predicate<E> predicate,
         Comparator<E> comparator, int page, int size);
+
+    <E extends Extension> List<E> listAll(Class<E> type, ListOptions options, Sort sort);
+
+    <E extends Extension> ListResult<E> listBy(Class<E> type, ListOptions options,
+        PageRequest page);
 
     /**
      * Fetches Extension by its type and name.
@@ -81,6 +88,8 @@ public interface ExtensionClient {
      * @param <E>       is Extension type.
      */
     <E extends Extension> void delete(E extension);
+
+    IndexedQueryEngine indexedQueryEngine();
 
     void watch(Watcher watcher);
 

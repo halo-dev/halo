@@ -9,24 +9,25 @@ export default definePlugin({
   ucRoutes: [
     {
       path: "/posts",
+      name: "PostsRoot",
       component: BasicLayout,
+      meta: {
+        title: "core.uc_post.title",
+        searchable: true,
+        permissions: ["uc:posts:manage"],
+        menu: {
+          name: "core.uc_sidebar.menu.items.posts",
+          group: "content",
+          icon: markRaw(IconBookRead),
+          priority: 0,
+          mobile: true,
+        },
+      },
       children: [
         {
           path: "",
           name: "Posts",
           component: PostList,
-          meta: {
-            title: "core.uc_post.title",
-            searchable: true,
-            permissions: ["uc:posts:manage"],
-            menu: {
-              name: "core.uc_sidebar.menu.items.posts",
-              group: "content",
-              icon: markRaw(IconBookRead),
-              priority: 0,
-              mobile: true,
-            },
-          },
         },
         {
           path: "editor",

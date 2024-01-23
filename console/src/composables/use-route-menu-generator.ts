@@ -25,27 +25,65 @@ export function useRouteMenuGenerator(
   const roleStore = useRoleStore();
   const { uiPermissions } = roleStore.permissions;
 
+  function flattenRoutes(route: RouteRecordNormalized | RouteRecordRaw) {
+    let routes: (RouteRecordNormalized | RouteRecordRaw)[] = [route];
+    if (route.children) {
+      route.children.forEach((child) => {
+        routes = routes.concat(flattenRoutes(child));
+      });
+    }
+    return routes;
+  }
+
+  function isRouteValid(route?: RouteRecordNormalized) {
+    if (!route) return false;
+    const { meta } = route;
+    if (!meta?.menu) return false;
+    return (
+      !meta.permissions || hasPermission(uiPermissions, meta.permissions, true)
+    );
+  }
+
   const generateMenus = () => {
-    // sort by menu.priority and meta.core
-    const currentRoutes = sortBy<RouteRecordNormalized>(
-      router.getRoutes().filter((route) => {
-        const { meta } = route;
-        if (!meta?.menu) {
-          return false;
-        }
-        if (meta.permissions) {
-          return hasPermission(
-            uiPermissions,
-            meta.permissions as string[],
-            true
-          );
-        }
-        return true;
-      }),
+    // Filter and sort routes based on menu and permissions
+    let currentRoutes = sortBy<RouteRecordNormalized>(
+      router.getRoutes().filter((route) => isRouteValid(route)),
       [
         (route: RouteRecordRaw) => !route.meta?.core,
         (route: RouteRecordRaw) => route.meta?.menu?.priority || 0,
       ]
+    );
+
+    // Flatten and filter child routes
+    currentRoutes.forEach((route) => {
+      if (route.children.length) {
+        const routesMap = new Map(
+          currentRoutes.map((route) => [route.name, route])
+        );
+
+        const flattenedAndValidChildren = route.children
+          .flatMap((child) => flattenRoutes(child))
+          .map((flattenedChild) => {
+            const validRoute = routesMap.get(flattenedChild.name);
+            if (validRoute && isRouteValid(validRoute)) {
+              return validRoute;
+            }
+          })
+          .filter(Boolean); // filters out falsy values
+
+        // Sorting the routes
+        // @ts-ignore children must be RouteRecordRaw[], but it is RouteRecordNormalized[]
+        route.children = sortBy(flattenedAndValidChildren, [
+          (route) => !route?.meta?.core,
+          (route) => route?.meta?.menu?.priority || 0,
+        ]);
+      }
+    });
+
+    // Remove duplicate routes
+    const allChildren = currentRoutes.flatMap((route) => route.children);
+    currentRoutes = currentRoutes.filter(
+      (route) => !allChildren.find((child) => child.name === route.name)
     );
 
     // group by menu.group
@@ -55,19 +93,20 @@ export function useRouteMenuGenerator(
         return acc;
       }
       const group = acc.find((item) => item.id === menu.group);
-      const childRoute = route.children[0];
-      const childMetaMenu = childRoute?.meta?.menu;
+      const childRoute = route.children;
 
-      // only support one level
-      const menuChildren = childMetaMenu
-        ? [
-            {
-              name: childMetaMenu.name,
-              path: childRoute.path,
-              icon: childMetaMenu.icon,
-            },
-          ]
-        : undefined;
+      const menuChildren: MenuItemType[] = childRoute
+        .map((child) => {
+          if (!child.meta?.menu) return;
+          return {
+            name: child.meta.menu.name,
+            path: child.path,
+            icon: child.meta.menu.icon,
+            mobile: child.meta.menu.mobile,
+          };
+        })
+        .filter(Boolean) as MenuItemType[];
+
       if (group) {
         group.items?.push({
           name: menu.name,

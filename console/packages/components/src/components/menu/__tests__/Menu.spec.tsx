@@ -88,7 +88,7 @@ describe("Menu", () => {
       // has sub menu
       if (item.props().id === "3") {
         item.trigger("click");
-        expect(item.emitted().select).toBeUndefined();
+        expect(item.emitted().select).toBeDefined();
 
         expect(item.vm.open).toBe(false);
 

@@ -33,24 +33,25 @@ export default definePlugin({
     },
     {
       path: "/users",
+      name: "UsersRoot",
       component: BasicLayout,
+      meta: {
+        title: "core.user.title",
+        searchable: true,
+        permissions: ["system:users:view"],
+        menu: {
+          name: "core.sidebar.menu.items.users",
+          group: "system",
+          icon: markRaw(IconUserSettings),
+          priority: 1,
+          mobile: true,
+        },
+      },
       children: [
         {
           path: "",
           name: "Users",
           component: UserList,
-          meta: {
-            title: "core.user.title",
-            searchable: true,
-            permissions: ["system:users:view"],
-            menu: {
-              name: "core.sidebar.menu.items.users",
-              group: "system",
-              icon: markRaw(IconUserSettings),
-              priority: 1,
-              mobile: true,
-            },
-          },
         },
         {
           path: ":name",

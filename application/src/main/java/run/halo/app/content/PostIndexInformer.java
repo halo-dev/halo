@@ -12,6 +12,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import run.halo.app.core.extension.content.Post;
+import run.halo.app.extension.DefaultExtensionMatcher;
 import run.halo.app.extension.Extension;
 import run.halo.app.extension.ExtensionClient;
 import run.halo.app.extension.GroupVersionKind;
@@ -53,11 +54,13 @@ public class PostIndexInformer implements ApplicationListener<ApplicationStarted
         postIndexer.addIndexFunc(LABEL_INDEXER_NAME, labelIndexFunc());
 
         this.postWatcher = new PostWatcher();
+        var emptyPost = new Post();
         this.synchronizer = new RequestSynchronizer(true,
             client,
-            new Post(),
+            emptyPost,
             postWatcher,
-            this::checkExtension);
+            DefaultExtensionMatcher.builder(client, emptyPost.groupVersionKind()).build()
+        );
     }
 
     private DefaultIndexer.IndexFunc<Post> labelIndexFunc() {

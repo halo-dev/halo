@@ -2,6 +2,7 @@ package run.halo.app.extension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import run.halo.app.extension.exception.ExtensionConvertException;
 import run.halo.app.extension.exception.SchemaViolationException;
+import run.halo.app.extension.index.IndexSpecRegistry;
 import run.halo.app.extension.store.ExtensionStore;
 
 class JsonExtensionConverterTest {
@@ -26,8 +28,9 @@ class JsonExtensionConverterTest {
     void setUp() {
         localeDefault = Locale.getDefault();
         Locale.setDefault(Locale.ENGLISH);
+        var indexSpecRegistry = mock(IndexSpecRegistry.class);
 
-        DefaultSchemeManager schemeManager = new DefaultSchemeManager(null);
+        DefaultSchemeManager schemeManager = new DefaultSchemeManager(indexSpecRegistry, null);
         converter = new JSONExtensionConverter(schemeManager);
         objectMapper = converter.getObjectMapper();
 
