@@ -62,30 +62,12 @@ public class IndexedQueryEngineImpl implements IndexedQueryEngine {
         return fieldPathEntryMap.get(fieldPath);
     }
 
-    static <T> List<T> paginate(List<T> list, int page, int size) {
-        if (list == null) {
-            return new ArrayList<>();
-        }
-
-        if (size == 0) {
-            return new ArrayList<>(list);
-        }
-
-        int fromIndex = (page - 1) * size;
-        if (fromIndex >= list.size() || fromIndex < 0) {
-            return new ArrayList<>();
-        }
-
-        int toIndex = Math.min(fromIndex + size, list.size());
-        return new ArrayList<>(list.subList(fromIndex, toIndex));
-    }
-
     @Override
     public ListResult<String> retrieve(GroupVersionKind type, ListOptions options,
         PageRequest page) {
         var indexer = indexerFactory.getIndexer(type);
         var allMatchedResult = doRetrieve(indexer, options, page.getSort());
-        var list = paginate(allMatchedResult, page.getPageNumber(), page.getPageSize());
+        var list = ListResult.subList(allMatchedResult, page.getPageNumber(), page.getPageSize());
         return new ListResult<>(page.getPageNumber(), page.getPageSize(),
             allMatchedResult.size(), list);
     }
